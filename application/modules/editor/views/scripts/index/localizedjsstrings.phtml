@@ -166,9 +166,7 @@ Ext.define('Editor.controller.Localizer', {
         item_showRepeatedSegments: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>',
         item_themeMenuConfigText: '<?php echo $this->translate->_('Layout');?>',
         strings: {
-            interfaceTranslation: '<?php echo $this->translate->_('Oberfläche');?>',
-            toggleBookmark: '<?php echo $this->translate->_('Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen');?>',
-            toggleLock: '<?php echo $this->translate->_('Segment sperren bzw. entsperren');?>'
+            interfaceTranslation: '<?php echo $this->translate->_('Oberfläche');?>'
         }
     });
 
@@ -355,7 +353,6 @@ Ext.define('Editor.controller.Localizer', {
 
     Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_scrollToSegment = '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>';
@@ -1986,6 +1983,34 @@ Ext.define('Editor.controller.Localizer', {
     this.initPluginTranslations();
   }
 });
+
+//when all translations in the above way are converted to the JSON way, we can just create a set of JSON files, using the ordinary translation way
+Editor.data.l10n = {
+    segmentGrid: {
+        batchOperations: {
+            loading: {
+                lock: '<?php echo $this->translate->_('Segmente werden gesperrt');?>',
+                unlock: '<?php echo $this->translate->_('Segmente werden entsperrt');?>',
+                bookmark: '<?php echo $this->translate->_('Segmente werden als Favoriten markiert');?>',
+                unbookmark: '<?php echo $this->translate->_('Segmente werden von der Favoritenliste entfernt');?>'
+            },
+            menuText: '<?php echo $this->translate->_('Alle gefilterten Segmente:');?>',
+            menuLock: '<?php echo $this->translate->_('sperren');?>',
+            menuUnlock: '<?php echo $this->translate->_('entsperren');?>',
+            menuBookmark: '<?php echo $this->translate->_('Lesezeichen setzen');?>',
+            menuUnbookmark: '<?php echo $this->translate->_('Lesezeichen entfernen');?>',
+            btnText: '<?php echo $this->translate->_('Aktionen');?>',
+            btnTooltip: '<?php echo $this->translate->_('Auswahl an Aktionen die auf alle Segmente im aktuellen Filterset ausgeführt werden sollen');?>'
+        },
+        toolbar: {
+            btnScrollToSegment: '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>',
+            btnJumpToSegment: '<?php echo $this->translate->_('Springe zu Segment mit Nr (STRG + G)');?>',
+            segmentLockBtn: '<?php echo $this->translate->_('Segment sperren bzw. entsperren (STRG + L)');?>',
+            bookmarkBtn: '<?php echo $this->translate->_('Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen (STRG + D)');?>'
+        }
+    }
+};
+
 <?php
 
 $paths = $this->pluginLocale()->getLocalePaths();

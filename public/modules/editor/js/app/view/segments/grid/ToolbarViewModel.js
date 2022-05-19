@@ -30,6 +30,9 @@ Ext.define('Editor.view.segments.grid.ToolbarViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.segmentsToolbar',
     formulas: {
+        scrollToTooltip: function(get) {
+            return get('isEditingSegment') ? get('l10n.segmentGrid.toolbar.btnScrollToSegment') : get('l10n.segmentGrid.toolbar.btnJumpToSegment');
+        },
         segmentIsWatched: {
             bind: {
                 bindTo: '{selectedSegment}',

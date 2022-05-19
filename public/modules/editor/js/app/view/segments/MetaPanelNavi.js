@@ -59,7 +59,6 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     //Item Strings:
     item_startWatchingSegment: '#UT#Segment auf Lesezeichenliste (STRG + D)',
     item_stopWatchingSegment: '#UT#Segment von Lesezeichenliste entfernen (STRG + D)',
-    item_scrollToSegment: '#UT#Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)',
     item_cancel: '#UT#Abbrechen (ESC)',
     item_reset: '#UT#Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)',
     item_save: '#UT#Speichern (STRG + S)',
@@ -133,12 +132,6 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
                     itemId: 'resetSegmentBtn',
                     tooltip: tooltip(me.item_reset),
                     icon: Editor.data.moduleFolder + 'images/arrow_undo.png',
-                    iconAlign: 'right'
-                }, {
-                    xtype: 'button',
-                    itemId: 'scrollToSegmentBtn',
-                    tooltip: tooltip(me.item_scrollToSegment),
-                    icon: Editor.data.moduleFolder + 'images/scrollTo.png',
                     iconAlign: 'right'
                 }]
             }, {

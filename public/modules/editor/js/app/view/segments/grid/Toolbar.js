@@ -42,7 +42,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     alias: 'widget.segmentsToolbar',
 
     requires: [
-    	'Editor.view.segments.grid.ToolbarViewModel'
+    	'Editor.view.segments.grid.ToolbarViewModel',
+    	'Editor.view.segments.grid.ToolbarViewController'
     ],
     //Item Strings: 
     item_viewModesMenu: '#UT#Ansichtsmodus',
@@ -65,10 +66,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_showRepeatedSegments: '#UT#Nur Segmente mit Wiederholungen anzeigen',
     item_themeMenuConfigText:'#UT#Layout',
     strings:{
-        interfaceTranslation:'#UT#Oberfläche',
-        toggleBookmark: '#UT#Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen',
-        toggleLock: '#UT#Segment sperren bzw. entsperren'
+        interfaceTranslation:'#UT#Oberfläche'
     },
+    controller: 'segmentsToolbar',
     viewModel: {
         type:'segmentsToolbar'
     },
@@ -207,6 +207,17 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'tbseparator',
                 },{
                     xtype: 'button',
+                    itemId: 'scrollToSegmentBtn',
+                    bind: {
+                        tooltip:{
+                            dismissDelay: 0,
+                            text: '{scrollToTooltip}' //is a formula!
+                        }
+                    },
+                    icon: Editor.data.moduleFolder + 'images/scrollTo.png',
+                    iconAlign: 'right'
+                },{
+                    xtype: 'button',
                     itemId: 'bookmarkBtn',
                     enableToggle: true,
                     bind: {
@@ -214,10 +225,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         //if a segment is edited the button in the meta panel must be used
                         disabled: '{isEditingSegment || !selectedSegment}',
                         icon: Editor.data.moduleFolder+'images/{segmentIsWatched ? "star_remove" : "star_add"}.png',
-                    },
-                    tooltip: {
-                        text: me.strings.toggleBookmark,
-                        showDelay: 0
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.bookmarkBtn}',
+                            showDelay: 0
+                        }
                     }
                 },{
                     xtype: 'button',
@@ -228,13 +239,55 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         icon: Editor.data.moduleFolder+'images/{segmentIsEditable ? "lock_open" : "lock"}.png',
                         pressed: '{! segmentIsEditable}',
                         // to reduce problems of update the opened segment we just prohibit usage if a segment is in editing
-                        disabled: '{isEditingSegment || !selectedSegment || segmentIsBlocked}'
+                        disabled: '{isEditingSegment || !selectedSegment || segmentIsBlocked}',
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.segmentLockBtn}',
+                            showDelay: 0
+                        }
                     },
-                    tooltip: {
-                        text: me.strings.toggleLock,
-                        showDelay: 0
+                },{
+                    xtype: 'button',
+                    glyph: 'f141@FontAwesome5FreeSolid',
+                    itemId: 'batchOperations',
+                    bind: {
+                        text: '{l10n.segmentGrid.batchOperations.btnText}',
+                        tooltip: '{l10n.segmentGrid.batchOperations.btnTooltip}',
+                        disabled: '{isEditingSegment}',
+                    },
+                    menu: {
+                        xtype: 'menu',
+                        items: [{
+                            bind: {
+                                text: '{l10n.segmentGrid.batchOperations.menuText}'
+                            }
+                        },{
+                            hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentBatch') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentBatch'),
+                            icon: Editor.data.moduleFolder+'images/lock.png',
+                            operation: 'lock',
+                            bind: {
+                                text: '{l10n.segmentGrid.batchOperations.menuLock}'
+                            }
+                        },{
+                            hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentBatch') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentBatch'),
+                            icon: Editor.data.moduleFolder+'images/lock_open.png',
+                            operation: 'unlock',
+                            bind: {
+                                text: '{l10n.segmentGrid.batchOperations.menuUnlock}'
+                            }
+                        },{
+                            icon: Editor.data.moduleFolder+'images/star_add.png',
+                            operation: 'bookmark',
+                            bind: {
+                                text: '{l10n.segmentGrid.batchOperations.menuBookmark}'
+                            }
+                        },{
+                            icon: Editor.data.moduleFolder+'images/star_remove.png',
+                            operation: 'unbookmark',
+                            bind: {
+                                text: '{l10n.segmentGrid.batchOperations.menuUnbookmark}'
+                            }
+                        }]
                     }
-                
                 },{
                 	xtype: 'tbfill'
                 },{

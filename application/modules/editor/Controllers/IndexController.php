@@ -523,8 +523,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->initCurrentTask();
             // try to use the job of the current user and task, the one with a usedState,
         }
-        // NoAccess is thrown here only of no job with used state was found, this is handled later on getting the initState
+        catch(ZfExtended_Models_Entity_NotFoundException) { //SEE TRANSLATE-2972
+            $this->redirect(APPLICATION_RUNDIR);
+        }
         catch(NoAccessException) {
+            // NoAccess is thrown here only of no job with used state was found, this is handled later on getting the initState
         }
 
         $task = $this->getCurrentTask();  //on no access exception above current task is though set

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\FilteredIterator;
+use MittagQI\Translate5\Segment\Locking;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
@@ -681,16 +683,25 @@ class Editor_SegmentController extends ZfExtended_RestController
     }
 
     /**
+     * @param bool $lock optional, defines if lock or unlock, defaults to true
      * @throws ZfExtended_NoAccessException
      * @throws editor_Models_Segment_Exception
      */
-    public function lockOperation() {
+    public function lockOperation(bool $lock = true) {
+        $acl = $lock ? 'lockSegmentOperation' : 'unlockSegmentOperation';
+
         //the amount of new ACL rules would be huge to handle that lock/unlock Batch/Operations with
         // ordinary controller right handling since currently role editor has access to all methods here.
         // So its easier to double access to that functions for PM users then
-        $this->checkAccess('frontend', 'lockSegmentOperation', __CLASS__.'::'.__FUNCTION__);
+        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockOperation'));
         $this->getAction();
-        $this->toggleEditable(false);
+
+        /* @var Locking $locking */
+        $locking = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Locking');
+        $locking->toggleLock($this->entity, $lock);
+
+        //update the already flushed object with the locked one
+        $this->view->rows = $this->entity->getDataObject();
     }
 
     /**
@@ -698,45 +709,49 @@ class Editor_SegmentController extends ZfExtended_RestController
      * @throws editor_Models_Segment_Exception
      */
     public function unlockOperation() {
-        $this->checkAccess('frontend', 'unlockSegmentOperation', __CLASS__.'::'.__FUNCTION__);
-        $this->getAction();
-        $this->toggleEditable(true);
+        $this->lockOperation(false);
     }
 
     /**
-     * lock / unlocks a segment
-     * @param bool $editable
-     * @throws editor_Models_Segment_Exception
+     * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
-    protected function toggleEditable(bool $editable) {
-        $history = $this->entity->getNewHistoryEntity();
-        $task = editor_ModelInstances::taskByGuid($this->entity->getTaskGuid());
+    public function unlockBatch() {
+        $this->lockBatch(false);
+    }
 
-        //if a segment is locked and lockLocked is set, the editable flag may not be changed
-        if($this->entity->meta()->getLocked() && (bool)$task->getLockLocked()) {
-            return;
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    public function lockBatch(bool $lock = true) {
+        $acl = $lock ? 'lockSegmentBatch' : 'unlockSegmentBatch';
+        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockBatch'));
+
+        /* @var FilteredIterator $segments */
+        $segments = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\FilteredIterator', [
+            $this->getCurrentTask()->getTaskGuid(),
+            $this->entity
+        ]);
+
+        /* @var Locking $locking */
+        $locking = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Locking');
+
+        foreach($segments as $segment) {
+            error_log("FOO. ".$segment->getSegmentNrInTask());
+            try {
+                $locking->toggleLock($segment, $lock);
+            }
+            catch (editor_Models_Segment_Exception) {
+                // we just ignore that segment on processing
+            }
         }
-        $this->entity->setEditable($editable);
-
-        /* @var editor_Models_Segment_AutoStates $autoState */
-        $autoState = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        if($editable) {
-            $autoState->recalculateAndSetOnUnlock($this->entity);
-        }
-        else {
-            $autoState->recalculateAndSetOnLock($this->entity);
-        }
-
-        $history->save();
-        $this->entity->save();
-
-        //update the already flushed (on load outside) object
-        $this->view->rows = $this->entity->getDataObject();
     }
 
     /**
      * returns the mapping between fileIds and segment row indizes
-     * @return array
+     * @return void
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function filemapAction()
     {

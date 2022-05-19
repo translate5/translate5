@@ -148,9 +148,6 @@ Ext.define('Editor.controller.Segments', {
           'segmentsToolbar #segmentLockBtn': {
               click: 'onToggleLockBtn'
           },
-          'segmentsToolbar #bookmarkBtn': {
-              click: 'onToggleBookmarkBtn'
-          },
           'segmentsToolbar #watchListFilterBtn': {
               click: 'watchListFilter'
           },
@@ -325,20 +322,21 @@ Ext.define('Editor.controller.Segments', {
       if (btn.pressed && otherFound) {
           Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
       }
-  },
-
-    onToggleBookmarkBtn: function(button){
-        let vm = button.up('#segmentgrid').getViewModel(),
-            /** @var {Editor.model.Segment} segment */
-            segment = vm.get('selectedSegment');
-        segment && segment.toogleBookmark();
     },
 
-  onToggleLockBtn: function (button) {
-      let vm = button.up('#segmentgrid').getViewModel(),
+  onToggleLockBtn: function () {
+      let grid = this.getSegmentGrid(),
+          vm = grid.getViewModel(),
+          ed = grid && grid.editingPlugin,
           segment = vm.get('selectedSegment'),
-          operation = segment.get('editable') ? 'lock' : 'unlock',
-          appendId = segment.proxy.appendId;
+          operation, appendId;
+
+      //if there is no segment selected or a segment is opened for editing, then we can not (un)lock
+      if(!segment || (ed && ed.editing)) {
+          return;
+      }
+      operation = segment.get('editable') ? 'lock' : 'unlock';
+      appendId = segment.proxy.appendId;
 
       segment.proxy.appendId = false;
       segment.load({

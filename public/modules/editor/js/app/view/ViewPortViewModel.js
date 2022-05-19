@@ -26,25 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.segments.GridViewModel', {
+/**
+ * @class Editor.view.ViewPortViewModel
+ * @extends Ext.app.ViewModel
+ */
+Ext.define('Editor.view.ViewPortViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.segmentsGrid',
+    alias: 'viewmodel.viewport',
     data: {
-        isEditingSegment: false,
-        segmentFinishCount: null,
-        selectedSegment: null
-    },
-    formulas: {
-        taskDescription: function(){
-            return Editor.data.task.get('description');
-        },
-        segmentFinishCountPercent:function(get){
-        	var value=get('segmentFinishCount'),
-        		totalCount=Editor.data.task.get('segmentCount');
-        	if(value>0 && totalCount>0){
-    			value=value/totalCount;
-    		}
-    		return value;
-        }
+        l10n: Editor.data.l10n
     }
 });

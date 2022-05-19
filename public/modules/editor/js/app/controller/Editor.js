@@ -128,6 +128,9 @@ Ext.define('Editor.controller.Editor', {
                 select:'onSegmentGridSelect',
                 segmentSizeChanged:'onSegmentGridSegmentsSizeChanged'
             },
+            '#segmentgrid segmentsToolbar #scrollToSegmentBtn': {
+                click: 'focusSegmentShortcut'
+            },
             '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
             },
@@ -187,10 +190,10 @@ Ext.define('Editor.controller.Editor', {
         me.keyMapConfig = {
             'ctrl-d':         ['D',{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ['S',{ctrl: true, alt: false}, me.save, true],
-            'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
+            'ctrl-g':         ['G',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
-            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
+            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.toggleSegmentLock, true],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -671,10 +674,24 @@ Ext.define('Editor.controller.Editor', {
         this.fireEvent('redo'); // see SnapshotHistory
     },
 
-    /***
-     * Focus the segment given in the prompt window input
+    /**
+     * Handling CTRL-L
      */
-    focusSegmentShortcut:function (){
+    toggleSegmentLock: function() {
+        var segments = Editor.app.getController('Segments');
+        segments && segments.onToggleLockBtn();
+    },
+
+    /**
+     * Focus the segment given in the prompt window input
+     * Handling CTRL-G
+     */
+    focusSegmentShortcut:function (key, ev){
+        if(this.isEditing) {
+            this.scrollToSegment(key, ev);
+            return;
+        }
+
         var me = this,
             prompt = Ext.Msg.prompt('Go to segment', 'No.:', function(btn, text){
             if (btn === 'ok'){
