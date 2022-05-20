@@ -39,7 +39,7 @@ Ext.define('Editor.util.Util', {
         '32': 'trace'
     },
     statics:{
-        
+
         /***
         *
         * @param {Date} date The date to modify
@@ -298,7 +298,13 @@ Ext.define('Editor.util.Util', {
                     .then(responseHandler)
                     .catch(responseHandler);
             });
-        }
-    }
+        },
 
+        // @see https://stackoverflow.com/a/3561711
+        escapeRegex: function(string){
+            return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        },
+
+
+    }
 });
