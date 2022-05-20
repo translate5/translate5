@@ -28,13 +28,21 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     extend: 'Ext.data.Model',
     storeId: 'bconfFilterStore',
     alias: 'model.bconfFilterModel',
+    idProperty: 'okapiId',
     fields: [{
         name: 'id',
         type: 'int',
     }, {
+        name: 'okapiId',
+        type: 'string',
+    }, {
         name: 'bconfId',
         type: 'int',
         reference: 'bconfmodel',
+    }, {
+        name: 'isCustom',
+        type: 'int',
+        defaultValue: 0
     }
     ]
 });

@@ -91,38 +91,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
 
     showFilterGrid: function(){
-        Ext.create('Ext.window.Window', {
+        fw = Ext.create('Editor.plugins.Okapi.view.BconfFilterGrid', {
             constrain: true,
-            title: 'Okapi Filters',
-            tools: [{
-                xtype: 'button',
-                enableToggle: true,
-                toggleHandler: function(btn, toggled){
-                    var filterGrid = btn.up('window').down('filtergrid'),
-                        filterProxy = filterGrid.getStore().getProxy();
-                    var extraParams = filterProxy.getExtraParams() || {};
-                    if(toggled){
-                        extraParams.defaults = 1;
-                    } else {
-                        delete extraParams.defaults;
-                    }
-                    filterProxy.setExtraParams(extraParams);
-                    filterGrid.getStore().reload();
-                },
-                text: '#UT#Show Okapi Defaults Filters',
-            }, {
-                xtype: 'tbspacer',
-                flex: 9
-            }],
             modal: true,
+            //renderTo: this.getView().up('viewport'),
+            floating: true,
+            closable: true,
             height: window.innerHeight - 50,
             width: window.innerWidth - 50,
-            resizable: true,
-            layout: 'fit',
+            maximizable: true,
             //height: '95%',
             //width: '95%',
             resizable: true,
-            items: [Ext.create('Editor.plugins.Okapi.view.BconfFilterGrid', {})]
         }).show();
     },
 
@@ -300,8 +280,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
 
     loadOkapiFilters: function(bconfGrid){
-        debugger;
-        Ext.create('Editor.plugins.Okapi.store.OkapiBconfFilterStore');
+        Ext.create('Editor.plugins.Okapi.store.DefaultBconfFilterStore');
     },
 
     createInfoSpan: function(json){

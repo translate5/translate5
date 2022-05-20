@@ -27,28 +27,27 @@
 
 /**
  * Store for the Okapi and Translate5 filters
- * @class Editor.plugins.Okapi.store.OkapiBconfFilterStore
+ * @class Editor.plugins.Okapi.store.DefaultBconfFilterStore
  * @extends Ext.data.Store
  */
-Ext.define('Editor.plugins.Okapi.store.OkapiBconfFilterStore', {
+Ext.define('Editor.plugins.Okapi.store.DefaultBconfFilterStore', {
     extend: 'Ext.data.Store',
-    storeId: 'bconfFilterStore',
-    alias: 'model.okapiBconfFilterStore',
+    storeId: 'defaultBconfFilterStore',
+    alias: 'model.DefaultBconfFilterStore',
     model: 'Editor.plugins.Okapi.model.BconfFilterModel',
     autoLoad: true,
     pageSize: 0,
     idProperty: 'id',
     proxy: {
         type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconffilter/okapi',
+        url: Editor.data.restpath + 'plugins_okapi_bconffilter/getdefaultfilters',
         reader: {
             rootProperty: 'rows',
-            type: 'json'
+            type: 'json',
+            transform: function(data){
+                data.rows = Object.values(data.rows);
+                return data;
+            },
         }
     },
-    data: [{
-        name: 'okapi',
-        extensions: 'doc',
-        description: 'new filter'
-    }]
 });

@@ -1,0 +1,9 @@
+.docx	okf_openxml@translate5
+.odp	okf_openoffice@translate5
+.ods	okf_openoffice@translate5
+.odt	okf_openoffice@translate5
+.pptx	okf_openxml@translate5
+.sdlxliff	okf_xliff@translate5-sdl
+.strings	okf_regex@translate5-macStrings
+.tbx	okf_xml@translate5-tbx-translate-definitions-setup-ITS
+.xlsx	okf_openxml@translate5

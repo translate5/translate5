@@ -28,12 +28,15 @@
 Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     extend: 'Ext.grid.Panel',
     requires: [
+        'Editor.plugins.Okapi.view.BconfFilterGridController',
         'Editor.plugins.Okapi.store.BconfFilterStore'
     ],
-    alias: 'widget.filtergrid',
+    alias: 'widget.bconffiltergrid',
+    controller: 'bconfFilterGridController',
     plugins: ['gridfilters'],
     helpSection: 'useroverview',
     cls: 'actionColGrid',
+    title: {text: 'Okapi Filters', flex: 0},
     text_cols: {
         customFilterName: '#UT#Customized Okapi Filter Type',
         name: '#UT#Name',
@@ -71,6 +74,35 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                 return true;
             },
             config = {
+                header: {
+                    defaults: {margin: '0 10 0'},
+                    items: [{
+                        xtype: 'button',
+                        reference: 'defaultsFilterBtn',
+                        enableToggle: true,
+                        toggleHandler: 'toggleDefaultsFilter',
+                        text: '#UT#Show Okapi Defaults Filters',
+                    }, {
+                        xtype: 'textfield',
+                        width: 300,
+                        flex: 1,
+                        emptyText: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.searchEmptyText,
+                        triggers: {
+                            clear: {
+                                cls: Ext.baseCSSPrefix + 'form-clear-trigger',
+                                handler: field => field.setValue(null) || field.focus(),
+                                hidden: true
+                            }
+                        },
+                        listeners: {
+                            change: 'filterByText',
+                            buffer: 300
+                        }
+                    }, {
+                        xtype: 'tbspacer',
+                        flex: 1
+                    }]
+                },
                 columns: [{
                     xtype: 'gridcolumn',
                     dataIndex: 'name',
@@ -80,6 +112,17 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         type: 'string'
                     },
                     text: me.text_cols.name
+                }, {
+                    xtype: 'gridcolumn',
+                    dataIndex: 'okapiId',
+                    width: 300,
+
+                    text: 'okapiId'
+                }, {
+                    xtype: 'gridcolumn',
+                    dataIndex: 'mimeType',
+                    width: 300,
+                    text: 'mimeType'
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'extensions',
@@ -109,7 +152,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         isAllowedFor: 'bconfEdit',
                         glyph: 'f044@FontAwesome5FreeSolid',
                         handler: 'editbconf'
-                    },{
+                    }, {
                         tooltip: me.strings.configuration,
                         isAllowedFor: 'bconfEdit',
                         glyph: 'f24d@FontAwesome5FreeSolid',
@@ -122,7 +165,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     }], itemFilter)
                 }],
             };
-        return me.callParent([config]);
+        return me.callParent([Ext.apply(config, instanceConfig)]);
     },
 
 });

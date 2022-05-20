@@ -1,4 +1,3 @@
-
 /*
  START LICENSE AND COPYRIGHT
 
@@ -39,5 +38,47 @@
 Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.bconfFilterGridController',
+    listen: {
+        store: {
+            'bconfFilterStore': {
+                load: 'addDefaults'
+            }
+        }
+    },
+    control: {
+        '#': { // # references the view
+
+        },
+    },
+
+    addDefaults: function(store, records){
+        // Show defaultFilters if no others are present
+        if(records.length === 0){
+            this.lookupReference('defaultsFilterBtn').setPressed(true)
+        }
+        // Add default BconfFilters
+        var defaultBconfFilters = Ext.getStore('defaultBconfFilterStore').getData().items
+        store.loadRecords(defaultBconfFilters, {addRecords: true})
+    },
+
+    filterByText: function(field, searchString){
+        var store = this.getView().getStore(),
+            searchFilterValue = searchString.trim();
+        store.clearFilter();
+        if(searchFilterValue){
+            var searchRE = new RegExp(searchFilterValue, 'i');
+            store.filterBy(({data}) => searchRE.exec(JSON.stringify(data)));
+        }
+        field.getTrigger('clear').setVisible(searchFilterValue);
+    },
+
+    toggleDefaultsFilter: function(btn, toggled){
+        var store = this.getView().getStore();
+        if(toggled){
+            store.removeFilter('defaultsFilter')
+        } else {
+            store.addFilter(store.defaultsFilter)
+        }
+    }
 
 });
