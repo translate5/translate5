@@ -105,7 +105,7 @@ class editor_Segment_Numbers_Check {
         $target = strip_tags($target);
 
         // Get source and target language
-        preg_match('~ - (.+?) / (.+?)$~', $task->getTaskName(), $m);
+        preg_match('~ - ([^ ]+?) / (.+?)$~', $task->getTaskName(), $m);
 
         // Run check
         $states = numbers_check($source, $target, $m[1], $m[2]);

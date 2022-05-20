@@ -952,8 +952,8 @@ function getRealTags($seg, $tagDefs)
         if ((preg_match('!^</g>$!', $currentTag, $m1)) && (preg_match("!^<g id=\"([A-Za-z0-9\-\._]+)\"([^>])*?>$!", $previousTag, $m))) {
             $tagID = $m[1];
 
-            $realOpenTag = $tagDefs['bptTags'][$tagID];
-            $realCloseTag = $tagDefs['eptTags'][$tagID];
+            $realOpenTag = $tagDefs['bptTags'][$tagID] ?? '';
+            $realCloseTag = $tagDefs['eptTags'][$tagID] ?? '';
 
             $tagPair2 = $realOpenTag . '|' . $realCloseTag;
 
