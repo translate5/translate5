@@ -88,6 +88,7 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
 
     /**
      * Provides validating a list of DOMchildren to be the inner elements of a proper internal tag
+     * This API is only needed where it is not known, if we deal with translate5 segment text or common markup (e.g. via InstantTranslate)
      * @param DOMNodeList|null $domChildren
      * @return bool
      */
@@ -107,6 +108,7 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
     }
     /**
      * Provides validating an array of HtmlNode children to be the inner elements of a proper internal tag
+     * This API is only needed where it is not known, if we deal with translate5 segment text or common markup (e.g. via InstantTranslate)
      * @param AbstractNode[]|null $htmlChildren
      */
     public static function htmlNodeChildrenAreInternalTagChildren(array $htmlChildren=NULL){

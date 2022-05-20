@@ -35,24 +35,58 @@ namespace MittagQI\Translate5\Segment\TagRepair;
 class InternalTag extends Tag {
 
     /**
-     * Internal flag that tells us, if in the unparsing phace we successfully intercepted the unparsing of tags
-     * If not, then as a fallback we act just as a normal repairTag
+     * Internal flag that tells us, if we have already been sequenced
      * @var bool
      */
-    private bool $wasHandled = false;
+    private bool $wasSequenced = false;
 
+    /**
+     * As soon as our internal spans are added we act as singular tags
+     * {@inheritDoc}
+     * @see editor_Tag::isSingular()
+     */
     public function isSingular() : bool {
-        return ($this->singular || $this->wasHandled);
+        return ($this->wasSequenced);
     }
     /**
-     * Overwritten to ensure, all APIs work as expected
-     * @return bool
+     * Internal tags must not be splitted nor joined !
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::isSplitable()
      */
-    public function hasChildren(){
-        if($this->wasHandled){
-            return false;
-        }
-        return parent::hasChildren();
+    public function isSplitable() : bool {
+        return false;
+    }
+    /**
+     * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
+     * {@inheritDoc}
+     * @see \editor_Tag::getText()
+     */
+    public function getText(){
+        return '';
+    }
+    /**
+     * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
+     * {@inheritDoc}
+     * @see \editor_Tag::getTextLength()
+     */
+    public function getTextLength(){
+        return 0;
+    }
+    /**
+     * Must be overwritten to ensure, the internal tag does add it's text nor text-length to the field-tags
+     * {@inheritDoc}
+     * @see \editor_Tag::getLastChildsTextLength()
+     */
+    public function getLastChildsTextLength() : int {
+        return 0;
+    }
+    /**
+     * Must be overwritten to ensure it's working correct within the Repair Tags logic
+     * @param Tags $tags
+     * @return int
+     */
+    public function getNumWords(Tags $tags) : int {
+        return 0;
     }
     /**
      * {@inheritDoc}
@@ -60,64 +94,25 @@ class InternalTag extends Tag {
      * @return InternalTag|Tag
      */
     protected function createBaseClone(){
-        if($this->wasHandled){
-            return new InternalTag($this->startIndex, $this->endIndex, $this->category, $this->name);
-        }
-        return new Tag($this->startIndex, $this->endIndex, $this->category, $this->name);
-    }
-    /**
-     * @param Tags $tags
-     * @return int
-     */
-    public function getNumWords(Tags $tags) : int {
-        if($this->wasHandled){
-            return 0;
-        }
-        return parent::getNumWords($tags);
+        return new InternalTag($this->startIndex, $this->endIndex, $this->category, $this->name);
     }
 
-
-    /* unparsing API */
+    /* Sequencing API */
 
     /**
-     * We intercept the unparsing and save the passed nodes as our internal content
-     * It is ensured here, that two span's are passed...
-     * @param \DOMNodeList $domElementChildren
-     * @param editor_TagSequence $tagSequence
-     * @return bool
+     * We process all our children here as internal/lateral markup
+     * {@inheritDoc}
+     * @see Tag::prepareSequencing()
      */
-    public function handleDomElementChildrenInternally(\DOMNodeList $domElementChildren, \editor_TagSequence $tagSequence) : bool {
-        try {
-            $span1 = $tagSequence->createUnchainedTagFromDomElement($domElementChildren->item(0));
-            $span2 = $tagSequence->createUnchainedTagFromDomElement($domElementChildren->item(1));
-            $this->afterStartMarkup = $span1->render().$span2->render();
-            $this->wasHandled = true;
-            $this->singular = true;
-            return true;
-        } catch (Exception $e) {
-            // we will act as a normal Tag when we could not intercept the children
-            return false;
+    public function prepareSequencing(){
+        $this->afterStartMarkup = '';
+        if($this->hasChildren()){
+            foreach($this->children as $child){
+                $this->afterStartMarkup .= $child->render();
+            }
         }
-    }
-    /**
-     * We intercept the unparsing and save the passed nodes as our internal content
-     * It is ensured here, that two span's are passed...
-     * @param array|null $htmlNodeChildren
-     * @param editor_TagSequence $tagSequence
-     * @return bool
-     */
-    public function handleHtmlNodeChildrenInternally(array $htmlNodeChildren, \editor_TagSequence $tagSequence) : bool {
-        try {
-            $span1 = $tagSequence->createUnchainedTagFromHtmlNode($htmlNodeChildren[0]);
-            $span2 = $tagSequence->createUnchainedTagFromHtmlNode($htmlNodeChildren[1]);
-            $this->afterStartMarkup = $span1->render().$span2->render();
-            $this->wasHandled = true;
-            $this->singular = true;
-            return true;
-        } catch (Exception $e) {
-            // we will act as a normal Tag when we could not intercept the children
-            return false;
-        }
+        $this->children = [];
+        $this->wasSequenced = true;
     }
 
     /* Request Rendering API */
@@ -127,20 +122,14 @@ class InternalTag extends Tag {
      * @return string
      */
     public function renderForRequest() : string {
-        if($this->wasHandled){
-            return $this->renderRequestTag('singular');
-        }
-        return parent::renderForRequest();
+        return $this->renderRequestTag('singular');
     }
     /**
      * renders the children for request
      * @return string
      */
     public function renderChildrenForRequest() : string {
-        if($this->wasHandled){
-            return '';
-        }
-        return parent::renderChildrenForRequest();
+        return '';
     }
 
     /* Rendering API */
@@ -151,30 +140,13 @@ class InternalTag extends Tag {
      * @return string
      */
     protected function renderStart(bool $withDataAttribs=true) : string {
-        if($this->wasHandled) {
-            return '<' . $this->getName() . $this->renderAttributes($withDataAttribs) . '>' . $this->afterStartMarkup . '</' . $this->getName() . '>';
-        }
-        return parent::renderStart($withDataAttribs);
+        return '<' . $this->getName() . $this->renderAttributes($withDataAttribs) . '>' . $this->afterStartMarkup . '</' . $this->getName() . '>';
     }
     /**
      * No end-tag needed if handled
      * @return string
      */
     protected function renderEnd() : string {
-        if($this->wasHandled) {
-            return '';
-        }
-        return parent::renderEnd();
-    }
-    /**
-     * No renderable children if handled
-     * @param array|null $skippedTypes
-     * @return string
-     */
-    public function renderChildren(array $skippedTypes=NULL) : string {
-        if($this->wasHandled) {
-            return '';
-        }
-        return parent::renderChildren($skippedTypes);
+        return '';
     }
 }
