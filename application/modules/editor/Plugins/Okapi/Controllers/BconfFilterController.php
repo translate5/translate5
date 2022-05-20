@@ -62,15 +62,20 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             $okapiId = substr($fprm, 0 ,-5); // remove .fprm
             // okf_xml@translate5-AndroidStrings -> okf_xml-AndroidStrings
             $parentId = str_replace('@translate5', '',$okapiId);
-            if($parentId){
-                $row = $rows[$parentId];
+            $row = @$rows[$parentId];
+            if($row){
                 $row['okapiId'] = $okapiId;
                 $rows[$parentId] = $row;
             } else {
                 // okf_xml@translate5-tbx-translate-definitions-setup-ITS.fprm -> okf_xml
-                $parentId = substr($okapiId,0,strpos($okapiId,'@translate5'));
+                $t5Pos = strpos($okapiId, '@translate5-');
+                $parentId = substr($okapiId,0, $t5Pos);
+                $name = substr($okapiId,$t5Pos+12);
                 $row = $rows[$parentId];
                 $row['okapiId'] = $okapiId;
+                if($name){
+                    $row['name'] = ucfirst($name);
+                }
                 $rows[$okapiId] = $row;
             }
             //TODO: extension mapping
