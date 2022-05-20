@@ -104,14 +104,17 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
                     // Do check
                     $check = new editor_Segment_Numbers_Check($task, $target->getField(), $segment);
 
-                    // Collect distinct states
-                    $states += $check->getStates();
-                }
-            }
+                    // Get messages grouped by message type
+                    foreach ($check->getStates() as $state => $mqmA) {
 
-            // Process check results
-            foreach (array_keys($states) as $state) {
-                $tags->addQuality('target', static::$type, $state);
+                        // Foreach message
+                        foreach ($mqmA as $mqm) {
+
+                            // Add quality. Multiple qualities of same kind can be added for same target
+                            $tags->addQuality($target->getField(), static::$type, $state);
+                        }
+                    }
+                }
             }
         }
 
@@ -151,8 +154,17 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      */
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
-            case editor_Segment_Numbers_Check::NUM1: return $translate->_('Unstimmigkeiten in SRC vs TRG');
-            case editor_Segment_Numbers_Check::NUM2: return $translate->_('Alphanum. Zeichenfolge in SRC ≠ TRG');
+            case editor_Segment_Numbers_Check::NUM1: return $translate->_('Zahlen SRC ≠ TRG');
+            case editor_Segment_Numbers_Check::NUM2: return $translate->_('Alphanumerische Zeichenfolgen');
+            case editor_Segment_Numbers_Check::NUM3: return $translate->_('Formatänderung (Datumsangaben u.ä.)');
+            case editor_Segment_Numbers_Check::NUM4: return $translate->_('Trenner nicht lokalisiert');
+            case editor_Segment_Numbers_Check::NUM5: return $translate->_('Formatierung 1000er-Zahl geändert');
+            case editor_Segment_Numbers_Check::NUM6: return $translate->_('Unterschiedliche Minuszeichen');
+            case editor_Segment_Numbers_Check::NUM7: return $translate->_('Trenner aus SRC geändert');
+            case editor_Segment_Numbers_Check::NUM8: return $translate->_('Zahlwort aus SRC als Zahl in TRG gefunden');
+            case editor_Segment_Numbers_Check::NUM9: return $translate->_('Zahl aus SRC als Zahlwort in TRG gefunden');
+            case editor_Segment_Numbers_Check::NUM10: return $translate->_('Formatänderung (Ordinalzahlen, führende Null u.ä.)');
+            case editor_Segment_Numbers_Check::NUM11: return $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall');
         }
         return NULL;
     }
@@ -166,10 +178,6 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      * @return string|null
      */
     public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch($category){
-            case editor_Segment_Numbers_Check::NUM1: return $translate->_('Unstimmigkeiten in SRC vs TRG, bitte auch Trenner prüfen');
-            case editor_Segment_Numbers_Check::NUM2: return $translate->_('Alphanum. Zeichenfolge in SRC ≠ TRG');
-        }
         return '';
     }
 
@@ -183,6 +191,15 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
         return [
             editor_Segment_Numbers_Check::NUM1,
             editor_Segment_Numbers_Check::NUM2,
+            editor_Segment_Numbers_Check::NUM3,
+            editor_Segment_Numbers_Check::NUM4,
+            editor_Segment_Numbers_Check::NUM5,
+            editor_Segment_Numbers_Check::NUM6,
+            editor_Segment_Numbers_Check::NUM7,
+            editor_Segment_Numbers_Check::NUM8,
+            editor_Segment_Numbers_Check::NUM9,
+            editor_Segment_Numbers_Check::NUM10,
+            editor_Segment_Numbers_Check::NUM11,
         ];
     }
 }

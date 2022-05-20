@@ -42,6 +42,51 @@ class editor_Segment_Numbers_Check {
     const NUM2 = 'num2';
 
     /**
+     * @var string
+     */
+    const NUM3 = 'num3';
+
+    /**
+     * @var string
+     */
+    const NUM4 = 'num4';
+
+    /**
+     * @var string
+     */
+    const NUM5 = 'num5';
+
+    /**
+     * @var string
+     */
+    const NUM6 = 'num6';
+
+    /**
+     * @var string
+     */
+    const NUM7 = 'num7';
+
+    /**
+     * @var string
+     */
+    const NUM8 = 'num8';
+
+    /**
+     * @var string
+     */
+    const NUM9 = 'num9';
+
+    /**
+     * @var string
+     */
+    const NUM10 = 'num10';
+
+    /**
+     * @var string
+     */
+    const NUM11 = 'num11';
+
+    /**
      * @var array
      */
     private $states = [];
@@ -59,8 +104,16 @@ class editor_Segment_Numbers_Check {
         $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
         $target = strip_tags($target);
 
-        //
-        $this->states += numbers_check($source, $target, 'en', 'de');
+        // Get source and target language
+        preg_match('~ - (.+?) / (.+?)$~', $task->getTaskName(), $m);
+
+        // Run check
+        $states = numbers_check($source, $target, $m[1], $m[2]);
+
+        // Foreach problem type
+        foreach ($states as $state => $mqmA) {
+            $this->states[$state] = $mqmA;
+        }
     }
 
     /**

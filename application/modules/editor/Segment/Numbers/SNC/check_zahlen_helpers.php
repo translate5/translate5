@@ -1775,8 +1775,7 @@ function subCheck_zahlen_v1($checkSeg, $dateChecked, $data, $currentData, $check
 
     if ((empty($numsCount[0])) && (empty($numsCount[1]))) return;
 
-    $checkResults['checkMessage'] = 'num1'; //'Unstimmigkeiten in SRC vs TRG, bitte auch Trenner prüfen<br>';
-    //$checkResults['checkMessage'] = 'Discrepancy in SRC vs TRG, please also check separators <br>'; //'Unstimmigkeiten in SRC vs TRG, bitte auch Trenner prüfen<br>';
+    $checkResults['checkMessage'] = 'Unstimmigkeiten in SRC vs TRG, bitte auch Trenner prüfen';
     $checkResults['checkMessage_EN'] = 'Discrepancy in SRC vs TRG, please also check separators <br>';
 
     if (noLokaAllowed($sncSettings)) {
@@ -2071,8 +2070,7 @@ function subCheck_alphanumStrings($data, $currentData, $checkProps, &$checks, $s
             $trgCount = substr_count($checkSeg[1], $match);
 
             if ($srcCount != $trgCount) {
-                $checkResults['checkMessage'] = "num2";
-                //$checkResults['checkMessage'] = "Alphanum. Zeichenfolge [{$match}] in SRC ≠ TRG [{$srcCount}:{$trgCount}]";
+                $checkResults['checkMessage'] = "Alphanum. Zeichenfolge [{$match}] in SRC ≠ TRG [{$srcCount}:{$trgCount}]";
                 $checkResults['checkMessage_EN'] = "Alphanumerical character sequence [{$match}] in SRC ≠ TRG [{$srcCount}:{$trgCount}]";
 
                 $checkResults['replaceString'] = '<span class="matchStandard">' . $match . '</span>';
@@ -2108,9 +2106,7 @@ function subCheck_alphanumStrings($data, $currentData, $checkProps, &$checks, $s
             $trgCount = substr_count($checkSeg[1], $match);
 
             if ($srcCount != $trgCount) {
-                $checkResults['checkMessage'] = "num2";
-                //$checkResults['checkMessage'] = "Alphanum. Zeichenfolge in SRC ≠ TRG";
-                //$checkResults['checkMessage'] = "Alphanum. Zeichenfolge [{$match}] in SRC ≠ TRG [{$srcCount}:{$trgCount}]";
+                $checkResults['checkMessage'] = "Alphanum. Zeichenfolge [{$match}] in SRC ≠ TRG [{$srcCount}:{$trgCount}]";
                 $checkResults['checkMessage_EN'] = "Alphanumerical character sequence [{$match}] in SRC ≠ TRG [{$srcCount}:{$trgCount}]";
 
                 $checkResults['replaceString'] = '<span class="matchStandard">' . $match . '</span>';
@@ -3437,6 +3433,7 @@ function compareNumCounts_explode2($numsCount, $currentData, $checkProps, &$chec
         $checkProps['checkSubType_extra_EN'] = 'Format alteration (date information etc.) [type2]';
 
         $checkResults['checkMessage'] = "Hinweis: Formatänderung: SRC [{$unsetList[0]}] vs TRG [{$unsetList[1]}] [Typ2]";
+        $checkResults['checkMessage'] = "Formatänderung (Datumsangaben u.ä.): SRC [{$unsetList[0]}] vs TRG [{$unsetList[1]}]";
         $checkResults['checkMessage_EN'] = "Note: Format alteration: SRC [{$unsetList[0]}] vs TRG [{$unsetList[1]}] [Typ2]";
 
         if (true) {
@@ -4029,6 +4026,7 @@ function compareNumCounts_leadingZero_trailingPeriod($numsCount, $currentData, $
                 $checkProps['checkSubType_extra_EN'] = 'Format alteration (ordinal numbers, leading zero etc.) [type1]';
 
                 $checkResults['checkMessage'] = "Hinweis: Formatänderung: SRC [{$numOrigSrc}] vs. TRG [{$numOrigTrg}] [Typ1]";
+                $checkResults['checkMessage'] = "Formatänderung (Ordinalzahlen, führende Null u.ä.): SRC [{$numOrigSrc}] vs. TRG [{$numOrigTrg}] [Typ1]";
                 $checkResults['checkMessage_EN'] = "Note: Format alteration: SRC [{$numOrigSrc}] vs. TRG [{$numOrigTrg}] [Typ1]";
 
                 if (true) {
@@ -4589,7 +4587,7 @@ function compareNumCounts_sameDiv($numsCount, $checkSeg, $currentData, $checkPro
                 $extraText_EN = '';
 
                 if (isDeciPointNum($numOrig)) {
-                    $extraText_DE = "<span class=\"fs_13\">Bitte prüfen, ob es sich hierbei um eine echte Zahl vs. eine Kapitel-/Produktnummer{$chSpezial_DE} o.ä. handelt. Im letzteren Fall, oder wenn die Zahl in SRC mit falschem Trenner geschrieben wurde, bitte Meldung ignorieren (oder Filter nutzen um diese Unterkategorie für alle Segmente auszublenden).</span>";
+                    $extraText_DE = "Bitte prüfen, ob es sich hierbei um eine echte Zahl vs. eine Kapitel-/Produktnummer{$chSpezial_DE} o.ä. handelt. Im letzteren Fall, oder wenn die Zahl in SRC mit falschem Trenner geschrieben wurde, bitte Meldung ignorieren (oder Filter nutzen um diese Unterkategorie für alle Segmente auszublenden).";
                     $extraText_EN = "<span class=\"fs_13\">Please check if this is a real number vs. a chapter/product number {$chSpezial_EN} or similar. In the latter case, or if the number has incorrect separator(s) in SRC, please ignore this message (or use the filter to hide this subcategory for all segments).</span>";
                 }
 
@@ -5193,3 +5191,62 @@ function compareNumCounts_spelledOut($numsCount, $currentData, $checkProps, &$ch
 }
 /** /subsub checks */
 
+function matchHexExplain(&$theMatchHex)
+{
+    $debug = false;
+
+    if ($theMatchHex == '20') {
+        $theMatchHex = ' = SPACE';
+    } elseif ($theMatchHex == 'c2a0') {
+        $theMatchHex = ' = NO-BREAK SPACE';
+    } elseif ($theMatchHex == 'e28080') {
+        $theMatchHex = ' = EN QUAD';
+    } elseif ($theMatchHex == 'e28081') {
+        $theMatchHex = ' = EM QUAD';
+    } elseif ($theMatchHex == 'e28082') {
+        $theMatchHex = ' = EN SPACE';
+    } elseif ($theMatchHex == 'e28083') {
+        $theMatchHex = ' = EM SPACE';
+    } elseif ($theMatchHex == 'e28087') {
+        $theMatchHex = ' = FIGURE SPACE';
+    } elseif ($theMatchHex == 'e28088') {
+        $theMatchHex = ' = PUNCTUATION SPACE';
+    } elseif ($theMatchHex == 'e28089') {
+        $theMatchHex = ' = THIN SPACE';
+    } elseif ($theMatchHex == 'e2808a') {
+        $theMatchHex = ' = HAIR SPACE';
+    } elseif ($theMatchHex == 'e280af') {
+        $theMatchHex = ' = NARROW NO-BREAK SPACE';
+    } elseif ($theMatchHex == 'e2819f') {
+        $theMatchHex = ' = MEDIUM MATHEMATICAL SPACE';
+    } elseif ($theMatchHex == 'e38080') {
+        $theMatchHex = ' = IDEOGRAPHIC SPACE';
+    } elseif ($theMatchHex == '2d') {
+        $theMatchHex = ' = HYPHEN-MINUS';
+    } elseif ($theMatchHex == 'e28892') {
+        $theMatchHex = ' = MINUS SIGN';
+    } elseif ($theMatchHex == 'e28090') {
+        $theMatchHex = ' = HYPHEN';
+    } elseif ($theMatchHex == 'c2ad') {
+        $theMatchHex = ' = SOFT HYPHEN';
+    } elseif ($theMatchHex == 'e28091') {
+        $theMatchHex = ' = NON-BREAKING HYPHEN';
+    } elseif ($theMatchHex == 'e28092') {
+        $theMatchHex = ' = FIGURE DASH';
+    } elseif ($theMatchHex == 'e28093') {
+        $theMatchHex = ' = EN DASH';
+    } elseif ($theMatchHex == 'e28094') {
+        $theMatchHex = ' = EM DASH';
+    } elseif ($theMatchHex == 'efb998') {
+        $theMatchHex = ' = SMALL EM DASH';
+    } elseif ($theMatchHex == 'efb9a3') {
+        $theMatchHex = ' = SMALL HYPHEN-MINUS';
+    } elseif ($theMatchHex == 'efbc8d') {
+        $theMatchHex = ' = FULLWIDTH HYPHEN-MINUS';
+    } else {
+        $theMatchHex = ' = ???';
+    }
+    //echo "MatchHex: $theMatchHex\n";
+
+    return $theMatchHex;
+}

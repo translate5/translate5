@@ -40,9 +40,33 @@ function numbers_check($source, $target, $sourceLang, $targetLang) {
     check_zahlen($data, $checkMessages, $msgCounts, $msgMatches, $emptyTrgMids);
     $res = $checkMessages['noVar_kombi_package_file_mid_checkFunc_checkSubFunc'][$kombi]['Lose_Dateien'] ?? false;
     if (!$res) return [];
+
+    $nums = [
+        'Unstimmigkeiten in SRC vs TRG'                      => 'num1',
+        'Alphanum. Zeichenfolge'                             => 'num2',
+        'Formatänderung (Datumsangaben u.ä.)'                => 'num3',
+        'Trenner in'                                         => 'num4',
+        'Hinweis: Formatierung 1000er-Zahl geändert'         => 'num5',
+        'Unterschiedliche Minuszeichen'                      => 'num6',
+        'Trenner aus SRC geändert in'                        => 'num7',
+        // '1000er-Trenner in'                               => 'num7',
+        'Hinweis: Zahlwort als Zahl gefunden'                => 'num8',
+        'Hinweis: Zahl als Zahlwort gefunden'                => 'num9',
+        'Formatänderung (Ordinalzahlen, führende Null u.ä.)' => 'num10',
+    ];
+
     $res = current(current(current($res ?? [[]])));
     $ret = [];
-    foreach ($res as $subCheck => $msgs) $ret += array_flip($msgs);
+    foreach ($res as $subCheck => $msgs) {
+        foreach ($msgs as $msg) {
+            foreach ($nums as $beg => $key) {
+                if (preg_match('~^' . preg_quote($beg, '~') . '~', $msg)) {
+                    $ret[$key] []= $msg;
+                }
+            }
+        }
+    }
+
     return $ret;
 }
 if (isset($argv) && is_array($argv) && count($argv) == 5) {
