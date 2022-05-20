@@ -425,7 +425,7 @@ class Tag extends \editor_Segment_Tag {
             $numChildren = count($this->children);
             $hasLateral = false;
             for($i = 0; $i < $numChildren; $i++){
-                if($this->children[$i]->getTextLength() > 0 || is_a($this->children[$i], 'InternalTag')){
+                if($this->children[$i]->getTextLength() > 0){
                     break;
                 }
                 if(!$this->children[$i]->isText()){
@@ -433,7 +433,7 @@ class Tag extends \editor_Segment_Tag {
                 }
             }
             for($i = $numChildren - 1; $i >= 0; $i--){
-                if($this->children[$i]->getTextLength() > 0 || is_a($this->children[$i], 'InternalTag')){
+                if($this->children[$i]->getTextLength() > 0){
                     break;
                 }
                 if(!$this->children[$i]->isText()){
