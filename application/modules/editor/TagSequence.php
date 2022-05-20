@@ -603,7 +603,7 @@ abstract class editor_TagSequence implements JsonSerializable {
                 if($last->isPairedOpener()){
                     for($j = $i; $j < $numTags; $j++){
                         // if we found the counterpart (the opener could pair it) this closer will be removed from our chain
-                        if($this->tags[$j]->isPairedCloser() && $last->getType() == $this->tags[$j]->getType() && $last->pairWith($this->tags[$j])){
+                        if($this->tags[$j]->isPairedCloser() && $last->isOfType($this->tags[$j]->getType()) && $last->pairWith($this->tags[$j])){
                             array_splice($this->tags, $j, 1);
                             $numTags--;
                             break;
@@ -613,7 +613,7 @@ abstract class editor_TagSequence implements JsonSerializable {
                 // we may already removed the current element, so check
                 if($i < $numTags){
                     $tag = $this->tags[$i];
-                    // we join only tasks that are splitable of course ...
+                    // we join only tags that are splitable of course ...
                     if($last->isSplitable() && $tag->isSplitable() && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
                         $last->endIndex = $tag->endIndex;
                     } else {

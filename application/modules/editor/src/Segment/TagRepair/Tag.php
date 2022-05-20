@@ -89,7 +89,7 @@ class Tag extends \editor_Segment_Tag {
      * A unique ID that will re-identify the after the request returned and when recreating the original state
      * @var int
      */
-    protected int $tagIdx;
+    protected int $repairIdx;
     /**
      * Additional markup to render after our start tag
      * @var string
@@ -139,7 +139,7 @@ class Tag extends \editor_Segment_Tag {
      */
     public int $oldEndIndex;
     /**
-     * The tagIdx of our parentTag
+     * The repairIdx of our parentTag
      * @var int
      */
     protected int $parentTagIdx;
@@ -155,20 +155,27 @@ class Tag extends \editor_Segment_Tag {
      * @param string $category
      * @param string $nodeName
      */
-    public function __construct(int $startIndex, int $endIndex, string $category='', string $nodeName='span', int $tagIdx=0) {
+    public function __construct(int $startIndex, int $endIndex, string $category='', string $nodeName='span', int $repairIdx=0) {
         $this->startIndex = $startIndex;
         $this->endIndex = $endIndex;
         $this->category = $category;
         $this->name = strtolower($nodeName);
-        $this->tagIdx = $tagIdx;
+        $this->repairIdx = $repairIdx;
         $this->singular = in_array($nodeName, static::$singularTypes);
     }
     /**
      * retrieves the unique index of the tag
      * @return int
      */
-    public function getTagIndex() : int {
-        return $this->tagIdx;
+    public function getRepairIndex() : int {
+        return $this->repairIdx;
+    }
+    /**
+     * Must only be used in the pre pairing phase to manipulate the repair index for paired internal tags ...
+     * @param int $idx
+     */
+    public function setRepairIndex(int $idx) {
+        $this->repairIdx = $idx;
     }
     /**
      * {@inheritDoc}
@@ -234,7 +241,7 @@ class Tag extends \editor_Segment_Tag {
         }
         $parentTag = $tags->findByOrder($this->parentOrder);
         if($parentTag != NULL){
-            $this->parentTagIdx = $parentTag->getTagIndex();
+            $this->parentTagIdx = $parentTag->getRepairIndex();
             if($this->startIndex > $parentTag->startIndex){
                 $this->numWordsBeforeParent = $tags->countWords($tags->getTextPart($parentTag->startIndex, $this->startIndex));
             }
@@ -489,7 +496,30 @@ class Tag extends \editor_Segment_Tag {
      */
     protected function renderRequestTag(string $type) : string {
         $tag = str_replace('@TYPE@', $type, static::REQUEST_TAG_TPL);
-        return str_replace('@TAGIDX@', strval($this->tagIdx), $tag);
+        return str_replace('@TAGIDX@', strval($this->repairIdx), $tag);
+    }
+
+    /* Consolidation / pre pairing API */
+
+    /**
+     * Retrieves, if the tag potentially can be paired in the pairing phase
+     * @return bool
+     */
+    public function canBePaired() : bool {
+        return false;
+    }
+    /**
+     * This API is called before consolidation and before rendering for request
+     */
+    public function preparePairing(){
+
+    }
+    /**
+     * This API is called before consolidation and before rendering for request
+     * @param Tag $tag
+     */
+    public function prePairWith(Tag $tag){
+
     }
 
     /* Rendering API */
@@ -527,7 +557,7 @@ class Tag extends \editor_Segment_Tag {
      * @param \stdClass $data
      */
     protected function furtherSerialize(\stdClass $data){
-        $data->tagIdx = $this->tagIdx;
+        $data->repairIdx = $this->repairIdx;
         $data->afterStartMarkup = $this->afterStartMarkup;
         $data->beforeEndMarkup = $this->beforeEndMarkup;
     }
@@ -536,7 +566,7 @@ class Tag extends \editor_Segment_Tag {
      * @param \stdClass $data
      */
     protected function furtherUnserialize(\stdClass $data){
-        $this->tagIdx = intval($data->tagIdx);
+        $this->repairIdx = intval($data->repairIdx);
         $this->afterStartMarkup = $data->afterStartMarkup;
         $this->beforeEndMarkup = $data->beforeEndMarkup;
     }

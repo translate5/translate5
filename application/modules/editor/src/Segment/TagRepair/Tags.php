@@ -34,6 +34,8 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  * This increases the chances to restore a tag where only the closing tag is returned by the service (DeepL)
  * Afterwards the original tags will be restored from the (potentially incomplete) markup sent back, lost tags will be attempted to insert/restored at their "scaled" word-position
  * In a worst-case scenario the pure text of the original markup will be restored (although until now there is no test/example for such scenario; it is a more theoretical case)
+ * The processing of internal tags is pretty sophisticated, as they will be handled as tags with two children in the unparsing, then morph to singular tags holding their rendered contents as afterStart/beforeEnd Markup
+ * and finally when pairing the paired (opening/closing) internal tags return to be non-singular tags but one hierarchy level higher compared to the unparsing. Therefore the "prepare pairing" phase had to be added
  *
  * Diagram of usage:
  * Create instance from original, valid markup     ->      Send "request markup" to the service [::getRequestHtml()]     ->     Restore original markup from service-result [::recreateTags($returnedMarkup)]
@@ -70,6 +72,11 @@ class Tags extends \editor_TagSequence {
      * @var int
      */
     private int $originalNumWords;
+    /**
+     * Holds any paired tags for the prapare pairing phase
+     * @var Tag[]
+     */
+    private array $pairedTags = [];
     
     /* general API */
 
@@ -134,7 +141,7 @@ class Tags extends \editor_TagSequence {
         if(static::DO_DEBUG){
             error_log('RE-EVALUATE: chars before: ' .$this->originalTextLength.', words before: '.$this->originalNumWords.', num tags before: '.$numTags);
             for($i=0; $i < $numTags; $i++){
-                error_log('RE-EVALUATE before tag '.$i.': ( idx: '.$this->tags[$i]->getTagIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
+                error_log('RE-EVALUATE before tag '.$i.': ( idx: '.$this->tags[$i]->getRepairIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
             }
         }
     }
@@ -206,7 +213,7 @@ class Tags extends \editor_TagSequence {
         if(static::DO_DEBUG){
             error_log('RE-EVALUATE: chars after: ' .$textLength.', words after: '.$this->countWords($this->text).', num tags after: '.$numTags);
             for($i=0; $i < $numTags; $i++){
-                error_log('RE-EVALUATE recreated tag '.$i.': ( idx: '.$this->tags[$i]->getTagIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
+                error_log('RE-EVALUATE recreated tag '.$i.': ( idx: '.$this->tags[$i]->getRepairIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
             }
         }
     }
@@ -350,7 +357,7 @@ class Tags extends \editor_TagSequence {
      */
     public function findByTagIdx(int $tagIdx) : ?Tag {
         foreach($this->tags as $tag){
-            if($tag->getTagIndex() === $tagIdx){
+            if($tag->getRepairIndex() === $tagIdx){
                 return $tag;
             }
         }
@@ -387,13 +394,37 @@ class Tags extends \editor_TagSequence {
             if($wrapper->getTextLength() != $this->getTextLength()){ error_log("\n##### WRAPPER TEXT LENGTH ".$wrapper->getTextLength()." DOES NOT MATCH FIELD TEXT LENGTH: ".$this->getTextLength()." #####\n"); }
             if($wrapper->endIndex != $this->getTextLength()){ error_log("\n##### WRAPPER END INDEX ".$wrapper->endIndex." DOES NOT MATCH FIELD TEXT LENGTH: ".$this->getTextLength()." #####\n"); }
         }
+        // before rendering the request markup, we need to prepare paired tags (which need to manipulate the repairIndex in case of a successfull pairing)
+        $this->preparePairing();
         // after unparsing we need to save the markup we send as request
         $this->requestHtml = $wrapper->renderChildrenForRequest();
         // sequence the nested tags as our children
         $wrapper->sequenceChildren($this);
+        // consolidation / pairing
         $this->consolidate();
         // finalize unparsing
         $this->finalizeUnparse();
+    }
+
+    /* Consolidation / pre-pairing API */
+
+    /**
+     * Prepares the consolidation/pairing of tags
+     * The paired closer tags need to know their openers tag index and use it for rendering the request (which is done before sequencing!)
+     */
+    protected function preparePairing(){
+        foreach($this->pairedTags as $tag){
+            $tag->preparePairing();
+        }
+        foreach($this->pairedTags as $tag){
+            if($tag->isPairedOpener()) {
+                foreach($this->pairedTags as $otherTag){
+                    if($otherTag->isPairedCloser() && $otherTag->isOfType($tag->getType())) {
+                        $tag->prePairWith($otherTag);
+                    }
+                }
+            }
+        }
     }
 
     /* Creation API */
@@ -452,6 +483,10 @@ class Tags extends \editor_TagSequence {
             $tag = new InternalTag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
         } else {
             $tag = new Tag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
+        }
+        // we need to prepare any paired tags before consolidation, so we need to know them before sequencing
+        if($tag->canBePaired()){
+            $this->pairedTags[] = $tag;
         }
         $this->tagIdxCount++;
         if(count($classNames) > 0){

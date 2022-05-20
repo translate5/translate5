@@ -408,9 +408,9 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
         // debugging
         if(false){
             error_log('==================='."\n");
-            error_log('ORIGINAL:'."\n".$originalMarkup."\n");
-            error_log('TRANSLATED:'."\n".$translated."\n");
-            error_log('RECREATED:'."\n".$actual."\n");
+            error_log('ORIGINAL:'."\n".$this->revertInternalTags($originalMarkup)."\n");
+            error_log('REQUEST:'."\n".$request."\n");
+            error_log('RECREATED:'."\n".$this->revertInternalTags($actual)."\n");
             error_log('==================='."\n\n");
         }
         $this->assertEquals($expected, $actual);
@@ -418,6 +418,14 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
         if($expectedStripped != 'NO'){
             $strippedRequest = Markup::strip($request);
             $actual = $tags->recreateTags($strippedRequest);
+            // debugging
+            if(false){
+                error_log('==================='."\n");
+                error_log('ORIGINAL:'."\n".$this->revertInternalTags($originalMarkup)."\n");
+                error_log('REQUEST:'."\n".$strippedRequest."\n");
+                error_log('RECREATED:'."\n".$this->revertInternalTags($actual)."\n");
+                error_log('==================='."\n\n");
+            }
             if(empty($expectedStripped)) {
                 $this->assertEquals($expected, $actual);
             } else {
@@ -480,6 +488,16 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
     private function replaceInternalTags(string $markup) : string{
         foreach(array_keys($this->internalTags) as $key){
             $markup = str_replace($key, $this->internalTags[$key], $markup);
+        }
+        return $markup;
+    }
+    /**
+     * @param string $markup
+     * @return string
+     */
+    private function revertInternalTags(string $markup) : string{
+        foreach(array_keys($this->internalTags) as $key){
+            $markup = str_replace($this->internalTags[$key], $key, $markup);
         }
         return $markup;
     }
