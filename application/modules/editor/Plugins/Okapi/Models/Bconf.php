@@ -199,14 +199,15 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * @return editor_Plugins_Okapi_Models_Bconf|null
+     * @return int
      * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception|Zend_Exception
+     * @throws editor_Plugins_Okapi_Exception
      */
-    public function importDefaultWhenNeeded() {
+    public function importDefaultWhenNeeded() : int {
         $sysBconfRow = $this->db->fetchRow($this->db->select()->where('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME));
         // when the system default bconf does not exist we have to generate it
         if($sysBconfRow == NULL){
@@ -218,9 +219,9 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
                 $sysBconf->setIsDefault(1);
             }
             $sysBconf->save();
-            return $sysBconf;
+            return $sysBconf->getId();
         }
-        return NULL;
+        return $sysBconfRow->id;
     }
     /**
      * @param string $id If given, gets the directory without loaded entity
@@ -263,7 +264,11 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             $customerMeta = new editor_Models_Customer_Meta();
             try {
                 $customerMeta->loadByCustomerId($customerId);
-                return $customerMeta->getDefaultBconfId();
+                // return the customers default only, if it is set!
+                // API-based import's may have a customer set that not neccessarily must have a default-bconf
+                if(!empty($customerMeta->getDefaultBconfId())){
+                    return $customerMeta->getDefaultBconfId();
+                }
             } catch(ZfExtended_Models_Entity_NotFoundException){
             }
         }
@@ -273,8 +278,8 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             return $this->getId();
         } catch(ZfExtended_Models_Entity_NotFoundException){
         }
-        // if not found, generate it
-        return $this->importDefaultWhenNeeded()->getId();
+        // if not found, generate it and return it's id
+        return $this->importDefaultWhenNeeded();
     }
     /**
      * @param string $bconfId
