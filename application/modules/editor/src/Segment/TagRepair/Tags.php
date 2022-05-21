@@ -52,6 +52,8 @@ class Tags extends \editor_TagSequence {
      * @var bool
      */
     const DO_DEBUG = false;
+
+    protected static string $logger_domain = 'editor.tagrepair';
     /**
      * Each tag must have a unique id to be re-identifyable
      * @var int
@@ -117,11 +119,37 @@ class Tags extends \editor_TagSequence {
         $this->invalidate();
         $this->reEvaluate($html);
         try {
-            return $this->render();
+            // rendering may produce errors with overlapping internal tags.
+            // these errors will be automatically repaired by adjusting the start-index of the overlapping tag
+            // therefore we dismiss these errors as this mechanic can be seen as part of our repair capabilities
+            $this->captureErrors = true;
+            $rendered = $this->render();
+            // reset captured errors
+            if(self::DO_DEBUG && count($this->capturedErrors) > 0){
+                error_log('RENDEREING RepairTags CREATED ERRORS:'."\n");
+                error_log('VISUALIZED MARKUP: '.\editor_Segment_Internal_Tag::visualizeTags($rendered)."\n");
+                foreach($this->capturedErrors as $item){
+                    error_log("\n".$item->debug());
+                }
+            }
+            $this->capturedErrors = [];
+            $this->captureErrors = false;
+            return $rendered;
+
         } catch (Exception $e) {
-            // fallback: recreate original structure from scratch(without any sent tags)
+            // reset captured errors
+            $this->captureErrors = false;
+            if(self::DO_DEBUG && count($this->capturedErrors) > 0) {
+                error_log('RENDEREING RepairTags BY DISMISSING REQUESTED TAGS' . "\n");
+                foreach ($this->capturedErrors as $item) {
+                    error_log("\n" . $item->debug());
+                }
+            }
+            $this->capturedErrors = [];
+            // fallback: recreate original structure from scratch (without any sent tags)
             $this->invalidate();
             $this->reEvaluate(strip_tags($html));
+            // if this still produces errors we may create tag-errors which will be reported or even lead to an exception
             return $this->render();
         }
     }

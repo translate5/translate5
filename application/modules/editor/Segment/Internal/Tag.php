@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use PHPHtmlParser\Dom\Node\HtmlNode;
 use PHPHtmlParser\Dom\Node\AbstractNode;
+use MittagQI\Translate5\Tools\Markup;
 
 /**
  * Represents an Internal tag
@@ -47,6 +48,10 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * @var string
      */
     const REGEX_REMOVE = '~<div\s*class="[^"]*internal-tag[^"]*"[^>]*><span[^>]*title="[^"]*"[^>]*>[^<]*</span><span[^>]*full[^>]*>[^<]*</span></div>~s';
+    /**
+     * Same as above, but intended to capture the contents of the classes & short-tag (which encodes the internal tag index)
+     */
+    const REGEX_CAPTURE = '~<div\s*class="([^"]*internal-tag[^"]*)"[^>]*><span[^>]*title="[^"]*"[^>]*>([^<]*)</span><span[^>]*full[^>]*>[^<]*</span></div>~s';
     /**
      * @var string
      */
@@ -121,6 +126,16 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
             return true;
         }
         return false;
+    }
+    /**
+     * Helper to visualize internal tags in a markup string. The tags are turned to what is visualized in the frontend, <1>...</1> or <2/>
+     * @param string $markup
+     * @return string
+     */
+    public static function visualizeTags(string $markup) : string {
+        return preg_replace_callback(self::REGEX_CAPTURE, function($matches){
+            return Markup::unescapeText($matches[2]);
+        }, $markup);
     }
 
     /**

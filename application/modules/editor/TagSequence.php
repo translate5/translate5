@@ -72,6 +72,12 @@ abstract class editor_TagSequence implements JsonSerializable {
     const VALIDATION_MODE = false;
 
     /**
+     * Defines the error-domain to log
+     * @var string
+     */
+    protected static string $logger_domain = 'editor.tagsequence';
+
+    /**
      * Helper to sort Internal tags or rendered tags by startIndex
      * This is a central part of the rendering logic
      * Note, that for rendering, tags, that potentially contain other tags, must come first, otherwise this will lead to rendering errors
@@ -132,6 +138,16 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @var integer
      */
     protected int $orderIndex = -1;
+    /**
+     * If set, all errors/exceptions ar captured instead of logging them.
+     * @var bool
+     */
+    protected bool $captureErrors = true;
+    /**
+     * Holds captured errors
+     * @var ZfExtended_ErrorData[]
+     */
+    protected array $capturedErrors = [];
 
     /**
      * Sets the internal tags & the text by markup, acts like a constructor
@@ -210,7 +226,8 @@ abstract class editor_TagSequence implements JsonSerializable {
         $this->orderIndex = -1;
         $this->_setMarkup($text);
         if($this->text != $textBefore){
-            $this->logError('E1343', 'Setting the tags by text led to a changed text-content presumably because the encoded tags have been improperly processed');
+            $extraData = ['textBefore' => $textBefore ];
+            $this->logError('E1343', 'Setting the tags by text led to a changed text-content presumably because the encoded tags have been improperly processed', $extraData);
         }
     }
     /**
@@ -340,8 +357,11 @@ abstract class editor_TagSequence implements JsonSerializable {
                                 }
                             } else {
                                 // we have an overlap with tags, that both are not allowed to overlap. this must not happen.
-                                // TODO FIXME: Add Proper Exception / error-code
-                                $this->logError('E9999', 'Two non-splittable tags interleave each other.');
+                                // we report this error but continue with rendering, the overlapping tag will be adjusted in the cutting phase automatically
+                                $errorData = [];
+                                $errorData['overlappedTag'] = $tag->toJson();
+                                $errorData['overlappingTag'] = $compare->toJson();
+                                $this->logError('E1391', 'Two non-splittable tags interleave each other.', $errorData);
                             }
                         }
                     }
@@ -388,9 +408,9 @@ abstract class editor_TagSequence implements JsonSerializable {
             // TS-1337: This error happend "in the wild". It can only happen with malformed Markup. We need more data for a proper investigation
             if($nearest == null){
                 $errorData = [];
-                $errorData['holder'] = $holder->jsonSerialize();
-                $errorData['container'] = $container->jsonSerialize();
-                $errorData['tag'] = $tag->jsonSerialize();
+                $errorData['holder'] = $holder->toJson();
+                $errorData['container'] = $container->toJson();
+                $errorData['tag'] = $tag->toJson();
                 $errorData = $this->logError('E1343', 'Rendering TagSequence tags led to a invalid tag structure that could not be processed', $errorData);
                 throw new ZfExtended_Exception('editor_TagSequence::render: Rendering failed presumably due to invalid tag structure.'."\n".json_encode($errorData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
             }
@@ -714,7 +734,7 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @throws Zend_Exception
      */
     protected function createLogger() : ZfExtended_Logger {
-        return Zend_Registry::get('logger')->cloneMe('editor.tagsequence');
+        return Zend_Registry::get('logger')->cloneMe(static::$logger_domain);
     }
     /**
      *
@@ -725,18 +745,21 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @throws Zend_Exception
      */
     protected function logError(string $code, string $msg, array $errorData=[]) : array {
-        $this->createLogger()->error($code, $msg, $this->addErrorDetails($errorData));
+        $this->addErrorDetails($errorData);
+        if($this->captureErrors){
+            $this->capturedErrors[] = new ZfExtended_ErrorData($code, $msg, $errorData, static::$logger_domain);
+        } else {
+            $this->createLogger()->error($code, $msg, $errorData);
+        }
         return $errorData;
     }
     /**
-     *
+     * To be extended in inheriting classes
      * @param array $errorData
      */
     protected function addErrorDetails(array &$errorData){
         $errorData['text'] = $this->text;
     }
-
-    /* Validation API */
 
     /* Debugging API */
 
