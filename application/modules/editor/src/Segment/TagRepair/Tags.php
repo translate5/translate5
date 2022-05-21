@@ -506,6 +506,8 @@ class Tags extends \editor_TagSequence {
      * @return Tag
      */
     private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex, \DOMNodeList $domChildren=NULL, array $htmlChildren=NULL) : Tag {
+        // InternalTag needs special processing to prevent them to be manipulated and to pair the open/close-pairs
+        // Since we may deal with user-generated markup here, we not only rely on the class but also inspect the children to avoid quirks
         if(in_array(\editor_Segment_Internal_Tag::CSS_CLASS, $classNames) && \editor_Segment_Internal_Tag::hasNodeName($nodeName)
                 && (\editor_Segment_Internal_Tag::domElementChildrenAreInternalTagChildren($domChildren) || \editor_Segment_Internal_Tag::htmlNodeChildrenAreInternalTagChildren($htmlChildren))){
             $tag = new InternalTag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
