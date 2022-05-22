@@ -108,9 +108,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         if(!empty($bconfId) && static::$cachedBconf != NULL && static::$cachedBconf->getId() === $bconfId){
             return static::$cachedBconf;
         }
-        // empty cover not set and also id '0'
+        // empty covers "not set" and also invalid id '0'
         if(empty($bconfId)){
-            // ver unlikely if not impossible: no bconf-id set for the task. In that case we use the default one and add a warning
+            // very unlikely if not impossible: no bconf-id set for the task. In that case we use the default one and add a warning
             $bconf = new editor_Plugins_Okapi_Models_Bconf();
             $bconfId = $bconf->getDefaultBconfId();
             $task->logger('editor.task.okapi')->warn('E1055', 'Okapi Plug-In: Bconf not given or not found: {bconfFile}', ['bconfFile' => 'No bconf-id was set for task meta']);
