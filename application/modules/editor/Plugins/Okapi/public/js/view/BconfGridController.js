@@ -85,8 +85,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     downloadBconf: function(view, rowIndex, /* colIndex */){
         view.select(rowIndex);
         Editor.util.Util.download('plugins_okapi_bconf/downloadbconf', {
-            bconfId: view.selection.id,
-            okapiName: view.selection.get('name'),
+            id: view.selection.id
         });
     },
     showSRXChooser: function(view, rowIndex, colIndex, actionItem){

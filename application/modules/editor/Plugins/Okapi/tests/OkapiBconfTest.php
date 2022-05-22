@@ -150,7 +150,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         // Ensure system bconf dir can't be deleted
         $e = null;
         try {
-            $newSystemBconf->deleteDirectory($newSystemBconf->getId());
+            $newSystemBconf->delete();
         } catch(ZfExtended_NoAccessException $e){
         } finally {
             self::assertNotNull($e, 'Deleting the system bconf directory was not prevented by ZfExtended_NoAccessException');
@@ -173,10 +173,9 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $systemBconf->setName(editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
         $systemBconf->save();
 
-        $newSystemBconf->deleteDirectory($newSystemBconf->getId());
-        self::assertDirectoryDoesNotExist($newSystemBconfDir, "Could not delete directory'$newSystemBconfDir' for testing purpose");
-
-        $newSystemBconf->delete();
+        try {
+            $newSystemBconf->delete();
+        } catch(ZfExtended_NoAccessException $e){ }
         $e = null;
         try {
             $newSystemBconf->load($newSystemBconfId);
@@ -255,6 +254,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      */
     public function test60_InvalidFiles() {
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $testDir = NULL;
         try {
             $bconf->setId(0);
             $testDir = $bconf->getDir();
@@ -280,7 +280,12 @@ class OkapiBconfTest extends editor_Test_JsonTest {
             }
         } catch(Exception $outerEx){
         } finally {
-            $bconf->deleteDirectory(0); // Make sure to delete directory
+            // Make sure to delete directory
+            if($testDir !== NULL){
+                /** @var ZfExtended_Controller_Helper_Recursivedircleaner $cleaner */
+                $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
+                $cleaner->delete($testDir);
+            }
             if(!empty($outerEx)){
                 throw $outerEx;
             }
@@ -295,8 +300,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $bconf->load(self::$bconfId);
 
         $bconfDir = $bconf->getDir();
-        $bconf->deleteDirectory(self::$bconfId);
-        $bconf->delete(); // delete record
+        $bconf->delete(); // delete record, which deletes directory as well
         self::assertDirectoryDoesNotExist($bconfDir);
     }
 

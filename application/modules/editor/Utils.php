@@ -236,19 +236,32 @@ class editor_Utils {
     }
     /**
      * Generates a websafe filename out of any string
+     * This may includes the extension
      * The resulting string is lowercase and has all whitespace stripped, blanks are replaced with "-"
+     * Leading & trailing dots are removed
      * Take into account the returned string may be empty !
      * @param string $name
      * @return string
      */
-    public static function secureFilename($name){
-        // first, some ASCII transformations
-        $name = self::asciify($name);
-        // now for security and lowercase
-        $name = strtolower(urlencode($name));
-        $name = preg_replace('/%[0-9a-z][0-9a-z]/', '',  $name);
+    public static function secureFilename($name, $forceLowercase=true){
+        // first, some ASCII transformations, remove leading & trailing dots
+        $name = trim(self::asciify($name), '.');
+        // now replace any special chars and lowercase (if wanted)
+        $name = ($forceLowercase) ?
+            preg_replace('/%[0-9a-z][0-9a-z]/', '', strtolower(urlencode($name)))
+            : preg_replace('/%[0-9A-Za-z][0-9A-Za-z]/', '', urlencode($name));
+        // replace multiple dashes with a single one
         $name = preg_replace('/-{2,}/', '-',  $name);
         return $name;
+    }
+
+    /**
+     * Checks, if a filename is secure
+     * @param string $fileName
+     * @return bool
+     */
+    public static function isSecureFilename(string $fileName) : bool {
+        return preg_match('/^[a-zA-Z0-9\-_][a-zA-Z0-9\-_\.]*[a-zA-Z0-9\-_]$/', $fileName);
     }
 
     /***

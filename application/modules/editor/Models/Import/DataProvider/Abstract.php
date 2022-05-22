@@ -51,6 +51,10 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     protected $task;
     protected $taskPath;
     protected $importFolder;
+    /**
+     * hashtable of additional files of the form $fileName => $filePath
+     * @var array
+     */
     protected array $additionalArchiveFiles = [];
 
     /**
@@ -138,11 +142,16 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * Must obviously be called before the archive is created
      * Be aware that this will delete existing files if they already exist !
      * @param string $filePath
+     * @param string|null $fileName: If given, this defines the filename in the destination / ZIP. Be aware, that the passed name may is changed to a web-save filename in case it contains special characters or whitespace
      * @return bool
      */
-    public function addAdditonalFileToArchive(string $filePath) : bool {
-        if(file_exists($filePath) && !in_array($filePath, $this->additionalArchiveFiles)){
-            $this->additionalArchiveFiles[] = $filePath;
+    public function addAdditonalFileToArchive(string $filePath, string $fileName=NULL) : bool {
+        // check for proper filename or use basename of file path
+        if($fileName == NULL || $fileName == '' || !editor_Utils::isSecureFilename($fileName)){
+            $fileName = basename($filePath);
+        }
+        if(file_exists($filePath) && !array_key_exists($fileName, $this->additionalArchiveFiles)){
+            $this->additionalArchiveFiles[$fileName] = $filePath;
             return true;
         }
         return false;
@@ -212,9 +221,9 @@ abstract class editor_Models_Import_DataProvider_Abstract {
         ));
         // process the additional files by temporarily adding them to the importFolder
         $deletions = [];
-        foreach($this->additionalArchiveFiles as $file){
-            $dest = rtrim($this->importFolder, '/').'/'.basename($file);
-            @copy($file, $dest);
+        foreach($this->additionalArchiveFiles as $fileName => $filePath){
+            $dest = rtrim($this->importFolder, '/').'/'.$fileName;
+            @copy($filePath, $dest);
             $deletions[] = $dest;
         }
         if(!$filter->filter($this->importFolder)){
