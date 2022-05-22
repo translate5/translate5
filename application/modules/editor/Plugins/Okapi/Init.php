@@ -97,7 +97,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
 
     /**
-     * Fetches the import BCONF id to use by id
+     * Fetches the import BCONF to use by id
      * @param editor_Models_Task $task
      * @param int|null $bconfId
      * @return editor_Plugins_Okapi_Models_Bconf
