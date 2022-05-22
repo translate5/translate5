@@ -141,8 +141,8 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $autoImportFailureMsg = 'AutoImport of missing system bconf failed.';
         self::assertEquals($total + 1, $newTotal, $autoImportFailureMsg . ' Totalcount not increased');
         $newSystemBconf = new editor_Plugins_Okapi_Models_Bconf();
-        $newSystemBconf->loadRow('name = ? ');
         $expectedName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
+        $newSystemBconf->loadRow('name = ?', $expectedName);
         self::assertEquals($expectedName, $newSystemBconf->getName(), $autoImportFailureMsg . " No record name matches '$expectedName'");
         $newBconfFile = $newSystemBconf->getFilePath();
         self::assertFileExists($newBconfFile, $autoImportFailureMsg . " File '$newBconfFile' does not exist");
