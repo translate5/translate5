@@ -103,7 +103,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         ]);
         self::assertEquals(200, $res->getStatus());
 
-        $res = $api->request("editor/plugins_okapi_bconf/downloadbconf?bconfId=$id");
+        $res = $api->request("editor/plugins_okapi_bconf/downloadbconf?id=$id");
         self::assertEquals(200, $res->getStatus());
         $bconfString = $res->getBody();
 
