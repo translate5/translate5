@@ -128,8 +128,13 @@ class Tags extends \editor_TagSequence {
             if(self::DO_DEBUG && count($this->capturedErrors) > 0){
                 error_log('RENDEREING RepairTags CREATED ERRORS:'."\n");
                 error_log('VISUALIZED MARKUP: '.\editor_Segment_Internal_Tag::visualizeTags($rendered)."\n");
-                foreach($this->capturedErrors as $item){
-                    error_log("\n".$item->debug());
+                // TODO FIXME: create an API in ZfExtended_ErrorCodeException for this
+                foreach($this->capturedErrors as $exception){
+                    $extraLog = '';
+                    foreach($exception->getErrors() as $key => $val){
+                        $extraLog .= "   \n".$key.': '.$val;
+                    }
+                    error_log("\n\n".$exception->getErrorCode().': '.$exception->getMessage().$extraLog);
                 }
             }
             $this->capturedErrors = [];

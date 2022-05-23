@@ -145,7 +145,7 @@ abstract class editor_TagSequence implements JsonSerializable {
     protected bool $captureErrors = true;
     /**
      * Holds captured errors
-     * @var ZfExtended_ErrorData[]
+     * @var ZfExtended_ErrorCodeException[]
      */
     protected array $capturedErrors = [];
 
@@ -747,7 +747,11 @@ abstract class editor_TagSequence implements JsonSerializable {
     protected function logError(string $code, string $msg, array $errorData=[]) : array {
         $this->addErrorDetails($errorData);
         if($this->captureErrors){
-            $this->capturedErrors[] = new ZfExtended_ErrorData($code, $msg, $errorData, static::$logger_domain);
+            // when capturing the errors7exceptions the cade initiating the capture is responsible for processing them !
+            $error = new ZfExtended_ErrorCodeException($code, $errorData);
+            $error->setMessage($msg);
+            $error->setDomain(static::$logger_domain);
+            $this->capturedErrors[] = $error;
         } else {
             $this->createLogger()->error($code, $msg, $errorData);
         }
