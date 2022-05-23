@@ -100,7 +100,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     /**
      * @var editor_Plugins_Okapi_Bconf_File
      */
-    public $file = NULL;
+    private $file = NULL;
     /**
      * @var string
      */
@@ -199,28 +199,31 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * @return editor_Plugins_Okapi_Models_Bconf|null
+     * @return int
      * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception|Zend_Exception
+     * @throws editor_Plugins_Okapi_Exception
      */
-    public function importDefaultWhenNeeded() {
+    public function importDefaultWhenNeeded() : int {
         $sysBconfRow = $this->db->fetchRow($this->db->select()->where('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME));
         // when the system default bconf does not exist we have to generate it
         if($sysBconfRow == NULL){
-            $t5ProvidedImportBconf = editor_Plugins_Okapi_Init::getBconfStaticDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
-            $sysBconf = new self(['tmp_name' => $t5ProvidedImportBconf, 'name' => 'Translate5-Standard.bconf']);
+            $sysBconf = new self([
+                'tmp_name' => editor_Plugins_Okapi_Init::getBconfStaticDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT,
+                'name' => editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME . '.' .  editor_Plugins_Okapi_Init::BCONF_EXTENSION
+            ]);
             $sysBconf->setDescription("The default .bconf used for file imports unless another one is configured");
             $sysBconf->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
             if(!$this->db->fetchRow(['isDefault = 1'])){
                 $sysBconf->setIsDefault(1);
             }
             $sysBconf->save();
-            return $sysBconf;
+            return $sysBconf->getId();
         }
-        return NULL;
+        return $sysBconfRow->id;
     }
     /**
      * @param string $id If given, gets the directory without loaded entity
@@ -235,16 +238,26 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * @param string $id
-     * @param string $fileName Appended to the bconf's data directory, defaults to the bconf file itself
+     * @param string $id optional: define the id of the bconf manually
+     * @param string $fileName Append any file to the bconf's data directory
      * @return string path The absolute path of the bconf
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getFilePath(string $id = '', string $fileName = ''): string {
+    public function getFilePath(string $id = '', string $fileName = '') : string {
         if(!$fileName){
-            $fileName = 'bconf-' . ($id ?: $this->getId()) . '.bconf';
+            $fileName = 'bconf-' . ($id ?: $this->getId()) . '.' . editor_Plugins_Okapi_Init::BCONF_EXTENSION;
         }
         return $this->getDir($id) . DIRECTORY_SEPARATOR . $fileName;
+    }
+
+    /**
+     * Retrieves the download filename with extension
+     * @return string
+     */
+    public function getDownloadFilename() : string {
+        $filename = editor_Utils::secureFilename($this->getName(), false);
+        $filename = ($filename == '') ? 'bconf-'.$this->getId() : $filename;
+        return $filename.'.'.editor_Plugins_Okapi_Init::BCONF_EXTENSION;
     }
 
     /**
@@ -263,7 +276,11 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             $customerMeta = new editor_Models_Customer_Meta();
             try {
                 $customerMeta->loadByCustomerId($customerId);
-                return $customerMeta->getDefaultBconfId();
+                // return the customers default only, if it is set!
+                // API-based import's may have a customer set that not neccessarily must have a default-bconf
+                if(!empty($customerMeta->getDefaultBconfId())){
+                    return $customerMeta->getDefaultBconfId();
+                }
             } catch(ZfExtended_Models_Entity_NotFoundException){
             }
         }
@@ -273,29 +290,8 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             return $this->getId();
         } catch(ZfExtended_Models_Entity_NotFoundException){
         }
-        // if not found, generate it
-        return $this->importDefaultWhenNeeded()->getId();
-    }
-    /**
-     * @param string $bconfId
-     * @return void
-     * @throws Zend_Exception
-     * @throws ZfExtended_NoAccessException
-     * @throws editor_Plugins_Okapi_Exception
-     */
-    public function deleteDirectory(string $bconfId): void {
-        $bconfId = (int)$bconfId;  // directory traversal mitigation
-        $systemBconf_row = $this->db->fetchRow(['name = ?' => editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME]);
-        if($bconfId == $systemBconf_row['id'] && !$this->isNewRecord){
-            throw new ZfExtended_NoAccessException();
-        }
-        chdir(self::getBconfRootDir());
-        if(is_dir($bconfId)){ // just to be safe
-            $this->dir = ""; // remove cached valid dir
-            /** @var ZfExtended_Controller_Helper_Recursivedircleaner $cleaner */
-            $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
-            $cleaner->delete($bconfId);
-        }
+        // if not found, generate it and return it's id
+        return $this->importDefaultWhenNeeded();
     }
 
     /**
@@ -316,4 +312,33 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         return $srxFileName;
     }
 
+    public function delete(){
+        if($this->isSystemDefault()){
+            throw new ZfExtended_NoAccessException('You can not delete the system default bconf.');
+        }
+        try {
+            // first try to delete record to avoid records without files in any case
+            $id = $this->row->id;
+            $this->row->delete();
+            $this->removeFiles($id);
+        } catch (Zend_Db_Statement_Exception $e) {
+            $this->handleIntegrityConstraintException($e);
+        }
+    }
+
+    /**
+     * Removes the related files of an bconf entity
+     * Must only be called via ::delete
+     * @param int $id
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    private function removeFiles(int $id){
+        $dir = self::getBconfRootDir().DIRECTORY_SEPARATOR.strval($id);
+        if(is_dir($dir)){ // just to be safe
+            $this->dir = ''; // remove cached valid dir
+            /** @var ZfExtended_Controller_Helper_Recursivedircleaner $cleaner */
+            $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
+            $cleaner->delete($dir);
+        }
+    }
 }
