@@ -92,7 +92,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         enableTextSelection: true, // neccessary for pointer class to have effect on whole row
         getRowClass: function({data: bconf}){
             var cls = '',
-                customer = this.grid.ownerCt.ownerCt.getViewModel().getData().list.selection || {};
+                customer = this.grid.isCustomerGrid ? this.grid.ownerCt.ownerCt.getViewModel().getData().list.selection : null;
             if(customer && customer.get('id') === bconf.customerId){
                 cls += ' pointer ';
             } //else not editable
