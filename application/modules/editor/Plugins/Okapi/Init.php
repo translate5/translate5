@@ -450,7 +450,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public function addBconfIdToTaskMeta(Zend_EventManager_Event $event){
         /** @var editor_Models_Task_Meta $meta */
         @['data' => $data, 'meta' => $meta] = $event->getParams();
-        $bconfId = ($data['bconfId']??null) ?: (new editor_Plugins_Okapi_Models_Bconf())->getDefaultBconfId($data['customerId']);
+        $bconfId = array_key_exists('bconfId', $data) ? $data['bconfId'] : NULL;
+        // empty makes sense here since we anly accept an bconf-id > 0
+        if(empty($bconfId)){
+            $bconf = new editor_Plugins_Okapi_Models_Bconf();
+            $bconfId = $bconf->getDefaultBconfId($data['customerId']);
+        }
         $meta->setBconfId($bconfId);
     }
 
