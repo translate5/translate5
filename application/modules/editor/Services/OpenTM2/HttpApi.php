@@ -26,12 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
  * OpenTM2 HTTP Connection API
  */
@@ -172,46 +166,30 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($response);
     }
 
+    /**
+     * repairs the TMX from OpenTM2 regarding encoded entities and newlines
+     * @param string $tmxData
+     * @return string
+     * @throws Zend_Exception
+     */
     protected function fixInvalidOpenTM2XML(string $tmxData): string
     {
         if($this->isT5Memory) {
             return $tmxData;
         }
-        $changeCount = 0;
-        $newLineCount = 0;
 
-        $xml = new \editor_Models_Import_FileParser_XmlParser();
-        $xml->registerOther(function($other, $key) use ($xml, &$changeCount) {
-            $replaced = htmlentities($other, flags: ENT_XML1, double_encode: false);
-            if($other !== $replaced) {
-                $changeCount++;
-                $tu = $xml->getParent('tu');
-                if(!is_null($tu)) {
-                    // the TU must exist, otherwise we are outside of a TU (like <?xml header)
-                    error_log('TMX Export - TU: '.$xml->getChunk($tu['openerKey'])."\n  OLD: ".$other."\n  NEW: ".$replaced);
-                    $xml->replaceChunk($key, $replaced);
-                }
-            }
-        });
-
-        $xml->registerElement('ph', function($tag, $attr, $key, $isSingle) use ($xml, &$newLineCount){
-            if($isSingle && $xml->getAttribute($attr, 'type') === 'lb') {
-                $newLineCount++;
-                $xml->replaceChunk($key, "\n");
-            }
-        });
-
-        $tmxTags = ['body', 'header', 'map', 'note', 'prop', 'seg', 'tmx', 'tu', 'tuv', 'ude', 'bpt', 'ept', 'hi', 'it', 'ph', 'sub', 'ut'];
-        $replaced = $xml->parse($tmxData, validTags: $tmxTags);
-        if($changeCount > 0 || $newLineCount > 0) {
+        /** @var editor_Services_OpenTM2_FixExport $fix */
+        $fix = ZfExtended_Factory::get('editor_Services_OpenTM2_FixExport');
+        $result = $fix->convert($tmxData);
+        if($fix->getChangeCount() > 0 || $fix->getNewLineCount() > 0) {
             $logger = Zend_Registry::get('logger');
             $logger->warn('E9999', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
                 'languageResource' => $this->languageResource,
-                'changeCount' => $changeCount,
-                'newLineCount' => $newLineCount,
+                'changeCount' => $fix->getChangeCount(),
+                'newLineCount' => $fix->getNewLineCount(),
             ]);
         }
-        return $replaced;
+        return $result;
     }
     
     /**

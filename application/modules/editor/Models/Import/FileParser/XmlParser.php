@@ -154,7 +154,11 @@ class editor_Models_Import_FileParser_XmlParser {
         foreach($this->xmlChunks as $key => $chunk) {
             $this->currentOffset = $key;
             //ensure that chunk is a tag (see XML naming rules in parse() ):
-            if(!empty($chunk) && $chunk[0] === '<' && preg_match('#^</?[a-zA-Z_]#i', $chunk)) {
+            if(!empty($chunk)
+                && $chunk[0] === '<'
+                && preg_match('#^</?[a-zA-Z_]#i', $chunk)
+                && mb_substr($chunk, -1) === '>'
+            ) {
                 $isSingle = mb_substr($chunk, -2) === '/>';
                 $parts = explode(' ', trim($chunk,'</> '));
                 $tag = trim(reset($parts));
