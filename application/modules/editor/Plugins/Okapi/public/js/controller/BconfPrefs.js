@@ -26,8 +26,8 @@
  */
 
 /**
- * Main Controller of the Visual Review
- * Defines the Layout of the review Panel and it's controls, listens to the relevant global events and perocesses them
+ * Main Controller of the Okapi Plugin
+ * Adds the BconfGrids and BconfCombo
  *
  * @class BconfPrefs
  * @extends Ext.app.Controller
@@ -41,7 +41,11 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         'Editor.model.admin.Customer'
     ],
     init: function(){
-        Editor.model.admin.Customer.addFields([{type: 'int', name: 'defaultBconfId', persist:true}]);
+        Editor.model.admin.Customer.addFields([{
+            type: 'int',
+            name: 'defaultBconfId',
+            persist:false,
+        }]);
     },
     onLaunch: function(){
         Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
@@ -125,6 +129,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             // add the bconf grid to the tabPanel and bind it to the customer
             tabPanel.insert(2, {
                 xtype: 'okapiBconfGrid',
+                id: 'bconfCustomerGrid',
                 bind: {
                     customer: '{list.selection}', // list is reference name of customerGrid
                     store: '{customersBconfStore}'

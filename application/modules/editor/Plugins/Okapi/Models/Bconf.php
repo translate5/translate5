@@ -284,6 +284,11 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             } catch(ZfExtended_Models_Entity_NotFoundException){
             }
         }
+        try {
+            $this->loadRow('isDefault = ? ', 1);
+            return $this->getId();
+        } catch(ZfExtended_Models_Entity_NotFoundException){
+        }
         // try to load system default bconf
         try {
             $this->loadRow('name = ? ', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);

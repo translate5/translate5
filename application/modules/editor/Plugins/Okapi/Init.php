@@ -373,7 +373,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         //attach to the config after index to check the config values
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
         $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'handleCustomerAfterIndex']);
-        $this->eventManager->attach('Editor_CustomerController', 'afterPutAction', [$this, 'handleCustomerAfterPut']);
     }
 
     /**
@@ -754,25 +753,4 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
     }
 
-    /**
-     * @see ZfExtended_RestController::beforeActionEvent
-     * @param Zend_EventManager_Event $event
-     * @return void
-     */
-    public function handleCustomerAfterPut(Zend_EventManager_Event $event) {
-        /** @var Zend_Controller_Request_Abstract $request */
-        $request = $event->getParam('request');
-        $data = json_decode($request->getParam('data'),true);
-        @['id' => $customerId, 'defaultBconfId' => $bconfId] = $data;
-        if($customerId && $bconfId){
-            $customerMeta = new editor_Models_Customer_Meta();
-            try {
-                $customerMeta->loadByCustomerId($customerId);
-            } catch(ZfExtended_Models_Entity_NotFoundException){
-                $customerMeta->init(['customerId' => $customerId]); // new entity
-            }
-            $customerMeta->setDefaultBconfId($bconfId);
-            $customerMeta->save();
-        }
-    }
 }

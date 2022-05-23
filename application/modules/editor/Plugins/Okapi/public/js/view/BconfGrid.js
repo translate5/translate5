@@ -170,15 +170,25 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             customer = view.grid.getCustomer(),
                             oldDefaultId = customer.get('defaultBconfId'),
                             isSelect = oldDefaultId !== clicked.id, // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
-                            id2Refresh = (isSelect && oldDefaultId) ? customer.get('defaultBconfId') : Editor.data.plugins.Okapi.systemDefaultBconfId;
-                        customer.set('defaultBconfId', isSelect ? clicked.id : 0); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
-                        customer.save();
+                            id2Refresh = (isSelect && oldDefaultId) ? customer.get('defaultBconfId') : Editor.data.plugins.Okapi.systemDefaultBconfId,
+                            value = isSelect ? clicked.id : 0;
+                        customer.set('defaultBconfId', value); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
+                        Ext.Ajax.request({
+                            url: Editor.data.restpath + 'customermeta',
+                            method: 'PUT',
+                            params: {
+                                id: customer.id,
+                                data: Ext.encode({
+                                    defaultBconfId: value
+                                })
+                            }
+                        })
                         view.refresh(clicked);
                         if(id2Refresh !== clicked.id){
                             var oldDefaultRec = store.getById(id2Refresh);
                             if(oldDefaultRec){
                                 view.refreshNode(oldDefaultRec);
-                             }
+                            }
                         }
                         return false; // checked state handled manually via view.refresh
                     }
@@ -211,9 +221,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             } else if(checked){ // must uncheck old default
                                 oldDefault = store.getAt(store.findBy(({data}) => data.isDefault && !data.customerId));
                                 if(oldDefault && oldDefault !== record){
-                                    oldDefault.set('isDefault', false);
+                                    oldDefault.set('isDefault', {commit: false}); // QUIRK: prevent saving twice this way
+                                    oldDefault.commit();
                                 }
                             }
+                            Editor.data.plugins.Okapi.systemDefaultBconfId = record.id;
                         }
                 }
             },
