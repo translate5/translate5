@@ -738,7 +738,6 @@ class Editor_SegmentController extends ZfExtended_RestController
         $locking = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Locking');
 
         foreach($segments as $segment) {
-            error_log("FOO. ".$segment->getSegmentNrInTask());
             try {
                 $locking->toggleLock($segment, $lock);
             }
