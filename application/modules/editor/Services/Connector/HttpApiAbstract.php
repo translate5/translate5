@@ -34,16 +34,6 @@ abstract class editor_Services_Connector_HttpApiAbstract {
     const ENC_TYPE = 'application/json; charset=utf-8';
 
     /**
-     * This URL can be used to set up a language resource doing no real requests but generating loremn ipsum translations (currently only for DeepL)
-     */
-    const FAKE_TRANLATOR_URL = 'http://fake.translate5.api';
-
-    /**
-     * This URL can be used to set up a language resource doing no real requests but generating loremn ipsum translations with random tag-dropping (currently only for DeepL)
-     */
-    const FAKE_DROPTAGS_TRANLATOR_URL = 'http://fake.translate5.droptags.api';
-    
-    /**
      * @var editor_Models_LanguageResources_Resource
      */
     protected $resource;
@@ -182,23 +172,5 @@ abstract class editor_Services_Connector_HttpApiAbstract {
         }
         
         return empty($this->error);
-    }
-
-    /**
-     * Can be used to check if the Resource URL represents a fake translation
-     * @param string $url
-     * @return bool
-     */
-    protected function isFakeUrl(string $url) : bool {
-        return str_contains($url, '://fake.translate5');
-    }
-
-    /**
-     * Can be used to check if the Resource URL represents a fake translation with frequest tag-dropping
-     * @param string $url
-     * @return bool
-     */
-    protected function isFakeDropTagsUrl(string $url) : bool {
-        return $this->isFakeUrl($url) && str_contains($url, '.droptags.');
     }
 }
