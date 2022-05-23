@@ -118,7 +118,7 @@ abstract class editor_Services_Connector_HttpApiAbstract {
         //$response = new Zend_Http_Response(500, [], '{"ReturnValue":0,"ErrorMsg":"Error: too many open translation memory databases"}');
         $this->error = null;
         $this->response = $response;
-        $validStates = [200, 201];
+        $validStates = [200, 201, 204];
         
         $url = $this->http->getUri(true);
         

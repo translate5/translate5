@@ -93,7 +93,7 @@ trait editor_Models_Entity_SpecificDataTrait {
      */
     public function removeSpecificData(string $propertyName): void
     {
-        $specificData=$this->getSpecificData();
+        $specificData=$this->getSpecificData() ?? new stdClass();
         if(property_exists($specificData,$propertyName)){
             unset($specificData->$propertyName);
         }
