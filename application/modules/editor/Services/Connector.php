@@ -169,9 +169,11 @@ class editor_Services_Connector {
      * @return editor_Services_ServiceResult
      */
     protected function _translate(string $searchString){
-        //instant translate calls are by default always without tags ... only if the adapter supports tags we leave them
-        if($this->adapter->canHandleHtmlTags()){
 
+        //instant translate calls are by default always without tags ... only if the adapter supports tags we leave them
+        if($this->adapter->canTranslateHtmlTags()){
+
+            // when the service is capable of processing raw markup directly
             // we use the TagRepair's processor to automatically repair lost or "defect" tags when requesting the translation
             // InstantTranslate will preserve HTML comments which otherwise have no meaning in T5
             $processor = new HtmlProcessor(true);
@@ -187,6 +189,22 @@ class editor_Services_Connector {
                 }
                 $serviceResult->setResults($results);
             }
+        } else if($this->adapter->canTranslateInternalTags()) {
+
+            // when the connector is able to process the internal T5 format for segment text we convert the raw markup and reconvert it after translation
+            // we use the utilities broker that is already instantiated in the concrete connector
+            $utilities = $this->adapter->getTagHandler()->getUtilities();
+            // protect tags to t5 internal tags & convert whitespace to t5 whitespace tags, which then can be processed by the resource
+            $searchString = $this->convertMarkupToInternalTags($searchString, $utilities);
+            // translate it (if possible)
+            $serviceResult = $this->adapter->translate($searchString);
+            // UGLY: The service result holds a list of results (representing the translated texts + metadata) which unfortunately have no defined format
+            $results = $serviceResult->getResult();
+            if(count($results) > 0){
+                // revert the internal and whitespace tags to the input format
+                $results[0]->target = $this->convertInternalTagsToMarkup($results[0]->target, $utilities);
+                $serviceResult->setResults($results);
+            }
         } else {
             $searchString = trim(strip_tags($searchString));
             $serviceResult = $this->adapter->translate($searchString);
@@ -198,7 +216,33 @@ class editor_Services_Connector {
         }
         return $serviceResult;
     }
-
+    /**
+     * Protect markup with whitespace & tags to internal tags
+     * this simplifies but still copies the logic of editor_Models_Import_FileParser_Csv::parseSegment
+     * @param string $markup
+     * @param editor_Models_Segment_UtilityBroker $utilities
+     * @return string
+     */
+    private function convertMarkupToInternalTags(string $markup, editor_Models_Segment_UtilityBroker $utilities) : string {
+        $shortTagIdent = 1;
+        $markup = $utilities->tagProtection->protectTags($markup, false);
+        $markup = $utilities->whitespace->replacePlaceholderTags($markup, $shortTagIdent);
+        $markup = $utilities->whitespace->protectWhitespace($markup, $utilities->whitespace::ENTITY_MODE_OFF);
+        $markup = $utilities->whitespace->replacePlaceholderTags($markup, $shortTagIdent);
+        return $markup;
+    }
+    /**
+     * Revert markup with whitespace encoded to internal tags to it's original format
+     * this simplifies but still copies the logic of editor_Models_Export_FileParser::exportSingleSegmentContent
+     * @param string $textWithTags
+     * @param editor_Models_Segment_UtilityBroker $utilities
+     * @return string
+     */
+    private function convertInternalTagsToMarkup(string $textWithTags, editor_Models_Segment_UtilityBroker $utilities) : string {
+        $textWithTags = $utilities->internalTag->restore($textWithTags);
+        $textWithTags =  $utilities->whitespace->unprotectWhitespace($textWithTags);
+        return $textWithTags;
+    }
     /***
      * This magic method is invoked each time a nonexistent method is called on the object.
      * If the function exist in the adapter it will be called there.
