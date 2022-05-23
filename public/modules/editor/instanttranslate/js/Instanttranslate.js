@@ -399,7 +399,9 @@ function setfileUploadLanguageCombinationsAvailable() {
         languageResourceToCheck,
         languageResourceToCheckAllSources,
         languageResourceToCheckAllTargets,
+        useSub = Editor.data.instanttranslate.showSublanguages,
         langComb;
+
     for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
         if (Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)) {
             languageResourceToCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
@@ -409,7 +411,16 @@ function setfileUploadLanguageCombinationsAvailable() {
                 $.each(languageResourceToCheckAllSources, function(indexS) {
                     languageResourceToCheckAllTargets = languageResourceToCheck.target;
                     $.each(languageResourceToCheckAllTargets, function(indexT) {
-                        langComb = languageResourceToCheckAllSources[indexS] + '|' + languageResourceToCheckAllTargets[indexT];
+
+                        // when using sub langauges, direct matching is required. Without sub-languages, fuzzy matching will be applied on
+                        // the backend side and decided which resource will be used for file-translations
+                        if(useSub){
+                            langComb = languageResourceToCheckAllSources[indexS] + '|' + languageResourceToCheckAllTargets[indexT];
+                        }else{
+                            // use the major languages when sub-languages are disabled
+                            langComb = languageResourceToCheckAllSources[indexS].split('-')[0] + '|' + languageResourceToCheckAllTargets[indexT].split('-')[0];
+                        }
+
                         if ( languageResourceToCheckAllSources[indexS] !== languageResourceToCheckAllTargets[indexT] && $.inArray(langComb, fileUploadLanguageCombinationsAvailable) === -1) {
                             fileUploadLanguageCombinationsAvailable.push(langComb); 
                         }
