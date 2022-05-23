@@ -342,9 +342,11 @@ class editor_Models_Segment_AutoStates {
      */
     public function calculateImportState(editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes): int
     {
+        // the locked attribute is immutable, therefore we BLOCK the segment (which means locked immutable)
         if($segmentAttributes->locked) {
             return self::BLOCKED;
         }
+        // if a segment is just not editable, this is mutable, so we set it to LOCKED (which can be then unlocked)
         if(! $segmentAttributes->editable) {
             return self::LOCKED;
         }
