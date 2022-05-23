@@ -15,12 +15,30 @@ Ext.define('TMMaintenance.view.main.List', {
     columns: [
         {
             text: 'Source text',
-            dataIndex: 'SourceText',
+            dataIndex: 'source',
+            minWidth: 200,
+            cell: {
+                encodeHtml: false,
+            },
         },
         {
             text: 'Target text',
-            dataIndex: 'TargetText',
-        }
+            dataIndex: 'target',
+            minWidth: 200,
+            cell: {
+                encodeHtml: false,
+            },
+        },
+        {
+            cell: {
+                tools: {
+                    delete: {
+                        iconCls: 'x-fa fa-trash-alt',
+                        handler: 'onDeletePressed',
+                    },
+                },
+            },
+        },
     ],
 
     listeners: {

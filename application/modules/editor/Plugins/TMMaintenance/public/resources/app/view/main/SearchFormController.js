@@ -2,46 +2,12 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.searchform',
 
-    listen: {
-        global: {
-            onApplicationLoad: 'onLoad'
-        }
-    },
-
-    onLoad: function () {
-        let me = this;
-        // Setup default ajax headers
-        Ext.Ajax.setDefaultHeaders({
-            'Accept': 'application/json'
-        });
-
-        Ext.Ajax.request({
-            url: '/editor/plugins_tmmaintenance_api/tm/list',
-            async: false,
-            method: 'GET',
-            success: function (xhr) {
-                let data = Ext.JSON.decode(xhr.responseText, true);
-
-                if (!(data)) {
-                    // TODO show an error
-                    return;
-                }
-
-                me.getViewModel().setData(data);
-            }
-        })
-    },
-
     /**
      * @param {ComboBox} comboBox
      * @param {String} tm
      */
     onTMChange: function (comboBox, tm) {
-        console.log(tm);
-    },
-
-    onEnterCriteria: function () {
-
+        this.getViewModel().set('disabled', null === tm);
     },
 
     onSearch: function () {
@@ -52,6 +18,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         store.load({
             params: {
                 tm: values.tm,
+                searchField: values.searchField,
                 searchCriteria: values.searchCriteria,
             }
         });

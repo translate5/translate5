@@ -9,18 +9,22 @@ Ext.define('TMMaintenance.view.main.EditForm', {
     items: [
         {
             required: true,
-            name: 'SourceText',
+            name: 'rawSource',
         },
         {
             required: true,
-            name: 'TargetText',
+            name: 'rawTarget',
         },
     ],
 
     buttons: [
         {
             text: 'Save',
-            handler: 'onSave'
-        }
+            handler: 'onSavePressed'
+        },
+        {
+            text: 'Cancel',
+            handler: 'onCancelPressed'
+        },
     ]
 })

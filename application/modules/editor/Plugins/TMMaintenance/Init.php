@@ -104,6 +104,6 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
             'controller' => 'plugins_tmmaintenance_api',
             'action' => 'search'
         ]);
-        $router->addRoute('plugins_tmmaintenance_segments', $route);
+        $router->addRoute('plugins_tmmaintenance_segments_search', $route);
     }
 }

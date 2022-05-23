@@ -315,6 +315,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             foreach($results as $result) {
                 $this->resultList->addResult($this->highlight($searchString, $this->tagHandler->restoreInResult($result->target), $field == 'target'));
                 $this->resultList->setSource($this->highlight($searchString, $this->tagHandler->restoreInResult($result->source), $field == 'source'));
+                $this->resultList->setRawContent($result->source, $result->target);
             }
             
             return $this->resultList;

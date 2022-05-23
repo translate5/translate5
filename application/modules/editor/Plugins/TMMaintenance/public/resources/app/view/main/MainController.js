@@ -8,7 +8,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
      * @param {Array} record
      */
     onItemSelected: function (sender, record) {
-        let form = Ext.getCmp('editform');
+        let form = this.getForm();
 
         if (form.isDirty()) {
             Ext.Msg.confirm(
@@ -19,11 +19,54 @@ Ext.define('TMMaintenance.view.main.MainController', {
             );
         }
 
+        form.reset();
         form.setRecord(record[0]);
         form.getItems().each(function (item) {
             if (typeof(item.resetOriginalValue) === 'function') {
                 item.resetOriginalValue();
             }
         });
+        form.show();
     },
+
+    onCreatePressed: function () {
+        let form = this.getForm();
+        let segment = Ext.create('TMMaintenance.model.Segment', {});
+
+        form.setRecord(segment);
+        form.show();
+    },
+
+    onDeletePressed: function (sender, record) {
+        let me = this;
+        Ext.Msg.confirm(
+            'Confirm',
+            'Do you really want to delete a segment?',
+            (buttonPressed) => {
+                if ('no' === buttonPressed) {
+                    return;
+                }
+
+                me.onDeleteConfirm(record.record);
+            },
+            this
+        );
+    },
+
+    /**
+     * @param {TMMaintenance.model.Segment} record
+     */
+    onDeleteConfirm: function (record) {
+        //TODO get from base/main/global
+        record.set({tm: Ext.getCmp('searchform').getValues().tm});
+        record.erase({
+            success: () => {
+                // TODO what to do here?
+            }
+        });
+    },
+
+    getForm: function () {
+        return Ext.getCmp('editform');
+    }
 });

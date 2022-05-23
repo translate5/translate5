@@ -18,10 +18,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         $this->session = new Zend_Session_Namespace('user');
     }
 
-    public function indexAction(): void
-    {
-
-    }
+    #region Actions
 
     public function localesAction(): void
     {
@@ -36,46 +33,63 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     public function tmsAction(): void
     {
-        $data = [
-            'tms' => [
-                ['name' => 'TM1', 'value' => 'TM1'],
-                ['name' => 'TM2', 'value' => 'TM2'],
-                ['name' => 'TM3', 'value' => 'TM3'],
-            ]
-        ];
+        /** @var editor_Models_LanguageResources_LanguageResource $model */
+        $model = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
 
-        $this->view->assign($data);
+        //get all resources for the customers of the user by language combination
+        $resources = $model->loadByUserCustomerAssocs();
+
+        $tms = array_map(
+            static function (array $resource): array {
+                return ['name' => $resource['name'], 'value' => $resource['id']];
+            },
+            $resources
+        );
+
+        $this->view->assign($tms);
     }
 
     public function searchAction(): void
     {
-        $data = [
-            [
-                'CleantName' => 'Client name',
-                'SourceLanguage' => 'en',
-                'TargetLanguage' => 'de',
-                'SourceText' => 'Segment 1',
-                'TargetText' => 'Target 1',
-                'Author' => 'Leon',
-                'CreationDate' => (new \DateTime('yesterday'))->format(\DateTimeInterface::RFC2822),
-                'DocumentName' => 'Document name',
-                'AdditionalInfo' => 'Some additional info',
-            ],
-            [
-                'CleantName' => 'Client name',
-                'SourceLanguage' => 'en',
-                'TargetLanguage' => 'de',
-                'SourceText' => 'Segment 2',
-                'TargetText' => 'Target 2',
-                'Author' => 'Leon',
-                'CreationDate' => (new \DateTime('yesterday'))->format(\DateTimeInterface::RFC2822),
-                'DocumentName' => 'Document name',
-                'AdditionalInfo' => 'Some additional info',
-            ],
-        ];
+        $connector = $this->getOpenTM2Connector((int)$this->getRequest()?->getParam('tm'));
+        $data = $connector->search(
+            $this->getRequest()?->getParam('searchCriteria'),
+            $this->getRequest()?->getParam('searchField')
+        )->getResult();
 
         $this->view->assign($data);
     }
+
+    public function segmentsAction(): void
+    {
+        $data = $this->getRequest()?->getParams();
+        $this->view->assign([]);
+    }
+
+    public function postAction(): void
+    {
+        $this->view->assign([]);
+    }
+
+    public function putAction(): void
+    {
+        $data = $this->jsonDecode($this->getRequest()?->getParam('data'));
+        $api = $this->getApi((int)$data['tm']);
+        $api->updateEntry($data['rawSource'], $data['rawTarget']);
+
+        $this->view->assign([]);
+    }
+
+    public function deleteAction(): void
+    {
+        $data = $this->jsonDecode($this->getRequest()?->getParam('data'));
+        $api = $this->getApi((int)$data['tm']);
+        $api->deleteEntry($data['rawSource'], $data['rawTarget']);
+
+        $this->view->assign([]);
+    }
+
+    #endregion
 
     private function readLocalization(): array
     {
@@ -83,7 +97,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
         $fileContent = file_get_contents(__DIR__ . '/../locales/' . $this->session->data->locale . '.json');
         try {
-            $data = json_decode($fileContent, true, self::JSON_DEFAULT_DEPTH, JSON_THROW_ON_ERROR);
+            $data = $this->jsonDecode($fileContent);
         } catch (JsonException $exception) {
             // TODO do something
         }
@@ -103,5 +117,41 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         }
 
         return $this->session->data->locale;
+    }
+
+    private function getOpenTM2Connector(int $languageResourceId): editor_Services_Connector
+    {
+        /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
+        $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        $languageResource->load($languageResourceId);
+
+        /** @var editor_Services_Manager $manager */
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+
+        return $manager->getConnector($languageResource);
+    }
+
+    private function getApi(int $languageResourceId): editor_Services_OpenTM2_HttpApi
+    {
+        /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
+        $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        $languageResource->load($languageResourceId);
+
+        $api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
+        $api->setLanguageResource($languageResource);
+
+        return $api;
+    }
+
+    /**
+     * @param string $data
+     *
+     * @return array
+     *
+     * @throws JsonException
+     */
+    private function jsonDecode(string $data): array
+    {
+        return json_decode($data, true, self::JSON_DEFAULT_DEPTH, JSON_THROW_ON_ERROR);
     }
 }

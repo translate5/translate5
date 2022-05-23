@@ -123,7 +123,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'config', 'segmentuserassoc', 'session', 'language','termcollection',
                 'languageresourceresource','languageresourcetaskassoc',
                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
-                'quality','userassocdefault', 'log'
+                'quality','userassocdefault', 'log', 'segments'
             ],
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);

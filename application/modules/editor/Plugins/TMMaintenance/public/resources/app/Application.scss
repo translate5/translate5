@@ -6,6 +6,10 @@ $enable-font-awesome: dynamic(true);
   flex-direction: column;
 }
 
+.highlight {
+  font-weight: bold;
+}
+
 @media (min-width: 1000px) {
   .big-100 {
     width: calc(100% - #{$item-spacing});
