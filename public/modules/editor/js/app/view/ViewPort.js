@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.ViewPort', {
     extend: 'Ext.container.Viewport',
     requires: [
+        'Editor.view.ViewPortViewModel',
         'Editor.view.MaintenancePanel',
         'Editor.view.admin.user.Grid',
         'Editor.view.admin.TaskGrid',
@@ -42,6 +43,9 @@ Ext.define('Editor.view.ViewPort', {
         'Editor.view.admin.preferences.OverviewPanel',
         'Editor.view.project.ProjectPanel'
     ],
+    viewModel: {
+        type: 'viewport'
+    },
     layout: 'border',
     initComponent: function() {
         var me = this,

@@ -30,6 +30,7 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.openIdPanel',
     itemId:'openIdPanel',
+    glyph: 'f2c2@FontAwesome5FreeSolid',
 
     strings:{
         save:'#UT#Speichern',

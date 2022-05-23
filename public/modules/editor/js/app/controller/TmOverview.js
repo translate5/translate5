@@ -644,6 +644,7 @@ Ext.define('Editor.controller.TmOverview', {
             Ext.Msg.show({
                 title: this.strings.mergeTermsWarnTitle,
                 message: this.strings.mergeTermsWarnMessage,
+                buttons: Ext.MessageBox.OK,
                 icon: Ext.Msg.WARNING
             });
         }

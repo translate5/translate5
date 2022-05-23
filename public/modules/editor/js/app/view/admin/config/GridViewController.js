@@ -150,8 +150,12 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     },
 
     filterConfigByRoute: function(filterValue) {
-        this.searchField.setValue(filterValue);
-        this.groupingFeature.expandAll();
+        //update searchvalue only from route if it was different
+        if(filterValue !== this.searchValue) {
+            this.searchField.setValue(filterValue);
+            this.searchValue = filterValue;
+            this.groupingFeature.expandAll();
+        }
     },
 
     /**
@@ -176,8 +180,6 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         view.refresh();
 
         me.searchValue = me.getSearchValue();
-        //TODO UGLY: is there another generic way to do such a thing? Otherwise we would have to implement a parser which gets and changes only the desired part of the hash instead of setting the whole one(here the config value)
-        me.redirectTo('preferences/adminConfigGrid|config/'+me.searchValue);
         
         if(me.searchValue == null){
             store.clearFilter();

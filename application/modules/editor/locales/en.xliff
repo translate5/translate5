@@ -66,8 +66,12 @@
 	</trans-unit>
 	<trans-unit id="R2VzcGVycnQ=">
 		<source>Gesperrt</source>
-		<target>Blocked</target>
+		<target>Locked</target>
 	</trans-unit>
+    <trans-unit id="RGF1ZXJoYWZ0IGdlc3BlcnJ0">
+      <source>Dauerhaft gesperrt</source>
+      <target>Blocked</target>
+    </trans-unit>
       <trans-unit id="QmVzdWNoZXI=">
         <source>Besucher</source>
         <target>visitor</target>
@@ -4157,6 +4161,58 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Nur Segmente mit Wiederholungen anzeigen</source>
   <target>Show only repeated segments</target>
 </trans-unit>
+<trans-unit id="U2VnbWVudCBzcGVycmVuIGJ6dy4gZW50c3BlcnJlbiAoU1RSRyArIEwp">
+  <source>Segment sperren bzw. entsperren (STRG + L)</source>
+  <target>lock / unlock the selected segment (CTRL + L)</target>
+</trans-unit>
+<trans-unit id="U3ByaW5nZSB6dSBTZWdtZW50IG1pdCBOciAoU1RSRyArIEcp">
+  <source>Springe zu Segment mit Nr (STRG + G)</source>
+  <target>Jump to segment with nr (CTRL + G)</target>
+</trans-unit>
+<trans-unit id="QXVzd2FobCBhbiBBa3Rpb25lbiBkaWUgYXVmIGFsbGUgU2VnbWVudGUgaW0gYWt0dWVsbGVuIEZpbHRlcnNldCBhdXNnZWbDvGhydCB3ZXJkZW4gc29sbGVu">
+  <source>Auswahl an Aktionen die auf alle Segmente im aktuellen Filterset ausgeführt werden sollen</source>
+  <target>Selection of actions to be executed on all segments in the current filter set</target>
+</trans-unit>
+<trans-unit id="TGVzZXplaWNoZW4gZW50ZmVybmVu">
+  <source>Lesezeichen entfernen</source>
+  <target>remove bookmark</target>
+</trans-unit>
+<trans-unit id="TGVzZXplaWNoZW4gc2V0emVu">
+  <source>Lesezeichen setzen</source>
+  <target>add bookmark</target>
+</trans-unit>
+<trans-unit id="ZW50c3BlcnJlbg==">
+  <source>entsperren</source>
+  <target>unlock</target>
+</trans-unit>
+<trans-unit id="c3BlcnJlbg==">
+  <source>sperren</source>
+  <target>lock</target>
+</trans-unit>
+<trans-unit id="QWxsZSBnZWZpbHRlcnRlbiBTZWdtZW50ZTo=">
+  <source>Alle gefilterten Segmente:</source>
+  <target>All filtered segments:</target>
+</trans-unit>
+<trans-unit id="U2VnbWVudGUgd2VyZGVuIHZvbiBkZXIgRmF2b3JpdGVubGlzdGUgZW50ZmVybnQ=">
+  <source>Segmente werden von der Favoritenliste entfernt</source>
+  <target>Remove segments from the bookmark list</target>
+</trans-unit>
+<trans-unit id="U2VnbWVudGUgd2VyZGVuIGFscyBGYXZvcml0ZW4gbWFya2llcnQ=">
+  <source>Segmente werden als Favoriten markiert</source>
+  <target>Add segments to bookmark list</target>
+</trans-unit>
+<trans-unit id="U2VnbWVudGUgd2VyZGVuIGVudHNwZXJydA==">
+  <source>Segmente werden entsperrt</source>
+  <target>Unlock segments</target>
+</trans-unit>
+<trans-unit id="U2VnbWVudGUgd2VyZGVuIGdlc3BlcnJ0">
+  <source>Segmente werden gesperrt</source>
+  <target>Lock segments</target>
+</trans-unit>
+<trans-unit id="U2VnbWVudCBhbHMgRmF2b3JpdCAoQm9va21hcmspIG1hcmtpZXJlbiBiencuIE1hcmtpZXJ1bmcgZW50ZmVybmVuIChTVFJHICsgRCk=">
+  <source>Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen (STRG + D)</source>
+  <target>bookmark or unbookmark the selected segment (CTRL + D)</target>
+</trans-unit>
 <trans-unit id='TWl0IFdpZWRlcmhvbHVuZ2Vu'>
     <source>Mit Wiederholungen</source>
     <target>With repetitions</target>
@@ -4630,5 +4686,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Dieses Feld darf nicht leer sein</source>
   <target>This field can not be empty</target>
 </trans-unit>
+<trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminology Translation Project</target></trans-unit>
+<trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Project</target></trans-unit>
+<trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Project</target></trans-unit>
+
   </file>
 </xliff>

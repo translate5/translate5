@@ -97,7 +97,8 @@
 		"jquery/jquery-ui": "1.13.0",
 		"translate5/instanttranslate-roboto-font": "26",
 		"axelbecher/material-design-icons": "^1.0",
-		"wilsonglasser/spout": "^3.0"
+		"wilsonglasser/spout": "^3.0",
+		"joshtronic/php-loremipsum": "^2.1"
     },
 	"extra" : {
 		"merge-plugin" : {

@@ -357,7 +357,22 @@ function getLanguageCombinations(languageResource) {
  * @returns boolean
  */
 function isAvailableLocale(localeToCheck, allLocalesAvailable) {
-    return $.inArray(localeToCheck, allLocalesAvailable) !== -1;
+    var useSub = Editor.data.instanttranslate.showSublanguages,
+        hasLang = false;
+
+    if(useSub){
+        return $.inArray(localeToCheck, allLocalesAvailable) !== -1;
+    }
+
+    // when no sublangauges are used, use fuzzy matching on localeToCheck, since in the backend fuzzy latching will be used as well
+    $.each(allLocalesAvailable, function(index) {
+        var locale = allLocalesAvailable[index];
+        hasLang = localeToCheck === locale.split('-')[0];
+        if(hasLang){
+            return false;
+        }
+    });
+    return hasLang;
 }
 /**
  * Which fileTypes are allowed?
@@ -488,8 +503,21 @@ function hasEnginesForLanguageCombination() {
  * @returns {Boolean}
  */
 function isSourceTargetAvailable(sourceRfc,targetRfc){
-    var targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc);
-    return targetLocalesAvailable.indexOf(targetRfc) !== -1;
+    var targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc),
+        useSub = Editor.data.instanttranslate.showSublanguages,
+        hasLang = false;
+    if(useSub){
+        return targetLocalesAvailable.indexOf(targetRfc) !== -1;
+    }
+    // when no sublangauges are used, use fuzzy matching on localeToCheck, since in the backend fuzzy latching will be used as well
+    $.each(targetLocalesAvailable, function(index) {
+        var locale = targetLocalesAvailable[index];
+        hasLang = targetRfc === locale.split('-')[0];
+        if(hasLang){
+            return false;
+        }
+    });
+    return hasLang;
 }
 
 /***
@@ -517,7 +545,6 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
         languageResourceId,
         toCheck,
         langSet,
-        useSub = Editor.data.instanttranslate.showSublanguages,
         allToAdd;
 
     for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
@@ -526,7 +553,7 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
         }
         toCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
         langSet = (accordingTo === 'accordingToSourceLocale') ? toCheck.source : toCheck.target;
-        if (!isAvailableLocale(selectedLocale, langSet)) {
+        if (!isAvailableLocale(selectedLocale, langSet)){
             continue;
         }
         allToAdd = (accordingTo === 'accordingToSourceLocale') ? toCheck.target : toCheck.source;
@@ -537,8 +564,7 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
                 //prevent duplicates
                 notAdded = ($.inArray(toAdd, localesAvailable) === -1);
             
-            //respect showSublanguages config too
-            if (!isSame && notAdded && (useSub || !/-/.test(toAdd))) {
+            if (!isSame && notAdded) {
                 localesAvailable.push(toAdd);
             }
         });
@@ -656,9 +682,10 @@ function translateText(textToTranslate, translationInProgressID){
         dataType: "json",
         type: "POST",
         data: {
-            'source':$("#sourceLocale").val(),
-            'target':$("#targetLocale").val(),
-            'text':textToTranslate
+            'source': $("#sourceLocale").val(),
+            'target': $("#targetLocale").val(),
+            'text': textToTranslate,
+            'escape': 1
         },
         success: function(result){
             if (translationInProgressID !== latestTranslationInProgressID) {
@@ -1404,12 +1431,59 @@ function changeLanguage(){
 
 function swapLanguages(){
     // detect old languages
-    var $oldSourceLang = $('#sourceLocale').val();
-    var $oldTargetLang = $('#targetLocale').val();
+    var $oldSourceLang = $('#sourceLocale').val(),
+        $oldTargetLang = $('#targetLocale').val(),
+        allSourceLangs = $.map($("#sourceLocale option[value]"), function(option) {
+            return $(option).attr("value");
+        }),
+        allTargetLangs = $.map($("#targetLocale option[value]"), function(option) {
+            return $(option).attr("value");
+        });
+        
+    //check if oldLangs are missing in other language, if yes try fuzzying, 
+    // if still nothing found keep logic as it was (use the last one of the select)
+    
+    if($.inArray($oldSourceLang, allTargetLangs) < 0) {
+        if(/[-_]/.test($oldSourceLang)) {
+            //if old source is sublanguage, use main language of it
+            $oldSourceLang = $oldSourceLang.split(/[-_]/)[0];
+        }        
+        else {
+            //if it is a main language, use the first matchin sub language
+            $.each(allTargetLangs, function(idx,target){
+                if((new RegExp($oldSourceLang+'[-_]')).test(target)) {
+                    $oldSourceLang = target;
+                    return false;
+                }
+            });
+        }
+    }
+    if($.inArray($oldTargetLang, allSourceLangs) < 0) {
+        if(/[-_]/.test($oldTargetLang)) {
+            //if old source is sublanguage, use main language of it
+            $oldTargetLang = $oldTargetLang.split(/[-_]/)[0];
+        }
+        else {
+            //if it is a main language, use the first matchin sub language
+            $.each(allSourceLangs, function(idx,source){
+                if((new RegExp($oldTargetLang+'[-_]')).test(source)) {
+                    $oldTargetLang = source;
+                    return false;
+                }
+            });
+        }
+    }
+
+    // if after all checks, still no source or target language is found, show the error about "no language resources" found
+    if($.inArray($oldTargetLang, allSourceLangs) < 0 || $.inArray($oldSourceLang, allTargetLangs) < 0) {
+        showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
+        return;
+    }
 
     // now swap the language selections
     $("#sourceLocale").val($oldTargetLang);
     $("#targetLocale").val($oldSourceLang);
+    
     $("#sourceLocale").selectmenu("refresh");
     $("#targetLocale").selectmenu("refresh");
 
@@ -1417,12 +1491,26 @@ function swapLanguages(){
     var results = $('div.translation-result');
     if(results.length > 0) {
         // set the source textarea text, therfore markup must be removed and breaktags restored
-        $('#sourceText').val(markupToText(results.first().html()));
+        var text = unescapeHtml(results.first().html());
+        $('#sourceText').val(text);
     }
     $('#translations').hide();
     changeLanguage();
 }
-
+/**
+ * Just a simple htmlspecialchars_decode in JS
+ * @param string text
+ * @returns string
+ */
+function unescapeHtml(text){
+    return text
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&apos;/g, "'");
+}
 /**
  * Shows the GUI as neccessary for the current app-state
  */

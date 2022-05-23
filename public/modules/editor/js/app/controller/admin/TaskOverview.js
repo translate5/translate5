@@ -184,7 +184,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
-        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler',
         validateImportWizard: 'onValidateImportWizard'
     },
     listen: {
@@ -895,8 +894,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     /**
      * delete the task
-     * Fires: beforeTaskDelete  and afterTaskDelete
-     * INFO: beforeTaskDelete is a chained event
      * @param {Editor.model.admin.Task} task
      */
     editorDeleteTask: function(task) {
@@ -904,13 +901,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             app = Editor.app;
 
         app.mask(Ext.String.format(me.strings.taskDestroy, task.get('taskName')), task.get('taskName'));
-
-        //the beforeTaskDelete is chained event. If one of the chained listeners does not return true,
-        //the task delete will be omitted.
-        if (!me.fireEvent('beforeTaskDelete', task)) {
-            app.unmask();
-            return;
-        }
 
         task.dropped = true; //doing the drop / erase manually
         task.save({
@@ -1268,15 +1258,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             return null;
         }
         return activeTab;
-    },
-
-    /***
-     * Before task delete request event handler.
-     * Return true so the event call chain continues
-     */
-    onBeforeTaskDeleteEventHandler: function (task) {
-        Ext.StoreManager.get('admin.Tasks').remove(task);
-        return true;
     },
 
     /***

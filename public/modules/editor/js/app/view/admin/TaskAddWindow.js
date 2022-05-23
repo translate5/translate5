@@ -156,6 +156,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     anchor: '100%',
                                     msgTarget: 'under'
                                 },
+                                /** @see Editor.controller.admin.TaskPreferences.onTaskMainCardAdded
+                                 * QUIRK: Inserts client combobox. TODO Unify and add here. */
                                 items: [{
                                     xtype: 'textfield',
                                     name: 'taskName',
@@ -200,8 +202,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     checked: true,
                                     fieldLabel: me.strings.lockLockedLabel
                                 }]
-                                // + item for assigning customers to the task
-                                // (added dynamically by Editor.controller.admin.TaskPreferences)
                             },{
                                 xtype: 'container',
                                 itemId: 'taskSecondCardContainer',

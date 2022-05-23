@@ -11,13 +11,7 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
-
-
-
-
-
-
-## [5.7.1] - 2022-05-05
+## [5.7.1] - 2022-05-10
 
 ### Important Notes:
 #### [TRANSLATE-2931](https://jira.translate5.net/browse/TRANSLATE-2931)
@@ -48,6 +42,9 @@ For on premise clients: the role must be added manually in the DB to one user. W
 
 
 ### Bugfixes
+**[TRANSLATE-2962](https://jira.translate5.net/browse/TRANSLATE-2962): LanguageResources - DeepL error when when sending large content** <br>
+Fixes problem with failing request to DeepL because of exhausted request size.
+
 **[TRANSLATE-2961](https://jira.translate5.net/browse/TRANSLATE-2961): Editor general - Error on repetition save** <br>
 Solves a problem where an error happens in the UI after saving repetitions with repetition editor.
 

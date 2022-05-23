@@ -47,13 +47,14 @@ $data = [
     'footer' => $this->footer,
     'role' => $this->translate->_(ucfirst(ACL_ROLE_PM)),
     'projectId' => $this->project->getId(),
-    'projectName' => $this->project->getTaskName()
+    'projectName' => $this->project->getTaskName(),
+    'projectType' => $this->translate->_('taskType::' . $this->project->getTaskType()->id()),
 ];
 
 // Build mail body
 $mailBody = $this->templateApply('
 {header}
-Im Projektportal {portalLink} wurde ein neues Terminologieübersetzungsprojekt erstellt.<br />
+Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
 <strong>Project ID:</strong> {projectId} <br />
 <strong>Project Name:</strong> {projectName}
 {footer}'

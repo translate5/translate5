@@ -30,8 +30,9 @@ END LICENSE AND COPYRIGHT
  * Reusable HTTP Connection API code for HTTP with JSON based APIs
  */
 abstract class editor_Services_Connector_HttpApiAbstract {
+
     const ENC_TYPE = 'application/json; charset=utf-8';
-    
+
     /**
      * @var editor_Models_LanguageResources_Resource
      */

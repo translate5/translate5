@@ -28,11 +28,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.admin.Customer', {
     extend: 'Ext.data.Model',
     alias: 'model.customer',
-
-    statics: {
-        DEFAULTCUSTOMER_NUMBER: 'default for legacy data',
-    },
-
     fields: [
         {type: 'int', name: 'id', persist: false},
         {type: 'string', name: 'name', validations: [{type: 'presence'}, {type: 'length', max: 255, min: 3}]},
@@ -47,6 +42,13 @@ Ext.define('Editor.model.admin.Customer', {
         {type: 'string', name: 'openIdClientSecret', validations: [{type: 'presence'}, {type: 'length', max: 1024}]},
         {type: 'string', name: 'openIdRedirectLabel', validations: [{type: 'presence'}, {type: 'length', max: 1024}]},
         {type: 'auto', name: 'openIdRedirectCheckbox', serialize: function(value){return value ? '1' : '0';}},
+        {
+            name: 'isDefaultCustomer',
+            calculate: function (data) {
+                return data.name === Editor.data.customers.defaultCustomerName;
+            }
+        }
+
     ],
 
     idProperty: 'id',
@@ -62,5 +64,5 @@ Ext.define('Editor.model.admin.Customer', {
             rootProperty: 'data',
             writeAllFields: false,
         },
-    },
+    }
 });
