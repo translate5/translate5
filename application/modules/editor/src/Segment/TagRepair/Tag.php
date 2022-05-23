@@ -89,47 +89,47 @@ class Tag extends \editor_Segment_Tag {
      * A unique ID that will re-identify the after the request returned and when recreating the original state
      * @var int
      */
-    private int $tagIdx;
+    protected int $repairIdx;
     /**
      * Additional markup to render after our start tag
      * @var string
      */
-    private string $afterStartMarkup = '';
+    protected string $afterStartMarkup = '';
     /**
      * Additional markup to render before our end tag
      * @var string
      */
-    private string $beforeEndMarkup = '';
+    protected string $beforeEndMarkup = '';
     /**
      * The number of words we cover
      * @var int
      */
-    private int $numWords;
+    protected int $numWords;
     /**
      * The number of words before relative to the whole text
      * @var int
      */
-    private int $numWordsBefore;
+    protected int $numWordsBefore;
     /**
      * The number of words after relative to the whole text
      * @var int
      */
-    private int $numWordsAfter;
+    protected int $numWordsAfter;
     /**
      * The number of words before relative to the parent tag
      * @var int
      */
-    private int $numWordsBeforeParent;
+    protected int $numWordsBeforeParent;
     /**
      * If a singular tag is before or after whitespace
      * @var bool
      */
-    private bool $isBeforeWhitespace;
+    protected bool $isBeforeWhitespace;
     /**
      * The number of words after relative to the parent tag
      * @var int
      */
-    private int $numWordsAfterParent;
+    protected int $numWordsAfterParent;
     /**
      * @var int
      */
@@ -139,10 +139,10 @@ class Tag extends \editor_Segment_Tag {
      */
     public int $oldEndIndex;
     /**
-     * The tagIdx of our parentTag
+     * The repairIdx of our parentTag
      * @var int
      */
-    private int $parentTagIdx;
+    protected int $parentTagIdx;
     /**
      * Defines, if a tag is on the left or right side of the parent tag and does not contain text
      * @var bool
@@ -155,20 +155,27 @@ class Tag extends \editor_Segment_Tag {
      * @param string $category
      * @param string $nodeName
      */
-    public function __construct(int $startIndex, int $endIndex, string $category='', string $nodeName='span', int $tagIdx=0) {
+    public function __construct(int $startIndex, int $endIndex, string $category='', string $nodeName='span', int $repairIdx=0) {
         $this->startIndex = $startIndex;
         $this->endIndex = $endIndex;
         $this->category = $category;
         $this->name = strtolower($nodeName);
-        $this->tagIdx = $tagIdx;
+        $this->repairIdx = $repairIdx;
         $this->singular = in_array($nodeName, static::$singularTypes);
     }
     /**
      * retrieves the unique index of the tag
      * @return int
      */
-    public function getTagIndex() : int {
-        return $this->tagIdx;
+    public function getRepairIndex() : int {
+        return $this->repairIdx;
+    }
+    /**
+     * Must only be used in the pre pairing phase to manipulate the repair index for paired internal tags ...
+     * @param int $idx
+     */
+    public function setRepairIndex(int $idx) {
+        $this->repairIdx = $idx;
     }
     /**
      * {@inheritDoc}
@@ -200,7 +207,7 @@ class Tag extends \editor_Segment_Tag {
      * Repair tags that represent an comment will act specially, e.g. render a comment instead of tags
      * @return bool
      */
-    private function isComment(){
+    protected function isComment(){
         return ($this->name === self::COMMENT_NODE_NAME);
     }
 
@@ -234,7 +241,7 @@ class Tag extends \editor_Segment_Tag {
         }
         $parentTag = $tags->findByOrder($this->parentOrder);
         if($parentTag != NULL){
-            $this->parentTagIdx = $parentTag->getTagIndex();
+            $this->parentTagIdx = $parentTag->getRepairIndex();
             if($this->startIndex > $parentTag->startIndex){
                 $this->numWordsBeforeParent = $tags->countWords($tags->getTextPart($parentTag->startIndex, $this->startIndex));
             }
@@ -487,9 +494,32 @@ class Tag extends \editor_Segment_Tag {
      * @param string $type
      * @return string
      */
-    private function renderRequestTag(string $type) : string {
+    protected function renderRequestTag(string $type) : string {
         $tag = str_replace('@TYPE@', $type, static::REQUEST_TAG_TPL);
-        return str_replace('@TAGIDX@', strval($this->tagIdx), $tag);
+        return str_replace('@TAGIDX@', strval($this->repairIdx), $tag);
+    }
+
+    /* Consolidation / pre pairing API */
+
+    /**
+     * Retrieves, if the tag potentially can be paired in the pairing phase
+     * @return bool
+     */
+    public function canBePaired() : bool {
+        return false;
+    }
+    /**
+     * This API is called before consolidation and before rendering for request
+     */
+    public function preparePairing(){
+
+    }
+    /**
+     * This API is called before consolidation and before rendering for request
+     * @param Tag $tag
+     */
+    public function prePairWith(Tag $tag){
+
     }
 
     /* Rendering API */
@@ -527,7 +557,7 @@ class Tag extends \editor_Segment_Tag {
      * @param \stdClass $data
      */
     protected function furtherSerialize(\stdClass $data){
-        $data->tagIdx = $this->tagIdx;
+        $data->repairIdx = $this->repairIdx;
         $data->afterStartMarkup = $this->afterStartMarkup;
         $data->beforeEndMarkup = $this->beforeEndMarkup;
     }
@@ -536,7 +566,7 @@ class Tag extends \editor_Segment_Tag {
      * @param \stdClass $data
      */
     protected function furtherUnserialize(\stdClass $data){
-        $this->tagIdx = intval($data->tagIdx);
+        $this->repairIdx = intval($data->repairIdx);
         $this->afterStartMarkup = $data->afterStartMarkup;
         $this->beforeEndMarkup = $data->beforeEndMarkup;
     }

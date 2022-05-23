@@ -58,7 +58,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         } catch(e){
             return;
         }
-        var params = { id: rec.id, name: name };
+        var params = {id: rec.id, name: name};
         var customer = view.ownerGrid.getCustomer();
         if(customer){
             params.customerId = customer.id;
@@ -99,22 +99,30 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
     downloadSRX: function(view, rowIndex, colIndex, /* actionItem */ {purpose}, e, /* record */ {id}){
         view.select(rowIndex);
-        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx',{id, purpose});
+        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx', {id, purpose});
     },
     uploadSRX: function(id, srx, purpose){
-        var controller = this;
-        var {invalidTitle, invalidMsg} = this.getView().strings;
+        var controller = this,
+            s = this.getView().strings;
+        var [invalidTitle, invalidMsg, fileUploaded]
+            = [s.invalidTitle, s.invalidMsg, s.fileUploaded].map(x => x.replace('{}', 'SRX'));
 
         Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconf/uploadsrx/?id=' + id, {
             method: 'POST', formData: {purpose, srx}
-        }).then(function({status, responseJson: json}){
-            if(status === 422){
+        }).then(function(response){
+            var {status, responseJson: json = {}} = response;
+            if(json.errorCode === 'E1390'){
                 var extraInfo = controller.createInfoSpan(json);
                 Ext.Msg.show({
-                    title: invalidTitle.replace('{}', 'SRX'),
-                    message: invalidMsg.replace('{}', 'SRX') + extraInfo,
+                    title: invalidTitle,
+                    message: invalidMsg + extraInfo,
+                    buttons: Ext.MessageBox.OK,
                     icon: Ext.Msg.WARNING
                 });
+            } else if(status !== 200){
+                Editor.app.getController('ServerException').handleException(response);
+            } else {
+                Editor.MessageBox.addSuccess(fileUploaded);
             }
         });
     },
@@ -122,7 +130,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === Editor.data.plugins.Okapi.systemDefaultBconfName;
     },
     isSRXUploadDisabled: function(view, rowIndex, colIndex, item, record){
-        return view.ownerGrid.isCustomerGrid && !record.get('customerId');
+        return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemDefaultBconfName));
     },
 
     filterByText: function(field, searchString){
@@ -227,13 +235,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                     },
                     listeners: {
                         specialkey: function(field, e){
-                            if([e.ENTER,e.ESC].includes(e.keyCode)){
+                            if([e.ENTER, e.ESC].includes(e.keyCode)){
                                 panel.close();
                             }
                         }
                     }
                 }],
-                fbar: [{xtype: 'button', text: 'OK', formBind: true, handler:()=>panel.close() }]
+                fbar: [{xtype: 'button', text: 'OK', formBind: true, handler: () => panel.close()}]
             }).show();
             panel.isValid(); // trigger display of red border when invalid
         });
@@ -255,16 +263,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
 
     createInfoSpan: function(json){
-        var extraInfo = '';
-        if(json.errors && json.errors.length){
+        var extraInfo = '',
+            errorMessage = json.errorMessage || '',
+            errors = json.errors || errorMessage.split('\n').slice(1);
+        errors = errors.flat().filter(err => err.trim()).map(Ext.htmlEncode);
+        if(errors.length){
+            var errorTable = `<code><ul><li>${errors.join('</li><li>')}</li></ul>`;
             extraInfo = ' ' + Ext.DomHelper.createHtml({
                 tag: 'span',
                 class: 'x-fa fa-question-circle pointer',
                 'data-hide': 'user',
                 'data-qwidth': '800',
-                'data-qtip': '<code><ul><li>'
-                    + json.errors.join('\n').trim().split('\n').map(Ext.htmlEncode).join('</li><li>')
-                    + '</li></ul>',
+                'data-qtip': errorTable
             });
         }
         return extraInfo;

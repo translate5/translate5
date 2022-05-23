@@ -26,30 +26,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tools\FakeTranslator;
+use MittagQI\Translate5\Segment\TagRepair\Tags;
+
 /**
  * Dummy Pretranslator which just takes the whole source content, creates random content and fills the target with that.
  * Needed for Testing
  */
 class editor_Plugins_DummyPretranslator_Init extends ZfExtended_Plugin_Abstract {
+
     protected static $description = 'Provides a dummy pretranslator - for testing';
-    
-    /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $tag;
-    
+
     public function init() {
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
-        $this->tag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
     
     public function handleAfterImport(Zend_EventManager_Event $event) {
+
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
+
         if(!$task->isTranslation()) {
             error_log("DummyPretranslator disabled due existing targets for Task ".$task->getTaskGuid().' - '.$task->getTaskName());
             return;
         }
+
+        error_log("DummyPretranslator will now translate task ".$task->getTaskGuid().' - '.$task->getTaskName());
         
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
         /* @var $segments editor_Models_Segment_Iterator */
@@ -70,22 +72,15 @@ class editor_Plugins_DummyPretranslator_Init extends ZfExtended_Plugin_Abstract 
         }
     }
     
-    protected function getDummyContent($source) {
-        $idx = 0;
-        $placeHolder = [];
-        $source = $this->tag->replace($source, function($matches) use (&$placeHolder, &$idx){
-            $id = '<tag-'.($idx++).'>';
-            $placeHolder[$id] = $matches[0];
-            return $id;
-        });
-        $split = preg_split('/(<tag-[0-9]+>)/', $source, flags: PREG_SPLIT_DELIM_CAPTURE);
-        $max = count($split);
+    protected function getDummyContent(string $source) : string {
+        try {
+            $tags = new Tags($source, true);
+            $request = $tags->getRequestHtml();
+            return $tags->recreateTags(FakeTranslator::translateMarkup($request));
 
-        for($i = 0; $i < $max; $i = $i+2) {
-            $split[$i] = html_entity_decode($split[$i], ENT_HTML5|ENT_QUOTES);
-            $split[$i] = str_rot13($split[$i]);
-            $split[$i] = htmlentities($split[$i], ENT_XML1);
+        } catch (Exception $e) {
+
+            return $source;
         }
-        return str_replace(array_keys($placeHolder), array_values($placeHolder), join($split));
     }
 }

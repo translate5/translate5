@@ -84,6 +84,10 @@
     <source>Ungültige {}-Datei</source>
     <target>Ungültige {}-Datei</target>
 </trans-unit>
+<trans-unit id='e30tRGF0ZWkgZXJmb2xncmVpY2ggaG9jaGdlbGFkZW4u'>
+    <source>{}-Datei erfolgreich hochgeladen.</source>
+    <target>{}-Datei erfolgreich hochgeladen.</target>
+</trans-unit>
 <trans-unit id='RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2Uge30tRGF0ZWku'>
     <source>Die hochgeladene Datei ist keine gültige {}-Datei.</source>
     <target>Die hochgeladene Datei ist keine gültige {}-Datei.</target>

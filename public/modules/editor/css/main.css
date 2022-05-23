@@ -774,6 +774,12 @@ a.x-btn span.task-confirmation {
     font-weight: bold;
     font-style: italic;
 }
+
+/*show all whitespace changes in the matchgrid*/
+.language-resource-result-panel .matchGrid .x-grid-cell-inner {
+    white-space: break-spaces;
+}
+
 .lableInfoIcon:after {
     content: "";
     display: block;

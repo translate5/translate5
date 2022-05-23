@@ -5,15 +5,19 @@
 <formathandle type="end" include="yes"></formathandle>
 <formathandle type="isolated" include="no"></formathandle>
 <okpsrx:options oneSegmentIncludesAll="no" trimLeadingWhitespaces="yes" trimTrailingWhitespaces="yes" useJavaRegex="yes" useIcu4JBreakRules="no" treatIsolatedCodesAsWhitespace="no"></okpsrx:options>
-<okpsrx:sample language="de" useMappedRules="yes">Mr. Holmes is from~/*T5-IGNORE*/~ the U.K. not the U.S. &lt;B>Is Dr. Watson from there too?&lt;/B> Yes: both are.&lt;BR/></okpsrx:sample>
+<okpsrx:sample language="de" useMappedRules="yes">&amp;lt;div class="eg-content-editor" data-type="textEditorOneColumn" style="width: 100%;"&amp;gt;&amp;lt;div class="column" style="display: inline-block; width: 100%; vertical-align: top;"&amp;gt;&amp;lt;h4 style="text-align: center;"&amp;gt;Willkommen zum Vertriebstraining für die barrierefreie Nullschwelle in Verbindung mit der Schüco AD UP.&amp;lt;/h4&amp;gt;&amp;lt;p style="text-align: center;"&amp;gt;Nutze die Abschnitte auf der rechten Seite, um das Produkt kennenzulernen und dich optimal auf die Beratung deiner Partner und Kunden vorzubereiten.&amp;lt;/p&amp;gt;&amp;lt;p style="text-align: center;"&amp;gt;Am Ende eines Abschnitts wirst du auf Quiz-Fragen stoßen, die dir helfen, dein Wissen zu überprüfen.&amp;lt;/p&amp;gt;&amp;lt;p style="text-align: center;"&amp;gt;Beantworte 80 % der Fragen korrekt für einen erfolgreichen Abschluss.&amp;lt;/p&amp;gt;&amp;lt;h4 style="text-align: center;"&amp;gt;Los gehts!&amp;lt;/h4&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;/div&amp;gt;</okpsrx:sample>
 <okpsrx:rangeRule></okpsrx:rangeRule>
 </header>
 <body>
 <languagerules>
 <languagerule languagerulename="German">
 <rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
 <beforebreak></beforebreak>
-<afterbreak>~/\*T5-IGNORE\*/~</afterbreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
 </rule>
 <!--titles - GERMAN-->
 <rule break="no">
@@ -3432,16 +3436,24 @@
 <beforebreak>\s\p{L}[\.!?…]\s</beforebreak>
 <afterbreak>\p{Lu}\p{Ll}</afterbreak>
 </rule>
+<rule break="yes">
+<beforebreak>\.</beforebreak>
+<afterbreak>&amp;lt;</afterbreak>
+</rule>
 </languagerule>
 <languagerule languagerulename="English">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/\*T5-IGNORE\*/~</afterbreak>
 </rule>
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
 <rule break="no">
@@ -4368,14 +4380,18 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Bulgarian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
 <afterbreak>[s]+(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|Ä|Ö|Ü)</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak></beforebreak>
-<afterbreak>~/\*T5-IGNORE\*/~</afterbreak>
 </rule>
 <!--titles-->
 <rule break="no">
@@ -4551,6 +4567,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Breton">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -4575,6 +4599,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Czech">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -5088,6 +5120,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Danish">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -7673,6 +7713,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Greek">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -10597,6 +10645,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Spanish">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -11728,6 +11784,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Estonian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -11887,6 +11951,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Finnish">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -12719,6 +12791,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="French">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -13549,6 +13629,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Croatian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -13733,6 +13821,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Hungarian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -13917,6 +14013,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Italian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -15405,6 +15509,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Japanese">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -15510,6 +15622,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Korean">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -15562,6 +15682,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Lithuanian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -15736,6 +15864,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Latvian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -15920,6 +16056,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Dutch">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -17600,6 +17744,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Polish">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -19884,6 +20036,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Portuguese">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -20417,6 +20577,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Romanian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -20705,6 +20873,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Russian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -21031,6 +21207,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Slovak">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -22889,6 +23073,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Slovenian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -23222,6 +23414,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Serbian">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -23401,6 +23601,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Twi">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
@@ -23575,6 +23783,14 @@
 </rule>
 </languagerule>
 <languagerule languagerulename="Chinese">
+<rule break="yes">
+<beforebreak>~/\*T5-IGNORE-END\*/~</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak></beforebreak>
+<afterbreak>~/\*T5-IGNORE-START\*/~</afterbreak>
+</rule>
 <!-- yes rule added by translate5 / Marc -->
 <rule break="yes">
 <beforebreak>(:)</beforebreak>
