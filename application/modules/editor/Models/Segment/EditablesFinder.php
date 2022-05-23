@@ -239,7 +239,7 @@ class editor_Models_Segment_EditablesFinder {
         $f = $this->segment->db.'.`'.$prop.'` ';
         $sql->where('('.$f.$comparator.' ?', $value);
         $sql->orWhere('('.$f.'= ?', $value);
-        $sql->where('id'.$comparator.' ? ))', $this->segment->getId());
+        $sql->where($this->segment->db.'.id'.$comparator.' ? ))', $this->segment->getId());
     }
     
     /**

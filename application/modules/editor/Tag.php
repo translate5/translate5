@@ -759,11 +759,11 @@ class editor_Tag {
             return $this->addClasses($val);
         }
         if(array_key_exists($name, $this->attribs)){
-            if(!empty($val)){
+            if($val != null){
                 $this->attribs[$name] .= ' '.static::unescapeAttribute(trim($val));
             }
         } else {
-            $this->attribs[$name] = (empty($val)) ? '' : static::unescapeAttribute(trim($val));
+            $this->attribs[$name] = ($val == null) ? '' : static::unescapeAttribute(trim($val));
         }
         return $this;
     }    

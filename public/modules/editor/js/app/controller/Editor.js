@@ -128,6 +128,9 @@ Ext.define('Editor.controller.Editor', {
                 select:'onSegmentGridSelect',
                 segmentSizeChanged:'onSegmentGridSegmentsSizeChanged'
             },
+            '#segmentgrid segmentsToolbar #scrollToSegmentBtn': {
+                click: 'focusSegmentShortcut'
+            },
             '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
             },
@@ -187,10 +190,10 @@ Ext.define('Editor.controller.Editor', {
         me.keyMapConfig = {
             'ctrl-d':         ['D',{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ['S',{ctrl: true, alt: false}, me.save, true],
-            'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
+            'ctrl-g':         ['G',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
-            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
+            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.toggleSegmentLock, true],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -219,27 +222,6 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-zoomIn':    [[187, Ext.EventObjectImpl.NUM_PLUS],{ctrl: true, alt: false, shift: false}, me.handleZoomIn, true],
             'ctrl-zoomOut':   [[189, Ext.EventObjectImpl.NUM_MINUS],{ctrl: true, alt: false, shift: false}, me.handleZoomOut, true]
         };
-        
-        //FIXME let me come from the server out of AutoStates.php
-        Editor.data.segments.autoStates = {
-            'TRANSLATED': 0,
-            'REVIEWED': 1,
-            'REVIEWED_AUTO': 2,
-            'BLOCKED': 3,
-            'NOT_TRANSLATED': 4,
-            'REVIEWED_UNTOUCHED': 5,
-            'REVIEWED_UNCHANGED': 6,
-            'REVIEWED_UNCHANGED_AUTO': 7,
-            'REVIEWED_TRANSLATOR': 8,
-            'REVIEWED_TRANSLATOR_AUTO': 9,
-            'REVIEWED_PM': 10,
-            'REVIEWED_PM_AUTO': 11,
-            'REVIEWED_PM_UNCHANGED': 12,
-            'REVIEWED_PM_UNCHANGED_AUTO': 13,
-            'TRANSLATED_AUTO': 14,
-            'EDITING_BY_USER': 998,
-            'PENDING': 999
-        };
     },
     /**
      * track isEditing state 
@@ -247,7 +229,12 @@ Ext.define('Editor.controller.Editor', {
     initEditPluginHandler: function (segmentsGrid) {
         var me = this,
             plug = me.getEditPlugin(),
-            disableEditing = function(){me.isEditing = false;};
+            disableEditing = function(){
+                let vm = me.getSegmentGrid().lookupViewModel();
+                    //if needed add current edited segment here too
+                    vm.set('isEditingSegment', false);
+                me.isEditing = false;
+            };
             
         plug.on('beforestartedit', me.handleBeforeStartEdit, me);
         plug.on('beforeedit', me.handleStartEdit, me);
@@ -374,9 +361,9 @@ Ext.define('Editor.controller.Editor', {
             // we just make a loop to check if the segment state is not pending anymore 
             me.getSegmentGrid().setLoading(me.messages.segmentStillSaving);
             deferInterval = Ext.interval(function(){
-                var skip = i++ > 12, 
-                    pending = segment.get('autoStateId') == Editor.data.segments.autoStates.PENDING;
                 //skip after 6 seconds, with can not edit message
+                var skip = i++ > 12,
+                    pending = segment.get('autoStateId') == Editor.data.segments.autoStates.PENDING;
                 if(skip) {
                     Editor.MessageBox.addInfo(me.messages.f2Readonly);
                 }
@@ -399,8 +386,11 @@ Ext.define('Editor.controller.Editor', {
         return true;
     },
     handleStartEdit: function(plugin, context) {
-        var me = this;
+        let me = this,
+            vm = me.getSegmentGrid().lookupViewModel();
         me.isEditing = true;
+        //if needed add current edited segment here too
+        vm.set('isEditingSegment', true);
         me.prevNextSegment.calculateRows(context); //context.record, context.rowIdx TODO
         me.getSourceTags(context);
     },
@@ -684,10 +674,24 @@ Ext.define('Editor.controller.Editor', {
         this.fireEvent('redo'); // see SnapshotHistory
     },
 
-    /***
-     * Focus the segment given in the prompt window input
+    /**
+     * Handling CTRL-L
      */
-    focusSegmentShortcut:function (){
+    toggleSegmentLock: function() {
+        var segments = Editor.app.getController('Segments');
+        segments && segments.onToggleLockBtn();
+    },
+
+    /**
+     * Focus the segment given in the prompt window input
+     * Handling CTRL-G
+     */
+    focusSegmentShortcut:function (key, ev){
+        if(this.isEditing) {
+            this.scrollToSegment(key, ev);
+            return;
+        }
+
         var me = this,
             prompt = Ext.Msg.prompt('Go to segment', 'No.:', function(btn, text){
             if (btn === 'ok'){
@@ -1699,33 +1703,24 @@ Ext.define('Editor.controller.Editor', {
      */
     watchSegment: function() {
         if(!this.isEditing){
+            let segment = this.getSegmentGrid()?.getViewModel()?.get('selectedSegment');
+            /** @var {Editor.model.Segment} segment */
+            segment && segment.toogleBookmark();
             return;
         }
         var me = this,
-            model, config,
             ed = me.getEditPlugin(),
             record = ed.context.record,
-            segmentId = record.get('id'),
             isWatched = Boolean(record.get('isWatched')),
-            segmentUserAssocId = record.get('segmentUserAssocId'),
             navi = me.getNavi(),
             startText = navi.item_startWatchingSegment,
             stopText = navi.item_stopWatchingSegment,
             but = navi.down('#watchSegmentBtn'),
-            success = function(rec, op) {
+            success = function() {
                 var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
                     autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
-                //isWatched
-                record.set('isWatched', !isWatched);
-                record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
                 but.setTooltip(isWatched ? startText : stopText);
                 but.toggle(!isWatched, true);
-                if(op.action === 'create') {
-                    me.fireEvent('watchlistAdded', record, me, rec);
-                }
-                else {
-                    me.fireEvent('watchlistRemoved', record, me, rec);
-                }
                 //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
                 autoStateCell && displayfield.setValue(autoStateCell.getHtml());
             },
@@ -1733,26 +1728,10 @@ Ext.define('Editor.controller.Editor', {
                 but.setTooltip(isWatched ? stopText : startText);
                 but.toggle(isWatched, true);
             };
-        
-        if (isWatched) {
-            config = {
-                id: segmentUserAssocId
-            };
-            model = Ext.create('Editor.model.SegmentUserAssoc', config);
-            model.getProxy().setAppendId(true);
-            model.erase({
-                success: success,
-                failure: failure
-            });
-        } else {
-            model = Ext.create('Editor.model.SegmentUserAssoc', {'segmentId': segmentId});
-            model.save({
-                success: success,
-                failure: failure
-            });
-        }
+
+        record.toogleBookmark(success, failure);
     },
-    
+
     /**
      * In textareas ExtJS 6.2 enter keys are not bubbling up, but they are triggering a specialkey event
      *  we listen to that event and process our own keys then. 

@@ -1,0 +1,34 @@
+assumeWellformed: true
+preserve_whitespace: false
+attributes:
+  xml:lang:
+    ruleTypes: [ATTRIBUTE_WRITABLE]
+  xml:id:
+    ruleTypes: [ATTRIBUTE_ID]
+  id:
+    ruleTypes: [ATTRIBUTE_ID]
+  xml:space:
+    ruleTypes: [ATTRIBUTE_PRESERVE_WHITESPACE]
+    preserve: ['xml:space', EQUALS, preserve]
+    default: ['xml:space', EQUALS, default]
+elements:
+  martifheader:
+    ruleTypes: [EXCLUDE]
+  transacgrp:
+    ruleTypes: [EXCLUDE]
+  termnote:
+    ruleTypes: [EXCLUDE]
+  admin:
+    ruleTypes: [EXCLUDE]
+  ref:
+    ruleTypes: [EXCLUDE]
+  xref:
+    ruleTypes: [EXCLUDE]
+  back:
+    ruleTypes: [EXCLUDE]
+  descrip:
+    ruleTypes: [EXCLUDE]
+    conditions:
+    - type
+    - NOT_EQUALS
+    - [definition, context]

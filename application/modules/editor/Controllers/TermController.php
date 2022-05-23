@@ -361,7 +361,7 @@ class editor_TermController extends ZfExtended_RestController
         $params = $this->getRequest()->getParams();
 
         // Update proposal
-        $this->entity->setProposal(trim($params['proposal']));
+        $this->entity->setProposal(trim($params['proposal'] ?? ''));
         $this->entity->setUpdatedBy($this->_session->id);
 
         // Save, and pass params required to update `terms_transacgrp`-records of type 'modification' for all 3 levels

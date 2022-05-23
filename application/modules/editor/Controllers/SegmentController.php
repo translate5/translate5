@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\FilteredIterator;
+use MittagQI\Translate5\Segment\Locking;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
@@ -681,8 +683,74 @@ class Editor_SegmentController extends ZfExtended_RestController
     }
 
     /**
+     * @param bool $lock optional, defines if lock or unlock, defaults to true
+     * @throws ZfExtended_NoAccessException
+     * @throws editor_Models_Segment_Exception
+     */
+    public function lockOperation(bool $lock = true) {
+        $acl = $lock ? 'lockSegmentOperation' : 'unlockSegmentOperation';
+
+        //the amount of new ACL rules would be huge to handle that lock/unlock Batch/Operations with
+        // ordinary controller right handling since currently role editor has access to all methods here.
+        // So its easier to double access to that functions for PM users then
+        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockOperation'));
+        $this->getAction();
+
+        /* @var Locking $locking */
+        $locking = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Locking');
+        $locking->toggleLock($this->entity, $lock);
+
+        //update the already flushed object with the locked one
+        $this->view->rows = $this->entity->getDataObject();
+    }
+
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws editor_Models_Segment_Exception
+     */
+    public function unlockOperation() {
+        $this->lockOperation(false);
+    }
+
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    public function unlockBatch() {
+        $this->lockBatch(false);
+    }
+
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    public function lockBatch(bool $lock = true) {
+        $acl = $lock ? 'lockSegmentBatch' : 'unlockSegmentBatch';
+        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockBatch'));
+
+        /* @var FilteredIterator $segments */
+        $segments = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\FilteredIterator', [
+            $this->getCurrentTask()->getTaskGuid(),
+            $this->entity
+        ]);
+
+        /* @var Locking $locking */
+        $locking = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Locking');
+
+        foreach($segments as $segment) {
+            try {
+                $locking->toggleLock($segment, $lock);
+            }
+            catch (editor_Models_Segment_Exception) {
+                // we just ignore that segment on processing
+            }
+        }
+    }
+
+    /**
      * returns the mapping between fileIds and segment row indizes
-     * @return array
+     * @return void
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function filemapAction()
     {

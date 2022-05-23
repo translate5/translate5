@@ -41,11 +41,6 @@ class Markup {
      */
     const COMMENT_PATTERN = '~(<!--.*-->)~';
     /**
-     * a pattern that will be used to replace tags with numeric placeholders
-     * @var string
-     */
-    const PROTECT_PATTERN = '<{counter}>';
-    /**COUNT
      * Evaluates if a text contains Markup
      * @param string $text
      * @return bool
@@ -87,44 +82,42 @@ class Markup {
         }
         return $result;
     }
-
-
-    /**
+   /**
      * Escapes Markup that is expected to contain no comments
      * @param string $markup
      * @return string
      */
-    private static function escapePureMarkup(string $markup) : string {
-        $parts = preg_split(self::PATTERN.'U', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-        $result = '';
-        foreach($parts as $part){
-            if(preg_match(self::PATTERN, $part) === 1){
-                $result .= $part;
-            } else {
-                $result .= self::escapeText($part);
-            }
-        }
-        return $result;
-    }
-    /**
-     * Unescapes markup escaped with ::escape
-     * Be aware that this may creates invalid Markup !
-     * @param string $markup
-     * @return string
-     */
-    public static function unescape(string $markup) : string {
-        // first we need to unescape comments as they would be destroyed by the next step otherwise
-        $parts = preg_split(self::COMMENT_PATTERN.'Us', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-        $result = '';
-        foreach($parts as $part){
-            if(preg_match(self::COMMENT_PATTERN.'s', $part) === 1){
-                $result .= $part;
-            } else {
-                $result .= self::unescapePureMarkup($part);
-            }
-        }
-        return $result;
-    }
+   private static function escapePureMarkup(string $markup) : string {
+       $parts = preg_split(self::PATTERN.'U', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+       $result = '';
+       foreach($parts as $part){
+           if(preg_match(self::PATTERN, $part) === 1){
+               $result .= $part;
+           } else {
+               $result .= self::escapeText($part);
+           }
+       }
+       return $result;
+   }
+   /**
+    * Unescapes markup escaped with ::escape
+    * Be aware that this may creates invalid Markup !
+    * @param string $markup
+    * @return string
+    */
+   public static function unescape(string $markup) : string {
+       // first we need to unescape comments as they would be destroyed by the next step otherwise
+       $parts = preg_split(self::COMMENT_PATTERN.'Us', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+       $result = '';
+       foreach($parts as $part){
+           if(preg_match(self::COMMENT_PATTERN.'s', $part) === 1){
+               $result .= $part;
+           } else {
+               $result .= self::unescapePureMarkup($part);
+           }
+       }
+       return $result;
+   }
     /**
      * Unescapes markup escaped with ::escape
      * Be aware that this may creates invalid Markup !
@@ -185,56 +178,5 @@ class Markup {
         $text = str_replace("\r\n", "\n", $text);
         $text = str_replace("\r", "\n", $text);
         return str_replace("\n", $breaktag, $text);
-    }
-    /**
-     * Replaces all tags and Comments in the string with a pattern like '<1>'
-     * The pure text is escaped (optionally disabled)
-     * Optionally the pattern can be changed, it must contain the placeholder '{counter}' though
-     * @param string $markup
-     * @param bool $doEscape: optional: escape the pure text contents
-     * @param string $protectionPattern
-     * @return \stdClass
-     */
-    public static function protect(string $markup, bool $doEscape=true, string $protectionPattern = self::PROTECT_PATTERN) : \stdClass {
-        $result = new \stdClass();
-        $result->text = '';
-        $result->tags = [];
-        $result->count = 0;
-        $result->protector = $protectionPattern;
-        // first we need to escape comments as they would be destroyed by the next step otherwise
-        $parts = preg_split(self::COMMENT_PATTERN.'Us', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-        foreach($parts as $part){
-            if(preg_match(self::COMMENT_PATTERN.'s', $part) === 1){
-                $result->text .= str_replace('{counter}', strval($result->count), $result->protector);
-                $result->tags[$result->count] = $part;
-                $result->count++;
-            } else {
-                $innerParts = preg_split(self::PATTERN.'U', $part, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-                foreach($innerParts as $innerPart){
-                    if(preg_match(self::PATTERN, $innerPart) === 1){
-                        $result->text .= str_replace('{counter}', strval($result->count), $result->protector);
-                        $result->tags[$result->count] = $innerPart;
-                        $result->count++;
-                    } else {
-                        $result->text .= ($doEscape) ? self::escapeText($innerPart) : $innerPart;
-                    }
-                }
-            }
-        }
-        return $result;
-    }
-    /**
-     * Reverts the tag-protection created with ::protect
-     * @param string $protectedMarkup
-     * @param \stdClass $data: the result of ::protect
-     * @param bool $doUnescape
-     * @return string
-     */
-    public static function unprotect(string $protectedMarkup, \stdClass $data, bool $doUnescape=true) : string {
-        for($i=0; $i < $data->count; $i++){
-            $key = str_replace('{counter}', strval($i), $data->protector);
-            $protectedMarkup = str_replace($key, $data->tags[$i], $protectedMarkup);
-        }
-        return ($doUnescape ? self::unescape($protectedMarkup) : $protectedMarkup);
     }
 }

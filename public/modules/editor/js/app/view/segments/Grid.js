@@ -533,7 +533,6 @@ Ext.define('Editor.view.segments.Grid', {
      */
     focusSegment: function(segmentNrInTask, forEditing = false, failureEventName = '', afterFocusCallback = Ext.emptyFn) {
         var me = this,
-            selectedSegmentNrInTask = me.selection && me.selection.get('segmentNrInTask'),
             segIsInFocusConfig = {};
 
         segIsInFocusConfig.callback = segIsInFocusConfig.notScrollCallback = function(){
@@ -545,7 +544,7 @@ Ext.define('Editor.view.segments.Grid', {
             }
             afterFocusCallback();
         };
-        if(!segmentNrInTask || selectedSegmentNrInTask == segmentNrInTask){
+        if(!segmentNrInTask){
             segmentNrInTask && segIsInFocusConfig.callback();
             return;
         }

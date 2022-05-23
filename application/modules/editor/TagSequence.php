@@ -72,6 +72,12 @@ abstract class editor_TagSequence implements JsonSerializable {
     const VALIDATION_MODE = false;
 
     /**
+     * Defines the error-domain to log
+     * @var string
+     */
+    protected static string $logger_domain = 'editor.tagsequence';
+
+    /**
      * Helper to sort Internal tags or rendered tags by startIndex
      * This is a central part of the rendering logic
      * Note, that for rendering, tags, that potentially contain other tags, must come first, otherwise this will lead to rendering errors
@@ -132,13 +138,23 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @var integer
      */
     protected int $orderIndex = -1;
+    /**
+     * If set, all errors/exceptions ar captured instead of logging them.
+     * @var bool
+     */
+    protected bool $captureErrors = true;
+    /**
+     * Holds captured errors
+     * @var ZfExtended_ErrorData[]
+     */
+    protected array $capturedErrors = [];
 
     /**
      * Sets the internal tags & the text by markup, acts like a constructor
      * @param string $text
      * @throws ZfExtended_Exception
      */
-    protected function _setMarkup(string $text){
+    protected function _setMarkup(string $text=NULL){
         if(!empty($text) && $text != editor_Segment_Tag::strip($text)){
             $this->unparse($text);
             // This debug can be used to evaluate the quality of the DOM parsing
@@ -210,7 +226,8 @@ abstract class editor_TagSequence implements JsonSerializable {
         $this->orderIndex = -1;
         $this->_setMarkup($text);
         if($this->text != $textBefore){
-            $this->logError('E1343', 'Setting the tags by text led to a changed text-content presumably because the encoded tags have been improperly processed');
+            $extraData = ['textBefore' => $textBefore ];
+            $this->logError('E1343', 'Setting the tags by text led to a changed text-content presumably because the encoded tags have been improperly processed', $extraData);
         }
     }
     /**
@@ -340,8 +357,11 @@ abstract class editor_TagSequence implements JsonSerializable {
                                 }
                             } else {
                                 // we have an overlap with tags, that both are not allowed to overlap. this must not happen.
-                                // TODO FIXME: Add Proper Exception / error-code
-                                $this->logError('E9999', 'Two non-splittable tags interleave each other.');
+                                // we report this error but continue with rendering, the overlapping tag will be adjusted in the cutting phase automatically
+                                $errorData = [];
+                                $errorData['overlappedTag'] = $tag->toJson();
+                                $errorData['overlappingTag'] = $compare->toJson();
+                                $this->logError('E1391', 'Two non-splittable tags interleave each other.', $errorData);
                             }
                         }
                     }
@@ -388,9 +408,9 @@ abstract class editor_TagSequence implements JsonSerializable {
             // TS-1337: This error happend "in the wild". It can only happen with malformed Markup. We need more data for a proper investigation
             if($nearest == null){
                 $errorData = [];
-                $errorData['holder'] = $holder->jsonSerialize();
-                $errorData['container'] = $container->jsonSerialize();
-                $errorData['tag'] = $tag->jsonSerialize();
+                $errorData['holder'] = $holder->toJson();
+                $errorData['container'] = $container->toJson();
+                $errorData['tag'] = $tag->toJson();
                 $errorData = $this->logError('E1343', 'Rendering TagSequence tags led to a invalid tag structure that could not be processed', $errorData);
                 throw new ZfExtended_Exception('editor_TagSequence::render: Rendering failed presumably due to invalid tag structure.'."\n".json_encode($errorData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
             }
@@ -521,9 +541,10 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @return editor_Segment_Tag
      */
     protected function fromHtmlNode(HtmlNode $node, int $startIndex){
-        $tag = $this->createFromHtmlNode($node, $startIndex);
-        if($node->hasChildren()){
-            foreach($node->getChildren() as $childNode){
+        $children = $node->hasChildren() ? $node->getChildren() : NULL;
+        $tag = $this->createFromHtmlNode($node, $startIndex, $children);
+        if($children !== NULL){
+            foreach($children as $childNode){
                 if($childNode->isTextNode()){
                     if($tag->addText($childNode->text())){
                         $startIndex += $tag->getLastChildsTextLength();
@@ -543,9 +564,10 @@ abstract class editor_TagSequence implements JsonSerializable {
     /**
      * @param HtmlNode $node
      * @param int $startIndex
+     * @param array|null $children
      * @return editor_Segment_Tag
      */
-    abstract protected function createFromHtmlNode(HtmlNode $node, int $startIndex) : editor_Segment_Tag;
+    abstract protected function createFromHtmlNode(HtmlNode $node, int $startIndex, array $children=NULL) : editor_Segment_Tag;
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a DOMElement structure
      * This is an alternative implementation using PHP DOM
@@ -555,10 +577,11 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @return editor_Segment_Tag
      */
     protected function fromDomElement(DOMElement $element, int $startIndex){
-        $tag = $this->createFromDomElement($element, $startIndex);
-        if($element->hasChildNodes()){
-            for($i = 0; $i < $element->childNodes->length; $i++){
-                $child = $element->childNodes->item($i);
+        $children = $element->hasChildNodes() ? $element->childNodes : NULL;
+        $tag = $this->createFromDomElement($element, $startIndex, $children);
+        if($children !== NULL){
+            for($i = 0; $i < $children->length; $i++){
+                $child = $children->item($i);
                 if($child->nodeType == XML_TEXT_NODE){
                     if($tag->addText(editor_Tag::convertDOMText($child->nodeValue))){
                         $startIndex += $tag->getLastChildsTextLength();
@@ -578,9 +601,10 @@ abstract class editor_TagSequence implements JsonSerializable {
     /**
      * @param DOMElement $element
      * @param int $startIndex
+     * @param DOMNodeList|null $children
      * @return editor_Segment_Tag
      */
-    abstract protected function createFromDomElement(DOMElement $element, int $startIndex) : editor_Segment_Tag;
+    abstract protected function createFromDomElement(DOMElement $element, int $startIndex, DOMNodeList $children=NULL) : editor_Segment_Tag;
     /**
      * Joins Tags that are equal and directly beneath each other
      * Also removes any internal connections between the tags
@@ -599,7 +623,7 @@ abstract class editor_TagSequence implements JsonSerializable {
                 if($last->isPairedOpener()){
                     for($j = $i; $j < $numTags; $j++){
                         // if we found the counterpart (the opener could pair it) this closer will be removed from our chain
-                        if($this->tags[$j]->isPairedCloser() && $last->getType() == $this->tags[$j]->getType() && $last->pairWith($this->tags[$j])){
+                        if($this->tags[$j]->isPairedCloser() && $last->isOfType($this->tags[$j]->getType()) && $last->pairWith($this->tags[$j])){
                             array_splice($this->tags, $j, 1);
                             $numTags--;
                             break;
@@ -609,7 +633,7 @@ abstract class editor_TagSequence implements JsonSerializable {
                 // we may already removed the current element, so check
                 if($i < $numTags){
                     $tag = $this->tags[$i];
-                    // we join only tasks that are splitable of course ...
+                    // we join only tags that are splitable of course ...
                     if($last->isSplitable() && $tag->isSplitable() && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
                         $last->endIndex = $tag->endIndex;
                     } else {
@@ -710,7 +734,7 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @throws Zend_Exception
      */
     protected function createLogger() : ZfExtended_Logger {
-        return Zend_Registry::get('logger')->cloneMe('editor.tagsequence');
+        return Zend_Registry::get('logger')->cloneMe(static::$logger_domain);
     }
     /**
      *
@@ -721,18 +745,21 @@ abstract class editor_TagSequence implements JsonSerializable {
      * @throws Zend_Exception
      */
     protected function logError(string $code, string $msg, array $errorData=[]) : array {
-        $this->createLogger()->error($code, $msg, $this->addErrorDetails($errorData));
+        $this->addErrorDetails($errorData);
+        if($this->captureErrors){
+            $this->capturedErrors[] = new ZfExtended_ErrorData($code, $msg, $errorData, static::$logger_domain);
+        } else {
+            $this->createLogger()->error($code, $msg, $errorData);
+        }
         return $errorData;
     }
     /**
-     *
+     * To be extended in inheriting classes
      * @param array $errorData
      */
     protected function addErrorDetails(array &$errorData){
         $errorData['text'] = $this->text;
     }
-
-    /* Validation API */
 
     /* Debugging API */
 

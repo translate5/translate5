@@ -58,7 +58,7 @@ class editor_Models_Import_FileParser_SegmentAttributes {
     public $autopropagated = false;
     
     /**
-     * flag if segment was locked in file
+     * flag if segment was locked in file - locks the segment immutable (auto state BLOCKED) - task lockLocked is true
      * @var boolean
      */
     public $locked = false;
@@ -77,7 +77,7 @@ class editor_Models_Import_FileParser_SegmentAttributes {
     public $autoStateId;
     
     /**
-     * Is the segment editable or not, calculated by the fileparser
+     * Is the segment editable or not, calculated by the fileparser - locks the segment mutable (auto state BLOCKED - if locked is not already set)
      * @var boolean
      */
     public $editable;

@@ -34,6 +34,8 @@ namespace MittagQI\Translate5\Segment\TagRepair;
  * This increases the chances to restore a tag where only the closing tag is returned by the service (DeepL)
  * Afterwards the original tags will be restored from the (potentially incomplete) markup sent back, lost tags will be attempted to insert/restored at their "scaled" word-position
  * In a worst-case scenario the pure text of the original markup will be restored (although until now there is no test/example for such scenario; it is a more theoretical case)
+ * The processing of internal tags is pretty sophisticated, as they will be handled as tags with two children in the unparsing, then morph to singular tags holding their rendered contents as afterStart/beforeEnd Markup
+ * and finally when pairing the paired (opening/closing) internal tags return to be non-singular tags but one hierarchy level higher compared to the unparsing. Therefore the "prepare pairing" phase had to be added
  *
  * Diagram of usage:
  * Create instance from original, valid markup     ->      Send "request markup" to the service [::getRequestHtml()]     ->     Restore original markup from service-result [::recreateTags($returnedMarkup)]
@@ -50,6 +52,8 @@ class Tags extends \editor_TagSequence {
      * @var bool
      */
     const DO_DEBUG = false;
+
+    protected static string $logger_domain = 'editor.tagrepair';
     /**
      * Each tag must have a unique id to be re-identifyable
      * @var int
@@ -70,6 +74,11 @@ class Tags extends \editor_TagSequence {
      * @var int
      */
     private int $originalNumWords;
+    /**
+     * Holds any paired tags for the prapare pairing phase
+     * @var Tag[]
+     */
+    private array $pairedTags = [];
     
     /* general API */
 
@@ -110,11 +119,37 @@ class Tags extends \editor_TagSequence {
         $this->invalidate();
         $this->reEvaluate($html);
         try {
-            return $this->render();
+            // rendering may produce errors with overlapping internal tags.
+            // these errors will be automatically repaired by adjusting the start-index of the overlapping tag
+            // therefore we dismiss these errors as this mechanic can be seen as part of our repair capabilities
+            $this->captureErrors = true;
+            $rendered = $this->render();
+            // reset captured errors
+            if(self::DO_DEBUG && count($this->capturedErrors) > 0){
+                error_log('RENDEREING RepairTags CREATED ERRORS:'."\n");
+                error_log('VISUALIZED MARKUP: '.\editor_Segment_Internal_Tag::visualizeTags($rendered)."\n");
+                foreach($this->capturedErrors as $item){
+                    error_log("\n".$item->debug());
+                }
+            }
+            $this->capturedErrors = [];
+            $this->captureErrors = false;
+            return $rendered;
+
         } catch (Exception $e) {
-            // fallback: recreate original structure from scratch(without any sent tags)
+            // reset captured errors
+            $this->captureErrors = false;
+            if(self::DO_DEBUG && count($this->capturedErrors) > 0) {
+                error_log('RENDEREING RepairTags BY DISMISSING REQUESTED TAGS' . "\n");
+                foreach ($this->capturedErrors as $item) {
+                    error_log("\n" . $item->debug());
+                }
+            }
+            $this->capturedErrors = [];
+            // fallback: recreate original structure from scratch (without any sent tags)
             $this->invalidate();
             $this->reEvaluate(strip_tags($html));
+            // if this still produces errors we may create tag-errors which will be reported or even lead to an exception
             return $this->render();
         }
     }
@@ -134,7 +169,7 @@ class Tags extends \editor_TagSequence {
         if(static::DO_DEBUG){
             error_log('RE-EVALUATE: chars before: ' .$this->originalTextLength.', words before: '.$this->originalNumWords.', num tags before: '.$numTags);
             for($i=0; $i < $numTags; $i++){
-                error_log('RE-EVALUATE before tag '.$i.': ( idx: '.$this->tags[$i]->getTagIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
+                error_log('RE-EVALUATE before tag '.$i.': ( idx: '.$this->tags[$i]->getRepairIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
             }
         }
     }
@@ -190,7 +225,7 @@ class Tags extends \editor_TagSequence {
         // re-evaluate the word-positions of our tags and restore the text-indices
         $textLength = $this->getTextLength();
         $wordRatio = $this->countWords($this->text) / $this->originalNumWords;
-        $textRatio = $textLength / $this->originalTextLength;
+        $textRatio = ($this->originalTextLength === 0) ? 1 : $textLength / $this->originalTextLength;
         // first the "real" non-singular tags
         for($i=0; $i < $numTags; $i++){
             if(!$this->tags[$i]->isSingular()){
@@ -206,7 +241,7 @@ class Tags extends \editor_TagSequence {
         if(static::DO_DEBUG){
             error_log('RE-EVALUATE: chars after: ' .$textLength.', words after: '.$this->countWords($this->text).', num tags after: '.$numTags);
             for($i=0; $i < $numTags; $i++){
-                error_log('RE-EVALUATE recreated tag '.$i.': ( idx: '.$this->tags[$i]->getTagIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
+                error_log('RE-EVALUATE recreated tag '.$i.': ( idx: '.$this->tags[$i]->getRepairIndex().' | start: '.$this->tags[$i]->startIndex.' | end: '.$this->tags[$i]->endIndex.' | num words: '.$this->tags[$i]->getNumWords($this).')');
             }
         }
     }
@@ -350,7 +385,7 @@ class Tags extends \editor_TagSequence {
      */
     public function findByTagIdx(int $tagIdx) : ?Tag {
         foreach($this->tags as $tag){
-            if($tag->getTagIndex() === $tagIdx){
+            if($tag->getRepairIndex() === $tagIdx){
                 return $tag;
             }
         }
@@ -387,25 +422,49 @@ class Tags extends \editor_TagSequence {
             if($wrapper->getTextLength() != $this->getTextLength()){ error_log("\n##### WRAPPER TEXT LENGTH ".$wrapper->getTextLength()." DOES NOT MATCH FIELD TEXT LENGTH: ".$this->getTextLength()." #####\n"); }
             if($wrapper->endIndex != $this->getTextLength()){ error_log("\n##### WRAPPER END INDEX ".$wrapper->endIndex." DOES NOT MATCH FIELD TEXT LENGTH: ".$this->getTextLength()." #####\n"); }
         }
+        // before rendering the request markup, we need to prepare paired tags (which need to manipulate the repairIndex in case of a successfull pairing)
+        $this->preparePairing();
         // after unparsing we need to save the markup we send as request
         $this->requestHtml = $wrapper->renderChildrenForRequest();
         // sequence the nested tags as our children
         $wrapper->sequenceChildren($this);
+        // consolidation / pairing
         $this->consolidate();
         // finalize unparsing
         $this->finalizeUnparse();
     }
 
+    /* Consolidation / pre-pairing API */
+
+    /**
+     * Prepares the consolidation/pairing of tags
+     * The paired closer tags need to know their openers tag index and use it for rendering the request (which is done before sequencing!)
+     */
+    protected function preparePairing(){
+        foreach($this->pairedTags as $tag){
+            $tag->preparePairing();
+        }
+        foreach($this->pairedTags as $tag){
+            if($tag->isPairedOpener()) {
+                foreach($this->pairedTags as $otherTag){
+                    if($otherTag->isPairedCloser() && $otherTag->isOfType($tag->getType())) {
+                        $tag->prePairWith($otherTag);
+                    }
+                }
+            }
+        }
+    }
+
     /* Creation API */
 
     /**
-     *
      * @param \PHPHtmlParser\Dom\Node\HtmlNode $node
      * @param int $startIndex
+     * @param array|null $children
      * @return \editor_Segment_Tag
      * @throws \stringEncode\Exception
      */
-    protected function createFromHtmlNode(\PHPHtmlParser\Dom\Node\HtmlNode $node, int $startIndex) : \editor_Segment_Tag {
+    protected function createFromHtmlNode(\PHPHtmlParser\Dom\Node\HtmlNode $node, int $startIndex, array $children=NULL) : \editor_Segment_Tag {
         $classNames = [];
         $attributes = [];
         $domTag = $node->getTag();
@@ -417,15 +476,15 @@ class Tags extends \editor_TagSequence {
                 $attributes[$name] = $attrib->getValue();
             }
         }
-        return $this->createRepairTag($classNames, $attributes, $domTag->name(), $startIndex);
+        return $this->createRepairTag($classNames, $attributes, $domTag->name(), $startIndex, NULL, $children);
     }
     /**
-     *
      * @param \DOMElement $element
      * @param int $startIndex
+     * @param \DOMNodeList|null $children
      * @return \editor_Segment_Tag
      */
-    protected function createFromDomElement(\DOMElement $element, int $startIndex) : \editor_Segment_Tag {
+    protected function createFromDomElement(\DOMElement $element, int $startIndex, \DOMNodeList $children=NULL) : \editor_Segment_Tag {
         $classNames = [];
         $attributes = [];
         if($element->hasAttributes()){
@@ -437,7 +496,7 @@ class Tags extends \editor_TagSequence {
                 }
             }
         }
-        return $this->createRepairTag($classNames, $attributes, $element->nodeName, $startIndex);
+        return $this->createRepairTag($classNames, $attributes, $element->nodeName, $startIndex, $children, NULL);
     }
     /**
      * @param array $classNames
@@ -446,8 +505,19 @@ class Tags extends \editor_TagSequence {
      * @param int $startIndex
      * @return Tag
      */
-    private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex) : Tag {
-        $tag = new Tag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
+    private function createRepairTag(array $classNames, array $attributes, string $nodeName, int $startIndex, \DOMNodeList $domChildren=NULL, array $htmlChildren=NULL) : Tag {
+        // InternalTag needs special processing to prevent them to be manipulated and to pair the open/close-pairs
+        // Since we may deal with user-generated markup here, we not only rely on the class but also inspect the children to avoid quirks
+        if(in_array(\editor_Segment_Internal_Tag::CSS_CLASS, $classNames) && \editor_Segment_Internal_Tag::hasNodeName($nodeName)
+                && (\editor_Segment_Internal_Tag::domElementChildrenAreInternalTagChildren($domChildren) || \editor_Segment_Internal_Tag::htmlNodeChildrenAreInternalTagChildren($htmlChildren))){
+            $tag = new InternalTag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
+        } else {
+            $tag = new Tag($startIndex, 0, '', $nodeName, $this->tagIdxCount);
+        }
+        // we need to prepare any paired tags before consolidation, so we need to know them before sequencing
+        if($tag->canBePaired()){
+            $this->pairedTags[] = $tag;
+        }
         $this->tagIdxCount++;
         if(count($classNames) > 0){
             foreach($classNames as $cname){
