@@ -238,7 +238,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var editor_Models_Import_SupportedFileTypes
      */
     protected editor_Models_Import_SupportedFileTypes $fileTypes;
-    
+    #region Plugin Init
     public function init() {
         $this->fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
@@ -373,6 +373,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $view = $event->getParam('view');
         $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
+
+    #endregion
 
     /**
      * Hook that adds the used bconf to the ImportArchive as a long-term reference which bconf was used

@@ -58,7 +58,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         } catch(e){
             return;
         }
-        var params = { id: rec.id, name: name };
+        var params = {id: rec.id, name: name};
         var customer = view.ownerGrid.getCustomer();
         if(customer){
             params.customerId = customer.id;
@@ -99,7 +99,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
     downloadSRX: function(view, rowIndex, colIndex, /* actionItem */ {purpose}, e, /* record */ {id}){
         view.select(rowIndex);
-        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx',{id, purpose});
+        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx', {id, purpose});
     },
     uploadSRX: function(id, srx, purpose){
         var controller = this;
@@ -130,14 +130,17 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             searchFilterValue = searchString.trim();
         store.clearFilter();
         if(searchFilterValue){
-            var searchRE = new RegExp(searchFilterValue, 'i');
+            var searchRE = new RegExp(Editor.util.Util.escapeRegex(Editor.util.Util.escapeRegex(searchFilterValue)), 'i');
             store.filterBy(({data}) => searchRE.exec(JSON.stringify(data, ['id', 'name', 'description'])));
         }
         field.getTrigger('clear').setVisible(searchFilterValue);
     },
 
     uploadBconf: async function(file){
-        var fileName = file.name.split('.').slice(0, -1).join('.').trim(); // remove .bconf
+        var me = this,
+            cutPosition = Math.min(file.name.search(/\.bconf$/), 50),
+            fileName = file.name.substring(0, cutPosition); // remove .bconf
+
         if(!fileName || Ext.getStore('bconfStore').getData().find('name', fileName, 0, true, true, true)){ //...start, startsWith, endsWith, ignoreCase
             try {
                 fileName = await this.promptUniqueBconfName(fileName);
@@ -175,6 +178,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                     message: invalidMsg.replace('{}', 'Bconf') + extraInfo,
                     icon: Ext.Msg.WARNING
                 });
+            } else if(response.status === 500 && response.responseJson?.errorCode === 'E1015'){
+                me.uploadBconf(file); // bconf with same name was uploaded outside this session
             } else {
                 Editor.app.getController('ServerException').handleException(response);
             }
@@ -209,6 +214,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                 items: [{
                     xtype: 'textfield',
                     fieldLabel: uniqueName,
+                    maxLength: 50, // DB constraint
                     width: 300,
                     selectOnFocus: true,
                     labelSeparator: ':',
@@ -227,13 +233,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                     },
                     listeners: {
                         specialkey: function(field, e){
-                            if([e.ENTER,e.ESC].includes(e.keyCode)){
+                            if([e.ENTER, e.ESC].includes(e.keyCode)){
                                 panel.close();
                             }
                         }
                     }
                 }],
-                fbar: [{xtype: 'button', text: 'OK', formBind: true, handler:()=>panel.close() }]
+                fbar: [{xtype: 'button', text: 'OK', formBind: true, handler: () => panel.close()}]
             }).show();
             panel.isValid(); // trigger display of red border when invalid
         });
