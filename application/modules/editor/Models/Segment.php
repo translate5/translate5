@@ -1266,15 +1266,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * This method assumes that segmentFieldManager was already loaded internally
      * @param string $taskGuid
      * @param int $id
-     * @param int $fileId optional, loads first file of given fileId in task
+     * @param int|null $fileId optional, loads first file of given fileId in task
      * @return editor_Models_Segment | null if no next found
      */
-    public function loadNext($taskGuid, $id, $fileId = null)
+    public function loadNext(string $taskGuid, int $id, int $fileId = null): ?static
     {
         $this->segmentFieldManager->initFields($taskGuid);
 
-        $s = $this->db->select();
-        $s = $this->addWatchlistJoin($s);
+        $s = $this->db->select()->from($this->tableName);
+        $this->applyFilterAndSort($s); //respecting filters if set any
+        $s = $this->addWatchlistJoin($s, $this->tableName);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
         $s->where($this->tableName . '.id > ?', $id)
             ->order($this->tableName . '.id ASC')
@@ -1288,6 +1289,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         if (empty($row)) {
             return null;
         }
+        //is needed since the join with isWatch is setting it true
+        $row->setReadOnly(false);
         $this->row = $row;
         $this->initData($this->getId());
         return $this;

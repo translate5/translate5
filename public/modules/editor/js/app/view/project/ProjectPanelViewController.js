@@ -55,8 +55,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         },
         controller: {
             '#admin.TaskOverview':{
-                afterTaskDelete:'onAfterTaskDeleteEventHandler',
-                beforeTaskDelete:'onBeforeTaskDeleteEventHandler'
+                afterTaskDelete:'onAfterTaskDeleteEventHandler'
             }
         },
         store: {
@@ -219,17 +218,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     onReloadProjectBtnClick:function(){
         var me=this;
         me.reloadProject();
-    },
-
-    /***
-     * Before task delete event handler
-     * Return true so the event call chain continues
-     */
-    onBeforeTaskDeleteEventHandler:function(task){
-        var me=this,
-            projectTaskGrid = me.lookup('projectTaskGrid');
-        projectTaskGrid.getStore().remove(task);
-        return true;
     },
 
     /***
