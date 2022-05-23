@@ -47,9 +47,6 @@ class Editor_CustomermetaController extends ZfExtended_RestController {
         $customer->load($this->_getParam('id'));
         //using the meta() method instead a direct meta::loadByCustomerId ensures that a empty taskmeta instance is given, also if nothing exists in DB
         $this->entity = $customer->meta();
-        //return;
-        //$this->entity = ZfExtended_Factory::get('editor_Models_Customer_Meta');
-        //$this->entity->loadByCustomerId($this->_getParam('id'));
     }
 
 

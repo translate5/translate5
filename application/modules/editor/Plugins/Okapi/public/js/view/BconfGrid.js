@@ -92,7 +92,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         enableTextSelection: true, // neccessary for pointer class to have effect on whole row
         getRowClass: function({data: bconf}){
             var cls = '',
-                customer = this.grid.customer;
+                customer = this.grid.ownerCt.ownerCt.getViewModel().getData().list.selection || {};
             if(customer && customer.get('id') === bconf.customerId){
                 cls += ' pointer ';
             } //else not editable
@@ -150,8 +150,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 // QUIRK: This is a purely synthetic column that renders based on the associated customer, so no dataIndex is set
                 // This is way easier than trying to model this dynamic relation canonically
                 renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
-                    this.disabled = view.grid.customer.get('isDefaultCustomer');
-                    arguments[0] = (record.id === view.grid.customer.get('defaultBconfId')); // customer is always set, else panel wouldn't be active
+                    const customer = view.grid.ownerCt.ownerCt.getViewModel().getData().list.selection || {};
+                    arguments[0] = (record.id === customer.data.defaultBconfId); // customer is always set, else panel wouldn't be active
                     return this.defaultRenderer.apply(this, arguments);
                 },
                 listeners: {
@@ -171,7 +171,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             oldDefaultId = customer.get('defaultBconfId'),
                             isSelect = oldDefaultId !== clicked.id, // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
                             id2Refresh = (isSelect && oldDefaultId) ? customer.get('defaultBconfId') : Editor.data.plugins.Okapi.systemDefaultBconfId,
-                            value = isSelect ? clicked.id : 0;
+                            value = isSelect ? clicked.id : null;
                         customer.set('defaultBconfId', value); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
                         Ext.Ajax.request({
                             url: Editor.data.restpath + 'customermeta',
