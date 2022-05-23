@@ -33,6 +33,8 @@ use PHPHtmlParser\Dom\Node\HtmlNode;
  * The structure of the tags in this class is a simple sequence, any nesting / interleaving is covered with rendering / unparsing
  */
 class editor_Segment_FieldTags extends editor_TagSequence {
+
+    protected static string $logger_domain = 'editor.fieldtags';
     
     /**
      * The counterpart to ::toJson: creates the tags from the serialized JSON data
@@ -367,17 +369,19 @@ class editor_Segment_FieldTags extends editor_TagSequence {
     /**
      * @param HtmlNode $node
      * @param int $startIndex
+     * @param array|null $children
      * @return editor_Segment_Tag
      */
-    protected function createFromHtmlNode(HtmlNode $node, int $startIndex) : editor_Segment_Tag {
+    protected function createFromHtmlNode(HtmlNode $node, int $startIndex, array $children=NULL) : editor_Segment_Tag {
         return editor_Segment_TagCreator::instance()->fromHtmlNode($node, $startIndex);
     }
     /**
      * @param DOMElement $element
      * @param int $startIndex
+     * @param DOMNodeList|null $children
      * @return editor_Segment_Tag
      */
-    protected function createFromDomElement(DOMElement $element, int $startIndex) : editor_Segment_Tag {
+    protected function createFromDomElement(DOMElement $element, int $startIndex, DOMNodeList $children=NULL) : editor_Segment_Tag {
         return editor_Segment_TagCreator::instance()->fromDomElement($element, $startIndex);
     }
 
@@ -601,6 +605,7 @@ class editor_Segment_FieldTags extends editor_TagSequence {
      * @param array $errorData
      */
     protected function addErrorDetails(array &$errorData){
+        $errorData['text'] = $this->text;
         $errorData['segmentId'] = $this->segmentId;
         $errorData['taskId'] = $this->task->getId();
         $errorData['taskGuid'] = $this->task->getTaskGuid();
