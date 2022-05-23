@@ -527,14 +527,19 @@ Ext.define('Editor.view.segments.Grid', {
 
     /**
      * Focus the segment in editor (open the segment for editing)
-    @param forEditing {boolean} - wether to open the segment editor when focused
-    @param failureEventName {string} - event to fire when segmentNrInTask's index cannot be found in the grid
-    @callback afterFocusCallback - to be called when segment is focused
+     * @param {String|Number} segmentNrInTask  - The segment Nr in Task - as String or already as int
+     * @param {Boolean} forEditing  - whether to open the segment editor when focused
+     * @param {String} failureEventName - event to fire when segmentNrInTask's index cannot be found in the grid
+     * @param {Function} afterFocusCallback - to be called when segment is focused
      */
     focusSegment: function(segmentNrInTask, forEditing = false, failureEventName = '', afterFocusCallback = Ext.emptyFn) {
-        var me = this,
-            selectedSegmentNrInTask = me.selection && me.selection.get('segmentNrInTask'),
-            segIsInFocusConfig = {};
+        let me = this,
+            segIsInFocusConfig = {},
+            segmentIndex;
+
+        if(!segmentNrInTask){
+            return;
+        }
 
         segIsInFocusConfig.callback = segIsInFocusConfig.notScrollCallback = function(){
             if(forEditing) {
@@ -545,17 +550,13 @@ Ext.define('Editor.view.segments.Grid', {
             }
             afterFocusCallback();
         };
-        if(!segmentNrInTask || selectedSegmentNrInTask == segmentNrInTask){
-            segmentNrInTask && segIsInFocusConfig.callback();
-            return;
-        }
         segmentNrInTask = parseInt(segmentNrInTask);
-        var segmentIndex = me.getStore().findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
+        segmentIndex = me.getStore().findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
         if(segmentIndex >= 0) {
-            me.scrollTo(segmentIndex, segIsInFocusConfig, forEditing);
+            me.scrollTo(segmentIndex, segIsInFocusConfig);
         } else {
-            me.searchPosition(segmentNrInTask, failureEventName).then(function scrollTo(segmentIndex) {
-                me.scrollTo(segmentIndex, segIsInFocusConfig, forEditing);
+            me.searchPosition(segmentNrInTask, failureEventName).then(function scrollTo(index) {
+                me.scrollTo(index, segIsInFocusConfig);
             });
         }
     },

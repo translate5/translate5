@@ -421,8 +421,9 @@ The German and the English Comment tag of the string must be imported as comment
         $segmentAttributes = $this->createSegmentAttributes($textId);
         $this->setMid($textId);
         $segmentAttributes->transunitId = $textId;
+        $segmentAttributes->locked = $this->currentIsReadOnly;
         $segmentAttributes->editable = !$this->currentIsReadOnly;
-        
+
         if(array_key_exists($lengthId, $this->lengthDefinitions)) {
             $segmentAttributes->maxWidth = $this->lengthDefinitions[$lengthId]['maxWidth'];
             $segmentAttributes->sizeUnit = editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING;

@@ -256,7 +256,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         this.currentFilterVal = (checkedVals.length > 0) ? (checkedVals.join(',') + '|' + modeVal) : ('NONE|' + modeVal);
         // CRUCIAL: if we generate values for the segment Controller we must return an empty value in case nothing is checked
         // the segments controller will manage only the two states 'not filtered' = empty value or 'filtered= = value with all filters
-        if(!forStoreReload && checkedVals.length == 0){
+        if(!forStoreReload && checkedVals.length === 0){
             return '';
         }
         // if we reload the store we want the state of the expanded/collapsed nodes to be persistent and thus send them as well
@@ -266,7 +266,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             Ext.Array.each(this.getView().getStore().getRoot().getCollapsedChildren(), function(record){
                 collapsedVals.push(record.getTypeCatKey());
             });
-            return (collapsedVals.length == 0) ? (this.currentFilterVal + '|NONE') : (this.currentFilterVal + '|' + collapsedVals.join(','));
+            return (collapsedVals.length === 0) ? (this.currentFilterVal + '|NONE') : (this.currentFilterVal + '|' + collapsedVals.join(','));
         }
         return this.currentFilterVal;
     }

@@ -27,10 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Implements an Iterator for Task Segments. 
- * This Iterator loads always one Segment instead storing all segments in Memory.
- * @author tlauria
- *
+ * Implements an Iterator for a tasks segments.
+ * - this iterator loads always one Segment instead storing all segments in Memory.
+ * - The only filtering arguments are the optional file id, for more advanced filtering (like in the indexAction) @see
  */
 class editor_Models_Segment_Iterator implements Iterator {
 
@@ -68,7 +67,8 @@ class editor_Models_Segment_Iterator implements Iterator {
      * @return ?editor_Models_Segment
      * @see Iterator::current()
      */
-    public function current() : mixed {
+    public function current() : ?editor_Models_Segment
+    {
         return $this->segment;
     }
 
@@ -93,11 +93,11 @@ class editor_Models_Segment_Iterator implements Iterator {
      * @see Iterator::rewind()
      */
     public function rewind() : void {
-        $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
+        $this->initSegment();
         try {
             $this->segment->loadFirst($this->taskGuid, $this->fileId);
             $this->isEmpty = false;
-        } catch(ZfExtended_Models_Entity_NotFoundException $noSegments) {
+        } catch(ZfExtended_Models_Entity_NotFoundException) {
             $this->isEmpty = true;
         }
     }
@@ -111,5 +111,10 @@ class editor_Models_Segment_Iterator implements Iterator {
 
     public function isEmpty(): bool {
         return $this->isEmpty;
+    }
+
+    protected function initSegment(): void
+    {
+        $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
     }
 }

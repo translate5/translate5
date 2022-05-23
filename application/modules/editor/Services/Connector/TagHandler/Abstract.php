@@ -169,4 +169,11 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     public function setTagMap(array $map) {
         $this->map = $map;
     }
+
+    /**
+     * @return editor_Models_Segment_UtilityBroker|mixed
+     */
+    public function getUtilities() : editor_Models_Segment_UtilityBroker {
+        return $this->utilities;
+    }
 }

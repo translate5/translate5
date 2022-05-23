@@ -130,7 +130,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                   FROM (
                     SELECT t1.*, 1 as segCount
                     FROM LEK_match_analysis AS t1
-                    INNER JOIN LEK_segments s ON t1.segmentId = s.id AND s.autoStateId != ?
+                    INNER JOIN LEK_segments s ON t1.segmentId = s.id AND s.autoStateId != ? AND s.autoStateId != ?
                     LEFT OUTER JOIN LEK_match_analysis AS t2
                     ON t1.segmentId = t2.segmentId
                       AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.analysisId = ?
@@ -138,7 +138,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                   ) bestRates
                   GROUP BY bestRates.internalFuzzy, bestRates.languageResourceid, bestRates.matchRate;';
 
-        $bind = [editor_Models_Segment_AutoStates::BLOCKED, $analysisAssoc['id'], $analysisAssoc['id']];
+        $bind = [editor_Models_Segment_AutoStates::LOCKED, editor_Models_Segment_AutoStates::BLOCKED, $analysisAssoc['id'], $analysisAssoc['id']];
         
         $resultArray = $this->db->getAdapter()->query($sqlV3, $bind)->fetchAll();
         if (empty($resultArray)) {

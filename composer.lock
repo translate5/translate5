@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "89163d50cb5d3279a7b0ecab86cadd68",
+    "content-hash": "85e359f0c2eeff93145f3bea5af88429",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -1518,6 +1518,56 @@
                 "source": "https://github.com/infostars/headless-chromium-php/tree/master"
             },
             "time": "2018-12-07T14:25:03+00:00"
+        },
+        {
+            "name": "joshtronic/php-loremipsum",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/joshtronic/php-loremipsum.git",
+                "reference": "6d7f8cff6a092a53d66b5237edbe97d398b14f88"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/joshtronic/php-loremipsum/zipball/6d7f8cff6a092a53d66b5237edbe97d398b14f88",
+                "reference": "6d7f8cff6a092a53d66b5237edbe97d398b14f88",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.36 || ^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "joshtronic\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Josh Sherman",
+                    "email": "hello@joshtronic.com",
+                    "homepage": "https://joshtronic.com"
+                }
+            ],
+            "description": "Lorem ipsum generator in PHP without dependencies",
+            "homepage": "https://github.com/joshtronic/php-loremipsum",
+            "keywords": [
+                "generator",
+                "ipsum",
+                "lorem"
+            ],
+            "support": {
+                "issues": "https://github.com/joshtronic/php-loremipsum/issues",
+                "source": "https://github.com/joshtronic/php-loremipsum/tree/2.1.0"
+            },
+            "time": "2022-01-23T23:27:44+00:00"
         },
         {
             "name": "jquery/jquery-ui",
@@ -7981,9 +8031,13 @@
         "ext-simplexml": "*",
         "ext-libxml": "*",
         "ext-pdo": "*",
+        "ext-dom": "*",
         "ext-mysqli": "*",
         "ext-xmlreader": "*",
         "ext-sockets": "*",
+        "ext-iconv": "*",
+        "ext-zip": "*",
+        "ext-fileinfo": "*",
         "lib-imagick-imagemagick": "*",
         "ext-imagick": "*",
         "ext-bcmath": "*"

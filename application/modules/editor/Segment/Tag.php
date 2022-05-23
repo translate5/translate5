@@ -276,6 +276,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return static::$type;
     }
     /**
+     * Retrieves, if we are of the passed type
+     * @param string $type
+     * @return bool
+     */
+    public function isOfType(string $type) : bool {
+        return (static::$type === $type);
+    }
+    /**
      * Retrieves the category
      * NOTE: any connection between classes and categories must be coded in the inheriting class
      * @return string
@@ -631,6 +639,9 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
             }
         }
     }
+
+    /* Unparsing API */
+
     /**
      * Adds us and all our children to the segment tags
      * @param int $parentOrder
@@ -662,6 +673,9 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     public function finalize(editor_TagSequence $tags, editor_Models_task $task){
         
     }
+
+    /* Debugging API */
+
     /**
      * Debug output
      * @return string
