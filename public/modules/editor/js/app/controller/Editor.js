@@ -692,12 +692,15 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
 
-        var me = this,
+        let me = this,
+            grid = me.getSegmentGrid(),
+            nr = grid.selection && grid.selection.get('segmentNrInTask'),
             prompt = Ext.Msg.prompt('Go to segment', 'No.:', function(btn, text){
             if (btn === 'ok'){
                 me.getSegmentGrid().focusSegment(text);
             }
-        });
+        }, me, false, nr);
+        prompt.down('textfield').selectOnFocus = true;
         prompt.down('textfield').focus(200);
     },
 
@@ -1774,15 +1777,23 @@ Ext.define('Editor.controller.Editor', {
         });
     },
 
-    /***
+    /**
      * Edit task and focus segment route
+     * @param {String} taskId
+     * @param {String} segmentNrInTask
      */
     onTaskSegmentEditRoute: function(taskId, segmentNrInTask) {
-        var me = this,
+        let me = this,
+            grid = me.getSegmentGrid(),
             dataTask = Editor.data.task;
 
-        if(dataTask && dataTask.id == taskId) {
-            me.getSegmentGrid() && me.getSegmentGrid().focusSegment(segmentNrInTask);
+        //prevent re-run of focusing if we have the segment already selected
+        if(grid && grid.selection && grid.selection.get('segmentNrInTask') === parseInt(segmentNrInTask)) {
+            return;
+        }
+
+        if(dataTask && dataTask.id === parseInt(taskId)) {
+            grid && grid.focusSegment(segmentNrInTask);
             return;
         }
         if(dataTask && dataTask.isModel){ // task is active, switch task
