@@ -57,6 +57,7 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
         }
 
         params = params || {filter: "[]"};
+        params.qualities = grid.store.getQualityFilter();
         grid.view.setBind({
             loading: '{l10n.segmentGrid.batchOperations.loading.'+menuitem.operation+'}'
         });
