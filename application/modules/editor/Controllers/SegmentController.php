@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\FilteredIterator;
+use MittagQI\Translate5\Segment\Operations;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
@@ -680,9 +682,91 @@ class Editor_SegmentController extends ZfExtended_RestController
         throw new ZfExtended_BadMethodCallException(__CLASS__ . '->post');
     }
 
+    #region Operation Entry Points
+
+    /**
+     * @param bool $lock optional, defines if lock or unlock, defaults to true
+     * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws editor_Models_Segment_Exception
+     */
+    public function lockOperation(bool $lock = true) {
+        $acl = $lock ? 'lockSegmentOperation' : 'unlockSegmentOperation';
+
+        //the amount of new ACL rules would be huge to handle that lock/unlock Batch/Operations with
+        // ordinary controller right handling since currently role editor has access to all methods here.
+        // So its easier to double access to that functions for PM users then
+        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockOperation'));
+        $this->getAction();
+
+        /* @var Operations $locking */
+        $locking = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
+            $this->getCurrentTask()->getTaskGuid(),
+            $this->entity
+        ]);
+        $locking->toggleLockOperation($lock);
+
+        //update the already flushed object with the locked one
+        $this->view->rows = $this->entity->getDataObject();
+    }
+
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws editor_Models_Segment_Exception
+     */
+    public function unlockOperation() {
+        $this->lockOperation(false);
+    }
+
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    public function unlockBatch() {
+        $this->lockBatch(false);
+    }
+
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    public function lockBatch(bool $lock = true) {
+        $acl = $lock ? 'lockSegmentBatch' : 'unlockSegmentBatch';
+        $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockBatch'));
+
+        /* @var Operations $operations */
+        $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
+            $this->getCurrentTask()->getTaskGuid(),
+            $this->entity
+        ]);
+        $operations->toggleLockBatch($lock);
+    }
+
+    public function unbookmarkBatch() {
+        $this->bookmarkBatch(false);
+    }
+
+    /**
+     * @throws ZfExtended_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    public function bookmarkBatch(bool $bookmark = true) {
+        $acl = $bookmark ? 'bookmarkBatch' : 'unbookmarkBatch';
+        $this->checkAccess('editor_segmentuserassoc', $acl, __CLASS__.'::'.$acl);
+        /* @var Operations $operations */
+        $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
+            $this->getCurrentTask()->getTaskGuid(),
+            $this->entity
+        ]);
+        $operations->toggleBookmarkBatch($bookmark);
+    }
+
+    #endregion
+
     /**
      * returns the mapping between fileIds and segment row indizes
-     * @return array
+     * @return void
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function filemapAction()
     {

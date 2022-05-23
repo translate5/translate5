@@ -57,7 +57,7 @@ class editor_Models_Segment_AutoStates {
      * "locked" / 'Gesperrt' => locking of 100% matches
      * @var integer
      */
-    const BLOCKED = 3;
+    const LOCKED = 3;
     
     /**
      * "untranslated" / "Nicht übersetzt" → kommt wie 0 initial aus dem Import
@@ -131,6 +131,12 @@ class editor_Models_Segment_AutoStates {
      * @var integer
      */
     const PRETRANSLATED = 15;
+
+    /**
+     * Similar to LOCKED but immutable
+     */
+    const BLOCKED = 16;
+
     
     /**
      * Internal state used to show segment is pending
@@ -144,13 +150,14 @@ class editor_Models_Segment_AutoStates {
      */
     const PENDING = 999;
     
-    protected $states = array(
+    protected $states = [
         self::TRANSLATED => 'Übersetzt',
         self::TRANSLATED_AUTO => 'Übersetzt, auto',
         self::NOT_TRANSLATED => 'Nicht übersetzt',
         self::REVIEWED => 'Lektoriert',
         self::REVIEWED_AUTO => 'Lektoriert, auto',
-        self::BLOCKED => 'Gesperrt',
+        self::BLOCKED => 'Dauerhaft gesperrt',
+        self::LOCKED => 'Gesperrt',
         self::REVIEWED_UNTOUCHED => 'Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss',
         self::REVIEWED_UNCHANGED => 'Lektoriert, unverändert',
         self::REVIEWED_UNCHANGED_AUTO => 'Lektoriert, unverändert, auto',
@@ -161,8 +168,17 @@ class editor_Models_Segment_AutoStates {
         self::REVIEWED_PM_UNCHANGED => 'PM lektoriert, unverändert',
         self::REVIEWED_PM_UNCHANGED_AUTO => 'PM lektoriert, unverändert, auto',
         self::PRETRANSLATED => 'Vorübersetzt'
-    );
-    
+    ];
+
+    private editor_Models_SegmentHistory $segmentHistory;
+
+    public function __construct()
+    {
+        $this->segmentHistory = ZfExtended_Factory::get('editor_Models_SegmentHistory');
+    }
+
+    #region Getters
+
     /**
      * returns a map with state as index and translated text as value
      * @return array
@@ -233,7 +249,65 @@ class editor_Models_Segment_AutoStates {
             self::REVIEWED_PM_UNCHANGED_AUTO,
         ];
     }
-    
+
+    /***
+     * Get the required auto states for segment workflow step loading.
+     * This specific state is used for changedSegments loading in the workflow mails.
+     * @param bool $withPm: set to true to include the required pm autostates
+     * @return array
+     */
+    public function getForWorkflowStepLoading(bool $withPm = false)  {
+        //required autostates
+        //1 "Reviewed", 2 "Reviewed, auto-set", 8 "2. Review", 9 "2. Review, auto"
+        $autoStates = [
+            editor_Models_Segment_AutoStates::REVIEWED,
+            editor_Models_Segment_AutoStates::REVIEWED_AUTO,
+            editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR,
+            editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR_AUTO
+        ];
+        //if pmChanges is active, add additional required autostates
+        //10 PM reviewed,11 PM reviewed, auto-set
+        if($withPm){
+            $autoStates = array_merge($autoStates,[
+                editor_Models_Segment_AutoStates::REVIEWED_PM,
+                editor_Models_Segment_AutoStates::REVIEWED_PM_AUTO
+            ]);
+        }
+        return $autoStates;
+    }
+
+    /**
+     * returns a map of constant names to the corresponding integer values
+     * @return array
+     */
+    public function getStateMap(): array {
+        $refl = new ReflectionClass($this);
+        $consts = $refl->getConstants();
+        $result = [];
+        foreach ($consts as $const => $val) {
+            $result[$const] = $val;
+        }
+        return $result;
+    }
+
+    /**
+     * Returns a map with counts of each state in a task
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getStatistics(string $taskGuid): array {
+        $seg = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $seg editor_Models_Segment */
+        $stats = $seg->getAutoStateCount($taskGuid);
+        $result = array_fill_keys($this->getStates(), 0);
+        foreach($stats as $stat) {
+            $result[$stat['autoStateId']] = $stat['cnt'];
+        }
+        return $result;
+    }
+    #endregion Getters
+
+    #region Calculators
     /**
      * returns the state to use for Alikesegments
      *
@@ -268,8 +342,13 @@ class editor_Models_Segment_AutoStates {
      */
     public function calculateImportState(editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes): int
     {
-        if(! $segmentAttributes->editable) {
+        // the locked attribute is immutable, therefore we BLOCK the segment (which means locked immutable)
+        if($segmentAttributes->locked) {
             return self::BLOCKED;
+        }
+        // if a segment is just not editable, this is mutable, so we set it to LOCKED (which can be then unlocked)
+        if(! $segmentAttributes->editable) {
+            return self::LOCKED;
         }
         if($segmentAttributes->isPreTranslated) {
             return self::PRETRANSLATED;
@@ -279,41 +358,61 @@ class editor_Models_Segment_AutoStates {
         }
         return self::NOT_TRANSLATED;
     }
-    
+
+
+
     /**
-     * re calculates the autoStateId on un block of fullmatches
-     * @param bool $isEditable
-     * @param bool $isTranslated
-     * @return integer
+     * recalculates the auto state for the given segment when unlocking it
+     * @param editor_Models_Segment $segment
+     * @return int
      */
-    public function recalculateUnBlocked(bool $isTranslated, bool $preTranslated): int
+    public function recalculateUnLockedState(editor_Models_Segment $segment): int
     {
-        if(! $isTranslated) {
+        // LOCKED → to all previous non locked and non untranslated states possible from history
+        $latest = $this->segmentHistory->loadLatestForSegment($segment->getId(), [
+            'editable != ?' => 0,
+            'autoStateId != ?' => self::LOCKED,
+            'autoStateId != ?' => self::BLOCKED,
+            'autoStateId != ?' => self::NOT_TRANSLATED,
+        ]);
+
+        //if nothing found in history, re calculate it
+        if (!empty($latest)) {
+            return $latest['autoStateId'];
+        }
+        // LOCKED → TRANSLATED     if target.length > 0 and pretrans = 0 (false)
+        // LOCKED → NOT_TRANSLATED if target.length == 0
+        // LOCKED → PRETRANSLATED  if target.length > 0 and pretrans > 0 (true)
+        if(! $segment->isTargetTranslated()) {
             return self::NOT_TRANSLATED;
         }
-        return $preTranslated ? self::PRETRANSLATED : self::TRANSLATED;
+        if((int)$segment->getPretrans() !== $segment::PRETRANS_NOTDONE) {
+            return self::PRETRANSLATED;
+        }
+        return self::TRANSLATED;
     }
 
     /**
      * re calculates the autoStateId on blocking of fullmatches
-     * @param int $isTranslated
+     * @param editor_Models_Segment $segment
+     * @return int
      */
-    public function recalculateBlocked(int $previousState): int
+    public function recalculateLockedState(editor_Models_Segment $segment): int
     {
-        switch ($previousState) {
-            case self::TRANSLATED:
-            case self::REVIEWED_UNTOUCHED:
-            case self::REVIEWED_UNCHANGED:
-            case self::REVIEWED_UNCHANGED_AUTO:
-            case self::REVIEWED_PM_UNCHANGED:
-            case self::REVIEWED_PM_UNCHANGED_AUTO:
-            case self::PRETRANSLATED:
-                return self::BLOCKED;
-            default:
-                return $previousState;
-        }
+        return match ($segment->getAutoStateId()) {
+            self::TRANSLATED,
+            self::REVIEWED_UNTOUCHED,
+            self::REVIEWED_UNCHANGED,
+            self::REVIEWED_UNCHANGED_AUTO,
+            self::REVIEWED_PM_UNCHANGED,
+            self::REVIEWED_PM_UNCHANGED_AUTO,
+            self::PRETRANSLATED
+                => self::LOCKED,
+            default
+                => $segment->getAutoStateId(),
+        };
     }
-    
+
     /**
      * calculates the initial autoStateId of an segment in the import process
      * @param bool $isEditable
@@ -321,15 +420,16 @@ class editor_Models_Segment_AutoStates {
      */
     public function calculatePretranslationState(bool $isEditable): int
     {
-        return $isEditable ? self::PRETRANSLATED : self::BLOCKED;
+        return $isEditable ? self::PRETRANSLATED : self::LOCKED;
     }
-    
+
     /**
      * calculates and returns the autoStateID to use
      * @param editor_Models_Segment $segment
      * @param editor_Models_TaskUserAssoc $tua
+     * @return int
      */
-    public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
+    public function calculateSegmentState(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua): int {
         $isModified = $segment->isDataModifiedAgainstOriginal();
         
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
@@ -338,7 +438,11 @@ class editor_Models_Segment_AutoStates {
         if($segment->getAutoStateId() == self::BLOCKED){
             return self::BLOCKED;
         }
-        
+
+        if($segment->getAutoStateId() == self::LOCKED){
+            return self::LOCKED;
+        }
+
         if($tua->getRole() == $workflow::ROLE_TRANSLATOR) {
             return self::TRANSLATED;
         }
@@ -354,8 +458,10 @@ class editor_Models_Segment_AutoStates {
         }
         
         //if no role match, return old value
-        return $segment->getAutoStateId();
+        return (int) $segment->getAutoStateId();
     }
+
+    #endregion Calculators
     
     /**
      * sets the reviewer untouched state for a given taskGuid
@@ -427,23 +533,7 @@ class editor_Models_Segment_AutoStates {
             return;
         }
     }
-    
-    /**
-     * Returns a map with counts of each state in a task
-     * @param string $taskGuid
-     * @return array
-     */
-    public function getStatistics(string $taskGuid): array {
-        $seg = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $seg editor_Models_Segment */
-        $stats = $seg->getAutoStateCount($taskGuid);
-        $result = array_fill_keys($this->getStates(), 0);
-        foreach($stats as $stat) {
-            $result[$stat['autoStateId']] = $stat['cnt'];
-        }
-        return $result;
-    }
-    
+
     /**
      * returns true if user has right to edit all Tasks, checks optionally the workflow role of the user
      * @param editor_Models_TaskUserAssoc $tua optional, if not given only acl is considered
@@ -463,32 +553,6 @@ class editor_Models_Segment_AutoStates {
         return empty($role) && ($editAllTasks || $sameUserGuid || $systemUser);
     }
     
-    /***
-     * Get the required auto states for segment workflow step loading.
-     * This specific state is used for changedSegments loading in the workflow mails.
-     * @param bool $withPm: set to true to include the required pm autostates
-     * @return array
-     */
-    public function getForWorkflowStepLoading(bool $withPm = false)  {
-        //required autostates
-        //1 "Reviewed", 2 "Reviewed, auto-set", 8 "2. Review", 9 "2. Review, auto"
-        $autoStates = [
-            editor_Models_Segment_AutoStates::REVIEWED,
-            editor_Models_Segment_AutoStates::REVIEWED_AUTO,
-            editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR,
-            editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR_AUTO
-        ];
-        //if pmChanges is active, add additional required autostates
-        //10 PM reviewed,11 PM reviewed, auto-set
-        if($withPm){
-            $autoStates = array_merge($autoStates,[
-                editor_Models_Segment_AutoStates::REVIEWED_PM,
-                editor_Models_Segment_AutoStates::REVIEWED_PM_AUTO
-            ]);
-        }
-        return $autoStates;
-    }
-    
     /**
      * returns true if the given state is state produced by a translator
      * @param int $autoState
@@ -498,4 +562,15 @@ class editor_Models_Segment_AutoStates {
     {
         return in_array($autoState, [self::TRANSLATED, self::TRANSLATED_AUTO]);
     }
+
+    /**
+     * returns true if the segment is blocked (so it can not be unlocked)
+     * @param int $autoState
+     * @return bool
+     */
+    public function isBlocked(int $autoState): bool
+    {
+        return $autoState === self::BLOCKED;
+    }
+
 }

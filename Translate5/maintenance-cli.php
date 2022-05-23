@@ -102,6 +102,7 @@ if(file_exists('.git')) {
     $commands[] = new ReleaseNotesCommand();
     $commands[] = new DevelopmentNewModelCommand();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
+    $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
 }
 $app->addCommands($commands);
 $app->run();

@@ -682,9 +682,10 @@ function translateText(textToTranslate, translationInProgressID){
         dataType: "json",
         type: "POST",
         data: {
-            'source':$("#sourceLocale").val(),
-            'target':$("#targetLocale").val(),
-            'text':textToTranslate
+            'source': $("#sourceLocale").val(),
+            'target': $("#targetLocale").val(),
+            'text': textToTranslate,
+            'escape': 1
         },
         success: function(result){
             if (translationInProgressID !== latestTranslationInProgressID) {
@@ -1490,12 +1491,26 @@ function swapLanguages(){
     var results = $('div.translation-result');
     if(results.length > 0) {
         // set the source textarea text, therfore markup must be removed and breaktags restored
-        $('#sourceText').val(markupToText(results.first().html()));
+        var text = unescapeHtml(results.first().html());
+        $('#sourceText').val(text);
     }
     $('#translations').hide();
     changeLanguage();
 }
-
+/**
+ * Just a simple htmlspecialchars_decode in JS
+ * @param string text
+ * @returns string
+ */
+function unescapeHtml(text){
+    return text
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&apos;/g, "'");
+}
 /**
  * Shows the GUI as neccessary for the current app-state
  */
