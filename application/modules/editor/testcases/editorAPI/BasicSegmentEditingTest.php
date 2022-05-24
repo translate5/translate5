@@ -99,7 +99,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','0','3','0','0','4','4','4','4','0','4','4'), $autoStateIds);
+        $this->assertEquals(array('0','0','0','16','0','0','4','4','4','4','0','4','4'), $autoStateIds);
         
         foreach($segments as $segment) {
             $this->assertEquals('{00000000-0000-0000-C100-CCDDEE000001}', $segment->userGuid);
@@ -232,7 +232,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','1','3','0','0','1','1','1','4','0','4','4'), $autoStateIds);
+        $this->assertEquals(array('0','0','1','16','0','0','1','1','1','4','0','4','4'), $autoStateIds);
         
         //bulk check of all workflowStepNr fields
         $workflowStepNr = array_map(function($item){
