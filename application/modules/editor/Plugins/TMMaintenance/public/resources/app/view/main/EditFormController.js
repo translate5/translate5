@@ -12,8 +12,7 @@ Ext.define('TMMaintenance.view.main.EditFormController', {
 
         let record = form.getRecord();
         record.set(form.getValues());
-        //TODO get from base/main/global
-        record.set({tm: Ext.getCmp('searchform').getValues().tm});
+        record.set({tm: this.getViewModel().get('selectedTm')});
         record.save({
             success: () => {
                 me.onSuccess();

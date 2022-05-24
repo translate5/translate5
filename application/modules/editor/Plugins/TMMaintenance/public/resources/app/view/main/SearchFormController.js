@@ -4,6 +4,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
 
     onTMChange: function () {
         let values = this.getView().getValues();
+        this.getViewModel().set('selectedTm', values.tm);
         this.getViewModel().set('disabled', null === values.tm || null === values.searchField);
     },
 

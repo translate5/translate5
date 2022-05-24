@@ -53,7 +53,10 @@ Ext.define('TMMaintenance.view.main.Main', {
                     xtype: 'button',
                     text: 'Create',
                     handler: 'onCreatePressed',
-                    // TODO disable if TM is not selected
+                    disabled: '{disabled}',
+                    bind: {
+                        disabled: '{!selectedTm}',
+                    },
                 },
                 {
                     id: 'editform',

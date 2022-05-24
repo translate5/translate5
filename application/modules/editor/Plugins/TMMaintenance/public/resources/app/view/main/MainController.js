@@ -57,8 +57,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
      * @param {TMMaintenance.model.Segment} record
      */
     onDeleteConfirm: function (record) {
-        //TODO get from base/main/global
-        record.set({tm: Ext.getCmp('searchform').getValues().tm});
+        record.set({tm: this.getViewModel().get('selectedTm')});
         record.erase({
             success: () => {
                 // TODO what to do here?
