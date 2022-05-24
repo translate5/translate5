@@ -2,12 +2,14 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.searchform',
 
-    /**
-     * @param {ComboBox} comboBox
-     * @param {String} tm
-     */
-    onTMChange: function (comboBox, tm) {
-        this.getViewModel().set('disabled', null === tm);
+    onTMChange: function () {
+        let values = this.getView().getValues();
+        this.getViewModel().set('disabled', null === values.tm || null === values.searchField);
+    },
+
+    onSearchFieldChange: function () {
+        let values = this.getView().getValues();
+        this.getViewModel().set('disabled', null === values.tm || null === values.searchField);
     },
 
     onSearch: function () {

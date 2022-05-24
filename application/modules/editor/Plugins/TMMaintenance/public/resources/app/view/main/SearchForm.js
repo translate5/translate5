@@ -44,6 +44,9 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     value: 'target',
                 },
             ],
+            listeners: {
+                change: 'onSearchFieldChange'
+            },
         },
         {
             xtype: 'panel',
