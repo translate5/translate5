@@ -4189,6 +4189,14 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>sperren</source>
   <target>lock</target>
 </trans-unit>
+<trans-unit id="U29sbCBkaWUgQWt0aW9uIHdpcmtsaWNoIGF1ZiBhbGxlIFNlZ21lbnRlIGFuZ2V3ZW5kZXQgd2VyZGVuPyBEYXMga2FubiBlaW5pZ2UgWmVpdCBpbiBBbnNwcnVjaCBuZWhtZW4u">
+  <source>Soll die Aktion wirklich auf alle Segmente angewendet werden? Das kann einige Zeit in Anspruch nehmen.</source>
+  <target>Shall the action really applied on all segments? This may need some time.</target>
+</trans-unit>
+<trans-unit id="S2VpbiBTZWdtZW50IEZpbHRlciBnZXNldHp0">
+  <source>Kein Segment Filter gesetzt</source>
+  <target>No segment filter set</target>
+</trans-unit>
 <trans-unit id="QWxsZSBnZWZpbHRlcnRlbiBTZWdtZW50ZTo=">
   <source>Alle gefilterten Segmente:</source>
   <target>All filtered segments:</target>
