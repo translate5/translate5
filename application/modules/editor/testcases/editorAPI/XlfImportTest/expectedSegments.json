@@ -224,7 +224,7 @@
         "pretrans": "0",
         "matchRate": "90",
         "stateId": "0",
-        "autoStateId": "3",
+        "autoStateId": "16",
         "fileOrder": "0",
         "workflowStepNr": "0",
         "workflowStep": null,
