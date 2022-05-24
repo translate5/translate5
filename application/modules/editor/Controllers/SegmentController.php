@@ -98,11 +98,7 @@ class Editor_SegmentController extends ZfExtended_RestController
         $taskGuid = $this->getCurrentTask()->getTaskGuid();
 
         // apply quality filter
-        if($this->getRequest()->getParam('qualities', '') != ''){
-            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'), $this->getCurrentTask());
-            $filter = $this->entity->getFilter();
-            $filter->setQualityFilter($qualityState);
-        }
+        $this->applyQualityFilter();
         $rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
@@ -699,12 +695,12 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockOperation'));
         $this->getAction();
 
-        /* @var Operations $locking */
-        $locking = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
+        /* @var Operations $operations */
+        $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
             $this->getCurrentTask()->getTaskGuid(),
             $this->entity
         ]);
-        $locking->toggleLockOperation($lock);
+        $operations->toggleLockOperation($lock);
 
         //update the already flushed object with the locked one
         $this->view->rows = $this->entity->getDataObject();
@@ -733,6 +729,7 @@ class Editor_SegmentController extends ZfExtended_RestController
     public function lockBatch(bool $lock = true) {
         $acl = $lock ? 'lockSegmentBatch' : 'unlockSegmentBatch';
         $this->checkAccess('frontend', $acl, __CLASS__.'::'.($lock ? __FUNCTION__ : 'unlockBatch'));
+        $this->applyQualityFilter();
 
         /* @var Operations $operations */
         $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
@@ -753,6 +750,8 @@ class Editor_SegmentController extends ZfExtended_RestController
     public function bookmarkBatch(bool $bookmark = true) {
         $acl = $bookmark ? 'bookmarkBatch' : 'unbookmarkBatch';
         $this->checkAccess('editor_segmentuserassoc', $acl, __CLASS__.'::'.$acl);
+        $this->applyQualityFilter();
+
         /* @var Operations $operations */
         $operations = ZfExtended_Factory::get('\MittagQI\Translate5\Segment\Operations', [
             $this->getCurrentTask()->getTaskGuid(),
@@ -979,5 +978,17 @@ class Editor_SegmentController extends ZfExtended_RestController
             return;
         }
         $this->view->metaData->jumpToSegmentIndex = 0;
+    }
+
+    /**
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    private function applyQualityFilter()
+    {
+        if($this->getRequest()->getParam('qualities', '') != ''){
+            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'), $this->getCurrentTask());
+            $filter = $this->entity->getFilter();
+            $filter->setQualityFilter($qualityState);
+        }
     }
 }

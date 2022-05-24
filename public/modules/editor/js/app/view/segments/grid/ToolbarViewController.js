@@ -50,6 +50,7 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
     onBatchOperation: function(menuitem) {
         let me = this,
             grid = me.getSegmentGrid(),
+            vm = grid.getViewModel(),
             params = grid.store.getFilterParams();
 
         if(!menuitem || !menuitem.operation) {
@@ -57,16 +58,37 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
         }
 
         params = params || {filter: "[]"};
+        params.qualities = grid.store.getQualityFilter();
+        if(params.filter === '[]' && params.qualities === '') {
+                Ext.Msg.confirm(
+                    vm.get('l10n.segmentGrid.batchOperations.warnAllTitle'),
+                    vm.get('l10n.segmentGrid.batchOperations.warnAllText'),
+                    function(btn){
+                    if (btn === 'yes'){
+                        me.runBatchOperation(menuitem.operation, params);
+                    }
+                });
+        }
+        else {
+            me.runBatchOperation(menuitem.operation, params);
+        }
+    },
+
+    runBatchOperation: function(opName, params) {
+        let me = this,
+            grid = me.getSegmentGrid();
+
         grid.view.setBind({
-            loading: '{l10n.segmentGrid.batchOperations.loading.'+menuitem.operation+'}'
+            loading: '{l10n.segmentGrid.batchOperations.loading.'+opName+'}'
         });
 
         Ext.Ajax.request({
-            url: Editor.data.restpath+'segment/'+menuitem.operation+'/batch',
+            url: Editor.data.restpath+'segment/'+opName+'/batch',
             method: 'post',
             params: params,
+            timeout: 240000,
             scope: me,
-            success: function(response){
+            success: function(){
                 grid.store.load({
                     callback: function(){
                         let selSeg = grid.getViewModel().get('selectedSegment'),

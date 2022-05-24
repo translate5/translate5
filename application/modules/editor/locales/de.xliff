@@ -2015,6 +2015,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id="TGVzZXplaWNoZW4gc2V0emVu"><source>Lesezeichen setzen</source><target>Lesezeichen setzen</target></trans-unit>
 <trans-unit id="ZW50c3BlcnJlbg=="><source>entsperren</source><target>entsperren</target></trans-unit>
 <trans-unit id="c3BlcnJlbg=="><source>sperren</source><target>sperren</target></trans-unit>
+<trans-unit id="U29sbCBkaWUgQWt0aW9uIHdpcmtsaWNoIGF1ZiBhbGxlIFNlZ21lbnRlIGFuZ2V3ZW5kZXQgd2VyZGVuPyBEYXMga2FubiBlaW5pZ2UgWmVpdCBpbiBBbnNwcnVjaCBuZWhtZW4u"><source>Soll die Aktion wirklich auf alle Segmente angewendet werden? Das kann einige Zeit in Anspruch nehmen.</source><target>Soll die Aktion wirklich auf alle Segmente angewendet werden? Das kann einige Zeit in Anspruch nehmen.</target></trans-unit>
+<trans-unit id="S2VpbiBTZWdtZW50IEZpbHRlciBnZXNldHp0"><source>Kein Segment Filter gesetzt</source><target>Kein Segment Filter gesetzt</target></trans-unit>
 <trans-unit id="QWxsZSBnZWZpbHRlcnRlbiBTZWdtZW50ZTo="><source>Alle gefilterten Segmente:</source><target>Alle gefilterten Segmente:</target></trans-unit>
 <trans-unit id="U2VnbWVudGUgd2VyZGVuIHZvbiBkZXIgRmF2b3JpdGVubGlzdGUgZW50ZmVybnQ="><source>Segmente werden von der Favoritenliste entfernt</source><target>Segmente werden von der Favoritenliste entfernt</target></trans-unit>
 <trans-unit id="U2VnbWVudGUgd2VyZGVuIGFscyBGYXZvcml0ZW4gbWFya2llcnQ="><source>Segmente werden als Favoriten markiert</source><target>Segmente werden als Favoriten markiert</target></trans-unit>
