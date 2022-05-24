@@ -58,11 +58,10 @@ class editor_Plugins_Okapi_Bconf_File {
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    protected function invalid(string $msg = '', string $errorCode = 'E1026'): void {
+    protected function invalidate(string $msg = '', string $errorCode = 'E1026'): void {
         $errors = [[$msg]];
         if($this->entity->isNewRecord()){
             try {
-                $this->entity->deleteDirectory($this->entity->getId());
                 $this->entity->delete();
             } catch(Exception $e){
                 if($errorCode === 'E1026'){

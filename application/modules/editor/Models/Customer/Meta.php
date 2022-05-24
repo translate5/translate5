@@ -46,24 +46,23 @@ class editor_Models_Customer_Meta extends ZfExtended_Models_Entity_MetaAbstract 
     public function loadByCustomerId(int $customerId): Zend_Db_Table_Row_Abstract {
         return $this->loadRow('customerId = ?', $customerId);
     }
-    
+
     /**
      * Adds an empty meta data rowset to the DB.
      */
-    public function initEmptyRowset(){
+    public function initEmptyRowset() {
         $db = new $this->dbInstanceClass;
         /* @var $db Zend_Db_Table_Abstract */
         try {
-            $db->insert(array('customerId' => $this->getCustomerId()));
-        }
-        catch(Zend_Db_Statement_Exception $e) {
+            $db->insert(['customerId' => $this->getCustomerId()]);
+        } catch(Zend_Db_Statement_Exception $e){
             try {
                 $this->handleIntegrityConstraintException($e);
-            }
-            catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-                //"duplicate entry" errors are ignored. 
+            } catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e){
+                //"duplicate entry" errors are ignored.
                 return;
             }
         }
     }
+
 }

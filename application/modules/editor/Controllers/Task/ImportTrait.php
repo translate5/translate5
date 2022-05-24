@@ -64,7 +64,11 @@ trait editor_Controllers_Task_ImportTrait {
         $this->entity->initTaskDataDirectory();
 
         // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
-        $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->entity, 'dataProvider' => $dp));
+        $this->events->trigger("afterUploadPreparation", $this, array(
+            'task' => $this->entity,
+            'dataProvider' => $dp,
+            'requestData' => $this->data
+        ));
 
         $dp->checkAndPrepare($this->entity);
 
@@ -129,7 +133,7 @@ trait editor_Controllers_Task_ImportTrait {
         $import->setTask($task);
 
         try {
-            $import->import($dp);
+            $import->import($dp, $this->data);
         } catch (ZfExtended_ErrorCodeException $e){
             // in case there is task, remove it
             $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));

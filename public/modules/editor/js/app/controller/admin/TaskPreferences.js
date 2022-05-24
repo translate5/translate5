@@ -512,7 +512,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
             comboBox = taskMainCardContainer.insert(0, {
                 xtype: 'customersCombo', // user is allowed to see the CustomerSwitch => show all customers
                 name: 'customerId',
-                reference: 'customer',
                 itemId: 'customerId',
                 toolTip: me.strings.customerTip,
                 fieldLabel: me.strings.customerLabel + '¹'
@@ -525,7 +524,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
             comboBox = taskMainCardContainer.insert(0, {
                 xtype: 'usercustomerscombo', // show only those customers that are assigned to the user
                 name: 'customerId',
-                reference: 'customer',
                 itemId: 'customerId',
                 toolTip: me.strings.customerTip,
                 fieldLabel: me.strings.customerLabel + '¹'

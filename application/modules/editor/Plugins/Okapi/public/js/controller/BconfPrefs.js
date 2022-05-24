@@ -26,8 +26,8 @@
  */
 
 /**
- * Main Controller of the Visual Review
- * Defines the Layout of the review Panel and it's controls, listens to the relevant global events and perocesses them
+ * Main Controller of the Okapi Plugin
+ * Adds the BconfGrids and BconfCombo
  *
  * @class BconfPrefs
  * @extends Ext.app.Controller
@@ -41,7 +41,11 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         'Editor.model.admin.Customer'
     ],
     init: function(){
-        Editor.model.admin.Customer.addFields([{type: 'int', name: 'defaultBconfId', persist:true}]);
+        Editor.model.admin.Customer.addFields([{
+            type: 'int',
+            name: 'defaultBconfId',
+            persist: false,
+        }]);
     },
     onLaunch: function(){
         Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
@@ -61,6 +65,23 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                     priority: 900 // we want after customersCombo has been added
                 }
             },
+            'combobox#customerId': {
+                change: {
+                    fn: function(customerCombo, customerId){
+                        if(!customerId){ // QUIRK: Emptying can set value to null even with forceSelection set
+                            return
+                        }
+                        var bconfCombo = Ext.getCmp('bconfCombo'),
+                            bconfFilters = bconfCombo.getStore().getFilters(),
+                            customerFilter = bconfFilters.getByKey('customerFilter');
+                        customerFilter.setValue(customerId)
+                        bconfFilters.add(customerFilter) // trigger filter
+
+                        bconfCombo.setValue(customerCombo.getSelection().get('defaultBconfId'));
+                        bconfCombo.enable();
+                    },
+                }
+            }
         }
     },
     refs: [{
@@ -110,8 +131,8 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                     id: 'clientFilter',
                     property: 'customerId',
                     value: '{list.selection}',
-                    filterFn: function ({data}) {
-                        return !data.customerId || (this._value && this._value.id === data.customerId);
+                    filterFn: function(rec){
+                        return !rec.get('customerId') || (this._value && this._value.id === rec.get('customerId'));
                     },
                 }],
                 sorters: [{
@@ -125,6 +146,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             // add the bconf grid to the tabPanel and bind it to the customer
             tabPanel.insert(2, {
                 xtype: 'okapiBconfGrid',
+                id: 'bconfCustomerGrid',
                 bind: {
                     customer: '{list.selection}', // list is reference name of customerGrid
                     store: '{customersBconfStore}'
@@ -140,55 +162,36 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             queryMode: 'local',
             forceSelection: true,
             displayField: 'name',
+            id: 'bconfCombo',
             name: 'bconfId',
             valueField: 'id',
+            disabled: true,
+            value: Editor.data.plugins.Okapi.systemDefaultBconfId,
             fieldLabel: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.titleLong,
             listConfig: {
                 getInnerTpl: function(displayField){
                     return `<span data-qtip="{description}">{${displayField}}</span>`;
                 },
             },
-            bind: {
-                store: '{bconfImportWizard}',
-                disabled: '{!customer.selection}',
-                value: '{defaultBconf}',
-            },
-            viewModel: {
-                alias: 'viewmodel.bconfComboImportWizard',
-                stores: {
-                    bconfImportWizard: {
-                        storeId: 'bconfImportWizard',
-                        source: 'bconfStore',
-                        autoLoad: true,
-                        filters: [{
-                            filterFn: function({data: bconf}){
-                                return !bconf.customerId || (this._value && this._value.id === bconf.customerId);
-                            },
-                            property: 'customerId',
-                            value: '{customer.selection}'
-                        }],
-                        sorters: [{
-                            property: 'customerId',
-                            direction: 'DESC'
-                        }, {
-                            property: 'name',
-                        }],
-                    }
-                },
-                formulas: {
-                    defaultBconf: {
-                        bind: {
-                            customer: '{customer.selection}'
-                        },
-                        get: function({customer}){
-                            if(customer && customer.get('defaultBconfId')){
-                                return customer.get('defaultBconfId');
-                            }
-                            // the system default bconf id is part of the global data
-                            return Editor.data.plugins.Okapi.systemDefaultBconfId;
-                        }
-                    }
-                }
+            store: {
+                type: 'chained',
+                storeId: 'bconfImportWizard',
+                source: 'bconfStore',
+                autoLoad: true,
+                filters: [{
+                    id: 'customerFilter',
+                    property: 'customerId',
+                    value: null,
+                    filterFn: function({data: bconf}){
+                        return !bconf.customerId || (this._value === bconf.customerId);
+                    },
+                }],
+                sorters: [{
+                    property: 'customerId',
+                    direction: 'DESC'
+                }, {
+                    property: 'name',
+                }],
             }
         });
     }
