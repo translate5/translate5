@@ -92,6 +92,13 @@ class editor_Segment_Numbers_Check {
     private $states = [];
 
     /**
+     * Languages [id => rfc5646] pairs
+     *
+     * @var array
+     */
+    public static $lang = null;
+
+    /**
      * @param editor_Models_Task $task
      */
     public function __construct(editor_Models_Task $task, $targetField, editor_Models_Segment $segment) {
@@ -104,11 +111,18 @@ class editor_Segment_Numbers_Check {
         $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
         $target = strip_tags($target);
 
-        // Get source and target language
-        preg_match('~ - ([^ ]+?) / (.+?)$~', $task->getTaskName(), $m);
+        // Load langs [id => rfc5646] pairs if not yet loaded
+        self::$lang = self::$lang ?? ZfExtended_Factory
+            ::get('editor_Models_Languages')
+            ->loadAllKeyValueCustom('id', 'rfc5646');
 
         // Run check
-        $states = numbers_check($source, $target, $m[1], $m[2]);
+        $states = numbers_check(
+            $source,
+            $target,
+            self::$lang[$task->getSourceLang()],
+            self::$lang[$task->getTargetLang()]
+        );
 
         // Foreach problem type
         foreach ($states as $state => $mqmA) {

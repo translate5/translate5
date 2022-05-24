@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 12,
-    "qtotal": 12,
+    "qcount": 13,
+    "qtotal": 13,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -668,13 +668,13 @@
         {
             "qid": -1,
             "qtype": "numbers",
-            "qcount": 12,
+            "qcount": 13,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "36838",
+                    "qid": "36882",
                     "qtype": "numbers",
-                    "qcount": 7,
+                    "qcount": 3,
                     "qcomplete": true,
                     "qcategory": "num1",
                     "qcatidx": "-1",
@@ -683,7 +683,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "36846",
+                    "qid": "36891",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -694,7 +694,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "36848",
+                    "qid": "36893",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -705,7 +705,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "36839",
+                    "qid": "36883",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -716,31 +716,31 @@
                     "checked": false
                 },
                 {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num3",
-                    "text": "Format alteration (date information etc.)",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num4",
-                    "text": "Separator(s) not localised",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36841",
+                    "qid": "36884",
                     "qtype": "numbers",
                     "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num3",
+                    "qcatidx": "-1",
+                    "text": "Format alteration (date information etc.)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "36885",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num4",
+                    "qcatidx": "-1",
+                    "text": "Separator(s) not localised",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "36886",
+                    "qtype": "numbers",
+                    "qcount": 2,
                     "qcomplete": true,
                     "qcategory": "num5",
                     "qcatidx": "-1",
@@ -749,7 +749,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "36843",
+                    "qid": "36888",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -771,24 +771,24 @@
                     "checked": false
                 },
                 {
-                    "qid": -1,
+                    "qid": "36889",
                     "qtype": "numbers",
-                    "qcount": 0,
+                    "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num8",
+                    "qcatidx": "-1",
                     "text": "Numeral from SRC found as number in TRG",
-                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": -1,
+                    "qid": "36890",
                     "qtype": "numbers",
-                    "qcount": 0,
+                    "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num9",
+                    "qcatidx": "-1",
                     "text": "Number from SRC found as numeral in TRG",
-                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 }
@@ -796,7 +796,7 @@
             "qcategory": null,
             "qtooltip": "",
             "text": "Zahlen",
-            "qtotal": 12,
+            "qtotal": 13,
             "expanded": true,
             "checked": false
         }
