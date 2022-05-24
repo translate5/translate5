@@ -741,6 +741,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     {
         /** @var ZfExtended_View $view */
         $view = $event->getParam('view');
+        $bconf = new editor_Plugins_Okapi_Models_Bconf();
         $meta = new editor_Models_Db_CustomerMeta();
         $metas = $meta->fetchAll('defaultBconfId IS NOT NULL')->toArray();
         $bconfIds = array_column($metas, 'defaultBconfId', 'customerId');
@@ -748,7 +749,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             if(array_key_exists($customer['id'], $bconfIds)){
                 $customer['defaultBconfId'] = (int) $bconfIds[$customer['id']];
             } else {
-                $customer['defaultBconfId'] = NULL;
+                $customer['defaultBconfId'] = $bconf->getDefaultBconfId();
             }
         }
     }
