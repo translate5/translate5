@@ -206,7 +206,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         ];
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
         $api->import($task);
-        $this->cleanupTask($api);
+        $api->deleteTask();
     }
 
     /***
@@ -223,7 +223,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en-2.txt'));
         $api->import($task);
-        $this->cleanupTask($api);
+        $api->deleteTask();
     }
 
     /***
@@ -245,7 +245,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
 
         $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
-        $this->cleanupTask();
+        $api->deleteTask();
     }
 
     /***
@@ -302,22 +302,5 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $bconfDir = $bconf->getDir();
         $bconf->delete(); // delete record, which deletes directory as well
         self::assertDirectoryDoesNotExist($bconfDir);
-    }
-
-    public static function tearDownAfterClass(): void {
-        parent::tearDownAfterClass();
-    }
-
-    /**
-     * Delete and cleanup the current active task.
-     * Needed because this Test does multiple task imports.
-     */
-    public function cleanupTask(): void {
-        /** @var editor_Models_Task $realTask */
-        $realTask = ZfExtended_Factory::get('editor_Models_Task');
-        $realTask->load(self::$api->getTask()->id);
-        /** @var editor_Models_Task_Remover $remover */
-        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$realTask]);
-        $remover->removeForced();
     }
 }
