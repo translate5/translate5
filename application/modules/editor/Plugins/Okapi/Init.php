@@ -436,11 +436,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $meta = $event->getParam('meta');
         /* @var $requestData array */
         $requestData = $event->getParam('data');
-        $bconfId = array_key_exists('', $requestData) ? $requestData['bconfId'] : NULL;
+        $bconfId = array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : NULL;
+        $customerId = array_key_exists('customerId', $requestData) ? $requestData['customerId'] : NULL;
         // empty makes sense here since we anly accept an bconf-id > 0
         if(empty($bconfId)){
             $bconf = new editor_Plugins_Okapi_Models_Bconf();
-            $bconfId = $bconf->getDefaultBconfId($requestData['customerId']);
+            $bconfId = $bconf->getDefaultBconfId($customerId);
         }
         $meta->setBconfId($bconfId);
     }
