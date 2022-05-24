@@ -131,6 +131,18 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         ->where('LEK_languageresources.serviceType IN(?)',$allservices);
         return $this->loadFilterdCustom($s);
     }
+
+    /***
+     * Load all language resource by given service name
+     * @param string $serviceName
+     * @return array
+     */
+    public function loadByService(string $serviceName): array
+    {
+        $s = $this->db->select()
+            ->where('LEK_languageresources.serviceName = ?',$serviceName);
+        return $this->db->fetchAll($s)->toArray();
+    }
     
     /***
      * Get all available language resources for customers of loged user
