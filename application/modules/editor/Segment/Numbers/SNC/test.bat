@@ -2,7 +2,7 @@
 :: php snc_main.php "MAN Mobile24 kontaktiert proaktiv den Kunden" "MAN MOBILE24 contacte le client de manière proactive" de-DE en-US
 :: php snc_main.php "aktualisiert am 13.01.2022" "Updated on 13 January 2022" de-DE en-US
 :: php snc_main.php "Elastomer Dichtung 263.380" "Elastomer gasket 263.380" de-DE en-US
-:: php snc_main.php "24926.91 / 437436.80" "24926,91 / 437436,80" de-DE en-US :: 2
+:: php snc_main.php "24926.91 / 8100" "24926,91 / 8,100" de-DE en-US
 :: php snc_main.php "Motorschutzschalter auf Stellung –1–" "Przełącznik zabezpieczenia silnika w pozycji -1-" de-DE en-US
 :::::: php snc_main.php "502.526" "502,526" de-DE ru-RU
 :: php snc_main.php "Die medizinische Fachkraft oder der Fachhändler kann im Gerät bis zu vier Programme für Sie vorkonfigurieren und freischalten." "Az egészségügyi szakember vagy a szakkereskedő legfeljebb 4 programot konfigurálhat és engedélyezhet a készüléken." de-DE en-US
