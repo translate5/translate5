@@ -270,6 +270,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
+        $this->view->Php2JsVars()->set('segments.autoStates', $states->getStateMap());
         $this->view->Php2JsVars()->set('segments.roleAutoStateMap', $states->getRoleToStateMap());
 
         $tagPath = APPLICATION_RUNDIR . '/' . $rop->dir->tagImagesBasePath . '/';
@@ -522,8 +523,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->initCurrentTask();
             // try to use the job of the current user and task, the one with a usedState,
         }
-        // NoAccess is thrown here only of no job with used state was found, this is handled later on getting the initState
+        catch(ZfExtended_Models_Entity_NotFoundException) { //SEE TRANSLATE-2972
+            $this->redirect(APPLICATION_RUNDIR);
+        }
         catch(NoAccessException) {
+            // NoAccess is thrown here only of no job with used state was found, this is handled later on getting the initState
         }
 
         $task = $this->getCurrentTask();  //on no access exception above current task is though set

@@ -85,8 +85,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     downloadBconf: function(view, rowIndex, /* colIndex */){
         view.select(rowIndex);
         Editor.util.Util.download('plugins_okapi_bconf/downloadbconf', {
-            bconfId: view.selection.id,
-            okapiName: view.selection.get('name'),
+            id: view.selection.id
         });
     },
 
@@ -144,10 +143,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         });
     },
     isDeleteDisabled: function({grid}, rowIndex, colIndex, item, {data: bconf}){
-        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === Editor.data.plugins.Okapi.systemDefaultBconfName;
+        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === Editor.data.plugins.Okapi.systemStandardBconfName;
     },
     isSRXUploadDisabled: function(view, rowIndex, colIndex, item, record){
-        return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemDefaultBconfName));
+        return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemStandardBconfName));
     },
 
     filterByText: function(field, searchString){
@@ -162,7 +161,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
 
     uploadBconf: async function(file){
-        var fileName = file.name.split('.').slice(0, -1).join('.').trim(); // remove .bconf
+        var me = this,
+            cutPosition = Math.min(file.name.search(/\.bconf$/), 50),
+            fileName = file.name.substring(0, cutPosition); // remove .bconf
+
         if(!fileName || Ext.getStore('bconfStore').getData().find('name', fileName, 0, true, true, true)){ //...start, startsWith, endsWith, ignoreCase
             try {
                 fileName = await this.promptUniqueBconfName(fileName);
@@ -200,6 +202,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                     message: invalidMsg.replace('{}', 'Bconf') + extraInfo,
                     icon: Ext.Msg.WARNING
                 });
+            } else if(response.status === 500 && response.responseJson?.errorCode === 'E1015'){
+                me.uploadBconf(file); // bconf with same name was uploaded outside this session
             } else {
                 Editor.app.getController('ServerException').handleException(response);
             }
@@ -234,6 +238,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                 items: [{
                     xtype: 'textfield',
                     fieldLabel: uniqueName,
+                    maxLength: 50, // DB constraint
                     width: 300,
                     selectOnFocus: true,
                     labelSeparator: ':',
@@ -268,7 +273,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         var grid = this.getView(),
             {name, customerId} = cellContext.record.getData();
         grid.view.select(cellContext.record);
-        if(name === Editor.data.plugins.Okapi.systemDefaultBconfName || grid.isCustomerGrid && !customerId){
+        if(name === Editor.data.plugins.Okapi.systemStandardBconfName || grid.isCustomerGrid && !customerId){
             return false; // Can't change system default and globals bconfs in customer view
         }
         if(cellContext.field === 'name'){

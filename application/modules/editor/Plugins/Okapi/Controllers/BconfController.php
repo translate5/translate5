@@ -65,26 +65,18 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         }
     }
 
-    public function deleteAction() {
-        $this->entity->deleteDirectory($this->getParam('id'));
-        parent::deleteAction();
-    }
-
     /**
      * Export bconf
      */
     public function downloadbconfAction() {
-        $okapiName = $this->getParam('okapiName');
-        $id = (int)$this->getParam('bconfId'); // directory traversal mitigation
-        $downloadFile = $this->entity->getFilePath($id);
+        $this->entityLoad();
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $okapiName . '.bconf"');
+        header('Content-Disposition: attachment; filename="'.$this->entity->getDownloadFilename());
         header('Cache-Control: no-cache');
-        header('Content-Length: ' . filesize($downloadFile));
-        header('Content-Length: ' . filesize($downloadFile));
+        header('Content-Length: ' . filesize($this->entity->getFilePath()));
         ob_clean();
         flush();
-        readfile($downloadFile);
+        readfile($this->entity->getFilePath());
         exit;
     }
 
@@ -116,8 +108,6 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         }
         $this->entityLoad();
         $bconf = $this->entity;
-        $this->getParam('id');
-
         $srxUploadFile = $_FILES['srx']['tmp_name'];
         $srx = new editor_Utils_Dom();
         $xmlErrors = '';

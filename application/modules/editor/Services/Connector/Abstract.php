@@ -146,10 +146,16 @@ abstract class editor_Services_Connector_Abstract {
     protected $disabled = false;
 
     /**
-     *  Is the connector generally able to support HTML Tags in the ->translate() API
+     *  Is the connector generally able to support HTML Tags in the ->translate() API; see ::canTranslateHtmlTags
      * @var bool
      */
     protected $htmlTagSupport = false;
+
+    /**
+     *  Is the connector generally able to support Internal Tags in the ->translate() API; see ::canTranslateInternalTags
+     * @var bool
+     */
+    protected $internalTagSupport = false;
     
     /**
      * initialises the internal result list
@@ -414,7 +420,10 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /**
-     * Logs all queued log entries, adding segment data on each log entry
+     * Logs all queued log entries, adding segment  {
+        return $this->utilities;
+    }
+}data on each log entry
      * @param editor_Models_Segment $segment
      */
     public function logForSegment(editor_Models_Segment $segment) {
@@ -449,10 +458,26 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * @return bool
      * Retrieves, if the connector supports handling of HTML tags in the ->translate() API which then will not be stripped
-     * This API currently is only used by InstantTranslate
-     * The general in the pretranslation Tag-Repair is configured via the tag-handler!
+     * This API currently is only used by InstantTranslate and will perform an automatic tag-repair
+     * Be aware that the markup is expected to be valid !
+     * The general capabilities for this (e.g. when pretranslating) are configured via the tag-handler
      */
-    public function canHandleHtmlTags() : bool {
+    public function canTranslateHtmlTags() : bool {
         return $this->htmlTagSupport;
+    }
+    /**
+     * @return bool
+     * Retrieves, if the connector supports handling of Internal tags in the ->translate() API which then will not be stripped
+     * This API currently is only used by InstantTranslate
+     */
+    public function canTranslateInternalTags() : bool {
+        return $this->internalTagSupport;
+    }
+    /**
+     * Retrieves the configuerd tag handler
+     * @return editor_Services_Connector_TagHandler_Abstract
+     */
+    public function getTagHandler() : editor_Services_Connector_TagHandler_Abstract {
+        return $this->tagHandler;
     }
 }
