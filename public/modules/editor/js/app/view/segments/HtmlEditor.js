@@ -365,7 +365,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         // insert
         this.fireEvent('beforeInsertMarkup', range);
         range = sel.getRangeAt(0); // range might have changed during handling the beforeInsertMarkup
-        range.insertNode(frag);
+        if(!range.collapsed) {
+            range.deleteContents();
+        }
+		range.insertNode(frag);
         rangeForNode = range.cloneRange();
         if (lastNode !== undefined) {
         	range.setStartAfter(lastNode);
