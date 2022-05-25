@@ -165,6 +165,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
             case editor_Segment_Numbers_Check::NUM9: return $translate->_('Zahl aus SRC als Zahlwort in TRG gefunden');
             case editor_Segment_Numbers_Check::NUM10: return $translate->_('Formatänderung (Ordinalzahlen, führende Null u.ä.)');
             case editor_Segment_Numbers_Check::NUM11: return $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall');
+            case editor_Segment_Numbers_Check::NUM12: return $translate->_('1000er-Brenner nicht erlaubt');
         }
         return NULL;
     }
@@ -200,6 +201,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
             editor_Segment_Numbers_Check::NUM9,
             editor_Segment_Numbers_Check::NUM10,
             editor_Segment_Numbers_Check::NUM11,
+            editor_Segment_Numbers_Check::NUM12,
         ];
     }
 }

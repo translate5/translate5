@@ -87,6 +87,11 @@ class editor_Segment_Numbers_Check {
     const NUM11 = 'num11';
 
     /**
+     * @var string
+     */
+    const NUM12 = 'num12';
+
+    /**
      * @var array
      */
     private $states = [];
@@ -121,7 +126,8 @@ class editor_Segment_Numbers_Check {
             $source,
             $target,
             self::$lang[$task->getSourceLang()],
-            self::$lang[$task->getTargetLang()]
+            self::$lang[$task->getTargetLang()],
+            $task
         );
 
         // Foreach problem type

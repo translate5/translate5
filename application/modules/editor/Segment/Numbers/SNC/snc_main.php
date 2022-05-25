@@ -9,7 +9,7 @@ define('SYMBOL_TAB', "\xE2\x87\xA5");
 require_once '_snc_misc_helpers.php';
 require_once 'morphSegs_sdlxliff.php';
 require_once 'check_zahlen_helpers.php';
-function numbers_check($source, $target, $sourceLang, $targetLang) {
+function numbers_check($source, $target, $sourceLang, $targetLang, editor_Models_Task $task = null) {
     $data = [];
     $package = 'Lose_Dateien';
     $file = 'file';
@@ -49,25 +49,42 @@ function numbers_check($source, $target, $sourceLang, $targetLang) {
         'Hinweis: Formatierung 1000er-Zahl geändert'          => 'num5',
         'Unterschiedliche Minuszeichen'                       => 'num6',
         'Trenner aus SRC geändert in'                         => 'num7',
-        // '1000er-Trenner in'                                => 'num7',
         'Hinweis: Zahlwort als Zahl gefunden'                 => 'num8',
         'Hinweis: Zahl als Zahlwort gefunden'                 => 'num9',
         'Formatänderung (Ordinalzahlen, führende Null u.ä.)'  => 'num10',
         'Untersch. Zeichen/Formatierung für Zahlen-Intervall' => 'num11',
+        '1000er-Trenner in'                                   => 'num12',
     ];
 
     $res = current(current(current($res ?? [[]])));
-    $ret = [];
+    $ret = []; $notFound = [];
     foreach ($res as $subCheck => $msgs) {
         foreach ($msgs as $msg) {
+            $found = false;
             foreach ($nums as $beg => $key) {
                 if (preg_match('~^' . preg_quote($beg, '~') . '~', $msg)) {
                     $ret[$key] []= $msg;
+                    $found = true;
+                }
+            }
+            if (!$found) {
+                $notFound []= $msg;
+                if ($task) {
+                    $task->logger('editor.task.autoqa')->error('E1392', 'AutoQA Numbers check: new kind of error detected', [
+                        'error' => $msg,
+                        'sourceLang' => $sourceLang,
+                        'targetLang' => $targetLang,
+                        'sourceText' => $source,
+                        'targetText' => $target,
+                    ]);
                 }
             }
         }
     }
-
+    if ($notFound && !$task) {
+        echo "Not Found\n";
+        print_r($notFound);
+    }
     return $ret;
 }
 if (isset($argv) && is_array($argv) && count($argv) == 5) {

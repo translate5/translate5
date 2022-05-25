@@ -2139,6 +2139,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='WmFobCBhdXMgU1JDIGFscyBaYWhsd29ydCBpbiBUUkcgZ2VmdW5kZW4='><source>Zahl aus SRC als Zahlwort in TRG gefunden</source><target>Zahl aus SRC als Zahlwort in TRG gefunden</target></trans-unit>
 <trans-unit id='Rm9ybWF0w6RuZGVydW5nIChPcmRpbmFsemFobGVuLCBmw7xocmVuZGUgTnVsbCB1LsOkLik='><source>Formatänderung (Ordinalzahlen, führende Null u.ä.)</source><target>Formatänderung (Ordinalzahlen, führende Null u.ä.)</target></trans-unit>
 <trans-unit id='VW50ZXJzY2guIFplaWNoZW4vRm9ybWF0aWVydW5nIGbDvHIgWmFobGVuLUludGVydmFsbA=='><source>Untersch. Zeichen/Formatierung für Zahlen-Intervall</source><target>Untersch. Zeichen/Formatierung für Zahlen-Intervall</target></trans-unit>
+<trans-unit id='MTAwMGVyLUJyZW5uZXIgbmljaHQgZXJsYXVidA=='><source>1000er-Brenner nicht erlaubt</source><target>1000er-Brenner nicht erlaubt</target></trans-unit>
 
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminologieübersetzungsprojekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Projekt</target></trans-unit>
