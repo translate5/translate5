@@ -32,7 +32,7 @@
  *
  */
 /**
- * @class Editor.view.admin.okapi.filter.BconfFilterGridController
+ * @class BconfFilterGridController
  * @extends Ext.app.ViewController
  */
 Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
@@ -47,8 +47,20 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     },
     control: {
         '#': { // # references the view
-
+            edit: 'saveFilterAfterEdit',
         },
+
+        'textfield#search': {
+            change: 'search',
+        }
+    },
+
+    isDeleteDisabled: function(view, rowIndex, colIndex, item, record){
+        return !record.data.isCustom;
+    },
+
+    isEditDisabled: function(view, rowIndex, colIndex, item, record){
+        return true;
     },
 
     addDefaults: function(store, records){
@@ -61,7 +73,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         store.loadRecords(defaultBconfFilters, {addRecords: true})
     },
 
-    filterByText: function(field, searchString){
+    search: function(field, searchString){
         var store = this.getView().getStore(),
             searchFilterValue = searchString.trim();
         store.clearFilter();
@@ -79,6 +91,66 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         } else {
             store.addFilter(store.defaultsFilter)
         }
-    }
+    },
+
+    copy: function(view, rowIndex, colIndex, item, e, record, row){
+        searchField = view.grid.down('textfield#search')
+        searchField.setValue(record.get('name'))
+        searchField.checkChange()
+        view.select(rowIndex);
+        var store = view.getStore(),
+            bconfCustomerGrid = Ext.getCmp('bconfCustomerGrid'),
+            suffix,
+            //newId = record.id.replace(/@.*$/,)
+            /* TODO calc correct customerId
+            if(bconfCustomerGrid.isVisible()){
+                newId = bconfCustomerGrid
+            }
+            */
+            newRecData = {
+                name: record.get('name'),
+                //name:'',
+                okapiId: record.get('okapiId').replace(/@.*$/, '') + '@' + location.host + '-' + Date.now(),
+                bconfId: view.grid.getBconf().getId(),
+            };
+
+        newRec = store.add(newRecData)[0];
+        newRec.isNewRecord = true;
+
+        var rowediting = view.grid.findPlugin('rowediting'),
+            editingStarted = rowediting.startEdit(newRec);
+
+        if(editingStarted){
+            var nameEditor = rowediting.getEditor().down('textfield[dataIndex=name]')
+            //getRoweditor
+        }
+    },
+
+    delete: function(view, rowIndex, colIndex, item, e, record, /*row*/){
+        record.drop();
+        record.save()
+    },
+
+    /**
+     * Save changed record
+     * @param {Ext.grid.plugin.RowEditing} cellEditPlugin
+     * @param {Ext.grid.CellContext} cellContext
+     */
+    saveFilterAfterEdit: function(cellEditPlugin, cellContext){
+        var record = cellContext.record;
+        var changed = Editor.util.Util.getChanged(cellContext.newValues, cellContext.originalValues);
+        record.set(changed); //QUIRK TODO check why not ausosave
+        //record.commit();
+        if(changed){
+            if(record.isNewRecord){
+                record.crudState = 'C'
+                record.phantom = true
+                delete record.isNewRecord;
+            }
+
+            record.save(); //TODO: add new Id to search
+        }
+
+    },
 
 });

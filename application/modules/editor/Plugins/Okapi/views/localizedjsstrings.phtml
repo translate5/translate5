@@ -31,12 +31,11 @@
  * */
 $translate = $this->translate;
 ?>
-
-Editor.controller.Localizer.addPluginInit('okapi', function() {
-
+// <script> //language=JS
+Editor.controller.Localizer.addPluginInit('okapi', function(){
     /** @class okapi_l18n */
-    Ext.define("Editor.locale.plugins.Okapi.view.BconfGrid", {
-        override: "Editor.plugins.Okapi.view.BconfGrid",
+    Ext.define('Editor.locale.plugins.Okapi.view.BconfGrid', {
+        override: 'Editor.plugins.Okapi.view.BconfGrid',
         config: { // configs need direct override
             title: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
         },
@@ -48,7 +47,7 @@ Editor.controller.Localizer.addPluginInit('okapi', function() {
             uploadBconf: `<?= $translate->_('Bconf hochladen...'); ?>`,
             _file: `<?= $translate->_('-Datei'); ?>`,
             fileDlTemplate: `<?= $translate->_('{0}{1} herunterladen'); ?>`,
-            fileUpTemplate:`<?= $translate->_('{0}{1} hochladen'); ?>`,
+            fileUpTemplate: `<?= $translate->_('{0}{1} hochladen'); ?>`,
             srx: `<?= $translate->_('SRX-Datei'); ?>`,
             sourceSrx: `<?= $translate->_('SourceSRX'); ?>`,
             targetSrx: `<?= $translate->_('TargetSRX'); ?>`,
@@ -70,18 +69,42 @@ Editor.controller.Localizer.addPluginInit('okapi', function() {
             export: `<?= $translate->_('Exportieren'); ?>`,
             invalidMsg: `<?= $translate->_('Die hochgeladene Datei ist keine gültige {}-Datei.'); ?>`,
             invalidTitle: `<?= $translate->_('Ungültige {}-Datei'); ?>`,
-            name:`<?= $translate->_('Name'); ?>`,
-            nameExists:`<?= $translate->_('Dieser Name ist schon vergeben'); ?>`,
+            name: `<?= $translate->_('Name'); ?>`,
+            nameExists: `<?= $translate->_('Dieser Name ist schon vergeben'); ?>`,
             newBconf: `<?= $translate->_('Neue Bconf-Datei'); ?>`,
             refresh: `<?= $translate->_('Aktualisieren'); ?>`,
             remove: `<?= $translate->_('Löschen'); ?>`,
             searchEmptyText: `<?= $translate->_('Suchen'); ?>`,
             searchText: `<?= $translate->_('Suchen'); ?>`,
             titleLong: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
-            uniqueName:`<?= $translate->_('Eindeutiger Name'); ?>`,
+            uniqueName: `<?= $translate->_('Eindeutiger Name'); ?>`,
             upload: `<?= $translate->_('Hochladen'); ?>`,
             uploadBconf: `<?= $translate->_('Bconf hochladen...'); ?>`,
-},
-
+        },
     });
+    Ext.define('Editor.locale.plugins.Okapi.view.BconfFilterGrid', {
+        override: 'Editor.plugins.Okapi.view.BconfFilterGrid',
+        text_cols: {
+            customFilterName: '#UT#Customized Okapi Filter Type',
+            name: '#UT#Name',
+            extensions: '#UT#Extensions',
+            description: '#UT#Description',
+            action: '#UT#Actions',
+            notes: '#UT#Notes',
+            upload: '#UT#upload',
+            srx: '#UT#SRX',
+            pipeline: '#UT#Pipeline',
+        },
+        strings: {
+            configuration: '#UT#Configur Filter',
+            remove: '#UT#Remove',
+            copy: '#UT#Copy',
+            upload: '#UT#Upload',
+            addBconf: '#UT#Add Bconf',
+            showDefaultFilter: '#UT#Show Okapi Defaults Filters',
+            customizeFilter: '#UT#Customize Filter',
+            refresh: `<?= $translate->_('Aktualisieren'); ?>`,
+        },
+    });
+
 });

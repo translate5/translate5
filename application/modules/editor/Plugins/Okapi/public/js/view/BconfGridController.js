@@ -89,8 +89,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         });
     },
 
-    showFilterGrid: function(){
+    showFilterGrid: function(view, recIdx){
         fw = Ext.create('Editor.plugins.Okapi.view.BconfFilterGrid', {
+            bconf: view.store.getAt(recIdx),
             constrain: true,
             modal: true,
             //renderTo: this.getView().up('viewport'),
@@ -268,7 +269,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             panel.isValid(); // trigger display of red border when invalid
         });
     },
-
+    // Forbid systemDefault editing, show Name prompt
     handleBeforeedit: function(cellEditPlugin, cellContext){
         var grid = this.getView(),
             {name, customerId} = cellContext.record.getData();

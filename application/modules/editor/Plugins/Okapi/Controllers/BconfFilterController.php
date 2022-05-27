@@ -27,12 +27,12 @@
  */
 
 /**
- * 
+ *
  * REST Endpoint Controller to serve a Bconfs Filter List for the Bconf-Management in the Preferences
  *
  */
 class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestController {
-    
+
     protected $entityClass = 'editor_Plugins_Okapi_Models_BconfFilter';
 
     /** @var editor_Plugins_Okapi_Models_BconfFilter $entity */
@@ -43,25 +43,25 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
-    public function getdefaultfiltersAction(){
+    public function getdefaultfiltersAction() {
         $bconffilter = new editor_Plugins_Okapi_Models_DefaultBconfFilter();
         $default_fprms = $bconffilter->loadAll();
 
         //
         $rows = [];
         foreach($default_fprms as &$fprm){
-            unset($fprm['id']);
+            //unset($fprm['id']);
             $rows[$fprm['okapiId']] = &$fprm;
         }
         unset($fprm);
 
         $dataDir = editor_Plugins_Okapi_Init::getBconfStaticDataDir();
-        chdir($dataDir.'fprm/translate5/');
+        chdir($dataDir . 'fprm/translate5/');
         $t5_fprms = glob("*@translate5*.fprm");
         foreach($t5_fprms as $fprm){
-            $okapiId = substr($fprm, 0 ,-5); // remove .fprm
+            $okapiId = substr($fprm, 0, -5); // remove .fprm
             // okf_xml@translate5-AndroidStrings -> okf_xml-AndroidStrings
-            $parentId = str_replace('@translate5', '',$okapiId);
+            $parentId = str_replace('@translate5', '', $okapiId);
             $row = @$rows[$parentId];
             if($row){
                 $row['okapiId'] = $okapiId;
@@ -69,8 +69,8 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             } else {
                 // okf_xml@translate5-tbx-translate-definitions-setup-ITS.fprm -> okf_xml
                 $t5Pos = strpos($okapiId, '@translate5-');
-                $parentId = substr($okapiId,0, $t5Pos);
-                $name = substr($okapiId,$t5Pos+12);
+                $parentId = substr($okapiId, 0, $t5Pos);
+                $name = substr($okapiId, $t5Pos + 12);
                 $row = $rows[$parentId];
                 $row['okapiId'] = $okapiId;
                 if($name){
@@ -81,12 +81,18 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             //TODO: extension mapping
         }
 
-        $this->view->rows = $rows;
+        $this->view->rows = array_values($rows); // remove named indexes
         $this->view->total = count($rows);
 
     }
 
-    public function init() {
-        parent::init();
+    public function indexAction() {
+        $db = $this->entity->db;
+        $s = $db->select();
+        //$s->from($db, ['okapiId', 'name','extensions', 'description']);
+        $s->where('bconfId = ?', $this->getParam('bconfId'));
+        $this->view->rows = $db->fetchAll($s)->toArray();
+        $this->view->total = count($this->view->rows);
     }
+
 }

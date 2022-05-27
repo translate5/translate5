@@ -33,7 +33,27 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     ],
     alias: 'widget.bconffiltergrid',
     controller: 'bconfFilterGridController',
-    plugins: ['gridfilters'],
+    config: {
+        bconf: null,
+    },
+    plugins: [{
+        ptype: 'rowediting',
+        clicksToEdit: 3, // QUIRK: 1 not possible, triggers on actioncolumns TODO: limit to non actionCols, add pointerCls
+        removeUnmodified: true,
+    }],
+    initComponent: function(){
+        var me = this,
+        bconf = me.getBconf().getData();
+        me.callParent();
+        var proxy = me.getStore().getProxy(),
+            api = proxy.getApi();
+        api.read = proxy.getUrl() + '?bconfId=' + bconf.id; // simple way to filter for bconfId
+        proxy.setApi(api);
+
+        var title = me.getTitle();
+        title.text += ` in <i data-qtip="${bconf.description}">${bconf.name}.bconf</i>`;
+
+    },
     helpSection: 'useroverview',
     cls: 'actionColGrid',
     title: {text: 'Okapi Filters', flex: 0},
@@ -55,7 +75,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         upload: '#UT#Upload',
         addBconf: '#UT#Add Bconf',
         showDefaultFilter: '#UT#Show Okapi Defaults Filters',
-        customizeFilter: '#UT#Customize Filter'
+        customizeFilter: '#UT#Customize Filter',
+        in: '#in',
     },
     store: {
         type: 'bconfFilterStore'
@@ -83,8 +104,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         toggleHandler: 'toggleDefaultsFilter',
                         text: '#UT#Show Okapi Defaults Filters',
                     }, {
+                        xtype: 'tbspacer',
+                        flex: 1
+                    }, {
                         xtype: 'textfield',
                         width: 300,
+                        checkChangeBuffer: 300,
+                        itemId: 'search',
                         flex: 1,
                         emptyText: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.searchEmptyText,
                         triggers: {
@@ -94,18 +120,35 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                                 hidden: true
                             }
                         },
-                        listeners: {
-                            change: 'filterByText',
-                            buffer: 300
-                        }
                     }, {
-                        xtype: 'tbspacer',
-                        flex: 1
-                    }]
+                        xtype: 'button',
+                        iconCls: 'x-fa fa-undo',
+                        text: me.strings.refresh,
+                        handler: function(btn){
+                            btn.up('grid').getStore().reload();
+                        }
+                    },
+                    ]
                 },
                 columns: [{
                     xtype: 'gridcolumn',
                     dataIndex: 'name',
+                    editor: {
+                        xtype: 'textfield',
+                        allowOnlyWhitespace: false,
+                        lastVal: [],
+                        validator: function(v){
+                            if(v === this.lastVal[0]){ // already validated
+                                return this.lastVal[1];
+                            }
+                            var view = this.column.getView(),
+                                records = Editor.util.Util.getUnfiltered(view.getStore()),
+                                nameIsUnique = !records.some(r => r.data.name === v && r.id !== view.selection.id)
+                                    || Editor.plugins.Okapi.view.BconfGrid.prototype.strings.nameExists; // errormessage
+                            this.lastVal = [v, nameIsUnique]; // cache validation result
+                            return nameIsUnique;
+                        }
+                    },
                     stateId: 'name',
                     width: 300,
                     filter: {
@@ -122,6 +165,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     xtype: 'gridcolumn',
                     dataIndex: 'mimeType',
                     width: 300,
+                    editor: {
+                        xtype: 'textfield'
+                    },
                     text: 'mimeType'
                 }, {
                     xtype: 'gridcolumn',
@@ -134,11 +180,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     text: me.text_cols.extensions
                 }, {
                     xtype: 'gridcolumn',
-                    dataIndex: 'notes',
+                    dataIndex: 'description',
                     stateId: 'notes',
                     flex: 1,
-                    filter: {
-                        type: 'string'
+                    editor: {
+                        xtype: 'textfield'
                     },
                     text: me.text_cols.notes
                 }, {
@@ -150,18 +196,20 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     items: Ext.Array.filter([{
                         tooltip: me.strings.configuration,
                         isAllowedFor: 'bconfEdit',
+                        isDisabled: 'isEditDisabled',
                         glyph: 'f044@FontAwesome5FreeSolid',
-                        handler: 'editbconf'
+                        handler: 'editfilter'
                     }, {
                         tooltip: me.strings.configuration,
-                        isAllowedFor: 'bconfEdit',
+                        isAllowedFor: 'isFromTranslate5',
                         glyph: 'f24d@FontAwesome5FreeSolid',
-                        handler: 'clonebconf'
+                        handler: 'copy'
                     }, {
                         tooltip: me.strings.remove,
                         isAllowedFor: 'bconfDelete',
+                        isDisabled: 'isDeleteDisabled',
                         glyph: 'f2ed@FontAwesome5FreeSolid',
-                        handler: 'deletebconf'
+                        handler: 'delete'
                     }], itemFilter)
                 }],
             };

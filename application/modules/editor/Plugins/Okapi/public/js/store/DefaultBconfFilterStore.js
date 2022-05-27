@@ -35,19 +35,23 @@ Ext.define('Editor.plugins.Okapi.store.DefaultBconfFilterStore', {
     storeId: 'defaultBconfFilterStore',
     alias: 'model.DefaultBconfFilterStore',
     model: 'Editor.plugins.Okapi.model.BconfFilterModel',
-    autoLoad: true,
-    pageSize: 0,
-    idProperty: 'id',
     proxy: {
-        type: 'rest',
+        type: 'ajax', // rest not needed, is readonly
         url: Editor.data.restpath + 'plugins_okapi_bconffilter/getdefaultfilters',
         reader: {
             rootProperty: 'rows',
             type: 'json',
             transform: function(data){
-                data.rows = Object.values(data.rows);
+                data.rows.forEach(row => {
+                    row.isCustom = false // Flag Okapi and translate5 BconfFilters
+                    row.id = -row.id // Avoid collisions with custom BconfFilters
+                });
                 return data;
-            },
+            }
         }
     },
+    autoLoad: true,
+    pageSize: 0,
+    idProperty: 'id',
+
 });

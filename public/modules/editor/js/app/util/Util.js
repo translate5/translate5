@@ -300,11 +300,31 @@ Ext.define('Editor.util.Util', {
             });
         },
 
-        // @see https://stackoverflow.com/a/3561711
+        /** @see https://stackoverflow.com/a/3561711 */
         escapeRegex: function(string){
             return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         },
 
+        /** @see https://forum.sencha.com/forum/showthread.php?310616 */
+        getUnfiltered: function(store){
+            return store.isFiltered() ? store.getData().getSource().getRange() : store.getRange();
+        },
+
+        /** Get changed properties from edit compared to orig
+         * @param considerFalsyChange Wether changes from one falsy value to another are considered as change
+         * @returns An object with changed values only
+         */
+        getChanged: function(edit, orig, considerFalsyChange = false){
+            var ret = {};
+            for(let[prop,newVal] of Object.entries(edit)){
+                let oldVal = orig[prop];
+                if(newVal !== oldVal && (considerFalsyChange || newVal || oldVal)){
+                    ret[prop] = newVal;
+
+                }
+            }
+            return ret;
+        },
 
     }
 });
