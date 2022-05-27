@@ -78,7 +78,6 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
                 }
                 $rows[$okapiId] = $row;
             }
-            //TODO: extension mapping
         }
 
         $this->view->rows = array_values($rows); // remove named indexes
@@ -88,11 +87,20 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
 
     public function indexAction() {
         $db = $this->entity->db;
+        $bconfId = $this->getParam('bconfId');
+        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+
         $s = $db->select();
         //$s->from($db, ['okapiId', 'name','extensions', 'description']);
-        $s->where('bconfId = ?', $this->getParam('bconfId'));
+        $s->where('bconfId = ?', $bconfId);
         $this->view->rows = $db->fetchAll($s)->toArray();
         $this->view->total = count($this->view->rows);
+
+        if(!$this->view->metaData){
+            $this->view->metaData = new stdClass();
+        }
+        $this->view->metaData->{'extensions-mapping'}
+            = file_get_contents($bconf->getFilePath($bconfId, 'extensions-mapping.txt'));
     }
 
 }
