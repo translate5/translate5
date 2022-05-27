@@ -74,14 +74,6 @@ Ext.define('Editor.view.admin.log.SystemGrid', {
                 remoteFilter: true,
                 remoteSort: true,
                 pageSize: 25,
-                proxy: {
-                    type: 'rest',
-                    url: Editor.data.restpath+'log',
-                    reader: {
-                        rootProperty: 'rows',
-                        type: 'json'
-                    }
-                }
             }),
             title: me.strings.title,
             plugins: ['gridfilters', {

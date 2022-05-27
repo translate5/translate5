@@ -38,17 +38,4 @@ Ext.define('Editor.plugins.Okapi.store.BconfStore', {
     autoLoad: true,
     autoSync: true,
     pageSize: 0,
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconf',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data',
-            writeAllFields: false
-        }
-    },
 });

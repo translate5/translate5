@@ -27,6 +27,13 @@
 Ext.define('Editor.plugins.Okapi.model.BconfModel', {
     extend: 'Ext.data.Model',
     alias: 'model.BconfModel',
+    proxy: {
+        type: 'rest',
+        url: Editor.data.restpath + 'plugins_okapi_bconf',
+        reader: {
+            rootProperty: 'rows',
+        },
+    },
     fields: [{
         name: 'id',
         type: 'int',

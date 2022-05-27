@@ -28,7 +28,22 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     extend: 'Ext.data.Model',
     storeId: 'bconfFilterStore',
     alias: 'model.bconfFilterModel',
-    idProperty: 'okapiId',
+    proxy: {
+        type: 'rest',
+        url: Editor.data.restpath + 'plugins_okapi_bconffilter',
+        reader: {
+            rootProperty: 'rows',
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false
+
+        },
+        api: {
+            read: undefined // is set on grid init with bconfId as filter
+        }
+    },
     fields: [{
         name: 'id',
         type: 'int',
@@ -41,8 +56,13 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         reference: 'bconfmodel',
     }, {
         name: 'isCustom',
-        type: 'int',
-        defaultValue: 0
+        type: 'bool',
+        defaultValue: true,
+        presist: false
+    }, {
+        name: 'description',
+        type: 'string'
+
     }
     ]
 });

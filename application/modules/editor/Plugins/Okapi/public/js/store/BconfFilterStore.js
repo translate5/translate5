@@ -30,6 +30,7 @@
  * @class Editor.plugins.Okapi.store.BconfFilterStore
  * @extends Ext.data.Store
  */
+ 
 Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
     extend: 'Ext.data.Store',
     requires: ['Editor.plugins.Okapi.store.DefaultBconfFilterStore'], // for Okapi and Translate5 filters
@@ -37,27 +38,18 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
     alias: 'store.bconfFilterStore',
     model: 'Editor.plugins.Okapi.model.BconfFilterModel',
     autoLoad: true,
+    autoSync: false, // Needed to edit the name before saving!
     pageSize: 0,
     idProperty: 'id',
     defaultsFilter: {
         id: 'defaultsFilter',
-        filterFn: function(rec){return rec.data.isCustom}, // QUIRK: Mustn't be arrow function
+        filterFn: function(rec){return rec.data.isCustom},
     },
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconffilter',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json',
-            transform: function(data){
-                data.rows = Object.values(data.rows);
-                return data;
-            },
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data',
-            writeAllFields: false
+    initConfig: function(config){
+        if(!config.filters){
+            config.filters = [];
         }
+        config.filters.push(this.defaultsFilter); // Enable filter initially
+        return this.callParent([config]);
     }
 });
