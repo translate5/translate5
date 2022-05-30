@@ -103,4 +103,15 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             = file_get_contents($bconf->getFilePath($bconfId, 'extensions-mapping.txt'));
     }
 
+    protected function entityLoad() {
+        $id = $this->getRequest()->getParam('id');
+        if(gettype($id) != 'array'){
+            $path = $this->getRequest()->getPathInfo();
+            // /editor/plugins_okapi_bconffilter/8-okf_odf%40translate5.test
+            $id = explode('-.-',urldecode(basename($path)));
+        }
+        $this->entity->load($id[0], $id[1]);
+    }
+
+
 }

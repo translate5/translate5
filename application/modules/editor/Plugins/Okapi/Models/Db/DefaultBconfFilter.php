@@ -29,5 +29,5 @@
 class editor_Plugins_Okapi_Models_Db_DefaultBconfFilter extends Zend_Db_Table_Abstract {
     
     protected $_name = 'LEK_okapi_bconf_default_filter';
-    public $_primary = 'id';
+    public $_primary = ['bconfId', 'okapiId'];
 }

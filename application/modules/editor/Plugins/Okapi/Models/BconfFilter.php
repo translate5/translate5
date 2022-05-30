@@ -53,5 +53,29 @@ class editor_Plugins_Okapi_Models_BconfFilter extends ZfExtended_Models_Entity_A
           }
           return null;
      }
-    
+
+    /**
+     * Override that supports composite key
+     * @param int $bconfId
+     * @param string $okapiId  Not in signature to match ZfExtended_Models_Entity_Abstract::load
+     * @return Zend_Db_Table_Row_Abstract|null
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function load($bconfId) {
+        $args = func_get_args();
+        $okapiId = $args[1];
+        try {
+            $rowset = $this->db->find($bconfId, $okapiId);
+        } catch (Exception $e) {
+            $this->notFound('NotFound after other Error', $e);
+        }
+        if (!$rowset || $rowset->count() == 0) {
+            $this->notFound('#PK', [$bconfId, $okapiId]);
+        }
+        $rowset->rewind(); // triggers loading
+        //load implies loading one Row, so use only the first row
+        return $this->row = $rowset->current();
+    }
+
+
 }

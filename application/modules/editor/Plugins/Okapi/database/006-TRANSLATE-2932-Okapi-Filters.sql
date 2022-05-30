@@ -26,3 +26,4 @@
 ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `okapiId` VARCHAR(255);
 ALTER TABLE `LEK_okapi_bconf_filter` RENAME COLUMN `notes` TO `description`;
 ALTER TABLE `LEK_okapi_bconf` MODIFY `description` VARCHAR(255);
+ALTER TABLE `LEK_okapi_bconf_filter` DROP PRIMARY KEY, DROP COLUMN `id`, ADD PRIMARY KEY (`bconfId`, `okapiId`);
