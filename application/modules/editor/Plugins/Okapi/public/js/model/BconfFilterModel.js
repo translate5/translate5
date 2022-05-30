@@ -46,7 +46,18 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
 
         },
         api: {
-            read: undefined // is set on grid init with bconfId as filter
+            read: undefined /** @link self.proxy.setBconfId sets this for easy filtering */
+        },
+        /**
+         * Sets the id of the currently opened bconf to
+         * - the defaultValue of the bconfId field
+         * - the read api param
+         * @see Editor.plugins.Okapi.view.BconfFilterGrid.initComponent
+         */
+        setBconfId: function(bconfId){
+            var proxy = this;
+            proxy.getModel().getField('bconfId').defaultValue = proxy.bconfId = bconfId;
+            proxy.api.read = proxy.getUrl() + '?bconfId=' + bconfId
         }
     },
     idProperty: 'okapiId',
@@ -56,15 +67,10 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     }, {
         name: 'bconfId',
         type: 'int',
-        reference: 'bconfmodel',
-        critical: true
+        //reference: 'bconfmodel', // leads to fiels being null
+        critical: true,
+        defaultValue: 0 /** @see self.proxy.setBconfId */
     },{
-        name: 'id',
-        presist: true,
-        calculate: function(data){
-            return [data.bconfId, data.okapiId]
-        }
-},{
         name: 'isCustom',
         type: 'bool',
         defaultValue: true,

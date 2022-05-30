@@ -91,7 +91,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
 
         $s = $db->select();
-        //$s->from($db, ['okapiId', 'name','extensions', 'description']);
+        $s->from($db, ['okapiId', 'name', 'description']);
         $s->where('bconfId = ?', $bconfId);
         $this->view->rows = $db->fetchAll($s)->toArray();
         $this->view->total = count($this->view->rows);

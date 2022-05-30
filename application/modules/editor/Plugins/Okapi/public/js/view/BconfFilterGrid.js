@@ -41,22 +41,16 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         clicksToEdit: 3, // QUIRK: 1 not possible, triggers on actioncolumns TODO: limit to non actionCols, add pointerCls
         removeUnmodified: true,
     }],
+    title: {text: 'Okapi Filters', flex: 0},
     initComponent: function(){
         var me = this,
-        bconf = me.getBconf().getData();
+            bconf = me.getBconf().getData();
+        me.title.text += ` in <i data-qtip="${bconf.description}">${bconf.name}.bconf</i>`;
         me.callParent();
-        var proxy = me.getStore().getProxy(),
-            api = proxy.getApi();
-        api.read = proxy.getUrl() + '?bconfId=' + bconf.id; // simple way to filter for bconfId
-        proxy.setApi(api);
-
-        var title = me.getTitle();
-        title.text += ` in <i data-qtip="${bconf.description}">${bconf.name}.bconf</i>`;
-
+        me.getStore().getProxy().setBconfId(bconf.id); // for records and backend filter
     },
     helpSection: 'useroverview',
     cls: 'actionColGrid',
-    title: {text: 'Okapi Filters', flex: 0},
     text_cols: {
         customFilterName: '#UT#Customized Okapi Filter Type',
         name: '#UT#Name',
