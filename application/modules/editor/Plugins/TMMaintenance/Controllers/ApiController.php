@@ -49,7 +49,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         $this->view->assign($tms);
     }
 
-    public function searchAction(): void
+    public function getAction(): void
     {
         $connector = $this->getOpenTM2Connector((int)$this->getRequest()?->getParam('tm'));
 
@@ -81,12 +81,6 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             'items' => array_merge(...$result),
             'metaData' => ['offset' => $offset],
         ]);
-    }
-
-    public function segmentsAction(): void
-    {
-        $data = $this->getRequest()?->getParams();
-        $this->view->assign([]);
     }
 
     public function postAction(): void

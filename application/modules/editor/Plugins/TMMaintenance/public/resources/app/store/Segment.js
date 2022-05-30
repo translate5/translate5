@@ -7,7 +7,7 @@ Ext.define('TMMaintenance.store.Segment', {
 
     proxy: {
         type: 'ajax',
-        url: '/editor/plugins_tmmaintenance_api/segment/search',
+        url: '/editor/plugins_tmmaintenance_api/segments',
         reader: {
             type: 'json',
             rootProperty: 'items'

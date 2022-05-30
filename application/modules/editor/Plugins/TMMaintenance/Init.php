@@ -98,12 +98,5 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
             'action' => 'tms'
         ]);
         $router->addRoute('plugins_tmmaintenance_tms', $route);
-
-        $route = new ZfExtended_Controller_RestLikeRoute('editor/plugins_tmmaintenance_api/segment/search', [
-            'module' => 'editor',
-            'controller' => 'plugins_tmmaintenance_api',
-            'action' => 'search'
-        ]);
-        $router->addRoute('plugins_tmmaintenance_segments_search', $route);
     }
 }
