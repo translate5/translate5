@@ -67,6 +67,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             );
 
             $data = $resultList->getResult();
+            $data = $this->reformatData($data);
             $offset = $resultList->getNextOffset();
 
             $totalAmount += count($data);
@@ -106,7 +107,27 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         $this->view->assign([]);
     }
 
-    #endregion
+    #endregion Actions
+
+    private function reformatData(array $data): array
+    {
+        $result = [];
+
+        foreach ($data as $item) {
+            $item = (array)$item;
+            $metadata = [];
+
+            foreach ($item['metaData'] as $metadataum) {
+                $metadata[$metadataum->name] = $metadataum->value;
+            }
+
+            $item['metaData'] = $metadata;
+
+            $result[] = $item;
+        }
+
+        return $result;
+    }
 
     private function readLocalization(): array
     {

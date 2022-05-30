@@ -44,6 +44,26 @@ Ext.define('TMMaintenance.view.main.List', {
             },
         },
         {
+            text: 'Author',
+            tpl: '{metaData.author}',
+            xtype: 'templatecolumn',
+        },
+        {
+            text: 'Creation date',
+            tpl: '{metaData.timestamp}',
+            xtype: 'templatecolumn',
+        },
+        {
+            text: 'Document name',
+            tpl: '{metaData.documentName}',
+            xtype: 'templatecolumn',
+        },
+        {
+            text: 'Additional info',
+            tpl: '{metaData.additionalInfo}',
+            xtype: 'templatecolumn',
+        },
+        {
             cell: {
                 tools: {
                     edit: {

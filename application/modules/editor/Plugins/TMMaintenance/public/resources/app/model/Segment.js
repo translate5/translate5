@@ -7,13 +7,18 @@ Ext.define('TMMaintenance.model.Segment', {
         'languageResourceType',
         'languageResourceid',
         'matchrate',
-        'metaData',
         'rawSource',
         'rawTarget',
         'source',
         'state',
         'target',
     ],
+
+    hasOne: {
+        model: 'SegmentMetaData',
+        name: 'metaData',
+        associationKey: 'metaData'
+    },
 
     proxy: {
         type: 'rest',
