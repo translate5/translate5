@@ -11,57 +11,58 @@ Ext.define('TMMaintenance.view.main.Main', {
 
     controller: 'main',
     viewModel: 'main',
-    scrollable: true,
-
-    defaults: {
-        shadow: true
-    },
 
     items: [
         {
             id: 'containerHeader',
             xtype: 'maintoolbar',
             docked: 'top',
-            userCls: 'main-toolbar',
-            shadow: true
+            userCls: 'mb-20',
         },
         {
-            id: 'searchform',
-            xtype: 'searchform',
-            userCls: 'search-form',
-        },
-        {
-            id: 'resultPanel',
             xtype: 'panel',
-            userCls: 'result-panel',
+            userCls: 'w-100',
+            shadow: false,
+            items: [
+                {
+                    id: 'searchform',
+                    xtype: 'searchform',
+                    userCls: 'search-form ml-20 mr-20 mb-20',
+                    shadow: true
+                },
+            ],
+        },
+        {
+            xtype: 'panel',
+            userCls: 'w-100 container',
+            shadow: false,
             items: [
                 {
                     id: 'mainlist',
                     xtype: 'mainlist',
-                    userCls: 'panel big-40',
-                    // TODO move this to styles
-                    responsiveConfig: {
-                        'width >= 1000': {
-                            height: 'calc(100% - 20px)'
+                    userCls: 'result-list column left ml-20',
+                    shadow: true,
+                },
+                {
+                    xtype: 'panel',
+                    userCls: 'column right mr-20',
+                    shadow: true,
+                    items:[
+                        {
+                            xtype: 'button',
+                            text: 'Create',
+                            handler: 'onCreatePressed',
+                            disabled: '{disabled}',
+                            bind: {
+                                disabled: '{!selectedTm}',
+                            },
                         },
-                        'width < 1000': {
-                            height: 300
-                        }
-                    }
-                },
-                {
-                    xtype: 'button',
-                    text: 'Create',
-                    handler: 'onCreatePressed',
-                    disabled: '{disabled}',
-                    bind: {
-                        disabled: '{!selectedTm}',
-                    },
-                },
-                {
-                    id: 'editform',
-                    xtype: 'editform',
-                    userCls: 'panel big-40 hidden',
+                        {
+                            id: 'editform',
+                            xtype: 'editform',
+                            userCls: 'panel',
+                        },
+                    ]
                 },
             ]
         },

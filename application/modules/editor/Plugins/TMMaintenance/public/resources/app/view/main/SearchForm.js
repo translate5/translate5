@@ -2,51 +2,78 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
     extend: 'Ext.form.Panel',
     xtype: 'searchform',
     controller: 'searchform',
-    layout: 'vbox',
-    userCls: '',
+
+    requires: [
+        'Ext.layout.HBox'
+    ],
+
+    autoSize: true,
+
     items: [
         {
-            xtype: 'combobox',
-            name: 'tm',
-            label: 'Choose TM',
-            displayField: 'name',
-            valueField: 'value',
-            queryMode: 'remote',
-            forceSelection: true,
-            store: {
-                autoload: true,
-                fields: [
-                    'name',
-                    'value',
-                ],
-                proxy: {
-                    type: 'ajax',
-                    url: '/editor/plugins_tmmaintenance_api/tm/list',
-                    reader: {
-                        type: 'json',
-                    }
-                },
-            },
-            listeners: {
-                change: 'onTMChange'
-            },
-        },
-        {
-            xtype: 'combobox',
-            name: 'searchField',
-            label: 'Search in',
-            options: [
+            xtype: 'panel',
+            layout: 'hbox',
+            items: [
                 {
-                    text: 'Source',
-                    value: 'source',
-                }, {
-                    text: 'Target',
-                    value: 'target',
+                    xtype: 'container',
+                    autoSize: true,
+                    flex: 1,
+                    items: [
+                        {
+                            xtype: 'combobox',
+                            name: 'tm',
+                            label: 'Choose TM',
+                            displayField: 'name',
+                            valueField: 'value',
+                            queryMode: 'remote',
+                            forceSelection: true,
+                            store: {
+                                autoload: true,
+                                fields: [
+                                    'name',
+                                    'value',
+                                ],
+                                proxy: {
+                                    type: 'ajax',
+                                    url: '/editor/plugins_tmmaintenance_api/tm/list',
+                                    reader: {
+                                        type: 'json',
+                                    }
+                                },
+                            },
+                            listeners: {
+                                change: 'onTMChange'
+                            },
+                            userCls: 'tm',
+                        },
+                    ],
+                },
+                {
+                    xtype: 'container',
+                    autoSize: true,
+                    flex: 1,
+                    items: [
+                        {
+                            xtype: 'combobox',
+                            name: 'searchField',
+                            label: 'Search in',
+                            options: [
+                                {
+                                    text: 'Source',
+                                    value: 'source',
+                                }, {
+                                    text: 'Target',
+                                    value: 'target',
+                                },
+                            ],
+                            listeners: {
+                                change: 'onSearchFieldChange'
+                            },
+                            userCls: 'field',
+                        },
+                    ],
                 },
             ],
-            listeners: {
-                change: 'onSearchFieldChange'
-            },
         },
         {
             xtype: 'panel',
@@ -71,8 +98,8 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     bind: {
                         disabled: '{disabled}',
                     },
-                }
-            ]
+                },
+            ],
         },
     ],
 })

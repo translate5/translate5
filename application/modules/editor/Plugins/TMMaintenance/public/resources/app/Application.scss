@@ -1,35 +1,47 @@
-$item-spacing: dynamic(20px);
 $enable-font-awesome: dynamic(true);
 
-.panel {
-  display: flex;
-  flex-direction: column;
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.ml-20 {
+  margin-left: 20px;
+}
+
+.mr-20 {
+  margin-right: 20px;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.column {
+  &.left {
+    width: 55%;
+    float: left;
+  }
+
+  &.right {
+    width: 40%;
+    float: right;
+  }
 }
 
 .highlight {
   font-weight: bold;
 }
 
-@media (min-width: 1000px) {
-  .big-100 {
-    width: calc(100% - #{$item-spacing});
+.search-form {
+  .tm, .field {
+    width: 95%;
   }
-  .big-60 {
-    width: calc(60% - #{$item-spacing});
-  }
-  .big-50 {
-    width: calc(50% - #{$item-spacing});
-  }
-  .big-40 {
-    width: calc(40% - #{$item-spacing});
-  }
-  .big-33 {
-    width: calc(33.3% - #{$item-spacing});
-  }
-  .big-30 {
-    width: calc(30% - #{$item-spacing});
-  }
-  .big-20 {
-    width: calc(20% - #{$item-spacing});
-  }
+}
+
+.container {
+  height: calc(100% - 150px);
+}
+
+.result-list {
+  height: 99%;
 }

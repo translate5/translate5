@@ -6,5 +6,8 @@ Ext.define('TMMaintenance.view.main.MainModel', {
     data: {
         name: 'TMMaintenance',
         selectedTm: null,
+        //TODO move to search form view model
+        lastOffset: null,
+        hasMoreRecords: false,
     }
 });

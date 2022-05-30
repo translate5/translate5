@@ -52,12 +52,35 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     public function searchAction(): void
     {
         $connector = $this->getOpenTM2Connector((int)$this->getRequest()?->getParam('tm'));
-        $data = $connector->search(
-            $this->getRequest()?->getParam('searchCriteria'),
-            $this->getRequest()?->getParam('searchField')
-        )->getResult();
 
-        $this->view->assign($data);
+        // TODO extract to somewhere
+        $totalAmount = 0;
+        $limit = (int)$this->getRequest()?->getParam('limit');
+        $result = [];
+        $offset = $this->getRequest()?->getParam('offset');
+
+        while ($totalAmount < $limit) {
+            $resultList = $connector->search(
+                $this->getRequest()?->getParam('searchCriteria'),
+                $this->getRequest()?->getParam('searchField'),
+                $offset
+            );
+
+            $data = $resultList->getResult();
+            $offset = $resultList->getNextOffset();
+
+            $totalAmount += count($data);
+            $result[] = $data;
+
+            if (null === $offset) {
+                break;
+            }
+        }
+
+        $this->view->assign([
+            'items' => array_merge(...$result),
+            'metaData' => ['offset' => $offset],
+        ]);
     }
 
     public function segmentsAction(): void

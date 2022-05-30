@@ -28,5 +28,5 @@ Ext.define('TMMaintenance.view.main.EditFormController', {
     onSuccess: function () {
         this.view.hide();
         this.view.reset();
-    }
+    },
 });

@@ -3,13 +3,26 @@ Ext.define('TMMaintenance.view.main.List', {
     xtype: 'mainlist',
 
     requires: [
-        'TMMaintenance.store.Segment'
+        'TMMaintenance.store.Segment',
+        'Ext.grid.plugin.CellEditing',
+        'Ext.grid.plugin.Editable',
+        'Ext.grid.rowedit.Plugin'
     ],
 
     title: 'Segments',
 
+    controller: 'main',
     store: {
-        type: 'segment'
+        type: 'segment',
+    },
+
+    plugins: {
+        // cellediting: true,
+        rowedit: {
+            // selectOnEdit: true
+            autoConfirm: false,
+            autoCancel: false,
+        }
     },
 
     columns: [
@@ -25,6 +38,7 @@ Ext.define('TMMaintenance.view.main.List', {
             text: 'Target text',
             dataIndex: 'target',
             minWidth: 200,
+            editable: true,
             cell: {
                 encodeHtml: false,
             },
@@ -32,6 +46,10 @@ Ext.define('TMMaintenance.view.main.List', {
         {
             cell: {
                 tools: {
+                    edit: {
+                        iconCls: 'x-fa fa-pen',
+                        handler: 'onEditPressed',
+                    },
                     delete: {
                         iconCls: 'x-fa fa-trash-alt',
                         handler: 'onDeletePressed',
@@ -42,6 +60,22 @@ Ext.define('TMMaintenance.view.main.List', {
     ],
 
     listeners: {
-        select: 'onItemSelected'
-    }
+        select: 'onItemSelected',
+        onContainerScrollEnd: 'onContainerScrollEnd',
+        edit: 'onRowEdit',
+    },
+
+    scrollable: {
+        y: true,
+        listeners: {
+            scrollend: function () {
+                let maxPosition = this.getMaxPosition().y;
+                let threshold = Math.ceil(maxPosition * 0.1);
+
+                if (this.getPosition().y + threshold >= maxPosition) {
+                    this.component.getController().onContainerScrollEnd(arguments);
+                }
+            },
+        },
+    },
 });
