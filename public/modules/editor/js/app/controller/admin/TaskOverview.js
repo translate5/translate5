@@ -279,7 +279,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         this.closeAdvancedFilterWindow();
     },
     handleInitEditor: function () {
-        this.closeAdvancedFilterWindow();
+        let me = this;
+        me.closeAdvancedFilterWindow();
+        // reset the menu cache after the view port is changed
+        me.menuCache = [];
     },
     clearTasks: function () {
         this.getAdminTasksStore().removeAll();
