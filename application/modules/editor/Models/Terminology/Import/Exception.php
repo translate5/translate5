@@ -39,5 +39,6 @@ class editor_Models_Terminology_Import_Exception extends ZfExtended_ErrorCodeExc
         'E1354' => 'TBX Import: Folder to save termcollection images could not be created!',
         'E1356' => 'TBX Import: Import error - {msg}',
         'E1357' => 'TBX Import: Could not import due unknown attribute level',
+        'E1393' => 'TBX Import: The XML structure of the TBX file is invalid: {message}',
     ];
 }
