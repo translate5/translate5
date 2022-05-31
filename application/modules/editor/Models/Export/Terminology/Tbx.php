@@ -142,6 +142,11 @@ class editor_Models_Export_Terminology_Tbx {
         $oldTermEntry = '';
         $oldLanguage = 0;
         foreach($this->data as $row) {
+            if($this->isEmptyTerm($row->term)) {
+                $oldTermEntry = $row->termEntryTbxId;
+                $oldLanguage = $row->languageId;
+                continue;
+            }
             if($oldTermEntry != $row->termEntryTbxId) {
                 $termEntry = $body->addChild('termEntry');
                 $termEntry->addAttribute('id', $row->termEntryTbxId);
@@ -376,26 +381,38 @@ class editor_Models_Export_Terminology_Tbx {
                 }
                 $this->transacGrpNodes(4, $line, $trscA, $termEntry['id']);
                 foreach ($termA[$termEntry['id']] as $lang => $terms) {
-                    $line []= $this->tabs[4] . '<langSet xml:lang="' . $lang . '">';
-                    $this->descripGrpNodes(5, $line, $attrA, $trscA, $termEntry['id'], $lang);
-                    $this->attributeNodes (5, $line, $attrA, $termEntry['id'], $lang);
-                    $this->transacGrpNodes(5, $line, $trscA, $termEntry['id'], $lang);
+                    $langSet = [];
+                    $langSet []= $this->tabs[4] . '<langSet xml:lang="' . $lang . '">';
+                    $this->descripGrpNodes(5, $langSet, $attrA, $trscA, $termEntry['id'], $lang);
+                    $this->attributeNodes (5, $langSet, $attrA, $termEntry['id'], $lang);
+                    $this->transacGrpNodes(5, $langSet, $trscA, $termEntry['id'], $lang);
+                    $termsOut = [];
                     foreach ($terms as $term) {
-                        $line []= $this->tabs[5] . '<tig>';
+                        if($this->isEmptyTerm($term['term'])) {
+                            continue;
+                        }
+                        $termsOut []= $this->tabs[5] . '<tig>';
                         $tbxId = $selected ? '' : ' id="' . $term['termTbxId'] . '"';
-                        $line []= $this->tabs[6] . '<term' . $tbxId . '>' . htmlentities($term['term'], ENT_XML1) . '</term>';
-                        $this->descripGrpNodes(6, $line, $attrA, $trscA, $termEntry['id'], $lang, $term['id']);
-                        $this->attributeNodes (6, $line, $attrA, $termEntry['id'], $lang, $term['id']);
-                        $this->transacGrpNodes(6, $line, $trscA, $termEntry['id'], $lang, $term['id']);
-                        $line []= $this->tabs[5] . '</tig>';
+                        $termsOut []= $this->tabs[6] . '<term' . $tbxId . '>' . htmlentities($term['term'], ENT_XML1) . '</term>';
+                        $this->descripGrpNodes(6, $termsOut, $attrA, $trscA, $termEntry['id'], $lang, $term['id']);
+                        $this->attributeNodes (6, $termsOut, $attrA, $termEntry['id'], $lang, $term['id']);
+                        $this->transacGrpNodes(6, $termsOut, $trscA, $termEntry['id'], $lang, $term['id']);
+                        $termsOut []= $this->tabs[5] . '</tig>';
                     }
-                    $line []= $this->tabs[4] . '</langSet>';
+                    $langSet = array_merge($langSet, $termsOut);
+                    //merge into output only, if there is usable content (count == 1 is only the start tag)
+                    if(count($langSet) > 1) {
+                        $langSet []= $this->tabs[4] . '</langSet>';
+                        $line = array_merge($line, $langSet);
+                    }
                 }
                 $line []= $this->tabs[3] . '</termEntry>';
-            }
 
-            // Append into tbx file
-            $this->write($line);
+                // Append into tbx file, if the termEntry has content
+                if(count($line) > 2) {
+                    $this->write($line);
+                }
+            }
         }
 
         // Append closing body- and opening back-node
@@ -606,5 +623,15 @@ class editor_Models_Export_Terminology_Tbx {
 
         // Get buffered tbx contents
         return ob_get_clean();
+    }
+
+    /**
+     * returns true if term is empty or contains only whitespace
+     * @param string|null $term
+     * @return bool
+     */
+    private function isEmptyTerm(?string $term): bool
+    {
+        return editor_Models_Terminology_Models_TermModel::isEmptyTerm($term);
     }
 }

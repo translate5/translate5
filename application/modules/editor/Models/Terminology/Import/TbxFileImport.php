@@ -502,6 +502,13 @@ $memLog('Loaded terms:        ');
             $tig = $tigElement;
         }
 
+        $term = (string)$tig->term;
+
+        //if the term is empty, there is nothing to be processed - although if there are attributes.
+        if(editor_Models_Terminology_Models_TermModel::isEmptyTerm($term)) {
+            return;
+        }
+
         $cls = $this->bulkTerm->getNewImportObject();
         /** @var editor_Models_Terminology_TbxObjects_Term $newTerm */
         $newTerm = new $cls();
@@ -514,7 +521,7 @@ $memLog('Loaded terms:        ');
         $newTerm->languageId = $parsedLangSet->languageId;
         $newTerm->termEntryGuid = $newTerm->parentEntry->entryGuid;
         $newTerm->termEntryTbxId = $newTerm->parentEntry->termEntryTbxId;
-        $newTerm->term = (string)$tig->term;
+        $newTerm->term = $term;
         $newTerm->termTbxId = $this->getIdOrGenerate($tig->term);
         $newTerm->langSetGuid = $parsedLangSet->langSetGuid;
 
