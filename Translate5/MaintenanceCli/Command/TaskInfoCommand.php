@@ -122,6 +122,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
         $langs = array_column($lang->loadByIds([$task->getSourceLang(), $task->getTargetLang(), $task->getRelaisLang()]), 'rfc5646', 'id');
         $data = [
             'ID' => $task->getId(),
+            'Project ID' => $task->getProjectId(),
             'TaskGUID' => $task->getTaskGuid().' / LEK_segment_view_'.md5($task->getTaskGuid()),
             'Name (Order No)' => $task->getTaskName().(strlen($task->getTaskNr()) ? ' ('.$task->getTaskNr().')' : ''),
             'Type (Proj. ID)' => $task->getTaskType().' ('.$task->getProjectId().') - '.$task->isTranslation() ? 'translation' : 'review',
@@ -130,6 +131,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
             'Workflow' => $task->getWorkflow().' in step "'.$task->getWorkflowStepName().'" ('.$task->getWorkflowStep().')',
             'Languages' => ($langs[$task->getSourceLang()] ?? '-na-') . ' => ' . ($langs[$task->getTargetLang()] ?? '-na-') . ($task->getRelaisLang() ? (' Pivot: '.$langs[$task->getRelaisLang()] ?? '-na-') : ''),
             'Segment progress' => $task->getSegmentFinishCount().' / '.$task->getSegmentCount(),
+            'Data Dir' => $task->getAbsoluteTaskDataPath(),
         ];
         $this->writeAssoc($data);
 
