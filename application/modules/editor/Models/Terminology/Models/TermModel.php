@@ -122,6 +122,19 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     }
 
     /**
+     * return true if the given term should be considered as empty
+     * @param string|null $term
+     * @return bool
+     */
+    public static function isEmptyTerm(?string $term): bool
+    {
+        if(is_null($term) || strlen($term) === 0) {
+            return true;
+        }
+        return (bool) preg_match('/^\s*$/', $term);
+    }
+
+    /**
      *
      */
     public function insert($misc = []) {

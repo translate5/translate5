@@ -632,9 +632,6 @@ class editor_Models_Export_Terminology_Tbx {
      */
     private function isEmptyTerm(?string $term): bool
     {
-        if(is_null($term) || strlen($term) === 0) {
-            return true;
-        }
-        return (bool) preg_match('/^\s*$/', $term);
+        return editor_Models_Terminology_Models_TermModel::isEmptyTerm($term);
     }
 }
