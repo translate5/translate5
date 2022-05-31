@@ -153,10 +153,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     filterByText: function(field, searchString){
         var store = this.getView().getStore(),
             searchFilterValue = searchString.trim();
-        store.clearFilter();
         if(searchFilterValue){
             var searchRE = new RegExp(Editor.util.Util.escapeRegex(searchFilterValue), 'i');
-            store.filterBy(({data}) => searchRE.exec(JSON.stringify(data, ['id', 'name', 'description'])));
+            store.addFilter({ //
+                id: 'search',
+                filterFn: ({data}) => searchRE.exec(JSON.stringify(data, ['id', 'name', 'description']))
+            });
+        } else {
+            store.removeFilter('search');
         }
         field.getTrigger('clear').setVisible(searchFilterValue);
     },
