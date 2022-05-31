@@ -28,9 +28,10 @@
 /**
  * Store for the Filters inside a bconf
  * @class Editor.plugins.Okapi.store.BconfFilterStore
+ * @property {Map} extMap Holds the information of extensions-mapping.txt inside a Bconf
  * @extends Ext.data.Store
  */
- 
+
 Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
     extend: 'Ext.data.Store',
     requires: ['Editor.plugins.Okapi.store.DefaultBconfFilterStore'], // for Okapi and Translate5 filters
@@ -40,7 +41,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
     autoLoad: true,
     autoSync: false, // Needed to edit the name before saving!
     pageSize: 0,
-    idProperty: 'id',
+    extMap: new Map(),
     defaultsFilter: {
         id: 'defaultsFilter',
         filterFn: function(rec){return rec.data.isCustom},

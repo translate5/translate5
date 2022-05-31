@@ -81,11 +81,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                 return 'not-editable';
             }
             return '';
-        }
+        },
+        reference: 'gridview'
     },
     initConfig: function(instanceConfig){
         var me = this,
-            itemFilter = function(item){
+            itemFilter = function(item){ // TODO: Add authorization check
                 return true;
             },
             config = {
@@ -131,15 +132,15 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         xtype: 'textfield',
                         allowOnlyWhitespace: false,
                         lastVal: [],
-                        validator: function(v){
-                            if(v === this.lastVal[0]){ // already validated
+                        validator: function(name){
+                            if(name === this.lastVal[0]){ // already validated
                                 return this.lastVal[1];
                             }
                             var view = this.column.getView(),
-                                records = Editor.util.Util.getUnfiltered(view.getStore()),
-                                nameIsUnique = !records.some(r => r.data.name === v && r.id !== view.selection.id)
+                                records = view.getStore().getData().getSource().items,
+                                nameIsUnique = !records.some(rec => rec.data.name === name && rec.id !== view.selection.id)
                                     || Editor.plugins.Okapi.view.BconfGrid.prototype.strings.nameExists; // errormessage
-                            this.lastVal = [v, nameIsUnique]; // cache validation result
+                            this.lastVal = [name, nameIsUnique]; // cache validation result
                             return nameIsUnique;
                         }
                     },

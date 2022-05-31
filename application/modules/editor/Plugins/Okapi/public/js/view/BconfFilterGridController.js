@@ -35,25 +35,39 @@
  * @class BconfFilterGridController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
+let BconfFilterGridController = {
+    //region config
     extend: 'Ext.app.ViewController',
     alias: 'controller.bconfFilterGridController',
     listen: {
         store: {
             'bconfFilterStore': {
-                load: 'addDefaults'
+                beforeload: function(){
+                    this.lookup('gridview').suspendEvent('refresh'); // prevent repaint until records are processed
+                },
+                load: function(store){
+                    var gridview = this.lookup('gridview');
+                    this.addDefaultsToBconffilter.apply(this, arguments)
+                    this.parseExtensionMapping.apply(this, arguments)
+                    gridview.resumeEvent('refresh'); // enable repaint
+                    gridview.refresh();
+                }
             }
         }
     },
     control: {
         '#': { // # references the view
             edit: 'saveFilterAfterEdit',
+            canceledit: 'deleteNewRecord'
         },
 
         'textfield#search': {
             change: 'search',
         }
     },
+
+    //endregion config
+    //region authorization
 
     isDeleteDisabled: function(view, rowIndex, colIndex, item, record){
         return !record.data.isCustom;
@@ -63,14 +77,40 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         return true;
     },
 
-    addDefaults: function(store, records){
+    //endregion
+    /**
+     * Store Load listener. Assumes empty store.
+     */
+    addDefaultsToBconffilter: function(store, records){
         // Show defaultFilters if no others are present
         if(records.length === 0){
-            this.lookupReference('defaultsFilterBtn').setPressed(true)
+            this.lookup('defaultsFilterBtn').setPressed(true)
         }
         // Add default BconfFilters
-        var defaultBconfFilters = Ext.getStore('defaultBconfFilterStore').getData().items
+        var defaultBconfFilters = Ext.getStore('defaultBconfFilterStore').getData().getRange()
         store.loadRecords(defaultBconfFilters, {addRecords: true})
+    },
+    /**
+     * Store Load Listener
+     */
+    parseExtensionMapping: function(store, records, successful, operation){
+        var metadata = operation.getResultSet().getMetadata(),
+            extMapString = metadata['extensions-mapping'],
+            matches = Array.from(extMapString.matchAll(/^\.(.*)\t(.*)$/gm), match => match.slice(1, 3)),
+            bconffilters = Editor.util.Util.getUnfiltered(store)
+        matches.forEach(function([extension, okapiId]){
+            var filter = bconffilters.getByKey(okapiId);
+            if(filter){
+                filter.get('extensions').add(extension);
+            } else { // okapiId in extensions-mapping not contained in Bconf
+                store.add({
+                    bconfId: 0,
+                    okapiId,
+                    extensions: [extension]
+                })
+            }
+            store.extMap.set(extension, okapiId)
+        });
     },
 
     search: function(field, searchString){
@@ -80,7 +120,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
             var searchRE = new RegExp(Editor.util.Util.escapeRegex(searchFilterValue), 'i');
             store.addFilter({
                 id: 'search',
-                filterFn: ({data}) => searchRE.exec(JSON.stringify(data))
+                filterFn: ({data}) => searchRE.exec(JSON.stringify(Object.values(data)))
             });
         } else {
             store.removeFilter('search');
@@ -96,7 +136,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
             store.addFilter(store.defaultsFilter)
         }
     },
-
+// region grid columns
     copy: function(view, rowIndex, colIndex, item, e, record, row){
         searchField = view.grid.down('textfield#search')
         searchField.setValue(record.get('name'))
@@ -132,9 +172,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
 
     delete: function(view, rowIndex, colIndex, item, e, record, /*row*/){
         record.drop();
-        record.save()
+        if(record.crudState != 'C'){
+            record.save()
+        }
     },
-
+// endregion
     /**
      * Save changed record
      * @param {Ext.grid.plugin.RowEditing} cellEditPlugin
@@ -156,5 +198,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         }
 
     },
-
-});
+    /**
+     * Delete new records when edit was canceled
+     * @listens event:canceledit
+     * @param {Ext.grid.plugin.RowEditing} cellEditPlugin
+     * @param {Ext.grid.CellContext} cellContext
+     */
+    deleteNewRecord: function(cellEditPlugin, cellContext){
+        var record = cellContext.record;
+        if(record.isNewRecord){
+            record.drop();
+        }
+    },
+};
+Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', BconfFilterGridController);
+BconfFilterGridController = undefined;

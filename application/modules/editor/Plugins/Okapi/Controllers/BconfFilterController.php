@@ -50,7 +50,8 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         //
         $rows = [];
         foreach($default_fprms as &$fprm){
-            //unset($fprm['id']);
+            unset($fprm['id']);
+            unset($fprm['extensions']);
             $rows[$fprm['okapiId']] = &$fprm;
         }
         unset($fprm);

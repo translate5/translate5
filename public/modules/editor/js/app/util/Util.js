@@ -305,9 +305,10 @@ Ext.define('Editor.util.Util', {
             return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         },
 
-        /** @see https://forum.sencha.com/forum/showthread.php?310616 */
+        /** @see https://forum.sencha.com/forum/showthread.php?310616
+         * @returns {Ext.Util.Collection} */
         getUnfiltered: function(store){
-            return store.isFiltered() ? store.getData().getSource().getRange() : store.getRange();
+            return store.isFiltered() || store.isSorted() ? store.getData().getSource() : store.getData();
         },
 
         /** Get changed properties from edit compared to orig

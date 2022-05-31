@@ -26,10 +26,11 @@
  */
 Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     extend: 'Ext.data.Model',
-    storeId: 'bconfFilterStore',
+    requires: ['Editor.util.type.StringSet'],
     alias: 'model.bconfFilterModel',
     getId: function(){
-        var {bconfId, okapiId} = this.getData();
+        var bconfId = this.get('bconfId'),
+            okapiId = this.get('okapiId');
         return `${bconfId}-.-${okapiId}`; // Slash / as separator will lead to 404
     },
     proxy: {
@@ -42,8 +43,6 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         writer: {
             encode: true,
             rootProperty: 'data',
-            writeAllFields: false
-
         },
         api: {
             read: undefined /** @link self.proxy.setBconfId sets this for easy filtering */
@@ -61,7 +60,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         }
     },
     idProperty: 'okapiId',
-    fields: [ {
+    fields: [{
         name: 'okapiId',
         type: 'string',
     }, {
@@ -70,7 +69,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         //reference: 'bconfmodel', // leads to fiels being null
         critical: true,
         defaultValue: 0 /** @see self.proxy.setBconfId */
-    },{
+    }, {
         name: 'isCustom',
         type: 'bool',
         defaultValue: true,
@@ -78,11 +77,12 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     }, {
         name: 'description',
         type: 'string'
-
     }, {
         name: 'extensions',
-        persist: false, // Normal saving can lead to many requests for changed extensions,
-        defaultValue: []
+        persist: false, // Normal saving causes many requests
+        calculate: function(){
+            return new StringSet();
+        },
     },
     ]
 });

@@ -42,9 +42,9 @@ Ext.define('Editor.plugins.Okapi.store.DefaultBconfFilterStore', {
             rootProperty: 'rows',
             type: 'json',
             transform: function(data){
-                data.rows.forEach(row => {
+                data.rows.forEach((row, index) => {
                     row.isCustom = false // Flag Okapi and translate5 BconfFilters
-                    row.id = -row.id // Avoid collisions with custom BconfFilters
+                    row.id = -index-1 // Avoid collisions with custom BconfFilters
                 });
                 return data;
             }
