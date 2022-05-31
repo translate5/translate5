@@ -33,6 +33,10 @@ Ext.define('Editor.plugins.Okapi.model.BconfModel', {
         reader: {
             rootProperty: 'rows',
         },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+        },
     },
     fields: [{
         name: 'id',
