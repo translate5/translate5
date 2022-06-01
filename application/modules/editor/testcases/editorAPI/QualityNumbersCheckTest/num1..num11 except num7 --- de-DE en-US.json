@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 13,
-    "qtotal": 13,
+    "qcount": 14,
+    "qtotal": 14,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -507,6 +507,152 @@
         },
         {
             "qid": -1,
+            "qtype": "numbers",
+            "qcount": 14,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "37100",
+                    "qtype": "numbers",
+                    "qcount": 3,
+                    "qcomplete": true,
+                    "qcategory": "num1",
+                    "qcatidx": "-1",
+                    "text": "Numbers SRC \u2260 TRG",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37110",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num10",
+                    "qcatidx": "-1",
+                    "text": "Format alteration (ordinal numbers, leading zero etc.)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37112",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num11",
+                    "qcatidx": "-1",
+                    "text": "Different character\/formatting for number interval",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37106",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num12",
+                    "qcatidx": "-1",
+                    "text": "1000-separator not allowed",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37101",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num2",
+                    "qcatidx": "-1",
+                    "text": "Alphanumerical character sequences",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37102",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num3",
+                    "qcatidx": "-1",
+                    "text": "Format alteration (date information etc.)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37103",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num4",
+                    "qcatidx": "-1",
+                    "text": "Separator(s) not localised",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37104",
+                    "qtype": "numbers",
+                    "qcount": 2,
+                    "qcomplete": true,
+                    "qcategory": "num5",
+                    "qcatidx": "-1",
+                    "text": "Formatting of 1000s number altered",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37107",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num6",
+                    "qcatidx": "-1",
+                    "text": "Different minus characters",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num7",
+                    "text": "Separator from SRC altered",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37108",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num8",
+                    "qcatidx": "-1",
+                    "text": "Numeral from SRC found as number in TRG",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37109",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num9",
+                    "qcatidx": "-1",
+                    "text": "Number from SRC found as numeral in TRG",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Numbers",
+            "qtotal": 14,
+            "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
             "qtype": "matchrate",
             "qcount": 0,
             "qcomplete": true,
@@ -663,141 +809,6 @@
             "text": "White space at the beginning\/end",
             "qtotal": 0,
             "expanded": false,
-            "checked": false
-        },
-        {
-            "qid": -1,
-            "qtype": "numbers",
-            "qcount": 13,
-            "qcomplete": true,
-            "children": [
-                {
-                    "qid": "36882",
-                    "qtype": "numbers",
-                    "qcount": 3,
-                    "qcomplete": true,
-                    "qcategory": "num1",
-                    "qcatidx": "-1",
-                    "text": "Numbers SRC \u2260 TRG",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36891",
-                    "qtype": "numbers",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "num10",
-                    "qcatidx": "-1",
-                    "text": "Format alteration (ordinal numbers, leading zero etc.)",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36893",
-                    "qtype": "numbers",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "num11",
-                    "qcatidx": "-1",
-                    "text": "Different character\/formatting for number interval",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36883",
-                    "qtype": "numbers",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "num2",
-                    "qcatidx": "-1",
-                    "text": "Alphanumerical character sequences",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36884",
-                    "qtype": "numbers",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "num3",
-                    "qcatidx": "-1",
-                    "text": "Format alteration (date information etc.)",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36885",
-                    "qtype": "numbers",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "num4",
-                    "qcatidx": "-1",
-                    "text": "Separator(s) not localised",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36886",
-                    "qtype": "numbers",
-                    "qcount": 2,
-                    "qcomplete": true,
-                    "qcategory": "num5",
-                    "qcatidx": "-1",
-                    "text": "Formatting of 1000s number altered",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36888",
-                    "qtype": "numbers",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "num6",
-                    "qcatidx": "-1",
-                    "text": "Different minus characters",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num7",
-                    "text": "Separator from SRC altered",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36889",
-                    "qtype": "numbers",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "num8",
-                    "qcatidx": "-1",
-                    "text": "Numeral from SRC found as number in TRG",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36890",
-                    "qtype": "numbers",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "num9",
-                    "qcatidx": "-1",
-                    "text": "Number from SRC found as numeral in TRG",
-                    "leaf": true,
-                    "checked": false
-                }
-            ],
-            "qcategory": null,
-            "qtooltip": "",
-            "text": "Zahlen",
-            "qtotal": 13,
-            "expanded": true,
             "checked": false
         }
     ]

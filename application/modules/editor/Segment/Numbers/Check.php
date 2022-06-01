@@ -122,18 +122,13 @@ class editor_Segment_Numbers_Check {
             ->loadAllKeyValueCustom('id', 'rfc5646');
 
         // Run check
-        $states = numbers_check(
+        $this->states = numbers_check(
             $source,
             $target,
             self::$lang[$task->getSourceLang()],
             self::$lang[$task->getTargetLang()],
             $task
         );
-
-        // Foreach problem type
-        foreach ($states as $state => $mqmA) {
-            $this->states[$state] = $mqmA;
-        }
     }
 
     /**

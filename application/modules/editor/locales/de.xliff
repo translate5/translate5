@@ -2144,6 +2144,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U2luZ2xlIFNpZ24tb24='><source>Single Sign-on</source><target>Single Sign-on</target></trans-unit>
 <trans-unit id='RGllc2VzIEZlbGQgZGFyZiBuaWNodCBsZWVyIHNlaW4='><source>Dieses Feld darf nicht leer sein</source><target>Dieses Feld darf nicht leer sein</target></trans-unit>
 
+<trans-unit id='WmFobGVu'><source>Zahlen</source><target>Zahlen</target></trans-unit>
 <trans-unit id='WmFobGVuIFNSQyDiiaAgVFJH'><source>Zahlen SRC ≠ TRG</source><target>Zahlen SRC ≠ TRG</target></trans-unit>
 <trans-unit id='QWxwaGFudW1lcmlzY2hlIFplaWNoZW5mb2xnZW4='><source>Alphanumerische Zeichenfolgen</source><target>Alphanumerische Zeichenfolgen</target></trans-unit>
 <trans-unit id='Rm9ybWF0w6RuZGVydW5nIChEYXR1bXNhbmdhYmVuIHUuw6QuKQ=='><source>Formatänderung (Datumsangaben u.ä.)</source><target>Formatänderung (Datumsangaben u.ä.)</target></trans-unit>

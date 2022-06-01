@@ -104,14 +104,15 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
                     // Do check
                     $check = new editor_Segment_Numbers_Check($task, $target->getField(), $segment);
 
-                    // Get messages grouped by message type
-                    foreach ($check->getStates() as $state => $mqmA) {
+                    // Get error cases grouped by category
+                    foreach ($check->getStates() as $category => $cases) {
 
-                        // Foreach message
-                        foreach ($mqmA as $mqm) {
-
-                            // Add quality. Multiple qualities of same kind can be added for same target
-                            $tags->addQuality($target->getField(), static::$type, $state);
+                        // Multiple error cases of same category can be added for same target
+                        // so for each case we add a quality-record, but we don't add info
+                        // that will make possible to distunguish between cases of same category within same target
+                        // due to that there was a decision to postpone that development
+                        foreach ($cases as $case) {
+                            $tags->addQuality($target->getField(), static::$type, $category);
                         }
                     }
                 }

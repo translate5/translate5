@@ -4695,6 +4695,7 @@ The following task was imported with errors / warnings / notices. Please take ca
   <target>This field can not be empty</target>
 </trans-unit>
 
+<trans-unit id='WmFobGVu'><source>Zahlen</source><target>Numbers</target></trans-unit>
 <trans-unit id='WmFobGVuIFNSQyDiiaAgVFJH'><source>Zahlen SRC ≠ TRG</source><target>Numbers SRC ≠ TRG</target></trans-unit>
 <trans-unit id='QWxwaGFudW1lcmlzY2hlIFplaWNoZW5mb2xnZW4='><source>Alphanumerische Zeichenfolgen</source><target>Alphanumerical character sequences</target></trans-unit>
 <trans-unit id='Rm9ybWF0w6RuZGVydW5nIChEYXR1bXNhbmdhYmVuIHUuw6QuKQ=='><source>Formatänderung (Datumsangaben u.ä.)</source><target>Format alteration (date information etc.)</target></trans-unit>

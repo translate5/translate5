@@ -100,7 +100,7 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
     /**
      * Tests the generally availability and validity of the filter tree
      */
-    public function testFilterQualityTreeAllExceptNum7(){
+    public function testFilterQualityTrees(){
 
         // Foreach task based on imported csv file
         foreach (self::$taskA as $name => $env) {
