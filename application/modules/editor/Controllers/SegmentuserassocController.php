@@ -69,24 +69,9 @@ class Editor_SegmentuserassocController extends ZfExtended_RestController {
      * @throws ZfExtended_ValidateException
      */
     public function postAction() {
-        $sessionUser = new Zend_Session_Namespace('user');
-        $userGuid = $sessionUser->data->userGuid;
-        $now = date('Y-m-d H:i:s');
-        $this->entity->init();
-        $this->entity->setModified($now);
-        $this->entity->setCreated($now);
-        $this->entity->setTaskGuid($this->getCurrentTask()->getTaskGuid());
-        $this->entity->setUserGuid($userGuid);
         $this->decodePutData();
         $this->checkSegmentTaskGuid($this->data->segmentId);
-        $this->entity->setSegmentId($this->data->segmentId);
-        $this->entity->validate();
-        try {
-            $this->entity->save();
-        }
-        catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-            // on duplicate key everything is ok, the entry is already existing
-        }
+        $this->entity->createAndSave($this->getCurrentTask()->getTaskGuid(), (int) $this->data->segmentId, editor_User::instance()->getGuid());
         $this->view->rows = $this->entity->getDataObject();
     }
     

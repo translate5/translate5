@@ -78,6 +78,10 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract 
     protected $validatorInstanceClass   = 'editor_Models_Validator_Customer';
     
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
+    /**
+     * @var editor_Models_Customer_Meta|null
+     */
+    protected ?editor_Models_Customer_Meta $meta;
 
     public function delete() {
         $customerId = $this->getId();
@@ -208,6 +212,25 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract 
             return;
         }
         $this->row =$row;
+    }
+
+    /**
+     * convenient method to get the customer meta data
+     * @param bool $reinit if true reinits the internal meta object completely (after adding a field for example)
+     * @return editor_Models_customer_Meta
+     */
+    public function meta(bool $reinit = false) {
+        /** @var editor_Models_Customer_Meta $meta */
+        $meta = $this->meta ?? $this->meta = ZfExtended_Factory::get('editor_Models_Customer_Meta');
+        $customerId = $this->getId();
+        if($meta->getCustomerId() != $customerId || $reinit){
+            try {
+                $meta->loadByCustomerId($customerId);
+            } catch(ZfExtended_Models_Entity_NotFoundException){
+                $meta->init(['customerId' => $customerId]);
+            }
+        }
+        return $meta;
     }
     
     /***

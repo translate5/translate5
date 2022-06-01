@@ -11,6 +11,61 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.2] - 2022-05-24
+
+### Important Notes:
+#### [TRANSLATE-2314](https://jira.translate5.net/browse/TRANSLATE-2314)
+Wording and Icon changed: Introduced a new processing state "locked" with a lock icon. This segments can be locked / unlocked by PM users. The processing state blocked remains for segments which can not be unlocked by PMs.
+ 
+
+
+### Added
+**[TRANSLATE-2642](https://jira.translate5.net/browse/TRANSLATE-2642): LanguageResources - DeepL terminology integration** <br>
+Enable deepL language resources to use terminology as glossar.
+
+**[TRANSLATE-2314](https://jira.translate5.net/browse/TRANSLATE-2314): Editor general - Be able to lock/unlock segments in the editor by a PM** <br>
+The project-manager is now able to lock and unlock single segments (CTRL+L). 
+A jump to segment is implemented (CTRL+G).
+Bookmarks can now be set also on just a selected segment, not only on an opened one (CTRL+D). Locking and bookmarking can be done in a batch way on all segments in the current filtered grid. 
+
+
+### Changed
+**[TRANSLATE-2976](https://jira.translate5.net/browse/TRANSLATE-2976): Okapi integration - Make MS Office document properties translatable by default** <br>
+The Okapi default settings are changed, so that MS Office document properties are now translateable by default.
+
+
+
+### Bugfixes
+**[TRANSLATE-2973](https://jira.translate5.net/browse/TRANSLATE-2973): LanguageResources - Tag Repair creates Invalid Internal tags when Markup is too complex** <br>
+FIX: Automatic tag repair may generated invalid internal tags when complex markup was attempted to be translated
+
+**[TRANSLATE-2972](https://jira.translate5.net/browse/TRANSLATE-2972): Editor general - Leaving and Navigating to Deleted Tasks** <br>
+Trying to access a deleted task via URL was not handled properly. Now the user is redirected to the task overview.
+
+**[TRANSLATE-2969](https://jira.translate5.net/browse/TRANSLATE-2969): Import/Export - Reintroduce BCONF import via ZIP** <br>
+FIX: Re-enabled using a customized BCONF for OKAPI via the import zip. Please note, that this feature is nevertheless deprecated and the BCONF in the import zip will not be added to the application's BCONF pool.
+
+**[TRANSLATE-2968](https://jira.translate5.net/browse/TRANSLATE-2968): LanguageResources - Deleted space at start or end of fuzzy match not highlighted** <br>
+Fixed visualization issues of added / deleted white-space in the fuzzy match grind of the lower language resource panel in the editor.
+
+**[TRANSLATE-2967](https://jira.translate5.net/browse/TRANSLATE-2967): TermPortal - TermPortal: grid-attrs height problem** <br>
+Fixed the tiny height of attribute grids. 
+
+**[TRANSLATE-2965](https://jira.translate5.net/browse/TRANSLATE-2965): GroupShare integration - GroupShare sync deletes all associations between tasks and language-resources** <br>
+The synchronization of GroupShare TMs was deleting to much task language resource associations.
+
+**[TRANSLATE-2964](https://jira.translate5.net/browse/TRANSLATE-2964): Workflows - PM Project Notification is triggered on each project instead only on term translation projects** <br>
+Project creation notifications can now be sent only for certain project types.
+
+**[TRANSLATE-2926](https://jira.translate5.net/browse/TRANSLATE-2926): Okapi integration - Index and variables can not be extracted from Indesign** <br>
+So far it was not possible to translate Indesign text variables and index entries, because Okapi did not extract them.
+
+With an okapi contribution by Denis, financed by translate5, this is changed now.
+
+Also translate5 default okapi settings are changed, so that text variables and index entries are now translated by default for idml.
+
+
 ## [5.7.1] - 2022-05-10
 
 ### Important Notes:

@@ -103,7 +103,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         ]);
         self::assertEquals(200, $res->getStatus());
 
-        $res = $api->request("editor/plugins_okapi_bconf/downloadbconf?bconfId=$id");
+        $res = $api->request("editor/plugins_okapi_bconf/downloadbconf?id=$id");
         self::assertEquals(200, $res->getStatus());
         $bconfString = $res->getBody();
 
@@ -141,8 +141,8 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $autoImportFailureMsg = 'AutoImport of missing system bconf failed.';
         self::assertEquals($total + 1, $newTotal, $autoImportFailureMsg . ' Totalcount not increased');
         $newSystemBconf = new editor_Plugins_Okapi_Models_Bconf();
-        $newSystemBconf->loadRow('name = ? ');
         $expectedName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
+        $newSystemBconf->loadRow('name = ?', $expectedName);
         self::assertEquals($expectedName, $newSystemBconf->getName(), $autoImportFailureMsg . " No record name matches '$expectedName'");
         $newBconfFile = $newSystemBconf->getFilePath();
         self::assertFileExists($newBconfFile, $autoImportFailureMsg . " File '$newBconfFile' does not exist");
@@ -150,7 +150,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         // Ensure system bconf dir can't be deleted
         $e = null;
         try {
-            $newSystemBconf->deleteDirectory($newSystemBconf->getId());
+            $newSystemBconf->delete();
         } catch(ZfExtended_NoAccessException $e){
         } finally {
             self::assertNotNull($e, 'Deleting the system bconf directory was not prevented by ZfExtended_NoAccessException');
@@ -173,10 +173,9 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $systemBconf->setName(editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
         $systemBconf->save();
 
-        $newSystemBconf->deleteDirectory($newSystemBconf->getId());
-        self::assertDirectoryDoesNotExist($newSystemBconfDir, "Could not delete directory'$newSystemBconfDir' for testing purpose");
-
-        $newSystemBconf->delete();
+        try {
+            $newSystemBconf->delete();
+        } catch(ZfExtended_NoAccessException $e){ }
         $e = null;
         try {
             $newSystemBconf->load($newSystemBconfId);
@@ -207,7 +206,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         ];
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
         $api->import($task);
-        $this->cleanupTask($api);
+        $api->deleteTask();
     }
 
     /***
@@ -224,7 +223,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
         $api->addImportFile($api->getFile('workfiles/TRANSLATE-2266-de-en-2.txt'));
         $api->import($task);
-        $this->cleanupTask($api);
+        $api->deleteTask();
     }
 
     /***
@@ -246,7 +245,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
 
         $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
-        $this->cleanupTask();
+        $api->deleteTask();
     }
 
     /***
@@ -255,6 +254,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      */
     public function test60_InvalidFiles() {
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $testDir = NULL;
         try {
             $bconf->setId(0);
             $testDir = $bconf->getDir();
@@ -280,7 +280,12 @@ class OkapiBconfTest extends editor_Test_JsonTest {
             }
         } catch(Exception $outerEx){
         } finally {
-            $bconf->deleteDirectory(0); // Make sure to delete directory
+            // Make sure to delete directory
+            if($testDir !== NULL){
+                /** @var ZfExtended_Controller_Helper_Recursivedircleaner $cleaner */
+                $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
+                $cleaner->delete($testDir);
+            }
             if(!empty($outerEx)){
                 throw $outerEx;
             }
@@ -295,25 +300,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $bconf->load(self::$bconfId);
 
         $bconfDir = $bconf->getDir();
-        $bconf->deleteDirectory(self::$bconfId);
-        $bconf->delete(); // delete record
+        $bconf->delete(); // delete record, which deletes directory as well
         self::assertDirectoryDoesNotExist($bconfDir);
-    }
-
-    public static function tearDownAfterClass(): void {
-        parent::tearDownAfterClass();
-    }
-
-    /**
-     * Delete and cleanup the current active task.
-     * Needed because this Test does multiple task imports.
-     */
-    public function cleanupTask(): void {
-        /** @var editor_Models_Task $realTask */
-        $realTask = ZfExtended_Factory::get('editor_Models_Task');
-        $realTask->load(self::$api->getTask()->id);
-        /** @var editor_Models_Task_Remover $remover */
-        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$realTask]);
-        $remover->removeForced();
     }
 }

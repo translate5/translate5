@@ -399,7 +399,9 @@ function setfileUploadLanguageCombinationsAvailable() {
         languageResourceToCheck,
         languageResourceToCheckAllSources,
         languageResourceToCheckAllTargets,
+        useSub = Editor.data.instanttranslate.showSublanguages,
         langComb;
+
     for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
         if (Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)) {
             languageResourceToCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
@@ -409,7 +411,16 @@ function setfileUploadLanguageCombinationsAvailable() {
                 $.each(languageResourceToCheckAllSources, function(indexS) {
                     languageResourceToCheckAllTargets = languageResourceToCheck.target;
                     $.each(languageResourceToCheckAllTargets, function(indexT) {
-                        langComb = languageResourceToCheckAllSources[indexS] + '|' + languageResourceToCheckAllTargets[indexT];
+
+                        // when using sub langauges, direct matching is required. Without sub-languages, fuzzy matching will be applied on
+                        // the backend side and decided which resource will be used for file-translations
+                        if(useSub){
+                            langComb = languageResourceToCheckAllSources[indexS] + '|' + languageResourceToCheckAllTargets[indexT];
+                        }else{
+                            // use the major languages when sub-languages are disabled
+                            langComb = languageResourceToCheckAllSources[indexS].split('-')[0] + '|' + languageResourceToCheckAllTargets[indexT].split('-')[0];
+                        }
+
                         if ( languageResourceToCheckAllSources[indexS] !== languageResourceToCheckAllTargets[indexT] && $.inArray(langComb, fileUploadLanguageCombinationsAvailable) === -1) {
                             fileUploadLanguageCombinationsAvailable.push(langComb); 
                         }
@@ -682,9 +693,10 @@ function translateText(textToTranslate, translationInProgressID){
         dataType: "json",
         type: "POST",
         data: {
-            'source':$("#sourceLocale").val(),
-            'target':$("#targetLocale").val(),
-            'text':textToTranslate
+            'source': $("#sourceLocale").val(),
+            'target': $("#targetLocale").val(),
+            'text': textToTranslate,
+            'escape': 1
         },
         success: function(result){
             if (translationInProgressID !== latestTranslationInProgressID) {
@@ -1490,12 +1502,26 @@ function swapLanguages(){
     var results = $('div.translation-result');
     if(results.length > 0) {
         // set the source textarea text, therfore markup must be removed and breaktags restored
-        $('#sourceText').val(markupToText(results.first().html()));
+        var text = unescapeHtml(results.first().html());
+        $('#sourceText').val(text);
     }
     $('#translations').hide();
     changeLanguage();
 }
-
+/**
+ * Just a simple htmlspecialchars_decode in JS
+ * @param string text
+ * @returns string
+ */
+function unescapeHtml(text){
+    return text
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&apos;/g, "'");
+}
 /**
  * Shows the GUI as neccessary for the current app-state
  */

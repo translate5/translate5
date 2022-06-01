@@ -141,6 +141,12 @@ Ext.define('Editor.controller.ServerException', {
         
         try {
             json = Ext.JSON.decode(respText);
+
+            // Fire custom error code events for custom handling. The code bellow will not be processed If the event handler function returns false
+            // This is used in plugin context for custom error handling
+            if(json && json.errorCode && this.fireEvent('serverException'+json.errorCode,json,json.errorCode) === false){
+                return;
+            }
         }
         catch(e){
             //if there is no valid JSON, the error is probably not from us. With 0 we pass by the below switch and just print the error
@@ -149,7 +155,6 @@ Ext.define('Editor.controller.ServerException', {
         if(json && json.errorCode === 'E1381') {
             Ext.Logger.error("E1381 error on the backend");
         }
-            
         //it can happen on submit requests, that we receive the content in XML instead JSON:
         if(response && (!response.responseText || response.responseText.length == 0) && Ext.DomQuery.isXml(response.responseXML)) {
             json.httpStatus = status = Ext.DomQuery.selectNumber('httpStatus', response.responseXML);

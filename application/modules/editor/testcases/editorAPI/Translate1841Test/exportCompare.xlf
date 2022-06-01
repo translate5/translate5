@@ -35,6 +35,7 @@ translate5 autostatus			->	xliff 2.x substate	->	mapped xliff status
 //before translate5 workflow starts
 not translated		 			->	not_translated				->	initial
 blocked							->	blocked						->	initial
+locked							->	locked						->	initial
 
 //1st default translate5 workflow step: set in translation step or initial status before review only workflow
 translated						->	translated					->	translated

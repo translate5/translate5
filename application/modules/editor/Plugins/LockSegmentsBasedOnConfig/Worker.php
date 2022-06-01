@@ -67,7 +67,7 @@ class editor_Plugins_LockSegmentsBasedOnConfig_Worker extends editor_Models_Task
         $sgTable = $sg->info($sg::NAME);
         
         $query = $sg->getAdapter()->quoteInto('UPDATE `'.$sgTable.'` SET  `editable` = 0, autoStateId = '.
-                editor_Models_Segment_AutoStates::BLOCKED.' WHERE taskGuid = ?', $this->taskGuid );
+                editor_Models_Segment_AutoStates::LOCKED.' WHERE taskGuid = ?', $this->taskGuid );
         $query .= ' and id in ('.$subselect.')';
         $sg->getAdapter()->query($query);
         
@@ -76,7 +76,7 @@ class editor_Plugins_LockSegmentsBasedOnConfig_Worker extends editor_Models_Task
         $segmentFieldManager->initFields($this->taskGuid);
         $mv = $segmentFieldManager->getView();
         $query = $sg->getAdapter()->quoteInto('UPDATE `'.$mv->getName().'` SET  `editable` = 0, autoStateId = '.
-                editor_Models_Segment_AutoStates::BLOCKED.' WHERE taskGuid = ?', $this->taskGuid );
+                editor_Models_Segment_AutoStates::LOCKED.' WHERE taskGuid = ?', $this->taskGuid );
         $query .= ' and id in ('.$subselect.')';
 
         $sg->getAdapter()->query($query);

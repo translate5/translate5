@@ -26,12 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Angel Naydenov
- * @package editor
- * @version 1.0
- *
- */
 /**
  * SegmentUserAssoc Object Instance as needed in the application
  * @method integer getId() getId()
@@ -41,12 +35,54 @@ END LICENSE AND COPYRIGHT
  * @method void setSegmentId() setSegmentId(string $segmentId)
  * @method void setUserGuid() setUserGuid(string $userGuid)
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
+ * @method setCreated(string $timestamp)
+ * @method setModified(string $timestamp)
+ * @method string getCreated()
+ * @method string getModified()
  */
 class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentUserAssoc';
     protected $validatorInstanceClass = 'editor_Models_Validator_SegmentUserAssoc';
 
-    
+    #region direct calls
+
+    /**
+     * directly deletes the segment user association by given ID
+     * @param int $segmentId
+     * @param string $userGuid
+     */
+    public function directDelete(int $segmentId, string $userGuid): void
+    {
+        $this->db->delete([
+            'userGuid = ?' => $userGuid,
+            'segmentId = ?' => $segmentId,
+        ]);
+    }
+
+    /**
+     * @throws ZfExtended_ValidateException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     */
+    public function createAndSave(string $taskGuid, int $segmentId, string $userGuid) {
+        $now = date('Y-m-d H:i:s');
+        $this->init();
+        $this->setModified($now);
+        $this->setCreated($now);
+        $this->setTaskGuid($taskGuid);
+        $this->setUserGuid($userGuid);
+        $this->setSegmentId($segmentId);
+        $this->validate();
+        try {
+            $this->save();
+        }
+        catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+            // on duplicate key everything is ok, the entry is already existing
+        }
+    }
+
+    #endregion
+
     /**
      * returns all users to the segmentId of the given SegmentUserAssoc
      * @param int $segmentId
@@ -143,15 +179,17 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         return null;
     }
-    
+
     /**
      * loads one SegmentUserAssoc Instance by given params.
-     * 
+     *
      * @param string $userGuid
-     * @param string $segmentId
+     * @param int|string $segmentId
      * @return array
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function loadByParams(string $userGuid, $segmentId) {
+    public function loadByParams(string $userGuid, int|string $segmentId): array
+    {
         try {
             $s = $this->db->select()
                 ->where('userGuid = ?', $userGuid)

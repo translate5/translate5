@@ -30,8 +30,9 @@ END LICENSE AND COPYRIGHT
  * Reusable HTTP Connection API code for HTTP with JSON based APIs
  */
 abstract class editor_Services_Connector_HttpApiAbstract {
+
     const ENC_TYPE = 'application/json; charset=utf-8';
-    
+
     /**
      * @var editor_Models_LanguageResources_Resource
      */
@@ -118,7 +119,7 @@ abstract class editor_Services_Connector_HttpApiAbstract {
         //$response = new Zend_Http_Response(500, [], '{"ReturnValue":0,"ErrorMsg":"Error: too many open translation memory databases"}');
         $this->error = null;
         $this->response = $response;
-        $validStates = [200, 201];
+        $validStates = [200, 201, 204];
         
         $url = $this->http->getUri(true);
         

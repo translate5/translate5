@@ -146,25 +146,30 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-  	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
-  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
-  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Zu Detailansicht zurücksetzen');?>';
-  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Zu normaler Ansicht zurücksetzen');?>';
-  	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>';
-  	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
-  	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
-  	gridToolbar.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>';
-  	gridToolbar.item_zoomIn = '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>';
-  	gridToolbar.item_zoomOut = '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>';
-  	gridToolbar.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Tabelle zurücksetzen');?>';
-  	gridToolbar.item_clearSortAndFilterTooltip = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>';
-  	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
-  	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
-  	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
-  	gridToolbar.item_repeatedFilterBtn = '<?php echo $this->translate->_('Nur wiederholt');?>';
-  	gridToolbar.item_showRepeatedSegments = '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>';
-    gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
-    gridToolbar.item_themeMenuConfigText = '<?php echo $this->translate->_('Layout');?>';
+    Ext.define("Editor.locale.view.segments.grid.Toolbar", {
+        override: "Editor.view.segments.grid.Toolbar",
+        item_viewModesMenu: '<?php echo $this->translate->_('Ansicht');?>',
+        item_editModeBtn: '<?php echo $this->translate->_('Zu Detailansicht zurücksetzen');?>',
+        item_ergonomicModeBtn: '<?php echo $this->translate->_('Zu normaler Ansicht zurücksetzen');?>',
+        item_hideTagBtn: '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>',
+        item_shortTagBtn: '<?php echo $this->translate->_('Tag-Kurzansicht');?>',
+        item_fullTagBtn: '<?php echo $this->translate->_('Tag-Vollansicht');?>',
+        item_optionsTagBtn: '<?php echo $this->translate->_('Einstellungen');?>',
+        item_zoomIn: '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>',
+        item_zoomOut: '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>',
+        item_clearSortAndFilterBtn: '<?php echo $this->translate->_('Tabelle zurücksetzen');?>',
+        item_clearSortAndFilterTooltip: '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
+        item_watchListFilterBtn: '<?php echo $this->translate->_('Lesezeichen');?>',
+        item_helpTooltip: '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>',
+        item_showBookmarkedSegments: '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>',
+        item_repeatedFilterBtn: '<?php echo $this->translate->_('Nur wiederholt');?>',
+        item_showRepeatedSegments: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>',
+        item_themeMenuConfigText: '<?php echo $this->translate->_('Layout');?>',
+        strings: {
+            interfaceTranslation: '<?php echo $this->translate->_('Oberfläche');?>'
+        }
+    });
+
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
 
@@ -348,7 +353,6 @@ Ext.define('Editor.controller.Localizer', {
 
     Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_scrollToSegment = '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>';
@@ -1979,6 +1983,36 @@ Ext.define('Editor.controller.Localizer', {
     this.initPluginTranslations();
   }
 });
+
+//when all translations in the above way are converted to the JSON way, we can just create a set of JSON files, using the ordinary translation way
+Editor.data.l10n = {
+    segmentGrid: {
+        batchOperations: {
+            loading: {
+                lock: '<?php echo $this->translate->_('Segmente werden gesperrt');?>',
+                unlock: '<?php echo $this->translate->_('Segmente werden entsperrt');?>',
+                bookmark: '<?php echo $this->translate->_('Segmente werden als Favoriten markiert');?>',
+                unbookmark: '<?php echo $this->translate->_('Segmente werden von der Favoritenliste entfernt');?>'
+            },
+            warnAllTitle: '<?php echo $this->translate->_('Kein Segment Filter gesetzt');?>',
+            warnAllText: '<?php echo $this->translate->_('Soll die Aktion wirklich auf alle Segmente angewendet werden? Das kann einige Zeit in Anspruch nehmen.');?>',
+            menuText: '<?php echo $this->translate->_('Alle gefilterten Segmente:');?>',
+            menuLock: '<?php echo $this->translate->_('sperren');?>',
+            menuUnlock: '<?php echo $this->translate->_('entsperren');?>',
+            menuBookmark: '<?php echo $this->translate->_('Lesezeichen setzen');?>',
+            menuUnbookmark: '<?php echo $this->translate->_('Lesezeichen entfernen');?>',
+            btnText: '<?php echo $this->translate->_('Aktionen');?>',
+            btnTooltip: '<?php echo $this->translate->_('Auswahl an Aktionen die auf alle Segmente im aktuellen Filterset ausgeführt werden sollen');?>'
+        },
+        toolbar: {
+            btnScrollToSegment: '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>',
+            btnJumpToSegment: '<?php echo $this->translate->_('Springe zu Segment mit Nr (STRG + G)');?>',
+            segmentLockBtn: '<?php echo $this->translate->_('Segment sperren bzw. entsperren (STRG + L)');?>',
+            bookmarkBtn: '<?php echo $this->translate->_('Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen (STRG + D)');?>'
+        }
+    }
+};
+
 <?php
 
 $paths = $this->pluginLocale()->getLocalePaths();

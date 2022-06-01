@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Extends the main Test Class for some convenience methods regarding the Visual Plugin
  */
-class editor_Test_VisualTest extends editor_Test_JsonTest
+abstract class editor_Test_VisualTest extends editor_Test_JsonTest
 {
     /**
      * Retrieves the visual files structure as json

@@ -69,6 +69,7 @@ class Translate198Test extends editor_Test_JsonTest {
     }
     
     /***
+     * @depends testSetupTask
      * Open the task for editing twice (as pmOverrwrite. It is the same as with user assoc). On the secound time, we should get 422 and error code E1341
      */
     public function testTaskAllowedEdit() {

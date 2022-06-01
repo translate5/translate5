@@ -90,6 +90,8 @@ Ext.define('Editor.model.Segment', {
         {name: 'segmentUserAssocId', type: 'int', persist: false}
     ],
     idProperty: 'id',
+    // this is a flag needed when processing taken over matches, which causes the target to be updated in alike segments as well
+    wasOriginalTargetUpdated: false,
     proxy : {
         type : 'rest',
         url: Editor.data.restpath+'segment', //use relative path for REST calls in opened task context
@@ -116,6 +118,36 @@ Ext.define('Editor.model.Segment', {
             this.set('metaCache', meta);
         }        
     },
-    // this is a flag needed when processing taken over matches, which causes the target to be updated in alike segments as well
-    wasOriginalTargetUpdated: false
+    /**
+     * Adds a bookmark for this segment to the current user or removes and existing
+     * @param {Function} [outerSuccess] success callback, optional
+     * @param {Function} [outerFailure] fail callback, optional
+     */
+    toogleBookmark: function(outerSuccess, outerFailure) {
+        let me = this,
+            isWatched = Boolean(this.get('isWatched')),
+            model, config,
+            success = function(rec, op) {
+                me.set('isWatched', !isWatched);
+                me.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
+                outerSuccess && outerSuccess(rec, op);
+            };
+        if (isWatched) {
+            config = {
+                id: this.get('segmentUserAssocId')
+            };
+            model = Ext.create('Editor.model.SegmentUserAssoc', config);
+            model.getProxy().setAppendId(true);
+            model.erase({
+                success: success,
+                failure: outerFailure || Ext.emptyFn
+            });
+        } else {
+            model = Ext.create('Editor.model.SegmentUserAssoc', {'segmentId': this.get('id')});
+            model.save({
+                success: success,
+                failure: outerFailure || Ext.emptyFn
+            });
+        }
+    },
 });
