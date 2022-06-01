@@ -4,7 +4,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
     controller: 'searchform',
 
     requires: [
-        'Ext.layout.HBox'
+        'Ext.layout.HBox',
     ],
 
     autoSize: true,
@@ -25,26 +25,17 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                             label: 'Choose TM',
                             displayField: 'name',
                             valueField: 'value',
-                            queryMode: 'remote',
-                            forceSelection: true,
-                            store: {
-                                autoload: true,
-                                fields: [
-                                    'name',
-                                    'value',
-                                ],
-                                proxy: {
-                                    type: 'ajax',
-                                    url: '/editor/plugins_tmmaintenance_api/tm/list',
-                                    reader: {
-                                        type: 'json',
-                                    }
-                                },
+                            bind: {
+                                store: '{tms}',
                             },
                             listeners: {
-                                change: 'onTMChange'
+                                change: 'onTMChange',
                             },
                             userCls: 'tm',
+                            validators: {
+                                type: 'controller',
+                                fn: 'validateTmField',
+                            },
                         },
                     ],
                 },
@@ -61,15 +52,20 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                                 {
                                     text: 'Source',
                                     value: 'source',
-                                }, {
+                                },
+                                {
                                     text: 'Target',
                                     value: 'target',
                                 },
                             ],
                             listeners: {
-                                change: 'onSearchFieldChange'
+                                change: 'onSearchFieldChange',
                             },
                             userCls: 'field',
+                            validators: {
+                                type: 'controller',
+                                fn: 'validateSearchField',
+                            },
                         },
                     ],
                 },
@@ -91,8 +87,9 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                 },
                 {
                     xtype: 'button',
+                    name: 'search',
                     iconCls: 'x-fa fa-search',
-                    handler: 'onSearch',
+                    handler: 'onSearchPressed',
                     formBind: true,
                     disabled: '{!disabled}',
                     bind: {

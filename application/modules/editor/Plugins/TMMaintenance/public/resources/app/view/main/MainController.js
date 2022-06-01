@@ -34,7 +34,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
      * @param {Array} record
      */
     onItemSelected: function (sender, record) {
-        let form = this.getForm();
+        let form = this.getEditForm();
 
         form.reset();
         form.setRecord(record[0]);
@@ -47,14 +47,18 @@ Ext.define('TMMaintenance.view.main.MainController', {
     },
 
     onCreatePressed: function () {
-        let form = this.getForm();
+        let form = this.getEditForm();
         let segment = Ext.create('TMMaintenance.model.Segment', {});
 
         form.setRecord(segment);
         form.show();
     },
 
-    onDeletePressed: function (sender, record) {
+    /**
+     * @param {TMMaintenance.view.main.List} grid
+     * @param {Ext.dataview.Location} gridLocation
+     */
+    onDeletePressed: function (grid, gridLocation) {
         Ext.Msg.confirm(
             'Confirm',
             'Do you really want to delete a segment?',
@@ -63,8 +67,8 @@ Ext.define('TMMaintenance.view.main.MainController', {
                     return;
                 }
 
-                record.record.set({tm: this.getViewModel().get('selectedTm')});
-                record.record.erase({
+                gridLocation.record.set({tm: this.getViewModel().get('selectedTm')});
+                gridLocation.record.erase({
                     success: () => {
                         // TODO what to do here?
                     }
@@ -86,11 +90,6 @@ Ext.define('TMMaintenance.view.main.MainController', {
         editor.setCaretPos(editor.getValue().length);
     },
 
-    getForm: function () {
-        return Ext.getCmp('editform');
-    },
-
-
     /**
      * @param {TMMaintenance.view.main.List} grid
      * @param {Ext.dataview.Location} gridLocation
@@ -103,5 +102,9 @@ Ext.define('TMMaintenance.view.main.MainController', {
                 console.log('Saved');
             }
         });
+    },
+
+    getEditForm: function () {
+        return Ext.getCmp('editform');
     },
 });
