@@ -73,7 +73,7 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
         if(is_object($data)){
             foreach((array) $data as $key => $val){
                 if(is_object($val) || is_int($key)){
-                    throw new ZfExtended_Exception('Additional data for quality entities must be flat !');
+                    //throw new ZfExtended_Exception('Additional data for quality entities must be flat !');
                 }
             }
             $jsonString = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

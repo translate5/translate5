@@ -50,6 +50,7 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
         $this->initEvents();
         $this->addController('SpellCheckQueryController');
         $this->initRoutes();
+        editor_Segment_Quality_Manager::registerProvider('editor_Plugins_SpellCheck_QualityProvider');
     }
     
     protected function initEvents() {
@@ -64,6 +65,7 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
         //$view->Php2JsVars()->set('plugins.SpellCheck.XXX', $this->getConfig()->preloadedTranslationSegments);
         $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
         $view->Php2JsVars()->get('editor')->htmleditorCss[] = $this->getResourcePath('htmleditor.css');
+        $view->headLink()->appendStylesheet($this->getResourcePath('htmleditor.css'));
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {

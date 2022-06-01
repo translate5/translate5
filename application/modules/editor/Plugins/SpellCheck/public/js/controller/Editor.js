@@ -87,6 +87,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 click: 'startSpellCheckViaButton'
             }
         },
+        store: {
+            '#Segments':{
+                load: 'applySpellCheckStyles'
+            }
+        },
     },
     spellCheckMessages: {
         moreInformation: 'Mehr Informationen'
@@ -778,9 +783,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * @param {Integer} index
      * @returns {Object}
      */
-    createSpellcheckNode: function(index){
+    createSpellcheckNode: function(index, matches){
         var me = this,
-            match = me.allMatches[index],
+            match = matches ? matches[index] : me.allMatches[index],
             nodeElParams = { tag: me.self.NODE_NAME_MATCH };
         // CSS-class(es)
         nodeElParams['cls'] = me.self.CSS_CLASSNAME_MATCH + ' ' + match.cssClassErrorType;
@@ -923,5 +928,44 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.activeMatchNode = event.currentTarget;
         me.initTooltips(); // me.spellCheckTooltip.hide() is not enough (e.g. after a contextmenu had been shown with a long list of replacements, the next contextmenu was placed as if it still has that height)
         me.spellCheckTooltip.showAt(posX,posY);
+    },
+
+    applySpellCheckStyles: function(store) {
+        var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, node, matches;
+
+        for (var i = 0; i < store.getCount(); i++) {
+            rec = store.getAt(i);
+            target = 'target';
+            if (rec.get('spellCheck')[target] && rec.get('spellCheck')[target].length) {
+                rec.get('spellCheck')[target].forEach(function(item){
+                    item.range.containerNode = document.querySelector(
+                        '#' + view.id + '-record-' + rec.internalId
+                        + ' [data-columnid="' + target + 'EditColumn"] .x-grid-cell-inner'
+                    );
+                })
+                node = rec.get('spellCheck')[target][0].range.containerNode;
+                matches = rec.get('spellCheck')[target];
+                this.applyCustomMatches(node, matches);
+            }
+        }
+    },
+    applyCustomMatches: function(editorBody, allMatches) {
+        var me = this,
+            rangeForMatch,
+            documentFragmentForMatch,
+            spellCheckNode;
+        // apply the matches (iterate in reverse order; otherwise the ranges get lost due to DOM-changes "in front of them")
+        me.cleanUpNode(editorBody);
+        rangeForMatch = rangy.createRange(editorBody);
+        console.log(editorBody);
+        Ext.Array.each(allMatches, function(match, index) {
+            rangeForMatch.moveToBookmark(match.range);
+            rangeForMatch = me.cleanBordersOfCharacterbasedRange(rangeForMatch);
+            documentFragmentForMatch = rangeForMatch.extractContents();
+            spellCheckNode = me.createSpellcheckNode(index, allMatches);
+            spellCheckNode.appendChild(documentFragmentForMatch);
+            rangeForMatch.insertNode(spellCheckNode);
+        }, me, true);
+
     }
 });
