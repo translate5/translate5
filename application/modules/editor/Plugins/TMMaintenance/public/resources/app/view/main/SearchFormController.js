@@ -28,6 +28,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         let store = Ext.getCmp('mainlist').store;
         let me = this;
 
+        this.getViewModel().set('selectedTm', values.tm);
         store.load({
             params: values,
             callback: function(records, operation) {
