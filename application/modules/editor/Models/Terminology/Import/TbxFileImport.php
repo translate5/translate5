@@ -188,6 +188,9 @@ class editor_Models_Terminology_Import_TbxFileImport
         $this->mergeTerms = $mergeTerms;
         $this->prepareImportArrays($user);
 
+        //reset internal XML error list
+        //libxml_use_internal_errors(true)
+        libxml_clear_errors();
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
                 $this->close();
@@ -292,6 +295,12 @@ $memLog('Loaded terms:        ');
         {
             $totalCount++;
             $xmlReader->next($this->tbxMap[$this::TBX_TERM_ENTRY]);
+
+            if($error = libxml_get_last_error()) {
+                // 'E1393' => 'TBX Import: The XML structure of the TBX file is invalid: {message}',
+                throw new editor_Models_Terminology_Import_Exception('E1393', get_object_vars($error));
+            }
+
         }
         return $totalCount;
     }
