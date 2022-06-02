@@ -150,11 +150,10 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     },
 
     filterConfigByRoute: function(filterValue) {
-        //update searchvalue only from route if it was different
+        //update search value only from route if it was different
         if(filterValue !== this.searchValue) {
             this.searchField.setValue(filterValue);
             this.searchValue = filterValue;
-            this.groupingFeature.expandAll();
         }
     },
 
@@ -193,6 +192,8 @@ Ext.define('Editor.view.admin.config.GridViewController', {
 
         //mark the matched searchValue
         me.markMatches();
+
+        me.groupingFeature.expandAll();
     },
 
     onStoreLoad: function() {
@@ -243,10 +244,12 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         var me=this,
             store = me.getView().getStore();
         if(me.searchValue == null){
+            store.removeFilter('searchFilter');
             return;
         }
         //local store filter
-        store.filter(new Ext.util.Filter({
+        store.filter({
+            id:'searchFilter',
             filterFn: function (object) {
                 var match = false;
                 if(!me.searchRegExp){
@@ -258,7 +261,7 @@ Ext.define('Editor.view.admin.config.GridViewController', {
                 });
                 return match;
               }
-        }));
+        });
     },
     
     /***
