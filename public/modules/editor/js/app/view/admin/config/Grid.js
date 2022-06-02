@@ -254,6 +254,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                         xtype: 'textfield',
                         name: 'searchField',
                         itemId: 'searchField',
+                        checkChangeBuffer:500,
                         hideLabel: true,
                         width: 200
                     },{
