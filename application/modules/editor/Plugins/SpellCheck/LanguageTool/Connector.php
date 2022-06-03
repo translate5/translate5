@@ -50,20 +50,43 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
      * @var Zend_Config
      */
     private $languageToolConfig;
-    
+
     /**
      * Base-URL used for LanguagaTool - use the URL of your installed languageTool (without trailing slash!).
      * Taken from Zf_configuration (example: "http://yourlanguagetooldomain:8081/v2")
      * @var string
      */
     private $apiBaseUrl;
-    
+
     /**
-     * LanguageTool: supported languages
      * @var array
      */
-    private $languages;
-    
+    private static $languages = [
+
+        /**
+         * Translate5 languages [id => rfc5646] pairs.
+         * Lazy-loaded by $this->getSpellCheckLangByTaskTargetLangId() call
+         */
+        'translate5'   => null,
+
+        /**
+         * Array of languages supported by LanguageTool, each represended as
+         * stdClass instance having `name`, `code` and `longCode` properties
+         * Lazy-loaded by $this->getLanguages() call
+         */
+        'languageTool' => null,
+
+        /**
+         * Combined array of [id => longCode/false] pairs, where `id`-s are from translate5 and
+         * `longCode`-s are from LanguageTool if certain language is supported.
+         * Those codes need to be passed as 2nd arg of LanguageTool connector's getMatches() call
+         * Currently this is used to detect whether spellcheck-quality provider should process segments
+         * of a certain task, so if `false` - it means that target language of that task is not supported by LanguageTool,
+         * and in that case no segments will be processed by this quality provider
+         */
+        'argByLangId'  => [],
+    ];
+
     /**
      * LanguageTool: matches from spellcheck
      * @var object
@@ -119,13 +142,19 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
      * @return array
      */
     public function getLanguages(){
+
+        // Return cached, if already cached
+        if (isset(self::$languages['languageTool'])) {
+            return self::$languages['languageTool'];
+        }
+
         $http = $this->getHttpClient(self::PATH_LANGUAGES);
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
         
         $response = $http->request(self::METHOD_LANGUAGES);
         
-        return $this->processResponse($response);
+        return self::$languages['languageTool'] = $this->processResponse($response);
     }
     
     /**
@@ -145,5 +174,85 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
         $response = $http->request(self::METHOD_MATCHES);
         
         return $this->processResponse($response);
+    }
+
+    /**
+     * Is the language supported by the LanguageTool?
+     * Examples:
+     * |----------------------------------------------------------------------------|
+     * |---from Editor-----|--see LEK_languages---|--------see LanguageTool---------|
+     * |----------------------------------------------------------------------------|
+     * | targetLang (=rfc) | mainl. | sublanguage | longcode | needed result for LT |
+     * |----------------------------------------------------------------------------|
+     * |      de           |   de   |   de-DE     |   de-DE  |       de-DE          |
+     * |     de-DE         |   de   |   de-DE     |   de-DE  |       de-DE          |
+     * |     de-AT         |   de   |   de-AT     |   de-AT  |       de-AT          |
+     * |      fr           |   fr   |   fr-FR     |     fr   |         fr           |
+     * |     fr-FR         |   fr   |   fr-FR     |     fr   |         fr           |
+     * |      he           |   he   |   he-IL     |     he   |         he           |
+     * |      cs           |   cs   |   cs-CZ     |     cs   |         cs           |
+     * |     cs-CZ         |   cs   |   cs-CZ     |     cs   |         cs           |
+     * |----------------------------------------------------------------------------|
+     * @param string $targetLangCode
+     * @return object|false
+     */
+    public function getSupportedLanguage($targetLangCode) {
+
+        // Get supported languages
+        $supportedLanguages = $this->getLanguages();
+
+        /* @var $languagesModel editor_Models_Languages */
+        $languagesModel = ZfExtended_Factory::get('editor_Models_Languages');
+
+        // Get main-language and sub-language
+        $mainlanguage = $languagesModel->getMainlanguageByRfc5646($targetLangCode);
+        $sublanguage  = $languagesModel->getSublanguageByRfc5646($targetLangCode);
+
+        // Try to find sublanguage among supported languages
+        foreach ($supportedLanguages as $lang) {
+            if ($lang->longCode == $sublanguage) {      // priority: check if longCode (e.g. "de-DE","cs") is the default sublanguage ("de-DE", "cs-CZ") of the targetLangCode ("de", "cs-CZ")
+                return $lang;
+            }
+        }
+
+        // Try to find mainlanguage among supported languages
+        foreach ($supportedLanguages as $lang) {
+            if ($lang->longCode == $mainlanguage) {     // fallback: check if longCode (e.g. "fr", "cs") is the mainlanguage ("fr", "cs") of the targetLangCode ("fr", "cs-CZ")
+                return $lang;
+            }
+        }
+
+        // Return false if nothing found
+        return false;
+    }
+
+    /**
+     * Get target lang supported by LanguageTool by task's targetLangId-prop
+     *
+     * @param $targetLangId
+     * @return string|false
+     */
+    public function getSpellCheckLangByTaskTargetLangId($targetLangId) {
+
+        // If self::$languages['argByLangId'] is non-null this means
+        // that we've already checked whether current task's target language is
+        // supported by LanguageTool, and this, in it's turn, means that this variable
+        // is either `false` (if target lang is not supported), or string-code to be
+        // used as 2nd arg for getMatches() call (if target lang is supported)
+        if (isset(self::$languages['argByLangId'][$targetLangId])) {
+            return self::$languages['argByLangId'][$targetLangId];
+        }
+
+        // Load translate5 languages [id => rfc5646] pairs
+        self::$languages['translate5'] = self::$languages['translate5']
+            ?? ZfExtended_Factory
+                ::get('editor_Models_Languages')
+                ->loadAllKeyValueCustom('id', 'rfc5646');
+
+        // Get object representing language supported by LanguageTool
+        $spellCheckLang = $this->getSupportedLanguage(self::$languages['translate5'][$targetLangId]);
+
+        // Get language code supported by LanguageTool
+        return self::$languages['argByLangId'][$targetLangId] = $spellCheckLang ? $spellCheckLang->longCode : false;
     }
 }

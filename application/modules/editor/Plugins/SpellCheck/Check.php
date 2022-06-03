@@ -64,13 +64,6 @@ class editor_Plugins_SpellCheck_Check {
     ];
 
     /**
-     * LanguageTool connector instance
-     *
-     * @var editor_Plugins_SpellCheck_LanguageTool_Connector
-     */
-    protected static $_connector = null;
-
-    /**
      * Qualities
      *
      * @var array
@@ -78,27 +71,24 @@ class editor_Plugins_SpellCheck_Check {
     private $states = [];
 
     /**
-     * Get LanguageTool connector instance
+     * editor_Plugins_SpellCheck_Check constructor.
      *
-     * @return mixed|null
-     */
-    public function getConnector() {
-        return self::$_connector ?? self::$_connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
-    }
-
-    /**
      * @param editor_Models_Task $task
+     * @param $targetField
+     * @param editor_Models_Segment $segment
+     * @param editor_Plugins_SpellCheck_LanguageTool_Connector $connector
+     * @param $spellCheckLang
      */
-    public function __construct(editor_Models_Task $task, $targetField, editor_Models_Segment $segment) {
+    public function __construct(editor_Models_Task $task, $targetField, editor_Models_Segment $segment,
+                                editor_Plugins_SpellCheck_LanguageTool_Connector $connector, $spellCheckLang) {
 
         // Get target text, strip tags, replace htmlentities
         $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
         $target = strip_tags($target);
         $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
 
-
         // Get LanguageTool response
-        $data = $this->getConnector()->getMatches($target, 'en-US');
+        $data = $connector->getMatches($target, $spellCheckLang);
 
         // Foreach match given by LanguageTool API response
         foreach ($data->matches as $index => $match) {

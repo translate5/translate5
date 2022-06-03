@@ -53,6 +53,13 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     protected static $hasCategories = true;
 
     /**
+     * LanguageTool connector instance
+     *
+     * @var editor_Plugins_SpellCheck_LanguageTool_Connector
+     */
+    protected static $_connector = null;
+
+    /**
      * Method to check whether this quality is turned On
      *
      * @param Zend_Config $qualityConfig
@@ -61,6 +68,15 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      */
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
         return true; // $qualityConfig->enableSegmentSpellCheck == 1;
+    }
+
+    /**
+     * Get LanguageTool connector instance
+     *
+     * @return mixed|null
+     */
+    public function getConnector() {
+        return self::$_connector ?? self::$_connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
     }
 
     /**
@@ -74,6 +90,11 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         // If this check is turned Off in config - return $tags
         if (!$qualityConfig->enableSegmentSpellCheck == 1) {
             //return $tags;
+        }
+
+        // If current task's target lang is not supported by LanguageTool - return
+        if (!$spellCheckLang = $this->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())) {
+            return $tags;
         }
 
         // If processing mode is 'alike'
@@ -98,7 +119,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
 
                 // Do check
-                $check = new editor_Plugins_SpellCheck_Check($task, $target->getField(), $segment);
+                $check = new editor_Plugins_SpellCheck_Check($task, $target->getField(), $segment, $this->getConnector(), $spellCheckLang);
 
                 // Process check results
                 foreach ($check->getStates() as $category => $qualityA) {
