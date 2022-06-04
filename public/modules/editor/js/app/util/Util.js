@@ -38,22 +38,22 @@ Ext.define('Editor.util.Util', {
         '16': 'debug',
         '32': 'trace'
     },
-    statics:{
+    statics: {
 
         /***
-        *
-        * @param {Date} date The date to modify
-        * @param {Number} days The amount to add to the current date. If decimal provided, it will be converted to hours
-        * @return {Date} The new Date instance.
-        */
-        addBusinessDays:function(date,days){
+         *
+         * @param {Date} date The date to modify
+         * @param {Number} days The amount to add to the current date. If decimal provided, it will be converted to hours
+         * @return {Date} The new Date instance.
+         */
+        addBusinessDays: function(date, days){
             // if it is float number, calculate the hours from the floating point number.
             var hours = days - parseInt(days);
             if(hours > 0){
                 hours = 24 * hours;
                 date = Ext.Date.add(date, Ext.Date.HOUR, hours);
             }
-            for(var i=1;i<=days;){
+            for(var i = 1; i <= days;){
                 date = Ext.Date.add(date, Ext.Date.DAY, 1);
                 if(!Ext.Date.isWeekend(date)){
                     i++;
@@ -76,7 +76,7 @@ Ext.define('Editor.util.Util', {
             if(dataProps && Array.isArray(dataProps)){
                 dataProps.forEach(function(prop){
                     if(prop.name && prop.value){
-                        selector += ("[data-" + prop.name + "='" + prop.value + "']");
+                        selector += ('[data-' + prop.name + '=\'' + prop.value + '\']');
                     }
                 });
             }
@@ -88,7 +88,7 @@ Ext.define('Editor.util.Util', {
          * @param {String} val
          * @returns {String}
          */
-        gridColumnLanguageRenderer: function(val, md) {
+        gridColumnLanguageRenderer: function(val, md){
             var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
                 label;
             if(lang){
@@ -205,7 +205,7 @@ Ext.define('Editor.util.Util', {
             if(!level){
                 level = this.prototype.get('level');
             }
-            if(this.prototype.errorLevel[level]) {
+            if(this.prototype.errorLevel[level]){
                 return this.prototype.errorLevel[level];
             }
             return '';
@@ -312,20 +312,23 @@ Ext.define('Editor.util.Util', {
         },
 
         /** Get changed properties from edit compared to orig
+         * Supports primitives and objects with/iterables of primitive property values
          * @param considerFalsyChange Wether changes from one falsy value to another are considered as change
          * @returns An object with changed values only
          */
         getChanged: function(edit, orig, considerFalsyChange = false){
             var ret = {};
-            for(let[prop,newVal] of Object.entries(edit)){
+            for(let [prop, newVal] of Object.entries(edit)){
                 let oldVal = orig[prop];
                 if(newVal !== oldVal && (considerFalsyChange || newVal || oldVal)){
                     ret[prop] = newVal;
-
                 }
             }
             return ret;
         },
+        isIterable: function(value, includeString = false){
+            return typeof value[Symbol.iterator] === 'function' && (typeof value !== 'string' || includeString)
+        }
 
     }
 });

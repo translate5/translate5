@@ -46,7 +46,7 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function unpack(string $pathToParse): void {
+    private function do_unpack(string $pathToParse): void {
         chdir($this->entity->getDir());
 
         $content = [
@@ -62,7 +62,7 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
         }
         $version = $raf->readInt();
         if(!($version >= 1 && $version <= $raf::VERSION)){
-            $this->invalidate("Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . $raf::VERSION); 
+            $this->invalidate("Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . $raf::VERSION);
         }
 
         //=== Section 1: plug-ins
@@ -78,7 +78,6 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
                 $size = $raf->readInt();
                 self::createReferencedFile($raf, $size, $relPath);
             }
-
         }
 
         //=== Section 2: Read contained reference files
@@ -134,27 +133,17 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
         }
 
         //=== Section 5: the extensions -> filter configuration id mapping
-        $write = '';
-        $extMap = self::readExtensionMap($raf);
-        foreach($extMap as $ext => $okapiId){
-            $write .= $ext . "\t" . $okapiId . PHP_EOL;
-        }
-        file_put_contents(self::EXTENSIONMAP_FILE, $write);
-        file_put_contents(self::DESCRIPTION_FILE, json_encode($content, JSON_PRETTY_PRINT));
-    }
-
-    private function readExtensionMap($raf): array {
-        $map = [];
         $count = $raf->readInt();
         if(!$count){
             $this->invalidate("No extensions-mapping present in bconf.");
         }
+        $extMap = [];
         for($i = 0; $i < $count; $i++){
-            $ext = $raf->readUTF();
-            $okapiId = $raf->readUTF();
-            $map[$ext] = $okapiId;
+            $extMap[] = $raf->readUTF()."\t".$raf->readUTF();
         }
-        return $map;
+        sort($extMap);
+        file_put_contents(self::EXTENSIONMAP_FILE, implode(PHP_EOL, $extMap));
+        file_put_contents(self::DESCRIPTION_FILE, json_encode($content, JSON_PRETTY_PRINT));
     }
 
     /**

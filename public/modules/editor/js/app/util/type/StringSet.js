@@ -25,55 +25,40 @@
  END LICENSE AND COPYRIGHT
  */
 /**
- * Set of Strings with a two-phase lifecycle:
- * 1) Setup phase: Normal set functions are effective, items can be added fast
- * 2) Cache phase: Set functions will update the cached strval property
- * @property {String} strval A cached string representation of the set
+ * Set of Strings optimized for toString() performance. Thus suited well as value in
+ * @link Ext.panel.Grid
  */
 class StringSet extends Set {
-    strval
-    cacheMode = {
-        addAndUpdate(v){
-            var ret = super.add(v)
-            this.updateStrVal()
-            return ret
-        },
-        deleteAndUpdate(v){
-            var ret = super.delete(v)
-            this.updateStrVal()
-            return ret
-        },
-        clearAndUpdate(){
-            super.clear()
-            this.updateStrVal()
-        },
-        toStringCached(){
-            return this.strval
-        },
+    strval = ''
+
+    add(v){
+        this.strval += (this.strval && ', ') + v
+        return super.add(v)
     }
-    constructor(iterable) {
-        super(iterable);
-        this.toJSON = this.toString
-    }
-    updateStrVal(){
+
+    delete(v){
+        var ret = super.delete(v)
         this.strval = Array.from(this).join(', ')
+        return ret
+    }
+
+    clear(){
+        this.strval = ''
+        return super.clear()
     }
 
     /**
-     * Starts the cache phase. Set operations update the cached strval property.
-     */
-    startCachedMode(){
-        Object.assign(this, this.cacheMode);
-        this.toJSON = this.toString
-    }
-
-    /**
-     * Trigger cached mode on first call
+     * Optimized
+     * @return {String}
      */
     toString(){
-        this.updateStrVal()
-        this.startCachedMode();
         return this.strval
+    }
+
+    constructor(iterable){
+        super(iterable);
+        this.strval = Array.from(this).join(', ')
+        this.toJSON = this.toString
     }
 }
 

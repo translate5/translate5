@@ -61,7 +61,7 @@ class editor_Plugins_Okapi_Models_BconfFilter extends ZfExtended_Models_Entity_A
      * @return Zend_Db_Table_Row_Abstract|null
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function load($bconfId) {
+    public function load($bconfId /*, $okapiId */) {
         $args = func_get_args();
         $okapiId = $args[1];
         try {

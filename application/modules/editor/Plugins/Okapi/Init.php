@@ -385,6 +385,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         //attach to the config after index to check the config values
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
         $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'handleCustomerAfterIndex']);
+
+        foreach(['Post', 'Put', 'Delete'] as $action){
+            $this->eventManager->attach('editor_Plugins_Okapi_BconfFilterController', "before${action}Action", [$this, 'saveExtensionsMapping']);
+        }
+
     }
 
     /**
@@ -765,6 +770,25 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 $customer['defaultBconfId'] = $bconf->getDefaultBconfId();
             }
         }
+    }
+
+    /**
+     * Handles updates to Bconffilters
+     * @see ZfExtended_RestController::beforeActionEvent
+     */
+    public function saveExtensionsMapping(Zend_EventManager_Event $event){
+        /** @var editor_Plugins_Okapi_BconfFilterController $controller */
+        [$entity, $params, $controller] = array_values($event->getParams());
+        $extMap = editor_Utils::removeArrayKey($params, 'extensions-mapping');
+        if(isset($extMap)){
+            $id = $controller->getCompositeId();
+            // TODO: validity check
+            $bconf = new editor_Plugins_Okapi_Models_Bconf();
+            $path = $bconf->getFilePath($id[0], $bconf::EXTENSIONMAP_FILE);
+            file_put_contents($path, $extMap);
+            unset($extMap); // make memory freeable
+        }
+        // String $extMapString) {
     }
 
 }

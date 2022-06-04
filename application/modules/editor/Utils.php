@@ -991,6 +991,23 @@ class editor_Utils {
         }
         return false;
     }
+
+    /**
+     * Removes an item from the array and returns its value.
+     * @param array $arr The input array
+     * @param string|int $key The key pointing to the desired value
+     * @return ?mixed The value mapped to $key or null if none
+     * @see https://stackoverflow.com/a/10898827
+     */
+    public static function removeArrayKey(array &$arr, mixed $key) : mixed {
+        $val = NULL;
+        if (array_key_exists($key, $arr)) {
+            $val = &$arr[$key];
+            unset($arr[$key]);
+        }
+        return $val;
+    }
+
 }
 
 class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {

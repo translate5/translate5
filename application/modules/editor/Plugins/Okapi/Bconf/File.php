@@ -51,9 +51,27 @@ class editor_Plugins_Okapi_Bconf_File {
     }
 
     /**
-     * @param $msg
-     * @param string $errorCode
-     * @param string[] $detail
+     * @param string $method
+     * @param array $arguments
+     * @return void
+     * @throws Zend_Exception
+     */
+    public function __call(string $method, array $arguments) {
+        if(!in_array($method, ['pack', 'unpack'])){
+            throw new Zend_Exception("Call to undefined method " . get_class($this) . "::" . $method . "()");
+        }
+        try {
+            call_user_func_array([$this, 'do_' . $method], $arguments);
+        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity){
+        } catch(Exception $e){
+            $this->invalidate($e->__toString(), 'EXCEP');
+        }
+    }
+
+    /**
+     * Handles occurred errors by deleting new records and throwing appropriate Exceptions
+     * @param string $msg Message or exception to throw
+     * @param string $errorCode Defines which Exeption will be thrown
      * @return never // TODO Add as return type on PHP8.1
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
@@ -65,15 +83,16 @@ class editor_Plugins_Okapi_Bconf_File {
                 $this->entity->delete();
             } catch(Exception $e){
                 if($errorCode === 'E1026'){
-                    $errors[] = [$e->getMessage()];
+                    $errors[] = [strval($e)];
                 } else {
-                    $msg .= " " . $e->getMessage();
+                    $msg .= PHP_EOL . strval($e);
                 }
             }
         }
         throw match ($errorCode) {
             'E1057' => new editor_Plugins_Okapi_Exception($errorCode, ['okapiDataDir' => $msg]),
             'E1026' => new ZfExtended_UnprocessableEntity($errorCode, ['errors' => $errors]),
+            default => new Exception($msg),
         };
     }
 

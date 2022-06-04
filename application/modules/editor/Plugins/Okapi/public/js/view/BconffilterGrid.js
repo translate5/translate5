@@ -24,18 +24,24 @@
 
  END LICENSE AND COPYRIGHT
  */
-
-Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
+/**
+ * Grid for viewing and editing the different Okapi Filter configurations of a bconf
+ * The supported
+ * @property {Ext.grid.plugin.Editing} editingPlugin Undocumented property used for shorthand access (for this.findPlugin('rowediting'))
+ * @see Ext.grid.plugin.Editing.init
+ */
+Ext.define('Editor.plugins.Okapi.view.BconffilterGrid', {
     extend: 'Ext.grid.Panel',
     requires: [
-        'Editor.plugins.Okapi.view.BconfFilterGridController',
-        'Editor.plugins.Okapi.store.BconfFilterStore'
+        'Editor.plugins.Okapi.view.BconffilterGridController',
+        'Editor.plugins.Okapi.store.BconffilterStore'
     ],
     alias: 'widget.bconffiltergrid',
-    controller: 'bconfFilterGridController',
+    controller: 'bconffilterGridController',
     config: {
         bconf: null,
     },
+    editingPlugin: null, // placeholder for undocumented property, see JSDoc
     plugins: [{
         ptype: 'rowediting',
         clicksToEdit: 3, // QUIRK: 1 not possible, triggers on actioncolumns TODO: limit to non actionCols, add pointerCls
@@ -73,7 +79,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         in: '#in',
     },
     store: {
-        type: 'bconfFilterStore'
+        type: 'bconffilterStore'
     },
     viewConfig: {
         getRowClass: function(bconf){
@@ -94,7 +100,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     defaults: {margin: '0 10 0'},
                     items: [{
                         xtype: 'button',
-                        reference: 'defaultsFilterBtn',
+                        reference: 'showDefaultsBtn',
                         enableToggle: true,
                         toggleHandler: 'toggleDefaultsFilter',
                         text: '#UT#Show Okapi Defaults Filters',
@@ -172,7 +178,20 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     filter: {
                         type: 'string'
                     },
-                    text: me.text_cols.extensions
+                    text: me.text_cols.extensions,
+                    /**
+                     * @property {object} changelog Saves changes for rollback
+                     * @see BconffilterGridController.prepareFilterEdit
+                     */
+                    editor: { //TODO: add tooltip (tpl?) with current filter of extension
+                        xtype: 'tagfield',
+                        itemId: 'extMap',
+                        queryMode: 'local',
+                        createNewOnEnter: true,
+                        createNewOnBlur: true,
+                        filterPickList: true, // ture clears list on custom value
+                        changelog: null,
+                    },
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'description',

@@ -29,14 +29,17 @@
 /**
  *
  * REST Endpoint Controller to serve a Bconfs Filter List for the Bconf-Management in the Preferences
- *
  */
 class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestController {
 
     protected $entityClass = 'editor_Plugins_Okapi_Models_BconfFilter';
-
-    /** @var editor_Plugins_Okapi_Models_BconfFilter $entity */
+    /** @var Editor_Plugins_Okapi_Models_BconfFilter $entity */
     protected $entity;
+    /**
+     * @var array|null $compositeId composite key [bconfId, okapiId]
+     */
+    protected ?array $compositeId = NULL;
+
 
     /**
      * sends all bconf filters as JSON
@@ -86,6 +89,11 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
 
     }
 
+    /**
+     * Includes extension-mapping.txt in the metaData
+     * @return void
+     * @throws editor_Plugins_Okapi_Exception
+     */
     public function indexAction() {
         $db = $this->entity->db;
         $bconfId = $this->getParam('bconfId');
@@ -104,15 +112,29 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             = file_get_contents($bconf->getFilePath($bconfId, 'extensions-mapping.txt'));
     }
 
+    /**
+     * Splits the key in its composite components
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
     protected function entityLoad() {
-        $id = $this->getRequest()->getParam('id');
-        if(gettype($id) != 'array'){
-            $path = $this->getRequest()->getPathInfo();
-            // /editor/plugins_okapi_bconffilter/8-okf_odf%40translate5.test
-            $id = explode('-.-',urldecode(basename($path)));
-        }
+        $id = $this->getCompositeId();
         $this->entity->load($id[0], $id[1]);
     }
 
+    /**
+     * Parse, cache and return composite key from url
+     * @return array{int, string} composite key [bconfId, okapiId]
+     */
+    // QUIRK Is in controller because access to request params
+    public function getCompositeId(): array {
+        $id = $this->compositeId ?? $this->getRequest()->getParam('id');
+        if(gettype($id) !== 'array'){
+            $path = $this->getRequest()->getPathInfo();
+            // /editor/plugins_okapi_bconffilter/8-.-okf_odf%40translate5.test
+            $id = explode('-.-',urldecode(basename($path)));
+            $this->compositeId = $id;
+        }
+        return $id;
+    }
 
 }

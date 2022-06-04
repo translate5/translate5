@@ -178,15 +178,15 @@
       </trans-unit>
       <trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCB2ZXJsYXNzZW4u">
         <source>Aufgabe wurde erfolgreich verlassen.</source>
-        <target>task left successfully.</target>
+        <target>Task left successfully.</target>
       </trans-unit>
       <trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCBhYmdlc2NobG9zc2VuLg==">
         <source>Aufgabe wurde erfolgreich abgeschlossen.</source>
-        <target>task finished successfully.</target>
+        <target>Task finished successfully.</target>
       </trans-unit>
       <trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCBiZWVuZGV0Lg==">
         <source>Aufgabe wurde erfolgreich beendet.</source>
-        <target>task ended successfully.</target>
+        <target>Task ended successfully.</target>
       </trans-unit>
       <trans-unit id='QXVmZ2FiZSAiezB9IiBrb21wbGV0dCBsw7ZzY2hlbj8='>
         <source>Aufgabe "{0}" komplett löschen?</source>

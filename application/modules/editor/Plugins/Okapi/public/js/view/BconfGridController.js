@@ -32,10 +32,14 @@
  *
  */
 /**
- * @class BconfGridController
+ * @class
+ * @name BconfGridController
  * @extends Ext.app.ViewController
+ * @ignore Editor.plugins.Okapi
+ *
  */
-Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
+Ext.define('Editor.plugins.Okapi.view.BconfGridController',
+    {
     extend: 'Ext.app.ViewController',
     alias: 'controller.bconfGridController',
     /** @const {string} FILE_UPLOAD_NAME */
@@ -90,7 +94,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
 
     showFilterGrid: function(view, recIdx){
-        fw = Ext.create('Editor.plugins.Okapi.view.BconfFilterGrid', {
+        fw = Ext.create('Editor.plugins.Okapi.view.BconffilterGrid', {
             bconf: view.store.getAt(recIdx),
             constrain: true,
             modal: true,
@@ -290,7 +294,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
 
     loadOkapiFilters: function(bconfGrid){
-        Ext.create('Editor.plugins.Okapi.store.DefaultBconfFilterStore');
+        Ext.create('Editor.plugins.Okapi.store.DefaultBconffilterStore');
     },
 
     createInfoSpan: function(json){

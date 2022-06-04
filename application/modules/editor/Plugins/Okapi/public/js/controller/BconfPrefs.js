@@ -46,9 +46,11 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             name: 'defaultBconfId',
             persist: false,
         }]);
+
     },
     onLaunch: function(){
         Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
+
     },
 
     listen: {
@@ -72,10 +74,10 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                             return
                         }
                         var bconfCombo = Ext.getCmp('bconfCombo'),
-                            bconfFilters = bconfCombo.getStore().getFilters(),
-                            customerFilter = bconfFilters.getByKey('customerFilter');
+                            bconffilters = bconfCombo.getStore().getFilters(),
+                            customerFilter = bconffilters.getByKey('customerFilter');
                         customerFilter.setValue(customerId)
-                        bconfFilters.add(customerFilter) // trigger filter
+                        bconffilters.add(customerFilter) // trigger filter
 
                         bconfCombo.setValue(customerCombo.getSelection().get('defaultBconfId'));
                         bconfCombo.enable();

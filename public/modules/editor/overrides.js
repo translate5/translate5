@@ -1394,7 +1394,6 @@ Ext.override(Ext.grid.feature.Grouping, {
  */
 Ext.define('Translate5.override.form.field.VTypes', {
     override: 'Ext.form.field.VTypes',
-
     tmFileUploadSize: function(val, field) {
         var files = field.fileInputEl.dom.files;
 
@@ -1405,4 +1404,23 @@ Ext.define('Translate5.override.form.field.VTypes', {
     },
     tmFileUploadSizeText:Editor.data.frontend.override.VTypes.tmFileUploadSizeText
 
+});
+
+/***
+ * Up-to-date implementation that works on modern iterables via Array.from
+ * @see https://stackoverflow.com/q/18884249
+ */
+Ext.define('Translate5.override.Ext.Array.from', {
+    override: 'Ext.Array',
+    from: function(value = null, newReference){
+        if(value === null){
+            return [];
+        } else if(Array.isArray(value)){
+            return newReference ? value.slice() : value;
+        } else if(typeof value[Symbol.iterator] === 'function' && typeof value !== 'string'){
+            return Array.from(value);
+        } else {
+            return [value];
+        }
+    }
 });

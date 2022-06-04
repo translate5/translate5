@@ -26,31 +26,32 @@
  */
 
 /**
- * Store for the Filters inside a bconf
- * @class Editor.plugins.Okapi.store.BconfFilterStore
- * @property {Map} extMap Holds the information of extensions-mapping.txt inside a Bconf
+ * Store for the Okapi and Translate5 filters
+ * @class Editor.plugins.Okapi.store.DefaultBconffilterStore
  * @extends Ext.data.Store
  */
-
-Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
+Ext.define('Editor.plugins.Okapi.store.DefaultBconffilterStore', {
     extend: 'Ext.data.Store',
-    requires: ['Editor.plugins.Okapi.store.DefaultBconfFilterStore'], // for Okapi and Translate5 filters
-    storeId: 'bconfFilterStore',
-    alias: 'store.bconfFilterStore',
-    model: 'Editor.plugins.Okapi.model.BconfFilterModel',
-    autoLoad: true,
-    autoSync: false, // Needed to edit the name before saving!
-    pageSize: 0,
-    extMap: new Map(),
-    defaultsFilter: {
-        id: 'defaultsFilter',
-        filterFn: function(rec){return rec.data.isCustom},
-    },
-    initConfig: function(config){
-        if(!config.filters){
-            config.filters = [];
+    storeId: 'defaultBconffilters',
+    alias: 'model.DefaultBconffilterStore',
+    model: 'Editor.plugins.Okapi.model.BconffilterModel',
+    proxy: {
+        type: 'ajax', // rest not needed, is readonly
+        url: Editor.data.restpath + 'plugins_okapi_bconffilter/getdefaultfilters',
+        reader: {
+            rootProperty: 'rows',
+            type: 'json',
+            transform: function(data){
+                data.rows.forEach((row, index) => {
+                    row.isCustom = false // Flag Okapi and translate5 Bconffilters
+                    row.id = -index-1 // Avoid collisions with custom Bconffilters
+                });
+                return data;
+            }
         }
-        config.filters.push(this.defaultsFilter); // Enable filter initially
-        return this.callParent([config]);
-    }
+    },
+    autoLoad: true,
+    pageSize: 0,
+    idProperty: 'id',
+
 });
