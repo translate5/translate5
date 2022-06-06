@@ -89,7 +89,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         store: {
             '#Segments':{
-                load: 'applySpellCheckStyles'
+                load: 'applySpellCheckStyles',
+                update: 'applySpellCheckStylesForRecord'
             }
         },
     },
@@ -929,12 +930,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.initTooltips(); // me.spellCheckTooltip.hide() is not enough (e.g. after a contextmenu had been shown with a long list of replacements, the next contextmenu was placed as if it still has that height)
         me.spellCheckTooltip.showAt(posX,posY);
     },
-
-    applySpellCheckStyles: function(store) {
-        var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, node, matches;
-
-        for (var i = 0; i < store.getCount(); i++) {
-            rec = store.getAt(i);
+    applySpellCheckStylesForRecord: function(store, rec, operation) {
+        if (!operation || operation == 'commit') {
+            var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, node, matches;
             target = 'target';
             if (rec.get('spellCheck')[target] && rec.get('spellCheck')[target].length) {
                 rec.get('spellCheck')[target].forEach(function(item){
@@ -949,6 +947,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             }
         }
     },
+    applySpellCheckStyles: function(store) {
+        for (var i = 0; i < store.getCount(); i++) {
+            this.applySpellCheckStylesForRecord(null, store.getAt(i));
+        }
+    },
     applyCustomMatches: function(editorBody, allMatches) {
         var me = this,
             rangeForMatch,
@@ -957,7 +960,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // apply the matches (iterate in reverse order; otherwise the ranges get lost due to DOM-changes "in front of them")
         me.cleanUpNode(editorBody);
         rangeForMatch = rangy.createRange(editorBody);
-        console.log(editorBody);
         Ext.Array.each(allMatches, function(match, index) {
             rangeForMatch.moveToBookmark(match.range);
             rangeForMatch = me.cleanBordersOfCharacterbasedRange(rangeForMatch);
@@ -966,6 +968,5 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             spellCheckNode.appendChild(documentFragmentForMatch);
             rangeForMatch.insertNode(spellCheckNode);
         }, me, true);
-
     }
 });

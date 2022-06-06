@@ -74,4 +74,32 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
     public function setAdditionalData(stdClass $data){
         $this->row->setAdditionalData($data);
     }
+
+    /**
+     * Fetch spell check data for given segments ids
+     */
+    public function getSpellCheckData(array $segmentIds) {
+
+        // Get spell check data
+        $_data = $this->db->getAdapter()->query('
+            SELECT 
+              `segmentId`, 
+              `field`, 
+              `additionalData`, 
+              JSON_EXTRACT(`additionalData`, "$.matchIndex") AS `matchIndex`
+            FROM `LEK_segment_quality` 
+            WHERE 1
+              AND `segmentId` IN (' . join(',', $segmentIds ?: [0]) . ')
+              AND `type` = "spellcheck"
+            ORDER BY `segmentId`, `field`, `matchIndex`
+        ')->fetchAll();
+
+        // Group by `segmentId` and `field`
+        foreach ($_data as $_item) {
+            $data[ $_item['segmentId'] ][ $_item['field'] ] []= json_decode($_item['additionalData']);
+        }
+
+        // Return spell check data
+        return $data;
+    }
 }

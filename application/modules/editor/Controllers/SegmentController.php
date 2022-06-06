@@ -134,30 +134,17 @@ class Editor_SegmentController extends ZfExtended_RestController
             }
         }
 
-        $idA = array_column($this->view->rows, 'id');
+        // Get array of segment ids
+        $segmentIds = array_column($this->view->rows, 'id');
 
-        $_qualityA = editor_Utils::db()->query('
-            SELECT 
-              `segmentId`, 
-              `field`, 
-              `additionalData`, 
-              JSON_EXTRACT(`additionalData`, "$.matchIndex") AS `matchIndex`
-            FROM `LEK_segment_quality` 
-            WHERE 1
-              AND `segmentId` IN (' . join(',', $idA ?: [0]) . ')
-              AND `type` = "spellcheck"
-            ORDER BY `segmentId`, `field`, `matchIndex`
-        ')->fetchAll();
+        // Get [segmentId => spellCheckData] pairs
+        $segmentSpellCheckDataByIds = ZfExtended_Factory
+            ::get('editor_Models_SegmentQuality')
+            ->getSpellCheckData($segmentIds);
 
-        // Group by `segmentId` and `field`
-        class_exists('editor_Utils');
-
-        foreach ($_qualityA as $_) {
-            $qualityA[$_['segmentId']][$_['field']] []= json_decode($_['additionalData']);
-        }
-
+        // Apply to response
         foreach ($this->view->rows as &$row) {
-            $row['spellCheck'] = $qualityA[$row['id']] ?? new stdClass();
+            $row['spellCheck'] = $segmentSpellCheckDataByIds[$row['id']] ?? new stdClass();
         }
 
         // ----- Specific handling of rows (end) -----
@@ -381,6 +368,14 @@ class Editor_SegmentController extends ZfExtended_RestController
         //set the segmentFinishCount so the frontend viewmodel is updated
         //TODO: this should be updated from the websockets
         $this->view->segmentFinishCount = $task->getSegmentFinishCount();
+
+        // Get [segmentId => spellCheckData] pairs
+        $segmentSpellCheckDataByIds = ZfExtended_Factory
+            ::get('editor_Models_SegmentQuality')
+            ->getSpellCheckData([$this->view->rows->id]);
+
+        // Apply spellCheck prop
+        $this->view->rows->spellCheck = $segmentSpellCheckDataByIds[$this->view->rows->id] ?? new stdClass();
     }
 
     /***
