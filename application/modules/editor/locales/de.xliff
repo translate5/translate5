@@ -2146,6 +2146,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminologieübersetzungsprojekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Projekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Projekt</target></trans-unit>
+<trans-unit id='U3lub255bS1TdWNoZQ=='><source>Synonym-Suche</source><target>synonym-Suche</target></trans-unit>
+<trans-unit id='QWRqZWt0aXY'><source>Adjektiv</source><target>Adjektiv</target></trans-unit>
+<trans-unit id='QWR2ZXJi'><source>Adverb</source><target>Adverb</target></trans-unit>
+<trans-unit id='VmVyYmluZHVuZw=='><source>Verbindung</source><target>Verbindung</target></trans-unit>
+<trans-unit id='RGV0ZXJtaW5lcnM='><source>Bestimmer</source><target>Bestimmer</target></trans-unit>
+<trans-unit id='VmVyYg=='><source>Verb</source><target>Verb</target></trans-unit>
+<trans-unit id='Tm91bnM='><source>Substantiv</source><target>Substantiv</target></trans-unit>
+<trans-unit id='UHLDpHBvc2l0aW9u'><source>Präposition</source><target>Präposition</target></trans-unit>
+<trans-unit id='UHJvbm9tZW4='><source>Pronomen</source><target>Pronomen</target></trans-unit>
+<trans-unit id='U29uc3RpZ2Vz'><source>Sonstiges</source><target>Sonstiges</target></trans-unit>
+<trans-unit id='V2FocnNjaGVpbmxpY2hrZWl0'><source>Wahrscheinlichkeit</source><target>Wahrscheinlichkeit</target></trans-unit>
+<trans-unit id='QWx0ZXJuYXRpdmVu'><source>Alternativen</source><target>Alternativen</target></trans-unit>
   </body>
  </file>
 </xliff>
