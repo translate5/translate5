@@ -283,7 +283,8 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
     }
 
     public function translate(string $searchString){
-        return $this->search($searchString);
+        //null triggers the lookup instead the search
+        return $this->search($searchString, null);
     }
 
     /***

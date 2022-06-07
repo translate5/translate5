@@ -4694,9 +4694,71 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Dieses Feld darf nicht leer sein</source>
   <target>This field can not be empty</target>
 </trans-unit>
+
+<trans-unit id='WmFobGVu'><source>Zahlen</source><target>Numbers</target></trans-unit>
+<trans-unit id='WmFobGVuIFNSQyDiiaAgVFJH'><source>Zahlen SRC ≠ TRG</source><target>Numbers SRC ≠ TRG</target></trans-unit>
+<trans-unit id='QWxwaGFudW1lcmlzY2hlIFplaWNoZW5mb2xnZW4='><source>Alphanumerische Zeichenfolgen</source><target>Alphanumerical character sequences</target></trans-unit>
+<trans-unit id='Rm9ybWF0w6RuZGVydW5nIChEYXR1bXNhbmdhYmVuIHUuw6QuKQ=='><source>Formatänderung (Datumsangaben u.ä.)</source><target>Format alteration (date information etc.)</target></trans-unit>
+<trans-unit id='VHJlbm5lciBuaWNodCBsb2thbGlzaWVydA=='><source>Trenner nicht lokalisiert</source><target>Separator(s) not localised</target></trans-unit>
+<trans-unit id='Rm9ybWF0aWVydW5nIDEwMDBlci1aYWhsIGdlw6RuZGVydA=='><source>Formatierung 1000er-Zahl geändert</source><target>Formatting of 1000s number altered</target></trans-unit>
+<trans-unit id='VW50ZXJzY2hpZWRsaWNoZSBNaW51c3plaWNoZW4='><source>Unterschiedliche Minuszeichen</source><target>Different minus characters</target></trans-unit>
+<trans-unit id='VHJlbm5lciBhdXMgU1JDIGdlw6RuZGVydA=='><source>Trenner aus SRC geändert</source><target>Separator from SRC altered</target></trans-unit>
+<trans-unit id='WmFobHdvcnQgYXVzIFNSQyBhbHMgWmFobCBpbiBUUkcgZ2VmdW5kZW4='><source>Zahlwort aus SRC als Zahl in TRG gefunden</source><target>Numeral from SRC found as number in TRG</target></trans-unit>
+<trans-unit id='WmFobCBhdXMgU1JDIGFscyBaYWhsd29ydCBpbiBUUkcgZ2VmdW5kZW4='><source>Zahl aus SRC als Zahlwort in TRG gefunden</source><target>Number from SRC found as numeral in TRG</target></trans-unit>
+<trans-unit id='Rm9ybWF0w6RuZGVydW5nIChPcmRpbmFsemFobGVuLCBmw7xocmVuZGUgTnVsbCB1LsOkLik='><source>Formatänderung (Ordinalzahlen, führende Null u.ä.)</source><target>Format alteration (ordinal numbers, leading zero etc.)</target></trans-unit>
+<trans-unit id='VW50ZXJzY2guIFplaWNoZW4vRm9ybWF0aWVydW5nIGbDvHIgWmFobGVuLUludGVydmFsbA=='><source>Untersch. Zeichen/Formatierung für Zahlen-Intervall</source><target>Different character/formatting for number interval</target></trans-unit>
+<trans-unit id='MTAwMGVyLUJyZW5uZXIgbmljaHQgZXJsYXVidA=='><source>1000er-Brenner nicht erlaubt</source><target>1000-separator not allowed</target></trans-unit>
+
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminology Translation Project</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Project</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Project</target></trans-unit>
-
+<trans-unit id='U3lub255bS1TdWNoZQ=='>
+  <source>Synonym-Suche</source>
+  <target>synonym search</target>
+</trans-unit>
+<trans-unit id='QWRqZWt0aXY'>
+  <source>Adjektiv</source>
+  <target>adjective</target>
+</trans-unit>
+<trans-unit id='QWR2ZXJi'>
+  <source>Adverb</source>
+  <target>adverb</target>
+</trans-unit>
+<trans-unit id='VmVyYmluZHVuZw=='>
+  <source>Verbindung</source>
+  <target>conjunction</target>
+</trans-unit>
+<trans-unit id='QmVzdGltbWVy'>
+  <source>Bestimmer</source>
+  <target>determiner</target>
+</trans-unit>
+<trans-unit id='VmVyYg=='>
+  <source>Verb</source>
+  <target>verb</target>
+</trans-unit>
+<trans-unit id='U3Vic3RhbnRpdg=='>
+  <source>Substantiv</source>
+  <target>noun</target>
+</trans-unit>
+<trans-unit id='UHLDpHBvc2l0aW9u'>
+  <source>Präposition</source>
+  <target>preposition</target>
+</trans-unit>
+<trans-unit id='UHJvbm9tZW4='>
+  <source>Pronomen</source>
+  <target>pronoun</target>
+</trans-unit>
+<trans-unit id='U29uc3RpZ2Vz'>
+  <source>Sonstiges</source>
+  <target>other</target>
+</trans-unit>
+<trans-unit id='V2FocnNjaGVpbmxpY2hrZWl0'>
+  <source>Wahrscheinlichkeit</source>
+  <target>Probability</target>
+</trans-unit>
+<trans-unit id='QWx0ZXJuYXRpdmVu'>
+  <source>Alternativen</source>
+  <target>Alternatives</target>
+</trans-unit>
   </file>
 </xliff>

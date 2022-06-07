@@ -447,7 +447,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'search'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_search', $queryRoute);
-        
+
+
+        $translateRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:languageResourceId/translate',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'translate'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_translate', $translateRoute);
+
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/import',
             array(

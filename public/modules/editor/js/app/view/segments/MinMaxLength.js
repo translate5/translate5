@@ -371,7 +371,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * 
      */
     handleMaxWidthForLineInEditor: function (htmlInLine, lineWidth, maxWidthPerLine) {
-        var me = this,
+        let me = this,
+            disabled = ! Editor.app.getTaskConfig('lengthRestriction.automaticNewLineAdding'),
             allLines,
             div,
             textInLine,
@@ -384,8 +385,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             textForLine = '',
             options,
             sel;
-        
-        if (me.preventRecursion || lineWidth <= maxWidthPerLine) {
+
+        if (disabled || me.preventRecursion || lineWidth <= maxWidthPerLine) {
             return;
         }
 

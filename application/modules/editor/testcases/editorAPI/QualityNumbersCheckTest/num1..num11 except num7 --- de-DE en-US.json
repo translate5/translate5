@@ -1,0 +1,815 @@
+{
+    "qid": -1,
+    "qtype": "root",
+    "qcount": 14,
+    "qtotal": 14,
+    "qcategory": null,
+    "qcomplete": true,
+    "expanded": true,
+    "expandable": false,
+    "checked": false,
+    "text": "All categories",
+    "children": [
+        {
+            "qid": -1,
+            "qtype": "consistent",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "consistent",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "source",
+                    "text": "Inconsistent source",
+                    "textTooltip": "Finds segments with the same target, but different source (tags ignored)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "consistent",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "target",
+                    "text": "Inconsistent target",
+                    "textTooltip": "Finds segments with the same source, but different target (tags ignored)",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Consistency",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "empty",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "qtooltip": "Target only contains tags, spaces or punctuation, but source does not.",
+            "text": "Empty segments",
+            "qtotal": 0,
+            "leaf": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "internal",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "internal_tag_structure_faulty",
+                    "text": "Internal tags have an incorrect structure",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false,
+                    "qfaulty": true
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "internal_tags_added",
+                    "text": "Internal tags have been added",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "internal_tags_missing",
+                    "text": "Internal tags missing",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "whitespace_tags_added",
+                    "text": "Whitespace has been added",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "internal",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "whitespace_tags_missing",
+                    "text": "Whitespace has been removed",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Internal tags",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "length",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "not_long_enough",
+                    "text": "Segment relevantly shorter than allowed (more than 20% shorter or at least 100 Pixel shorter or at least 20 characters shorter)",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "too_long",
+                    "text": "Segment longer than allowed",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "too_many_lines",
+                    "text": "Segment has too many lines",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "length",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "too_short",
+                    "text": "Segment shorter than allowed",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Length check",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "qm",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_1",
+                    "text": "Demo QM error 1",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_2",
+                    "text": "Mistranslation",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_3",
+                    "text": "Terminology problem",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_4",
+                    "text": "Fluency issue",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "qm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "qm_5",
+                    "text": "Inconsistency",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Manual QA (complete segment)",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "mqm",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "mqm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "children": [
+                                {
+                                    "qid": -1,
+                                    "qtype": "mqm",
+                                    "qcount": 0,
+                                    "qcomplete": true,
+                                    "qcategory": "mqm_3",
+                                    "text": "Terminology",
+                                    "qcatidx": 3,
+                                    "qtotal": 0,
+                                    "leaf": true,
+                                    "checked": false
+                                }
+                            ],
+                            "qcategory": "mqm_2",
+                            "text": "Mistranslation",
+                            "qcatidx": 2,
+                            "qtotal": 0,
+                            "expanded": false,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_4",
+                            "text": "Omission",
+                            "qcatidx": 4,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_5",
+                            "text": "Addition",
+                            "qcatidx": 5,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_6",
+                            "text": "Untranslated",
+                            "qcatidx": 6,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "mqm_1",
+                    "text": "Accuracy",
+                    "qcatidx": 1,
+                    "qtotal": 0,
+                    "expanded": false,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "mqm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_8",
+                            "text": "Register",
+                            "qcatidx": 8,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_9",
+                            "text": "Style",
+                            "qcatidx": 9,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_10",
+                            "text": "Inconsistency",
+                            "qcatidx": 10,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_11",
+                            "text": "Spelling",
+                            "qcatidx": 11,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_12",
+                            "text": "Typography",
+                            "qcatidx": 12,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_13",
+                            "text": "Grammar",
+                            "qcatidx": 13,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_14",
+                            "text": "Locale violation",
+                            "qcatidx": 14,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_15",
+                            "text": "Unintelligible",
+                            "qcatidx": 15,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "mqm_7",
+                    "text": "Fluency",
+                    "qcatidx": 7,
+                    "qtotal": 0,
+                    "expanded": false,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "mqm",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_17",
+                            "text": "Completeness",
+                            "qcatidx": 17,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_18",
+                            "text": "Legal requirements",
+                            "qcatidx": 18,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "mqm",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "mqm_19",
+                            "text": "Locale applicability",
+                            "qcatidx": 19,
+                            "qtotal": 0,
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "mqm_16",
+                    "text": "Verity",
+                    "qcatidx": 16,
+                    "qtotal": 0,
+                    "expanded": false,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Manual QA (inside segment)",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "numbers",
+            "qcount": 14,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "37100",
+                    "qtype": "numbers",
+                    "qcount": 3,
+                    "qcomplete": true,
+                    "qcategory": "num1",
+                    "qcatidx": "-1",
+                    "text": "Numbers SRC \u2260 TRG",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37110",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num10",
+                    "qcatidx": "-1",
+                    "text": "Format alteration (ordinal numbers, leading zero etc.)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37112",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num11",
+                    "qcatidx": "-1",
+                    "text": "Different character\/formatting for number interval",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37106",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num12",
+                    "qcatidx": "-1",
+                    "text": "1000-separator not allowed",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37101",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num2",
+                    "qcatidx": "-1",
+                    "text": "Alphanumerical character sequences",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37102",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num3",
+                    "qcatidx": "-1",
+                    "text": "Format alteration (date information etc.)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37103",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num4",
+                    "qcatidx": "-1",
+                    "text": "Separator(s) not localised",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37104",
+                    "qtype": "numbers",
+                    "qcount": 2,
+                    "qcomplete": true,
+                    "qcategory": "num5",
+                    "qcatidx": "-1",
+                    "text": "Formatting of 1000s number altered",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37107",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num6",
+                    "qcatidx": "-1",
+                    "text": "Different minus characters",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num7",
+                    "text": "Separator from SRC altered",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37108",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num8",
+                    "qcatidx": "-1",
+                    "text": "Numeral from SRC found as number in TRG",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37109",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num9",
+                    "qcatidx": "-1",
+                    "text": "Number from SRC found as numeral in TRG",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Numbers",
+            "qtotal": 14,
+            "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "matchrate",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "matchrate",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "edited_100percent_match",
+                    "text": "Edited 100% match",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "matchrate",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "unedited_fuzzy_match",
+                    "text": "Unedited fuzzy match",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Usage of TM-matches",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "whitespace",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_begin",
+                    "text": "Line break at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_end",
+                    "text": "Line break at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_space",
+                    "text": "Space after line break",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "nbsp_begin",
+                    "text": "Non-breaking space at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "nbsp_end",
+                    "text": "Non-breaking space at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_lnbr",
+                    "text": "Space before line break",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_tag_end",
+                    "text": "Segment ends with a space followed by a tag",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tab_begin",
+                    "text": "Tab at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tab_end",
+                    "text": "Tab at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tag_space_begin",
+                    "text": "Segment begins with a tag followed by a space",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "White space at the beginning\/end",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        }
+    ]
+}
