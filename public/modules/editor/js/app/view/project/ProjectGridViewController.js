@@ -124,7 +124,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     
     
     /***
-     * Delete project by givent projectId
+     * Delete project by given projectId
      */
     deleteProject:function(project){
     	var me=this;
@@ -136,8 +136,13 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
                 Editor.MessageBox.addByOperation(op);
             },
             success: function() {
-            	me.reloadProjects();
+                // clean the route so the old hash is not kept in the url
+                me.redirectTo(Editor.util.Util.getCurrentBaseRoute());
+
+                me.reloadProjects();
+
             	Ext.StoreManager.get('admin.Tasks').reload();
+
             	Editor.MessageBox.addSuccess(Ext.String.format(me.strings.projectRemovedMessage, project.get('taskName')),2);
             },
             failure: function(records, op){

@@ -305,6 +305,16 @@ Ext.define('Editor.util.Util', {
             return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         },
 
+        /***
+         * Get the base route from the current route.
+         * ex: from project/123/124/focus the returned value will be project
+         * @returns {*|string}
+         */
+        getCurrentBaseRoute: function (){
+            var base = Ext.util.History.getToken().split('/');
+            return base.length > 0 ? base[0] : '';
+        },
+        
         /** @see https://forum.sencha.com/forum/showthread.php?310616
          * @returns {Ext.Util.Collection} */
         getUnfiltered: function(store){
@@ -329,6 +339,5 @@ Ext.define('Editor.util.Util', {
         isIterable: function(value, includeString = false){
             return typeof value[Symbol.iterator] === 'function' && (typeof value !== 'string' || includeString)
         }
-
     }
 });

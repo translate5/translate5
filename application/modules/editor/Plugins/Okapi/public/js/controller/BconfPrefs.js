@@ -71,13 +71,13 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 change: {
                     fn: function(customerCombo, customerId){
                         if(!customerId){ // QUIRK: Emptying can set value to null even with forceSelection set
-                            return
+                            return;
                         }
                         var bconfCombo = Ext.getCmp('bconfCombo'),
-                            bconffilters = bconfCombo.getStore().getFilters(),
-                            customerFilter = bconffilters.getByKey('customerFilter');
-                        customerFilter.setValue(customerId)
-                        bconffilters.add(customerFilter) // trigger filter
+                            bconfFilters = bconfCombo.getStore().getFilters(),
+                            customerFilter = bconfFilters.getByKey('customerFilter');
+                        customerFilter.setValue(customerId);
+                        bconfFilters.add(customerFilter); // trigger filter
 
                         bconfCombo.setValue(customerCombo.getSelection().get('defaultBconfId'));
                         bconfCombo.enable();

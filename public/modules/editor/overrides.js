@@ -1406,6 +1406,46 @@ Ext.define('Translate5.override.form.field.VTypes', {
 
 });
 
+Ext.define('Translate5.override.grid.feature.Grouping', {
+    override: 'Ext.grid.feature.Grouping',
+
+    /**
+     * Expand all groups
+     */
+    expandAll: function() {
+        var me = this,
+            metaGroupCache = me.getCache(),
+            lockingPartner = me.lockingPartner,
+            groupName;
+        // Clear all collapsed flags.
+        // metaGroupCache is shared between two lockingPartners
+        for (groupName in metaGroupCache) {
+            // This will ignore expand for non-visible elements.
+            // The elements which are getting expanded are loaded from the cache
+            // and since we are custom-filtering the store, those filters are not applied to the cache. This is done to
+            // avoid expand function call on non.visible(filtered) elements
+            if (metaGroupCache.hasOwnProperty(groupName) && metaGroupCache[groupName] !== undefined) {
+                metaGroupCache[groupName].isCollapsed = false;
+            }
+        }
+        // We do not need to inform our lockingPartner.
+        // It shares the same group cache - it will have the same set of expanded groups.
+        Ext.suspendLayouts();
+        me.dataSource.onDataChanged();
+        Ext.resumeLayouts(true);
+        // Fire event for all groups post expand
+        for (groupName in metaGroupCache) {
+            if (metaGroupCache.hasOwnProperty(groupName) && metaGroupCache[groupName] !== undefined) {
+                me.afterCollapseExpand(false, groupName);
+                if (lockingPartner) {
+                    lockingPartner.afterCollapseExpand(false, groupName);
+                }
+            }
+        }
+    }
+
+});
+
 /***
  * Up-to-date implementation that works on modern iterables via Array.from
  * @see https://stackoverflow.com/q/18884249
@@ -1424,3 +1464,4 @@ Ext.define('Translate5.override.Ext.Array.from', {
         }
     }
 });
+

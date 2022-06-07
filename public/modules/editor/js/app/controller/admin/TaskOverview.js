@@ -279,7 +279,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         this.closeAdvancedFilterWindow();
     },
     handleInitEditor: function () {
-        this.closeAdvancedFilterWindow();
+        let me = this;
+        me.closeAdvancedFilterWindow();
+        // reset the menu cache after the view port is changed
+        me.menuCache = [];
     },
     clearTasks: function () {
         this.getAdminTasksStore().removeAll();
@@ -898,10 +901,16 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      */
     editorDeleteTask: function(task) {
         var me = this,
-            app = Editor.app;
+            app = Editor.app,
+            store = task.store;
 
         app.mask(Ext.String.format(me.strings.taskDestroy, task.get('taskName')), task.get('taskName'));
 
+        if(task.isProject()){
+            Ext.StoreManager.get('projectTasks').removeAll();
+        }
+
+        store.remove(task);
         task.dropped = true; //doing the drop / erase manually
         task.save({
             //prevent default ServerException handling

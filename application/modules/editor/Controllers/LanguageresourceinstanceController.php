@@ -1068,7 +1068,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @param array $importInfo
      * @param boolean $addNew
      */
-    protected function queueServiceImportWorker(array $importInfo, bool $addNew){
+    protected function queueServiceImportWorker(array $importInfo, bool $addNew)
+    {
         $worker=ZfExtended_Factory::get('editor_Services_ImportWorker');
         /* @var $worker editor_Services_ImportWorker */
 
@@ -1095,7 +1096,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->addSpecificData('status',editor_Services_Connector_FilebasedAbstract::STATUS_IMPORT);
         $this->entity->save();
 
-        $worker->queue();
+        $workerId = $worker->queue();
+
+        $this->events->trigger('serviceImportWorkerQueued',argv: [
+            'entity' => $this->entity,
+            'workerId' => $workerId,
+            'params' => $this->getAllParams()
+        ]);
     }
 
     /***
@@ -1140,6 +1147,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //load the entity
         $this->entityLoad();
 
+        // clone the current entity, so it can be re-applied later again after the entity is removed fron the database.
+        // there may be some post-delete events where the deleted entity should be checked
+        $clone = clone $this->entity;
+
         // if the current entity is term collection, init the entity as term collection
         if($this->entity->isTc()){
             $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
@@ -1178,6 +1189,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->entity->db->getAdapter()->rollBack();
             throw $e;
         }
+        $this->entity = $clone;
     }
 
     /**

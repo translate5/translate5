@@ -188,6 +188,9 @@ class editor_Models_Terminology_Import_TbxFileImport
         $this->mergeTerms = $mergeTerms;
         $this->prepareImportArrays($user);
 
+        //reset internal XML error list
+        //libxml_use_internal_errors(true)
+        libxml_clear_errors();
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
                 $this->close();
@@ -292,6 +295,12 @@ $memLog('Loaded terms:        ');
         {
             $totalCount++;
             $xmlReader->next($this->tbxMap[$this::TBX_TERM_ENTRY]);
+
+            if($error = libxml_get_last_error()) {
+                // 'E1393' => 'TBX Import: The XML structure of the TBX file is invalid: {message}',
+                throw new editor_Models_Terminology_Import_Exception('E1393', get_object_vars($error));
+            }
+
         }
         return $totalCount;
     }
@@ -502,6 +511,13 @@ $memLog('Loaded terms:        ');
             $tig = $tigElement;
         }
 
+        $term = (string)$tig->term;
+
+        //if the term is empty, there is nothing to be processed - although if there are attributes.
+        if(editor_Models_Terminology_Models_TermModel::isEmptyTerm($term)) {
+            return;
+        }
+
         $cls = $this->bulkTerm->getNewImportObject();
         /** @var editor_Models_Terminology_TbxObjects_Term $newTerm */
         $newTerm = new $cls();
@@ -514,7 +530,7 @@ $memLog('Loaded terms:        ');
         $newTerm->languageId = $parsedLangSet->languageId;
         $newTerm->termEntryGuid = $newTerm->parentEntry->entryGuid;
         $newTerm->termEntryTbxId = $newTerm->parentEntry->termEntryTbxId;
-        $newTerm->term = (string)$tig->term;
+        $newTerm->term = $term;
         $newTerm->termTbxId = $this->getIdOrGenerate($tig->term);
         $newTerm->langSetGuid = $parsedLangSet->langSetGuid;
 

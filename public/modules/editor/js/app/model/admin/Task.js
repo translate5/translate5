@@ -187,6 +187,11 @@ Ext.define('Editor.model.admin.Task', {
     hasProjectTasks: function () {
         return this.get('projectTasks') && this.get('projectTasks').length>0;
     },
+
+    isProject: function (){
+        return this.get('taskType') === 'project';
+    },
+
     /**
      * returns if task is editable depending on task locking and usagemode
      * does not evaluate waiting/finished etc. Therefore is isReadonly
