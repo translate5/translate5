@@ -155,18 +155,41 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      */
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
-            case editor_Segment_Numbers_Check::NUM1: return $translate->_('Zahlen SRC ≠ TRG');
-            case editor_Segment_Numbers_Check::NUM2: return $translate->_('Alphanumerische Zeichenfolgen');
-            case editor_Segment_Numbers_Check::NUM3: return $translate->_('Formatänderung (Datumsangaben u.ä.)');
-            case editor_Segment_Numbers_Check::NUM4: return $translate->_('Trenner nicht lokalisiert');
-            case editor_Segment_Numbers_Check::NUM5: return $translate->_('Formatierung 1000er-Zahl geändert');
-            case editor_Segment_Numbers_Check::NUM6: return $translate->_('Unterschiedliche Minuszeichen');
-            case editor_Segment_Numbers_Check::NUM7: return $translate->_('Trenner aus SRC geändert');
-            case editor_Segment_Numbers_Check::NUM8: return $translate->_('Zahlwort aus SRC als Zahl in TRG gefunden');
-            case editor_Segment_Numbers_Check::NUM9: return $translate->_('Zahl aus SRC als Zahlwort in TRG gefunden');
-            case editor_Segment_Numbers_Check::NUM10: return $translate->_('Formatänderung (Ordinalzahlen, führende Null u.ä.)');
-            case editor_Segment_Numbers_Check::NUM11: return $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall');
-            case editor_Segment_Numbers_Check::NUM12: return $translate->_('1000er-Brenner nicht erlaubt');
+            case editor_Segment_Numbers_Check::NUM1:
+                return $translate->_('Zahlen SRC ≠ TRG');
+
+            case editor_Segment_Numbers_Check::NUM2:
+                return $translate->_('Alphanumerische Zeichenfolgen');
+
+            case editor_Segment_Numbers_Check::NUM3:
+                return $translate->_('Formatänderung (Datumsangaben u.ä.)');
+
+            case editor_Segment_Numbers_Check::NUM4:
+                return $translate->_('Trenner nicht lokalisiert');
+
+            case editor_Segment_Numbers_Check::NUM5:
+                return $translate->_('Formatierung 1000er-Zahl geändert');
+
+            case editor_Segment_Numbers_Check::NUM6:
+                return $translate->_('Unterschiedliche Minuszeichen');
+
+            case editor_Segment_Numbers_Check::NUM7:
+                return $translate->_('Trenner aus SRC geändert');
+
+            case editor_Segment_Numbers_Check::NUM8:
+                return $translate->_('Zahlwort aus SRC als Zahl in TRG gefunden');
+
+            case editor_Segment_Numbers_Check::NUM9:
+                return $translate->_('Zahl aus SRC als Zahlwort in TRG gefunden');
+
+            case editor_Segment_Numbers_Check::NUM10:
+                return $translate->_('Formatänderung (Ordinalzahlen, führende Null u.ä.)');
+
+            case editor_Segment_Numbers_Check::NUM11:
+                return $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall');
+
+            case editor_Segment_Numbers_Check::NUM12:
+                return $translate->_('1000er-Brenner nicht erlaubt');
         }
         return NULL;
     }
@@ -202,7 +225,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
             editor_Segment_Numbers_Check::NUM9,
             editor_Segment_Numbers_Check::NUM10,
             editor_Segment_Numbers_Check::NUM11,
-            editor_Segment_Numbers_Check::NUM12,
+            editor_Segment_Numbers_Check::NUM12
         ];
     }
 }
