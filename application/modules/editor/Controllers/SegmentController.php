@@ -138,13 +138,13 @@ class Editor_SegmentController extends ZfExtended_RestController
         $segmentIds = array_column($this->view->rows, 'id');
 
         // Get [segmentId => spellCheckData] pairs
-        $segmentSpellCheckDataByIds = ZfExtended_Factory
+        $segmentSpellCheckDataById = ZfExtended_Factory
             ::get('editor_Models_SegmentQuality')
             ->getSpellCheckData($segmentIds);
 
         // Apply to response
         foreach ($this->view->rows as &$row) {
-            $row['spellCheck'] = $segmentSpellCheckDataByIds[$row['id']] ?? new stdClass();
+            $row['spellCheck'] = $segmentSpellCheckDataById[$row['id']];
         }
 
         // ----- Specific handling of rows (end) -----
@@ -375,7 +375,7 @@ class Editor_SegmentController extends ZfExtended_RestController
             ->getSpellCheckData([$this->view->rows->id]);
 
         // Apply spellCheck prop
-        $this->view->rows->spellCheck = $segmentSpellCheckDataByIds[$this->view->rows->id] ?? new stdClass();
+        $this->view->rows->spellCheck = $segmentSpellCheckDataByIds[$this->view->rows->id];
     }
 
     /***

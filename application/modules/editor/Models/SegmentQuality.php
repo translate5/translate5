@@ -99,6 +99,13 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
             $data[ $_item['segmentId'] ][ $_item['field'] ] []= json_decode($_item['additionalData']);
         }
 
+        // Foreach given segmentId
+        foreach ($segmentIds as $segmentId) {
+
+            // If no spell check data found make sure
+            $data[$segmentId] = $data[$segmentId] ?? new stdClass();
+        }
+
         // Return spell check data
         return $data;
     }
