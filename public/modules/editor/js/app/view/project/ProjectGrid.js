@@ -213,11 +213,24 @@ Ext.define('Editor.view.project.ProjectGrid', {
         }
         return me.callParent([config]);
     },
-    
+
+    /**
+     * Scrolle the given task row into view
+     *
+     * @param {Integer} rowindex
+     * @param {Object} config
+     */
+    scrollTo: function(rowindex, config) {
+        if(rowindex < 0) {
+            return;
+        }
+        var me = this;
+        me.ensureVisible(rowindex, config);
+    },
+
     initComponent:function(){
     	var me=this;
     	me.callParent();
-    	//me.store.load(); // initiated by 'gridfilters' plugin
     	me.configureActionColumn();
     },
     
