@@ -1269,6 +1269,23 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows = $result->getResult();
     }
 
+    public function translateAction(){
+        $this->initCurrentTask();
+
+        $query = $this->_getParam('searchText');
+        $languageResourceId = (int) $this->_getParam('languageResourceId');
+
+        //checks if the current task is associated to the languageResource
+        $this->entity->checkTaskAndLanguageResourceAccess($this->getCurrentTask()->getTaskGuid(), $languageResourceId);
+
+        $this->entity->load($languageResourceId);
+
+        $connector = $this->getConnector();
+        $result = $connector->translate($query);
+        $result = $result->getResult()[0] ?? [];
+        $this->view->translations = $result->metaData['alternativeTranslations'] ?? $result;
+    }
+
     /**
      * returns the connector to be used
      * @return editor_Services_Connector

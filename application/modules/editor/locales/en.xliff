@@ -4697,6 +4697,53 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminology Translation Project</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Project</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Project</target></trans-unit>
-
+<trans-unit id='U3lub255bS1TdWNoZQ=='>
+  <source>Synonym-Suche</source>
+  <target>synonym search</target>
+</trans-unit>
+<trans-unit id='QWRqZWt0aXY'>
+  <source>Adjektiv</source>
+  <target>adjective</target>
+</trans-unit>
+<trans-unit id='QWR2ZXJi'>
+  <source>Adverb</source>
+  <target>adverb</target>
+</trans-unit>
+<trans-unit id='VmVyYmluZHVuZw=='>
+  <source>Verbindung</source>
+  <target>conjunction</target>
+</trans-unit>
+<trans-unit id='QmVzdGltbWVy'>
+  <source>Bestimmer</source>
+  <target>determiner</target>
+</trans-unit>
+<trans-unit id='VmVyYg=='>
+  <source>Verb</source>
+  <target>verb</target>
+</trans-unit>
+<trans-unit id='U3Vic3RhbnRpdg=='>
+  <source>Substantiv</source>
+  <target>noun</target>
+</trans-unit>
+<trans-unit id='UHLDpHBvc2l0aW9u'>
+  <source>Präposition</source>
+  <target>preposition</target>
+</trans-unit>
+<trans-unit id='UHJvbm9tZW4='>
+  <source>Pronomen</source>
+  <target>pronoun</target>
+</trans-unit>
+<trans-unit id='U29uc3RpZ2Vz'>
+  <source>Sonstiges</source>
+  <target>other</target>
+</trans-unit>
+<trans-unit id='V2FocnNjaGVpbmxpY2hrZWl0'>
+  <source>Wahrscheinlichkeit</source>
+  <target>Probability</target>
+</trans-unit>
+<trans-unit id='QWx0ZXJuYXRpdmVu'>
+  <source>Alternativen</source>
+  <target>Alternatives</target>
+</trans-unit>
   </file>
 </xliff>
