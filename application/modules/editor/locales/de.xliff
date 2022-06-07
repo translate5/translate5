@@ -2143,6 +2143,21 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIGhvY2hnZWxhZGVuZW4gQXJiZWl0c2RhdGVpZW4gZ2VmdW5kZW4gb2RlciBkaWUgaG9jaGdlbGFkZW5lbiBEYXRlaWVuIMO8YmVyc2NocmVpdGVuIGRpZSBtYXhpbWFsIHp1bMOkc3NpZ2UgR3LDtsOfZS4='><source>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</source><target>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</target></trans-unit>
 <trans-unit id='U2luZ2xlIFNpZ24tb24='><source>Single Sign-on</source><target>Single Sign-on</target></trans-unit>
 <trans-unit id='RGllc2VzIEZlbGQgZGFyZiBuaWNodCBsZWVyIHNlaW4='><source>Dieses Feld darf nicht leer sein</source><target>Dieses Feld darf nicht leer sein</target></trans-unit>
+
+<trans-unit id='WmFobGVu'><source>Zahlen</source><target>Zahlen</target></trans-unit>
+<trans-unit id='WmFobGVuIFNSQyDiiaAgVFJH'><source>Zahlen SRC ≠ TRG</source><target>Zahlen SRC ≠ TRG</target></trans-unit>
+<trans-unit id='QWxwaGFudW1lcmlzY2hlIFplaWNoZW5mb2xnZW4='><source>Alphanumerische Zeichenfolgen</source><target>Alphanumerische Zeichenfolgen</target></trans-unit>
+<trans-unit id='Rm9ybWF0w6RuZGVydW5nIChEYXR1bXNhbmdhYmVuIHUuw6QuKQ=='><source>Formatänderung (Datumsangaben u.ä.)</source><target>Formatänderung (Datumsangaben u.ä.)</target></trans-unit>
+<trans-unit id='VHJlbm5lciBuaWNodCBsb2thbGlzaWVydA=='><source>Trenner nicht lokalisiert</source><target>Trenner nicht lokalisiert</target></trans-unit>
+<trans-unit id='Rm9ybWF0aWVydW5nIDEwMDBlci1aYWhsIGdlw6RuZGVydA=='><source>Formatierung 1000er-Zahl geändert</source><target>Formatierung 1000er-Zahl geändert</target></trans-unit>
+<trans-unit id='VW50ZXJzY2hpZWRsaWNoZSBNaW51c3plaWNoZW4='><source>Unterschiedliche Minuszeichen</source><target>Unterschiedliche Minuszeichen</target></trans-unit>
+<trans-unit id='VHJlbm5lciBhdXMgU1JDIGdlw6RuZGVydA=='><source>Trenner aus SRC geändert</source><target>Trenner aus SRC geändert</target></trans-unit>
+<trans-unit id='WmFobHdvcnQgYXVzIFNSQyBhbHMgWmFobCBpbiBUUkcgZ2VmdW5kZW4='><source>Zahlwort aus SRC als Zahl in TRG gefunden</source><target>Zahlwort aus SRC als Zahl in TRG gefunden</target></trans-unit>
+<trans-unit id='WmFobCBhdXMgU1JDIGFscyBaYWhsd29ydCBpbiBUUkcgZ2VmdW5kZW4='><source>Zahl aus SRC als Zahlwort in TRG gefunden</source><target>Zahl aus SRC als Zahlwort in TRG gefunden</target></trans-unit>
+<trans-unit id='Rm9ybWF0w6RuZGVydW5nIChPcmRpbmFsemFobGVuLCBmw7xocmVuZGUgTnVsbCB1LsOkLik='><source>Formatänderung (Ordinalzahlen, führende Null u.ä.)</source><target>Formatänderung (Ordinalzahlen, führende Null u.ä.)</target></trans-unit>
+<trans-unit id='VW50ZXJzY2guIFplaWNoZW4vRm9ybWF0aWVydW5nIGbDvHIgWmFobGVuLUludGVydmFsbA=='><source>Untersch. Zeichen/Formatierung für Zahlen-Intervall</source><target>Untersch. Zeichen/Formatierung für Zahlen-Intervall</target></trans-unit>
+<trans-unit id='MTAwMGVyLUJyZW5uZXIgbmljaHQgZXJsYXVidA=='><source>1000er-Brenner nicht erlaubt</source><target>1000er-Brenner nicht erlaubt</target></trans-unit>
+
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminologieübersetzungsprojekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Projekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Projekt</target></trans-unit>
