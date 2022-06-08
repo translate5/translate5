@@ -11,8 +11,8 @@
 <file original="/var/lib/tomcat9/work/Okapi-Longhorn-Files/1/input/original-255.odt/content.xml" source-language="en" target-language="de" datatype="x-undefined">
 <body>
 <trans-unit id="1" restype="x-text:h">
-<source xml:lang="en"><g id="1"><g id="2"></g><g id="3">Translate5</g></g><g id="4">Open Source Translation System</g> </source>
-<seg-source><mrk mid="0" mtype="seg"><g id="1"><g id="2"></g><g id="3">Translate5</g></g><g id="4">Open Source Translation System</g></mrk> </seg-source>
+<source xml:lang="en"><g id="1"><g id="2"></g><g id="3">SOME</g></g><g id="4">Open Source Translation System</g> </source>
+<seg-source><mrk mid="0" mtype="seg"><g id="1"><g id="2"></g><g id="3">SOME</g></g><g id="4">Open Source Translation System</g></mrk> </seg-source>
 <target xml:lang="de"><mrk mtype="seg" mid="0">,.""</mrk></target>
 </trans-unit>
 <trans-unit id="2" restype="x-text:h">
