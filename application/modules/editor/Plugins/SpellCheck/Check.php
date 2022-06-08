@@ -83,7 +83,7 @@ class editor_Plugins_SpellCheck_Check {
                                 editor_Plugins_SpellCheck_LanguageTool_Connector $connector, $spellCheckLang) {
 
         // Get target text, strip tags, replace htmlentities
-        $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
+        $target = $segment->{'get' . ucfirst($targetField) . 'Edit'}();
         $target = strip_tags($target);
         $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
 

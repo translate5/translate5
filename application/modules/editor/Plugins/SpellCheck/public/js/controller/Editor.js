@@ -720,7 +720,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             bookmarkForDelNode,
             lengthOfDelNode;
         // me.consoleLog('---\n- matchStart: ' + matchStart + ' / matchEnd: ' + matchEnd);
-        
+        //console.log('before', matchStart, matchEnd);
         // move offsets according to hidden del-Nodes in front of the match's start and/or end
         allDelNodes = me.getEditorBodyExtDomElement().query('del');
         Ext.Array.each(allDelNodes, function(delNode) {
@@ -745,7 +745,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         // set range for Match by selecting characters
         rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
-        
+        //console.log('after', matchStart, matchEnd);
         // return the bookmark
         return rangeForMatch.getBookmark();
     },
@@ -933,14 +933,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     applySpellCheckStylesForRecord: function(store, rec, operation) {
         if (!operation || operation == 'commit') {
             var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, node, matches;
-            target = 'target';
-            if (rec.get('spellCheck')[target] && rec.get('spellCheck')[target].length) {
+            for (target in rec.get('spellCheck')) {
                 rec.get('spellCheck')[target].forEach(function(item){
                     item.range.containerNode = document.querySelector(
                         '#' + view.id + '-record-' + rec.internalId
                         + ' [data-columnid="' + target + 'EditColumn"] .x-grid-cell-inner'
                     );
-                })
+                });
                 node = rec.get('spellCheck')[target][0].range.containerNode;
                 matches = rec.get('spellCheck')[target];
                 this.applyCustomMatches(node, matches);
