@@ -109,7 +109,6 @@ class Translate198Test extends editor_Test_JsonTest {
         self::assertLogin('testmanager');
         self::$api->addImportFile(self::$api->getFile($taskName.'-de-en.xlf'));
         self::$api->import($task,false,false);
-        error_log('Task created. '.self::$api->getTask()->taskName);
     }
     
     /***
@@ -124,7 +123,6 @@ class Translate198Test extends editor_Test_JsonTest {
      */
     protected function startImport(){
         self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
-        error_log('Import workers started.');
     }
     
     public static function tearDownAfterClass(): void {
@@ -133,6 +131,7 @@ class Translate198Test extends editor_Test_JsonTest {
         
         //leave the first task with the testmanager
         self::$api->requestJson('editor/task/'.self::$importedTasks[0]->id, 'PUT', ['userState' => 'open', 'id' => self::$importedTasks[0]->id]);
+        self::$api->requestJson('editor/task/'.self::$importedTasks[1]->id, 'PUT', ['userState' => 'open', 'id' => self::$importedTasks[1]->id]);
         //remove the 2 tasks
         self::$api->requestJson('editor/task/'.self::$importedTasks[0]->id, 'DELETE');
         self::$api->requestJson('editor/task/'.self::$importedTasks[1]->id, 'DELETE');
