@@ -512,7 +512,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "37100",
+                    "qid": "36519",
                     "qtype": "numbers",
                     "qcount": 3,
                     "qcomplete": true,
@@ -523,7 +523,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37110",
+                    "qid": "36529",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -534,7 +534,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37112",
+                    "qid": "36531",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -545,7 +545,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37106",
+                    "qid": "36525",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -556,7 +556,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37101",
+                    "qid": "36520",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -567,7 +567,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37102",
+                    "qid": "36521",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -578,7 +578,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37103",
+                    "qid": "36522",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -589,7 +589,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37104",
+                    "qid": "36523",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -600,7 +600,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37107",
+                    "qid": "36526",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -622,7 +622,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37108",
+                    "qid": "36527",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -633,7 +633,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37109",
+                    "qid": "36528",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -649,6 +649,64 @@
             "text": "Numbers",
             "qtotal": 14,
             "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "term",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "forbidden_in_source",
+                    "text": "Forbidden in source",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "forbidden_in_target",
+                    "text": "Forbidden in target",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "not_defined_in_target",
+                    "text": "Not defined in target terminology",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "not_found_in_target",
+                    "text": "Not found in target",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Terminology",
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         },
         {
