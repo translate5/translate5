@@ -4760,5 +4760,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Alternativen</source>
   <target>Alternatives</target>
 </trans-unit>
+<trans-unit id='UGl2b3QtU3ByYWNocmVzc291cmNlbg=='>
+  <source>Pivot-Sprachressourcen</source>
+  <target>Pivot Language Resources</target>
+</trans-unit>
   </file>
 </xliff>

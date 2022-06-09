@@ -1023,6 +1023,27 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
+    Ext.define("Editor.locale.de.view.LanguageResources.pivot.PivotWizard", {
+        override: "Editor.view.LanguageResources.pivot.PivotWizard",
+        strings: {
+            wizardTitle:'<?php echo $this->translate->_('Pivot-Sprachressourcen');?>',
+        }
+    });
+
+
+    Ext.define("Editor.locale.view.LanguageResources.pivot.Assoc", {
+        override: "Editor.view.LanguageResources.pivot.Assoc",
+        strings: {
+            empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.');?>',
+            checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            serviceName: '<?php echo $this->translate->_('Ressource');?>',
+            taskGuid: '<?php echo $this->translate->_('Aufgabenname');?>'
+        }
+    });
+
     Ext.define("Editor.locale.de.view.admin.config.Editor", {
         override: "Editor.view.admin.config.Editor",
         title: "<?php echo $this->translate->_('Konfiguration bearbeiten');?>",

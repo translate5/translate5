@@ -2173,6 +2173,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U29uc3RpZ2Vz'><source>Sonstiges</source><target>Sonstiges</target></trans-unit>
 <trans-unit id='V2FocnNjaGVpbmxpY2hrZWl0'><source>Wahrscheinlichkeit</source><target>Wahrscheinlichkeit</target></trans-unit>
 <trans-unit id='QWx0ZXJuYXRpdmVu'><source>Alternativen</source><target>Alternativen</target></trans-unit>
+<trans-unit id='UGl2b3QtU3ByYWNocmVzc291cmNlbg=='><source>Pivot-Sprachressourcen</source><target>Pivot-Sprachressourcen</target></trans-unit>
   </body>
  </file>
 </xliff>
