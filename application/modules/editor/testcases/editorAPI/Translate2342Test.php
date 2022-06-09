@@ -79,9 +79,9 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
         //file_put_contents(self::$api->getFile('exportInitial.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
 
         $expected=self::$api->getFileContent('exportInitial.txt');
-        $actual=json_encode($result, JSON_PRETTY_PRINT);
+        $actual = json_encode($result, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
-        self::assertEquals($expected, $actual, "The initial queue worker progress an the result file does not match.");
+        self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
         
         //run the import workers and check wait for task import
         $this->startImport();
@@ -100,7 +100,7 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
         $expected=self::$api->getFileContent('exportFinal.txt');
         $actual=json_encode($result, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
-        self::assertEquals($expected, $actual, "The initial queue worker progress an the result file does not match.");
+        self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
     }
     
     
