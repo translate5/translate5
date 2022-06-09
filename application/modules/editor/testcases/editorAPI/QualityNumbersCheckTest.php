@@ -76,7 +76,7 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
             $abs = $api->getFile($rel = 'testfiles/' . $name . '.csv');
 
             // Print the step where we are
-            error_log("\nCreating task based on file: '$rel', source lang: '{$lang[1]}', target lang: '{$lang[2]}'\n");
+            // error_log("\nCreating task based on file: '$rel', source lang: '{$lang[1]}', target lang: '{$lang[2]}'\n");
 
             // Add csv-file for import
             $api->addImportFile($abs);
@@ -93,7 +93,7 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
             $task = self::$taskA[$name]['task'] = $api->getTask();
 
             // Print imported task ID
-            error_log("Task ID: {$task->id} \n");
+            // error_log("Task ID: {$task->id} \n");
         }
     }
 
@@ -106,7 +106,7 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         foreach (self::$taskA as $name => $env) {
 
             // Print the step where we are
-            error_log("\nTesting task based on file: $name.csv\n");
+            // error_log("\nTesting task based on file: $name.csv\n");
 
             // Open task for whole testcase
             $env['api']->requestJson('editor/task/' . $env['task']->id, 'PUT', ['userState' => 'edit', 'id' => $env['task']->id]);
@@ -135,7 +135,7 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         foreach (self::$taskA as $name => $env) {
 
             // Print the step where we are
-            error_log("\nDeleting task based on file: $name.csv\n");
+            // error_log("\nDeleting task based on file: $name.csv\n");
 
             // Delete task
             $env['api']->requestJson('editor/task/' . $env['task']->id, 'DELETE');
