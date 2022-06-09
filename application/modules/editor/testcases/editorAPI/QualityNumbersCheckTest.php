@@ -118,7 +118,8 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
             // Check qualities
             $jsonFile = "$name.json";
             $tree = $env['api']->getJsonTree('/editor/quality', [], $jsonFile);
-            $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree);
+            $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'numbers');
+            $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
 
             // Close task
             $env['api']->requestJson('editor/task/' . $env['task']->id, 'PUT', ['userState' => 'open', 'id' => $env['task']->id]);

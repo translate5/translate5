@@ -141,10 +141,11 @@ abstract class editor_Test_Model_Abstract {
     /**
      * Copies & sanitizes our data
      * @param stdClass $data
-     * @param bool $isRoot
+     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
+     * @param bool $isRoot: internal prop to hint if an item is the root of a tree
      * @return stdClass
      */
-    protected function copy(stdClass $data, bool $isRoot=true) : stdClass {
+    protected function copy(stdClass $data, editor_Test_Model_Filter $treeFilter=NULL, bool $isRoot=true) : stdClass {
         $result = new stdClass();
         // copy sanitized fields
         foreach($this->sanitized as $field => $functionName){
@@ -178,7 +179,9 @@ abstract class editor_Test_Model_Abstract {
         if($this->isTree && property_exists($data, 'children')){
             $result->children = [];
             foreach($data->children as $child){
-                $result->children[] = $this->copy($child, false);
+                if($treeFilter === NULL || $treeFilter->matches($child)){
+                    $result->children[] = $this->copy($child, $treeFilter, false);
+                }
             }
         }
 
@@ -236,27 +239,30 @@ abstract class editor_Test_Model_Abstract {
      * @param editor_Test_JsonTest $testCase
      * @param stdClass $expected
      * @param string $message
+     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compare(editor_Test_JsonTest $testCase, stdClass $expected, string $message=''){
-        $this->compareExpectation($testCase, $expected, $message);
+    public function compare(editor_Test_JsonTest $testCase, stdClass $expected, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
+        $this->compareExpectation($testCase, $expected, $message, $treeFilter);
     }
     /**
      * Since test-models can act as expectation or actual data we provide both directions of comparision (a test-model is expected to represent real API data though)
      * @param editor_Test_JsonTest $testCase
      * @param stdClass $expected
      * @param string $message
+     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compareExpectation(editor_Test_JsonTest $testCase, stdClass $expected, string $message=''){
-        $testCase->assertEquals($this->copy($expected), $this->copy($this->_data), $message);
+    public function compareExpectation(editor_Test_JsonTest $testCase, stdClass $expected, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
+        $testCase->assertEquals($this->copy($expected, $treeFilter), $this->copy($this->_data, $treeFilter), $message);
     }
     /**
      * Since test-models can act as expectation or actual data we provide both directions of comparision (a test-model is expected to represent real API data though)
      * @param editor_Test_JsonTest $testCase
      * @param stdClass $actual
      * @param string $message
+     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compareActual(editor_Test_JsonTest $testCase, stdClass $actual, string $message=''){
-        $testCase->assertEquals($this->copy($this->_data), $this->copy($actual), $message);
+    public function compareActual(editor_Test_JsonTest $testCase, stdClass $actual, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
+        $testCase->assertEquals($this->copy($this->_data, $treeFilter), $this->copy($actual, $treeFilter), $message);
     }
     /**
      * Retrieves the transformed data for comparision
