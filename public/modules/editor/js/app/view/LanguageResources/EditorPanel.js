@@ -43,7 +43,8 @@ Ext.define('Editor.view.LanguageResources.EditorPanel', {
     requires:[
         'Editor.view.LanguageResources.EditorPanelViewController',
         'Editor.view.LanguageResources.SearchGrid',
-        'Editor.view.LanguageResources.MatchGrid'
+        'Editor.view.LanguageResources.MatchGrid',
+        'Editor.view.LanguageResources.services.Microsoft.SynonymSearch'
     ],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',
@@ -74,6 +75,7 @@ Ext.define('Editor.view.LanguageResources.EditorPanel', {
         me.title=me.strings.panelTitle;
 		me.isAllowedMatchQuery(config,instanceConfig);
 		me.isAllowedSearchQuery(config,instanceConfig);
+        me.isAllowedSynonymSearch(config,instanceConfig);
 		if (instanceConfig) {
 			me.self.getConfigurator().merge(me, config, instanceConfig);
 		}
@@ -97,5 +99,14 @@ Ext.define('Editor.view.LanguageResources.EditorPanel', {
             	 assocStore:instanceConfig.assocStore
 	         });
 		}
-	}
+	},
+
+    isAllowedSynonymSearch: function(config,instanceConfig){
+        var showSearch = instanceConfig.assocStore.find('serviceName', 'Microsoft') >= 0;
+        if(showSearch && Editor.app.authenticatedUser.isAllowed('languageResourcesSynonymSearch')) {
+            config.items.push({
+                xtype:'synonymSearch'
+            });
+        }
+    }
 });

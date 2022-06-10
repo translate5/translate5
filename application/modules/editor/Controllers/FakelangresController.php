@@ -124,6 +124,24 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
 //                 exit;
                 
                 break;
+            case 'v2/glossary-language-pairs':
+                echo $this->getGlossaryLanguagesResponse();
+                return;
+            case 'v2/glossaries':
+
+                if($this->getParam('name') !== null){
+                    // create new, return dummy create response
+                    echo $this->getGlossaryCreateResponse();
+                    return;
+                }elseif ($this->getParam('glossaryId') !== null){
+                    echo $this->getGlossaryInfoResponse();
+                    return;
+                }
+                // delete returns empty response
+                echo '{}';
+                return;
+                break;
+
             default:
                 throw new Exception("Unknown DeepL endpoint requested: ".$calledUrl);
         }
@@ -354,6 +372,91 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
             throw new Exception('Raw Input was empty.');
         }
         return json_decode($rawInput);
+    }
+
+    /***
+     * @return string
+     */
+    protected function getGlossaryLanguagesResponse(): string
+    {
+        return
+            '{
+                  "supported_languages": [
+                    {
+                      "source_lang": "de",
+                      "target_lang": "en"
+                    },
+                    {
+                      "source_lang": "de",
+                      "target_lang": "fr"
+                    },
+                    {
+                      "source_lang": "en",
+                      "target_lang": "de"
+                    },
+                    {
+                      "source_lang": "en",
+                      "target_lang": "es"
+                    },
+                    {
+                      "source_lang": "en",
+                      "target_lang": "fr"
+                    },
+                    {
+                      "source_lang": "en",
+                      "target_lang": "ja"
+                    },
+                    {
+                      "source_lang": "es",
+                      "target_lang": "en"
+                    },
+                    {
+                      "source_lang": "fr",
+                      "target_lang": "de"
+                    },
+                    {
+                      "source_lang": "fr",
+                      "target_lang": "en"
+                    },
+                    {
+                      "source_lang": "ja",
+                      "target_lang": "en"
+                    }
+                  ]
+            }';
+    }
+
+    /***
+     * @return string
+     */
+    protected function getGlossaryCreateResponse(): string
+    {
+        return '{
+            "glossary_id": "locale-test-def3a26b-3e84-45b3-84ae-0c0aaf3525f7",
+            "name": "'.$this->getParam('name').'",
+            "ready": true,
+            "source_lang": "'.$this->getParam('source_lang').'",
+            "target_lang": "'.$this->getParam('source_lang').'",
+            "creation_time": "'.NOW_ISO.'",
+            "entry_count": "'.count(explode("\n",$this->getParam('entries'))).'"
+        }';
+    }
+
+
+    protected function getGlossaryInfoResponse(){
+        $glossaryId = $this->getParam('glossaryId');
+
+        /** @var editor_Models_LanguageResources_LanguageResource $deepl */
+        $deepl = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+
+        $s = $deepl->db->select()
+            ->where('specificData like %?%',$glossaryId);
+        $result = $deepl->db->fetchAll($s)->toArray();
+
+        if(empty($result)){
+            return '{}';
+        }
+
     }
 }
 

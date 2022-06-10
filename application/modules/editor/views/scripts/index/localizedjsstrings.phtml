@@ -1729,6 +1729,28 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
+    Ext.define("Editor.locale.view.LanguageResources.services.Microsoft.SynonymSearch", {
+        override: "Editor.view.LanguageResources.services.Microsoft.SynonymSearch",
+        strings: {
+            synonymSearch: '<?php echo $this->translate->_('Synonym-Suche');?>',
+            resultColumn:'<?php echo $this->translate->_('Übersetzung');?>',
+            partOfSpeechColumn:'<?php echo $this->translate->_('Wortart');?>',
+            backTranslationsColumn:'<?php echo $this->translate->_('Alternativen');?>',
+            confidenceColumn:'<?php echo $this->translate->_('Wahrscheinlichkeit');?>',
+            ADJ:'<?php echo $this->translate->_('Adjektiv');?>',
+            ADV:'<?php echo $this->translate->_('Adverb');?>',
+            CONJ:'<?php echo $this->translate->_('Verbindung');?>',
+            DET:'<?php echo $this->translate->_('Bestimmer');?>',
+            MODAL:'<?php echo $this->translate->_('Verb');?>',
+            NOUN:'<?php echo $this->translate->_('Substantiv');?>',
+            PREP:'<?php echo $this->translate->_('Präposition');?>',
+            PRON:'<?php echo $this->translate->_('Pronomen');?>',
+            VERB:'<?php echo $this->translate->_('Verb');?>',
+            OTHER:'<?php echo $this->translate->_('Other');?>',
+            unknown:'<?php echo $this->translate->_('unbekannt');?>'
+        }
+    });
+
     Ext.define("Editor.locale.view.LanguageResources.ProposalExport", {
         override: "Editor.view.LanguageResources.ProposalExport",
         strings: {

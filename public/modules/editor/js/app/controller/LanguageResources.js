@@ -249,9 +249,9 @@ Ext.define('Editor.controller.LanguageResources', {
               }
           },
           height:Editor.data.task.get('visualReviewFiles') ? '25%' : '30%',
-          // minheight remains also for manual resizing
+          // min height remains also for manual resizing
           minHeight: 150,
-          //collapsing is independant of resizing
+          //collapsing is independent of resizing
           collapsible: true,
           resizable: true,
           assocStore:me.assocStore

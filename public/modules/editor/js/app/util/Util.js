@@ -305,6 +305,15 @@ Ext.define('Editor.util.Util', {
             return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         },
 
+        /***
+         * Get the base route from the current route.
+         * ex: from project/123/124/focus the returned value will be project
+         * @returns {*|string}
+         */
+        getCurrentBaseRoute: function (){
+            var base = Ext.util.History.getToken().split('/');
+            return base.length > 0 ? base[0] : '';
+        }
 
     }
 });

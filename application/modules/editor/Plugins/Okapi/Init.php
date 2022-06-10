@@ -103,17 +103,21 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @return editor_Plugins_Okapi_Models_Bconf
      * @throws Zend_Exception
      */
-    private static function getImportBconfById(editor_Models_Task $task, int $bconfId=NULL) : editor_Plugins_Okapi_Models_Bconf {
+    private static function getImportBconfById(editor_Models_Task $task, int $bconfId=NULL, string $orderer=NULL) : editor_Plugins_Okapi_Models_Bconf {
         // this may be called multiple times when processing the import upload, so we better cache it
         if(!empty($bconfId) && static::$cachedBconf != NULL && static::$cachedBconf->getId() === $bconfId){
             return static::$cachedBconf;
         }
         // empty covers "not set" and also invalid id '0'
+        // somehow dirty: unit tests pass a virtual" bconf-id of "0" to signal to use the system default bconf
         if(empty($bconfId)){
-            // very unlikely if not impossible: no bconf-id set for the task. In that case we use the default one and add a warning
+            // a bconfId may not be given when the API is used via an unittest or the termportal
+            // otherwise this is very unlikely if not impossible: no bconf-id set for the task. In that case we use the default one and add a warning
+            if($bconfId === NULL && $orderer != 'unittest' && $orderer != 'termportal'){
+                $task->logger('editor.task.okapi')->warn('E1055', 'Okapi Plug-In: Bconf not given or not found: {bconfFile}', ['bconfFile' => 'No bconf-id was set for task meta']);
+            }
             $bconf = new editor_Plugins_Okapi_Models_Bconf();
             $bconfId = $bconf->getDefaultBconfId();
-            $task->logger('editor.task.okapi')->warn('E1055', 'Okapi Plug-In: Bconf not given or not found: {bconfFile}', ['bconfFile' => 'No bconf-id was set for task meta']);
         }
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
         $bconf->load($bconfId);
@@ -421,7 +425,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             /* @var $requestData array */
             $requestData = $event->getParam('requestData');
             $bconfId = array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : NULL;
-            $bconf = self::getImportBconfById($task, $bconfId);
+            $orderer = array_key_exists('orderer', $requestData) ? $requestData['orderer'] : NULL;
+            $bconf = self::getImportBconfById($task, $bconfId, $orderer);
             // we add the bconf with it's visual name as filename to the archive for easier maintainability
             $dataProvider->addAdditonalFileToArchive($bconf->getFilePath(), $bconf->getDownloadFilename());
         }
@@ -742,7 +747,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     {
         /** @var ZfExtended_View $view */
         $view = $event->getParam('view');
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        // cache to prevent multiple fetching of the non-customer default bconf
+        $defaultBconfId = NULL;
         $meta = new editor_Models_Db_CustomerMeta();
         $metas = $meta->fetchAll('defaultBconfId IS NOT NULL')->toArray();
         $bconfIds = array_column($metas, 'defaultBconfId', 'customerId');
@@ -750,7 +756,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             if(array_key_exists($customer['id'], $bconfIds)){
                 $customer['defaultBconfId'] = (int) $bconfIds[$customer['id']];
             } else {
-                $customer['defaultBconfId'] = $bconf->getDefaultBconfId();
+                if($defaultBconfId === NULL){
+                    $bconf = new editor_Plugins_Okapi_Models_Bconf();
+                    $defaultBconfId = $bconf->getDefaultBconfId();
+                }
+                $customer['defaultBconfId'] = $defaultBconfId;
             }
         }
     }
