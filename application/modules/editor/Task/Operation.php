@@ -48,6 +48,14 @@ class editor_Task_Operation {
      * @return int The parent ID to use for all inner workers
      */
     public static function create(string $operationType, editor_Models_Task $task) : int {
+
+        if(in_array($task->getState(), self::getAllOperations())){
+            throw new editor_Task_Operation_Exception('E1396', ['otherOperation' => $task->getState()]);
+        }
+
+        if($task->getState() != editor_Models_Task::STATE_OPEN){
+            throw new editor_Task_Operation_Exception('E1395');
+        }
         
         $worker = ZfExtended_Factory::get('editor_Task_Operation_StartingWorker');
         /* @var $worker editor_Task_Operation_StartingWorker */
@@ -62,5 +70,13 @@ class editor_Task_Operation {
             }
         }
         return 0;
+    }
+
+    /**
+     * retrieves all Operations
+     * @return string[]
+     */
+    public static function getAllOperations() : array {
+        return [ self::AUTOQA, self::MATCHANALYSIS ];
     }
 }
