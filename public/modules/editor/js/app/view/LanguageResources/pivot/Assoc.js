@@ -34,9 +34,15 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
     extend : 'Ext.grid.Panel',
     alias : 'widget.languageResourcePivotAssoc',
     itemId:'languageResourcePivotAssoc',
-    // viewModel: {
-    //     type: 'languageResourcePivotAssoc'
-    // },
+    controller: 'languageResourcePivotAssoc',
+    viewModel: {
+        type: 'languageResourcePivotAssoc'
+    },
+    requires:[
+        'Editor.view.LanguageResources.pivot.AssocViewModel',
+        'Editor.view.LanguageResources.pivot.AssocViewController',
+        'Editor.model.LanguageResources.pivot.Assoc'
+    ],
     strings: {
         empty: '#UT#Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.',
         checked: '#UT#Ressource in Aufgabe verwenden',
@@ -48,10 +54,15 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
     },
     padding: 0,
     layout:'fit',
+    store:[],
+
     initConfig : function(instanceConfig) {
         var me = this,
         config = {
-            columns : [ {
+            bind:{
+                store:'{pivotAssoc}'
+            },
+            columns : [{
                 xtype : 'checkcolumn',
                 tooltip : me.strings.checked,
                 text : me.strings.checked,
@@ -107,6 +118,7 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
         }
         return me.callParent([ config ]);
     },
+
     langRenderer : function(val, md) {
         var lang = Ext.StoreMgr.get('admin.Languages').getById(val), label;
         if (lang) {

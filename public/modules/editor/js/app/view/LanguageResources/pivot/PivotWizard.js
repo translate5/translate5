@@ -66,11 +66,15 @@ Ext.define('Editor.view.LanguageResources.pivot.PivotWizard', {
     /***
      */
     onPivotWizardActivate:function(){
-        // var me = this,
-        //     grid = me.down('#adminConfigGrid');
-        // grid.setExtraParams({
-        //     taskGuid:me.task.get('taskGuid')
-        // });
+        var me = this,
+            view = me.down('#languageResourcePivotAssoc'),
+            store = view && view.getStore();
+
+        store && store.load({
+            params:{
+                taskGuid:me.task.get('taskGuid')
+            }
+        });
     },
     
     //called when next button is clicked

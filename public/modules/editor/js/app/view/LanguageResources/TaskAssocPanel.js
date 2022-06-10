@@ -102,7 +102,6 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 } ],
                 columns : [ {
                     xtype : 'checkcolumn',
-                    text : '',
                     tooltip : me.strings.checked,
                     text : me.strings.checked,
                     dataIndex : 'checked',
