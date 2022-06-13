@@ -156,10 +156,10 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch($category){
             case editor_Segment_Numbers_Check::NUM1:
-                return $translate->_('Zahlen SRC ≠ TRG');
+                return $translate->_('Zahlen Quelle ≠ Ziel');
 
             case editor_Segment_Numbers_Check::NUM2:
-                return $translate->_('Alphanumerische Zeichenfolgen');
+                return $translate->_('Alphanumerische Zeichenfolgen: Unterschiede');
 
             case editor_Segment_Numbers_Check::NUM3:
                 return $translate->_('Formatänderung (Datumsangaben u.ä.)');
@@ -174,13 +174,13 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
                 return $translate->_('Unterschiedliche Minuszeichen');
 
             case editor_Segment_Numbers_Check::NUM7:
-                return $translate->_('Trenner aus SRC geändert');
+                return $translate->_('Trenner aus Quelle geändert');
 
             case editor_Segment_Numbers_Check::NUM8:
-                return $translate->_('Zahlwort aus SRC als Zahl in TRG gefunden');
+                return $translate->_('Zahlwort aus Quelle als Zahl in Ziel gefunden');
 
             case editor_Segment_Numbers_Check::NUM9:
-                return $translate->_('Zahl aus SRC als Zahlwort in TRG gefunden');
+                return $translate->_('Zahl aus Quelle als Zahlwort in Ziel gefunden');
 
             case editor_Segment_Numbers_Check::NUM10:
                 return $translate->_('Formatänderung (Ordinalzahlen, führende Null u.ä.)');
@@ -189,7 +189,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
                 return $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall');
 
             case editor_Segment_Numbers_Check::NUM12:
-                return $translate->_('1000er-Brenner nicht erlaubt');
+                return $translate->_('1000er-Trenner nicht erlaubt');
         }
         return NULL;
     }

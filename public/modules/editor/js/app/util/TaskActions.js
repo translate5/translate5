@@ -111,48 +111,6 @@ Ext.define('Editor.util.TaskActions', {
         isTaskExportable: function() {
             var ctrl = Editor.app.getController('Segments');
             return !ctrl.saveChainMutex && !ctrl.saveIsRunning;
-        },
-        /**
-         * QUIRK: this API should better be in a global task Controller but unfortunately there is none
-         * Starts an operation of the given type & updates the task-state in all available stores
-         * @param {string} operationType, see editor_Task_Operation::XXX
-         * @param {int} taskId
-         * @param {object} params
-         */
-        operation: function(operationType, taskId, params){
-            //'editor/:entity/:id/operation/:operation'
-            var taskStore = Ext.StoreManager.get('admin.Tasks'),
-                adminTask = (taskStore && taskId) ? taskStore.getById(taskId) : null,
-                projectTaskGrid = Ext.ComponentQuery.query('#projectTaskGrid').at(0),
-                projectTask = (projectTaskGrid && projectTaskGrid.getStore()) ? projectTaskGrid.getStore().getById(taskId) : null,
-                taskInitialState = (adminTask || projectTask) ? (adminTask ? adminTask.get('state') : projectTask.get('state')) : null,
-                // this API might be called from the editor or the global context
-                baseUrl = (Editor.data.restpath.indexOf('/task/') === -1) ? Editor.data.restpath : Editor.data.restpath.split('/task/')[0] + '/';
-            // before the analysis is started, set the task state to 'autoqa' in the task/project stores
-            // the matchanalysis and languageresourcesassoc panel loading masks are binded
-            // to the task status. Changing the status to autoqa will automaticly apply the loading masks for those panels
-            if(adminTask && taskInitialState !== operationType){
-                adminTask.set('state', operationType);
-            }
-            if(projectTask && taskInitialState !== operationType){
-                projectTask.set('state', operationType);
-            }
-            Ext.Ajax.request({
-                url: baseUrl+'task/'+taskId+'/'+operationType+'/operation',
-                method: "PUT",
-                params: params,
-                scope: this,
-                failure: function(response){
-                    // on failure, we have to reset the task-state
-                    if(adminTask && taskInitialState !== operationType){
-                        adminTask.set('state', taskInitialState);
-                    }
-                    if(projectTask && taskInitialState !== operationType){
-                        projectTask.set('state', taskInitialState);
-                    }
-                    Editor.app.getController('ServerException').handleException(response);
-                }
-            });
         }
     },
     /**
