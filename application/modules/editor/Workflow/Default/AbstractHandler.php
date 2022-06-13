@@ -64,6 +64,7 @@ abstract class editor_Workflow_Default_AbstractHandler {
         foreach($actions as $action) {
             $class = $action['actionClass'];
             $method = $action['action'];
+            $config->parameters = !empty($action['parameters']) ? json_decode($action['parameters']) : null;
             if(empty($instances[$class])) {
                 $instance = ZfExtended_Factory::get($class);
                 /* @var $instance editor_Workflow_Actions_Abstract */

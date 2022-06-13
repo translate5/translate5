@@ -82,7 +82,7 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
         foreach ([3, 4, 5, 6, 9, 10] as $idx) {
             $fileName = 'expectedSegmentQualities-' . $idx . '.json';
             $qualities = self::$api->getJson('/editor/quality/segment?segmentId=' . static::$segments[$idx]->id, [], $fileName);
-            $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities);
+            $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, 'File '.$fileName.', Segment target: "'.static::$segments[$idx]->target.'"');
         }
     }
 

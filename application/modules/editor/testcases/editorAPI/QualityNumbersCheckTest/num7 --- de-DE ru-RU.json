@@ -611,7 +611,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "37114",
+                    "qid": "36533",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -649,6 +649,64 @@
             "text": "Numbers",
             "qtotal": 1,
             "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "term",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "forbidden_in_source",
+                    "text": "Forbidden in source",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "forbidden_in_target",
+                    "text": "Forbidden in target",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "not_defined_in_target",
+                    "text": "Not defined in target terminology",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "term",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "not_found_in_target",
+                    "text": "Not found in target",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Terminology",
+            "qtotal": 0,
+            "expanded": false,
             "checked": false
         },
         {

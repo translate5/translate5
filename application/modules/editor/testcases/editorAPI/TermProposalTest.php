@@ -308,7 +308,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertBatchEdit(2, 'batch-value for note-attr for termEntry-level', [
             'termId' => $termId_batch = join(',', [$importedTerm->id, $Term1->termId]),
             'level' => 'entry',
-            'dataType' => 20,
+            'dataType' => $dataTypeId_note,
             'batch' => '1'
         ], 0, false);
 
@@ -324,7 +324,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertBatchEdit($planQtyNote = 2, 'batch-value for note-attr for term-level', [
             'termId' => $termId_batch,
             'level' => 'term',
-            'dataType' => 20,
+            'dataType' => $dataTypeId_note,
             'batch' => '1',
         ], $existingPlanQtyNote = 1, true);
 

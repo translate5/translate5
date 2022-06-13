@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 491,
-    "qtotal": 491,
+    "qcount": 497,
+    "qtotal": 497,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "78486",
+                    "qid": "81318",
                     "qtype": "consistent",
                     "qcount": 2,
                     "qcomplete": true,
@@ -193,7 +193,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "78489",
+                    "qid": "81321",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
@@ -215,7 +215,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "78490",
+                    "qid": "81322",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
@@ -268,7 +268,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "78080",
+                            "qid": "80837",
                             "qtype": "mqm",
                             "qcount": 171,
                             "qcomplete": true,
@@ -280,7 +280,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78337",
+                            "qid": "80832",
                             "qtype": "mqm",
                             "qcount": 105,
                             "qcomplete": true,
@@ -292,7 +292,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78342",
+                            "qid": "80963",
                             "qtype": "mqm",
                             "qcount": 12,
                             "qcomplete": true,
@@ -304,7 +304,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78195",
+                            "qid": "80836",
                             "qtype": "mqm",
                             "qcount": 3,
                             "qcomplete": true,
@@ -316,7 +316,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78125",
+                            "qid": "80826",
                             "qtype": "mqm",
                             "qcount": 13,
                             "qcomplete": true,
@@ -342,7 +342,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "78336",
+                            "qid": "80829",
                             "qtype": "mqm",
                             "qcount": 21,
                             "qcomplete": true,
@@ -354,13 +354,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "78140",
+                            "qid": "80966",
                             "qtype": "mqm",
                             "qcount": 6,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "78345",
+                                    "qid": "80825",
                                     "qtype": "mqm",
                                     "qcount": 12,
                                     "qcomplete": true,
@@ -380,13 +380,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "78034",
+                            "qid": "80860",
                             "qtype": "mqm",
                             "qcount": 2,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "78395",
+                                    "qid": "80873",
                                     "qtype": "mqm",
                                     "qcount": 4,
                                     "qcomplete": true,
@@ -406,7 +406,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78085",
+                            "qid": "80854",
                             "qtype": "mqm",
                             "qcount": 10,
                             "qcomplete": true,
@@ -436,7 +436,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "78344",
+                                    "qid": "80827",
                                     "qtype": "mqm",
                                     "qcount": 32,
                                     "qcomplete": true,
@@ -448,7 +448,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "78084",
+                                    "qid": "80844",
                                     "qtype": "mqm",
                                     "qcount": 28,
                                     "qcomplete": true,
@@ -460,7 +460,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "78090",
+                                    "qid": "80835",
                                     "qtype": "mqm",
                                     "qcount": 51,
                                     "qcomplete": true,
@@ -472,7 +472,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "78338",
+                                    "qid": "80987",
                                     "qtype": "mqm",
                                     "qcount": 17,
                                     "qcomplete": true,
@@ -516,6 +516,152 @@
             "qtooltip": "",
             "text": "Manual QA (inside segment)",
             "qtotal": 487,
+            "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "numbers",
+            "qcount": 6,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "81314",
+                    "qtype": "numbers",
+                    "qcount": 3,
+                    "qcomplete": true,
+                    "qcategory": "num1",
+                    "qcatidx": "-1",
+                    "text": "Numbers SRC \u2260 TRG",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num10",
+                    "text": "Format alteration (ordinal numbers, leading zero etc.)",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "81312",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num11",
+                    "qcatidx": "-1",
+                    "text": "Different character\/formatting for number interval",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "81315",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num12",
+                    "qcatidx": "-1",
+                    "text": "1000-separator not allowed",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num2",
+                    "text": "Alphanumerical character sequences",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num3",
+                    "text": "Format alteration (date information etc.)",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num4",
+                    "text": "Separator(s) not localised",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num5",
+                    "text": "Formatting of 1000s number altered",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "81313",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num6",
+                    "qcatidx": "-1",
+                    "text": "Different minus characters",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num7",
+                    "text": "Separator from SRC altered",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num8",
+                    "text": "Numeral from SRC found as number in TRG",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num9",
+                    "text": "Number from SRC found as numeral in TRG",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Numbers",
+            "qtotal": 6,
             "expanded": true,
             "checked": false
         },
