@@ -206,4 +206,54 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         /* @var $log editor_Models_LanguageResources_UsageLogger */
         $log->removeOldLogs();
     }
+
+    /***
+     * Send post request to the configured url alongside with task,task user assoc and additional contend as
+     * json data
+     * @return void
+     * @throws Zend_Http_Client_Exception|Zend_Exception
+     */
+    public function triggerCallbackAction(): void
+    {
+        $triggerConfig = $this->config->parameters;
+        $url = $triggerConfig->url ?? '';
+        // set the data parameters from the trigger config if exist
+        // this can be used for api authentication
+        $data = $triggerConfig->params ?? new stdClass();
+        if( empty($url) ){
+            return;
+        }
+        $tua = $this->config->newTua;
+        $task = $this->config->task;
+
+        /** @var Zend_Http_Client $http */
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        $http->setUri($url);
+        $http->setMethod($http::POST);
+        $http->setHeaders('Accept-charset', 'UTF-8');
+        $http->setHeaders('Accept', 'application/json; charset=utf-8');
+
+        if( !empty($task)){
+            $data->task = $task->getDataObject();
+            unset($data->lockedInternalSessionUniqId);
+            unset($data->qmSubsegmentFlags);
+        }
+
+        if( !empty($tua)){
+            $data->tua = $tua->getDataObject();
+        }
+
+        if(isset($data)){
+            $http->setRawData(json_encode($data, JSON_PRETTY_PRINT));
+        }
+        $response = $http->request();
+
+        //we consider all non 200 status values as invalid and log that!
+        if($response->getStatus() !== 200) {
+            $task->logger()->warn('E1394', 'All finish of a role callback HTTP status code is {code} instead 200.', [
+                'code' => $response->getStatus(),
+                'result' => $response->getBody(),
+            ]);
+        }
+    }
 }
