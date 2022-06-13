@@ -119,7 +119,7 @@ class editor_Segment_Numbers_Check {
         // Load langs [id => rfc5646] pairs if not yet loaded
         self::$lang = self::$lang ?? ZfExtended_Factory
             ::get('editor_Models_Languages')
-            ->loadAllKeyValueCustom('id', 'rfc5646');
+            ->loadAllKeyValueCustom('id', 'sublanguage');
 
         // Run check
         $this->states = numbers_check(
