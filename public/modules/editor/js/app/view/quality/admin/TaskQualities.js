@@ -200,13 +200,40 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
         return me.callParent([ config ]);
     },
     /**
-     * Starts a auto-qa re-analysis
+     * TODO AUTOQA: add dialog to modify the QA configuration
+     * Starts a re-analysis
      */
-    onAnalysisButtonClick: function(){
+    onAnalysisButtonClick: function(btn){
     	if(!this.store || !this.store.taskGuid || !this.store.taskId){
     		return;
     	}
-        Editor.util.TaskActions.operation('autoqa', this.store.taskId, { "taskId": this.store.taskId, "taskGuid": this.store.taskGuid });
+        var me = this,
+        	taskGuid = this.store.taskGuid,
+        	taskId = this.store.taskId,
+        	projectTaskGrid = Ext.ComponentQuery.query('#projectTaskGrid').at(0),
+	        setAnalysisRecordState = function(store, taskId){
+	            var record = store ? store.getById(taskId) : null;
+	            if(!record){
+	                return;
+	            }
+	            record.set('state', 'opautoqa');
+	        };
+	    // before the analysis is started, set the task state to 'autoqa'
+	    // the matchanalysis and languageresourcesassoc panel loading masks are binded 
+	    // to the task status. Changing the status to autoqa will automaticly apply the loading masks for those panels
+	    setAnalysisRecordState(Ext.StoreManager.get('admin.Tasks'), taskId);
+	    if(projectTaskGrid){
+	    	setAnalysisRecordState(projectTaskGrid.getStore(), taskId);
+	    }
+        Ext.Ajax.request({
+            url: Editor.data.restpath+'task/'+taskId+'/autoqa/operation',
+            method: "PUT",
+            params: { "taskGuid": taskGuid, "taskId": taskId },
+            scope: this,
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
     }
 });
 

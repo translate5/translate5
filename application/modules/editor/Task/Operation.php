@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 class editor_Task_Operation {
     
     // Every operation (also from Plugins) should define their type here to have an overview about the possible operations
-    // these keys presumably also be used to find code related to the operation, so please keep them pretty unique !
+    // these kays presumably also be used to find code related to the operation, so please keep them pretty unique !
     /**
      * @var string
      */
@@ -40,11 +40,7 @@ class editor_Task_Operation {
     /**
      * @var string
      */
-    const AUTOQA = 'autoqa';
-    /**
-     * @var string
-     */
-    const PRETRANSLATION = 'pretranslation';
+    const AUTOQA = 'opautoqa';
     /**
      * 
      * @param string $operationType: must be a constant of this class
@@ -53,16 +49,14 @@ class editor_Task_Operation {
      */
     public static function create(string $operationType, editor_Models_Task $task) : int {
 
-        // Only one operation is allowed to run at a time !
         if(in_array($task->getState(), self::getAllOperations())){
-            throw new editor_Task_Operation_Exception('E1396', ['taskstate' => $task->getState()]);
+            throw new editor_Task_Operation_Exception('E1396', ['otherOperation' => $task->getState()]);
         }
-        // TODO FIXME: in what task states operations should not run (matchanalysis, pretranslation, autoqa) ?
-        /*
+
         if($task->getState() != editor_Models_Task::STATE_OPEN){
-            throw new editor_Task_Operation_Exception('E1395', ['taskstate' => $task->getState(), 'operation' => $operationType]);
+            throw new editor_Task_Operation_Exception('E1395');
         }
-        */
+        
         $worker = ZfExtended_Factory::get('editor_Task_Operation_StartingWorker');
         /* @var $worker editor_Task_Operation_StartingWorker */
         if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType ])) {
@@ -83,6 +77,6 @@ class editor_Task_Operation {
      * @return string[]
      */
     public static function getAllOperations() : array {
-        return [ self::AUTOQA, self::MATCHANALYSIS, self::PRETRANSLATION ];
+        return [ self::AUTOQA, self::MATCHANALYSIS ];
     }
 }
