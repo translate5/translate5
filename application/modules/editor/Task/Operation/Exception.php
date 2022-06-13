@@ -60,7 +60,7 @@ class editor_Task_Operation_Exception extends ZfExtended_ErrorCodeException {
     protected $domain = 'task.operation';
     
     static protected $localErrorCodes = [
-        'E1395' => 'The Task-Operation can only be started for open tasks',
-        'E1396' => 'The Task-Operation can not be started, there is already an operation running'
+        'E1395' => 'The Task-Operation "{operation}" can not be started when the task is in state "{taskstate}"',
+        'E1396' => 'The Task-Operation "{operation}" can not be started, there is already an operation running'
     ];
 }
