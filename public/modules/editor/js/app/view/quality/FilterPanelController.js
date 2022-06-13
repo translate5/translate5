@@ -102,16 +102,15 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         }
     },
     /**
-     * TODO AUTOQA: implement
-     * Opens the re-analysis dialog
+     * Re-analyses the auto-qa
      */
-    onAnalysisButtonClick: function(btn){
-        console.log('onAnalysisButtonClick: ', btn);
+    onAnalysisButtonClick: function(){
+        Editor.util.TaskActions.operation('autoqa', Editor.data.task.get('id'), { "taskId": Editor.data.task.get('id'), "taskGuid": Editor.data.task.get('taskGuid') });
     },
     /**
      * Called on saving of segments (incl. alikes). We refresh our store then without updating the filtered grid if we are visible /show qualities
      */
-    onSegmentSaved: function(grid, record){
+    onSegmentSaved: function(){
         if(this.panelShown){
             // the "segmentEditSaved" event it seems does not cover the time e.g. the checking of the segment state needs in conjunction with language resources that must be requested.
             // generally this event seem to fire BEFORE all processing of all edited segment save related operations have finished
@@ -135,7 +134,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     /**
      * Prevents an item being checked when it has no qualities
      */
-    onBeforeCheckChange (record, checked, e){
+    onBeforeCheckChange (record){
         if(record.isEmpty()){
             return false;
         }
