@@ -2841,7 +2841,7 @@ A task was associated to you in the task-portal {portalLink}.<br />
 </trans-unit>
 <trans-unit id='TWF0Y2hlcw=='>
   <source>Matches</source>
-  <target>matches</target>
+  <target>Matches</target>
 </trans-unit>
 <trans-unit id='UXVlbGx0ZXh0c3VjaGU='>
   <source>Quelltextsuche</source>
@@ -4712,9 +4712,9 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminology Translation Project</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Project</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Project</target></trans-unit>
-<trans-unit id='U3lub255bS1TdWNoZQ=='>
-  <source>Synonym-Suche</source>
-  <target>synonym search</target>
+<trans-unit id='U3lub255bXN1Y2hl'>
+  <source>Synonymsuche</source>
+  <target>Synonym search</target>
 </trans-unit>
 <trans-unit id='QWRqZWt0aXY'>
   <source>Adjektiv</source>

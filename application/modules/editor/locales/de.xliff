@@ -2161,7 +2161,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminologieübersetzungsprojekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Projekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Projekt</target></trans-unit>
-<trans-unit id='U3lub255bS1TdWNoZQ=='><source>Synonym-Suche</source><target>synonym-Suche</target></trans-unit>
+<trans-unit id='U3lub255bXN1Y2hl'><source>Synonymsuche</source><target>Synonymsuche</target></trans-unit>
 <trans-unit id='QWRqZWt0aXY'><source>Adjektiv</source><target>Adjektiv</target></trans-unit>
 <trans-unit id='QWR2ZXJi'><source>Adverb</source><target>Adverb</target></trans-unit>
 <trans-unit id='VmVyYmluZHVuZw=='><source>Verbindung</source><target>Verbindung</target></trans-unit>
