@@ -94,7 +94,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController',
     },
 
     showFilterGrid: function(view, recIdx){
-        fw = Ext.create('Editor.plugins.Okapi.view.BconffilterGrid', {
+        fw = Ext.create('Editor.plugins.Okapi.view.BconfFilterGrid', {
             bconf: view.store.getAt(recIdx),
             constrain: true,
             modal: true,
@@ -294,7 +294,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController',
     },
 
     loadOkapiFilters: function(bconfGrid){
-        Ext.create('Editor.plugins.Okapi.store.DefaultBconffilterStore');
+        Ext.create('Editor.plugins.Okapi.store.DefaultBconfFilterStore');
     },
 
     createInfoSpan: function(json){

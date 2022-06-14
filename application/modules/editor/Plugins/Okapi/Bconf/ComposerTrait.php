@@ -37,7 +37,7 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
     /**
      * @throws editor_Plugins_Okapi_Exception
      */
-    private function do_pack(): void {
+    private function doPack(): void {
         chdir($this->entity->getDir()); // so we can access with file name only
 
         $content = ['refs' => null, 'fprm' => null];

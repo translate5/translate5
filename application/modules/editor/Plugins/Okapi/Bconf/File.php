@@ -51,17 +51,26 @@ class editor_Plugins_Okapi_Bconf_File {
     }
 
     /**
-     * @param string $method
-     * @param array $arguments
-     * @return void
-     * @throws Zend_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
      */
-    public function __call(string $method, array $arguments) {
-        if(!in_array($method, ['pack', 'unpack'])){
-            throw new Zend_Exception("Call to undefined method " . get_class($this) . "::" . $method . "()");
-        }
+    private function pack(): void {
         try {
-            call_user_func_array([$this, 'do_' . $method], $arguments);
+            $this->doPack();
+        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity){
+        } catch(Exception $e){
+            $this->invalidate($e->__toString(), 'EXCEP');
+        }
+    }
+
+    /**
+     * @param string $pathToParse
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function unpack(string $pathToParse): void {
+        try {
+            $this->doUnpack($pathToParse);
         } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity){
         } catch(Exception $e){
             $this->invalidate($e->__toString(), 'EXCEP');
@@ -76,7 +85,7 @@ class editor_Plugins_Okapi_Bconf_File {
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    protected function invalidate(string $msg = '', string $errorCode = 'E1026'): void {
+    protected function  invalidate(string $msg = '', string $errorCode = 'E1026'): void {
         $errors = [[$msg]];
         if($this->entity->isNewRecord()){
             try {

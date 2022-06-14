@@ -31,7 +31,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     extend: 'Ext.grid.Panel',
     requires: [
         'Editor.plugins.Okapi.view.BconfGridController',
-        'Editor.plugins.Okapi.view.BconffilterGrid',
+        'Editor.plugins.Okapi.view.BconfFilterGrid',
         'Editor.plugins.Okapi.store.BconfStore',
     ],
     alias: 'widget.okapiBconfGrid',

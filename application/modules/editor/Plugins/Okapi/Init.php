@@ -783,7 +783,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
 
     /**
-     * Handles updates to Bconffilters
+     * Handles updates to BconfFilters
      * @see ZfExtended_RestController::beforeActionEvent
      */
     public function saveExtensionsMapping(Zend_EventManager_Event $event){

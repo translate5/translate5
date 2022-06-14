@@ -46,7 +46,7 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    private function do_unpack(string $pathToParse): void {
+    private function doUnpack(string $pathToParse): void {
         chdir($this->entity->getDir());
 
         $content = [
