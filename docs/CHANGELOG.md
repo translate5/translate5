@@ -12,6 +12,46 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.3] - 2022-06-14
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2811](https://jira.translate5.net/browse/TRANSLATE-2811): Editor general, LanguageResources - Integrate MS Translator synonym search in editor** <br>
+Microsoft's translator synonym search is now part of translate5 editor.
+
+**[TRANSLATE-2539](https://jira.translate5.net/browse/TRANSLATE-2539): Auto-QA - AutoQA: Numbers check** <br>
+AutoQA: added 12 number-checks from SNC library
+
+
+### Changed
+**[TRANSLATE-2986](https://jira.translate5.net/browse/TRANSLATE-2986): Main back-end mechanisms (Worker, Logging, etc.) - Trigger callback when all users did finish the assigned role** <br>
+After all jobs are finished, callback workflow action can be configured. How this can be configured it is explained in this link:  https://confluence.translate5.net/display/BUS/Workflow+Action+and+Notification+Customization#:~:text=Remote%20callback%20when%20all%20users%20finish%20there%20jobs
+
+**[TRANSLATE-2978](https://jira.translate5.net/browse/TRANSLATE-2978): Editor Length Check - Disable automatic adding of newlines on segments by configuration** <br>
+The automatic adding of newlines could now disabled by configuration.
+
+
+### Bugfixes
+**[TRANSLATE-2985](https://jira.translate5.net/browse/TRANSLATE-2985): Editor general - Error on configuration overview filtering** <br>
+The error which pops-up when quick-typing in configuration filter is solved.
+
+**[TRANSLATE-2983](https://jira.translate5.net/browse/TRANSLATE-2983): Editor general - Task action menu error after leaving a task** <br>
+Opening the task action menu after leaving the task will no longer produce error.
+
+**[TRANSLATE-2982](https://jira.translate5.net/browse/TRANSLATE-2982): TermPortal, TermTagger integration - Empty term in TBX leads to crashing termtagger** <br>
+If an imported TBX was containing empty terms (which is basically non sense) and that term collection was then used for termtagging in asian languages, the termtagger was hanging in an endless loop and was not usable anymore.
+
+**[TRANSLATE-2981](https://jira.translate5.net/browse/TRANSLATE-2981): TBX-Import - Importing TBX with invalid XML leads to high CPU usage** <br>
+On importing a TBX file with invalid XML the import process was caught in an endless loop. This is fixed and the import stops now with an error message.
+
+**[TRANSLATE-2980](https://jira.translate5.net/browse/TRANSLATE-2980): Editor general - On task delete translate5 keeps the old route** <br>
+Missing task message when the task is removed will no longer be shown.
+
+
 ## [5.7.2] - 2022-05-24
 
 ### Important Notes:
