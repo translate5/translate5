@@ -107,6 +107,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         'LEK_term_entry'=>false,
         'LEK_term_history'=>false,
         'LEK_term_proposal'=>false,
+        'LEK_termcollection_deepl_glossary_assoc' => false,
         'LEK_user_assoc_default' => false,
         'LEK_user_changelog_info' => false,
         'LEK_user_config' => false,
