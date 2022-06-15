@@ -2841,7 +2841,7 @@ A task was associated to you in the task-portal {portalLink}.<br />
 </trans-unit>
 <trans-unit id='TWF0Y2hlcw=='>
   <source>Matches</source>
-  <target>matches</target>
+  <target>Matches</target>
 </trans-unit>
 <trans-unit id='UXVlbGx0ZXh0c3VjaGU='>
   <source>Quelltextsuche</source>
@@ -4696,25 +4696,25 @@ The following task was imported with errors / warnings / notices. Please take ca
 </trans-unit>
 
 <trans-unit id='WmFobGVu'><source>Zahlen</source><target>Numbers</target></trans-unit>
-<trans-unit id='WmFobGVuIFNSQyDiiaAgVFJH'><source>Zahlen SRC ≠ TRG</source><target>Numbers SRC ≠ TRG</target></trans-unit>
-<trans-unit id='QWxwaGFudW1lcmlzY2hlIFplaWNoZW5mb2xnZW4='><source>Alphanumerische Zeichenfolgen</source><target>Alphanumerical character sequences</target></trans-unit>
+<trans-unit id='WmFobGVuIFF1ZWxsZSDiiaAgWmllbA=='><source>Zahlen Quelle ≠ Ziel</source><target>Numbers source ≠ target</target></trans-unit>
+<trans-unit id='QWxwaGFudW1lcmlzY2hlIFplaWNoZW5mb2xnZW46IFVudGVyc2NoaWVkZQ=='><source>Alphanumerische Zeichenfolgen: Unterschiede</source><target>Alphanumerical character sequences: Differences</target></trans-unit>
 <trans-unit id='Rm9ybWF0w6RuZGVydW5nIChEYXR1bXNhbmdhYmVuIHUuw6QuKQ=='><source>Formatänderung (Datumsangaben u.ä.)</source><target>Format alteration (date information etc.)</target></trans-unit>
 <trans-unit id='VHJlbm5lciBuaWNodCBsb2thbGlzaWVydA=='><source>Trenner nicht lokalisiert</source><target>Separator(s) not localised</target></trans-unit>
 <trans-unit id='Rm9ybWF0aWVydW5nIDEwMDBlci1aYWhsIGdlw6RuZGVydA=='><source>Formatierung 1000er-Zahl geändert</source><target>Formatting of 1000s number altered</target></trans-unit>
 <trans-unit id='VW50ZXJzY2hpZWRsaWNoZSBNaW51c3plaWNoZW4='><source>Unterschiedliche Minuszeichen</source><target>Different minus characters</target></trans-unit>
-<trans-unit id='VHJlbm5lciBhdXMgU1JDIGdlw6RuZGVydA=='><source>Trenner aus SRC geändert</source><target>Separator from SRC altered</target></trans-unit>
-<trans-unit id='WmFobHdvcnQgYXVzIFNSQyBhbHMgWmFobCBpbiBUUkcgZ2VmdW5kZW4='><source>Zahlwort aus SRC als Zahl in TRG gefunden</source><target>Numeral from SRC found as number in TRG</target></trans-unit>
-<trans-unit id='WmFobCBhdXMgU1JDIGFscyBaYWhsd29ydCBpbiBUUkcgZ2VmdW5kZW4='><source>Zahl aus SRC als Zahlwort in TRG gefunden</source><target>Number from SRC found as numeral in TRG</target></trans-unit>
+<trans-unit id='VHJlbm5lciBhdXMgUXVlbGxlIGdlw6RuZGVydA=='><source>Trenner aus Quelle geändert</source><target>Separator from source altered</target></trans-unit>
+<trans-unit id='WmFobHdvcnQgYXVzIFF1ZWxsZSBhbHMgWmFobCBpbiBaaWVsIGdlZnVuZGVu'><source>Zahlwort aus Quelle als Zahl in Ziel gefunden</source><target>Numeral from source found as number in target</target></trans-unit>
+<trans-unit id='WmFobCBhdXMgUXVlbGxlIGFscyBaYWhsd29ydCBpbiBaaWVsIGdlZnVuZGVu'><source>Zahl aus Quelle als Zahlwort in Ziel gefunden</source><target>Number from source found as numeral in target</target></trans-unit>
 <trans-unit id='Rm9ybWF0w6RuZGVydW5nIChPcmRpbmFsemFobGVuLCBmw7xocmVuZGUgTnVsbCB1LsOkLik='><source>Formatänderung (Ordinalzahlen, führende Null u.ä.)</source><target>Format alteration (ordinal numbers, leading zero etc.)</target></trans-unit>
 <trans-unit id='VW50ZXJzY2guIFplaWNoZW4vRm9ybWF0aWVydW5nIGbDvHIgWmFobGVuLUludGVydmFsbA=='><source>Untersch. Zeichen/Formatierung für Zahlen-Intervall</source><target>Different character/formatting for number interval</target></trans-unit>
-<trans-unit id='MTAwMGVyLUJyZW5uZXIgbmljaHQgZXJsYXVidA=='><source>1000er-Brenner nicht erlaubt</source><target>1000-separator not allowed</target></trans-unit>
+<trans-unit id='MTAwMGVyLVRyZW5uZXIgbmljaHQgZXJsYXVidA=='><source>1000er-Trenner nicht erlaubt</source><target>1000-separator not allowed</target></trans-unit>
 
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminology Translation Project</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Project</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Project</target></trans-unit>
-<trans-unit id='U3lub255bS1TdWNoZQ=='>
-  <source>Synonym-Suche</source>
-  <target>synonym search</target>
+<trans-unit id='U3lub255bXN1Y2hl'>
+  <source>Synonymsuche</source>
+  <target>Synonym search</target>
 </trans-unit>
 <trans-unit id='QWRqZWt0aXY'>
   <source>Adjektiv</source>

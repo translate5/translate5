@@ -32,8 +32,8 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearchViewCo
 
     listen: {
         component: {
-            "#textSearch": {
-                change: 'onTextSearchChange'
+            "#searchButton": {
+                click: 'onSearchButtonClick'
             }
         }
     },
@@ -43,20 +43,21 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearchViewCo
      * @param field
      * @param newValue
      */
-    onTextSearchChange: function (field,newValue){
+    onSearchButtonClick: function (){
         var me = this,
             view = me.getView(),
+            searchValue = view && view.down('#textSearch').getValue(),
             languageResourceEditorPanel = view && view.up('#languageResourceEditorPanel'),
             assocStore = languageResourceEditorPanel && languageResourceEditorPanel.assocStore,
             index = assocStore && assocStore.find('serviceName', 'Microsoft'),
             record = index > -1 ? assocStore.getAt(index) : null;
 
-        if( !record){
+        if( !record || Ext.isEmpty(searchValue)){
             return;
         }
         view.getStore().load({
             params:{
-                searchText:newValue
+                searchText:searchValue
             },
             url: Editor.data.restpath+'languageresourceinstance/'+record.get('languageResourceId')+'/translate',
             failure: Editor.app.getController('ServerException').handleException

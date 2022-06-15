@@ -40,7 +40,7 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearch', {
         'Editor.view.LanguageResources.services.Microsoft.SynonymSearchViewModel'
     ],
     strings: {
-        synonymSearch: '#UT#Synonym-Suche',
+        synonymSearch: '#UT#Synonymsuche',
         resultColumn:'#UT#Übersetzung',
         partOfSpeechColumn:'#UT#Wortart',
         backTranslationsColumn:'#UT#Alternativen',
@@ -77,7 +77,7 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearch', {
                 columns: [{
                     xtype: 'gridcolumn',
                     enableTextSelection: true,
-                    flex: 2,
+                    flex: 0.3,
                     dataIndex: 'target',
                     hideable: false,
                     sortable: false,
@@ -86,7 +86,7 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearch', {
                 },{
                     xtype: 'gridcolumn',
                     enableTextSelection: true,
-                    flex: 2,
+                    flex: 0.1,
                     dataIndex: 'posTag',
                     renderer: function(val) {
                         return me.strings[val] !== undefined ? me.strings[val] : me.strings.unknown;
@@ -97,7 +97,7 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearch', {
                     text: me.strings.partOfSpeechColumn
                 },{
                     xtype: 'gridcolumn',
-                    flex: 1,
+                    flex: 0.5,
                     hideable: false,
                     sortable: false,
                     dataIndex: 'backTranslations',
@@ -115,6 +115,7 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearch', {
                 },{
                     text: me.strings.confidenceColumn,
                     xtype: 'widgetcolumn',
+                    width: null,
                     widget: {
                         bind: '{record.confidence}',
                         xtype: 'progressbarwidget',
@@ -128,6 +129,10 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearch', {
                     itemId:'textSearch',
                     checkChangeBuffer:500,
                     fieldLabel: me.strings.synonymSearch
+                },{
+                    xtype: 'button',
+                    itemId: 'searchButton',
+                    glyph: 'f002@FontAwesome5FreeSolid'
                 }]
 		    };
 		if (instanceConfig) {
