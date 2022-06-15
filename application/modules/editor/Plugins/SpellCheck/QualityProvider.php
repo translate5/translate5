@@ -80,6 +80,53 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     }
 
     /**
+     * we will run with any processing mode
+     *
+     * @param string $processingMode
+     * @return bool
+     */
+    public function hasOperationWorker(string $processingMode) : bool {
+        return true;
+    }
+
+    public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode, array $workerParams = []) {
+
+        // Crucial: add processing-mode to worker params
+        $workerParams['processingMode'] = $processingMode;
+
+        // if no terminology is present we usually to not queue a worker, only a re-tag or analysis must cover the case we actually have to remove the terms !
+        /* @var $task editor_Models_Task */
+        /*if($processingMode == editor_Segment_Processing::ANALYSIS || $processingMode == editor_Segment_Processing::RETAG){
+            $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_Remove');
+            if(!$worker->init($task->getTaskGuid(), $workerParams)) {
+                $this->log->error('E1128', 'TermTagger Remove Worker can not be initialized!', [ 'parameters' => $workerParams ]);
+                return;
+            }
+            $worker->queue($parentWorkerId);
+        }*/
+
+        $worker = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Worker_SpellCheckImport');
+        /* @var $worker editor_Plugins_SpellCheck_Worker_SpellCheckImport */
+        // Create segments_meta-field 'spellcheckState' if not exists
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        //$meta->addMeta('spellcheckState', $meta::META_TYPE_STRING, editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_UNCHECKED, 'Contains the SpellCheck-state for this segment while importing', 36);
+
+        //lock oversized segments and reset already tagged segments to untagged
+        $this->prepareSegments($task, $meta);
+
+        // init worker and queue it
+
+        // QUIRK / FIXME: the "import" resourcePool is used for all Operations (import, analysis, retag)
+        $workerParams['resourcePool'] = 'import';
+        if (!$worker->init($task->getTaskGuid(), $workerParams)) {
+            $this->log->error('E1128', 'SpellCheckImport Worker can not be initialized!', [ 'parameters' => $workerParams ]);
+            return;
+        }
+        $worker->queue($parentWorkerId);
+    }
+
+    /**
      * Check segment against quality
      *
      * {@inheritDoc}
@@ -103,17 +150,20 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             // the only task in an alike process is cloning the qualities ...
             $tags->cloneAlikeQualitiesByType(static::$type);
 
+            // when copying alike tags, we just save the qualities extracted from the tags (if active in config)
+            /*if($task->getConfig()->runtimeOptions->termTagger->enableAutoQA){
+
+                editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
+            }*/
+
         // Else
-        } else if ($processingMode == editor_Segment_Processing::EDIT || editor_Segment_Processing::isOperation($processingMode)) {
+        } else if ($processingMode == editor_Segment_Processing::EDIT) {
 
             // Get segment shortcut
             $segment = $tags->getSegment();
 
             // Distinct states
             $states = [];
-
-            //
-            class_exists('editor_Utils');
 
             // Foreach target
             foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
@@ -179,5 +229,27 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             editor_Plugins_SpellCheck_Check::GRAMMAR,
             editor_Plugins_SpellCheck_Check::STYLE,
         ];
+    }
+
+    /**
+     * Find oversized segments and mark them as oversized and sets tagged segments to untagged?
+     * @param editor_Models_Task $task
+     * @param editor_Models_Segment_Meta $meta
+     */
+    private function prepareSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta) {
+        /*$config = Zend_Registry::get('config');
+        $maxWordCount = $config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150;
+        $meta->db->update([
+            'termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE
+        ],[
+            'taskGuid = ?' => $task->getTaskGuid(),
+            'sourceWordCount >= ?' => $maxWordCount,
+        ]);*/
+        $meta->db->update([
+            'spellcheckState' => editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_UNCHECKED
+        ],[
+            'taskGuid = ?' => $task->getTaskGuid(),
+            'spellcheckState = ?' => editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_CHECKED,
+        ]);
     }
 }

@@ -85,7 +85,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             },
             '#segmentStatusStrip #btnRunSpellCheck': {
                 click: 'startSpellCheckViaButton'
-            }
+            },
+            '#segmentgrid': {
+                canceledit: 'onSegmentEditCancelled'
+            },
         },
         store: {
             '#Segments':{
@@ -967,5 +970,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             spellCheckNode.appendChild(documentFragmentForMatch);
             rangeForMatch.insertNode(spellCheckNode);
         }, me, true);
+    },
+
+    onSegmentEditCancelled: function(plugin, context) {
+        this.applySpellCheckStylesForRecord(context.store, context.record);
     }
 });
