@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Encapsulates the tagging of groups of segment-tags
  * This enables to not "misuse" the import/analysis worker for processing a single tag when editing
  */
-class editor_Plugins_TermTagger_SegmentProcessor {
+class editor_Plugins_SpellCheck_SegmentProcessor {
     
     /**
      * Filters a quality state out of an array of term tag css-classes (=states)
@@ -102,7 +102,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
      */
     private $communicationService;
     
-    public function __construct(editor_Models_Task $task, editor_Plugins_TermTagger_Configuration $config, string $processingMode, bool $isWorkerThread){
+    public function __construct(editor_Models_Task $task, editor_Plugins_SpellCheck_Configuration $config, string $processingMode, bool $isWorkerThread){
         $this->task = $task;
         $this->config = $config;
         $this->processingMode = $processingMode;
@@ -116,7 +116,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
      * @throws ZfExtended_Exception
      */
     public function process(array $segmentsTags, string $slot, bool $doSaveTags) {
-        foreach($segmentsTags as $tags){            
+        /*foreach($segmentsTags as $tags){
             $tags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
         }
         // creating the communication service which passes the tags to a temporary model sent to the tagger
@@ -126,14 +126,16 @@ class editor_Plugins_TermTagger_SegmentProcessor {
             [$this->config->getLoggerDomain($this->processingMode),
                 $this->config->getRequestTimeout($this->isWorkerThread),
                 editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT]);
-        /* @var $termTagger editor_Plugins_TermTagger_Service */
+        /* @var $termTagger editor_Plugins_TermTagger_Service * /
         $this->config->checkTermTaggerTbx($termTagger, $slot, $this->communicationService->tbxFile);
         $result = $termTagger->tagterms($slot, $this->communicationService);
         $taggedSegments = $this->config->markTransFound($result->segments);
-        $taggedSegmentsById = $this->groupResponseById($taggedSegments);
+        $taggedSegmentsById = $this->groupResponseById($taggedSegments);*/
+        class_exists('editor_Utils');
         foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
             $segmentId = $tags->getSegmentId();
-            if(array_key_exists($segmentId, $taggedSegmentsById)){
+            i($segmentId, 'a');
+            /*if(array_key_exists($segmentId, $taggedSegmentsById)){
                 // bring the tagged segment content back to the tags model
                 $this->applyResponseToTags($taggedSegmentsById[$segmentId], $tags);
                 $tags->termtaggerProcessed = true;
@@ -152,7 +154,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
             } else {
                 // TODO FIXME: proper exception
                 throw new ZfExtended_Exception('Response of termtagger did not contain the sent segment with ID '.$segmentId);
-            }
+            }*/
         }
     }
     /**

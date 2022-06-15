@@ -27,123 +27,113 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Seperate Holder of certain configurations to accompany editor_Plugins_TermTagger_SegmentProcessor and editor_Plugins_TermTagger_Worker_TermTaggerImport
+ * Seperate Holder of certain configurations to accompany editor_Plugins_SpellCheck_Worker_SpellCheckImport
  * 
  */
-class editor_Plugins_TermTagger_Configuration {
+class editor_Plugins_SpellCheck_Configuration {
     
     /**
      * @var string
      */
-    const SEGMENT_STATE_UNTAGGED = 'untagged';
+    const SEGMENT_STATE_UNCHECKED = 'unchecked';
+
     /**
      * @var string
      */
     const SEGMENT_STATE_INPROGRESS = 'inprogress';
+
     /**
      * @var string
      */
-    const SEGMENT_STATE_TAGGED = 'tagged';
+    const SEGMENT_STATE_CHECKED = 'checked';
+
+    /**
+     * @var string
+     */
+    const SEGMENT_STATE_RECHECK = 'recheck';
+
     /**
      * @var string
      */
     const SEGMENT_STATE_DEFECT = 'defect';
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_RETAG = 'retag';
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_OVERSIZE = 'oversized';
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_IGNORE = 'ignore';
-    
-    //const SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
+
     /**
      * Defines, how much segments can be processed in one worker call
      * @var integer
      */
     const IMPORT_SEGMENTS_PER_CALL = 5;
+
     /**
-     * Defines the timeout in seconds how long a termtag call with multiple segments may need
+     * Defines the timeout in seconds how long a spell-check call with multiple segments may need
+     *
      * @var integer
      */
     const IMPORT_TIMEOUT_REQUEST = 300;
+
     /**
-     * Defines the timeout in seconds how long a single segment needs to be tagged
+     * Defines the timeout in seconds how long a single segment needs to be spell-checked
+     *
      * @var integer
      */
     const EDITOR_TIMEOUT_REQUEST = 180;
-    /**
-     * Defines the timeout in seconds how long the upload and parse request of a TBX may need
-     * @var integer
-     */
-    const TIMEOUT_TBXIMPORT = 600;
+
     /**
      * Logger Domain Import
      * @var string
      */
-    const IMPORT_LOGGER_DOMAIN = 'editor.terminology.import';
+    const IMPORT_LOGGER_DOMAIN = 'editor.spellcheck.import';
+
     /**
      * Logger Domain Editing
      * @var string
      */
-    const EDITOR_LOGGER_DOMAIN = 'editor.terminology.segmentediting';
+    const EDITOR_LOGGER_DOMAIN = 'editor.spellcheck.segmentediting';
+
     /**
-     * Logger Domain Manual Analysis
+     *
      * @var string
      */
-    const ANALYSIS_LOGGER_DOMAIN = 'editor.terminology.analysis';
+    const DOWN_CACHE_KEY = 'SpellCheckDownList';
+
     /**
-     * 
-     * @var string
-     */
-    const DOWN_CACHE_KEY = 'TermTaggerDownList';
-    
-    /**
-     * 
+     *
      * @param array $offlineServers
      */
     public static function saveDownListToMemCache(array $offlineUrls) {
         $memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
-        $memCache->save($offlineUrls, editor_Plugins_TermTagger_Configuration::DOWN_CACHE_KEY);
+        $memCache->save($offlineUrls, editor_Plugins_SpellCheck_Configuration::DOWN_CACHE_KEY);
     }
+
     /**
      * @var editor_Models_Task
      */
     private $task;
-    /**
-     * @var editor_Plugins_TermTagger_RecalcTransFound
-     */
-    private $recalcTransFound;
+
     /**
      * @var Zend_Cache_Core
      */
     private $memCache;
-    
+
     /**
      * 
      * @param editor_Models_Task $task
      */
     public function __construct(editor_Models_Task $task){
         $this->task = $task;
-        $this->recalcTransFound = ZfExtended_Factory::get('editor_Plugins_TermTagger_RecalcTransFound', array($this->task));
         $this->memCache = null;
-     }
+    }
+
     /**
      * 
      * @param bool $isWorkerThread
      * @return int
      */
-     public function getRequestTimeout(bool $isWorkerThread) : int {
-         if($isWorkerThread){
-            return self::IMPORT_TIMEOUT_REQUEST;
-        }
-        return self::EDITOR_TIMEOUT_REQUEST;
+    public function getRequestTimeout(bool $isWorkerThread) : int {
+        return $isWorkerThread
+            ? self::IMPORT_TIMEOUT_REQUEST
+            : self::EDITOR_TIMEOUT_REQUEST;
     }
+
     /**
      * 
      * @param string $processingType
@@ -151,18 +141,9 @@ class editor_Plugins_TermTagger_Configuration {
      */
     public function getLoggerDomain(string  $processingType) : string {
         switch($processingType){
-            
-            case editor_Segment_Processing::IMPORT:
-                return self::IMPORT_LOGGER_DOMAIN;
-                
-            case editor_Segment_Processing::ANALYSIS:
-            case editor_Segment_Processing::RETAG:
-            case editor_Segment_Processing::TAGTERMS:
-                return self::ANALYSIS_LOGGER_DOMAIN;
-                
-            case editor_Segment_Processing::EDIT:
-            default:
-                return self::EDITOR_LOGGER_DOMAIN;
+            case editor_Segment_Processing::IMPORT: return self::IMPORT_LOGGER_DOMAIN;
+            case editor_Segment_Processing::EDIT:   return self::EDITOR_LOGGER_DOMAIN;
+            default:                                return self::EDITOR_LOGGER_DOMAIN;
         }
     }
     /**
@@ -181,7 +162,7 @@ class editor_Plugins_TermTagger_Configuration {
      */
     public function getAvailableResourceSlots($resourcePool) {
         $config = Zend_Registry::get('config');
-        $url = $config->runtimeOptions->termTagger->url;
+        $url = $config->runtimeOptions->plugins->SpellCheck->url;
         switch ($resourcePool) {
             case 'gui':
                 $return = $url->gui->toArray();
@@ -196,7 +177,7 @@ class editor_Plugins_TermTagger_Configuration {
                 $return = $url->default->toArray();
                 break;
         }
-        //remove not available termtaggers from configured list
+        //remove not available spellcheckers from configured list
         $downList = $this->getMemCache()->load(self::DOWN_CACHE_KEY);
         if(!empty($downList) && is_array($downList)) {
             $return = array_diff($return, $downList);
@@ -239,8 +220,8 @@ class editor_Plugins_TermTagger_Configuration {
      *
      * @return stdClass $segments
      */
-    public function markTransFound(array $segments) {
-        return $this->recalcTransFound->recalcList($segments);
+    public function markTransFound1(array $segments) {
+        //return $this->recalcTransFound->recalcList($segments);
     }
     /**
      * Checks if tbx-file with hash $tbxHash is loaded on the TermTagger-server behind $url.
@@ -251,31 +232,14 @@ class editor_Plugins_TermTagger_Configuration {
      * @param string $url the TermTagger-server-url
      * @param string $tbxHash unique id of the tbx-file
      */
-    public function checkTermTaggerTbx(editor_Plugins_TermTagger_Service $termTagger, $url, &$tbxHash) {
-        try {
-            // test if tbx-file is already loaded
-            if (!empty($tbxHash) && $termTagger->ping($url, $tbxHash)) {
-                return;
-            }
-            //getDataTbx also creates the TbxHash
-            $tbx = $this->getTbxData();
-            $tbxHash = $this->task->meta()->getTbxHash();
-            $termTagger->open($url, $tbxHash, $tbx);
-        }
-        catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
-            $e->addExtraData([
-                'task' => $this->task,
-                'termTaggerUrl' => $url,
-            ]);
-            throw $e;
-        }
+    public function checkTermTaggerTbx1(editor_Plugins_TermTagger_Service $termTagger, $url, &$tbxHash) {
     }
     /**
      * returns the TBX string to be loaded into the termtagger
      * @throws editor_Plugins_TermTagger_Exception_Open
      * @return string
      */
-    private function getTbxData() {
+    private function getTbxData1() {
         // try to load tbx-file to the TermTagger-server
         $tbxFileInfo = new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($this->task));
         $tbxParser = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
@@ -294,7 +258,7 @@ class editor_Plugins_TermTagger_Configuration {
      * @param editor_Segment_Tags[] $segmentsTags
      * @return editor_Plugins_TermTagger_Service_ServerCommunication
      */
-    public function createServerCommunicationServiceFromTags(array $segmentsTags) : editor_Plugins_TermTagger_Service_ServerCommunication {
+    public function createServerCommunicationServiceFromTags1(array $segmentsTags) : editor_Plugins_TermTagger_Service_ServerCommunication {
         
         $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($this->task));
         /* @var $service editor_Plugins_TermTagger_Service_ServerCommunication */

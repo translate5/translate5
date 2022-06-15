@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * 
  * The Worker to process the termtagging for an import
  */
-class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_TermTagger_Worker_Abstract {
+class editor_Plugins_SpellCheck_Worker_SpellCheckImport extends editor_Plugins_SpellCheck_Worker_Abstract {
 
     protected $resourcePool = 'import';
     
@@ -52,13 +52,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             /* @var $db editor_Models_Db_SegmentMeta */
 
             $sql = $db->select()
-                ->from($db, ['termtagState', 'cnt' => 'count(id)'])
+                ->from($db, ['spellcheckState', 'cnt' => 'count(id)'])
                 ->where('taskGuid = ?', $this->task->getTaskGuid());
             $segmentCounts = $db->fetchAll($sql)->toArray();
 
-            $data = array_column($segmentCounts, 'cnt', 'termtagState');
+            $data = array_column($segmentCounts, 'cnt', 'spellcheckState');
             $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: '%s'", $k, $v); }, $data, array_keys($data)));
-            $this->getLogger()->info('E1364', 'TermTagger overall run done - {segmentCounts}', [
+            $this->getLogger()->info('E1364', 'SpellCheck overall run done - {segmentCounts}', [
                 'task' => $this->task,
                 'segmentCounts' => $data,
             ]);
