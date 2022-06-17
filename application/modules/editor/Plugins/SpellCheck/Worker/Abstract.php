@@ -332,38 +332,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
     }
 
     /*************************** SINGLE SEGMENT PROCESSING ***************************/
-    
     protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool {
-        
-        // skip processing when source & target language are equal
-        if($this->skipDueToEqualLangs){
-            return true;
-        }
-        // processes a single tag withot saving it, this is done in the Quaity provider
-        //try {
-            $processor = new editor_Plugins_SpellCheck_SegmentProcessor($this->task, $this->config, $this->processingMode, $this->isWorkerThread);
-            $processor->process([ $tags ], $slot, false);
-        /*}
-        catch(editor_Plugins_SpellCheck_Exception_Abstract $exception) {
-            if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
-                $this->config->disableResourceSlot($slot);
-            }
-            $processor->getCommunicationsService()->task = '- see directly in event -';
-            $exception->addExtraData([
-                'task' => $this->task,
-                'termTagData' => $processor->getCommunicationsService(),
-            ]);
-            $this->getLogger()->exception($exception, [
-                'domain' => $this->config->getLoggerDomain($this->processingMode)
-            ]);
-            if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
-                //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
-                //so we have to disable termtagging for this task, otherwise on each segment save we will get such a warning
-                $this->task->setTerminologie(0);
-                $this->task->save();
-                return false;
-            }
-        }*/
         return true;
     }
 }

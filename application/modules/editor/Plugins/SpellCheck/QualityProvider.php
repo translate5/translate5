@@ -53,11 +53,11 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     protected static $hasCategories = true;
 
     /**
-     * LanguageTool connector instance
+     * SpellCheck segment processor instance
      *
-     * @var editor_Plugins_SpellCheck_LanguageTool_Connector
+     * @var editor_Plugins_SpellCheck_SegmentProcessor
      */
-    protected static $_connector = null;
+    protected static $_processor = null;
 
     /**
      * Method to check whether this quality is turned On
@@ -71,12 +71,12 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     }
 
     /**
-     * Get LanguageTool connector instance
+     * Get SpellCheck segment processor instance
      *
-     * @return mixed|null
+     * @return editor_Plugins_SpellCheck_SegmentProcessor|null
      */
-    public function getConnector() {
-        return self::$_connector ?? self::$_connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
+    public function getProcessor() {
+        return self::$_processor ?? self::$_processor = ZfExtended_Factory::get('editor_Plugins_SpellCheck_SegmentProcessor');
     }
 
     /**
@@ -94,29 +94,18 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         // Crucial: add processing-mode to worker params
         $workerParams['processingMode'] = $processingMode;
 
-        // if no terminology is present we usually to not queue a worker, only a re-tag or analysis must cover the case we actually have to remove the terms !
-        /* @var $task editor_Models_Task */
-        /*if($processingMode == editor_Segment_Processing::ANALYSIS || $processingMode == editor_Segment_Processing::RETAG){
-            $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_Remove');
-            if(!$worker->init($task->getTaskGuid(), $workerParams)) {
-                $this->log->error('E1128', 'TermTagger Remove Worker can not be initialized!', [ 'parameters' => $workerParams ]);
-                return;
-            }
-            $worker->queue($parentWorkerId);
-        }*/
-
         $worker = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Worker_SpellCheckImport');
         /* @var $worker editor_Plugins_SpellCheck_Worker_SpellCheckImport */
+
         // Create segments_meta-field 'spellcheckState' if not exists
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
-        //$meta->addMeta('spellcheckState', $meta::META_TYPE_STRING, editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_UNCHECKED, 'Contains the SpellCheck-state for this segment while importing', 36);
+        $meta->addMeta('spellcheckState', $meta::META_TYPE_STRING, editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_UNCHECKED, 'Contains the SpellCheck-state for this segment while importing', 36);
 
         //lock oversized segments and reset already tagged segments to untagged
         $this->prepareSegments($task, $meta);
 
         // init worker and queue it
-
         // QUIRK / FIXME: the "import" resourcePool is used for all Operations (import, analysis, retag)
         $workerParams['resourcePool'] = 'import';
         if (!$worker->init($task->getTaskGuid(), $workerParams)) {
@@ -140,7 +129,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         }
 
         // If current task's target lang is not supported by LanguageTool - return
-        if (!$spellCheckLang = $this->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())) {
+        if (!$spellCheckLang = $this->getProcessor()->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())) {
             return $tags;
         }
 
@@ -150,39 +139,10 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             // the only task in an alike process is cloning the qualities ...
             $tags->cloneAlikeQualitiesByType(static::$type);
 
-            // when copying alike tags, we just save the qualities extracted from the tags (if active in config)
-            /*if($task->getConfig()->runtimeOptions->termTagger->enableAutoQA){
-
-                editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
-            }*/
-
         // Else
         } else if ($processingMode == editor_Segment_Processing::EDIT) {
 
-            // Get segment shortcut
-            $segment = $tags->getSegment();
-
-            // Distinct states
-            $states = [];
-
-            // Foreach target
-            foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
-
-                // Do check
-                $check = new editor_Plugins_SpellCheck_Check($task, $target->getField(), $segment, $this->getConnector(), $spellCheckLang);
-
-                // Process check results
-                foreach ($check->getStates() as $category => $qualityA) {
-                    foreach ($qualityA as $quality) {
-                        $tags->addQuality(
-                            field: $target->getField(),
-                            type: static::$type,
-                            category: $category,
-                            additionalData: $quality
-                        );
-                    }
-                }
-            }
+            $this->getProcessor()->process([$tags]);
         }
 
         // Return
