@@ -83,7 +83,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
      * @param {Ext.dataview.Location} gridLocation
      */
     onEditPressed: function (grid, gridLocation) {
-        let rowedit = grid.getPlugin('rowedit');
+        let rowedit = grid.getPlugin('cellediting');
         rowedit.startEdit(gridLocation.record, grid.down('[dataIndex=target]'));
 
         let editor = rowedit.editor.down('textfield');

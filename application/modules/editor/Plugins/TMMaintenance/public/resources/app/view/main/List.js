@@ -6,7 +6,8 @@ Ext.define('TMMaintenance.view.main.List', {
         'TMMaintenance.store.Segment',
         'Ext.grid.plugin.CellEditing',
         'Ext.grid.plugin.Editable',
-        'Ext.grid.rowedit.Plugin'
+        'Ext.grid.rowedit.Plugin',
+        'Ext.translate5.Editor',
     ],
 
     title: 'Segments',
@@ -17,12 +18,11 @@ Ext.define('TMMaintenance.view.main.List', {
     },
 
     plugins: {
-        // cellediting: true,
-        rowedit: {
-            // selectOnEdit: true
-            autoConfirm: false,
-            autoCancel: false,
-        }
+        cellediting: true,
+    },
+
+    itemConfig: {
+        minHeight: 100,
     },
 
     columns: [
@@ -30,17 +30,28 @@ Ext.define('TMMaintenance.view.main.List', {
             text: 'Source text',
             dataIndex: 'source',
             minWidth: 200,
+            sortable: false,
             cell: {
                 encodeHtml: false,
+            },
+            editable: false,
+            editor: {
+                xtype: 'celleditor',
             },
         },
         {
             text: 'Target text',
             dataIndex: 'target',
-            minWidth: 200,
+            minWidth: 300,
             editable: true,
+            sortable: false,
             cell: {
                 encodeHtml: false,
+                height: 100,
+            },
+            editor: {
+                xtype: 't5editor',
+                editingDataIndex: 'rawTarget',
             },
         },
         {

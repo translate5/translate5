@@ -45,3 +45,23 @@ $enable-font-awesome: dynamic(true);
 .result-list {
   height: 99%;
 }
+
+.ck.ck-editor {
+  width: 100%;
+
+  .ck-editor__main {
+    height: 60px;
+
+    .ck-content {
+      height: 100%;
+    }
+  }
+}
+
+.tag, .tag img {
+  display: inline-block;
+  width: 2em;
+  height: 1.2em;
+  margin: 0 2px;
+  vertical-align: text-bottom;
+}

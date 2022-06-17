@@ -19,6 +19,7 @@
 
     <!-- The line below must be kept intact for Sencha Cmd to build your application -->
     <script id="microloader" data-app="c6b88c3f-c52d-48ab-b369-15896285f643" type="text/javascript" src="bootstrap.js"></script>
+    <script id="microloader" data-app="c6b88c3f-c52d-48ab-b369-15896285f643" type="text/javascript" src="editor.js"></script>
 
 </head>
 <body>
