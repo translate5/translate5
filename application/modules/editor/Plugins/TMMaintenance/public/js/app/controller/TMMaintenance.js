@@ -13,7 +13,7 @@ Ext.define('Editor.plugins.TMMaintenance.app.controller.TMMaintenance', {
     },
 
     strings: {
-        TMMaintenance: '#UT#TMMaintenance'
+        TMMaintenance: 'TMMaintenance'
     },
 
     /**
