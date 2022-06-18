@@ -13,7 +13,8 @@ Ext.define('TMMaintenance.view.main.Toolbar', {
     items: [
         {
             xtype: 'image',
-            id: 'logo'
+            id: 'logo',
+            userCls: 'logo',
         },
         '->',
         {
@@ -29,7 +30,7 @@ Ext.define('TMMaintenance.view.main.Toolbar', {
             value: 'en',
             store: [],
             listeners: {
-                change: 'onLocaleChange'
+                change: 'onLocaleChange',
             },
         },
         {
@@ -37,9 +38,9 @@ Ext.define('TMMaintenance.view.main.Toolbar', {
             xtype: 'button',
             bind: {
                 text: '{l10n.logout}',
-                hidden: '{!l10n.logout}'
+                hidden: '{!l10n.logout}',
             },
             handler: 'onLogoutButtonClick',
-        }
-    ]
+        },
+    ],
 });

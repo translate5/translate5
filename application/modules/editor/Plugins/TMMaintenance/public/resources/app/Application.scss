@@ -16,18 +16,6 @@ $enable-font-awesome: dynamic(true);
   width: 100%;
 }
 
-.column {
-  &.left {
-    width: 55%;
-    float: left;
-  }
-
-  &.right {
-    width: 40%;
-    float: right;
-  }
-}
-
 .highlight {
   font-weight: bold;
 }
@@ -64,4 +52,11 @@ $enable-font-awesome: dynamic(true);
   height: 1.2em;
   margin: 0 1px;
   vertical-align: text-bottom;
+}
+
+.logo {
+  flex: 0 0 80px;
+  height: 50px;
+  margin: 0 0 0 20px;
+  background-image: url(/images/translate5.png?v=1);
 }
