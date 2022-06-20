@@ -101,20 +101,6 @@ Ext.define('TMMaintenance.view.main.MainController', {
         }, 200);
     },
 
-    /**
-     * @param {TMMaintenance.view.main.List} grid
-     * @param {Ext.dataview.Location} gridLocation
-     */
-    onRowEdit: function (grid, gridLocation) {
-        let record = gridLocation.record;
-        record.set({tm: this.getViewModel().get('selectedTm')});
-        record.save({
-            success: () => {
-                console.log('Saved');
-            }
-        });
-    },
-
     getEditForm: function () {
         return Ext.getCmp('editform');
     },
