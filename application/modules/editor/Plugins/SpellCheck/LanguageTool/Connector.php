@@ -47,11 +47,6 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
     const REQUEST_TIMEOUT_SECONDS = 360;
     
     /**
-     * @var Zend_Config
-     */
-    private $languageToolConfig;
-
-    /**
      * Base-URL used for LanguagaTool - use the URL of your installed languageTool (without trailing slash!).
      * Taken from Zf_configuration (example: "http://yourlanguagetooldomain:8081/v2")
      * @var string
@@ -92,15 +87,12 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
      * @var object
      */
     private $matches;
-    
+
     /**
      * 
      */
-    public function __construct() {
-        $this->languageToolConfig= Zend_Registry::get('config')->runtimeOptions->plugins->SpellCheck;
-        /* @var Zend_Config */
-        
-        $this->apiBaseUrl=$this->languageToolConfig->languagetool->api->baseurl;
+    public function __construct($slot = null) {
+        $this->apiBaseUrl = $slot ?? Zend_Registry::get('config')->runtimeOptions->plugins->SpellCheck->languagetool->api->baseurl;
     }
     
     /**

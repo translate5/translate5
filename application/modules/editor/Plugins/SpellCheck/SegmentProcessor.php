@@ -37,7 +37,16 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
      *
      * @var editor_Plugins_SpellCheck_LanguageTool_Connector
      */
-    protected static $_connector = null;
+    protected static $_connector = [];
+
+    /**
+     * Get LanguageTool connector instance
+     *
+     * @return mixed|null
+     */
+    public function getConnector($slot) {
+        return self::$_connector[$slot] ?? self::$_connector[$slot] = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector', [$slot]);
+    }
 
     /**
      * 
@@ -48,6 +57,8 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
      */
     public function process(array $segmentsTags, string $slot = null, $processingMode) {
 
+        $connector = $this->getConnector($slot);
+
         foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
 
             $segmentId = $tags->getSegmentId();
@@ -56,7 +67,7 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
             $segment = $tags->getSegment(); $task = $tags->getTask();
 
             //
-            $spellCheckLang = $this->getConnector($slot)->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
+            $spellCheckLang = $connector->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
 
             // Distinct states
             $states = [];
@@ -65,7 +76,7 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
             foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
 
                 // Do check
-                $check = new editor_Plugins_SpellCheck_Check($task, $target->getField(), $segment, $this->getConnector(), $spellCheckLang);
+                $check = new editor_Plugins_SpellCheck_Check($task, $target->getField(), $segment, $connector, $spellCheckLang);
 
                 // Process check results
                 foreach ($check->getStates() as $category => $qualityA) {
@@ -82,14 +93,5 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
 
             $tags->getQualities()->save();
         }
-    }
-
-    /**
-     * Get LanguageTool connector instance
-     *
-     * @return mixed|null
-     */
-    public function getConnector() {
-        return self::$_connector ?? self::$_connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
     }
 }

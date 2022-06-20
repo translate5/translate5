@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Seperate Holder of certain configurations to accompany editor_Plugins_SpellCheck_Worker_SpellCheckImport
- * 
  */
 class editor_Plugins_SpellCheck_Configuration {
     
@@ -58,10 +57,11 @@ class editor_Plugins_SpellCheck_Configuration {
     const SEGMENT_STATE_DEFECT = 'defect';
 
     /**
-     * Defines, how much segments can be processed in one worker call
+     * Defines, how much segments can be processed per one worker call
+     *
      * @var integer
      */
-    const IMPORT_SEGMENTS_PER_CALL = 1;
+    const IMPORT_SEGMENTS_PER_CALL = 5;
 
     /**
      * Defines the timeout in seconds how long a spell-check call with multiple segments may need
@@ -69,13 +69,6 @@ class editor_Plugins_SpellCheck_Configuration {
      * @var integer
      */
     const IMPORT_TIMEOUT_REQUEST = 300;
-
-    /**
-     * Defines the timeout in seconds how long a single segment needs to be spell-checked
-     *
-     * @var integer
-     */
-    //const EDITOR_TIMEOUT_REQUEST = 180;
 
     /**
      * Logger Domain Import
@@ -90,19 +83,11 @@ class editor_Plugins_SpellCheck_Configuration {
     const EDITOR_LOGGER_DOMAIN = 'editor.spellcheck.segmentediting';
 
     /**
+     * Cache key to point to the list of LanguageTool connectors which are down
      *
      * @var string
      */
     const DOWN_CACHE_KEY = 'SpellCheckDownList';
-
-    /**
-     *
-     * @param array $offlineServers
-     */
-    public static function saveDownListToMemCache(array $offlineUrls) {
-        $memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
-        $memCache->save($offlineUrls, editor_Plugins_SpellCheck_Configuration::DOWN_CACHE_KEY);
-    }
 
     /**
      * @var editor_Models_Task
@@ -149,54 +134,77 @@ class editor_Plugins_SpellCheck_Configuration {
      * @return Zend_Cache_Core
      */
     public function getMemCache() : Zend_Cache_Core {
-        if($this->memCache == null){
-            $this->memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
-        }
-        return $this->memCache;
+        return $this->memCache ?? $this->memCache = Zend_Cache
+            ::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
     }
+
+    /**
+     * Save list of LanguageTool spots which are offline to cache
+     *
+     * @param array $offlineSpots
+     */
+    public static function saveDownListToMemCache(array $offlineSpots) {
+        Zend_Cache
+            ::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true])
+            ->save($offlineSpots, self::DOWN_CACHE_KEY);
+    }
+
     /**
      *
      * @return array
      */
     public function getAvailableResourceSlots($resourcePool) {
+
+        // Get config
         $config = Zend_Registry::get('config');
+
+        // Get declared LanguageTool slots, grouped by resource pools
         $url = $config->runtimeOptions->plugins->SpellCheck->languagetool->url;
+
+        // Get slot(s) declared for given $resourcePool
         switch ($resourcePool) {
-            case 'gui':
-                $return = $url->gui->toArray();
-                break;
-                
-            case 'import':
-                $return = $url->import->toArray();
-                break;
-                
+            case 'gui'   :   $declared = [$url->gui];              break;
+            case 'import':   $declared = $url->import->toArray();  break;
             case 'default':
-            default:
-                $return = $url->default->toArray();
-                break;
+            default:         $declared = $url->default->toArray(); break;
         }
-        //remove not available spellcheckers from configured list
-        $downList = $this->getMemCache()->load(self::DOWN_CACHE_KEY);
-        if(!empty($downList) && is_array($downList)) {
-            $return = array_diff($return, $downList);
-        }
-        // no slots for this resourcePool defined
-        if (empty($return) && $resourcePool != 'default') {
-            // calculate slot from default resourcePool
+
+        // Get list of offline slots
+        $offline = $this->getMemCache()->load(self::DOWN_CACHE_KEY);
+
+        // Get online slots by deducting offline from declared
+        $online = array_diff($declared, is_array($offline) ? $offline : []);
+
+        // If given $resourcePool is not 'default' and no online slots detected
+        if (empty($online) && $resourcePool != 'default') {
+
+            // Pick slots for 'default'-resourcePool
             return $this->getAvailableResourceSlots('default');
         }
-        return $return;
+
+        // Return online slots array (can be empty)
+        return $online;
     }
+
     /**
-     * disables the given slot (URL) via memcache.
+     * Append slot (URL) to the list of down slots to be able to skip it further
+     *
      * @param string $url
      */
     public function disableResourceSlot(string $url) : void {
+
+        // Get current list of down slots
         $list = $this->getMemCache()->load(self::DOWN_CACHE_KEY);
-        if(!$list || !is_array($list)) {
+
+        // Make sure it's an array
+        if (!$list || !is_array($list)) {
             $list = [];
         }
+
+        // Append $url arg to the list
         $list[] = $url;
+
+        // Save list back to memcache
         $this->getMemCache()->save($list, self::DOWN_CACHE_KEY);
     }
 }

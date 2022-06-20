@@ -37,56 +37,68 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
      * @var array(strings)
      */
     protected static $allowedResourcePools = ['default', 'gui', 'import'];
+
     /**
      * Praefix for workers resource-name
      * @var string
      */
     protected static $praefixResourceName = 'SpellCheck_';
     
-    
     /**
      * overwrites $this->workerModel->maxLifetime
      */
     protected $maxLifetime = '2 HOUR';
+
     /**
      * Multiple workers are allowed to run simultaneously per task
      * @var string
      */
     protected $onlyOncePerTask = false;
+
     /**
      * resourcePool for the different SpellCheck-Operations;
-     * Possible Values: $this->allowdResourcePools = array('default', 'gui', 'import');
+     * Possible Values: $this->allowdResourcePools = ['default', 'gui', 'import'];
      * @var string
      */
     protected $resourcePool = 'default';
+
     /**
      * @var ZfExtended_Logger
      */
     private $logger;
+
     /**
      * @var editor_Plugins_SpellCheck_Configuration
      */
     private $config;
+
     /**
      * @var string
      */
     private $malfunctionState;
+
     /**
      * @var array
      */
     private $loadedSegmentIds;
+
     /**
      * @var editor_Segment_Tags
      */
     private $proccessedTags;
+
     /**
      * the termtagger will hang if source and target language are identical, so we skip work in that case
      * see TRANSLATE-2373
      * @var boolean
      */
     private $skipDueToEqualLangs = false;
-    
-    
+
+    /**
+     * @param null $taskGuid
+     * @param array $parameters
+     * @return bool
+     */
     public function init($taskGuid = NULL, $parameters = array()) {
         $return = parent::init($taskGuid, $parameters);
         $this->config = new editor_Plugins_SpellCheck_Configuration($this->task);
@@ -95,6 +107,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
         $this->skipDueToEqualLangs = ($this->task->getSourceLang() === $this->task->getTargetLang());
         return $return;
     }
+
     /***
      * Update the progres based on the tagged field in lek segments meta
      * {@inheritDoc}
@@ -106,6 +119,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
         $progress = $meta->getSpellcheckSegmentProgress($this->taskGuid);
         parent::updateProgress($progress);
     }
+
     /**
      *
      * @return ZfExtended_Logger
@@ -116,6 +130,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
         }
         return $this->logger;
     }
+
     /**
      * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
      * {@inheritDoc}
