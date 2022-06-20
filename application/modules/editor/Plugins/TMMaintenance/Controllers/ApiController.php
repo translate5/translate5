@@ -272,7 +272,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         $result = [];
 
         foreach ($data as $item) {
-            foreach (['source', 'target', 'rawSource', 'rawTarget'] as $field) {
+            foreach (['source', 'target', 'rawTarget'] as $field) {
                 $item[$field] = $process($item[$field]);
             }
 
