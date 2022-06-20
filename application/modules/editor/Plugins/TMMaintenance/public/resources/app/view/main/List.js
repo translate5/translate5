@@ -90,8 +90,50 @@ Ext.define('TMMaintenance.view.main.List', {
         },
     ],
 
+    titleBar: {
+        shadow: false,
+        items: [
+            {
+                xtype: 'button',
+                align: 'right',
+                text: 'Create',
+                handler: 'onCreatePressed',
+                disabled: '{disabled}',
+                bind: {
+                    disabled: '{!selectedTm}',
+                },
+            },
+            {
+                xtype: 'panel',
+                align: 'right',
+                userCls: 'editor-buttons',
+                items: [
+                    {
+                        xtype: 'button',
+                        align: 'right',
+                        iconCls: 'x-fa fa-check',
+                        handler: 'onSavePressed',
+                        disabled: '{disabled}',
+                        bind: {
+                            disabled: '{!selectedTm}',
+                        },
+                    },
+                    {
+                        xtype: 'button',
+                        align: 'right',
+                        iconCls: 'x-fa fa-octagon-xmark',
+                        handler: 'onCancelPressed',
+                        disabled: '{disabled}',
+                        bind: {
+                            disabled: '{!selectedTm}',
+                        },
+                    },
+                ]
+            },
+        ],
+    },
+
     listeners: {
-        select: 'onItemSelected',
         onContainerScrollEnd: 'onContainerScrollEnd',
         edit: 'onRowEdit',
     },
@@ -108,5 +150,27 @@ Ext.define('TMMaintenance.view.main.List', {
                 }
             },
         },
+    },
+
+    dialog: {
+        xtype: 'dialog',
+        title: 'Create new',
+        closable: true,
+        defaultFocus: '#ok',
+        maximizable: true,
+        maskTapHandler: 'onCancelCreate',
+        bodyPadding: 20,
+        maxWidth: 600,
+        minWidth: 400,
+        items: [
+            {
+                id: 'editform',
+                xtype: 'editform',
+            },
+        ],
+        // buttons: {
+        //     ok: 'onCreate',
+        //     cancel: 'onCancelCreate'
+        // },
     },
 });

@@ -10,5 +10,6 @@ Ext.define('TMMaintenance.view.main.MainModel', {
         //TODO move to search form view model
         lastOffset: null,
         hasMoreRecords: false,
+        dialog: null,
     },
 });

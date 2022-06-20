@@ -9,10 +9,12 @@ Ext.define('TMMaintenance.view.main.EditForm', {
     items: [
         {
             required: true,
+            label: 'Source text',
             name: 'rawSource',
         },
         {
             required: true,
+            label: 'Target text',
             name: 'rawTarget',
         },
     ],

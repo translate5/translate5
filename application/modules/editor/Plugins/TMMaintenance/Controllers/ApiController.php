@@ -67,7 +67,6 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
     public function putAction(): void
     {
-        return;
         $data = $this->jsonDecode($this->getRequest()?->getParam('data'));
         $api = $this->getApi((int)$data['tm']);
         $api->updateEntry($data['rawSource'], $data['rawTarget']);

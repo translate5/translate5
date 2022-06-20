@@ -29,29 +29,38 @@ Ext.define('TMMaintenance.view.main.MainController', {
         });
     },
 
-    /**
-     * @param {TMMaintenance.view.main.List} sender
-     * @param {Array} record
-     */
-    onItemSelected: function (sender, record) {
-        let form = this.getEditForm();
+    onCreatePressed: function () {
+        let view = this.getView();
+        let dialog = this.getViewModel().get('dialog');
 
-        form.reset();
-        form.setRecord(record[0]);
-        form.getItems().each(function (item) {
-            if (typeof(item.resetOriginalValue) === 'function') {
-                item.resetOriginalValue();
-            }
-        });
-        form.show();
+        if (!dialog) {
+            dialog = Ext.apply({
+                ownerCmp: view
+            }, view.dialog);
+
+            dialog = Ext.create(dialog);
+
+            this.getViewModel().set('dialog', dialog);
+        }
+
+        dialog.show();
     },
 
-    onCreatePressed: function () {
-        let form = this.getEditForm();
-        let segment = Ext.create('TMMaintenance.model.Segment', {});
+    onCancelPressed: function () {
+        // this.view.hide();
+        // this.view.reset();
+    },
 
-        form.setRecord(segment);
-        form.show();
+    onCreate: function () {
+        this.getViewModel().get('dialog').hide();
+    },
+
+    onCancelCreate: function () {
+        this.getViewModel().get('dialog').hide();
+    },
+
+    hideForm: function () {
+        this.getViewModel().get('dialog').hide();
     },
 
     /**
@@ -86,8 +95,10 @@ Ext.define('TMMaintenance.view.main.MainController', {
         let rowedit = grid.getPlugin('cellediting');
         rowedit.startEdit(gridLocation.record, grid.down('[dataIndex=target]'));
 
-        let editor = rowedit.editor.down('textfield');
-        editor.setCaretPos(editor.getValue().length);
+        Ext.defer(function () {
+            let editor = rowedit.getActiveEditor().getEditor();
+            editor.focus();
+        }, 200);
     },
 
     /**

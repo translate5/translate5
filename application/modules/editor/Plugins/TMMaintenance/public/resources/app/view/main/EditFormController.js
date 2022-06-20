@@ -11,22 +11,21 @@ Ext.define('TMMaintenance.view.main.EditFormController', {
         }
 
         let record = form.getRecord();
+
+        if (!record) {
+            record = Ext.create('TMMaintenance.model.Segment', {});
+        }
+
         record.set(form.getValues());
         record.set({tm: this.getViewModel().get('selectedTm')});
         record.save({
             success: () => {
-                me.onSuccess();
+                this.getView().up('app-main').controller.hideForm()
             }
         });
     },
 
     onCancelPressed: function () {
-        this.view.hide();
-        this.view.reset();
-    },
-
-    onSuccess: function () {
-        this.view.hide();
-        this.view.reset();
+        this.getView().up('app-main').controller.hideForm()
     },
 });

@@ -7,6 +7,7 @@ Ext.define('TMMaintenance.view.main.Main', {
         'TMMaintenance.view.main.SearchForm',
         'TMMaintenance.view.main.List',
         'TMMaintenance.view.main.EditForm',
+        'Ext.Dialog',
     ],
 
     controller: 'main',
@@ -17,7 +18,7 @@ Ext.define('TMMaintenance.view.main.Main', {
             id: 'containerHeader',
             xtype: 'maintoolbar',
             docked: 'top',
-            userCls: 'mb-20',
+            userCls: 'mb-20 toolbar',
         },
         {
             xtype: 'panel',
@@ -40,31 +41,10 @@ Ext.define('TMMaintenance.view.main.Main', {
                 {
                     id: 'mainlist',
                     xtype: 'mainlist',
-                    userCls: 'result-list column left ml-20',
+                    userCls: 'result-list ml-20 mr-20',
                     shadow: true,
                 },
-                {
-                    xtype: 'panel',
-                    userCls: 'column right mr-20',
-                    shadow: true,
-                    items:[
-                        {
-                            xtype: 'button',
-                            text: 'Create',
-                            handler: 'onCreatePressed',
-                            disabled: '{disabled}',
-                            bind: {
-                                disabled: '{!selectedTm}',
-                            },
-                        },
-                        {
-                            id: 'editform',
-                            xtype: 'editform',
-                            userCls: 'panel',
-                        },
-                    ]
-                },
-            ]
+            ],
         },
-    ]
+    ],
 });
