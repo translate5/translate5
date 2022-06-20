@@ -89,7 +89,7 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
                     xtype: 'button',
                     name: 'search',
                     iconCls: 'x-fa fa-search',
-                    handler: 'onSearchPressed',
+                    handler: 'onSearchPress',
                     formBind: true,
                     disabled: '{!disabled}',
                     bind: {

@@ -29,7 +29,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
         });
     },
 
-    onCreatePressed: function () {
+    onCreatePress: function () {
         let view = this.getView();
         let dialog = this.getViewModel().get('dialog');
 
@@ -46,28 +46,11 @@ Ext.define('TMMaintenance.view.main.MainController', {
         dialog.show();
     },
 
-    onCancelPressed: function () {
-        // this.view.hide();
-        // this.view.reset();
-    },
-
-    onCreate: function () {
-        this.getViewModel().get('dialog').hide();
-    },
-
-    onCancelCreate: function () {
-        this.getViewModel().get('dialog').hide();
-    },
-
-    hideForm: function () {
-        this.getViewModel().get('dialog').hide();
-    },
-
     /**
      * @param {TMMaintenance.view.main.List} grid
      * @param {Ext.dataview.Location} gridLocation
      */
-    onDeletePressed: function (grid, gridLocation) {
+    onDeletePress: function (grid, gridLocation) {
         Ext.Msg.confirm(
             'Confirm',
             'Do you really want to delete a segment?',
@@ -91,14 +74,26 @@ Ext.define('TMMaintenance.view.main.MainController', {
      * @param {TMMaintenance.view.main.List} grid
      * @param {Ext.dataview.Location} gridLocation
      */
-    onEditPressed: function (grid, gridLocation) {
-        let rowedit = grid.getPlugin('cellediting');
-        rowedit.startEdit(gridLocation.record, grid.down('[dataIndex=target]'));
+    onEditPress: function (grid, gridLocation) {
+        let celledit = grid.getPlugin('cellediting');
+        celledit.startEdit(gridLocation.record, grid.down('[dataIndex=target]'));
 
         Ext.defer(function () {
-            let editor = rowedit.getActiveEditor().getEditor();
+            let editor = celledit.getActiveEditor().getEditor();
             editor.focus();
         }, 200);
+    },
+
+    onUpdatePress: function () {
+        this.getView().getPlugin('cellediting').getActiveEditor().completeEdit();
+    },
+
+    onCancelEditPress: function () {
+        this.getView().getPlugin('cellediting').getActiveEditor().cancelEdit();
+    },
+
+    hideForm: function () {
+        this.getViewModel().get('dialog').hide();
     },
 
     getEditForm: function () {

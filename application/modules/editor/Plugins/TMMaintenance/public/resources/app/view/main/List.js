@@ -79,11 +79,11 @@ Ext.define('TMMaintenance.view.main.List', {
                 tools: {
                     edit: {
                         iconCls: 'x-fa fa-pen',
-                        handler: 'onEditPressed',
+                        handler: 'onEditPress',
                     },
                     delete: {
                         iconCls: 'x-fa fa-trash-alt',
-                        handler: 'onDeletePressed',
+                        handler: 'onDeletePress',
                     },
                 },
             },
@@ -97,7 +97,7 @@ Ext.define('TMMaintenance.view.main.List', {
                 xtype: 'button',
                 align: 'right',
                 text: 'Create',
-                handler: 'onCreatePressed',
+                handler: 'onCreatePress',
                 disabled: '{disabled}',
                 bind: {
                     disabled: '{!selectedTm}',
@@ -112,7 +112,7 @@ Ext.define('TMMaintenance.view.main.List', {
                         xtype: 'button',
                         align: 'right',
                         iconCls: 'x-fa fa-check',
-                        handler: 'onSavePressed',
+                        handler: 'onUpdatePress',
                         disabled: '{disabled}',
                         bind: {
                             disabled: '{!selectedTm}',
@@ -121,8 +121,8 @@ Ext.define('TMMaintenance.view.main.List', {
                     {
                         xtype: 'button',
                         align: 'right',
-                        iconCls: 'x-fa fa-octagon-xmark',
-                        handler: 'onCancelPressed',
+                        iconCls: 'x-fa fa-window-close',
+                        handler: 'onCancelEditPress',
                         disabled: '{disabled}',
                         bind: {
                             disabled: '{!selectedTm}',
@@ -135,7 +135,6 @@ Ext.define('TMMaintenance.view.main.List', {
 
     listeners: {
         onContainerScrollEnd: 'onContainerScrollEnd',
-        edit: 'onRowEdit',
     },
 
     scrollable: {
@@ -155,10 +154,9 @@ Ext.define('TMMaintenance.view.main.List', {
     dialog: {
         xtype: 'dialog',
         title: 'Create new',
-        closable: true,
+        closable: false,
         defaultFocus: '#ok',
         maximizable: true,
-        maskTapHandler: 'onCancelCreate',
         bodyPadding: 20,
         maxWidth: 600,
         minWidth: 400,
@@ -168,9 +166,5 @@ Ext.define('TMMaintenance.view.main.List', {
                 xtype: 'editform',
             },
         ],
-        // buttons: {
-        //     ok: 'onCreate',
-        //     cancel: 'onCancelCreate'
-        // },
     },
 });

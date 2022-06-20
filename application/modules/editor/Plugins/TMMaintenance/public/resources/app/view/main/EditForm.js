@@ -22,11 +22,11 @@ Ext.define('TMMaintenance.view.main.EditForm', {
     buttons: [
         {
             text: 'Save',
-            handler: 'onSavePressed'
+            handler: 'onSavePress'
         },
         {
             text: 'Cancel',
-            handler: 'onCancelPressed'
+            handler: 'onCancelPress'
         },
     ]
 })

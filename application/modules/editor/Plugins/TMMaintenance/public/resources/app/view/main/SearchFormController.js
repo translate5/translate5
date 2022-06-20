@@ -19,7 +19,7 @@ Ext.define('TMMaintenance.view.main.SearchFormController', {
         this.getViewModel().set('disabled', null === values.tm || null === values.searchField);
     },
 
-    onSearchPressed: function () {
+    onSearchPress: function () {
         if(!this.getView().isValid()) {
             return;
         }
