@@ -55,8 +55,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         },
         controller: {
             '#admin.TaskOverview':{
-                afterTaskDelete:'onAfterTaskDeleteEventHandler',
-                beforeTaskDelete:'onBeforeTaskDeleteEventHandler'
+                afterTaskDelete:'onAfterTaskDeleteEventHandler'
             }
         },
         store: {
@@ -203,9 +202,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             return;
         }
 
-        var me = this,
-            record = me.getView().getViewModel().get('projectSelection'),
-            task = null;
+        var me = this;
         //when the global task is set, this is a "leave task action"
         //set the route to this task
         if(Editor.data.task){
@@ -222,24 +219,22 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /***
-     * Before task delete event handler
-     * Return true so the event call chain continues
-     */
-    onBeforeTaskDeleteEventHandler:function(task){
-        var me=this,
-            projectTaskGrid = me.lookup('projectTaskGrid');
-        projectTaskGrid.getStore().remove(task);
-        return true;
-    },
-
-    /***
      * After task remove event handelr
      */
-    onAfterTaskDeleteEventHandler:function(task){
-        var me = this,
-            grid = me.lookup('projectGrid');
-        this.checkAndReloadStores();
-        grid && grid.store.load();
+    onAfterTaskDeleteEventHandler:function(){
+        var me=this,
+            grid = me.lookup('projectTaskGrid'),
+            store = grid.getStore();
+
+        // Check if the project tasks store is empty, if yes full reload is required (projects + project tasks).
+        // If the project tasks store is not empty, just refresh the data.
+        if(store.getCount() === 0){
+            // reset the route to the default one
+            me.redirectTo(Editor.util.Util.getCurrentBaseRoute());
+            me.reloadProject();
+            return;
+        }
+        store.load();
     },
 
     onProjectPanelDeactivate:function(){
@@ -279,7 +274,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 }
                 return;
             }
-            grid.bufferedRenderer.scrollTo(index,{
+            grid.scrollTo(index,{
                 callback:function(){
                     //no db index is found
                     if(index===undefined || index<0){
@@ -313,7 +308,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                     Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
                     me.selectProjectTaskRecord(taskId);
                 }
-            });
+            },true);
         }, function(err) {
             //the exception is handled in the searchIndex
         });
@@ -387,21 +382,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 }
             });
         });
-    },
-
-    /***
-     * Check if the project tasks store is empty, if yes full reload is required (projects + project tasks).
-     * If the project tasks store is not empty, just refresh the data.
-     */
-    checkAndReloadStores:function(){
-        var me=this,
-            grid = me.lookup('projectTaskGrid'),
-            store = grid.getStore();
-        if(store.getCount()==0){
-            me.reloadProject();
-            return;
-        }
-        store.load();
     },
 
     /***

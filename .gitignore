@@ -1,4 +1,4 @@
-# /data dir
+# User data dirs
 /data/editorImportedTasks*
 /data/editorOkapiBconf*
 /data/editorVisualReviewFonts*
@@ -29,3 +29,7 @@
 /.settings/
 /.buildpath
 /.project
+
+# Tests
+/test-requests/*.env.json
+

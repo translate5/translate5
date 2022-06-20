@@ -82,4 +82,9 @@ class editor_Workflow_Actions_Config {
      * @var ZfExtended_EventManager
      */
     public ZfExtended_EventManager $events;
+
+    /***
+     * @var stdClass|null
+     */
+    public ?stdClass $parameters;
 }

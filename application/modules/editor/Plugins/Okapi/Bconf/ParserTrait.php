@@ -57,12 +57,13 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
 
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($pathToParse, "rb");
         $sig = $raf->readUTF();
-        $sig !== $raf::SIGNATURE && $this->invalid(
-            "Invalid signature '" . htmlspecialchars($sig) . "' in file header before byte " . $raf->ftell() . ". Must be '" . $raf::SIGNATURE . "'");
-
+        if($sig !== $raf::SIGNATURE){
+            $this->invalidate("Invalid signature '" . htmlspecialchars($sig) . "' in file header before byte " . $raf->ftell() . ". Must be '" . $raf::SIGNATURE . "'");
+        }
         $version = $raf->readInt();
-        !($version >= 1 && $version <= $raf::VERSION) && $this->invalid(
-            "Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . $raf::VERSION);
+        if(!($version >= 1 && $version <= $raf::VERSION)){
+            $this->invalidate("Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . $raf::VERSION); 
+        }
 
         //=== Section 1: plug-ins
         if($version > 1){ // Remain compatible with v.1 bconf files
@@ -72,7 +73,9 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
                 $relPath = $raf->readUTF();
                 $raf->readInt(); // Skip ID
                 $raf->readUTF(); // Skip original full filename
-                $size = $raf->readLong();
+                // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we read 2 32bit Ints here (limiting the decodable size to 4GB...)
+                $raf->readInt();
+                $size = $raf->readInt();
                 self::createReferencedFile($raf, $size, $relPath);
             }
 
@@ -85,14 +88,20 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
         while(($refIndex = $raf->readInt()) != -1 && !is_null($refIndex)) {
             $filename = $refMap[$refIndex] = $raf->readUTF();
             // Skip over the data to move to the next reference
-            $size = $raf->readLong();
+            // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we read 2 32bit Ints here (limiting the decodable size to 4GB...)
+            $raf->readInt();
+            $size = $raf->readInt();
             if($size > 0){
                 self::createReferencedFile($raf, $size, $filename);
             }
         }
 
-        $refIndex === NULL && $this->invalid("Malformed references list. Read NULL instead of integer before byte " . $raf->ftell());
-        ($refCount = count($refMap)) < 2 && $this->invalid("Only $refCount reference" . ($refCount ? '' : 's') . " included. Need sourceSRX and targetSRX.");
+        if($refIndex === NULL){
+            $this->invalidate("Malformed references list. Read NULL instead of integer before byte " . $raf->ftell());
+        }
+        if(($refCount = count($refMap)) < 2){
+            $this->invalidate("Only $refCount reference" . ($refCount ? '' : 's') . " included. Need sourceSRX and targetSRX.");
+        }
 
         //=== Section 3 : the pipeline itself
         $xmlWordCount = $raf->readInt();
@@ -137,8 +146,9 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
     private function readExtensionMap($raf): array {
         $map = [];
         $count = $raf->readInt();
-        !$count && $this->invalid("No extensions-mapping present in bconf.");
-
+        if(!$count){
+            $this->invalidate("No extensions-mapping present in bconf.");
+        }
         for($i = 0; $i < $count; $i++){
             $ext = $raf->readUTF();
             $okapiId = $raf->readUTF();
@@ -157,7 +167,9 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
     private function createReferencedFile(SplFileObject $raf, int $size, string $path): void {
         /** @var resource $fos file output stream */
         $fos = fopen($path, 'wb');
-        !$fos && $this->invalid("Could not create '$path'", 'E1057');
+        if(!$fos){
+            $this->invalidate("Could not create '$path'", 'E1057');
+        }
         // FIXME: when stream_copy_to_stream supports SplFileObjects use that
         // $written = stream_copy_to_stream($raf->getFp(), $fos, $size);
 
@@ -171,20 +183,22 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
         }
         $written += fwrite($fos, $raf->fread($toWrite));
         fclose($fos);
-        $written !== $size && $this->invalid(
-            "Could " . ($written !== false ? "only write $written bytes of " : "not write") . "'$path'", 'E1057');
+        if($written !== $size){
+            $this->invalidate("Could " . ($written !== false ? "only write $written bytes of " : "not write") . "'$path'", 'E1057');
+        }
     }
 
     public function parsePipeline(&$pipeline, &$refMap, &$content): array {
         $doc = new editor_Utils_Dom();
         $pipeline['xml'] && $doc->loadXML($pipeline['xml']);
-        (!$pipeline['xml'] || !$doc->isValid()) && $this->invalid(
-            "Invalid Pipeline inside bconf. " . $doc->getErrorMsg('', true));
-
+        if(!$pipeline['xml'] || !$doc->isValid()){
+            $this->invalidate("Invalid Pipeline inside bconf. " . $doc->getErrorMsg('', true));
+        }
         foreach($doc->getElementsByTagName("step") as $i => $step){
             $class = $step->getAttribute("class");
-            $class == null && $this->invalid("The attribute 'class' is missing on step #$i.");
-
+            if($class == null){
+                $this->invalidate("The attribute 'class' is missing on step #$i.");
+            }
             $pipeline['steps'][] = $content['step'][] = $class;
             $classParts = explode('.', $class);
             $stepName = end($classParts);
@@ -198,9 +212,9 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
         }
 
         $refs = &$content['refs'];
-        !isset($refs['sourceSrxPath'], $refs['targetSrxPath']) && $this->invalid(
-            "Reference files missing. Need sourceSRX and targetSRX. Got " . print_r($refs, true));
-
+        if(!isset($refs['sourceSrxPath'], $refs['targetSrxPath'])){
+            $this->invalidate("Reference files missing. Need sourceSRX and targetSRX. Got " . print_r($refs, true));
+        }
         return $pipeline;
     }
 }

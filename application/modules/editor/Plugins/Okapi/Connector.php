@@ -164,6 +164,7 @@ class editor_Plugins_Okapi_Connector {
              // 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
              throw new editor_Plugins_Okapi_Exception('E1055', ['bconfFile' => $bconfPath]);
         }
+        // $bconfPath = '/var/www/translate5/application/modules/editor/Plugins/Okapi/data/okapi_default_import.bconf';
         $url = $this->projectUrl.'/batchConfiguration';
         $http = $this->getHttpClient($url);
         $http->setFileUpload($bconfPath , 'batchConfiguration');

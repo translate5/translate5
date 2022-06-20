@@ -422,6 +422,79 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         return $this->db->fetchAll($s)->toArray();
     }
 
+
+    /***
+     * Get term translations (source/target) for given term collection and source/target language.
+     * @param int $collection
+     * @param int $source
+     * @param int $target
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getTermTranslationsForLanguageCombo(int $collection, int $source, int $target): array
+    {
+        /** @var editor_Models_Languages $fuzzyModel */
+        $fuzzyModel = ZfExtended_Factory::get('editor_Models_Languages');
+
+        $sourceLanguages = $fuzzyModel->getFuzzyLanguages($source,includeMajor: true);
+        $targetLanguages = $fuzzyModel->getFuzzyLanguages($target,includeMajor: true);
+
+        // This query will select translated terms from source to target langauge from each term entry
+        // excluding the deprecated terms. The terms with preferredTerm status will have always priority against the
+        // other terms. In case the term is not in preferredTerm status, the next most valuable status is admittedTerm.
+        // Because sorting inside a grouped rows is needed, this is the way how this is done in mysql 8.
+        // What the query is doing is actually it is joining the terms_term table by itself and searching for term
+        // pairs with source and target langauges. When multiple matches in one term entry are found, because of the
+        // term status order by and termEntryId group by, only one pair per langauge combo will be returned.
+        $sql = 'SELECT sourceTable.term AS source,targetTable.term AS target FROM(
+                    SELECT
+                        sorted_temp_table.*
+                    FROM (
+                        SELECT
+                            ROW_NUMBER() OVER (
+                                PARTITION BY termEntryId 
+                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC
+                            ) AS virtual_id,
+                            term,
+                            id,
+                            status,
+                            termEntryId,
+                            languageId,
+                            collectionId
+                        FROM terms_term
+                        WHERE languageId IN('.implode(',',$sourceLanguages).')
+                        AND status != "'.editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED.'"
+                    ) AS sorted_temp_table
+                    GROUP BY sorted_temp_table.termEntryId) AS sourceTable
+                    INNER JOIN (
+                    
+                    SELECT
+                        sorted_temp_table.*
+                    FROM (
+                        SELECT
+                            ROW_NUMBER() OVER (
+                                PARTITION BY termEntryId 
+                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC
+                            ) AS virtual_id,
+                            term,
+                            id,
+                            status,
+                            termEntryId,
+                            languageId,
+                            collectionId
+                        FROM terms_term
+                        WHERE languageId IN('.implode(',',$targetLanguages).')
+                        AND status != "'.editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED.'"
+                    ) AS sorted_temp_table
+                    GROUP BY sorted_temp_table.termEntryId
+                    ) as targetTable ON sourceTable.termEntryId = targetTable.termEntryId
+                    WHERE sourceTable.collectionId = '.$collection.'
+                    AND sourceTable.id != targetTable.id
+                    GROUP BY sourceTable.term;';
+
+        return $this->db->getAdapter()->query($sql)->fetchAll();
+    }
+
     /***
      * Remove recursive the given directory path
      *

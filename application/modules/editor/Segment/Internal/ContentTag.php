@@ -32,9 +32,6 @@ END LICENSE AND COPYRIGHT
  * Examples of internal content tags:
  * <span class="short" title="&lt;13/&gt;: Non breaking space">&lt;13/&gt;</span>
  * <span class="full" data-originalid="char" data-length="1">⎵</span>
- * 
- * @method editor_Segment_Internal_ContentTag clone(boolean $withDataAttribs)
- * @method editor_Segment_Internal_ContentTag createBaseClone()
  */
 final class  editor_Segment_Internal_ContentTag extends editor_Tag implements JsonSerializable {
     

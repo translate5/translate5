@@ -58,7 +58,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         } catch(e){
             return;
         }
-        var params = { id: rec.id, name: name };
+        var params = {id: rec.id, name: name};
         var customer = view.ownerGrid.getCustomer();
         if(customer){
             params.customerId = customer.id;
@@ -85,8 +85,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     downloadBconf: function(view, rowIndex, /* colIndex */){
         view.select(rowIndex);
         Editor.util.Util.download('plugins_okapi_bconf/downloadbconf', {
-            bconfId: view.selection.id,
-            okapiName: view.selection.get('name'),
+            id: view.selection.id
         });
     },
     showSRXChooser: function(view, rowIndex, colIndex, actionItem){
@@ -99,30 +98,38 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
     downloadSRX: function(view, rowIndex, colIndex, /* actionItem */ {purpose}, e, /* record */ {id}){
         view.select(rowIndex);
-        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx',{id, purpose});
+        Editor.util.Util.download('plugins_okapi_bconf/downloadsrx', {id, purpose});
     },
     uploadSRX: function(id, srx, purpose){
-        var controller = this;
-        var {invalidTitle, invalidMsg} = this.getView().strings;
+        var controller = this,
+            s = this.getView().strings;
+        var [invalidTitle, invalidMsg, fileUploaded]
+            = [s.invalidTitle, s.invalidMsg, s.fileUploaded].map(x => x.replace('{}', 'SRX'));
 
         Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconf/uploadsrx/?id=' + id, {
             method: 'POST', formData: {purpose, srx}
-        }).then(function({status, responseJson: json}){
-            if(status === 422){
+        }).then(function(response){
+            var {status, responseJson: json = {}} = response;
+            if(json.errorCode === 'E1390'){
                 var extraInfo = controller.createInfoSpan(json);
                 Ext.Msg.show({
-                    title: invalidTitle.replace('{}', 'SRX'),
-                    message: invalidMsg.replace('{}', 'SRX') + extraInfo,
+                    title: invalidTitle,
+                    message: invalidMsg + extraInfo,
+                    buttons: Ext.MessageBox.OK,
                     icon: Ext.Msg.WARNING
                 });
+            } else if(status !== 200){
+                Editor.app.getController('ServerException').handleException(response);
+            } else {
+                Editor.MessageBox.addSuccess(fileUploaded);
             }
         });
     },
     isDeleteDisabled: function({grid}, rowIndex, colIndex, item, {data: bconf}){
-        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === grid.SYSTEM_BCONF_NAME;
+        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === Editor.data.plugins.Okapi.systemStandardBconfName;
     },
     isSRXUploadDisabled: function(view, rowIndex, colIndex, item, record){
-        return view.ownerGrid.isCustomerGrid && !record.get('customerId');
+        return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemStandardBconfName));
     },
 
     filterByText: function(field, searchString){
@@ -130,14 +137,17 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             searchFilterValue = searchString.trim();
         store.clearFilter();
         if(searchFilterValue){
-            var searchRE = new RegExp(searchFilterValue, 'i');
+            var searchRE = new RegExp(Editor.util.Util.escapeRegex(Editor.util.Util.escapeRegex(searchFilterValue)), 'i');
             store.filterBy(({data}) => searchRE.exec(JSON.stringify(data, ['id', 'name', 'description'])));
         }
         field.getTrigger('clear').setVisible(searchFilterValue);
     },
 
     uploadBconf: async function(file){
-        var fileName = file.name.split('.').slice(0, -1).join('.').trim(); // remove .bconf
+        var me = this,
+            cutPosition = Math.min(file.name.search(/\.bconf$/), 50),
+            fileName = file.name.substring(0, cutPosition); // remove .bconf
+
         if(!fileName || Ext.getStore('bconfStore').getData().find('name', fileName, 0, true, true, true)){ //...start, startsWith, endsWith, ignoreCase
             try {
                 fileName = await this.promptUniqueBconfName(fileName);
@@ -175,6 +185,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                     message: invalidMsg.replace('{}', 'Bconf') + extraInfo,
                     icon: Ext.Msg.WARNING
                 });
+            } else if(response.status === 500 && response.responseJson?.errorCode === 'E1015'){
+                me.uploadBconf(file); // bconf with same name was uploaded outside this session
             } else {
                 Editor.app.getController('ServerException').handleException(response);
             }
@@ -191,7 +203,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
 
     promptUniqueBconfName: function(nameToPrefill = '', allowedRec = null){
         var grid = this.getView(),
-            {name, nameUnique, newBconf, editBconf} = grid.strings,
+            {uniqueName, nameExists, newBconf, editBconf} = grid.strings,
             bconfs = Ext.getStore('bconfStore').getData();
         return new Promise(function(resolve, reject){
             var panel = new Ext.form.Panel({
@@ -208,10 +220,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                 },
                 items: [{
                     xtype: 'textfield',
-                    fieldLabel: name,
+                    fieldLabel: uniqueName,
+                    maxLength: 50, // DB constraint
                     width: 300,
                     selectOnFocus: true,
-                    labelSeparator: '?',
+                    labelSeparator: ':',
                     labelWidth: 70,
                     lastVal: ['', false],
                     value: nameToPrefill,
@@ -222,18 +235,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                             return this.lastVal[1];
                         }
                         var existingRec = v && bconfs.find('name', v, 0, true, true, true);
-                        var ret = !existingRec || existingRec === allowedRec || nameUnique; //...start, startsWith, endsWith, ignoreCase
+                        var ret = !existingRec || existingRec === allowedRec || nameExists; //...start, startsWith, endsWith, ignoreCase
                         this.lastVal = [v, ret]; // cache validation result
                     },
                     listeners: {
                         specialkey: function(field, e){
-                            if([e.ENTER,e.ESC].includes(e.keyCode)){
+                            if([e.ENTER, e.ESC].includes(e.keyCode)){
                                 panel.close();
                             }
                         }
                     }
                 }],
-                fbar: [{xtype: 'button', text: 'OK', formBind: true, handler:()=>panel.close() }]
+                fbar: [{xtype: 'button', text: 'OK', formBind: true, handler: () => panel.close()}]
             }).show();
             panel.isValid(); // trigger display of red border when invalid
         });
@@ -243,7 +256,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         var grid = this.getView(),
             {name, customerId} = cellContext.record.getData();
         grid.view.select(cellContext.record);
-        if(name === grid.SYSTEM_BCONF_NAME || grid.isCustomerGrid && !customerId){
+        if(name === Editor.data.plugins.Okapi.systemStandardBconfName || grid.isCustomerGrid && !customerId){
             return false; // Can't change system default and globals bconfs in customer view
         }
         if(cellContext.field === 'name'){
@@ -255,16 +268,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
 
     createInfoSpan: function(json){
-        var extraInfo = '';
-        if(json.errors && json.errors.length){
+        var extraInfo = '',
+            errorMessage = json.errorMessage || '',
+            errors = json.errors || errorMessage.split('\n').slice(1);
+        errors = errors.flat().filter(err => err.trim()).map(Ext.htmlEncode);
+        if(errors.length){
+            var errorTable = `<code><ul><li>${errors.join('</li><li>')}</li></ul>`;
             extraInfo = ' ' + Ext.DomHelper.createHtml({
                 tag: 'span',
                 class: 'x-fa fa-question-circle pointer',
                 'data-hide': 'user',
                 'data-qwidth': '800',
-                'data-qtip': '<code><ul><li>'
-                    + json.errors.join('\n').trim().split('\n').map(Ext.htmlEncode).join('</li><li>')
-                    + '</li></ul>',
+                'data-qtip': errorTable
             });
         }
         return extraInfo;

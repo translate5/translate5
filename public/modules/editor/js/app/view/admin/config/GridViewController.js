@@ -150,8 +150,11 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     },
 
     filterConfigByRoute: function(filterValue) {
-        this.searchField.setValue(filterValue);
-        this.groupingFeature.expandAll();
+        //update search value only from route if it was different
+        if(filterValue !== this.searchValue) {
+            this.searchField.setValue(filterValue);
+            this.searchValue = filterValue;
+        }
     },
 
     /**
@@ -176,8 +179,6 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         view.refresh();
 
         me.searchValue = me.getSearchValue();
-        //TODO UGLY: is there another generic way to do such a thing? Otherwise we would have to implement a parser which gets and changes only the desired part of the hash instead of setting the whole one(here the config value)
-        me.redirectTo('preferences/adminConfigGrid|config/'+me.searchValue);
         
         if(me.searchValue == null){
             store.clearFilter();
@@ -191,6 +192,8 @@ Ext.define('Editor.view.admin.config.GridViewController', {
 
         //mark the matched searchValue
         me.markMatches();
+
+        me.groupingFeature.expandAll();
     },
 
     onStoreLoad: function() {
@@ -241,10 +244,12 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         var me=this,
             store = me.getView().getStore();
         if(me.searchValue == null){
+            store.removeFilter('searchFilter');
             return;
         }
         //local store filter
-        store.filter(new Ext.util.Filter({
+        store.filter({
+            id:'searchFilter',
             filterFn: function (object) {
                 var match = false;
                 if(!me.searchRegExp){
@@ -256,7 +261,7 @@ Ext.define('Editor.view.admin.config.GridViewController', {
                 });
                 return match;
               }
-        }));
+        });
     },
     
     /***

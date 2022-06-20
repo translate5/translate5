@@ -26,8 +26,8 @@
  */
 
 /**
- * Main Controller of the Visual Review
- * Defines the Layout of the review Panel and it's controls, listens to the relevant global events and perocesses them
+ * Main Controller of the Okapi Plugin
+ * Adds the BconfGrids and BconfCombo
  *
  * @class BconfPrefs
  * @extends Ext.app.Controller
@@ -41,7 +41,11 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         'Editor.model.admin.Customer'
     ],
     init: function(){
-        Editor.model.admin.Customer.addFields([{type: 'int', name: 'defaultBconfId', persist:true}]);
+        Editor.model.admin.Customer.addFields([{
+            type: 'int',
+            name: 'defaultBconfId',
+            persist: false,
+        }]);
     },
     onLaunch: function(){
         Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
@@ -61,6 +65,23 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                     priority: 900 // we want after customersCombo has been added
                 }
             },
+            'combobox#customerId': {
+                change: {
+                    fn: function(customerCombo, customerId){
+                        if(!customerId){ // QUIRK: Emptying can set value to null even with forceSelection set
+                            return;
+                        }
+                        var bconfCombo = Ext.getCmp('bconfCombo'),
+                            bconfFilters = bconfCombo.getStore().getFilters(),
+                            customerFilter = bconfFilters.getByKey('customerFilter');
+                        customerFilter.setValue(customerId);
+                        bconfFilters.add(customerFilter); // trigger filter
+
+                        bconfCombo.setValue(customerCombo.getSelection().get('defaultBconfId'));
+                        bconfCombo.enable();
+                    },
+                }
+            }
         }
     },
     refs: [{
@@ -74,10 +95,6 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     bconfPanel: null,
     // shows the preference panel in the preferences (bconf-section is shown via 'showBconfInOverviewPanel' afterwards)
     onBconfRoute: function(){
-
-        console.log('onBconfRoute');
-
-
         if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
             // QUIRK: just to make sure, not the same thing can happen as with Quirk in ::showBconfInOverviewPanel
             var pop = this.getPreferencesOverviewPanel();
@@ -103,37 +120,41 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         }
     },
     addBconfToCustomerPanel: function(tabPanel){
-        var vm = tabPanel.up('[viewModel]').getViewModel();
-        var vmStores = vm.storeInfo || {};
-        vmStores.bconfCustomer = {
-            source: 'bconfStore',
-            storeId: 'bconfCustomer',
-            filters: [{
-                id: 'clientFilter',
-                property: 'customerId',
-                value: '{list.selection.id}',
-                filterFn: function({data}){
-                    return !data.customerId || this._value == data.customerId;
+        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
+            // create filtered store from bconfStore & apply it to the grid's view-model
+            var vm = tabPanel.up('[viewModel]').getViewModel();
+            var vmStores = vm.storeInfo || {};
+            vmStores.customersBconfStore = {
+                source: 'bconfStore',
+                storeId: 'customersBconfStore',
+                filters: [{
+                    id: 'clientFilter',
+                    property: 'customerId',
+                    value: '{list.selection}',
+                    filterFn: function(rec){
+                        return !rec.get('customerId') || (this._value && this._value.id === rec.get('customerId'));
+                    },
+                }],
+                sorters: [{
+                    property: 'customerId',
+                    direction: 'DESC'
+                }, {
+                    property: 'name',
+                }]
+            };
+            vm.setStores(vmStores);
+            // add the bconf grid to the tabPanel and bind it to the customer
+            tabPanel.insert(2, {
+                xtype: 'okapiBconfGrid',
+                id: 'bconfCustomerGrid',
+                bind: {
+                    customer: '{list.selection}', // list is reference name of customerGrid
+                    store: '{customersBconfStore}'
                 },
-            }],
-            sorters: [{
-                property: 'customerId',
-                direction: 'DESC'
-            }, {
-                property: 'name',
-            }]
-        };
-        vm.setStores(vmStores);
-
-        tabPanel.insert(2, {
-            xtype: 'okapiBconfGrid',
-            bind: {
-                customer: '{list.selection}', // list is reference name of customerGrid
-                store: '{bconfCustomer}'
-            },
-            isCustomerGrid: true,
-        });
-        tabPanel.setActiveTab(0);
+                isCustomerGrid: true,
+            });
+            tabPanel.setActiveTab(0);
+        }
     },
     addBconfComboToTaskMainCard: function(taskMainCard){
         taskMainCard.down('#taskMainCardContainer').add({
@@ -141,54 +162,36 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             queryMode: 'local',
             forceSelection: true,
             displayField: 'name',
+            id: 'bconfCombo',
             name: 'bconfId',
             valueField: 'id',
+            disabled: true,
+            value: Editor.data.plugins.Okapi.systemDefaultBconfId,
             fieldLabel: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.titleLong,
             listConfig: {
                 getInnerTpl: function(displayField){
                     return `<span data-qtip="{description}">{${displayField}}</span>`;
                 },
             },
-            bind: {
-                store: '{bconfImportWizard}',
-                disabled: '{!customer.selection}',
-                value: '{defaultBconf}',
-            },
-            viewModel: {
-                alias: 'viewmodel.bconfComboImportWizard',
-                stores: {
-                    bconfImportWizard: {
-                        storeId: 'bconfImportWizard',
-                        source: 'bconfStore',
-                        autoLoad: true,
-                        filters: [{
-                            filterFn: function({data: bconf}){
-                                return !bconf.customerId || this._value == bconf.customerId;
-                            },
-                            property: 'customerId',
-                            value: '{customer.selection.id}'
-                        }],
-                        sorters: [{
-                            property: 'customerId',
-                            direction: 'DESC'
-                        }, {
-                            property: 'name',
-                        }],
-                    }
-                },
-                formulas: {
-                    defaultBconf: {
-                        bind: {
-                            customer: '{customer.selection}',
-                            store: '{bconfImportWizard}', // QUIRK: artificial dependency to wait for store being filtered by bound customerId
-                        },
-                        get: function({customer, store}){
-                            return customer && customer.get('defaultBconfId') || this.globalDefaultId ||
-                                //FIXME: find better way to (pre)calculate global default, maybe global variable
-                                (this.globalDefaultId = store.getData().findBy(({data: bconf}) => bconf.isDefault).id);
-                        }
-                    }
-                }
+            store: {
+                type: 'chained',
+                storeId: 'bconfImportWizard',
+                source: 'bconfStore',
+                autoLoad: true,
+                filters: [{
+                    id: 'customerFilter',
+                    property: 'customerId',
+                    value: null,
+                    filterFn: function({data: bconf}){
+                        return !bconf.customerId || (this._value === bconf.customerId);
+                    },
+                }],
+                sorters: [{
+                    property: 'customerId',
+                    direction: 'DESC'
+                }, {
+                    property: 'name',
+                }],
             }
         });
     }

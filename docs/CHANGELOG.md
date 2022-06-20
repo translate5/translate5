@@ -13,11 +13,100 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [5.7.3] - 2022-06-14
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2811](https://jira.translate5.net/browse/TRANSLATE-2811): Editor general, LanguageResources - Integrate MS Translator synonym search in editor** <br>
+Microsoft's translator synonym search is now part of translate5 editor.
+
+**[TRANSLATE-2539](https://jira.translate5.net/browse/TRANSLATE-2539): Auto-QA - AutoQA: Numbers check** <br>
+AutoQA: added 12 number-checks from SNC library
+
+
+### Changed
+**[TRANSLATE-2986](https://jira.translate5.net/browse/TRANSLATE-2986): Main back-end mechanisms (Worker, Logging, etc.) - Trigger callback when all users did finish the assigned role** <br>
+After all jobs are finished, callback workflow action can be configured. How this can be configured it is explained in this link:  https://confluence.translate5.net/display/BUS/Workflow+Action+and+Notification+Customization#:~:text=Remote%20callback%20when%20all%20users%20finish%20there%20jobs
+
+**[TRANSLATE-2978](https://jira.translate5.net/browse/TRANSLATE-2978): Editor Length Check - Disable automatic adding of newlines on segments by configuration** <br>
+The automatic adding of newlines could now disabled by configuration.
+
+
+### Bugfixes
+**[TRANSLATE-2985](https://jira.translate5.net/browse/TRANSLATE-2985): Editor general - Error on configuration overview filtering** <br>
+The error which pops-up when quick-typing in configuration filter is solved.
+
+**[TRANSLATE-2983](https://jira.translate5.net/browse/TRANSLATE-2983): Editor general - Task action menu error after leaving a task** <br>
+Opening the task action menu after leaving the task will no longer produce error.
+
+**[TRANSLATE-2982](https://jira.translate5.net/browse/TRANSLATE-2982): TermPortal, TermTagger integration - Empty term in TBX leads to crashing termtagger** <br>
+If an imported TBX was containing empty terms (which is basically non sense) and that term collection was then used for termtagging in asian languages, the termtagger was hanging in an endless loop and was not usable anymore.
+
+**[TRANSLATE-2981](https://jira.translate5.net/browse/TRANSLATE-2981): TBX-Import - Importing TBX with invalid XML leads to high CPU usage** <br>
+On importing a TBX file with invalid XML the import process was caught in an endless loop. This is fixed and the import stops now with an error message.
+
+**[TRANSLATE-2980](https://jira.translate5.net/browse/TRANSLATE-2980): Editor general - On task delete translate5 keeps the old route** <br>
+Missing task message when the task is removed will no longer be shown.
+
+
+## [5.7.2] - 2022-05-24
+
+### Important Notes:
+#### [TRANSLATE-2314](https://jira.translate5.net/browse/TRANSLATE-2314)
+Wording and Icon changed: Introduced a new processing state "locked" with a lock icon. This segments can be locked / unlocked by PM users. The processing state blocked remains for segments which can not be unlocked by PMs.
+ 
+
+
+### Added
+**[TRANSLATE-2642](https://jira.translate5.net/browse/TRANSLATE-2642): LanguageResources - DeepL terminology integration** <br>
+Enable deepL language resources to use terminology as glossar.
+
+**[TRANSLATE-2314](https://jira.translate5.net/browse/TRANSLATE-2314): Editor general - Be able to lock/unlock segments in the editor by a PM** <br>
+The project-manager is now able to lock and unlock single segments (CTRL+L). 
+A jump to segment is implemented (CTRL+G).
+Bookmarks can now be set also on just a selected segment, not only on an opened one (CTRL+D). Locking and bookmarking can be done in a batch way on all segments in the current filtered grid. 
+
+
+### Changed
+**[TRANSLATE-2976](https://jira.translate5.net/browse/TRANSLATE-2976): Okapi integration - Make MS Office document properties translatable by default** <br>
+The Okapi default settings are changed, so that MS Office document properties are now translateable by default.
 
 
 
+### Bugfixes
+**[TRANSLATE-2973](https://jira.translate5.net/browse/TRANSLATE-2973): LanguageResources - Tag Repair creates Invalid Internal tags when Markup is too complex** <br>
+FIX: Automatic tag repair may generated invalid internal tags when complex markup was attempted to be translated
 
-## [5.7.1] - 2022-05-05
+**[TRANSLATE-2972](https://jira.translate5.net/browse/TRANSLATE-2972): Editor general - Leaving and Navigating to Deleted Tasks** <br>
+Trying to access a deleted task via URL was not handled properly. Now the user is redirected to the task overview.
+
+**[TRANSLATE-2969](https://jira.translate5.net/browse/TRANSLATE-2969): Import/Export - Reintroduce BCONF import via ZIP** <br>
+FIX: Re-enabled using a customized BCONF for OKAPI via the import zip. Please note, that this feature is nevertheless deprecated and the BCONF in the import zip will not be added to the application's BCONF pool.
+
+**[TRANSLATE-2968](https://jira.translate5.net/browse/TRANSLATE-2968): LanguageResources - Deleted space at start or end of fuzzy match not highlighted** <br>
+Fixed visualization issues of added / deleted white-space in the fuzzy match grind of the lower language resource panel in the editor.
+
+**[TRANSLATE-2967](https://jira.translate5.net/browse/TRANSLATE-2967): TermPortal - TermPortal: grid-attrs height problem** <br>
+Fixed the tiny height of attribute grids. 
+
+**[TRANSLATE-2965](https://jira.translate5.net/browse/TRANSLATE-2965): GroupShare integration - GroupShare sync deletes all associations between tasks and language-resources** <br>
+The synchronization of GroupShare TMs was deleting to much task language resource associations.
+
+**[TRANSLATE-2964](https://jira.translate5.net/browse/TRANSLATE-2964): Workflows - PM Project Notification is triggered on each project instead only on term translation projects** <br>
+Project creation notifications can now be sent only for certain project types.
+
+**[TRANSLATE-2926](https://jira.translate5.net/browse/TRANSLATE-2926): Okapi integration - Index and variables can not be extracted from Indesign** <br>
+So far it was not possible to translate Indesign text variables and index entries, because Okapi did not extract them.
+
+With an okapi contribution by Denis, financed by translate5, this is changed now.
+
+Also translate5 default okapi settings are changed, so that text variables and index entries are now translated by default for idml.
+
+
+## [5.7.1] - 2022-05-10
 
 ### Important Notes:
 #### [TRANSLATE-2931](https://jira.translate5.net/browse/TRANSLATE-2931)
@@ -48,6 +137,9 @@ For on premise clients: the role must be added manually in the DB to one user. W
 
 
 ### Bugfixes
+**[TRANSLATE-2962](https://jira.translate5.net/browse/TRANSLATE-2962): LanguageResources - DeepL error when when sending large content** <br>
+Fixes problem with failing request to DeepL because of exhausted request size.
+
 **[TRANSLATE-2961](https://jira.translate5.net/browse/TRANSLATE-2961): Editor general - Error on repetition save** <br>
 Solves a problem where an error happens in the UI after saving repetitions with repetition editor.
 

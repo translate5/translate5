@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -118,7 +118,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
             'editor' => [
-                'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment', 'attributedatatype',
+                'file', 'segment', 'alikesegment', 'customer', 'customermeta', 'referencefile', 'comment', 'attributedatatype',
                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                 'config', 'segmentuserassoc', 'session', 'language','termcollection',
                 'languageresourceresource','languageresourcetaskassoc',
@@ -128,13 +128,22 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
-        //this is not standard controller action route
-        //when this route is triggered, a coresponding event from the given controller will be fired
-        //ex: editor/task/123/analysis/operation
-        //    - an event called analysisOperation will be fired from task controller(task entity with id 123)
+        /**
+         * Operation routes:
+         * - operations extend the RESTful approach of the API to provide operations triggered on an entity or on a set of entities instead of doing all by CRUD actions only
+         * - operations|batch may exist either as fooOperation or fooBatch method in the controller, or as an attached event to the controller
+         * - operation is on one entity
+         * - batch is the same on the current entity filter set
+         */
         $this->front->getRouter()->addRoute('editorOperationHandler', new ZfExtended_Controller_RestLikeRoute(
-            //'editor/:entity/:id/:operation/operation',
             'editor/:controller/:id/:operation/operation',
+            array(
+                'module' => 'editor',
+                'action' => '',
+            )
+        ));
+        $this->front->getRouter()->addRoute('editorBatchHandler', new ZfExtended_Controller_RestLikeRoute(
+            'editor/:controller/:operation/batch',
             array(
                 'module' => 'editor',
                 'action' => '',
@@ -438,7 +447,18 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'search'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_search', $queryRoute);
-        
+
+
+        $translateRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:languageResourceId/translate',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'translate'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_translate', $translateRoute);
+
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/import',
             array(

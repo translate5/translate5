@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 491,
-    "qtotal": 491,
+    "qcount": 498,
+    "qtotal": 498,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "78486",
+                    "qid": "92220",
                     "qtype": "consistent",
                     "qcount": 2,
                     "qcomplete": true,
@@ -193,7 +193,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "78489",
+                    "qid": "92223",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
@@ -215,7 +215,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "78490",
+                    "qid": "92224",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
@@ -268,7 +268,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "78080",
+                            "qid": "91738",
                             "qtype": "mqm",
                             "qcount": 171,
                             "qcomplete": true,
@@ -280,7 +280,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78337",
+                            "qid": "91733",
                             "qtype": "mqm",
                             "qcount": 105,
                             "qcomplete": true,
@@ -292,7 +292,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78342",
+                            "qid": "91864",
                             "qtype": "mqm",
                             "qcount": 12,
                             "qcomplete": true,
@@ -304,7 +304,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78195",
+                            "qid": "91737",
                             "qtype": "mqm",
                             "qcount": 3,
                             "qcomplete": true,
@@ -316,7 +316,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78125",
+                            "qid": "91727",
                             "qtype": "mqm",
                             "qcount": 13,
                             "qcomplete": true,
@@ -342,7 +342,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "78336",
+                            "qid": "91730",
                             "qtype": "mqm",
                             "qcount": 21,
                             "qcomplete": true,
@@ -354,13 +354,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "78140",
+                            "qid": "91867",
                             "qtype": "mqm",
                             "qcount": 6,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "78345",
+                                    "qid": "91726",
                                     "qtype": "mqm",
                                     "qcount": 12,
                                     "qcomplete": true,
@@ -380,13 +380,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "78034",
+                            "qid": "91761",
                             "qtype": "mqm",
                             "qcount": 2,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "78395",
+                                    "qid": "91774",
                                     "qtype": "mqm",
                                     "qcount": 4,
                                     "qcomplete": true,
@@ -406,7 +406,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "78085",
+                            "qid": "91755",
                             "qtype": "mqm",
                             "qcount": 10,
                             "qcomplete": true,
@@ -436,7 +436,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "78344",
+                                    "qid": "91728",
                                     "qtype": "mqm",
                                     "qcount": 32,
                                     "qcomplete": true,
@@ -448,7 +448,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "78084",
+                                    "qid": "91745",
                                     "qtype": "mqm",
                                     "qcount": 28,
                                     "qcomplete": true,
@@ -460,7 +460,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "78090",
+                                    "qid": "91736",
                                     "qtype": "mqm",
                                     "qcount": 51,
                                     "qcomplete": true,
@@ -472,7 +472,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "78338",
+                                    "qid": "91888",
                                     "qtype": "mqm",
                                     "qcount": 17,
                                     "qcomplete": true,
@@ -516,6 +516,152 @@
             "qtooltip": "",
             "text": "Manual QA (inside segment)",
             "qtotal": 487,
+            "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "numbers",
+            "qcount": 7,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "92216",
+                    "qtype": "numbers",
+                    "qcount": 2,
+                    "qcomplete": true,
+                    "qcategory": "num1",
+                    "qcatidx": "-1",
+                    "text": "Numbers source \u2260 target",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num10",
+                    "text": "Format alteration (ordinal numbers, leading zero etc.)",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "92213",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num11",
+                    "qcatidx": "-1",
+                    "text": "Different character\/formatting for number interval",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "92217",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num12",
+                    "qcatidx": "-1",
+                    "text": "1000-separator not allowed",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num2",
+                    "text": "Alphanumerical character sequences: Differences",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num3",
+                    "text": "Format alteration (date information etc.)",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "92214",
+                    "qtype": "numbers",
+                    "qcount": 2,
+                    "qcomplete": true,
+                    "qcategory": "num4",
+                    "qcatidx": "-1",
+                    "text": "Separator(s) not localised",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num5",
+                    "text": "Formatting of 1000s number altered",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "92215",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num6",
+                    "qcatidx": "-1",
+                    "text": "Different minus characters",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num7",
+                    "text": "Separator from source altered",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num8",
+                    "text": "Numeral from source found as number in target",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num9",
+                    "text": "Number from source found as numeral in target",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Numbers",
+            "qtotal": 7,
             "expanded": true,
             "checked": false
         },

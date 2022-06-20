@@ -54,42 +54,41 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {
-        $this->view->total = $this->entity->getTotalCount();
-        if($this->entity->importDefaultWhenNeeded($this->view->total)){
-            $this->view->total += 1;
-        }
         $this->view->rows = $this->entity->loadAll();
-    }
-
-    public function deleteAction() {
-        $this->entity->deleteDirectory($this->getParam('id'));
-        parent::deleteAction();
+        $this->view->total = count($this->view->rows);
+        // auto-import of default-bconf: when there are no rows we can assume the feature was just installed and the DB is empty
+        // then we automatically add the system default bconf
+        if($this->view->total < 1){
+            $this->entity->importDefaultWhenNeeded();
+            $this->view->rows = $this->entity->loadAll();
+            $this->view->total = count($this->view->rows);
+        }
     }
 
     /**
      * Export bconf
      */
     public function downloadbconfAction() {
-        $okapiName = $this->getParam('okapiName');
-        $id = (int)$this->getParam('bconfId'); // directory traversal mitigation
-        $downloadFile = $this->entity->getFilePath($id);
+        $this->entityLoad();
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $okapiName . '.bconf"');
+        header('Content-Disposition: attachment; filename="'.$this->entity->getDownloadFilename());
         header('Cache-Control: no-cache');
-        header('Content-Length: ' . filesize($downloadFile));
-        header('Content-Length: ' . filesize($downloadFile));
+        header('Content-Length: ' . filesize($this->entity->getFilePath()));
         ob_clean();
         flush();
-        readfile($downloadFile);
+        readfile($this->entity->getFilePath());
         exit;
     }
 
     public function uploadbconfAction() {
         $ret = new stdClass();
 
-        empty($_FILES) && throw new ZfExtended_ErrorCodeException('E1212', [
-            'msg' => "No upload files were found. Please try again. If the error persists, please contact support.",
-        ]);
+        if(empty($_FILES)){
+            throw new ZfExtended_ErrorCodeException('E1212', [
+                'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
+            ]);
+        }
+
         $bconf = new editor_Plugins_Okapi_Models_Bconf($_FILES[self::FILE_UPLOAD_NAME], $this->getAllParams());
 
         $ret->success = is_object($bconf);
@@ -102,27 +101,33 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
     public function uploadsrxAction() {
-        empty($_FILES) && throw new editor_Plugins_Okapi_Exception('E1212', [
-            'msg' => "No upload files were found. Please try again. If the error persists, please contact support.",
-        ]);
+        if(empty($_FILES)){
+            throw new editor_Plugins_Okapi_Exception('E1212', [
+                'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
+            ]);
+        }
         $this->entityLoad();
         $bconf = $this->entity;
-        $this->getParam('id');
-
         $srxUploadFile = $_FILES['srx']['tmp_name'];
         $srx = new editor_Utils_Dom();
-        $xmlErrors = $srx->load($srxUploadFile) ? $srx->getErrorMsg('', true) : '';
+        $xmlErrors = '';
+        if($srx->load($srxUploadFile)){
+            $rootTag = strtolower($srx->firstChild?->tagName);
+            if($rootTag !== 'srx'){
+                $xmlErrors .= "\nInvalid root tag '$rootTag'.";
+            }
+        } else {
+            $xmlErrors .= "\n".$srx->getErrorMsg('', true);
+        }
 
-        $rootTag = strtolower($srx->firstChild?->tagName);
-        $rootTag !== 'srx' && $xmlErrors .= "\n Invalid root tag '$rootTag'.";
 
-        $xmlErrors && throw new ZfExtended_UnprocessableEntity('E1026',
-            ['errors' => [[$xmlErrors]]]
-        );
+        if(!empty($xmlErrors)){
+            throw new editor_Plugins_Okapi_Exception('E1390', ['details' => $xmlErrors]);
+        }
 
         $srxNameToBe = $bconf->srxNameFor($this->getParam('purpose'));
         move_uploaded_file($srxUploadFile, $bconf->getFilePath(fileName: $srxNameToBe));
-        $bconf->file->pack();
+        $bconf->getFile()->pack();
     }
 
     public function downloadsrxAction() {

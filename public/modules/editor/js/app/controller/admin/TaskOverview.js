@@ -184,7 +184,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     listeners: {
         afterTaskDelete: 'onAfterTaskDeleteEventHandler',
-        beforeTaskDelete: 'onBeforeTaskDeleteEventHandler',
         validateImportWizard: 'onValidateImportWizard'
     },
     listen: {
@@ -280,7 +279,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         this.closeAdvancedFilterWindow();
     },
     handleInitEditor: function () {
-        this.closeAdvancedFilterWindow();
+        let me = this;
+        me.closeAdvancedFilterWindow();
+        // reset the menu cache after the view port is changed
+        me.menuCache = [];
     },
     clearTasks: function () {
         this.getAdminTasksStore().removeAll();
@@ -895,23 +897,20 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
     /**
      * delete the task
-     * Fires: beforeTaskDelete  and afterTaskDelete
-     * INFO: beforeTaskDelete is a chained event
      * @param {Editor.model.admin.Task} task
      */
     editorDeleteTask: function(task) {
         var me = this,
-            app = Editor.app;
+            app = Editor.app,
+            store = task.store;
 
         app.mask(Ext.String.format(me.strings.taskDestroy, task.get('taskName')), task.get('taskName'));
 
-        //the beforeTaskDelete is chained event. If one of the chained listeners does not return true,
-        //the task delete will be omitted.
-        if (!me.fireEvent('beforeTaskDelete', task)) {
-            app.unmask();
-            return;
+        if(task.isProject()){
+            Ext.StoreManager.get('projectTasks').removeAll();
         }
 
+        store.remove(task);
         task.dropped = true; //doing the drop / erase manually
         task.save({
             //prevent default ServerException handling
@@ -1268,15 +1267,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             return null;
         }
         return activeTab;
-    },
-
-    /***
-     * Before task delete request event handler.
-     * Return true so the event call chain continues
-     */
-    onBeforeTaskDeleteEventHandler: function (task) {
-        Ext.StoreManager.get('admin.Tasks').remove(task);
-        return true;
     },
 
     /***

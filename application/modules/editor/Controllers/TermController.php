@@ -336,11 +336,32 @@ class editor_TermController extends ZfExtended_RestController
             ],
         ], $this->entity);
 
+        // Setup a flag indicating whther current user can change any term
+        $canChangeAny = $this->isAllowed('editor_term', 'putAny');
+
+        // Status shortcuts
+        $isUnprocessed = $this->entity->getProposal() || $this->entity->getProcessStatus() == 'unprocessed';
+        $isProvisionallyProcessed = !$this->entity->getProposal() && $this->entity->getProcessStatus() == 'provisionallyProcessed';
+
+        // Roles shortcuts
+        $termProposer  = in_array('termProposer' , $this->_session->roles);
+        $termReviewer  = in_array('termReviewer' , $this->_session->roles);
+        $termFinalizer = in_array('termFinalizer', $this->_session->roles);
+
+        // Setup a flag indicating whether current user can edit current term
+        $editable = $canChangeAny
+            || ($termProposer  && $this->entity->getCreatedBy() == $this->_session->id)
+            || ($termReviewer  && $isUnprocessed)
+            || ($termFinalizer && $isProvisionallyProcessed);
+
+        // If not allowed - flush failure
+        if (!$editable) $this->jflush(false, 'This term is not editable');
+
         // Get request params
         $params = $this->getRequest()->getParams();
 
         // Update proposal
-        $this->entity->setProposal(trim($params['proposal']));
+        $this->entity->setProposal(trim($params['proposal'] ?? ''));
         $this->entity->setUpdatedBy($this->_session->id);
 
         // Save, and pass params required to update `terms_transacgrp`-records of type 'modification' for all 3 levels
@@ -373,22 +394,20 @@ class editor_TermController extends ZfExtended_RestController
             ]
         ]);
 
-        // If current user has none of termPM, termPM_allClients or admin roles, but has termProposer role
-        if (!$this->isAllowed('editor_term', 'deleteAny')) {
+        // Setup a flag indicating whether current user can delete any term
+        $canDeleteAny = $this->isAllowed('editor_term', 'deleteAny');
 
-            // Deletion is disabled by default
-            $deletable = false;
+        // Setup a flag indicating whether current user can delete current term
+        // Actually, the logic is that if user can't delete any, then the deletion is only
+        // possible if user has termProposer-role, and he is the creator of current term
+        // And currently, all is ok because other roles (termReviewer and termFinalizer)
+        // do not have delete-right on editor_term-resource, so the execution won't even reach
+        // for them, but if at some point of time they would be granted then the below line
+        // should be amended to rely on termProposer-role explicitly
+        $deletable = $canDeleteAny || $this->entity->getCreatedBy() == $this->_session->id;
 
-            // If current user is the one who created this term
-            // and this term is a proposal or has a proposal
-            if ($this->entity->getCreatedBy() == $this->_session->id
-                && ($this->entity->getProcessStatus() == 'unprocessed' || $this->entity->getProposal())) {
-                $deletable = true;
-            }
-
-            // If this term is not deletable - flush failure
-            if (!$deletable) $this->jflush(false, 'This term is not deletable');
-        }
+        // If current term is not deletable - flush failure
+        if (!$deletable) $this->jflush(false, 'This term is not deletable');
 
         // If no or only certain collections are accessible - validate collection accessibility
         if ($this->collectionIds !== true) $this->jcheck([
