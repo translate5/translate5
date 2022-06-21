@@ -113,6 +113,8 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         $result = [];
         $offset = $this->getRequest()?->getParam('offset');
 
+        // TODO remove once id on tm side is implemented
+        $fakeIdIndex = 1;
         while ($totalAmount < $limit) {
             $resultList = $connector->search(
                 $this->getRequest()?->getParam('searchCriteria'),
@@ -122,6 +124,14 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
             $data = $resultList->getResult();
             $data = $this->reformatData($data, $tmId);
+
+            // TODO remove once id on tm side is implemented
+            $data = array_map(function (array $item) use ($tmId, &$fakeIdIndex) {
+                $item['id'] = $tmId . '_' . ++$fakeIdIndex;
+
+                return $item;
+            }, $data);
+
             $data = $this->processTags($data);
             $offset = $resultList->getNextOffset();
 
@@ -154,7 +164,6 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             $item['metaData'] = $metadata;
 
             $item['tm'] = $tmId;
-            $item['id'] = $tmId . '_' . $index;
 
             $result[] = $item;
         }
