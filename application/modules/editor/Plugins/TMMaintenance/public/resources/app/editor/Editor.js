@@ -47,6 +47,27 @@ Ext.define('Ext.translate5.Editor', {
             .then((newEditor) => {
                 me.editor = newEditor;
                 me.editor.setData(value);
+
+                // TODO move to a separate method
+                me.editor.editing.view.document.on(
+                    'enter',
+                    (evt, data) => {
+                        me.editor.execute('shiftEnter');
+                        //Cancel existing event
+                        data.preventDefault();
+                        evt.stop();
+                    }
+                );
+
+                me.editor.editing.view.document.on(
+                    'clipboardInput',
+                    (evt, data) => {
+                        console.log('Past from clipboard');
+
+                        // Prevent the default listener from being executed.
+                        // evt.stop();
+                    }
+                );
             })
             .catch(error => {
                 console.error(error);
