@@ -57,27 +57,9 @@ class editor_Services_OpenTM2_FixLanguageCodes {
         'hi-IN' => 'ar',
         'fr-CH' => 'fr',
         'it-CH' => 'it',
-    ];
-    
-    /**
-     * Must contain search and replace language keys
-     * @var array
-     */
-    protected array $labels = [
-        //langcode_search => langcode_replace
-        'mn'    => 'Mongolian',
-        'mn-MN' => 'Mongolian',
-        'ru'    => 'Russian',
-        'ru-RU' => 'Russian',
-        'ar'    => 'Arabic',
-        'hi'    => 'Hindi',
-        'hi-IN' => 'Hindi',
-        'fr'    => 'French(national)',
-        'fr-FR' => 'French(national)',
-        'fr-CH' => 'French(Swiss)',
-        'it'    => 'Italian',
-        'it-IT' => 'Italian',
-        'it-CH' => 'Italian(Swiss)',
+        'en-GB' => 'en-UK',
+        'sr-Latn-ME' => 'ME',
+        'bs-Latn-BA' => 'BA',
     ];
     
     /**
@@ -148,26 +130,23 @@ class editor_Services_OpenTM2_FixLanguageCodes {
             //OpenTM2 returns sometimes the language as "fr" and sometimes as "fr-FR",
             // so we replace just both:
             $search[] = 'xml:lang="'.$sourceLangMapped.'-'.strtoupper($sourceLangMapped).'"';
-            $search[] = '<prop type="tmgr:language">'.($this->labels[$sourceLangMapped] ?? '').'</prop>';
             $replace[] = 'xml:lang="'.$sourceLang.'"';
             $replace[] = 'xml:lang="'.$sourceLang.'"';
-            $replace[] = '<prop type="tmgr:language">'.($this->labels[$sourceLang] ?? '').'</prop>';
-            //source original labels
         }
-        
+
         if(!empty($this->languageMap[$targetLang])) {
             $targetLangMapped = $this->languageMap[$targetLang];
             $search[] = 'xml:lang="'.$targetLangMapped.'"';
             //OpenTM2 returns sometimes the language as "fr" and sometimes as "fr-FR",
             // so we replace just both:
             $search[] = 'xml:lang="'.$targetLangMapped.'-'.strtoupper($targetLangMapped).'"';
-            $search[] = '<prop type="tmgr:language">'.strtoupper($this->labels[$targetLangMapped] ?? '').'</prop>';
             $replace[] = 'xml:lang="'.$targetLang.'"';
             $replace[] = 'xml:lang="'.$targetLang.'"';
-            $replace[] = '<prop type="tmgr:language">'.strtoupper($this->labels[$targetLang] ?? '').'</prop>';
-            //target uppercase labels
         }
-        
+
+        //Since the prop type tmgr:language is openTM2 proprietary, we just remove it:
+        $tmxData = preg_replace('#<prop type="tmgr:language">[^<]+</prop>(\s)*#', '', $tmxData);
+
         return str_replace($search, $replace, $tmxData);
     }
 
