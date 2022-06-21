@@ -127,7 +127,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
             // TODO remove once id on tm side is implemented
             $data = array_map(function (array $item) use ($tmId, &$fakeIdIndex) {
-                $item['id'] = $tmId . '_' . ++$fakeIdIndex;
+                $item['id'] = $tmId . '_' . urlencode($item['rawSource']) . '_' . ++$fakeIdIndex;
 
                 return $item;
             }, $data);
