@@ -6,14 +6,6 @@ Ext.define('Ext.translate5.Editor', {
 
     config: {},
 
-    startEdit: function(location, value, doFocus) {
-        if (location && location.column.config.editor.editingDataIndex !== undefined) {
-            value = location.record.get(location.column.config.editor.editingDataIndex);
-        }
-
-        return this.callParent([location, value, doFocus]);
-    },
-
     onEditComplete: function(remainVisible, cancelling) {
         const location = this.getLocation();
 
@@ -23,11 +15,18 @@ Ext.define('Ext.translate5.Editor', {
             return result;
         }
 
-        if (location.record.get(this.config.editingDataIndex) === this.editor.getData()) {
+        let data = this.editor.getData();
+
+        // TODO move to a separate method
+        let dom = document.createElement('html');
+        dom.innerHTML = this.editor.getData(data);
+        let rawData = dom.getElementsByTagName('p')[0].innerHTML;
+
+        if (location.record.get(this.config.editingDataIndex) === rawData) {
             return result;
         }
 
-        location.record.set(this.config.editingDataIndex, this.editor.getData());
+        location.record.set(this.config.editingDataIndex, rawData);
         location.record.save();
 
         return result;
