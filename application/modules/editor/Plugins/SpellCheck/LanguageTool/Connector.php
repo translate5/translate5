@@ -145,7 +145,9 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
         $http->setHeaders('Accept: application/json');
         
         $response = $http->request(self::METHOD_LANGUAGES);
-        
+        //class_exists('editor_Utils');
+        //i(stack(), 'a');
+
         return self::$languages['languageTool'] = $this->processResponse($response);
     }
     
@@ -246,5 +248,14 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
 
         // Get language code supported by LanguageTool
         return self::$languages['argByLangId'][$targetLangId] = $spellCheckLang ? $spellCheckLang->longCode : false;
+    }
+
+    /**
+     * Getter for $this->apiBaseUrl
+     *
+     * @return string|null
+     */
+    public function getApiBaseUrl() {
+        return $this->apiBaseUrl;
     }
 }

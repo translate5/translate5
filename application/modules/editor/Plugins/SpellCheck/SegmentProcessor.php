@@ -41,9 +41,32 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
     /**
      * Get LanguageTool connector instance
      *
-     * @return mixed|null
+     * @return editor_Plugins_SpellCheck_LanguageTool_Connector|null
      */
     public function getConnector($slot = null) {
+
+        // If no $slot is given
+        if (!$slot) {
+
+            // Get connector instance with default slot
+            $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
+
+            // Get that default slot
+            $slot = $connector->getApiBaseUrl();
+
+            /*class_exists('editor_Utils');
+            i(getmypid(), 'a');
+            i([
+                '$slot arg' => func_num_args() ? func_get_arg(0) : 'null',
+                '$slot auto' => $slot,
+                'self::$_connector[$slot]' => self::$_connector[$slot] ? 'exists' : 'not exists'
+            ], 'a');*/
+
+            // Put connector instance into $_connector array under $slot key for further accessibility, if not there yet
+            if (!self::$_connector[$slot]) self::$_connector[$slot] = $connector;
+        }
+
+        // Get connector instance for given $slot
         return self::$_connector[$slot] ?? self::$_connector[$slot] = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector', [$slot]);
     }
 
@@ -51,11 +74,11 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
      * Do process
      *
      * @param editor_Segment_Tags[] $segmentsTags
-     * @param string $slot
-     * @param bool $doSaveTags
-     * @throws ZfExtended_Exception
+     * @param string|null $slot
+     * @param $processingMode
+     * @param bool|string $spellCheckLang
      */
-    public function process(array $segmentsTags, string $slot = null, $processingMode) {
+    public function process(array $segmentsTags, string $slot = null, $processingMode, $spellCheckLang = false) {
 
         // Get connector
         $connector = $this->getConnector($slot);
@@ -68,9 +91,6 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
 
             // Get segment and task shortcut
             $segment = $tags->getSegment(); $task = $tags->getTask();
-
-            //
-            $spellCheckLang = $connector->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
 
             // Distinct states
             $states = [];

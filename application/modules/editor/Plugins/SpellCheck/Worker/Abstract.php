@@ -125,7 +125,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
         $this->proccessedTags = null;
 
         // Get language to be passed within LanguageTool-request params (if task target language is supported)
-        $this->spellCheckLang = $this->getProcessor()->getConnector()->getSpellCheckLangByTaskTargetLangId($this->task->getTargetLang());
+        $this->spellCheckLang = $parameters['spellCheckLang'];
 
         // Return flag indicating whether worker initialization was successful
         return $return;
@@ -137,6 +137,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
      * @return editor_Plugins_SpellCheck_SegmentProcessor|null
      */
     public function getProcessor() {
+        //class_exists('editor_Utils'); i(self::$_processor ? 'processor exists' : 'processor not exists', 'a');
         return self::$_processor ?? self::$_processor = ZfExtended_Factory::get('editor_Plugins_SpellCheck_SegmentProcessor');
     }
 
@@ -278,7 +279,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
     protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {
         try {
             $processor = new editor_Plugins_SpellCheck_SegmentProcessor($this->task, $this->config, $this->processingMode, $this->isWorkerThread);
-            $processor->process($segmentsTags, $slot, true);
+            $processor->process($segmentsTags, $slot, true, $this->spellCheckLang);
             $this->setSpellcheckState($this->loadedSegmentIds, editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_CHECKED);
         }
         //Malfunction means the termtagger is up, but the send data produces an error in the tagger.

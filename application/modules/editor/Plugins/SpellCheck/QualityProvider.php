@@ -100,7 +100,11 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode, array $workerParams = []) {
 
         // Crucial: add processing-mode to worker params
-        $workerParams = ['processingMode' => $processingMode, 'resourcePool' => 'import'] + $workerParams;
+        $workerParams = [
+            'processingMode' => $processingMode,
+            'resourcePool' => 'import',
+            'spellCheckLang' => $this->getProcessor()->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())
+        ] + $workerParams;
 
         /* @var $worker editor_Plugins_SpellCheck_Worker_Import */
         $worker = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Worker_Import');
