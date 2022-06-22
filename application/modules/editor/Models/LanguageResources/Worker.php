@@ -31,7 +31,10 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_LanguageResources_Worker extends editor_Models_Task_AbstractWorker {
     const STATE_REIMPORT = 'reimporttm';
-    
+
+    private string $oldState;
+    private editor_Models_LanguageResources_LanguageResource $languageresource;
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -52,29 +55,28 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Task_Abstract
         /* @var MittagQI\Translate5\LanguageResource\TaskAssociation $assoc */
         
         $params = $this->workerModel->getParameters();
-        
+
+        $this->languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        $this->languageresource->load($params['languageResourceId']);
+
         $task = $this->task;
         if(!$task->lock(NOW_ISO, self::STATE_REIMPORT)) {
-            $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
-            $logger->error('E1169', 'The task is in use and cannot be reimported into the associated language resources.');
+            $this->getLogger()->error('E1169', 'The task is in use and cannot be reimported into the associated language resources.');
             return false;
         }
-        $oldState = $task->getState();
+        $this->oldState = $task->getState();
         $task->setState(self::STATE_REIMPORT);
         $task->save();
         $task->createMaterializedView();
-        
+
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
         /* @var $segments editor_Models_Segment_Iterator */
         $assoc->loadByTaskGuidAndTm($task->getTaskGuid(), $params['languageResourceId']);
-        
-        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-        $languageresource->load($params['languageResourceId']);
-        
+
+
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
-        $connector = $manager->getConnector($languageresource,null,null,$task->getConfig());
+        $connector = $manager->getConnector($this->languageresource,null,null,$task->getConfig());
         
         foreach($segments as $segment) {
             if(empty($segment->getTargetEdit()) || mb_strpos($segment->getTargetEdit(), "\n") !== false){
@@ -82,17 +84,60 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Task_Abstract
             }
             //TaskAssoc laden! daher die segmentsUpdateable info
             if(!empty($assoc->getSegmentsUpdateable())) {
-                $connector->update($segment);
+                try {
+                    $connector->update($segment);
+                }
+                catch(ZfExtended_Zendoverwrites_Http_Exception | editor_Services_Connector_Exception) {
+                    //if the TM is not available (due service restart or whatever) we just wait some time and try it again once.
+                    sleep(30);
+                    $connector->update($segment);
+                }
             }
         }
-        $task->setState($oldState);
-        $task->save();
-        if($oldState == $task::STATE_END) {
-            $task->dropMaterializedView();
-        }
-        $task->unlock();
-        $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
-        $logger->info('E0000', 'Task reimported successfully into the desired TM');
+
+        $this->reopenTask();
+        $this->getLogger()->info('E0000', 'Task reimported successfully into the desired TM');
         return true;
+    }
+
+    /**
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    protected function reopenTask() {
+        $this->task->setState($this->oldState);
+        $this->task->save();
+        if($this->oldState == $this->task::STATE_END) {
+            $this->task->dropMaterializedView();
+        }
+        $this->task->unlock();
+    }
+
+    /**
+     * @param Throwable $workException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    protected function handleWorkerException(Throwable $workException) {
+        $this->reopenTask();
+        $this->getLogger()->error('E0000', 'Task reimport in TM failed - please check log for reason and restart!');
+        if($workException instanceof ZfExtended_ErrorCodeException) {
+            $workException->addExtraData(['languageResource' => $this->languageresource]);
+        }
+        parent::handleWorkerException($workException);
+    }
+
+    /**
+     * @return ZfExtended_Logger
+     * @throws Zend_Exception
+     */
+    private function getLogger(): ZfExtended_Logger {
+        return Zend_Registry::get('logger')->cloneMe('editor.languageresource', [
+            'task' => $this->task ?? null,
+            'languageResource' => $this->languageresource ?? null,
+        ]);
     }
 }
