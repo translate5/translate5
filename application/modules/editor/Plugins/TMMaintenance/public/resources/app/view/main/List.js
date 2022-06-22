@@ -23,6 +23,7 @@ Ext.define('TMMaintenance.view.main.List', {
     },
 
     itemConfig: {
+        viewModel: true,
         minHeight: 100,
     },
 
@@ -88,11 +89,11 @@ Ext.define('TMMaintenance.view.main.List', {
                         handler: 'onDeletePress',
                     },
                     spinner: {
-                        iconCls: 'x-fa fa-cog',
+                        iconCls: 'loading',
                         bind: {
                             hidden: '{!record.isSaving}',
-                            tooltip: 'Saving. Please wait a while.',
-                        }
+                        },
+                        tooltip: 'Saving. Please wait a while.',
                     },
                 },
             },

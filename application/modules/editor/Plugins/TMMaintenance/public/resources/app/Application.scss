@@ -68,3 +68,7 @@ $enable-font-awesome: dynamic(true);
   font: 500 13px/16px 'Open Sans', 'Helvetica Neue', helvetica, arial, sans-serif;
   color: #404040;
 }
+
+.loading {
+  background-image: url("/modules/editor/images/loading_ico.gif");
+}

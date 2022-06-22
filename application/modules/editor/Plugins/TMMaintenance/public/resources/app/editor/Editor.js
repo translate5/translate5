@@ -26,11 +26,12 @@ Ext.define('Ext.translate5.Editor', {
             return result;
         }
 
+        location.record.set('isSaving', true);
         location.record.set(this.config.dataIndex, rawData);
         location.record.set(this.config.editingDataIndex, rawData);
         location.record.save({
-            success: function(record, operation) {
-                console.log(record, operation);
+            success: function() {
+                location.record.set('isSaving', false);
             },
         });
 
