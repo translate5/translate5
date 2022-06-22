@@ -157,7 +157,8 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         // Else
         } else if ($processingMode == editor_Segment_Processing::EDIT) {
 
-            $this->getProcessor()->process([$tags]);
+            // Do process
+            $this->getProcessor()->process([$tags], null, false, $spellCheckLang);
         }
 
         // Return

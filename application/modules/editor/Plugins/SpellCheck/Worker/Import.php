@@ -76,11 +76,19 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Plugins_SpellCheck_
             // Convert to human-readable log format
             $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: '%s'", $k, $v); }, $data, array_keys($data)));
 
+            /*class_exists('editor_Utils');
+            i('empty result - ' . date('H:i:s') . ' - ' . $slot . ' - ' . getmypid() , 'a');
+            i(stack(), 'a');*/
+
             // Log we're done
             $this->getLogger()->info('E1364', 'SpellCheck overall run done - {segmentCounts}', [
                 'task' => $this->task,
                 'segmentCounts' => $data,
             ]);
+        /*} else {
+            class_exists('editor_Utils');
+            i('non empty result - ' . date('H:i:s') . ' - '. $slot . ' - ' . getmypid() , 'a');
+            i(stack(), 'a');*/
         }
 
         // Return bunch

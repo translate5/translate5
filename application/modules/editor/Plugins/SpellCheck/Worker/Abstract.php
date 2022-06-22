@@ -276,28 +276,50 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
         return $this->processSegmentsTags($segmentsTags, $slot);
     }
 
+    /**
+     * Propcess segments tags
+     *
+     * @param array $segmentsTags
+     * @param string $slot
+     * @return bool
+     */
     protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {
+
+        // Try to process
         try {
+
+            // Create processor instance
             $processor = new editor_Plugins_SpellCheck_SegmentProcessor($this->task, $this->config, $this->processingMode, $this->isWorkerThread);
+
+            // Do process
             $processor->process($segmentsTags, $slot, true, $this->spellCheckLang);
+
+            // Set spellcheck state as 'checked'
             $this->setSpellcheckState($this->loadedSegmentIds, editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_CHECKED);
         }
-        //Malfunction means the termtagger is up, but the send data produces an error in the tagger.
-        // 1. we set the segment satus to retag, so each segment is tagged again, segment by segment, not in a bulk manner
-        // 2. we log all the data producing the error
-        /*catch(editor_Plugins_TermTagger_Exception_Malfunction $exception) {
+
+        // If Malfunction exception caught, it means the LanguageTool is up, but HTTP response code was not 2xx, so that
+        // - we set the segments status to 'recheck', so each segment will be checked again, segment by segment, not in a bulk manner
+        // - we log all the data producing the error
+        catch (editor_Plugins_TermTagger_Exception_Malfunction $exception) {
+
+            // Set segments status to 'recheck'
             $this->setTermtagState($this->loadedSegmentIds, $this->malfunctionState);
-            $exception->addExtraData([
-                'task' => $this->task
-            ]);
+
+            // Add task to exception extra data
+            $exception->addExtraData(['task' => $this->task]);
+
+            // Do log
             $this->getLogger()->exception($exception, [
                 'level' => ZfExtended_Logger::LEVEL_WARN,
-                'domain' => $this->config->getLoggerDomain($this->processingMode)
+                'domain' => $this->config->getLoggerDomain($this->processingMode) // processingType ?
             ]);
-        }*/
+        }
+
+        // If other exception caught
         catch (editor_Plugins_SpellCheck_Exception_Abstract $exception) {
 
-            //
+            // If it was Down exception - disable slot
             if ($exception instanceof editor_Plugins_SpellCheck_Exception_Down) {
                 $this->config->disableResourceSlot($slot);
             }
@@ -311,8 +333,10 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
             // Set status
             $this->setSpellcheckState($this->loadedSegmentIds, $state);
 
+            // Add task to exception extra data
             $exception->addExtraData(['task' => $this->task]);
 
+            // Do log
             $this->getLogger()->exception($exception, [
                 'domain' => $this->config->getLoggerDomain($this->processingMode)
             ]);
@@ -388,14 +412,18 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
     }
 
     /**
-     * sets the meta TermtagState of the given segment ids to the given state
+     * Sets the meta SpellcheckState of the given segment ids to the given state
+     *
      * @param editor_Models_Task $task
      * @param array $segments
      * @param string $state
      */
     private function setSpellcheckState(array $segments, $state) {
-        $segMetaDb = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+
         /* @var $segMetaDb editor_Models_Db_SegmentMeta */
+        $segMetaDb = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+
+        // Update spellcheckState to $state
         $segMetaDb->update(['spellcheckState' => $state], [
             'taskGuid = ?' => $this->task->getTaskGuid(),
             'segmentId in (?)' => $segments,
@@ -406,38 +434,51 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
      *
      */
     private function reportDefectSegments() {
-        // get list of defect segments
-        $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $dbMeta editor_Models_Db_SegmentMeta */
+        $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+
+        // Search for of defect segments
         $sql = $dbMeta->select()
             ->from($dbMeta, ['segmentId', 'spellcheckState'])
             ->where('taskGuid = ?', $this->task->getTaskGuid())
             ->where('spellcheckState IS NULL OR spellcheckState IN (?)', [
                 editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_DEFECT,
-                //editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE
+                editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE
             ]);
-        
         $defectSegments = $dbMeta->fetchAll($sql)->toArray();
+
+        // If nothing found - return
         if (empty($defectSegments)) {
             return;
         }
+
+        // Messages
         $segmentsToLog = [];
+
+        // Foreach defetc segments
         foreach ($defectSegments as $defectsegment) {
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+
             /* @var $segment editor_Models_Segment */
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+
+            // Load segment
             $segment->load($defectsegment['segmentId']);
-            
-            $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+
             /* @var $fieldManager editor_Models_SegmentFieldManager */
+            $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+
+            // Init fields
             $fieldManager->initFields($this->workerModel->getTaskGuid());
-            
-            if($defectsegment['spellcheckState'] == editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_DEFECT) {
-                $segmentsToLog[] = $segment->getSegmentNrInTask().'; Source-Text: '.strip_tags($segment->get($fieldManager->getFirstSourceName()));
-            }
-            else {
-                $segmentsToLog[] = $segment->getSegmentNrInTask().': Something wrong with with segment for SpellCheck';
+
+            // Setup a message
+            if ($defectsegment['spellcheckState'] == editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_DEFECT) {
+                $segmentsToLog []= $segment->getSegmentNrInTask().'; Source-Text: '.strip_tags($segment->get($fieldManager->getFirstSourceName()));
+            } else {
+                $segmentsToLog []= $segment->getSegmentNrInTask().': Segment too long for LanguageTool';
             }
         }
+
+        // Do log
         $this->getLogger()->warn('E1123', 'Some segments could not be checked by the SpellCheck.', [
             'task' => $this->task,
             'uncheckableSegments' => $segmentsToLog,

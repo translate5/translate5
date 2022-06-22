@@ -34,13 +34,13 @@ abstract class editor_Plugins_SpellCheck_Exception_Abstract extends ZfExtended_E
     /**
      * @var string
      */
-    protected $domain = 'editor.terminology'; // ?
+    protected $domain = 'editor.spellcheck';
     
     /**
      * Basically the spell-check exceptions produce just a warning
      *
      * @var integer
-     */
+     */á
     protected $level = ZfExtended_Logger::LEVEL_WARN;
 
     /**
@@ -55,7 +55,7 @@ abstract class editor_Plugins_SpellCheck_Exception_Abstract extends ZfExtended_E
 
         'E1129' => 'SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary.',
         'E1131' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
-        'E1240' => 'SpellCheck TIMEOUT: The configured LanguageTool "{termTaggerUrl}" did not respond in an appropriate time.',
+        'E1240' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.',
         'E1326' => 'SpellCheck can not work when target language is not supported by LanguageTool.',
     ];
 }

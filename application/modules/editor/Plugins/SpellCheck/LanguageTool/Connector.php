@@ -89,6 +89,13 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
     private $matches;
 
     /**
+     * Contains the HTTP status of the last request
+     *
+     * @var integer
+     */
+    protected $lastStatus;
+
+    /**
      * 
      */
     public function __construct($slot = null) {
@@ -158,16 +165,67 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
      * @return object
      */
     public function getMatches($text, $language){
+
+        // Get client
         $http = $this->getHttpClient(self::PATH_MATCHES);
+
+        // Set headers
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
-        
-        $http->setParameterPost('text',$text);
-        $http->setParameterPost('language',$language);
-        
-        $response = $http->request(self::METHOD_MATCHES);
-        
-        return $this->processResponse($response);
+
+        // Set params
+        $http->setParameterPost('text', $text);
+        $http->setParameterPost('language', $language);
+
+        // Reset $this->lastStatus
+        $this->lastStatus = false;
+
+        // Try to
+        try {
+
+            // Extra data to be passed to exception
+            $extraData = [
+                'httpMethod' => $method,
+                'languageToolUrl' => $http->getUri(true),
+            ];
+
+            // Make request and get response
+            $response = $http->request(self::METHOD_MATCHES);
+
+            // Get status
+            $this->lastStatus = $response->getStatus();
+
+            // Return processed response
+            return $this->processResponse($response);
+
+        // Catch timeout
+        } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $httpException) {
+            throw new editor_Plugins_SpellCheck_Exception_TimeOut('E1240', $extraData, $httpException);
+
+        // Catch spot down
+        } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $httpException) {
+            throw new editor_Plugins_SpellCheck_Exception_Down('E1129', $extraData, $httpException);
+
+        // Catch no response
+        } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $httpException) {
+            throw new editor_Plugins_SpellCheck_Exception_Request('E1130', $extraData, $httpException);
+
+        // Others
+        } catch (Exception $httpException) {
+            throw new editor_Plugins_SpellCheck_Exception_Request('E1119', $extraData, $httpException);
+        }
+
+        // If response http status is not between 200 and 300
+        if (!$this->wasSuccessfull()) {
+
+            // Throw malfunction exception
+            throw new editor_Plugins_SpellCheck_Exception_Malfunction('E1120', [
+                'httpStatus' => $this->getLastStatus(),
+                'termTaggerUrl' => $http->getUri(true),
+                'plainServerResponse' => print_r($response->getBody(), true),
+                'requestedData' => compact('text', 'language'),
+            ]);
+        }
     }
 
     /**
@@ -257,5 +315,28 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
      */
     public function getApiBaseUrl() {
         return $this->apiBaseUrl;
+    }
+
+    /**
+     * Returns true if the last request HTTP status was 2**
+     *
+     * @return boolean
+     */
+    public function wasSuccessfull() {
+
+        // Get last status
+        $stat = $this->getLastStatus();
+
+        // Return whether it's 2**
+        return $stat >= 200 && $stat < 300;
+    }
+
+    /**
+     * Returns the HTTP Status of the last request
+     *
+     * @return integer
+     */
+    public function getLastStatus() {
+        return (int) $this->lastStatus;
     }
 }
