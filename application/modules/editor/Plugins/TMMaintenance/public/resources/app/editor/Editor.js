@@ -26,8 +26,15 @@ Ext.define('Ext.translate5.Editor', {
             return result;
         }
 
+        location.record.set(this.config.dataIndex, rawData);
         location.record.set(this.config.editingDataIndex, rawData);
-        location.record.save();
+        location.record.save({
+            success: function(record, operation) {
+                console.log(record, operation);
+            },
+        });
+
+        location.view.refresh();
 
         return result;
     },
@@ -75,6 +82,18 @@ Ext.define('Ext.translate5.Editor', {
 
     onFocusLeave: function() {
         // Prevent editor from closing when clicking outside
+    },
+
+    realign: function () {
+        console.log('realign');
+
+        return this.callParent([]);
+    },
+
+    afterShow: function () {
+        console.log('afterShow');
+
+        return this.callParent([]);
     },
 
     getEditor: function () {

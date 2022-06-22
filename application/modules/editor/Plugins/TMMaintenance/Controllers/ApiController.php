@@ -69,7 +69,11 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     {
         $data = $this->jsonDecode($this->getRequest()?->getParam('data'));
         $api = $this->getApi((int)$data['tm']);
-        $api->updateEntry($data['rawSource'], $data['rawTarget']);
+        try {
+            $api->updateEntry($data['rawSource'], $data['rawTarget']);
+        } catch (\Exception $e) {
+            // TODO error
+        }
 
         $this->view->assign([$data]);
     }
@@ -162,7 +166,6 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             }
 
             $item['metaData'] = $metadata;
-
             $item['tm'] = $tmId;
 
             $result[] = $item;

@@ -343,7 +343,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($http->request());
     }
 
-    public function updateEntry(string $source, string $target): bool
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @throws JsonException
+     * @throws Exception
+     */
+    public function updateEntry(string $source, string $target): array
     {
         $request = [
             'sourceLang' => $this->languageResource->getSourceLang(),
@@ -356,7 +361,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $http = $this->getHttpWithMemory('POST', 'entry');
         $http->setRawData(json_encode($request, JSON_THROW_ON_ERROR), self::REQUEST_ENCTYPE);
 
-        return $this->processResponse($http->request());
+        $success = $this->processResponse($http->request());
+
+        if (!$success) {
+            throw new Exception();
+        }
+
+        return (array)$this->response;
     }
 
     public function deleteEntry(string $source, string $target): bool
