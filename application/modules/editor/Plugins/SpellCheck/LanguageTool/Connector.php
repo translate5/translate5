@@ -92,7 +92,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
      * 
      */
     public function __construct($slot = null) {
-        $this->apiBaseUrl = $slot ?? Zend_Registry::get('config')->runtimeOptions->plugins->SpellCheck->languagetool->api->baseurl;
+        $this->apiBaseUrl = $slot ?? Zend_Registry::get('config')->runtimeOptions->plugins->SpellCheck->languagetool->url->gui;
     }
     
     /**

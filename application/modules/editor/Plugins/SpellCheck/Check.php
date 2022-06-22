@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_SpellCheck_Check {
 
     /**
-     * Css class and quality category name for spell errors
+     * Css class and quality categoáry name for spell errors
      */
     const SPELL   = 'spellError';
 
@@ -50,7 +50,7 @@ class editor_Plugins_SpellCheck_Check {
     const STYLE   = 'suggestion';
 
     /**
-     * Mapppings for issueType-values provided by LanguageTool API response
+     * Mappings for issueType-values provided by LanguageTool API response
      *
      * @var array
      */
@@ -113,6 +113,7 @@ class editor_Plugins_SpellCheck_Check {
 
     /**
      * Retrieves the evaluated states
+     *
      * @return string[]
      */
     public function getStates(){
@@ -120,7 +121,6 @@ class editor_Plugins_SpellCheck_Check {
     }
 
     /**
-     * 
      * @return boolean
      */
     public function hasStates() {

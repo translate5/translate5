@@ -27,8 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Encapsulates the tagging of groups of segment-tags
- * This enables to not "misuse" the import/analysis worker for processing a single tag when editing
+ *
  */
 class editor_Plugins_SpellCheck_SegmentProcessor {
 
@@ -44,12 +43,13 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
      *
      * @return mixed|null
      */
-    public function getConnector($slot) {
+    public function getConnector($slot = null) {
         return self::$_connector[$slot] ?? self::$_connector[$slot] = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector', [$slot]);
     }
 
     /**
-     * 
+     * Do process
+     *
      * @param editor_Segment_Tags[] $segmentsTags
      * @param string $slot
      * @param bool $doSaveTags
@@ -57,10 +57,13 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
      */
     public function process(array $segmentsTags, string $slot = null, $processingMode) {
 
+        // Get connector
         $connector = $this->getConnector($slot);
 
+        // Foreach segment
         foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
 
+            // Get segmentId
             $segmentId = $tags->getSegmentId();
 
             // Get segment and task shortcut
@@ -91,6 +94,7 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
                 }
             }
 
+            // Save qualities
             $tags->getQualities()->save();
         }
     }

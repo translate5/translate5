@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Seperate Holder of certain configurations to accompany editor_Plugins_SpellCheck_Worker_SpellCheckImport
+ * Separate holder of certain configurations to accompany editor_Plugins_SpellCheck_Worker_Import
  */
 class editor_Plugins_SpellCheck_Configuration {
     
@@ -90,26 +90,15 @@ class editor_Plugins_SpellCheck_Configuration {
     const DOWN_CACHE_KEY = 'SpellCheckDownList';
 
     /**
-     * @var editor_Models_Task
-     */
-    private $task;
-
-    /**
+     * Memcache instance
+     *
      * @var Zend_Cache_Core
      */
-    private $memCache;
+    private $memCache = null;
 
     /**
-     * 
-     * @param editor_Models_Task $task
-     */
-    public function __construct(editor_Models_Task $task){
-        $this->task = $task;
-        $this->memCache = null;
-    }
-
-    /**
-     * 
+     * Get request timeout
+     *
      * @param bool $isWorkerThread
      * @return int
      */
@@ -118,19 +107,22 @@ class editor_Plugins_SpellCheck_Configuration {
     }
 
     /**
-     * 
+     * Get logger domain
+     *
      * @param string $processingType
      * @return string
      */
     public function getLoggerDomain(string  $processingType) : string {
-        switch($processingType){
+        switch ($processingType) {
             case editor_Segment_Processing::IMPORT: return self::IMPORT_LOGGER_DOMAIN;
             case editor_Segment_Processing::EDIT:   return self::EDITOR_LOGGER_DOMAIN;
             default:                                return self::EDITOR_LOGGER_DOMAIN;
         }
     }
+
     /**
-     * 
+     * Get memcache instance
+     *
      * @return Zend_Cache_Core
      */
     public function getMemCache() : Zend_Cache_Core {
@@ -139,7 +131,7 @@ class editor_Plugins_SpellCheck_Configuration {
     }
 
     /**
-     * Save list of LanguageTool spots which are offline to cache
+     * Save to cache list of LanguageTool spots which are offline
      *
      * @param array $offlineSpots
      */
@@ -150,6 +142,7 @@ class editor_Plugins_SpellCheck_Configuration {
     }
 
     /**
+     * Get array of available resource slots for the given $resourcePool
      *
      * @return array
      */
@@ -202,7 +195,7 @@ class editor_Plugins_SpellCheck_Configuration {
         }
 
         // Append $url arg to the list
-        $list[] = $url;
+        $list []= $url;
 
         // Save list back to memcache
         $this->getMemCache()->save($list, self::DOWN_CACHE_KEY);

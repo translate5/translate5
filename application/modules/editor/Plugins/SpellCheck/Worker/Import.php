@@ -30,12 +30,18 @@ END LICENSE AND COPYRIGHT
  * 
  * The Worker to process the termtagging for an import
  */
-class editor_Plugins_SpellCheck_Worker_SpellCheckImport extends editor_Plugins_SpellCheck_Worker_Abstract {
+class editor_Plugins_SpellCheck_Worker_Import extends editor_Plugins_SpellCheck_Worker_Abstract {
 
+    /**
+     * Resource pool key
+     *
+     * @var string
+     */
     protected $resourcePool = 'import';
     
     /***
-     * Term tagging takes approximately 15 % of the import time
+     * Spell checking takes approximately 15 % of the import time
+     *
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::getWeight()
      */
@@ -43,26 +49,41 @@ class editor_Plugins_SpellCheck_Worker_SpellCheckImport extends editor_Plugins_S
         return 15;
     }
 
+    /**
+     * Load next bunch of segments to be process
+     *
+     * @param string $slot
+     * @return array
+     */
     protected function loadNextSegments(string $slot): array
     {
+        // Load segments to be processed
         $result = parent::loadNextSegments($slot);
-        if(empty($result)) {
 
-            $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+        // If nothing left
+        if (empty($result)) {
+
             /* @var $db editor_Models_Db_SegmentMeta */
+            $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
 
+            // Get quantities-by-spellcheckState
             $sql = $db->select()
                 ->from($db, ['spellcheckState', 'cnt' => 'count(id)'])
                 ->where('taskGuid = ?', $this->task->getTaskGuid());
             $segmentCounts = $db->fetchAll($sql)->toArray();
-
             $data = array_column($segmentCounts, 'cnt', 'spellcheckState');
+
+            // Convert to human-readable log format
             $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: '%s'", $k, $v); }, $data, array_keys($data)));
+
+            // Log we're done
             $this->getLogger()->info('E1364', 'SpellCheck overall run done - {segmentCounts}', [
                 'task' => $this->task,
                 'segmentCounts' => $data,
             ]);
         }
+
+        // Return bunch
         return $result;
     }
 }

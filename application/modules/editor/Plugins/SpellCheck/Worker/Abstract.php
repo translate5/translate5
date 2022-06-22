@@ -27,19 +27,21 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Base Implementation of the Term-Tagger Worker.
- * Tags the segments on task import and also handles the segment saving (the class-name is historical)
+ * Base Implementation of the SpellCheck worker.
+ * Checks spell, grammar and style for each segment on task import
  */
 abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_Quality_SegmentWorker {
     
     /**
-     * Allowd values for setting resourcePool
+     * Allowed values for setting resourcePool
+     *
      * @var array(strings)
      */
     protected static $allowedResourcePools = ['default', 'gui', 'import'];
 
     /**
-     * Praefix for workers resource-name
+     * Prefix for workers resource-name
+     *
      * @var string
      */
     protected static $praefixResourceName = 'SpellCheck_';
@@ -50,14 +52,16 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
     protected $maxLifetime = '2 HOUR';
 
     /**
-     * Multiple workers are allowed to run simultaneously per task
+     * Whether multiple workers are allowed to run simultaneously per task
+     *
      * @var string
      */
     protected $onlyOncePerTask = false;
 
     /**
-     * resourcePool for the different SpellCheck-Operations;
+     * Default resourcePool for the different SpellCheck-operations
      * Possible Values: $this->allowdResourcePools = ['default', 'gui', 'import'];
+     *
      * @var string
      */
     protected $resourcePool = 'default';
@@ -88,110 +92,195 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
     private $proccessedTags;
 
     /**
-     * the termtagger will hang if source and target language are identical, so we skip work in that case
-     * see TRANSLATE-2373
-     * @var boolean
+     * SpellCheck segment processor instance
+     *
+     * @var editor_Plugins_SpellCheck_SegmentProcessor
      */
-    private $skipDueToEqualLangs = false;
+    protected static $_processor = null;
 
     /**
+     * Language that will be passed as a param within LanguageTool-request along with segment text for spellcheck
+     *
+     * @var null
+     */
+    private $spellCheckLang = null;
+
+    /**
+     * Init worker
+     *
      * @param null $taskGuid
      * @param array $parameters
      * @return bool
      */
-    public function init($taskGuid = NULL, $parameters = array()) {
+    public function init($taskGuid = NULL, $parameters = []) {
+
+        // Call parent
         $return = parent::init($taskGuid, $parameters);
+
+        // Get config
         $this->config = new editor_Plugins_SpellCheck_Configuration($this->task);
+
+        // (Re)set logger to null
         $this->logger = null;
         $this->proccessedTags = null;
-        $this->skipDueToEqualLangs = ($this->task->getSourceLang() === $this->task->getTargetLang());
+
+        // Get language to be passed within LanguageTool-request params (if task target language is supported)
+        $this->spellCheckLang = $this->getProcessor()->getConnector()->getSpellCheckLangByTaskTargetLangId($this->task->getTargetLang());
+
+        // Return flag indicating whether worker initialization was successful
         return $return;
     }
 
-    /***
-     * Update the progres based on the tagged field in lek segments meta
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::updateProgress()
+    /**
+     * Get SpellCheck segment processor instance
+     *
+     * @return editor_Plugins_SpellCheck_SegmentProcessor|null
      */
-    public function updateProgress(float $progress = 1){
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+    public function getProcessor() {
+        return self::$_processor ?? self::$_processor = ZfExtended_Factory::get('editor_Plugins_SpellCheck_SegmentProcessor');
+    }
+
+    /**
+     * Update the progres based on the checked field in lek segments meta
+     *
+     * @inheritdoc
+     * @see ZfExtended_Worker_Abstract::updateProgress()
+     * @param float $progress
+     */
+    public function updateProgress(float $progress = 1) {
+
         /* @var $meta editor_Models_Segment_Meta */
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+
+        // Get progress
         $progress = $meta->getSpellcheckSegmentProgress($this->taskGuid);
+
+        // Call parent
         parent::updateProgress($progress);
     }
 
     /**
+     * Get logger instance (will be created if not exists)
      *
      * @return ZfExtended_Logger
      */
     protected function getLogger() : ZfExtended_Logger {
-        if($this->logger == null){
-            $this->logger = Zend_Registry::get('logger')->cloneMe($this->config->getLoggerDomain($this->processingMode));
-        }
-        return $this->logger;
+        return $this->logger ?? $this->logger = Zend_Registry
+            ::get('logger')->cloneMe(
+                $this->config->getLoggerDomain($this->processingMode)
+            );
     }
 
     /**
      * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
-     * {@inheritDoc}
+     *
+     * @inheritdoc
      * @see editor_Models_Import_Worker_ResourceAbstract::getAvailableSlots()
+     * @param string $resourcePool
+     * @return array
      */
-    protected function getAvailableSlots($resourcePool='default') : array {
+    protected function getAvailableSlots($resourcePool = 'default'): array {
         return $this->config->getAvailableResourceSlots($resourcePool);
     }
 
-    protected function raiseNoAvailableResourceException(){
-        // E1131 No TermTaggers available, please enable term taggers to import this task.
-        throw new editor_Plugins_TermTagger_Exception_Down('E1131', [
+    /**
+     * @throws editor_Plugins_TermTagger_Exception_Down
+     */
+    protected function raiseNoAvailableResourceException() {
+        // E1131 No reachable LanguageTool instances available, please specify LanguageTool urls to import this task.
+        throw new editor_Plugins_SpellCheck_Exception_Down('E1131', [
             'task' => $this->task
         ]);
     }
 
-    /*************************** THREADED MULTI-SEGMENT PROCESSING ***************************/
-    
-    protected function loadNextSegments(string $slot) : array {
+    /**
+     * Load array of editor_Models_Segment instances to be spell-checked
+     *
+     * @param string $slot
+     * @return array
+     */
+    protected function loadNextSegments(string $slot): array {
+
+        // At this stage we assume that malfunction state is a state indicating that
+        // something went wrong while last attempt to spell-check loaded segments
         $this->malfunctionState = editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_RECHECK;
+
+        // Load a list of segmentIds which are not yet spell-checked
         $this->loadedSegmentIds = $this->loadUncheckedSegmentIds();
-        if (empty($this->loadedSegmentIds)) {
-            $this->loadedSegmentIds = $this->loadNextRecheckSegmentId();
-            // if the loading of rechecked segments does not work we need to set them to be defect ...
+
+        // If nothing loaded
+        if (!$this->loadedSegmentIds) {
+
+            // If the loading of rechecked segments does not work we need to set them to be defect
             $this->malfunctionState = editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_DEFECT;
-            if(empty($this->loadedSegmentIds)) {
+
+            // Try load a list of IDs of segments to be rechecked
+            $this->loadedSegmentIds = $this->loadNextRecheckSegmentId();
+
+            // If nothing loaded
+            if (!$this->loadedSegmentIds) {
+
+                // Report defect segments
                 $this->reportDefectSegments();
+
+                // Return empty array as we found nothing to be processed
                 return [];
             }
         }
-        $segments = [];
+
+        // Foreach segmentId - load segment instance and add to $segments array
         foreach ($this->loadedSegmentIds as $segmentId) {
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $segment editor_Models_Segment */
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
             $segment->load($segmentId);
             $segments[] = $segment;
         }
-        return $segments;
+
+        // Return array of loaded segment instances
+        return $segments ?? [];
     }
-    
+
+    /**
+     * Process segments
+     *
+     * @param array $segments
+     * @param string $slot
+     * @return bool
+     */
     protected function processSegments(array $segments, string $slot) : bool {
-        if($this->skipDueToEqualLangs){
-            if($this->isWorkerThread){
-                $this->getLogger()->error('E1326', 'SpellCheck can not work when source and target language are equal?.', ['task' => $this->task]);
+
+        // If task's target language is not supported by LanguageTool
+        if (!$this->spellCheckLang) {
+
+            // If we're inside a worker thread
+            if ($this->isWorkerThread) {
+
+                // Log event
+                $this->getLogger()->error('E1326', 'SpellCheck can not work when target language is not supported by LanguageTool.', ['task' => $this->task]);
+
+                // Return false
                 return false;
             }
+
+            // Return true
             return true;
         }
-        
-        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, editor_Segment_Processing::isOperation($this->processingMode)), $slot);
+
+        // Get segments tags from segments
+        $segmentsTags = editor_Segment_Tags::fromSegments(
+            $this->task, $this->processingMode, $segments, editor_Segment_Processing::isOperation($this->processingMode)
+        );
+
+        // Process segments tags
+        return $this->processSegmentsTags($segmentsTags, $slot);
     }
-    
+
     protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {
-        //try {
+        try {
             $processor = new editor_Plugins_SpellCheck_SegmentProcessor($this->task, $this->config, $this->processingMode, $this->isWorkerThread);
             $processor->process($segmentsTags, $slot, true);
             $this->setSpellcheckState($this->loadedSegmentIds, editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_CHECKED);
-        //}
-        //catch (ZfExtended_ErrorCodeException $exception) {
-
-        //}
+        }
         //Malfunction means the termtagger is up, but the send data produces an error in the tagger.
         // 1. we set the segment satus to retag, so each segment is tagged again, segment by segment, not in a bulk manner
         // 2. we log all the data producing the error
@@ -204,46 +293,50 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
                 'level' => ZfExtended_Logger::LEVEL_WARN,
                 'domain' => $this->config->getLoggerDomain($this->processingMode)
             ]);
-        }
-        catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
-            if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
+        }*/
+        catch (editor_Plugins_SpellCheck_Exception_Abstract $exception) {
+
+            //
+            if ($exception instanceof editor_Plugins_SpellCheck_Exception_Down) {
                 $this->config->disableResourceSlot($slot);
             }
-            //if we run in a timeout then set status retag, so that the affected segments are tagged lonely not as batch
-            if($exception instanceof editor_Plugins_TermTagger_Exception_TimeOut) {
-                // if we are in the retag loop the timeout should be handled as malfunction
-                $state = $this->malfunctionState; //this is either retag or defect (later if we are already processing retags)
-            }
-            else {
-                $state = editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED;
-            }
 
-            $this->setTermtagState($this->loadedSegmentIds, $state);
+            // If we run in a timeout then set status recheck, so that the affected segments are checked lonely not as batch
+            // If we are in the recheck loop the timeout should be handled as malfunction
+            $state = $exception instanceof editor_Plugins_SpellCheck_Exception_TimeOut
+                ? $this->malfunctionState // This is either recheck or defect (later if we are already processing rechecks)
+                : editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNCHECKED;
 
-            $exception->addExtraData([
-                'task' => $this->task
-            ]);
+            // Set status
+            $this->setSpellcheckState($this->loadedSegmentIds, $state);
+
+            $exception->addExtraData(['task' => $this->task]);
+
             $this->getLogger()->exception($exception, [
                 'domain' => $this->config->getLoggerDomain($this->processingMode)
             ]);
-            if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
+            /*if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
                 //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
                 //so we do not create a new worker entry, that imports the task without terminology markup then
                 $this->task->setTerminologie(0);
                 $this->task->save();
                 return false;
-            }
-        }*/
+            }*/
+        }
         return true;
     }
+
     /**
-     * Loads a list of segmentIds where terms are not tagged yet.
+     * Load a list of segmentIds which are not yet spell-checked
+     *
      * @return array
      */
     private function loadUncheckedSegmentIds(): array {
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+
         /* @var $db editor_Models_Db_SegmentMeta */
-        
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+
+        // Get unchecked segments ids
         $db->getAdapter()->beginTransaction();
         $sql = $db->select()
             ->from($db, ['segmentId'])
@@ -253,39 +346,43 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
             ->limit(editor_Plugins_SpellCheck_Configuration::IMPORT_SEGMENTS_PER_CALL)
             ->forUpdate(Zend_Db_Select::FU_MODE_SKIP);
         $segmentIds = $db->fetchAll($sql)->toArray();
-        $segmentIds = array_column($segmentIds, 'segmentId');
-        
-        if(empty($segmentIds)) {
-            $db->getAdapter()->commit();
-            return $segmentIds;
+
+        // If not empty
+        if ($segmentIds = array_column($segmentIds, 'segmentId')) {
+
+            // Lock those segments by setting their status as 'inprogress', so that they won't be touched by other workers
+            $db->update(['spellcheckState' => editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_INPROGRESS], [
+                'taskGuid = ?' => $this->task->getTaskGuid(),
+                'segmentId in (?)' => $segmentIds,
+            ]);
         }
-        
-        $db->update(['spellcheckState' => editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_INPROGRESS], [
-            'taskGuid = ?' => $this->task->getTaskGuid(),
-            'segmentId in (?)' => $segmentIds,
-        ]);
+
+        // Commit the transaction
         $db->getAdapter()->commit();
-        
+
+        // Return unchecked segments ids (even if empty)
         return $segmentIds;
     }
 
     /**
-     * returns a list with the next segmentId where terms are marked as to be "rechecked"
-     * returns only one segment since this segments has to be single checked
+     * Fetch a list with the next segmentId marked as to be "rechecked"
+     * and return only one segment from that list since this segments has to be single checked
      *
      * @return array
      */
     private function loadNextRecheckSegmentId(): array {
-        // get list of unchecked segments
-        $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+
         /* @var $dbMeta editor_Models_Db_SegmentMeta */
-        
+        $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+
+        // Get list of segments to be rechecked limited to 1
         $sql = $dbMeta->select()
             ->from($dbMeta, ['segmentId'])
             ->where('taskGuid = ?', $this->task->getTaskGuid())
-            ->where('termtagState IS NULL OR termtagState = ?', [editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_RECHECK])
+            ->where('spellcheckState IS NULL OR spellcheckState = ?', [editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_RECHECK])
             ->limit(1);
-        
+
+        // Return an array containing 1 segmentId
         return array_column($dbMeta->fetchAll($sql)->toArray(), 'segmentId');
     }
 
