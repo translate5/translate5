@@ -1,6 +1,6 @@
-Ext.define('TMMaintenance.view.main.EditFormController', {
+Ext.define('TMMaintenance.view.main.CreateFormController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.editform',
+    alias: 'controller.createform',
 
     onSavePress: function () {
         let form = this.view;

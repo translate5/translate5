@@ -6,7 +6,6 @@ Ext.define('TMMaintenance.view.main.Main', {
         'TMMaintenance.view.main.Toolbar',
         'TMMaintenance.view.main.SearchForm',
         'TMMaintenance.view.main.List',
-        'TMMaintenance.view.main.EditForm',
         'Ext.Dialog',
     ],
 

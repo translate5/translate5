@@ -8,6 +8,7 @@ Ext.define('TMMaintenance.view.main.List', {
         'Ext.grid.plugin.Editable',
         'Ext.grid.rowedit.Plugin',
         'Ext.translate5.Editor',
+        'TMMaintenance.view.main.CreateForm',
     ],
 
     title: 'Segments',
@@ -51,6 +52,7 @@ Ext.define('TMMaintenance.view.main.List', {
             },
             editor: {
                 xtype: 't5editor',
+                dataIndex: 'target',
                 editingDataIndex: 'rawTarget',
             },
         },
@@ -84,6 +86,13 @@ Ext.define('TMMaintenance.view.main.List', {
                     delete: {
                         iconCls: 'x-fa fa-trash-alt',
                         handler: 'onDeletePress',
+                    },
+                    spinner: {
+                        iconCls: 'x-fa fa-cog',
+                        bind: {
+                            hidden: '{!record.isSaving}',
+                            tooltip: 'Saving. Please wait a while.',
+                        }
                     },
                 },
             },
@@ -162,8 +171,8 @@ Ext.define('TMMaintenance.view.main.List', {
         minWidth: 400,
         items: [
             {
-                id: 'editform',
-                xtype: 'editform',
+                id: 'createform',
+                xtype: 'createform',
             },
         ],
     },

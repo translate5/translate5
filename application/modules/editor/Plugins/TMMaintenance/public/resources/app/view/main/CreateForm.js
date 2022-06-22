@@ -1,7 +1,7 @@
-Ext.define('TMMaintenance.view.main.EditForm', {
+Ext.define('TMMaintenance.view.main.CreateForm', {
     extend: 'Ext.form.Panel',
-    xtype: 'editform',
-    controller: 'editform',
+    xtype: 'createform',
+    controller: 'createform',
     layout: 'vbox',
     defaultType: 'textfield',
     userCls: '',
