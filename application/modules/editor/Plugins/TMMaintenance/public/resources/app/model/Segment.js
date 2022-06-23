@@ -28,6 +28,6 @@ Ext.define('TMMaintenance.model.Segment', {
             rootProperty: 'data',
             type: 'json',
             writeAllFields: true,
-        }
+        },
     }
 });
