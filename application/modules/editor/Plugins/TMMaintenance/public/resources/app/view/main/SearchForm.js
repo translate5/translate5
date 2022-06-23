@@ -99,4 +99,12 @@ Ext.define('TMMaintenance.view.main.SearchForm', {
             ],
         },
     ],
+
+    getSearchCriteriaValue: function () {
+        return this.getValues().searchCriteria;
+    },
+
+    getSearchFieldValue: function () {
+        return this.getValues().searchField;
+    },
 })

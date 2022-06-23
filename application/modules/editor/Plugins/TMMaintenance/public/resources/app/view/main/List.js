@@ -36,10 +36,7 @@ Ext.define('TMMaintenance.view.main.List', {
             cell: {
                 encodeHtml: false,
             },
-            editable: false,
-            editor: {
-                xtype: 'celleditor',
-            },
+            renderer: 'sourceTargetRenderer',
         },
         {
             text: 'Target text',
@@ -56,6 +53,7 @@ Ext.define('TMMaintenance.view.main.List', {
                 dataIndex: 'target',
                 editingDataIndex: 'rawTarget',
             },
+            renderer: 'sourceTargetRenderer',
         },
         {
             text: 'Author',

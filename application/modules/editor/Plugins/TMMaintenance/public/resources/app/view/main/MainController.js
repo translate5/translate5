@@ -3,6 +3,8 @@ Ext.define('TMMaintenance.view.main.MainController', {
 
     alias: 'controller.main',
 
+    searchForm: null,
+
     onContainerScrollEnd: function () {
         if (!this.getViewModel().get('hasMoreRecords')) {
             return;
@@ -27,6 +29,16 @@ Ext.define('TMMaintenance.view.main.MainController', {
                 me.getViewModel().set('hasMoreRecords', null !== offset);
             },
         });
+    },
+
+    sourceTargetRenderer: function (value, record, cell, column) {
+        if (this.getSearchForm().getSearchFieldValue() !== cell) {
+            return value;
+        }
+
+        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
+
+        return tagHelper.highlight(value, this.getSearchForm().getSearchCriteriaValue());
     },
 
     onCreatePress: function () {
@@ -96,7 +108,11 @@ Ext.define('TMMaintenance.view.main.MainController', {
         this.getViewModel().get('dialog').hide();
     },
 
-    getEditForm: function () {
-        return Ext.getCmp('editform');
+    getSearchForm: function () {
+        if (null === this.searchForm) {
+            this.searchForm = Ext.getCmp('searchform');
+        }
+
+        return this.searchForm;
     },
 });

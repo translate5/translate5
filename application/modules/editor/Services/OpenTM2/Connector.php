@@ -320,11 +320,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             //[NextSearchPosition] =>
             foreach($results as $result) {
                 $this->resultList->addResult(
-                    $this->highlight($searchString, $this->tagHandler->restoreInResult($result->target), $field == 'target'),
+                    $this->tagHandler->restoreInResult($result->target),
                     0,
                     $this->getMetaData($result)
                 );
-                $this->resultList->setSource($this->highlight($searchString, $this->tagHandler->restoreInResult($result->source), $field == 'source'));
+                $this->resultList->setSource($this->tagHandler->restoreInResult($result->source));
                 $this->resultList->setRawContent($result->source, $result->target);
             }
             
