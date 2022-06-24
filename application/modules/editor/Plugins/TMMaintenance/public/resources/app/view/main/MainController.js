@@ -31,14 +31,15 @@ Ext.define('TMMaintenance.view.main.MainController', {
         });
     },
 
-    sourceTargetRenderer: function (value, record, cell, column) {
+    sourceTargetRenderer: function (value, record, cell) {
+        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
+        let result = tagHelper.transform(value);
+
         if (this.getSearchForm().getSearchFieldValue() !== cell) {
-            return value;
+            return result;
         }
 
-        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
-
-        return tagHelper.highlight(value, this.getSearchForm().getSearchCriteriaValue());
+        return tagHelper.highlight(result, this.getSearchForm().getSearchCriteriaValue());
     },
 
     onCreatePress: function () {

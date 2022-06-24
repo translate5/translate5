@@ -136,7 +136,6 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
                 return $item;
             }, $data);
 
-            $data = $this->processTags($data);
             $offset = $resultList->getNextOffset();
 
             $totalAmount += count($data);
@@ -249,48 +248,5 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     private function jsonDecode(string $data): array
     {
         return json_decode($data, true, self::JSON_DEFAULT_DEPTH, JSON_THROW_ON_ERROR);
-    }
-
-    private function processTags(array $data): array
-    {
-        $process = static function (string $resultString) {
-            $result = str_replace(["\r\n", ' '], ['<br/>', '&nbsp;'], $resultString);
-
-            foreach (['bpt', 'ept'] as $tag) {
-                $matches = [];
-                $pattern = '/<' . $tag . '(.[xi]="\d+"){2}\/>/';
-                preg_match_all($pattern, $result, $matches);
-
-                foreach (current($matches) as $match) {
-                    preg_match('/i="(\d+)"/', $match, $indexes);
-                    $index = array_pop($indexes);
-
-                    $svg = '<svg xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="rgb(207,207,207)" rx="3" ry="3"/><text x="0.25em" y="1em" font-size="13px">';
-                    $svg .= '&lt;' . ($tag === 'ept' ? '/' : '') . $index . '&gt;</text></svg>';
-
-                    $replace = str_replace(
-                        ['{tagType}', '{index}'],
-                        [$tag === 'bpt' ? 'open' : 'close', $index],
-                        '<img src="data:image/svg+xml;charset=utf-8,' . rawurlencode($svg) . '" data-tag-type="{tagType}" data-tag-id="{index}" class="tag"/>'
-                    );
-
-                    $result = str_replace($match, $replace, $result);
-                }
-            }
-
-            return $result;
-        };
-
-        $result = [];
-
-        foreach ($data as $item) {
-            foreach (['source', 'target', 'rawTarget'] as $field) {
-                $item[$field] = $process($item[$field]);
-            }
-
-            $result[] = $item;
-        }
-
-        return $result;
     }
 }

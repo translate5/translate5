@@ -317,27 +317,27 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         }
         Ext.getCmp("sourceSearch").setValue(""); 
     },
+
     highlight: function (source, search) {
         let tagsRe = /<[^>]*>/gm;
         let tagsProtect = '\x0f';
-        let matches;
-        let result;
+        let matches = source.match(tagsRe);
 
-        matches = source.match(tagsRe);
-        result = source.replace(tagsRe, tagsProtect);
+        if (null === matches) {
+            return source;
+        }
 
+        let result = source.replace(tagsRe, tagsProtect);
         let searchRegexp = new RegExp(search, 'gi');
 
-        result = result.replace(searchRegexp, function(item) {
+        result = result.replace(searchRegexp, function (item) {
             return '<span class="highlight">' + item + '</span>';
         }, this);
 
         // restore protected tags
-        if (null !== matches) {
-            matches.forEach(function(match) {
-                result = result.replace(tagsProtect, match);
-            });
-        }
+        matches.forEach(function (match) {
+            result = result.replace(tagsProtect, match);
+        });
 
         return result;
     },
