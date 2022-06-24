@@ -15,7 +15,8 @@ Ext.define('Ext.translate5.Editor', {
             return result;
         }
 
-        let data = this.editor.getData();
+        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
+        let data = tagHelper.reverseTransform(this.editor.getData());
 
         // TODO move to a separate method
         let dom = document.createElement('html');
@@ -42,7 +43,8 @@ Ext.define('Ext.translate5.Editor', {
 
     beforeEdit: function() {
         let me = this;
-        let value = me.getLocation().record.get(this.config.editingDataIndex);
+        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
+        let value = tagHelper.transform(me.getLocation().record.get(this.config.editingDataIndex));
 
         if (null !== me.editor) {
             me.editor.setData(value);

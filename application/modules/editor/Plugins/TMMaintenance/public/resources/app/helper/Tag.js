@@ -29,7 +29,8 @@ Ext.define('TMMaintenance.helper.Tag', {
     },
 
     reverseTransform: function (source) {
-
+        // TODO add real implementation
+        return source;
     },
 
     highlight: function (source, search) {
