@@ -37,7 +37,7 @@ class editor_Models_Export_Xliff2Worker extends ZfExtended_Worker_Abstract {
      */
     protected function validateParameters($parameters = array()) {
         if(isset($parameters['exportToFolder']) && (!is_dir($parameters['exportToFolder']) || !is_writable($parameters['exportToFolder']))){
-            $this->log->logError('Export folder not found or not write able: '.$parameters['exportToFolder']);
+            $this->log->error('E1398', 'Export folder not found or not write able: {folder}', ['folder' => $parameters['exportToFolder']]);
             return false;
         }
         return true;

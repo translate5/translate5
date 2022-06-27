@@ -108,7 +108,6 @@ class editor_Models_Export {
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
             mkdir($path);
         }
-        $log = Zend_Registry::get('logger')->cloneMe('editor.export');
         $segmentErrors = [];
         foreach ($filePaths as $fileId => $relPath) {
             $path = $localEncoded->encode($relPath);
