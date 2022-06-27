@@ -62,8 +62,10 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         parent::__construct();
 
         //en/disable gTagPairing
-        $this->gTagPairing = (bool) $options['gTagPairing'] ?? true;
-        
+        if(array_key_exists('gTagPairing', $options)) {
+            $this->gTagPairing = (bool) $options['gTagPairing'] ?? true;
+        }
+
         //replace unusable <ph|it etc> tags with usable <x|bx etc> tags
         $this->xmlparser->registerElement(
             't5xliffresult > it,t5xliffresult > ph,t5xliffresult > ept,t5xliffresult > bpt',
