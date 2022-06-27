@@ -35,11 +35,12 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     ConfigCommand,
     DatabaseUpdateCommand,
     DevelopmentCreatetestCommand,
+    DevelopmentEcodeCommand,
     DevelopmentGithookCommand,
     DevelopmentNewModelCommand,
     DevelopmentNewdbchangeCommand,
     DevelopmentRuntestCommand,
-    DevelopmentEcodeCommand,
+    DevelopmentTriggerworkflowCommand,
     L10nAddCommand,
     L10nRemoveCommand,
     LogCommand,
@@ -109,6 +110,7 @@ if(file_exists('.git')) {
     $commands[] = new ReleaseNotesCommand();
     $commands[] = new DevelopmentNewModelCommand();
     $commands[] = new DevelopmentEcodeCommand();
+    $commands[] = new DevelopmentTriggerworkflowCommand();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
 }
