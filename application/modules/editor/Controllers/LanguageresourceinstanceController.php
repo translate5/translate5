@@ -857,7 +857,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * The returned data is no real task entity, although the task model is used in the frontend!
      */
     public function tasksAction() {
-        $this->getAction();
+        try {
+            $this->getAction();
+        } catch (editor_Services_Connector_Exception $e) {
+            $e->addExtraData(['languageResource' => $this->entity]);
+            throw $e;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->decodePutData();
