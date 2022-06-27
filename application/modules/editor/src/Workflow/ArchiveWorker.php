@@ -63,7 +63,9 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract {
     public function work()
     {
         $parameters = $this->workerModel->getParameters();
-        $this->validateParameters($parameters);
+        if(!$this->validateParameters($parameters)) {
+            return false;
+        }
 
 
         $this->task = ZfExtended_Factory::get('editor_Models_Task');
@@ -94,6 +96,7 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract {
                 'targetPath' => $targetFile,
                 'guid' => $taskJson->taskGuid,
             ]);
+            return true;
         } catch (FilesystemException $e) {
             //Task could not backuped there fore it also was not deleted.
             throw new ArchiveException('E1400', [
@@ -135,6 +138,10 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract {
         file_put_contents($filename, $xliffConverter->export($this->task));
     }
 
+    /**
+     * @param array $parameters
+     * @return bool
+     */
     protected function validateParameters($parameters = array())
     {
         if(empty($parameters['exportToFolder']) || (!is_dir($parameters['exportToFolder']) || !is_writable($parameters['exportToFolder']))){
