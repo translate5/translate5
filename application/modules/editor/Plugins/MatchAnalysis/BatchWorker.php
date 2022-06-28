@@ -35,7 +35,7 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
     /**
      * @var ZfExtended_Logger
      */
-    protected $log;
+    protected ZfExtended_Logger $log;
     
     public function __construct() {
         parent::__construct();
