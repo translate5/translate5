@@ -29,17 +29,17 @@
 /**
  * Class representing the static data for all default filters a bconf can have
  */
-final class editor_Plugins_Okapi_Bconf_Filter_Okapi extends editor_Plugins_Okapi_Bconf_Filter_Inventory {
+final class editor_Plugins_Okapi_Bconf_Filters_Okapi extends editor_Plugins_Okapi_Bconf_Filters_Inventory {
 
-    private static ?editor_Plugins_Okapi_Bconf_Filter_Okapi $_instance = NULL;
+    private static ?editor_Plugins_Okapi_Bconf_Filters_Okapi $_instance = NULL;
 
     /**
      * Classic Singleton
-     * @return editor_Plugins_Okapi_Bconf_Filter_Okapi
+     * @return editor_Plugins_Okapi_Bconf_Filters_Okapi
      */
-    public static function instance() : editor_Plugins_Okapi_Bconf_Filter_Okapi {
+    public static function instance() : editor_Plugins_Okapi_Bconf_Filters_Okapi {
         if(self::$_instance == NULL){
-            self::$_instance = new editor_Plugins_Okapi_Bconf_Filter_Okapi();
+            self::$_instance = new editor_Plugins_Okapi_Bconf_Filters_Okapi();
         }
         return self::$_instance;
     }

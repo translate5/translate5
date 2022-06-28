@@ -27,41 +27,22 @@
  */
 
 /**
- * Class representing the static data for all translate5 specific filters
+ * Class representing the Filters a bconf can have
+ * These consist of okapi default-filters, translate5-adjusted filters and the user customized filters from the database
  */
-final class editor_Plugins_Okapi_Bconf_Filter_Translate5 extends editor_Plugins_Okapi_Bconf_Filter_Inventory {
-
-    private static ?editor_Plugins_Okapi_Bconf_Filter_Translate5 $_instance = NULL;
+class editor_Plugins_Okapi_Bconf_Filters {
 
     /**
-     * Classic Singleton
-     * @return editor_Plugins_Okapi_Bconf_Filter_Translate5
+     * All Filters that have a GUI must be defined here
      */
-    public static function instance() : editor_Plugins_Okapi_Bconf_Filter_Translate5 {
-        if(self::$_instance == NULL){
-            self::$_instance = new editor_Plugins_Okapi_Bconf_Filter_Translate5();
-        }
-        return self::$_instance;
+    const GUIS = [];
+
+    public static function hasGui(string $filterType) : bool {
+        return in_array($filterType, self::GUIS);
     }
 
-    /**
-     * Relative to the static data-dir
-     * @var string
-     */
-    protected string $inventoryFile = 'fprm/translate5-filters.json';
 
-    /**
-     * Relative to the static data-dir
-     * @var string
-     */
-    protected string $inventoryFolder = 'fprm/translate5';
 
-    protected function __construct(){
-        parent::__construct();
-        // unneccessary to encode this in the JSON
-        foreach($this->inventory as $index => $item){
-            $this->inventory[$index]->settings = true;
-        }
-    }
- 
+
+
 }

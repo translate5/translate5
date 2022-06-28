@@ -44,7 +44,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
      * Verifies that all FPRM files of the T5 & Okapi default inventory are present
      */
     public function test10_BconfFilterInventories() {
-        $this->assertEquals(true, editor_Plugins_Okapi_Bconf_Filter_Okapi::instance()->validate());
-        $this->assertEquals(true, editor_Plugins_Okapi_Bconf_Filter_Translate5::instance()->validate());
+        $this->assertEquals(true, editor_Plugins_Okapi_Bconf_Filters_Okapi::instance()->validate());
+        $this->assertEquals(true, editor_Plugins_Okapi_Bconf_Filters_Translate5::instance()->validate());
     }
 }

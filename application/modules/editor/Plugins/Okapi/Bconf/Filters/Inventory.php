@@ -29,7 +29,7 @@
 /**
  * Class representing the static data for all translate5 specific filters
  */
-abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory {
+abstract class editor_Plugins_Okapi_Bconf_Filters_Inventory {
 
     /*
      * A filter-entry has the following structure:
@@ -75,7 +75,7 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory {
         foreach($this->inventory as $filter){
             if($filter->settings !== false && !file_exists($this->createFprmPath($filter))){
                 error_log('Okapi Filter Inventory '.get_class($this).': Missing FPRM file '.$this->createFprmPath($filter));
-                // return false;
+                return false;
             }
         }
         return true;
@@ -120,7 +120,7 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory {
      * Finds filters by type and id
      * @param string $type
      * @param string|null $id
-     * @return array
+     * @return stdClass[]
      */
     public function findFilter(string $type, string $id=NULL) : array {
         $result = [];
