@@ -189,7 +189,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         window.insertCard({
             xtype:'languageResourcesWizardPanel',
             //index where the card should appear in the group
-            groupIndex:3,
+            groupIndex:2,
             listeners:{
                 activate:{
                     fn:me.onLanguageResourcesWizardPanelActivate,

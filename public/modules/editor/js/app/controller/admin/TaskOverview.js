@@ -1111,7 +1111,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             grid = me.getWizardUploadGrid(),
             formData = new FormData(),
             form = me.getTaskAddForm(),
-            params = form.getForm().getValues();
+            params = form.getForm().getValues(),
+            hasPivotFiles = false;
 
 
         // import wizard form validation event. Return false in the subscribed event listener to cancel the form submit
@@ -1127,8 +1128,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 formData.append('importUpload[]', record.get('file'), record.get('name'));
                 formData.append('importUpload_language[]', record.get('targetLang'));
                 formData.append('importUpload_type[]', record.get('type'));
+                if(!hasPivotFiles){
+                    hasPivotFiles = record.get('type') === Editor.model.admin.projectWizard.File.TYPE_PIVOT;
+                }
             }
         });
+
+        win.getViewModel().set('hasPivotFiles',hasPivotFiles);
 
         //ensure that UI always generates projects with projectTasks
         formData.append('taskType', 'project');

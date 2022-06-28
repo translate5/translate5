@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+
 /**
  * Encapsulates the part of the import logic which is intended to be run in a worker
  */
@@ -235,17 +237,26 @@ class editor_Models_Import_Worker_Import {
             'availableParsers' => $this->supportedFiles->getSupportedExtensions(),
         ]);
     }
-    
+
     /**
      * Importiert die Relais Dateien
-     * @param editor_Models_RelaisFoldertree $tree
      */
-    protected function importRelaisFiles(){
+    protected function importRelaisFiles(): void
+    {
         if(! $this->importConfig->hasRelaisLanguage()){
             return;
         }
-        
+
         $relayFiles = $this->filelist->processRelaisFiles();
+
+        if(empty($relayFiles)){
+            $this->onPivotFilesNotFound();
+            return;
+        }
+
+        // when there are files for pivot, we do not need the pivot language resources associations
+        // remove all of them for the current project/task
+        $this->removePivotAssoc();
         
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
@@ -273,5 +284,50 @@ class editor_Models_Import_Worker_Import {
         //dont update view here, since it is not existing yet!
         $segment->syncFileOrderFromFiles($this->task->getTaskGuid(), true);
         $segment->syncRepetitions($this->task->getTaskGuid(), false);
+    }
+
+    /***
+     * Check and create the pivot row if there are pivot translate assocs.
+     */
+    public function onPivotFilesNotFound(): void
+    {
+        /** @var TaskPivotAssociation $pivotAssoc */
+        $pivotAssoc = ZfExtended_Factory::get('\MittagQI\Translate5\LanguageResource\TaskPivotAssociation');
+        $associations = $pivotAssoc->loadTaskAssociated($this->task->getTaskGuid());
+
+        // if no reference files where found, check for pivot pre-translation associations.
+        if(!empty($associations)){
+            // add the relais field when there are no files but only resources for pre-translation
+            $this->segmentFieldManager->addField($this->segmentFieldManager::LABEL_RELAIS, editor_Models_SegmentField::TYPE_RELAIS, false);
+
+        }else{
+            // log the missing relais files if no pivot associations are found
+            $this->filelist->getRelaisFolderTree()->logMissingFile();
+            // remove the relais lang when no pivot assoc are found
+            $this->task->setRelaisLang(null);
+        }
+
+    }
+
+    /***
+     * Remove all pivot assocs for the current project/task
+     * @return void
+     */
+    protected function removePivotAssoc(): void
+    {
+        if($this->task->isProject()){
+            /** @var editor_Models_Task $task */
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            $projectTasks = $task->loadProjectTasks($this->task->getProjectId(),true);
+            $tasks = array_column($projectTasks,'taskGuid');
+        }else{
+            $tasks = [$this->task->getTaskGuid()];
+        }
+
+        foreach ($tasks as $task){
+            /** @var TaskPivotAssociation $assoc */
+            $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskPivotAssociation');
+            $assoc->deleteAllForTask($task);
+        }
     }
 }

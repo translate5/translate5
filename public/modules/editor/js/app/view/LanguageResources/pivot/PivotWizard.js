@@ -33,8 +33,12 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.LanguageResources.pivot.PivotWizard', {
     extend:'Ext.panel.Panel',
     alias: 'widget.languageResourcePivotWizard',
+    controller: 'languageResourcePivotWizard',
     itemId:'languageResourcePivotWizard',
-    requires:['Editor.view.LanguageResources.pivot.Assoc'],
+    requires:[
+        'Editor.view.LanguageResources.pivot.Assoc',
+        'Editor.view.LanguageResources.pivot.PivotWizardViewController'
+    ],
     mixins:['Editor.controller.admin.IWizardCard'],
     
     //card type, used for card display order
@@ -53,6 +57,8 @@ Ext.define('Editor.view.LanguageResources.pivot.PivotWizard', {
             config = {
                 items: [{
                     xtype: 'languageResourcePivotAssoc',
+                    visible:false,
+                    hidden:true,
                     header:false,
                     title:null
                 }]
@@ -68,22 +74,35 @@ Ext.define('Editor.view.LanguageResources.pivot.PivotWizard', {
     onPivotWizardActivate:function(){
         var me = this,
             view = me.down('#languageResourcePivotAssoc'),
-            store = view && view.getStore();
+            hasPivotFiles = me.lookupViewModel().get('hasPivotFiles'),
+            hasPivotLanguage = Editor.util.Util.isEmpty(me.task.get('relaisLang')) === false;
 
-        store && store.load({
-            params:{
-                taskGuid:me.task.get('taskGuid')
-            }
-        });
+        // when there are pivot files provided in the upload grid, change the current card.
+        // All pre-set associations will be removed on back-end
+        if(hasPivotFiles || !hasPivotLanguage){
+            view.setVisible(false);
+            me.getController().handleNextCardClick();
+            return;
+        }
+        view.setVisible(true);
+        view && view.loadForTask(me.task);
+        view && view.down('toolbar[dock="bottom"]').setHidden(true);
+
     },
     
-    //called when next button is clicked
+    /***
+     * called when next button is clicked
+     * @param activeItem
+     */
     triggerNextCard:function(activeItem){
-        this.fireEvent('wizardCardFinished', null);
+        this.getController().handleNextCardClick();
     },
-    //called when skip button is clicked
+    /***
+     * called when skip button is clicked
+     * @param activeItem
+     */
     triggerSkipCard:function(activeItem){
-        this.fireEvent('wizardCardFinished', 2);
+        this.getController().handleSkipCardClick();
     },
 
     disableSkipButton:function(){

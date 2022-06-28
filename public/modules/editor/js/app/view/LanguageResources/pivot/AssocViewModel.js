@@ -34,10 +34,34 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.LanguageResources.pivot.AssocViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.languageResourcePivotAssoc',
+
     stores: {
         pivotAssoc: {
             model: 'Editor.model.LanguageResources.pivot.Assoc',
+            groupField: 'taskGuid',
             pageSize: false
         }
-    }
+    },
+
+    formulas : {
+        isPivotPreTranslationRunning : {
+            get : function (task) {
+                return !task ? false : task.isPivotPreTranslation();
+            },
+            bind : {
+                bindTo : '{currentTask}',
+                deep : true
+            }
+        },
+        enablePivotPreTranslationPanel : {
+            get : function (task) {
+                // if import status error disabled
+                return (task && !task.isErroneous() && !task.isImporting());
+            },
+            bind : {
+                bindTo : '{currentTask}',
+                deep : true
+            }
+        }
+    },
 });

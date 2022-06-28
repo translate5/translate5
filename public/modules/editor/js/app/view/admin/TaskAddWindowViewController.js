@@ -50,7 +50,7 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
         win.insertCard({
             xtype:'languageResourcePivotWizard',
             itemId:'languageResourcePivotWizard',
-            groupIndex:2
+            groupIndex:3
         },'postimport');
 
         win.insertCard({

@@ -4764,5 +4764,17 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Pivot-Sprachressourcen</source>
   <target>Pivot Language Resources</target>
 </trans-unit>
+<trans-unit id='UGl2b3QtVm9yw7xiZXJzZXR6dW5nIGzDpHVmdA=='>
+  <source>Pivot-Vorübersetzung läuft</source>
+  <target>Pivot-pretranslation is running</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6TDn2lnIGFscyBQaXZvdCB2ZXJ3ZW5kZW4='>
+  <source>Standardmäßig als Pivot verwenden</source>
+  <target>Use as pivot by default</target>
+</trans-unit>
+<trans-unit id='Vm9yw7xiZXJzZXR6dW5n'>
+  <source>Vorübersetzung</source>
+  <target>Pre-translation</target>
+</trans-unit>
   </file>
 </xliff>

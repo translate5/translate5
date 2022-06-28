@@ -19,15 +19,26 @@ class TaskPivotAssociation extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'MittagQI\Translate5\LanguageResource\Validator\TaskPivotAssociation';
 
     /***
+     * Load a list of all language resources available for pivot pre-translation for given taskGuid.
      * @param string $taskGuid
      * @return array
      */
-    public function loadAllForTask(string $taskGuid): array
+    public function loadAllAvailableForTask(string $taskGuid): array
     {
 
         /** @var \editor_Models_Task $task */
         $task = ZfExtended_Factory::get('\editor_Models_Task');
         $task->loadByTaskGuid($taskGuid);
+
+        if($task->isProject()){
+            //get all project tasks and get the resources for each task
+            $projectGuids=array_column($task->loadProjectTasks($task->getProjectId(),true), 'taskGuid');
+            $result=[];
+            foreach ($projectGuids as $pg){
+                $result=array_merge($result,$this->loadAllAvailableForTask($pg));
+            }
+            return array_filter(array_values($result));
+        }
 
         $db = $this->db;
         $adapter = $db->getAdapter();
@@ -35,9 +46,16 @@ class TaskPivotAssociation extends ZfExtended_Models_Entity_Abstract {
         $languageModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languageModel editor_Models_Languages */
 
-        //get source and target language fuzzies
+        if(empty($task->getSourceLang()) || empty($task->getRelaisLang())){
+            return [];
+        }
+        //get source and relais language fuzzy
         $sourceLangs=$languageModel->getFuzzyLanguages($task->getSourceLang(),'id',true);
         $relaisLangs=$languageModel->getFuzzyLanguages($task->getRelaisLang(),'id',true);
+
+        if(empty($sourceLangs) || empty($relaisLangs)){
+            return [];
+        }
 
         $this->filter->addTableForField('taskGuid', 'ta');
         $s = $db->select()
@@ -62,10 +80,32 @@ class TaskPivotAssociation extends ZfExtended_Models_Entity_Abstract {
             ]
         );
 
-        // Only match resources can be associated to a task, that are associated to the same client as the task is.
+        // filter only for task customer resources
         $s->join(array("cu"=>"LEK_languageresources_customerassoc"), 'languageResource.id=cu.languageResourceId',array('cu.customerId AS customerId'))
             ->where('cu.customerId=?',$task->getCustomerId());
         $s->group('languageResource.id');
         return $this->loadFilterdCustom($s);
+    }
+
+    /***
+     * @param string $taskGuid
+     * @return array|null
+     */
+    public function loadTaskAssociated(string $taskGuid): ?array
+    {
+        $s = $this->db->select()
+            ->where('taskGuid = ?',$taskGuid);
+        return $this->db->getAdapter()->fetchAll($s);
+    }
+
+    /***
+     * Delete all associations for given taskGuid
+     *
+     * @param string $taskGuid
+     * @return void
+     */
+    public function deleteAllForTask(string $taskGuid): void
+    {
+        $this->db->delete(['taskGuid = ?' => $taskGuid]);
     }
 }

@@ -48,13 +48,24 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
         checked: '#UT#Ressource in Aufgabe verwenden',
         name: '#UT#Name',
         source: '#UT#Quellsprache',
-        target: '#UT#Zielsprache',
+        relaisLang: '#UT#Relaissprache',
         serviceName: '#UT#Ressource',
-        taskGuid:'#UT#Aufgabename'
+        taskGuid:'#UT#Aufgabename',
+        workerQueued:'#UT#Pivot-Vorübersetzung läuft',
+        startPretranslationButtonText:'#UT#Vorübersetzung',
+        assocSave: '#UT#Eintrag gespeichert!',
+        assocDeleted: '#UT#Eintrag gelöscht!'
     },
     padding: 0,
     layout:'fit',
     store:[],
+
+    task: null,
+
+    bind: {
+        loading: '{isPivotPreTranslationRunning}',
+        disabled: '{!enablePivotPreTranslationPanel}'
+    },
 
     initConfig : function(instanceConfig) {
         var me = this,
@@ -62,6 +73,31 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
             bind:{
                 store:'{pivotAssoc}'
             },
+            features: [{
+                ftype: 'grouping',
+                groupHeaderTpl: Ext.create('Ext.XTemplate',
+                    '{columnName}: {[this.formatValue(values)]}',
+                    {
+                        formatValue: function(values) {
+                            var ret=values.name;
+                            if(values.groupField === 'taskGuid'){
+                                // when taskGuid is active as grouping, render the task name as group value
+                                var data = values.rows && values.rows[0];
+                                return data ? data.get('taskName') : ret;
+                            }
+                            return ret;
+                        }
+                    }
+                ),
+                hideGroupedHeader: false,
+                enableGroupingMenu: true,
+                groupers:[{property:'serviceName'},{property:'targetLang'}]
+            }],
+            bbar:[{
+                xtype: 'button',
+                itemId: 'startPivotPretranslation',
+                text:me.strings.startPretranslationButtonText
+            }],
             columns : [{
                 xtype : 'checkcolumn',
                 tooltip : me.strings.checked,
@@ -104,8 +140,8 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
                 flex : 25 / 100,
             }, {
                 xtype : 'gridcolumn',
-                tooltip : me.strings.target,
-                text : me.strings.target,
+                tooltip : me.strings.relaisLang,
+                text : me.strings.relaisLang,
                 cls : 'target-lang',
                 dataIndex : 'targetLang',
                 renderer : me.langRenderer,
@@ -117,6 +153,30 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([ config ]);
+    },
+
+    /***
+     * Load the current grid store for given task
+     * @param task
+     */
+    loadForTask: function (task){
+        var me = this,
+            store = me.getStore();
+
+        if( !task){
+            return;
+        }
+
+        store && store.load({
+            params:{
+                taskGuid:task.get('taskGuid')
+            }
+        });
+    },
+
+    setTask: function (currentTask){
+        this.task = currentTask;
+        this.loadForTask(this.task);
     },
 
     langRenderer : function(val, md) {

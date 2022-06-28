@@ -29,7 +29,19 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.LanguageResources.pivot.Assoc', {
     extend: 'Ext.data.Model',
     fields: [
-        {name: 'id', type: 'int', persist: false},
+        {
+            name: 'id',
+            type: 'int',
+            persist: false,
+            convert: function (val, record) {
+                // One term collection can be listed and assigned for multiple projectTasks
+                // To display unique row for each field in the import wizard, attach the taskGuid to the id field
+                if(record.get('taskGuid') !== undefined){
+                    return record.get('id')+record.get('taskGuid');
+                }
+                return record.get('id');
+            }
+        },
         {name: 'checked',type: 'boolean'},
         {name: 'taskGuid', type: 'string'},
         {name: 'languageResourceId', type: 'int'}

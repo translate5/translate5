@@ -45,26 +45,17 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
      */
     protected $postBlacklist = ['id'];
     
-    public function init() {
-        ZfExtended_Models_Entity_Conflict::addCodes([
-            'E1050' => 'Referenced language resource not found.',
-            'E1051' => 'Cannot remove language resource from task since task is used at the moment.',
-        ], 'editor.languageresource.taskassoc');
-        parent::init();
-    }
-    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
         $taskGuid = $this->getParam('taskGuid');
-
         if(empty($taskGuid)){
-            // TODO: error code for missing param
-            throw new ZfExtended_ErrorCodeException();
+            //TODO:
+            throw new ZfExtended_ErrorCodeException("");
         }
-        $this->view->rows = $this->entity->loadAllForTask($taskGuid);
+        $this->view->rows =  $this->entity->loadAllAvailableForTask($taskGuid);
     }
     
     /**
@@ -87,21 +78,117 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
         }
     }
     
-    public function deleteAction(){
-        try {
-            $this->entityLoad();
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            if($task->isUsed($this->entity->getTaskGuid())) {
-                throw ZfExtended_Models_Entity_Conflict::createResponse('E1050',[
-                    'Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht von der Aufgabe entfernt werden!'
-                ]);
-            }
-            $clone=clone $this->entity;
-            $this->entity->delete();
+    public function pretranslationBatch(){
+
+        $taskGuid = $this->getParam('taskGuid');
+        if(empty($taskGuid)){
+            return;
         }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            //do nothing since it was already deleted, and thats ok since user tried to delete it
+
+        /** @var editor_Models_Task $task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task->loadByTaskGuid($taskGuid);
+
+        $taskGuids = [$task->getTaskGuid()];
+        //if the requested operation is from project, queue analysis for each project task
+        if($task->isProject()){
+            $projects = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $projects editor_Models_Task */
+            $projects = $projects->loadProjectTasks($task->getProjectId(), true);
+            $taskGuids = array_column($projects, 'taskGuid');
         }
+
+        foreach ($taskGuids as $taskGuid){
+            $this->queuePivotWorker($taskGuid);
+        }
+
+        //TODO: call this only when the task is not in import ?
+        $wq = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
+        /* @var $wq ZfExtended_Worker_Queue */
+        $wq->trigger();
+    }
+
+    /***
+     * Queue the match analysis worker
+     *
+     * @param string $taskGuid
+     * @throws Zend_Exception
+     */
+    protected function queuePivotWorker(string $taskGuid) : void {
+
+        /** @var TaskPivotAssociation $pivotAssoc */
+        $pivotAssoc = ZfExtended_Factory::get('\MittagQI\Translate5\LanguageResource\TaskPivotAssociation');
+        $assoc = $pivotAssoc->loadTaskAssociated($taskGuid);
+
+        if(empty($assoc)){
+            return;
+        }
+
+
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+
+        if($task->isImporting()) {
+            //on import, we use the import worker as parentId
+            $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
+        } else {
+            // crucial: add a different behaviour for the workers when Cperforming an operation
+            $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
+            // this creates the operation start/finish workers
+            $parentWorkerId = editor_Task_Operation::create(editor_Task_Operation::PIVOT_PRE_TRANSLATION, $task);
+        }
+
+        $workerParameters['userGuid'] = editor_User::instance()->getGuid();
+        $workerParameters['userName'] = editor_User::instance()->getUserName();
+
+        //enable batch query via config
+        $workerParameters['batchQuery'] = (boolean) Zend_Registry::get('config')->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
+        if($workerParameters['batchQuery']){
+
+            // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
+            $this->events->trigger("beforePivotPreTranslationQueue", $this, array(
+                'task' => $task,
+                'pivotAssociations' => $assoc,
+                'parentWorkerId' => $parentWorkerId
+            ));
+        }
+
+        /** @var MittagQI\Translate5\LanguageResource\Pretranslation\PivotWorker $pivotWorker */
+        $pivotWorker = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\PivotWorker');
+
+        if (!$pivotWorker->init($taskGuid, $workerParameters)) {
+            $this->addWarn($task,'Pivot pre-translation Error on worker init(). Worker could not be initialized');
+            return;
+        }
+        $pivotWorker->queue($parentWorkerId, null, false);
+    }
+
+    /**
+     *
+     * @param string $taskGuid
+     * @return NULL|int
+     */
+    private function fetchImportWorkerId(string $taskGuid): ?int
+    {
+        $parent = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $parent ZfExtended_Models_Worker */
+        $result = $parent->loadByState(ZfExtended_Models_Worker::STATE_PREPARE, 'editor_Models_Import_Worker', $taskGuid);
+        if(count($result) > 0){
+            return $result[0]['id'];
+        }
+        return 0;
+    }
+
+    /***
+     * Log analysis warning
+     * @param string $taskGuid
+     * @param array $extra
+     * @param string $message
+     */
+    protected function addWarn(editor_Models_Task $task,string $message,array $extra=[]) {
+        $extra['task']=$task;
+        $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+        $logger->warn('E1100',$message,$extra);
     }
 }

@@ -44,6 +44,9 @@ Ext.define('Editor.view.LanguageResources.pivot.AssocViewController', {
         component: {
             '#languageResourcePivotAssoc checkcolumn[dataIndex="checked"]': {
                 checkchange: 'handleAssocCheckChange'
+            },
+            '#startPivotPretranslation':{
+                click:'onStartPivotPretranslationClick'
             }
         }
     },
@@ -57,6 +60,7 @@ Ext.define('Editor.view.LanguageResources.pivot.AssocViewController', {
      */
     saveRecord: function(record){
         var me = this,
+            view = me.getView(),
             params = {},
             method = 'DELETE',
             url = Editor.data.restpath+'languageresourcetaskpivotassoc',
@@ -83,11 +87,11 @@ Ext.define('Editor.view.LanguageResources.pivot.AssocViewController', {
                     var resp = Ext.util.JSON.decode(response.responseText),
                         newId = resp.rows['id'];
                     record.set('associd', newId);
-                    Editor.MessageBox.addSuccess("TODO: record assigned");
+                    Editor.MessageBox.addSuccess(view.strings.assocSave);
                 }
                 else {
                     record.set('associd', 0);
-                    Editor.MessageBox.addSuccess("TODO: record unassigned");
+                    Editor.MessageBox.addSuccess(view.strings.assocDeleted);
                 }
                 record.commit();
             },
@@ -96,4 +100,47 @@ Ext.define('Editor.view.LanguageResources.pivot.AssocViewController', {
             }
         });
     },
+
+    /***
+     *
+     */
+    onStartPivotPretranslationClick: function (){
+        var me = this,
+            task = me.getView().task;
+        if(! task){
+            return;
+        }
+        me.queueWorker(task,function (){
+            task.load({
+                success: function() {
+                    Editor.MessageBox.addInfo(me.getView().strings.workerQueued);
+                },
+            });
+        });
+    },
+
+    /***
+     * Queue pivot pre-translation worker. If callback provided, it will be called
+     * on request success callback
+     * @param task
+     * @param callback
+     */
+    queueWorker: function (task,callback){
+        if(!task){
+            return;
+        }
+
+        Ext.Ajax.request({
+            url: Editor.data.restpath+'languageresourcetaskpivotassoc/pretranslation/batch',
+            method: 'post',
+            params:{
+                taskGuid: task.get('taskGuid')
+            },
+            scope: this,
+            success: callback,
+            failure: function (response) {
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+    }
 });

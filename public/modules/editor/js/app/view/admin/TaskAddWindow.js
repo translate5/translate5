@@ -257,9 +257,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                         // (this field is not visible to the user)
                                         Editor.MessageBox.addError(error);
                                     },
-                                    bind:{
-                                        hidden: '{!isZipUpload}'
-                                    },
                                     allowBlank: true,
                                     toolTip: me.strings.relaisLangTip,
                                     fieldLabel: me.strings.relaisLangLabel

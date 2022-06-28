@@ -126,7 +126,7 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
             store = me.getView().getViewModel().getStore('files');
 
         // check if the uploaded file is a zip and if a zip is allowed for the type.
-        // zip is only alowed to be dropped as workfile
+        // zip is only allowed to be dropped as workfile
         if(me.ignoreZipByType(type)){
             // reset the zip flag since the uploaded file is ignored
             me.setIsZipUploadViewModel(false);

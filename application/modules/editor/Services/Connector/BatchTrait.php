@@ -245,7 +245,7 @@ trait editor_Services_Connector_BatchTrait {
      * @param int $segmentId
      */
     protected function saveBatchResults(int $segmentId) {
-        Zend_Db_Table::getDefaultAdapter()->insert('LEK_match_analysis_batchresults', [
+        Zend_Db_Table::getDefaultAdapter()->insert('LEK_languageresources_batchresults', [
             'languageResource' =>$this->languageResource->getId(),
             'segmentId'=>$segmentId,
             'result'=>serialize($this->resultList)

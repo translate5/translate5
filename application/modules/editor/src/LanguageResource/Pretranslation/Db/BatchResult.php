@@ -26,9 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\LanguageResource\Pretranslation\Db;
+use Zend_Db_Table_Abstract;
+
 /**
  */
-class editor_Plugins_MatchAnalysis_Models_Db_BatchResult extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_match_analysis_batchresults';
+class BatchResult extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_languageresources_batchresults';
     public $_primary = 'id';
 }

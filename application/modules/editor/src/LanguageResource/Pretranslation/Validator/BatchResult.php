@@ -25,8 +25,11 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+namespace MittagQI\Translate5\LanguageResource\Pretranslation\Validator;
 
-class editor_Plugins_MatchAnalysis_Models_Validator_BatchResult extends ZfExtended_Models_Validator_Abstract {
+use ZfExtended_Models_Validator_Abstract;
+
+class BatchResult extends ZfExtended_Models_Validator_Abstract {
     /**
      * 
      */

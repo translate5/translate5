@@ -34,8 +34,9 @@ Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
         'Ext.app.bind.Formula'
     ],
     data:{
-        currentTask : null,
-        isZipUpload:false
+        currentTask: null,
+        isZipUpload: false,
+        hasPivotFiles: false
     },
     activeItem: null,
     

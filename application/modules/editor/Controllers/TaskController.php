@@ -701,7 +701,8 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function setTaskDefaults(editor_Models_Task $task){
         $defaults = $this->_helper->taskDefaults;
         /* @var $defaults Editor_Controller_Helper_TaskDefaults */
-        $defaults->addDefaultLanguageResources($task,$this->data['customerId']);
+        $defaults->addDefaultLanguageResources($task);
+        $defaults->addDefaultPivotResources($task);
         $defaults->addDefaultUserAssoc($task);
     }
 
