@@ -1,7 +1,7 @@
 {
 	"config" : {
 		"platform" : {
-			"php" : "8"
+			"php" : "8.0.15"
 		},
 		"allow-plugins": {
 			"wikimedia/composer-merge-plugin": true
@@ -98,7 +98,9 @@
 		"translate5/instanttranslate-roboto-font": "26",
 		"axelbecher/material-design-icons": "^1.0",
 		"wilsonglasser/spout": "^3.0",
-		"joshtronic/php-loremipsum": "^2.1"
+		"joshtronic/php-loremipsum": "^2.1",
+		"league/flysystem": "^3.0",
+		"league/flysystem-sftp": "^3.0"
     },
 	"extra" : {
 		"merge-plugin" : {

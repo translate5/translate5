@@ -992,6 +992,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     {
         $res = parent::getDataObject();
         $this->segmentFieldManager->mergeData($this->segmentdata, $res);
+        /** @var $segmentUserAssoc editor_Models_SegmentUserAssoc */
         $segmentUserAssoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
         try {
             $assoc = $segmentUserAssoc->loadByParams($res->userGuid, $res->id);
