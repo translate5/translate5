@@ -48,6 +48,15 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
     public function indexAction() {
         //print description
     }
+
+    /**
+     * test endpoint for callback caller
+     * FIXME create a test with task config calling this URL, how to validate the result? How to set the correct URL, with a relative path?
+     */
+    public function taskcallbackAction() {
+        $data = json_decode(file_get_contents('php://input'));
+        error_log("Task created called: TaskID: ".($data->id ?? 'invalid JSON!').' status '.($data->state ?? ''));
+    }
     
     /**
      * Faking DeepL requests, translating with rot13.

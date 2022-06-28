@@ -35,10 +35,14 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     ConfigCommand,
     DatabaseUpdateCommand,
     DevelopmentCreatetestCommand,
+    DevelopmentEcodeCommand,
     DevelopmentGithookCommand,
     DevelopmentNewModelCommand,
     DevelopmentNewdbchangeCommand,
     DevelopmentRuntestCommand,
+    DevelopmentTriggerworkflowCommand,
+    L10nAddCommand,
+    L10nRemoveCommand,
     LogCommand,
     MaintenanceAnnounceCommand,
     MaintenanceNotifyCommand,
@@ -60,6 +64,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     TermportalDatatypecheckCommand,
     UserCreateCommand,
     UserInfoCommand,
+    WorkerCleanCommand,
     WorkerListCommand,
     WorkerQueueCommand};
 use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
@@ -71,6 +76,8 @@ $commands = [
     new ConfigCommand(),
     new DatabaseUpdateCommand(),
     new LogCommand(),
+    new L10nAddCommand(),
+    new L10nRemoveCommand(),
     new MaintenanceAnnounceCommand(),
     new MaintenanceNotifyCommand(),
     new MaintenanceCommand(),
@@ -91,6 +98,7 @@ $commands = [
     new TermportalDatatypecheckCommand(),
     new UserCreateCommand(),
     new UserInfoCommand(),
+    new WorkerCleanCommand(),
     new WorkerListCommand(),
     new WorkerQueueCommand(),
 ];
@@ -101,6 +109,8 @@ if(file_exists('.git')) {
     $commands[] = new DevelopmentRuntestCommand();
     $commands[] = new ReleaseNotesCommand();
     $commands[] = new DevelopmentNewModelCommand();
+    $commands[] = new DevelopmentEcodeCommand();
+    $commands[] = new DevelopmentTriggerworkflowCommand();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
 }

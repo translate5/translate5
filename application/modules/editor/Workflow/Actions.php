@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Workflow\ArchiveTaskActions;
+
 /**
  * Encapsulates the Default Actions triggered by the Workflow.
  * Warning: the here listed public methods are called as configured in LEK_workflow_action table!
@@ -187,15 +189,36 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $log = ZfExtended_Factory::get('editor_Logger_Workflow', [$task]);
         $log->debug('E1013', 'finish overdued task via workflow action');
     }
-    
-    /***
+
+    /**
      * Delete all tasks where the task status is 'end',
      * and the last modified date for this task is older than x days (where x is zf_config variable)
+     *
+     * Parameters docu for the LEK_worker_action table:
+     *      - if no filesystem and targetPath configuration is given, task is just deleted without backup!
+     *      - A backup configuration may look like (as JSON string the DB then):
+     *       {
+     *          "filesystem": "local|sftp",
+     *              → One of the implemented Adapters in MittagQI\Translate5\Tools\FlysystemFactory
+     *          "targetPath": "/target/dir/task-{taskName}.zip"
+     *              → the target filename for the task, may contain any field from the task meta json in the exported
+     *                file + the magic filed {time} which gives the current time stamp
+     *          "other options for filesystem": "just place here too"
+     *              → See again FlysystemFactory for the needed options, just to be placed directly in the options object
+     *       }
      */
     public function deleteOldEndedTasks(){
-        $taskModel=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $taskModel editor_Models_Task */
-        $taskModel->removeOldTasks();
+        /** @var ArchiveTaskActions $taskActions */
+        $taskActions = ZfExtended_Factory::get('\MittagQI\Translate5\Workflow\ArchiveTaskActions', [
+            $this->config
+        ]);
+        $params = $this->config->parameters;
+        if(empty($params->filesystem) && empty($params->targetPath)) {
+            $taskActions->removeOldTasks();
+        }
+        else {
+            $taskActions->backupThenRemove();
+        }
     }
     
     /***
