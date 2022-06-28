@@ -697,10 +697,11 @@ class editor_TaskController extends ZfExtended_RestController {
     /***
      * Sets task defaults for given task (default languageResources, default userAssocs)
      * @param editor_Models_Task $task
+     * @throws Zend_Cache_Exception
      */
     protected function setTaskDefaults(editor_Models_Task $task){
         $defaults = $this->_helper->taskDefaults;
-        /* @var $defaults Editor_Controller_Helper_TaskDefaults */
+        /* @var Editor_Controller_Helper_TaskDefaults $defaults */
         $defaults->addDefaultLanguageResources($task);
         $defaults->addDefaultPivotResources($task);
         $defaults->addDefaultUserAssoc($task);

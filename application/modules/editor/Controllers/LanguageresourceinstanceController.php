@@ -647,7 +647,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //check and save customer assoc db entry
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+        /* @var editor_Models_LanguageResources_CustomerAssoc $customerAssoc */
         try {
             $customerAssoc->saveAssocRequest($this->entity->getId(),$this->data);
         }
@@ -658,7 +658,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //check and save categories assoc db entry
         $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
-        /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
+        /* @var editor_Models_LanguageResources_CategoryAssoc $categoryAssoc */
         try {
             $categoryAssoc->saveAssocRequest($this->data);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
@@ -668,7 +668,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //save the resource languages to
         $resourceLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $resourceLanguages editor_Models_LanguageResources_Languages */
+        /* @var editor_Models_LanguageResources_Languages $resourceLanguages */
         $resourceLanguages->setSourceLang($sourceLangId);
         $resourceLanguages->setSourceLangCode($sourceLangCode);
         $resourceLanguages->setTargetLang($targetLangId);

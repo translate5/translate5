@@ -103,7 +103,7 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
         //if the requested operation is from project, queue analysis for each project task
         if($task->isProject()){
             $projects = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $projects editor_Models_Task */
+            /* @var editor_Models_Task $projects */
             $projects = $projects->loadProjectTasks($task->getProjectId(), true);
             $taskGuids = array_column($projects, 'taskGuid');
         }
