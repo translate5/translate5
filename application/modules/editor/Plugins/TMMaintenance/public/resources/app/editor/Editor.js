@@ -8,20 +8,25 @@ Ext.define('Ext.translate5.Editor', {
 
     onEditComplete: function(remainVisible, cancelling) {
         const location = this.getLocation();
-
         let result = this.callParent([remainVisible, cancelling]);
 
-        if (!location && undefined === this.config.editingDataIndex) {
+        if (cancelling) {
             return result;
+
         }
 
-        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
-        let data = tagHelper.reverseTransform(this.editor.getData());
+        if (!location || undefined === this.config.editingDataIndex) {
+            return result;
+        }
+        let data = this.editor.getData();
 
         // TODO move to a separate method
         let dom = document.createElement('html');
         dom.innerHTML = this.editor.getData(data);
         let rawData = dom.getElementsByTagName('p')[0].innerHTML;
+
+        let tagHelper = Ext.create('TMMaintenance.helper.Tag');
+        rawData = tagHelper.reverseTransform(rawData);
 
         if (location.record.get(this.config.editingDataIndex) === rawData) {
             return result;

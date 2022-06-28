@@ -5,7 +5,7 @@ Ext.define('TMMaintenance.helper.Tag', {
         let result = source;
 
         if (null === matches) {
-            return source;
+            return result;
         }
 
         matches.forEach(function (match) {
@@ -18,10 +18,9 @@ Ext.define('TMMaintenance.helper.Tag', {
             let svg = '<svg xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="rgb(207,207,207)" rx="3" ry="3"/><text x="0.25em" y="1em" font-size="13px">'
             svg += Ext.String.htmlEncode('&lt;' + (tagMatches[1] === 'ept' ? '/' : '') + tagMatches[2] + '&gt;') + '</text></svg>';
 
-            console.log(svg);
-            console.log(encodeURI(svg));
+            let replace = '<img src="data:image/svg+xml;charset=utf-8,' + encodeURI(svg);
+            replace += '" data-tag-type="' + (tagMatches[1] === 'bpt' ? 'open' : 'close') + '" data-tag-id="' + tagMatches[2] + '" class="tag"/>';
 
-            let replace = '<img src="data:image/svg+xml;charset=utf-8,' + encodeURI(svg) + '" data-tag-type="{tagType}" data-tag-id="{index}" class="tag"/>';
             result = result.replace(match, replace);
         });
 
@@ -29,8 +28,25 @@ Ext.define('TMMaintenance.helper.Tag', {
     },
 
     reverseTransform: function (source) {
-        // TODO add real implementation
-        return source;
+        let tagsRe = /<img[^>]*>/gm;
+        let matches = source.match(tagsRe);
+        let result = source;
+
+        if (null === matches) {
+            return result;
+        }
+
+        let index = 1;
+        matches.forEach(function (match) {
+            let params = match.match(/data-tag-id="(\d+)" data-tag-type="(open|close)"/);
+            let replace = '<' + (params[2] === 'open' ? 'bpt' : 'ept') + ' x="' + index + '" i="' + params[1] + '"/>';
+
+            result = result.replace(match, replace);
+
+            index++;
+        });
+
+        return result;
     },
 
     highlight: function (source, search) {
