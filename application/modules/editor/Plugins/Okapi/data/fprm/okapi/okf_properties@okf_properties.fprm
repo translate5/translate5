@@ -1,0 +1,21 @@
+#v1
+escapeExtendedChars.b=true
+convertLFandTab.b=true
+useKeyCondition.b=false
+extractOnlyMatchingKey.b=true
+keyCondition=.*text.*
+extraComments.b=false
+commentsAreNotes.b=true
+idLikeResname.b=false
+useJavaEscapes.b=false
+useCodeFinder.b=true
+useLd.b=true
+localizeOutside.b=true
+codeFinderRules.count.i=4
+codeFinderRules.rule0=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn]
+codeFinderRules.rule1=(\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v
+codeFinderRules.rule2=\{\d[^\\]*?\}
+codeFinderRules.rule3=\<(/?)\w+[^>]*?>
+codeFinderRules.sample=%s, %d, {1}, \n, \r, \t, etc.
+codeFinderRules.useAllRulesWhenTesting.b=true
+subfilter=

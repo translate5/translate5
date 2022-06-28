@@ -1,0 +1,11 @@
+#v1
+useDirectives.b=true
+extractOutsideDirectives.b=true
+useCodeFinder.b=true
+codeFinderRules.count.i=4
+codeFinderRules.rule0=<[\w!?/].*?>
+codeFinderRules.rule1=\\a|\\b|\\f|\\n|\\r|\\t|\\v
+codeFinderRules.rule2=(\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3})
+codeFinderRules.rule3=[\[{][\w_$]+?[}\]]
+codeFinderRules.sample=text <br/> text \n text <a att='val'> text [VAR1] text$0a${VAR2} text
+codeFinderRules.useAllRulesWhenTesting.b=true

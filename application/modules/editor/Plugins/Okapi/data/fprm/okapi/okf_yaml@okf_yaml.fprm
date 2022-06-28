@@ -1,0 +1,16 @@
+#v1
+extractIsolatedStrings.b=false
+extractAllPairs.b=true
+exceptions=
+useKeyAsName.b=true
+useFullKeyPath.b=true
+useCodeFinder.b=true
+subFilterProcessLiteralAsBlock.b=false
+escapeNonAscii.b=false
+wrap.b=true
+codeFinderRules.count.i=3
+codeFinderRules.rule0=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpnYyBbHhSMmAZ]
+codeFinderRules.rule1=(\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v
+codeFinderRules.rule2=\{\{\w.*?\}\}
+codeFinderRules.sample=%s, %d, {1}, \n, \r, \t, {{var}} etc.
+codeFinderRules.useAllRulesWhenTesting.b=true

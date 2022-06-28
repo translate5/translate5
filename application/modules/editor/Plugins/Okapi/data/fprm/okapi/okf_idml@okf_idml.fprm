@@ -1,0 +1,12 @@
+#v1
+maxAttributeSize.i=4194304
+untagXmlStructures.b=true
+extractNotes.b=false
+extractMasterSpreads.b=true
+extractHiddenLayers.b=false
+skipDiscretionaryHyphens.b=false
+extractBreaksInline.b=false
+ignoreCharacterKerning.b=false
+ignoreCharacterTracking.b=false
+ignoreCharacterLeading.b=false
+ignoreCharacterBaselineShift.b=false

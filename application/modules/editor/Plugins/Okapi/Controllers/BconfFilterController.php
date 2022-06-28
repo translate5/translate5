@@ -59,7 +59,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         }
         unset($fprm);
 
-        $dataDir = editor_Plugins_Okapi_Init::getBconfStaticDataDir();
+        $dataDir = editor_Plugins_Okapi_Init::getDataDir();
         chdir($dataDir . 'fprm/translate5/');
         $t5_fprms = glob("*@translate5*.fprm");
         foreach($t5_fprms as $fprm){

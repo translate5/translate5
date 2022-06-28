@@ -1,0 +1,6 @@
+#v1
+csvStartingRow.i=1
+csvAutoDetectColumnTypes.b=false
+csvAutoDetectColumnTypesRow.i=2
+csvFormatCols=
+csvNoExtractCols=

@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
  * For details see the issue.
  */
 class OkapiBconfTest extends editor_Test_JsonTest {
+
     private static editor_Plugins_Okapi_Models_Bconf $bconf;
     private static int $bconfId = 0;
     private static Zend_Config $okapiConf;
@@ -49,7 +50,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         self::assertNotEmpty($okapiConf->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
         self::assertNotEmpty($okapiConf->api->url, self::OKAPI_CONFIG . ".api.url not set");
 
-        $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getBconfStaticDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
+        $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists($t5defaultImportBconf,
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
 

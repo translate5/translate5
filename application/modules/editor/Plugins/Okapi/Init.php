@@ -81,7 +81,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         if(empty($defaultExportBconf)){
             throw new editor_Plugins_Okapi_Exception('E1340');
         }
-        return self::getBconfStaticDataDir().$defaultExportBconf;
+        return self::getDataDir().$defaultExportBconf;
     }
 
     /**
@@ -132,7 +132,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @return string
      * @throws editor_Plugins_Okapi_Exception|editor_Models_ConfigException
      */
-    public static function getBconfStaticDataDir(): string {
+    public static function getDataDir(): string {
         return APPLICATION_PATH.'/modules/editor/Plugins/Okapi/data/';
     }
     /**
@@ -608,7 +608,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     protected function findDefaultBconfFiles(): array {
         $filenames = [];
-        $directory = new DirectoryIterator(self::getBconfStaticDataDir());
+        $directory = new DirectoryIterator(self::getDataDir());
         foreach ($directory as $fileinfo) {
             /* @var $fileinfo SplFileInfo */
             if (strtolower($fileinfo->getExtension()) === self::BCONF_EXTENSION) {
@@ -653,7 +653,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 return true;
             }
         }
-
         return in_array($extension, $this->okapiFileTypes);
     }
 
