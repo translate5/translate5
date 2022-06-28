@@ -35,10 +35,19 @@ Ext.define('Editor.view.LanguageResources.pivot.AssocViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.languageResourcePivotAssoc',
 
+    data:{
+        pivotAssocStoreHasRecords: false
+    },
+
     stores: {
         pivotAssoc: {
             model: 'Editor.model.LanguageResources.pivot.Assoc',
             groupField: 'taskGuid',
+            listeners: {
+                load: 'pivotAssocStoreUpdate',
+                update: 'pivotAssocStoreUpdate',
+                datachanged: 'pivotAssocStoreUpdate'
+            },
             pageSize: false
         }
     },

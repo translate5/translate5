@@ -51,6 +51,18 @@ Ext.define('Editor.view.LanguageResources.pivot.AssocViewController', {
         }
     },
 
+    /***
+     *
+     * @param store
+     */
+    pivotAssocStoreUpdate: function (store) {
+        var me = this,
+            vm = me.getViewModel();
+        if(vm){
+            vm.set('pivotAssocStoreHasRecords', store.getCount() > 0);
+        }
+    },
+
     handleAssocCheckChange: function(column, rowIdx, checked,record){
         this.saveRecord(record);
     },

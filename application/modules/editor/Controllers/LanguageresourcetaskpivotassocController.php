@@ -44,7 +44,16 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
      * @var array
      */
     protected $postBlacklist = ['id'];
-    
+
+    public function init()
+    {
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1403' => 'The taskGuid is required as parameter',
+        ], 'languageresources.pivotpretranslation');
+
+        parent::init();
+    }
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
@@ -52,8 +61,9 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
     public function indexAction(){
         $taskGuid = $this->getParam('taskGuid');
         if(empty($taskGuid)){
-            //TODO:
-            throw new ZfExtended_ErrorCodeException("");
+            throw ZfExtended_UnprocessableEntity::createResponse('E1403',[
+                'taskGuid' => 'The taskGuid field is empty'
+            ]);
         }
         $this->view->rows =  $this->entity->loadAllAvailableForTask($taskGuid);
     }

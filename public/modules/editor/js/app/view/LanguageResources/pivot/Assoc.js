@@ -96,6 +96,9 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
             bbar:[{
                 xtype: 'button',
                 itemId: 'startPivotPretranslation',
+                bind: {
+                    disabled: '{!pivotAssocStoreHasRecords}'
+                },
                 text:me.strings.startPretranslationButtonText
             }],
             columns : [{
@@ -170,6 +173,11 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
         store && store.load({
             params:{
                 taskGuid:task.get('taskGuid')
+            },
+            callback: function () {
+                if(me.getStore().getCount() < 1){
+                    me.down('#startPivotPretranslation')
+                }
             }
         });
     },
