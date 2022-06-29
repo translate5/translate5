@@ -73,13 +73,12 @@ class editor_Plugins_SpellCheck_Check {
     /**
      * editor_Plugins_SpellCheck_Check constructor.
      *
-     * @param editor_Models_Task $task
      * @param $targetField
      * @param editor_Models_Segment $segment
      * @param editor_Plugins_SpellCheck_LanguageTool_Connector $connector
      * @param $spellCheckLang
      */
-    public function __construct(editor_Models_Task $task, $targetField, editor_Models_Segment $segment,
+    public function __construct(editor_Models_Segment $segment, $targetField,
                                 editor_Plugins_SpellCheck_LanguageTool_Connector $connector, $spellCheckLang) {
 
         // Get target text, strip tags, replace htmlentities

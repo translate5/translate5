@@ -60,7 +60,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
 
     /**
      * Default resourcePool for the different SpellCheck-operations
-     * Possible Values: $this->allowdResourcePools = ['default', 'gui', 'import'];
+     * Possible Values: $this->allowedResourcePools = ['default', 'gui', 'import'];
      *
      * @var string
      */
@@ -137,7 +137,6 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
      * @return editor_Plugins_SpellCheck_SegmentProcessor|null
      */
     public function getProcessor() {
-        //class_exists('editor_Utils'); i(self::$_processor ? 'processor exists' : 'processor not exists', 'a');
         return self::$_processor ?? self::$_processor = ZfExtended_Factory::get('editor_Plugins_SpellCheck_SegmentProcessor');
     }
 
@@ -165,7 +164,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
      *
      * @return ZfExtended_Logger
      */
-    protected function getLogger() : ZfExtended_Logger {
+    public function getLogger() : ZfExtended_Logger {
         return $this->logger ?? $this->logger = Zend_Registry
             ::get('logger')->cloneMe(
                 $this->config->getLoggerDomain($this->processingMode)
@@ -250,23 +249,6 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
      */
     protected function processSegments(array $segments, string $slot) : bool {
 
-        // If task's target language is not supported by LanguageTool
-        if (!$this->spellCheckLang) {
-
-            // If we're inside a worker thread
-            if ($this->isWorkerThread) {
-
-                // Log event
-                $this->getLogger()->error('E1326', 'SpellCheck can not work when target language is not supported by LanguageTool.', ['task' => $this->task]);
-
-                // Return false
-                return false;
-            }
-
-            // Return true
-            return true;
-        }
-
         // Get segments tags from segments
         $segmentsTags = editor_Segment_Tags::fromSegments(
             $this->task, $this->processingMode, $segments, editor_Segment_Processing::isOperation($this->processingMode)
@@ -289,7 +271,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
         try {
 
             // Create processor instance
-            $processor = new editor_Plugins_SpellCheck_SegmentProcessor($this->task, $this->config, $this->processingMode, $this->isWorkerThread);
+            $processor = new editor_Plugins_SpellCheck_SegmentProcessor(/*$this->task, $this->config, $this->processingMode, $this->isWorkerThread*/);
 
             // Do process
             $processor->process($segmentsTags, $slot, true, $this->spellCheckLang);
@@ -299,15 +281,20 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
         }
 
         // If Malfunction exception caught, it means the LanguageTool is up, but HTTP response code was not 2xx, so that
-        // - we set the segments status to 'recheck', so each segment will be checked again, segment by segment, not in a bulk manner
-        // - we log all the data producing the error
-        catch (editor_Plugins_TermTagger_Exception_Malfunction $exception) {
+        // - we set the segments status to 'recheck', so each segment will be checked again, segment by segment, not in a bulk manner,
+        //   but if while running one-by-one recheck it will result the same problem, then each status will be set as 'defect' one-by-one
+        // - we log all the data producing the error.
+        catch (editor_Plugins_SpellCheck_Exception_Malfunction $exception) {
 
             // Set segments status to 'recheck'
-            $this->setTermtagState($this->loadedSegmentIds, $this->malfunctionState);
+            $this->setSpellcheckState($this->loadedSegmentIds, $this->malfunctionState);
 
             // Add task to exception extra data
-            $exception->addExtraData(['task' => $this->task]);
+            $exception->addExtraData([
+                'task' => $this->task,
+                'spellcheckState' => $this->malfunctionState,
+                'segmentIds' => $this->loadedSegmentIds,
+            ]);
 
             // Do log
             $this->getLogger()->exception($exception, [
@@ -328,13 +315,17 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
             // If we are in the recheck loop the timeout should be handled as malfunction
             $state = $exception instanceof editor_Plugins_SpellCheck_Exception_TimeOut
                 ? $this->malfunctionState // This is either recheck or defect (later if we are already processing rechecks)
-                : editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNCHECKED;
+                : editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_UNCHECKED;
 
             // Set status
             $this->setSpellcheckState($this->loadedSegmentIds, $state);
 
             // Add task to exception extra data
-            $exception->addExtraData(['task' => $this->task]);
+            $exception->addExtraData([
+                'task' => $this->task,
+                'spellcheckState' => $state,
+                'loadedSegmentIds' => $this->loadedSegmentIds
+            ]);
 
             // Do log
             $this->getLogger()->exception($exception, [

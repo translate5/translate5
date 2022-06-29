@@ -99,11 +99,14 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      */
     public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode, array $workerParams = []) {
 
+        // Get version of task's target language, applicable for use with LanguageTool, if supported
+        $spellCheckLang = $this->getProcessor()->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
+
         // Crucial: add processing-mode to worker params
         $workerParams = [
             'processingMode' => $processingMode,
             'resourcePool' => 'import',
-            'spellCheckLang' => $this->getProcessor()->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())
+            'spellCheckLang' => $spellCheckLang
         ] + $workerParams;
 
         /* @var $worker editor_Plugins_SpellCheck_Worker_Import */
@@ -124,6 +127,16 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         if (!$worker->init($task->getTaskGuid(), $workerParams)) {
             $this->log->error('E1128', 'SpellCheckImport Worker can not be initialized!', [ 'parameters' => $workerParams ]);
             return;
+        }
+
+        // If task target language is not supported by LanguageTool
+        if (!$spellCheckLang) {
+
+            // Log event
+            $worker->getLogger()->error('E1326', 'SpellCheck can not work when target language is not supported by LanguageTool.', ['task' => $task]);
+
+            // Prevent worker from being initialized/queued
+            return false;
         }
 
         // Add to queue

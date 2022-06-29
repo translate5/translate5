@@ -54,14 +54,6 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
             // Get that default slot
             $slot = $connector->getApiBaseUrl();
 
-            /*class_exists('editor_Utils');
-            i(getmypid(), 'a');
-            i([
-                '$slot arg' => func_num_args() ? func_get_arg(0) : 'null',
-                '$slot auto' => $slot,
-                'self::$_connector[$slot]' => self::$_connector[$slot] ? 'exists' : 'not exists'
-            ], 'a');*/
-
             // Put connector instance into $_connector array under $slot key for further accessibility, if not there yet
             if (!self::$_connector[$slot]) self::$_connector[$slot] = $connector;
         }
@@ -86,20 +78,14 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
         // Foreach segment
         foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
 
-            // Get segmentId
-            $segmentId = $tags->getSegmentId();
-
             // Get segment and task shortcut
-            $segment = $tags->getSegment(); $task = $tags->getTask();
-
-            // Distinct states
-            $states = [];
+            $segment = $tags->getSegment();
 
             // Foreach target
             foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
 
                 // Do check
-                $check = new editor_Plugins_SpellCheck_Check($task, $target->getField(), $segment, $connector, $spellCheckLang);
+                $check = new editor_Plugins_SpellCheck_Check($segment, $target->getField(), $connector, $spellCheckLang);
 
                 // Process check results
                 foreach ($check->getStates() as $category => $qualityA) {
@@ -112,6 +98,9 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
                         );
                     }
                 }
+
+                // Prevent other target-columns from being processed as this is not fully supported yet
+                break;
             }
 
             // Save qualities

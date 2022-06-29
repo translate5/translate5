@@ -40,7 +40,7 @@ abstract class editor_Plugins_SpellCheck_Exception_Abstract extends ZfExtended_E
      * Basically the spell-check exceptions produce just a warning
      *
      * @var integer
-     */á
+     */
     protected $level = ZfExtended_Logger::LEVEL_WARN;
 
     /**

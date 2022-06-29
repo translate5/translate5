@@ -152,8 +152,6 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
         $http->setHeaders('Accept: application/json');
         
         $response = $http->request(self::METHOD_LANGUAGES);
-        //class_exists('editor_Utils');
-        //i(stack(), 'a');
 
         return self::$languages['languageTool'] = $this->processResponse($response);
     }
@@ -185,7 +183,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
 
             // Extra data to be passed to exception
             $extraData = [
-                'httpMethod' => $method,
+                'httpMethod' => self::METHOD_MATCHES,
                 'languageToolUrl' => $http->getUri(true),
             ];
 
@@ -221,7 +219,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
             // Throw malfunction exception
             throw new editor_Plugins_SpellCheck_Exception_Malfunction('E1120', [
                 'httpStatus' => $this->getLastStatus(),
-                'termTaggerUrl' => $http->getUri(true),
+                'languageToolUrl' => $http->getUri(true),
                 'plainServerResponse' => print_r($response->getBody(), true),
                 'requestedData' => compact('text', 'language'),
             ]);
