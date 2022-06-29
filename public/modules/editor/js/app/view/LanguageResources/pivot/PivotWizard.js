@@ -75,7 +75,7 @@ Ext.define('Editor.view.LanguageResources.pivot.PivotWizard', {
         var me = this,
             view = me.down('#languageResourcePivotAssoc'),
             hasPivotFiles = me.lookupViewModel().get('hasPivotFiles'),
-            hasPivotLanguage = Editor.util.Util.isEmpty(me.task.get('relaisLang')) === false;
+            hasPivotLanguage = Editor.util.Util.isLanguageEmpty(me.task.get('relaisLang')) === false;
 
         // when there are pivot files provided in the upload grid, change the current card.
         // All pre-set associations will be removed on back-end

@@ -319,15 +319,24 @@ class editor_Models_Import_Worker_Import {
             /** @var editor_Models_Task $task */
             $task = ZfExtended_Factory::get('editor_Models_Task');
             $projectTasks = $task->loadProjectTasks($this->task->getProjectId(),true);
-            $tasks = array_column($projectTasks,'taskGuid');
+            $taskGuids = array_column($projectTasks,'taskGuid');
         }else{
-            $tasks = [$this->task->getTaskGuid()];
+            $taskGuids = [$this->task->getTaskGuid()];
         }
 
-        foreach ($tasks as $task){
+        $logger = Zend_Registry::get('logger')->cloneMe('languageresources.pivotpretranslation');
+
+        foreach ($taskGuids as $taskGuid){
             /** @var TaskPivotAssociation $assoc */
             $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskPivotAssociation');
-            $assoc->deleteAllForTask($task);
+            if($assoc->deleteAllForTask($taskGuid)){
+                /** @var editor_Models_Task $task */
+                $task = ZfExtended_Factory::get('editor_Models_Task');
+                $task->loadByTaskGuid($taskGuid);
+                $logger->info('E1011','Default user associations removed: Files will be used as pivot source.',[
+                    'task' => $task
+                ]);
+            }
         }
     }
 }

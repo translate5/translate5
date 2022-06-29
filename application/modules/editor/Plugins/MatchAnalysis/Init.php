@@ -215,7 +215,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
         }
         foreach ($batchResources as $languageRessource){
-            /* @var $lr editor_Models_LanguageResources_LanguageResource */
+            /* @var editor_Models_LanguageResources_LanguageResource $languageRessource */
             $batchWorker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_BatchWorker');
             /* @var $batchWorker editor_Plugins_MatchAnalysis_BatchWorker */
 

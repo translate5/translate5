@@ -316,11 +316,12 @@ Ext.define('Editor.util.Util', {
         },
 
         /***
-         * Check if the given string is empty
+         * Check if the given language id/string is empty.
+         * 0 / "0" is treated as empty
          * @param e
          * @returns {boolean}
          */
-        isEmpty:function (e) {
+        isLanguageEmpty:function (e) {
             switch (e) {
                 case "":
                 case 0:

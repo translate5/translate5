@@ -102,10 +102,10 @@ class TaskPivotAssociation extends ZfExtended_Models_Entity_Abstract {
      * Delete all associations for given taskGuid
      *
      * @param string $taskGuid
-     * @return void
+     * @return bool
      */
-    public function deleteAllForTask(string $taskGuid): void
+    public function deleteAllForTask(string $taskGuid): bool
     {
-        $this->db->delete(['taskGuid = ?' => $taskGuid]);
+        return $this->db->delete(['taskGuid = ?' => $taskGuid]) > 0;
     }
 }
