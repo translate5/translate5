@@ -72,3 +72,7 @@ $enable-font-awesome: dynamic(true);
 .loading {
   background-image: url("/modules/editor/images/loading_ico.gif");
 }
+
+.x-gridcell-body-el {
+  white-space: normal;
+}
