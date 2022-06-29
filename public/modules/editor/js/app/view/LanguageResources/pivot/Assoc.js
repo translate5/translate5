@@ -173,11 +173,6 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
         store && store.load({
             params:{
                 taskGuid:task.get('taskGuid')
-            },
-            callback: function () {
-                if(me.getStore().getCount() < 1){
-                    me.down('#startPivotPretranslation')
-                }
             }
         });
     },

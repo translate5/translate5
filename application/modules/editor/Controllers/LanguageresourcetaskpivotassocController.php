@@ -68,26 +68,6 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
         $this->view->rows =  $this->entity->loadAllAvailableForTask($taskGuid);
     }
     
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::postAction()
-     */
-    public function postAction(){
-        try {
-            parent::postAction();
-        }
-        catch(Zend_Db_Statement_Exception $e){
-            $m = $e->getMessage();
-            //duplicate entries are OK, since the user tried to create it
-            if(strpos($m,'SQLSTATE') !== 0 || stripos($m,'Duplicate entry') === false) {
-                throw $e;
-            }
-            //but we have to load and return the already existing duplicate 
-            $this->entity->loadByTaskGuidAndTm($this->data->taskGuid, $this->data->languageResourceId);
-            $this->view->rows = $this->entity->getDataObject();
-        }
-    }
-    
     public function pretranslationBatch(){
 
         $taskGuid = $this->getParam('taskGuid');
@@ -112,10 +92,11 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
             $this->queuePivotWorker($taskGuid);
         }
 
-        //TODO: call this only when the task is not in import ?
-        $wq = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
-        /* @var $wq ZfExtended_Worker_Queue */
-        $wq->trigger();
+        if($task->isImporting() === false){
+            $wq = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
+            /* @var $wq ZfExtended_Worker_Queue */
+            $wq->trigger();
+        }
     }
 
     /***
