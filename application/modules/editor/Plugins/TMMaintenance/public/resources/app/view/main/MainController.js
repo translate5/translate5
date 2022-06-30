@@ -97,14 +97,6 @@ Ext.define('TMMaintenance.view.main.MainController', {
         }, 200);
     },
 
-    onUpdatePress: function () {
-        this.getView().getPlugin('cellediting').getActiveEditor().completeEdit();
-    },
-
-    onCancelEditPress: function () {
-        this.getView().getPlugin('cellediting').getActiveEditor().cancelEdit();
-    },
-
     hideForm: function () {
         this.getViewModel().get('dialog').hide();
     },

@@ -1,5 +1,9 @@
 $enable-font-awesome: dynamic(true);
 
+.mb-5 {
+  margin-bottom: 5px;
+}
+
 .mb-20 {
   margin-bottom: 20px;
 }
@@ -14,6 +18,10 @@ $enable-font-awesome: dynamic(true);
 
 .w-100 {
   width: 100%;
+}
+
+.f-column {
+  flex-direction: column;
 }
 
 .highlight {

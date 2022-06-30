@@ -4,7 +4,12 @@ Ext.define('Ext.translate5.Editor', {
 
     editor: null,
 
-    config: {},
+    config: {
+        field: {
+            xtype: 'textfield',
+            clearable: false,
+        },
+    },
 
     onEditComplete: function(remainVisible, cancelling) {
         const location = this.getLocation();
@@ -62,26 +67,8 @@ Ext.define('Ext.translate5.Editor', {
                 me.editor = newEditor;
                 me.editor.setData(value);
 
-                // TODO move to a separate method
-                me.editor.editing.view.document.on(
-                    'enter',
-                    (evt, data) => {
-                        me.editor.execute('shiftEnter');
-                        //Cancel existing event
-                        data.preventDefault();
-                        evt.stop();
-                    }
-                );
-
-                me.editor.editing.view.document.on(
-                    'clipboardInput',
-                    (evt, data) => {
-                        console.log('Past from clipboard');
-
-                        // Prevent the default listener from being executed.
-                        // evt.stop();
-                    }
-                );
+                me.addListeners(me.editor);
+                me.addButtons(me);
             })
             .catch(error => {
                 console.error(error);
@@ -106,5 +93,48 @@ Ext.define('Ext.translate5.Editor', {
 
     getEditor: function () {
         return this.editor;
+    },
+
+    addListeners: function (editor) {
+        editor.editing.view.document.on(
+            'enter',
+            (evt, data) => {
+                me.editor.execute('shiftEnter');
+                //Cancel existing event
+                data.preventDefault();
+                evt.stop();
+            }
+        );
+
+        editor.editing.view.document.on(
+            'clipboardInput',
+            (evt, data) => {
+                console.log('Past from clipboard');
+
+                // Prevent the default listener from being executed.
+                // evt.stop();
+            }
+        );
+    },
+
+    addButtons: function (me) {
+        let buttons = document.createElement('div');
+        buttons.classList.value = 'x-trigger x-interactive x-cleartrigger-celleditor x-trigger-celleditor f-column';
+        let ok = document.createElement('i');
+        ok.classList.value = 'x-fa fa-check mb-5';
+        let cancel = document.createElement('i');
+        cancel.classList.value = 'x-fa fa-window-close';
+        buttons.appendChild(ok);
+        buttons.appendChild(cancel);
+
+        me.getField().afterInputElement.appendChild(buttons);
+
+        ok.addEventListener('click', function () {
+            me.completeEdit();
+        });
+
+        cancel.addEventListener('click', function () {
+            me.cancelEdit();
+        });
     },
 });

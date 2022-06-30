@@ -111,33 +111,6 @@ Ext.define('TMMaintenance.view.main.List', {
                     disabled: '{!selectedTm}',
                 },
             },
-            {
-                xtype: 'panel',
-                align: 'right',
-                userCls: 'editor-buttons',
-                items: [
-                    {
-                        xtype: 'button',
-                        align: 'right',
-                        iconCls: 'x-fa fa-check',
-                        handler: 'onUpdatePress',
-                        disabled: '{disabled}',
-                        bind: {
-                            disabled: '{!selectedTm}',
-                        },
-                    },
-                    {
-                        xtype: 'button',
-                        align: 'right',
-                        iconCls: 'x-fa fa-window-close',
-                        handler: 'onCancelEditPress',
-                        disabled: '{disabled}',
-                        bind: {
-                            disabled: '{!selectedTm}',
-                        },
-                    },
-                ]
-            },
         ],
     },
 
