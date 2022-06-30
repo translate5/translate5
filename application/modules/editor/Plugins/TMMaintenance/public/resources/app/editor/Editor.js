@@ -68,7 +68,7 @@ Ext.define('Ext.translate5.Editor', {
                 me.editor.setData(value);
 
                 me.addListeners(me.editor);
-                me.addButtons(me);
+                me.addEditorButtons(me);
             })
             .catch(error => {
                 console.error(error);
@@ -117,7 +117,7 @@ Ext.define('Ext.translate5.Editor', {
         );
     },
 
-    addButtons: function (me) {
+    addEditorButtons: function (me) {
         let buttons = document.createElement('div');
         buttons.classList.value = 'x-trigger x-interactive x-cleartrigger-celleditor x-trigger-celleditor f-column';
         let ok = document.createElement('i');
