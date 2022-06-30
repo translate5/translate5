@@ -246,8 +246,13 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         if( empty($url) ){
             return;
         }
-        $tua = $this->config->newTua;
+
         $task = $this->config->task;
+
+        /** @var editor_Models_TaskUserAssoc $assoc */
+        $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+
+        $tua = $assoc->loadAllOfATask($task->getTaskGuid());
 
         /** @var Zend_Http_Client $http */
         $http = ZfExtended_Factory::get('Zend_Http_Client');
@@ -258,12 +263,17 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
 
         if( !empty($task)){
             $data->task = $task->getDataObject();
-            unset($data->lockedInternalSessionUniqId);
-            unset($data->qmSubsegmentFlags);
+            unset($data->task->lockedInternalSessionUniqId);
+            unset($data->task->qmSubsegmentFlags);
         }
 
         if( !empty($tua)){
-            $data->tua = $tua->getDataObject();
+            foreach ($tua as &$item) {
+                unset($item['staticAuthHash']);
+                unset($item['usedInternalSessionUniqId']);
+            }
+            $data->tua = $tua;
+
         }
 
         if(isset($data)){
