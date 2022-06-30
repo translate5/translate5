@@ -4777,5 +4777,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Vorübersetzung</source>
   <target>Pre-translation</target>
 </trans-unit>
+<trans-unit id='U29sbHRlIGRhcyB6dSBpbXBvcnRpZXJlbmRlIFpJUC1QYWtldCBEYXRlaWVuIGbDvHIgZGllIEJlZsO8bGx1bmcgZGVyIFBpdm90LVNwYWx0ZSBlbnRoYWx0ZW4sIHdlcmRlbiBoaWVyIGdlbWFjaHQgRWluc3RlbGx1bmdlbiBpZ25vcmllcnQu'>
+  <source>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</source>
+  <target>If the ZIP package to be imported contains files for filling the pivot column, settings made here will be ignored.</target>
+</trans-unit>
   </file>
 </xliff>

@@ -47,7 +47,8 @@ Ext.define('Editor.view.LanguageResources.pivot.PivotWizard', {
     task:null,
     autoScroll: true,
     strings:{
-        wizardTitle:'#UT#Pivot-Sprachressourcen'
+        wizardTitle:'#UT#Pivot-Sprachressourcen',
+        pivotFilesZipMessage:'#UT#Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.'
     },
     listeners:{
         activate:'onPivotWizardActivate'
@@ -74,8 +75,23 @@ Ext.define('Editor.view.LanguageResources.pivot.PivotWizard', {
     onPivotWizardActivate:function(){
         var me = this,
             view = me.down('#languageResourcePivotAssoc'),
+            isZipUpload = me.lookupViewModel().get('isZipUpload'),
             hasPivotFiles = me.lookupViewModel().get('hasPivotFiles'),
             hasPivotLanguage = Editor.util.Util.isLanguageEmpty(me.task.get('relaisLang')) === false;
+
+        if(isZipUpload){
+            view && view.addDocked([{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                items: [{
+                    xtype: 'displayfield',
+                    value:me.strings.pivotFilesZipMessage,
+                    fieldCls:'redTextColumn',
+                    anchor:'100%'
+                }]
+            }]);
+
+        }
 
         // when there are pivot files provided in the upload grid, change the current card.
         // All pre-set associations will be removed on back-end
