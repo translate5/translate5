@@ -31,21 +31,23 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.adminTaskPreferencesWindow',
     requires: [
-       'Editor.view.admin.task.PreferencesWindowViewModel',
-       'Editor.view.admin.task.UserAssoc',
-       'Editor.view.admin.task.Preferences',
-       'Editor.view.admin.task.TaskAttributes',
-       'Editor.view.quality.admin.TaskQualities',
-       'Editor.view.admin.task.LogGrid',
-       'Editor.view.admin.task.LogWindow',
-       'Editor.view.admin.config.Grid'
+        'Editor.view.admin.task.PreferencesWindowViewModel',
+        'Editor.view.admin.task.UserAssoc',
+        'Editor.view.admin.task.Preferences',
+        'Editor.view.admin.task.TaskAttributes',
+        'Editor.view.quality.admin.TaskQualities',
+        'Editor.view.admin.task.LogGrid',
+        'Editor.view.admin.task.LogWindow',
+        'Editor.view.admin.config.Grid',
+        'Editor.view.LanguageResources.pivot.Assoc'
     ],
     itemId: 'adminTaskPreferencesWindow',
     header:false,
     strings: {
         close: '#UT#Fenster schließen',
         events: '#UT#Ereignisse',
-        config : '#UT#Standardkonfiguration Kunde überschreiben'
+        config : '#UT#Standardkonfiguration Kunde überschreiben',
+        pivotAssoc: '#UT#Pivot-Sprachressourcen'
     },
     layout: 'fit',
     viewModel: {
@@ -53,7 +55,6 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     },
     initConfig: function(instanceConfig) {
         var me = this,
-            task = me.initialConfig.actualTask,
             auth = Editor.app.authenticatedUser,
             tabs = [],
             config;
@@ -69,7 +70,20 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'languageResourceTaskAssocPanel'
             });
         }
-        
+
+        if(auth.isAllowed('languageResourcesTaskPivotAssoc')) {
+            tabs.push({
+                xtype: 'languageResourcePivotAssoc',
+                title: me.strings.pivotAssoc,
+                bind:{
+                    task:'{currentTask}'
+                }
+            });
+        }
+
+
+
+
         if(auth.isAllowed('editorManageQualities')) {
             tabs.push({
                 xtype: 'taskQualities',

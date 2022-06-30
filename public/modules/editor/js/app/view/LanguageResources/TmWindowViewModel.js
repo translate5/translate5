@@ -61,6 +61,15 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
                 operator : "in",
                 value : '{useAsDefault.value}'
             }
+        },
+        customersDefaultPivot: {
+            source: '{customers}',
+            pageSize:0,
+            filters : {
+                property : 'id',
+                operator : "in",
+                value : '{resourcesCustomers.value}'
+            }
         }
     },
     formulas: {

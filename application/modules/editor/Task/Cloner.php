@@ -107,6 +107,7 @@ class editor_Task_Cloner {
 
     public function cloneDependencies() {
         $this->cloneLanguageResources();
+        $this->clonePivotLanguageResources();
         $this->cloneTaskSpecificConfig();
     }
 
@@ -126,6 +127,29 @@ class editor_Task_Cloner {
                 //do not clone such TermCollection associations, since they are recreated through the cloned import package
                 continue;
             }
+            $jobData['taskGuid'] = $this->clone->getTaskGuid();
+            $job->init($jobData);
+            try {
+                $job->save();
+            } catch (Zend_Db_Statement_Exception | ZfExtended_Models_Entity_Exceptions_IntegrityConstraint | ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
+                // do nothing here
+            }
+        }
+    }
+
+    /**
+     * Clone existing pivot language resources from oldTaskGuid for newTaskGuid.
+     */
+    protected function clonePivotLanguageResources(): void
+    {
+        /** @var \MittagQI\Translate5\LanguageResource\TaskPivotAssociation $job */
+        $job = ZfExtended_Factory::get('\MittagQI\Translate5\LanguageResource\TaskPivotAssociation');
+        $jobs = $job->loadTaskAssociated($this->original->getTaskGuid());
+        if(empty($jobs)){
+            return;
+        }
+        foreach($jobs as $jobData){
+            unset($jobData['id']);
             $jobData['taskGuid'] = $this->clone->getTaskGuid();
             $job->init($jobData);
             try {

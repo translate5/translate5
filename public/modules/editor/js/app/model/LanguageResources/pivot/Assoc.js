@@ -26,41 +26,34 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class Editor.plugins.GlobalesePreTranslation.controller.Globalese
- * @extends Ext.app.Controller
- */
-Ext.define('Editor.plugins.GlobalesePreTranslation.controller.Globalese', {
-  extend: 'Ext.app.Controller',
-  views: [
-      'Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth',
-      'Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings',
-      'Editor.view.admin.TaskAddWindow'
-      ],
-  
-  listen: {
-      component: {
-          '#adminTaskAddWindow': {
-              beforerender:'onAdminTaskWindowBeforeRender'
-          }
+Ext.define('Editor.model.LanguageResources.pivot.Assoc', {
+    extend: 'Ext.data.Model',
+    fields: [
+        {
+            name: 'id',
+            type: 'int',
+            persist: false,
+            convert: function (val, record) {
+                // One term collection can be listed and assigned for multiple projectTasks
+                // To display unique row for each field in the import wizard, attach the taskGuid to the id field
+                if(record.get('taskGuid') !== undefined){
+                    return record.get('id')+record.get('taskGuid');
+                }
+                return record.get('id');
+            }
+        },
+        {name: 'checked',type: 'boolean'},
+        {name: 'taskGuid', type: 'string'},
+        {name: 'languageResourceId', type: 'int'}
+    ],
+
+    idProperty: 'id',
+    proxy : {
+      type : 'rest',
+      url: Editor.data.restpath+'languageresourcetaskpivotassoc',
+      reader : {
+        rootProperty: 'rows',
+        type : 'json'
       }
-  },
-  onAdminTaskWindowBeforeRender:function(window,eOpts){
-      window.insertCard({
-          xtype:'globaleseAuthPanel',
-          //index where the card should appear in the group
-          groupIndex:5,
-      },'postimport');      
-      window.insertCard({
-          xtype:'globaleseSettingsPanel',
-          //index where the card should appear in the group
-          groupIndex:6,
-      },'postimport');
-  }
+    }
 });
