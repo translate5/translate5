@@ -668,8 +668,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         if (empty($this->connectors) || !$this->batchQuery) {
             return;
         }
-        $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
-        /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
+        $model = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult');
+        /* @var $model MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult */
         foreach ($this->connectors as $connector) {
             if ($connector->isBatchQuery()) {
                 $model->deleteForLanguageresource($connector->getLanguageResource()->getId());

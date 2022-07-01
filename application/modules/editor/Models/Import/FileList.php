@@ -56,6 +56,11 @@ class editor_Models_Import_FileList {
      * @var editor_Models_Foldertree
      */
     protected $treeDb;
+
+    /***
+     * @var editor_Models_RelaisFoldertree
+     */
+    protected editor_Models_RelaisFoldertree $relaisFolderTree;
     
     public function __construct(editor_Models_Import_Configuration $importConfig, editor_Models_Task $task) {
         $this->importConfig = $importConfig;
@@ -141,15 +146,16 @@ class editor_Models_Import_FileList {
     }
     
     public function processRelaisFiles() {
-        $tree = ZfExtended_Factory::get('editor_Models_RelaisFoldertree');
-        /* @var $tree editor_Models_RelaisFoldertree */
-        $tree->setImportConfig($this->importConfig);
-        $tree->getPaths($this->task->getTaskGuid(),'file'); //Aufruf nötig, er initialisiert den Baum
-        $relaisFiles = $tree->checkAndGetRelaisFiles($this->importConfig->importFolder);
-        $tree->save();
+        $this->relaisFolderTree = ZfExtended_Factory::get('editor_Models_RelaisFoldertree');
+        $this->relaisFolderTree->setImportConfig($this->importConfig);
+        $this->relaisFolderTree->getPaths($this->task->getTaskGuid(),'file'); //Aufruf nötig, er initialisiert den Baum
+
+        $relaisFiles = $this->relaisFolderTree->checkAndGetRelaisFiles($this->importConfig->importFolder);
+
+        $this->relaisFolderTree->save();
         return $relaisFiles;
     }
-    
+
     /**
      * returns if reference files has to be imported
      * @return boolean
@@ -160,5 +166,13 @@ class editor_Models_Import_FileList {
         $workfilesDirectory = $this->importConfig->getFilesDirectory();
         $refDir = $config->runtimeOptions->import->referenceDirectory;
         return !empty($workfilesDirectory) && is_dir($this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir);
+    }
+
+    /**
+     * @return editor_Models_RelaisFoldertree
+     */
+    public function getRelaisFolderTree(): editor_Models_RelaisFoldertree
+    {
+        return $this->relaisFolderTree;
     }
 }

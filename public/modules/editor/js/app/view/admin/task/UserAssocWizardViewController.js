@@ -66,7 +66,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
 
     skipCardClick: function (){
         var me = this;
-        me.checkOperation(4);
+        me.checkOperation(5);
     },
 
     checkOperation: function (skipCards){

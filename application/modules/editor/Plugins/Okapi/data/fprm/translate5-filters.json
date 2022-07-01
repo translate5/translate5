@@ -2,6 +2,7 @@
     {
         "id": "translate5",
         "type": "okf_openoffice",
+        "replaceId": "okf_openoffice",
         "name": "t5 OpenOffice.org Documents",
         "description": "translate5 adjusted filter for OpenOffice.org documents",
         "mime": "application/x-openoffice",
@@ -10,6 +11,7 @@
     {
         "id": "translate5",
         "type": "okf_openxml",
+        "replaceId": "okf_openxml",
         "name": "t5 Microsoft Office Document",
         "description": "translate5 adjusted filter for Microsoft Office documents",
         "mime": "text/xml",
@@ -18,6 +20,7 @@
     {
         "id": "translate5-macStrings",
         "type": "okf_regex",
+        "replaceId": "okf_regex-macStrings",
         "name": "t5 Mac Strings",
         "description": "translate5 adjusted filter for Macintosh-strings files",
         "mime": "text/x-regex",
@@ -26,6 +29,7 @@
     {
         "id": "translate5-sdl",
         "type": "okf_xliff",
+        "replaceId": "",
         "name": "t5 XLIFF",
         "description": "translate5 adjusted filter for XLIFF documents",
         "mime": "application/x-xliff+xml",
@@ -34,6 +38,7 @@
     {
         "id": "translate5-tbx",
         "type": "okf_xmlstream",
+        "replaceId": "",
         "name": "t5 TBX",
         "description": "translate5 adjusted filter for TBX files",
         "mime": "text/xml",
@@ -42,6 +47,7 @@
     {
         "id": "translate5-AndroidStrings",
         "type": "okf_xml",
+        "replaceId": "okf_xml-AndroidStrings",
         "name": "t5 Android Strings",
         "description": "translate5 adjusted filter for Android Strings",
         "mime": "text/xml",
@@ -50,6 +56,7 @@
     {
         "id": "translate5-tbx-translate-definitions-setup-ITS",
         "type": "okf_xml",
+        "replaceId": "",
         "name": "T5 ITS Definitions Setup TBX",
         "description": "translate5 adjusted filter for ITS Definitions Setup TBX files",
         "mime": "text/xml",

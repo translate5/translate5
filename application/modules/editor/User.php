@@ -100,6 +100,14 @@ class editor_User {
         return $this->session->data->roles;
     }
 
+    /***
+     * @return string
+     */
+    public function getUserName(): string
+    {
+        return $this->session->data->userName;
+    }
+
     /**
      * Check if currently logged in user is allowed to access the given ressource and right
      *

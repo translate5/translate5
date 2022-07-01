@@ -27,12 +27,55 @@
  */
 
 /**
- * Class representing the static data for all default filters a bconf can have
+ * Class representing the static data for all okapi default filters a bconf can have
  */
 final class editor_Plugins_Okapi_Bconf_Filters_Okapi extends editor_Plugins_Okapi_Bconf_Filters_Inventory {
 
     private static ?editor_Plugins_Okapi_Bconf_Filters_Okapi $_instance = NULL;
 
+    /**
+     * Validates a default-identifier (a mapping-identifier pointing to an okapi-default and not a fprm-file)
+     * @param string $identifier
+     * @return bool
+     */
+    public static function isValidDefaultIdentifier(string $identifier){
+        // avoid nonsense
+        if(str_contains($identifier, editor_Plugins_Okapi_Bconf_Filters::IDENTIFIER_SEPERATOR)){
+            throw new ZfExtended_BadMethodCallException('editor_Plugins_Okapi_Bconf_Filters_Okapi::isValidDefaultIdentifier can only check Okapi default filters that do not point to a fprm file');
+        }
+        if(count(self::instance()->findFilter(null, $identifier)) > 0){
+            return true;
+        }
+        // as a fallback, we lookup by type. Currently, all types will have an file $type@$type as well but who knows ...
+        return self::isValidType($identifier);
+    }
+
+    /**
+     * validates an okapi filter type (if it generally exists)
+     * @param $okapiType
+     * @return bool
+     */
+    public static function isValidType($okapiType){
+        return (count(self::instance()->findFilter($okapiType)) > 0);
+    }
+    /**
+     * Retrieves the MimeType for a OKAPI filter type (or id)
+     * @param $okapiType
+     * @return string
+     */
+    public static function findMimeType($okapiType) : string {
+        // first, try to find filter by ID (which are the un-customized types in our inventory!)
+        $result = self::instance()->findFilter(null, $okapiType);
+        if(count($result) > 0){
+            return $result[0]->mime;
+        }
+        $result = self::instance()->findFilter($okapiType);
+        if(count($result) > 0){
+            return $result[0]->mime;
+        }
+        // the mime type has only informative character. Therefore we use a generic default in case of not being able to evaluate it
+        return 'text/plain';
+    }
     /**
      * Classic Singleton
      * @return editor_Plugins_Okapi_Bconf_Filters_Okapi

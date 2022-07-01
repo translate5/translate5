@@ -71,6 +71,18 @@ class editor_Models_Segment_RepetitionHash {
     }
 
     /**
+     * rehashes the relais of the given segment (assuming the segments relais is already up-to-date) alternatively a new relais value can be given as string
+     * @param editor_Models_Segment $segment
+     * @param string|null $newValue
+     * @return string
+     */
+    public function rehashRelais(editor_Models_Segment $segment, ?string $newValue = null): string {
+        $this->segment = $segment;
+        return $this->hashRelais($newValue ?? $segment->getRelais());
+    }
+
+
+    /**
      * Creates the hash out of the target string, adds source tag count if source editing is enabled
      * @param string $target
      * @param string $source

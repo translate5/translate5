@@ -31,51 +31,95 @@
  *
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
+ * @method integer getBconfId() getBconfId()
+ * @method void setBconfId() setBconfId(int $bconfId)
+ * @method string getOkapiType() getOkapiType()
+ * @method void setOkapiType() setOkapiType(string $okapiType)
+ * @method string getOkapiId() getOkapiId()
+ * @method void setOkapiId() setOkapiId(string $okapiId)
+ * @method string getMimeType() getMimeType()
+ * @method void setMimeType() setMimeType(string $mimeType)
+ * @method string getName() getName()
+ * @method void setName() setName(string $name)
+ * @method string getDescription() getDescription()
+ * @method void setDescription() setDescription(string $description)
+ * @method string getExtensions() getExtensions()
+ * @method void setExtensions() setExtensions(string $extensions)
  */
 class editor_Plugins_Okapi_Models_BconfFilter extends ZfExtended_Models_Entity_Abstract {
-    
-    const DATA_DIR = 'editorOkapiBconf';
     
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_BconfFilter';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_BconfFilter';
 
-    /** get all the row by $bconfId
-     * @param $bconfId
-     * @return array|null
-     */
-     public function getByBconfId($bconfId): ?array {
-          // find all fonts for a task
-          $select = $this->db->select()
-               ->where('bconfId = ?', $bconfId);
-          $rows = $this->loadFilterdCustom($select);
-          if($rows != null){
-              return $rows;
-          }
-          return null;
-     }
-
     /**
-     * Override that supports composite key
-     * @param int $bconfId
-     * @param string $okapiId  Not in signature to match ZfExtended_Models_Entity_Abstract::load
-     * @return Zend_Db_Table_Row_Abstract|null
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @return array
      */
-    public function load($bconfId /*, $okapiId */) {
-        $args = func_get_args();
-        $okapiId = $args[1];
-        try {
-            $rowset = $this->db->find($bconfId, $okapiId);
-        } catch (Exception $e) {
-            $this->notFound('NotFound after other Error', $e);
-        }
-        if (!$rowset || $rowset->count() == 0) {
-            $this->notFound('#PK', [$bconfId, $okapiId]);
-        }
-        $rowset->rewind(); // triggers loading
-        //load implies loading one Row, so use only the first row
-        return $this->row = $rowset->current();
+    public function getFileExtensions() : array {
+        return explode(',', $this->getExtensions());
     }
 
+    /**
+     * @param string[] $extensions
+     * @return array
+     */
+    public function setFileExtensions(array $extensions) {
+        $this->setExtensions(implode(',', $extensions));
+    }
 
+    /**
+     * find all customized filters for a bconf
+     * @param int $bconfId
+     * @return array
+     */
+    public function getByBconfId(int $bconfId) : array {
+         $select = $this->db->select()
+              ->where('bconfId = ?', $bconfId);
+         return $this->loadFilterdCustom($select);
+    }
+
+    /**
+     * Retrieves all customized filters having one of the passed extensions
+     * @param array $extensions
+     * @return array
+     */
+    public function getByExtensions(array $extensions) : array {
+        if(count($extensions) === 0){
+            return [];
+        }
+        $select = $this->db->select();
+        foreach($extensions as $extension){
+            $select
+                ->orWhere('extensions = ?', $extension)
+                ->orWhere('extensions LIKE ?', $extension.',%')
+                ->orWhere('extensions LIKE ?', '%,'.$extension)
+                ->orWhere('extensions LIKE ?', '%,'.$extension.',%');
+        }
+        return $this->loadFilterdCustom($select);
+    }
+
+    /**
+     * Removes the passed Extension from the entry.
+     * If there are no extensions left then, it will be removed (return-value: false) or saved (return-value: true)
+     * @param string[] $extensionsToRemove
+     * @return bool
+     */
+    public function removeExtensions(array $extensionsToRemove) : bool {
+        if(count($extensionsToRemove) === 0){
+            return true;
+        }
+        $newExtensions = [];
+        foreach($this->getFileExtensions() as $extension){
+            if(!in_array($extension, $extensionsToRemove)){
+                $newExtensions[] = $extension;
+            }
+        }
+        if(count($newExtensions) === 0){
+            $this->delete();
+            return false;
+        } else {
+            $this->setExtensions(implode(',', $newExtensions));
+            $this->save();
+            return true;
+        }
+    }
 }

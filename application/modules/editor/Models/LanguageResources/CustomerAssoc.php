@@ -42,6 +42,9 @@ END LICENSE AND COPYRIGHT
  * @method integer getWriteAsDefault() getWriteAsDefault()
  * @method void setWriteAsDefault() setWriteAsDefault(int $writeAsDefault)
  *
+ * @method integer getPivotAsDefault() getPivotAsDefault()
+ * @method void setPivotAsDefault() setPivotAsDefault(int $pivotAsDefault)
+ * 
  */
 class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract {
     
@@ -53,11 +56,15 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * A language resource that is saved must have at least one customer assigned
      * (if none is given, we use the defaultcustomer).
      * @param int $id
-     * @param array $customers
-     * @param array $useAsDefault
-     * @param array $writeAsDefault
+     * @param array $data : request parametars
      */
-    public function saveAssocRequest(int $id, array $customers, array $useAsDefault, array $writeAsDefault){
+    public function saveAssocRequest(int $id, array $data){
+        
+        $customers = $data['customerIds'] ?? [];
+        $useAsDefault = $data['customerUseAsDefaultIds'] ?? [];
+        $writeAsDefault = $data['customerWriteAsDefaultIds'] ?? [];
+        $pivotAsDefault = $data['customerPivotAsDefaultIds'] ?? [];
+
         // Check if (at least one) customer is set and use the 'defaultcustomer' if not
         if (empty($customers)) {
             $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
@@ -71,23 +78,25 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
 
         // ensure that only writeAsDefault customers are used, which are added also as useAsDefault(read as default)
         $writeAsDefault = array_intersect($writeAsDefault, $useAsDefault);
+
+        // ensure that only pivotAsDefault customers are used, which are added also as customers
+        $pivotAsDefault = array_intersect($pivotAsDefault, $customers);
         
-        $this->addAssocs($id, $customers, $useAsDefault,$writeAsDefault);
+        $this->addAssocs($id, $customers, $useAsDefault,$writeAsDefault,$pivotAsDefault);
     }
     
     /**
      * Update customer assoc from the request parameters.
+     *
      * @param int $id
-     * @param array $customers
-     * @param array $useAsDefault
-     * @param array $writeAsDefault
+     * @param stdClass $data
      */
-    public function updateAssocRequest(int $id, array $customers, array $useAsDefault, array $writeAsDefault){
+    public function updateAssocRequest(int $id, array $data){
         // remove old assocs for the current languageResourceId
         $this->db->delete(['languageResourceId IN (?)' => $id]);
         
         // save the new data
-        $this->saveAssocRequest($id, $customers, $useAsDefault, $writeAsDefault);
+        $this->saveAssocRequest($id, $data);
     }
     
     /***
@@ -97,8 +106,9 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * @param array $customers
      * @param array $useAsDefault : list of all customers which useAsDefault is 1
      * @param array $writeAsDefault : list of all customers which writeAsDefault is 1
+     * @param array $pivotAsDefault : list of all customers which pivotAsDefault is 1
      */
-    public function addAssocs(int $languageResourceId, array $customers, array $useAsDefault = [], array $writeAsDefault = []){
+    public function addAssocs(int $languageResourceId, array $customers, array $useAsDefault = [], array $writeAsDefault = [], array $pivotAsDefault = []){
         foreach ($customers as $id){
             $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
             /* @var $model editor_Models_LanguageResources_CustomerAssoc */
@@ -106,6 +116,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
             $model->setLanguageResourceId($languageResourceId);
             $model->setUseAsDefault(in_array($id, $useAsDefault));
             $model->setWriteAsDefault(in_array($id, $writeAsDefault));
+            $model->setPivotAsDefault(in_array($id, $pivotAsDefault));
             $model->save();
         }
     }
@@ -175,6 +186,18 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         return $this->db->fetchAll($s)->toArray();
     }
     
+    /***
+     * Get all pivotAsDefault customer assocs for given customer ids
+     * If no $customerIds is provided, all results where pivotAsDefault is set to 1 will be returned.
+     * INFO: this function is used by pivotAsDefault filter in the language resources. Do not change the layout.
+     * @param array $customerIds
+     * @return array
+     */
+    public function loadByCustomerIdsPivotAsDefault(array $customerIds = []): array{
+        $s=$this->getCustomerIdsSelect($customerIds);
+        $s->where('pivotAsDefault=1');
+        return $this->db->fetchAll($s)->toArray();
+    }
     
     /***
      * Get all customers for $languageResourceId (languageResourceId)

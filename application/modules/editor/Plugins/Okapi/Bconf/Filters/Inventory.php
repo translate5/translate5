@@ -72,13 +72,14 @@ abstract class editor_Plugins_Okapi_Bconf_Filters_Inventory {
      * @return bool
      */
     public function validate(){
+        $valid = true;
         foreach($this->inventory as $filter){
             if($filter->settings !== false && !file_exists($this->createFprmPath($filter))){
                 error_log('Okapi Filter Inventory '.get_class($this).': Missing FPRM file '.$this->createFprmPath($filter));
-                return false;
+                $valid = false;
             }
         }
-        return true;
+        return $valid;
     }
 
     /**
@@ -113,19 +114,22 @@ abstract class editor_Plugins_Okapi_Bconf_Filters_Inventory {
      * TODO OKAPI: Extension as class constant
      */
     public function createFprmPath(stdClass $filterItem) : string {
-        return $this->getFolderPath().'/'.$this->createFprmFilename($filterItem).'.fprm';
+        return $this->getFolderPath().'/'.$this->createFprmFilename($filterItem).'.'.editor_Plugins_Okapi_Bconf_Filters::EXTENSION;
     }
 
     /**
      * Finds filters by type and id
-     * @param string $type
+     * @param string|null $type
      * @param string|null $id
      * @return stdClass[]
      */
-    public function findFilter(string $type, string $id=NULL) : array {
+    public function findFilter(string $type=NULL, string $id=NULL) : array {
+        if($type === NULL && $id === NULL){
+            return [];
+        }
         $result = [];
         foreach($this->inventory as $item){
-            if($item->type === $type && ($id === NULL || $item->id === $id)){
+            if(($item->type === $type || $type === NULL) && ($item->id === $id || $id === NULL)){
                 $result[] = $item;
             }
         }

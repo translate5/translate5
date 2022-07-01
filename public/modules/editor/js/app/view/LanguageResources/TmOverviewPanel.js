@@ -78,7 +78,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         writeAsDefault:'#UT#Schreibrechte standardmäßig',
         taskassocgridcell:'#UT#Zugewiesene Aufgaben',
         groupHeader: '#UT#Ressource: {name}',
-        specificDataText:'#UT#Zusätzliche Infos'
+        specificDataText:'#UT#Zusätzliche Infos',
+        pivotAsDefault:'#UT#Standardmäßig als Pivot verwenden'
     },
     cls:'tmOverviewPanel',
     height: '100%',
@@ -255,6 +256,17 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     },
                     text:me.strings.writeAsDefault,
                     tooltip:me.strings.writeAsDefault,
+                    renderer:me.defaultCustomersRenderer
+                },
+                {
+                    xtype: 'gridcolumn',
+                    width: 270,
+                    dataIndex:'customerPivotAsDefaultIds',
+                    filter: {
+                        type: 'string'
+                    },
+                    text:me.strings.pivotAsDefault,
+                    tooltip:me.strings.pivotAsDefault,
                     renderer:me.defaultCustomersRenderer
                 },
                 {

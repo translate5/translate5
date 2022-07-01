@@ -696,7 +696,8 @@ function translateText(textToTranslate, translationInProgressID){
             'source': $("#sourceLocale").val(),
             'target': $("#targetLocale").val(),
             'text': textToTranslate,
-            'escape': 1
+            'escape': 1,
+            'orderer': 'gui'
         },
         success: function(result){
             if (translationInProgressID !== latestTranslationInProgressID) {
