@@ -23,7 +23,11 @@
 --
 --  END LICENSE AND COPYRIGHT
 
-ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `okapiId` VARCHAR(255);
-ALTER TABLE `LEK_okapi_bconf_filter` RENAME COLUMN `notes` TO `description`;
-ALTER TABLE `LEK_okapi_bconf` MODIFY `description` VARCHAR(255);
-ALTER TABLE `LEK_okapi_bconf_filter` DROP PRIMARY KEY, DROP COLUMN `id`, ADD PRIMARY KEY (`bconfId`, `okapiId`);
+ALTER TABLE `LEK_okapi_bconf_filter` ADD `okapiType` VARCHAR(50) NOT NULL AFTER `bconfId`;
+ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `okapiId` VARCHAR(255) NOT NULL;
+ALTER TABLE `LEK_okapi_bconf_filter` ADD `description` VARCHAR(255) NOT NULL default '' AFTER `notes`;
+ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `mimeType` varchar(50) NOT NULL default '';
+ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `name` varchar(100) NOT NULL;
+ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `extensions` varchar(255) NOT NULL;
+ALTER TABLE `LEK_okapi_bconf_filter` DROP COLUMN `okapiName`;
+ALTER TABLE `LEK_okapi_bconf_filter` DROP COLUMN `notes`;

@@ -1,3 +1,4 @@
+
 <?php
 /*
  START LICENSE AND COPYRIGHT
@@ -44,7 +45,14 @@
  */
 class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
 
+    /**
+     * @var string
+     */
     const EXTENSIONMAP_FILE = editor_Plugins_Okapi_Bconf_File::EXTENSIONMAP_FILE;
+
+    /**
+     * @var string|null
+     */
     private static ?string $bconfRootDir = null;
 
     public static function getBconfRootDir(): string {
