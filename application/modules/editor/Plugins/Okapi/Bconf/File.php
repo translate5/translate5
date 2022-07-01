@@ -54,7 +54,7 @@ class editor_Plugins_Okapi_Bconf_File {
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    private function pack(): void {
+    public function pack(): void {
         try {
             $this->doPack();
         } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity){

@@ -24,6 +24,7 @@
 
  END LICENSE AND COPYRIGHT
  */
+
 Ext.define('Editor.plugins.Okapi.model.BconfModel', {
     extend: 'Ext.data.Model',
     alias: 'model.BconfModel',
@@ -44,7 +45,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfModel', {
     }, {
         name: 'customerId',
         type: 'int',
-        reference: 'customer',
+        reference: 'Editor.model.admin.Customer',
     }, {
         name: 'isDefault', // global setting
         type: 'boolean'

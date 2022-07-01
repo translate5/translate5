@@ -25,7 +25,8 @@
  END LICENSE AND COPYRIGHT
  */
 /**
- * @class okapiBconfGrid
+ * Lists and manages the available Input Bconfs to choose from when creating a task
+ * On import the chosen one is sent together with the input files to Okapi Longhorn for Segmentation
  */
 Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     extend: 'Ext.grid.Panel',
@@ -37,7 +38,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     alias: 'widget.okapiBconfGrid',
     plugins: ['cellediting'],
     itemId: 'okapiBconfGrid',
-    controller: 'bconfGridController',
+    controller: 'Editor.plugins.Okapi.view.BconfGridController',
     store: 'bconfStore',
     isCustomerGrid: false,
     userCls: 'actionColGrid',
@@ -168,7 +169,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     return this.defaultRenderer.apply(this, arguments);
                 },
                 listeners: {
-                    /**
+                    /** @method
                      * There is always a row to be highlighted and one to be unhighlighted
                      * The exception is, when system default is (de)selected as customer default - then don't refresh old
                      * @param col

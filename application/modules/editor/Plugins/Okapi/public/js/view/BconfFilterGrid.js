@@ -26,8 +26,8 @@
  */
 /**
  * Grid for viewing and editing the different Okapi Filter configurations of a bconf
- * The supported
  * @property {Ext.grid.plugin.Editing} editingPlugin Undocumented property used for shorthand access (for this.findPlugin('rowediting'))
+ * @property {Editor.plugins.Okapi.model.BconfModel} bconf Config of the filtergrid, holds the bconf to which the filters belong.
  * @see Ext.grid.plugin.Editing.init
  */
 Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
@@ -39,6 +39,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     alias: 'widget.bconffiltergrid',
     controller: 'bconffilterGridController',
     config: {
+        /**
+         * @method getBconf
+         * @return {Editor.plugins.Okapi.model.BconfModel}
+         */
         bconf: null,
     },
     editingPlugin: null, // placeholder for undocumented property, see JSDoc
@@ -203,6 +207,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     text: me.text_cols.notes
                 }, {
                     xtype: 'actioncolumn',
+                    cellFocusable: false, // prevent actionItemCLick from entering RowEditMode
                     width: 3 * 28 + 8 + 28,
                     stateId: 'okapiGridActionColumn',
                     align: 'center',

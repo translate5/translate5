@@ -25,18 +25,11 @@
  END LICENSE AND COPYRIGHT
  */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * @class
- * @name BconfFilterGridController
  * @extends Ext.app.ViewController
  * @property {Object} extMapChangelog Tracks changes to the filter's extensions-mapping
  */
+// QUIRK: To support named regions this separate config object is used and later fed to Ext.define()
 let BconfFilterGridController = {
     //region config
     extend: 'Ext.app.ViewController',
@@ -125,25 +118,19 @@ let BconfFilterGridController = {
         }
     },
 // region grid columns
+    /** @method
+     * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
+     */
     copy: function(view, rowIndex, colIndex, item, e, record){
         searchField = view.grid.down('textfield#search')
         searchField.setValue(record.get('name'))
         searchField.checkChange()
         view.select(rowIndex);
         var store = view.getStore(),
-            /*bconfCustomerGrid = Ext.getCmp('bconfCustomerGrid'),
-            suffix,
-            //newId = record.id.replace(/@.*$/,)
-            /* TODO calc correct customerId
-            if(bconfCustomerGrid.isVisible()){
-                newId = bconfCustomerGrid
-            }
-            */
             newRecData = {
                 name: record.get('name'),
                 //name:'',
                 okapiId: record.get('okapiId').replace(/@.*$/, '') + '@' + location.host + '-' + Date.now(),
-                bconfId: view.grid.getBconf().getId(),
             };
 
         newRec = store.add(newRecData)[0];
@@ -159,9 +146,9 @@ let BconfFilterGridController = {
     },
 
     delete: function(view, rowIndex, colIndex, item, e, record, /*row*/){
-        record.drop();
+        record.drop(/* cascade */ false);
         if(record.crudState != 'C'){
-            record.save() // TODO: delete on success only
+            record.save()
         }
     },
 // endregion
@@ -193,7 +180,7 @@ let BconfFilterGridController = {
         if(Object.keys(changed).length){
 
             record.set(changed); //QUIRK TODO check why not ausosave
-
+            record.commit();
             if(record.isNewRecord){
                 record.crudState = 'C'
                 record.phantom = true
@@ -269,8 +256,9 @@ let BconfFilterGridController = {
 
         if(changelog[extension]){ // revert prior change
             isRevert = true;
-            var {filter, affected} = changelog[extension],
-                added = !changelog[extension].added;
+            filter = changelog[extension].filter;
+            affected = changelog[extension].affected;
+            added = !changelog[extension].added;
             delete changelog[extension];
         }
         if(added){
@@ -285,42 +273,7 @@ let BconfFilterGridController = {
         if(!isRevert){ // Save log for revert
             tagfield.changelog[extension] = {added, filter, affected}
         }
-        return
-        if(added){
-            change.to = filter.id
-            affected = store.getById(changelog[extension]?.to || store.extMap.get(extension));
-            if(affected && affected !== filter){
-                change.from = affected;
-                detail = ` from '${affected.get('name')}'`
-            }
-            msg = `Added extension <i>${extension}</i>${detail}`
-        } else { // removed
-            change.from = filter.id
-            affected = store.getById(changelog[extension]?.from) // was added from other filter before
-            // || TODO default's extensionMapping ...as in default
-            if(affected && affected !== filter){
-                change.to = affected
-                detail = ` and added to '${affected.get('name')}' `
-            }
-            msg = `Removed extension <i>${extension}</i> ${detail}`
-
-            filter.removeExtension(extension, affected)
-        }
-
-        this.changeSingleExtension(extension, change);
-    }
-    ,
-
-    changeSingleExtension: function(extension, change,){
-        var store = this.getView().getStore(), // BconfFilterStore
-            changelog = this.extMapChangelog, change = {},
-            affected, msg, detail = '';
-        changelog[extension] = change
-        Editor.MessageBox.addInfo(msg, 2)
-
-
-    }
-    ,
+    },
 
 };
 Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', BconfFilterGridController);

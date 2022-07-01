@@ -27,7 +27,6 @@
 
 /**
  * Store for the Okapi and Translate5 filters
- * @class Editor.plugins.Okapi.store.DefaultBconfFilterStore
  * @extends Ext.data.Store
  */
 Ext.define('Editor.plugins.Okapi.store.DefaultBconfFilterStore', {

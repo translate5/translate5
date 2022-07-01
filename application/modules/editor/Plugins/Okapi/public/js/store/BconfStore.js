@@ -27,7 +27,6 @@
 
 /**
  * Store for the Bconfs og the translate5 installation
- * @class Editor.plugins.Okapi.store.BconfStore
  * @extends Ext.data.Store
  */
 Ext.define('Editor.plugins.Okapi.store.BconfStore', {

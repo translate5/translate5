@@ -29,7 +29,6 @@
  * Main Controller of the Okapi Plugin
  * Adds the BconfGrids and BconfCombo
  *
- * @class BconfPrefs
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {

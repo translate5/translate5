@@ -26,8 +26,7 @@
  */
 
 /**
- * Store for the Filters inside a bconf
- * @class Editor.plugins.Okapi.store.BconfFilterStore
+ * Store for the so called BconfFilters aka fprms inside a Bconf
  * @property {Map} extMap Holds the information of extensions-mapping.txt inside a Bconf
  * @extends Ext.data.Store
  */

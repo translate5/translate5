@@ -24,6 +24,7 @@
 
  END LICENSE AND COPYRIGHT
  */
+
 Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     extend: 'Ext.data.Model',
     requires: ['Editor.util.type.StringSet'],
@@ -66,7 +67,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     }, {
         name: 'bconfId',
         type: 'int',
-        //reference: 'bconfmodel', // leads to fiels being null
+        reference: 'Editor.plugins.Okapi.model.BconfModel',
         critical: true,
         defaultValue: 0 /** @see self.proxy.setBconfId */
     }, {
@@ -100,7 +101,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
                     set[v.op](v.extension)
                     return set
                 } else {
-                    var array = Ext.isString(v) ? v.split(/[,\.\s]+/) : Ext.Array.from(v)
+                    var array = Ext.isString(v) ? v.split(/[,.\s]+/) : Ext.Array.from(v)
                     return new StringSet(array);
                 }
             },

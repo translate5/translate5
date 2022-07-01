@@ -25,23 +25,9 @@
  END LICENSE AND COPYRIGHT
  */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class
- * @name BconfGridController
- * @extends Ext.app.ViewController
- * @ignore Editor.plugins.Okapi
- *
- */
-Ext.define('Editor.plugins.Okapi.view.BconfGridController',
-    {
+Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.bconfGridController',
+    alias: 'controller.Editor.plugins.Okapi.view.BconfGridController',
     /** @const {string} FILE_UPLOAD_NAME */
     FILE_UPLOAD_NAME: 'bconffile',
 
