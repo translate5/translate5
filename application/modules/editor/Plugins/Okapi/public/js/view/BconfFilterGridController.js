@@ -87,11 +87,11 @@ let BconfFilterGridController = {
             Editor.app.getController('ServerException').handleCallback(records, operation);
             return;
         }
-        if(records.length === 0){
-            this.lookup('showDefaultsBtn').setPressed(true)
-        }
         store.add(Ext.getStore('defaultBconfFilters').getRange());
         store.setExtMapString(operation.getResultSet().getMetadata()['extensions-mapping']);
+        if(store.getCount() === 0 && store.loadCount === 1){ // Show defaults on empty Bconffilters
+            this.lookup('showDefaultsBtn').setPressed(true)
+        }
     },
 
     search: function(field, searchString){
@@ -144,12 +144,24 @@ let BconfFilterGridController = {
             //getRoweditor
         }
     },
-
+    /**
+     * Delete a Bconffilter from DB and extensions-mapping
+     * TODO Remove files
+     */
     delete: function(view, rowIndex, colIndex, item, e, record, /*row*/){
+        /** @param {Editor.plugins.Okapi.store.BconfFilterStore} store */
+        var store = Ext.getStore('bconffilterStore');
+        record.get('extensions').forEach(function(ext){
+            record.removeExtension(ext);
+        })
+        view.select();
+
+
         record.drop(/* cascade */ false);
-        if(record.crudState != 'C'){
-            record.save()
-        }
+        store.saveExtMap().then(function(){
+
+            store.sync()
+        });
     },
 // endregion
     prepareFilterEdit: function(rowEditPlugin, cellContext){
@@ -166,7 +178,7 @@ let BconfFilterGridController = {
      * @param {Ext.grid.plugin.RowEditing} plugin
      * @param {Ext.grid.CellContext} cellContext
      */
-    saveEdit: function(plugin, cellContext){
+    saveEdit: async function(plugin, cellContext){
         var ctlr = this,
             store = Ext.getStore('bconffilterStore'),
             record = cellContext.record,
@@ -174,13 +186,13 @@ let BconfFilterGridController = {
         if(record.get('extensions').unchanged){
             delete changed.extensions // complex value is always seen as changed
         } else { // extensions changed
-            store.getProxy().setExtraParam('extensions-mapping', store.getExtMapString());
+            await store.saveExtMap();
         }
         //record.commit();
         if(Object.keys(changed).length){
 
             record.set(changed); //QUIRK TODO check why not ausosave
-            record.commit();
+            //record.commit();
             if(record.isNewRecord){
                 record.crudState = 'C'
                 record.phantom = true

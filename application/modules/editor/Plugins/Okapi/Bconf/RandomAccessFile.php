@@ -35,7 +35,7 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
 
     const SIGNATURE = "batchConf";
     const VERSION = 2;
-    const NUMPLUGINS = 0; // FIXME: Implement plugin support
+    const NUMPLUGINS = 0;
     const PHP_INT32_MAX = 0x7FFFFFFF;
     const PHP_UINT32_MAX = 0xFFFFFFFF;
     const OVERFLOW_SUB = 0x100000000; // == PHP_UINT32_MAX +1

@@ -71,7 +71,8 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
                 store.add([{
                     bconfId: 0,
                     okapiId,
-                    name: '<i>Unknown filter</i>',
+                    name: '<i>#UT#Unknown filter</i>',
+                    description: '#UT#Unknown filter from extensions-mapping.txt',
                 }])[0].get('extensions').add(extension)
             }
             extMap.set(extension, okapiId);
@@ -81,13 +82,22 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
         store.getModel().prototype.extMap = extMap;
         store.extMap = extMap;
     },
-    /**
-     * Returns the extensions-mapping as a string for saving
-     * @return {string}
-     */
-    getExtMapString: function(){
-        return Array.from(this.extMap.entries()).sort()
-            .map(ext_okapiId => '.' + ext_okapiId.join('\t'))
-            .join('\n');
+
+    saveExtMap: function(){
+        var store = this;
+        return new Promise(function(resolve, reject){
+            Ext.Ajax.request({
+                url: Editor.data.restpath + 'plugins_okapi_bconffilter/saveextensionsmapping',
+                headers: {
+                    'Content-Type': 'text/tab-separated-values'
+                },
+                params: {
+                    bconfId: store.getProxy().bconfId
+                },
+                rawData: Array.from(store.extMap.entries()).sort()
+                    .map(ext_okapiId => '.' + ext_okapiId.join('\t'))
+                    .join('\n')
+            }).then(resolve, res => Editor.app.getController('ServerException').handleException(res))
+        });
     }
 });

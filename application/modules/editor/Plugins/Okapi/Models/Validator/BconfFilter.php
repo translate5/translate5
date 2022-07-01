@@ -39,6 +39,6 @@ class editor_Plugins_Okapi_Models_Validator_BconfFilter extends ZfExtended_Model
         $this->addValidator('mimeType', 'stringLength', array('min' => 0, 'max' => 20));
         $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 50));
         $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('extensions', 'stringLength', array('min' => 1, 'max' => 200));
+        $this->addValidator('extensions', 'stringLength', array('min' => 0, 'max' => 200));
     }
 }

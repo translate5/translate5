@@ -349,6 +349,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                  'action'     => 'getdefaultfilters'
                 ]
             ));
+
+        $r->addRoute('plugins_okapi_bconffilter_saveextensionsmapping',
+            new $RestLike('editor/plugins_okapi_bconffilter/saveextensionsmapping',
+                ['module'     => 'editor',
+                 'controller' => 'plugins_okapi_bconffilter',
+                 'action'     => 'saveextensionsmapping'
+                ]
+            ));
     }
 
     public function getFrontendControllers(): array {
@@ -390,10 +398,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
         $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'handleCustomerAfterIndex']);
 
-        foreach(['Post', 'Put', 'Delete'] as $action){
-            $this->eventManager->attach('editor_Plugins_Okapi_BconfFilterController', "before${action}Action", [$this, 'saveExtensionsMapping']);
-        }
-
     }
 
     /**
@@ -403,7 +407,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     public function handleAfterIndex(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
-        /* @var $view Zend_View_Interface */
+        /** @var $view ZfExtended_View */
         $bconf = new editor_Plugins_Okapi_Models_Bconf();
         $view->Php2JsVars()->set('plugins.Okapi.systemDefaultBconfId', $bconf->getDefaultBconfId());
         $view->Php2JsVars()->set('plugins.Okapi.systemStandardBconfName', self::BCONF_SYSDEFAULT_IMPORT_NAME);
@@ -763,8 +767,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     {
         /** @var ZfExtended_View $view */
         $view = $event->getParam('view');
-        // cache to prevent multiple fetching of the non-customer default bconf
-        $defaultBconfId = NULL;
+        $bconf = new editor_Plugins_Okapi_Models_Bconf();
         $meta = new editor_Models_Db_CustomerMeta();
         $metas = $meta->fetchAll('defaultBconfId IS NOT NULL')->toArray();
         $bconfIds = array_column($metas, 'defaultBconfId', 'customerId');
@@ -772,11 +775,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             if(array_key_exists($customer['id'], $bconfIds)){
                 $customer['defaultBconfId'] = (int) $bconfIds[$customer['id']];
             } else {
-                if($defaultBconfId === NULL){
-                    $bconf = new editor_Plugins_Okapi_Models_Bconf();
-                    $defaultBconfId = $bconf->getDefaultBconfId();
-                }
-                $customer['defaultBconfId'] = $defaultBconfId;
+                $customer['defaultBconfId'] = $bconf->getDefaultBconfId();
             }
         }
     }

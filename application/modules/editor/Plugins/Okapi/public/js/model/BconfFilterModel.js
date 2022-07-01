@@ -48,6 +48,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         api: {
             read: undefined /** @link self.proxy.setBconfId sets this for easy filtering */
         },
+        bconfId: null,
         /**
          * Sets the id of the currently opened bconf to
          * - the defaultValue of the bconfId field
@@ -132,17 +133,22 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} from Record where to take the extension from#
      * @param {Boolean} isRevert Inidcates if to set dirty or not
      */
-    addExtension: function(extension, from, isRevert = false){
+    addExtension: function(extension, from, isRevert = false, showMsg = true){
         var extMap = this.store.extMap,
-            filters = Editor.util.Util.getUnfiltered(this.store);
+            filters = Editor.util.Util.getUnfiltered(this.store),
+            msg = `Added extension <i>${extension}</i>`;
 
         from = (from !== undefined) ? from : filters.getByKey(extMap.get(extension))
         if(from){
-            from.removeExtension(extension, null, isRevert);
+            from.removeExtension(extension, null, isRevert, !showMsg);
+            msg += ` from '${from.get('name')}'`
         }
         this.set('extensions', {op: 'add', extension}, {dirty: !isRevert})
         extMap.set(extension, this.id)
 
+        if(showMsg){
+            Editor.MessageBox.addInfo(msg, 2)
+        }
         if(from){
             return from
         }
@@ -152,16 +158,20 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
      * @param {String} extension
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} to
      */
-    removeExtension: function(extension, to, isRevert){
-        var filters = Editor.util.Util.getUnfiltered(this.store);
-
+    removeExtension: function(extension, to, isRevert, showMsg = true){
+        var filters = Editor.util.Util.getUnfiltered(this.store),
+            msg = `Removed extension <i>${extension}</i>`
         this.set('extensions', {op: 'delete', extension}, {dirty: !isRevert})
-        this.extMap.delete(extension)
 
+        this.extMap.delete(extension)
         // TODO: defaults 'to' receiver based on current system default (via global varaible?)
         if(to){
-            to.addExtension(extension, null, isRevert);
-            return to
+            to.addExtension(extension, null, isRevert, !showMsg);
+            msg += ` and added to '${to.get('name')}' `
         }
+        if(showMsg){
+            Editor.MessageBox.addInfo(msg, 2)
+        }
+        return to === null ? undefined : to;
     },
 });

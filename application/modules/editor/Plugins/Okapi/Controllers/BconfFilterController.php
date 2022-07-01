@@ -137,4 +137,16 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         return $id;
     }
 
+    /**
+     * Updates the extensions-mapping.txt file of a Bconffilter
+     */
+    public function saveextensionsmappingAction(){
+        $extMap = $this->getRequest()->getRawBody();
+            $bconfId = $this->getParam('bconfId');
+            // TODO: validity check
+            $bconf = new editor_Plugins_Okapi_Models_Bconf();
+            $path = $bconf->getFilePath($bconfId, $bconf::EXTENSIONMAP_FILE);
+            file_put_contents($path, $extMap);
+    }
+
 }
