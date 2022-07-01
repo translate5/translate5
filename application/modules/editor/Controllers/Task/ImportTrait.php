@@ -30,7 +30,7 @@ trait editor_Controllers_Task_ImportTrait {
         // add task defaults (user associations and language resources)
         $this->setTaskDefaults($this->entity);
 
-        //for internal tasks the usage log requires different handling, so log only non internal tasks
+        //for internal tasks the usage log requires different handling, so log only non-internal tasks
         if(!$this->entity->getTaskType()->isInternalTask()){
             //update the task usage log for the current task
             $this->insertTaskUsageLog($this->entity);

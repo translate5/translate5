@@ -41,6 +41,8 @@ class editor_Task_Operation {
      * @var string
      */
     const AUTOQA = 'opautoqa';
+
+    const PIVOT_PRE_TRANSLATION = 'pivotpretranslation';
     /**
      * 
      * @param string $operationType: must be a constant of this class

@@ -339,5 +339,24 @@ Ext.define('Editor.util.Util', {
         isIterable: function(value, includeString = false){
             return typeof value[Symbol.iterator] === 'function' && (typeof value !== 'string' || includeString)
         }
+        /***
+         * Check if the given language id/string is empty.
+         * 0 / "0" is treated as empty
+         * @param e
+         * @returns {boolean}
+         */
+        isLanguageEmpty:function (e) {
+            switch (e) {
+                case "":
+                case 0:
+                case "0":
+                case null:
+                case false:
+                case undefined:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 });

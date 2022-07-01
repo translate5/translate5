@@ -35,42 +35,95 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
     /***
      * Assign language resources by default that are set as useAsDefault for the task's client
      * (but only if the language combination matches).
+     *
      * @param editor_Models_Task $task
-     * @param int $customerId
+     * @throws Zend_Cache_Exception
      */
-    public function addDefaultLanguageResources(editor_Models_Task $task, int $customerId) {
+    public function addDefaultLanguageResources(editor_Models_Task $task): void {
         $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
 
-        //TODO: here write as reference also
-        $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsUseAsDefault([$customerId]);
+        $data = $customerAssoc->loadByCustomerIdsUseAsDefault([$task->getCustomerId()]);
 
-        if(empty($allUseAsDefaultCustomers)) {
+        if(empty($data)) {
             return;
         }
 
-        $taskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
-        /* @var $taskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
+        $taskGuid = $task->getTaskGuid();
+
+        $this->findMatchingAssocData($task->getSourceLang(),$task->getTargetLang(),$data,function ($assocRow) use ($taskGuid){
+            $taskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+            /* @var $taskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
+            $taskAssoc->setLanguageResourceId($assocRow['languageResourceId']);
+            $taskAssoc->setTaskGuid($taskGuid);
+            if(!empty($assocRow['writeAsDefault'])){
+                $taskAssoc->setSegmentsUpdateable(1);
+            }
+            $taskAssoc->save();
+        });
+    }
+
+    /***
+     * Associate default pivot resources for given task
+     * @param editor_Models_Task $task
+     *
+     * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Cache_Exception
+     */
+    public function addDefaultPivotResources(editor_Models_Task $task): void
+    {
+        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+
+        $data = $customerAssoc->loadByCustomerIdsPivotAsDefault([$task->getCustomerId()]);
+
+        if(empty($data)) {
+            return;
+        }
+
+        $taskGuid = $task->getTaskGuid();
+
+        $this->findMatchingAssocData($task->getSourceLang(),$task->getRelaisLang(),$data,function ($assocRow) use ($taskGuid){
+            /** @var \MittagQI\Translate5\LanguageResource\TaskPivotAssociation $pivotAssoc */
+            $pivotAssoc = ZfExtended_Factory::get('\MittagQI\Translate5\LanguageResource\TaskPivotAssociation');
+            $pivotAssoc->setLanguageResourceId($assocRow['languageResourceId']);
+            $pivotAssoc->setTaskGuid($taskGuid);
+            $pivotAssoc->save();
+        });
+    }
+
+    /***
+     * Find matching language resources by task languages and call the callback for saving
+     * @param int $sourceLang
+     * @param int $targetLang
+     * @param array $defaultData
+     * @param callable $saveCallback
+     * @return void
+     * @throws Zend_Cache_Exception
+     */
+    private function findMatchingAssocData(int $sourceLang, int $targetLang, array $defaultData,callable $saveCallback): void
+    {
+
+        if(empty($sourceLang) || empty($targetLang)){
+            return;
+        }
         $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $languages editor_Models_LanguageResources_Languages */
         $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language ZfExtended_Languages */
 
-        $sourceLanguages = $language->getFuzzyLanguages($task->getSourceLang(),'id',true);
-        $targetLanguages = $language->getFuzzyLanguages($task->getTargetLang(),'id',true);
+        $sourceLanguages = $language->getFuzzyLanguages($sourceLang,'id',true);
+        $targetLanguages = $language->getFuzzyLanguages($targetLang,'id',true);
 
-        foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
-            $languageResourceId = $defaultCustomer['languageResourceId'];
+        foreach ($defaultData as $data) {
+            $languageResourceId = $data['languageResourceId'];
             $sourceLangMatch = $languages->isInCollection($sourceLanguages, 'sourceLang', $languageResourceId);
             $targetLangMatch = $languages->isInCollection($targetLanguages, 'targetLang', $languageResourceId);
             if ($sourceLangMatch && $targetLangMatch) {
-                $taskAssoc->init();
-                $taskAssoc->setLanguageResourceId($languageResourceId);
-                $taskAssoc->setTaskGuid($task->getTaskGuid());
-                if(!empty($defaultCustomer['writeAsDefault'])){
-                    $taskAssoc->setSegmentsUpdateable(1);
-                }
-                $taskAssoc->save();
+                $saveCallback($data);
             }
         }
     }

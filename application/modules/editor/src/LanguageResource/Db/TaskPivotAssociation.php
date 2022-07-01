@@ -26,14 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_MatchAnalysis_Models_Validator_BatchResult extends ZfExtended_Models_Validator_Abstract {
-    /**
-     * 
-     */
-    protected function defineValidators() {
-        $this->addValidator('id', 'int');
-        $this->addValidator('languageResource', 'int');
-        $this->addValidator('segmentId', 'int');
-        $this->addValidator('result', 'string');
-    }
+namespace MittagQI\Translate5\LanguageResource\Db;
+
+use Zend_Db_Table_Abstract;
+
+/**
+ */
+class TaskPivotAssociation extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_languageresources_taskpivotassoc';
+    public $_primary = 'id';
 }

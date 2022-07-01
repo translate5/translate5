@@ -26,6 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\LanguageResource\Pretranslation;
+
+use editor_Services_ServiceResult;
+use ZfExtended_Models_Entity_Abstract;
+
 /**
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
@@ -36,9 +41,10 @@ END LICENSE AND COPYRIGHT
  * @method string getResult() getResult()
  * @method void setResult() setResult(string $result)
  */
-class editor_Plugins_MatchAnalysis_Models_BatchResult extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_BatchResult';
-    protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_BatchResult';
+class BatchResult extends ZfExtended_Models_Entity_Abstract {
+
+    protected $dbInstanceClass = 'MittagQI\Translate5\LanguageResource\Pretranslation\Db\BatchResult';
+    protected $validatorInstanceClass = 'MittagQI\Translate5\LanguageResource\Pretranslation\Validator\BatchResult';
     
     /***
      * Load the lates service result cache for segment and languageresource 
