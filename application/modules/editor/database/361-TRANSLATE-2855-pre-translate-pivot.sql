@@ -56,13 +56,6 @@ ALTER TABLE `LEK_languageresources_customerassoc`
     COMMENT 'If set to 1, the assigned tasks to this customer will have this language resource used to pre-translate pivot language'
     AFTER `writeAsDefault`;
 
-ALTER TABLE `LEK_match_analysis_batchresults` RENAME TO  `LEK_languageresources_batchresults` ;
-
-UPDATE `Zf_configuration`
-SET `name` = 'runtimeOptions.LanguageResources.Pretranslation.enableBatchQuery',
-    `description` = 'Enables batch query requests for pretranslations only for the associated language resource that support batch query. Batch query is much faster for many language resources for imports and InstantTranslate'
-WHERE (`name` = 'runtimeOptions.plugins.MatchAnalysis.enableBatchQuery');
-
 INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`)
 VALUES ('editor_Models_Import_Worker_SetTaskToOpen', 'MittagQI\\Translate5\\LanguageResource\\Pretranslation\\PivotWorker');
 INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`)
