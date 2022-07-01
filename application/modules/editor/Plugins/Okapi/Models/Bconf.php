@@ -118,6 +118,10 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @var bool
      */
     private bool $isNewRecord = false; // flag for newly created entities
+    /**
+     * @var editor_Models_Customer_Customer
+     */
+    private ?editor_Models_Customer_Customer $customer = NULL;
 
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_Bconf';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
@@ -316,7 +320,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function srxNameFor(string $purpose): string {
+    public function getSrxNameFor(string $purpose): string {
         $purpose .= 'SrxPath';
         $descFile = $this->getFilePath(fileName: editor_Plugins_Okapi_Bconf_File::DESCRIPTION_FILE);
         $content = json_decode(file_get_contents($descFile), true);
@@ -324,6 +328,94 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         $srxFileName = $content['refs'][$purpose] ?? '';
         !$srxFileName && throw new ZfExtended_Exception("Corrupt bconf record: Could not get '$purpose' from '$descFile'.");
         return $srxFileName;
+    }
+
+    /**
+     * Retrieves the bound customers name (cached)
+     * @return string|null
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getCustomerName() : ?string {
+        if(empty($this->getCustomerId())){
+            return NULL;
+        }
+        if($this->customer == NULL || $this->customer->getId() != $this->getCustomerId()){
+            $this->customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+            $this->customer->load($this->getCustomerId());
+        }
+        return $this->customer->getName();
+    }
+
+    /**
+     * Retrieves the provider-prefix to be used for custom filters ( $okapiType@$provider-$specialization )
+     * Keep in mind that this string may not neccessarily be unique for a customer
+     * @return string
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getCustomFilterProvider() : string {
+        if(empty($this->getCustomerId())){
+            $config = Zend_Registry::get('config');
+            return $this->removeDashesAndDots($config->runtimeOptions->server->name);
+        }
+        $name = $this->removeDashesAndDots(editor_Utils::secureFilename(str_replace(' ', '_', $this->getCustomerName())));
+        if(empty($name)){
+            $name = 'customer'.$this->getCustomerId();
+        }
+        return $name;
+    }
+
+    public function getCustomFilterSpecialization() : string {
+
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    private function removeDashesAndDots(string $text){
+        return str_replace('-', '', str_replace('.', '', $text));
+    }
+
+    public function addCustomFilterOnUnpack($identifier, $extensions) {
+
+    }
+
+    public function addCustomFilterOnGuiAdd() {
+
+    }
+
+    /**
+     * Adds a Bconf Filter to the DB
+     * @param string $type
+     * @param string $id
+     * @param string $name
+     * @param string $description
+     * @param array $extensions
+     * @param string|null $mimeType
+     * @return editor_Plugins_Okapi_Models_BconfFilter
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_BadMethodCallException
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    private function addCustomFilterEntry(string $type, string $id, string $name, string $description, array $extensions, string $mimeType=NULL) {
+        if(empty($extensions)){
+            throw new ZfExtended_BadMethodCallException('A Okapi Bconf custom filter can not be added without related file extensions');
+        }
+        if($mimeType === NULL){
+            $mimeType = editor_Plugins_Okapi_Bconf_Filters_Okapi::findMimeType($type);
+        }
+        $filterEntity = new editor_Plugins_Okapi_Models_BconfFilter();
+        $filterEntity->setBconfId($this->getId());
+        $filterEntity->setOkapiType($type);
+        $filterEntity->setOkapiId($id);
+        $filterEntity->setMimeType($mimeType);
+        $filterEntity->setName($name);
+        $filterEntity->setDescription($description);
+        $filterEntity->setFileExtensions($extensions);
+        $filterEntity->save();
+        return $filterEntity;
     }
 
     public function delete(){

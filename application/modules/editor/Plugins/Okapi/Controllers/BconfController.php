@@ -125,7 +125,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
             throw new editor_Plugins_Okapi_Exception('E1390', ['details' => $xmlErrors]);
         }
 
-        $srxNameToBe = $bconf->srxNameFor($this->getParam('purpose'));
+        $srxNameToBe = $bconf->getSrxNameFor($this->getParam('purpose'));
         move_uploaded_file($srxUploadFile, $bconf->getFilePath(fileName: $srxNameToBe));
         $bconf->getFile()->pack();
     }
@@ -133,7 +133,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     public function downloadsrxAction() {
         $this->entityLoad();
         $bconf = $this->entity;
-        $fileName = $bconf->srxNameFor($this->getParam('purpose'));
+        $fileName = $bconf->getSrxNameFor($this->getParam('purpose'));
         $file = $bconf->getFilePath(fileName: $fileName);
 
         $dlName = $bconf->getName() . '-' . $fileName;

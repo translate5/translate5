@@ -75,6 +75,14 @@ class editor_Plugins_Okapi_Bconf_Filters {
     }
 
     /**
+     * Evaluates, if the identifier represents an okapi default identifier
+     * @param string $identifier
+     * @return bool
+     */
+    public static function isOkapiDefaultIdentifier(string $identifier) : bool {
+        return !str_contains($identifier, self::IDENTIFIER_SEPERATOR);
+    }
+    /**
      * Parses an identifier that is part of the bconf file
      * @param string $identifier
      * @return stdClass
@@ -153,16 +161,42 @@ class editor_Plugins_Okapi_Bconf_Filters {
     }
 
     /**
+     * Finds the fprm path for an OKAPI default filter
+     * Note that this might actually return a tranlate5 adjusted filter in case it is a replacing filter
      * @param $filterId
      * @return string|null
      * @throws ZfExtended_Exception
      */
     public function getOkapiDefaultFilterPathById($filterId) : ?string {
+        // fisrt, search if there is a replacing filter
+        $filters = $this->translate5Filters->findOkapiDefaultReplacingFilter($filterId);
+        if(count($filters) > 1){
+            throw new ZfExtended_Exception('translate5 replacing filter id '.$filterId.' is ambigous!');
+        } else if(count($filters) === 1){
+            return $this->translate5Filters->createFprmPath($filters[0]);
+        }
+        // search the OKAPI filters
         $filters = $this->okapiFilters->findFilter(NULL, $filterId);
         if(count($filters) > 1){
             throw new ZfExtended_Exception('OKAPI filter id '.$filterId.' is ambigous!');
         } else if(count($filters) === 1){
-            $this->okapiFilters->createFprmPath($filters[0]);
+            return $this->okapiFilters->createFprmPath($filters[0]);
+        }
+        return NULL;
+    }
+
+    /**
+     * @param string $type
+     * @param string $id
+     * @return string|null
+     * @throws ZfExtended_Exception
+     */
+    public function getTranslate5FilterPath(string $type, string $id) : ?string {
+        $filters = $this->translate5Filters->findFilter($type, $id);
+        if(count($filters) > 1){
+            throw new ZfExtended_Exception('Translate5 filter identifier '.$type.self::IDENTIFIER_SEPERATOR.$id.' is ambigous!');
+        } else if(count($filters) === 1){
+            return $this->translate5Filters->createFprmPath($filters[0]);
         }
         return NULL;
     }

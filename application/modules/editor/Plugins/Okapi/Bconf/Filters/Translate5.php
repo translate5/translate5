@@ -28,6 +28,7 @@
 
 /**
  * Class representing the static data for all translate5 specific filters
+ * Note that the "replaceId" prop is specific to this inventory and needs to point to a valid id in okapi-filters.json
  */
 final class editor_Plugins_Okapi_Bconf_Filters_Translate5 extends editor_Plugins_Okapi_Bconf_Filters_Inventory {
 
@@ -58,10 +59,24 @@ final class editor_Plugins_Okapi_Bconf_Filters_Translate5 extends editor_Plugins
 
     protected function __construct(){
         parent::__construct();
-        // unneccessary to encode this in the JSON
+        // unneccessary to encode this in the JSON ... all T5 adjusted filters must have settings
         foreach($this->inventory as $index => $item){
             $this->inventory[$index]->settings = true;
         }
     }
- 
+
+    /**
+     * Retrieves an Translate5 adjusted filter that replaces an OKAPI default filter
+     * @param string $filterId
+     * @return array
+     */
+    public function findOkapiDefaultReplacingFilter(string $filterId){
+        $result = [];
+        foreach($this->inventory as $index => $item){
+            if($item->replaceId === $filterId && !empty($item->replaceId)){
+                $result[] = $item;
+            }
+        }
+        return $result;
+    }
 }

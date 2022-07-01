@@ -126,10 +126,10 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
 
         // Read each one
         for($i = 0; $i < $count; $i++){
-            $okapiId = $content['fprm'][] = $raf->readUTF();
+            $identifier = $content['fprm'][] = $raf->readUTF();
             $data = $raf->readUTF();
             // And create the parameters file
-            file_put_contents("$okapiId.fprm", $data);
+            file_put_contents($identifier.'.'.editor_Plugins_Okapi_Bconf_Filters::EXTENSION, $data);
         }
 
         //=== Section 5: the extensions -> filter configuration id mapping

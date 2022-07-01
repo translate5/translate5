@@ -45,5 +45,9 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
         'E1340' => 'Okapi Plug-In: The default bconf configuration file-name is not set.',
         'E1387' => 'Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated',
         'E1390' => 'Okapi Plug-In: The SRX file is not valid. {details}',
+        'E4400' => 'Okapi Plug-In: The filter "{filter}" from the imported bconf "{bconf}" is not valid',
+        'E4401' => 'Okapi Plug-In: The okapi filter "{filter}" from the imported bconf "{bconf}" is not valid',
+        'E4402' => 'Okapi Plug-In: Invalid extension-mapping found in the bconf "{bconf}" to import',
+        'E4403' => 'Okapi Plug-In: The extension mapping of the bconf "{bconf}" containes an invalid filter-mapping identifier "{identifier}"'
     ];
 }
