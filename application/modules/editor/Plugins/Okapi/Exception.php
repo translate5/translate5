@@ -48,6 +48,7 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
         'E4400' => 'Okapi Plug-In: The filter "{filter}" from the imported bconf "{bconf}" is not valid',
         'E4401' => 'Okapi Plug-In: The okapi filter "{filter}" from the imported bconf "{bconf}" is not valid',
         'E4402' => 'Okapi Plug-In: Invalid extension-mapping found in the bconf "{bconf}" to import',
-        'E4403' => 'Okapi Plug-In: The extension mapping of the bconf "{bconf}" containes an invalid filter-mapping identifier "{identifier}"'
+        'E4403' => 'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}"',
+        'E4404' => 'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed'
     ];
 }

@@ -47,6 +47,8 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * @see ZfExtended_RestController::indexAction()
      */
     public function getdefaultfiltersAction() {
+
+        // TODO BCONF REFACTOR
         $bconffilter = new editor_Plugins_Okapi_Models_DefaultBconfFilter();
         $default_fprms = $bconffilter->loadAll();
 
@@ -91,6 +93,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
 
     /**
      * Includes extension-mapping.txt in the metaData
+     * TODO BCONF: rework using the sent id to load an entity and process from there
      * @return void
      * @throws editor_Plugins_Okapi_Exception
      */
@@ -143,7 +146,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     public function saveextensionsmappingAction(){
         $extMap = $this->getRequest()->getRawBody();
             $bconfId = $this->getParam('bconfId');
-            // TODO: validity check
+            // TODO BCONF: rework, load bconf by id as validation
             $bconf = new editor_Plugins_Okapi_Models_Bconf();
             $path = $bconf->getFilePath($bconfId, $bconf::EXTENSIONMAP_FILE);
             file_put_contents($path, $extMap);

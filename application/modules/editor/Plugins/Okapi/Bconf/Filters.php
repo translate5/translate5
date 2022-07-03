@@ -35,11 +35,6 @@ class editor_Plugins_Okapi_Bconf_Filters {
     /**
      * @var string
      */
-    const EXTENSION = 'fprm';
-
-    /**
-     * @var string
-     */
     const IDENTIFIER_SEPERATOR = '@';
 
     /**
@@ -75,7 +70,7 @@ class editor_Plugins_Okapi_Bconf_Filters {
     }
 
     /**
-     * Evaluates, if the identifier represents an okapi default identifier
+     * Evaluates, if the identifier represents an okapi default identifier (an identier that does not point to a fprm embedded in the bconf)
      * @param string $identifier
      * @return bool
      */
@@ -100,6 +95,15 @@ class editor_Plugins_Okapi_Bconf_Filters {
     }
 
     /**
+     * @param string $okapiType
+     * @param string $okapiId
+     * @return string
+     */
+    public static function createIdentifier(string $okapiType, string $okapiId) : string {
+        return $okapiType.self::IDENTIFIER_SEPERATOR.$okapiId;
+    }
+
+    /**
      * @return editor_Plugins_Okapi_Bconf_Filters
      */
     public static function instance() : editor_Plugins_Okapi_Bconf_Filters {
@@ -108,7 +112,6 @@ class editor_Plugins_Okapi_Bconf_Filters {
         }
         return self::$_instance;
     }
-
 
     /**
      * @var editor_Plugins_Okapi_Bconf_Filters_Okapi
@@ -126,17 +129,29 @@ class editor_Plugins_Okapi_Bconf_Filters {
     }
 
     /**
-     * @param string $identifier
+     * @param string $type
+     * @param string $id
+     * @return bool
+     */
+    public function isValidOkapiDefaultFilter(string $identifier) : bool {
+        if(str_contains($identifier, self::IDENTIFIER_SEPERATOR)){
+            return false;
+        }
+        return (count($this->okapiFilters->findFilter(NULL, $identifier)) === 1);
+    }
+
+    /**
+     * Checks, whether the $identifier is a default identifier, either OKAPI default, OKAPI embedded default or translate5 adjusted default
+     * @param string $type
+     * @param string $id
      * @return bool
      * @throws ZfExtended_Exception
      */
-    public function isDefaultFilter(string $identifier) : bool {
-        $idata = self::parseIdentifier($identifier);
-        // translate5 adjusted
-        if(strlen($idata->id) > 9 && substr($idata->id, 0, 10) === 'translate5'){
-            return $this->isTranslate5Filter($idata->type, $idata->id);
+    public function isEmbeddedDefaultFilter(string $type, string $id) : bool {
+        if(editor_Plugins_Okapi_Bconf_Filters_Translate5::isTranslate5Id($idata->id)){
+            return $this->isEmbeddedTranslate5Filter($type, $id);
         } else {
-            return $this->isOkapiDefaultFilter($idata->type, $idata->id);
+            return $this->isEmbeddedOkapiDefaultFilter($type, $id);
         }
     }
 
@@ -145,7 +160,7 @@ class editor_Plugins_Okapi_Bconf_Filters {
      * @param string $id
      * @return bool
      */
-    public function isOkapiDefaultFilter(string $type, string $id) : bool {
+    public function isEmbeddedOkapiDefaultFilter(string $type, string $id) : bool {
         $filters = $this->okapiFilters->findFilter($type, $id);
         return(count($filters) > 0);
     }
@@ -155,7 +170,7 @@ class editor_Plugins_Okapi_Bconf_Filters {
      * @param string $id
      * @return bool
      */
-    public function isTranslate5Filter(string $type, string $id) : bool {
+    public function isEmbeddedTranslate5Filter(string $type, string $id) : bool {
         $filters = $this->translate5Filters->findFilter($type, $id);
         return(count($filters) > 0);
     }

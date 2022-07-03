@@ -38,14 +38,14 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
      * @throws editor_Plugins_Okapi_Exception
      */
     private function doPack(): void {
-        chdir($this->entity->getDir()); // so we can access with file name only
+        chdir($this->entity->getDataDirectory()); // so we can access with file name only
 
         $content = ['refs' => null, 'fprm' => null];
 
         if(file_exists(self::DESCRIPTION_FILE)){
             $content = json_decode(file_get_contents(self::DESCRIPTION_FILE), associative: true);
         }
-        $fileName = basename($this->entity->getFilePath());
+        $fileName = basename($this->entity->getPath());
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
 
         $raf->writeUTF($raf::SIGNATURE, false);

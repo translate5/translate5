@@ -76,7 +76,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         self::$bconf = new editor_Plugins_Okapi_Models_Bconf();
         self::$bconf->load(self::$bconfId);
         self::assertEquals(self::$bconf->getName(), $bconfName, "Imported bconf's name is not '$bconfName' but '" . self::$bconf->getName() . "'");
-        $output = self::$bconf->getFilePath();
+        $output = self::$bconf->getPath();
 
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
         self::assertFileEquals($input, $output, $failureMsg);
@@ -145,7 +145,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $expectedName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
         $newSystemBconf->loadRow('name = ?', $expectedName);
         self::assertEquals($expectedName, $newSystemBconf->getName(), $autoImportFailureMsg . " No record name matches '$expectedName'");
-        $newBconfFile = $newSystemBconf->getFilePath();
+        $newBconfFile = $newSystemBconf->getPath();
         self::assertFileExists($newBconfFile, $autoImportFailureMsg . " File '$newBconfFile' does not exist");
 
         // Ensure system bconf dir can't be deleted
@@ -164,11 +164,11 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $newSystemBconf->save();
         $newSystemBconf->repackIfOutdated();
         self::assertEquals(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX, $newSystemBconf->getVersionIdx(), 'Bconf version was not updated after being outdated');
-        self::assertFileExists($newSystemBconf->getFilePath(), $autoImportFailureMsg . " Version Auto Update failed. File '$newBconfFile' does not exist.");
+        self::assertFileExists($newSystemBconf->getPath(), $autoImportFailureMsg . " Version Auto Update failed. File '$newBconfFile' does not exist.");
 
         // Reset to initial system bconf, delete  newly imported
         $newSystemBconfId = $newSystemBconf->getId();
-        $newSystemBconfDir = $newSystemBconf->getDir();
+        $newSystemBconfDir = $newSystemBconf->getDataDirectory();
         $newSystemBconf->setName('ToDelete-' . time() . rand());
         $newSystemBconf->save();
         $systemBconf->setName(editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
@@ -258,7 +258,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $testDir = NULL;
         try {
             $bconf->setId(0);
-            $testDir = $bconf->getDir();
+            $testDir = $bconf->getDataDirectory();
             if(!is_dir($testDir)){
                 mkdir($testDir); // Created as test user for unit test. Make sure to remove in every circumstance!
             }
@@ -300,7 +300,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $bconf = self::$bconf;
         $bconf->load(self::$bconfId);
 
-        $bconfDir = $bconf->getDir();
+        $bconfDir = $bconf->getDataDirectory();
         $bconf->delete(); // delete record, which deletes directory as well
         self::assertDirectoryDoesNotExist($bconfDir);
     }

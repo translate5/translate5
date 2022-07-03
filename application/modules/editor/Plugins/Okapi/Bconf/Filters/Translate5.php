@@ -46,6 +46,14 @@ final class editor_Plugins_Okapi_Bconf_Filters_Translate5 extends editor_Plugins
     }
 
     /**
+     * @param string $identifier
+     * @return bool
+     */
+    public static function isTranslate5Id(string $id) : bool {
+        return (strlen($id) > 9 && substr($id, 0, 10) === 'translate5');
+    }
+
+    /**
      * Relative to the static data-dir
      * @var string
      */

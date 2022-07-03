@@ -114,7 +114,7 @@ abstract class editor_Plugins_Okapi_Bconf_Filters_Inventory {
      * TODO OKAPI: Extension as class constant
      */
     public function createFprmPath(stdClass $filterItem) : string {
-        return $this->getFolderPath().'/'.$this->createFprmFilename($filterItem).'.'.editor_Plugins_Okapi_Bconf_Filters::EXTENSION;
+        return $this->getFolderPath().'/'.$this->createFprmFilename($filterItem).'.'.editor_Plugins_Okapi_Models_BconfFilter::EXTENSION;
     }
 
     /**

@@ -47,12 +47,12 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
      * @throws editor_Plugins_Okapi_Exception
      */
     private function doUnpack(string $pathToParse): void {
-        chdir($this->entity->getDir());
+        chdir($this->entity->getDataDirectory());
 
         $content = [
             'refs' => [],
             'step' => [],
-            'fprm' => [],
+            editor_Plugins_Okapi_Models_BconfFilter::EXTENSION => [],
         ];
 
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($pathToParse, "rb");
@@ -126,10 +126,10 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
 
         // Read each one
         for($i = 0; $i < $count; $i++){
-            $identifier = $content['fprm'][] = $raf->readUTF();
+            $identifier = $content[editor_Plugins_Okapi_Models_BconfFilter::EXTENSION][] = $raf->readUTF();
             $data = $raf->readUTF();
             // And create the parameters file
-            file_put_contents($identifier.'.'.editor_Plugins_Okapi_Bconf_Filters::EXTENSION, $data);
+            file_put_contents($identifier.'.'.editor_Plugins_Okapi_Models_BconfFilter::EXTENSION, $data);
         }
 
         //=== Section 5: the extensions -> filter configuration id mapping

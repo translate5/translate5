@@ -256,6 +256,22 @@ class editor_Utils {
     }
 
     /**
+     * Helper to turn names/escriptions into usable, re-identifiable filenames
+     * As an seperator either dashes "-" or underscores "_" are used
+     * @param $text
+     * @param bool $useDashes
+     * @return string
+     */
+    public static function filenameFromUserText($text, $useDashes=true) : string {
+        $seperator = $useDashes ? '-' : '_';
+        $replaceSeperator = $useDashes ? '_' : '-';
+        $text = preg_replace('/\s+/', $seperator, $text);
+        // normalize seperator, remove any dots to create proper filenames/extensions
+        $text = str_replace($replaceSeperator, $seperator, str_replace('.', '', $text));
+        return static::secureFilename($text);
+    }
+
+    /**
      * Checks, if a filename is secure
      * @param string $fileName
      * @return bool

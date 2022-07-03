@@ -73,10 +73,10 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="'.$this->entity->getDownloadFilename());
         header('Cache-Control: no-cache');
-        header('Content-Length: ' . filesize($this->entity->getFilePath()));
+        header('Content-Length: ' . filesize($this->entity->getPath()));
         ob_clean();
         flush();
-        readfile($this->entity->getFilePath());
+        readfile($this->entity->getPath());
         exit;
     }
 
@@ -126,7 +126,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         }
 
         $srxNameToBe = $bconf->getSrxNameFor($this->getParam('purpose'));
-        move_uploaded_file($srxUploadFile, $bconf->getFilePath(fileName: $srxNameToBe));
+        move_uploaded_file($srxUploadFile, $bconf->createPath(fileName: $srxNameToBe));
         $bconf->getFile()->pack();
     }
 
@@ -156,6 +156,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @throws editor_Plugins_Okapi_Exception
      */
     public function cloneAction() {
+        // TODO BCONF: rework
         $clone = new editor_Plugins_Okapi_Models_Bconf(
             ['tmp_name' => $this->entity->getFilePath($this->getParam('id'))],
             $this->getAllParams()

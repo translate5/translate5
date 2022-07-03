@@ -58,12 +58,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     const BCONF_SYSDEFAULT_EXPORT = 'okapi_default_export.bconf';
 
     /**
-     * The filename of the system default export bconf
-     * @var string
-     */
-    const BCONF_EXTENSION = 'bconf';
-
-    /**
      * @var editor_Plugins_Okapi_Models_Bconf
      */
     private static $cachedBconf = NULL;
@@ -145,7 +139,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $directory = new DirectoryIterator($dir);
         foreach ($directory as $fileinfo) {
             /* @var $fileinfo SplFileInfo */
-            if (strtolower($fileinfo->getExtension()) === self::BCONF_EXTENSION) {
+            if (strtolower($fileinfo->getExtension()) === editor_Plugins_Okapi_Models_Bconf::EXTENSION) {
                 return $fileinfo->getPathname();
             }
         }
@@ -449,7 +443,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $orderer = array_key_exists('orderer', $requestData) ? $requestData['orderer'] : NULL;
             $bconf = self::getImportBconfById($task, $bconfId, $orderer);
             // we add the bconf with it's visual name as filename to the archive for easier maintainability
-            $dataProvider->addAdditonalFileToArchive($bconf->getFilePath(), $bconf->getDownloadFilename());
+            $dataProvider->addAdditonalFileToArchive($bconf->getPath(), $bconf->getDownloadFilename());
         }
     }
 
@@ -495,7 +489,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             ]);
         } else {
             // the normal behaviour: bconf is defined via task and set in import wizard
-            $bconfPath = static::getImportBconf($event->getParam('task'))->getFilePath();
+            $bconfPath = static::getImportBconf($event->getParam('task'))->getPath();
             $this->useCustomBconf = basename($bconfPath) != self::BCONF_SYSDEFAULT_IMPORT_NAME;
         }
         // TODO: use extension mapping from bconf
@@ -615,7 +609,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $directory = new DirectoryIterator(self::getDataDir());
         foreach ($directory as $fileinfo) {
             /* @var $fileinfo SplFileInfo */
-            if (strtolower($fileinfo->getExtension()) === self::BCONF_EXTENSION) {
+            if (strtolower($fileinfo->getExtension()) === editor_Plugins_Okapi_Models_Bconf::EXTENSION) {
                 $filenames[] = $fileinfo->getFilename();
             }
         }
@@ -676,7 +670,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $workerParentId = $params['workerParentId'];
         // retrieving the bconf to use
         $bconfFilePath = ($this->bconfInZip == NULL) ?
-            static::getImportBconf($task)->getFilePath() // the normal way: retrieve the bconf to use from the task meta
+            static::getImportBconf($task)->getPath() // the normal way: retrieve the bconf to use from the task meta
             : $this->bconfInZip; // COMPATIBILITY: we use the bconf from the ZIP file here if there was one bypassing the bconf management
         $params = [
             'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
@@ -781,6 +775,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
 
     /**
+     * TODO BCONF: rework to normal id
      * Handles updates to BconfFilters
      * @see ZfExtended_RestController::beforeActionEvent
      */

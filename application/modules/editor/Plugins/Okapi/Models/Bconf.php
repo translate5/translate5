@@ -48,6 +48,11 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     /**
      * @var string
      */
+    const EXTENSION = 'bconf';
+
+    /**
+     * @var string
+     */
     const EXTENSIONMAP_FILE = editor_Plugins_Okapi_Bconf_File::EXTENSIONMAP_FILE;
 
     /**
@@ -151,7 +156,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             $this->isNewRecord = true;
             $this->init($bconfData, false);
             $this->save(); // Generates id needed for directory
-            $dir = $this->getDir();
+            $dir = $this->getDataDirectory();
             if(self::checkDirectory($dir) && !mkdir($dir, 0755, true)){
                 $this->delete();
                 $errorMsg = "Could not create directory for bconf (in runtimeOptions.plugins.Okapi.dataDir)";
@@ -226,7 +231,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         if($sysBconfRow == NULL){
             $sysBconf = new self([
                 'tmp_name' => editor_Plugins_Okapi_Init::getDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT,
-                'name' => editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME . '.' .  editor_Plugins_Okapi_Init::BCONF_EXTENSION
+                'name' => editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME . '.' .  static::EXTENSION
             ]);
             $sysBconf->setDescription("The default .bconf used for file imports unless another one is configured");
             $sysBconf->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
@@ -239,11 +244,13 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         return $sysBconfRow->id;
     }
     /**
+     * @DEPRECATED
+     * TODO BCONF: Remove when getFilePath is removed
      * @param string $id If given, gets the directory without loaded entity
      * @return string
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getDir(string $id = ''): string {
+    private function getDir(string $id = ''): string {
         return match ((bool)$id) {
             true => self::getBconfRootDir() . DIRECTORY_SEPARATOR . $id,
             false => $this->dir ?: $this->dir = self::getBconfRootDir() . DIRECTORY_SEPARATOR . $this->getId(),
@@ -251,6 +258,8 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
+     * @DEPRECATED
+     * TODO BCONF: Replace Usage with ->getPath or ->createPath
      * @param string $id optional: define the id of the bconf manually
      * @param string $fileName Append any file to the bconf's data directory
      * @return string path The absolute path of the bconf
@@ -258,9 +267,37 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      */
     public function getFilePath(string $id = '', string $fileName = '') : string {
         if(!$fileName){
-            $fileName = 'bconf-' . ($id ?: $this->getId()) . '.' . editor_Plugins_Okapi_Init::BCONF_EXTENSION;
+            $fileName = 'bconf-' . ($id ?: $this->getId()) . '.' . static::EXTENSION;
         }
         return $this->getDir($id) . DIRECTORY_SEPARATOR . $fileName;
+    }
+
+    /**
+     * Retrieves our data-directory
+     * @return string
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getDataDirectory() : string {
+        return self::getBconfRootDir().'/'.$this->getId();
+    }
+
+    /**
+     * Creates the path for the bconf itself which follllows a fixed naming-schema
+     * @return string
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getPath() : string {
+        return $this->createPath('bconf-'.$this->getId().'.'.static::EXTENSION);
+    }
+
+    /**
+     * Creates the path for a file inside the bconf's data-directory
+     * @param string $fileName
+     * @return string
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function createPath(string $fileName) : string {
+        return $this->getDataDirectory().'/'.$fileName;
     }
 
     /**
@@ -270,7 +307,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     public function getDownloadFilename() : string {
         $filename = editor_Utils::secureFilename($this->getName(), false);
         $filename = ($filename == '') ? 'bconf-'.$this->getId() : $filename;
-        return $filename.'.'.editor_Plugins_Okapi_Init::BCONF_EXTENSION;
+        return $filename.'.'.static::EXTENSION;
     }
 
     /**
@@ -322,7 +359,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      */
     public function getSrxNameFor(string $purpose): string {
         $purpose .= 'SrxPath';
-        $descFile = $this->getFilePath(fileName: editor_Plugins_Okapi_Bconf_File::DESCRIPTION_FILE);
+        $descFile = $this->createPath(editor_Plugins_Okapi_Bconf_File::DESCRIPTION_FILE);
         $content = json_decode(file_get_contents($descFile), true);
 
         $srxFileName = $content['refs'][$purpose] ?? '';
@@ -353,28 +390,19 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getCustomFilterProvider() : string {
+    public function getCustomFilterProviderId() : string {
         if(empty($this->getCustomerId())){
             $config = Zend_Registry::get('config');
-            return $this->removeDashesAndDots($config->runtimeOptions->server->name);
+            return editor_Utils::filenameFromUserText($config->runtimeOptions->server->name, false);
         }
-        $name = $this->removeDashesAndDots(editor_Utils::secureFilename(str_replace(' ', '_', $this->getCustomerName())));
+        $name = editor_Utils::filenameFromUserText($this->getCustomerName(), false);
         if(empty($name)){
             $name = 'customer'.$this->getCustomerId();
         }
+        if(strlen($name) > 50){
+            return substr($name, 0, 50);
+        }
         return $name;
-    }
-
-    public function getCustomFilterSpecialization() : string {
-
-    }
-
-    /**
-     * @param string $text
-     * @return string
-     */
-    private function removeDashesAndDots(string $text){
-        return str_replace('-', '', str_replace('.', '', $text));
     }
 
     public function addCustomFilterOnUnpack($identifier, $extensions) {
@@ -392,6 +420,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @param string $name
      * @param string $description
      * @param array $extensions
+     * @param string $hash
      * @param string|null $mimeType
      * @return editor_Plugins_Okapi_Models_BconfFilter
      * @throws Zend_Db_Statement_Exception
@@ -399,7 +428,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    private function addCustomFilterEntry(string $type, string $id, string $name, string $description, array $extensions, string $mimeType=NULL) {
+    public function addCustomFilterEntry(string $type, string $id, string $name, string $description, array $extensions, string $hash, string $mimeType=NULL) : editor_Plugins_Okapi_Models_BconfFilter {
         if(empty($extensions)){
             throw new ZfExtended_BadMethodCallException('A Okapi Bconf custom filter can not be added without related file extensions');
         }
@@ -414,6 +443,7 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
         $filterEntity->setName($name);
         $filterEntity->setDescription($description);
         $filterEntity->setFileExtensions($extensions);
+        $filterEntity->setHash($hash);
         $filterEntity->save();
         return $filterEntity;
     }
