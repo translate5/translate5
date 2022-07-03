@@ -67,6 +67,11 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
         }
         $this->view->rows =  $this->entity->loadAllAvailableForTask($taskGuid);
     }
+
+    public function putAction()
+    {
+        throw new BadMethodCallException('HTTP method PUT not allowed!');
+    }
     
     public function pretranslationBatch(){
 
@@ -173,9 +178,10 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
 
     /***
      * Log analysis warning
-     * @param string $taskGuid
-     * @param array $extra
+     * @param editor_Models_Task $task
      * @param string $message
+     * @param array $extra
+     * @throws Zend_Exception
      */
     protected function addWarn(editor_Models_Task $task,string $message,array $extra=[]) {
         $extra['task']=$task;
