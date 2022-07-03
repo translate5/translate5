@@ -80,7 +80,7 @@ final class editor_Segment_Qualities {
         $this->processingMode = $processingMode;
         $this->table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
         // we only overwrite/adjust existing entries when editing or saving Alike segments
-        if($this->processingMode == editor_Segment_Processing::EDIT || $this->processingMode == editor_Segment_Processing::ALIKE){
+        if($this->processingMode == editor_Segment_Processing::EDIT || $this->processingMode == editor_Segment_Processing::ALIKE/* || $this->processingMode == editor_Segment_Processing::IMPORT*/){
             // QM-qualities will not be processed with the segment-tags at all as they are not related to the segment's texts but relate on the whole segment
             foreach($this->table->fetchFiltered(NULL, $segmentId, editor_Segment_Tag::TYPE_QM, true) as $quality){
                 /* @var $qualityRow editor_Models_Db_SegmentQualityRow */
@@ -148,6 +148,22 @@ final class editor_Segment_Qualities {
             $quality->delete();
         }
     }
+
+    /**
+     * Drop qualities by type
+     *
+     * @param string $field
+     * @param string $type
+     * @throws Zend_Db_Table_Row_Exception
+     */
+    public function dropByType(string $field, string $type) {
+        foreach ($this->getExisting() as $quality) {
+            if ($quality->field == $field && $quality->type === $type) {
+                $quality->delete();
+            }
+        }
+    }
+
     /**
      * Adds a quality by it's associated tag
      * @param editor_Segment_Tag $tag
@@ -231,6 +247,7 @@ final class editor_Segment_Qualities {
             }
         }
         $this->table->deleteByIds($deleteIds);
+        class_exists('editor_Utils');
         foreach($this->added as $quality){
             if($quality->processingState == 'new'){
                 $newQualities[] = $quality;

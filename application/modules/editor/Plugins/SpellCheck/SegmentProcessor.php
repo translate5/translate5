@@ -75,11 +75,19 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
         // Get connector
         $connector = $this->getConnector($slot);
 
+        // Get quality type
+        $type = editor_Plugins_SpellCheck_QualityProvider::qualityType();
+
         // Foreach segment
         foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
 
             // Get segment and task shortcut
             $segment = $tags->getSegment();
+
+            class_exists('editor_Utils');
+
+            //i($tags->processingMode, 'a');
+            $tags->processingMode = editor_Segment_Processing::EDIT;
 
             // Foreach target
             foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
@@ -87,12 +95,38 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
                 // Do check
                 $check = new editor_Plugins_SpellCheck_Check($segment, $target->getField(), $connector, $spellCheckLang);
 
+                //$text = $segment->getTargetEditToSort();
+                /*if (preg_match('~MOBILE24~', $text)) {
+                    //i($text, 'a');
+                    //i('mobile ' . $segment->getId(), 'a');
+
+                    i([
+                        'database',
+                        editor_Utils::db()->query('
+                            SELECT * FROM `LEK_segment_quality` WHERE `segmentId` = ?
+                        ', $segment->getId())->fetchAll()
+                    ], 'a');
+
+                    // Drop existing spellcheck-qualities
+                    //$tags->getQualities()->dropByType($target->getField(), $type);
+                    foreach ($tags->getQualities()->getExisting() as &$existing) {
+                        i([$existing->processingState, $existing->toArray()], 'a');
+                    }
+                }*/
+
+                // Drop existing spellcheck-qualities
+                //$tags->getQualities()->dropByType($target->getField(), $type);
+                /*foreach ($tags->getQualities()->getExisting() as &$existing) {
+                    i($existing->toArray(), 'a');
+                    $existing->processingState = 'delete';
+                }*/
+
                 // Process check results
                 foreach ($check->getStates() as $category => $qualityA) {
                     foreach ($qualityA as $quality) {
                         $tags->addQuality(
                             field: $target->getField(),
-                            type: editor_Plugins_SpellCheck_QualityProvider::qualityType(),
+                            type: $type,
                             category: $category,
                             additionalData: $quality
                         );

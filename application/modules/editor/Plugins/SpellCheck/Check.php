@@ -73,10 +73,14 @@ class editor_Plugins_SpellCheck_Check {
     /**
      * editor_Plugins_SpellCheck_Check constructor.
      *
-     * @param $targetField
      * @param editor_Models_Segment $segment
+     * @param $targetField
      * @param editor_Plugins_SpellCheck_LanguageTool_Connector $connector
      * @param $spellCheckLang
+     * @throws editor_Plugins_SpellCheck_Exception_Down
+     * @throws editor_Plugins_SpellCheck_Exception_Malfunction
+     * @throws editor_Plugins_SpellCheck_Exception_Request
+     * @throws editor_Plugins_SpellCheck_Exception_TimeOut
      */
     public function __construct(editor_Models_Segment $segment, $targetField,
                                 editor_Plugins_SpellCheck_LanguageTool_Connector $connector, $spellCheckLang) {
