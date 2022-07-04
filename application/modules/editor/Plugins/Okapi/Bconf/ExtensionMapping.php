@@ -174,7 +174,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      */
     public function __construct(editor_Plugins_Okapi_Models_Bconf $bconf, ?array $unpackedLines=NULL, ?array $replacementMap=NULL){
         $this->path = $bconf->getExtensionMappingPath();
-        $this->dir = rtrim(dirname($path), '/');
+        $this->dir = rtrim(dirname($this->path), '/');
         $this->bconf = $bconf;
 
         if(is_array($unpackedLines) && is_array($replacementMap)){
@@ -184,11 +184,11 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         } else {
             // opening a mapping from the file-system
             $content = NULL;
-            if(file_exists($path) && is_writable($path)){
-                $content = file_get_contents($path);
+            if(file_exists($this->path) && is_writable($this->path)){
+                $content = file_get_contents($this->path);
             }
             if(empty($content)){
-                throw new ZfExtended_Exception('editor_Plugins_Okapi_Bconf_ExtensionMapping can only be instantiated for an existing extension-mapping file ('.$path.')');
+                throw new ZfExtended_Exception('editor_Plugins_Okapi_Bconf_ExtensionMapping can only be instantiated for an existing extension-mapping file ('.$this->path.')');
             }
             $this->parseContent($content, []);
             if(!$this->hasEntries()){
@@ -347,7 +347,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             $count++;
             $name = $baseName.' '.$count;
         }
-        $extensions = $this->findExtensionsForFilter();
+        $extensions = $this->findExtensionsForFilter($identifier);
         $this->bconf->addCustomFilterEntry(
             $idata->type,
             $idata->id,
@@ -397,7 +397,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * Internal API to parse our contents from unpacked bconf data (on import)
      * @param string $content
      */
-    private function umnpackContent(array $unpackedLines, array $replacementMap){
+    private function unpackContent(array $unpackedLines, array $replacementMap){
         foreach($unpackedLines as $line){
             $identifier = array_key_exists($line[1], $replacementMap) ? $replacementMap[$line[1]] : $line[1];
             if($identifier != self::INVALID_IDENTIFIER){
@@ -412,7 +412,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * @return string
      */
     private function createContent(array $map) {
-        $content = [];
+        $content = '';
         foreach($map as $extension => $identifier){
             $content .= '.'.$extension . self::SEPERATOR . $identifier . self::LINEFEED;
         }

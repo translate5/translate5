@@ -88,11 +88,26 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
                 'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
             ]);
         }
+        $postFile = $_FILES[self::FILE_UPLOAD_NAME];
+        $name = $this->getParam('name');
+        $description = $this->getParam('description');
+        $customerId = $this->getParam('customerId');
 
-        $bconf = new editor_Plugins_Okapi_Models_Bconf($_FILES[self::FILE_UPLOAD_NAME], $this->getAllParams());
+        if($name == NULL){
+            $name = pathinfo($postFile['name'], PATHINFO_FILENAME);
+        }
+        if($description == NULL){
+            $description = '';
+        }
+        if($customerId != NULL){
+            $customerId = intval($customerId);
+        }
 
-        $ret->success = is_object($bconf);
+        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $bconf->import($postFile['tmp_name'], $name, $description, $customerId);
+
         $ret->id = $bconf->getId();
+        $ret->success = !empty($ret->id);
 
         echo json_encode($ret);
     }

@@ -144,40 +144,40 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
 
     /**
-     * Creates new bconf record in DB and directory on disk
-     * @param ?array $postFile - see https://www.php.net/manual/features.file-upload.post-method.php
-     * @param array $data - data to initialize the record, usually the POST params
+     * @param string $tmpPath
+     * @param string $name
+     * @param string $description
+     * @param int|null $customerId
      * @throws Zend_Db_Statement_Exception
-     * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_NoAccessException
+     * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function __construct(array $postFile = null, array $data = []) {
-        parent::__construct();
-        if($postFile && self::getBconfRootDir()){ // create new entity from file
+    public function import(string $tmpPath, string $name, string $description, int $customerId=NULL){
 
-            // init data
-            $bconfData = [];
-            $bconfData['name'] = (array_key_exists('name', $data) && !empty($data['name'])) ? $data['name'] : pathinfo($postFile['name'])['filename'];
-            $bconfData['description'] = (array_key_exists('description', $data) && !empty($data['description'])) ? $data['description'] : '';
-            $bconfData['customerId'] = (array_key_exists('customerId', $data) && $data['customerId'] != NULL) ? intval($data['customerId']) : NULL;
-            $bconfData['versionIdx'] = editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX;
-            $bconfData['isDefault'] = 0;
+        error_log("IMPORT BCONF, tmpPath: $tmpPath, name: $name, description: $description, customerId: $customerId");
 
-            $this->isNewRecord = true;
-            $this->init($bconfData, false);
-            $this->save(); // Generates id needed for directory
-            $dir = $this->getDataDirectory();
-            if(self::checkDirectory($dir) && !mkdir($dir, 0755, true)){
-                $this->delete();
-                $errorMsg = "Could not create directory for bconf (in runtimeOptions.plugins.Okapi.dataDir)";
-                throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
-            }
-            $this->getFile()->unpack($postFile['tmp_name']);
-            $this->getFile()->pack();
-            $this->isNewRecord = false;
+        $bconfData = [
+            'name' => $name,
+            'description' => $description,
+            'customerId' => $customerId,
+            'versionIdx' => editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX,
+            'isDefault' => 0
+        ];
+        $this->isNewRecord = true;
+        $this->init($bconfData, false);
+        $this->save(); // Generates id needed for directory
+        $dir = $this->getDataDirectory();
+        if(self::checkDirectory($dir) && !mkdir($dir, 0755, true)){
+            $this->delete();
+            $errorMsg = "Could not create directory for bconf (in runtimeOptions.plugins.Okapi.dataDir)";
+            throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
         }
+        $this->getFile()->unpack($tmpPath);
+        $this->getFile()->pack();
+        $this->isNewRecord = false;
     }
 
     /**
