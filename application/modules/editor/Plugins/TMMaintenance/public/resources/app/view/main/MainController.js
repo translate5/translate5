@@ -4,6 +4,43 @@ Ext.define('TMMaintenance.view.main.MainController', {
     alias: 'controller.main',
 
     searchForm: null,
+    gridList: null,
+
+    init: function() {
+        if (this.initialized) {
+            return;
+        }
+
+        console.log('init');
+
+        let me = this;
+
+        const keymap = {
+            'escape':           [Ext.event.Event.ESC,   this.cancelEditing],
+            'f2':               [Ext.event.Event.F2,    this.startEditing],
+            'ctrl+s':           [Ext.event.Event.S,     this.saveCurrent,               {ctrl: true}],
+            'ctrl+enter':       [Ext.event.Event.ENTER, this.saveCurrentGoToNext,       {ctrl: true, shift: false}],
+            'ctrl+shift+enter': [Ext.event.Event.ENTER, this.saveCurrentGoToPrevious,   {ctrl: true, shift: true}],
+            'ctrl+alt+up':      [Ext.event.Event.UP,    this.goToPrevious,              {ctrl: true, alt: true}],
+            'ctrl+alt+down':    [Ext.event.Event.DOWN,  this.goToNext,                  {ctrl: true, alt: true}],
+        };
+
+        let bindings = [];
+
+        Ext.Object.each(keymap, function (key, item) {
+            item
+            bindings.push(Ext.applyIf(item[2] || {}, {
+                key: item[0],
+                handler: item[1],
+                scope: item[3] || me
+            }));
+        });
+
+        new Ext.util.KeyMap({
+            target: this.getListGrid().element,
+            binding: bindings,
+        });
+    },
 
     onContainerScrollEnd: function () {
         if (!this.getViewModel().get('hasMoreRecords')) {
@@ -88,13 +125,111 @@ Ext.define('TMMaintenance.view.main.MainController', {
      * @param {Ext.dataview.Location} gridLocation
      */
     onEditPress: function (grid, gridLocation) {
-        let celledit = grid.getPlugin('cellediting');
-        celledit.startEdit(gridLocation.record, grid.down('[dataIndex=target]'));
+        this.startEdit(gridLocation.record);
+    },
 
-        Ext.defer(function () {
-            let editor = celledit.getActiveEditor().getEditor();
-            editor.focus();
-        }, 200);
+    startEditing: function () {
+        let editingPlugin = this.getEditingPlugin();
+
+        if (editingPlugin.editing) {
+            return;
+        }
+
+        let grid = this.getListGrid();
+
+        if (!grid.getLastSelected()) {
+            return;
+        }
+
+        this.startEdit(grid.getLastSelected());
+    },
+
+    cancelEditing: function () {
+        let editingPlugin = this.getEditingPlugin();
+
+        if (!editingPlugin.editing) {
+            return;
+        }
+
+        editingPlugin.getActiveEditor().cancelEdit();
+    },
+
+    saveCurrent: function() {
+        let editingPlugin = this.getEditingPlugin();
+
+        if (!editingPlugin.editing) {
+            return;
+        }
+
+        editingPlugin.getActiveEditor().completeEdit();
+    },
+
+    saveCurrentGoToNext: function () {
+        let currentEditingRecord = this.getEditingPlugin().getActiveEditor().currentEditingRecord;
+        if (!currentEditingRecord) {
+            return;
+        }
+
+        this.saveCurrent();
+
+        let store = this.getListGrid().getStore();
+        let nextEditingIndex = store.indexOf(currentEditingRecord) + 1;
+        if (!store.getAt(nextEditingIndex)) {
+            return;
+        }
+
+        this.startEdit(store.getAt(nextEditingIndex));
+    },
+
+    saveCurrentGoToPrevious: function () {
+        let currentEditingRecord = this.getEditingPlugin().getActiveEditor().currentEditingRecord;
+        if (!currentEditingRecord) {
+            return;
+        }
+
+        this.saveCurrent();
+
+        let store = this.getListGrid().getStore();
+        let nextEditingIndex = store.indexOf(currentEditingRecord) - 1;
+        if (!store.getAt(nextEditingIndex)) {
+            return;
+        }
+
+        this.startEdit(store.getAt(nextEditingIndex));
+    },
+
+    goToNext: function () {
+        let currentEditingRecord = this.getEditingPlugin().getActiveEditor().currentEditingRecord;
+        if (!currentEditingRecord) {
+            return;
+        }
+
+        this.cancelEditing();
+
+        let store = this.getListGrid().getStore();
+        let nextEditingIndex = store.indexOf(currentEditingRecord) + 1;
+        if (!store.getAt(nextEditingIndex)) {
+            return;
+        }
+
+        this.startEdit(store.getAt(nextEditingIndex));
+    },
+
+    goToPrevious: function () {
+        let currentEditingRecord = this.getEditingPlugin().getActiveEditor().currentEditingRecord;
+        if (!currentEditingRecord) {
+            return;
+        }
+
+        this.cancelEditing();
+
+        let store = this.getListGrid().getStore();
+        let nextEditingIndex = store.indexOf(currentEditingRecord) - 1;
+        if (!store.getAt(nextEditingIndex)) {
+            return;
+        }
+
+        this.startEdit(store.getAt(nextEditingIndex));
     },
 
     hideForm: function () {
@@ -107,5 +242,32 @@ Ext.define('TMMaintenance.view.main.MainController', {
         }
 
         return this.searchForm;
+    },
+
+    /**
+     * @returns {TMMaintenance.view.main.List}
+     */
+    getListGrid: function () {
+        if (null === this.gridList) {
+            this.gridList = Ext.getCmp('mainlist');
+        }
+
+        return this.gridList;
+    },
+
+    getEditingPlugin: function () {
+        return this.getListGrid().getPlugin('cellediting');
+    },
+
+    startEdit: function (record) {
+        let grid = this.getListGrid();
+        let editingPlugin = this.getEditingPlugin();
+
+        editingPlugin.startEdit(record, grid.down('[dataIndex=target]'));
+
+        Ext.defer(function () {
+            let editor = editingPlugin.getActiveEditor().getEditor();
+            editor.focus();
+        }, 200);
     },
 });

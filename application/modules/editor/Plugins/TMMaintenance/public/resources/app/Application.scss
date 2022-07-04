@@ -84,3 +84,14 @@ $enable-font-awesome: dynamic(true);
 .x-gridcell-body-el {
   white-space: normal;
 }
+
+.editor-buttons {
+  .x-body-wrap-el {
+    width: 30px;
+    justify-content: center;
+
+    .x-body-el {
+      display: contents;
+    }
+  }
+}

@@ -3,6 +3,7 @@ Ext.define('Ext.translate5.Editor', {
     xtype: 't5editor',
 
     editor: null,
+    currentEditingRecord: null,
 
     config: {
         field: {
@@ -48,6 +49,8 @@ Ext.define('Ext.translate5.Editor', {
 
         location.view.refresh();
 
+        this.currentEditingRecord = null;
+
         return result;
     },
 
@@ -55,6 +58,7 @@ Ext.define('Ext.translate5.Editor', {
         let me = this;
         let tagHelper = Ext.create('TMMaintenance.helper.Tag');
         let value = tagHelper.transform(me.getLocation().record.get(this.config.editingDataIndex));
+        this.currentEditingRecord = me.getLocation().record;
 
         if (null !== me.editor) {
             me.editor.setData(value);
@@ -79,18 +83,6 @@ Ext.define('Ext.translate5.Editor', {
         // Prevent editor from closing when clicking outside
     },
 
-    realign: function () {
-        console.log('realign');
-
-        return this.callParent([]);
-    },
-
-    afterShow: function () {
-        console.log('afterShow');
-
-        return this.callParent([]);
-    },
-
     getEditor: function () {
         return this.editor;
     },
@@ -99,7 +91,8 @@ Ext.define('Ext.translate5.Editor', {
         editor.editing.view.document.on(
             'enter',
             (evt, data) => {
-                me.editor.execute('shiftEnter');
+                //change enter to shift+enter to prevent ckeditor from inserting a new p tag
+                this.editor.execute('shiftEnter');
                 //Cancel existing event
                 data.preventDefault();
                 evt.stop();
@@ -118,23 +111,37 @@ Ext.define('Ext.translate5.Editor', {
     },
 
     addEditorButtons: function (me) {
-        let buttons = document.createElement('div');
-        buttons.classList.value = 'x-trigger x-interactive x-cleartrigger-celleditor x-trigger-celleditor f-column';
-        let ok = document.createElement('i');
-        ok.classList.value = 'x-fa fa-check mb-5';
-        let cancel = document.createElement('i');
-        cancel.classList.value = 'x-fa fa-window-close';
-        buttons.appendChild(ok);
-        buttons.appendChild(cancel);
+        Ext.create(
+            {
+                xtype: 'panel',
+                align: 'right',
+                userCls: 'editor-buttons',
+                renderTo: me.getField().afterInputElement,
+                items: [
+                    {
+                        xtype: 'button',
+                        align: 'right',
+                        iconCls: 'x-fa fa-check',
+                        handler: 'onUpdatePress',
+                        scope: this,
+                    },
+                    {
+                        xtype: 'button',
+                        align: 'right',
+                        iconCls: 'x-fa fa-window-close',
+                        handler: 'onCancelEditPress',
+                        scope: this,
+                    },
+                ]
+            }
+        );
+    },
 
-        me.getField().afterInputElement.appendChild(buttons);
+    onUpdatePress: function () {
+        this.completeEdit();
+    },
 
-        ok.addEventListener('click', function () {
-            me.completeEdit();
-        });
-
-        cancel.addEventListener('click', function () {
-            me.cancelEdit();
-        });
+    onCancelEditPress: function () {
+        this.cancelEdit();
     },
 });
