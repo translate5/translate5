@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 class OkapiBconfTest extends editor_Test_JsonTest {
 
-    private static editor_Plugins_Okapi_Models_Bconf $bconf;
+    private static editor_Plugins_Okapi_Bconf_Entity $bconf;
     private static int $bconfId = 0;
     private static Zend_Config $okapiConf;
     public const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
@@ -73,7 +73,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         ]);
         self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true');
         self::$bconfId = $res->id;
-        self::$bconf = new editor_Plugins_Okapi_Models_Bconf();
+        self::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
         self::$bconf->load(self::$bconfId);
         self::assertEquals(self::$bconf->getName(), $bconfName, "Imported bconf's name is not '$bconfName' but '" . self::$bconf->getName() . "'");
         $output = self::$bconf->getPath();
@@ -129,7 +129,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $bconf = self::$bconf;
         $bconf->importDefaultWhenNeeded();
 
-        $systemBconf = new editor_Plugins_Okapi_Models_Bconf();
+        $systemBconf = new editor_Plugins_Okapi_Bconf_Entity();
         $systemBconf->loadRow('name = ? ', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
         $systemBconf->setName('NotSystemBconfAnymore-' . time() . rand()); // Unmark as system bconf
         $systemBconf->save();
@@ -141,7 +141,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
         $autoImportFailureMsg = 'AutoImport of missing system bconf failed.';
         self::assertEquals($total + 1, $newTotal, $autoImportFailureMsg . ' Totalcount not increased');
-        $newSystemBconf = new editor_Plugins_Okapi_Models_Bconf();
+        $newSystemBconf = new editor_Plugins_Okapi_Bconf_Entity();
         $expectedName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
         $newSystemBconf->loadRow('name = ?', $expectedName);
         self::assertEquals($expectedName, $newSystemBconf->getName(), $autoImportFailureMsg . " No record name matches '$expectedName'");
@@ -254,7 +254,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * @depends test10_BconfImportExport
      */
     public function test60_InvalidFiles() {
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $testDir = NULL;
         try {
             $bconf->setId(0);

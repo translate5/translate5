@@ -30,20 +30,20 @@
  * Class representing the static data for all translate5 specific filters
  * Note that the "replaceId" prop is specific to this inventory and needs to point to a valid id in okapi-filters.json
  */
-final class editor_Plugins_Okapi_Bconf_Filters_Translate5 extends editor_Plugins_Okapi_Bconf_Filters_Inventory {
+final class editor_Plugins_Okapi_Bconf_Filter_Translate5 extends editor_Plugins_Okapi_Bconf_Filter_Inventory {
 
     /**
-     * @var editor_Plugins_Okapi_Bconf_Filters_Translate5|null
+     * @var editor_Plugins_Okapi_Bconf_Filter_Translate5|null
      */
-    private static ?editor_Plugins_Okapi_Bconf_Filters_Translate5 $_instance = NULL;
+    private static ?editor_Plugins_Okapi_Bconf_Filter_Translate5 $_instance = NULL;
 
     /**
      * Classic Singleton
-     * @return editor_Plugins_Okapi_Bconf_Filters_Translate5
+     * @return editor_Plugins_Okapi_Bconf_Filter_Translate5
      */
-    public static function instance() : editor_Plugins_Okapi_Bconf_Filters_Translate5 {
+    public static function instance() : editor_Plugins_Okapi_Bconf_Filter_Translate5 {
         if(self::$_instance == NULL){
-            self::$_instance = new editor_Plugins_Okapi_Bconf_Filters_Translate5();
+            self::$_instance = new editor_Plugins_Okapi_Bconf_Filter_Translate5();
         }
         return self::$_instance;
     }

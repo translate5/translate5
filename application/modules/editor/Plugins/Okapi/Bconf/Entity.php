@@ -43,7 +43,7 @@
  * @method int getVersionIdx()
  * @method setVersionIdx(int $versionIdx)
  */
-class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstract {
+class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * @var string
@@ -138,8 +138,8 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      */
     private ?editor_Models_Customer_Customer $customer = NULL;
 
-    protected $dbInstanceClass = 'editor_Plugins_Okapi_Models_Db_Bconf';
-    protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_Bconf';
+    protected $dbInstanceClass = 'editor_Plugins_Okapi_Db_Bconf';
+    protected $validatorInstanceClass = 'editor_Plugins_Okapi_Db_Validator_Bconf';
 
     /**
      * @param string $tmpPath
@@ -406,8 +406,17 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @return array
      */
     public function getCustomFilterData(){
-        $filters = new editor_Plugins_Okapi_Models_BconfFilter();
+        $filters = new editor_Plugins_Okapi_Bconf_Filter_Entity();
         return $filters->getRowsByBconfId($this->getId());
+    }
+
+    /**
+     * Returns the custom (database based) filters for the frontend
+     * @return array
+     */
+    public function getCustomFilterGridData(){
+        $filters = new editor_Plugins_Okapi_Bconf_Filter_Entity();
+        return $filters->getGridRowsByBconfId($this->getId());
     }
 
     /**
@@ -441,20 +450,20 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
      * @param array $extensions
      * @param string $hash
      * @param string|null $mimeType
-     * @return editor_Plugins_Okapi_Models_BconfFilter
+     * @return editor_Plugins_Okapi_Bconf_Filter_Entity
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_BadMethodCallException
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function addCustomFilterEntry(string $type, string $id, string $name, string $description, array $extensions, string $hash, string $mimeType=NULL) : editor_Plugins_Okapi_Models_BconfFilter {
+    public function addCustomFilterEntry(string $type, string $id, string $name, string $description, array $extensions, string $hash, string $mimeType=NULL) : editor_Plugins_Okapi_Bconf_Filter_Entity {
         if(empty($extensions)){
             throw new ZfExtended_BadMethodCallException('A Okapi Bconf custom filter can not be added without related file extensions');
         }
         if($mimeType === NULL){
-            $mimeType = editor_Plugins_Okapi_Bconf_Filters_Okapi::findMimeType($type);
+            $mimeType = editor_Plugins_Okapi_Bconf_Filter_Okapi::findMimeType($type);
         }
-        $filterEntity = new editor_Plugins_Okapi_Models_BconfFilter();
+        $filterEntity = new editor_Plugins_Okapi_Bconf_Filter_Entity();
         $filterEntity->setBconfId($this->getId());
         $filterEntity->setOkapiType($type);
         $filterEntity->setOkapiId($id);

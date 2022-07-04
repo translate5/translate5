@@ -174,7 +174,7 @@ class editor_Plugins_Okapi_Connector {
         } catch (ZfExtended_BadGateway $e) {
             $msg = $e->getMessage();
             $bconfId = (int)basename(dirname($bconfPath));
-            $bconf = new editor_Plugins_Okapi_Models_Bconf();
+            $bconf = new editor_Plugins_Okapi_Bconf_Entity();
             $bconf->load($bconfId);
             $bconfName = $bconf->getName();
             // TODO Include link. Beware: $msg is escaped, no html possible as is

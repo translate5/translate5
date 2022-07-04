@@ -26,8 +26,18 @@
  END LICENSE AND COPYRIGHT
  */
 
-class editor_Plugins_Okapi_Models_Db_BconfFilter extends Zend_Db_Table_Abstract {
-    
-    protected $_name = 'LEK_okapi_bconf_filter';
-    public $_primary = ['bconfId', 'okapiId'];
+class editor_Plugins_Okapi_Db_Validator_BconfFilter extends ZfExtended_Models_Validator_Abstract {
+    /**
+     * Validators for Okapi Bconf Filter Entity
+     */
+    protected function defineValidators() {
+        $this->addValidator('id', 'int');
+        $this->addValidator('bconfId', 'int');
+        $this->addValidator('okapiType', 'stringLength', array('min' => 1, 'max' => 50));
+        $this->addValidator('okapiId', 'stringLength', array('min' => 1, 'max' => 255));
+        $this->addValidator('mimeType', 'stringLength', array('min' => 0, 'max' => 50));
+        $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 100));
+        $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('extensions', 'stringLength', array('min' => 0, 'max' => 200));
+    }
 }

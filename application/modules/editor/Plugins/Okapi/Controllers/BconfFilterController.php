@@ -32,14 +32,12 @@
  */
 class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestController {
 
-    protected $entityClass = 'editor_Plugins_Okapi_Models_BconfFilter';
-    /** @var Editor_Plugins_Okapi_Models_BconfFilter $entity */
-    protected $entity;
-    /**
-     * @var array|null $compositeId composite key [bconfId, okapiId]
-     */
-    protected ?array $compositeId = NULL;
+    protected $entityClass = 'editor_Plugins_Okapi_Bconf_Filter_Entity';
 
+    /**
+     * @var Editor_Plugins_Okapi_Models_BconfFilter
+     */
+    protected $entity;
 
     /**
      * sends all default bconf filters as JSON, Translate5 adjusted and okapi defaults
@@ -47,8 +45,10 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * @see ZfExtended_RestController::indexAction()
      */
     public function getdefaultfiltersAction() {
-        $t5Rows = editor_Plugins_Okapi_Bconf_Filters_Translate5::instance()->getRows(0);
-        $this->view->rows = array_merge($t5Rows, editor_Plugins_Okapi_Bconf_Filters_Okapi::instance()->getRows(count($t5Rows)));
+        $bconf = new editor_Plugins_Okapi_Bconf_Filter_Entity();
+        $startIndex = $bconf->getHighestId() + 1000000;
+        $t5Rows = editor_Plugins_Okapi_Bconf_Filter_Translate5::instance()->getGridRows($startIndex);
+        $this->view->rows = array_merge($t5Rows, editor_Plugins_Okapi_Bconf_Filter_Okapi::instance()->getGridRows(count($t5Rows) + $startIndex));
         $this->view->total = count($this->view->rows);
     }
 
@@ -59,47 +59,19 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      * @throws editor_Plugins_Okapi_Exception
      */
     public function indexAction() {
-        $db = $this->entity->db;
         $bconfId = $this->getParam('bconfId');
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $bconf->load($this->getParam('bconfId'));
 
-        $s = $db->select();
-        $s->from($db, ['okapiId', 'name', 'description']);
-        $s->where('bconfId = ?', $bconfId);
-        $this->view->rows = $db->fetchAll($s)->toArray();
+        // add the grid data
+        $this->view->rows = $bconf->getCustomFilterGridData();
         $this->view->total = count($this->view->rows);
 
+        // the extension mapping is sent as meta-data
         if(!$this->view->metaData){
             $this->view->metaData = new stdClass();
         }
-        $this->view->metaData->{'extensions-mapping'}
-            = file_get_contents($bconf->getFilePath($bconfId, 'extensions-mapping.txt'));
-    }
-
-    /**
-     * Splits the key in its composite components
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    protected function entityLoad() {
-        $id = $this->getCompositeId();
-        $this->entity->load($id[0], $id[1]);
-    }
-
-    /**
-     * TODO BCONF: remove, we use normal ids
-     * Parse, cache and return composite key from url
-     * @return array{int, string} composite key [bconfId, okapiId]
-     */
-    // QUIRK Is in controller because access to request params
-    public function getCompositeId(): array {
-        $id = $this->compositeId ?? $this->getRequest()->getParam('id');
-        if(gettype($id) !== 'array'){
-            $path = $this->getRequest()->getPathInfo();
-            // /editor/plugins_okapi_bconffilter/8-.-okf_odf%40translate5.test
-            $id = explode('-.-',urldecode(basename($path)));
-            $this->compositeId = $id;
-        }
-        return $id;
+        $this->view->metaData->{'extensions-mapping'} = file_get_contents($bconf->getExtensionMappingPath());
     }
 
     /**
@@ -107,9 +79,10 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      */
     public function saveextensionsmappingAction(){
         $extMap = $this->getRequest()->getRawBody();
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->load($this->getParam('bconfId'));
-        file_put_contents($bconf->getExtensionMappingPath(), $extMap);
+        $extensionMapping = $bconf->getExtensionMapping();
+        $extensionMapping->updateByContent($extMap);
     }
 
 }

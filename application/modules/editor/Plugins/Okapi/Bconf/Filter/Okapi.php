@@ -29,12 +29,12 @@
 /**
  * Class representing the static data for all okapi default filters a bconf can have
  */
-final class editor_Plugins_Okapi_Bconf_Filters_Okapi extends editor_Plugins_Okapi_Bconf_Filters_Inventory {
+final class editor_Plugins_Okapi_Bconf_Filter_Okapi extends editor_Plugins_Okapi_Bconf_Filter_Inventory {
 
     /**
-     * @var editor_Plugins_Okapi_Bconf_Filters_Okapi|null
+     * @var editor_Plugins_Okapi_Bconf_Filter_Okapi|null
      */
-    private static ?editor_Plugins_Okapi_Bconf_Filters_Okapi $_instance = NULL;
+    private static ?editor_Plugins_Okapi_Bconf_Filter_Okapi $_instance = NULL;
 
     /**
      * Validates a default-identifier (a mapping-identifier pointing to an okapi-default and not a fprm-file)
@@ -44,7 +44,7 @@ final class editor_Plugins_Okapi_Bconf_Filters_Okapi extends editor_Plugins_Okap
     public static function isValidDefaultIdentifier(string $identifier){
         // avoid nonsense
         if(str_contains($identifier, editor_Plugins_Okapi_Bconf_Filters::IDENTIFIER_SEPERATOR)){
-            throw new ZfExtended_BadMethodCallException('editor_Plugins_Okapi_Bconf_Filters_Okapi::isValidDefaultIdentifier can only check Okapi default filters that do not point to a fprm file');
+            throw new ZfExtended_BadMethodCallException('editor_Plugins_Okapi_Bconf_Filter_Okapi::isValidDefaultIdentifier can only check Okapi default filters that do not point to a fprm file');
         }
         if(count(self::instance()->findFilter(null, $identifier)) > 0){
             return true;
@@ -81,11 +81,11 @@ final class editor_Plugins_Okapi_Bconf_Filters_Okapi extends editor_Plugins_Okap
     }
     /**
      * Classic Singleton
-     * @return editor_Plugins_Okapi_Bconf_Filters_Okapi
+     * @return editor_Plugins_Okapi_Bconf_Filter_Okapi
      */
-    public static function instance() : editor_Plugins_Okapi_Bconf_Filters_Okapi {
+    public static function instance() : editor_Plugins_Okapi_Bconf_Filter_Okapi {
         if(self::$_instance == NULL){
-            self::$_instance = new editor_Plugins_Okapi_Bconf_Filters_Okapi();
+            self::$_instance = new editor_Plugins_Okapi_Bconf_Filter_Okapi();
         }
         return self::$_instance;
     }

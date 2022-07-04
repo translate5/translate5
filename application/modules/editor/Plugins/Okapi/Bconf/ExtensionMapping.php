@@ -61,7 +61,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * - a custom embedded filter is imported: Will be saved to the file-system & written as custom filter to the DB. Existing custom filters are searched by hash for a name & description
      * if true is returned, the fprm needs to be saved to the bconfs data dir
      *
-     * @param editor_Plugins_Okapi_Models_Bconf $bconf
+     * @param editor_Plugins_Okapi_Bconf_Entity $bconf
      * @param string $identifier
      * @param string $unpackedContent
      * @param array $replacementMap
@@ -70,14 +70,14 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      */
-    public static function processUnpackedFilter(editor_Plugins_Okapi_Models_Bconf $bconf, string $identifier, string $unpackedContent, array &$replacementMap, array &$customFilters) : bool {
+    public static function processUnpackedFilter(editor_Plugins_Okapi_Bconf_Entity $bconf, string $identifier, string $unpackedContent, array &$replacementMap, array &$customFilters) : bool {
         // default-identifiers do not need to be embedded, we just check them
         if(editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)){
             // a non-embedded default-identifier that does not point to a valid OKAPI default filter will be removed & a warning written
             if(!editor_Plugins_Okapi_Bconf_Filters::instance()->isValidOkapiDefaultFilter($identifier)){
                 $replacementMap[$identifier] = self::INVALID_IDENTIFIER;
                 static::getLogger()->warn(
-                    'E4404',
+                    'E1407',
                     'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed',
                     ['bconf' => $bconf->getName(), 'bconfId' => $bconf->getId(), 'identifier' => $identifier]);
             }
@@ -91,14 +91,14 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 }
             } else {
                 // "real" custom filters, check if they have a supported type
-                if(editor_Plugins_Okapi_Bconf_Filters_Okapi::isValidType($idata->type)){
+                if(editor_Plugins_Okapi_Bconf_Filter_Okapi::isValidType($idata->type)){
                     // add a custom filter to the filesys & map (that later is flushed to the DB)
                     $customFilters[$identifier] = md5($unpackedContent);
                     return true;
                 } else {
                     $replacementMap[$identifier] = self::INVALID_IDENTIFIER;
                     static::getLogger()->warn(
-                        'E4404',
+                        'E1407',
                         'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed',
                         ['bconf' => $bconf->getName(), 'bconfId' => $bconf->getId(), 'identifier' => $identifier]);
                 }
@@ -160,18 +160,18 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     private array $fprmsToPack;
 
     /**
-     * @var editor_Plugins_Okapi_Models_Bconf
+     * @var editor_Plugins_Okapi_Bconf_Entity
      */
-    private editor_Plugins_Okapi_Models_Bconf $bconf;
+    private editor_Plugins_Okapi_Bconf_Entity $bconf;
 
     /**
-     * @param editor_Plugins_Okapi_Models_Bconf $bconf
+     * @param editor_Plugins_Okapi_Bconf_Entity $bconf
      * @param string|null $unpackedContent: must be set when unpacking a bconf
      * @param array $replacementMap: must be set when unpacking a bconf, represents the filters that have been mapped to a different identifier (e.g. filebased okapi-default back to a default identifier or default identifier to a translate5 adjuated one etc.)
      * @throws ZfExtended_Exception
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function __construct(editor_Plugins_Okapi_Models_Bconf $bconf, ?array $unpackedLines=NULL, ?array $replacementMap=NULL){
+    public function __construct(editor_Plugins_Okapi_Bconf_Entity $bconf, ?array $unpackedLines=NULL, ?array $replacementMap=NULL){
         $this->path = $bconf->getExtensionMappingPath();
         $this->dir = rtrim(dirname($this->path), '/');
         $this->bconf = $bconf;
@@ -191,7 +191,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             }
             $this->parseContent($content);
             if(!$this->hasEntries()){
-                throw new editor_Plugins_Okapi_Exception('E4402', ['bconf' => $bconf->getName(), 'bconfId' => $bconf->getId()]);
+                throw new editor_Plugins_Okapi_Exception('E1405', ['bconf' => $bconf->getName(), 'bconfId' => $bconf->getId()]);
             }
         }
     }
@@ -208,6 +208,20 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      */
     public function getMap() : array {
         return $this->map;
+    }
+
+    /**
+     * Updates a mapping with an adjusted content
+     * @param string $content
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function updateByContent(string $content) {
+        $this->parseContent($content);
+        if(!$this->hasEntries()){
+            throw new editor_Plugins_Okapi_Exception('E1405', ['bconf' => $this->bconf->getName(), 'bconfId' => $this->bconf->getId()]);
+        }
+        $this->flush();
     }
 
     /**
@@ -249,8 +263,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         }
         if($removed){
             $this->map = $map;
-            if(file_exists($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Models_BconfFilter::EXTENSION)){
-                @unlink($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Models_BconfFilter::EXTENSION);
+            if(file_exists($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION)){
+                @unlink($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
             }
         }
         return $removed;
@@ -281,6 +295,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
     /**
      * re-scans an existing bconf and brings the database in-sync with the filesystem
+     * This is to support the initial rollout
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_BadMethodCallException
      * @throws ZfExtended_Exception
@@ -291,7 +306,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      */
     public function rescanFilters(){
         // evaluate existing filters from db
-        $bconfFilter = new editor_Plugins_Okapi_Models_BconfFilter();
+        $bconfFilter = new editor_Plugins_Okapi_Bconf_Filter_Entity();
         $existingFilters = [];
         $existingNames = [];
         $filesysFilters = [];
@@ -335,7 +350,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     private function flushFilterToDatabase(string $identifier, string $hash, array &$usedNames) {
         // evaluate name & description from a filter that already exists in the DB
         $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
-        $hashedEntity = new editor_Plugins_Okapi_Models_BconfFilter();
+        $hashedEntity = new editor_Plugins_Okapi_Bconf_Filter_Entity();
         try{
             $hashedEntity->loadByTypeAndHash($idata->type, $hash);
             $name = $hashedEntity->getName();
@@ -437,7 +452,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                     // or it is a okapi default identifier which then needs to be added as explicit fprm
                     $path = editor_Plugins_Okapi_Bconf_Filters::instance()->getOkapiDefaultFilterPathById($identifier);
                     if($path === NULL) {
-                        throw new editor_Plugins_Okapi_Exception('E4403', ['bconf' => $this->bconf->getName(), 'bconfId' => $this->bconf->getId(), 'identifier' => $identifier]);
+                        throw new editor_Plugins_Okapi_Exception('E1406', ['bconf' => $this->bconf->getName(), 'bconfId' => $this->bconf->getId(), 'identifier' => $identifier]);
                     } else if($path === false){
                         $this->mapToPack[] = [ '.'.$extension, $identifier ];
                     } else {
@@ -454,7 +469,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                         $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
                         $path = editor_Plugins_Okapi_Bconf_Filters::instance()->getTranslate5FilterPath($idata->type, $idata->id);
                         if(empty($path)){
-                            throw new editor_Plugins_Okapi_Exception('E4403', ['bconf' => $this->bconf->getName(), 'bconfId' => $this->bconf->getId(), 'identifier' => $identifier]);
+                            throw new editor_Plugins_Okapi_Exception('E1406', ['bconf' => $this->bconf->getName(), 'bconfId' => $this->bconf->getId(), 'identifier' => $identifier]);
                         } else {
                             $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifierFromPath($path);
                             $this->fprmsToPack[$identifier] = $path;

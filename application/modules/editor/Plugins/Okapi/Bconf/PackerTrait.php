@@ -30,9 +30,9 @@
 /**
  * Generate new bconf file
  * @see editor_Plugins_Okapi_Bconf_File
- * @var editor_Plugins_Okapi_Models_Bconf $entity
+ * @var editor_Plugins_Okapi_Bconf_Entity $entity
  */
-trait editor_Plugins_Okapi_Bconf_ComposerTrait {
+trait editor_Plugins_Okapi_Bconf_PackerTrait {
 
     /**
      * @throws editor_Plugins_Okapi_Exception
@@ -44,10 +44,10 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
 
         $fileName = basename($this->entity->getPath());
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
-        $raf->writeUTF(editor_Plugins_Okapi_Models_Bconf::SIGNATURE, false);
-        $raf->writeInt(editor_Plugins_Okapi_Models_Bconf::VERSION);
+        $raf->writeUTF(editor_Plugins_Okapi_Bconf_Entity::SIGNATURE, false);
+        $raf->writeInt(editor_Plugins_Okapi_Bconf_Entity::VERSION);
         // TODO BCONF: currently plugins are not supported
-        $raf->writeInt(editor_Plugins_Okapi_Models_Bconf::NUM_PLUGINS);
+        $raf->writeInt(editor_Plugins_Okapi_Bconf_Entity::NUM_PLUGINS);
 
         // Read the pipeline and extract steps
         $this->processPipeline($raf);
@@ -77,7 +77,7 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
         $raf->writeInt($numAllEmbeddedFilters);
         foreach($customIdentifiers as $identifier){
             // we are already in the bconf's dir, so we can reference custom filters by filename only
-            $this->writeFprm($raf, $identifier, $identifier.'.'.editor_Plugins_Okapi_Models_BconfFilter::EXTENSION);
+            $this->writeFprm($raf, $identifier, $identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
         }
         foreach($defaultFilterFiles as $identifier => $path){
             // the static default filters will be added with explicit settings, These are either OKAPI defaults or translate5 adjusted defaults

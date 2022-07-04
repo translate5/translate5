@@ -31,8 +31,8 @@
  */
 class editor_Plugins_Okapi_Bconf_File {
 
-    use editor_Plugins_Okapi_Bconf_ParserTrait;
-    use editor_Plugins_Okapi_Bconf_ComposerTrait;
+    use editor_Plugins_Okapi_Bconf_UnpackerTrait;
+    use editor_Plugins_Okapi_Bconf_PackerTrait;
 
     /**
      * @var string
@@ -57,16 +57,16 @@ class editor_Plugins_Okapi_Bconf_File {
     ];
 
     /**
-     * @var editor_Plugins_Okapi_Models_Bconf
+     * @var editor_Plugins_Okapi_Bconf_Entity
      */
-    protected editor_Plugins_Okapi_Models_Bconf $entity;
+    protected editor_Plugins_Okapi_Bconf_Entity $entity;
 
     /**
      * @var bool
      */
     protected bool $isNew;
 
-    public function __construct(editor_Plugins_Okapi_Models_Bconf $entity, bool $isNew=false) {
+    public function __construct(editor_Plugins_Okapi_Bconf_Entity $entity, bool $isNew=false) {
         $this->entity = $entity;
         $this->isNew = $isNew;
     }

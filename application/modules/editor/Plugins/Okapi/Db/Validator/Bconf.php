@@ -26,18 +26,17 @@
  END LICENSE AND COPYRIGHT
  */
 
-class editor_Plugins_Okapi_Models_Validator_BconfFilter extends ZfExtended_Models_Validator_Abstract {
+class editor_Plugins_Okapi_Db_Validator_Bconf extends ZfExtended_Models_Validator_Abstract {
+
     /**
-     * Validators for Okapi Bconf Filter Entity
+     * Validators for Okapi Bconf Entity
      */
     protected function defineValidators() {
         $this->addValidator('id', 'int');
-        $this->addValidator('bconfId', 'int');
-        $this->addValidator('okapiType', 'stringLength', array('min' => 1, 'max' => 50));
-        $this->addValidator('okapiId', 'stringLength', array('min' => 1, 'max' => 255));
-        $this->addValidator('mimeType', 'stringLength', array('min' => 0, 'max' => 50));
-        $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 100));
-        $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('extensions', 'stringLength', array('min' => 0, 'max' => 200));
+        $this->addValidator('isDefault', 'boolean');
+        $this->addValidator('customerId', 'int');
+        $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 50));
+        $this->addValidator('description', 'stringLength', array('min' => 1, 'max' => 255));
+        $this->addValidator('versionIdx', 'int');
     }
 }

@@ -129,18 +129,18 @@ class editor_Plugins_Okapi_Bconf_Filters {
     }
 
     /**
-     * @var editor_Plugins_Okapi_Bconf_Filters_Okapi
+     * @var editor_Plugins_Okapi_Bconf_Filter_Okapi
      */
-    private editor_Plugins_Okapi_Bconf_Filters_Okapi $okapiFilters;
+    private editor_Plugins_Okapi_Bconf_Filter_Okapi $okapiFilters;
 
     /**
-     * @var editor_Plugins_Okapi_Bconf_Filters_Translate5
+     * @var editor_Plugins_Okapi_Bconf_Filter_Translate5
      */
-    private editor_Plugins_Okapi_Bconf_Filters_Translate5 $translate5Filters;
+    private editor_Plugins_Okapi_Bconf_Filter_Translate5 $translate5Filters;
 
     protected function __construct(){
-        $this->okapiFilters = editor_Plugins_Okapi_Bconf_Filters_Okapi::instance();
-        $this->translate5Filters = editor_Plugins_Okapi_Bconf_Filters_Translate5::instance();
+        $this->okapiFilters = editor_Plugins_Okapi_Bconf_Filter_Okapi::instance();
+        $this->translate5Filters = editor_Plugins_Okapi_Bconf_Filter_Translate5::instance();
     }
 
     /**
@@ -163,7 +163,7 @@ class editor_Plugins_Okapi_Bconf_Filters {
      * @throws ZfExtended_Exception
      */
     public function isEmbeddedDefaultFilter(string $type, string $id) : bool {
-        if(editor_Plugins_Okapi_Bconf_Filters_Translate5::isTranslate5Id($id)){
+        if(editor_Plugins_Okapi_Bconf_Filter_Translate5::isTranslate5Id($id)){
             return $this->isEmbeddedTranslate5Filter($type, $id);
         } else {
             return $this->isEmbeddedOkapiDefaultFilter($type, $id);

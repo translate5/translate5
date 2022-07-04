@@ -33,7 +33,7 @@
  */
 
 /**
- * @property editor_Plugins_Okapi_Models_Bconf $entity
+ * @property editor_Plugins_Okapi_Bconf_Entity $entity
  */
 class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     /***
@@ -46,7 +46,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     /**
      * @var string
      */
-    protected $entityClass = 'editor_Plugins_Okapi_Models_Bconf';
+    protected $entityClass = 'editor_Plugins_Okapi_Bconf_Entity';
 
     /**
      * sends all bconfs as JSON
@@ -103,7 +103,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
             $customerId = intval($customerId);
         }
 
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->import($postFile['tmp_name'], $name, $description, $customerId);
 
         $ret->id = $bconf->getId();
@@ -172,7 +172,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      */
     public function cloneAction() {
         // TODO BCONF: rework
-        $clone = new editor_Plugins_Okapi_Models_Bconf(
+        $clone = new editor_Plugins_Okapi_Bconf_Entity(
             ['tmp_name' => $this->entity->getFilePath($this->getParam('id'))],
             $this->getAllParams()
         );

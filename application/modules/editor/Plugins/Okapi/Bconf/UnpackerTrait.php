@@ -28,9 +28,9 @@
 
 /**
  * @see editor_Plugins_Okapi_Bconf_File
- * @var editor_Plugins_Okapi_Models_Bconf $entity
+ * @var editor_Plugins_Okapi_Bconf_Entity $entity
  */
-trait editor_Plugins_Okapi_Bconf_ParserTrait {
+trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
 
     /**
      * Import bconf
@@ -59,12 +59,12 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
 
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($pathToParse, "rb");
         $sig = $raf->readUTF();
-        if($sig !== editor_Plugins_Okapi_Models_Bconf::SIGNATURE){
-            $this->invalidate("Invalid signature '" . htmlspecialchars($sig) . "' in file header before byte " . $raf->ftell() . ". Must be '" . editor_Plugins_Okapi_Models_Bconf::SIGNATURE . "'");
+        if($sig !== editor_Plugins_Okapi_Bconf_Entity::SIGNATURE){
+            $this->invalidate("Invalid signature '" . htmlspecialchars($sig) . "' in file header before byte " . $raf->ftell() . ". Must be '" . editor_Plugins_Okapi_Bconf_Entity::SIGNATURE . "'");
         }
         $version = $raf->readInt();
-        if(!($version >= 1 && $version <= editor_Plugins_Okapi_Models_Bconf::VERSION)){
-            $this->invalidate("Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . editor_Plugins_Okapi_Models_Bconf::VERSION);
+        if(!($version >= 1 && $version <= editor_Plugins_Okapi_Bconf_Entity::VERSION)){
+            $this->invalidate("Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . editor_Plugins_Okapi_Bconf_Entity::VERSION);
         }
 
         //=== Section 1: plug-ins
@@ -137,7 +137,7 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
 
             // save the fprm if it points to a valid custom identifier/filter
             if(editor_Plugins_Okapi_Bconf_ExtensionMapping::processUnpackedFilter($this->entity, $identifier, $data, $replacementMap, $customFilters)){
-                file_put_contents($identifier.'.'.editor_Plugins_Okapi_Models_BconfFilter::EXTENSION, $data);
+                file_put_contents($identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION, $data);
                 $content['fprm'][] = $identifier;
             }
         }
