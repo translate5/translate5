@@ -55,6 +55,7 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
     {name: 'resourceId', type: 'string'},
     {name: 'customerUseAsDefaultIds'},
     {name: 'customerWriteAsDefaultIds'},
+    {name: 'customerPivotAsDefaultIds'},
     {name: 'customerIds'},
     {name: 'status', type: 'string', persist: false},
     {name: 'statusInfo', type: 'string', persist: false},

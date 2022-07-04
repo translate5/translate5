@@ -129,8 +129,8 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1281"></a>E1281  | Task/User | The content of the segmentrange that is assigned to the user is not valid. | Make sure that the values are not reverse and do not overlap (neither in itself nor with other users of the same role).
 | <a id="E1339"></a>E1339  | Task | Missing mandatory parameter taskGuid. | The taskGuid is not provided as request parameter.
 | <a id="E1341"></a>E1341  | Task | You tried to open or edit another task, but you have already opened another one in another window. Please press F5 to open the previous one here, or close this message to stay in the Taskoverview. | Only one task can be opened for editing per user. If if the user has already opened a task for editing, he/she is not able to modify tasks in task overview with different browser tab. In short words, please use only one browser tab.
-| <a id="E1348"></a>E1348  | Task materialized view | The tasks materialized view was created. | Debugging information to trace the creation of a tasks materialiazed view.
-| <a id="E1349"></a>E1349  | Task materialized view | The tasks materialized view was dropped. | Debugging information to trace the deletion of a tasks materialiazed view.
+| <a id="E1348"></a>E1348  | Task materialized view | The tasks materialized view {matView} was created. | Debugging information to trace the creation of a tasks materialiazed view.
+| <a id="E1349"></a>E1349  | Task materialized view | The tasks materialized view {matView} was dropped. | Debugging information to trace the deletion of a tasks materialiazed view.
 | <a id="E1381"></a>E1381  | Current Task | Access to CurrentTask was requested but no task ID was given in the URL. | Development error: Some PHP code tried to load the currently opened task (identified by the taskid given in the URL) but no task ID was provided in the URL. So either the URL producing the request is wrongly created (no Editor.data.restpath prefix), or its just the wrong context where the CurrentTask was accessed.
 | <a id="E1382"></a>E1382  | Current Task | Access to CurrentTask was requested but it was NOT initialized yet. | Development error: Some PHP code tried to access the currently opened task but it was not loaded yet. This can be done calling TaskContextTrait::initCurrentTask.
 | <a id="E1395"></a>E1395  | Task-Operation | The Task-Operation &quot;{operation}&quot; can not be started when the task is in state &quot;{taskstate}&quot; | The Task-Operation can not be started if the task is in the given state
@@ -311,7 +311,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1346"></a>E1346  | Language&nbsp;Resource Microsoft Translator | Microsoft Translator quota exceeded. A limit has been reached. | See the error log for details.
 | <a id="E1358"></a>E1358  | Language&nbsp;Resource Term Collection | Term Collection Import: Unable to open zip file from file-path: {filePath} | See the error log for details.
 | <a id="E1359"></a>E1359  | Language&nbsp;Resource Term Collection | Term Collection Import: Content from zip file could not be extracted. | See the error log for details.
-
+| <a id="E1403"></a>E1403  | Language&nbsp;Resource pivot pre-translation    | The taskGuid is required as parameter | The taskGuid is not provided as parametar on the request | 
 
 ### Terminology
 | EventCode        | Context       | EventMessage  | Description/Solution

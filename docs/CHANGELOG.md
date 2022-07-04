@@ -13,6 +13,43 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.4] - 2022-06-30
+
+### Important Notes:
+#### [TRANSLATE-2984](https://jira.translate5.net/browse/TRANSLATE-2984)
+Configure in client instance! See internal notes.
+ 
+
+
+### Added
+**[TRANSLATE-2984](https://jira.translate5.net/browse/TRANSLATE-2984): Task Management - Archive and delete old tasks** <br>
+Implement a workflow action to export ended tasks, save the export (xliff2 and normal export) to a configurable destination and delete the task afterwards.
+This action is disabled by default.
+
+**[TRANSLATE-2855](https://jira.translate5.net/browse/TRANSLATE-2855): MatchAnalysis & Pretranslation - Pre-translate pivot language with language resource** <br>
+Pivot segments in task now can be be filled/translated using language resources. For api usage check this link: https://confluence.translate5.net/display/TAD/LanguageResources%3A+pivot+pre-translation
+
+**[TRANSLATE-2839](https://jira.translate5.net/browse/TRANSLATE-2839): OpenTM2 integration - Attach to t5memory service** <br>
+Structural adjustments for t5memory service.
+
+
+### Changed
+**[TRANSLATE-2988](https://jira.translate5.net/browse/TRANSLATE-2988): LanguageResources - Make translate5 fit for switch to t5memory** <br>
+Add some fixes and data conversions when exporting a TMX from OpenTM2 so that it can be imported into t5memory.
+
+
+### Bugfixes
+**[TRANSLATE-2992](https://jira.translate5.net/browse/TRANSLATE-2992): Main back-end mechanisms (Worker, Logging, etc.) - PHP's setlocale has different default values** <br>
+The PHP's system locale was not correctly set. This is due a strange behaviour setting the default locale randomly.
+
+**[TRANSLATE-2990](https://jira.translate5.net/browse/TRANSLATE-2990): OpenTM2 integration - Improve error handling on task re-import into TM** <br>
+Sometimes the re-import a task into a TM feature was hanging and blocking the task. This is solved, the task is reopened in the case of an error and the logging was improved.
+
+**[TRANSLATE-2989](https://jira.translate5.net/browse/TRANSLATE-2989): Import/Export - XLIFF2 export is failing** <br>
+The XLIFF 2 export was failing if the imported tasks was containing one file which was ignored on import (for example if all segments were tagged with translate no)
+
+
 ## [5.7.3] - 2022-06-14
 
 ### Important Notes:

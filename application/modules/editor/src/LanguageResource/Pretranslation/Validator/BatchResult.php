@@ -25,10 +25,18 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+namespace MittagQI\Translate5\LanguageResource\Pretranslation\Validator;
 
-/**
- */
-class editor_Plugins_MatchAnalysis_Models_Db_BatchResult extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_match_analysis_batchresults';
-    public $_primary = 'id';
+use ZfExtended_Models_Validator_Abstract;
+
+class BatchResult extends ZfExtended_Models_Validator_Abstract {
+    /**
+     * 
+     */
+    protected function defineValidators() {
+        $this->addValidator('id', 'int');
+        $this->addValidator('languageResource', 'int');
+        $this->addValidator('segmentId', 'int');
+        $this->addValidator('result', 'string');
+    }
 }

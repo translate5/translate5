@@ -37,7 +37,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.task.UserAssocWizard',
         'Editor.view.admin.task.UserAssocWizardViewModel',
         'Editor.view.admin.projectWizard.UploadTabPanel',
-        'Editor.view.admin.TaskAddWindowViewController'
+        'Editor.view.admin.TaskAddWindowViewController',
+        'Editor.view.LanguageResources.pivot.PivotWizard'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -255,9 +256,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                         // show error message when the field is marked as invalid from the backend
                                         // (this field is not visible to the user)
                                         Editor.MessageBox.addError(error);
-                                    },
-                                    bind:{
-                                        hidden: '{!isZipUpload}'
                                     },
                                     allowBlank: true,
                                     toolTip: me.strings.relaisLangTip,
