@@ -67,9 +67,24 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
      */
     onAnalysisBeforeLoad:function( store){
         var me = this,
+            view = me.getView(),
             proxy=store.getProxy(),
-            merged = Ext.merge({}, proxy.getExtraParams(), {
-                unitType:me.getView().down('#unitType').getValue()
+            unitTypeField = view && view.down('#unitType'),
+            unitTypeValue = Editor.data.plugins.MatchAnalysis.calculateBasedOn;
+
+        try {
+            // in some cases, when the grid is clicked to fast, the field dom element is not set (it can be because of
+            // extjs cache) and getting the value using getValue method produces js error
+            if(unitTypeField){
+                unitTypeValue = unitTypeField.getValue();
+            }
+        }catch (e){
+            if( !Ext.isEmpty(unitTypeField.value)){
+                unitTypeValue = unitTypeField.value;
+            }
+        }
+        var merged = Ext.merge({}, proxy.getExtraParams(), {
+                unitType:unitTypeValue
             });
         proxy.setExtraParams(merged);
     },
