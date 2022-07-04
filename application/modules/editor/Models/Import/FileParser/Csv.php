@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * - parent class should ensure, that file already is utf-8-encoded
  *
  */
-class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParser {
+class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParser_Csv_Base {
 
     /**
      * string "source" as defined in application.ini column definition
@@ -81,26 +81,12 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @var array
      */
     protected $replaceRegularExpressionsAfterTagParsing = array();
-    
-    /**
-     *
-     * @var string special placeholder needed in the loop that protects different kind of strings and tags in csv for the editing process
-     */
-    protected $placeholderCSV = '𓇽𓇽𓇽𓇽𓇽𓇽';
+
     /**
      *
      * @var string regex describing the structure of translate5 internal tags
      */
-    protected $regexInternalTags = null;
-    /**
-     *
-     * @var array syntax: array('𓇽𓇽𓇽𓇽𓇽𓇽1' => '<div class="single 73706163652074733d2263326130222f"><span title="<space/>" class="short" id="ext-gen1796">&lt;1/&gt;</span><span id="space-2-b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>');
-     *      explanation: key: the string that is the placeholder for the actual to be protected string
-     *                   value: the to be protected string already converted to a translate5 internal tag
-     */
-    protected $protectedStrings = array();
-    
-    
+    protected string $regexInternalTags = editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS;
 
     /**
      * (non-PHPdoc)
@@ -111,13 +97,13 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     }
     
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
+
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $task);
 
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
-        $this->regexInternalTags = editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS;
-        
+
         $options = $this->config->runtimeOptions->import->fileparser->csv->options;
         if (isset($options->regexes->beforeTagParsing->regex)) {
             $this->addReplaceRegularExpression($options->regexes->beforeTagParsing->regex,'replaceRegularExpressionsBeforeTagParsing');
@@ -153,10 +139,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $log->logError('invalid regular expression', $message);
                 continue;
             }
-            if(preg_match($regEx, $this->placeholderCSV)===1){
+            if(preg_match($regEx, $this->placeholderPrefix) === 1){
                 throw new editor_Models_Import_FileParser_Csv_Exception('E1017', [
                     'regex' => $regEx,
-                    'placeholder' => $this->placeholderCSV,
+                    'placeholder' => $this->placeholderPrefix,
                     'task' => $this->task,
                 ]);
             }
@@ -364,10 +350,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @return string $segment
      */
     protected function parseSegment($segment,$isSource){
-        //check, if $this->placeholderCSV is present in segment - this must lead to error
-        if(strpos($segment, $this->placeholderCSV)!==false){
+        //check, if $this->placeholderPrefix is present in segment - this must lead to error
+        if(strpos($segment, $this->placeholderPrefix) !== false){
             throw new editor_Models_Import_FileParser_Csv_Exception('E1018', [
-                'placeholder' => $this->placeholderCSV,
+                'placeholder' => $this->placeholderPrefix,
                 'task' => $this->task,
             ]);
         }
@@ -405,50 +391,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         
         return $this->parseSegmentReplacePlaceholders($segment);
     }
-    
-    /**
-     *
-     * @param string $segment
-     * @return string
-     */
-    protected function parseSegmentReplacePlaceholders($segment){
-        $placeholders = array_keys($this->protectedStrings);
-        $tags = array_values($this->protectedStrings);
-        $this->protectedStrings = array();
-        return str_replace($placeholders, $tags, $segment);
-    }
-    
-    /**
-     * be careful: if segment does not contain a "<", this method will simply return the segment (for performance reasons)
-     * @param string $segment
-     * @param string $tagToReplaceRegex - should contain a regex, that stands for a tag, that should be hidden for parsing reasons by a placeholder.
-     * @return string
-     */
-    protected function parseSegmentInsertPlaceholders($segment,$tagToReplaceRegex){
-        if(strpos($segment, '<')===false){
-            return $segment;
-        }
-        
-        $str_replace_first = function($search, $replace, $subject) {
-            $pos = strpos($subject, $search);
-            if ($pos !== false) {
-                $subject = substr_replace($subject, $replace, $pos, strlen($search));
-            }
-            return $subject;
-        };
-        
-        
-        preg_match_all($tagToReplaceRegex, $segment, $matches, PREG_PATTERN_ORDER);
-        //"<div\s*class=\"([a-z]*)\s+([gxA-Fa-f0-9]*)\"\s*.*?(?!</div>)<span[^>]*id=\"([^-]*)-.*?(?!</div>).</div>"s
-        $protectedStringCount = count($this->protectedStrings);
-        foreach ($matches[0] as $match) {
-            $placeholder = $this->placeholderCSV.$protectedStringCount;
-            $this->protectedStrings[$placeholder] = $match;
-            $segment = $str_replace_first($match,$placeholder,$segment);
-            $protectedStringCount++;
-        }
-        return $segment;
-    }
 
     /**
      * Mask all regular expressions $this->replaceRegularExpressions with internal tag <regex ...>
@@ -464,7 +406,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $mask = function ($matches){
             $tag = $matches[0];
             //if there already is a protected string inside this match, don't protect it
-            if(strpos($tag, $this->placeholderCSV)!==false){
+            if(strpos($tag, $this->placeholderPrefix) !== false){
                 return $tag;
             }
             $tagObj = new editor_Models_Import_FileParser_Tag(editor_Models_Import_FileParser_Tag::TYPE_SINGLE, false);

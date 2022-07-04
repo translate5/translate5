@@ -117,8 +117,7 @@ Ext.define('Editor.controller.Segments', {
         	  editorViewportOpened: 'onOpenEditorViewport'
           },
           '#Editor': {
-              saveSegment: 'saveChainStart',
-              watchlistRemoved: 'handleWatchlistRemoved'
+              saveSegment: 'saveChainStart'
           },
           '#ChangeAlike': {
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
@@ -145,6 +144,9 @@ Ext.define('Editor.controller.Segments', {
           },
           '#clearSortAndFilterBtn': {
               click: 'clearSortAndFilter'
+          },
+          'segmentsToolbar #segmentLockBtn': {
+              click: 'onToggleLockBtn'
           },
           'segmentsToolbar #watchListFilterBtn': {
               click: 'watchListFilter'
@@ -320,6 +322,30 @@ Ext.define('Editor.controller.Segments', {
       if (btn.pressed && otherFound) {
           Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
       }
+    },
+
+  onToggleLockBtn: function () {
+      let grid = this.getSegmentGrid(),
+          vm = grid.getViewModel(),
+          ed = grid && grid.editingPlugin,
+          segment = vm.get('selectedSegment'),
+          operation, appendId;
+
+      //if there is no segment selected or a segment is opened for editing, then we can not (un)lock
+      if(!segment || (ed && ed.editing)) {
+          return;
+      }
+      operation = segment.get('editable') ? 'lock' : 'unlock';
+      appendId = segment.proxy.appendId;
+
+      segment.proxy.appendId = false;
+      segment.load({
+          url: segment.proxy.url+'/'+segment.get('id')+'/'+operation+'/operation',
+          success: function(seg) {
+              vm.set('selectedSegment', seg);
+          }
+      });
+      segment.proxy.appendId = appendId;
   },
   
   repeatedFilter: function (btn) {
@@ -336,16 +362,6 @@ Ext.define('Editor.controller.Segments', {
           else {
               column.filter.setActive(false);
           }
-      }
-  },
-  /**
-   * removes the segment from the grid if removed from the watchlist and watchlist filter is set
-   */
-  handleWatchlistRemoved: function(rec) {
-      var me = this, 
-          btn = me.getWatchListFilterBtn();
-      if(!btn.pressed) {
-          return;
       }
   },
   /**
@@ -414,7 +430,7 @@ Ext.define('Editor.controller.Segments', {
       }
       me.lastFileMapParams = encoded;
       Ext.Ajax.request({
-          url: Editor.data.pathToRunDir+'/editor/segment/filemap',
+          url: Editor.data.restpath+'segment/filemap',
           method: 'get',
           params: params,
           scope: me,

@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
- This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+  This file is part of translate5
 
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
-  
- There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
-END LICENSE AND COPYRIGHT
-*/
+  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+  included in the packaging of this file.  Please review the following information
+  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+  http://www.gnu.org/licenses/agpl.html
+
+  There is a plugin exception available for use with this release of translate5 for
+  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+  plugin-exception.txt in the root folder of translate5.
+
+  @copyright  Marc Mittag, MittagQI - Quality Informatics
+  @author     MittagQI - Quality Informatics
+  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+ END LICENSE AND COPYRIGHT
+ */
 
 /**
  * MatchAnalysis Entity Object
@@ -49,6 +49,9 @@ END LICENSE AND COPYRIGHT
  * @method integer getWordCount() getWordCount()
  * @method void setWordCount() setWordCount(int $wordCount)
  *
+ * @method integer getCharacterCount() getCharacterCount()
+ * @method void setCharacterCount() setCharacterCount(int $characterCount)
+ *
  * @method string getType() getType()
  * @method void setType() setType(string $type)
  *
@@ -67,6 +70,16 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * @var string
      */
     const TASK_STATE_ANALYSIS = 'matchanalysis';
+
+    /***
+     * Database field name when counting analysis on character based
+     */
+    const UNIT_COUNT_CHARACTER = 'characterCount';
+
+    /***
+     * Database field name when counting analysis on word based
+     */
+    const UNIT_COUNT_WORD = 'wordCount';
     
     protected static $languageResourceCache = [];
 
@@ -86,14 +99,16 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * Ex: group index 99 is every matchrate between 90 and 99
      *
      * @param string $taskGuid
-     * @param bool $rawData return raw data
+     * @param bool $groupData return raw data
+     * @param string|null $unitType
      * @return array
+     * @throws Zend_Db_Statement_Exception
      */
-    public function loadByBestMatchRate(string $taskGuid, bool $groupData = true): array
+    public function loadByBestMatchRate(string $taskGuid, bool $groupData = true, ?string $unitType = null): array
     {
         //load the latest analysis for the given taskGuid
+        /** @var editor_Plugins_MatchAnalysis_Models_TaskAssoc $analysisAssoc */
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($taskGuid);
         if (empty($analysisAssoc)) {
             return [];
@@ -103,11 +118,19 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $task->loadByTaskGuid($taskGuid);
         $this->loadFuzzyBoundaries($task);
 
-        $sqlV3 = 'SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount, SUM(bestRates.segCount) segCount
+        if(is_null($unitType) || $unitType === 'word'){
+            $unitType = self::UNIT_COUNT_WORD;
+        }else if($unitType === 'character'){
+            $unitType = self::UNIT_COUNT_CHARACTER;
+        }else{
+            $unitType = self::UNIT_COUNT_WORD;
+        }
+
+        $sqlV3 = 'SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.'.$unitType.') unitCount, SUM(bestRates.segCount) segCount
                   FROM (
                     SELECT t1.*, 1 as segCount
                     FROM LEK_match_analysis AS t1
-                    INNER JOIN LEK_segments s ON t1.segmentId = s.id AND s.autoStateId != ?
+                    INNER JOIN LEK_segments s ON t1.segmentId = s.id AND s.autoStateId != ? AND s.autoStateId != ?
                     LEFT OUTER JOIN LEK_match_analysis AS t2
                     ON t1.segmentId = t2.segmentId
                       AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.analysisId = ?
@@ -115,11 +138,18 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                   ) bestRates
                   GROUP BY bestRates.internalFuzzy, bestRates.languageResourceid, bestRates.matchRate;';
 
-        $bind = [editor_Models_Segment_AutoStates::BLOCKED, $analysisAssoc['id'], $analysisAssoc['id']];
+        $bind = [editor_Models_Segment_AutoStates::LOCKED, editor_Models_Segment_AutoStates::BLOCKED, $analysisAssoc['id'], $analysisAssoc['id']];
         
         $resultArray = $this->db->getAdapter()->query($sqlV3, $bind)->fetchAll();
         if (empty($resultArray)) {
-            return [];
+            // we have to set an emoty result here, in order that the result is correctly grouped and displayed in the UI
+            $resultArray = [[
+                'internalFuzzy' => '0',
+                'languageResourceid' => '0',
+                'matchRate' => '0',
+                'unitCount' => '0',
+                'segCount' => '0',
+            ]];
         }
         if($groupData) {
             return $this->groupByMatchrate($resultArray, $analysisAssoc);
@@ -173,8 +203,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //results found in group
             $resultFound = false;
 
-            if (!isset($groupedResults[$rowKey]['wordCountTotal'])) {
-                $groupedResults[$rowKey]['wordCountTotal'] = 0;
+            if (!isset($groupedResults[$rowKey]['unitCountTotal'])) {
+                $groupedResults[$rowKey]['unitCountTotal'] = 0;
             }
 
             //check on which border group this result belongs to
@@ -199,15 +229,15 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
                 //check matchrate border
                 if ($begin <= $res['matchRate'] && $res['matchRate'] <= $end) {
-                    $groupedResults[$rowKey][$begin] += $res['wordCount'];
-                    $groupedResults[$rowKey]['wordCountTotal'] += $res['wordCount'];
+                    $groupedResults[$rowKey][$begin] += $res['unitCount'];
+                    $groupedResults[$rowKey]['unitCountTotal'] += $res['unitCount'];
                     $resultFound = true;
                 }
             }
             //if no results match group is found, the result is in noMatch group
             if (!$resultFound) {
-                $groupedResults[$rowKey]['noMatch'] += $res['wordCount'];
-                $groupedResults[$rowKey]['wordCountTotal'] += $res['wordCount'];
+                $groupedResults[$rowKey]['noMatch'] += $res['unitCount'];
+                $groupedResults[$rowKey]['unitCountTotal'] += $res['unitCount'];
             }
         }
         return array_values($groupedResults);
@@ -222,8 +252,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     //protected function initResultArray($taskGuid,$internalFuzzy){
     protected function initResultArray(array $analysisData): array
     {
-        $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        $taskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $taskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $langResTaskAssocs = $taskAssoc->loadByTaskGuids([$analysisData['taskGuid']]);
 
         $isInternalFuzzy = $analysisData['internalFuzzy'] == '1';
@@ -244,7 +274,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
             $row[$key]['created'] = $analysisData['created'];
             $row[$key]['internalFuzzy'] = $fuzzyString;
-            $row[$key]['wordCountTotal'] = 0;
+            $row[$key]['unitCountTotal'] = 0;
 
 
             //init the fuzzy range groups with 0

@@ -26,15 +26,34 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
+
 /**
  * Wrapper for ZfExtended_SessionController
  * else RestRoutes, ACL authentication, etc. will not work.
  */
 class editor_SessionController extends ZfExtended_SessionController {
+    use TaskContextTrait;
+
     const AUTH_HASH_DISABLED = 'disabled';
     const AUTH_HASH_DYNAMIC = 'dynamic';
     const AUTH_HASH_STATIC = 'static';
-    
+
+    /**
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    public function resyncOperation() {
+        try {
+            if($this->isTaskProvided()) {
+                $this->initCurrentTask();
+            }
+        } catch (NoAccessException|ZfExtended_Models_Entity_NotFoundException) {
+            //if task is not available just do nothing, empty current task is evaluated later
+        }
+
+    }
+
     public function indexAction() {
         if(!empty($_REQUEST['authhash'])) {
             $this->hashauth();
@@ -61,13 +80,6 @@ class editor_SessionController extends ZfExtended_SessionController {
         $userModel = ZfExtended_Factory::get($config->authentication->userEntityClass);
         /* @var $userModel \ZfExtended_Models_User */
         $userModel->setUserSessionNamespaceWithoutPwCheck($login);
-
-        $userSession = new Zend_Session_Namespace('user');
-        
-        $session = ZfExtended_Factory::get('ZfExtended_Session');
-        /* @var $session ZfExtended_Session */
-        // remove the old session (if exist) for the impersonated user
-        $session->cleanForUser($userSession->data->id);
     }
     
     public function postAction() {
@@ -89,37 +101,14 @@ class editor_SessionController extends ZfExtended_SessionController {
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        $workflow = $wfm->getByTask($task);
-        
-        $user = new Zend_Session_Namespace('user');
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        try {
-            $tua->loadByStep($user->data->userGuid, $taskGuid, $task->getWorkflowStepName());
-            $state = $workflow->getInitialUsageState($tua);
+        if(is_numeric($taskGuid)) {
+            //some one provided the ID instead
+            $task->load($taskGuid);
         }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            //without tua we can open it with edit, nothing will be confirmed then
-            $state = $workflow::STATE_EDIT;
+        else {
+            $task->loadByTaskGuid($taskGuid);
         }
-        
-        
-        $params = ['id' => $task->getId(), 'data' => '{"userState":"'.$state.'","id":'.$task->getId().'}'];
-        $this->forward('put', 'task', 'editor', $params);
-        
-        // the static event manager must be used!
-        $events = Zend_EventManager_StaticEventManager::getInstance();
-        $events->attach('editor_TaskController', 'afterPutAction', function(Zend_EventManager_Event $event) use ($mv){
-            //clearing the view vars added in Task::PUT keeps the old content (the session id and token)
-            $view = $event->getParam('view');
-            $view->clearVars();
-            //if a taskGuid was given we clean the MVs after accessing that task to prevent drop MV then create MV
-            $mv->cleanUp();
-        });
+        $this->view->taskUrlPath = editor_Controllers_Plugins_LoadCurrentTask::makeUrlPath($task->getId());
     }
     
     /**
@@ -171,24 +160,9 @@ class editor_SessionController extends ZfExtended_SessionController {
 
         ZfExtended_Models_LoginLog::addSuccess($user, "authhash");
         
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        $workflow = $wfm->getByTask($task);
-        
-        $state = $workflow->getInitialUsageState($taskUserAssoc);
-        
-        //open task
-        $params = ['id' => $task->getId(), 'data' => '{"userState":"'.$state.'","id":'.$task->getId().'}'];
-        $this->forward('put', 'task', 'editor', $params);
-        
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView */
         $mv->cleanUp();
-        
-        $event = Zend_EventManager_StaticEventManager::getInstance();
-        $event->attach('editor_TaskController', 'afterPutAction', function() {
-            //the redirect must be triggered after the successful PUT OPEN of the task above
-            $this->redirect(APPLICATION_RUNDIR.'/editor', ['code' => 302]);
-        });
+        $this->redirect(editor_Controllers_Plugins_LoadCurrentTask::makeUrlPath($task->getId()), ['code' => 307]);
     }
 }

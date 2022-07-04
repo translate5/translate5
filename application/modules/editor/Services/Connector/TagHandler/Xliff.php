@@ -36,13 +36,7 @@ END LICENSE AND COPYRIGHT
  * protects the translate5 internal tags as XLIFF for language resource processing
  */
 class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connector_TagHandler_Abstract {
-    
-    /**
-     * Contains the tag map of the prepared query
-     * @var array
-     */
-    protected $map = [];
-    
+
     /**
      * @var integer
      */
@@ -53,10 +47,25 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      * @var integer
      */
     protected $additionalTagCount = 1;
-    
-    public function __construct() {
+
+    /**
+     * Flag if bx/ex tags should be paired to g tags or if bx/ex should be kept
+     * @var bool
+     */
+    protected bool $gTagPairing = true;
+
+    /**
+     * Valid options are: gTagPairing bool en/disables if bx/ex bpt/ept tags should be paired to g tags or not
+     * @param array $options
+     */
+    public function __construct(array $options = []) {
         parent::__construct();
-        
+
+        //en/disable gTagPairing
+        if(array_key_exists('gTagPairing', $options)) {
+            $this->gTagPairing = (bool) $options['gTagPairing'] ?? true;
+        }
+
         //replace unusable <ph|it etc> tags with usable <x|bx etc> tags
         $this->xmlparser->registerElement(
             't5xliffresult > it,t5xliffresult > ph,t5xliffresult > ept,t5xliffresult > bpt',
@@ -85,16 +94,25 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      * calculates and sets map and mapCount internally
      *
      * @param string $queryString
+     * @param int $segmentId
      * @return string
      */
-    public function prepareQuery(string $queryString): string {
+    public function prepareQuery(string $queryString, int $segmentId=-1): string {
         $this->realTagCount = 0;
+        $tag = $this->utilities->internalTag;
         $queryString = $this->restoreWhitespaceForQuery($queryString);
-        
+
         //$map is set by reference
         $this->map = [];
-        $this->realTagCount = $this->utilities->internalTag->count($queryString);
-        $queryString = $this->utilities->internalTag->toXliffPaired($queryString, true, $this->map);
+        $this->realTagCount = $tag->count($queryString);
+
+        if($this->gTagPairing) {
+            $queryString = $tag->toXliffPaired($queryString, true, $this->map);
+        }
+        else {
+            $queryString = $tag->toXliff($queryString, true, $this->map);
+        }
+
         $this->mapCount = count($this->map);
         return $queryString;
     }
@@ -102,9 +120,10 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
     /**
      * protects the internal tags for language resource processing as defined in the class
      * @param string $queryString
+     * @param int $segmentId
      * @return string|NULL NULL on error
      */
-    public function restoreInResult(string $resultString): ?string {
+    public function restoreInResult(string $resultString, int $segmentId=-1): ?string {
         $this->hasRestoreErrors = false;
         //strip other then x|ex|bx|g|/g
         $resultString = strip_tags($this->replaceTagsWithContent($resultString), '<x><x/><bx><bx/><ex><ex/><g>');

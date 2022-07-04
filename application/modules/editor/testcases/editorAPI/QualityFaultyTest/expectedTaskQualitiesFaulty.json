@@ -1,5 +1,5 @@
 {
-    "text": "{c150c215-c196-4275-9d4c-3238568148f9}",
+    "text": "{8bffa4e5-3f2e-49af-89b5-66a30c2fd0f4}",
     "children": [
         {
             "qid": -1,
@@ -8,7 +8,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "35796",
+                    "qid": "81852",
                     "qtype": "consistent",
                     "qcount": 3,
                     "qcomplete": true,
@@ -45,7 +45,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "35794",
+                    "qid": "81850",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -57,7 +57,7 @@
                     "qfaulty": true
                 },
                 {
-                    "qid": "35795",
+                    "qid": "81851",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -113,12 +113,37 @@
         },
         {
             "qid": -1,
+            "qtype": "numbers",
+            "qcount": 1,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "81849",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num1",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Numbers SRC \u2260 TRG",
+                    "leaf": true
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "qcountfp": 0,
+            "text": "Numbers",
+            "qtotal": 1,
+            "expanded": false
+        },
+        {
+            "qid": -1,
             "qtype": "term",
             "qcount": 10,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "35787",
+                    "qid": "81842",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -129,7 +154,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "35783",
+                    "qid": "81838",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -140,7 +165,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "35789",
+                    "qid": "81844",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -169,10 +194,22 @@
             "text": "Usage of TM-matches",
             "qtotal": 0,
             "leaf": true
+        },
+        {
+            "qid": -1,
+            "qtype": "whitespace",
+            "qcount": 0,
+            "qcomplete": true,
+            "qcategory": null,
+            "qtooltip": "",
+            "qcountfp": 0,
+            "text": "White space at the beginning\/end",
+            "qtotal": 0,
+            "leaf": true
         }
     ],
     "metaData": {
-        "numSegments": 15,
+        "numSegments": 16,
         "hasFaultyInternalTags": true
     }
 }

@@ -162,6 +162,11 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     cleanUpHelper: null,
 
     /**
+     * flag to prevent recursive calls
+     */
+    preventRecursion: null,
+
+    /**
      * 
      */
     initComponent : function() {
@@ -366,7 +371,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * 
      */
     handleMaxWidthForLineInEditor: function (htmlInLine, lineWidth, maxWidthPerLine) {
-        var me = this,
+        let me = this,
+            disabled = ! Editor.app.getTaskConfig('lengthRestriction.automaticNewLineAdding'),
             allLines,
             div,
             textInLine,
@@ -379,8 +385,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             textForLine = '',
             options,
             sel;
-        
-        if (lineWidth <= maxWidthPerLine) {
+
+        if (disabled || me.preventRecursion || lineWidth <= maxWidthPerLine) {
             return;
         }
 
@@ -390,6 +396,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             return;
         }
 
+        me.preventRecursion = true;
         div = document.createElement('div');
         div.innerHTML = htmlInLine;
         textInLine = div.textContent || div.innerText || "";
@@ -405,10 +412,12 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 }
                 if(me.editor.getLength(textForLine, me.segmentMeta, me.segmentFileId) > maxWidthPerLine) {
                     // eg if the single word in the line is too long
+                    me.preventRecursion = false;
                     return;
                 }
                 // the caret is saved back when the "insertNewline" event triggered the "afterInsertWhitespace" event
-                // TODO FIXME: we better should create the whitespace tag with an HtmlEditor API and insert it here
+                //TODO FIXME: we better should create the whitespace tag with an HtmlEditor API and insert it here (this would also solve the recursion problem)
+                // ??? will that whole code work when containing <del> tags of track changes or duplicated strings, since it is just a text search ???
                 me.bookmarkForCaret = me.getPositionOfCaret();
                 range = rangy.createRange();
                 range.selectNodeContents(editorBody);
@@ -424,16 +433,34 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                     // => try again without the whitespace at the beginning:
                     range.findText(textForLine.trim(), options);
                     if (textForLine.trim() !== range.toString()) {
+                        me.preventRecursion = false;
                         return;
                     }
                 }
-                range.collapse(false);
+
+                if(Editor.app.getTaskConfig('lengthRestriction.newLineReplaceWhitespace')) {
+                    //find the text without trailing whitespace, select its end and use that as sel start
+                    var range2 = rangy.createRange();
+                    range2.selectNodeContents(editorBody);
+                    range2.findText(textForLine.trim(), options);
+                    range.setStart(range2.endContainer, range2.endOffset);
+                }
+                else {
+                    // just add the newline at the end of the found line
+                    range.collapse(false);
+                }
+
                 sel = rangy.getSelection(editorBody);
                 sel.setSingleRange(range);
+
+                //this event triggers down deep a editor change event which then triggers this whole code again,
+                // therefore the preventRecursion flag was added as workaround!
                 me.fireEvent('insertNewline');
+                me.preventRecursion = false;
                 return;
             }
         }
+        me.preventRecursion = false;
     },
 
     /**

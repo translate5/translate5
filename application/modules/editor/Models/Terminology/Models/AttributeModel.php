@@ -663,20 +663,30 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
               IFNULL(`createdBy`, 0) AS `createdBy`, DATE_FORMAT(`createdAt`, "%d.%m.%Y %H:%i:%s") AS `createdAt`,
               IFNULL(`updatedBy`, 0) AS `updatedBy`, DATE_FORMAT(`updatedAt`, "%d.%m.%Y %H:%i:%s") AS `updatedAt`
             FROM `terms_attributes` 
-            WHERE ' . $where . '
+            WHERE ' . $where . ' AND `isDraft` = 0
             ORDER BY `type` = "processStatus" DESC, `id` DESC', $bind
         )->fetchAll(PDO::FETCH_GROUP);
     }
 
     /**
      * Set up `isDraft` = 0 for records identified by comma-separated ids given by $ids arg
+     * Return ids of special attrs among those (e.g. processStatus- and definition-attrs) if any
      *
      * @param $ids
+     * @return array
+     * @throws Zend_Db_Statement_Exception
      */
     public function undraftByIds($ids) {
+
+        // Set up `isDraft` = 0 for records identified by comma-separated ids given by $ids arg
         $this->db->getAdapter()->query('
             UPDATE `terms_attributes` SET `isDraft` = "0" WHERE `id` IN (' . $ids . ')
         ');
+
+        // Return ids of special attrs among those
+        return $this->db->getAdapter()->query('
+            SELECT `id` FROM `terms_attributes` WHERE `id` IN (' . $ids . ') AND FIND_IN_SET(`type`, "processStatus,definition,administrativeStatus") 
+        ')->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**
@@ -701,5 +711,140 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             // Call delete method
             $this->delete();
         }
+    }
+
+    /**
+     * @param array $attrIds
+     */
+    public function getReadonlyByIds(array $attrIds, $createdBy, array $roles) {
+
+        // Shortcuts to bool flags indicating whether or not current user has certain roles
+        $termReviewer  = in_array('termReviewer' , $roles);
+        $termProposer  = in_array('termProposer' , $roles);
+        $termFinalizer = in_array('termFinalizer', $roles);
+
+        // Get termIds for those of given attrIds that belong to term-level
+        $termIds = $attrIds ? $this->db->getAdapter()->query('
+            SELECT `termId` 
+            FROM `terms_attributes` 
+            WHERE `id` IN (' . join(',', $attrIds) . ') AND NOT ISNULL(`termId`) 
+        ')->fetchAll(PDO::FETCH_COLUMN) : [];
+
+        // Get [termId => processStatus] pairs
+        $processStatusA = $termIds ? $this->db->getAdapter()->query('
+            SELECT
+              `id`,
+              IF (`proposal` != "", "unprocessed", `processStatus`) AS `processStatus`
+            FROM `terms_term`
+            WHERE `id` IN (' . join(',', $termIds) . ')
+        ')->fetchAll(PDO::FETCH_KEY_PAIR) : [];
+
+        // Get attrs info
+        $_attrA = $attrIds ? $this->db->getAdapter()->query('
+            SELECT 
+               `id`, 
+               `termEntryId`, 
+               `language`, 
+               `termId`, 
+               `createdBy`,
+               `isDraft`,    
+               IF (`termId`, "term", IF (`language` != "", "language", "entry")) AS `level`
+            FROM `terms_attributes` 
+            WHERE `id` IN (' . join(',', $attrIds) . ') 
+        ')->fetchAll(PDO::FETCH_UNIQUE) : [];
+
+        // Group by termEntryId, preserving attrId as keys
+        $attrA = [];
+        foreach ($_attrA as $attrId => $attr)
+            $attrA[$attr['termEntryId']][$attrId] = $attr;
+
+        // As long as editing and deletion of language- and entry-level attributes is only allowed for cases when
+        //  - ALL terms within given language, or
+        //  - ALL terms within given entry
+        // are having same processStatus we need to collect lists of distinct processStatus-values grouped by languages
+        $infoByTermEntryIdA = $attrA ? $this->db->getAdapter()->query('
+            SELECT
+              `termEntryId`, 
+              `language`,
+              GROUP_CONCAT(DISTINCT IF(`proposal` != "", "unprocessed", `processStatus`)) AS `distinct`
+            FROM `terms_term` 
+            WHERE `termEntryId` IN (' . join(',', array_keys($attrA)) . ')
+            GROUP BY CONCAT(`termEntryId`, "-", `language`)'
+        )->fetchAll(PDO::FETCH_GROUP) : [];
+
+        // Readonly info represented as [attrId => boolean] pairs
+        $readonly = [];
+
+        // Foreach involved termEntryId and it's distinct info
+        foreach ($infoByTermEntryIdA as $termEntryId => $distinct) {
+
+            // Convert $distinct from
+            // [['language' => 'en', 'distinct' => 'status1,status2'], ...]
+            // to
+            // ['en' => 'status1,status2', ...]
+            $distinct = array_combine(
+                array_column($distinct, 'language'),
+                array_column($distinct, 'distinct')
+            );
+
+            // Wrap that info into a more handy format
+            $distinct = [
+                'entry' => join(',', array_unique($distinct)),
+                'language' => $distinct
+            ];
+
+            // Foreach attr within current $termEntryId
+            foreach ($attrA[$termEntryId] as $attrId => $attr) {
+
+                // Set up readonly flag to be true by default
+                $readonly[$attrId] = true;
+
+                // If it is a draft attribute
+                if ($attr['isDraft']) {
+
+                    // Setup readonly flag to be false
+                    $readonly[$attrId] = false;
+
+                    // Goto next
+                    continue;
+                }
+
+                // Shortcuts
+                $level = $attr['level']; $language = $attr['language']; $termId = $attr['termId'];
+
+                // Get list of distinct processStatus-values depending on level
+                     if ($level == 'term'    ) $_distinct = $processStatusA[$termId];
+                else if ($level == 'language') $_distinct = $distinct[$level][$language];
+                else if ($level == 'entry'   ) $_distinct = $distinct[$level];
+
+                // If distinct processStatus list consists of only 1 value, and it's 'unprocessed'
+                if ($_distinct == 'unprocessed') {
+
+                    // If current user has termProposer role, but has no termReviewer-role
+                    if ($termProposer && !$termReviewer) {
+
+                        // If current user can delete own attrs, and current user is current attr creator
+                        if ($createdBy && $attr['createdBy'] == $createdBy) {
+                            $readonly[$attrId] = false;
+                        }
+
+                    // Else if current user has termReviewer role
+                    } else if ($termReviewer) {
+                        $readonly[$attrId] = false;
+                    }
+
+                // Else if distinct processStatus list consists of only 1 value, and it's 'provisionallyProcessed'
+                } else if ($_distinct == 'provisionallyProcessed') {
+
+                    // If current user has termFinalizer-role
+                    if ($termFinalizer) {
+                        $readonly[$attrId] = false;
+                    }
+                }
+            }
+        }
+
+        // Return
+        return $readonly;
     }
 }

@@ -1,0 +1,5 @@
+POST {{baseurl}}/editor/session
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Accept: application/json
+
+data={"login":"{{user}}","passwd":"{{password}}"}

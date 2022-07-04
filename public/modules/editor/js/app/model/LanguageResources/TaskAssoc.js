@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -37,33 +36,45 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Model
  */
 Ext.define('Editor.model.LanguageResources.TaskAssoc', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'name', type: 'string'},
-    {name: 'taskGuid', type: 'string'},
-    {name: 'sourceLang', type: 'string'},
-    {name: 'targetLang', type: 'string'},
-    {name: 'color', type: 'string'},
-    {name: 'resourceId', type: 'string'},
-    {name: 'serviceName', type: 'string'},
-    {name: 'serviceType', type: 'string'},
-    {name: 'checked', type: 'boolean'},
-    {name: 'writable', type: 'boolean'}, //this is the flag if the associated LanguageResource is technically able to write data back
-    {name: 'segmentsUpdateable', type: 'boolean'} // this is the user choice if write back should be enabled for this assoc
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'languageresourcetaskassoc', //same as PHP controller name
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
-    },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+    extend: 'Ext.data.Model',
+    fields: [
+        {
+            name: 'id',
+            type: 'int',
+            convert: function (val, record) {
+                // One term collection can be listed and assigned for multiple projectTasks
+                // To display unique row for each field in the import wizard, attach the taskGuid to the id field
+                if(record.get('taskGuid') !== undefined){
+                  return record.get('id')+record.get('taskGuid');
+                }
+                return record.get('id');
+            }
+        },
+        {name: 'languageResourceId', type: 'int'},
+        {name: 'name', type: 'string'},
+        {name: 'taskGuid', type: 'string'},
+        {name: 'sourceLang', type: 'string'},
+        {name: 'targetLang', type: 'string'},
+        {name: 'color', type: 'string'},
+        {name: 'resourceId', type: 'string'},
+        {name: 'serviceName', type: 'string'},
+        {name: 'serviceType', type: 'string'},
+        {name: 'checked', type: 'boolean'},
+        {name: 'writable', type: 'boolean'}, //this is the flag if the associated LanguageResource is technically able to write data back
+        {name: 'segmentsUpdateable', type: 'boolean'} // this is the user choice if write back should be enabled for this assoc
+    ],
+    idProperty: 'id',
+    proxy: {
+        type: 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
+        url: Editor.data.restpath + 'languageresourcetaskassoc', //same as PHP controller name
+        reader: {
+            rootProperty: 'rows',
+            type: 'json'
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false
+        }
     }
-  }
 });

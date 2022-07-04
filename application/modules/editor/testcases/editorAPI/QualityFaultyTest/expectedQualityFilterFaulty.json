@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 15,
-    "qtotal": 15,
+    "qcount": 16,
+    "qtotal": 16,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "35796",
+                    "qid": "81852",
                     "qtype": "consistent",
                     "qcount": 3,
                     "qcomplete": true,
@@ -34,7 +34,7 @@
                     "qcomplete": true,
                     "qcategory": "target",
                     "text": "Inconsistent target",
-                    "textTooltip": "Finds segments with same source, but different target (tags ignored)",
+                    "textTooltip": "Finds segments with the same source, but different target (tags ignored)",
                     "leaf": true,
                     "checked": false
                 }
@@ -65,7 +65,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "35794",
+                    "qid": "81850",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -88,7 +88,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "35795",
+                    "qid": "81851",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -533,6 +533,152 @@
         },
         {
             "qid": -1,
+            "qtype": "numbers",
+            "qcount": 1,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "81849",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num1",
+                    "qcatidx": "-1",
+                    "text": "Numbers SRC \u2260 TRG",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num10",
+                    "text": "Format alteration (ordinal numbers, leading zero etc.)",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num11",
+                    "text": "Different character\/formatting for number interval",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num12",
+                    "text": "1000-separator not allowed",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num2",
+                    "text": "Alphanumerical character sequences",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num3",
+                    "text": "Format alteration (date information etc.)",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num4",
+                    "text": "Separator(s) not localised",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num5",
+                    "text": "Formatting of 1000s number altered",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num6",
+                    "text": "Different minus characters",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num7",
+                    "text": "Separator from SRC altered",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num8",
+                    "text": "Numeral from SRC found as number in TRG",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num9",
+                    "text": "Number from SRC found as numeral in TRG",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "Numbers",
+            "qtotal": 1,
+            "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
             "qtype": "term",
             "qcount": 10,
             "qcomplete": true,
@@ -549,7 +695,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "35787",
+                    "qid": "81842",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -560,7 +706,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "35783",
+                    "qid": "81838",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -571,7 +717,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "35789",
+                    "qid": "81844",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -621,6 +767,130 @@
             "qcategory": null,
             "qtooltip": "",
             "text": "Usage of TM-matches",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "whitespace",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_begin",
+                    "text": "Line break at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_end",
+                    "text": "Line break at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "lnbr_space",
+                    "text": "Space after line break",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "nbsp_begin",
+                    "text": "Non-breaking space at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "nbsp_end",
+                    "text": "Non-breaking space at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_lnbr",
+                    "text": "Space before line break",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "space_tag_end",
+                    "text": "Segment ends with a space followed by a tag",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tab_begin",
+                    "text": "Tab at the beginning",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tab_end",
+                    "text": "Tab at the end",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "whitespace",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "tag_space_begin",
+                    "text": "Segment begins with a tag followed by a space",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "White space at the beginning\/end",
             "qtotal": 0,
             "expanded": false,
             "checked": false

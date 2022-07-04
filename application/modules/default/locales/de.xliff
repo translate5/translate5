@@ -316,6 +316,21 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
               <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=94&amp;autoplay=1" dir="auto">1:34</a> Kontaktinformationen<br/>
         </figure>
 </target></trans-unit>
+<trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVVcmx9'><source>{CustomerYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/Z-RPoxq64cI</target></trans-unit>
+<trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'><source>{CustomerYoutubeVideoGuideDescriptionContent}</source>
+<target><br/>
+                <figure>
+                    <figcaption><b>Übersicht:</b></figcaption>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=19&amp;autoplay=1" dir="auto">0:19</a> Standard-Benutzerzuweisung<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=188&amp;autoplay=1" dir="auto">3:08</a> Benutzerverwaltung<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=206&amp;autoplay=1" dir="auto">3:26</a> Automatisierte Benutzerzuweisung<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=335&amp;autoplay=1" dir="auto">5:35</a> Sprachressourcenzuweisung<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=413&amp;autoplay=1" dir="auto">6:53</a> Kontaktinformationen<br/>
+                </figure>
+</target>
+</trans-unit>
+<trans-unit id='UmVkaXJlY3QgdG8gbG9naW4uLi4='><source>Redirect to login...</source><target>Redirect to login...</target></trans-unit>
   </body>
  </file>
 </xliff>

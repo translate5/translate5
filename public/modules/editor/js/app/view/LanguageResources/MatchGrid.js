@@ -157,13 +157,10 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          dataIndex: 'matchrate',
 	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
-	              var str = me.assocStore.getById(record.get('languageResourceid'));
-				  
+				  var str = me.assocStore.findRecord('languageResourceId',record.get('languageResourceid'),0,false,true,true);
 	              meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')'+"<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
-
 				  meta.tdCls  = meta.tdCls  + ' info-icon';
-	              clr = str.get('color');
-	              meta.tdAttr += 'bgcolor="' + clr + '"';
+	              meta.tdAttr += 'bgcolor="' + str.get('color') + '"';
 	              return "<b>"+(matchrate > 0 ? matchrate : '&nbsp;')+"</b>";
 	          },
 	          text: me.strings.match

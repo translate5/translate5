@@ -35,10 +35,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         noProjectTaskMessage:'#UT#Die angeforderte Projektaufgabe existiert nicht',
         noProjectInFilter:'#UT#Projekt im aktuellen Filter nicht gefunden'
     },
-    rootRoute:'#project',
 
     routes:{
-        'project':'onProjectRoute',
+        'project':'onProjectBaseRoute',
         'project/:id/focus' :'onProjectFocusRoute',
         'project/:id/:taskId/focus' :'onProjectTaskFocusRoute'
     },
@@ -56,8 +55,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         },
         controller: {
             '#admin.TaskOverview':{
-                afterTaskDelete:'onAfterTaskDeleteEventHandler',
-                beforeTaskDelete:'onBeforeTaskDeleteEventHandler'
+                afterTaskDelete:'onAfterTaskDeleteEventHandler'
             }
         },
         store: {
@@ -89,19 +87,25 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         route.push(action);
         route = route.join('/');
 
-        Editor.app.openAdministrationSection(me.getView(),route);
+        //do only a focusRedirect if we are already in project panel!
+        if(Ext.util.History.getToken().split('/')[0] === 'project') {
+            me.redirectTo(route);
+        }
     },
 
-    /***
-     * On project rute
+    /**
+     * if no project is selected in route we get here
      */
-    onProjectRoute:function(){
-        var me=this;
-        //if it is not the default route, ignore it
-        if(window.location.hash!=me.rootRoute){
+    onProjectBaseRoute:function(){
+        var store = this.lookup('projectGrid').store;
+        if(store.hasPendingLoad()) {
+            //do nothing since will be handled in the load handler then
             return;
         }
-        me.checkAndReloadStores();
+
+        //if no project selected in route we just choose the first one and try to select that
+        //no selected record is found, use the first in the store
+        this.redirectFocus(store.getAt(0), false);
     },
 
 
@@ -189,7 +193,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /***
-     * On project store load
+     * On project store initial load or reload
      */
     onProjectStoreLoad:function(store){
         //if the project panel is not active, ignore the redirect,
@@ -198,25 +202,15 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             return;
         }
 
-        var me = this,
-            record = me.getView().getViewModel().get('projectSelection'),
-            task = null;
+        var me = this;
         //when the global task is set, this is a "leave task action"
         //set the route to this task
         if(Editor.data.task){
             me.redirectFocus(Editor.data.task,true);
             return;
         }
-
-        //if selected record already exist, use it
-        if(record){
-            task = store.getById(record.get('id'));
-        }
-        //no selected record is found, use the first in the store
-        if(!task){
-            task = store.getAt(0);
-        }
-        me.redirectFocus(task,false);
+        //force rerouting to the desired project/task in the hash (this contains also a selected one!)
+        me.redirectTo(Ext.util.History.getToken(), true);
     },
 
     onReloadProjectBtnClick:function(){
@@ -225,24 +219,22 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /***
-     * Before task delete event handler
-     * Return true so the event call chain continues
-     */
-    onBeforeTaskDeleteEventHandler:function(task){
-        var me=this,
-            projectTaskGrid = me.lookup('projectTaskGrid');
-        projectTaskGrid.getStore().remove(task);
-        return true;
-    },
-
-    /***
      * After task remove event handelr
      */
-    onAfterTaskDeleteEventHandler:function(task){
-        var me = this,
-            grid = me.lookup('projectGrid');
-        this.checkAndReloadStores();
-        grid && grid.store.load();
+    onAfterTaskDeleteEventHandler:function(){
+        var me=this,
+            grid = me.lookup('projectTaskGrid'),
+            store = grid.getStore();
+
+        // Check if the project tasks store is empty, if yes full reload is required (projects + project tasks).
+        // If the project tasks store is not empty, just refresh the data.
+        if(store.getCount() === 0){
+            // reset the route to the default one
+            me.redirectTo(Editor.util.Util.getCurrentBaseRoute());
+            me.reloadProject();
+            return;
+        }
+        store.load();
     },
 
     onProjectPanelDeactivate:function(){
@@ -274,12 +266,15 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
         //search for the task store record index
         me.searchIndex(id,grid).then(function(index){
+            var store = grid.getStore();
             //do not scroll on empty store
-            if(grid.getStore().getTotalCount()==0){
-                Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+            if(store.getTotalCount() === 0){
+                if(!store.hasPendingLoad()) {
+                    Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+                }
                 return;
             }
-            grid.bufferedRenderer.scrollTo(index,{
+            grid.scrollTo(index,{
                 callback:function(){
                     //no db index is found
                     if(index===undefined || index<0){
@@ -313,7 +308,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                     Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
                     me.selectProjectTaskRecord(taskId);
                 }
-            });
+            },true);
         }, function(err) {
             //the exception is handled in the searchIndex
         });
@@ -390,21 +385,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /***
-     * Check if the project tasks store is empty, if yes full reload is required (projects + project tasks).
-     * If the project tasks store is not empty, just refresh the data.
-     */
-    checkAndReloadStores:function(){
-        var me=this,
-            grid = me.lookup('projectTaskGrid'),
-            store = grid.getStore();
-        if(store.getCount()==0){
-            me.reloadProject();
-            return;
-        }
-        store.load();
-    },
-
-    /***
      * Focus and select grid record without firing the selectionchange event.
      * This will also update the viw model variable name with the record
      */
@@ -415,15 +395,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         grid.setSelection(record);
         record && grid.getView().focusRow(record);
         grid.resumeEvent('selectionchange');
-    },
-
-    /***
-     * Set the default route
-     */
-    resetRoute:function(){
-        var me=this;
-        Editor.app.openAdministrationSection(me.getView(),me.rootRoute);
-        me.redirectTo(me.rootRoute);
     },
 
     /***
@@ -446,6 +417,5 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     reset:function(){
         this.resetSelection();
-        this.resetRoute();
     }
 });

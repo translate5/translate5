@@ -26,41 +26,62 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_FileController extends editor_Controllers_EditorrestController {
-  
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
+
+class Editor_FileController extends ZfExtended_RestController {
+  use TaskContextTrait;
+
   protected $entityClass = 'editor_Models_Foldertree';
   
   /**
    * @var editor_Models_Foldertree
    */
   protected $entity;
-  
-  public function indexAction()
-  {
-    $session = new Zend_Session_Namespace();
-    $this->entity->loadByTaskGuid($session->taskGuid);
-    //by passing output handling, output is already JSON
-    $contextSwitch = $this->getHelper('ContextSwitch');
-    $contextSwitch->setAutoSerialization(false);
-    $this->getResponse()->setBody($this->entity->getTreeAsJson());
-  }
-  
-  public function putAction()
-  {
-    $session = new Zend_Session_Namespace();
-    $data = json_decode($this->_getParam('data'));
-    
-    $wfh = $this->_helper->workflow;
-    /* @var $wfh Editor_Controller_Helper_Workflow */
-    $wfh->checkWorkflowWriteable($session->taskGuid);
-    
-    $this->entity->loadByTaskGuid($session->taskGuid);
-    $mover = ZfExtended_Factory::get('editor_Models_Foldertree_Mover', array($this->entity));
-    $mover->moveNode((int)$data->id, (int)$data->parentId, (int)$data->index);
-    $this->entity->syncTreeToFiles();
-    $this->syncSegmentFileOrder($session->taskGuid);
-    $this->view->data = $mover->getById((int)$data->id);
-  }
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    public function init()
+    {
+        parent::init();
+        $this->initCurrentTask();
+    }
+
+    /**
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
+    public function indexAction()
+    {
+        $this->entity->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
+        //by passing output handling, output is already JSON
+        $contextSwitch = $this->getHelper('ContextSwitch');
+        $contextSwitch->setAutoSerialization(false);
+        $this->getResponse()->setBody($this->entity->getTreeAsJson());
+    }
+
+    /**
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws ZfExtended_NoAccessException
+     */
+    public function putAction()
+    {
+        $taskGuid = $this->getCurrentTask()->getTaskGuid();
+        $data = json_decode($this->_getParam('data'));
+
+        $wfh = $this->_helper->workflow;
+        /* @var $wfh Editor_Controller_Helper_Workflow */
+        $wfh->checkWorkflowWriteable($taskGuid, editor_User::instance()->getGuid());
+
+        $this->entity->loadByTaskGuid($taskGuid);
+        $mover = ZfExtended_Factory::get('editor_Models_Foldertree_Mover', array($this->entity));
+        $mover->moveNode((int)$data->id, (int)$data->parentId, (int)$data->index);
+        $this->entity->syncTreeToFiles();
+        $this->syncSegmentFileOrder($taskGuid);
+        $this->view->data = $mover->getById((int)$data->id);
+    }
   
   /**
    * syncronize the Segment FileOrder Values to the corresponding Values in LEK_Files

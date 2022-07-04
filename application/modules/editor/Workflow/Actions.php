@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Workflow\ArchiveTaskActions;
+
 /**
  * Encapsulates the Default Actions triggered by the Workflow.
  * Warning: the here listed public methods are called as configured in LEK_workflow_action table!
@@ -187,15 +189,36 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $log = ZfExtended_Factory::get('editor_Logger_Workflow', [$task]);
         $log->debug('E1013', 'finish overdued task via workflow action');
     }
-    
-    /***
+
+    /**
      * Delete all tasks where the task status is 'end',
      * and the last modified date for this task is older than x days (where x is zf_config variable)
+     *
+     * Parameters docu for the LEK_worker_action table:
+     *      - if no filesystem and targetPath configuration is given, task is just deleted without backup!
+     *      - A backup configuration may look like (as JSON string the DB then):
+     *       {
+     *          "filesystem": "local|sftp",
+     *              → One of the implemented Adapters in MittagQI\Translate5\Tools\FlysystemFactory
+     *          "targetPath": "/target/dir/task-{taskName}.zip"
+     *              → the target filename for the task, may contain any field from the task meta json in the exported
+     *                file + the magic filed {time} which gives the current time stamp
+     *          "other options for filesystem": "just place here too"
+     *              → See again FlysystemFactory for the needed options, just to be placed directly in the options object
+     *       }
      */
     public function deleteOldEndedTasks(){
-        $taskModel=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $taskModel editor_Models_Task */
-        $taskModel->removeOldTasks();
+        /** @var ArchiveTaskActions $taskActions */
+        $taskActions = ZfExtended_Factory::get('\MittagQI\Translate5\Workflow\ArchiveTaskActions', [
+            $this->config
+        ]);
+        $params = $this->config->parameters;
+        if(empty($params->filesystem) && empty($params->targetPath)) {
+            $taskActions->removeOldTasks();
+        }
+        else {
+            $taskActions->backupThenRemove();
+        }
     }
     
     /***
@@ -205,5 +228,65 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $log = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
         /* @var $log editor_Models_LanguageResources_UsageLogger */
         $log->removeOldLogs();
+    }
+
+    /***
+     * Send post request to the configured url alongside with task,task user assoc and additional contend as
+     * json data
+     * @return void
+     * @throws Zend_Http_Client_Exception|Zend_Exception
+     */
+    public function triggerCallbackAction(): void
+    {
+        $triggerConfig = $this->config->parameters;
+        $url = $triggerConfig->url ?? '';
+        // set the data parameters from the trigger config if exist
+        // this can be used for api authentication
+        $data = $triggerConfig->params ?? new stdClass();
+        if( empty($url) ){
+            return;
+        }
+
+        $task = $this->config->task;
+
+        /** @var editor_Models_TaskUserAssoc $assoc */
+        $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+
+        $tua = $assoc->loadAllOfATask($task->getTaskGuid());
+
+        /** @var Zend_Http_Client $http */
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        $http->setUri($url);
+        $http->setMethod($http::POST);
+        $http->setHeaders('Accept-charset', 'UTF-8');
+        $http->setHeaders('Accept', 'application/json; charset=utf-8');
+
+        if( !empty($task)){
+            $data->task = $task->getDataObject();
+            unset($data->task->lockedInternalSessionUniqId);
+            unset($data->task->qmSubsegmentFlags);
+        }
+
+        if( !empty($tua)){
+            foreach ($tua as &$item) {
+                unset($item['staticAuthHash']);
+                unset($item['usedInternalSessionUniqId']);
+            }
+            $data->tua = $tua;
+
+        }
+
+        if(isset($data)){
+            $http->setRawData(json_encode($data, JSON_PRETTY_PRINT));
+        }
+        $response = $http->request();
+
+        //we consider all non 200 status values as invalid and log that!
+        if($response->getStatus() !== 200) {
+            $task->logger()->warn('E1394', 'All finish of a role callback HTTP status code is {code} instead 200.', [
+                'code' => $response->getStatus(),
+                'result' => $response->getBody(),
+            ]);
+        }
     }
 }

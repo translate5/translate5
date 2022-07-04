@@ -105,20 +105,27 @@ class ProjectTaskTest extends editor_Test_JsonTest {
      * @param stdClass $task
      */
     protected function checkProjectTaskSegments(stdClass $task){
+        $project = $this->api()->getTask();
+        //set internal current task for further processing
+        $this->api()->setTask($task);
+
         error_log('Segments check for task ['.$task->taskName.']');
         //open the task for editing. This is the only way to load the segments via the api
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
 
         $fileName = str_replace(['/','::'],'_',$task->taskName.'.json');
-        
+
         // load all segments for the current opened task
         $segments = self::$api->requestJson('editor/segment?page=1&start=0&limit=200');
-        
+
         // compare segments (this API will strip/adjust segment contents)
         $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected in '.basename($fileName).'!');
-        
+
         //close the task for editing
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
+
+        //reset internal current task to the project
+        $this->api()->setTask($project);
     }
     
 

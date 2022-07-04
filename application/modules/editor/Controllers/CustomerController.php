@@ -50,6 +50,10 @@ class Editor_CustomerController extends ZfExtended_RestController {
     }
     
     public function indexAction(){
+        if($this->entity->getFilter()->hasSort() === false){
+            // add default alphabetical sort
+            $this->entity->getFilter()->addSort('name');
+        }
         parent::indexAction();
         $this->cleanUpOpenIdForDefault();
     }
@@ -128,6 +132,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
     protected function decodePutData(){
         parent::decodePutData();
         $this->handleDomainField();
+        $this->handleDefaultOpenIdLableText();
     }
     
     /***
@@ -155,7 +160,22 @@ class Editor_CustomerController extends ZfExtended_RestController {
             }
         }
     }
-    
+
+    /***
+     * Set default text for the "login with SSO" button
+     * @return void
+     */
+    protected function handleDefaultOpenIdLableText(): void
+    {
+        $openIdRedirectCheckbox = $this->data->openIdRedirectCheckbox ?? null;
+        if(is_null($openIdRedirectCheckbox) || (bool)$openIdRedirectCheckbox === true){
+            return;
+        }
+        if(empty($this->data->openIdRedirectLabel)){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            $this->data->openIdRedirectLabel = $t->_('Single Sign-on');
+        }
+    }
     /***
      * Remove the openid data for the default customer if it is configured so
      */

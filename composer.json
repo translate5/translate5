@@ -1,7 +1,7 @@
 {
 	"config" : {
 		"platform" : {
-			"php" : "8"
+			"php" : "8.0.15"
 		},
 		"allow-plugins": {
 			"wikimedia/composer-merge-plugin": true
@@ -10,6 +10,7 @@
 	"autoload" : {
 		"psr-4" : {
 			"MittagQI\\Translate5\\" : "application/modules/editor/src",
+			"MittagQI\\Translate5\\Plugins\\" : "application/modules/editor/Plugins",
             "Translate5\\MaintenanceCli\\" : "Translate5/MaintenanceCli"
 		}
 	},
@@ -97,8 +98,11 @@
 		"translate5/instanttranslate-roboto-font": "26",
 		"axelbecher/material-design-icons": "^1.0",
 		"wilsonglasser/spout": "^3.0",
-		"setasign/tfpdf": "1.32"
-	},
+		"setasign/tfpdf": "1.32",
+		"joshtronic/php-loremipsum": "^2.1",
+		"league/flysystem": "^3.0",
+		"league/flysystem-sftp": "^3.0"
+    },
 	"extra" : {
 		"merge-plugin" : {
 			"include" : [

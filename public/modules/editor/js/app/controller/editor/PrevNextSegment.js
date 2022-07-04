@@ -345,7 +345,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         
         
         me.isLoading = Ext.Ajax.request({
-            url: Editor.data.pathToRunDir+'/editor/segment/nextsegments',
+            url: Editor.data.restpath+'segment/nextsegments',
             method: 'post',
             params: params,
             scope: me,

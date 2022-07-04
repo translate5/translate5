@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
 /**
  * Language Resource Connector class
  * - provides a connection to a concrete language resource, via the internal adapter (which contains the concrete connector instance)
@@ -43,21 +44,31 @@ class editor_Services_Connector {
      * The request source when language resources is used is InstantTranslate
      * @var string
      */
-    const REQUEST_SOURCE_INSTANT_TRANSLATE='instanttranslate';
+    const REQUEST_SOURCE_INSTANT_TRANSLATE = 'instanttranslate';
     
     /***
      * The request source when language resource is used is the editor
      * @var string
      */
-    const REQUEST_SOURCE_EDITOR='editor';
-    
-    
+    const REQUEST_SOURCE_EDITOR = 'editor';
+
+    /***
+     * An error with markup tags when parsing it for request
+     * @var string
+     */
+    const TAG_ERROR_PREPARE = 'tagprepare';
+
+    /***
+     * An error with markup tags when re-applying the request
+     * @var string
+     */
+    const TAG_ERROR_RECREATE = 'tagrecreate';
+
     /***
      * The real service connector
      * @var editor_Services_Connector_Abstract
      */
     protected $adapter;
-    
     
     /***
      *
@@ -65,13 +76,11 @@ class editor_Services_Connector {
      */
     protected $languageResource;
     
-    
     /***
      * Requested source language id
      * @var integer
      */
     protected $sourceLang;
-    
     
     /***
      * Requested target language id
@@ -142,6 +151,7 @@ class editor_Services_Connector {
     
     /***
      * Invoke search resource action so the MT logger can be used
+     * This is the main entry point for the concordance search
      * @param string $searchString
      * @param string $field
      * @param integer $offset
@@ -154,13 +164,51 @@ class editor_Services_Connector {
     
     /***
      * Invoke the translate resource action so the MT logger can be used
+     * This is the main entry point for InstantTranslate
      * @param string $searchString
      * @return editor_Services_ServiceResult
      */
     protected function _translate(string $searchString){
-        //instant translate calls are always with out tags
-        $searchString = trim(strip_tags($searchString));
-        $serviceResult = $this->adapter->translate($searchString);
+
+        //instant translate calls are by default always without tags ... only if the adapter supports tags we leave them
+        if($this->adapter->canTranslateHtmlTags()){
+
+            // when the service is capable of processing raw markup directly
+            // we use the TagRepair's processor to automatically repair lost or "defect" tags when requesting the translation
+            // InstantTranslate will preserve HTML comments which otherwise have no meaning in T5
+            $processor = new HtmlProcessor(true);
+            $serviceResult = $this->adapter->translate($processor->prepareRequest(trim($searchString)));
+            // UGLY: The service result holds a list of results (representing the translated texts + metadata) which unfortunately have no defined format
+            $results = $serviceResult->getResult();
+            if(count($results) > 0){
+                $results[0]->target = $processor->restoreResult($results[0]->target);
+                if($processor->hasPreparationError()){
+                    $results[0]->tagError = self::TAG_ERROR_PREPARE;
+                } else if($processor->hasRecreationError()){
+                    $results[0]->tagError = self::TAG_ERROR_RECREATE;
+                }
+                $serviceResult->setResults($results);
+            }
+        } else if($this->adapter->canTranslateInternalTags()) {
+
+            // when the connector is able to process the internal T5 format for segment text we convert the raw markup and reconvert it after translation
+            // we use the utilities broker that is already instantiated in the concrete connector
+            $utilities = $this->adapter->getTagHandler()->getUtilities();
+            // protect tags to t5 internal tags & convert whitespace to t5 whitespace tags, which then can be processed by the resource
+            $searchString = $this->convertMarkupToInternalTags($searchString, $utilities);
+            // translate it (if possible)
+            $serviceResult = $this->adapter->translate($searchString);
+            // UGLY: The service result holds a list of results (representing the translated texts + metadata) which unfortunately have no defined format
+            $results = $serviceResult->getResult();
+            if(count($results) > 0){
+                // revert the internal and whitespace tags to the input format
+                $results[0]->target = $this->convertInternalTagsToMarkup($results[0]->target, $utilities);
+                $serviceResult->setResults($results);
+            }
+        } else {
+            $searchString = trim(strip_tags($searchString));
+            $serviceResult = $this->adapter->translate($searchString);
+        }
         //log the instant translate results, when the adapter is of mt type or when the result set
         //contains result with matchrate >=100
         if(!empty($serviceResult) && ($this->isMtAdapter() || $serviceResult->has100PercentMatch())){
@@ -168,7 +216,33 @@ class editor_Services_Connector {
         }
         return $serviceResult;
     }
-
+    /**
+     * Protect markup with whitespace & tags to internal tags
+     * this simplifies but still copies the logic of editor_Models_Import_FileParser_Csv::parseSegment
+     * @param string $markup
+     * @param editor_Models_Segment_UtilityBroker $utilities
+     * @return string
+     */
+    private function convertMarkupToInternalTags(string $markup, editor_Models_Segment_UtilityBroker $utilities) : string {
+        $shortTagIdent = 1;
+        $markup = $utilities->tagProtection->protectTags($markup, false);
+        $markup = $utilities->whitespace->replacePlaceholderTags($markup, $shortTagIdent);
+        $markup = $utilities->whitespace->protectWhitespace($markup, $utilities->whitespace::ENTITY_MODE_OFF);
+        $markup = $utilities->whitespace->replacePlaceholderTags($markup, $shortTagIdent);
+        return $markup;
+    }
+    /**
+     * Revert markup with whitespace encoded to internal tags to it's original format
+     * this simplifies but still copies the logic of editor_Models_Export_FileParser::exportSingleSegmentContent
+     * @param string $textWithTags
+     * @param editor_Models_Segment_UtilityBroker $utilities
+     * @return string
+     */
+    private function convertInternalTagsToMarkup(string $textWithTags, editor_Models_Segment_UtilityBroker $utilities) : string {
+        $textWithTags = $utilities->internalTag->restore($textWithTags);
+        $textWithTags =  $utilities->whitespace->unprotectWhitespace($textWithTags);
+        return $textWithTags;
+    }
     /***
      * This magic method is invoked each time a nonexistent method is called on the object.
      * If the function exist in the adapter it will be called there.
@@ -195,6 +269,10 @@ class editor_Services_Connector {
             }
         } catch (ZfExtended_BadGateway $toThrow) {
             //handle legacy BadGateway messages, see below
+
+            //FIXME a connector should not throw Http Exceptions (since we can not know here on handling if the connector uses HTTP or some other raw connector
+            // conclusion: the connectors themself have to convert the Http exceptions to editor_Services_Connector_Exception exceptions
+            // with the below error codes (best directly in the abstract HttpApi)
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
                 //'E1311' => 'Could not connect to language resource {service}: server not reachable',
                 $ecode = 'E1311';
@@ -261,8 +339,8 @@ class editor_Services_Connector {
      * @return editor_Services_ServiceResult
      */
     protected function getCachedResult(editor_Models_Segment $segment) {
-        $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
-        /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
+        $model = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult');
+        /* @var $model MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult */
         return $model->getResults($segment->getId(), $this->adapter->getLanguageResource()->getId());
     }
     

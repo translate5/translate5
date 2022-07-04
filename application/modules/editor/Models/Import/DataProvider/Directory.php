@@ -64,17 +64,6 @@ class editor_Models_Import_DataProvider_Directory  extends editor_Models_Import_
      * @see editor_Models_Import_DataProvider_Abstract::archiveImportedData()
      */
     public function archiveImportedData($filename = null) {
-        $filter = new Zend_Filter_Compress(array(
-            'adapter' => 'Zip',
-            'options' => array(
-                'archive' => $this->getZipArchivePath($filename)
-            ),
-        ));
-        if(!$filter->filter($this->importFolder)){
-            //DataProvider Directory: Could not create archive-zip
-            throw new editor_Models_Import_DataProvider_Exception('E1247', [
-                'task' => $this->task,
-            ]);
-        }
+        $this->createImportedDataArchive($this->getZipArchivePath($filename));
     }
 }

@@ -56,7 +56,7 @@ class editor_Tag {
      * @return string
      */
     public static function escapeAttribute($text) : string {
-        return self::escapeHTML($text);
+        return static::escapeHTML($text);
     }
     /**
      * Unscapes an CDATA attribute-value according to the HTML-Spec, replaces all tabs & newlines with blanks
@@ -69,7 +69,7 @@ class editor_Tag {
             return '';
         }
         $text = str_replace(["\r\n","\n","\r","\t"], ' ', $text);
-        return self::unescapeHTML($text);
+        return static::unescapeHTML($text);
     }
     /**
      * Escapes Markup according to the HTML-Spec
@@ -136,7 +136,7 @@ class editor_Tag {
         if(empty(trim($id))){
             return '';
         }
-        return self::createAttribute('id', trim($id));
+        return static::createAttribute('id', trim($id));
     }
     /**
      * creates the class-attribute for use in html-tags. Leading blank is added
@@ -159,7 +159,7 @@ class editor_Tag {
         if(empty(trim($inlinestyle))){
             return '';
         }
-        return self::createAttribute('style', $inlinestyle);
+        return static::createAttribute('style', $inlinestyle);
     }
     /**
      * creates the href-attribute for use in html-tags. Leading blank is added
@@ -170,7 +170,7 @@ class editor_Tag {
         if(empty(trim($href))){
             return '';
         }
-        return self::createAttribute('href', $href);
+        return static::createAttribute('href', $href);
     }
      /**
      * creates an attribute for use in html-tags. Leading blank is added
@@ -185,7 +185,7 @@ class editor_Tag {
         // name-only attribs
         if($name == 'controls' || $name == 'autoplay' || $name == 'allowfullscreen' || $name == 'loop' || $name == 'muted' || $name == 'novalidate' || $name == 'playsinline')
             return ' '.$name;
-        return ' '.$name.'="'.self::escapeAttribute($value).'"';
+        return ' '.$name.'="'.static::escapeAttribute($value).'"';
     }
     /**
      * creates a Tag
@@ -227,7 +227,7 @@ class editor_Tag {
      * @return editor_Tag
      */
     public static function div($text='') : editor_Tag {
-        $tag = self::create('div');
+        $tag = static::create('div');
         $tag->addText($text);
         return $tag;
     }
@@ -237,7 +237,7 @@ class editor_Tag {
      * @return editor_Tag
      */
     public static function span($text='') : editor_Tag {
-        $tag = self::create('span');
+        $tag = static::create('span');
         $tag->addText($text);
         return $tag;
     }
@@ -247,7 +247,7 @@ class editor_Tag {
      * @return editor_Tag
      */
     public static function img($source=null) : editor_Tag {
-        $tag = self::create('img');
+        $tag = static::create('img');
         if($source != null){
             $tag->setSource($source);
         }
@@ -272,7 +272,7 @@ class editor_Tag {
      * @return editor_Tag|NULL
      */
     public static function unparse($html){
-        if(self::USE_PHP_DOM){
+        if(static::USE_PHP_DOM){
             // implementation using PHP DOM
             $dom = new editor_Utils_Dom();
             $node = $dom->loadUnicodeElement($html);
@@ -282,7 +282,7 @@ class editor_Tag {
             return NULL;
         }
         // implementation using PHPHtmlParser
-        $dom = self::createDomParser();
+        $dom = static::createDomParser();
         $dom->loadStr($html);
         if($dom->countChildren() != 1){
             return NULL;
@@ -303,7 +303,6 @@ class editor_Tag {
      */
     public static function convertDOMText(string $text) : string {
         return htmlspecialchars($text, ENT_XML1, null, false);
-        return $text;
     }
     /**
      * Creates a editor_Tag out of a AbstractNode
@@ -373,6 +372,11 @@ class editor_Tag {
      */
     protected static $singularTypes = array('img','input','br','hr','wbr','area','col','embed','keygen','link','meta','param','source','track','command'); // TODO: not complete !
     /**
+     * QUIRK: The blank before the space is against the HTML-Spec and superflous BUT termtagger does double img-tags if they do not have a blank before the trailing slash ...
+     * @var string
+     */
+    protected static $selfClosingMarker = ' /';
+    /**
      * @var string
      */
     protected $name;
@@ -408,7 +412,7 @@ class editor_Tag {
             throw new Exception('A tag must have a node name');
         }
         $this->name = strtolower($nodeName);
-        $this->singular = in_array($nodeName, self::$singularTypes);
+        $this->singular = in_array($nodeName, static::$singularTypes);
     }
     
     /* child API */
@@ -433,7 +437,7 @@ class editor_Tag {
      * @return boolean
      */
     public function addText(string $text) : bool {
-        if(self::isNodeText($text)){
+        if(static::isNodeText($text)){
             $this->addChild(editor_Tag::createText($text));
             return true;
         }
@@ -684,7 +688,7 @@ class editor_Tag {
         if($name == 'class'){
             return $this->setClasses($val);
         }
-        $this->attribs[$name] = self::unescapeAttribute(trim($val));
+        $this->attribs[$name] = static::unescapeAttribute(trim($val));
         return $this;
     }
     /**
@@ -720,7 +724,7 @@ class editor_Tag {
     public function setData($name, $val) : editor_Tag {
         if($name == '')
             return $this;
-        $this->attribs['data-'.$name] = self::unescapeAttribute(trim($val));
+        $this->attribs['data-'.$name] = static::unescapeAttribute(trim($val));
         return $this;
     }
     /**
@@ -755,11 +759,11 @@ class editor_Tag {
             return $this->addClasses($val);
         }
         if(array_key_exists($name, $this->attribs)){
-            if(!empty($val)){
-                $this->attribs[$name] .= ' '.self::unescapeAttribute(trim($val));
+            if($val != null){
+                $this->attribs[$name] .= ' '.static::unescapeAttribute(trim($val));
             }
         } else {
-            $this->attribs[$name] = (empty($val)) ? '' : self::unescapeAttribute(trim($val));
+            $this->attribs[$name] = ($val == null) ? '' : static::unescapeAttribute(trim($val));
         }
         return $this;
     }    
@@ -781,7 +785,7 @@ class editor_Tag {
      */
     public function getAttribute($name){
         if(array_key_exists($name, $this->attribs)){
-            return self::escapeAttribute($this->attribs[$name]);
+            return static::escapeAttribute($this->attribs[$name]);
         }
         return null;
     }
@@ -1016,8 +1020,7 @@ class editor_Tag {
         }
         $tag = '<'.$this->getName().$this->renderAttributes($withDataAttribs);
         if($this->isSingular()){
-            // QUIRK: The blank before the space is against the HTML-Spec and superflous BUT termtagger does double img-tags if they do not have a blank before the trailing slash ...
-            return $tag.' />';
+            return $tag.static::$selfClosingMarker.'>';
         }
         return $tag.'>';
     }
@@ -1037,10 +1040,10 @@ class editor_Tag {
      * @return string
      */
     protected function renderAttributes(bool $withDataAttribs=true) : string {
-        $attribs = self::classAttr($this->getClasses());
+        $attribs = static::classAttr($this->getClasses());
         foreach($this->attribs as $name => $val){
             if($withDataAttribs || substr($name, 0, 5) != 'data-'){
-                $attribs .= self::createAttribute($name, $val);
+                $attribs .= static::createAttribute($name, $val);
             }
         }
         return $attribs;
@@ -1049,7 +1052,7 @@ class editor_Tag {
      * Helper to debug nested tags
      * @param string $indentation
      */
-    public function debugStructure(string $indentation=''){
+    public function debugStructure(string $indentation='') : string {
         $text = $indentation.' '.get_class($this).' '.$this->debugProps()."\n";
         if($this->hasChildren()){
             foreach($this->getChildren() as $child){

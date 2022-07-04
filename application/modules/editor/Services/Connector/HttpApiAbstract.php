@@ -30,8 +30,9 @@ END LICENSE AND COPYRIGHT
  * Reusable HTTP Connection API code for HTTP with JSON based APIs
  */
 abstract class editor_Services_Connector_HttpApiAbstract {
+
     const ENC_TYPE = 'application/json; charset=utf-8';
-    
+
     /**
      * @var editor_Models_LanguageResources_Resource
      */
@@ -118,7 +119,7 @@ abstract class editor_Services_Connector_HttpApiAbstract {
         //$response = new Zend_Http_Response(500, [], '{"ReturnValue":0,"ErrorMsg":"Error: too many open translation memory databases"}');
         $this->error = null;
         $this->response = $response;
-        $validStates = [200, 201];
+        $validStates = [200, 201, 204];
         
         $url = $this->http->getUri(true);
         
@@ -134,6 +135,12 @@ abstract class editor_Services_Connector_HttpApiAbstract {
         }
         
         $responseBody = trim($response->getBody());
+
+        // for tsv response, return teh content directly, no need for json decode
+        if(is_null($this->error) && !empty($responseBody) && $this->isTsvResponse($response)){
+            $this->result = $responseBody;
+            return empty($this->error);
+        }
         
         if(empty($responseBody)) {
             $this->result = '';
@@ -171,5 +178,14 @@ abstract class editor_Services_Connector_HttpApiAbstract {
         }
         
         return empty($this->error);
+    }
+
+    /***
+     * Check if the given response content type is tsv (tab separated value)
+     * @param Zend_Http_Response $response
+     * @return bool|void
+     */
+    protected function isTsvResponse(Zend_Http_Response $response){
+        return str_contains($response->getHeader('Content-type'),'tab-separated-values');
     }
 }

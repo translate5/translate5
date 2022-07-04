@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 		     http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
-END LICENSE AND COPYRIGHT
-*/
+ END LICENSE AND COPYRIGHT
+ */
 
 /**
  * Upload/download file to okapi server, and converting it to xlf
@@ -150,20 +150,38 @@ class editor_Plugins_Okapi_Connector {
         $response= $http->request('DELETE');
         $this->processResponse($response);
     }
-    
+
     /**
      * Upload the bconf file
+     * @param string $bconfPath
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_BadGateway
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
      */
-    public function uploadOkapiConfig(array $bconfPaths){
-        if(empty($bconfPaths) || empty($bconfPaths[0]) || !file_exists($bconfPaths[0])) {
+    public function uploadOkapiConfig(string $bconfPath){
+        if(empty($bconfPath) || !file_exists($bconfPath)) {
              // 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
-             throw new editor_Plugins_Okapi_Exception('E1055', ['bconfFile' => $bconfPaths[0]]);
+             throw new editor_Plugins_Okapi_Exception('E1055', ['bconfFile' => $bconfPath]);
         }
+        // $bconfPath = '/var/www/translate5/application/modules/editor/Plugins/Okapi/data/okapi_default_import.bconf';
         $url = $this->projectUrl.'/batchConfiguration';
         $http = $this->getHttpClient($url);
-        $http->setFileUpload($bconfPaths[0], 'batchConfiguration');
+        $http->setFileUpload($bconfPath , 'batchConfiguration');
         $response = $http->request('POST');
-        $this->processResponse($response);
+        try {
+            $this->processResponse($response);
+        } catch (ZfExtended_BadGateway $e) {
+            $msg = $e->getMessage();
+            $bconfId = (int)basename(dirname($bconfPath));
+            $bconf = new editor_Plugins_Okapi_Models_Bconf();
+            $bconf->load($bconfId);
+            $bconfName = $bconf->getName();
+            // TODO Include link. Beware: $msg is escaped, no html possible as is
+            $msg .= " \nBconf used was '$bconfName.bconf' (id $bconfId)";
+            $e->setMessage($msg);
+            throw new ZfExtended_BadGateway($msg, 500);
+        }
     }
     
     /**
@@ -273,7 +291,6 @@ class editor_Plugins_Okapi_Connector {
      * @param string $fileName filename in okapi to get the file
      * @param string $manifestFile
      * @param SplFileInfo $originalFile
-     * @return string the path to the downloaded data file
      */
     public function downloadMergedFile($fileName, SplFileInfo $targetFile){
         $http = $this->getHttpClient($this->projectUrl.'/outputFiles/'.$fileName);

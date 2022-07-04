@@ -307,6 +307,7 @@ class AppInstance {
      * @param array $user
      */
     protected function startSession(string $sessionId, array $user) {
+        $user['sessionStarted'] = time(); //store the timestamp when the session was registered in the messagebus
         $this->sessions[$sessionId] = $user;
         $this->eachChannel(__FUNCTION__, $sessionId, $user);
     }
@@ -346,6 +347,21 @@ class AppInstance {
             }
         }
         return array_unique($sessions);
+    }
+
+    /**
+     * returns a list of session IDs which do not have any connection anymore
+     */
+    protected function getStalledSessions(): array {
+        $allSessions = array_keys($this->sessions);
+        $withConnection = $this->getConnectionSessions();
+        $stalledSessions = array_diff($allSessions, $withConnection);
+        $now = time();
+        return array_filter($stalledSessions, function($sessionId) use ($now){
+            //we consider only sessions older as 30 seconds as stalled,
+            // since session may be opened, but UI is still loading, so there would be no connection
+            return ($now - $this->sessions[$sessionId]['sessionStarted']) > 30;
+        });
     }
 
     /**
@@ -491,7 +507,12 @@ class AppInstance {
         }
         $this->metrics = $metrics;
     }
-    
+
+    /**
+     * Receives a list of valid sessions from the DB, all sessions in the message bus not listed there are deleted
+     * @param array $existingSessions
+     * @return array|mixed[]
+     */
     public function garbageCollection(array $existingSessions) {
         $this->cleanUpUnverifiedConnections();
         $toDelete = array_diff(array_keys($this->sessions), $existingSessions);

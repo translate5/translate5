@@ -92,6 +92,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public $targetLangCode;
 
     /***
+     * @var array
+     */
+    protected array $customers;
+
+    /***
      * Init the language resource instance for given editor_Models_LanguageResources_Resource
      * @param editor_Models_LanguageResources_Resource $resource
      * @return void
@@ -125,6 +130,18 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $s=$this->db->select()
         ->where('LEK_languageresources.serviceType IN(?)',$allservices);
         return $this->loadFilterdCustom($s);
+    }
+
+    /***
+     * Load all language resource by given service name
+     * @param string $serviceName
+     * @return array
+     */
+    public function loadByService(string $serviceName): array
+    {
+        $s = $this->db->select()
+            ->where('LEK_languageresources.serviceName = ?',$serviceName);
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /***
@@ -257,7 +274,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         if(empty($taskGuidList)){
             return [];
         }
-        $assocDb = new editor_Models_Db_Taskassoc();
+        $assocDb = new MittagQI\Translate5\LanguageResource\Db\TaskAssociation();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
             ->from($this->db, array('*',$assocName.'.taskGuid', $assocName.'.segmentsUpdateable'))
@@ -277,7 +294,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         if(empty($taskGuidList)){
             return $taskGuidList;
         }
-        $assocDb = new editor_Models_Db_Taskassoc();
+        $assocDb = new MittagQI\Translate5\LanguageResource\Db\TaskAssociation();
         $tableName=$this->db->info($assocDb::NAME);
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
@@ -298,7 +315,23 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $s = $this->db->select()->where('resourceId = ?', $serviceResourceId);
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
+    /**
+     * loads the language resources to a specific service resource ID (language resource to a specific server (=resource))
+     * @param string $uuid
+     * @return Zend_Db_Table_Row_Abstract|null
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function loadByUuid(string $uuid): ?Zend_Db_Table_Row_Abstract
+    {
+        $s = $this->db->select()->where('langResUuid = ?', $uuid);
+        $this->row = $this->db->fetchRow($s);
+        if(empty($this->row)){
+            $this->notFound('#langResUuid '.$uuid);
+        }
+        return $this->row;
+    }
+
     /**
      * returns the resource used by this languageResource instance
      * @return editor_Models_LanguageResources_Resource
@@ -328,8 +361,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function checkTaskAndLanguageResourceAccess(string $taskGuid,int $languageResourceId, editor_Models_Segment $segment = null) {
         
         //checks if the queried languageResource is associated to the task:
-        $languageResourceTaskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $languageResourceTaskAssoc editor_Models_LanguageResources_Taskassoc */
+        $languageResourceTaskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $languageResourceTaskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         try {
             //for security reasons a service can only be queried when a valid task association exists and this task is loaded
             // that means the user has also access to the service. If not then not!
@@ -423,6 +456,20 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             $this->targetLang=$this->getLanguageByField('targetLang');
         }
         return $this->targetLang;
+    }
+
+    /***
+     * Get the customers of the current langauge resource
+     * @return array
+     */
+    public function getCustomers(): array
+    {
+        if(empty($this->customers)){
+            /** @var editor_Models_LanguageResources_CustomerAssoc $model */
+            $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+            $this->customers = array_column($model->loadByLanguageResourceId($this->getId()),'customerId');
+        }
+        return $this->customers;
     }
     
     /**

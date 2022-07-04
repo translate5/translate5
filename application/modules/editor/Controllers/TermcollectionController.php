@@ -122,6 +122,11 @@ class editor_TermcollectionController extends ZfExtended_RestController
         $params = $this->getRequest()->getParams();
         $searchTerms = json_decode($params['searchTerms']);
 
+        // InstantTranslate supports translation of markup. This is unusable for Terms and thus we need to remove any Markup
+        $numTerms = count($searchTerms);
+        for($i = 0; $i < $numTerms; $i++){
+            $searchTerms[$i]->text = strip_tags($searchTerms[$i]->text);
+        }
         //get the language root and find all fuzzy languages
         $lang = $params['targetLang'];
         $lang = explode('-', $lang);

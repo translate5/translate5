@@ -26,13 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
+ * List of tables in system:
  */
 class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     
@@ -53,6 +48,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     protected $tables = array(
         'LEK_browser_log' => false,
         'LEK_customer' => false,
+        'LEK_customer_meta' => false,
         'LEK_categories' => false,
         'LEK_languageresources_category_assoc' => false,
         'LEK_change_log' => false,
@@ -71,10 +67,14 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         'LEK_languageresources_usage_log' => false,
         'LEK_languageresources_usage_log_sum' => false,
         'LEK_languageresources_taskassoc' => false,
+        'LEK_languageresources_taskpivotassoc' => false,
         'LEK_languageresources' => false,
         'LEK_match_analysis' => 'taskGuid',
-        'LEK_match_analysis_batchresults' => false,
+        'LEK_languageresources_batchresults' => false,
         'LEK_match_analysis_taskassoc' => 'taskGuid',
+        'LEK_okapi_bconf' => false,
+        'LEK_okapi_bconf_default_filter' => false,
+        'LEK_okapi_bconf_filter' => false,
         'LEK_pixel_mapping' => false,
         'LEK_plugin_segmentstatistic_terms' => 'taskGuid',
         'LEK_plugin_segmentstatistics' => 'taskGuid',
@@ -108,6 +108,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         'LEK_term_entry'=>false,
         'LEK_term_history'=>false,
         'LEK_term_proposal'=>false,
+        'LEK_termcollection_deepl_glossary_assoc' => false,
         'LEK_user_assoc_default' => false,
         'LEK_user_changelog_info' => false,
         'LEK_user_config' => false,

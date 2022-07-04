@@ -42,11 +42,16 @@ $config = Zend_Registry::get('config');
     <link rel="shortcut icon" href="<?php echo $this->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
     <title><?php echo $this->translate->_('translate5'); ?></title>
     <script>
-    if (location.hash.match(/^#(termportal|itranslate)/)) location = '/editor/termportal' + location.hash;
     Editor = {};
     <?php
     echo $this->Php2JsVars();
     ?>;
+    for (const directRedirectsKey in Editor.data.directRedirects) {
+        if (location.hash.match(new RegExp('^#'+directRedirectsKey))) {
+            location = Editor.data.directRedirects[directRedirectsKey];
+            break;
+        }
+    }
     Editor.TRANSTILDE = '~@#!WS~';
     </script>
     <?php

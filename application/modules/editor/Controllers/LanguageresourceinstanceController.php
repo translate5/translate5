@@ -26,10 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
+
 /***
  * Language resource controller
  */
 class editor_LanguageresourceinstanceController extends ZfExtended_RestController {
+    use TaskContextTrait;
 
     const FILE_UPLOAD_NAME = 'tmUpload';
 
@@ -60,6 +65,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected $categories;
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
     public function init() {
         //add filter type for languages
         $finalTableForAssoc = new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId');
@@ -154,6 +164,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
             $languageresource['customerUseAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'useAsDefault', $id);
             $languageresource['customerWriteAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'writeAsDefault', $id);
+            $languageresource['customerPivotAsDefaultIds'] = $this->getCustassocByIndex($custAssoc, 'pivotAsDefault', $id);
             
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
@@ -218,7 +229,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /***
-     * Returns customer assoc active flag fields (useAsDefault or writeAsDefault) for given customer assoc data
+     * Returns customer assoc active flag fields (useAsDefault,writeAsDefault or pivotAsDefault) for given customer assoc data
      * and give language resource id
      *
      * @param array $data
@@ -321,6 +332,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $writeAsDefault = array_column($customerAssocs,'writeAsDefault','customerId');
         $this->view->rows->customerWriteAsDefaultIds = array_keys(array_filter($writeAsDefault));
 
+
+        // Filter out pivot as default from use as default array. If assoc is pivotAsDefault it must be useAsDefault to.
+        $pivotAsDefault = array_column($customerAssocs,'pivotAsDefault','customerId');
+        $this->view->rows->customerPivotAsDefaultIds = array_keys(array_filter($pivotAsDefault));
+
         // categories that are assigned to the resource
         $categoryIds = [];
         $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
@@ -345,6 +361,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $targetFilter=null;
         $useAsDefault=null;
         $writeAsDefault=null;
+        $pivotAsDefault=null;
         $taskList=null;
 
         $this->entity->getFilter()->hasFilter('sourceLang',$sourceFilter);
@@ -352,6 +369,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $this->entity->getFilter()->hasFilter('customerUseAsDefaultIds',$useAsDefault);
         $this->entity->getFilter()->hasFilter('customerWriteAsDefaultIds',$writeAsDefault);
+        $this->entity->getFilter()->hasFilter('customerPivotAsDefaultIds',$pivotAsDefault);
         $this->entity->getFilter()->hasFilter('taskList',$taskList);
 
         //search the model for the filter value and set the filter value with the found matches(ids)
@@ -448,12 +466,23 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 $this->entity->getFilter()->deleteFilter('customerWriteAsDefaultIds');
             }
         }
+
+        //check if filtering for writeAsDefault should be done
+        if(isset($pivotAsDefault)) {
+            if(isset($pivotAsDefault->value) && is_string($pivotAsDefault->value)) {
+                $resultList=$searchEntity($pivotAsDefault->value,'editor_Models_Customer_Customer');
+                $handleFilter($pivotAsDefault,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIdsPivotAsDefault','languageResourceId');
+            }
+            else {
+                $this->entity->getFilter()->deleteFilter('customerPivotAsDefaultIds');
+            }
+        }
         
         //check if filtering for taskList should be done
         if(isset($taskList)){
             if(isset($taskList->value) && is_string($taskList->value)){
                 $resultList=$searchEntity($taskList->value,'editor_Models_Task','taskGuid');
-                $handleFilter($taskList,$resultList,'editor_Models_LanguageResources_Taskassoc','loadByTaskGuids','languageResourceId');
+                $handleFilter($taskList,$resultList,'MittagQI\Translate5\LanguageResource\TaskAssociation','loadByTaskGuids','languageResourceId');
             }
             else {
                 $this->entity->getFilter()->deleteFilter('taskList');
@@ -490,8 +519,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     private function prepareTaskInfo($languageResourceids) {
-        /* @var $assocs editor_Models_LanguageResources_Taskassoc */
-        $assocs = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+
+        /* @var $assocs MittagQI\Translate5\LanguageResource\TaskAssociation */
+        $assocs = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
 
         $taskinfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
         if(empty($taskinfo)) {
@@ -613,16 +643,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         settype($this->data['customerIds'], 'array');
         settype($this->data['customerUseAsDefaultIds'], 'array');
         settype($this->data['customerWriteAsDefaultIds'], 'array');
+        settype($this->data['customerPivotAsDefaultIds'], 'array');
 
         //check and save customer assoc db entry
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+        /* @var editor_Models_LanguageResources_CustomerAssoc $customerAssoc */
         try {
-            $customerAssoc->saveAssocRequest(
-                $this->entity->getId(),
-                $this->data['customerIds'],
-                $this->data['customerUseAsDefaultIds'],
-                $this->data['customerWriteAsDefaultIds']);
+            $customerAssoc->saveAssocRequest($this->entity->getId(),$this->data);
         }
         catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();
@@ -631,7 +658,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //check and save categories assoc db entry
         $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
-        /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
+        /* @var editor_Models_LanguageResources_CategoryAssoc $categoryAssoc */
         try {
             $categoryAssoc->saveAssocRequest($this->data);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
@@ -641,7 +668,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //save the resource languages to
         $resourceLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $resourceLanguages editor_Models_LanguageResources_Languages */
+        /* @var editor_Models_LanguageResources_Languages $resourceLanguages */
         $resourceLanguages->setSourceLang($sourceLangId);
         $resourceLanguages->setSourceLangCode($sourceLangCode);
         $resourceLanguages->setTargetLang($targetLangId);
@@ -667,18 +694,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     public function putAction() {
+        $this->decodePutAssociative = true;
         $this->decodePutData();
         parent::putAction();
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-        settype($this->data->customerIds, 'array');
-        settype($this->data->customerUseAsDefaultIds, 'array');
-        settype($this->data->customerWriteAsDefaultIds, 'array');
+
         $customerAssoc->updateAssocRequest(
             $this->entity->getId(),
-            $this->data->customerIds,
-            $this->data->customerUseAsDefaultIds,
-            $this->data->customerWriteAsDefaultIds);
+            $this->data);
         $this->addAssocData();
     }
 
@@ -846,7 +870,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * The returned data is no real task entity, although the task model is used in the frontend!
      */
     public function tasksAction() {
-        $this->getAction();
+        try {
+            $this->getAction();
+        } catch (editor_Services_Connector_Exception $e) {
+            $e->addExtraData(['languageResource' => $this->entity]);
+            throw $e;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->decodePutData();
@@ -865,8 +894,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
         }
 
-        $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $taskinfo = $assoc->getTaskInfoForLanguageResources([$this->entity->getId()]);
         //FIXME replace lockingUser guid with concrete username and show it in the frontend!
         $this->view->rows = $taskinfo;
@@ -1057,7 +1086,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @param array $importInfo
      * @param boolean $addNew
      */
-    protected function queueServiceImportWorker(array $importInfo, bool $addNew){
+    protected function queueServiceImportWorker(array $importInfo, bool $addNew)
+    {
         $worker=ZfExtended_Factory::get('editor_Services_ImportWorker');
         /* @var $worker editor_Services_ImportWorker */
 
@@ -1084,7 +1114,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->addSpecificData('status',editor_Services_Connector_FilebasedAbstract::STATUS_IMPORT);
         $this->entity->save();
 
-        $worker->queue();
+        $workerId = $worker->queue();
+
+        $this->events->trigger('serviceImportWorkerQueued',argv: [
+            'entity' => $this->entity,
+            'workerId' => $workerId,
+            'params' => $this->getAllParams()
+        ]);
     }
 
     /***
@@ -1129,6 +1165,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //load the entity
         $this->entityLoad();
 
+        // clone the current entity, so it can be re-applied later again after the entity is removed fron the database.
+        // there may be some post-delete events where the deleted entity should be checked
+        $clone = clone $this->entity;
+
         // if the current entity is term collection, init the entity as term collection
         if($this->entity->isTc()){
             $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
@@ -1167,13 +1207,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->entity->db->getAdapter()->rollBack();
             throw $e;
         }
+        $this->entity = $clone;
     }
 
     /**
      * performs a languageResource query
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws editor_Models_ConfigException
      */
     public function queryAction() {
-        $session = new Zend_Session_Namespace();
+        $this->initCurrentTask();
         $languageResourceId = (int) $this->_getParam('languageResourceId');
 
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
@@ -1182,7 +1227,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         //check taskGuid of segment against loaded taskguid for security reasons
         //checks if the current task is associated to the languageResource
-        $this->entity->checkTaskAndLanguageResourceAccess((string) $session->taskGuid,$languageResourceId, $segment);
+        $this->entity->checkTaskAndLanguageResourceAccess($this->getCurrentTask()->getTaskGuid(),$languageResourceId, $segment);
 
         $this->entity->load($languageResourceId);
 
@@ -1208,9 +1253,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      *  field: source or target
      *  offset: the offset from where the next search should start
      * Since the GUI is dynamically loading additional content no traditional paging can be used here
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws editor_Models_ConfigException
+     * @throws editor_Services_Exceptions_NoService
      */
     public function searchAction() {
-        $session = new Zend_Session_Namespace();
+        $this->initCurrentTask();
         $query = $this->_getParam('query');
         $languageResourceId = (int) $this->_getParam('languageResourceId');
         $field = $this->_getParam('field');
@@ -1222,7 +1272,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         //checks if the current task is associated to the languageResource
-        $this->entity->checkTaskAndLanguageResourceAccess($session->taskGuid,$languageResourceId);
+        $this->entity->checkTaskAndLanguageResourceAccess($this->getCurrentTask()->getTaskGuid(), $languageResourceId);
 
         $this->entity->load($languageResourceId);
 
@@ -1237,18 +1287,34 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows = $result->getResult();
     }
 
+    public function translateAction(){
+        $this->initCurrentTask();
+
+        $query = $this->_getParam('searchText');
+        $languageResourceId = (int) $this->_getParam('languageResourceId');
+
+        //checks if the current task is associated to the languageResource
+        $this->entity->checkTaskAndLanguageResourceAccess($this->getCurrentTask()->getTaskGuid(), $languageResourceId);
+
+        $this->entity->load($languageResourceId);
+
+        $connector = $this->getConnector();
+        $result = $connector->translate($query);
+        $result = $result->getResult()[0] ?? [];
+        $this->view->translations = $result->metaData['alternativeTranslations'] ?? $result;
+    }
+
     /**
      * returns the connector to be used
      * @return editor_Services_Connector
+     * @throws editor_Models_ConfigException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     protected function getConnector() {
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
-        $session = new Zend_Session_Namespace();
-        $task=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($session->taskGuid);
-        return $manager->getConnector($this->entity,$task->getSourceLang(),$task->getTargetLang(),$task->getConfig());
+        $task = $this->getCurrentTask();
+        return $manager->getConnector($this->entity, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
     }
 
     /***

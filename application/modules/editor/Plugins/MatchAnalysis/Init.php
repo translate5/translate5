@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
- This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+  This file is part of translate5
 
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
-  
- There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
-END LICENSE AND COPYRIGHT
-*/
+  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+  included in the packaging of this file.  Please review the following information
+  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+  http://www.gnu.org/licenses/agpl.html
+
+  There is a plugin exception available for use with this release of translate5 for
+  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+  plugin-exception.txt in the root folder of translate5.
+
+  @copyright  Marc Mittag, MittagQI - Quality Informatics
+  @author     MittagQI - Quality Informatics
+  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+ END LICENSE AND COPYRIGHT
+ */
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     protected static $description = 'Provides the match-analysis and pre-translation against language-resources.';
@@ -93,12 +93,17 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleOnAnalysisOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleOnPretranslationOperation'));
         $this->eventManager->attach('Editor_CronController', 'afterDailyAction', array($this, 'handleAfterDailyAction'));
+
+        $this->eventManager->attach('editor_LanguageresourcetaskpivotassocController', 'beforePivotPreTranslationQueue', array($this, 'handleBeforePivotPreTranslationQueue'));
+
     }
     
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         /* @var $view Zend_View_Interface */
         $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
+        $config = $this->getConfig();
+        $view->Php2JsVars()->set('plugins.MatchAnalysis.calculateBasedOn', $config->calculateBasedOn);
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
@@ -119,12 +124,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     }
     
     /***
-     * Cron controller dayily action
+     * Cron controller daily action
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterDailyAction(Zend_EventManager_Event $event){
-        $batchCache = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
-        /* @var $batchCache editor_Plugins_MatchAnalysis_Models_BatchResult */
+        $batchCache = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult');
+        /* @var $batchCache MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult */
         $batchCache->deleteOlderRecords();
     }
 
@@ -132,7 +137,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * Operation action handler. Run analysis and pretranslate if $pretranslate is true.
      *
      * @param Zend_EventManager_Event $event
-     * @param bool $pretranlsate
+     * @param bool $pretranslate
+     * @throws editor_Models_ConfigException
      */
     protected function handleOperation(Zend_EventManager_Event $event, bool $pretranslate){
         $task = $event->getParam('entity');
@@ -177,7 +183,89 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         /* @var $wq ZfExtended_Worker_Queue */
         $wq->trigger();
     }
-    
+
+    /***
+     * Add batch query worker for the resources used for pivot pre-translation before the pivot worker is queued
+     * @param Zend_EventManager_Event $event
+     * @return void
+     */
+    public function handleBeforePivotPreTranslationQueue(Zend_EventManager_Event $event): void
+    {
+        $task = $event->getParam('task');
+        $pivotAssociations = $event->getParam('pivotAssociations');
+        $parentWorkerId = $event->getParam('parentWorkerId');
+
+        $batchResources = $this->getAvailableBatchResourceForPivotPreTranslation($task->getTaskGuid(),$pivotAssociations);
+        if(!empty($batchResources)){
+            $this->queueBatchWorkersForPivot($task , $parentWorkerId,$batchResources);
+        }
+
+    }
+
+    /**
+     * For each batch supported connector queue one batch worker
+     * @param editor_Models_Task $task
+     * @param int $parentWorkerId
+     * @param array $batchResources
+     */
+    protected function queueBatchWorkersForPivot(editor_Models_Task $task, int $parentWorkerId, array $batchResources)
+    {
+        $workerParameters = [];
+        if(!$task->isImporting()) {
+            $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
+        }
+        foreach ($batchResources as $languageRessource){
+            /* @var editor_Models_LanguageResources_LanguageResource $languageRessource */
+            $batchWorker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_BatchWorker');
+            /* @var $batchWorker editor_Plugins_MatchAnalysis_BatchWorker */
+
+            $workerParameters['languageResourceId'] = $languageRessource->getId();
+            $workerParameters['userGuid'] = editor_User::instance()->getGuid();
+
+            if (!$batchWorker->init($task->getTaskGuid(), $workerParameters)) {
+                //we log that fact, queue nothing and rely on the normal match analysis processing
+                $this->addWarn($task,'MatchAnalysis-Error on batchWorker init(). Batch worker for pivot pre-translation could not be initialized');
+                return;
+            }
+
+            //we may not trigger the queue here, just add the workers!
+            $batchWorker->queue($parentWorkerId, null, false);
+        }
+    }
+
+    /***
+     * Check if the given pivot associations can be used for batch pre-translation
+     * @param string $taskGuid
+     * @return array
+     */
+    protected function getAvailableBatchResourceForPivotPreTranslation(string $taskGuid,array $assocs): array
+    {
+
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+
+        $batchAssocs = [];
+        foreach ($assocs as $assoc){
+            $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $languageresource editor_Models_LanguageResources_LanguageResource  */
+
+            $languageresource->load($assoc['languageResourceId']);
+
+            $manager = ZfExtended_Factory::get('editor_Services_Manager');
+            /* @var $manager editor_Services_Manager */
+
+            $connector = $manager->getConnector($languageresource, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
+            /* @var $connector editor_Services_Connector */
+            //collect all connectors which are supporting batch query
+            if($connector->isBatchQuery()){
+                $batchAssocs[] = clone $languageresource;
+            }
+
+        }
+        return $batchAssocs;
+    }
+
     /***
      * Queue the match analysis worker
      *
@@ -217,7 +305,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $workerParameters['userName'] = $user->data->userName;
 
         //enable batch query via config
-        $workerParameters['batchQuery'] = (boolean) $this->config->enableBatchQuery;
+        $workerParameters['batchQuery'] = (boolean) Zend_Registry::get('config')->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
         if(!empty($this->batchAssocs) && $workerParameters['batchQuery']){
             $this->queueBatchWorkers($task, $workerParameters, $parentWorkerId);
         }

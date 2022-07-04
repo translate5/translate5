@@ -135,6 +135,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 		//before translate5 workflow starts
 			not translated		 			->	not_translated				->	initial
 			blocked							->	blocked						->	initial
+			locked							->	locked						->	initial
 
 		//1st default translate5 workflow step: set in translation step or initial status before review only workflow
 			translated						->	translated					->	translated
@@ -165,6 +166,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             editor_Models_Segment_AutoStates::REVIEWED=>self::XLIFF2_SEGMENT_STATE_REVIEWED,
             editor_Models_Segment_AutoStates::NOT_TRANSLATED=>self::XLIFF2_SEGMENT_STATE_INITIAL,
             editor_Models_Segment_AutoStates::BLOCKED=>self::XLIFF2_SEGMENT_STATE_INITIAL,
+            editor_Models_Segment_AutoStates::LOCKED=>self::XLIFF2_SEGMENT_STATE_INITIAL,
 
             editor_Models_Segment_AutoStates::TRANSLATED=>self::XLIFF2_SEGMENT_STATE_TRANSLATED,
             editor_Models_Segment_AutoStates::TRANSLATED_AUTO=>self::XLIFF2_SEGMENT_STATE_TRANSLATED,
@@ -348,6 +350,9 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         }
         $segmentsOfFile->rewind();
         $first = $this->unifySegmentData($segmentsOfFile->current());
+        if(empty($first)) {
+            return;
+        }
 
         $file = '<file id="%s" translate5:filename="%s">';
         $this->result[] = sprintf($file,$first['fileId'],$this->escape($filename));
@@ -877,6 +882,7 @@ translate5 autostatus			->	xliff 2.x substate	->	mapped xliff status
 //before translate5 workflow starts
 not translated		 			->	not_translated				->	initial
 blocked							->	blocked						->	initial
+locked							->	locked						->	initial
 
 //1st default translate5 workflow step: set in translation step or initial status before review only workflow
 translated						->	translated					->	translated

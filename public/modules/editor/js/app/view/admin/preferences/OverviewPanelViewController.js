@@ -26,13 +26,51 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * @class Editor.view.admin.preferences.OverviewPanelViewController
+ * @extends Ext.app.ViewController
+ */
 Ext.define('Editor.view.admin.preferences.OverviewPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.preferencesOverviewPanel',
     routes: {
-        'preferences': 'onPreferencesRoute'
+        'preferences': 'onPreferencesRoute',
+        'preferences/:tab' :'onPreferencesRoute',
     },
-    onPreferencesRoute: function() {
-        Editor.app.openAdministrationSection(this.getView(), 'preferences');
+    listen:{
+        component: {
+            '#preferencesOverviewPanel adminConfigGrid #searchField': {
+                change: 'onSearchFieldChange'
+            }
+        }
+    },
+    /**
+     * If we change the search field in the main config grid, we set that as route
+     * @param field
+     */
+    onSearchFieldChange: function(field) {
+        var confGrid = field.up('adminConfigGrid');
+        if(confGrid && confGrid.getController().getSearchValue()) {
+            //TODO UGLY: is there another generic way to do such a thing? Otherwise we would have to implement a parser which gets and changes only the desired part of the hash instead of setting the whole one(here the config value)
+            this.redirectTo('preferences/adminConfigGrid|config/'+confGrid.getController().getSearchValue());
+        }
+    },
+    onPreferencesRoute: function(tab) {
+        var v = this.getView();
+        if(tab) {
+            Editor.app.openAdministrationSection(this.getView());
+            v.setActiveTab(v.down('#'+tab));
+        }
+        else {
+            Editor.app.openAdministrationSection(this.getView());
+        }
+    },
+    /**
+     * Sets the url hash to the current choosen preferences tab (itemID needed therefore to be configured!)
+     * @param tabpanel {Ext.tab.Panel}
+     * @param newCard {Ext.panel.Panel}
+     */
+    onTabChange: function(tabpanel, newCard) {
+        this.redirectTo('preferences/'+newCard.getItemId());
     }
 });

@@ -85,7 +85,8 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
                 $model = editor_Test_Model_Abstract::create($segment, 'segment');
                 $segments[$idx] = $model->getComparableData();
             }
-            file_put_contents($this->api()->getFile($fileToCompare), json_encode($segments,JSON_PRETTY_PRINT));
+            // on capturing we disable assert existence
+            file_put_contents($this->api()->getFile($fileToCompare, assert: false), json_encode($segments,JSON_PRETTY_PRINT));
         }
         $expectations = self::$api->getFileContent($fileToCompare);
         $numSegments = count($segments);
@@ -175,10 +176,11 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $fileToCompare
      * @param array $actualModels
      * @param string $message
+     * @param editor_Test_Model_Filter|null $filter: If given, the expected & actual items will be filtered according to this filter
      */
-    public function assertModelsEqualsJsonFile(string $modelName, string $fileToCompare, array $actualModels, string $message=''){
+    public function assertModelsEqualsJsonFile(string $modelName, string $fileToCompare, array $actualModels, string $message='', editor_Test_Model_Filter $filter=NULL){
         $expectedModels = self::$api->getFileContent($fileToCompare);
-        $this->assertModelsEqualsObjects($modelName, $expectedModels, $actualModels, $message);
+        $this->assertModelsEqualsObjects($modelName, $expectedModels, $actualModels, $message, $filter);
     }
     /**
      * Compares a model of the given type/name with an expected model encoded as JSON object in a file
@@ -186,9 +188,10 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $fileToCompare
      * @param stdClass $actualModel
      * @param string $message
+     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
      */
-    public function assertModelEqualsJsonFile(string $modelName, string $fileToCompare, stdClass $actualModel, string $message=''){
-        $this->assertModelEqualsObject($modelName, self::$api->getFileContent($fileToCompare), $actualModel, $message);
+    public function assertModelEqualsJsonFile(string $modelName, string $fileToCompare, stdClass $actualModel, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
+        $this->assertModelEqualsObject($modelName, self::$api->getFileContent($fileToCompare), $actualModel, $message, $treeFilter);
     }
     
     /**
@@ -208,10 +211,11 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param stdClass $expectedModel
      * @param stdClass $actualModel
      * @param string $message
+     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
      */
-    public function assertModelEqualsObject(string $modelName, stdClass $expectedModel, stdClass $actualModel, string $message=''){
+    public function assertModelEqualsObject(string $modelName, stdClass $expectedModel, stdClass $actualModel, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
         $model = editor_Test_Model_Abstract::create($actualModel, $modelName);
-        $model->compare($this, $expectedModel, $message);
+        $model->compare($this, $expectedModel, $message, $treeFilter);
     }
     /**
      * Compares expected with actual models of the given type/name
@@ -219,8 +223,14 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param array $expectedModels
      * @param array $actualModels
      * @param string $message
+     * @param editor_Test_Model_Filter|null $filter: If given, the expected & actual items will be filtered according to this filter
      */
-    public function assertModelsEqualsObjects(string $modelName, array $expectedModels, array $actualModels, string $message=''){
+    public function assertModelsEqualsObjects(string $modelName, array $expectedModels, array $actualModels, string $message='', editor_Test_Model_Filter $filter=NULL){
+        // if a filter was passed, we need to reduce the lists
+        if($filter != NULL){
+            $actualModels = $filter->apply($actualModels);
+            $expectedModels = $filter->apply($expectedModels);
+        }
         $numModels = count($actualModels);
         if($numModels != count($expectedModels)){
             $this->assertEquals($numModels, count($expectedModels), $message.' [Number of '.ucfirst($modelName).'s does not match the expectations]');

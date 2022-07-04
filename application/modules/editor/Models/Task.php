@@ -262,11 +262,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param string $tasktype
      * @return array
      */
-    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype) {
+    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype): array
+    {
         $s = $this->db->select();
         $s->where('pmGuid = ?', $pmGuid);
         $s->where('tasktype = ?', $tasktype);
-        $s->order('orderdate ASC');
+        $s->order('orderdate DESC');
         return parent::loadFilterdCustom($s);
     }
 
@@ -293,11 +294,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function loadUserList(string $userGuid) {
+        /** @var ZfExtended_Models_User $userModel */
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
 
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $loadAll = $userModel->isAllowed('backend', 'loadAllTasks');
+        $loadAll = editor_User::instance()->isAllowed('backend', 'loadAllTasks');
         $ignoreAnonStuff = $this->rolesAllowReadAnonymizedUsers();
 
         $anonSql = '';
@@ -595,44 +596,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * register this Tasks config and Guid in the session as active Task
-     * @param Zend_Session_Namespace $session optional, if omitted standard SessionNamespace is generated
-     * @param string $openState
-     */
-    public function registerInSession(string $openState,Zend_Session_Namespace $session = null) {
-        if(empty($session)) {
-            $session = new Zend_Session_Namespace();
-        }
-        
-        $session->taskGuid = $this->getTaskGuid();
-        $session->taskOpenState = $openState;
-        $session->taskWorkflow = $this->getWorkflow();
-        $session->taskWorkflowStepNr = $this->getWorkflowStep();
-        $session->taskWorkflowStepName = $this->getWorkflowStepName();
-    }
-
-    /**
-     * deletes this Tasks config and Guid from the session as active Task
-     * @param Zend_Session_Namespace $session optional, if omitted standard SessionNamespace is generated
-     */
-    public function unregisterInSession(Zend_Session_Namespace $session = null) {
-        if(empty($session)) {
-            $session = new Zend_Session_Namespace();
-        }
-        $session->taskGuid = null;
-        $session->taskOpenState = null;
-        $session->taskWorkflowStepNr = null;
-    }
-
-    /**
-     * returns true if the loaded task is registered in the session
-     * @return boolean
-     */
-    public function isRegisteredInSession() {
-        $session = new Zend_Session_Namespace();
-        return !empty($session->taskGuid) && $session->taskGuid == $this->getTaskGuid();
-    }
-    /**
      * Convenience API
      * @return boolean
      */
@@ -916,23 +879,33 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * convenient method to get the task meta data
-     * @param boolean $reinit if true reinits the internal meta object completely (after adding a field for example)
+     * Explicitly creates a new meta entity to mark the beginnig of its lifecycle.
+     * @param array $data
      * @return editor_Models_Task_Meta
      */
-    public function meta($reinit = false) {
-        if(empty($this->meta) || $reinit) {
-            $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
-        }
-        elseif($this->getTaskGuid() == $this->meta->getTaskGuid()) {
-            return $this->meta;
-        }
-        try {
-            $this->meta->loadByTaskGuid($this->getTaskGuid());
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->meta->init(array('taskGuid' => $this->getTaskGuid()));
-        }
+    public function createMeta(array $data = []): editor_Models_Task_Meta {
+        $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        $data['taskGuid'] = $this->getTaskGuid();
+        $this->meta->init($data);
         return $this->meta;
+    }
+
+    /**
+     * convenient method to get the task meta data
+     * @param bool $reinit if true reinits the internal meta object completely (after adding a field for example)
+     * @return editor_Models_Task_Meta
+     */
+    public function meta(bool $reinit = false) {
+        $meta = $this->meta ?? $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        $taskGuid = $this->getTaskGuid();
+        if($meta->getTaskGuid() != $taskGuid || $reinit){
+            try {
+                $meta->loadByTaskGuid($taskGuid);
+            } catch(ZfExtended_Models_Entity_NotFoundException){
+                $meta->init(['taskGuid' => $taskGuid]);
+            }
+        }
+        return $meta;
     }
 
     /**
@@ -954,58 +927,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                 'isExclusiveState' => $this->isExclusiveState(),
             ]);
         }
-    }
-
-    /***
-     * Remove all ended task from the database and from the disk when there is no
-     * change since (taskLifetimeDays)config days in lek_task_log
-     */
-    public function removeOldTasks() {
-        $config = Zend_Registry::get('config');
-        $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
-
-
-        $daysOffset = $taskLifetimeDays ?? 100;
-
-        if(!$daysOffset){
-            throw new Zend_Exception('No task taskLifetimeDays configuration defined.');
-        }
-
-        $daysOffset = (int)$daysOffset; //ensure that it is plain integer
-        $s = $this->db->select()
-            ->where('`state` = ?', self::STATE_END)
-            ->where('`modified` < (CURRENT_DATE - INTERVAL ? DAY)', $daysOffset);
-        $tasks = $this->db->getAdapter()->fetchAll($s);
-
-        if(empty($tasks)){
-            return;
-        }
-
-        $taskEntity=null;
-        $removedTasks=[];
-        //foreach task task, check the deletable, and delete it
-        foreach ($tasks as $task){
-            $taskEntity=ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $taskEntity editor_Models_Task */
-            $taskEntity->load($task['id']);
-
-            if(!$taskEntity->isErroneous()){
-                $taskEntity->checkStateAllowsActions();
-            }
-
-            //no need for entity version check, since field loaded from db will always have one
-
-            $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($taskEntity));
-            /* @var $remover editor_Models_Task_Remover */
-            $removedTasks[]=$taskEntity->getTaskName();
-            $remover->remove();
-        }
-        $logger = Zend_Registry::get('logger');
-        /* @var $logger ZfExtended_Logger */
-        $logger->info('E1011', 'removeOldTasks - removed {taskCount} tasks', [
-            'taskCount' => count($removedTasks),
-            'taskNames' => $removedTasks
-        ]);
     }
 
     /**
@@ -1042,8 +963,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function updateIsTerminologieFlag($taskGuid,$ignoreAssocs=array()){
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
-        $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $assoc=ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $result=$assoc->loadAssocByServiceName($taskGuid, $service->getName(),$ignoreAssocs);
         $this->loadByTaskGuid($taskGuid);
         $this->setTerminologie(!empty($result));
@@ -1170,8 +1091,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         $states = $this->getTaskRoleAutoStates() ?: [];
-        // include blocked autostate in total segments finish count because blocked segments can not be edited and therefore they should count as finished.
+        // include (b)locked autostate in total segments finish count because (b)locked segments can not be edited and therefore they should count as finished.
         //TODO: with TRANSLATE-2753 this will be changed
+        $states[] = editor_Models_Segment_AutoStates::LOCKED;
         $states[] = editor_Models_Segment_AutoStates::BLOCKED;
 
         $isWorkflowEnded = $workflow->isEnded($this);
@@ -1237,11 +1159,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return $stateMap[$roleOfStep] ?? false;
     }
 
-    /***
+    /**
      * Get the active workflow for the current task
-     * @return editor_Workflow_Default|null if task is configured with a non existent workflow
+     * @return editor_Workflow_Default
      */
-    public function getTaskActiveWorkflow(): ?editor_Workflow_Default {
+    public function getTaskActiveWorkflow(): editor_Workflow_Default {
         //get the current task active workflow
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */

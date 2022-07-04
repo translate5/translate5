@@ -26,11 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\CurrentTask;
+use MittagQI\Translate5\Task\TaskContextTrait;
+
 /**
  *
  */
 class editor_TaskController extends ZfExtended_RestController {
 
+    use TaskContextTrait;
     use editor_Controllers_Task_ImportTrait;
 
 
@@ -208,23 +212,12 @@ class editor_TaskController extends ZfExtended_RestController {
             ]
         ])
         ->addActionContext('kpi', 'xlsx')
-
-
-        /*
-        ->addContext('excel', [
+        ->addContext('excelhistory', [
             'headers' => [
-                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // TODO Content-Type prüfen
             ]
         ])
-        ->addActionContext('export', 'excel')
-
-        ->addContext('excelReimport', [
-            'headers' => [
-                'Content-Type'          => 'text/xml',
-            ]
-        ])
-        ->addActionContext('export', 'excelReimport')
-        */
+        ->addActionContext('export', 'excelhistory')
 
         ->initContext();
     }
@@ -393,7 +386,7 @@ class editor_TaskController extends ZfExtended_RestController {
 
             $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
 
-            $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+            $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
             $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
 
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
@@ -659,7 +652,11 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->entity->setTargetLang(reset($this->data['targetLang']));
         }
 
-        $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+        if(empty($this->data['relaisLang'])){
+            $this->data['relaisLang'] = 0;
+        } else {
+            $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+        }
         $this->entity->setRelaisLang($this->data['relaisLang']);
 
         return $targetLangCount;
@@ -700,11 +697,13 @@ class editor_TaskController extends ZfExtended_RestController {
     /***
      * Sets task defaults for given task (default languageResources, default userAssocs)
      * @param editor_Models_Task $task
+     * @throws Zend_Cache_Exception
      */
     protected function setTaskDefaults(editor_Models_Task $task){
         $defaults = $this->_helper->taskDefaults;
-        /* @var $defaults Editor_Controller_Helper_TaskDefaults */
-        $defaults->addDefaultLanguageResources($task,$this->data['customerId']);
+        /* @var Editor_Controller_Helper_TaskDefaults $defaults */
+        $defaults->addDefaultLanguageResources($task);
+        $defaults->addDefaultPivotResources($task);
         $defaults->addDefaultUserAssoc($task);
     }
 
@@ -872,6 +871,13 @@ class editor_TaskController extends ZfExtended_RestController {
         //if it is a project, start the import workers for each sub task
         if($task->isProject()) {
             $tasks = $task->loadProjectTasks($task->getProjectId(),true);
+
+            /** @var editor_Workflow_Manager $wfm */
+            ZfExtended_Factory::get('editor_Workflow_Manager')
+                ->getActiveByTask($task)
+                ->hookin()
+                ->doHandleProjectCreated($task);
+
         } else {
             $tasks[] = $task;
         }
@@ -934,7 +940,13 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity = $cloner->clone($this->entity);
 
         if($this->validate()) {
-            $this->processUploadedFile($this->entity, $dataProvider);
+            // set meta data in controller as in post request
+            $metaData = $this->entity->meta()->toArray();
+            unset($metaData['id'], $metaData['taskGuid']);
+            foreach($metaData as $field => $value){
+                $this->data[$field] = $value;
+            }
+            $this->processUploadedFile($this->entity, $dataProvider); //creates task_meta via editor_Models_Import::import
             $cloner->cloneDependencies();
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
@@ -995,7 +1007,6 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time.
-        $this->checkUserSessionAllowsOpen($this->entity->getTaskGuid());
         $this->decodePutData();
 
         $this->handleCancelImport();
@@ -1083,7 +1094,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
         $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
-        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll, $this->data->userState ?? null);
         $this->view->rows = (object)$row;
 
@@ -1287,7 +1298,6 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         if($this->isOpenTaskRequest()){
             $task->createMaterializedView();
-            $task->registerInSession($this->data->userState);
             $this->events->trigger("afterTaskOpen", $this, array(
                 'task' => $task,
                 'view' => $this->view,
@@ -1332,7 +1342,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * unregisters the task from the session and close all open services
      */
     protected function unregisterTask() {
-        $this->entity->unregisterInSession();
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
         $manager->closeForTask($this->entity);
@@ -1501,7 +1510,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $isTaskPm;
-        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity, $this->isTaskProvided());
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->addMissingSegmentrangesToResult($row);
         $this->view->rows = (object)$row;
@@ -1549,6 +1558,16 @@ class editor_TaskController extends ZfExtended_RestController {
             case 'importArchive':
                 $this->logInfo('Task import archive downloaded');
                 $this->downloadImportArchive();
+                return;
+
+            case 'excelhistory':
+                if(!$this->isAllowed('frontend', 'editorExportExcelhistory')) {
+                    throw new ZfExtended_NoAccessException();
+                }
+                // run history excel export
+                /** @var editor_Models_Export_TaskHistoryExcel $exportExcel */
+                $exportExcel = ZfExtended_Factory::get('editor_Models_Export_TaskHistoryExcel', [$this->entity]);
+                $exportExcel->exportAsDownload();
                 return;
 
             case 'xliff2':
@@ -1913,7 +1932,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if($projectOnly){
             $filterValues = $taskTypes->getProjectTypes();
         } else {
-            $filterValues = $taskTypes->getTaskTypes();
+            $filterValues = $taskTypes->getNonInternalTaskTypes();
         }
         
         $filter->addFilter((object)[
@@ -1923,44 +1942,6 @@ class editor_TaskController extends ZfExtended_RestController {
             'comparison' => 'in'
         ]);
         return $projectOnly;
-    }
-
-    /***
-     * Check if the session allows the task to be opened for editing by the current user.
-     * If the user tries to open different task then the one in the session, exception is thrown
-     * INFO: the pmOverride is counted as opened editor
-     *       the user is not able to edit task properties if he already edits different task
-     * @param string $taskGuid
-     * @throws ZfExtended_UnprocessableEntity
-     */
-    protected function checkUserSessionAllowsOpen(string $taskGuid) {
-        if($this->config?->runtimeOptions?->ignoreE1341 ?? false) {
-            return;
-        }
-        $session = new Zend_Session_Namespace();
-        $sessionGuid = $session->taskGuid ?? null;
-        // if the task is with already active session for the user, ignore the check
-        if($sessionGuid == $taskGuid){
-            return;
-        }
-        $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $assoc editor_Models_TaskUserAssoc */
-
-        $tuas = $assoc->isUserInUse($this->user->data->userGuid);
-        //check if for the current user, there are task in use
-        if(empty($tuas)){
-            return;
-        }
-        ZfExtended_UnprocessableEntity::addCodes([
-            'E1341' => 'You tried to open or edit another task, but you have already opened another one in another window. Please press F5 to open the previous one here, or close this message to stay in the Taskoverview.'
-        ], 'editor.task');
-        throw new ZfExtended_UnprocessableEntity('E1341',[
-            'task' =>$this->entity, //TODO: is this really required ?,
-            'sessionGuid'=>$sessionGuid,
-            'taskGuid'=>$taskGuid,
-            'tuas' => $tuas,
-            'internalSessionUniqId' => $session->internalSessionUniqId
-        ]);
     }
 
     /***

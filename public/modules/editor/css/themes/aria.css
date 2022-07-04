@@ -68,3 +68,7 @@ tr.import td div {
 .x-menu-item-icon.x-fa {
     color: #ffffff;
 }
+
+.chosenDefault {
+    background-color: black;
+}

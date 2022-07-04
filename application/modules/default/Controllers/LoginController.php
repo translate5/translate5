@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
+ START LICENSE AND COPYRIGHT
 
- This file is part of translate5
- 
- Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+  This file is part of translate5
 
- Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+  Copyright (c) 2013 - 2022 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
- This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
- to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
- http://www.gnu.org/licenses/agpl.html
-  
- There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
-  
- @copyright  Marc Mittag, MittagQI - Quality Informatics
- @author     MittagQI - Quality Informatics
- @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
-END LICENSE AND COPYRIGHT
-*/
+  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+  included in the packaging of this file.  Please review the following information
+  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+  http://www.gnu.org/licenses/agpl.html
+
+  There is a plugin exception available for use with this release of translate5 for
+  translate5: Please see http://www.translate5.net/plugin-exception.txt or
+  plugin-exception.txt in the root folder of translate5.
+
+  @copyright  Marc Mittag, MittagQI - Quality Informatics
+  @author     MittagQI - Quality Informatics
+  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+ END LICENSE AND COPYRIGHT
+ */
 
 /**#@+
  * @author Marc Mittag
@@ -60,14 +60,10 @@ class LoginController extends ZfExtended_Controllers_Login {
         $lock = ZfExtended_Factory::get('ZfExtended_Models_Db_SessionUserLock');
         /* @var $lock ZfExtended_Models_Db_SessionUserLock */
         $this->view->lockedUsers = $lock->getLocked();
+       
+        //add the redirecthash from loginform to the stored origin
+        $this->getHelper('Access')->addHashToOrigin($this->getRequest()->getParam('redirecthash',''));
 
-        //set the redirecthash value in the session if it is provided by the login form submit
-        //Info: bacause of the multiple redirects (sso authentication), we save the hash in the session, and reaply it when
-        //we redirect to the editor module
-        $redirecthash = $this->getRequest()->getParam('redirecthash','');
-        if(!empty($redirecthash)){
-            $this->_session->redirecthash = $redirecthash;
-        }
         parent::indexAction();
         //if the login status is required, try to authenticate with openid connect
         if($this->view->loginStatus==ZfExtended_Models_SessionUserInterface::LOGIN_STATUS_OPENID){
@@ -97,103 +93,21 @@ class LoginController extends ZfExtended_Controllers_Login {
         }
         
         $this->localeSetup();
-        
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        $roles=editor_User::instance()->getRoles();
 
-        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, $acl::INITIAL_PAGE_RESOURCE, 'termPortal');
-        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, $acl::INITIAL_PAGE_RESOURCE, 'instantTranslatePortal');
-
-
-        $hash = $this->handleAppsRedirectHash();
-
-        // Case 1: redirect to instant-translate/term-portal using hash route
-        // If user was not logged in during the attempt to load termportal, but now is logged and allowed to do that
-        //TODO: after itranslate route is changed to itranslate to instanttranslate here
-        if (preg_match('~^#(termportal|itranslate)~', $hash) && $isTermPortalAllowed) {
-            // Do redirect
-            $this->applicationRedirect(substr($hash, 1), true);
-        }
-
-        // Case 2: redirect base on allowed modules
-        if(!empty($redirectModule = $this->getModuleRedirect())){
-            $this->moduleRedirect($redirectModule);
-        }
-
-        // Case 3: redirect to instant-translate/term-portal when the user has both roles. Where the user will be redirected
-        // will be decided based on the last used application
-        if($isTermPortalAllowed && $isInstantTranslateAllowed){
-            //find the last used app, if none use the instantranslate as default
-            $meta=ZfExtended_Factory::get('editor_Models_UserMeta');
-            /* @var $meta editor_Models_UserMeta */
-            $meta->loadOrSet(editor_User::instance()->getId());
-            $rdr='instanttranslate';
-            if($meta->getId()!=null && $meta->getLastUsedApp()!=''){
-                $rdr=$meta->getLastUsedApp();
-            }
-            $this->applicationRedirect($rdr, true);
-        }
-        
-        //Case 4: the user is only instant-translate allowed, redirect directly to instant-translate
-        if($isInstantTranslateAllowed){
-            $this->applicationRedirect('instanttranslate');
-        }
-
-        //Case 5: the user is only term-portal allowed, redirect directly to term-portal
-        if($isTermPortalAllowed){
-            $this->applicationRedirect('termportal');
-        }
-        
         if(editor_User::instance()->getLogin() == Zfextended_Models_User::SYSTEM_LOGIN) {
             $this->logoutAction();
         }
-        
+
+        // Redirect to the stored redirectTo target - if any
+        $this->getHelper('Access')->redirectToOrigin();
+
+        //if we are not redirected, then we try to load the possible applet:
+        \MittagQI\Translate5\Applet\Dispatcher::getInstance()->dispatch(); //no redirection was given, so dispatch by default
+
+        //if the applet dispatcher is not redirecting us, we trigger NoAccess
         throw new ZfExtended_NoAccessException("No initial_page resource is found.");
     }
 
-    /***
-     * Redirect to one of the existing applications (termportal or instanttranslate)
-     *
-     * @param string $applicationName application name
-     * @param null $isTermPortalAllowed is the user allowed to see termportal by acl
-     * @throws Zend_Exception
-     */
-    protected function applicationRedirect(string $applicationName, $isTermPortalAllowed = null){
-
-        $pluginmanager = Zend_Registry::get('PluginManager');
-        /* @var $pluginmanager ZfExtended_Plugin_Manager */
-        $termPortalEnabled = $pluginmanager->isActive('TermPortal');
-
-        // is term portal allowed when the user has termportal rights and the termportal plugin is enabled
-        $isTermPortalAllowed = $isTermPortalAllowed && $termPortalEnabled;
-
-        header ('HTTP/1.1 302 Moved Temporarily');
-        $apiUrl=APPLICATION_RUNDIR.'/editor/'.$applicationName;
-        $url = $applicationName == 'termportal' || $isTermPortalAllowed
-            ? APPLICATION_RUNDIR.'/editor/termportal#'.$applicationName
-            : APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
-        header ('Location: '.$url);
-        exit;
-    }
-
-    /***
-     * Redirect to the provided module and append the hash(if exist in the session) to the redirect url
-     * @param string $redirectModule
-     */
-    protected function moduleRedirect(string $redirectModule){
-        $redirecthash = $this->_session->redirecthash ?? null;
-        $redirectHeader = 'Location: '.APPLICATION_RUNDIR.'/'.$redirectModule;
-        if(!empty($redirecthash)){
-            //remove the redirect hash from the session. The rout handling is done by extjs
-            unset($this->_session->redirecthash);
-            $redirectHeader.=$redirecthash;
-        }
-        header ('HTTP/1.1 302 Moved Temporarily');
-        header ($redirectHeader);
-        exit;
-    }
-    
     /***
      * Check if the current request is valid for the openid. If it is a valid openid request, the user
      * login will be redirected to the openid client server
@@ -207,7 +121,7 @@ class LoginController extends ZfExtended_Controllers_Login {
             return;
         }
 
-        //add form hidden field, which is used when redirec to openid is needed
+        //add form hidden field, which is used when redirect to openid is needed
         $redirect = new Zend_Form_Element_Hidden([
             'name' => 'openidredirect',
             'value' => $oidc->getCustomer()->getOpenIdRedirectCheckbox()
@@ -232,10 +146,27 @@ class LoginController extends ZfExtended_Controllers_Login {
                     
                 )
             ));
+
             $link->setOrder(4);
             $this->_form->addElement($link);
+        }else{
+            // Add overlay to the login page only when the user is automatically redirected to the SSO auth provider
+            $overlay = new Zend_Form_Element_Note([
+                'name' => 'overlay',
+                'value' => '<div style="position: absolute;top: 50%;left: 50%;font-size: 50px;color: white;transform: translate(-50%,-50%);-ms-transform: translate(-50%,-50%);">'.$this->_translate->_('Redirect to login...').'</div>',
+                'decorators' => [
+                    ['ViewHelper'],
+                    ['HtmlTag', [
+                        'tag' => 'div',
+                        'id' => 'overlay',
+                        'style' => 'position: fixed;display: block;width: 100%;height: 100%;top: 0;left: 0;right: 0;bottom: 0;background-color: rgba(175,175,175,1);z-index: 10001;'
+                    ]],
+
+                ]
+            ]);
+            $this->_form->addElement($overlay);
         }
-        
+
         try {
             //authenticate with the configured openid client
             if($oidc->authenticate()){
@@ -322,7 +253,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                 loginForm.action+=(window.location.hash);
 
                 if(redirecthashField){
-                    //store the hash in field, it is required for the openid
+                    //transmit the hash to the server for proper redirect after login
                     redirecthashField.value=(window.location.hash);
                 }
 
@@ -343,55 +274,5 @@ class LoginController extends ZfExtended_Controllers_Login {
             'ViewRenderer'
         );
         $renderer->view->headScript()->appendScript($openIdScript);
-    }
-
-    /**
-     * Parse and adjust the redirect hash when the current request is for terportal/instant-translate
-     * @return string
-     */
-    protected function handleAppsRedirectHash() : string {
-
-        $hash = $this->_session->redirecthash ?: '';
-        if(preg_match('~^#name=(termportal|instanttranslate)~', $hash, $matches)){
-            // Drop redirecthash prop from session
-            $this->_session->redirecthash = '';
-            $hash = $matches[1];
-            //TODO: after itranslate route is changed to instanttranslate this should be removed
-            if($hash === 'instanttranslate'){
-                $hash = 'itranslate';
-            }
-            return '#'.$hash;
-        }
-
-        return $hash;
-    }
-
-    /***
-     * Get the redirect module based on the initial_page resource for the current user.
-     * The order of the modules is decided by runtimeOptions->modulesOrder config in application ini
-     * @return string
-     * @throws Zend_Db_Table_Exception
-     * @throws Zend_Exception
-     */
-    protected function getModuleRedirect(): string
-    {
-
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-
-        // get all initial_page acl records for all available user roles
-        $aclModules = $acl->getInitialPageModulesForRoles(editor_User::instance()->getRoles());
-
-        $config = Zend_Registry::get('config');
-        $modulesOrder = explode(',',$config->runtimeOptions->modulesOrder);
-
-        // find the module redirect based on the modulesOrder config
-        foreach ($modulesOrder as $module){
-            if(in_array($module,$aclModules)){
-                return $module;
-            }
-        }
-        // no redirect module was found
-        return '';
     }
 }

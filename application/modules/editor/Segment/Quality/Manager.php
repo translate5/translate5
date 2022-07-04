@@ -71,7 +71,9 @@ final class editor_Segment_Quality_Manager {
         'editor_Segment_Qm_Provider',
         'editor_Segment_Length_QualityProvider',
         'editor_Segment_Empty_QualityProvider',
-        'editor_Segment_Consistent_QualityProvider'
+        'editor_Segment_Consistent_QualityProvider',
+        'editor_Segment_Whitespace_QualityProvider',
+        'editor_Segment_Numbers_QualityProvider',
     ];
     /**
      * @var boolean

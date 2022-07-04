@@ -75,6 +75,12 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     protected $shortTagIdent = 1;
 
     /**
+     * Contains the tag map of the prepared query
+     * @var array
+     */
+    protected $map = [];
+
+    /**
      * @var ZfExtended_Logger_Queued
      */
     public $logger;
@@ -100,16 +106,18 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     /**
      * protects the internal tags for language resource processing as defined in the class
      * @param string $queryString
+     * @param int $segmentId: optional: only used by some Taghandlers and only provided by some connectors
      * @return string
      */
-    abstract public function prepareQuery(string $queryString): string;
+    abstract public function prepareQuery(string $queryString, int $segmentId=-1): string;
     
     /**
      * protects the internal tags for language resource processing as defined in the class
-     * @param string $queryString
-     * @return string|NULL NULL on error
+     * @param string $resultString
+     * @param int $segmentId if given must match what was provided with the prepareQuery call for this result
+     * @return string|null returns NULL on error
      */
-    abstract public function restoreInResult(string $resultString): ?string;
+    abstract public function restoreInResult(string $resultString, int $segmentId=-1): ?string;
     
     /**
      * Returns true if last restoreInResult call had errors
@@ -160,5 +168,12 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      */
     public function setTagMap(array $map) {
         $this->map = $map;
+    }
+
+    /**
+     * @return editor_Models_Segment_UtilityBroker|mixed
+     */
+    public function getUtilities() : editor_Models_Segment_UtilityBroker {
+        return $this->utilities;
     }
 }

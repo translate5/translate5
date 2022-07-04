@@ -187,6 +187,11 @@ Ext.define('Editor.model.admin.Task', {
     hasProjectTasks: function () {
         return this.get('projectTasks') && this.get('projectTasks').length>0;
     },
+
+    isProject: function (){
+        return this.get('taskType') === 'project';
+    },
+
     /**
      * returns if task is editable depending on task locking and usagemode
      * does not evaluate waiting/finished etc. Therefore is isReadonly
@@ -287,6 +292,13 @@ Ext.define('Editor.model.admin.Task', {
      */
     isAutoqa: function () {
         return (this.get('state') === 'opautoqa' || this.get('state') === 'matchanalysis');
+    },
+
+    /***
+     * Is the task state pivotpretranslation
+     */
+    isPivotPreTranslation: function () {
+        return this.get('state') === 'pivotpretranslation';
     },
     /**
      * Is the current task state open

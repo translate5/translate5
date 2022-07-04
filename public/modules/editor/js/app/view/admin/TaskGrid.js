@@ -240,7 +240,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             '</tpl>',
             {
                 getLevel: function (values) {
-                    return Editor.model.admin.task.Log.prototype.getLevelName(values.level)
+                    return Editor.util.Util.getErrorLevelName(values.level);
                 }
             }
         );

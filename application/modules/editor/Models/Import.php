@@ -62,10 +62,14 @@ class editor_Models_Import {
 
     /**
      * führt den Import aller Dateien eines Task durch
-     * @param string $importFolderPath
-     * @throws Exception
+     * @param editor_Models_Import_DataProvider_Abstract $dataProvider
+     * @param array $requestData: this should be the controller's request data
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function import(editor_Models_Import_DataProvider_Abstract $dataProvider) {
+    public function import(editor_Models_Import_DataProvider_Abstract $dataProvider, array $requestData=[]) {
         if(empty($this->task)){
             throw new Zend_Exception('taskGuid not set - please set using $this->setTask/$this->createTask');
         }
@@ -86,7 +90,11 @@ class editor_Models_Import {
                 editor_Models_Languages::LANG_TYPE_ID);
 
             // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
-            $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->task, 'dataProvider' => $dataProvider));
+            $this->events->trigger("afterUploadPreparation", $this, array(
+                'task' => $this->task,
+                'dataProvider' => $dataProvider,
+                'requestData' => $requestData
+            ));
             
             $dataProvider->archiveImportedData();
             $this->importConfig->importFolder = $dataProvider->getAbsImportPath();
@@ -99,12 +107,8 @@ class editor_Models_Import {
             }
             
             $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
-            
-            //if the task meta exist, save it
-            if($this->task->meta()){
-                $this->task->meta()->save();
-            }
-            
+            $this->task->meta()->save(); /** @see editor_Controllers_Task_ImportTrait::processUploadedFile Creates meta */
+
             $this->task->lock(NOW_ISO, $this->task::STATE_IMPORT); //locks the task
             
             $this->events->trigger('beforeImport', $this, array(

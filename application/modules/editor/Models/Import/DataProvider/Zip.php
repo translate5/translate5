@@ -76,6 +76,16 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
                 'target' => $target,
             ]);
         }
+        // add additional Archive-files if set
+        if(count($this->additionalArchiveFiles) > 0){
+            $zip = new ZipArchive();
+            if ($zip->open($target) === TRUE) {
+                foreach($this->additionalArchiveFiles as $fileName => $filePath){
+                    $zip->addFile($filePath, $fileName);
+                }
+                $zip->close();
+            }
+        }
     }
 
     /**

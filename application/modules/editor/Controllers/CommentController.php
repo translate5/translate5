@@ -26,7 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_CommentController extends editor_Controllers_EditorrestController {
+use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\TaskContextTrait;
+
+class Editor_CommentController extends ZfExtended_RestController {
+    use TaskContextTrait;
 
     protected $entityClass = 'editor_Models_Comment';
 
@@ -35,8 +39,14 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
      */
     protected $entity;
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
     public function init() {
         parent::init();
+        $this->initCurrentTask();
         $events = Zend_EventManager_StaticEventManager::getInstance();
         
         //if comments are changed via REST the workflow stuff must be triggered
@@ -53,10 +63,14 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
             $workflow->getSegmentHandler()->beforeCommentedSegmentSave($segment, $task);
         });
     }
-    
+
+    /**
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
     public function indexAction() {
+        $taskGuid = $this->getCurrentTask()->getTaskGuid();
         $segmentId = (int)$this->_getParam('segmentId');
-        $this->view->rows = $this->entity->loadBySegmentId($segmentId, $this->session->taskGuid);
+        $this->view->rows = $this->entity->loadBySegmentId($segmentId, $taskGuid);
         foreach($this->view->rows as &$row) {
             $row['comment'] = htmlspecialchars($row['comment']);
         }
@@ -65,18 +79,28 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         // anonymize users for view?
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->session->taskGuid);
+        $task->loadByTaskGuid($taskGuid);
         if ($task->anonymizeUsers()) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
             foreach ($this->view->rows as &$row) {
-                $row = $workflowAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
+                $row = $workflowAnonymize->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
             }
         }
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws Zend_Db_Statement_Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_ValidateException
+     * @throws NoAccessException
+     * @throws ZfExtended_NoAccessException
+     */
     public function putAction() {
-        $session = new Zend_Session_Namespace();
         $commentId = (int) $this->_getParam('id');
         $this->entity->load($commentId);
 
@@ -97,9 +121,15 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->isEditable = true; //a edited comment is editable again
-        $this->updateSegment((int)$this->entity->getSegmentId(), $this->session->taskGuid);
+        $this->updateSegment((int)$this->entity->getSegmentId(), $this->getCurrentTask()->getTaskGuid());
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws ZfExtended_NoAccessException
+     */
     public function deleteAction() {
         $commentId = (int) $this->_getParam('id');
         $this->entity->load($commentId);
@@ -110,11 +140,20 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $this->entity->getUserGuid());
         $id = (int)$this->entity->getSegmentId();
         $this->entity->delete();
-        $this->updateSegment($id, $this->session->taskGuid);
+        $this->updateSegment($id, $this->getCurrentTask()->getTaskGuid());
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_ValidateException
+     * @throws ZfExtended_NoAccessException
+     */
     public function postAction() {
-        $taskGuid = $this->session->taskGuid;
+        $taskGuid = $this->getCurrentTask()->getTaskGuid();
         $sessionUser = new Zend_Session_Namespace('user');
         $userGuid = $sessionUser->data->userGuid;
         $wfh = $this->_helper->workflow;
@@ -172,8 +211,9 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
      * @throws ZfExtended_Models_Entity_NoAccessException
      */
     protected function checkEditable() {
+        $this->validateTaskAccess($this->entity->getTaskGuid());
         $editable = $this->entity->isEditable();
-        if (empty($editable) || $this->session->taskGuid !== $this->entity->getTaskGuid()) {
+        if (empty($editable)) {
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
     }
@@ -183,13 +223,10 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
      * @throws ZfExtended_Models_Entity_NoAccessException
      */
     protected function checkSegmentTaskGuid(int $segmentId) {
-        $session = new Zend_Session_Namespace();
+        /** @var editor_Models_Segment $segment */
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
         $segment->load($segmentId);
-        if ($session->taskGuid !== $segment->getTaskGuid()) {
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
+        $this->validateTaskAccess($segment->getTaskGuid());
     }
     
     /**

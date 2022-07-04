@@ -109,6 +109,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param array $userData
      */
     protected function notify(array $userData) {
+        // if disabled by config, do not send email
+        // TODO: this is a quick solution for the problem. To solve this really, this should be configurable for a workflow
+        if($this->isDisabled()){
+            return;
+        }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->init($userData);
@@ -116,10 +121,15 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
 
     /**
-     * send the latest created notification to the list of users
+     * send the latest created notification to single user
      * @param ZfExtended_Models_User $user
      */
     protected function notifyUser(ZfExtended_Models_User $user) {
+        // if disabled by config, do not send email
+        // TODO: this is a quick solution for the problem. To solve this really, this should be configurable for a workflow
+        if($this->isDisabled()){
+            return;
+        }
         $this->mailer->sendToUser($user);
     }
 
@@ -441,6 +451,36 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
 
     /**
+     * Notify project PM about that project was just created
+     */
+    public function notifyNewProjectForPm() {
+
+        /** @var ZfExtended_Models_User $user */
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $user->loadByGuid($this->config->task->getPmGuid());
+
+        // Create notification
+        $this->createNotification(ACL_ROLE_PM, __FUNCTION__, [
+            'project' => $project = $this->config->task,
+            'user' => (array) $user->getDataObject(),
+        ]);
+
+        // Get trigger config
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
+
+        // If notification should be sent only for specific project types, but current one is not like that
+        if (is_array($triggerConfig->projectTypes ?? null)
+            && !in_array($project->getTaskType()->id(), $triggerConfig->projectTypes)) {
+
+            // Prevent notification from being sent
+            return;
+        }
+
+        // Do notify
+        $this->notifyUser($user);
+    }
+
+    /**
      * Notifies the tasks PM over the new task, but only if PM != the user who has uploaded the task
      */
     public function notifyNewTaskForPm() {
@@ -588,7 +628,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         //remove the tmp file from the disc
         unlink($file);
     }
-
 
     /**
      * attaches the segmentList as attachment to the internal mailer object
@@ -763,5 +802,20 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->notify($assoc);
             $deadlineHelper->logDeadlineNotified($assoc,$isApproaching);
         }
+    }
+
+    /***
+     * Check if the workflow notifications are disabled by config. If the current request is in task context, task config will be used.
+     * Otherwise, the system config value will be used.
+     * @return bool
+     * @throws editor_Models_ConfigException|Zend_Exception
+     */
+    protected function isDisabled() : bool{
+        if(isset($this->config->task)){
+            $config = $this->config->task->getConfig();
+        }else{
+            $config = Zend_Registry::get('config');
+        }
+        return (bool) $config->runtimeOptions->workflow->disableNotifications;
     }
 }

@@ -48,7 +48,7 @@ Ext.define('Editor.view.admin.log.Grid', {
         message: '#UT# Ereignis',
         created: '#UT# Zeitpunkt',
         moreInfo: '#UT# Mehr Info',
-        eventCodeInfoText : '#UT#Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken'
+        eventCodeInfoText : '#UT#Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken.<br/>Nicht alle Fehler können hier aufgelistet werden, bitte beachten Sie daher auch das <a href="#preferences/adminSystemLog">generelle System Log</a>!'
     },
     layout: 'fit',
     entityUrlPart: null,
@@ -67,7 +67,7 @@ Ext.define('Editor.view.admin.log.Grid', {
         var me = this,
             config,
             levelFilter = [];
-        Ext.Object.each(Editor.model.admin.task.Log.prototype.errorLevel, function(k, v) {
+        Ext.Object.each(Editor.util.Util.prototype.errorLevel, function(k, v) {
             levelFilter.push({
                 id: k,
                 text: me.imgTpl.apply([v]) + ' ' +  me.strings['level_'+v]
@@ -97,7 +97,7 @@ Ext.define('Editor.view.admin.log.Grid', {
                         width: 50,
                         tdCls: 'error-level',
                         renderer: function(v, meta, rec) {
-                            var level = rec.getLevelName(),
+                            var level = Editor.util.Util.getErrorLevelName(v),
                                 img = me.imgTpl.apply([level]);
                             meta.tdAttr = 'data-qtip="' + me.strings['level_'+level]+'"';
                             return img;

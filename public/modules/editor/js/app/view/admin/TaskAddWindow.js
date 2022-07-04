@@ -37,7 +37,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.task.UserAssocWizard',
         'Editor.view.admin.task.UserAssocWizardViewModel',
         'Editor.view.admin.projectWizard.UploadTabPanel',
-        'Editor.view.admin.TaskAddWindowViewController'
+        'Editor.view.admin.TaskAddWindowViewController',
+        'Editor.view.LanguageResources.pivot.PivotWizard'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -50,6 +51,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     },
     controller:'adminTaskAddWindow',
     title: '#UT#Projekt erstellen',
+    defaultFocus: '#customerId',
     strings: {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (Angabe notwendig)',
         importUploadLabel: '#UT#Import Datei¹',
@@ -126,7 +128,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         config = {
                 title: me.title, //see EXT6UPD-9
                 layout: 'card',
-                height: parseInt(Editor.app.viewport.getHeight() * 0.70),
+                height: parseInt(Editor.app.viewport.getHeight() * 0.80),
                 width: parseInt(Editor.app.viewport.getWidth() * 0.70),
                 items:[
                     {
@@ -155,6 +157,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     anchor: '100%',
                                     msgTarget: 'under'
                                 },
+                                /** @see Editor.controller.admin.TaskPreferences.onTaskMainCardAdded
+                                 * QUIRK: Inserts client combobox. TODO Unify and add here. */
                                 items: [{
                                     xtype: 'textfield',
                                     name: 'taskName',
@@ -199,8 +203,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     checked: true,
                                     fieldLabel: me.strings.lockLockedLabel
                                 }]
-                                // + item for assigning customers to the task
-                                // (added dynamically by Editor.controller.admin.TaskPreferences)
                             },{
                                 xtype: 'container',
                                 itemId: 'taskSecondCardContainer',
@@ -254,9 +256,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                         // show error message when the field is marked as invalid from the backend
                                         // (this field is not visible to the user)
                                         Editor.MessageBox.addError(error);
-                                    },
-                                    bind:{
-                                        hidden: '{!isZipUpload}'
                                     },
                                     allowBlank: true,
                                     toolTip: me.strings.relaisLangTip,

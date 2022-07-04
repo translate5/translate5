@@ -57,11 +57,18 @@ class editor_User {
      * @var Zend_Session_Namespace
      */
     private $session;
-    
+
+    /**
+     * @throws ZfExtended_NotAuthenticatedException
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
     private function __construct(){
         $this->session = new Zend_Session_Namespace('user');
         // TODO FIXME: add some validation to catch an inexisting session or an invalid user
         self::$modelInstance = ZfExtended_Factory::get('ZfExtended_Models_User');
+        if($this->getId() === 0) {
+            throw new ZfExtended_NotAuthenticatedException();
+        }
         self::$modelInstance->load($this->getId());
     }
     /**
@@ -92,6 +99,32 @@ class editor_User {
     public function getRoles() : array {
         return $this->session->data->roles;
     }
+
+    /***
+     * @return string
+     */
+    public function getUserName(): string
+    {
+        return $this->session->data->userName;
+    }
+
+    /**
+     * Check if currently logged in user is allowed to access the given ressource and right
+     *
+     * @param string $resource
+     * @param string $right
+     *
+     * @return boolean
+     */
+    public function isAllowed(string $resource, string $right): bool {
+        try {
+            return ZfExtended_Acl::getInstance()->isInAllowedRoles($this->getRoles(), $resource, $right);
+        }
+        catch (Zend_Acl_Exception) {
+            return false;
+        }
+    }
+
     /**
      *
      * @return stdClass

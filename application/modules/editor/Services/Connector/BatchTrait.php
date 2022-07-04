@@ -40,6 +40,12 @@ trait editor_Services_Connector_BatchTrait {
      * @var integer
      */
     protected $batchQueryBuffer = 1;
+
+    /***
+     * Buffer size in KB or false to disable the size calculation
+     * @var bool|integer
+     */
+    protected $batchQueryBufferSize = false;
     
     /**
      * container for collected exceptions
@@ -76,6 +82,7 @@ trait editor_Services_Connector_BatchTrait {
         
         $segmentCounter = 0;
         $progress = 0;
+        $bufferSize = 0;
         foreach ($segments as $segment){
             
             $segmentCounter++;
@@ -87,31 +94,54 @@ trait editor_Services_Connector_BatchTrait {
             //For analysis, the mt matchrate will always be the same.So it make no difference here if it is pretranslation
             //or analysis, the empty target segments for mt resources should not be send to batch processor
             //TODO: in future, when the matchrate is provided/calculated for mt, this should be changed
-            
+
             
             $target = $segment->getTarget();
             if(strlen($target) > 0 && $this->languageResource->isMt()){
                 continue;
             }
+            $querySegment = $this->tagHandler->prepareQuery($this->getQueryString($segment), $segment->getId());
             $batchQuery[] = [
-                //set the query string to segment map. Later it will be used to reapply the taks
+                //set the query string to segment map. Later it will be used to reapply the tags
                 'segment' => clone $segment,
                 //collect the source text
-                'query' => $this->tagHandler->prepareQuery($this->getQueryString($segment)),
+                'query' => $querySegment,
                 'tagMap' => $this->tagHandler->getTagMap(),
             ];
-            
-            if(++$tmpBuffer != $this->batchQueryBuffer){
+
+            // collect the segment size in bytes in temporary variable
+            $bufferSize += $this->getQuerySegmentSize($querySegment);
+            // is the collected buffer size above the allowed limit (if the buffer size limit is not allowed for the resource, this will return true)
+            $allowByContent = $this->isAllowedByContentSize($bufferSize);
+
+            if(++$tmpBuffer != $this->batchQueryBuffer && $allowByContent){
                 continue;
             }
-            
-            //send batch query request, and save the results to the batch cache
-            $this->handleBatchQuerys($batchQuery);
-            
-            $progressCallback && $progressCallback($progress);
 
-            $batchQuery = [];
-            $tmpBuffer=0;
+            // if the content is above the allowed buffer, remove the last segment from the batchQuery, and save it for the next loop
+            if($allowByContent === false){
+                // get the last query segment
+                $resetBuffer = $batchQuery[count($batchQuery)-1];
+                // remove the last query segment from the array (since the size is over the allowed limit)
+                array_pop($batchQuery);
+                //send batch query request, and save the results to the batch cache
+                $this->handleBatchQuerys($batchQuery);
+                $progressCallback && $progressCallback($progress);
+                $batchQuery = [];
+                $batchQuery[] = $resetBuffer;
+
+                // set the current buffer size to the last segment size
+                $bufferSize = $this->getQuerySegmentSize($querySegment);
+            }else{
+                //send batch query request, and save the results to the batch cache
+                $this->handleBatchQuerys($batchQuery);
+
+                $progressCallback && $progressCallback($progress);
+
+                $batchQuery = [];
+                $bufferSize = 0;
+            }
+            $tmpBuffer = 0;
         }
         
         //query the rest, if there are any:
@@ -119,6 +149,32 @@ trait editor_Services_Connector_BatchTrait {
             $this->handleBatchQuerys($batchQuery);
             $progressCallback && $progressCallback($progress);
         }
+    }
+
+    /***
+     * Check if calculate content size exceeds the allowed limit
+     * @param int $totalContentSize
+     * @return bool
+     */
+    protected function isAllowedByContentSize(int $totalContentSize): bool
+    {
+        if(is_numeric($this->batchQueryBufferSize) === false){
+            return true;
+        }
+        return $totalContentSize < $this->batchQueryBufferSize;
+    }
+
+    /***
+     * Return the queried segment size in KB
+     * @param string $querySegment
+     * @return float|bool|int
+     */
+    protected function getQuerySegmentSize(string $querySegment): float|bool|int
+    {
+        if(is_numeric($this->batchQueryBufferSize) === false){
+            return 0;
+        }
+        return strlen(urlencode($querySegment)) / 1024;
     }
     
     /**
@@ -153,15 +209,14 @@ trait editor_Services_Connector_BatchTrait {
             //get the segment from the beginning of the cache
             //we assume that for each requested query string, we get one response back
             $query = array_shift($batchQuery);
-            /* @var $segment editor_Models_Segment */
-            
+            $segmentId = $query['segment']->getId();
             $this->getQueryStringAndSetAsDefault($query['segment']);
             $this->tagHandler->setTagMap($query['tagMap']);
-            $this->processBatchResult($segmentResults);
+            $this->processBatchResult($segmentResults, $segmentId);
             
             $this->logForSegment($query['segment']);
             
-            $this->saveBatchResults($query['segment']->getId());
+            $this->saveBatchResults($segmentId);
 
             //log the adapter usage for the batch query segment
             $this->logAdapterUsage($query['segment']);
@@ -182,14 +237,15 @@ trait editor_Services_Connector_BatchTrait {
     /**
      * process (add to the result list and decode) results from the language resource
      * @param mixed $segmentResults
+     * @param int $segmentId: only needed by same tag handlers
      */
-    abstract protected function processBatchResult($segmentResults);
+    abstract protected function processBatchResult($segmentResults, int $segmentId=-1);
     
     /**
      * @param int $segmentId
      */
     protected function saveBatchResults(int $segmentId) {
-        Zend_Db_Table::getDefaultAdapter()->insert('LEK_match_analysis_batchresults', [
+        Zend_Db_Table::getDefaultAdapter()->insert('LEK_languageresources_batchresults', [
             'languageResource' =>$this->languageResource->getId(),
             'segmentId'=>$segmentId,
             'result'=>serialize($this->resultList)

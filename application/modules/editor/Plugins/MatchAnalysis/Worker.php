@@ -28,14 +28,7 @@ END LICENSE AND COPYRIGHT
 
 class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWorker
 {
-
-    /***
-     *
-     * @var ZfExtended_Logger
-     */
-    protected $log;
-    /***
-     *
+    /**
      * @var editor_Plugins_MatchAnalysis_Analysis
      */
     protected $analysis;

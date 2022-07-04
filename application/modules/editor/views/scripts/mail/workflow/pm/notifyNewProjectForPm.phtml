@@ -1,0 +1,68 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/**#@+
+ * @author Marc Mittag
+ * @package portal
+ * @version 2.0
+ *
+ */
+
+/* @var $this Zend_View */
+$this->render('general.phtml');
+
+// Setup subject
+$this->subject = $this->translate->_('Translate5 - Projekt erstellt')
+    . ' "' . $this->project->getId()
+    .' - ' . $this->project->getTaskName() . '"';
+
+// Prepare data to merged with general.phtml's data
+$data = [
+    'header' => $this->header,
+    'footer' => $this->footer,
+    'role' => $this->translate->_(ucfirst(ACL_ROLE_PM)),
+    'projectId' => $this->project->getId(),
+    'projectName' => $this->project->getTaskName(),
+    'projectType' => $this->translate->_('taskType::' . $this->project->getTaskType()->id()),
+];
+
+// Build mail body
+$mailBody = $this->templateApply('
+{header}
+Im Projektportal {portalLink} wurde ein neues {projectType} erstellt.<br />
+<strong>Project ID:</strong> {projectId} <br />
+<strong>Project Name:</strong> {projectName}
+{footer}'
+, $data);
+
+// Prepare text version
+$this->textbody = strip_tags($mailBody);
+
+// Print mail body
+echo $mailBody;
+

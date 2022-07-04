@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.ViewPort', {
     extend: 'Ext.container.Viewport',
     requires: [
+        'Editor.view.ViewPortViewModel',
         'Editor.view.MaintenancePanel',
         'Editor.view.admin.user.Grid',
         'Editor.view.admin.TaskGrid',
@@ -42,6 +43,9 @@ Ext.define('Editor.view.ViewPort', {
         'Editor.view.admin.preferences.OverviewPanel',
         'Editor.view.project.ProjectPanel'
     ],
+    viewModel: {
+        type: 'viewport'
+    },
     layout: 'border',
     initComponent: function() {
         var me = this,
@@ -54,7 +58,19 @@ Ext.define('Editor.view.ViewPort', {
                 region: 'center',
                 xtype: 'tabpanel',
                 itemId: 'adminMainSection',
-                
+                /**
+                 * returns the configured default route of the active tab (if any configured)
+                 * @returns {string}
+                 */
+                getActiveTabDefaultRoute: function() {
+                    var tab = this.getActiveTab(),
+                        ctrl = tab.getController(),
+                        conf = ctrl && ctrl.defaultConfig;
+                    if(conf && conf.routes) {
+                        return Object.keys(conf.routes)[0];
+                    }
+                    return '';
+                },
                 //ui: 'navigation', → eigene UI benötigt eigenes CSS! Im Beispiel ist das ja SCSS was noch gerendert werden müsste!
                 tabBar: {
                     // turn off borders for classic theme.  neptune and crisp don't need this

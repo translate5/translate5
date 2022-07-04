@@ -39,9 +39,8 @@ Ext.define('Editor.controller.Editor', {
         'Editor.view.task.ConfirmationWindow',
         'Editor.view.ReferenceFilesInfoMessage'
     ],
-    mixins: [
-        'Editor.util.Event',
-        'Editor.util.Range'
+    mixins: ['Editor.util.Event',
+        	 'Editor.util.Range'
     ],
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
@@ -94,11 +93,7 @@ Ext.define('Editor.controller.Editor', {
     sourceTags: null,
     copiedSelectionWithTagHandling: null,
     resetSegmentValueForEditor: null,
-    /**
-     * TODO FIXME: this references the HTML editor and therefore better should be called htmlEditor. The Range mixin though expects "editor"
-     * {Editor.view.segments.HtmlEditor}
-     */
-    editor: null,
+    htmlEditor: null,
     listen: {
         controller: {
             '#Editor.$application': {
@@ -133,6 +128,9 @@ Ext.define('Editor.controller.Editor', {
                 select:'onSegmentGridSelect',
                 segmentSizeChanged:'onSegmentGridSegmentsSizeChanged'
             },
+            '#segmentgrid segmentsToolbar #scrollToSegmentBtn': {
+                click: 'focusSegmentShortcut'
+            },
             '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
             },
@@ -153,6 +151,9 @@ Ext.define('Editor.controller.Editor', {
             '#naviToolbar #btnInsertWhitespaceTab': {
                 click: 'insertWhitespaceTab'
             },
+            '#naviToolbar specialCharactersButton': {
+                click: 'insertSpecialCharacter'
+            },
             '#segmentMinMaxLength': {
                 insertNewline: 'insertWhitespaceNewline'
             }
@@ -166,7 +167,7 @@ Ext.define('Editor.controller.Editor', {
 
     routes: {
         'task/:id/:segmentNrInTask/edit': 'onTaskSegmentEditRoute',
-        'task/:id/edit': 'onTaskSegmentEditRoute'
+        'task/:id/edit': 'onTaskSegmentEditRoute',
     },
 
     init : function() {
@@ -189,10 +190,10 @@ Ext.define('Editor.controller.Editor', {
         me.keyMapConfig = {
             'ctrl-d':         ['D',{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ['S',{ctrl: true, alt: false}, me.save, true],
-            'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
+            'ctrl-g':         ['G',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
-            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.focusSegmentShortcut, true],
+            'ctrl-l':         ['L',{ctrl: true, alt: false}, me.toggleSegmentLock, true],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -221,27 +222,6 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-zoomIn':    [[187, Ext.EventObjectImpl.NUM_PLUS],{ctrl: true, alt: false, shift: false}, me.handleZoomIn, true],
             'ctrl-zoomOut':   [[189, Ext.EventObjectImpl.NUM_MINUS],{ctrl: true, alt: false, shift: false}, me.handleZoomOut, true]
         };
-        
-        //FIXME let me come from the server out of AutoStates.php
-        Editor.data.segments.autoStates = {
-            'TRANSLATED': 0,
-            'REVIEWED': 1,
-            'REVIEWED_AUTO': 2,
-            'BLOCKED': 3,
-            'NOT_TRANSLATED': 4,
-            'REVIEWED_UNTOUCHED': 5,
-            'REVIEWED_UNCHANGED': 6,
-            'REVIEWED_UNCHANGED_AUTO': 7,
-            'REVIEWED_TRANSLATOR': 8,
-            'REVIEWED_TRANSLATOR_AUTO': 9,
-            'REVIEWED_PM': 10,
-            'REVIEWED_PM_AUTO': 11,
-            'REVIEWED_PM_UNCHANGED': 12,
-            'REVIEWED_PM_UNCHANGED_AUTO': 13,
-            'TRANSLATED_AUTO': 14,
-            'EDITING_BY_USER': 998,
-            'PENDING': 999
-        };
     },
     /**
      * track isEditing state 
@@ -249,7 +229,12 @@ Ext.define('Editor.controller.Editor', {
     initEditPluginHandler: function (segmentsGrid) {
         var me = this,
             plug = me.getEditPlugin(),
-            disableEditing = function(){me.isEditing = false;};
+            disableEditing = function(){
+                let vm = me.getSegmentGrid().lookupViewModel();
+                    //if needed add current edited segment here too
+                    vm.set('isEditingSegment', false);
+                me.isEditing = false;
+            };
             
         plug.on('beforestartedit', me.handleBeforeStartEdit, me);
         plug.on('beforeedit', me.handleStartEdit, me);
@@ -296,7 +281,7 @@ Ext.define('Editor.controller.Editor', {
             ]
         }));
         //inits the editor iframe directly after loading the application
-        plug.editor = plug.initEditor();
+        plug.editor = plug.initEditor(); 
         
         me.handleReferenceFilesMessage();
 
@@ -376,9 +361,9 @@ Ext.define('Editor.controller.Editor', {
             // we just make a loop to check if the segment state is not pending anymore 
             me.getSegmentGrid().setLoading(me.messages.segmentStillSaving);
             deferInterval = Ext.interval(function(){
-                var skip = i++ > 12, 
-                    pending = segment.get('autoStateId') == Editor.data.segments.autoStates.PENDING;
                 //skip after 6 seconds, with can not edit message
+                var skip = i++ > 12,
+                    pending = segment.get('autoStateId') == Editor.data.segments.autoStates.PENDING;
                 if(skip) {
                     Editor.MessageBox.addInfo(me.messages.f2Readonly);
                 }
@@ -401,8 +386,11 @@ Ext.define('Editor.controller.Editor', {
         return true;
     },
     handleStartEdit: function(plugin, context) {
-        var me = this;
+        let me = this,
+            vm = me.getSegmentGrid().lookupViewModel();
         me.isEditing = true;
+        //if needed add current edited segment here too
+        vm.set('isEditingSegment', true);
         me.prevNextSegment.calculateRows(context); //context.record, context.rowIdx TODO
         me.getSourceTags(context);
     },
@@ -521,7 +509,7 @@ Ext.define('Editor.controller.Editor', {
     initEditor: function(editor){
         var me = this,
             docEl = Ext.get(editor.getDoc());
-        this.editor = editor;
+        this.htmlEditor = editor;
         
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
@@ -686,16 +674,33 @@ Ext.define('Editor.controller.Editor', {
         this.fireEvent('redo'); // see SnapshotHistory
     },
 
-    /***
-     * Focus the segment given in the prompt window input
+    /**
+     * Handling CTRL-L
      */
-    focusSegmentShortcut:function (){
-        var me = this,
+    toggleSegmentLock: function() {
+        var segments = Editor.app.getController('Segments');
+        segments && segments.onToggleLockBtn();
+    },
+
+    /**
+     * Focus the segment given in the prompt window input
+     * Handling CTRL-G
+     */
+    focusSegmentShortcut:function (key, ev){
+        if(this.isEditing) {
+            this.scrollToSegment(key, ev);
+            return;
+        }
+
+        let me = this,
+            grid = me.getSegmentGrid(),
+            nr = grid.selection && grid.selection.get('segmentNrInTask'),
             prompt = Ext.Msg.prompt('Go to segment', 'No.:', function(btn, text){
             if (btn === 'ok'){
                 me.getSegmentGrid().focusSegment(text);
             }
-        });
+        }, me, false, nr);
+        prompt.down('textfield').selectOnFocus = true;
         prompt.down('textfield').focus(200);
     },
 
@@ -721,11 +726,11 @@ Ext.define('Editor.controller.Editor', {
     },
     
     /**
-     * handleDelayedChange: fire deferred change event if still changing
+     * handleAfterCursorMove: fire deferred change event if still changing
      */    
     handleDelayedChange: function(){
     	if(this.isEditing) {
-    		this.fireEvent('clockedchange',  this.editor, this.getEditPlugin().context);
+    		this.fireEvent('clockedchange', this.htmlEditor, this.getEditPlugin().context); 
         }
     	this.isCapturingChange = false;
     },
@@ -955,7 +960,13 @@ Ext.define('Editor.controller.Editor', {
             callback,
             sel,
             scrollMode = ed.self.STARTEDIT_MOVEEDITOR;
-        
+
+        // do not try to open the editor if there is nothing to be opened.
+        // this can happen in some rare cases when repetitions are saved via repetition editor
+        if(!rowMeta){
+            return;
+        }
+
         //if the editor should be scrolled or moved
         if(!rowMeta.isMoveEditor){
         	scrollMode = ed.self.STARTEDIT_SCROLLUNDER;
@@ -1459,27 +1470,25 @@ Ext.define('Editor.controller.Editor', {
             clipboard = (e.browserEvent.clipboardData || window.clipboardData),
             clipboardText = clipboard.getData('Text'),
             clipboardHtml = clipboard.getData('text/html'),
-            toInsert, sel, caret, range,
+            toInsert, sel,
             textMatch = clipboardText == internalClip.selDataText,
             //the clipboardHtml adds meta information like charset and so on, so we just check if 
             // the stored one is a substring of the one in the clipboard
             htmlMatch = clipboardHtml.includes(internalClip.selDataHtml);
 
         //remove selected content before pasting the new content
-        sel = me.getEditorDoc().getSelection();
+        sel = rangy.getSelection(this.getEditPlugin().editor.mainEditor.getEditorBody());       
         if(sel.rangeCount) {
-            range = sel.getRangeAt(0);
-            range.deleteContents();
-            caret = me.getPositionInRange(range);
-        } else {
-            caret = me.getPositionOfCaret();
+            sel.getRangeAt(0).deleteContents();
+            sel.getRangeAt(0).collapse();
+            sel.getRangeAt(0).select();
         }
+
         //when making a copy in translate5, we store the content in an internal variable and in the clipboard
         //if neither the text or html clipboard content matches the internally stored content, 
         // that means that the pasted content comes from outside and we insert just text:
         if(me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
-            me.editor.insertMarkup(Ext.String.htmlEncode(clipboardText));
-            me.setPositionOfCaret(caret);
+            me.htmlEditor.insertMarkup(Ext.String.htmlEncode(clipboardText));
             me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
             me.copiedSelectionWithTagHandling = null;
             return;
@@ -1498,8 +1507,7 @@ Ext.define('Editor.controller.Editor', {
         }
 
         // we always use insertMarkup, regardless if it is img or div content
-        me.editor.insertMarkup(toInsert);
-        me.setPositionOfCaret(caret);
+        me.htmlEditor.insertMarkup(toInsert);
         me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
     },
     copySourceToTarget: function() {
@@ -1510,35 +1518,56 @@ Ext.define('Editor.controller.Editor', {
         }
         plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
     },
-    insertWhitespaceNbsp: function(key, e) {
-        this.insertWhitespace(key, e, 'nbsp');
+    insertWhitespaceNbsp: function(key,e) {
+        this.insertWhitespace(key,e,'nbsp');
     },
-    insertWhitespaceTab: function(key, e) {
-        this.insertWhitespace(key, e, 'tab');
+    insertWhitespaceNewline: function(key,e) {
+        this.insertWhitespace(key,e,'newline');
     },
-    insertWhitespaceNewline: function(key, e) {
-        this.insertWhitespace(key, e, 'newline');
+    insertWhitespaceTab: function(key,e) {
+        this.insertWhitespace(key,e,'tab');
     },
-    insertWhitespace: function(key, e, whitespaceType) {
+
+    /***
+     * Button handler for special characters buttons.
+     * @param button
+     * @param e
+     */
+    insertSpecialCharacter: function (button, e){
+        var me = this,
+            plug = me.getEditPlugin(),
+            editor = plug && plug.editor.mainEditor;
+
+        if(editor){
+            editor.insertMarkup(button.value);
+            if (e.delegatedTarget.nodeName.toLowerCase() === 'a') {
+                editor.focus();
+            }
+            e.stopEvent();
+        }
+    },
+
+
+    insertWhitespace: function(key,e,whitespaceType) {
         var me = this,
             userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
             userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
             tagNr,
-            caret;
+            plug,
+            editor;
         if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
             return;
         }
-        caret = (e === undefined) ? null : me.getPositionOfCaret(); // caret bookmark not neccessary when triggered by event
         tagNr = me.getNextWhitespaceTagNumber();
-        me.editor.insertWhitespaceInEditor(whitespaceType, tagNr);
-
-        if (e === undefined) { // MinMaxLength inserts via an event that will not incorporate key data but needs a callback-event to restore the caret on it's own
+        plug = me.getEditPlugin();
+        editor = plug.editor.mainEditor;
+        editor.insertWhitespaceInEditor(whitespaceType, tagNr);
+        if (e === undefined) { // we can use insertWhitespace by firing an event, too
             me.fireEvent('afterInsertWhitespace');
             return;
         }
-        me.setPositionOfCaret(caret);
         if (e.delegatedTarget.nodeName.toLowerCase() === 'a') {
-            me.editor.focus();
+            editor.focus();
         }
         e.stopEvent();
     },
@@ -1571,100 +1600,100 @@ Ext.define('Editor.controller.Editor', {
         })) + 1;
     },
 
-    handleInsertTagShift: function(key, e) {
-        e.shiftKey = true; //somehow a hack, but is doing what it should do
-        this.handleInsertTag(key, e);
-    },
-    handleInsertTag: function(key, e) {
-        var me = this,
-            plug = this.getEditPlugin(),
-            editor = plug.editor.mainEditor,
-            tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
-            sourceTagsForTagIdx,
-            sel,
-            selRange,
-            rangeOpen,
-            bookmarkOpen,
-            rangeClose,
-            insertBothTags;
+        handleInsertTagShift: function(key, e) {
+            e.shiftKey = true; //somehow a hack, but is doing what it should do
+            this.handleInsertTag(key, e);
+        },
+        handleInsertTag: function(key, e) {
+            var me = this,
+                plug = this.getEditPlugin(),
+                editor = plug.editor.mainEditor,
+                tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
+                sourceTagsForTagIdx,
+                sel,
+                selRange,
+                rangeOpen,
+                bookmarkOpen,
+                rangeClose,
+                insertBothTags;
 
-        //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
-        if(tagIdx < 0) {
-            tagIdx = 9;
-        }
+            //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
+            if(tagIdx < 0) {
+                tagIdx = 9;
+            }
 
-        if(e.shiftKey) {
-            tagIdx = tagIdx + 10;
-        }
-
-        //do only something when editing targets with tags and tag nrs > 1:
-        if(!me.sourceTags || !me.sourceTags[tagIdx]){
-            return;
-        }
-
-        sourceTagsForTagIdx = [];
-        Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
-            var tagObject = {'id': id, 'tag': tag};
-            sourceTagsForTagIdx.push(tagObject);
-        });
-
-        // If a text range is marked, this short-cut inserts immediately the opening tag
-        // at the start of the range and the closing tag at the end of the range.
-        insertBothTags = false;
-        sel = rangy.getSelection(editor.getEditorBody());
-        selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
-        if (selRange !== null && !selRange.collapsed) {
-            insertBothTags = true;
-            rangeOpen = selRange.cloneRange();
-            rangeOpen.collapse(true);
-            bookmarkOpen = rangeOpen.getBookmark();
-            rangeClose = selRange.cloneRange();
-            rangeClose.collapse(false);
-            // Make sure to insert closing tag first, otherwise the ranges gets messy.
-            sourceTagsForTagIdx.sort(function(a, b){
-                var x = a.id.toLowerCase();
-                var y = b.id.toLowerCase();
-                if (x < y) {return -1;}
-                if (x > y) {return 1;}
-                return 0;
-            });
-        }
-
-        Ext.Array.each(sourceTagsForTagIdx, function(tagObject){
-            var id = tagObject.id,
-                tag = tagObject.tag,
-                tagInTarget = editor.getDoc().getElementById(id);
-            if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase() !== 'del'){
+            if(e.shiftKey) {
+                tagIdx = tagIdx + 10;
+            }
+                
+            //do only something when editing targets with tags and tag nrs > 1:
+            if(!me.sourceTags || !me.sourceTags[tagIdx]){
                 return;
             }
-            if (insertBothTags) {
-                switch (true) {
-                    case (id.indexOf('-open') !== -1):
-                        // In Firefox, sel.setSingleRange(rangeOpen) does NOT work. No idea why.
-                        // Workaround: use bookmark - THAT works somehow.
-                        selRange.moveToBookmark(bookmarkOpen);
-                        sel.setSingleRange(selRange);
-                        break;
-                    case (id.indexOf('-close') !== -1):
-                        sel.setSingleRange(rangeClose);
-                        break;
+            
+            sourceTagsForTagIdx = [];
+            Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
+                var tagObject = {'id': id, 'tag': tag}; 
+                sourceTagsForTagIdx.push(tagObject);
+            });
+            
+            // If a text range is marked, this short-cut inserts immediately the opening tag
+            // at the start of the range and the closing tag at the end of the range.
+            insertBothTags = false;
+            sel = rangy.getSelection(editor.getEditorBody());
+            selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+            if (selRange !== null && !selRange.collapsed) {
+                insertBothTags = true;
+                rangeOpen = selRange.cloneRange();
+                rangeOpen.collapse(true);
+                bookmarkOpen = rangeOpen.getBookmark();
+                rangeClose = selRange.cloneRange();
+                rangeClose.collapse(false);
+                // Make sure to insert closing tag first, otherwise the ranges gets messy.
+                sourceTagsForTagIdx.sort(function(a, b){
+                  var x = a.id.toLowerCase();
+                  var y = b.id.toLowerCase();
+                  if (x < y) {return -1;}
+                  if (x > y) {return 1;}
+                  return 0;
+                });
+            }
+            
+            Ext.Array.each(sourceTagsForTagIdx, function(tagObject){
+                var id = tagObject.id,
+		    tag = tagObject.tag,
+                    tagInTarget = editor.getDoc().getElementById(id);
+                if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase() !== 'del'){
+                    return;
                 }
+                if (insertBothTags) {
+                    switch (true) {
+                        case (id.indexOf('-open') !== -1):
+                            // In Firefox, sel.setSingleRange(rangeOpen) does NOT work. No idea why.
+                            // Workaround: use bookmark - THAT works somehow.
+                            selRange.moveToBookmark(bookmarkOpen);
+                            sel.setSingleRange(selRange);
+                        break;
+                        case (id.indexOf('-close') !== -1):
+                            sel.setSingleRange(rangeClose);
+                        break;
+                    }
+                }
+                editor.insertMarkup(tag);
+                if (!insertBothTags) {
+                    return false;
+                }
+            });
+            
+            if (insertBothTags) {
+                // place cursor at the end of the formerly selected content
+                sel.removeAllRanges();
+                sel.addRange(rangeClose);
             }
-            editor.insertMarkup(tag);
-            if (!insertBothTags) {
-                return false;
-            }
-        });
-
-        if (insertBothTags) {
-            // place cursor at the end of the formerly selected content
-            sel.removeAllRanges();
-            sel.addRange(rangeClose);
-        }
-
-        e.stopEvent();
-        return false;
-    },
+            
+            e.stopEvent();
+            return false;
+        },
     /**
      * scrolls to the first segment.
      */
@@ -1677,33 +1706,24 @@ Ext.define('Editor.controller.Editor', {
      */
     watchSegment: function() {
         if(!this.isEditing){
+            let segment = this.getSegmentGrid()?.getViewModel()?.get('selectedSegment');
+            /** @var {Editor.model.Segment} segment */
+            segment && segment.toogleBookmark();
             return;
         }
         var me = this,
-            model, config,
             ed = me.getEditPlugin(),
             record = ed.context.record,
-            segmentId = record.get('id'),
             isWatched = Boolean(record.get('isWatched')),
-            segmentUserAssocId = record.get('segmentUserAssocId'),
             navi = me.getNavi(),
             startText = navi.item_startWatchingSegment,
             stopText = navi.item_stopWatchingSegment,
             but = navi.down('#watchSegmentBtn'),
-            success = function(rec, op) {
+            success = function() {
                 var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
                     autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
-                //isWatched
-                record.set('isWatched', !isWatched);
-                record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
                 but.setTooltip(isWatched ? startText : stopText);
                 but.toggle(!isWatched, true);
-                if(op.action === 'create') {
-                    me.fireEvent('watchlistAdded', record, me, rec);
-                }
-                else {
-                    me.fireEvent('watchlistRemoved', record, me, rec);
-                }
                 //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
                 autoStateCell && displayfield.setValue(autoStateCell.getHtml());
             },
@@ -1711,26 +1731,10 @@ Ext.define('Editor.controller.Editor', {
                 but.setTooltip(isWatched ? stopText : startText);
                 but.toggle(isWatched, true);
             };
-        
-        if (isWatched) {
-            config = {
-                id: segmentUserAssocId
-            };
-            model = Ext.create('Editor.model.SegmentUserAssoc', config);
-            model.getProxy().setAppendId(true);
-            model.erase({
-                success: success,
-                failure: failure
-            });
-        } else {
-            model = Ext.create('Editor.model.SegmentUserAssoc', {'segmentId': segmentId});
-            model.save({
-                success: success,
-                failure: failure
-            });
-        }
+
+        record.toogleBookmark(success, failure);
     },
-    
+
     /**
      * In textareas ExtJS 6.2 enter keys are not bubbling up, but they are triggering a specialkey event
      *  we listen to that event and process our own keys then. 
@@ -1773,15 +1777,23 @@ Ext.define('Editor.controller.Editor', {
         });
     },
 
-    /***
+    /**
      * Edit task and focus segment route
+     * @param {String} taskId
+     * @param {String} segmentNrInTask
      */
     onTaskSegmentEditRoute: function(taskId, segmentNrInTask) {
-        var me = this,
+        let me = this,
+            grid = me.getSegmentGrid(),
             dataTask = Editor.data.task;
 
-        if(dataTask && dataTask.id == taskId) {
-            me.getSegmentGrid() && me.getSegmentGrid().focusSegment(segmentNrInTask);
+        //prevent re-run of focusing if we have the segment already selected
+        if(grid && grid.selection && grid.selection.get('segmentNrInTask') === parseInt(segmentNrInTask)) {
+            return;
+        }
+
+        if(dataTask && dataTask.id === parseInt(taskId)) {
+            grid && grid.focusSegment(segmentNrInTask);
             return;
         }
         if(dataTask && dataTask.isModel){ // task is active, switch task

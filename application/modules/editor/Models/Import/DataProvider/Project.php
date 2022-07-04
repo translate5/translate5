@@ -58,6 +58,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         $this->fileLanguages = $langauges;
         $this->fileTypes = $types;
         $this->supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+        $this->validate();
     }
 
     /**
@@ -160,18 +161,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     public function archiveImportedData($filename = null)
     {
-        $filter = new Zend_Filter_Compress(array(
-            'adapter' => 'Zip',
-            'options' => array(
-                'archive' => $this->getZipArchivePath($filename)
-            ),
-        ));
-        if(!$filter->filter($this->importFolder)){
-            //DataProvider Directory: Could not create archive-zip
-            throw new editor_Models_Import_DataProvider_Exception('E1247', [
-                'task' => $this->task,
-            ]);
-        }
+        $this->createImportedDataArchive($this->getZipArchivePath($filename));
     }
 
     /***
@@ -307,5 +297,16 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         // if the extension is supported, this file will be processed by okapi
         $supported = in_array($ext,$this->supportedFiles->getSupportedExtensions());
         return $supported && ($workFile.'.xlf' === $pivotFile);
+    }
+
+
+    /**
+     * Validate the uploaded files
+     * @throws editor_Models_Import_DataProvider_Exception
+     */
+    protected function validate(){
+        if(count($this->fileTypes) != count($this->files['importUpload']) && count($this->fileTypes) > ini_get('max_file_uploads')) {
+            throw new editor_Models_Import_DataProvider_Exception('E1384');
+        }
     }
 }

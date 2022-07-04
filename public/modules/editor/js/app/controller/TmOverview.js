@@ -227,7 +227,7 @@ Ext.define('Editor.controller.TmOverview', {
         
         window.setLoading(true);
         form.submit({
-            timeout: 240,
+            timeout: 3600, //1h, is seconds here, ensure upload of bigger files
             params: {
                 format: 'jsontext'
             },
@@ -644,6 +644,7 @@ Ext.define('Editor.controller.TmOverview', {
             Ext.Msg.show({
                 title: this.strings.mergeTermsWarnTitle,
                 message: this.strings.mergeTermsWarnMessage,
+                buttons: Ext.MessageBox.OK,
                 icon: Ext.Msg.WARNING
             });
         }

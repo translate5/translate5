@@ -70,7 +70,7 @@ if(Ext.browser.is.IE) {
     Ext.application = Ext.emptyFn;
     Ext.onReady(function() {
         Ext.Ajax.request({
-            url: Editor.data.pathToRunDir + '/editor/index/logbrowsertype',
+            url: Editor.data.restpath + 'index/logbrowsertype',
             method: 'post',
             params: {
                 appVersion: navigator.appVersion,
@@ -110,6 +110,11 @@ Ext.application({
     appFolder: Editor.data.appFolder,
     windowTitle: '',
     viewport: null,
+    /**
+     * Storing the unmatched route on app init for further processing after all handling views were loaded
+     * @var {String}
+     */
+    unmatchedRoute: null, //null means the further handlers are not loaded. If set to false, the handlers are through
     //***********************************************************************************
     //Begin Events
     //***********************************************************************************
@@ -144,10 +149,25 @@ Ext.application({
             'viewport > #adminMainSection': {
                 tabchange: 'onAdminMainSectionChange'
             }
+        },
+        controller : {
+            '#' : {
+                unmatchedroute : 'onUnmatchedRoute'
+            }
+        }
+
+    },
+    /**
+     * Since the route handlers are brought in by view controllers, all routes handled by them are initially caught as unmatched route
+     * Therefore we store it and handle it after rendering of all of the views able to handle them
+     * @param hash
+     */
+    onUnmatchedRoute : function(hash) {
+        if(this.unmatchedRoute === null) {
+            this.unmatchedRoute = Ext.util.History.getToken(); //we have to store the whole token here
         }
     },
     init: function () {
-
         //enable json in our REST interface
         Ext.Ajax.setDefaultHeaders({
             'Accept': 'application/json'
@@ -164,6 +184,7 @@ Ext.application({
         // the init of the QuickTips has to be done here otherwise it's too late to set the internal tip class
         Ext.tip.QuickTipManager.init(true, {className: 'Editor.view.QuickTip'});
 
+        this.handleMissingSlash();
         this.callParent(arguments);
         this.logoutOnWindowClose();
     },
@@ -181,12 +202,15 @@ Ext.application({
             Ext.getStore('customersStore').load();
         }
 
-        //Check if it is task route. If yes, use the redirect to task method.
+        //Check if it is task URL or route. If yes, use the redirect to task method.
         //if it is not a task route, open the administration
         //if no route is provided, use the defautl me[Editor.data.app.initMethod]();
-        if (me.isEditTaskRoute()) {
+        var taskId = me.parseTaskIdFromUrl();
+        if (taskId > 0 || me.isEditTaskRoute()) {
             //check if the taskid is provided in the hash
-            var taskId = me.parseTaskIdFromTaskEditHash(false);
+            if(taskId <= 0){
+                taskId = me.parseTaskIdFromTaskEditHash(false);
+            }
             if (taskId > 0 && !Editor.data.task) {
                 Editor.data.task = {};
                 //set the taskId to the task global object
@@ -224,7 +248,7 @@ Ext.application({
 
         //Logs the users userAgent and screen size for usability improvements:
         Ext.Ajax.request({
-            url: Editor.data.pathToRunDir + '/editor/index/logbrowsertype',
+            url: Editor.data.restpath + 'index/logbrowsertype',
             method: 'post',
             params: {
                 appVersion: navigator.appVersion,
@@ -247,11 +271,11 @@ Ext.application({
             return;
         }
         Ext.get(window).on({
-            beforeunload: function (e) {
+            beforeunload: function () {
                 if (!Editor.data.logoutOnWindowClose) {
                     return;
                 }
-                var fd = new FormData;
+                var fd = new FormData();
                 fd.append('zfExtended', Ext.util.Cookies.get('zfExtended'));
                 fd.append('noredirect', 1);
                 // destroy the user session and prevent redirect
@@ -276,8 +300,9 @@ Ext.application({
         }
 
         me.loadEditorConfigData(task, function () {
-
             me.fireEvent('editorConfigLoaded', me, task);
+
+            me.addTaskToUrl(task);
 
             Editor.data.task = task;
             Editor.model.Segment.redefine(task.segmentFields());
@@ -286,7 +311,7 @@ Ext.application({
                 source: languages.getById(task.get('sourceLang')),
                 relais: languages.getById(task.get('relaisLang')),
                 target: languages.getById(task.get('targetLang'))
-            }
+            };
 
             if (me.viewport) {
                 //trigger closeEvent depending on which viewport was open
@@ -335,10 +360,10 @@ Ext.application({
             failure: me.handleOpenTaskDirectError
         });
     },
-    handleOpenTaskDirectError: function (record, op, success) {
+    handleOpenTaskDirectError: function (record, op) {
         if (!Editor.data.editor.toolbar.hideLeaveTaskButton) {
             this.openAdministration();
-            if (op.error.status == 404 && record.get('taskGuid') == '') {
+            if (op.error.status === 404 && record.get('taskGuid') === '') {
                 Editor.MessageBox.getInstance().showDirectError('The requested task does not exist anymore.');
             } else {
                 Editor.app.getController('ServerException').handleFailedRequest(op.error.status, op.error.statusText, op.error.response);
@@ -349,7 +374,7 @@ Ext.application({
             title = 'Uups... The requested task could not be opened',
             respText = response && response.responseText;
 
-        if (op.error.status == 404 && record.get('taskGuid') == '') {
+        if (op.error.status === 404 && record.get('taskGuid') === '') {
             this.showInlineError('The requested task does not exist anymore.', title);
         } else if (respText) {
             this.showInlineError(Editor.app.getController('ServerException').renderHtmlMessage(title, Ext.JSON.decode(respText)));
@@ -374,10 +399,11 @@ Ext.application({
      * firing the editorViewportClosed event
      */
     openAdministration: function (task) {
-        var me = this, tabPanel;
+        let me = this, tabPanel;
         if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
         }
+        me.removeTaskFromUrl();
         if (me.viewport) {
             me.getController('ViewModes').deactivate();
             me.viewport.destroy();
@@ -402,8 +428,9 @@ Ext.application({
         me.fireEvent('adminViewportOpened');
         tabPanel = me.viewport.down('#adminMainSection');
 
-        // on intial load we have to trigger the change manually
-        me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab(), task);
+        // on intial load we have to trigger the opening of the desired tab manually:
+        me.redirectTo(me.unmatchedRoute ? me.unmatchedRoute : tabPanel.getActiveTabDefaultRoute(), true);
+        me.unmatchedRoute = false; //we disable unmatchedRoute handling after first usage
 
         //set the value used for displaying the help pages
         Ext.getDoc().dom.title = me.windowTitle;
@@ -418,9 +445,12 @@ Ext.application({
         if (Ext.isString(panel)) {
             panel = me.viewport.down(panel);
         }
-        //what  happens if panel does not belong to the tabpanel?
+
+        //do nothing if already active
+        mainTabs.disableRouteHandling = true;
         mainTabs.setActiveTab(panel);
-        me.redirectTo(redirectRoute);
+        mainTabs.disableRouteHandling = false;
+        me.redirectTo(redirectRoute || Ext.util.History.getToken());
 
         //if we are in a task, we have to stop routing, leave it, and resume routing after the task was closed (a new one was loaded, for routing open tasks)
     },
@@ -429,15 +459,14 @@ Ext.application({
      * The first route in a panel is defined as the main route where the redirect should go
      * @param {Ext.tab.Panel} tabpanel
      * @param {Ext.Component} activatedPanel
+     * @param {Editor.model.admin.Task} task
      */
-    onAdminMainSectionChange: function (tabpanel, activatedPanel, task) {
+    onAdminMainSectionChange: function (tabpanel, activatedPanel) {
         var me = this,
-            ctrl = activatedPanel.getController(),
-            conf = ctrl && ctrl.defaultConfig,
-            mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
+            mainRoute = tabpanel.getActiveTabDefaultRoute();
         me.fireEvent('adminSectionChanged', activatedPanel);
 
-        if (!mainRoute) {
+        if (!mainRoute || tabpanel.disableRouteHandling) {
             return;
         }
         me.redirectTo(mainRoute);
@@ -449,7 +478,7 @@ Ext.application({
         this.appMask.wait(msg, title);
     },
     unmask: function () {
-        //no "this" usage, so we can use this method directly as failure handler 
+        //no "this" usage, so we can use this method directly as failure handler
         Editor.app.appMask && Editor.app.appMask.close();
     },
     logout: function () {
@@ -496,7 +525,7 @@ Ext.application({
             callback:function(){
                 // disable logoutOnWindowClose when the theme is changed
                 Editor.data.logoutOnWindowClose = false;
-                location.reload();
+                window.location.reload();
             }
         });
     },
@@ -509,7 +538,7 @@ Ext.application({
             return;
         }
         Ext.Object.each(Editor.data.supportedBrowsers, function (idx, version) {
-            if (Ext.browser.name == idx && Ext.browser.version.major >= version) {
+            if (Ext.browser.name === idx && Ext.browser.version.major >= version) {
                 supportedBrowser = true;
                 return false;
             }
@@ -533,7 +562,53 @@ Ext.application({
     },
 
     /**
-     * Check if in the current hash, the edit task route is defined. The edit task route is only valid
+     * Our URLs need a trailing slash for proper working:
+     */
+    handleMissingSlash: function() {
+        let loc = window.location,
+            path = loc.pathname;
+        if(path.substr(-1) !== '/') {
+            window.history.pushState({}, "", loc.href.replace(path, path+'/'));
+        }
+    },
+
+    /**
+     * The URL of the opened application may contain the taskId
+     */
+    parseTaskIdFromUrl: function() {
+        var match = window.location.pathname.match(/^\/editor\/taskid\/([0-9]+)\/$/);
+        if(match) {
+            return parseInt(match[1], 10);
+        }
+        return 0;
+    },
+
+    addTaskToUrl: function(task) {
+        var currentLocation = window.location.href,
+            newLocation,
+            matchTask = /\/editor\/taskid\/[0-9]+\//; //a trailing string is needed for working with relative paths
+
+        if(task) {
+            if(! matchTask.test(currentLocation)) {
+                // current task not given yet, insert it
+                matchTask = /\/editor\//;
+            }
+            newLocation = currentLocation.replace(matchTask, '/editor/taskid/'+task.get('id')+'/');
+        }
+        else {
+            //if task is not given or false, we try to remove task fragments from the URL
+            newLocation = currentLocation.replace(matchTask, '/editor/');
+        }
+        window.history.pushState({}, "", newLocation);
+        Editor.data.restpath = window.location.pathname; //we set the new task relative location as restpath, so all other requests use it too
+    },
+
+    removeTaskFromUrl: function() {
+        this.addTaskToUrl(false);
+    },
+
+    /**
+     * Check if in the current hash, the edit task route is defined (or the taskId is given via URL at all). The edit task route is only valid
      * when the segments-editor is opened
      */
     isEditTaskRoute: function () {
@@ -550,7 +625,7 @@ Ext.application({
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length > 1) ? parseInt(h[1]) : -1;
+        return (h && h.length > 1) ? parseInt(h[1], 10) : -1;
     },
 
     /***
@@ -564,7 +639,7 @@ Ext.application({
         }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
-        return (h && h.length == 4) ? parseInt(h[2]) : 0;
+        return (h && h.length === 4) ? parseInt(h[2], 10) : 0;
     },
 
     /***
@@ -618,6 +693,21 @@ Ext.application({
      */
     isDevelopmentVersion:function (){
         return Editor.data.app.version === "development";
-    }
+    },
 
+    /**
+     * requests the current browser window to be closed, show a message if not possible
+     */
+    closeWindow: function() {
+        if(window.opener === null) {
+            this.viewport.destroy();
+            this.unmask();
+            Ext.getBody().setCls('loading');
+            Ext.getBody().update('<div class="loading"></div>');
+            this.showInlineError('But the application window can not be closed automatically!', 'Application left successfully');
+        }
+        else {
+            window.close();
+        }
+    }
 });

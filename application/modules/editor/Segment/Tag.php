@@ -34,7 +34,6 @@ END LICENSE AND COPYRIGHT
  * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
  * 
  * @method editor_Segment_Tag clone(bool $withDataAttribs, bool $withId)
- * @method editor_Segment_Tag createBaseClone()
  */
 class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     
@@ -176,17 +175,17 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public $parentOrder = -1;
     /**
-     * Set by editor_Segment_FieldTags to indicate that the Tag spans the complete segment text
+     * Set by editor_TagSequence to indicate that the Tag spans the complete segment text
      * @var bool
      */
     public $isFullLength;
     /**
-     * Set by editor_Segment_FieldTags to indicate that the Tag was deleted at some time in the segment's history (is in a del-tag)
+     * Set by editor_TagSequence to indicate that the Tag was deleted at some time in the segment's history (is in a del-tag)
      * @var bool
      */
     public $wasDeleted;
     /**
-     * Set by editor_Segment_FieldTags to indicate that the Tag was inserted at some time in the segment's history (is in an ins-tag)
+     * Set by editor_TagSequence to indicate that the Tag was inserted at some time in the segment's history (is in an ins-tag)
      * @var bool
      */
     public $wasInserted;
@@ -277,6 +276,14 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return static::$type;
     }
     /**
+     * Retrieves, if we are of the passed type
+     * @param string $type
+     * @return bool
+     */
+    public function isOfType(string $type) : bool {
+        return (static::$type === $type);
+    }
+    /**
      * Retrieves the category
      * NOTE: any connection between classes and categories must be coded in the inheriting class
      * @return string
@@ -316,13 +323,13 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         // Compatibility with old code: if there is a existing entry we simply turn it into the current format
         if(static::$historicDataNameQid != NULL && $this->hasData(static::$historicDataNameQid)){
             // transfer only if not present
-            if(!array_key_exists('data-'.self::DATA_NAME_QUALITYID, $this->attribs)){
-                $this->attribs['data-'.self::DATA_NAME_QUALITYID] = $this->attribs['data-'.static::$historicDataNameQid];
+            if(!array_key_exists('data-'.static::DATA_NAME_QUALITYID, $this->attribs)){
+                $this->attribs['data-'.static::DATA_NAME_QUALITYID] = $this->attribs['data-'.static::$historicDataNameQid];
             }
             unset($this->attribs['data-'.static::$historicDataNameQid]);
-            return ctype_digit($this->getData(self::DATA_NAME_QUALITYID));
+            return ctype_digit($this->getData(static::DATA_NAME_QUALITYID));
         }
-        return ($this->hasData(self::DATA_NAME_QUALITYID) && ctype_digit($this->getData(self::DATA_NAME_QUALITYID)));
+        return ($this->hasData(static::DATA_NAME_QUALITYID) && ctype_digit($this->getData(static::DATA_NAME_QUALITYID)));
     }
     /**
      * Retrieves the quality ID. If not encoded in the tag, returns -1
@@ -330,7 +337,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public function getQualityId() : int {
         if($this->hasQualityId()){
-            return intval($this->getData(self::DATA_NAME_QUALITYID));
+            return intval($this->getData(static::DATA_NAME_QUALITYID));
         }
         return -1;
     }
@@ -340,7 +347,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @return editor_Segment_Tag
      */
     public function setQualityId(int $qualityId) : editor_Segment_Tag {
-        $this->setData(self::DATA_NAME_QUALITYID, strval($qualityId));
+        $this->setData(static::DATA_NAME_QUALITYID, strval($qualityId));
         return $this;
     }
     /**
@@ -348,7 +355,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @return string
      */
     public function getDataNameQualityId() : string {
-        return self::DATA_NAME_QUALITYID;
+        return static::DATA_NAME_QUALITYID;
     }
     /**
      * Retrieves additional data to identify a tag from quality entries
@@ -394,7 +401,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @return bool
      */
     public function isFalsePositive() : bool {
-        return $this->hasClass(self::CSS_CLASS_FALSEPOSITIVE);
+        return $this->hasClass(static::CSS_CLASS_FALSEPOSITIVE);
     }
     /**
      * Retrieves the false-positiveness as DB val / int
@@ -413,9 +420,9 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public function setFalsePositive(int $falsePositive=1) : editor_Segment_Tag {
         if($falsePositive == 1){
-            $this->addClass(self::CSS_CLASS_FALSEPOSITIVE);
+            $this->addClass(static::CSS_CLASS_FALSEPOSITIVE);
         } else {
-            $this->removeClass(self::CSS_CLASS_FALSEPOSITIVE);
+            $this->removeClass(static::CSS_CLASS_FALSEPOSITIVE);
         }
         return $this;
     }
@@ -602,13 +609,13 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * After the nested structure of tags is set this fills in the text-chunks of the segments text
      * CRUCIAL: at this point only editor_Segment_Tag must be added as children !
      * API is used in the rendering process only
-     * @param editor_Segment_FieldTags $tags
+     * @param editor_TagSequence $tags
      */
-    public function addSegmentText(editor_Segment_FieldTags $tags){
+    public function addSegmentText(editor_TagSequence $tags){
         if($this->startIndex < $this->endIndex){
             if($this->hasChildren()){
                 // crucial: we need to sort our children as tags with the same start-position but length 0 must come first
-                usort($this->children, array('editor_Segment_FieldTags', 'compareChildren'));
+                usort($this->children, array('editor_TagSequence', 'compareChildren'));
                 // fill the text-gaps around our children with text-parts of the segments & fill our children with text
                 $chldrn = [];
                 $last = $this->startIndex;
@@ -616,7 +623,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
                     if(is_a($child, 'editor_Segment_Tag')){
                         /* @var $child editor_Segment_Tag */
                         if($last < $child->startIndex){
-                            $chldrn[] = editor_Tag::createText($tags->getFieldTextPart($last, $child->startIndex));
+                            $chldrn[] = editor_Tag::createText($tags->getTextPart($last, $child->startIndex));
                         }
                         $child->addSegmentText($tags);
                         $chldrn[] = $child;
@@ -624,28 +631,31 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
                     }
                 }
                 if($last < $this->endIndex){
-                    $chldrn[] = editor_Tag::createText($tags->getFieldTextPart($last, $this->endIndex));
+                    $chldrn[] = editor_Tag::createText($tags->getTextPart($last, $this->endIndex));
                 }
                 $this->children = $chldrn;
             } else {
-                $this->addText($tags->getFieldTextPart($this->startIndex, $this->endIndex));
+                $this->addText($tags->getTextPart($this->startIndex, $this->endIndex));
             }
         }
     }
+
+    /* Unparsing API */
+
     /**
      * Adds us and all our children to the segment tags
      * @param int $parentOrder
      */
-    public function sequence(editor_Segment_FieldTags $tags, int $parentOrder){
+    public function sequence(editor_TagSequence $tags, int $parentOrder){
         $tags->addTag($this, -1, $parentOrder);
         $this->sequenceChildren($tags, $this->order);
     }
     /**
      * Adds all our children to the segment tags
-     * @param editor_Segment_FieldTags $tags
+     * @param editor_TagSequence $tags
      * @param int $parentOrder
      */
-    public function sequenceChildren(editor_Segment_FieldTags $tags, int $parentOrder=-1){
+    public function sequenceChildren(editor_TagSequence $tags, int $parentOrder=-1){
         if($this->hasChildren()){
             foreach($this->children as $child){
                 if(is_a($child, 'editor_Segment_Tag')){
@@ -657,12 +667,15 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * This API finishes the Field Tags generation. It is the final step and finishing work can be made here, e.g. the evaluation of task specific data
-     * @param editor_Segment_FieldTags $tags
+     * @param editor_TagSequence $tags
      * @param editor_Models_task $task
      */
-    public function finalize(editor_Segment_FieldTags $tags, editor_Models_task $task){
+    public function finalize(editor_TagSequence $tags, editor_Models_task $task){
         
     }
+
+    /* Debugging API */
+
     /**
      * Debug output
      * @return string

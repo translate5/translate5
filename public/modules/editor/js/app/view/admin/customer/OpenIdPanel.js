@@ -30,6 +30,7 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.openIdPanel',
     itemId:'openIdPanel',
+    glyph: 'f2c2@FontAwesome5FreeSolid',
 
     strings:{
         save:'#UT#Speichern',
@@ -47,7 +48,9 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
         openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.',
         defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenID-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
         serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.',
-        helpButtonText:'#UT#Hilfe'
+        helpButtonText:'#UT#Hilfe',
+        ssoText:'#UT#Single Sign-on',
+        thisFieldIsRequiredText:'#UT#Dieses Feld darf nicht leer sein'
     },
 
     initConfig: function (instanceConfig) {
@@ -111,7 +114,8 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
                     vtype: 'url',
                     name: 'openIdServer',
                     listeners: {
-                        change: me.onOpenIdFieldChange
+                        change: me.onOpenIdFieldChange,
+                        scope: me
                     },
                     bind: {
                         value:'{record.openIdServer}'
@@ -122,7 +126,8 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
                     vtype: 'url',
                     name: 'openIdIssuer',
                     listeners: {
-                        change: me.onOpenIdFieldChange
+                        change: me.onOpenIdFieldChange,
+                        scope: me
                     },
                     bind: {
                         value:'{record.openIdIssuer}'
@@ -132,7 +137,8 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
                     fieldLabel: me.strings.openIdClientId,
                     name: 'openIdClientId',
                     listeners: {
-                        change: me.onOpenIdFieldChange
+                        change: me.onOpenIdFieldChange,
+                        scope: me
                     },
                     bind: {
                         value:'{record.openIdClientId}'
@@ -143,7 +149,8 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
                     fieldLabel: me.strings.openIdClientSecret,
                     name: 'openIdClientSecret',
                     listeners: {
-                        change: me.onOpenIdFieldChange
+                        change: me.onOpenIdFieldChange,
+                        scope: me
                     },
                     bind: {
                         value:'{record.openIdClientSecret}'
@@ -155,7 +162,8 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
                     vtype: 'url',
                     name: 'openIdAuth2Url',
                     listeners: {
-                        change: me.onOpenIdFieldChange
+                        change: me.onOpenIdFieldChange,
+                        scope: me
                     },
                     bind: {
                         value:'{record.openIdAuth2Url}'
@@ -202,18 +210,29 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
                     fieldLabel: me.strings.openIdRedirectLabel,
                     name: 'openIdRedirectLabel',
                     itemId: 'openIdRedirectLabel',
+                    validator: me.openIdRedirectLabelValidator,
+                    emptyText:me.strings.ssoText,
                     bind:{
                         value:'{record.openIdRedirectLabel}'
+                    },
+                    listeners: {
+                        //change: 'checkFieldsValid',
+                        change: 'onOpenIdRedirectLabelChange',
+                        scope:me
                     }
+
                 }, {
                     xtype: 'checkbox',
                     boxLabel: me.strings.openIdRedirectCheckbox,
                     name: 'openIdRedirectCheckbox',
+                    itemId: 'openIdRedirectCheckbox',
                     bind:{
                         value:'{record.openIdRedirectCheckbox}'
                     },
                     listeners: {
-                        change: me.onOpenIdRedirectCheckboxChange
+                        //change: 'checkFieldsValid',
+                        change: 'onOpenIdRedirectCheckboxChange',
+                        scope:me
                     }
                 }]
             };
@@ -221,6 +240,46 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+
+    /***
+     * Redirect lable text change event handler.
+     * Redirect lable and redirect checkbox requirements are combined.
+     * When the checkbox is checked, no need for lable text, otherwise the lable text is required.
+     * @param field
+     * @param newValue
+     */
+    onOpenIdRedirectLabelChange: function (field, newValue){
+        var me=this;
+
+        if(newValue !== ""){
+            field.clearInvalid();
+        }else{
+            field.setActiveError(me.strings.thisFieldIsRequiredText);
+        }
+
+        me.onOpenIdFieldChange(field, newValue);
+    },
+
+    /***
+     * Redirect checkbox change event handler.
+     * Redirect lable and redirect checkbox requirements are combined.
+     * When the checkbox is checked, no need for lable text, otherwise the lable text is required.
+     * @param field
+     * @param newValue
+     */
+    onOpenIdRedirectCheckboxChange: function (field,newValue){
+        var me=this,
+            openIdRedirectLabel=me.down('#openIdRedirectLabel');
+
+        // if checked or
+        if(newValue || openIdRedirectLabel.getValue() !== ""){
+            openIdRedirectLabel.clearInvalid();
+        }else{
+            openIdRedirectLabel.setActiveError(me.strings.thisFieldIsRequiredText);
+        }
+
+        me.onOpenIdFieldChange(openIdRedirectLabel, openIdRedirectLabel.getValue());
     },
 
 
@@ -245,34 +304,37 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
         me.down('#saveOpenIdButton').setDisabled(!isValid || mainSaveButton.isDisabled());
     },
 
-    onOpenIdFieldChange:function(field,newValue,oldValue,eOpts){
+    /***
+     * Run validation and set allowBlank for all required fields defined in the fields list
+     * @param field
+     * @param newValue
+     */
+    onOpenIdFieldChange:function(field,newValue){
         var me=this,
-            view = me.up('#openIdPanel'),
-            fields=['openIdServer','openIdIssuer','openIdAuth2Url','openIdClientId','openIdClientSecret'],
+            fields=['openIdServer','openIdIssuer','openIdAuth2Url','openIdClientId','openIdClientSecret','openIdRedirectLabel'],
             isRequired = Ext.Array.contains(fields,field.name) && newValue !== "",
             openIdField;
 
         // if required field is changed, mark all as invalid and force the user to enter value
         Ext.Array.forEach(fields, function(f) {
-            openIdField = view.down('field[name="'+f+'"]');
+            openIdField = me.down('field[name="'+f+'"]');
             openIdField.allowBlank = !isRequired;
             openIdField.isValid();
         });
 
-        view.checkFieldsValid();
+        me.checkFieldsValid();
     },
 
-    onOpenIdRedirectCheckboxChange:function(field){
+    /***
+     * Redirect lable validator. It is valid when the checkbox is checked or when there is some text provided
+     * @param val
+     * @returns {boolean|string}
+     */
+    openIdRedirectLabelValidator: function (val) {
         var me=this,
             view = me.up('#openIdPanel'),
-            openIdRedirectLabel=view.down('#openIdRedirectLabel');
-        if(field.checked){
-            openIdRedirectLabel.clearInvalid();
-        }else{
-            openIdRedirectLabel.setActiveError("This field is required");
-        }
-        
-        view.checkFieldsValid();
+            openIdRedirectCheckbox = view.down('#openIdRedirectCheckbox');
+        return (openIdRedirectCheckbox.checked || val !== "") ? true : view.strings.thisFieldIsRequiredText;
     },
 
     /**

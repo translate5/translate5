@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * that it appears the possibility for distinction between termtranslation- and other tasks
  * Currently it is only used to decide whether reimport back to TermCollection export menu option should be shown
  */
-class editor_Task_Type_TermTranslation extends editor_Task_Type_Default {
+class editor_Task_Type_TermTranslation extends editor_Task_Type_Project {
 
     /**
      * Type ID
@@ -44,13 +44,7 @@ class editor_Task_Type_TermTranslation extends editor_Task_Type_Default {
      * @param string $taskType
      */
     public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType) {
-
-        // Call parent
-        parent::calculateImportTypes($multiTarget, $projectType, $taskType);
-
-        // If $multiTarget - spoof $taskType
-        if ($multiTarget) {
-            $taskType = editor_Task_Type_TermTranslationTask::ID;
-        }
+        $projectType = editor_Task_Type_TermTranslation::ID;
+        $taskType = editor_Task_Type_TermTranslationTask::ID;
     }
 }

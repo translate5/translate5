@@ -19,11 +19,11 @@
  * )
  * Note: keys are prefixed with numeric indexes to be used for proper order of appearance in browser json response preview
  */
-$mt = 0; function mt($stage = null){
+$GLOBALS['mt'] = 0; function mt($stage = null){
     $m = microtime();
     list($mc, $s) = explode(' ', $m);
     $n = $s + $mc;
-    $ret = $n - $GLOBALS['mt'];
+        $ret = $n - $GLOBALS['mt'];
     $GLOBALS['mt'] = $n;
     settype($GLOBALS['_mt'], 'array');
     if ($stage !== false) {

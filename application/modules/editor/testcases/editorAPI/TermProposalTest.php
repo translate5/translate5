@@ -181,7 +181,8 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         // [10] create image-attr for entry-level for created term entry
         $figurecreate = $this->api()->requestJson('editor/attribute', 'POST', $data = [
-            'termEntryId' => $Term1->termEntryId,
+            'termId' => $Term1->termId,
+            'level' => 'entry',
             'dataType' => 'figure'
         ]);
         $this->assertTrue(is_object($figurecreate)
@@ -195,7 +196,8 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         // [12] create ref-attr for termEntry-level for Term1
         $refcreate = $this->api()->requestJson('editor/attribute', 'POST', $data = [
-            'termEntryId' => $Term1->termEntryId,
+            'termId' => $Term1->termId,
+            'level' => 'entry',
             'dataType' => 'crossReference'
         ]);
         $this->assertTrue(is_object($refcreate)
@@ -207,11 +209,12 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             'target' => $importedTerm->termEntryTbxId,
         ]);
         $this->assertTrue(is_object($refupdate)
-            && $refupdate->value == $rejected->inserted->term, 'Unable to update ref-attribute for the entry-level');
+            && $refupdate->target == $rejected->inserted->termEntryTbxId, 'Unable to update ref-attribute for the entry-level');
 
         // [14] create ref-attr for term-level for Term1
         $refcreate = $this->api()->requestJson('editor/attribute', 'POST', $data = [
             'termId' => $Term1->termId,
+            'level' => 'term',
             'dataType' => 'crossReference'
         ]);
         $this->assertTrue(is_object($refcreate)
@@ -228,6 +231,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         // [16] create xref-attr for Term1
         $xrefcreate = $this->api()->requestJson('editor/attribute', 'POST', $data = [
             'termId' => $Term1->termId,
+            'level' => 'term',
             'dataType' => 'externalCrossReference'
         ]);
         $this->assertTrue(is_object($xrefcreate)
@@ -302,25 +306,26 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         // Batch create note-attr for termEntry-level
         $this->assertBatchEdit(2, 'batch-value for note-attr for termEntry-level', [
-            'termEntryId' => $termEntryId_batch = join(',', [$importedTerm->termEntryId, $Term1->termEntryId]),
-            'dataType' => 20,
-            'batch' => 'true'
+            'termId' => $termId_batch = join(',', [$importedTerm->id, $Term1->termId]),
+            'level' => 'entry',
+            'dataType' => $dataTypeId_note,
+            'batch' => '1'
         ], 0, false);
 
         // Batch create image-attr for language-level
-        $this->assertBatchEdit($planQtyImage = 2, $this->api()->getFile('Image.jpg'), [
-            'termEntryId' => $Term1->termEntryId,
+        $this->assertBatchEdit($planQtyImage = 1, $this->api()->getFile('Image.jpg'), [
+            'termId' => $Term1->termId,
+            'level' => 'language',
             'dataType' => 'figure',
-            'language' => self::$german->rfc5646 . ',' . self::$english->rfc5646,
-            'batch' => 'true',
+            'batch' => '1',
         ], 0, true);
 
         // Batch create note-attr for term-level
-        $this->assertBatchEdit($planQtyNote = 4, 'batch-value for note-attr for term-level', [
-            'termEntryId' => $termEntryId_batch,
-            'dataType' => 20,
-            'languageId' => 'batch',
-            'termId' => 'batch',
+        $this->assertBatchEdit($planQtyNote = 2, 'batch-value for note-attr for term-level', [
+            'termId' => $termId_batch,
+            'level' => 'term',
+            'dataType' => $dataTypeId_note,
+            'batch' => '1',
         ], $existingPlanQtyNote = 1, true);
 
         // [22] Get the export data and compare the values with the expected export file data
@@ -330,7 +335,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertIsArray($exportFact, 'Unable to export the term proposals');
         $exportPlan = $this->api()->getFileContent('Export.json');
         $this->assertEquals(
-            count($exportPlan) + $planQtyImage + $planQtyNote - $existingPlanQtyNote,
+            count($exportPlan), // + $planQtyImage + $planQtyNote - $existingPlanQtyNote,
             count((array) $exportFact),
             "The proposal export result does not match the expected result"
         );

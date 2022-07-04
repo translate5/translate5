@@ -26,12 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
  * OpenTM2 HTTP Connection API
  */
@@ -164,12 +158,38 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             if($mime == "application/xml"){
                 $targetLang = $this->languageResource->targetLangCode;
                 $sourceLang = $this->languageResource->sourceLangCode;
-                $this->result = $this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result);
+                $this->result = $this->fixInvalidOpenTM2XML($this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result));
             }
             return true;
         }
         
         return $this->processResponse($response);
+    }
+
+    /**
+     * repairs the TMX from OpenTM2 regarding encoded entities and newlines
+     * @param string $tmxData
+     * @return string
+     * @throws Zend_Exception
+     */
+    protected function fixInvalidOpenTM2XML(string $tmxData): string
+    {
+        if($this->isT5Memory) {
+            return $tmxData;
+        }
+
+        /** @var editor_Services_OpenTM2_FixExport $fix */
+        $fix = ZfExtended_Factory::get('editor_Services_OpenTM2_FixExport');
+        $result = $fix->convert($tmxData);
+        if($fix->getChangeCount() > 0 || $fix->getNewLineCount() > 0) {
+            $logger = Zend_Registry::get('logger');
+            $logger->warn('E9999', 'TMX Export: Entities in {changeCount} text parts repaired (see raw php error log), {newLineCount} new line tags restored.', [
+                'languageResource' => $this->languageResource,
+                'changeCount' => $fix->getChangeCount(),
+                'newLineCount' => $fix->getNewLineCount(),
+            ]);
+        }
+        return $result;
     }
     
     /**
@@ -232,9 +252,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible,
         // so we take only the single filename at the moment
         $json->documentName = $filename;
-        
-        $json->segmentNumber = ''; //TODO can be used after implementing TRANSLATE-793
-        $json->markupTable = 'OTMXUXLF';
+
+        $json->markupTable = 'OTMXUXLF'; //NEEDED otherwise t5memory crashes
         $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
@@ -408,12 +427,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function setResource(editor_Models_LanguageResources_Resource $resource)
     {
         parent::setResource($resource);
-        $this->isT5Memory != strstr($resource->getUrl(), '/otmmemoryservice');
+        $this->isT5Memory = !str_contains($resource->getUrl(), '/otmmemoryservice');
         $this->fixLanguages->setDisabled($this->isT5Memory);
     }
 
     /**
      * returns true if the target system is OpenTM2, false if isT5Memory
+     * @deprecated check all usages and remove them if OpenTM2 is replaced with t5memory
      * @return bool
      */
     public function isOpenTM2(): bool {

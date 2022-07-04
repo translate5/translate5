@@ -47,6 +47,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @var editor_Services_Connector_TagHandler_Xliff
      */
     protected $tagHandler;
+
+    /**
+     *  Is the connector generally able to support internal Tags for the translate-API
+     * @var bool
+     */
+    protected $internalTagSupport = true;
     
     public function __construct() {
         editor_Services_Connector_Exception::addCodes([
@@ -68,6 +74,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         parent::connectTo($languageResource, $sourceLang, $targetLang);
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
+
+        //t5 memory is not needing the OpenTM2 specific Xliff TagHandler, the default XLIFF TagHandler is sufficient
+        if(!$this->api->isOpenTM2() && $this->tagHandler instanceof editor_Services_Connector_TagHandler_OpenTM2Xliff) {
+            $this->tagHandler = ZfExtended_Factory::get('editor_Services_Connector_TagHandler_Xliff', ['gTagPairing' => false]);
+        }
     }
     
     /**
@@ -269,12 +280,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     protected function getMetaData($found) {
         $nameToShow = [
             "documentName",
-            "documentShortName",
-            "type",
             "matchType",
             "author",
             "timestamp",
-            "markupTable",
             "context",
             "additionalInfo",
         ];
@@ -327,6 +335,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
+
         //return empty result when no search string
         if(empty($searchString) && $searchString !== "0") {
             return $this->resultList;
@@ -338,15 +347,23 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         /* @var $dummySegment editor_Models_Segment */
         $dummySegment->init();
 
+        $query = $this->tagHandler->prepareQuery($searchString);
 
-        if($this->api->lookup($dummySegment, $searchString, 'source')){
+        if($this->api->lookup($dummySegment, $query, 'source')){
             $result = $this->api->getResult();
             if((int)$result->NumOfFoundProposals === 0){
                 return $this->resultList;
             }
             foreach($result->results as $found) {
-                $found->target = strip_tags($found->target);
-                $found->source = strip_tags($found->source);
+                $found->target = $this->tagHandler->restoreInResult($found->target);
+                $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
+                $found->source = $this->tagHandler->restoreInResult($found->source);
+                $hasSourceErrors = $this->tagHandler->hasRestoreErrors();
+
+                if($hasTargetErrors || $hasSourceErrors) {
+                    //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
+                    $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
+                }
                 
                 $calcMatchRate = $this->calculateMatchRate($found->matchRate, $this->getMetaData($found), $dummySegment, 'InstantTranslate');
                 
@@ -621,6 +638,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         //sort by highes matchrate from the >=100 match results, when same matchrate sort by timestamp
         usort($filterArray,function($item1,$item2) use($resultlist){
+            //FIXME UGLY UGLY
+            // the whole existing code of reducing double 100% matches (getResultListGrouped) must be moved to the processing of the search results for the UI usage of matches
+            // this is nothing which should be handled so deep inside of the connector
+            // the connector should not make any decision about sorting or so, this is business logic on a higher level, a connector should be only about connecting...
+            // if this is moved, there is no need to contain the isFuzzy check anymore since there is then no fuzzy usage anymore.
+            $item1IsFuzzy = preg_match('#^translate5-unique-id\[[^\]]+\]$#', $item1->target);
+            $item2IsFuzzy = preg_match('#^translate5-unique-id\[[^\]]+\]$#', $item2->target);
+            if($item1IsFuzzy && !$item2IsFuzzy) {
+                return 1;
+            }
+            if(!$item1IsFuzzy && $item2IsFuzzy) {
+                return -1;
+            }
             if ($item1->matchrate == $item2->matchrate){
                 return date($resultlist->getMetaValue($item1->metaData, 'timestamp'))<date($resultlist->getMetaValue($item2->metaData, 'timestamp')) ? 1 : -1;
             }

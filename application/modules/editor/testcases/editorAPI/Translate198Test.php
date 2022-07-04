@@ -27,10 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * This will import 2 tasks, and it will test the functionality if the user is able to open 2 different task in the same time.
- * If the user already has opened task for editing, translate5 throws an exception when the user tries to open another task.
+ * This will import 2 tasks, and it will test the functionality if the user is able to open 2 different task at the same time.
  */
-class Translate198Test extends \ZfExtended_Test_ApiTestcase {
+class Translate198Test extends editor_Test_JsonTest {
     /* @var $this Translate198Test */
     
     /***
@@ -61,34 +60,38 @@ class Translate198Test extends \ZfExtended_Test_ApiTestcase {
         $this->createTask("task1");
         $this->startImport();
         $this->checkTaskState();
-        self::$importedTasks[] = self::$api->getTask()->id;
+        self::$importedTasks[] = self::$api->getTask();
         
         $this->createTask("task2");
         $this->startImport();
         $this->checkTaskState();
-        self::$importedTasks[] = self::$api->getTask()->id;
+        self::$importedTasks[] = self::$api->getTask();
     }
     
     /***
+     * @depends testSetupTask
      * Open the task for editing twice (as pmOverrwrite. It is the same as with user assoc). On the secound time, we should get 422 and error code E1341
      */
     public function testTaskAllowedEdit() {
-        
         $task1 = self::$importedTasks[0];
         //open task for editing. This should not produce any error
-        $response = self::$api->requestJson('editor/task/'.$task1,'PUT',['userState' => 'edit', 'id' => $task1]);
-        self::assertNotEmpty($response,'Unable to edit task.');
-        
+        $response = self::$api->requestJson('editor/task/'.$task1->id,'PUT',['userState' => 'edit', 'id' => $task1->id]);
+        $this->api()->setTask($task1);
+        self::assertNotEmpty($response,'Unable to edit task 1.');
+
         $segments = self::$api->requestJson('editor/segment?page=1&start=0&limit=200');
+        $this->assertSegmentsEqualsJsonFile('segments-task1.json', $segments);
+
         self::assertCount(1, $segments);
-        
+
         $task2 = self::$importedTasks[1];
         //open the secound task with the same user. This should not be posible
-        $response = self::$api->request('editor/task/'.$task2,'PUT',['userState' => 'edit', 'id' => $task2]);
-        $response = json_decode($response->getBody());
+        $response = self::$api->requestJson('editor/task/'.$task2->id,'PUT',['userState' => 'edit', 'id' => $task2->id]);
+        $this->api()->setTask($task2);
+        self::assertNotEmpty($response,'Unable to edit task 2.');
 
-        self::assertEquals('E1341',$response->errorCode,'The response does not match the expected error code.');
-        self::assertEquals(422,$response->httpStatus,'The response does not match the expected http code.');
+        $segments = self::$api->requestJson('editor/segment?page=1&start=0&limit=200');
+        $this->assertSegmentsEqualsJsonFile('segments-task2.json', $segments);
     }
     
     
@@ -104,9 +107,8 @@ class Translate198Test extends \ZfExtended_Test_ApiTestcase {
             'autoStartImport'=>0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('testcase-de-en.xlf','TestImportProjects'));
+        self::$api->addImportFile(self::$api->getFile($taskName.'-de-en.xlf'));
         self::$api->import($task,false,false);
-        error_log('Task created. '.self::$api->getTask()->taskName);
     }
     
     /***
@@ -121,7 +123,6 @@ class Translate198Test extends \ZfExtended_Test_ApiTestcase {
      */
     protected function startImport(){
         self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
-        error_log('Import workers started.');
     }
     
     public static function tearDownAfterClass(): void {
@@ -129,10 +130,11 @@ class Translate198Test extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testmanager');
         
         //leave the first task with the testmanager
-        self::$api->requestJson('editor/task/'.self::$importedTasks[0], 'PUT', ['userState' => 'open', 'id' => self::$importedTasks[0]]);
+        self::$api->requestJson('editor/task/'.self::$importedTasks[0]->id, 'PUT', ['userState' => 'open', 'id' => self::$importedTasks[0]->id]);
+        self::$api->requestJson('editor/task/'.self::$importedTasks[1]->id, 'PUT', ['userState' => 'open', 'id' => self::$importedTasks[1]->id]);
         //remove the 2 tasks
-        self::$api->requestJson('editor/task/'.self::$importedTasks[0], 'DELETE');
-        self::$api->requestJson('editor/task/'.self::$importedTasks[1], 'DELETE');
+        self::$api->requestJson('editor/task/'.self::$importedTasks[0]->id, 'DELETE');
+        self::$api->requestJson('editor/task/'.self::$importedTasks[1]->id, 'DELETE');
         
         //remove the temp customer
         self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
