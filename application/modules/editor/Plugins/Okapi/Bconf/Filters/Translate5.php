@@ -32,6 +32,9 @@
  */
 final class editor_Plugins_Okapi_Bconf_Filters_Translate5 extends editor_Plugins_Okapi_Bconf_Filters_Inventory {
 
+    /**
+     * @var editor_Plugins_Okapi_Bconf_Filters_Translate5|null
+     */
     private static ?editor_Plugins_Okapi_Bconf_Filters_Translate5 $_instance = NULL;
 
     /**

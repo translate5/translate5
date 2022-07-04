@@ -72,9 +72,9 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      */
     public static function processUnpackedFilter(editor_Plugins_Okapi_Models_Bconf $bconf, string $identifier, string $unpackedContent, array &$replacementMap, array &$customFilters) : bool {
         // default-identifiers do not need to be embedded, we just check them
-        if(editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier()){
+        if(editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)){
             // a non-embedded default-identifier that does not point to a valid OKAPI default filter will be removed & a warning written
-            if(!editor_Plugins_Okapi_Bconf_Filters::instance()->isValidOkapiDefaultFilter()){
+            if(!editor_Plugins_Okapi_Bconf_Filters::instance()->isValidOkapiDefaultFilter($identifier)){
                 $replacementMap[$identifier] = self::INVALID_IDENTIFIER;
                 static::getLogger()->warn(
                     'E4404',
@@ -83,7 +83,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             }
         } else {
             // process all identifiers pointing to a file
-            $idata = self::parseIdentifier($identifier);
+            $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
             if(editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedDefaultFilter($idata->type, $idata->id)){
                 // when we import a embedded okapi default filter we map it to a non-embedded okapi default filter
                 if(editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)){

@@ -31,6 +31,9 @@
  */
 final class editor_Plugins_Okapi_Bconf_Filters_Okapi extends editor_Plugins_Okapi_Bconf_Filters_Inventory {
 
+    /**
+     * @var editor_Plugins_Okapi_Bconf_Filters_Okapi|null
+     */
     private static ?editor_Plugins_Okapi_Bconf_Filters_Okapi $_instance = NULL;
 
     /**

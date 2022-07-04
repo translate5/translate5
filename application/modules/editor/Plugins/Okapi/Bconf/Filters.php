@@ -44,6 +44,11 @@ class editor_Plugins_Okapi_Bconf_Filters {
     const GUIS = [];
 
     /**
+     * @var editor_Plugins_Okapi_Bconf_Filters|null
+     */
+    private static ?editor_Plugins_Okapi_Bconf_Filters $_instance = NULL;
+
+    /**
      * Evaluates if a filter has aExtJS GUI to be edited with
      * @param string $filterType
      * @return bool
@@ -148,7 +153,7 @@ class editor_Plugins_Okapi_Bconf_Filters {
      * @throws ZfExtended_Exception
      */
     public function isEmbeddedDefaultFilter(string $type, string $id) : bool {
-        if(editor_Plugins_Okapi_Bconf_Filters_Translate5::isTranslate5Id($idata->id)){
+        if(editor_Plugins_Okapi_Bconf_Filters_Translate5::isTranslate5Id($id)){
             return $this->isEmbeddedTranslate5Filter($type, $id);
         } else {
             return $this->isEmbeddedOkapiDefaultFilter($type, $id);
