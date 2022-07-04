@@ -36,6 +36,15 @@
  */
 class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
+    /**
+     * The filename an extension mapping generaly has
+     * @var sring
+     */
+    const FILE = 'extensions-mapping.txt';
+
+    /**
+     * @var sring
+     */
     const INVALID_IDENTIFIER = 'INVALID';
 
     private static ?ZfExtended_Logger $logger = NULL;
@@ -154,15 +163,14 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     private editor_Plugins_Okapi_Models_Bconf $bconf;
 
     /**
-     * @param string $path
      * @param editor_Plugins_Okapi_Models_Bconf $bconf
      * @param string|null $unpackedContent: must be set when unpacking a bconf
      * @param array $replacementMap: must be set when unpacking a bconf, represents the filters that have been mapped to a different identifier (e.g. filebased okapi-default back to a default identifier or default identifier to a translate5 adjuated one etc.)
      * @throws ZfExtended_Exception
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function __construct(editor_Plugins_Okapi_Models_Bconf $bconf, string $path, ?array $unpackedLines=NULL, ?array $replacementMap=NULL){
-        $this->path = $path;
+    public function __construct(editor_Plugins_Okapi_Models_Bconf $bconf, ?array $unpackedLines=NULL, ?array $replacementMap=NULL){
+        $this->path = $bconf->getExtensionMappingPath();
         $this->dir = rtrim(dirname($path), '/');
         $this->bconf = $bconf;
 

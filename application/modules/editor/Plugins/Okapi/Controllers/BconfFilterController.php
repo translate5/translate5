@@ -125,6 +125,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     }
 
     /**
+     * TODO BCONF: remove, we use normal ids
      * Parse, cache and return composite key from url
      * @return array{int, string} composite key [bconfId, okapiId]
      */
@@ -145,11 +146,9 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      */
     public function saveextensionsmappingAction(){
         $extMap = $this->getRequest()->getRawBody();
-            $bconfId = $this->getParam('bconfId');
-            // TODO BCONF: rework, load bconf by id as validation
-            $bconf = new editor_Plugins_Okapi_Models_Bconf();
-            $path = $bconf->getFilePath($bconfId, $bconf::EXTENSIONMAP_FILE);
-            file_put_contents($path, $extMap);
+        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $bconf->load($this->getParam('bconfId'));
+        file_put_contents($bconf->getExtensionMappingPath(), $extMap);
     }
 
 }

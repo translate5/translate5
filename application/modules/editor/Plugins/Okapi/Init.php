@@ -773,25 +773,4 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             }
         }
     }
-
-    /**
-     * TODO BCONF: rework to normal id
-     * Handles updates to BconfFilters
-     * @see ZfExtended_RestController::beforeActionEvent
-     */
-    public function saveExtensionsMapping(Zend_EventManager_Event $event){
-        /** @var editor_Plugins_Okapi_BconfFilterController $controller */
-        [$entity, $params, $controller] = array_values($event->getParams());
-        $extMap = editor_Utils::removeArrayKey($params, 'extensions-mapping');
-        if(isset($extMap)){
-            $id = $controller->getCompositeId();
-            // TODO: validity check
-            $bconf = new editor_Plugins_Okapi_Models_Bconf();
-            $path = $bconf->getFilePath($id[0], $bconf::EXTENSIONMAP_FILE);
-            file_put_contents($path, $extMap);
-            unset($extMap); // make memory freeable
-        }
-        // String $extMapString) {
-    }
-
 }

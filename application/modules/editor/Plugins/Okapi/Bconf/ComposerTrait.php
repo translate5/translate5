@@ -132,10 +132,10 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
      * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
      */
     private function extensionsMapping(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf): void {
-        if(!file_exists(self::EXTENSIONMAP_FILE)){
+        if(!file_exists(editor_Plugins_Okapi_Bconf_ExtensionMapping::FILE)){
             return;
         }
-        $extMap = file(self::EXTENSIONMAP_FILE, FILE_IGNORE_NEW_LINES);
+        $extMap = file(editor_Plugins_Okapi_Bconf_ExtensionMapping::FILE, FILE_IGNORE_NEW_LINES);
         $amount = count($extMap);
         $extMapBinary = ''; // we'll build up the binary format in memory instead of wirting every line itself to file
         foreach($extMap as $line){

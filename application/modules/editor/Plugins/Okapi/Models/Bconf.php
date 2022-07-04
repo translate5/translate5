@@ -51,11 +51,6 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     const EXTENSION = 'bconf';
 
     /**
-     * @var string
-     */
-    const EXTENSIONMAP_FILE = editor_Plugins_Okapi_Bconf_File::EXTENSIONMAP_FILE;
-
-    /**
      * @var string|null
      */
     private static ?string $bconfRootDir = null;
@@ -384,6 +379,25 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
+     * Retrieves the server path to the extension mapping to a bconf
+     * @return string
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getExtensionMappingPath() : string {
+        return $this->createPath(editor_Plugins_Okapi_Bconf_ExtensionMapping::FILE);
+    }
+
+    /**
+     * Retrieves the extension-mapping object for this bconf
+     * @return editor_Plugins_Okapi_Bconf_ExtensionMapping
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getExtensionMapping() : editor_Plugins_Okapi_Bconf_ExtensionMapping {
+        return new editor_Plugins_Okapi_Bconf_ExtensionMapping($this);
+    }
+
+    /**
      * Retrieves the provider-prefix to be used for custom filters ( $okapiType@$provider-$specialization )
      * Keep in mind that this string may not neccessarily be unique for a customer
      * @return string
@@ -403,14 +417,6 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
             return substr($name, 0, 50);
         }
         return $name;
-    }
-
-    public function addCustomFilterOnUnpack($identifier, $extensions) {
-
-    }
-
-    public function addCustomFilterOnGuiAdd() {
-
     }
 
     /**

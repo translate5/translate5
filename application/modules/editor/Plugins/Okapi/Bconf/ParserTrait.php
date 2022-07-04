@@ -142,7 +142,7 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
             $extMap[] = $raf->readUTF()."\t".$raf->readUTF();
         }
         sort($extMap);
-        file_put_contents(self::EXTENSIONMAP_FILE, implode(PHP_EOL, $extMap));
+        file_put_contents(editor_Plugins_Okapi_Bconf_ExtensionMapping::FILE, implode(PHP_EOL, $extMap));
         file_put_contents(self::DESCRIPTION_FILE, json_encode($content, JSON_PRETTY_PRINT));
     }
 

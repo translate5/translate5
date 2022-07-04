@@ -88,6 +88,42 @@ class editor_Plugins_Okapi_Models_BconfFilter extends ZfExtended_Models_Entity_A
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Models_Validator_BconfFilter';
 
     /**
+     * @var editor_Plugins_Okapi_Models_Bconf|null
+     */
+    private ?editor_Plugins_Okapi_Models_Bconf $bconf = NULL;
+
+
+    /**
+     * @return editor_Plugins_Okapi_Models_Bconf
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getRelatedBconf() : editor_Plugins_Okapi_Models_Bconf {
+        if($this->bconf === NULL){
+            $this->bconf = new editor_Plugins_Okapi_Models_Bconf();
+            $this->bconf->load($this->getBconfId());
+        }
+        return $this->bconf;
+    }
+
+    /**
+     * Retrieves the full filename of the related fprm file
+     * @return string
+     */
+    public function getFile() : string {
+        return editor_Plugins_Okapi_Bconf_Filters::createIdentifier($this->getOkapiType(), $this->getOkapiId()).'.'.self::EXTENSION;
+    }
+
+    /**
+     * Retrieves the server-path to our related fprm
+     * @return string
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getPath() : string {
+        return $this->getRelatedBconf()->createPath($this->getFile());
+    }
+
+    /**
      * @return array
      */
     public function getFileExtensions() : array {
