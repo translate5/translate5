@@ -100,12 +100,22 @@ class editor_Plugins_Okapi_Bconf_Filters {
     }
 
     /**
+     * Creates an identifier out of okapiType and okapiId
      * @param string $okapiType
      * @param string $okapiId
      * @return string
      */
     public static function createIdentifier(string $okapiType, string $okapiId) : string {
         return $okapiType.self::IDENTIFIER_SEPERATOR.$okapiId;
+    }
+
+    /**
+     * Creates an identifier out of a path to a fprm file
+     * @param string $fprmPath
+     * @return string
+     */
+    public static function createIdentifierFromPath(string $fprmPath) : string {
+        return pathinfo($fprmPath, PATHINFO_FILENAME);
     }
 
     /**
@@ -183,12 +193,13 @@ class editor_Plugins_Okapi_Bconf_Filters {
     /**
      * Finds the fprm path for an OKAPI default filter
      * Note that this might actually return a tranlate5 adjusted filter in case it is a replacing filter
+     * This API will return NULL for a filter that could not be found and false for filters that do not support a settings file
      * @param $filterId
-     * @return string|null
+     * @return string|null|bool
      * @throws ZfExtended_Exception
      */
-    public function getOkapiDefaultFilterPathById($filterId) : ?string {
-        // fisrt, search if there is a replacing filter
+    public function getOkapiDefaultFilterPathById($filterId) {
+        // first, search if there is a replacing filter
         $filters = $this->translate5Filters->findOkapiDefaultReplacingFilter($filterId);
         if(count($filters) > 1){
             throw new ZfExtended_Exception('translate5 replacing filter id '.$filterId.' is ambigous!');
@@ -200,6 +211,10 @@ class editor_Plugins_Okapi_Bconf_Filters {
         if(count($filters) > 1){
             throw new ZfExtended_Exception('OKAPI filter id '.$filterId.' is ambigous!');
         } else if(count($filters) === 1){
+            // we may have filters without settings !
+            if(!$filters[0]->settings){
+                return false;
+            }
             return $this->okapiFilters->createFprmPath($filters[0]);
         }
         return NULL;

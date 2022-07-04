@@ -40,6 +40,11 @@ class editor_Plugins_Okapi_Bconf_File {
     const DESCRIPTION_FILE = 'content.json';
 
     /**
+     * @var false
+     */
+    const DO_DEBUG = false;
+
+    /**
      * @var string
      */
     const PIPELINE_FILE = 'pipeline.pln';
@@ -51,10 +56,19 @@ class editor_Plugins_Okapi_Bconf_File {
         'XSLTransformStep'   => ['XsltPath'],
     ];
 
+    /**
+     * @var editor_Plugins_Okapi_Models_Bconf
+     */
     protected editor_Plugins_Okapi_Models_Bconf $entity;
 
-    public function __construct(editor_Plugins_Okapi_Models_Bconf $entity) {
+    /**
+     * @var bool
+     */
+    protected bool $isNew;
+
+    public function __construct(editor_Plugins_Okapi_Models_Bconf $entity, bool $isNew=false) {
         $this->entity = $entity;
+        $this->isNew = $isNew;
     }
 
     /**
@@ -64,7 +78,8 @@ class editor_Plugins_Okapi_Bconf_File {
     public function pack(): void {
         try {
             $this->doPack();
-        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity){
+        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity $e){
+            error_log('EXCEPTION: '.$e->getMessage());
         } catch(Exception $e){
             $this->invalidate($e->__toString(), 'EXCEP');
         }
@@ -78,7 +93,8 @@ class editor_Plugins_Okapi_Bconf_File {
     public function unpack(string $pathToParse): void {
         try {
             $this->doUnpack($pathToParse);
-        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity){
+        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity $e){
+            error_log('EXCEPTION: '.$e->getMessage());
         } catch(Exception $e){
             $this->invalidate($e->__toString(), 'EXCEP');
         }
@@ -92,9 +108,9 @@ class editor_Plugins_Okapi_Bconf_File {
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    protected function  invalidate(string $msg = '', string $errorCode = 'E1026'): void {
+    protected function  invalidate(string $msg = '', string $errorCode = 'E1026') : void {
         $errors = [[$msg]];
-        if($this->entity->isNewRecord()){
+        if($this->isNew){
             try {
                 $this->entity->delete();
             } catch(Exception $e){

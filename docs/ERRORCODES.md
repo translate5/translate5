@@ -488,6 +488,11 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1340"></a>E1340  | Plug-In Okapi | Okapi Plug-In: The default bconf configuration file-name is not set. | The value was empty for the config with name:&nbsp;runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName or&nbsp;runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName<br />For more info see error log.
 | <a id="E1387"></a>E1387  | Plug-In Okapi | Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated | This is just a warning hinting to the use of the deprecated feature to provide the BCONF to use in the import ZIP
 | <a id="E1390"></a>E1390  | Plug-In Okapi | Okapi Plug-In: The SRX file is not valid | The uploaded segmentation/SRX file is not valid. Details will be part of the message
+| <a id="E1404"></a>E1404  | Plug-In Okapi | Okapi Plug-In: The filter/fprm "{filter}" from the imported bconf "{bconf}" is not valid | The provided bconf can not be imported to translate5
+| <a id="E1405"></a>E1405  | Plug-In Okapi | Okapi Plug-In: Invalid extension-mapping found in the bconf "{bconf}" to import | The provided bconf can not be imported to translate5
+| <a id="E1406"></a>E1406  | Plug-In Okapi | Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" | The provided bconf can not be imported to translate5
+| <a id="E1407"></a>E1407  | Plug-In Okapi | Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed | Warning, that the invalid filter in the provided bconf was removed
+| <a id="E1408"></a>E1408  | Plug-In Okapi | Okapi Plug-In: The bconf "{bconf}" to import is not valid | The provided bconf can not be imported to translate5
 
 
 #### Plug-In PangeaMt
