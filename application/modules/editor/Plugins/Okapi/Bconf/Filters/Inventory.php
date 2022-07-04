@@ -135,5 +135,30 @@ abstract class editor_Plugins_Okapi_Bconf_Filters_Inventory {
         }
         return $result;
     }
- 
+
+    /**
+     * Retrieves the rows for the frontend
+     * @param int $startIndex
+     * @return array
+     */
+    public function getRows(int $startIndex=0) : array {
+        $rows = [];
+        foreach($this->inventory as $item){
+            $editable = ($item->settings && editor_Plugins_Okapi_Bconf_Filters::hasGui($item->type));
+            $rows[] = [
+                'id' => $startIndex,
+                'okapiId' => $item->id,
+                'okapiType' => $item->type,
+                'name' => $item->name,
+                'description' => $item->description,
+                'mime' => $item->mime,
+                'extensions' => $item->extensions,
+                'editable' => $editable,
+                'unclonable' => ($item->settings == false),
+                'guiClass' => ($editable ? editor_Plugins_Okapi_Bconf_Filters::getGuiName($item->type, true) : '')
+            ];
+            $startIndex++;
+        }
+        return $rows;
+    }
 }

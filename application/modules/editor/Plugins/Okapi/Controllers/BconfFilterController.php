@@ -42,53 +42,14 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
 
 
     /**
-     * sends all bconf filters as JSON
+     * sends all default bconf filters as JSON, Translate5 adjusted and okapi defaults
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
     public function getdefaultfiltersAction() {
-
-        // TODO BCONF REFACTOR
-        $bconffilter = new editor_Plugins_Okapi_Models_DefaultBconfFilter();
-        $default_fprms = $bconffilter->loadAll();
-
-        //
-        $rows = [];
-        foreach($default_fprms as &$fprm){
-            unset($fprm['id']);
-            unset($fprm['extensions']);
-            $rows[$fprm['okapiId']] = &$fprm;
-        }
-        unset($fprm);
-
-        $dataDir = editor_Plugins_Okapi_Init::getDataDir();
-        chdir($dataDir . 'fprm/translate5/');
-        $t5_fprms = glob("*@translate5*.fprm");
-        foreach($t5_fprms as $fprm){
-            $okapiId = substr($fprm, 0, -5); // remove .fprm
-            // okf_xml@translate5-AndroidStrings -> okf_xml-AndroidStrings
-            $parentId = str_replace('@translate5', '', $okapiId);
-            $row = @$rows[$parentId];
-            if($row){
-                $row['okapiId'] = $okapiId;
-                $rows[$parentId] = $row;
-            } else {
-                // okf_xml@translate5-tbx-translate-definitions-setup-ITS.fprm -> okf_xml
-                $t5Pos = strpos($okapiId, '@translate5-');
-                $parentId = substr($okapiId, 0, $t5Pos);
-                $name = substr($okapiId, $t5Pos + 12);
-                $row = $rows[$parentId];
-                $row['okapiId'] = $okapiId;
-                if($name){
-                    $row['name'] = ucfirst($name);
-                }
-                $rows[$okapiId] = $row;
-            }
-        }
-
-        $this->view->rows = array_values($rows); // remove named indexes
-        $this->view->total = count($rows);
-
+        $t5Rows = editor_Plugins_Okapi_Bconf_Filters_Translate5::instance()->getRows(0);
+        $this->view->rows = array_merge($t5Rows, editor_Plugins_Okapi_Bconf_Filters_Okapi::instance()->getRows(count($t5Rows)));
+        $this->view->total = count($this->view->rows);
     }
 
     /**
