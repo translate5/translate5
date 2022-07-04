@@ -33,11 +33,19 @@
  */
 class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
 
-    const SIGNATURE = "batchConf";
-    const VERSION = 2;
-    const NUMPLUGINS = 0;
+    /**
+     * @var int
+     */
     const PHP_INT32_MAX = 0x7FFFFFFF;
+
+    /**
+     * @var int
+     */
     const PHP_UINT32_MAX = 0xFFFFFFFF;
+
+    /**
+     * @var int
+     */
     const OVERFLOW_SUB = 0x100000000; // == PHP_UINT32_MAX +1
 
     public function __construct(string $filename, string $mode = "r", bool $useIncludePath = false, ?object $context = null) {

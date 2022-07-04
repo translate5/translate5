@@ -52,17 +52,17 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
         $content = [
             'refs' => [],
             'step' => [],
-            editor_Plugins_Okapi_Models_BconfFilter::EXTENSION => [],
+            'fprm' => [],
         ];
 
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($pathToParse, "rb");
         $sig = $raf->readUTF();
-        if($sig !== $raf::SIGNATURE){
-            $this->invalidate("Invalid signature '" . htmlspecialchars($sig) . "' in file header before byte " . $raf->ftell() . ". Must be '" . $raf::SIGNATURE . "'");
+        if($sig !== editor_Plugins_Okapi_Models_Bconf::SIGNATURE){
+            $this->invalidate("Invalid signature '" . htmlspecialchars($sig) . "' in file header before byte " . $raf->ftell() . ". Must be '" . editor_Plugins_Okapi_Models_Bconf::SIGNATURE . "'");
         }
         $version = $raf->readInt();
-        if(!($version >= 1 && $version <= $raf::VERSION)){
-            $this->invalidate("Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . $raf::VERSION);
+        if(!($version >= 1 && $version <= editor_Plugins_Okapi_Models_Bconf::VERSION)){
+            $this->invalidate("Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . editor_Plugins_Okapi_Models_Bconf::VERSION);
         }
 
         //=== Section 1: plug-ins
@@ -124,12 +124,19 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
         // Get the number of filter configurations
         $count = $raf->readInt();
 
+        // needed for data-exchange in the processing API in editor_Plugins_Okapi_Bconf_ExtensionMapping
+        $replacementMap = [];
+        $customFilters = [];
+
         // Read each one
         for($i = 0; $i < $count; $i++){
-            $identifier = $content[editor_Plugins_Okapi_Models_BconfFilter::EXTENSION][] = $raf->readUTF();
+            $identifier = $content['fprm'][] = $raf->readUTF();
             $data = $raf->readUTF();
-            // And create the parameters file
-            file_put_contents($identifier.'.'.editor_Plugins_Okapi_Models_BconfFilter::EXTENSION, $data);
+
+            // save the fprm if it points to a valid custom identifier/filter
+            if(editor_Plugins_Okapi_Bconf_ExtensionMapping::processUnpackedFilter($this->entity, $identifier, $data, $replacementMap, $customFilters)){
+                file_put_contents($identifier.'.'.editor_Plugins_Okapi_Models_BconfFilter::EXTENSION, $data);
+            }
         }
 
         //=== Section 5: the extensions -> filter configuration id mapping
@@ -137,12 +144,16 @@ trait editor_Plugins_Okapi_Bconf_ParserTrait {
         if(!$count){
             $this->invalidate("No extensions-mapping present in bconf.");
         }
-        $extMap = [];
+        $rawMap = [];
         for($i = 0; $i < $count; $i++){
-            $extMap[] = $raf->readUTF()."\t".$raf->readUTF();
+            $rawMap[] = [ $raf->readUTF(), $raf->readUTF() ];
         }
-        sort($extMap);
-        file_put_contents(editor_Plugins_Okapi_Bconf_ExtensionMapping::FILE, implode(PHP_EOL, $extMap));
+        // the extension-mapping will validate the raw data and applies any adjustments cached in the replacement-map
+        $extensionMapping = new editor_Plugins_Okapi_Bconf_ExtensionMapping($this->entity, $rawMap, $replacementMap);
+        // this saves the custom-filters as entries to the DB and writes the mapping-file
+        $extensionMapping->flushUnpacked($customFilters);
+
+        // save our inventory as description file
         file_put_contents(self::DESCRIPTION_FILE, json_encode($content, JSON_PRETTY_PRINT));
     }
 

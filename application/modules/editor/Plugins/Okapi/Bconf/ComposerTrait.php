@@ -48,15 +48,15 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
         $fileName = basename($this->entity->getPath());
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
 
-        $raf->writeUTF($raf::SIGNATURE, false);
-        $raf->writeInt($raf::VERSION);
+        $raf->writeUTF(editor_Plugins_Okapi_Models_Bconf::SIGNATURE, false);
+        $raf->writeInt(editor_Plugins_Okapi_Models_Bconf::VERSION);
         //TODO check the Plugins currentlly not in use
-        $raf->writeInt(self::NUMPLUGINS);
+        $raf->writeInt(editor_Plugins_Okapi_Models_Bconf::NUM_PLUGINS);
 
         //Read the pipeline and extract steps
-        self::processPipeline($raf);
-        self::filterConfiguration($raf, $content);
-        self::extensionsMapping($raf);
+        $this->processPipeline($raf);
+        $this->processFilters($raf, $content);
+        $this->processExtensionMapping($raf);
     }
 
     private function processPipeline($raf): void {
@@ -117,7 +117,7 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
      * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
      * @param array $content Ordered bconf contents
      */
-    private function filterConfiguration(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf, array $content): void {
+    private function processFilters(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf, array $content): void {
         $fprms = $content['fprm'] ?? glob("*.fprm");
         $raf->writeInt(count($fprms));
         foreach($fprms as $filterParam){
@@ -131,7 +131,7 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
      * Section 5: Mapping extensions -> filter configuration id
      * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
      */
-    private function extensionsMapping(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf): void {
+    private function processExtensionMapping(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf): void {
         if(!file_exists(editor_Plugins_Okapi_Bconf_ExtensionMapping::FILE)){
             return;
         }

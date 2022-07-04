@@ -34,15 +34,21 @@ class editor_Plugins_Okapi_Bconf_File {
     use editor_Plugins_Okapi_Bconf_ParserTrait;
     use editor_Plugins_Okapi_Bconf_ComposerTrait;
 
-    public const NUMPLUGINS = 0;
-    public const DESCRIPTION_FILE = 'content.json';
-    public const PIPELINE_FILE = 'pipeline.pln';
+    /**
+     * @var string
+     */
+    const DESCRIPTION_FILE = 'content.json';
+
+    /**
+     * @var string
+     */
+    const PIPELINE_FILE = 'pipeline.pln';
 
     public const STEP_REFERENCES = [
-        "SegmentationStep"   => ["SourceSrxPath", "TargetSrxPath"],
-        "TermExtractionStep" => ["StopWordsPath", "NotStartWordsPath", "NotEndWordsPath"],
-        "XMLValidationStep"  => ["SchemaPath"],
-        "XSLTransformStep"   => ["XsltPath"],
+        'SegmentationStep'   => ['SourceSrxPath', 'TargetSrxPath'],
+        'TermExtractionStep' => ['StopWordsPath', 'NotStartWordsPath', 'NotEndWordsPath'],
+        'XMLValidationStep'  => ['SchemaPath'],
+        'XSLTransformStep'   => ['XsltPath'],
     ];
 
     protected editor_Plugins_Okapi_Models_Bconf $entity;

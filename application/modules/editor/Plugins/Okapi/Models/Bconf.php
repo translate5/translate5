@@ -51,6 +51,23 @@ class editor_Plugins_Okapi_Models_Bconf extends ZfExtended_Models_Entity_Abstrac
     const EXTENSION = 'bconf';
 
     /**
+     * The general version of bconfs we support
+     */
+    const VERSION = 2;
+
+    /**
+     * The signature written int the bconf-files
+     * @var string
+     */
+    const SIGNATURE = 'batchConf';
+
+    /**
+     * Momentary there is no support for plugins in our bconfs
+     * @var int
+     */
+    const NUM_PLUGINS = 0;
+
+    /**
      * @var string|null
      */
     private static ?string $bconfRootDir = null;

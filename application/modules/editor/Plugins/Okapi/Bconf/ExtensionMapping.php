@@ -47,6 +47,9 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      */
     const INVALID_IDENTIFIER = 'INVALID';
 
+    /**
+     * @var ZfExtended_Logger|null
+     */
     private static ?ZfExtended_Logger $logger = NULL;
 
     /**
