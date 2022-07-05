@@ -715,17 +715,24 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * @param {Integer} matchEnd
      * @returns {Object}
      */
+    /*amendOffsets: function(node) {
+
+    },*/
+
     getRangeForMatch: function(matchStart,matchEnd) {
         var me = this,
             rangeForMatch = rangy.createRange(),
+            rangeForMatch1 = document.createRange(),
             allDelNodes = [],
             rangeForDelNode = rangy.createRange(),
+            rangeForDelNode1 = document.createRange(),
             bookmarkForDelNode,
             lengthOfDelNode;
         // me.consoleLog('---\n- matchStart: ' + matchStart + ' / matchEnd: ' + matchEnd);
         //console.log('before', matchStart, matchEnd);
         // move offsets according to hidden del-Nodes in front of the match's start and/or end
         allDelNodes = me.getEditorBodyExtDomElement().query('del');
+        //console.log(matchStart, matchEnd);
         Ext.Array.each(allDelNodes, function(delNode) {
             rangeForDelNode.selectNodeContents(delNode);
             bookmarkForDelNode = rangeForDelNode.getBookmark();
@@ -749,8 +756,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // set range for Match by selecting characters
         rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
         //console.log('after', matchStart, matchEnd);
+        var bookmark = rangeForMatch.getBookmark();
+        //console.log('bookmark', bookmark); // {start: xx, end: yy, containerNode: cellNode}
         // return the bookmark
-        return rangeForMatch.getBookmark();
+        return bookmark;
     },
     /**
      * Apply results to captured content from the Editor.
@@ -935,7 +944,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
     applySpellCheckStylesForRecord: function(store, rec, operation) {
         if (!operation || operation == 'commit') {
-            var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, node, matches;
+            var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, cellNode, matches;
             for (target in rec.get('spellCheck')) {
                 rec.get('spellCheck')[target].forEach(function(item){
                     item.range.containerNode = document.querySelector(
@@ -943,9 +952,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                         + ' [data-columnid="' + target + 'EditColumn"] .x-grid-cell-inner'
                     );
                 });
-                node = rec.get('spellCheck')[target][0].range.containerNode;
+                cellNode = rec.get('spellCheck')[target][0].range.containerNode;
                 matches = rec.get('spellCheck')[target];
-                this.applyCustomMatches(node, matches);
+                this.applyCustomMatches(cellNode, matches);
             }
         }
     },
@@ -954,22 +963,48 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             this.applySpellCheckStylesForRecord(null, store.getAt(i));
         }
     },
-    applyCustomMatches: function(editorBody, allMatches) {
+    applyCustomMatches: function(cellNode, matches) {
         var me = this,
             rangeForMatch,
             documentFragmentForMatch,
             spellCheckNode;
+
         // apply the matches (iterate in reverse order; otherwise the ranges get lost due to DOM-changes "in front of them")
-        me.cleanUpNode(editorBody);
-        rangeForMatch = rangy.createRange(editorBody);
-        Ext.Array.each(allMatches, function(match, index) {
+        me.cleanUpNode(cellNode);
+        rangeForMatch = rangy.createRange(cellNode);
+        Ext.Array.each(matches, function(match, index) {
+            me.mindDelTags(match);
             rangeForMatch.moveToBookmark(match.range);
             rangeForMatch = me.cleanBordersOfCharacterbasedRange(rangeForMatch);
             documentFragmentForMatch = rangeForMatch.extractContents();
-            spellCheckNode = me.createSpellcheckNode(index, allMatches);
+            spellCheckNode = me.createSpellcheckNode(index, matches);
             spellCheckNode.appendChild(documentFragmentForMatch);
             rangeForMatch.insertNode(spellCheckNode);
         }, me, true);
+    },
+
+    mindDelTags: function(match) {
+        var dels = match.range.containerNode.innerHTML.matchAll(/(<del.*?>)(.+?)<\/del>/g), delA = [];
+
+        // Get array of regex matches of del-tags found within node's innerHTML
+        while (del = dels.next()) {
+            if (del.value) {
+                delA.push(del.value);
+            } else {
+                break;
+            }
+        }
+
+        // Foreach del-tag
+        for (var i = 0; i < delA.length; i++) {
+            for (j = 0; j < i; j++) {
+                delA[i].index -= delA[j][0].length - delA[j][2].length;
+            }
+            if (delA[i].index < match.range.start) {
+                match.range.start += delA[i][2].length;
+                match.range.end += delA[i][2].length;
+            }
+        }
     },
 
     onSegmentEditCancelled: function(plugin, context) {
