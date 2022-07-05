@@ -89,26 +89,15 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         ref: 'preferencesOverviewPanel',
         selector: '#preferencesOverviewPanel'
     }],
-    routes: {
-        'bconfprefs': 'onBconfRoute'
-    },
-    // just a reference to our view
+    /** @property {Editor.plugins.Okapi.view.BconfGrid} bconfPanel reference to our main view */
     bconfPanel: null,
-    // shows the preference panel in the preferences (bconf-section is shown via 'showBconfInOverviewPanel' afterwards)
-    onBconfRoute: function(){
-        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
-            // QUIRK: just to make sure, not the same thing can happen as with Quirk in ::showBconfInOverviewPanel
-            var pop = this.getPreferencesOverviewPanel();
-            if(pop){
-                Editor.app.openAdministrationSection(pop, 'reviewbconf');
-            }
-        }
-    },
     // adds the Font-Prefs-Panel to the Overview Panel if the right is present
     addBconfToSettingsPanel: function(panel){
         if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
             this.bconfPanel = panel.insert(2, {
                 xtype: 'okapiBconfGrid',
+                id: 'okapiBconfGrid',
+                routePrefix: 'preferences/',
                 store: {
                     type: 'chained',
                     source: 'bconfStore',
@@ -148,6 +137,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             tabPanel.insert(2, {
                 xtype: 'okapiBconfGrid',
                 id: 'bconfCustomerGrid',
+                routePrefix: 'client/:clientId/',
                 bind: {
                     customer: '{list.selection}', // list is reference name of customerGrid
                     store: '{customersBconfStore}'

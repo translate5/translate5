@@ -37,7 +37,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     ],
     alias: 'widget.okapiBconfGrid',
     plugins: ['cellediting'],
-    itemId: 'okapiBconfGrid',
+    itemId: 'bconf',
     controller: 'Editor.plugins.Okapi.view.BconfGridController',
     store: 'bconfStore',
     isCustomerGrid: false,

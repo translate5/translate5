@@ -338,7 +338,7 @@ Ext.define('Editor.util.Util', {
         },
         isIterable: function(value, includeString = false){
             return typeof value[Symbol.iterator] === 'function' && (typeof value !== 'string' || includeString)
-        }
+        },
         /***
          * Check if the given language id/string is empty.
          * 0 / "0" is treated as empty
@@ -357,6 +357,25 @@ Ext.define('Editor.util.Util', {
                 default:
                     return false;
             }
-        }
+        },
+
+        trimLastSlash: function(str){
+            return str.substring(0, str.lastIndexOf('/'));
+        },
+
+        awaitRoute: async function(route){
+            var ret = new Promise(function(resolve, reject){
+                Ext.util.History.on('change', function(token){
+                    debugger;
+                    if(token === route){
+                        resolve()
+                    } else {
+                        reject()
+                    }
+                }, this, {single: true})
+            })
+            Editor.app.redirectTo(route);
+            return ret;
+        },
     }
 });

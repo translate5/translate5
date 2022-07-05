@@ -49,5 +49,8 @@ Ext.define('Editor.plugins.Okapi.model.BconfModel', {
     }, {
         name: 'isDefault', // global setting
         type: 'boolean'
-    }]
+    }],
+    toUrl: function(){
+        return Ext.util.History.getToken().replace(/bconf\/?\d*.*$/, 'bconf/' + this.id)
+    }
 });

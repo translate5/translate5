@@ -30,6 +30,52 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     alias: 'controller.Editor.plugins.Okapi.view.BconfGridController',
     /** @const {string} FILE_UPLOAD_NAME */
     FILE_UPLOAD_NAME: 'bconffile',
+    routesToSet: {
+        ':bconfId': 'onBconfRoute',
+        ':bconfId/filters': async function(bconfId){
+            if(this.getView().selection?.id != bconfId){
+                var token = Ext.util.History.getToken();
+                var parentToken =  Editor.util.Util.trimLastSlash(token);
+                await Editor.util.Util.awaitRoute(parentToken)
+                this.redirectTo(token)
+            } else {
+                this.showFilterGrid(bconfId);
+            }
+        }
+    },
+    beforeInit: function(view){
+        var itemId = view.getItemId(),
+            routes = {};
+        for(const [route, action] of Object.entries(this.routesToSet)){
+            routes[view.routePrefix + itemId + '/' + route] = action
+        }
+        this.setRoutes(routes);
+        this.callParent(arguments);
+    },
+    control: {
+        '#':
+            { // # references the view
+                'selectionchange':
+                    {
+                        fn: function(selModel, selected, eOpts){
+                            var rec = selected.length && selected[0];
+                            if(rec){
+                                this.redirectTo(rec);
+                            }
+                        }
+                    }
+            }
+    }
+    ,
+    onBconfRoute: function(bconfId, action){
+        var grid = this.getView(),
+            selected = grid.getSelectionModel().getSelectionStart(),
+            toSelect = grid.getStore().getById(bconfId);
+        if(toSelect !== selected){
+            grid.setSelection(toSelect);
+        }
+    }
+    ,
 
     deletebconf: function(view, rowIndex, /* colIndex */){
         view.select(rowIndex);
@@ -79,9 +125,17 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         });
     },
 
-    showFilterGrid: function(view, recIdx){
+    showFilterGrid: function(view, rowIndex){
+        if(rowIndex){
+            view.select(rowIndex);
+        } else {
+            view = this.getView()
+            if(!view.selection){
+                return
+            }
+        }
         fw = Ext.create('Editor.plugins.Okapi.view.BconfFilterGrid', {
-            bconf: view.store.getAt(recIdx),
+            bconf: view.store.getById(view.selection.id),
             constrain: true,
             modal: true,
             //renderTo: this.getView().up('viewport'),
@@ -263,7 +317,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             panel.isValid(); // trigger display of red border when invalid
         });
     },
-    // Forbid systemDefault editing, show Name prompt
+// Forbid systemDefault editing, show Name prompt
     handleBeforeedit: function(cellEditPlugin, cellContext){
         var grid = this.getView(),
             {name, customerId} = cellContext.record.getData();

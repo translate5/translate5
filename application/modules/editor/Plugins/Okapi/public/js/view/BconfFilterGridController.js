@@ -67,6 +67,7 @@ let BconfFilterGridController = {
     },
 
     //endregion config
+
     //region authorization
 
     isDeleteDisabled: function(view, rowIndex, colIndex, item, record){

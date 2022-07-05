@@ -55,14 +55,11 @@ Ext.define('Editor.view.admin.preferences.OverviewPanelViewController', {
             this.redirectTo('preferences/adminConfigGrid|config/'+confGrid.getController().getSearchValue());
         }
     },
-    onPreferencesRoute: function(tab) {
+    onPreferencesRoute: function(tab, entityId) {
         var v = this.getView();
+        Editor.app.openAdministrationSection(this.getView());
         if(tab) {
-            Editor.app.openAdministrationSection(this.getView());
             v.setActiveTab(v.down('#'+tab));
-        }
-        else {
-            Editor.app.openAdministrationSection(this.getView());
         }
     },
     /**
