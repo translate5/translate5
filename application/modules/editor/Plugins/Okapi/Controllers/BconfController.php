@@ -33,7 +33,7 @@
  */
 
 /**
- * @property editor_Plugins_Okapi_Models_Bconf $entity
+ * @property editor_Plugins_Okapi_Bconf_Entity $entity
  */
 class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     /***
@@ -46,7 +46,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     /**
      * @var string
      */
-    protected $entityClass = 'editor_Plugins_Okapi_Models_Bconf';
+    protected $entityClass = 'editor_Plugins_Okapi_Bconf_Entity';
 
     /**
      * sends all bconfs as JSON
@@ -73,10 +73,10 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="'.$this->entity->getDownloadFilename());
         header('Cache-Control: no-cache');
-        header('Content-Length: ' . filesize($this->entity->getFilePath()));
+        header('Content-Length: ' . filesize($this->entity->getPath()));
         ob_clean();
         flush();
-        readfile($this->entity->getFilePath());
+        readfile($this->entity->getPath());
         exit;
     }
 
@@ -88,11 +88,26 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
                 'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
             ]);
         }
+        $postFile = $_FILES[self::FILE_UPLOAD_NAME];
+        $name = $this->getParam('name');
+        $description = $this->getParam('description');
+        $customerId = $this->getParam('customerId');
 
-        $bconf = new editor_Plugins_Okapi_Models_Bconf($_FILES[self::FILE_UPLOAD_NAME], $this->getAllParams());
+        if($name == NULL){
+            $name = pathinfo($postFile['name'], PATHINFO_FILENAME);
+        }
+        if($description == NULL){
+            $description = '';
+        }
+        if($customerId != NULL){
+            $customerId = intval($customerId);
+        }
 
-        $ret->success = is_object($bconf);
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $bconf->import($postFile['tmp_name'], $name, $description, $customerId);
+
         $ret->id = $bconf->getId();
+        $ret->success = !empty($ret->id);
 
         echo json_encode($ret);
     }
@@ -126,7 +141,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         }
 
         $srxNameToBe = $bconf->getSrxNameFor($this->getParam('purpose'));
-        move_uploaded_file($srxUploadFile, $bconf->getFilePath(fileName: $srxNameToBe));
+        move_uploaded_file($srxUploadFile, $bconf->createPath(fileName: $srxNameToBe));
         $bconf->getFile()->pack();
     }
 
@@ -156,7 +171,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @throws editor_Plugins_Okapi_Exception
      */
     public function cloneAction() {
-        $clone = new editor_Plugins_Okapi_Models_Bconf(
+        // TODO BCONF: rework
+        $clone = new editor_Plugins_Okapi_Bconf_Entity(
             ['tmp_name' => $this->entity->getFilePath($this->getParam('id'))],
             $this->getAllParams()
         );

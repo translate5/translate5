@@ -30,24 +30,45 @@
  * Class representing a .bconf file and associated operations
  */
 class editor_Plugins_Okapi_Bconf_File {
-    use editor_Plugins_Okapi_Bconf_ParserTrait;
-    use editor_Plugins_Okapi_Bconf_ComposerTrait;
 
-    public const NUMPLUGINS = 0;
-    public const DESCRIPTION_FILE = "content.json";
-    public const PIPELINE_FILE = "pipeline.pln";
-    public const EXTENSIONMAP_FILE = "extensions-mapping.txt";
+    use editor_Plugins_Okapi_Bconf_UnpackerTrait;
+    use editor_Plugins_Okapi_Bconf_PackerTrait;
+
+    /**
+     * @var string
+     */
+    const DESCRIPTION_FILE = 'content.json';
+
+    /**
+     * @var false
+     */
+    const DO_DEBUG = false;
+
+    /**
+     * @var string
+     */
+    const PIPELINE_FILE = 'pipeline.pln';
+
     public const STEP_REFERENCES = [
-        "SegmentationStep"   => ["SourceSrxPath", "TargetSrxPath"],
-        "TermExtractionStep" => ["StopWordsPath", "NotStartWordsPath", "NotEndWordsPath"],
-        "XMLValidationStep"  => ["SchemaPath"],
-        "XSLTransformStep"   => ["XsltPath"],
+        'SegmentationStep'   => ['SourceSrxPath', 'TargetSrxPath'],
+        'TermExtractionStep' => ['StopWordsPath', 'NotStartWordsPath', 'NotEndWordsPath'],
+        'XMLValidationStep'  => ['SchemaPath'],
+        'XSLTransformStep'   => ['XsltPath'],
     ];
 
-    protected editor_Plugins_Okapi_Models_Bconf $entity;
+    /**
+     * @var editor_Plugins_Okapi_Bconf_Entity
+     */
+    protected editor_Plugins_Okapi_Bconf_Entity $entity;
 
-    public function __construct(editor_Plugins_Okapi_Models_Bconf $entity) {
+    /**
+     * @var bool
+     */
+    protected bool $isNew;
+
+    public function __construct(editor_Plugins_Okapi_Bconf_Entity $entity, bool $isNew=false) {
         $this->entity = $entity;
+        $this->isNew = $isNew;
     }
 
     /**
@@ -57,7 +78,8 @@ class editor_Plugins_Okapi_Bconf_File {
     public function pack(): void {
         try {
             $this->doPack();
-        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity){
+        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity $e){
+            error_log('EXCEPTION: '.$e->getMessage());
         } catch(Exception $e){
             $this->invalidate($e->__toString(), 'EXCEP');
         }
@@ -71,7 +93,8 @@ class editor_Plugins_Okapi_Bconf_File {
     public function unpack(string $pathToParse): void {
         try {
             $this->doUnpack($pathToParse);
-        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity){
+        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity $e){
+            error_log('EXCEPTION: '.$e->getMessage());
         } catch(Exception $e){
             $this->invalidate($e->__toString(), 'EXCEP');
         }
@@ -85,9 +108,9 @@ class editor_Plugins_Okapi_Bconf_File {
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    protected function  invalidate(string $msg = '', string $errorCode = 'E1026'): void {
+    protected function  invalidate(string $msg = '', string $errorCode = 'E1026') : void {
         $errors = [[$msg]];
-        if($this->entity->isNewRecord()){
+        if($this->isNew){
             try {
                 $this->entity->delete();
             } catch(Exception $e){

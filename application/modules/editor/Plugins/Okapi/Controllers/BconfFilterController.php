@@ -32,109 +32,46 @@
  */
 class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestController {
 
-    protected $entityClass = 'editor_Plugins_Okapi_Models_BconfFilter';
-    /** @var Editor_Plugins_Okapi_Models_BconfFilter $entity */
-    protected $entity;
+    protected $entityClass = 'editor_Plugins_Okapi_Bconf_Filter_Entity';
+
     /**
-     * @var array|null $compositeId composite key [bconfId, okapiId]
+     * @var Editor_Plugins_Okapi_Models_BconfFilter
      */
-    protected ?array $compositeId = NULL;
-
+    protected $entity;
 
     /**
-     * sends all bconf filters as JSON
+     * sends all default bconf filters as JSON, Translate5 adjusted and okapi defaults
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
     public function getdefaultfiltersAction() {
-        $bconffilter = new editor_Plugins_Okapi_Models_DefaultBconfFilter();
-        $default_fprms = $bconffilter->loadAll();
-
-        //
-        $rows = [];
-        foreach($default_fprms as &$fprm){
-            unset($fprm['id']);
-            unset($fprm['extensions']);
-            $rows[$fprm['okapiId']] = &$fprm;
-        }
-        unset($fprm);
-
-        $dataDir = editor_Plugins_Okapi_Init::getDataDir();
-        chdir($dataDir . 'fprm/translate5/');
-        $t5_fprms = glob("*@translate5*.fprm");
-        foreach($t5_fprms as $fprm){
-            $okapiId = substr($fprm, 0, -5); // remove .fprm
-            // okf_xml@translate5-AndroidStrings -> okf_xml-AndroidStrings
-            $parentId = str_replace('@translate5', '', $okapiId);
-            $row = @$rows[$parentId];
-            if($row){
-                $row['okapiId'] = $okapiId;
-                $rows[$parentId] = $row;
-            } else {
-                // okf_xml@translate5-tbx-translate-definitions-setup-ITS.fprm -> okf_xml
-                $t5Pos = strpos($okapiId, '@translate5-');
-                $parentId = substr($okapiId, 0, $t5Pos);
-                $name = substr($okapiId, $t5Pos + 12);
-                $row = $rows[$parentId];
-                $row['okapiId'] = $okapiId;
-                if($name){
-                    $row['name'] = ucfirst($name);
-                }
-                $rows[$okapiId] = $row;
-            }
-        }
-
-        $this->view->rows = array_values($rows); // remove named indexes
-        $this->view->total = count($rows);
-
+        $bconf = new editor_Plugins_Okapi_Bconf_Filter_Entity();
+        $startIndex = $bconf->getHighestId() + 1000000;
+        $t5Rows = editor_Plugins_Okapi_Bconf_Filter_Translate5::instance()->getGridRows($startIndex);
+        $this->view->rows = array_merge($t5Rows, editor_Plugins_Okapi_Bconf_Filter_Okapi::instance()->getGridRows(count($t5Rows) + $startIndex));
+        $this->view->total = count($this->view->rows);
     }
 
     /**
      * Includes extension-mapping.txt in the metaData
+     * TODO BCONF: rework using the sent id to load an entity and process from there
      * @return void
      * @throws editor_Plugins_Okapi_Exception
      */
     public function indexAction() {
-        $db = $this->entity->db;
         $bconfId = $this->getParam('bconfId');
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $bconf->load($this->getParam('bconfId'));
 
-        $s = $db->select();
-        $s->from($db, ['okapiId', 'name', 'description']);
-        $s->where('bconfId = ?', $bconfId);
-        $this->view->rows = $db->fetchAll($s)->toArray();
+        // add the grid data
+        $this->view->rows = $bconf->getCustomFilterGridData();
         $this->view->total = count($this->view->rows);
 
+        // the extension mapping is sent as meta-data
         if(!$this->view->metaData){
             $this->view->metaData = new stdClass();
         }
-        $this->view->metaData->{'extensions-mapping'}
-            = file_get_contents($bconf->getFilePath($bconfId, 'extensions-mapping.txt'));
-    }
-
-    /**
-     * Splits the key in its composite components
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     */
-    protected function entityLoad() {
-        $id = $this->getCompositeId();
-        $this->entity->load($id[0], $id[1]);
-    }
-
-    /**
-     * Parse, cache and return composite key from url
-     * @return array{int, string} composite key [bconfId, okapiId]
-     */
-    // QUIRK Is in controller because access to request params
-    public function getCompositeId(): array {
-        $id = $this->compositeId ?? $this->getRequest()->getParam('id');
-        if(gettype($id) !== 'array'){
-            $path = $this->getRequest()->getPathInfo();
-            // /editor/plugins_okapi_bconffilter/8-.-okf_odf%40translate5.test
-            $id = explode('-.-',urldecode(basename($path)));
-            $this->compositeId = $id;
-        }
-        return $id;
+        $this->view->metaData->{'extensions-mapping'} = file_get_contents($bconf->getExtensionMappingPath());
     }
 
     /**
@@ -142,11 +79,10 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      */
     public function saveextensionsmappingAction(){
         $extMap = $this->getRequest()->getRawBody();
-            $bconfId = $this->getParam('bconfId');
-            // TODO: validity check
-            $bconf = new editor_Plugins_Okapi_Models_Bconf();
-            $path = $bconf->getFilePath($bconfId, $bconf::EXTENSIONMAP_FILE);
-            file_put_contents($path, $extMap);
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $bconf->load($this->getParam('bconfId'));
+        $extensionMapping = $bconf->getExtensionMapping();
+        $extensionMapping->updateByContent($extMap);
     }
 
 }

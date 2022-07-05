@@ -30,33 +30,73 @@
 /**
  * Generate new bconf file
  * @see editor_Plugins_Okapi_Bconf_File
- * @var editor_Plugins_Okapi_Models_Bconf $entity
+ * @var editor_Plugins_Okapi_Bconf_Entity $entity
  */
-trait editor_Plugins_Okapi_Bconf_ComposerTrait {
+trait editor_Plugins_Okapi_Bconf_PackerTrait {
 
     /**
      * @throws editor_Plugins_Okapi_Exception
      */
     private function doPack(): void {
-        chdir($this->entity->getDir()); // so we can access with file name only
 
-        $content = ['refs' => null, 'fprm' => null];
+        // so we can access all files in the bconf's data-dir with file name only
+        chdir($this->entity->getDataDirectory());
 
-        if(file_exists(self::DESCRIPTION_FILE)){
-            $content = json_decode(file_get_contents(self::DESCRIPTION_FILE), associative: true);
-        }
-        $fileName = basename($this->entity->getFilePath());
+        $fileName = basename($this->entity->getPath());
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
+        $raf->writeUTF(editor_Plugins_Okapi_Bconf_Entity::SIGNATURE, false);
+        $raf->writeInt(editor_Plugins_Okapi_Bconf_Entity::VERSION);
+        // TODO BCONF: currently plugins are not supported
+        $raf->writeInt(editor_Plugins_Okapi_Bconf_Entity::NUM_PLUGINS);
 
-        $raf->writeUTF($raf::SIGNATURE, false);
-        $raf->writeInt($raf::VERSION);
-        //TODO check the Plugins currentlly not in use
-        $raf->writeInt(self::NUMPLUGINS);
+        // Read the pipeline and extract steps
+        $this->processPipeline($raf);
 
-        //Read the pipeline and extract steps
-        self::processPipeline($raf);
-        self::filterConfiguration($raf, $content);
-        self::extensionsMapping($raf);
+        // process filters & extension mapping
+        $customIdentifiers = [];
+        foreach($this->entity->getCustomFilterData() as $filterData){
+            $customIdentifiers[] = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($filterData['okapiType'], $filterData['okapiId']);
+        }
+        // DEBUG
+        if(editor_Plugins_Okapi_Bconf_File::DO_DEBUG) { error_log('PACKED CUSTOM FILTERS: '."\n".implode(', ', $customIdentifiers)); }
+
+        // instantiate the extension mapping and evaluate the additional default okapi and translate5 filter files (this needs to know the "real" custom filters
+        $extensionMapping = $this->entity->getExtensionMapping();
+        $extensionMapData = $extensionMapping->getMapForPacking($customIdentifiers);
+        $defaultFilterFiles = $extensionMapping->getOkapiDefaultFprmsForPacking($customIdentifiers); // retrieves an array of pathes !
+
+        // DEBUG
+        if(editor_Plugins_Okapi_Bconf_File::DO_DEBUG){
+            error_log('PACKED DEFAULT FILTERS: '."\n".print_r($defaultFilterFiles, 1));
+            error_log('PACKED EXTENSION MAPPING: '."\n".print_r($extensionMapData, 1));
+        }
+
+
+        $numAllEmbeddedFilters = count($customIdentifiers) + count($defaultFilterFiles);
+        // write number of embedded filters
+        $raf->writeInt($numAllEmbeddedFilters);
+        foreach($customIdentifiers as $identifier){
+            // we are already in the bconf's dir, so we can reference custom filters by filename only
+            $this->writeFprm($raf, $identifier, $identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
+        }
+        foreach($defaultFilterFiles as $identifier => $path){
+            // the static default filters will be added with explicit settings, These are either OKAPI defaults or translate5 adjusted defaults
+            $this->writeFprm($raf, $identifier, $path);
+        }
+        // write the adjuated extension map
+        $countLines = count($extensionMapData);
+        $extMapBinary = ''; // we'll build up the binary format in memory instead of wirting every line itself to file
+        foreach($extensionMapData as $lineData){
+            $extMapBinary .= $raf::toUTF($lineData[0]);
+            $extMapBinary .= $raf::toUTF($lineData[1]);
+        }
+        $raf->writeInt($countLines);
+        $raf->fwrite($extMapBinary);
+    }
+
+    private function writeFprm(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf, string $identifier, string $path){
+        $raf->writeUTF($identifier, false);
+        $raf->writeUTF(file_get_contents($path), false); // QUIRK: Need additional null byte. Where does it come from in Java?
     }
 
     private function processPipeline($raf): void {
@@ -111,40 +151,4 @@ trait editor_Plugins_Okapi_Bconf_ComposerTrait {
         }
         fclose($file);
     }
-    //=== Section 4: The filter configurations
-
-    /**
-     * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
-     * @param array $content Ordered bconf contents
-     */
-    private function filterConfiguration(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf, array $content): void {
-        $fprms = $content['fprm'] ?? glob("*.fprm");
-        $raf->writeInt(count($fprms));
-        foreach($fprms as $filterParam){
-            $filename = $filterParam . (str_ends_with($filterParam, '.fprm') ? '' : '.fprm');
-            $raf->writeUTF($filterParam, false);
-            $raf->writeUTF(file_get_contents($filename), false); //QUIRK: Need additional null byte. Where does it come from in Java?
-        }
-    }
-
-    /**
-     * Section 5: Mapping extensions -> filter configuration id
-     * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
-     */
-    private function extensionsMapping(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf): void {
-        if(!file_exists(self::EXTENSIONMAP_FILE)){
-            return;
-        }
-        $extMap = file(self::EXTENSIONMAP_FILE, FILE_IGNORE_NEW_LINES);
-        $amount = count($extMap);
-        $extMapBinary = ''; // we'll build up the binary format in memory instead of wirting every line itself to file
-        foreach($extMap as $line){
-            $extAndConf = explode("\t", $line);
-            $extMapBinary .= $raf::toUTF($extAndConf[0]);
-            $extMapBinary .= $raf::toUTF($extAndConf[1]);
-        }
-        $raf->writeInt($amount);
-        $raf->fwrite($extMapBinary);
-    }
-
 }

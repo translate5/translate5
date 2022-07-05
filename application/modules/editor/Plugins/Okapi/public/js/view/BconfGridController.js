@@ -333,7 +333,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         }
     },
 
-    loadOkapiFilters: function(bconfGrid){
+    loadOkapiFilters: function(){
         Ext.create('Editor.plugins.Okapi.store.DefaultBconfFilterStore');
     },
 

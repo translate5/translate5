@@ -45,7 +45,9 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
     extMap: null,
     defaultsFilter: {
         id: 'defaultsFilter',
-        filterFn: function(rec){return rec.data.isCustom},
+        filterFn: function(rec){
+            return rec.data.isCustom;
+        }
     },
     initConfig: function(config){
         if(!config.filters){
@@ -62,7 +64,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
             matches = Array.from(extMapString.matchAll(/^\.(.*)\t(.*)$/gm), match => match.slice(1, 3)).sort(),
             bconffilters = Editor.util.Util.getUnfiltered(store),
             extMap = new Map();
-        bconffilters.items.forEach(f => f.get('extensions').clear())
+        bconffilters.items.forEach(f => f.get('extensions').clear());
         matches.forEach(function([extension, okapiId]){
             var filter = bconffilters.getByKey(okapiId);
             if(filter){
@@ -73,7 +75,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
                     okapiId,
                     name: '<i>#UT#Unknown filter</i>',
                     description: '#UT#Unknown filter from extensions-mapping.txt',
-                }])[0].get('extensions').add(extension)
+                }])[0].get('extensions').add(extension);
             }
             extMap.set(extension, okapiId);
         });
@@ -97,7 +99,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
                 rawData: Array.from(store.extMap.entries()).sort()
                     .map(ext_okapiId => '.' + ext_okapiId.join('\t'))
                     .join('\n')
-            }).then(resolve, res => Editor.app.getController('ServerException').handleException(res))
+            }).then(resolve, res => Editor.app.getController('ServerException').handleException(res));
         });
     }
 });

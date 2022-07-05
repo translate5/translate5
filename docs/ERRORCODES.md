@@ -17,7 +17,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E0001"></a>E0001  | everywhere | HTTP client logging - SEND | The raw connection content of a internal used HTTP client is logged for debugging purposes.
 | <a id="E0002"></a>E0002  | everywhere | HTTP client logging - RECEIVE | The raw connection content of a internal used HTTP client is logged for debugging purposes.
 | <a id="E1352"></a>E1352  | everywhere | No access to requested URL | The currently authenticated user is not allowed to access the requested resource.<br />Since this is normally a misconfiguration of ACL rules or programming error in the GUI (missing isAllowed check) this error is locked as error.
-| <a id="E1014"></a>E1014  | everywhere | Log HTTP Request | The HTTP request to the server and its parameters are logged. Generally for debugging only.
+| <a id="E1014"></a>E1014  | everywhere | Log HTTP Request {route} | The HTTP request to the server and its parameters are logged. Generally for debugging only.
 | <a id="E1015"></a>E1015  | entities | Duplicate Key | A database key for the entity to be saved does already exist.
 | <a id="E1016"></a>E1016  | entities | Integrity Constraint Violation | An entity can not be added or updated since a referenced entity does not exist (anymore).<br />Or an entity can not be updated or deleted since it is referenced by other entities.
 | <a id="E1019"></a>E1019  | everywhere | HTTP Status 404 | The requested URL / page was not found, the API endpoint in the application does not exist.
@@ -32,7 +32,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1073"></a>E1073  | Worker | Worker URL result is no HTTP answer!: {host}:{port} | This can only happen if the worker URL is not pointing to an translate5 instance, or if there is an error on the translate5 instance. In the latter case investigate the log for further errors.
 | <a id="E1074"></a>E1074  | Worker | Worker HTTP response state was not 2XX but {state}. | This should happen only if there is an error on the translate5 instance. In the latter case investigate the log for further errors.
 | <a id="E1107"></a>E1107  | Worker | Worker HTTP response state was 404, the worker system requests probably the wrong server! | Check the server URL configuration values.<br />Either runtimeOptions.worker.server or runtimeOptions.server.protocol and runtimeOptions.server.name are pointing to a wrong server / translate5 installation!<br />This can also happen, if the server name is resolving to multiple IPs on the server it self (multiple entries in the /etc/hosts for example).
-| <a id="E1219"></a>E1219  | Worker | Worker &quot;{worker}&quot; failed on initialisation. | Check other errors , this message is just for debugging.
+| <a id="E1219"></a>E1219  | Worker | Worker "{worker}" failed on initialisation. | Check other errors , this message is just for debugging.
 | <a id="E1201"></a>E1201  | DB | Still producing a DB DeadLock after {retries} retries. | A transaction was repeated X times after a deadlock and it is still producing a deadlock. <br />The original dead lock exception is contained in this exception.
 | <a id="E1202"></a>E1202  | DB | A transaction could be completed after {retries} retries after a DB deadlock. | This is just a info / debug message to track if a deadlock occured, an that it could be successfully executed after X retries.
 | <a id="E1203"></a>E1203  | DB | A transaction was rejected after a DB deadlock. | This is just a info / debug message to track if a deadlock occured, an that it was intentionally rejected.
@@ -46,7 +46,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1294"></a>E1294  | Installation &amp; Update | Errors on calling database update - see details for more information. | This are the errors happend on calling the alter SQLs.
 | <a id="E1295"></a>E1295  | Installation &amp; Update | Result of imported DbUpdater PHP File {path}: {result} | The output of a PHP update file is logged as info.
 | <a id="E1307"></a>E1307  | Http Client | Request time out in {method}ing URL {url} | The requested service did not respond in a reasonable time.
-| <a id="E1308"></a>E1308  | Http Client | Requested URL is DOWN: {url} | The requested service is either not available or not reachable.
+| <a id="E1308"></a>E1308  | Http Client | Requested Service is DOWN: {server} | The requested service is either not available or not reachable.
 | <a id="E1309"></a>E1309  | Http Client | Empty response in {method}ing URL {url} | The requested service returns an empty response, this may indicate a problem (crash) on the service side.
 
 
@@ -81,7 +81,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1297"></a>E1297   | Task Configuration | Unable to load task config. &quot;taskGuid&quot; is not set for this entity. | taskGuid is not set for this entity.
 | <a id="E1298"></a>E1298   | Customer Configuration | Unable to load customer config. &quot;id&quot; is not set for this entity. | id is not set for this entity.
 | <a id="E1299"></a>E1299   | User Configuration | Not allowed to load user config for different user. | The current request to load the user config is not for the currently authenticated user.
-| <a id="E1324"></a>E1324   | Configuration | Updated config with name &quot;{name}&quot; to &quot;{value}&quot; | Log info when configuration value is updated.
+| <a id="E1324"></a>E1324   | Configuration | Updated user GUI state "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
 | <a id="E1363"></a>E1363   | Configuration | Configuration value invalid: {errorMsg} | The given configuration value is invalid, check the configuration description or default value to find out what is wrong.
 
 ### Categories
@@ -105,7 +105,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | :--------------- |:------------- | :------------ | :-------------------
 | <a id="E1011"></a>E1011  | Task; Workflow | Multi Purpose Code logging in the context of a task | Multi Purpose code for several info logs around a task.<br />Also important in Context of workflow.
 | <a id="E1012"></a>E1012  | Job; Workflow | Multi Purpose Code logging in the context of jobs (task user association) | Multi Purpose Code logging in the context of jobs (task user association)<br />Also important in Context of workflow.
-| <a id="E1013"></a>E1013  | Workflow only | Multi Purpose Code logging in the context of pure workflow processing | Multi Purpose Code logging in the context of workflow processing
+| <a id="E1013"></a>E1013  | Workflow only |  Workflow called action editor_Workflow_Notification::notifyImportErrorSummary() through trigger {trigger} | Multi Purpose Code logging in the context of workflow processing
 | <a id="E1042"></a>E1042  | Task | The task can not be removed due it is used by a user. | One user has opened the task for reading or editing the task. Therefore this task can not be deleted.
 | <a id="E1043"></a>E1043  | Task | The task can not be removed due it is locked by a user. | One user has opened the task for editing the task, or some other action has locked the task.<br />Therefore this task can not be deleted.
 | <a id="E1044"></a>E1044  | Task | The task can not be locked for deletion. | The task must be locked by the deleting user, before it can be deleted. This lock could not be set.
@@ -223,7 +223,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1054"></a>E1054  | Task Import; Pixel-Mapping MetaData | Pixel-Mapping: missing default-values for pixel-width for font-size {fontSize}. Add the missing values to the config. | Add the missing value in your defaultPixelWidths-settings in the task template config.
 | <a id="E1096"></a>E1096  | Task Import; Pixel-Mapping MetaData | Pixel-Mapping: ignored one ore more lines of the excel due one or more empty columns. | Check the imported pixel-mapping.xlsx some of the needed columns were empty, see also error details for the collected lines with empty columns.
 | <a id="E1278"></a>E1278  | Task Import; Pixel-Mapping MetaData | Segment length calculation: No pixel-width set for several characters.<br />Default width is used. See affected characters in extra data. | For the listed characters no width was defined, so the configured default value as fallback is used. <br />The missing characters are listed as unicode charpoints and the real character in parathensis.
-| <a id="E1060"></a>E1060  | Task Import | For the fileextension &quot;{extension}&quot; no parser is registered. For available parsers see log details. | The user tried to import a file which can not be imported by the native import converters. See the log details for the available native importable file formats.<br />Otherwise consider to enable [Okapi](https://confluence.translate5.net/display/CON/Okapi) to convert the uploaded file into a native importable XLF format.
+| <a id="E1060"></a>E1060  | Task Import | For the fileextension "{extension}" no parser is registered. For available parsers see log details. | The user tried to import a file which can not be imported by the native import converters. See the log details for the available native importable file formats.<br />Otherwise consider to enable [Okapi](https://confluence.translate5.net/display/CON/Okapi) to convert the uploaded file into a native importable XLF format.
 | <a id="E1135"></a>E1135  | Task Import | There are no importable files in the Task. The following file extensions can be imported: {extensions} | There is no file in the import package which can be imported. Neither native by translate5, nor via a converter plug-in like [Okapi](https://confluence.translate5.net/display/CON/Okapi).
 | <a id="E1136"></a>E1136  | Task Import | Some files could not be imported, since there is no parser available. For affected files see log details. | The user tried to import one or more files which can not be imported. Neither native by translate5, nor via a converter plug-in like [Okapi](https://confluence.translate5.net/display/CON/Okapi). See the log details for the affected files.
 | <a id="E1166"></a>E1166  | Task Import | Although there were importable files in the task, no files were imported. Investigate the log for preceeding errors. | There was at least one importable file in the package which can be imported, but the import process did not import any file. Probably there was another error before, for example with a file converter plug-in like [Okapi](https://confluence.translate5.net/display/CON/Okapi).
@@ -488,6 +488,11 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1340"></a>E1340  | Plug-In Okapi | Okapi Plug-In: The default bconf configuration file-name is not set. | The value was empty for the config with name:&nbsp;runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName or&nbsp;runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName<br />For more info see error log.
 | <a id="E1387"></a>E1387  | Plug-In Okapi | Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated | This is just a warning hinting to the use of the deprecated feature to provide the BCONF to use in the import ZIP
 | <a id="E1390"></a>E1390  | Plug-In Okapi | Okapi Plug-In: The SRX file is not valid | The uploaded segmentation/SRX file is not valid. Details will be part of the message
+| <a id="E1404"></a>E1404  | Plug-In Okapi | Okapi Plug-In: The filter/fprm "{filter}" from the imported bconf "{bconf}" is not valid | The provided bconf can not be imported to translate5
+| <a id="E1405"></a>E1405  | Plug-In Okapi | Okapi Plug-In: Invalid extension-mapping found in the bconf "{bconf}" to import | The provided bconf can not be imported to translate5
+| <a id="E1406"></a>E1406  | Plug-In Okapi | Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" | The provided bconf can not be imported to translate5
+| <a id="E1407"></a>E1407  | Plug-In Okapi | Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed | Warning, that the invalid filter in the provided bconf was removed
+| <a id="E1408"></a>E1408  | Plug-In Okapi | Okapi Plug-In: The bconf "{bconf}" to import is not valid | The provided bconf can not be imported to translate5
 
 
 #### Plug-In PangeaMt

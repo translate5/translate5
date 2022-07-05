@@ -39,18 +39,10 @@ Ext.define('Editor.plugins.Okapi.store.DefaultBconfFilterStore', {
         url: Editor.data.restpath + 'plugins_okapi_bconffilter/getdefaultfilters',
         reader: {
             rootProperty: 'rows',
-            type: 'json',
-            transform: function(data){
-                data.rows.forEach((row, index) => {
-                    row.isCustom = false // Flag Okapi and translate5 BconfFilters
-                    row.id = -index-1 // Avoid collisions with custom BconfFilters
-                });
-                return data;
-            }
+            type: 'json'
         }
     },
     autoLoad: true,
     pageSize: 0,
     idProperty: 'id',
-
 });

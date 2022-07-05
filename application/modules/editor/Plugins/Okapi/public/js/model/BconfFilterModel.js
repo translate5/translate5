@@ -29,13 +29,8 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     extend: 'Ext.data.Model',
     requires: ['Editor.util.type.StringSet'],
     alias: 'model.bconffilterModel',
-    getId: function(){
-        var bconfId = this.get('bconfId'),
-            okapiId = this.get('okapiId');
-        return `${bconfId}-.-${okapiId}`; // Slash / as separator will lead to 404
-    },
+    idProperty: 'id',
     proxy: {
-        idParam: 'id',
         type: 'rest',
         url: Editor.data.restpath + 'plugins_okapi_bconffilter',
         reader: {
