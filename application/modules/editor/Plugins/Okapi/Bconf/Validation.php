@@ -109,7 +109,7 @@ final class editor_Plugins_Okapi_Bconf_Validation {
      * Some bconfs can not be tested since we do not have a testfile to check the supported extensions
      * @return bool
      */
-    public function wasNotTestable() : bool {
+    public function wasTestable() : bool {
         return $this->testable;
     }
 
@@ -141,10 +141,13 @@ final class editor_Plugins_Okapi_Bconf_Validation {
      * @return bool
      */
     private function process(string $testfilePath){
+        $testDir = editor_Plugins_Okapi_Bconf_Entity::getUserDataDir().'/tmp';
+        if(!is_dir($testDir)){
+            @mkdir($testDir, 0777, true);
+        }
         $dir = dirname($testfilePath);
         $manifestFile = sprintf(editor_Plugins_Okapi_Worker::MANIFEST_FILE, 'test');
         $testfile = basename($testfilePath);
-        $targetFile = 'test-result.'.pathinfo($testfile, PATHINFO_EXTENSION);
         /* @var $api editor_Plugins_Okapi_Connector */
         $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
         /* @var $language editor_Models_Languages */
@@ -155,16 +158,16 @@ final class editor_Plugins_Okapi_Bconf_Validation {
             $api->uploadOkapiConfig($this->bconf->getPath());
             $api->uploadInputFile($testfile, new SplFileInfo($testfilePath));
             $api->executeTask($language->loadLangRfc5646(self::SOURCE_LANGUAGE), $language->loadLangRfc5646(self::TARGET_LANGUAGE));
-            $convertedFile = $api->downloadFile($targetFile, $manifestFile, new SplFileInfo($dir));
+            $convertedFile = $api->downloadFile($testfile, $manifestFile, new SplFileInfo($testDir));
             // cleanup downloaded files
             unlink($convertedFile);
-            unlink($dir.'/'.$manifestFile);
+            unlink($testDir.'/'.$manifestFile);
         } catch (Exception $e){
             $this->validationError = 'Failed to convert '.$testfile.' for import with OKAPI ['.$e->getMessage().']';
             return false;
         } finally {
             $api->removeProject();
-            return true;
         }
+        return true;
     }
 }

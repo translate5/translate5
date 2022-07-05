@@ -92,7 +92,6 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
      */
     private ?editor_Plugins_Okapi_Bconf_Entity $bconf = NULL;
 
-
     /**
      * @return editor_Plugins_Okapi_Bconf_Entity
      * @throws ZfExtended_Models_Entity_NotFoundException

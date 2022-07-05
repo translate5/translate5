@@ -29,6 +29,7 @@
 /**
  * @see editor_Plugins_Okapi_Bconf_File
  * @var editor_Plugins_Okapi_Bconf_Entity $entity
+ * @var bool $doDebug
  */
 trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
 
@@ -142,7 +143,7 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
             }
         }
         // DEBUG
-        if(editor_Plugins_Okapi_Bconf_File::DO_DEBUG){
+        if($this->doDebug){
             error_log('UNPACK CUSTOM FILTERS: '.print_r($customFilters, 1));
             error_log('UNPACK REPLACEMENT MAP: '.print_r($replacementMap, 1));
         }
@@ -162,7 +163,7 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
         $extensionMapping->flushUnpacked($customFilters);
 
         // DEBUG
-        if(editor_Plugins_Okapi_Bconf_File::DO_DEBUG) { error_log('UNPACKED MAP: '."\n".print_r($extensionMapping->getMap(), 1)); }
+        if($this->doDebug) { error_log('UNPACKED MAP: '."\n".print_r($extensionMapping->getMap(), 1)); }
 
         // save our inventory as description file
         file_put_contents(self::DESCRIPTION_FILE, json_encode($content, JSON_PRETTY_PRINT));

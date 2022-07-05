@@ -52,7 +52,7 @@ foreach($bconf->loadAll() as $bconfData){
         $extensionMapping->rescanFilters();
         $bconf->repackIfOutdated(true);
     } catch (Exception $e) {
-        $msg = 'ERROR rescanning filters for bconf ['.$bconf->getName().']: '.$e->getMessage();
+        $msg = 'ERROR rescanning filters for bconf '.$bconf->getId().', "'.$bconf->getName().'": '.$e->getMessage();
         error_log($msg);
     }
 }

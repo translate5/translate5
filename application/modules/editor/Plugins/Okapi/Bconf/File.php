@@ -40,11 +40,6 @@ class editor_Plugins_Okapi_Bconf_File {
     const DESCRIPTION_FILE = 'content.json';
 
     /**
-     * @var false
-     */
-    const DO_DEBUG = false;
-
-    /**
      * @var string
      */
     const PIPELINE_FILE = 'pipeline.pln';
@@ -66,9 +61,15 @@ class editor_Plugins_Okapi_Bconf_File {
      */
     protected bool $isNew;
 
+    /**
+     * @var bool
+     */
+    protected bool $doDebug;
+
     public function __construct(editor_Plugins_Okapi_Bconf_Entity $entity, bool $isNew=false) {
         $this->entity = $entity;
         $this->isNew = $isNew;
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfPackUnpack');
     }
 
     /**
