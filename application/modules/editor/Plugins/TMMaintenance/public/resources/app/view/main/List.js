@@ -56,6 +56,77 @@ Ext.define('TMMaintenance.view.main.List', {
             renderer: 'sourceTargetRenderer',
         },
         {
+            text: 'Actions',
+            cell: {
+                userCls: 'editor-tools',
+                tools: {
+                    edit: {
+                        iconCls: 'x-fa fa-pen',
+                        handler: 'onEditPress',
+                        bind: {
+                            hidden: '{record.isEditing}',
+                        },
+                    },
+                    delete: {
+                        iconCls: 'x-fa fa-trash-alt',
+                        handler: 'onDeletePress',
+                        bind: {
+                            hidden: '{record.isEditing}',
+                        },
+                    },
+                    spinner: {
+                        iconCls: 'icon loading',
+                        bind: {
+                            hidden: '{!record.isSaving}',
+                        },
+                        tooltip: 'Saving. Please wait a while.',
+                    },
+                    save: {
+                        iconCls: 'icon save',
+                        handler: 'saveCurrent',
+                        bind: {
+                            hidden: '{!record.isEditing}',
+                        },
+                    },
+                    cancel: {
+                        iconCls: 'icon cancel',
+                        handler: 'cancelEditing',
+                        bind: {
+                            hidden: '{!record.isEditing}',
+                        },
+                    },
+                    saveGoNext: {
+                        iconCls: 'icon save-go-previous',
+                        handler: 'saveCurrentGoToPrevious',
+                        bind: {
+                            hidden: '{!record.isEditing}',
+                        },
+                    },
+                    saveGoPrevious: {
+                        iconCls: 'icon save-go-next',
+                        handler: 'saveCurrentGoToNext',
+                        bind: {
+                            hidden: '{!record.isEditing}',
+                        },
+                    },
+                    cancelGoNext: {
+                        iconCls: 'icon close-go-previous',
+                        handler: 'goToPrevious',
+                        bind: {
+                            hidden: '{!record.isEditing}',
+                        },
+                    },
+                    cancelGoPrevious: {
+                        iconCls: 'icon close-go-next',
+                        handler: 'goToNext',
+                        bind: {
+                            hidden: '{!record.isEditing}',
+                        },
+                    },
+                },
+            },
+        },
+        {
             text: 'Author',
             tpl: '{metaData.author}',
             xtype: 'templatecolumn',
@@ -74,27 +145,6 @@ Ext.define('TMMaintenance.view.main.List', {
             text: 'Additional info',
             tpl: '{metaData.additionalInfo}',
             xtype: 'templatecolumn',
-        },
-        {
-            cell: {
-                tools: {
-                    edit: {
-                        iconCls: 'x-fa fa-pen',
-                        handler: 'onEditPress',
-                    },
-                    delete: {
-                        iconCls: 'x-fa fa-trash-alt',
-                        handler: 'onDeletePress',
-                    },
-                    spinner: {
-                        iconCls: 'loading',
-                        bind: {
-                            hidden: '{!record.isSaving}',
-                        },
-                        tooltip: 'Saving. Please wait a while.',
-                    },
-                },
-            },
         },
     ],
 

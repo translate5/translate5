@@ -77,10 +77,6 @@ $enable-font-awesome: dynamic(true);
   color: #404040;
 }
 
-.loading {
-  background-image: url("/modules/editor/images/loading_ico.gif");
-}
-
 .x-gridcell-body-el {
   white-space: normal;
 }
@@ -92,6 +88,43 @@ $enable-font-awesome: dynamic(true);
 
     .x-body-el {
       display: contents;
+    }
+  }
+}
+
+.editor-tools {
+  .x-tool-zone {
+    display: block;
+    flex: unset;
+  }
+
+  .icon {
+    &.loading {
+      background-image: url("/modules/editor/images/loading_ico.gif");
+    }
+
+    &.save {
+      background-image: url("/modules/editor/images/tick.png");
+    }
+
+    &.cancel {
+      background-image: url("/modules/editor/images/cross.png");
+    }
+
+    &.save-go-previous {
+      background-image: url("/modules/editor/images/arrow_up.png");
+    }
+
+    &.save-go-next {
+      background-image: url("/modules/editor/images/arrow_down.png");
+    }
+
+    &.close-go-previous {
+      background-image: url("/modules/editor/images/arrow_up_nosave.png");
+    }
+
+    &.close-go-next {
+      background-image: url("/modules/editor/images/arrow_down_nosave.png");
     }
   }
 }

@@ -16,12 +16,13 @@ Ext.define('Ext.translate5.Editor', {
         const location = this.getLocation();
         let result = this.callParent([remainVisible, cancelling]);
 
-        if (cancelling) {
+        if (!location || undefined === this.config.editingDataIndex) {
             return result;
-
         }
 
-        if (!location || undefined === this.config.editingDataIndex) {
+        location.record.set('isEditing', false);
+
+        if (cancelling) {
             return result;
         }
         let data = this.editor.getData();
@@ -56,9 +57,11 @@ Ext.define('Ext.translate5.Editor', {
 
     beforeEdit: function() {
         let me = this;
+        let location = me.getLocation();
         let tagHelper = Ext.create('TMMaintenance.helper.Tag');
-        let value = tagHelper.transform(me.getLocation().record.get(this.config.editingDataIndex));
-        this.currentEditingRecord = me.getLocation().record;
+        let value = tagHelper.transform(location.record.get(this.config.editingDataIndex));
+        this.currentEditingRecord = location.record;
+        location.record.set('isEditing', true);
 
         if (null !== me.editor) {
             me.editor.setData(value);
@@ -72,7 +75,6 @@ Ext.define('Ext.translate5.Editor', {
                 me.editor.setData(value);
 
                 me.addListeners(me.editor);
-                me.addEditorButtons(me);
             })
             .catch(error => {
                 console.error(error);
@@ -108,40 +110,5 @@ Ext.define('Ext.translate5.Editor', {
                 // evt.stop();
             }
         );
-    },
-
-    addEditorButtons: function (me) {
-        Ext.create(
-            {
-                xtype: 'panel',
-                align: 'right',
-                userCls: 'editor-buttons',
-                renderTo: me.getField().afterInputElement,
-                items: [
-                    {
-                        xtype: 'button',
-                        align: 'right',
-                        iconCls: 'x-fa fa-check',
-                        handler: 'onUpdatePress',
-                        scope: this,
-                    },
-                    {
-                        xtype: 'button',
-                        align: 'right',
-                        iconCls: 'x-fa fa-window-close',
-                        handler: 'onCancelEditPress',
-                        scope: this,
-                    },
-                ]
-            }
-        );
-    },
-
-    onUpdatePress: function () {
-        this.completeEdit();
-    },
-
-    onCancelEditPress: function () {
-        this.cancelEdit();
     },
 });

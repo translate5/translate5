@@ -7,12 +7,6 @@ Ext.define('TMMaintenance.view.main.MainController', {
     gridList: null,
 
     init: function() {
-        if (this.initialized) {
-            return;
-        }
-
-        console.log('init');
-
         let me = this;
 
         const keymap = {
@@ -32,7 +26,7 @@ Ext.define('TMMaintenance.view.main.MainController', {
             bindings.push(Ext.applyIf(item[2] || {}, {
                 key: item[0],
                 handler: item[1],
-                scope: item[3] || me
+                scope: item[3] || me,
             }));
         });
 
