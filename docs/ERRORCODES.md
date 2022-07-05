@@ -493,6 +493,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1406"></a>E1406  | Plug-In Okapi | Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" | The provided bconf can not be imported to translate5
 | <a id="E1407"></a>E1407  | Plug-In Okapi | Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed | Warning, that the invalid filter in the provided bconf was removed
 | <a id="E1408"></a>E1408  | Plug-In Okapi | Okapi Plug-In: The bconf "{bconf}" to import is not valid | The provided bconf can not be imported to translate5
+| <a id="E1409"></a>E1409  | Plug-In Okapi | Okapi Plug-In: The edited filter file "{filterfile}" is not valid | Please contact translate5 support to resolve this issue
 
 
 #### Plug-In PangeaMt
