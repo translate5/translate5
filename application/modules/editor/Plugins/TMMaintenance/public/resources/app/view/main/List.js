@@ -164,10 +164,6 @@ Ext.define('TMMaintenance.view.main.List', {
         ],
     },
 
-    listeners: {
-        onContainerScrollEnd: 'onContainerScrollEnd',
-    },
-
     scrollable: {
         y: true,
         listeners: {
