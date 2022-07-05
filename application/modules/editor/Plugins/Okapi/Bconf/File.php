@@ -72,6 +72,14 @@ class editor_Plugins_Okapi_Bconf_File {
     }
 
     /**
+     * Retrieves the id of the related bconf
+     * @return int
+     */
+    public function getBconfId(){
+        return $this->entity->getId();
+    }
+
+    /**
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */

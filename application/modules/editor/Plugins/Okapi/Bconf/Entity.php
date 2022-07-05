@@ -205,12 +205,15 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
 
     /**
      * Updates a bconf if the version-index is outdated with potentially changed default settings
+     * @param bool $force: if set, it will be repacked even if not outdated
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
      */
-    public function repackIfOutdated() {
-        // TODO MILESTONE 2: We then need to re-pack every outdated bconf when accessing it -> remove sys-default check, change mechanic
-        if($this->isSystemDefault() && $this->isOutdated()){
-            $t5ProvidedImportBconf = editor_Plugins_Okapi_Init::getDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
-            $this->getFile()->unpack($t5ProvidedImportBconf);
+    public function repackIfOutdated(bool $force=false) {
+        if($this->isOutdated() || $force){
             $this->getFile()->pack();
             $this->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
             $this->save();
@@ -222,7 +225,8 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      * @return editor_Plugins_Okapi_Bconf_File
      */
     public function getFile(): editor_Plugins_Okapi_Bconf_File {
-        if($this->file == NULL){
+        // use cached file only with identical ID
+        if($this->file === NULL || $this->file->getBconfId() != $this->getId()){
             $this->file = new editor_Plugins_Okapi_Bconf_File($this);
         }
         return $this->file;

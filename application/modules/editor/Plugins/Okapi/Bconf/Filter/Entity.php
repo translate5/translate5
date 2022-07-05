@@ -98,7 +98,8 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function getRelatedBconf() : editor_Plugins_Okapi_Bconf_Entity {
-        if($this->bconf === NULL){
+        // use cached bconf only with identical ID
+        if($this->bconf === NULL || $this->bconf->getId() != $this->getBconfId()){
             $this->bconf = new editor_Plugins_Okapi_Bconf_Entity();
             $this->bconf->load($this->getBconfId());
         }
