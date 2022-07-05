@@ -29,15 +29,12 @@
 /**
  *
  * REST Endpoint Controller to serve a Bconfs Filter List for the Bconf-Management in the Preferences
+ *
+ * @property editor_Plugins_Okapi_Bconf_Filter_Entity $entity
  */
 class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestController {
 
     protected $entityClass = 'editor_Plugins_Okapi_Bconf_Filter_Entity';
-
-    /**
-     * @var Editor_Plugins_Okapi_Models_BconfFilter
-     */
-    protected $entity;
 
     /**
      * sends all default bconf filters as JSON, Translate5 adjusted and okapi defaults
@@ -75,14 +72,38 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     }
 
     /**
-     * Updates the extensions-mapping.txt file of a Bconffilter
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Plugins_Okapi_Exception
      */
-    public function saveextensionsmappingAction(){
-        $extMap = $this->getRequest()->getRawBody();
-        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
-        $bconf->load($this->getParam('bconfId'));
-        $extensionMapping = $bconf->getExtensionMapping();
-        $extensionMapping->updateByContent($extMap);
+    public function getfprmAction(){
+        $this->entityLoad();
+        $fprm = $this->entity->getFprm();
+        $fprm->output();
+        exit;
     }
 
+    /**
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function savefprmAction(){
+        $this->entityLoad();
+        // create a fprm from the sent raw content
+        $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm(
+            $this->entity->getPath(),
+            $this->getRequest()->getRawBody()
+        );
+        if($fprm->validate()){
+            // save FPRM
+            $fprm->flush();
+            // update/pack the related bconf
+            $this->entity->getRelatedBconf()->getFile()->pack();
+        } else {
+            // this can only happen if the implementation of a filter-frontend generates faulty data
+            throw new editor_Plugins_Okapi_Exception('E1409', ['details' => $fprm->getValidationError(), 'filterfile' => $this->entity->getFile(), 'bconfId' => $this->entity->getBconfId()]);
+        }
+    }
 }

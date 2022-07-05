@@ -275,16 +275,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
         $r = $f->getRouter();
-        $RestLike = 'ZfExtended_Controller_RestLikeRoute';
 
-        // route for bconfs
+        // routes for bconfs
         $route = new Zend_Rest_Route($f, [], [
             'editor' => ['plugins_okapi_bconf'],
         ]);
         $r->addRoute('plugins_okapi_bconf_restdefault', $route);
 
-        $r->addRoute('plugins_okapi_bconffilter_restdefault', $route);
-        // New get route to export the bconf file.
+        // route to export the bconf file.
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/downloadbconf',
             [
@@ -293,8 +291,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'downloadbconf'
             ]);
         $r->addRoute('plugins_okapi_bconf_downloadbconf', $route);
-
-        // New post route to upload a bconf file.
+        // post route to upload a bconf file.
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/uploadbconf',
             [
@@ -303,7 +300,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'uploadbconf'
             ]);
         $r->addRoute('plugins_okapi_bconf_uploadbconf', $route);
-        // New post route to upload the SRX file.
+        // post route to upload the SRX file.
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/uploadsrx',
             [
@@ -312,7 +309,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'uploadsrx'
             ]);
         $r->addRoute('plugins_okapi_bconf_uploadsrx', $route);
-        // New route to download the SRX file.
+        // route to download the SRX file.
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/downloadsrx',
             [
@@ -321,6 +318,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'downloadsrx'
             ]);
         $r->addRoute('plugins_okapi_bconf_downloadsrx', $route);
+        // clone bconf
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/clone',
             [
@@ -329,28 +327,54 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'clone'
             ]);
         $r->addRoute('plugins_okapi_bconf_clone', $route);
+        // save extension mapping
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/saveextensionsmapping',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action'     => 'saveextensionsmapping'
+            ]);
+        $r->addRoute('plugins_okapi_bconf_saveextensionsmapping', $route);
 
-        // route for bconf filter
+        // routes for bconf filters
         $route = new Zend_Rest_Route($f, [], [
             'editor' => ['plugins_okapi_bconffilter'],
         ]);
-        $r->addRoute('plugins_okapifilter_restdefault', $route);
+        $r->addRoute('plugins_okapi_bconffilter_restdefault', $route);
 
-        $r->addRoute('plugins_okapi_bconffilter_getdefaultfilters',
-            new $RestLike('editor/plugins_okapi_bconffilter/getdefaultfilters',
-                ['module'     => 'editor',
-                 'controller' => 'plugins_okapi_bconffilter',
-                 'action'     => 'getdefaultfilters'
-                ]
-            ));
+        // default filters list route
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconffilter/getdefaultfilters',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconffilter',
+                'action'     => 'getdefaultfilters'
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconffilter_getdefaultfilters', $route);
 
-        $r->addRoute('plugins_okapi_bconffilter_saveextensionsmapping',
-            new $RestLike('editor/plugins_okapi_bconffilter/saveextensionsmapping',
-                ['module'     => 'editor',
-                 'controller' => 'plugins_okapi_bconffilter',
-                 'action'     => 'saveextensionsmapping'
-                ]
-            ));
+        // get fprm settings file content route
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconffilter/getfprm',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconffilter',
+                'action'     => 'getfprm'
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconffilter_getfprm', $route);
+
+        // save fprm settings file content route
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconffilter/savefprm',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconffilter',
+                'action'     => 'savefprm'
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconffilter_savefprm', $route);
     }
 
     public function getFrontendControllers(): array {

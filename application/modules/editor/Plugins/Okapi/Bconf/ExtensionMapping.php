@@ -274,9 +274,6 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * writes back an extension-mapping to the filesystem
      */
     public function flush() {
-        if(empty($this->path)){
-            throw new ZfExtended_Exception('editor_Plugins_Okapi_Bconf_ExtensionMapping::flush can not be called for packing clones');
-        }
         file_put_contents($this->path, $this->createContent($this->map));
     }
 
