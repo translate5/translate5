@@ -89,12 +89,12 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
         var store = this;
         return new Promise(function(resolve, reject){
             Ext.Ajax.request({
-                url: Editor.data.restpath + 'plugins_okapi_bconffilter/saveextensionsmapping',
+                url: Editor.data.restpath + 'plugins_okapi_bconf/saveextensionsmapping',
                 headers: {
                     'Content-Type': 'text/tab-separated-values'
                 },
                 params: {
-                    bconfId: store.getProxy().bconfId
+                    id: store.getProxy().bconfId
                 },
                 rawData: Array.from(store.extMap.entries()).sort()
                     .map(ext_okapiId => '.' + ext_okapiId.join('\t'))

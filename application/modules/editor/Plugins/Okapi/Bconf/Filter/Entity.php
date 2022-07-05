@@ -124,6 +124,16 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
     }
 
     /**
+     * @return editor_Plugins_Okapi_Bconf_Filter_Fprm
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getFprm() : editor_Plugins_Okapi_Bconf_Filter_Fprm {
+        return new editor_Plugins_Okapi_Bconf_Filter_Fprm($this->getPath());
+    }
+
+    /**
      * @return array
      */
     public function getFileExtensions() : array {

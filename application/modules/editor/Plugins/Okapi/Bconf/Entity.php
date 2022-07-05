@@ -1,4 +1,3 @@
-
 <?php
 /*
  START LICENSE AND COPYRIGHT
@@ -242,34 +241,6 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         }
         return $sysBconfRow->id;
     }
-    /**
-     * @DEPRECATED
-     * TODO BCONF: Remove when getFilePath is removed
-     * @param string $id If given, gets the directory without loaded entity
-     * @return string
-     * @throws editor_Plugins_Okapi_Exception
-     */
-    private function getDir(string $id = ''): string {
-        return match ((bool)$id) {
-            true => self::getBconfRootDir() . DIRECTORY_SEPARATOR . $id,
-            false => $this->dir ?: $this->dir = self::getBconfRootDir() . DIRECTORY_SEPARATOR . $this->getId(),
-        };
-    }
-
-    /**
-     * @DEPRECATED
-     * TODO BCONF: Replace Usage with ->getPath or ->createPath
-     * @param string $id optional: define the id of the bconf manually
-     * @param string $fileName Append any file to the bconf's data directory
-     * @return string path The absolute path of the bconf
-     * @throws editor_Plugins_Okapi_Exception
-     */
-    public function getFilePath(string $id = '', string $fileName = '') : string {
-        if(!$fileName){
-            $fileName = 'bconf-' . ($id ?: $this->getId()) . '.' . static::EXTENSION;
-        }
-        return $this->getDir($id) . DIRECTORY_SEPARATOR . $fileName;
-    }
 
     /**
      * Retrieves our data-directory
@@ -364,6 +335,20 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $srxFileName = $content['refs'][$purpose] ?? '';
         !$srxFileName && throw new ZfExtended_Exception("Corrupt bconf record: Could not get '$purpose' from '$descFile'.");
         return $srxFileName;
+    }
+
+    /**
+     * Retrieves the SRX as file-object, either "source" or "target"
+     * @param string $purpose
+     * @return editor_Plugins_Okapi_Bconf_Srx
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getSrx(string $purpose) : editor_Plugins_Okapi_Bconf_Srx {
+        $path = $this->createPath($this->getSrxNameFor($purpose));
+        return new editor_Plugins_Okapi_Bconf_Srx($path);
     }
 
     /**
