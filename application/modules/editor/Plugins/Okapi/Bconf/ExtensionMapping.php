@@ -211,6 +211,32 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
+     * @return string[]
+     */
+    public function getAllFilters() : array {
+        $filters = [];
+        foreach($this->map as $extension => $identifier){
+            $filters[$identifier] = true;
+        }
+        return array_keys($filters);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllExtensions() : array {
+        return array_keys($this->map);
+    }
+
+    /**
+     * @param string $extension
+     * @return bool
+     */
+    public function hasExtension(string $extension) : bool {
+        return array_key_exists(ltrim($extension, '.'), $this->map);
+    }
+
+    /**
      * Updates a mapping with an adjusted content
      * @param string $content
      * @throws ZfExtended_Exception
@@ -317,12 +343,19 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         $filterFiles = glob($dir.'/*.fprm');
         foreach($filterFiles as $filterFile){
             $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifierFromPath($filterFile);
-            if(!array_key_exists($identifier, $existingFilters)){
-                $hash = md5(file_get_contents($dir.'/'.$filterFile));
-                $this->flushFilterToDatabase($identifier, $hash, $existingNames);
+
+            if(editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedDefaultFilter()){
+                // translate5 and okapi filters must not be in the custom filter dir
+                @unlink($dir.'/'.$filterFile);
+            } else {
+                // if a filter is not in the DB we must do so
+                if(!array_key_exists($identifier, $existingFilters)){
+                    $hash = md5(file_get_contents($dir.'/'.$filterFile));
+                    $this->flushFilterToDatabase($identifier, $hash, $existingNames);
+                }
+                $filesysFilters[$identifier] = $identifier;
             }
-            $filesysFilters[$identifier] = $identifier;
-        }
+         }
         // remove the filters that exist in the database but have no corresponding file
         foreach($existingFilters as $identifier => $id){
             if(!array_key_exists($identifier, $filesysFilters)){

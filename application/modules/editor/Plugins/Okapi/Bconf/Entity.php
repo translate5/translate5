@@ -171,6 +171,20 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $bconfFile = new editor_Plugins_Okapi_Bconf_File($this, true);
         $bconfFile->unpack($tmpPath);
         $bconfFile->pack();
+
+        // final step: validate the bconf
+        $validation = new editor_Plugins_Okapi_Bconf_Validation($this);
+        if($validation->validate()){
+            if($validation->wasNotTestable()){
+                $logger = Zend_Registry::get('logger')->cloneMe('editor.okapi.bconf');
+                $logger->warn(
+                    'E1408',
+                    'Okapi Plug-In: The bconf "{bconf}" to import is not valid ({details})',
+                    ['bconf' => $this->getName(), 'bconfId' => $this->getId(), 'details' => $validation->getValidationError()]);
+            }
+        } else {
+            throw new editor_Plugins_Okapi_Exception('E1408', ['bconf' => $this->getName(), 'bconfId' => $this->getId(), 'details' => $validation->getValidationError()]);
+        }
     }
 
     /**
@@ -384,6 +398,27 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      */
     public function getExtensionMapping() : editor_Plugins_Okapi_Bconf_ExtensionMapping {
         return new editor_Plugins_Okapi_Bconf_ExtensionMapping($this);
+    }
+
+    /**
+     * All the file-extensions we support
+     * @return array
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getSupportedExtensions() : array {
+        return $this->getExtensionMapping()->getAllExtensions();
+    }
+
+    /**
+     * Checks whether the given extension is supported
+     * @param string $extension
+     * @return bool
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function hasSupportFor(string $extension) : bool {
+        return $this->getExtensionMapping()->hasExtension($extension);
     }
 
     /**

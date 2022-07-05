@@ -110,7 +110,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             if($bconfId === NULL && $orderer != 'unittest' && $orderer != 'termportal'){
                 $task->logger('editor.task.okapi')->warn('E1055', 'Okapi Plug-In: Bconf not given or not found: {bconfFile}', ['bconfFile' => 'No bconf-id was set for task meta']);
             }
-            $bconf = new editor_Plugins_Okapi_Bconf_Entity();
             $bconfId = $bconf->getDefaultBconfId();
         }
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
@@ -251,7 +250,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $frontendControllers = array(
         'pluginOkapiBconfPrefs' => 'Editor.plugins.Okapi.controller.BconfPrefs'
-
     );
 
     /**
@@ -513,8 +511,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             ]);
         } else {
             // the normal behaviour: bconf is defined via task and set in import wizard
-            $bconfPath = static::getImportBconf($event->getParam('task'))->getPath();
-            $this->useCustomBconf = basename($bconfPath) != self::BCONF_SYSDEFAULT_IMPORT_NAME;
+            $this->useCustomBconf = false;
         }
         // TODO: use extension mapping from bconf
         if($this->useCustomBconf){
@@ -541,8 +538,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         foreach($filelist as $fileId => $filePath) {
             $fileInfo = new SplFileInfo($importFolder.'/'.ZfExtended_Utils::filesystemEncode($filePath));
 
-            //if there is a filefilter or a fileparser (isProcessable) we do not process the file with Okapi
-            if($fileFilter->hasFilter($fileId, $fileFilter::TYPE_IMPORT) || !$this->isProcessable($fileInfo)) {
+            //if there is a filefilter or a fileparser (isProcessableFile) we do not process the file with Okapi
+            if($fileFilter->hasFilter($fileId, $fileFilter::TYPE_IMPORT) || !$this->isProcessableFile($fileInfo, $params['task'])) {
                 continue;
             }
             $this->queueWorker($fileId, $fileInfo, $params);
@@ -645,7 +642,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param SplFileInfo $fileinfo
      * @return boolean
      */
-    protected function isProcessable(SplFileInfo $fileinfo): bool {
+    protected function isProcessableFile(SplFileInfo $fileinfo, editor_Models_Task $task): bool {
         $extension = strtolower($fileinfo->getExtension());
         if(!$fileinfo->isFile()){
             return false;
@@ -675,7 +672,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 return true;
             }
         }
-        return in_array($extension, $this->okapiFileTypes);
+        // by default we check the real extensions the current import bconf supports
+        return static::getImportBconf($task)->hasSupportFor($extension);
     }
 
     /**
