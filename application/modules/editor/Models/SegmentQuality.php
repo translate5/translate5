@@ -107,6 +107,6 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
         }
 
         // Return spell check data
-        return $data;
+        return $data ?? [];
     }
 }

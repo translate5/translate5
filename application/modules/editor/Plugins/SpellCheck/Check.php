@@ -75,7 +75,7 @@ class editor_Plugins_SpellCheck_Check {
      *
      * @param editor_Models_Segment $segment
      * @param $targetField
-     * @param editor_Plugins_SpellCheck_LanguageTool_Connector $connector
+     * @param editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter $connector
      * @param $spellCheckLang
      * @throws editor_Plugins_SpellCheck_Exception_Down
      * @throws editor_Plugins_SpellCheck_Exception_Malfunction
@@ -83,11 +83,10 @@ class editor_Plugins_SpellCheck_Check {
      * @throws editor_Plugins_SpellCheck_Exception_TimeOut
      */
     public function __construct(editor_Models_Segment $segment, $targetField,
-                                editor_Plugins_SpellCheck_LanguageTool_Connector $connector, $spellCheckLang) {
+                                editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter $connector, $spellCheckLang) {
 
         // Get target text, strip tags, replace htmlentities
         $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
-        //$target = strip_tags($target);
         $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
 
         // Get LanguageTool response

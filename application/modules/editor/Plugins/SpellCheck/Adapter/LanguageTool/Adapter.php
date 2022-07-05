@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Connector to LanguageTool
  * https://languagetool.org/http-api/swagger-ui/#/default
  */
-class editor_Plugins_SpellCheck_LanguageTool_Connector {
+class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
     
     /**
      * LanguageTool

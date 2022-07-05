@@ -48,3 +48,18 @@ INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) values('editor_Seg
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `typeClass`, `description`, `level`, `guiName`, `guiGroup`, `comment`) values
 ('runtimeOptions.plugins.SpellCheck.languagetool.maxSegmentCharacterCount' ,'1','editor','plugins','20000','20000','','integer',NULL,'Maximum number of characters per request to LanguageTool server','1','','','');
+
+UPDATE `Zf_configuration`
+SET
+    `description` = "If set to active, spell- grammar and style check is active while typing in the editor (based on languagetool)",
+    `guiName` = "Spell-, grammar and style live-check on segment editing",
+    `name` = "runtimeOptions.plugins.SpellCheck.liveCheckOnEditing"
+WHERE `name` = "runtimeOptions.plugins.SpellCheck.active";
+
+UPDATE `LEK_customer_config`
+SET `name` = "runtimeOptions.plugins.SpellCheck.liveCheckOnEditing"
+WHERE `name` = "runtimeOptions.plugins.SpellCheck.active";
+
+UPDATE `LEK_task_config`
+SET `name` = "runtimeOptions.plugins.SpellCheck.liveCheckOnEditing"
+WHERE `name` = "runtimeOptions.plugins.SpellCheck.active";

@@ -34,14 +34,14 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
     /**
      * LanguageTool connector instance
      *
-     * @var editor_Plugins_SpellCheck_LanguageTool_Connector
+     * @var editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter
      */
     protected static $_connector = [];
 
     /**
      * Get LanguageTool connector instance
      *
-     * @return editor_Plugins_SpellCheck_LanguageTool_Connector|null
+     * @return editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter|null
      */
     public function getConnector($slot = null) {
 
@@ -49,24 +49,24 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
         if (!$slot) {
 
             // Get connector instance with default slot
-            $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
+            $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter');
 
             // Get that default slot
             $slot = $connector->getApiBaseUrl();
 
             // Put connector instance into $_connector array under $slot key for further accessibility, if not there yet
-            if (!self::$_connector[$slot]) self::$_connector[$slot] = $connector;
+            if (!isset(self::$_connector[$slot])) self::$_connector[$slot] = $connector;
         }
 
         // Get connector instance for given $slot
-        return self::$_connector[$slot] ?? self::$_connector[$slot] = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector', [$slot]);
+        return self::$_connector[$slot] ?? self::$_connector[$slot] = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter', [$slot]);
     }
 
     /**
      * Do process
      *
      * @param editor_Segment_Tags[] $segmentsTags
-     * @param string|null $slot
+     * @param string|null $slo
      * @param $processingMode
      * @param bool|string $spellCheckLang
      */

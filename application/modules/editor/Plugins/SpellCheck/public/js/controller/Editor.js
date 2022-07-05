@@ -165,7 +165,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     onEditorConfigLoaded:function(app, task){
         var me=this,
-            isPluginActive = app.getTaskConfig('plugins.SpellCheck.active');
+            isPluginActive = app.getTaskConfig('plugins.SpellCheck.liveCheckOnEditing');
         me.setActive(isPluginActive);
     },
     
@@ -715,24 +715,17 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * @param {Integer} matchEnd
      * @returns {Object}
      */
-    /*amendOffsets: function(node) {
-
-    },*/
-
     getRangeForMatch: function(matchStart,matchEnd) {
         var me = this,
             rangeForMatch = rangy.createRange(),
-            rangeForMatch1 = document.createRange(),
             allDelNodes = [],
             rangeForDelNode = rangy.createRange(),
-            rangeForDelNode1 = document.createRange(),
             bookmarkForDelNode,
             lengthOfDelNode;
         // me.consoleLog('---\n- matchStart: ' + matchStart + ' / matchEnd: ' + matchEnd);
         //console.log('before', matchStart, matchEnd);
         // move offsets according to hidden del-Nodes in front of the match's start and/or end
         allDelNodes = me.getEditorBodyExtDomElement().query('del');
-        //console.log(matchStart, matchEnd);
         Ext.Array.each(allDelNodes, function(delNode) {
             rangeForDelNode.selectNodeContents(delNode);
             bookmarkForDelNode = rangeForDelNode.getBookmark();
@@ -756,10 +749,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // set range for Match by selecting characters
         rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
         //console.log('after', matchStart, matchEnd);
-        var bookmark = rangeForMatch.getBookmark();
-        //console.log('bookmark', bookmark); // {start: xx, end: yy, containerNode: cellNode}
         // return the bookmark
-        return bookmark;
+        return rangeForMatch.getBookmark();
     },
     /**
      * Apply results to captured content from the Editor.
@@ -959,11 +950,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
     },
     applySpellCheckStyles: function(store) {
-        for (var i = 0; i < store.getCount(); i++) {
-            this.applySpellCheckStylesForRecord(null, store.getAt(i));
-        }
+        var me = this;
+        setTimeout(function(){
+            for (var i = 0; i < store.getCount(); i++) {
+                me.applySpellCheckStylesForRecord(null, store.getAt(i));
+            }
+        }, 300);
     },
     applyCustomMatches: function(cellNode, matches) {
+        if (!cellNode) return;
         var me = this,
             rangeForMatch,
             documentFragmentForMatch,
