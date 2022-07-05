@@ -40,7 +40,7 @@ set_time_limit(0);
 $SCRIPT_IDENTIFIER = '008-TRANSLATE-2932-Okapi-Filters.php';
 
 //uncomment the following line, so that the file is not marked as processed:
-$this->doNotSavePhpForDebugging = false;
+// $this->doNotSavePhpForDebugging = false;
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
