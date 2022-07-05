@@ -51,7 +51,6 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
 
     /**
      * Includes extension-mapping.txt in the metaData
-     * TODO BCONF: rework using the sent id to load an entity and process from there
      * @return void
      * @throws editor_Plugins_Okapi_Exception
      */
