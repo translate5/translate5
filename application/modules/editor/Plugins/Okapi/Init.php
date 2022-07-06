@@ -27,6 +27,13 @@
  */
 
 /**
+ * OKAPI file converter and segmenter plugin
+ *
+ * There are several debug options for this Plugin:
+ * runtimeOptions.debug.plugin.OkapiBconfPackUnpack => Turns general debugging for the packing/unpacking of bconfs
+ * runtimeOptions.debug.plugin.OkapiBconfProcessing => Turns debugging for the processing of bconfs
+ * runtimeOptions.debug.plugin.OkapiExtensionMapping => Turns debugging for the processing of the extension-mapping
+ * runtimeOptions.debug.plugin.OkapiKeepIntermediateFiles => All the files that are created in the various processing steps are kept
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
@@ -34,7 +41,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     /**
      * The current internal version index of the bconf's
-     * This must be increased each time, a git-based fprm or the default bconf (next const) is changed
+     * This must be increased each time, a git-based fprm or srx is changed
      * @var int
      */
     const BCONF_VERSION_INDEX = 1;
@@ -52,10 +59,23 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     const BCONF_SYSDEFAULT_IMPORT_NAME = 'Translate5-Standard';
 
     /**
-     *
      * @var string
      */
     const BCONF_SYSDEFAULT_EXPORT = 'okapi_default_export.bconf';
+
+    /**
+     * The default supported file-types by okapi
+     * @var string[]
+     */
+    const DEFAULT_EXTENSIONS = [
+        'okapi', //currently needed, see TRANSLATE-1019
+        //'csv' => ['text/csv'], disabled due our own importer
+        'c', 'catkeys', 'cpp', 'dita', 'ditamap', 'docm', 'docx', 'dotm', 'dotx', 'dtd', 'h', 'htm', 'html',
+        'idml', 'json', 'lang', 'md', 'mif', 'odg', 'odp', 'ods', 'odt', 'otg', 'otp', 'ots', 'ott',
+        'pdf', 'pentm', 'php', 'po', 'potm', 'potx', 'ppsm', 'ppsx', 'pptm', 'pptx', 'properties',
+        'rdf', 'resx', 'rkm', 'rtf', 'srt', 'strings', 'tbx', 'tmx', 'ts', 'tsv', 'ttx', 'txml', 'txp', 'txt',
+        'vrsz', 'vsdm', 'vsdx', 'wcml', 'wix', 'xlsm', 'xlsx', 'xltm', 'xltx', 'xml', 'yaml', 'yml'
+    ];
 
     /**
      * @var editor_Plugins_Okapi_Bconf_Entity
@@ -102,6 +122,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         if(!empty($bconfId) && static::$cachedBconf != NULL && static::$cachedBconf->getId() === $bconfId){
             return static::$cachedBconf;
         }
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         // empty covers "not set" and also invalid id '0'
         // somehow dirty: unit tests pass a virtual" bconf-id of "0" to signal to use the system default bconf
         if(empty($bconfId)){
@@ -110,10 +131,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             if($bconfId === NULL && $orderer != 'unittest' && $orderer != 'termportal'){
                 $task->logger('editor.task.okapi')->warn('E1055', 'Okapi Plug-In: Bconf not given or not found: {bconfFile}', ['bconfFile' => 'No bconf-id was set for task meta']);
             }
-            $bconf = new editor_Plugins_Okapi_Bconf_Entity();
             $bconfId = $bconf->getDefaultBconfId();
         }
-        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->load($bconfId);
         // we update outdated bconfs when accessing them
         $bconf->repackIfOutdated();
@@ -149,78 +168,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected $localePath = 'locales';
 
     /**
-     * Supported file-types by okapi
-     *
-     * @var array
-     */
-    private array $okapiFileTypes = array(
-        'okapi', //currently needed, see TRANSLATE-1019
-        'c',
-        'catkeys',
-        //'csv' => ['text/csv'], disabled due our own importer
-        'cpp',
-        'dita',
-        'ditamap',
-        'docm',
-        'docx',
-        'dotm',
-        'dotx',
-        'dtd',
-        'h',
-        'htm',
-        'html',
-        'idml',
-        'json',
-        'lang',
-        'md',
-        'mif',
-        'odg',
-        'odp',
-        'ods',
-        'odt',
-        'otg',
-        'otp',
-        'ots',
-        'ott',
-        'pdf',
-        'pentm',
-        'php',
-        'po',
-        'potm',
-        'potx',
-        'ppsm',
-        'ppsx',
-        'pptm',
-        'pptx',
-        'properties',
-        'rdf',
-        'resx',
-        'rkm',
-        'rtf',
-        'srt',
-        'strings',
-        'tbx',
-        'tmx',
-        'ts',
-        'tsv',
-        'ttx',
-        'txml',
-        'txp',
-        'txt',
-        'vrsz',
-        'vsdm',
-        'vsdx',
-        'wcml',
-        'wix',
-        'xlsm',
-        'xlsx',
-        'xltm',
-        'xltx',
-        'xml',
-        'yaml',
-        'yml',
-    );
-    /**
      * Ignored filetypes if a custom bconf is provided (which skips the check for supported files)
      *
      * @var array
@@ -251,7 +198,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $frontendControllers = array(
         'pluginOkapiBconfPrefs' => 'Editor.plugins.Okapi.controller.BconfPrefs'
-
     );
 
     /**
@@ -262,7 +208,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public function init() {
         $this->fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
-        foreach ($this->okapiFileTypes as $ext) {
+        foreach (self::DEFAULT_EXTENSIONS as $ext) {
             $this->fileTypes->register($ext);
         }
         $this->initEvents();
@@ -513,8 +459,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             ]);
         } else {
             // the normal behaviour: bconf is defined via task and set in import wizard
-            $bconfPath = static::getImportBconf($event->getParam('task'))->getPath();
-            $this->useCustomBconf = basename($bconfPath) != self::BCONF_SYSDEFAULT_IMPORT_NAME;
+            $this->useCustomBconf = false;
         }
         // TODO: use extension mapping from bconf
         if($this->useCustomBconf){
@@ -541,8 +486,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         foreach($filelist as $fileId => $filePath) {
             $fileInfo = new SplFileInfo($importFolder.'/'.ZfExtended_Utils::filesystemEncode($filePath));
 
-            //if there is a filefilter or a fileparser (isProcessable) we do not process the file with Okapi
-            if($fileFilter->hasFilter($fileId, $fileFilter::TYPE_IMPORT) || !$this->isProcessable($fileInfo)) {
+            //if there is a filefilter or a fileparser (isProcessableFile) we do not process the file with Okapi
+            if($fileFilter->hasFilter($fileId, $fileFilter::TYPE_IMPORT) || !$this->isProcessableFile($fileInfo, $params['task'])) {
                 continue;
             }
             $this->queueWorker($fileId, $fileInfo, $params);
@@ -645,7 +590,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param SplFileInfo $fileinfo
      * @return boolean
      */
-    protected function isProcessable(SplFileInfo $fileinfo): bool {
+    protected function isProcessableFile(SplFileInfo $fileinfo, editor_Models_Task $task): bool {
         $extension = strtolower($fileinfo->getExtension());
         if(!$fileinfo->isFile()){
             return false;
@@ -675,7 +620,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 return true;
             }
         }
-        return in_array($extension, $this->okapiFileTypes);
+        // by default we check the real extensions the current import bconf supports
+        return static::getImportBconf($task)->hasSupportFor($extension);
     }
 
     /**

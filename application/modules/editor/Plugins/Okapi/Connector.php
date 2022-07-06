@@ -271,10 +271,10 @@ class editor_Plugins_Okapi_Connector {
      */
     public function downloadFile($fileName, $manifestFile, SplFileInfo $dataDir){
         $downloadedFile = $dataDir.'/'.$fileName.self::OUTPUT_FILE_EXTENSION;
-        $url=$this->projectUrl.'/outputFiles/pack1/work/'.$fileName.self::OUTPUT_FILE_EXTENSION;
+        $url = $this->projectUrl.'/outputFiles/pack1/work/'.$fileName.self::OUTPUT_FILE_EXTENSION;
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
-        $responseFile=$this->processResponse($response);
+        $responseFile = $this->processResponse($response);
         file_put_contents($downloadedFile, $responseFile);
         
         //additionaly we save the manifest.rkm file to the disk, needed for export

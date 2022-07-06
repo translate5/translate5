@@ -31,6 +31,7 @@
  * Generate new bconf file
  * @see editor_Plugins_Okapi_Bconf_File
  * @var editor_Plugins_Okapi_Bconf_Entity $entity
+ * @var bool $doDebug
  */
 trait editor_Plugins_Okapi_Bconf_PackerTrait {
 
@@ -58,7 +59,7 @@ trait editor_Plugins_Okapi_Bconf_PackerTrait {
             $customIdentifiers[] = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($filterData['okapiType'], $filterData['okapiId']);
         }
         // DEBUG
-        if(editor_Plugins_Okapi_Bconf_File::DO_DEBUG) { error_log('PACKED CUSTOM FILTERS: '."\n".implode(', ', $customIdentifiers)); }
+        if($this->doDebug) { error_log('PACKED CUSTOM FILTERS: '."\n".implode(', ', $customIdentifiers)); }
 
         // instantiate the extension mapping and evaluate the additional default okapi and translate5 filter files (this needs to know the "real" custom filters
         $extensionMapping = $this->entity->getExtensionMapping();
@@ -66,12 +67,10 @@ trait editor_Plugins_Okapi_Bconf_PackerTrait {
         $defaultFilterFiles = $extensionMapping->getOkapiDefaultFprmsForPacking($customIdentifiers); // retrieves an array of pathes !
 
         // DEBUG
-        if(editor_Plugins_Okapi_Bconf_File::DO_DEBUG){
+        if($this->doDebug){
             error_log('PACKED DEFAULT FILTERS: '."\n".print_r($defaultFilterFiles, 1));
             error_log('PACKED EXTENSION MAPPING: '."\n".print_r($extensionMapData, 1));
         }
-
-
         $numAllEmbeddedFilters = count($customIdentifiers) + count($defaultFilterFiles);
         // write number of embedded filters
         $raf->writeInt($numAllEmbeddedFilters);

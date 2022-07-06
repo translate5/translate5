@@ -63,13 +63,14 @@ class editor_Plugins_Okapi_Bconf_Filters {
 
     /**
      * Small helper to create the filter-gui classname out of the filter type
-     * Optionalle defines the full ExtJS path
+     * Optionally defines the full ExtJS path
+     * Returns an empty string when no Gui defined
      * @param string $filterType
-     * @return string|NULL
+     * @return string
      */
-    public static function getGuiName(string $filterType, bool $fullPath=false) : ?string {
+    public static function getGuiClass(string $filterType, bool $fullPath=true) : string {
         if(!self::hasGui($filterType)){
-            return NULL;
+            return '';
         }
         $name = ucfirst(substr($filterType, 4));
         if($fullPath){

@@ -37,7 +37,7 @@
 class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
     /**
-     * The filename an extension mapping generaly has
+     * The filename an extension mapping generally has
      * @var sring
      */
     const FILE = 'extensions-mapping.txt';
@@ -71,6 +71,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * @throws ZfExtended_Exception
      */
     public static function processUnpackedFilter(editor_Plugins_Okapi_Bconf_Entity $bconf, string $identifier, string $unpackedContent, array &$replacementMap, array &$customFilters) : bool {
+        $doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiExtensionMapping');
         // default-identifiers do not need to be embedded, we just check them
         if(editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)){
             // a non-embedded default-identifier that does not point to a valid OKAPI default filter will be removed & a warning written
@@ -80,6 +81,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                     'E1407',
                     'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed',
                     ['bconf' => $bconf->getName(), 'bconfId' => $bconf->getId(), 'identifier' => $identifier]);
+                // DEBUG
+                if($doDebug){ error_log('ExtensionMapping processUnpackedFilter: okapi default identifier '.$identifier.' is invalid'); }
             }
         } else {
             // process all identifiers pointing to a file
@@ -88,10 +91,14 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 // when we import a embedded okapi default filter we map it to a non-embedded okapi default filter
                 if(editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)){
                     $replacementMap[$identifier] = $idata->id;
+                    // DEBUG
+                    if($doDebug){ error_log('ExtensionMapping processUnpackedFilter: replace '.$identifier.' with '.$idata->id); }
                 }
             } else {
                 // "real" custom filters, check if they have a supported type
                 if(editor_Plugins_Okapi_Bconf_Filter_Okapi::isValidType($idata->type)){
+                    // DEBUG
+                    if($doDebug){ error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '.$identifier.' will be embedded'); }
                     // add a custom filter to the filesys & map (that later is flushed to the DB)
                     $customFilters[$identifier] = md5($unpackedContent);
                     return true;
@@ -101,6 +108,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                         'E1407',
                         'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed',
                         ['bconf' => $bconf->getName(), 'bconfId' => $bconf->getId(), 'identifier' => $identifier]);
+                    // DEBUG
+                    if($doDebug){ error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '.$identifier.' is invalid'); }
                 }
             }
         }
@@ -160,6 +169,11 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     private array $fprmsToPack;
 
     /**
+     * @var bool
+     */
+    private bool $doDebug;
+
+    /**
      * @var editor_Plugins_Okapi_Bconf_Entity
      */
     private editor_Plugins_Okapi_Bconf_Entity $bconf;
@@ -175,12 +189,17 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         $this->path = $bconf->getExtensionMappingPath();
         $this->dir = rtrim(dirname($this->path), '/');
         $this->bconf = $bconf;
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiExtensionMapping');
 
         if(is_array($unpackedLines) && is_array($replacementMap)){
+            // DEBUG
+            if($this->doDebug){ error_log('ExtensionMapping construct by content:'."\n".print_r($unpackedLines, 1)."\n".' replacementMap:'."\n".print_r($replacementMap, 1)); }
             // importing an unpacked bconf
             $this->unpackContent($unpackedLines, $replacementMap);
 
         } else {
+            // DEBUG
+            if($this->doDebug){ error_log('ExtensionMapping construct by path: '.$this->path); }
             // opening a mapping from the file-system
             $content = NULL;
             if(file_exists($this->path) && is_writable($this->path)){
@@ -211,12 +230,41 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
+     * @return string[]
+     */
+    public function getAllFilters() : array {
+        $filters = [];
+        foreach($this->map as $extension => $identifier){
+            $filters[$identifier] = true;
+        }
+        return array_keys($filters);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllExtensions() : array {
+        return array_keys($this->map);
+    }
+
+    /**
+     * @param string $extension
+     * @return bool
+     */
+    public function hasExtension(string $extension) : bool {
+        return array_key_exists(ltrim($extension, '.'), $this->map);
+    }
+
+    /**
      * Updates a mapping with an adjusted content
      * @param string $content
      * @throws ZfExtended_Exception
      * @throws editor_Plugins_Okapi_Exception
      */
     public function updateByContent(string $content) {
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping updateByContent:'."\n".$content); }
+
         $this->parseContent($content);
         if(!$this->hasEntries()){
             throw new editor_Plugins_Okapi_Exception('E1405', ['bconf' => $this->bconf->getName(), 'bconfId' => $this->bconf->getId()]);
@@ -252,6 +300,9 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * @return bool
      */
     public function removeFilter(string $identifier) : bool {
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping removeFilter: '.$identifier); }
+
         $map = [];
         $removed = false;
         foreach($this->map as $extension => $fi){
@@ -266,6 +317,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             if(file_exists($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION)){
                 @unlink($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
             }
+            // DEBUG
+            if($this->doDebug){ error_log('ExtensionMapping removeFilter: '.$identifier.' has been removed'); }
         }
         return $removed;
     }
@@ -302,6 +355,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * @throws editor_Plugins_Okapi_Exception
      */
     public function rescanFilters(){
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping rescanFilters'); }
         // evaluate existing filters from db
         $bconfFilter = new editor_Plugins_Okapi_Bconf_Filter_Entity();
         $existingFilters = [];
@@ -317,17 +372,28 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         $filterFiles = glob($dir.'/*.fprm');
         foreach($filterFiles as $filterFile){
             $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifierFromPath($filterFile);
-            if(!array_key_exists($identifier, $existingFilters)){
-                $hash = md5(file_get_contents($dir.'/'.$filterFile));
-                $this->flushFilterToDatabase($identifier, $hash, $existingNames);
+            $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
+            if(editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedDefaultFilter($idata->type, $idata->id)){
+                // translate5 and okapi filters must not be in the custom filter dir
+                @unlink($filterFile);
+                // DEBUG
+                if($this->doDebug){ error_log('ExtensionMapping rescanFilters: deleted embedded default filter '.$identifier); }
+            } else {
+                // if a filter is not in the DB we must do so
+                if(!array_key_exists($identifier, $existingFilters)){
+                    $hash = md5(file_get_contents($filterFile));
+                    $this->flushFilterToDatabase($identifier, $hash, $existingNames);
+                }
+                $filesysFilters[$identifier] = $identifier;
             }
-            $filesysFilters[$identifier] = $identifier;
-        }
+         }
         // remove the filters that exist in the database but have no corresponding file
         foreach($existingFilters as $identifier => $id){
             if(!array_key_exists($identifier, $filesysFilters)){
                 $bconfFilter->load($filesysFilters[$identifier]);
                 $bconfFilter->delete();
+                // DEBUG
+                if($this->doDebug){ error_log('ExtensionMapping rescanFilters: deleted non-existing filter '.$identifier.' from database'); }
             }
         }
     }
@@ -375,6 +441,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             $hash
         );
         $usedNames[] = $name;
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping flushFilterToDatabase: added '.$identifier.', "'.$name.'" to database with extensions [ '.implode(', ', $extensions).' ]'); }
     }
 
     /**
@@ -441,6 +509,9 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * @param array $addedCustomIdentifiers
      */
     private function preparePacking(array $addedCustomIdentifiers){
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping preparePacking: addedCustomIdentifiers: [ '.implode(', ', $addedCustomIdentifiers).' ]'); }
+
         if($this->mapToPack == NULL){
             $this->mapToPack = [];
             $this->fprmsToPack = [];
@@ -452,15 +523,21 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                         throw new editor_Plugins_Okapi_Exception('E1406', ['bconf' => $this->bconf->getName(), 'bconfId' => $this->bconf->getId(), 'identifier' => $identifier]);
                     } else if($path === false){
                         $this->mapToPack[] = [ '.'.$extension, $identifier ];
+                        // DEBUG
+                        if($this->doDebug){ error_log('ExtensionMapping preparePacking: add non embedded default filter '.$identifier.' for '.$extension); }
                     } else {
                         $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifierFromPath($path);
                         $this->fprmsToPack[$identifier] = $path;
                         $this->mapToPack[] = [ '.'.$extension, $identifier ];
+                        // DEBUG
+                        if($this->doDebug){ error_log('ExtensionMapping preparePacking: add embedded default filter '.$identifier.' for '.$extension); }
                     }
                 } else {
                     if(in_array($identifier, $addedCustomIdentifiers)){
                         // either the identifier is a custom filter and therefore must be part of the already added custom filters
                         $this->mapToPack[] = [ '.'.$extension, $identifier ];
+                        // DEBUG
+                        if($this->doDebug){ error_log('ExtensionMapping preparePacking: add custom filter '.$identifier.' for '.$extension); }
                     } else {
                         // otherwise the entry must be a translate5 asjusted bconf or invalid
                         $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
@@ -471,6 +548,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                             $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifierFromPath($path);
                             $this->fprmsToPack[$identifier] = $path;
                             $this->mapToPack[] = [ '.'.$extension, $identifier ];
+                            // DEBUG
+                            if($this->doDebug){ error_log('ExtensionMapping preparePacking: add embedded translate5 filter '.$identifier.' for '.$extension); }
                         }
                     }
                 }

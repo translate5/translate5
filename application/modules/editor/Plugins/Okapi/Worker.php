@@ -199,7 +199,10 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             $workfile2 = new SplFileInfo($workFile.editor_Models_Export_FileParser_Xlf::SOURCE_TO_EMPTY_TARGET_SUFFIX);
             if($workfile2->isFile()) {
                 $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workfile2);
-                unlink($workfile2); //we remove that file from the export, bad for debugging but keep things clean
+                if(!ZfExtended_Debug::hasLevel('plugin', 'OkapiKeepIntermediateFiles')){
+                    //we remove that file from the export, bad for debugging but keep things clean
+                    unlink($workfile2);
+                }
                 //workfile (.xlf) is kept in export for further processing of the XLF
             }
             else {

@@ -136,13 +136,33 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         }
         $this->entityLoad();
         $srxUploadFile = $_FILES['srx']['tmp_name'];
+        $srxUploadName = $_FILES['srx']['name'];
         $srxFilename = $this->entity->getSrxNameFor($this->getParam('purpose'));
-        $srx = new editor_Plugins_Okapi_Bconf_Srx($this->entity->createPath($srxFilename), file_get_contents($srxUploadFile));
+        $srxPath = $this->entity->createPath($srxFilename);
+        // createan SRX from the upload and validate it
+        $srx = new editor_Plugins_Okapi_Bconf_Srx($srxPath, file_get_contents($srxUploadFile));
         if($srx->validate()){
+            // in case the uploaded SRX is valid we create a backup of the original we can restore after validating the bconf
+            $srxPathBU = $srxPath.'.bu';
+            rename($srxPath, $srxPathBU);
+            // write the uploaded srx to disk
             $srx->flush();
+            // repack the bconf
             $this->entity->getFile()->pack();
+            // validate the bconf
+            $bconfValidationError = $this->entity->validate();
+            if($bconfValidationError !== NULL){
+                // restore the original srx & pack the bconf
+                unlink($srxPath);
+                rename($srxPathBU, $srxPath);
+                $this->entity->getFile()->pack();
+                throw new editor_Plugins_Okapi_Exception('E1390', ['filename' => $srxUploadName, 'details' => $bconfValidationError]);
+            } else {
+                // cleanup: remove backup srx
+                unlink($srxPathBU);
+            }
         } else {
-            throw new editor_Plugins_Okapi_Exception('E1390', ['filename' => $srxFilename, 'details' => $srx->getValidationError()]);
+            throw new editor_Plugins_Okapi_Exception('E1390', ['filename' => $srxUploadName, 'details' => $srx->getValidationError()]);
         }
     }
 
