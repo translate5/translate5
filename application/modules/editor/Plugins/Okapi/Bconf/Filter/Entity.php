@@ -172,7 +172,7 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
             $row['editable'] = true;
             $row['clonable'] = true;
             $row['isCustom'] = true;
-            $row['guiClass'] = editor_Plugins_Okapi_Bconf_Filters::getGuiName($row['okapiId'], true);
+            $row['guiClass'] = editor_Plugins_Okapi_Bconf_Filters::getGuiClass($row['okapiType']);
             $rows[] = $row;
         }
         return $rows;

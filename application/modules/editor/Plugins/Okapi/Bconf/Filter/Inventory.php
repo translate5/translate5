@@ -144,18 +144,17 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory {
     public function getGridRows(int $startIndex=0) : array {
         $rows = [];
         foreach($this->inventory as $item){
-            $editable = ($item->settings && editor_Plugins_Okapi_Bconf_Filters::hasGui($item->type));
             $rows[] = [
                 'id' => $startIndex,
-                'okapiId' => $item->id,
                 'okapiType' => $item->type,
+                'okapiId' => $item->id,
                 'name' => $item->name,
                 'description' => $item->description,
                 'mime' => $item->mime,
-                'editable' => $editable,
+                'editable' => ($item->settings && editor_Plugins_Okapi_Bconf_Filters::hasGui($item->type)),
                 'clonable' => $item->settings,
                 'isCustom' => false,
-                'guiClass' => ($editable ? editor_Plugins_Okapi_Bconf_Filters::getGuiName($item->type, true) : '')
+                'guiClass' => editor_Plugins_Okapi_Bconf_Filters::getGuiClass($item->type)
             ];
             $startIndex++;
         }
