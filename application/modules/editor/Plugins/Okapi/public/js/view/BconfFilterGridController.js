@@ -27,22 +27,20 @@
 
 /**
  * @extends Ext.app.ViewController
- * @property {Object} extMapChangelog Tracks changes to the filter's extensions-mapping
  */
 // QUIRK: To support named regions this separate config object is used and later fed to Ext.define()
 let BconfFilterGridController = {
     //region config
     extend: 'Ext.app.ViewController',
     alias: 'controller.bconffilterGridController',
-    extMapChangelog: {},
     listen: {
         store: {
             'bconffilterStore': {
                 beforeload: function(){
                     this.lookup('gridview').suspendEvent('refresh'); // prevent repaint until records are processed
                 },
-                load: function(store){
-                    this.handleStoreLoad(...arguments)
+                load: function(){
+                    this.handleStoreLoad(...arguments);
                     this.lookup('gridview').resumeEvent('refresh'); // enable repaint
                     this.lookup('gridview').refresh();
                 }
@@ -61,7 +59,7 @@ let BconfFilterGridController = {
             change: 'search',
         },
 
-        'tagfield#extMap': {
+        'tagfield#extensionMap': {
             change: 'handleExtMapChange',
         },
 
@@ -76,7 +74,7 @@ let BconfFilterGridController = {
     },
 
     isEditDisabled: function(view, rowIndex, colIndex, item, record){
-        return !record.get('guiClass') || record.crudState === 'C';
+        return !record.get('editable') || record.crudState === 'C' || !record.get('guiClass');
     },
 
     //endregion
@@ -90,9 +88,9 @@ let BconfFilterGridController = {
             return;
         }
         store.add(Ext.getStore('defaultBconfFilters').getRange());
-        store.setExtMapString(operation.getResultSet().getMetadata()['extensions-mapping']);
+        store.setExtensionMapping(operation.getResultSet().getMetadata().extensionMapping);
         if(store.getCount() === 0 && store.loadCount === 1){ // Show defaults on empty Bconffilters
-            this.lookup('showDefaultsBtn').setPressed(true)
+            this.lookup('showDefaultsBtn').setPressed(true);
         }
     },
 
@@ -114,9 +112,9 @@ let BconfFilterGridController = {
     toggleDefaultsFilter: function(btn, toggled){
         var store = this.getView().getStore();
         if(toggled){
-            store.removeFilter('defaultsFilter')
+            store.removeFilter('defaultsFilter');
         } else {
-            store.addFilter(store.defaultsFilter)
+            store.addFilter(store.defaultsFilter);
         }
     },
 // region grid columns
@@ -126,25 +124,23 @@ let BconfFilterGridController = {
     editFPRM: function(view, rowIndex, colIndex, item, e, record){
         Ext.create(record.get('guiClass'),{
             bconfFilter: record
-        }).show()
+        }).show();
     },
 
     /** @method
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
      */
     copy: function(view, rowIndex, colIndex, item, e, record){
-        searchField = view.grid.down('textfield#search')
-        searchField.setValue(record.get('name'))
-        searchField.checkChange()
+        var searchField = view.grid.down('textfield#search');
+        searchField.setValue(record.get('name'));
+        searchField.checkChange();
         view.select(rowIndex);
         var store = view.getStore(),
             newRecData = Ext.clone(record.getData());
         delete newRecData.id;
         delete newRecData.extensions;
         newRecData.isCustom = true;
-
-        debugger;
-        newRec = store.add(newRecData)[0];
+        var newRec = store.add(newRecData)[0];
         newRec.isNewRecord = true;
 
         var rowediting = view.grid.findPlugin('rowediting'),
@@ -164,21 +160,20 @@ let BconfFilterGridController = {
         var store = Ext.getStore('bconffilterStore');
         record.get('extensions').forEach(function(ext){
             record.removeExtension(ext);
-        })
+        });
         view.select();
 
 
         record.drop(/* cascade */ false);
-        store.saveExtMap().then(function(){
-
-            store.sync()
+        store.saveExtensionMapping().then(function(){
+            store.sync();
         });
     },
 // endregion
     prepareFilterEdit: function(rowEditPlugin, cellContext){
         var record = cellContext.record,
             tagfield = rowEditPlugin.getEditor().down('tagfield'),
-            extensions = Array.from(this.getView().getStore().extMap.keys());
+            extensions = Array.from(this.getView().getStore().extensionMap.keys());
         tagfield.setStore(extensions);
         tagfield.changelog = {};
         //record.extensionsBeforeEdit = record.get('extensions').toString();
@@ -190,14 +185,13 @@ let BconfFilterGridController = {
      * @param {Ext.grid.CellContext} cellContext
      */
     saveEdit: async function(plugin, cellContext){
-        var ctlr = this,
-            store = Ext.getStore('bconffilterStore'),
+        var store = Ext.getStore('bconffilterStore'),
             record = cellContext.record,
             changed = Editor.util.Util.getChanged(cellContext.newValues, cellContext.originalValues);
         if(record.get('extensions').unchanged){
-            delete changed.extensions // complex value is always seen as changed
+            delete changed.extensions; // complex value is always seen as changed
         } else { // extensions changed
-            await store.saveExtMap();
+            await store.saveExtensionMapping();
         }
         //record.commit();
         if(Object.keys(changed).length){
@@ -205,8 +199,8 @@ let BconfFilterGridController = {
             record.set(changed); //QUIRK TODO check why not ausosave
             //record.commit();
             if(record.isNewRecord){
-                record.crudState = 'C'
-                record.phantom = true
+                record.crudState = 'C';
+                record.phantom = true;
                 delete record.isNewRecord;
             }
 
@@ -215,7 +209,7 @@ let BconfFilterGridController = {
                     listeners: {
                         operationcomplete: {
                             single: true,
-                            fn: function(batch, operation){
+                            fn: function(){
                                 store.getProxy().setExtraParams({});
                             }
                         }
@@ -226,7 +220,7 @@ let BconfFilterGridController = {
                  * @param {Ext.data.Batch} batch
                  * @param batchOptions
                  */
-                callback: function(batch, batchOptions){
+                callback: function(batch){
                     var success = !batch.hasException();
                     if(success){
                         record.commit();
@@ -254,9 +248,9 @@ let BconfFilterGridController = {
                     added = !changelog[extension].added;
                 delete changelog[extension];
                 if(added){
-                    affected = filter.addExtension(extension, affected, isRevert)
+                    affected = filter.addExtension(extension, affected, isRevert);
                 } else {
-                    affected = filter.removeExtension(extension, affected, isRevert)
+                    affected = filter.removeExtension(extension, affected, isRevert);
                 }
             }
         }
@@ -285,9 +279,9 @@ let BconfFilterGridController = {
             delete changelog[extension];
         }
         if(added){
-            affected = filter.addExtension(extension, affected, isRevert)
+            affected = filter.addExtension(extension, affected, isRevert);
         } else {
-            affected = filter.removeExtension(extension, affected, isRevert)
+            affected = filter.removeExtension(extension, affected, isRevert);
         }
         //TODO:this.lookup('gridview').refreshNode(filter);
         if(affected){
@@ -298,7 +292,7 @@ let BconfFilterGridController = {
         }
     },
     onClose: function(){
-        location.hash = location.hash.replace(/\/filters.*$/,'')
+        location.hash = location.hash.replace(/\/filters.*$/,'');
     }
 
 };

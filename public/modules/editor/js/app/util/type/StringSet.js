@@ -32,19 +32,19 @@ class StringSet extends Set {
     strval = ''
 
     add(v){
-        this.strval += (this.strval && ', ') + v
-        return super.add(v)
+        this.strval += (this.strval && ', ') + v;
+        return super.add(v);
     }
 
     delete(v){
-        var ret = super.delete(v)
-        this.strval = Array.from(this).join(', ')
-        return ret
+        var ret = super.delete(v);
+        this.strval = Array.from(this).join(', ');
+        return ret;
     }
 
     clear(){
-        this.strval = ''
-        return super.clear()
+        this.strval = '';
+        return super.clear();
     }
 
     /**
@@ -52,13 +52,13 @@ class StringSet extends Set {
      * @return {String}
      */
     toString(){
-        return this.strval
+        return this.strval;
     }
 
     constructor(iterable){
         super(iterable);
-        this.strval = Array.from(this).join(', ')
-        this.toJSON = this.toString
+        this.strval = Array.from(this).join(', ');
+        this.toJSON = this.toString;
     }
 }
 

@@ -256,20 +256,132 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
-     * Updates a mapping with an adjusted content
-     * @param string $content
+     * Generates the frontend-model for the extension mapping
+     * @return string
      * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
      */
-    public function updateByContent(string $content) {
-        // DEBUG
-        if($this->doDebug){ error_log('ExtensionMapping updateByContent:'."\n".$content); }
-
-        $this->parseContent($content);
-        if(!$this->hasEntries()){
-            throw new editor_Plugins_Okapi_Exception('E1405', ['bconf' => $this->bconf->getName(), 'bconfId' => $this->bconf->getId()]);
+    public function toJSON() : string {
+        $items = [];
+        // map extensions to filters
+        foreach($this->map as $extension => $identifier){
+            if(!array_key_exists($identifier, $items)){
+                $items[$identifier] = [];
+            }
+            $items[$identifier][] = $extension;
         }
+        // generate Frontend data model
+        $jsonData = [];
+        foreach($items as $identifier => $extensions){
+            if(editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)){
+                $okapiType = editor_Plugins_Okapi_Bconf_Filters::instance()->getOkapiDefaultFilterTypeById($identifier);
+                if($okapiType === NULL){
+                    // theoretically this can not happen
+                    error_log('INVALID non-embedded okapi default filter entry in extension mapping '.$this->path.' for bconf '.$this->bconf->getId());
+                } else {
+                    $jsonData[editor_Plugins_Okapi_Bconf_Filters::createIdentifier($okapiType, $identifier)] = $extensions;
+                }
+            } else {
+                $jsonData[$identifier] = $extensions;
+            }
+
+        }
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping toJSON: '."\n".print_r($jsonData, 1)); }
+
+        return json_encode($jsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Updates the extension mapping by frontend-data
+     * @param string $jsonString
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function updateByJSON(string $jsonString) {
+
+        // now we parse the sent json in
+        $jsonMap = json_decode($jsonString, true);
+        if(!$jsonMap || empty($jsonMap)){
+            throw new ZfExtended_Models_Entity_NotFoundException('No valid extension mapping sent');
+        }
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping updateByJSON: '."\n".$jsonString); }
+
+        $items = [];
+        // to keep the original order, we initialize a map from the existing map. New items then will be appended
+        foreach($this->map as $extension => $identifier){
+            if(!array_key_exists($identifier, $items)){
+                $items[$identifier] = [];
+            }
+        }
+        $customIdentifiers = [];
+        foreach($jsonMap as $identifier => $extensions){
+            $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
+            // a filter with an id that matches an okapi default-filter id will be regarded as an non-embedded default-filter
+            // the frontend must make sure, no custom filters can be created with okapi-ids as okapiId !
+            if(editor_Plugins_Okapi_Bconf_Filters::instance()->isValidOkapiDefaultFilter($idata->id)){
+                // DEBUG
+                if($this->doDebug){ error_log('ExtensionMapping updateByJSON: added okapi default identifier "'.$idata->id.'" with extensions [ '.implode(', ', $extensions).' ]'); }
+                $items[$idata->id] = $extensions;
+            } else {
+                if(editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedTranslate5Filter($idata->type, $idata->id)){
+                    // DEBUG
+                    if($this->doDebug){ error_log('ExtensionMapping updateByJSON: added embedded translate5 identifier "'.$identifier.'" with extensions [ '.implode(', ', $extensions).' ]'); }
+                    $items[$identifier] = $extensions;
+                } else {
+                    $filterEntry = $this->bconf->findCustomFilterEntry($idata->type, $idata->id);
+                    if($filterEntry === NULL){
+                        // this is a frontend error, any sent custom filters must exist in the database
+                        error_log('No custom bconf filter entry found for identifier "'.$identifier.'" with extensions [ '.implode(', ', $extensions).' ]');
+                        throw new ZfExtended_Models_Entity_NotFoundException('No custom bconf filter entry found for identifier "'.$identifier.'"');
+                    } else {
+                        if(!$this->arraysAreEqual($extensions, $filterEntry->getFileExtensions())){
+                            $filterEntry->setFileExtensions($extensions);
+                            $filterEntry->save();
+                        }
+                        // DEBUG
+                        if($this->doDebug){ error_log('ExtensionMapping updateByJSON: added embedded custom identifier "'.$identifier.'" with extensions [ '.implode(', ', $extensions).' ]'); }
+                        $items[$identifier] = $extensions;
+                        $customIdentifiers[] = $identifier;
+                    }
+                }
+            }
+        }
+        $actualCustomIdentifiers = $this->bconf->findCustomFilterIdentifiers();
+        // validate the custom filters, they must be identical !
+        if(!$this->arraysAreEqual($customIdentifiers, $actualCustomIdentifiers)){
+            error_log('ExtensionMapping updateByJSON: The sent custom filters do not match the custom filters in the DB:'."\n sent: [ ".implode(', ', $customIdentifiers)." ]\n actual: [ ".implode(', ', $actualCustomIdentifiers).' ]');
+            throw new ZfExtended_Models_Entity_NotFoundException('The sent custom filters do not match the custom filters in the DB');
+        }
+        $newMap = [];
+        foreach($items as $identifier => $extensions){
+            foreach($extensions as $extension){
+                $newMap[$extension] = $identifier;
+            }
+        }
+        if(count($newMap) < 1){
+            error_log('ExtensionMapping updateByJSON: The sent map had no valid entries: '.print_r($items, 1));
+            throw new ZfExtended_Models_Entity_NotFoundException('The sent map had no valid entries');
+        }
+        $this->map = $newMap;
         $this->flush();
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping updateByJSON: updated map: '.print_r($this->map, 1)); }
+    }
+
+    /**
+     * Just a small helper
+     * @param array $array1
+     * @param array $array2
+     * @return bool
+     */
+    private function arraysAreEqual(array $array1, array $array2) : bool {
+        if(count($array1) != count($array2)){
+            return false;
+        }
+        return(count(array_diff($array1, $array2)) === 0);
     }
 
     /**

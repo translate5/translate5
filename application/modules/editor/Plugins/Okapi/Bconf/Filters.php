@@ -240,4 +240,17 @@ class editor_Plugins_Okapi_Bconf_Filters {
         }
         return NULL;
     }
+
+    /**
+     * Retrieves the filter-type for an (non-embedded) okapi default filter
+     * @param string $id
+     * @return string|null
+     */
+    public function getOkapiDefaultFilterTypeById(string $id) : ?string {
+        $filters = $this->okapiFilters->findFilter(NULL, $id);
+        if(count($filters) === 1){
+            return $filters[0]->type;
+        }
+        return NULL;
+    }
 }

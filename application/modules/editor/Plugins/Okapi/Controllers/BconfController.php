@@ -198,8 +198,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      */
     public function saveextensionsmappingAction(){
         $this->entityLoad();
-        $extMap = $this->getRequest()->getRawBody();
+        $jsonString = $this->getRequest()->getRawBody();
         $extensionMapping = $this->entity->getExtensionMapping();
-        $extensionMapping->updateByContent($extMap);
+        $extensionMapping->updateByJSON($jsonString);
     }
 }

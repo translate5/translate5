@@ -80,6 +80,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     fields: [{
         name: 'id',
         type: 'int',
+        critical: true,
     }, {
         name: 'bconfId',
         type: 'int',
@@ -100,6 +101,10 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         type: 'string',
     }, {
         name: 'mimeType',
+        type: 'string',
+    }, {
+        /* the identifier is unique and is used e.g. to connect the extension-mapping with the store */
+        name: 'identifier',
         type: 'string',
     }, {
         name: 'editable',
@@ -174,17 +179,16 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
      * @param {Boolean} isRevert Inidcates if to set dirty or not
      */
     addExtension: function(extension, from, isRevert = false, showMsg = true){
-        var extMap = this.store.extMap,
-            filters = Editor.util.Util.getUnfiltered(this.store),
+        var filters = Editor.util.Util.getUnfiltered(this.store),
             msg = `Added extension <i>${extension}</i>`;
 
-        from = (from !== undefined) ? from : filters.getByKey(extMap.get(extension));
+        from = (from !== undefined) ? from : filters.getByKey(this.extensionMap.get(extension));
         if(from){
             from.removeExtension(extension, null, isRevert, !showMsg);
             msg += ` from '${from.get('name')}'`;
         }
         this.set('extensions', {op: 'add', extension}, {dirty: !isRevert});
-        extMap.set(extension, this.id);
+        this.extensionMap.set(extension, this.get('identifier'));
 
         if(showMsg){
             Editor.MessageBox.addInfo(msg, 2);
@@ -202,7 +206,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         var msg = `Removed extension <i>${extension}</i>`
         this.set('extensions', {op: 'delete', extension}, {dirty: !isRevert});
 
-        this.extMap.delete(extension);
+        this.extensionMap.delete(extension);
         // TODO: defaults 'to' receiver based on current system default (via global varaible?)
         if(to){
             to.addExtension(extension, null, isRevert, !showMsg);

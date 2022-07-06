@@ -82,18 +82,16 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
             uploadBconf: `<?= $translate->_('Bconf hochladen...'); ?>`,
         },
     });
+    /* TODO BCONF */
     Ext.define('Editor.locale.plugins.Okapi.view.BconfFilterGrid', {
         override: 'Editor.plugins.Okapi.view.BconfFilterGrid',
         text_cols: {
-            customFilterName: '#UT#Customized Okapi Filter Type',
             name: '#UT#Name',
-            extensions: '#UT#Extensions',
-            description: '#UT#Description',
-            action: '#UT#Actions',
-            notes: '#UT#Notes',
-            upload: '#UT#upload',
-            srx: '#UT#SRX',
-            pipeline: '#UT#Pipeline',
+            extensions: '#UT#Dateitypen',
+            description: '#UT#Beschreibung',
+            mime: '#UT#MIME-Typ',
+            identifier: '#UT#Kennung',
+            actions: '#UT#Aktionen'
         },
         strings: {
             configuration: '#UT#Configur Filter',

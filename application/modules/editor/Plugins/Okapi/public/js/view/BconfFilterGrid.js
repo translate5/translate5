@@ -63,18 +63,15 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     helpSection: 'useroverview',
     cls: 'actionColGrid',
     text_cols: {
-        customFilterName: '#UT#Customized Okapi Filter Type',
         name: '#UT#Name',
-        extensions: '#UT#Extensions',
-        description: '#UT#Description',
-        action: '#UT#Actions',
-        notes: '#UT#Notes',
-        upload: '#UT#upload',
-        srx: '#UT#SRX',
-        pipeline: '#UT#Pipeline',
+        extensions: '#UT#Dateitypen',
+        description: '#UT#Beschreibung',
+        mime: '#UT#MIME-Typ',
+        identifier: '#UT#Kennung',
+        actions: '#UT#Aktionen'
     },
     strings: {
-        configuration: '#UT#Configur Filter',
+        configuration: '#UT#Filter konfigurieren',
         remove: '#UT#Remove',
         copy: '#UT#Copy',
         upload: '#UT#Upload',
@@ -88,10 +85,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     },
     viewConfig: {
         getRowClass: function(bconf){
+            var classes = [];
             if(!bconf.get('editable')){
-                return 'not-editable';
+                classes.push('t5noneditable');
             }
-            return '';
+            if(bconf.get('isCustom')){
+                classes.push('t5default');
+            }
+            return classes.join(' ');
         },
         reference: 'gridview'
     },
@@ -163,10 +164,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     text: me.text_cols.name
                 }, {
                     xtype: 'gridcolumn',
-                    dataIndex: 'okapiId',
+                    dataIndex: 'identifier',
                     width: 300,
-
-                    text: 'okapiId'
+                    text: me.text_cols.identifier
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'mimeType',
@@ -174,7 +174,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     editor: {
                         xtype: 'textfield'
                     },
-                    text: 'mimeType'
+                    text: me.text_cols.mime,
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'extensions',
@@ -190,7 +190,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                      */
                     editor: { //TODO: add tooltip (tpl?) with current filter of extension
                         xtype: 'tagfield',
-                        itemId: 'extMap',
+                        itemId: 'extensionMap',
                         queryMode: 'local',
                         createNewOnEnter: true,
                         createNewOnBlur: true,
@@ -205,14 +205,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     editor: {
                         xtype: 'textfield'
                     },
-                    text: me.text_cols.notes
+                    text: me.text_cols.description
                 }, {
                     xtype: 'actioncolumn',
                     cellFocusable: false, // prevent actionItemCLick from entering RowEditMode
                     width: 3 * 28 + 8 + 28,
                     stateId: 'okapiGridActionColumn',
                     align: 'center',
-                    text: me.text_cols.action,
+                    text: me.text_cols.actions,
                     items: Ext.Array.filter([{
                         tooltip: me.strings.configuration,
                         isAllowedFor: 'bconfEdit',

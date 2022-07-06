@@ -264,21 +264,21 @@ Ext.define('Editor.util.Util', {
                         let contentType = (response.headers.get('Content-Type') || '').split('/').pop();
                         switch(contentType){
                             case 'json':
-                                response.responseJson = contentLength ? await response.json() : {}
+                                response.responseJson = contentLength ? await response.json() : {};
                                 if(response.status !== 200){
-                                    response.responseText = JSON.stringify(response.responseJson)
+                                    response.responseText = JSON.stringify(response.responseJson);
                                 }
                                 break;
                             case 'xml':
-                                response.responseText = contentLength ? await response.text() : ''
+                                response.responseText = contentLength ? await response.text() : '';
                                 response.responseXML = new window.DOMParser().parseFromString(response.responseText, 'text/xml');
                                 if(response.status !== 200){
-                                    delete response.responseText // QUIRK: match ServerException.handleFailedRequest
+                                    delete response.responseText; // QUIRK: match ServerException.handleFailedRequest
                                 }
                                 break;
                             case 'text':
                             default:
-                                response.responseText = contentLength ? await response.text() : ''
+                                response.responseText = contentLength ? await response.text() : '';
                         }
                     }
                     options.url = url;
@@ -288,7 +288,7 @@ Ext.define('Editor.util.Util', {
 
                 var headers = options.headers || (options.headers = new Headers());
                 if(!headers.has('Accept')){
-                    headers.append('Accept', 'application/json')
+                    headers.append('Accept', 'application/json');
                 }
                 if(options.formData){
                     var body = options.body = new FormData();
@@ -337,7 +337,7 @@ Ext.define('Editor.util.Util', {
             return ret;
         },
         isIterable: function(value, includeString = false){
-            return typeof value[Symbol.iterator] === 'function' && (typeof value !== 'string' || includeString)
+            return typeof value[Symbol.iterator] === 'function' && (typeof value !== 'string' || includeString);
         },
         /***
          * Check if the given language id/string is empty.

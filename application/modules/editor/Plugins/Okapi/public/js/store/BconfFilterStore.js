@@ -27,7 +27,7 @@
 
 /**
  * Store for the so called BconfFilters aka fprms inside a Bconf
- * @property {Map} extMap Holds the information of extensions-mapping.txt inside a Bconf
+ * @property {Map} extensionMap Holds the information of extensions-mapping.txt inside a Bconf
  * @extends Ext.data.Store
  */
 
@@ -42,7 +42,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
     autoLoad: true,
     autoSync: false, // Needed to edit the name before saving!
     pageSize: 0,
-    extMap: null,
+    extensionMap: null,
     defaultsFilter: {
         id: 'defaultsFilter',
         filterFn: function(rec){
@@ -57,36 +57,56 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
         return this.callParent([config]);
     },
     /**
-     * @param extMapString Consist of lines like '.txt\ttokf_plaintext'
+     * @param extensionMapping: array of mapping-items: { identifier => [ extension ] }
      */
-    setExtMapString: function(extMapString){
-        var store = this,
-            matches = Array.from(extMapString.matchAll(/^\.(.*)\t(.*)$/gm), match => match.slice(1, 3)).sort(),
-            bconffilters = Editor.util.Util.getUnfiltered(store),
-            extMap = new Map();
-        bconffilters.items.forEach(f => f.get('extensions').clear());
-        matches.forEach(function([extension, okapiId]){
-            var filter = bconffilters.getByKey(okapiId);
-            if(filter){
-                filter.get('extensions').add(extension);
-            } else { // okapiId in extensions-mapping not contained in Bconf
-                store.add([{
-                    bconfId: 0,
-                    okapiId,
-                    name: '<i>#UT#Unknown filter</i>',
-                    description: '#UT#Unknown filter from extensions-mapping.txt',
-                }])[0].get('extensions').add(extension);
+    setExtensionMapping: function(extensionMappingData){
+        var me = this,
+            storeItems = Editor.util.Util.getUnfiltered(this),
+            identifierMap = JSON.parse(extensionMappingData),
+            silent = { silent: true, dirty: false },
+            identifier;
+        me.extensionMap = new Map();
+
+        // provide our items with the needed extensions
+        storeItems.each(function(item){
+            identifier = item.get('identifier');
+            if(identifierMap.hasOwnProperty(identifier)){
+                item.set('extensions', identifierMap[identifier], silent);
+            } else {
+                item.set('extensions', [], silent);
             }
-            extMap.set(extension, okapiId);
         });
+        // generate the extension => identifier map
+        for(identifier in identifierMap){
+            identifierMap[identifier].forEach(extension => {
+                me.extensionMap.set(extension, identifier);
+            });
+        }
         // Set on model for easy retrieval, as default BconfFilters are bound to DefaultBconfFilterStore
         // @see https://docs.sencha.com/extjs/6.2.0/classic/Ext.data.Model.html#property-store
-        store.getModel().prototype.extMap = extMap;
-        store.extMap = extMap;
+        this.getModel().prototype.extensionMap = me.extensionMap;
     },
 
-    saveExtMap: function(){
-        var store = this;
+    /**
+     * Creates the extension mapping to be sent back to the store
+     */
+    createExtensionMappingData: function(){
+        var identifierMap = {};
+        this.extensionMap.forEach((identifier, extension) => {
+            if(identifierMap.hasOwnProperty(identifier)){
+                identifierMap[identifier].push(extension);
+            } else {
+                identifierMap[identifier] = [ extension ];
+            }
+        });
+        // TODO REMOVE
+        console.log('createExtensionMappingData: ', JSON.stringify(identifierMap));
+
+        return JSON.stringify(identifierMap);
+    },
+
+    saveExtensionMapping: function(){
+        var me = this;
         return new Promise(function(resolve, reject){
             Ext.Ajax.request({
                 url: Editor.data.restpath + 'plugins_okapi_bconf/saveextensionsmapping',
@@ -94,11 +114,9 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
                     'Content-Type': 'text/tab-separated-values'
                 },
                 params: {
-                    id: store.getProxy().bconfId
+                    id: me.getProxy().bconfId
                 },
-                rawData: Array.from(store.extMap.entries()).sort()
-                    .map(ext_okapiId => '.' + ext_okapiId.join('\t'))
-                    .join('\n')
+                rawData: me.createExtensionMappingData()
             }).then(resolve, res => Editor.app.getController('ServerException').handleException(res));
         });
     }

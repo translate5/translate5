@@ -169,6 +169,8 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
         foreach($this->getRowsByBconfId($bconfId) as $row){
             unset($row['extensions']);
             unset($row['hash']);
+            // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
+            $row['identifier'] = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($row['okapiType'], $row['okapiId']);
             $row['editable'] = true;
             $row['clonable'] = true;
             $row['isCustom'] = true;
@@ -217,6 +219,20 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
     }
 
     /**
+     * @param string $okapiType
+     * @param string $okapiId
+     * @param int $bconfId
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function loadByTypeAndIdForBconf(string $okapiType, string $okapiId, int $bconfId) {
+        $select = $this->db->select()
+            ->where('bconfId = ?', $bconfId)
+            ->where('okapiType = ?', $okapiType)
+            ->where('okapiId = ?', $okapiId);
+        $this->loadRowBySelect($select);
+    }
+
+    /**
      * Removes the passed Extension from the entry.
      * If there are no extensions left then, it will be removed (return-value: false) or saved (return-value: true)
      * @param string[] $extensionsToRemove
@@ -249,5 +265,18 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
      */
     public function getHighestId() : int {
         return intval($this->db->getAdapter()->fetchOne('SELECT MAX(id) FROM '.$this->db->info(Zend_Db_Table_Abstract::NAME)));
+    }
+
+    /**
+     * Retrieves the custom filter identifiers for the given bconf
+     * @param int $bconfId
+     * @return string[]
+     */
+    public function getIdentifiersForBconf(int $bconfId) : array {
+        $identifiers = [];
+        foreach($this->getRowsByBconfId($bconfId) as $rowData){
+            $identifiers[] = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($rowData['okapiType'], $rowData['okapiId']);
+        }
+        return $identifiers;
     }
 }

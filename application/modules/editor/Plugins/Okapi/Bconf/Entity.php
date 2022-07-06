@@ -506,8 +506,8 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
 
     /**
      * Adds a Bconf Filter to the DB
-     * @param string $type
-     * @param string $id
+     * @param string $okapiType
+     * @param string $okapiId
      * @param string $name
      * @param string $description
      * @param array $extensions
@@ -519,17 +519,17 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function addCustomFilterEntry(string $type, string $id, string $name, string $description, array $extensions, string $hash, string $mimeType=NULL) : editor_Plugins_Okapi_Bconf_Filter_Entity {
+    public function addCustomFilterEntry(string $okapiType, string $okapiId, string $name, string $description, array $extensions, string $hash, string $mimeType=NULL) : editor_Plugins_Okapi_Bconf_Filter_Entity {
         if(empty($extensions)){
             throw new ZfExtended_BadMethodCallException('A Okapi Bconf custom filter can not be added without related file extensions');
         }
         if($mimeType === NULL){
-            $mimeType = editor_Plugins_Okapi_Bconf_Filter_Okapi::findMimeType($type);
+            $mimeType = editor_Plugins_Okapi_Bconf_Filter_Okapi::findMimeType($okapiType);
         }
         $filterEntity = new editor_Plugins_Okapi_Bconf_Filter_Entity();
         $filterEntity->setBconfId($this->getId());
-        $filterEntity->setOkapiType($type);
-        $filterEntity->setOkapiId($id);
+        $filterEntity->setOkapiType($okapiType);
+        $filterEntity->setOkapiId($okapiId);
         $filterEntity->setMimeType($mimeType);
         $filterEntity->setName($name);
         $filterEntity->setDescription($description);
@@ -538,9 +538,34 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $filterEntity->save();
 
         // DEBUG
-        if($this->doDebug){ error_log('BCONF: Added custom filter entry "'.$name.'" '.$type.'@'.$id.' to bconf '.$this->getId()); }
+        if($this->doDebug){ error_log('BCONF: Added custom filter entry "'.$name.'" '.$okapiType.'@'.$okapiId.' to bconf '.$this->getId()); }
 
         return $filterEntity;
+    }
+
+    /**
+     * Finds a custom bconf filter entity
+     * @param string $okapiType
+     * @param string $okapiId
+     * @return editor_Plugins_Okapi_Bconf_Filter_Entity|null
+     */
+    public function findCustomFilterEntry(string $okapiType, string $okapiId) : ?editor_Plugins_Okapi_Bconf_Filter_Entity {
+        try {
+            $filterEntity = new editor_Plugins_Okapi_Bconf_Filter_Entity();
+            $filterEntity->loadByTypeAndIdForBconf($okapiType, $okapiId, $this->getId());
+            return $filterEntity;
+        } catch(ZfExtended_Models_Entity_NotFoundException $e){
+            return NULL;
+        }
+    }
+
+    /**
+     * Retrieves a list with the custom filter identifiers that are related
+     * @return string[]
+     */
+    public function findCustomFilterIdentifiers() : array {
+        $filterEntity = new editor_Plugins_Okapi_Bconf_Filter_Entity();
+        return $filterEntity->getIdentifiersForBconf($this->getId());
     }
 
     /**

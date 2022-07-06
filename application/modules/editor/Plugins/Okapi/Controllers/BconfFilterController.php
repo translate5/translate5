@@ -67,7 +67,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         if(!$this->view->metaData){
             $this->view->metaData = new stdClass();
         }
-        $this->view->metaData->{'extensions-mapping'} = file_get_contents($bconf->getExtensionMappingPath());
+        $this->view->metaData->extensionMapping = $bconf->getExtensionMapping()->toJSON();
     }
 
     /**

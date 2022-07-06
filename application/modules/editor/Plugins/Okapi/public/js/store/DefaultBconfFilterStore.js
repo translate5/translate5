@@ -43,6 +43,5 @@ Ext.define('Editor.plugins.Okapi.store.DefaultBconfFilterStore', {
         }
     },
     autoLoad: true,
-    pageSize: 0,
-    idProperty: 'id',
+    pageSize: 0
 });
