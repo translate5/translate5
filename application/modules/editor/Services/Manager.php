@@ -280,10 +280,19 @@ class editor_Services_Manager {
             catch(editor_Services_Exceptions_NoService | editor_Services_Connector_Exception | ZfExtended_BadGateway $e) {
                 $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service');
                 /* @var $logger ZfExtended_Logger */
-                $e->addExtraData([
+
+                $extraData = [
                     'languageResource' => $languageResource,
                     'task' => $task,
-                ]);
+                ];
+
+                //UGLY: remove on refactoring of ZfExtended_BadGateway
+                if($e instanceof ZfExtended_BadGateway) {
+                    $this->setErrors(array_merge($e->getErrors(), $extraData));
+                }
+                else {
+                    $e->addExtraData($extraData);
+                }
                 $event = $logger->exception($e,[
                     'level' => $logger::LEVEL_WARN
                 ], true);
