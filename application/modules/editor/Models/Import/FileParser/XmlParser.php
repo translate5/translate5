@@ -523,7 +523,7 @@ class editor_Models_Import_FileParser_XmlParser {
             return true;
         }
         
-        if(preg_match('/([^\^=$*]+)([^\^=$*]{0,1}=)([^=]+)$/', $filter, $parts)) {
+        if(preg_match('/([^\^=$*!]+)([^\^=$*!]{0,1}=)([^=]+)$/', $filter, $parts)) {
             $attribute = $parts[1];
             $operator = $parts[2];
             $comparator = $parts[3];
@@ -532,6 +532,7 @@ class editor_Models_Import_FileParser_XmlParser {
             //empty filter is excluded above, so reaching here can mean only the "existence" operator
             $attribute = $filter;
             $operator = 'has';
+            $comparator = null;
         }
 
         //since the attributes are stored normalized (lower case), the filter attribute must also be lowercase
@@ -551,7 +552,11 @@ class editor_Models_Import_FileParser_XmlParser {
             // tag[attr=foo] attribute value equals
             case '=':
                 return $value == $comparator;
-                
+
+            // tag[attr!=foo] attribute value is not equal
+            case '!=':
+                return $value != $comparator;
+
             // tag[attr^=foo] attribute value starts with
             case '^=':
                 return mb_strpos($value, $comparator) === 0;

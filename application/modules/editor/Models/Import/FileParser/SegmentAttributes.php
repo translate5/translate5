@@ -49,7 +49,7 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * the segments matchrate type, defaults to 'import'
      * @var string
      */
-    public $matchRateType = 'import'; //FIXME make me to come from MatchRateType class
+    public $matchRateType = 'import';
     
     /**
      * flag if the segments was autopropagated or not, defaults to false
@@ -142,6 +142,7 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * Additional string length of the string between the mrk tag containing that segment and next mrk, or the length of the content after the last mrk tag
      * This value must be added to the calculated length of each segment on each segment update and on the fly in the frontend
      * @var integer
+     * @deprecated not used anymore for newly imported tasks - still needed for legacy tasks
      */
     public $additionalMrkLength = 0;
     
