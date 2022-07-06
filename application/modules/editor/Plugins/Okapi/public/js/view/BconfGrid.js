@@ -246,6 +246,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
             {
                 xtype: 'actioncolumn',
                 align: 'center',
+                itemId: 'bconfFilters',
                 menuDisabled: true,
                 width: 60,
                 text: 'Filters',//me.text_cols.filters,

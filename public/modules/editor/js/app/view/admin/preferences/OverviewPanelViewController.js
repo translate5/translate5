@@ -36,6 +36,8 @@ Ext.define('Editor.view.admin.preferences.OverviewPanelViewController', {
     routes: {
         'preferences': 'onPreferencesRoute',
         'preferences/:tab' :'onPreferencesRoute',
+        'preferences/:tab/:selectionId' :'onPreferencesRoute',
+        'preferences/:tab/:selectionId/:action' :'onPreferencesRoute',
     },
     listen:{
         component: {
@@ -55,11 +57,11 @@ Ext.define('Editor.view.admin.preferences.OverviewPanelViewController', {
             this.redirectTo('preferences/adminConfigGrid|config/'+confGrid.getController().getSearchValue());
         }
     },
-    onPreferencesRoute: function(tab, entityId) {
+    onPreferencesRoute: function(tab) {
         var v = this.getView();
         Editor.app.openAdministrationSection(this.getView());
         if(tab) {
-            v.setActiveTab(v.down('#'+tab));
+            v.setActiveTab(v.down('#' + tab));
         }
     },
     /**
@@ -67,7 +69,10 @@ Ext.define('Editor.view.admin.preferences.OverviewPanelViewController', {
      * @param tabpanel {Ext.tab.Panel}
      * @param newCard {Ext.panel.Panel}
      */
-    onTabChange: function(tabpanel, newCard) {
-        this.redirectTo('preferences/'+newCard.getItemId());
+    onTabChange: function(tabpanel, newCard){
+        var newRoute = 'preferences/' + newCard.getItemId();
+        if(!Ext.util.History.getToken().startsWith(newRoute)){
+            this.redirectTo(newRoute);
+        }
     }
 });

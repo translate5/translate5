@@ -362,20 +362,32 @@ Ext.define('Editor.util.Util', {
         trimLastSlash: function(str){
             return str.substring(0, str.lastIndexOf('/'));
         },
-
-        awaitRoute: async function(route){
-            var ret = new Promise(function(resolve, reject){
-                Ext.util.History.on('change', function(token){
-                    debugger;
-                    if(token === route){
-                        resolve()
-                    } else {
-                        reject()
-                    }
-                }, this, {single: true})
-            })
-            Editor.app.redirectTo(route);
-            return ret;
+        parentRoute: async function(route){
+            route = route || Ext.util.History.getToken();
+            var parentRoute = Editor.util.Util.trimLastSlash(route);
+            Editor.app.redirectTo(parentRoute);
         },
+        awaitStore: async function(store){
+            return store.isLoaded() || await new Promise(function(resolve, reject){
+                store.on('load', function(store, records, successful){
+                        resolve()
+                }, this, {single: true});
+            });
+        },
+        awaitSelection: async function(grid, recId){
+            return (!recId || grid.selection?.id == recId) && grid.selection || await new Promise(function(resolve, reject){
+                grid.on('selectionchange', function(store, records, successful){
+                    resolve(grid.selection)
+                }, this, {single: true});
+            });
+        },
+
+        closeWindows: function(){
+            var win;
+            while(win = Ext.WindowManager.getActive()) {
+                win.close && win.close() || win.hide && win.hide();
+            }
+        }
+
     }
 });

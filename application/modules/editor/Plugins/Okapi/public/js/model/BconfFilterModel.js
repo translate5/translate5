@@ -24,7 +24,9 @@
 
  END LICENSE AND COPYRIGHT
  */
-
+/**
+ * {@link editor_Plugins_Okapi_Bconf_Filter_Entity::getGridRowsByBconfId}
+ */
 Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     extend: 'Ext.data.Model',
     requires: ['Editor.util.type.StringSet'],

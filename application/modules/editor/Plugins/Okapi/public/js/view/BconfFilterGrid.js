@@ -37,6 +37,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         'Editor.plugins.Okapi.store.BconfFilterStore'
     ],
     alias: 'widget.bconffiltergrid',
+    id: 'bconfFilterGrid',
     controller: 'bconffilterGridController',
     config: {
         /**
@@ -217,7 +218,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         isAllowedFor: 'bconfEdit',
                         isDisabled: 'isEditDisabled',
                         glyph: 'f044@FontAwesome5FreeSolid',
-                        handler: 'editfilter'
+                        handler: 'editFPRM'
                     }, {
                         tooltip: me.strings.configuration,
                         isAllowedFor: 'isFromTranslate5',

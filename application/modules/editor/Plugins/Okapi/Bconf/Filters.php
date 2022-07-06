@@ -41,7 +41,11 @@ class editor_Plugins_Okapi_Bconf_Filters {
      * All Filters that have a GUI must be defined here
      * @var string[]
      */
-    const GUIS = [];
+    const GUIS = [
+        'okf_html',
+        'okf_idml',
+        'okf_openxml'
+    ];
 
     /**
      * @var editor_Plugins_Okapi_Bconf_Filters|null

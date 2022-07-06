@@ -53,7 +53,8 @@ let BconfFilterGridController = {
         '#': { // # references the view
             beforeedit: 'prepareFilterEdit',
             edit: 'saveEdit',
-            canceledit: 'cancelEdit'
+            canceledit: 'cancelEdit',
+            close: 'onClose'
         },
 
         'textfield#search': {
@@ -74,8 +75,9 @@ let BconfFilterGridController = {
         return !record.data.isCustom;
     },
 
-    isEditDisabled: function(/*view, rowIndex, colIndex, item, record*/){
-        return true;
+    isEditDisabled: function(view, rowIndex, colIndex, item, record){
+        // TODO BCONF
+        return !record.get('guiClass');
     },
 
     //endregion
@@ -119,6 +121,13 @@ let BconfFilterGridController = {
         }
     },
 // region grid columns
+    /** @method
+     * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
+     */
+    editFPRM: function(view, rowIndex, colIndex, item, e, record){
+        Ext.create(record.get('guiClass')).show()
+    },
+
     /** @method
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
      */
@@ -287,6 +296,9 @@ let BconfFilterGridController = {
             tagfield.changelog[extension] = {added, filter, affected}
         }
     },
+    onClose: function(){
+        location.hash = location.hash.replace(/\/filters.*$/,'')
+    }
 
 };
 Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', BconfFilterGridController);
