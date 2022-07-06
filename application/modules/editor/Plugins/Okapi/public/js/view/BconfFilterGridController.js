@@ -76,8 +76,7 @@ let BconfFilterGridController = {
     },
 
     isEditDisabled: function(view, rowIndex, colIndex, item, record){
-        // TODO BCONF
-        return !record.get('guiClass');
+        return !record.get('guiClass') || record.crudState === 'C';
     },
 
     //endregion
@@ -125,7 +124,9 @@ let BconfFilterGridController = {
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
      */
     editFPRM: function(view, rowIndex, colIndex, item, e, record){
-        Ext.create(record.get('guiClass')).show()
+        Ext.create(record.get('guiClass'),{
+            bconfFilter: record
+        }).show()
     },
 
     /** @method
@@ -137,12 +138,12 @@ let BconfFilterGridController = {
         searchField.checkChange()
         view.select(rowIndex);
         var store = view.getStore(),
-            newRecData = {
-                name: record.get('name'),
-                //name:'',
-                okapiId: record.get('okapiId').replace(/@.*$/, '') + '@' + location.host + '-' + Date.now(),
-            };
+            newRecData = Ext.clone(record.getData());
+        delete newRecData.id;
+        delete newRecData.extensions;
+        newRecData.isCustom = true;
 
+        debugger;
         newRec = store.add(newRecData)[0];
         newRec.isNewRecord = true;
 

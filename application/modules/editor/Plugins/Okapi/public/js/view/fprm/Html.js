@@ -28,6 +28,17 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Html', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
 
     formItems: [{
-        xtype:'textarea',
-    }]
+        xtype: 'textarea',
+        width: '100%',
+        height: '100%',
+        name: 'yaml'
+    }],
+
+    parseFprm(fprm){
+       return {yaml:fprm}
+    },
+
+    compileFprm: function(){
+        return this.down('[name=yaml]').getValue()
+    }
 })
