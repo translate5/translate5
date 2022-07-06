@@ -89,7 +89,9 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
     }
     
-    
+    public static function registerApplet(){
+    }
+
     public function _initController()
     {
         $this->front = Zend_Controller_Front::getInstance();
