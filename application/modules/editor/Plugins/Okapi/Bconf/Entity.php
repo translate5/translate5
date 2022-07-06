@@ -191,6 +191,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $validation = new editor_Plugins_Okapi_Bconf_Validation($this);
         if($validation->validate()){
             if(!$validation->wasTestable()){
+                // we generate a warning when a bconf could not be validated properly (what rarely can happen)
                 $logger = Zend_Registry::get('logger')->cloneMe('editor.okapi.bconf');
                 $logger->warn(
                     'E1408',
@@ -202,6 +203,20 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
             $this->delete();
             throw new editor_Plugins_Okapi_Exception('E1408', ['bconf' => $name, 'details' => $validation->getValidationError()]);
         }
+    }
+
+    /**
+     * Validates the bconf. Returns NULL, if the bconf is valid, otherwise an error why it is invalid
+     * @return string|null
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function validate() : ?string {
+        $validation = new editor_Plugins_Okapi_Bconf_Validation($this);
+        if($validation->validate()){
+            return NULL;
+        }
+        return $validation->getValidationError();
     }
 
     /**
