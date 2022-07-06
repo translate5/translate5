@@ -25,6 +25,24 @@
  END LICENSE AND COPYRIGHT
  */
 
+/**
+ * Represents a bconf entry of the database or of the static default-bconf stores.
+ * Note, that the default bconfs will have "virtual" ids that start 1000000 above the database based entries
+ *
+ * Model like
+ * {
+ *  "id": 1000061,
+ *  "okapiType": "okf_openoffice",
+ *  "okapiId": "translate5",
+ *  "name": "t5 OpenOffice.org Documents",
+ *  "description": "translate5 adjusted filter for OpenOffice.org documents",
+ *  "mime": "application/x-openoffice",
+ *  "editable": false,
+ *  "clonable": true,
+ *  "isCustom": false,
+ *  "guiClass": ""
+ * }
+ */
 Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     extend: 'Ext.data.Model',
     requires: ['Editor.util.type.StringSet'],
@@ -53,13 +71,12 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         setBconfId: function(bconfId){
             var proxy = this;
             proxy.getModel().getField('bconfId').defaultValue = proxy.bconfId = bconfId;
-            proxy.api.read = proxy.getUrl() + '?bconfId=' + bconfId
+            proxy.api.read = proxy.getUrl() + '?bconfId=' + bconfId;
         },
     },
-    idProperty: 'okapiId',
     fields: [{
-        name: 'okapiId',
-        type: 'string',
+        name: 'id',
+        type: 'int',
     }, {
         name: 'bconfId',
         type: 'int',
@@ -67,52 +84,77 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         critical: true,
         defaultValue: 0 /** @see self.proxy.setBconfId */
     }, {
+        name: 'okapiType',
+        type: 'string',
+    }, {
+        name: 'okapiId',
+        type: 'string',
+    }, {
+        name: 'name',
+        type: 'string',
+    }, {
+        name: 'description',
+        type: 'string',
+    }, {
+        name: 'mime',
+        type: 'string',
+    }, {
+        name: 'editable',
+        type: 'bool',
+        defaultValue: false,
+        persist: false
+    }, {
+        name: 'clonable',
+        type: 'bool',
+        defaultValue: false,
+        persist: false
+    }, {
         name: 'isCustom',
         type: 'bool',
         defaultValue: true,
         persist: false
     }, {
-        name: 'description',
-        type: 'string'
+        name: 'guiClass',
+        type: 'string',
+        defaultValue: '',
+        persist: false
     },
+    /**
+     * @readonly This models a 1:n relation. To manipulate, retrieve value via .get() and use
+     * @see StringSet
+     * @property {bool} unchanged Flag that shows if extensions were changed during an edit
+     * @link BconfFilterGridController.prepareFilterEdit,saveEdit,cancelEdit
+    */
+    {
+        name: 'extensions',
+        persist: true, // Normal saving causes many requests
         /**
-         * @readonly This models a 1:n relation. To manipulate, retrieve value via .get() and use
-         * @see StringSet
-         * @property {bool} unchanged Flag that shows if extensions were changed during an edit
-         * @link BconfFilterGridController.prepareFilterEdit,saveEdit,cancelEdit
+         * Only allow initializing, changes will be handled by
+         * Must always create new Set for change detection
+         * @see Editor.plugins.Okapi.model.BconfFilterModel.addExtension
+         * @see Editor.plugins.Okapi.model.BconfFilterModel.removeExtension
+         * @return {StringSet}
          */
-        {
-            name: 'extensions',
-            persist: true, // Normal saving causes many requests
-            /**
-             * Only allow initializing, changes will be handled by
-             * Must always create new Set for change detection
-             * @see Editor.plugins.Okapi.model.BconfFilterModel.addExtension
-             * @see Editor.plugins.Okapi.model.BconfFilterModel.removeExtension
-             * @return {StringSet}
-             */
-            convert: function(v, rec){ // null is passed after saving the record
-                if(v && v.op){ // Special handler with op key
-                    var set = new StringSet(rec.data[this.name])
-                    set[v.op](v.extension)
-                    return set
-                } else {
-                    var array = Ext.isString(v) ? v.split(/[,.\s]+/) : Ext.Array.from(v)
-                    return new StringSet(array);
-                }
-            },
-            serialize: function(v){
-                return v.toString();
-            },
-            isEqual: function(a, b){
-                return a.toString() === b.toString();
-            },
-
+        convert: function(v, rec){ // null is passed after saving the record
+            if(v && v.op){ // Special handler with op key
+                var set = new StringSet(rec.data[this.name]);
+                set[v.op](v.extension);
+                return set;
+            } else {
+                var array = Ext.isString(v) ? v.split(/[,.\s]+/) : Ext.Array.from(v);
+                return new StringSet(array);
+            }
         },
-    ],
+        serialize: function(v){
+            return v.toString();
+        },
+        isEqual: function(a, b){
+            return a.toString() === b.toString();
+        },
+    }],
     isValid: function(){
-        return this.get('isCustom') // don't save default filters
-            && this.get('bconfId') > 0; // don't save unknow filters from extensions-mapping
+        return this.get('isCustom') && // don't save default filters
+            (this.get('bconfId') > 0); // don't save unknow filters from extensions-mapping
     },
     /**
      * Return a displayname for the given id
@@ -133,19 +175,19 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
             filters = Editor.util.Util.getUnfiltered(this.store),
             msg = `Added extension <i>${extension}</i>`;
 
-        from = (from !== undefined) ? from : filters.getByKey(extMap.get(extension))
+        from = (from !== undefined) ? from : filters.getByKey(extMap.get(extension));
         if(from){
             from.removeExtension(extension, null, isRevert, !showMsg);
-            msg += ` from '${from.get('name')}'`
+            msg += ` from '${from.get('name')}'`;
         }
-        this.set('extensions', {op: 'add', extension}, {dirty: !isRevert})
-        extMap.set(extension, this.id)
+        this.set('extensions', {op: 'add', extension}, {dirty: !isRevert});
+        extMap.set(extension, this.id);
 
         if(showMsg){
-            Editor.MessageBox.addInfo(msg, 2)
+            Editor.MessageBox.addInfo(msg, 2);
         }
         if(from){
-            return from
+            return from;
         }
     },
     /**
@@ -154,19 +196,18 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} to
      */
     removeExtension: function(extension, to, isRevert, showMsg = true){
-        var filters = Editor.util.Util.getUnfiltered(this.store),
-            msg = `Removed extension <i>${extension}</i>`
-        this.set('extensions', {op: 'delete', extension}, {dirty: !isRevert})
+        var msg = `Removed extension <i>${extension}</i>`
+        this.set('extensions', {op: 'delete', extension}, {dirty: !isRevert});
 
-        this.extMap.delete(extension)
+        this.extMap.delete(extension);
         // TODO: defaults 'to' receiver based on current system default (via global varaible?)
         if(to){
             to.addExtension(extension, null, isRevert, !showMsg);
-            msg += ` and added to '${to.get('name')}' `
+            msg += ` and added to '${to.get('name')}' `;
         }
         if(showMsg){
-            Editor.MessageBox.addInfo(msg, 2)
+            Editor.MessageBox.addInfo(msg, 2);
         }
         return to === null ? undefined : to;
-    },
+    }
 });

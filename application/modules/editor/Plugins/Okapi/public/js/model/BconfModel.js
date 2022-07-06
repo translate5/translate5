@@ -25,6 +25,17 @@
  END LICENSE AND COPYRIGHT
  */
 
+/**
+ * Represents a bconf entry of the database. Model like
+ * {
+ *  "id": "20",
+ *  "customerId": null,
+ *  "name": "Translate5-Standard",
+ *  "description": "The default .bconf used for file imports unless another one is configured",
+ *  "isDefault": "1",
+ *  "versionIdx": "2"
+ *  }
+ */
 Ext.define('Editor.plugins.Okapi.model.BconfModel', {
     extend: 'Ext.data.Model',
     alias: 'model.BconfModel',
@@ -49,7 +60,16 @@ Ext.define('Editor.plugins.Okapi.model.BconfModel', {
         type: 'int',
         reference: 'Editor.model.admin.Customer',
     }, {
+        name: 'name',
+        type: 'string',
+    }, {
+        name: 'description',
+        type: 'string',
+    }, {
         name: 'isDefault', // global setting
         type: 'boolean'
+    }, {
+        name: 'versionIdx',
+        type: 'int'
     }]
 });
