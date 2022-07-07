@@ -44,10 +44,6 @@ class editor_Task_Operation {
     /**
      * @var string
      */
-    const PRETRANSLATION = 'pretranslation';
-    /**
-     * @var string
-     */
     const PIVOT_PRE_TRANSLATION = 'pivotpretranslation';
     /**
      * 
@@ -87,6 +83,6 @@ class editor_Task_Operation {
      * @return string[]
      */
     public static function getAllOperations() : array {
-        return [ self::AUTOQA, self::MATCHANALYSIS, self::PRETRANSLATION, self::PIVOT_PRE_TRANSLATION ];
+        return [ self::AUTOQA, self::MATCHANALYSIS, self::PIVOT_PRE_TRANSLATION ];
     }
 }
