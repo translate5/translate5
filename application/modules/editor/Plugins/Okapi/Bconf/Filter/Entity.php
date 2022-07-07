@@ -43,8 +43,6 @@
  * @method void setName() setName(string $name)
  * @method string getDescription() getDescription()
  * @method void setDescription() setDescription(string $description)
- * @method string getExtensions() getExtensions()
- * @method void setExtensions() setExtensions(string $extensions)
  * @method string getHash() getHash()
  * @method void setHash() setHash(string $hash)
  */
@@ -142,18 +140,12 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
     }
 
     /**
+     * Retrieves our related file-extensions
+     * Note, that this fetches the related bconf from DB, reda the extensions-mapping & parses it
      * @return array
      */
-    public function getFileExtensions() : array {
-        return explode(',', $this->getExtensions());
-    }
-
-    /**
-     * @param string[] $extensions
-     * @return array
-     */
-    public function setFileExtensions(array $extensions) {
-        $this->setExtensions(implode(',', $extensions));
+    public function getMappedExtensions() : array {
+        return $this->getRelatedBconf()->getExtensionMapping()->findExtensionsForFilter($this->getIdentifier());
     }
 
     /**
@@ -175,7 +167,6 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
     public function getGridRowsByBconfId(int $bconfId) : array {
         $rows = [];
         foreach($this->getRowsByBconfId($bconfId) as $row){
-            unset($row['extensions']);
             unset($row['hash']);
             // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
             $row['identifier'] = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($row['okapiType'], $row['okapiId']);
@@ -186,32 +177,6 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
             $rows[] = $row;
         }
         return $rows;
-    }
-
-    /**
-     * Retrieves all customized filters having one of the passed extensions
-     * @param array $extensions
-     * @return editor_Plugins_Okapi_Bconf_Filter_Entity[]
-     */
-    public function getAllByExtensions(array $extensions) : array {
-        if(count($extensions) === 0){
-            return [];
-        }
-        $select = $this->db->select();
-        foreach($extensions as $extension){
-            $select
-                ->orWhere('extensions = ?', $extension)
-                ->orWhere('extensions LIKE ?', $extension.',%')
-                ->orWhere('extensions LIKE ?', '%,'.$extension)
-                ->orWhere('extensions LIKE ?', '%,'.$extension.',%');
-        }
-        $entities = [];
-        foreach($this->loadFilterdCustom($select) as $data){
-            $entity = new editor_Plugins_Okapi_Bconf_Filter_Entity();
-            $entity->init($data, true);
-            $entities[] = $entity;
-        }
-        return $entities;
     }
 
     /**

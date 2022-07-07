@@ -189,18 +189,4 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
 
         echo json_encode($clone->toArray());
     }
-
-    /**
-     * Updates the extensions-mapping of a Bconf from the frontend
-     * The mapping will be sent as identifier => [ extensions ]
-     * // TODO BCONF: remove when not needed
-     * @throws ZfExtended_Exception
-     * @throws editor_Plugins_Okapi_Exception
-     */
-    public function saveextensionsmappingAction(){
-        $this->entityLoad();
-        $jsonString = $this->getRequest()->getRawBody();
-        $extensionMapping = $this->entity->getExtensionMapping();
-        $extensionMapping->updateByIdentifierMap(json_decode($jsonString, true));
-    }
 }

@@ -65,8 +65,10 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      */
     public function postAction(){
         parent::postAction();
+        // extensions have been sent as put-data
+        $extensions = explode(',', $this->data->extensions);
         $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
-        $extensionMapping->changeFilter($this->entity->getIdentifier(), $this->entity->getFileExtensions());
+        $extensionMapping->changeFilter($this->entity->getIdentifier(), $extensions);
     }
 
     /**
@@ -77,8 +79,10 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      */
     public function putAction(){
         parent::putAction();
+        // extensions have been sent as put-data
+        $extensions = explode(',', $this->data->extensions);
         $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
-        $extensionMapping->addFilter($this->entity->getIdentifier(), $this->entity->getFileExtensions());
+        $extensionMapping->addFilter($this->entity->getIdentifier(), $extensions);
     }
 
     /**

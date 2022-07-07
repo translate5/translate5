@@ -287,15 +287,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'clone'
             ]);
         $r->addRoute('plugins_okapi_bconf_clone', $route);
-        // save extension mapping // TODO BCONF: remove when not needed
-        $route = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_okapi_bconf/saveextensionsmapping',
-            [
-                'module'     => 'editor',
-                'controller' => 'plugins_okapi_bconf',
-                'action'     => 'saveextensionsmapping'
-            ]);
-        $r->addRoute('plugins_okapi_bconf_saveextensionsmapping', $route);
 
 
         // routes for bconf filters

@@ -167,9 +167,10 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         var extensions = this.get('extensions'),
             index = extensions.indexOf(extension);
         if(index > -1){
-            extensions = extensions.splice(index, 1);
+            extensions.splice(index, 1);
             if(silent){
                 this.set('extensions', extensions, { silent: true, dirty: false });
+                this.commit();
             } else {
                 this.set('extensions', extensions);
             }

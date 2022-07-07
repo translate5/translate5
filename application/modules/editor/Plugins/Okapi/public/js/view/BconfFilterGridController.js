@@ -172,8 +172,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
             extensionsChanged = !Editor.util.Util.arraysAreEqual(extensions, record.extensionsBeforeEdit),
             // checks if the record has been changed
             recordChanged = Editor.util.Util.objectWasChanged(cellContext.newValues, cellContext.originalValues, ['name','description','mimeType']);
-
-        console.log('RECORD wasChanged:', recordChanged, ' Extensions were changed:', extensionsChanged, 'new extensions:', extensions, ' Custom: ', isCustom);
         // cleanup tmp data
         delete record.extensionsBeforeEdit;
         // save a custom record or just transfere the new extensions for a non-custom record

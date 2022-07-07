@@ -28,10 +28,10 @@ ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `okapiId` VARCHAR(255) NOT NULL;
 ALTER TABLE `LEK_okapi_bconf_filter` ADD `description` VARCHAR(255) NOT NULL default '' AFTER `notes`;
 ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `mimeType` varchar(50) NOT NULL default '';
 ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `name` varchar(100) NOT NULL;
-ALTER TABLE `LEK_okapi_bconf_filter` MODIFY `extensions` varchar(255) NOT NULL;
 ALTER TABLE `LEK_okapi_bconf_filter` ADD `hash` VARCHAR(32) NOT NULL;
 ALTER TABLE `LEK_okapi_bconf_filter` DROP COLUMN `okapiName`;
 ALTER TABLE `LEK_okapi_bconf_filter` DROP COLUMN `notes`;
+ALTER TABLE `LEK_okapi_bconf_filter` DROP COLUMN `extensions`;
 
 DROP TABLE IF EXISTS `LEK_okapi_bconf_default_filter`;
 

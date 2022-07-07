@@ -77,7 +77,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
      */
     getByIdentifier: function(identifier){
         if(this.identifierMap.hasOwnProperty(identifier)){
-            this.getById(this.identifierMap[identifier]);
+            return this.getById(this.identifierMap[identifier]);
         }
         return null;
     },
@@ -97,10 +97,14 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
         // provide our items with the needed extensions
         for(identifier in this.identifierMap){
             record = this.getById(this.identifierMap[identifier]);
-            if(identifierToExtensions.hasOwnProperty(identifier)){
-                record.set('extensions', identifierToExtensions[identifier].sort(), setSilent);
+            if(record) {
+                if (identifierToExtensions.hasOwnProperty(identifier)) {
+                    record.set('extensions', identifierToExtensions[identifier].sort(), setSilent);
+                } else {
+                    record.set('extensions', [], setSilent);
+                }
             } else {
-                record.set('extensions', [], setSilent);
+                console.log('ERROR: BconfFilterStore.setExtensionMapping: can not find record for identifier ', identifier);
             }
         }
         // generate the extension => identifier map
@@ -117,23 +121,27 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
      * @param {Array} extensions
      */
     updateExtensionsByIdentifier(identifier, extensions){
-        console.log('FilterStore: updateExtensionsByIdentifier:', identifier, extensions);
-        var item;
-        // first, remove all existing entries of the item
+        var record, extBefore = [];
+        // first, remove all existing entries of the item (TODO: can we delete the extension here in the loop ? unclear ...
         this.extensionMap.forEach((filter, extension) => {
             if(filter === identifier){
-                delete this.extensionMap[extension];
+                extBefore.push(extension);
             }
+        });
+        extBefore.forEach(extension => {
+            this.extensionMap.delete(extension);
         });
         // then remove the extension from all items referenced in the map and create/change to the new identifier/extension
         extensions.forEach(extension => {
-            if(this.extensionMap.hasOwnProperty(extension)){
-                item = this.getByIdentifier(this.extensionMap[extension]);
-                if(item){
-                    item.removeExtension(extension, true);
+            if(this.extensionMap.has(extension)){
+                record = this.getByIdentifier(this.extensionMap.get(extension));
+                if(record){
+                    record.removeExtension(extension, true);
+                } else {
+                    console.log('ERROR: BconfFilterStore.updateExtensionsByIdentifier: can not find record for extension ' + extension + ' mapping to identifier ' + this.extensionMap[extension]);
                 }
             }
-            this.extensionMap[extension] = identifier;
+            this.extensionMap.set(extension, identifier);
         });
     },
     /**
@@ -142,32 +150,5 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
      */
     getAllExtensions(){
         return this.allExtensions;
-    },
-    /**
-     * Creates the extension mapping to be sent back to the store
-     */
-    createExtensionMappingData: function(){
-        var identifierMap = {};
-        this.extensionMap.forEach((identifier, extension) => {
-            if(identifierMap.hasOwnProperty(identifier)){
-                identifierMap[identifier].push(extension);
-            } else {
-                identifierMap[identifier] = [ extension ];
-            }
-        });
-        return JSON.stringify(identifierMap);
-    },
-    /**
-     * syncs the extension-mapping to the backend
-     */
-    saveExtensionMapping: function(){
-        var me = this;
-        Ext.Ajax.request({
-            url: Editor.data.restpath + 'plugins_okapi_bconf/saveextensionsmapping',
-            params: {
-                id: me.getProxy().bconfId
-            },
-            rawData: me.createExtensionMappingData()
-        });
     }
 });

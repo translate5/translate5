@@ -510,19 +510,14 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      * @param string $okapiId
      * @param string $name
      * @param string $description
-     * @param array $extensions
      * @param string $hash
      * @param string|null $mimeType
      * @return editor_Plugins_Okapi_Bconf_Filter_Entity
      * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_BadMethodCallException
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function addCustomFilterEntry(string $okapiType, string $okapiId, string $name, string $description, array $extensions, string $hash, string $mimeType=NULL) : editor_Plugins_Okapi_Bconf_Filter_Entity {
-        if(empty($extensions)){
-            throw new ZfExtended_BadMethodCallException('A Okapi Bconf custom filter can not be added without related file extensions');
-        }
+    public function addCustomFilterEntry(string $okapiType, string $okapiId, string $name, string $description, string $hash, string $mimeType=NULL) : editor_Plugins_Okapi_Bconf_Filter_Entity {
         if($mimeType === NULL){
             $mimeType = editor_Plugins_Okapi_Bconf_Filter_Okapi::findMimeType($okapiType);
         }
@@ -533,7 +528,6 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $filterEntity->setMimeType($mimeType);
         $filterEntity->setName($name);
         $filterEntity->setDescription($description);
-        $filterEntity->setFileExtensions($extensions);
         $filterEntity->setHash($hash);
         $filterEntity->save();
 
