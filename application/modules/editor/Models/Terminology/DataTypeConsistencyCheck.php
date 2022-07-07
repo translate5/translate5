@@ -291,16 +291,23 @@ protected array $referenceData = [
 
     /**
      * returns a list of datatypes where the elementName and type of the datatype does not match the corresponding values in the attributes table
+     * or where the datatypeid does not exist in the datatypes list
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
     public function checkAttributesAgainstDataTypes(): array {
         /** @var editor_Models_Terminology_Models_AttributeDataType $model */
         $model = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        $q = $model->db->getAdapter()->query('select tad.id datatypeid, tad.label datatypeTag, tad.type datatypeType, ta.collectionId, ta.elementName attributeTag, ta.`type` attributeType  
-from terms_attributes_datatype tad
-JOIN terms_attributes ta on tad.id = ta.dataTypeId and (tad.label != ta.elementName or tad.`type` != ta.`type`)
-group by tad.id, tad.label, tad.type, ta.collectionId, ta.elementName, ta.`type`');
+        $q = $model->db->getAdapter()->query('select tad.id datatypeid, tad.label datatypeTag, tad.type datatypeType, ta.collectionId, ta.elementName attributeTag, ta.`type` attributeType
+from terms_attributes_datatype tad 
+    JOIN terms_attributes ta on tad.id = ta.dataTypeId and (tad.label != ta.elementName or tad.`type` != ta.`type`) 
+group by tad.id, tad.label, tad.type, ta.collectionId, ta.elementName, ta.`type`
+union
+select ta.id datatypeid, ": attribute ID" datatypeTag, "NOT EXISTENT" datatypeType, ta.collectionId, ta.elementName attributeTag, ta.`type` attributeType
+from terms_attributes ta
+LEFT JOIN terms_attributes_datatype tad ON ta.dataTypeId = tad.id
+where tad.id IS NULL;
+');
         return $q->fetchAll(Zend_Db::FETCH_ASSOC);
     }
 
