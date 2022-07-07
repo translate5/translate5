@@ -114,7 +114,8 @@ class QualityFaultyTest extends editor_Test_JsonTest {
     public function testFilterQualityTree(){
         $jsonFile = 'expectedQualityFilterFaulty.json';
         $tree = $this->api()->getJsonTree('/editor/quality', [], $jsonFile);
-        $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree);
+        $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'internal');
+        $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
     }
     /**
      * Test the task qualities after being edited
@@ -123,7 +124,8 @@ class QualityFaultyTest extends editor_Test_JsonTest {
     public function testTaskQualityTree(){
         $jsonFile = 'expectedTaskQualitiesFaulty.json';
         $tree = $this->api()->getJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid), [], $jsonFile);
-        $this->assertModelEqualsJsonFile('TaskQuality', $jsonFile, $tree);
+        $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'internal');
+        $this->assertModelEqualsJsonFile('TaskQuality', $jsonFile, $tree, '', $treeFilter);
     }
     /**
      * Tests the task-Tooltip of the Task-Grid with the Faulty icons

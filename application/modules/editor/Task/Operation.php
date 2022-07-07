@@ -46,13 +46,17 @@ class editor_Task_Operation {
      */
     const PRETRANSLATION = 'pretranslation';
     /**
+     * @var string
+     */
+    const PIVOT_PRE_TRANSLATION = 'pivotpretranslation';
+    /**
      * 
      * @param string $operationType: must be a constant of this class
      * @param editor_Models_Task $task
      * @return int The parent ID to use for all inner workers
      */
     public static function create(string $operationType, editor_Models_Task $task) : int {
-
+    
         // Only one operation is allowed to run at a time !
         if(in_array($task->getState(), self::getAllOperations())){
             throw new editor_Task_Operation_Exception('E1396', ['taskstate' => $task->getState()]);
@@ -83,6 +87,6 @@ class editor_Task_Operation {
      * @return string[]
      */
     public static function getAllOperations() : array {
-        return [ self::AUTOQA, self::MATCHANALYSIS, self::PRETRANSLATION ];
+        return [ self::AUTOQA, self::MATCHANALYSIS, self::PRETRANSLATION, self::PIVOT_PRE_TRANSLATION ];
     }
 }

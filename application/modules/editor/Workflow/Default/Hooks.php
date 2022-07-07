@@ -327,13 +327,15 @@ class editor_Workflow_Default_Hooks {
         $actions = $actions->loadByTrigger([$this->workflow->getName()], $trigger, $step, $role, $state);
         $this->actionDebugMessage([$this->workflow->getName()], $debugData);
         $instances = [];
+        $config = $this->getActionConfig($trigger);
         foreach($actions as $action) {
             $class = $action['actionClass'];
             $method = $action['action'];
+            $config->parameters = !empty($action['parameters']) ? json_decode($action['parameters']) : null;
             if(empty($instances[$class])) {
                 $instance = ZfExtended_Factory::get($class);
                 /* @var $instance editor_Workflow_Actions_Abstract */
-                $instance->init($this->getActionConfig($trigger));
+                $instance->init($config);
                 $instances[$class] = $instance;
             }
             else {

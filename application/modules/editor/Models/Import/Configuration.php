@@ -223,23 +223,15 @@ class editor_Models_Import_Configuration {
         $refDir = $config->runtimeOptions->import->referenceDirectory;
         return $refDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$refDir;
     }
-    
+
     /**
      * validiert / filtert die Get-Werte
      * @throws editor_Models_Import_ConfigurationException
+     * @throws Zend_Validate_Exception|Zend_Exception
      */
-    protected function validateParams($taskGuid){
-        
-        //if relais path does not exist, set $relaisLang to null, but keep relaisLangValue for validation
-        $config = Zend_Registry::get('config');
-        $dir = $this->importFolder.DIRECTORY_SEPARATOR.$config->runtimeOptions->import->relaisDirectory;
-        if($this->relaisLangValue > 0 && !is_dir($dir)) {
-            $this->relaisLang = null;
-            $logger = Zend_Registry::get('logger')->cloneMe('editor.import.configuration');
-            /* @var $logger ZfExtended_Logger */
-            $logger->warn('E1034','The given pivot language was removed because no pivot files were found for the current task.');
-        }
-        
+    protected function validateParams($taskGuid): void
+    {
+
         $guidValidator = new ZfExtended_Validate_Guid();
         $validateUsername = new Zend_Validate_Regex('"[A-Za-z0-9 \-]+"');
         if(!$guidValidator->isValid($taskGuid)){

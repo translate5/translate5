@@ -118,6 +118,7 @@ EOF;
             $key = '<info>'.$key.'</info> ';
             $this->output->writeln($key.OutputFormatter::escape((string) $value));
         }
+        $this->output->writeln('');
     }
 
     /**

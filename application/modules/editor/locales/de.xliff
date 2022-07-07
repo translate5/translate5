@@ -1019,6 +1019,7 @@
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKEJvc25pZW4gdW5kIEhlcnplZ293aW5hKQ=='><source>Serbisch (Latein) (Bosnien und Herzegowina)</source><target>Serbisch (Latein) (Bosnien und Herzegowina)</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Serbisch (Kyrillisch) (Bosnien und Herzegowina)</source><target>Serbisch (Kyrillisch) (Bosnien und Herzegowina)</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKFNlcmJpZW4gdW5kIE1vbnRlbmVncm8p'><source>Serbisch (Latein) (Serbien und Montenegro)</source><target>Serbisch (Latein) (Serbien und Montenegro)</target></trans-unit>
+<trans-unit id="U2VyYmlzY2ggKExhdGVpbikgKE1vbnRlbmVncm8p"><source>Serbisch (Latein) (Montenegro)</source><target>Serbisch (Latein) (Montenegro)</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuIHVuZCBNb250ZW5lZ3JvKQ=='><source>Serbisch (Kyrillisch) (Serbien und Montenegro)</source><target>Serbisch (Kyrillisch) (Serbien und Montenegro)</target></trans-unit>
 <trans-unit id='U2Nod2VkaXNjaCAoRmlubmxhbmQp'><source>Schwedisch (Finnland)</source><target>Schwedisch (Finnland)</target></trans-unit>
 <trans-unit id='U2Nod2VkaXNjaCAoU2Nod2VkZW4p'><source>Schwedisch (Schweden)</source><target>Schwedisch (Schweden)</target></trans-unit>
@@ -2173,6 +2174,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U29uc3RpZ2Vz'><source>Sonstiges</source><target>Sonstiges</target></trans-unit>
 <trans-unit id='V2FocnNjaGVpbmxpY2hrZWl0'><source>Wahrscheinlichkeit</source><target>Wahrscheinlichkeit</target></trans-unit>
 <trans-unit id='QWx0ZXJuYXRpdmVu'><source>Alternativen</source><target>Alternativen</target></trans-unit>
+<trans-unit id='UGl2b3QtU3ByYWNocmVzc291cmNlbg=='><source>Pivot-Sprachressourcen</source><target>Pivot-Sprachressourcen</target></trans-unit>
+<trans-unit id='UGl2b3QtVm9yw7xiZXJzZXR6dW5nIGzDpHVmdA=='><source>Pivot-Vorübersetzung läuft</source><target>Pivot-Vorübersetzung läuft</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6TDn2lnIGFscyBQaXZvdCB2ZXJ3ZW5kZW4='><source>Standardmäßig als Pivot verwenden</source><target>Standardmäßig als Pivot verwenden</target></trans-unit>
+<trans-unit id='Vm9yw7xiZXJzZXR6dW5n'><source>Vorübersetzung</source><target>Vorübersetzung</target></trans-unit>
+<trans-unit id='U29sbHRlIGRhcyB6dSBpbXBvcnRpZXJlbmRlIFpJUC1QYWtldCBEYXRlaWVuIGbDvHIgZGllIEJlZsO8bGx1bmcgZGVyIFBpdm90LVNwYWx0ZSBlbnRoYWx0ZW4sIHdlcmRlbiBoaWVyIGdlbWFjaHQgRWluc3RlbGx1bmdlbiBpZ25vcmllcnQu'><source>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</source><target>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</target></trans-unit>
   </body>
  </file>
 </xliff>

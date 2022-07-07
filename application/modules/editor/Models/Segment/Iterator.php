@@ -98,6 +98,7 @@ class editor_Models_Segment_Iterator implements Iterator {
             $this->segment->loadFirst($this->taskGuid, $this->fileId);
             $this->isEmpty = false;
         } catch(ZfExtended_Models_Entity_NotFoundException) {
+            $this->segment = null;
             $this->isEmpty = true;
         }
     }

@@ -517,7 +517,7 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num1",
-                    "text": "Numbers SRC \u2260 TRG",
+                    "text": "Numbers source \u2260 target",
                     "textTooltip": "",
                     "leaf": true,
                     "checked": false
@@ -561,7 +561,7 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num2",
-                    "text": "Alphanumerical character sequences",
+                    "text": "Alphanumerical character sequences: Differences",
                     "textTooltip": "",
                     "leaf": true,
                     "checked": false
@@ -611,13 +611,13 @@
                     "checked": false
                 },
                 {
-                    "qid": "36533",
+                    "qid": "92437",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num7",
                     "qcatidx": "-1",
-                    "text": "Separator from SRC altered",
+                    "text": "Separator from source altered",
                     "leaf": true,
                     "checked": false
                 },
@@ -627,7 +627,7 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num8",
-                    "text": "Numeral from SRC found as number in TRG",
+                    "text": "Numeral from source found as number in target",
                     "textTooltip": "",
                     "leaf": true,
                     "checked": false
@@ -638,7 +638,7 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num9",
-                    "text": "Number from SRC found as numeral in TRG",
+                    "text": "Number from source found as numeral in target",
                     "textTooltip": "",
                     "leaf": true,
                     "checked": false
