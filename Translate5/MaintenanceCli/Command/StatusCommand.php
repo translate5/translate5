@@ -113,7 +113,7 @@ class StatusCommand extends Translate5AbstractCommand
         $bus->setExceptionHandler(function(Throwable $e) use (&$exception){
             $exception = $e;
         });
-        $count = count($bus->getConnectionSessions()?->instanceResult ?? []);
+        $count = count((array)$bus->getConnectionSessions()?->instanceResult ?? []);
         if(empty($exception)) {
             return '<fg=green;options=bold>'.$count.'</>';
         }

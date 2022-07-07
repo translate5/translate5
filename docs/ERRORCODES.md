@@ -17,7 +17,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E0001"></a>E0001  | everywhere | HTTP client logging - SEND | The raw connection content of a internal used HTTP client is logged for debugging purposes.
 | <a id="E0002"></a>E0002  | everywhere | HTTP client logging - RECEIVE | The raw connection content of a internal used HTTP client is logged for debugging purposes.
 | <a id="E1352"></a>E1352  | everywhere | No access to requested URL | The currently authenticated user is not allowed to access the requested resource.<br />Since this is normally a misconfiguration of ACL rules or programming error in the GUI (missing isAllowed check) this error is locked as error.
-| <a id="E1014"></a>E1014  | everywhere | Log HTTP Request | The HTTP request to the server and its parameters are logged. Generally for debugging only.
+| <a id="E1014"></a>E1014  | everywhere | Log HTTP Request {route} | The HTTP request to the server and its parameters are logged. Generally for debugging only.
 | <a id="E1015"></a>E1015  | entities | Duplicate Key | A database key for the entity to be saved does already exist.
 | <a id="E1016"></a>E1016  | entities | Integrity Constraint Violation | An entity can not be added or updated since a referenced entity does not exist (anymore).<br />Or an entity can not be updated or deleted since it is referenced by other entities.
 | <a id="E1019"></a>E1019  | everywhere | HTTP Status 404 | The requested URL / page was not found, the API endpoint in the application does not exist.
@@ -32,7 +32,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1073"></a>E1073  | Worker | Worker URL result is no HTTP answer!: {host}:{port} | This can only happen if the worker URL is not pointing to an translate5 instance, or if there is an error on the translate5 instance. In the latter case investigate the log for further errors.
 | <a id="E1074"></a>E1074  | Worker | Worker HTTP response state was not 2XX but {state}. | This should happen only if there is an error on the translate5 instance. In the latter case investigate the log for further errors.
 | <a id="E1107"></a>E1107  | Worker | Worker HTTP response state was 404, the worker system requests probably the wrong server! | Check the server URL configuration values.<br />Either runtimeOptions.worker.server or runtimeOptions.server.protocol and runtimeOptions.server.name are pointing to a wrong server / translate5 installation!<br />This can also happen, if the server name is resolving to multiple IPs on the server it self (multiple entries in the /etc/hosts for example).
-| <a id="E1219"></a>E1219  | Worker | Worker &quot;{worker}&quot; failed on initialisation. | Check other errors , this message is just for debugging.
+| <a id="E1219"></a>E1219  | Worker | Worker "{worker}" failed on initialisation. | Check other errors , this message is just for debugging.
 | <a id="E1201"></a>E1201  | DB | Still producing a DB DeadLock after {retries} retries. | A transaction was repeated X times after a deadlock and it is still producing a deadlock. <br />The original dead lock exception is contained in this exception.
 | <a id="E1202"></a>E1202  | DB | A transaction could be completed after {retries} retries after a DB deadlock. | This is just a info / debug message to track if a deadlock occured, an that it could be successfully executed after X retries.
 | <a id="E1203"></a>E1203  | DB | A transaction was rejected after a DB deadlock. | This is just a info / debug message to track if a deadlock occured, an that it was intentionally rejected.
@@ -46,7 +46,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1294"></a>E1294  | Installation &amp; Update | Errors on calling database update - see details for more information. | This are the errors happend on calling the alter SQLs.
 | <a id="E1295"></a>E1295  | Installation &amp; Update | Result of imported DbUpdater PHP File {path}: {result} | The output of a PHP update file is logged as info.
 | <a id="E1307"></a>E1307  | Http Client | Request time out in {method}ing URL {url} | The requested service did not respond in a reasonable time.
-| <a id="E1308"></a>E1308  | Http Client | Requested URL is DOWN: {url} | The requested service is either not available or not reachable.
+| <a id="E1308"></a>E1308  | Http Client | Requested Service is DOWN: {server} | The requested service is either not available or not reachable.
 | <a id="E1309"></a>E1309  | Http Client | Empty response in {method}ing URL {url} | The requested service returns an empty response, this may indicate a problem (crash) on the service side.
 
 
@@ -81,7 +81,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1297"></a>E1297   | Task Configuration | Unable to load task config. &quot;taskGuid&quot; is not set for this entity. | taskGuid is not set for this entity.
 | <a id="E1298"></a>E1298   | Customer Configuration | Unable to load customer config. &quot;id&quot; is not set for this entity. | id is not set for this entity.
 | <a id="E1299"></a>E1299   | User Configuration | Not allowed to load user config for different user. | The current request to load the user config is not for the currently authenticated user.
-| <a id="E1324"></a>E1324   | Configuration | Updated config with name &quot;{name}&quot; to &quot;{value}&quot; | Log info when configuration value is updated.
+| <a id="E1324"></a>E1324   | Configuration | Updated user GUI state "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
 | <a id="E1363"></a>E1363   | Configuration | Configuration value invalid: {errorMsg} | The given configuration value is invalid, check the configuration description or default value to find out what is wrong.
 
 ### Categories
@@ -105,7 +105,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | :--------------- |:------------- | :------------ | :-------------------
 | <a id="E1011"></a>E1011  | Task; Workflow | Multi Purpose Code logging in the context of a task | Multi Purpose code for several info logs around a task.<br />Also important in Context of workflow.
 | <a id="E1012"></a>E1012  | Job; Workflow | Multi Purpose Code logging in the context of jobs (task user association) | Multi Purpose Code logging in the context of jobs (task user association)<br />Also important in Context of workflow.
-| <a id="E1013"></a>E1013  | Workflow only | Multi Purpose Code logging in the context of pure workflow processing | Multi Purpose Code logging in the context of workflow processing
+| <a id="E1013"></a>E1013  | Workflow only |  Workflow called action editor_Workflow_Notification::notifyImportErrorSummary() through trigger {trigger} | Multi Purpose Code logging in the context of workflow processing
 | <a id="E1042"></a>E1042  | Task | The task can not be removed due it is used by a user. | One user has opened the task for reading or editing the task. Therefore this task can not be deleted.
 | <a id="E1043"></a>E1043  | Task | The task can not be removed due it is locked by a user. | One user has opened the task for editing the task, or some other action has locked the task.<br />Therefore this task can not be deleted.
 | <a id="E1044"></a>E1044  | Task | The task can not be locked for deletion. | The task must be locked by the deleting user, before it can be deleted. This lock could not be set.
@@ -129,8 +129,8 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1281"></a>E1281  | Task/User | The content of the segmentrange that is assigned to the user is not valid. | Make sure that the values are not reverse and do not overlap (neither in itself nor with other users of the same role).
 | <a id="E1339"></a>E1339  | Task | Missing mandatory parameter taskGuid. | The taskGuid is not provided as request parameter.
 | <a id="E1341"></a>E1341  | Task | You tried to open or edit another task, but you have already opened another one in another window. Please press F5 to open the previous one here, or close this message to stay in the Taskoverview. | Only one task can be opened for editing per user. If if the user has already opened a task for editing, he/she is not able to modify tasks in task overview with different browser tab. In short words, please use only one browser tab.
-| <a id="E1348"></a>E1348  | Task materialized view | The tasks materialized view was created. | Debugging information to trace the creation of a tasks materialiazed view.
-| <a id="E1349"></a>E1349  | Task materialized view | The tasks materialized view was dropped. | Debugging information to trace the deletion of a tasks materialiazed view.
+| <a id="E1348"></a>E1348  | Task materialized view | The tasks materialized view {matView} was created. | Debugging information to trace the creation of a tasks materialiazed view.
+| <a id="E1349"></a>E1349  | Task materialized view | The tasks materialized view {matView} was dropped. | Debugging information to trace the deletion of a tasks materialiazed view.
 | <a id="E1381"></a>E1381  | Current Task | Access to CurrentTask was requested but no task ID was given in the URL. | Development error: Some PHP code tried to load the currently opened task (identified by the taskid given in the URL) but no task ID was provided in the URL. So either the URL producing the request is wrongly created (no Editor.data.restpath prefix), or its just the wrong context where the CurrentTask was accessed.
 | <a id="E1382"></a>E1382  | Current Task | Access to CurrentTask was requested but it was NOT initialized yet. | Development error: Some PHP code tried to access the currently opened task but it was not loaded yet. This can be done calling TaskContextTrait::initCurrentTask.
 | <a id="E1395"></a>E1395  | Task-Operation | The Task-Operation &quot;{operation}&quot; can not be started when the task is in state &quot;{taskstate}&quot; | The Task-Operation can not be started if the task is in the given state
@@ -138,7 +138,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1399"></a>E1399  | Task auto delete | No task taskLifetimeDays configuration defined. | Please set runtimeOptions.taskLifetimeDays in configuration.
 | <a id="E1400"></a>E1400  | Task Backup | Task could not backuped there fore it also was not deleted. | Please check the log for further information and validate your workflow action configuration for deleteOldEndedTasks action
 | <a id="E1401"></a>E1401  | Task Backup | Could not zip the export of the task | Check the application and PHP log for further information.
-| <a id="E1402"></a>E1402  | Task Backup | Task successfully removed. ID: {id} {name} | The given task was successfully removed (and backuped before if configured).
+| <a id="E1402"></a>E1402  | Task Backup | Task successfully removed (with backup before). ID: {id} {name} | The given task was successfully removed (and backuped before if configured).
 
 
 ### Project
@@ -185,11 +185,11 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1079"></a>E1079  | CSV Fileparser | In application.ini configured column-header(s) &quot;{headers}&quot; not found in CSV: &quot;{file}&quot; | The header column names of the CSV do not match to the configured header column names in &quot;runtimeOptions.import.csv.fields&quot;.&nbsp; The missing fields according to the configuration are shown in the error message.
 | <a id="E1080"></a>E1080  | CSV Fileparser | Source and mid given but no more data columns found in CSV: &quot;{file}&quot; | Each line must contain at least 3 columns: mid, source and target column. Check the CSV content.
 | <a id="E1067"></a>E1067  | XLF 1.2 Fileparser | MRK/SUB tag of source not found in target with Mid: &quot;{mid}&quot; | In the XLF a MRK or SUB tag was referenced in the source, but the referenced segment with the given mid was not found.
-| <a id="E1068"></a>E1068  | XLF 1.2 Fileparser | MRK/SUB tag of target not found in source with Mid(s): &quot;{mids}&quot; | In the XLF a MRK or SUB tag was referenced in the target, but the referenced segment with the given mid was not found.
+| <a id="E1068"></a>E1068  | XLF 1.2 Fileparser | MRK/SUB tag of target not found in source with Mid(s): "{mids}" | In the XLF a MRK or SUB tag was referenced in the target, but the referenced segment with the given mid was not found.
 | <a id="E1069"></a>E1069  | XLF 1.2 Fileparser | There is other content as whitespace outside of the mrk tags. Found content: {content} | Translate5 interprets the XLIFF 1.2 specification in a way that in a segmented segment there may not be any other content as whitespace outside between the &lt;mrk type=&quot;seg&quot;&gt; tags. If this is the case translate5 can not import the XLF file.
 | <a id="E1070"></a>E1070  | XLF 1.2 Fileparser | SUB tag of {field} is not unique due missing ID in the parent node and is ignored as separate segment therefore. | The XML node surrounding a &lt;sub&gt; tag must contain an id in order to identfy that sub tag.
 | <a id="E1071"></a>E1071  | XLF 1.2 Fileparser | MRK tag of {field} has no MID attribute. | The given MRK tag does not contain a MID attribute.
-| <a id="E1194"></a>E1194  | XLF 1.2 Fileparser | The file &quot;{file}&quot; contains &quot;{tag}&quot; tags, which are currently not supported! Stop Import. | Contact the support to implement the import of the new tags.
+| <a id="E1194"></a>E1194  | XLF 1.2 Fileparser | The file "{file}" contains "{tag}" tags, which are currently not supported! Stop Import. | Contact the support to implement the import of the new tags.
 | <a id="E1195"></a>E1195  | XLF 1.2 Fileparser | A trans-unit of file &quot;{file}&quot; contains MRK tags other than type=seg, which are currently not supported! Stop Import. | Contact the support to implement the import of the other mrk tags.
 | <a id="E1196"></a>E1196  | XLF 1.2 Fileparser | Whitespace in text content of file &quot;{file}&quot; can not be cleaned by preg_replace. Error Message: &quot;{pregMsg}&quot;. Stop Import. | Check the file content for validity.
 | <a id="E1232"></a>E1232  | XLF 1.2 Fileparser | XLF Parser supports only XLIFF Version 1.1 and 1.2, but the imported xliff tag does not match that criteria: {tag} | Check the file content for validity.
@@ -204,7 +204,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1022"></a>E1022  | Relais Import | Errors in adding relais segment: Source-content of relais file &quot;{fileName}&quot; is identical with source of translated file, but still original segment not found in the database: {segments} | This issue is similar to [E1021](#E1021), first a matching source segment was found to the relais segment, the source content equals, but the relais target data could not be saved. Investigate additional debug content!
 | <a id="E1112"></a>E1112  | Relais Import | Task was configured with relais language, but some relais file were not found. See Details. | Some of the work files do not have a corresponding file in the relais folder. In the details of the error the work files without a relais file are listed. Compare them with the files in the imported task.
 | <a id="E1023"></a>E1023  | TBX Parser | Unable to read the provided tbx file {filename} | The provided file for parsing can is not readable.
-| <a id="E1024"></a>E1024  | XML Parser | Invalid XML: expected closing &quot;{closingTag}&quot; tag, but got tag &quot;{receivedTag}&quot;. Opening tag was: {openingTag} | Invalid xml chunk found while parsing xml file.
+| <a id="E1024"></a>E1024  | XML Parser | Invalid XML: expected closing "{closingTag}" tag, but got tag "{receivedTag}". | Invalid xml chunk found while parsing xml file.
 | <a id="E1028"></a>E1028  | TBX Parser | {message}. \n Term collection name: {name} | Log the term collection exception/info produced while the tbx parser is running for the term.
 | <a id="E1031"></a>E1031  | Task Import - File Upload | A file &quot;{filename}&quot; with an unknown file extension &quot;{ext}&quot; was tried to be imported. | The uploaded file type is currently not supported.
 | <a id="E1032"></a>E1032  | Task Import | The passed source language &quot;{language}&quot; is not valid. | The source language given for the new task is invalid or not found in the languages table of the application.
@@ -223,11 +223,11 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1054"></a>E1054  | Task Import; Pixel-Mapping MetaData | Pixel-Mapping: missing default-values for pixel-width for font-size {fontSize}. Add the missing values to the config. | Add the missing value in your defaultPixelWidths-settings in the task template config.
 | <a id="E1096"></a>E1096  | Task Import; Pixel-Mapping MetaData | Pixel-Mapping: ignored one ore more lines of the excel due one or more empty columns. | Check the imported pixel-mapping.xlsx some of the needed columns were empty, see also error details for the collected lines with empty columns.
 | <a id="E1278"></a>E1278  | Task Import; Pixel-Mapping MetaData | Segment length calculation: No pixel-width set for several characters.<br />Default width is used. See affected characters in extra data. | For the listed characters no width was defined, so the configured default value as fallback is used. <br />The missing characters are listed as unicode charpoints and the real character in parathensis.
-| <a id="E1060"></a>E1060  | Task Import | For the fileextension &quot;{extension}&quot; no parser is registered. For available parsers see log details. | The user tried to import a file which can not be imported by the native import converters. See the log details for the available native importable file formats.<br />Otherwise consider to enable [Okapi](https://confluence.translate5.net/display/CON/Okapi) to convert the uploaded file into a native importable XLF format.
+| <a id="E1060"></a>E1060  | Task Import | For the fileextension "{extension}" no parser is registered. For available parsers see log details. | The user tried to import a file which can not be imported by the native import converters. See the log details for the available native importable file formats.<br />Otherwise consider to enable [Okapi](https://confluence.translate5.net/display/CON/Okapi) to convert the uploaded file into a native importable XLF format.
 | <a id="E1135"></a>E1135  | Task Import | There are no importable files in the Task. The following file extensions can be imported: {extensions} | There is no file in the import package which can be imported. Neither native by translate5, nor via a converter plug-in like [Okapi](https://confluence.translate5.net/display/CON/Okapi).
 | <a id="E1136"></a>E1136  | Task Import | Some files could not be imported, since there is no parser available. For affected files see log details. | The user tried to import one or more files which can not be imported. Neither native by translate5, nor via a converter plug-in like [Okapi](https://confluence.translate5.net/display/CON/Okapi). See the log details for the affected files.
 | <a id="E1166"></a>E1166  | Task Import | Although there were importable files in the task, no files were imported. Investigate the log for preceeding errors. | There was at least one importable file in the package which can be imported, but the import process did not import any file. Probably there was another error before, for example with a file converter plug-in like [Okapi](https://confluence.translate5.net/display/CON/Okapi).
-| <a id="E1190"></a>E1190  | XLF 1.2 Fileparser | The XML of the XLF file &quot;{fileName} (id {fileId})&quot; is invalid! | The provided XLF file contains no valid XML.<br />See the task log, the concrete XML error should be logged there too.
+| <a id="E1190"></a>E1190  | XLF 1.2 Fileparser | The XML of the XLF file "{fileName} (id {fileId})" is invalid! | The provided XLF file contains no valid XML.<br />See the task log, the concrete XML error should be logged there too.
 | <a id="E1191"></a>E1191  | XLF 1.2 Fileparser | The XLF file &quot;{fileName} (id {fileId})&quot; does not contain any translation relevant segments. | Since there are no importable segments in the file, omit the file in import.
 | <a id="E1193"></a>E1193  | Imported Matchrate Type | File &quot;{file}&quot; contains unknown matchrate types. See details. | In the mentioned file there are matchrate types not known to translate5.
 | <a id="E1241"></a>E1241  | DataProvider Zip | DataProvider Zip: zip file could not be opened: &quot;{zip}&quot; | Check if the uploaded file is a valid ZIP file.
@@ -311,7 +311,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1346"></a>E1346  | Language&nbsp;Resource Microsoft Translator | Microsoft Translator quota exceeded. A limit has been reached. | See the error log for details.
 | <a id="E1358"></a>E1358  | Language&nbsp;Resource Term Collection | Term Collection Import: Unable to open zip file from file-path: {filePath} | See the error log for details.
 | <a id="E1359"></a>E1359  | Language&nbsp;Resource Term Collection | Term Collection Import: Content from zip file could not be extracted. | See the error log for details.
-
+| <a id="E1403"></a>E1403  | Language&nbsp;Resource pivot pre-translation    | The taskGuid is required as parameter | The taskGuid is not provided as parametar on the request | 
 
 ### Terminology
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -448,7 +448,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1233"></a>E1233  | Plug-In InstantTranslate | InstantTranslate:&nbsp;Please check your configuration for pretranslationTaskLifetimeDays. &quot; | Adds an entry in the error-log due to configuration-issues, but doesn't stop the application. Solution: Check if pretranslationTaskLifetimeDays is set in the configuration.
 | <a id="E1287"></a>E1287  | Plug-In InstantTranslate | InstantTranslate: &quot;0&quot; as upload field name is deprecated. Use &quot;file&quot; as upload field name instead. | Temporary warning for &quot;0&quot; the file upload api field name. The correct file upload field name for files pre-translations should be &quot;file&quot;.
 | <a id="E1376"></a>E1376  | Plug-In InstantTranslate | InstantTranslate: Not all required parameters are provided when writing to instant-translate memory | Missing parameters where found in the write to instant translate memory request.
-| <a id="E1383"></a>E1383  | Plug-In InstantTranslate | InstantTranslate: The submitted Markup is invalid | The User submitted invalid markup that therefore could not be translated
+| <a id="E1383"></a>E1383  | Plug-In InstantTranslate | InstantTranslate: The sent text contains invalid markup | Invalid markup was submitted via the API that therefore could not be translated
 
 
 #### Plug-In MatchAnalysis

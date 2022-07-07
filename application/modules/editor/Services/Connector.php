@@ -339,8 +339,8 @@ class editor_Services_Connector {
      * @return editor_Services_ServiceResult
      */
     protected function getCachedResult(editor_Models_Segment $segment) {
-        $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
-        /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
+        $model = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult');
+        /* @var $model MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult */
         return $model->getResults($segment->getId(), $this->adapter->getLanguageResource()->getId());
     }
     
