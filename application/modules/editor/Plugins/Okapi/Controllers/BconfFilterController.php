@@ -37,25 +37,11 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     protected $entityClass = 'editor_Plugins_Okapi_Bconf_Filter_Entity';
 
     /**
-     * sends all default bconf filters as JSON, Translate5 adjusted and okapi defaults
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::indexAction()
-     */
-    public function getdefaultfiltersAction() {
-        $bconf = new editor_Plugins_Okapi_Bconf_Filter_Entity();
-        $startIndex = $bconf->getHighestId() + 1000000;
-        $t5Rows = editor_Plugins_Okapi_Bconf_Filter_Translate5::instance()->getGridRows($startIndex);
-        $this->view->rows = array_merge($t5Rows, editor_Plugins_Okapi_Bconf_Filter_Okapi::instance()->getGridRows(count($t5Rows) + $startIndex));
-        $this->view->total = count($this->view->rows);
-    }
-
-    /**
-     * Includes extension-mapping.txt in the metaData
+     * This also transfers the Extension-Mapping and the default Extensions to the frontend via metaData
      * @return void
      * @throws editor_Plugins_Okapi_Exception
      */
     public function indexAction() {
-        $bconfId = $this->getParam('bconfId');
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->load($this->getParam('bconfId'));
 
@@ -67,7 +53,46 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         if(!$this->view->metaData){
             $this->view->metaData = new stdClass();
         }
-        $this->view->metaData->extensionMapping = $bconf->getExtensionMapping()->toJSON();
+        $this->view->metaData->extensionMapping = $bconf->getExtensionMapping()->getIdentifierMap();
+        $this->view->metaData->allExtensions = editor_Plugins_Okapi_Init::getAllExtensions();
+    }
+
+    /**
+     * Adjusted to additionally process the extension mapping
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function postAction(){
+        parent::postAction();
+        $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
+        $extensionMapping->changeFilter($this->entity->getIdentifier(), $this->entity->getFileExtensions());
+    }
+
+    /**
+     * Adjusted to additionally process the extension mapping
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function putAction(){
+        parent::putAction();
+        $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
+        $extensionMapping->addFilter($this->entity->getIdentifier(), $this->entity->getFileExtensions());
+    }
+
+    /**
+     * Adjusted to additionally process the extension mapping
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function deleteAction(){
+        $this->entityLoad();
+        $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
+        $extensionMapping->removeFilter($this->entity->getIdentifier());
+        $this->processClientReferenceVersion();
+        $this->entity->delete();
     }
 
     /**

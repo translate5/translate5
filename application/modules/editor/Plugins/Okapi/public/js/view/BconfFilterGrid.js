@@ -180,23 +180,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     dataIndex: 'extensions',
                     width: 200,
                     stateId: 'extensions',
-                    filter: {
-                        type: 'string'
+                    renderer: function(value){
+                        return value.join(', ');
                     },
                     text: me.text_cols.extensions,
-                    /**
-                     * @property {object} changelog Saves changes for rollback
-                     * @see BconfFilterGridController.prepareFilterEdit
-                     */
                     editor: { //TODO: add tooltip (tpl?) with current filter of extension
                         xtype: 'tagfield',
                         itemId: 'extensionMap',
                         queryMode: 'local',
                         createNewOnEnter: true,
                         createNewOnBlur: true,
-                        filterPickList: true, // ture clears list on custom value
-                        changelog: null,
-                    },
+                        filterPickList: true // true clears list on custom value
+                     },
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'description',
@@ -234,6 +229,5 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                 }],
             };
         return me.callParent([Ext.apply(config, instanceConfig)]);
-    },
-
+    }
 });

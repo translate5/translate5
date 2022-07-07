@@ -321,20 +321,56 @@ Ext.define('Editor.util.Util', {
             return store.isFiltered() || store.isSorted() ? store.getData().getSource() : store.getData();
         },
 
-        /** Get changed properties from edit compared to orig
+        /**
+         * Checks changed properties from an edited object to an original object
          * Supports primitives and objects with/iterables of primitive property values
-         * @param considerFalsyChange Wether changes from one falsy value to another are considered as change
-         * @returns An object with changed values only
+         * Does not suppert complex iterables or objects as values
+         * By default, the order of array does not matter
+         * @param {Object} before
+         * @param {Object} after
+         * @param {Array} keys
+         * @param {boolean} orderIsIrrelevant
+         * @returns {boolean}
          */
-        getChanged: function(edit, orig, considerFalsyChange = false){
-            var ret = {};
-            for(let [prop, newVal] of Object.entries(edit)){
-                let oldVal = orig[prop];
-                if(newVal !== oldVal && (considerFalsyChange || newVal || oldVal)){
-                    ret[prop] = newVal;
+        objectWasChanged: function(before, after, keys, orderIsIrrelevant=true){
+            // if not given we use all object keys.
+            if(!Array.isArray(keys)){
+                keys = before.keys();
+                var afterKeys = before.keys();
+                // when the keys are differnt, there was something changed obviously ...
+                if(keys.sort().join('|') !== afterKeys.sort().join('|')){
+                    return true;
                 }
             }
-            return ret;
+            var bval, aval;
+            keys.forEach(key => {
+                bval = before.hasOwnProperty(key) ? before[key] : undefined;
+                aval = after.hasOwnProperty(key) ? after[key] : undefined;
+                if(Array.isArray(aval) && Array.isArray(bval) && !this.arraysAreEqual(aval, bval, orderIsIrrelevant)){
+                    return false;
+                } else if(aval !== bval){
+                    return false;
+                }
+            });
+            return false;
+        },
+        /**
+         * Checks if to arrays are equal. By default, the order of items is irrelevant
+         * @param {Array} a
+         * @param {Array} b
+         * @param {boolean} orderIsIrrelevant
+         * @returns {boolean}
+         */
+        arraysAreEqual: function(a, b, orderIsIrrelevant=true) {
+            if(a === b) { return true; }
+            if(!a || !b) { return false; }
+            if(a.length !== b.length) { return false; }
+            for (var i=0; i < a.length; i++) {
+                if((orderIsIrrelevant && b.indexOf(a[i]) === -1) || (!orderIsIrrelevant && a[i] !== b[i])){
+                    return false;
+                }
+            }
+            return true;
         },
         isIterable: function(value, includeString = false){
             return typeof value[Symbol.iterator] === 'function' && (typeof value !== 'string' || includeString);

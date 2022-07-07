@@ -68,7 +68,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var string[]
      */
     const DEFAULT_EXTENSIONS = [
-        'okapi', //currently needed, see TRANSLATE-1019
+        'okapi', //currently needed, see TRANSLATE-1019. TODO FIXME: is this still true, the issue is resolved ?? If you remove, also heal ::getAllExtensions
         //'csv' => ['text/csv'], disabled due our own importer
         'c', 'catkeys', 'cpp', 'dita', 'ditamap', 'docm', 'docx', 'dotm', 'dotx', 'dtd', 'h', 'htm', 'html',
         'idml', 'json', 'lang', 'md', 'mif', 'odg', 'odp', 'ods', 'odt', 'otg', 'otp', 'ots', 'ott',
@@ -165,6 +165,19 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         return NULL;
     }
 
+    /**
+     * Retrieves all file-extensions that can generally be handled by okapi
+     * @return string[]
+     */
+    public static function getAllExtensions(){
+        $extensions = self::DEFAULT_EXTENSIONS;
+        if (($key = array_search('okapi', $extensions)) !== false){
+            array_splice($extensions, $key, 1);
+        }
+        sort($extensions);
+        return $extensions;
+    }
+
     protected $localePath = 'locales';
 
     /**
@@ -214,6 +227,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->initEvents();
         $this->addController('BconfController');
         $this->addController('BconfFilterController');
+        $this->addController('BconfDefaultFilterController');
         $this->initRoutes();
     }
 
@@ -273,7 +287,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'clone'
             ]);
         $r->addRoute('plugins_okapi_bconf_clone', $route);
-        // save extension mapping
+        // save extension mapping // TODO BCONF: remove when not needed
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/saveextensionsmapping',
             [
@@ -283,22 +297,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             ]);
         $r->addRoute('plugins_okapi_bconf_saveextensionsmapping', $route);
 
+
         // routes for bconf filters
         $route = new Zend_Rest_Route($f, [], [
             'editor' => ['plugins_okapi_bconffilter'],
         ]);
         $r->addRoute('plugins_okapi_bconffilter_restdefault', $route);
-
-        // default filters list route
-        $route = new ZfExtended_Controller_RestLikeRoute(
-            'editor/plugins_okapi_bconffilter/getdefaultfilters',
-            [
-                'module'     => 'editor',
-                'controller' => 'plugins_okapi_bconffilter',
-                'action'     => 'getdefaultfilters'
-            ]
-        );
-        $r->addRoute('plugins_okapi_bconffilter_getdefaultfilters', $route);
 
         // get fprm settings file content route
         $route = new ZfExtended_Controller_RestLikeRoute(
@@ -321,6 +325,35 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             ]
         );
         $r->addRoute('plugins_okapi_bconffilter_savefprm', $route);
+
+
+        // routes for default bconf filters
+        $route = new Zend_Rest_Route($f, [], [
+            'editor' => ['plugins_okapi_bconfdefaultfilter'],
+        ]);
+        $r->addRoute('plugins_okapi_bconfdefaultfilter_restdefault', $route);
+
+        // default filters list route
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconfdefaultfilter/getall',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconfdefaultfilter',
+                'action'     => 'getall'
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconfdefaultfilter_getall', $route);
+
+        // save extensions for a non-custom filter route
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconfdefaultfilter/setextensions',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconfdefaultfilter',
+                'action'     => 'setextensions'
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconfdefaultfilter_setextensions', $route);
     }
 
     public function getFrontendControllers(): array {

@@ -36,7 +36,7 @@ Ext.define('Editor.plugins.Okapi.store.DefaultBconfFilterStore', {
     model: 'Editor.plugins.Okapi.model.BconfFilterModel',
     proxy: {
         type: 'ajax', // rest not needed, is readonly
-        url: Editor.data.restpath + 'plugins_okapi_bconffilter/getdefaultfilters',
+        url: Editor.data.restpath + 'plugins_okapi_bconfdefaultfilter/getall',
         reader: {
             rootProperty: 'rows',
             type: 'json'

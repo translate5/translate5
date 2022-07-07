@@ -28,8 +28,7 @@
 /**
  * @extends Ext.app.ViewController
  */
-// QUIRK: To support named regions this separate config object is used and later fed to Ext.define()
-let BconfFilterGridController = {
+Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     //region config
     extend: 'Ext.app.ViewController',
     alias: 'controller.bconffilterGridController',
@@ -39,30 +38,27 @@ let BconfFilterGridController = {
                 beforeload: function(){
                     this.lookup('gridview').suspendEvent('refresh'); // prevent repaint until records are processed
                 },
-                load: function(){
-                    this.handleStoreLoad(...arguments);
+                load: function(store, records, success){
+                    if(success && store.getCount() === 0 && store.loadCount === 1){
+                        // Show defaults when no custom filters are available
+                        this.lookup('showDefaultsBtn').setPressed(true);
+                    }
                     this.lookup('gridview').resumeEvent('refresh'); // enable repaint
                     this.lookup('gridview').refresh();
                 }
-            },
+            }
         }
     },
     control: {
         '#': { // # references the view
-            beforeedit: 'prepareFilterEdit',
+            beforeedit: 'prepareEdit',
             edit: 'saveEdit',
             canceledit: 'cancelEdit',
             close: 'onClose'
         },
-
         'textfield#search': {
             change: 'search',
-        },
-
-        'tagfield#extensionMap': {
-            change: 'handleExtMapChange',
-        },
-
+        }
     },
 
     //endregion config
@@ -78,21 +74,6 @@ let BconfFilterGridController = {
     },
 
     //endregion
-
-    /**
-     * Store Load listener. Assumes empty store.
-     */
-    handleStoreLoad: function(store, records, successful, operation){
-        if(!successful){
-            Editor.app.getController('ServerException').handleCallback(records, operation);
-            return;
-        }
-        store.add(Ext.getStore('defaultBconfFilters').getRange());
-        store.setExtensionMapping(operation.getResultSet().getMetadata().extensionMapping);
-        if(store.getCount() === 0 && store.loadCount === 1){ // Show defaults on empty Bconffilters
-            this.lookup('showDefaultsBtn').setPressed(true);
-        }
-    },
 
     search: function(field, searchString){
         var store = this.getView().getStore(),
@@ -153,31 +134,28 @@ let BconfFilterGridController = {
     },
     /**
      * Delete a Bconffilter from DB and extensions-mapping
-     * TODO Remove files
      */
-    delete: function(view, rowIndex, colIndex, item, e, record, /*row*/){
+    delete: function(view, rowIndex, colIndex, item, e, record){
         /** @param {Editor.plugins.Okapi.store.BconfFilterStore} store */
         var store = Ext.getStore('bconffilterStore');
         record.get('extensions').forEach(function(ext){
             record.removeExtension(ext);
         });
         view.select();
-
-
         record.drop(/* cascade */ false);
-        store.saveExtensionMapping().then(function(){
-            store.sync();
-        });
+        store.sync();
     },
 // endregion
-    prepareFilterEdit: function(rowEditPlugin, cellContext){
+    /**
+     *
+     * @param {Ext.grid.plugin.RowEditing} rowEditPlugin
+     * @param {Ext.grid.CellContext} cellContext
+     */
+    prepareEdit: function(rowEditPlugin, cellContext){
         var record = cellContext.record,
-            tagfield = rowEditPlugin.getEditor().down('tagfield'),
-            extensions = Array.from(this.getView().getStore().extensionMap.keys());
-        tagfield.setStore(extensions);
-        tagfield.changelog = {};
-        //record.extensionsBeforeEdit = record.get('extensions').toString();
-        record.get('extensions').unchanged = true;
+            tagfield = rowEditPlugin.getEditor().down('tagfield');
+        tagfield.setStore(this.getView().getStore().getAllExtensions());
+        record.extensionsBeforeEdit = record.get('extensions');
     },
     /**
      * Save changed record
@@ -187,23 +165,33 @@ let BconfFilterGridController = {
     saveEdit: async function(plugin, cellContext){
         var store = Ext.getStore('bconffilterStore'),
             record = cellContext.record,
-            changed = Editor.util.Util.getChanged(cellContext.newValues, cellContext.originalValues);
-        if(record.get('extensions').unchanged){
-            delete changed.extensions; // complex value is always seen as changed
-        } else { // extensions changed
-            await store.saveExtensionMapping();
-        }
-        //record.commit();
-        if(Object.keys(changed).length){
+            isCustom = record.get('isCustom'),
+            extensions = record.get('extensions'),
+            identifier = record.get('identifier'),
+            // checks, if the extensions have been changed
+            extensionsChanged = !Editor.util.Util.arraysAreEqual(extensions, record.extensionsBeforeEdit),
+            // checks if the record has been changed
+            recordChanged = Editor.util.Util.objectWasChanged(cellContext.newValues, cellContext.originalValues, ['name','description','mimeType']);
 
-            record.set(changed); //QUIRK TODO check why not ausosave
-            //record.commit();
+        console.log('RECORD wasChanged:', recordChanged, ' Extensions were changed:', extensionsChanged, 'new extensions:', extensions, ' Custom: ', isCustom);
+        // cleanup tmp data
+        delete record.extensionsBeforeEdit;
+        // save a custom record or just transfere the new extensions for a non-custom record
+        if(isCustom && (recordChanged || extensionsChanged)){
+            // transfere changed data of a custom entry
+            record.set({
+                'name': cellContext.newValues.name,
+                'description': cellContext.newValues.description,
+                'mimeType': cellContext.newValues.mimeType,
+                'extensions': extensions
+            });
+            // "heal" new records
             if(record.isNewRecord){
                 record.crudState = 'C';
                 record.phantom = true;
                 delete record.isNewRecord;
             }
-
+            // save back
             store.sync({
                 batch: {
                     listeners: {
@@ -216,85 +204,60 @@ let BconfFilterGridController = {
                     }
                 },
                 /**
-                 *
                  * @param {Ext.data.Batch} batch
                  * @param batchOptions
                  */
                 callback: function(batch){
                     var success = !batch.hasException();
                     if(success){
+                        // update record state
                         record.commit();
-                        //TODO clear other records
-
+                        // update the maps in the store & remove extension from other items
+                        store.updateExtensionsByIdentifier(identifier, extensions);
                     }
                 }
-            }); //TODO: add new Id to search
+                // TODO BCONF: add new Id to search
+            });
+        } else if(!isCustom && extensionsChanged){
+            Ext.Ajax.request({
+                url: Editor.data.restpath + 'plugins_okapi_bconfdefaultfilter/setextensions',
+                params: {
+                    identifier: identifier,
+                    bconfId: store.getProxy().bconfId,
+                    extensions: extensions.join(',')
+                },
+                success: function(){
+                    // update the record silently
+                    record.set('extensions', extensions, { silent: true, dirty: false });
+                    record.commit();
+                    // update the maps in the store & remove extension from other items
+                    store.updateExtensionsByIdentifier(identifier, extensions);
+                },
+                failure: function(response){
+                    Editor.app.getController('ServerException').handleException(response);
+                }
+            });
+        } else {
+            // to remove the "red corner" when the extension-editor changed anything
+            record.commit();
         }
-
     },
     /**
      * Delete new records when edit was canceled
-     * @listens event:canceledit
+     * @listens event: canceledit
      * @param {Ext.grid.plugin.RowEditing} plugin
      * @param {Ext.grid.CellContext} cellContext
      */
     cancelEdit: function(plugin, cellContext){
-        var record = cellContext.record,
-            changelog = plugin.getEditor().down('tagfield').changelog,
-            isRevert = true, extension;
-        if(!record.get('extensions').unchanged){ // revert changes
-            for(extension in changelog){
-                var {filter, affected} = changelog[extension],
-                    added = !changelog[extension].added;
-                delete changelog[extension];
-                if(added){
-                    affected = filter.addExtension(extension, affected, isRevert);
-                } else {
-                    affected = filter.removeExtension(extension, affected, isRevert);
-                }
-            }
-        }
-        if(record.isNewRecord){
-            record.drop();
+        delete cellContext.record.extensionsBeforeEdit;
+        if(cellContext.record.isNewRecord){
+            cellContext.record.drop();
         }
     },
-
     /**
-     * Handles changes of a filter's extensions
-     * Precondition: current and previous differ by exactly one element
+     *
      */
-    handleExtMapChange: function(tagfield, current, previous){
-        var added = current.length > previous.length,
-            [longer, shorter] = added ? [current, previous] : [previous, current],
-            extension = Ext.Array.difference(longer, shorter)[0],
-            filter = this.getView().editingPlugin.getEditor().getRecord(),
-            changelog = tagfield.changelog,
-            affected, isRevert;
-
-        if(changelog[extension]){ // revert prior change
-            isRevert = true;
-            filter = changelog[extension].filter;
-            affected = changelog[extension].affected;
-            added = !changelog[extension].added;
-            delete changelog[extension];
-        }
-        if(added){
-            affected = filter.addExtension(extension, affected, isRevert);
-        } else {
-            affected = filter.removeExtension(extension, affected, isRevert);
-        }
-        //TODO:this.lookup('gridview').refreshNode(filter);
-        if(affected){
-            //this.lookup('gridview').refreshNode(affected);
-        }
-        if(!isRevert){ // Save log for revert
-            tagfield.changelog[extension] = {added, filter, affected}
-        }
-    },
     onClose: function(){
         location.hash = location.hash.replace(/\/filters.*$/,'');
     }
-
-};
-Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', BconfFilterGridController);
-delete window.BconfFilterGridController;
+});

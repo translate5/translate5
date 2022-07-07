@@ -79,8 +79,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     },
     fields: [{
         name: 'id',
-        type: 'int',
-        critical: true,
+        type: 'int'
     }, {
         name: 'bconfId',
         type: 'int',
@@ -90,22 +89,28 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     }, {
         name: 'okapiType',
         type: 'string',
+        persist: false
     }, {
         name: 'okapiId',
         type: 'string',
+        persist: false
     }, {
         name: 'name',
         type: 'string',
+        persist: true
     }, {
         name: 'description',
         type: 'string',
+        persist: true
     }, {
         name: 'mimeType',
         type: 'string',
+        persist: true
     }, {
         /* the identifier is unique and is used e.g. to connect the extension-mapping with the store */
         name: 'identifier',
         type: 'string',
+        critical: true
     }, {
         name: 'editable',
         type: 'bool',
@@ -126,39 +131,20 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         type: 'string',
         defaultValue: '',
         persist: false
-    },
-    /**
-     * @readonly This models a 1:n relation. To manipulate, retrieve value via .get() and use
-     * @see StringSet
-     * @property {bool} unchanged Flag that shows if extensions were changed during an edit
-     * @link BconfFilterGridController.prepareFilterEdit,saveEdit,cancelEdit
-    */
-    {
+    },{
         name: 'extensions',
-        persist: true, // Normal saving causes many requests
-        /**
-         * Only allow initializing, changes will be handled by
-         * Must always create new Set for change detection
-         * @see Editor.plugins.Okapi.model.BconfFilterModel.addExtension
-         * @see Editor.plugins.Okapi.model.BconfFilterModel.removeExtension
-         * @return {StringSet}
-         */
-        convert: function(v, rec){ // null is passed after saving the record
-            if(v && v.op){ // Special handler with op key
-                var set = new StringSet(rec.data[this.name]);
-                set[v.op](v.extension);
-                return set;
-            } else {
-                var array = Ext.isString(v) ? v.split(/[,.\s]+/) : Ext.Array.from(v);
-                return new StringSet(array);
+        type: 'auto',
+        defaultValue: [],
+        convert: function (value) {
+            if(Array.isArray(value)){
+                return value.sort();
             }
+            return String(value).split(',').sort();
         },
-        serialize: function(v){
-            return v.toString();
+        serialize: function(value){
+            return value.join(',');
         },
-        isEqual: function(a, b){
-            return a.toString() === b.toString();
-        },
+        persist: true
     }],
     isValid: function(){
         return this.get('isCustom') && // don't save default filters
@@ -169,53 +155,27 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
      * @return {string} The filterName with the filterId in parantheses behind
      */
     getDisplayName(){
-        return this.get('name') + '&nbsp;(' + this.id + ')';
-    },
-
-    /**
-     * Add Extension to this filter. If it belonged to another filter before, remove from there.
-     * @param {String} extension
-     * @param {Editor.plugins.Okapi.model.BconfFilterModel} from Record where to take the extension from#
-     * @param {Boolean} isRevert Inidcates if to set dirty or not
-     */
-    addExtension: function(extension, from, isRevert = false, showMsg = true){
-        var filters = Editor.util.Util.getUnfiltered(this.store),
-            msg = `Added extension <i>${extension}</i>`;
-
-        from = (from !== undefined) ? from : filters.getByKey(this.extensionMap.get(extension));
-        if(from){
-            from.removeExtension(extension, null, isRevert, !showMsg);
-            msg += ` from '${from.get('name')}'`;
-        }
-        this.set('extensions', {op: 'add', extension}, {dirty: !isRevert});
-        this.extensionMap.set(extension, this.get('identifier'));
-
-        if(showMsg){
-            Editor.MessageBox.addInfo(msg, 2);
-        }
-        if(from){
-            return from;
-        }
+        return this.get('name') + '&nbsp;(' + this.get('identifier') + ')';
     },
     /**
-     * Remove extension this filter. If it belonged to another filter before, remove from there.
-     * @param {String} extension
-     * @param {Editor.plugins.Okapi.model.BconfFilterModel} to
+     * Removes an extension, returns if it was found
+     * @param {string} extension
+     * @param {boolean} silent
+     * @returns {boolean}
      */
-    removeExtension: function(extension, to, isRevert, showMsg = true){
-        var msg = `Removed extension <i>${extension}</i>`
-        this.set('extensions', {op: 'delete', extension}, {dirty: !isRevert});
-
-        this.extensionMap.delete(extension);
-        // TODO: defaults 'to' receiver based on current system default (via global varaible?)
-        if(to){
-            to.addExtension(extension, null, isRevert, !showMsg);
-            msg += ` and added to '${to.get('name')}' `;
+    removeExtension: function(extension, silent = false){
+        var extensions = this.get('extensions'),
+            index = extensions.indexOf(extension);
+        if(index > -1){
+            extensions = extensions.splice(index, 1);
+            if(silent){
+                this.set('extensions', extensions, { silent: true, dirty: false });
+            } else {
+                this.set('extensions', extensions);
+            }
+            return true;
         }
-        if(showMsg){
-            Editor.MessageBox.addInfo(msg, 2);
-        }
-        return to === null ? undefined : to;
+        return false;
     },
 
     loadFprm(){
@@ -228,15 +188,16 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
                 },
                 callback: function(options, success, response){
                     if(success){
-                        resolve(response.responseText)
+                        resolve(response.responseText);
                     } else {
                         reject();
                         Editor.app.getController('ServerException').handleException(response);
                     }
                 }
-            })
-        })
+            });
+        });
     },
+
     saveFprm(fprm){
         var id = this.id;
         return Ext.Ajax.request({

@@ -87,6 +87,22 @@ class editor_Plugins_Okapi_Bconf_Filters {
     public static function isOkapiDefaultIdentifier(string $identifier) : bool {
         return !str_contains($identifier, self::IDENTIFIER_SEPERATOR);
     }
+
+    /**
+     * Retrieves the non-embedded counterpart for an embedded okapi-default identifier, eg. "okf_plaintext_regex_paragraphs" for "okf_plaintext@okf_plaintext_regex_paragraphs"
+     * @param string $identifier
+     * @return string|null
+     * @throws ZfExtended_Exception
+     */
+    public static function createOkapiDefaultIdentifier(string $identifier) : ?string {
+        if(!self::isOkapiDefaultIdentifier($identifier)){
+            $idata = self::parseIdentifier($identifier);
+            if(self::instance()->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)){
+                return $idata->id;
+            }
+        }
+        return NULL;
+    }
     /**
      * Parses an identifier that is part of the bconf file
      * @param string $identifier

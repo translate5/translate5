@@ -256,11 +256,12 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
-     * Generates the frontend-model for the extension mapping
-     * @return string
+     * Generates the frontend-model for the extension mapping, where identifier => extenasions
+     * The non-embedded default identifiers like 'okf_xml-AndroidStrings' will be turned to embedded ones like 'okf_xml@okf_xml-AndroidStrings'
+     * @return array
      * @throws ZfExtended_Exception
      */
-    public function toJSON() : string {
+    public function getIdentifierMap() : array {
         $items = [];
         // map extensions to filters
         foreach($this->map as $extension => $identifier){
@@ -288,26 +289,25 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         // DEBUG
         if($this->doDebug){ error_log('ExtensionMapping toJSON: '."\n".print_r($jsonData, 1)); }
 
-        return json_encode($jsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return $jsonData;
     }
 
     /**
-     * Updates the extension mapping by frontend-data
-     * @param string $jsonString
+     * @param array $identifierMap
      * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function updateByJSON(string $jsonString) {
+    public function updateByIdentifierMap(array $identifierMap) {
 
         // now we parse the sent json in
-        $jsonMap = json_decode($jsonString, true);
-        if(!$jsonMap || empty($jsonMap)){
-            throw new ZfExtended_Models_Entity_NotFoundException('No valid extension mapping sent');
+        if(count($identifierMap) == 0){
+            throw new ZfExtended_Exception('No valid extension mapping sent');
         }
         // DEBUG
-        if($this->doDebug){ error_log('ExtensionMapping updateByJSON: '."\n".$jsonString); }
+        if($this->doDebug){ error_log('ExtensionMapping updateByIdentifierMap: '."\n".print_r($identifierMap, 1)); }
 
         $items = [];
         // to keep the original order, we initialize a map from the existing map. New items then will be appended
@@ -317,7 +317,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             }
         }
         $customIdentifiers = [];
-        foreach($jsonMap as $identifier => $extensions){
+        foreach($identifierMap as $identifier => $extensions){
             $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
             // a filter with an id that matches an okapi default-filter id will be regarded as an non-embedded default-filter
             // the frontend must make sure, no custom filters can be created with okapi-ids as okapiId !
@@ -407,35 +407,6 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
-     * Removes a filter from the mapping and deletes the corresponding fprm-file
-     * @param string $identifier
-     * @return bool
-     */
-    public function removeFilter(string $identifier) : bool {
-        // DEBUG
-        if($this->doDebug){ error_log('ExtensionMapping removeFilter: '.$identifier); }
-
-        $map = [];
-        $removed = false;
-        foreach($this->map as $extension => $fi){
-            if($fi === $identifier) {
-                $removed = true;
-            } else {
-                $map[$extension] = $fi;
-            }
-        }
-        if($removed){
-            $this->map = $map;
-            if(file_exists($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION)){
-                @unlink($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
-            }
-            // DEBUG
-            if($this->doDebug){ error_log('ExtensionMapping removeFilter: '.$identifier.' has been removed'); }
-        }
-        return $removed;
-    }
-
-    /**
      * writes back an extension-mapping to the filesystem
      */
     public function flush() {
@@ -453,6 +424,103 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             $this->flushFilterToDatabase($identifier, $hash, $usedNames);
         }
         $this->flush();
+    }
+
+    /**
+     * Removes a filter from the mapping and deletes the corresponding fprm-file anf flushes the map if changed
+     * @param string $identifier
+     * @return bool
+     */
+    public function removeFilter(string $identifier) : bool {
+        $defaultIdentifier = editor_Plugins_Okapi_Bconf_Filters::createOkapiDefaultIdentifier($identifier);
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping removeFilter: '.$identifier.($defaultIdentifier ? ' || '.$defaultIdentifier : '')); }
+
+        $newMap = [];
+        $removed = false;
+        foreach($this->map as $extension => $filter){
+            if($filter === $identifier || ($defaultIdentifier !== NULL && $filter === $defaultIdentifier)) {
+                $removed = true;
+            } else {
+                $newMap[$extension] = $filter;
+            }
+        }
+        if($removed){
+            $this->map = $newMap;
+            if(file_exists($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION)){
+                @unlink($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
+            }
+            $this->flush();
+            // DEBUG
+            if($this->doDebug){ error_log('ExtensionMapping removeFilter: '.$identifier.' has been removed'."\n".print_r($this->map, 1)); }
+        }
+        return $removed;
+    }
+
+    /**
+     * Adds a filter with it's extensions
+     * @param string $identifier
+     * @param array $extensions
+     * @return bool
+     * @throws ZfExtended_Exception
+     */
+    public function addFilter(string $identifier, array $extensions) : bool {
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping addFilter: '.$identifier.', extensions: [ '.implode(', ', $extensions).' ]'); }
+        // we simply use the change API, but it seems resonable to have an explicit add function
+        return $this->changeFilter($identifier, $extensions);
+    }
+
+    /**
+     * Changes a filter with it's extensions
+     * @param string $identifier
+     * @param array $extensions
+     * @return bool
+     * @throws ZfExtended_Exception
+     */
+    public function changeFilter(string $identifier, array $extensions) : bool {
+        $defaultIdentifier = editor_Plugins_Okapi_Bconf_Filters::createOkapiDefaultIdentifier($identifier);
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping changeFilter: '.$identifier.($defaultIdentifier ? ' || '.$defaultIdentifier : '').', extensions: [ '.implode(', ', $extensions).' ]'); }
+
+        $newMap = [];
+        $extToAdd = $extensions;
+        $extBefore = [];
+        $changed = false;
+        foreach($this->map as $extension => $filter){
+            if($filter === $identifier || ($defaultIdentifier !== NULL && $filter === $defaultIdentifier)){
+                $extBefore[] = $extension;
+                if(count($extToAdd) > 0){
+                    $newMap[array_shift($extToAdd)] = $filter;
+                } else {
+                    $changed = true;
+                }
+            } else if(in_array($extension, $extensions)){
+                $changed = true;
+            } else {
+                $newMap[$extension] = $filter;
+            }
+        }
+        // append extensions that could not be distribued to existing entries for $identifier
+        if(count($extToAdd) > 0){
+            // in the map on disk we always use default identifiers
+            $filter = ($defaultIdentifier === NULL) ? $identifier : $defaultIdentifier;
+            foreach($extToAdd as $extension){
+                $newMap[$extension] = $filter;
+            }
+            $changed = true;
+        }
+        // we must capture the case where different extensions of the same amount have been set, this cannot be evaluated with the logic above
+        if(!$changed){
+            $changed = (count(array_diff($extBefore, $extensions)) !== 0);
+        }
+        if($changed){
+            $this->map = $newMap;
+            $this->flush();
+            // DEBUG
+            if($this->doDebug){ error_log('ExtensionMapping changeFilter: '.$identifier.' with extensions [ '.implode(', ', $extensions).' ] has been changed: '."\n".print_r($this->map, 1)); }
+        }
+        return $changed;
     }
 
     /**

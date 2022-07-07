@@ -167,7 +167,6 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     }
 
     /**
-     * @return void
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
@@ -192,7 +191,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     }
 
     /**
-     * Updates the extensions-mapping.txt file of a Bconf
+     * Updates the extensions-mapping of a Bconf from the frontend
+     * The mapping will be sent as identifier => [ extensions ]
+     * // TODO BCONF: remove when not needed
      * @throws ZfExtended_Exception
      * @throws editor_Plugins_Okapi_Exception
      */
@@ -200,6 +201,6 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $this->entityLoad();
         $jsonString = $this->getRequest()->getRawBody();
         $extensionMapping = $this->entity->getExtensionMapping();
-        $extensionMapping->updateByJSON($jsonString);
+        $extensionMapping->updateByIdentifierMap(json_decode($jsonString, true));
     }
 }

@@ -106,11 +106,19 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
     }
 
     /**
+     * retrieves our identifier as it can be found in the extension mapping
+     * @return string
+     */
+    public function getIdentifier() : string {
+        return editor_Plugins_Okapi_Bconf_Filters::createIdentifier($this->getOkapiType(), $this->getOkapiId());
+    }
+
+    /**
      * Retrieves the full filename of the related fprm file
      * @return string
      */
     public function getFile() : string {
-        return editor_Plugins_Okapi_Bconf_Filters::createIdentifier($this->getOkapiType(), $this->getOkapiId()).'.'.self::EXTENSION;
+        return $this->getIdentifier().'.'.self::EXTENSION;
     }
 
     /**
@@ -230,32 +238,6 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
             ->where('okapiType = ?', $okapiType)
             ->where('okapiId = ?', $okapiId);
         $this->loadRowBySelect($select);
-    }
-
-    /**
-     * Removes the passed Extension from the entry.
-     * If there are no extensions left then, it will be removed (return-value: false) or saved (return-value: true)
-     * @param string[] $extensionsToRemove
-     * @return bool
-     */
-    public function removeExtensions(array $extensionsToRemove) : bool {
-        if(count($extensionsToRemove) === 0){
-            return true;
-        }
-        $newExtensions = [];
-        foreach($this->getFileExtensions() as $extension){
-            if(!in_array($extension, $extensionsToRemove)){
-                $newExtensions[] = $extension;
-            }
-        }
-        if(count($newExtensions) === 0){
-            $this->delete();
-            return false;
-        } else {
-            $this->setExtensions(implode(',', $newExtensions));
-            $this->save();
-            return true;
-        }
     }
 
     /**
