@@ -351,8 +351,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function updateEntry(string $source, string $target): array
     {
         $request = [
-            'sourceLang' => $this->languageResource->getSourceLang(),
-            'targetLang' => $this->languageResource->getTargetLang(),
+            'sourceLang' => $this->fixLanguages->key($this->languageResource->getSourceLangCode()),
+            'targetLang' => $this->fixLanguages->key($this->languageResource->getTargetLangCode()),
             'source' => $source,
             'target' => $target,
             'markupTable' => self::MARKUP_TABLE,
@@ -373,8 +373,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function deleteEntry(string $source, string $target): bool
     {
         $request = [
-            'sourceLang' => $this->languageResource->getSourceLang(),
-            'targetLang' => $this->languageResource->getTargetLang(),
+            'sourceLang' => $this->fixLanguages->key($this->languageResource->getSourceLangCode()),
+            'targetLang' => $this->fixLanguages->key($this->languageResource->getTargetLangCode()),
             'source' => $source,
             'target' => $target,
             'markupTable' => self::MARKUP_TABLE,
