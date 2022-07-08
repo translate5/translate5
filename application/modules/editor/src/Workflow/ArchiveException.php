@@ -26,9 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Workflow;
+
 /**
  */
-class editor_Plugins_MatchAnalysis_Models_Db_BatchResult extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_match_analysis_batchresults';
-    public $_primary = 'id';
+class ArchiveException extends \ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.workflow.archiveaction';
+
+    static protected array $localErrorCodes = [
+        'E1399' => 'No task taskLifetimeDays configuration defined.',
+        'E1400' => 'Task could not backuped there fore it also was not deleted.',
+        'E1401' => 'Could not zip the export of the task',
+    ];
 }

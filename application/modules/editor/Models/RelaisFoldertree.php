@@ -93,7 +93,6 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
         $this->checkCall = true;
         $this->relaisRootPath = $importFolder.DIRECTORY_SEPARATOR.$this->_pathPrefix;
     	$this->getFilePathsNodeVisitor($this->objectTree);
-    	$this->logMissingFile();
         $this->checkCall = false;
         return array_filter($this->_paths, function($path) {
             return $this->isFileToImport($path);
@@ -190,7 +189,7 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
     /**
      * Logs the missing relais files.
      */
-    protected function logMissingFile() {
+    public function logMissingFile() {
         if(empty($this->collectedMissingFiles)) {
             return;
         }

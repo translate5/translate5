@@ -60,7 +60,9 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
         categories: '#UT#Kategorien',
         useAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert',
-        writeAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden'
+        writeAsDefaultTooltip:'#UT#Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden',
+        pivotAsDefault:'#UT#Standardmäßig als Pivot verwenden',
+        pivotAsDefaultTooltip:'#UT#Standardmäßig als Pivot verwenden'
     },
     
     listeners:{
@@ -183,6 +185,23 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         autoEl: {
                             tag: 'div',
                             'data-qtip': me.strings.writeAsDefaultTooltip
+                        }
+                    },{
+                        xtype:'tagfield',
+                        name:'customerPivotAsDefaultIds',
+                        itemId:'pivotAsDefault',
+                        dataIndex:'customerPivotAsDefaultIds',
+                        bind:{
+                            store:'{customersDefaultPivot}',
+                        },
+                        displayField: 'name',
+                        valueField: 'id',
+                        queryMode: 'local',
+                        fieldLabel:me.strings.pivotAsDefault,
+                        labelClsExtra:'lableInfoIcon',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.pivotAsDefaultTooltip
                         }
                     },{
                         xtype: 'colorfield',

@@ -982,7 +982,8 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
             events: '<?php echo $this->translate->_('Ereignisse');?>',
-            config: '<?php echo $this->translate->_('Standardkonfiguration Kunde überschreiben');?>'
+            config: '<?php echo $this->translate->_('Standardkonfiguration Kunde überschreiben');?>',
+            pivotAssoc:'<?php echo $this->translate->_('Pivot-Sprachressourcen');?>',
         }
     });
 
@@ -1020,6 +1021,32 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.config.ConfigWizard",
         strings: {
             wizardTitle:'<?php echo $this->translate->_('Konfiguration');?>',
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.LanguageResources.pivot.PivotWizard", {
+        override: "Editor.view.LanguageResources.pivot.PivotWizard",
+        strings: {
+            wizardTitle:'<?php echo $this->translate->_('Pivot-Sprachressourcen');?>',
+            pivotFilesZipMessage: '<?php echo $this->translate->_('Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.');?>',
+        }
+    });
+
+
+    Ext.define("Editor.locale.view.LanguageResources.pivot.Assoc", {
+        override: "Editor.view.LanguageResources.pivot.Assoc",
+        strings: {
+            empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.');?>',
+            checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
+            serviceName: '<?php echo $this->translate->_('Ressource');?>',
+            taskGuid: '<?php echo $this->translate->_('Aufgabenname');?>',
+            workerQueued: '<?php echo $this->translate->_('Pivot-Vorübersetzung läuft');?>',
+            startPretranslationButtonText: '<?php echo $this->translate->_('Vorübersetzung');?>',
+            assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
+            assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>'
         }
     });
 
@@ -1732,7 +1759,7 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.view.LanguageResources.services.Microsoft.SynonymSearch", {
         override: "Editor.view.LanguageResources.services.Microsoft.SynonymSearch",
         strings: {
-            synonymSearch: '<?php echo $this->translate->_('Synonym-Suche');?>',
+            synonymSearch: '<?php echo $this->translate->_('Synonymsuche');?>',
             resultColumn:'<?php echo $this->translate->_('Übersetzung');?>',
             partOfSpeechColumn:'<?php echo $this->translate->_('Wortart');?>',
             backTranslationsColumn:'<?php echo $this->translate->_('Alternativen');?>',
@@ -1836,7 +1863,9 @@ Ext.define('Editor.controller.Localizer', {
             importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
             useAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert');?>',
             writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>',
-            collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>'
+            collectionUploadTooltip: '<?php echo $this->translate->_('Erlaubte Dateiformate: TBX oder eine Zip-Datei, die eine oder mehrere TBX-Dateien enthält.');?>',
+            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
+            pivotAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>'
         }
     });
 
@@ -1869,6 +1898,8 @@ Ext.define('Editor.controller.Localizer', {
             categories: '<?php echo $this->translate->_('Kategorien');?>',
             useAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden Leserecht für diese Sprachresource aktiviert');?>',
             writeAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig wird bei neuen Aufgaben für die gewählten Kunden gesetzt, dass Segmente beim Segment speichern in die Sprachresource geschrieben werden');?>',
+            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>',
+            pivotAsDefaultTooltip: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>'
         }
     });
 
@@ -1908,7 +1939,8 @@ Ext.define('Editor.controller.Localizer', {
         	writeAsDefault: '<?php echo $this->translate->_('Schreibrechte standardmäßig');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
-            specificDataText: '<?php echo $this->translate->_('Zusätzliche Infos');?>'
+            specificDataText: '<?php echo $this->translate->_('Zusätzliche Infos');?>',
+            pivotAsDefault: '<?php echo $this->translate->_('Standardmäßig als Pivot verwenden');?>'
         }
     });
 

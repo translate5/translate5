@@ -293,6 +293,13 @@ Ext.define('Editor.model.admin.Task', {
     isAutoqa: function () {
         return (this.get('state') === 'opautoqa' || this.get('state') === 'matchanalysis');
     },
+
+    /***
+     * Is the task state pivotpretranslation
+     */
+    isPivotPreTranslation: function () {
+        return this.get('state') === 'pivotpretranslation';
+    },
     /**
      * Is the current task state open
      * @returns {Boolean}

@@ -512,18 +512,18 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "36519",
+                    "qid": "92423",
                     "qtype": "numbers",
                     "qcount": 3,
                     "qcomplete": true,
                     "qcategory": "num1",
                     "qcatidx": "-1",
-                    "text": "Numbers SRC \u2260 TRG",
+                    "text": "Numbers source \u2260 target",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "36529",
+                    "qid": "92433",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -534,7 +534,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "36531",
+                    "qid": "92435",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -545,7 +545,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "36525",
+                    "qid": "92429",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -556,18 +556,18 @@
                     "checked": false
                 },
                 {
-                    "qid": "36520",
+                    "qid": "92424",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num2",
                     "qcatidx": "-1",
-                    "text": "Alphanumerical character sequences",
+                    "text": "Alphanumerical character sequences: Differences",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "36521",
+                    "qid": "92425",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -578,7 +578,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "36522",
+                    "qid": "92426",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -589,7 +589,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "36523",
+                    "qid": "92427",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -600,7 +600,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "36526",
+                    "qid": "92430",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -616,30 +616,30 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num7",
-                    "text": "Separator from SRC altered",
+                    "text": "Separator from source altered",
                     "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "36527",
+                    "qid": "92431",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num8",
                     "qcatidx": "-1",
-                    "text": "Numeral from SRC found as number in TRG",
+                    "text": "Numeral from source found as number in target",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "36528",
+                    "qid": "92432",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num9",
                     "qcatidx": "-1",
-                    "text": "Number from SRC found as numeral in TRG",
+                    "text": "Number from source found as numeral in target",
                     "leaf": true,
                     "checked": false
                 }

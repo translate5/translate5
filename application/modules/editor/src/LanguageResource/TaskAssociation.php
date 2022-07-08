@@ -95,9 +95,10 @@ class TaskAssociation extends ZfExtended_Models_Entity_Abstract {
      * ("The function is meant to be called only by rest call"!)
      *
      * @param string $taskGuid
-     * @return multitype:
+     * @return mixed
      */
-    public function loadByAssociatedTaskAndLanguage($taskGuid) {
+    public function loadByAssociatedTaskAndLanguage(string $taskGuid): mixed
+    {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid((string) $taskGuid);

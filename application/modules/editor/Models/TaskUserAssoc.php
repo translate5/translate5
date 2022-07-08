@@ -77,6 +77,16 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserAssoc';
 
 
+    /***
+     * @param string $taskGuid
+     * @return array|null
+     */
+    public function loadAllOfATask(string $taskGuid){
+        $s = $this->db->select()
+            ->where('taskGuid = ?',$taskGuid);
+        return $this->db->getAdapter()->fetchAll($s);
+    }
+
     /**
      * returns all users to the taskGuid and role of the given TaskUserAssoc
      * @param string $taskGuid
