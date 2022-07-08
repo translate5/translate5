@@ -69,8 +69,10 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     {
         $data = $this->jsonDecode($this->getRequest()?->getParam('data'));
         $api = $this->getApi((int)$data['tm']);
+        /** @var editor_Models_Segment_Whitespace $whitespace */
+        $whitespace = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
         try {
-            $api->updateEntry($data['rawSource'], $data['rawTarget']);
+            $api->updateEntry($data['rawSource'], $whitespace->unprotectWhitespace($data['rawTarget']));
         } catch (\Exception $e) {
             // TODO error
         }
@@ -82,7 +84,9 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
     {
         $data = $this->jsonDecode($this->getRequest()?->getParam('data'));
         $api = $this->getApi((int)$data['tm']);
-        $api->deleteEntry($data['source'], $data['target']);
+        /** @var editor_Models_Segment_Whitespace $whitespace */
+        $whitespace = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        $api->deleteEntry($data['source'], $whitespace->unprotectWhitespace($data['target']));
 
         $this->view->assign([]);
     }
@@ -128,6 +132,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
             $data = $resultList->getResult();
             $data = $this->reformatData($data, $tmId);
+            $data = $this->replaceSymbols($data);
 
             // TODO remove once id on tm side is implemented
             $data = array_map(function (array $item) use ($tmId, &$fakeIdIndex) {
@@ -166,6 +171,23 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
             $item['metaData'] = $metadata;
             $item['tm'] = $tmId;
+
+            $result[] = $item;
+        }
+
+        return $result;
+    }
+
+    private function replaceSymbols(array $data): array
+    {
+        /** @var editor_Models_Segment_Whitespace $whitespace */
+        $whitespace = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        $result = [];
+
+        foreach ($data as $item) {
+            foreach (['source', 'target', 'rawTarget'] as $field) {
+                $item[$field] = $whitespace->protectWhitespace($item[$field], editor_Models_Segment_Whitespace::ENTITY_MODE_OFF);
+            }
 
             $result[] = $item;
         }

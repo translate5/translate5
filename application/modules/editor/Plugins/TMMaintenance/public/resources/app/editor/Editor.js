@@ -12,7 +12,7 @@ Ext.define('Ext.translate5.Editor', {
         },
     },
 
-    onEditComplete: function(remainVisible, cancelling) {
+    onEditComplete: function (remainVisible, cancelling) {
         const location = this.getLocation();
         let result = this.callParent([remainVisible, cancelling]);
 
@@ -43,7 +43,7 @@ Ext.define('Ext.translate5.Editor', {
         location.record.set(this.config.dataIndex, rawData);
         location.record.set(this.config.editingDataIndex, rawData);
         location.record.save({
-            success: function() {
+            success: function () {
                 location.record.set('isSaving', false);
             },
         });
@@ -55,7 +55,7 @@ Ext.define('Ext.translate5.Editor', {
         return result;
     },
 
-    beforeEdit: function() {
+    beforeEdit: function () {
         let me = this;
         let location = me.getLocation();
         let tagHelper = Ext.create('TMMaintenance.helper.Tag');
@@ -81,7 +81,7 @@ Ext.define('Ext.translate5.Editor', {
             });
     },
 
-    onFocusLeave: function() {
+    onFocusLeave: function () {
         // Prevent editor from closing when clicking outside
     },
 
