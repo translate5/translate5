@@ -42,8 +42,13 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
     autoLoad: true,
     autoSync: false, // Needed to edit the name before saving!
     pageSize: 0,
+    /** @var {Map} */
     extensionMap: null,
-    identifierMap: {},
+    /** @var {Map} */
+    identifierMap: null,
+    /** @var {Map} */
+    customIdentifierMap: null,
+    /** @var {Array} */
     allExtensions: [],
     defaultsFilter: {
         id: 'defaultsFilter',
@@ -54,32 +59,24 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
     listeners: {
         'load': function(store, records, success, operation){
             if(success){
+                store.identifierMap = new Map();
+                store.customIdentifierMap = new Map();
                 // generate identifier map for loaded items
                 records.forEach(record => {
-                    store.identifierMap[record.get('identifier')] = record.id;
+                    store.identifierMap.set(record.get('identifier'), record.id);
+                    store.customIdentifierMap.set(record.get('identifier'), record.id);
                 });
                 var metadata = operation.getResultSet().getMetadata(),
                     defaultRecords = Ext.getStore('defaultBconfFilters').getRange();
                 // add the records from the default store, add them to the map as well
                 store.add(defaultRecords);
                 defaultRecords.forEach(record => {
-                    store.identifierMap[record.get('identifier')] = record.id;
+                    store.identifierMap.set(record.get('identifier'), record.id);
                 });
                 store.allExtensions = metadata.allExtensions;
                 store.setExtensionMapping(metadata.extensionMapping);
             }
         }
-    },
-    /**
-     * Retrieves a record by identifier via a cached map
-     * @param {string} identifier
-     * @returns {Editor.plugins.Okapi.model.BconfFilterModel|null}
-     */
-    getByIdentifier: function(identifier){
-        if(this.identifierMap.hasOwnProperty(identifier)){
-            return this.getById(this.identifierMap[identifier]);
-        }
-        return null;
     },
     initConfig: function(config){
         if(!config.filters){
@@ -89,14 +86,41 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
         return this.callParent([config]);
     },
     /**
+     * Retrieves a record by identifier via a cached map
+     * @param {string} identifier
+     * @returns {Editor.plugins.Okapi.model.BconfFilterModel|null}
+     */
+    getByIdentifier: function(identifier){
+        if(this.identifierMap.has(identifier)){
+            return this.getById(this.identifierMap.get(identifier));
+        }
+        return null;
+    },
+    /**
+     * Retrieves all records independetly of filtering
+     * @see https://forum.sencha.com/forum/showthread.php?310616
+     * @returns {Ext.util.Collection }
+     */
+    getUnfilteredData: function(){
+        return (this.isFiltered() || this.isSorted()) ? this.getData().getSource() : this.getData();
+    },
+    /**
+     * Retrieves an item by name
+     * @param {string} name
+     * @returns {Editor.plugins.Okapi.model.BconfFilterModel|null}
+     */
+    findUnfilteredByName: function(name){
+        return this.getUnfilteredData().find('name', name, 0, true, true, true);
+    },
+    /**
      * @param {object} identifierToExtensions: object of mapping-items: { identifier => [ extension ] }
      */
     setExtensionMapping: function(identifierToExtensions){
-        var identifier, record, setSilent = { silent: true, dirty: false };
+        var record, setSilent = { silent: true, dirty: false };
         this.extensionMap = new Map();
         // provide our items with the needed extensions
-        for(identifier in this.identifierMap){
-            record = this.getById(this.identifierMap[identifier]);
+        this.identifierMap.forEach((id, identifier) => {
+            record = this.getById(id);
             if(record) {
                 if (identifierToExtensions.hasOwnProperty(identifier)) {
                     record.set('extensions', identifierToExtensions[identifier].sort(), setSilent);
@@ -106,9 +130,9 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
             } else {
                 console.log('ERROR: BconfFilterStore.setExtensionMapping: can not find record for identifier ', identifier);
             }
-        }
+        });
         // generate the extension => identifier map
-        for(identifier in identifierToExtensions){
+        for(var identifier in identifierToExtensions){
             identifierToExtensions[identifier].forEach(extension => {
                 this.extensionMap.set(extension, identifier);
             });
@@ -119,9 +143,12 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
      * It is assumed, that the record of the identifier is updated in the calling code
      * @param {string} identifier
      * @param {Array} extensions
+     * @param {boolean} isCustom
      */
-    updateExtensionsByIdentifier(identifier, extensions){
-        var record, extBefore = [];
+    updateExtensionsByIdentifier(identifier, extensions, isCustom){
+        var record,
+            extBefore = [], // represents the extensions the changed item currently has
+            customChanged = isCustom; // evaluates, if the custom extensions have been changed
         // first, remove all existing entries of the item (TODO: can we delete the extension here in the loop ? unclear ...
         this.extensionMap.forEach((filter, extension) => {
             if(filter === identifier){
@@ -137,12 +164,27 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
                 record = this.getByIdentifier(this.extensionMap.get(extension));
                 if(record){
                     record.removeExtension(extension, true);
+                    if(!customChanged && record.get('isCustom')){
+                        customChanged = true;
+                    }
                 } else {
                     console.log('ERROR: BconfFilterStore.updateExtensionsByIdentifier: can not find record for extension ' + extension + ' mapping to identifier ' + this.extensionMap[extension]);
                 }
             }
             this.extensionMap.set(extension, identifier);
         });
+        // finally, if the extensions of custom items changed we fire an according event
+        if(customChanged){
+            var bconfId, allCustomExts = [];
+            // collect all custom extensions
+            this.customIdentifierMap.forEach(id => {
+                record = this.getById(id);
+                allCustomExts = allCustomExts.concat(record.get('extensions'));
+                bconfId = record.get('bconfId');
+            });
+            // the bconf grid will listen and update a bconf accordingly
+            this.fireEvent('customFilterExtensionsChanged', bconfId, allCustomExts);
+        }
     },
     /**
      * Retrieves all exensions that shall be shown in the tagfield selector

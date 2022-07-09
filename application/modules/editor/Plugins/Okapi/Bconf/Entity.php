@@ -563,6 +563,21 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
+     * Retrieves the extensions of our related custom filter entries
+     * @return array
+     */
+    public function findCustomFilterExtensions() : array {
+        $extensions = [];
+        $extensionMapping = $this->getExtensionMapping();
+        foreach($this->findCustomFilterIdentifiers() as $identifier){
+            $extensions = array_merge($extensionMapping->findExtensionsForFilter($identifier), $extensions);
+        }
+        $extensions = array_unique($extensions);
+        sort($extensions);
+        return $extensions;
+    }
+
+    /**
      * @throws Zend_Db_Statement_Exception
      * @throws Zend_Db_Table_Row_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
@@ -600,5 +615,20 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
             $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
             $cleaner->delete($dir);
         }
+    }
+
+    /**
+     * Retrieves the list to feed the bconf's grid view
+     * Adds the custom extensions to each row
+     * @return array
+     */
+    public function getGridRows() : array {
+        $data = [];
+        foreach($this->loadAllEntities() as $bconfEntity){ /* @var editor_Plugins_Okapi_Bconf_Entity $bconfEntity */
+            $bconfData = $bconfEntity->toArray();
+            $bconfData['customExtensions'] = $bconfEntity->findCustomFilterExtensions();
+            $data[] = $bconfData;
+        }
+        return $data;
     }
 }

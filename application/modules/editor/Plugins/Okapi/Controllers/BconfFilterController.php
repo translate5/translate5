@@ -69,6 +69,8 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         $extensions = explode(',', $this->data->extensions);
         $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
         $extensionMapping->changeFilter($this->entity->getIdentifier(), $extensions);
+        // the frontend needs to know about an adjusted identifier
+        $this->view->rows->identifier = $this->entity->getIdentifier();
     }
 
     /**
@@ -83,6 +85,28 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         $extensions = explode(',', $this->data->extensions);
         $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
         $extensionMapping->addFilter($this->entity->getIdentifier(), $extensions);
+        // the frontend needs to know about an adjusted identifier
+        $this->view->rows->identifier = $this->entity->getIdentifier();
+    }
+
+    /**
+     * Overwritten for additional processing on postAction
+     */
+    protected function decodePutData(){
+        // crucial: new entries are sent with a temp identifier 'NEW@FILTER' which needs to be turned to a valid custom identifier and id
+        // this represents a clone-operation and the original identifier can be restored from the (cloned) okapiType / okapiId
+        parent::decodePutData();
+        if($this->data->identifier === 'NEW@FILTER'){
+            // we need to copy the FPRM-file and generate the new identifier
+            $newOkapiId = editor_Plugins_Okapi_Bconf_Filter_Entity::preProcessNewEntry(
+                intval($this->data->bconfId),
+                $this->data->okapiType,
+                $this->data->okapiId,
+                $this->data->name
+            );
+            $this->data->okapiId = $newOkapiId;
+            $this->data->identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($this->data->okapiType, $newOkapiId);
+        }
     }
 
     /**

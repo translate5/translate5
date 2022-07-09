@@ -89,11 +89,11 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     }, {
         name: 'okapiType',
         type: 'string',
-        persist: false
+        critical: true
     }, {
         name: 'okapiId',
         type: 'string',
-        persist: false
+        critical: true
     }, {
         name: 'name',
         type: 'string',
@@ -170,7 +170,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
             extensions.splice(index, 1);
             if(silent){
                 this.set('extensions', extensions, { silent: true, dirty: false });
-                this.commit();
+                // this.commit();
             } else {
                 this.set('extensions', extensions);
             }

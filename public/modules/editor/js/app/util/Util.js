@@ -314,12 +314,6 @@ Ext.define('Editor.util.Util', {
             var base = Ext.util.History.getToken().split('/');
             return base.length > 0 ? base[0] : '';
         },
-        
-        /** @see https://forum.sencha.com/forum/showthread.php?310616
-         * @returns {Ext.Util.Collection} */
-        getUnfiltered: function(store){
-            return store.isFiltered() || store.isSorted() ? store.getData().getSource() : store.getData();
-        },
 
         /**
          * Checks changed properties from an edited object to an original object

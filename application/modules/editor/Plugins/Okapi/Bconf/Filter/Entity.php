@@ -58,6 +58,41 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
     const MAX_IDENTIFIER_LENGTH = 128;
 
     /**
+     * Creates new identifier and copies the referenced FPRM for a ne bconf-filter
+     * @param int $bconfId
+     * @param string $okapiType
+     * @param string $okapiId
+     * @param string $filterName
+     * @return string
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public static function preProcessNewEntry(int $bconfId, string $okapiType, string $okapiId, string $filterName) : string {
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $bconf->load($bconfId);
+        // we need the old identifier to copy the fprm
+        $oldIdentifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($okapiType, $okapiId);
+        $newOkapiId = editor_Plugins_Okapi_Bconf_Filter_Entity::createOkapiId($bconf, $filterName, $okapiType);
+        $newIdentifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($okapiType, $newOkapiId);
+        // retrieves the filepath of the fprm to copy
+        $sourcePath = $bconf->createPath(self::createFileFromIdentifier($oldIdentifier));
+        if(editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedOkapiDefaultFilter($okapiType, $okapiId)){
+            $sourcePath = editor_Plugins_Okapi_Bconf_Filters::instance()->getOkapiDefaultFilterPathById($okapiId);
+        } else if(editor_Plugins_Okapi_Bconf_Filters::instance()->isEmbeddedTranslate5Filter($okapiType, $okapiId)){
+            $sourcePath = editor_Plugins_Okapi_Bconf_Filters::instance()->getTranslate5FilterPath($okapiType, $okapiId);
+        } else if(!file_exists($sourcePath)){
+            throw new editor_Plugins_Okapi_Exception('E1409', ['filterfile' => $sourcePath, 'details' => 'The file was not found in '.ltrim($bconf->createPath(''), '/')]);
+        }
+        copy($sourcePath, $bconf->createPath(self::createFileFromIdentifier($newIdentifier)));
+        // DEBUG
+        if(ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfProcessing')){ error_log('BCONF FILTER: created new identifier "'.$newIdentifier.'" and copied FPRM-file for bconf-filter "'.$filterName.'" for bconf '.$bconf->getId()); }
+
+        return $newOkapiId;
+    }
+
+    /**
      * Generates the okapi-id for a new custom filter
      * @param editor_Plugins_Okapi_Bconf_Entity $bconf
      * @param string $name
@@ -80,6 +115,14 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
             $okapiId = $baseId.'-'.$count;
         }
         return $okapiId;
+    }
+
+    /**
+     * @param string $identifier
+     * @return string
+     */
+    public static function createFileFromIdentifier(string $identifier) : string {
+        return $identifier.'.'.self::EXTENSION;
     }
 
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Db_BconfFilter';
@@ -116,7 +159,7 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
      * @return string
      */
     public function getFile() : string {
-        return $this->getIdentifier().'.'.self::EXTENSION;
+        return self::createFileFromIdentifier($this->getIdentifier());
     }
 
     /**

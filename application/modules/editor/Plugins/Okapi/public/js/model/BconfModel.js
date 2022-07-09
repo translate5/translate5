@@ -33,7 +33,8 @@
  *  "name": "Translate5-Standard",
  *  "description": "The default .bconf used for file imports unless another one is configured",
  *  "isDefault": "1",
- *  "versionIdx": "2"
+ *  "versionIdx": "2",
+ *  "customExtensions": ["xml","html","sdxliff"]
  *  }
  */
 Ext.define('Editor.plugins.Okapi.model.BconfModel', {
@@ -71,6 +72,11 @@ Ext.define('Editor.plugins.Okapi.model.BconfModel', {
     }, {
         name: 'versionIdx',
         type: 'int'
+    }, {
+        name: 'customExtensions',
+        type: 'auto',
+        defaultValue: [],
+        persist: false
     }],
     toUrl: function(){
         return Ext.util.History.getToken().replace(/bconf\/?\d*.*$/, 'bconf/' + this.id)

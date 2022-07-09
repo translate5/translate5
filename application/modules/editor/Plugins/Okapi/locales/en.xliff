@@ -32,21 +32,21 @@
     <source>Aktionen</source>
     <target>Actions</target>
 </trans-unit>
-<trans-unit id='QmNvbmYgaG9jaGxhZGVuLi4u'>
-    <source>Bconf hochladen...</source>
-    <target>Upload Bconf...</target>
+<trans-unit id='QmNvbmYgaG9jaGxhZGVu'>
+    <source>Bconf hochladen</source>
+    <target>Upload Bconf</target>
 </trans-unit>
 <trans-unit id='U1JYLURhdGVp'>
     <source>SRX-Datei</source>
     <target>SRX file</target>
 </trans-unit>
-<trans-unit id='U291cmNlU1JY'>
-    <source>SourceSRX</source>
-    <target>SourceSRX</target>
+<trans-unit id='U291cmNlIFNSWA=='>
+    <source>Source SRX</source>
+    <target>Source SRX</target>
 </trans-unit>
-<trans-unit id='VGFyZ2V0U1JY'>
-    <source>TargetSRX</source>
-    <target>TargetSRX</target>
+<trans-unit id='VGFyZ2V0IFNSWA=='>
+    <source>Target SRX</source>
+    <target>Target SRX</target>
 </trans-unit>
 <trans-unit id='QmVhcmJlaXRlbg=='>
     <source>Bearbeiten</source>
@@ -80,17 +80,17 @@
     <source>Bconf-Datei gelöscht</source>
     <target>Bconf file deleted</target>
 </trans-unit>
-<trans-unit id='VW5nw7xsdGlnZSB7fS1EYXRlaQ=='>
-    <source>Ungültige {}-Datei</source>
-    <target>Invalid {} file</target>
+<trans-unit id='VW5nw7xsdGlnZSB7MH0tRGF0ZWk='>
+    <source>Ungültige {0}-Datei</source>
+    <target>Invalid {0} file</target>
 </trans-unit>
-<trans-unit id='e30tRGF0ZWkgZXJmb2xncmVpY2ggaG9jaGdlbGFkZW4u'>
-    <source>{}-Datei erfolgreich hochgeladen.</source>
-    <target>{} file successfully uploaded.</target>
+<trans-unit id='ezB9LURhdGVpIGVyZm9sZ3JlaWNoIGhvY2hnZWxhZGVuLg=='>
+    <source>{0}-Datei erfolgreich hochgeladen.</source>
+    <target>{0} file successfully uploaded.</target>
 </trans-unit>
-<trans-unit id='RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2Uge30tRGF0ZWku'>
-    <source>Die hochgeladene Datei ist keine gültige {}-Datei.</source>
-    <target>The uploaded file is not a valid {} file.</target>
+<trans-unit id='RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2UgezB9LURhdGVpLg=='>
+    <source>Die hochgeladene Datei ist keine gültige {0}-Datei.</source>
+    <target>The uploaded file is not a valid {0} file.</target>
 </trans-unit>
 <trans-unit id='TmV1ZSBCY29uZi1EYXRlaQ=='>
     <source>Neue Bconf-Datei</source>
@@ -111,6 +111,14 @@
 <trans-unit id='ezB9ezF9IGhvY2hsYWRlbg=='>
     <source>{0}{1} hochladen</source>
     <target>Upload {0}{1}</target>
+</trans-unit>
+<trans-unit id='RmlsdGVy=='>
+    <source>Filter</source>
+    <target>Filters</target>
+</trans-unit>
+<trans-unit id='RmlsdGVyIGtvbmZpZ3VyaWVyZW4='>
+    <source>Filter konfigurieren</source>
+    <target>Configure filters</target>
 </trans-unit>
 </body>
 </file>

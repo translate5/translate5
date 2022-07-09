@@ -108,7 +108,7 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory {
         return $filterItem->type.'@'.$filterItem->id;
     }
 
-    /**
+    /**!record.get() ||
      * @param stdClass $filterItem
      * @return string
      * TODO OKAPI: Extension as class constant
@@ -152,7 +152,7 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory {
                 'description' => $item->description,
                 'mime' => $item->mime,
                 'identifier' => editor_Plugins_Okapi_Bconf_Filters::createIdentifier($item->type, $item->id), // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
-                'editable' => ($item->settings && editor_Plugins_Okapi_Bconf_Filters::hasGui($item->type)),
+                'editable' => false,
                 'clonable' => $item->settings,
                 'isCustom' => false,
                 'guiClass' => editor_Plugins_Okapi_Bconf_Filters::getGuiClass($item->type)

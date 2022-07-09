@@ -53,15 +53,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         removeUnmodified: true,
     }],
     title: {text: 'Okapi Filters', flex: 0},
-    initComponent: function(){
-        var me = this,
-            bconf = me.getBconf().getData();
-        me.title.text += ` in <i data-qtip="${bconf.description}">${bconf.name}.bconf</i>`;
-        me.callParent();
-        me.getStore().getProxy().setBconfId(bconf.id); // for records and backend filter
-    },
     helpSection: 'useroverview',
-    cls: 'actionColGrid',
+    cls: 't5actionColumnGrid t5leveledGrid',
     text_cols: {
         name: '#UT#Name',
         extensions: '#UT#Dateitypen',
@@ -83,14 +76,21 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     store: {
         type: 'bconffilterStore'
     },
+    initComponent: function(){
+        var me = this,
+            bconf = me.getBconf().getData();
+        me.title.text += ` in <i data-qtip="${bconf.description}">${bconf.name}.bconf</i>`;
+        me.callParent();
+        me.getStore().getProxy().setBconfId(bconf.id); // for records and backend filter
+    },
     viewConfig: {
         getRowClass: function(bconf){
             var classes = [];
             if(!bconf.get('editable')){
                 classes.push('t5noneditable');
             }
-            if(bconf.get('isCustom')){
-                classes.push('t5default');
+            if(!bconf.get('isCustom')){
+                classes.push('t5level1 t5default');
             }
             return classes.join(' ');
         },
@@ -123,7 +123,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         triggers: {
                             clear: {
                                 cls: Ext.baseCSSPrefix + 'form-clear-trigger',
-                                handler: field => field.setValue(null) || field.focus(),
+                                handler: function(field){
+                                    field.setValue(null); // || field.focus();
+                                },
                                 hidden: true
                             }
                         },
@@ -143,16 +145,19 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     editor: {
                         xtype: 'textfield',
                         allowOnlyWhitespace: false,
-                        lastVal: [],
+                        lastValidationResult: [null, false],
                         validator: function(name){
-                            if(name === this.lastVal[0]){ // already validated
-                                return this.lastVal[1];
+                            if(!name){
+                                return false;
+                            }
+                            // QUIRK: the validator runs 3x in a row when validating, so to avoid checking the store permanently, we cache the result for a value
+                            if(name === this.lastValidationResult[0]){ // already validated
+                                return this.lastValidationResult[1];
                             }
                             var view = this.column.getView(),
-                                records = view.getStore().getData().getSource().items,
-                                nameIsUnique = !records.some(rec => rec.data.name === name && rec.id !== view.selection?.id)
-                                    || Editor.plugins.Okapi.view.BconfGrid.prototype.strings.nameExists; // errormessage
-                            this.lastVal = [name, nameIsUnique]; // cache validation result
+                                record = view.getStore().findUnfilteredByName(name), // finds the item in the store with the name to validate
+                                nameIsUnique = (!record || record.id === view.selection?.id); // we will accept if the name is identical to the existing
+                            this.lastValidationResult = [name, nameIsUnique]; // cache validation result
                             return nameIsUnique;
                         }
                     },
@@ -166,7 +171,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     xtype: 'gridcolumn',
                     dataIndex: 'identifier',
                     width: 300,
-                    text: me.text_cols.identifier
+                    text: me.text_cols.identifier,
+                    renderer: function(value, metaData, record){
+                        if(value === 'NEW@FILTER'){
+                            // this mimics rainbow-behaviour
+                            return record.get('okapiType') + '@copy-of-' + record.get('okapiId');
+                        }
+                        return value;
+                    }
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'mimeType',
@@ -190,7 +202,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         queryMode: 'local',
                         createNewOnEnter: true,
                         createNewOnBlur: true,
-                        filterPickList: true // true clears list on custom value
+                        filterPickList: true, // true clears list on custom value
                      },
                 }, {
                     xtype: 'gridcolumn',
@@ -218,13 +230,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         tooltip: me.strings.configuration,
                         isAllowedFor: 'isFromTranslate5',
                         glyph: 'f24d@FontAwesome5FreeSolid',
-                        handler: 'copy'
+                        handler: 'cloneFilter'
                     }, {
                         tooltip: me.strings.remove,
                         isAllowedFor: 'bconfDelete',
                         isDisabled: 'isDeleteDisabled',
                         glyph: 'f2ed@FontAwesome5FreeSolid',
-                        handler: 'delete'
+                        handler: 'deleteFilter'
                     }], itemFilter)
                 }],
             };

@@ -917,14 +917,9 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 #commentNavList>div.usernr8::before {background-color: var(--color-usernr8);}
 #commentNavList>div.usernrX::before {background-color: var(--color-usernrX);}
 
-.actionColGrid .x-action-col-icon {
-    margin: 5px;
-}
-
 td.x-grid-cell.pointer,
-tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"] /* Only enable for normal, especially disable for action and check columns */
-{
-    cursor: pointer;
+tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
+    cursor: pointer; /* Only enable for normal, especially disable for action and check columns */
 }
 
 .invalidGridBorder{
@@ -937,6 +932,11 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"] /* Only enable for 
     pointer-events: auto !important;
 }
 
-.chosenDefault {
-    background-color: hsl(0deg 0% 0% / 20%);
-}
+.t5chosenDefault { background-color: hsl(0deg 0% 0% / 20%); }
+.t5actionColumnGrid .x-action-col-icon { margin: 5px; }
+.t5leveledGrid .t5level1 .x-grid-item,
+.t5leveledGrid .t5level1 .x-grid-item-selected,
+.t5leveledGrid .t5level1 .x-grid-checkcolumn-checked::after,
+.t5leveledGrid .t5level1 .x-grid-hd-checker-on .x-column-header-checkbox::after,
+.t5leveledGrid .t5level1 .x-action-col-icon { opacity: 0.7; }
+.t5leveledGrid .t5level1 .x-action-col-cell .x-item-disabled { opacity: 0.3; }

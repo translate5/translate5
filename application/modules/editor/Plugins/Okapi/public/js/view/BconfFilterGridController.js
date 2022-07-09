@@ -111,7 +111,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     /** @method
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
      */
-    copy: function(view, rowIndex, colIndex, item, e, record){
+    cloneFilter: function(view, rowIndex, colIndex, item, e, record){
         var searchField = view.grid.down('textfield#search');
         searchField.setValue(record.get('name'));
         searchField.checkChange();
@@ -120,6 +120,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
             newRecData = Ext.clone(record.getData());
         delete newRecData.id;
         delete newRecData.extensions;
+        newRecData.identifier = 'NEW@FILTER'; // this is a special identifier that triggers creating a new identifier in the BconfFilterController
         newRecData.isCustom = true;
         var newRec = store.add(newRecData)[0];
         newRec.isNewRecord = true;
@@ -135,7 +136,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     /**
      * Delete a Bconffilter from DB and extensions-mapping
      */
-    delete: function(view, rowIndex, colIndex, item, e, record){
+    deleteFilter: function(view, rowIndex, colIndex, item, e, record){
         /** @param {Editor.plugins.Okapi.store.BconfFilterStore} store */
         var store = Ext.getStore('bconffilterStore');
         record.get('extensions').forEach(function(ext){
@@ -189,32 +190,17 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
                 record.phantom = true;
                 delete record.isNewRecord;
             }
-            // save back
-            store.sync({
-                batch: {
-                    listeners: {
-                        operationcomplete: {
-                            single: true,
-                            fn: function(){
-                                store.getProxy().setExtraParams({});
-                            }
-                        }
-                    }
+            record.save({
+                failure: function(unsavedRecord) {
+                    store.remove([unsavedRecord]);
                 },
-                /**
-                 * @param {Ext.data.Batch} batch
-                 * @param batchOptions
-                 */
-                callback: function(batch){
-                    var success = !batch.hasException();
-                    if(success){
-                        // update record state
-                        record.commit();
-                        // update the maps in the store & remove extension from other items
-                        store.updateExtensionsByIdentifier(identifier, extensions);
-                    }
+                success: function(savedRecord) {
+                    record.commit(true);
+                    identifier = savedRecord.get('identifier'); // crucial: identifier was changed from the backend!
+                    // update the maps in the store & remove extension from other items
+                    console.log('SAVED NEW RECORD: ', savedRecord, identifier, extensions);
+                    store.updateExtensionsByIdentifier(identifier, extensions, true);
                 }
-                // TODO BCONF: add new Id to search
             });
         } else if(!isCustom && extensionsChanged){
             Ext.Ajax.request({
@@ -229,7 +215,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
                     record.set('extensions', extensions, { silent: true, dirty: false });
                     record.commit();
                     // update the maps in the store & remove extension from other items
-                    store.updateExtensionsByIdentifier(identifier, extensions);
+                    store.updateExtensionsByIdentifier(identifier, extensions, false);
                 },
                 failure: function(response){
                     Editor.app.getController('ServerException').handleException(response);

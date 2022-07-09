@@ -37,4 +37,20 @@ Ext.define('Editor.plugins.Okapi.store.BconfStore', {
     autoLoad: true,
     autoSync: true,
     pageSize: 0,
+    /**
+     * Retrieves all records independetly of filtering
+     * @see https://forum.sencha.com/forum/showthread.php?310616
+     * @returns {Ext.util.Collection }
+     */
+    getUnfilteredData: function(){
+        return (this.isFiltered() || this.isSorted()) ? this.getData().getSource() : this.getData();
+    },
+    /**
+     * Retrieves an item by name
+     * @param {string} name
+     * @returns {Editor.plugins.Okapi.model.BconfModel|null}
+     */
+    findUnfilteredByName: function(name){
+        return this.getUnfilteredData().find('name', name, 0, true, true, true);
+    }
 });
