@@ -33,6 +33,16 @@
 abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
 
     /**
+     * Little helper to create a unique hash for a resource
+     * Nothing sophisticated neccessary, this is not security relevant, just enables re-identification
+     * @param string $content
+     * @return string
+     */
+    public static function createHash(string $content) : string {
+        return md5($content);
+    }
+
+    /**
      * @var string
      */
     protected string $content;
@@ -97,6 +107,13 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
      */
     public function getPath() : string {
         return $this->path;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash() : string {
+        return self::createHash($this->content);
     }
 
     /**

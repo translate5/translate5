@@ -97,15 +97,16 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         // this represents a clone-operation and the original identifier can be restored from the (cloned) okapiType / okapiId
         parent::decodePutData();
         if($this->data->identifier === 'NEW@FILTER'){
-            // we need to copy the FPRM-file and generate the new identifier
-            $newOkapiId = editor_Plugins_Okapi_Bconf_Filter_Entity::preProcessNewEntry(
+            // we need to copy the FPRM-file and generate the new identifier (returns Object with properties okapiId | identifier | path | hash
+            $newData = editor_Plugins_Okapi_Bconf_Filter_Entity::preProcessNewEntry(
                 intval($this->data->bconfId),
                 $this->data->okapiType,
                 $this->data->okapiId,
                 $this->data->name
             );
-            $this->data->okapiId = $newOkapiId;
-            $this->data->identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($this->data->okapiType, $newOkapiId);
+            $this->data->okapiId = $newData->okapiId;
+            $this->data->identifier = $newData->identifier;
+            $this->data->hash = $newData->hash;
         }
     }
 
@@ -152,7 +153,9 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             // save FPRM
             $fprm->flush();
             // update/pack the related bconf
+            $this->entity->setHash($fprm->getHash());
             $this->entity->getRelatedBconf()->getFile()->pack();
+            $this->entity->save();
         } else {
             // this can only happen if the implementation of a filter-frontend generates faulty data
             throw new editor_Plugins_Okapi_Exception('E1409', ['details' => $fprm->getValidationError(), 'filterfile' => $this->entity->getFile(), 'bconfId' => $this->entity->getBconfId()]);

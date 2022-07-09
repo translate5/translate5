@@ -100,7 +100,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                     // DEBUG
                     if($doDebug){ error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '.$identifier.' will be embedded'); }
                     // add a custom filter to the filesys & map (that later is flushed to the DB)
-                    $customFilters[$identifier] = md5($unpackedContent);
+                    $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($unpackedContent);
+                    $customFilters[$identifier] = $fprm->getHash();
                     return true;
                 } else {
                     $replacementMap[$identifier] = self::INVALID_IDENTIFIER;
@@ -453,8 +454,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             } else {
                 // if a filter is not in the DB we must do so
                 if(!array_key_exists($identifier, $existingFilters)){
-                    $hash = md5(file_get_contents($filterFile));
-                    $this->flushFilterToDatabase($identifier, $hash, $existingNames);
+                    $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($filterFile);
+                    $this->flushFilterToDatabase($identifier, $fprm->getHash(), $existingNames);
                 }
                 $filesysFilters[$identifier] = $identifier;
             }

@@ -63,13 +63,14 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
      * @param string $okapiType
      * @param string $okapiId
      * @param string $filterName
-     * @return string
+     * @return stdClass: Object with properties okapiId | identifier | path | hash
+     *
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public static function preProcessNewEntry(int $bconfId, string $okapiType, string $okapiId, string $filterName) : string {
+    public static function preProcessNewEntry(int $bconfId, string $okapiType, string $okapiId, string $filterName) : stdClass {
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->load($bconfId);
         // we need the old identifier to copy the fprm
@@ -85,11 +86,18 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
         } else if(!file_exists($sourcePath)){
             throw new editor_Plugins_Okapi_Exception('E1409', ['filterfile' => $sourcePath, 'details' => 'The file was not found in '.ltrim($bconf->createPath(''), '/')]);
         }
-        copy($sourcePath, $bconf->createPath(self::createFileFromIdentifier($newIdentifier)));
+        $targetPath = $bconf->createPath(self::createFileFromIdentifier($newIdentifier));
+        copy($sourcePath, $targetPath);
+        $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($targetPath);
         // DEBUG
         if(ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfProcessing')){ error_log('BCONF FILTER: created new identifier "'.$newIdentifier.'" and copied FPRM-file for bconf-filter "'.$filterName.'" for bconf '.$bconf->getId()); }
-
-        return $newOkapiId;
+        // generate return data
+        $newData = new stdClass();
+        $newData->okapiId = $newOkapiId;
+        $newData->identifier = $newIdentifier;
+        $newData->path = $targetPath;
+        $newData->hash = $fprm->getHash();
+        return $newData;
     }
 
     /**
