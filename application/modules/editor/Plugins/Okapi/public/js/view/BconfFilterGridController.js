@@ -120,18 +120,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
             newRecData = Ext.clone(record.getData());
         delete newRecData.id;
         delete newRecData.extensions;
+        newRecData.bconfId = this.getView().getBconf().get('id');
         newRecData.identifier = 'NEW@FILTER'; // this is a special identifier that triggers creating a new identifier in the BconfFilterController
         newRecData.isCustom = true;
         var newRec = store.add(newRecData)[0];
         newRec.isNewRecord = true;
-
-        var rowediting = view.grid.findPlugin('rowediting'),
-            editingStarted = rowediting.startEdit(newRec);
-
-        if(editingStarted){
-            //var nameEditor = rowediting.getEditor().down('textfield[dataIndex=name]')
-            //getRoweditor
-        }
+        // open roweditor for clone
+        var rowEditor = view.grid.findPlugin('rowEditing');
+        rowEditor.startEdit(newRec);
     },
     /**
      * Delete a Bconffilter from DB and extensions-mapping
@@ -198,7 +194,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
                     record.commit(true);
                     identifier = savedRecord.get('identifier'); // crucial: identifier was changed from the backend!
                     // update the maps in the store & remove extension from other items
-                    console.log('SAVED NEW RECORD: ', savedRecord, identifier, extensions);
+                    console.log('SAVED NEW RECORD: ', savedRecord, identifier, extensions); // TODO REMOVE
                     store.updateExtensionsByIdentifier(identifier, extensions, true);
                 }
             });

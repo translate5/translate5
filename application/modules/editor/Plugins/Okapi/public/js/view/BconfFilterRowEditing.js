@@ -1,4 +1,3 @@
-<?php
 /*
  START LICENSE AND COPYRIGHT
 
@@ -25,19 +24,21 @@
 
  END LICENSE AND COPYRIGHT
  */
-
-class editor_Plugins_Okapi_Db_Validator_BconfFilter extends ZfExtended_Models_Validator_Abstract {
-    /**
-     * Validators for Okapi Bconf Filter Entity
-     */
-    protected function defineValidators() {
-        $this->addValidator('id', 'int');
-        $this->addValidator('bconfId', 'int');
-        $this->addValidator('okapiType', 'stringLength', array('min' => 1, 'max' => 50));
-        $this->addValidator('okapiId', 'stringLength', array('min' => 1, 'max' => 255));
-        $this->addValidator('mimeType', 'stringLength', array('min' => 0, 'max' => 50));
-        $this->addValidator('name', 'stringLength', array('min' => 1, 'max' => 100));
-        $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('hash', 'stringLength', array('min' => 32, 'max' => 32));
+ 
+/**
+ * Custom Row Editor for bconf filter grid
+ */
+Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
+    extend: 'Ext.grid.plugin.RowEditing',
+    clicksToEdit: 2, // QUIRK: 1 not possible, triggers on actioncolumns TODO: limit to non actionCols, add pointerCls
+    id: 'rowEditing',
+    removeUnmodified: true,
+    listeners: {
+        beforeedit: function(editor, context){
+            console.log('BconfFilterRowEditing: beforeedit ', editor, context);
+        },
+        validateedit: function(editor, context){
+            console.log('BconfFilterRowEditing: validateedit ', editor, context);
+        }
     }
-}
+});

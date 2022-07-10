@@ -34,6 +34,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     extend: 'Ext.grid.Panel',
     requires: [
         'Editor.plugins.Okapi.view.BconfFilterGridController',
+        'Editor.plugins.Okapi.view.BconfFilterRowEditing',
         'Editor.plugins.Okapi.store.BconfFilterStore'
     ],
     alias: 'widget.bconffiltergrid',
@@ -47,11 +48,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         bconf: null,
     },
     editingPlugin: null, // placeholder for undocumented property, see JSDoc
-    plugins: [{
-        ptype: 'rowediting',
-        clicksToEdit: 3, // QUIRK: 1 not possible, triggers on actioncolumns TODO: limit to non actionCols, add pointerCls
-        removeUnmodified: true,
-    }],
+    plugins: [
+        Ext.create('Editor.plugins.Okapi.view.BconfFilterRowEditing')
+    ],
     title: {text: 'Okapi Filters', flex: 0},
     helpSection: 'useroverview',
     cls: 't5actionColumnGrid t5leveledGrid',
