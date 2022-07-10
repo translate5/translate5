@@ -934,7 +934,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.spellCheckTooltip.showAt(posX,posY);
     },
     applySpellCheckStylesForRecord: function(store, rec, operation) {
-        if (!operation || operation == 'commit') {
+        if (!operation || operation == 'commit' || operation == 'cancelled') {
             var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, cellNode, matches;
             for (target in rec.get('spellCheck')) {
                 rec.get('spellCheck')[target].forEach(function(item){
@@ -945,7 +945,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 });
                 cellNode = rec.get('spellCheck')[target][0].range.containerNode;
                 matches = rec.get('spellCheck')[target];
-                this.applyCustomMatches(cellNode, matches);
+                this.applyCustomMatches(cellNode, matches, operation == 'cancelled');
             }
         }
     },
@@ -957,7 +957,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             }
         }, 300);
     },
-    applyCustomMatches: function(cellNode, matches) {
+    applyCustomMatches: function(cellNode, matches, skipMindDelTags) {
         if (!cellNode) return;
         var me = this,
             rangeForMatch,
@@ -968,7 +968,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.cleanUpNode(cellNode);
         rangeForMatch = rangy.createRange(cellNode);
         Ext.Array.each(matches, function(match, index) {
-            me.mindDelTags(match);
+            if (!skipMindDelTags) me.mindDelTags(match);
             rangeForMatch.moveToBookmark(match.range);
             rangeForMatch = me.cleanBordersOfCharacterbasedRange(rangeForMatch);
             documentFragmentForMatch = rangeForMatch.extractContents();
@@ -979,7 +979,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
 
     mindDelTags: function(match) {
-        var dels = match.range.containerNode.innerHTML.matchAll(/(<del.*?>)(.+?)<\/del>/g), delA = [];
+        //console.log('html before', match.range.containerNode.innerHTML);
+        //var html = match.range.containerNode.innerHTML.replace(/<ins.*?>(.*?)<\/ins>/g, '$1');
+        var html = Ext.util.Format.stripTags(match.range.containerNode.innerHTML, '<del>');
+        //console.log('html after', html);
+        var dels = html.matchAll(/(<del.*?>)(.+?)<\/del>/g), delA = [];
 
         // Get array of regex matches of del-tags found within node's innerHTML
         while (del = dels.next()) {
@@ -989,20 +993,28 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 break;
             }
         }
-
+        var start = match.range.start + 0;
+        var end = match.range.end + 0; // console.log(delA);
+        //console.log('before', start, end);
         // Foreach del-tag
         for (var i = 0; i < delA.length; i++) {
+            //console.log('del#', i, 'was index', delA[i].index);
             for (j = 0; j < i; j++) {
                 delA[i].index -= delA[j][0].length - delA[j][2].length;
             }
-            if (delA[i].index < match.range.start) {
-                match.range.start += delA[i][2].length;
-                match.range.end += delA[i][2].length;
+            //console.log('del#', i, 'now index', delA[i].index, '-', start);
+            if (delA[i].index < start) {
+                start += delA[i][2].length;
+                end += delA[i][2].length;
             }
         }
+        //console.log('after', start, end);
+        match.range.start = start;
+        match.range.end = end;
     },
 
     onSegmentEditCancelled: function(plugin, context) {
-        this.applySpellCheckStylesForRecord(context.store, context.record);
+        this.applySpellCheckStylesForRecord(context.store, context.record, 'cancelled');
     }
 });
+// var matches = Ext.getCmp('segment-grid').getStore().getAt(1).get('spellCheck').target;
