@@ -60,7 +60,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
             // process the edited record
             rowEditing.saveRecord(record, cellContext.newValues, cellContext.originalValues);
             // unset the serach & clean a clone
-            if(crecord.isClonedRecord){
+            if(record.isClonedRecord){
                 delete record.isClonedRecord;
                 delete record.clonedFrom;
                 // invalidate the potential tmp search value set when cloning records

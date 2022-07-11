@@ -38,12 +38,12 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
     /**
      * The filename an extension mapping generally has
-     * @var sring
+     * @var string
      */
     const FILE = 'extensions-mapping.txt';
 
     /**
-     * @var sring
+     * @var string
      */
     const INVALID_IDENTIFIER = 'INVALID';
 
@@ -100,7 +100,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                     // DEBUG
                     if($doDebug){ error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '.$identifier.' will be embedded'); }
                     // add a custom filter to the filesys & map (that later is flushed to the DB)
-                    $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($unpackedContent);
+                    $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($bconf->getPath().DIRECTORY_SEPARATOR.self::FILE, $unpackedContent);
                     $customFilters[$identifier] = $fprm->getHash();
                     return true;
                 } else {
@@ -476,7 +476,6 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
      * @param string $identifier
      * @param string $hash
      * @param array $usedNames
-     * @return int
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_BadMethodCallException
      * @throws ZfExtended_Exception

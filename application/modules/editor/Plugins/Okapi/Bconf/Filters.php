@@ -43,6 +43,9 @@ class editor_Plugins_Okapi_Bconf_Filters {
      */
     const GUIS = [
         'okf_html',
+        'okf_xml',
+        'okf_xmlstream',
+        'okf_icml',
         'okf_idml',
         'okf_openxml'
     ];

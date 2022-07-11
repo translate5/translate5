@@ -83,14 +83,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     },
     viewConfig: {
         getRowClass: function(bconf){
-            var classes = [];
+            var cls = '';
             if(!bconf.get('editable')){
-                classes.push('t5noneditable');
+                cls +='t5noneditable ';
             }
             if(!bconf.get('isCustom')){
-                classes.push('t5level1 t5default');
+                cls += 't5level1 t5default ';
             }
-            return classes.join(' ');
+            return cls;
         },
         reference: 'gridview'
     },
@@ -138,6 +138,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     ]
                 },
                 columns: [{
+                    dataIndex: 'id',
+                    hidden: true,
+                    text: 'Id',
+                },{
                     xtype: 'gridcolumn',
                     dataIndex: 'name',
                     editor: {

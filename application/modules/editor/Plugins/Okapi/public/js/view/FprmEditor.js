@@ -50,6 +50,14 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     formPanel: null,
     form: null,
 
+    tools: [{
+        iconCls: 'x-fa fa-undo',
+        tooltip: '#UT#Refresh',
+        handler: function(){
+            this.up('window').load();
+        }
+    }],
+
     items: [{
         xtype:'form',
         itemId: 'fprm',
@@ -61,6 +69,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         xtype: 'button',
         text: '#UT#Save',
         itemId: 'save',
+        disabled: true,
         formBind: true,
         iconCls: 'x-fa fa-check',
         handler: function(){
@@ -81,15 +90,19 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         return this.callParent(arguments);
     },
 
+    load: function(){
+        this.setLoading()
+        const setFprm = this.setFprm.bind(this)
+        this.bconfFilter.loadFprm().then(setFprm, setFprm);
+    },
     initComponent: function(){
-        this.title.text += ` of <i>${this.bconfFilter.get('name')}</i>`;
+        this.title.text += ` of BconfFilter <i>${this.bconfFilter.get('name')}</i>, type ${this.bconfFilter.get('okapiType')}`;
 
         this.callParent();
         this.formPanel = this.down('form#fprm');
         this.form = this.formPanel.getForm();
-        const setFprm = this.setFprm.bind(this)
 
-        this.bconfFilter.loadFprm().then(setFprm);
+        this.load();
     },
 
     afterRender: function(){
@@ -101,8 +114,11 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     },
 
     applyFprm: function(fprm){
-        if(fprm){
+         if(fprm){
             this.form.setValues(this.parseFprm(fprm))
+          // TODO BCONF only enable save btn when different from last disabled state
+            this.down('button#save').enable()
+
         }
         this.setLoading(false);
     },
@@ -130,6 +146,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             me.setLoading()
             me.bconfFilter.saveFprm(me.compileFprm()).then(function(){
                 me.setLoading(false)
+                me.close()
             })
         } else {
             this.invalidFields = this.formPanel.query("field{getActiveErrors().length}")
