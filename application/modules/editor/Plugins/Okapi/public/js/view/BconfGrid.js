@@ -88,7 +88,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         refresh: '#UT#Aktualisieren',
         remove: '#UT#Löschen',
         searchEmptyText: '#UT#Suchen',
-        searchText: '#UT#Suchen',
         uniqueName: '#UT#Eindeutiger Name',
         upload: '#UT#Upload',
         uploadBconf: '#UT#Bconf hochladen',
