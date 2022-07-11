@@ -39,10 +39,12 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     height: innerHeight-100,
     minHeight: 400,
     layout: 'fit',
+    constrainHeader: true,
+    loadMask: true,
     title: {text: 'Editing fprm ' },
     config: {
         bconfFilter: null,
-        fprm: '',
+        fprm: undefined,
     },
     // Shortcuts:
     formPanel: null,
@@ -55,11 +57,24 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         items: [], // Fill in init method
     }],
 
-    fbar: [{xtype: 'button', text: '#UT#Save', formBind: true, handler: function(){
+    fbar: [{
+        xtype: 'button',
+        text: '#UT#Save',
+        itemId: 'save',
+        formBind: true,
+        iconCls: 'x-fa fa-check',
+        handler: function(){
             this.up('window').save()
         }
+    }, {
+        xtype: 'button',
+        text: '#UT#Cancel',
+        itemId: 'cancel',
+        iconCls: 'x-fa fa-times-circle',
+        handler: function(){
+            this.up('window').close()
+        }
     }],
-
 
     initConfig: function(config){
         this.items[0].items = this.formItems
@@ -74,14 +89,22 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         this.form = this.formPanel.getForm();
         const setFprm = this.setFprm.bind(this)
 
-        this.setLoading(true)
         this.bconfFilter.loadFprm().then(setFprm);
+    },
+
+    afterRender: function(){
+
+        if(this.fprm === undefined){
+            this.setLoading() // has no effect in initComponent
+        }
+        return this.callParent(arguments);
     },
 
     applyFprm: function(fprm){
         if(fprm){
             this.form.setValues(this.parseFprm(fprm))
         }
+        this.setLoading(false);
     },
     /**
      * @abstract
@@ -97,12 +120,30 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     compileFprm(){
         throw new Error('must be implemented by subclass!');
     },
-    
+
     save: function(){
-        var me = this;
-        me.setLoading()
-        me.bconfFilter.saveFprm(me.compileFprm()).then(function(){
-            me.setLoading(false)
-        })
+        var me = this,
+            currentValues = me.form.getValues();
+        if(/* !Ext.Object.equals(currentValues, me.lastInvalidValues) && */ this.form.isValid()){
+            me.setLoading()
+            me.bconfFilter.saveFprm(me.compileFprm()).then(function(){
+                me.setLoading(false)
+            })
+        } else {
+            this.invalidFields = this.formPanel.query("field{getActiveErrors().length}")
+            this.lastInvalidValues = currentValues
+            var response = {
+                status: 422,
+                statusText: 'Unprocessable Entity',
+                responseText: JSON.stringify({
+                    errorMessage: 'Invalid form data',
+                    errors: Object.assign({}, this.invalidFields.map(f => f.getActiveErrors()))
+                })
+            }
+            Editor.app.getController('ServerException').handleException(response);
+            Ext.Msg.toFront() // QUIRK: Sometimes not on top
+
+        }
     }
+
 })

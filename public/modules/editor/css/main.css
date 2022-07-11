@@ -51,6 +51,13 @@ div.x-container.x-container-default {position: initial;}
   	white-space: normal;
 }
 
+.mono {
+    font-family: "Source Code Pro", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    white-space: pre-wrap;
+    font-size: larger;
+    background: rgba(160, 160, 160, 0.75);
+}
+
 .editorAdminTaskLogGrid .x-property-grid .x-grid-row td.x-grid-cell-last .x-grid-cell-inner {
 	font-family: monospace;
     white-space: pre;
