@@ -198,11 +198,11 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
 
         // Catch timeout
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $httpException) {
-            throw new editor_Plugins_SpellCheck_Exception_TimeOut('E1240', $extraData, $httpException);
+            throw new editor_Plugins_SpellCheck_Exception_TimeOut('E1412', $extraData, $httpException);
 
         // Catch spot down
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $httpException) {
-            throw new editor_Plugins_SpellCheck_Exception_Down('E1129', $extraData, $httpException);
+            throw new editor_Plugins_SpellCheck_Exception_Down('E1410', $extraData, $httpException);
 
         // Catch no response
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $httpException) {

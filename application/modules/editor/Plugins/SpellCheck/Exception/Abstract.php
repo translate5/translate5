@@ -49,13 +49,9 @@ abstract class editor_Plugins_SpellCheck_Exception_Abstract extends ZfExtended_E
      * @var array
      */
     protected static $localErrorCodes = [
-        //'E1117' => 'Could not load TBX into TermTagger: TermTagger HTTP result was not successful!',
-        //'E1118' => 'Could not load TBX into TermTagger: TermTagger HTTP result could not be decoded!',
-        //'E1121' => 'TermTagger result could not be decoded.',
-
-        'E1129' => 'SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary.',
-        'E1131' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
-        'E1240' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.',
-        'E1326' => 'SpellCheck can not work when target language is not supported by LanguageTool.',
+        'E1410' => 'SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary.',
+        'E1411' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
+        'E1412' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.',
+        'E1413' => 'SpellCheck can not work when target language is not supported by LanguageTool.',
     ];
 }

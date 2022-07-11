@@ -187,8 +187,8 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
      * @throws editor_Plugins_TermTagger_Exception_Down
      */
     protected function raiseNoAvailableResourceException() {
-        // E1131 No reachable LanguageTool instances available, please specify LanguageTool urls to import this task.
-        throw new editor_Plugins_SpellCheck_Exception_Down('E1131', [
+        // E1411 No reachable LanguageTool instances available, please specify LanguageTool urls to import this task.
+        throw new editor_Plugins_SpellCheck_Exception_Down('E1411', [
             'task' => $this->task
         ]);
     }

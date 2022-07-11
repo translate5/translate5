@@ -569,6 +569,14 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1268"></a>E1268  | ModelFront | ModelFront Plug-In: Error on ModelFront api request. The error was: {message}. | Error happen on model front api request. For more info see the error log.
 | <a id="E1269"></a>E1269  | ModelFront | ModelFront Plug-In: Error on processing the segments. Segment list with errors: {errors}. | ModelFront api responds with error for the requested segment. For more info about the error check the error log.
 
+#### Plug-In SpellCheck
+| EventCode        | Context       | EventMessage  | Description/Solution
+| :--------------- |:------------- | :------------ | :-------------------
+| <a id="E1410"></a>E1410  | Plug-In SpellCheck | SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary. | The LanguageTool server as specified in the error message is deactivated automatically. On each periodical cron call (normally all 15 minutes) all LanguageTool instances are checked for availability. If a previously deactivated LanguageTool is available again, it is reactivated automatically. To reactivate the LanguageTool servers manually just call the following SQL statement in the Database:DELETE FROM Zf_memcache WHERE id = 'SpellCheckDownList';
+| <a id="E1411"></a>E1411  | Plug-In SpellCheck | SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task. | Start the LanguageTool(s) if not already done. If the LanguageTool instances were started and crashed then, see E1410 how to reactivate the LanguageTool instances marked as offline in translate5. After reactivation, reimport the task. The task clone functionality can be used to reimport the task.
+| <a id="E1412"></a>E1412  | Plug-In SpellCheck | SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time. | Normally everything should be OK, the considered LanguageTool is probably just doing its work and can not respond to another request in an appropriate time frame. Only if this error is logged multiple times further investigations should be done.
+| <a id="E1413"></a>E1413  | Plug-In SpellCheck | SpellCheck can not work when target language is not supported by LanguageTool. | Check task target language
+
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number

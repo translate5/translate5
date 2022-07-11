@@ -81,10 +81,6 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Plugins_SpellCheck_
                 'task' => $this->task,
                 'segmentCounts' => $data,
             ]);
-        /*} else {
-            class_exists('editor_Utils');
-            i('non empty result - ' . date('H:i:s') . ' - '. $slot . ' - ' . getmypid() , 'a');
-            i(stack(), 'a');*/
         }
 
         // Return bunch
