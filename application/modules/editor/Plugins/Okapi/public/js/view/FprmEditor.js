@@ -111,6 +111,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      * Parses the raw fprm into an object that can be loaded into the form
      */
     parseFprm(){
+        this.setLoading(false)
         throw new Error('must be implemented by subclass!');
     },
     /**
@@ -118,7 +119,8 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      * Parses theform into an textstring that can be saved
      */
     compileFprm(){
-        throw new Error('must be implemented by subclass!');
+     this.setLoading(false)   
+     throw new Error('must be implemented by subclass!');
     },
 
     save: function(){

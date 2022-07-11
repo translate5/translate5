@@ -26,7 +26,6 @@
  */
 /**
  * Grid for viewing and editing the different Okapi Filter configurations of a bconf
- * @property {Ext.grid.plugin.Editing} editingPlugin Undocumented property used for shorthand access (for this.findPlugin('rowediting'))
  * @property {Editor.plugins.Okapi.model.BconfModel} bconf Config of the filtergrid, holds the bconf to which the filters belong.
  * @see Ext.grid.plugin.Editing.init
  */
@@ -47,12 +46,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
          */
         bconf: null,
     },
-    editingPlugin: null, // placeholder for undocumented property, see JSDoc
-    plugins: [
-        Ext.create('Editor.plugins.Okapi.view.BconfFilterRowEditing')
-    ],
+    plugins: [{
+        ptype: 'BconfFilterRowEditing',
+        id: 'rowEditing',
+    }],
     title: {text: 'Okapi Filters', flex: 0},
     helpSection: 'useroverview',
+    searchValSet: '',
+    searchValCache: '',
     cls: 't5actionColumnGrid t5leveledGrid',
     text_cols: {
         name: '#UT#Name',
@@ -64,13 +65,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     },
     strings: {
         configuration: '#UT#Filter konfigurieren',
-        remove: '#UT#Remove',
-        copy: '#UT#Copy',
-        upload: '#UT#Upload',
-        addBconf: '#UT#Add Bconf',
-        showDefaultFilter: '#UT#Show Okapi Defaults Filters',
-        customizeFilter: '#UT#Customize Filter',
-        in: '#in',
+        showDefaultFilters: '#UT#Show Okapi Defaults Filters',
+        refresh: '#UT#Aktualisieren',
+        remove: '#UT#Löschen',
+        emptySearch: '#UT#Suchen',
+        uniqueName: '#UT#Eindeutiger Name'
     },
     store: {
         type: 'bconffilterStore'
@@ -108,7 +107,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         reference: 'showDefaultsBtn',
                         enableToggle: true,
                         toggleHandler: 'toggleDefaultsFilter',
-                        text: '#UT#Show Okapi Defaults Filters',
+                        text: this.strings.showDefaultFilters,
                     }, {
                         xtype: 'tbspacer',
                         flex: 1
@@ -118,7 +117,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         checkChangeBuffer: 300,
                         itemId: 'search',
                         flex: 1,
-                        emptyText: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.searchEmptyText,
+                        emptyText: this.strings.emptySearch,
                         triggers: {
                             clear: {
                                 cls: Ext.baseCSSPrefix + 'form-clear-trigger',
@@ -202,7 +201,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         createNewOnEnter: true,
                         createNewOnBlur: true,
                         filterPickList: true, // true clears list on custom value
-                     },
+                    },
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'description',
@@ -240,5 +239,29 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                 }],
             };
         return me.callParent([Ext.apply(config, instanceConfig)]);
+    },
+    /**
+     * @returns {string}
+     */
+    getSearchValue: function(){
+        return this.down('textfield#search').getValue();
+    },
+    /**
+     * @param {string} newVal
+     */
+    setSearchValue: function(newVal){
+        var searchField = this.down('textfield#search');
+        this.searchValSet = newVal;
+        this.searchValCache = searchField.getValue();
+        searchField.setValue(newVal);
+        searchField.checkChange();
+    },
+    unsetSearchValue: function(){
+        var searchField = this.down('textfield#search');
+        if(this.searchValSet && this.searchValSet === this.getSearchValue()){
+            searchField.setValue(this.searchValCache);
+            searchField.checkChange();
+        }
+        this.searchValCache = this.searchValCache = '';
     }
 });

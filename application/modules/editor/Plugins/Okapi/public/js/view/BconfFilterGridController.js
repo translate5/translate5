@@ -29,7 +29,6 @@
  * @extends Ext.app.ViewController
  */
 Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
-    //region config
     extend: 'Ext.app.ViewController',
     alias: 'controller.bconffilterGridController',
     listen: {
@@ -51,19 +50,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     },
     control: {
         '#': { // # references the view
-            beforeedit: 'prepareEdit',
-            edit: 'saveEdit',
-            canceledit: 'cancelEdit',
-            close: 'onClose'
+            close: 'handleClose'
         },
         'textfield#search': {
-            change: 'search',
+            change: 'handleSearch',
         }
     },
-
-    //endregion config
-
-    //region authorization
 
     isDeleteDisabled: function(view, rowIndex, colIndex, item, record){
         return !record.data.isCustom;
@@ -73,9 +65,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         return !record.get('editable') || record.crudState === 'C' || !record.get('guiClass');
     },
 
-    //endregion
-
-    search: function(field, searchString){
+    handleSearch: function(field, searchString){
         var store = this.getView().getStore(),
             searchFilterValue = searchString.trim();
         if(searchFilterValue){
@@ -98,8 +88,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
             store.addFilter(store.defaultsFilter);
         }
     },
-// region grid columns
-    /** @method
+
+    /**
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
      */
     editFPRM: function(view, rowIndex, colIndex, item, e, record){
@@ -112,21 +102,23 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
      */
     cloneFilter: function(view, rowIndex, colIndex, item, e, record){
-        var searchField = view.grid.down('textfield#search');
-        searchField.setValue(record.get('name'));
-        searchField.checkChange();
-        view.select(rowIndex);
         var store = view.getStore(),
             newRecData = Ext.clone(record.getData());
+        // we temporarily set a search value to reduce the number of shown rows
+        if(!view.grid.getSearchValue()){
+            view.grid.setSearchValue(record.get('name'));
+        }
+        view.select(rowIndex);
         delete newRecData.id;
         delete newRecData.extensions;
         newRecData.bconfId = this.getView().getBconf().get('id');
         newRecData.identifier = 'NEW@FILTER'; // this is a special identifier that triggers creating a new identifier in the BconfFilterController
         newRecData.isCustom = true;
         var newRec = store.add(newRecData)[0];
-        newRec.isNewRecord = true;
+        newRec.isClonedRecord = true;
+        newRec.clonedFrom = record;
         // open roweditor for clone
-        var rowEditor = view.grid.findPlugin('rowEditing');
+        var rowEditor = view.grid.findPlugin('rowediting');
         rowEditor.startEdit(newRec);
     },
     /**
@@ -142,102 +134,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         record.drop(/* cascade */ false);
         store.sync();
     },
-// endregion
     /**
-     *
-     * @param {Ext.grid.plugin.RowEditing} rowEditPlugin
-     * @param {Ext.grid.CellContext} cellContext
+     * Handles closing the Filter panel
      */
-    prepareEdit: function(rowEditPlugin, cellContext){
-        var record = cellContext.record,
-            tagfield = rowEditPlugin.getEditor().down('tagfield');
-        tagfield.setStore(this.getView().getStore().getAllExtensions());
-        record.extensionsBeforeEdit = record.get('extensions');
-    },
-    /**
-     * Save changed record
-     * @param {Ext.grid.plugin.RowEditing} plugin
-     * @param {Ext.grid.CellContext} cellContext
-     */
-    saveEdit: async function(plugin, cellContext){
-        var store = Ext.getStore('bconffilterStore'),
-            record = cellContext.record,
-            isCustom = record.get('isCustom'),
-            extensions = record.get('extensions'),
-            identifier = record.get('identifier'),
-            // checks, if the extensions have been changed
-            extensionsChanged = !Editor.util.Util.arraysAreEqual(extensions, record.extensionsBeforeEdit),
-            // checks if the record has been changed
-            recordChanged = Editor.util.Util.objectWasChanged(cellContext.newValues, cellContext.originalValues, ['name','description','mimeType']);
-        // cleanup tmp data
-        delete record.extensionsBeforeEdit;
-        // save a custom record or just transfere the new extensions for a non-custom record
-        if(isCustom && (recordChanged || extensionsChanged)){
-            // transfere changed data of a custom entry
-            record.set({
-                'name': cellContext.newValues.name,
-                'description': cellContext.newValues.description,
-                'mimeType': cellContext.newValues.mimeType,
-                'extensions': extensions
-            });
-            // "heal" new records
-            if(record.isNewRecord){
-                record.crudState = 'C';
-                record.phantom = true;
-                delete record.isNewRecord;
-            }
-            record.save({
-                failure: function(unsavedRecord) {
-                    store.remove([unsavedRecord]);
-                },
-                success: function(savedRecord) {
-                    record.commit(true);
-                    identifier = savedRecord.get('identifier'); // crucial: identifier was changed from the backend!
-                    // update the maps in the store & remove extension from other items
-                    console.log('SAVED NEW RECORD: ', savedRecord, identifier, extensions); // TODO REMOVE
-                    store.updateExtensionsByIdentifier(identifier, extensions, true);
-                }
-            });
-        } else if(!isCustom && extensionsChanged){
-            Ext.Ajax.request({
-                url: Editor.data.restpath + 'plugins_okapi_bconfdefaultfilter/setextensions',
-                params: {
-                    identifier: identifier,
-                    bconfId: store.getProxy().bconfId,
-                    extensions: extensions.join(',')
-                },
-                success: function(){
-                    // update the record silently
-                    record.set('extensions', extensions, { silent: true, dirty: false });
-                    record.commit();
-                    // update the maps in the store & remove extension from other items
-                    store.updateExtensionsByIdentifier(identifier, extensions, false);
-                },
-                failure: function(response){
-                    Editor.app.getController('ServerException').handleException(response);
-                }
-            });
-        } else {
-            // to remove the "red corner" when the extension-editor changed anything
-            record.commit();
-        }
-    },
-    /**
-     * Delete new records when edit was canceled
-     * @listens event: canceledit
-     * @param {Ext.grid.plugin.RowEditing} plugin
-     * @param {Ext.grid.CellContext} cellContext
-     */
-    cancelEdit: function(plugin, cellContext){
-        delete cellContext.record.extensionsBeforeEdit;
-        if(cellContext.record.isNewRecord){
-            cellContext.record.drop();
-        }
-    },
-    /**
-     *
-     */
-    onClose: function(){
+    handleClose: function(){
         location.hash = location.hash.replace(/\/filters.*$/,'');
     }
 });
