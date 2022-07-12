@@ -968,7 +968,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.cleanUpNode(cellNode);
         rangeForMatch = rangy.createRange(cellNode);
         Ext.Array.each(matches, function(match, index) {
-            if (!skipMindDelTags) me.mindDelTags(match);
+            if (!skipMindDelTags) me.mindTags(match);
             rangeForMatch.moveToBookmark(match.range);
             rangeForMatch = me.cleanBordersOfCharacterbasedRange(rangeForMatch);
             documentFragmentForMatch = rangeForMatch.extractContents();
@@ -978,7 +978,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }, me, true);
     },
 
-    mindDelTags: function(match) {
+    mindTags: function(match) {
         var html = Ext.util.Format.stripTags(
             match.range.containerNode.innerHTML.replace(/<([0-9]+)\/>/g, '&lt;$1&gt;'), '<del>'
         ).replace(/&lt;([0-9]+)\/&gt;/g, '<$1/>'), tagm, tags = [], tag, start, end;
