@@ -124,7 +124,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         var newRec = store.add(newRecData)[0];
         newRec.isClonedRecord = true;
         // open roweditor for clone
-        var rowEditor = view.grid.findPlugin('rowediting');
+        var rowEditor = view.grid.findPlugin('bconffilterrowediting');
         rowEditor.startEdit(newRec);
     },
     /**
