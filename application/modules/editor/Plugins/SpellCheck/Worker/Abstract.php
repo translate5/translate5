@@ -433,8 +433,7 @@ abstract class editor_Plugins_SpellCheck_Worker_Abstract extends editor_Segment_
             ->from($dbMeta, ['segmentId', 'spellcheckState'])
             ->where('taskGuid = ?', $this->task->getTaskGuid())
             ->where('spellcheckState IS NULL OR spellcheckState IN (?)', [
-                editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_DEFECT,
-                editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE
+                editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_DEFECT
             ]);
         $defectSegments = $dbMeta->fetchAll($sql)->toArray();
 

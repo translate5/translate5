@@ -120,7 +120,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_UNCHECKED,
             'Contains the SpellCheck-state for this segment while importing', 36);
 
-        // Lock oversized segments and reset already checked segments back to unchecked
+        // Reset already checked segments back to unchecked
         $this->prepareSegments($task, $meta);
 
         // If worker init attempt failed - log error
@@ -221,26 +221,12 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     }
 
     /**
-     * Lock oversized segments and reset already checked segments back to unchecked
+     * Reset already checked segments back to unchecked
      *
      * @param editor_Models_Task $task
      * @param editor_Models_Segment_Meta $meta
      */
     private function prepareSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta) {
-
-        // Get config
-        $config = Zend_Registry::get('config');
-
-        // Get maximum count of characters supported by LanguageTool
-        $maxCharacterCount = $config->runtimeOptions->plugins->SpellCheck->languagetool->maxSegmentCharacterCount ?? 20000;
-
-        // Setup oversized status for oversized segments
-        $meta->db->update([
-            'termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE
-        ],[
-            'taskGuid = ?' => $task->getTaskGuid(),
-            'sourceCharacterCount >= ?' => $maxCharacterCount,
-        ]);
 
         // Reset status to unchecked for checked segments
         $meta->db->update([
