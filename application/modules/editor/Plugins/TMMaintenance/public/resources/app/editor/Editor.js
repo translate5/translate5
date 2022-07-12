@@ -12,6 +12,22 @@ Ext.define('Ext.translate5.Editor', {
         },
     },
 
+    defaultListenerScope: true,
+
+    listeners: {
+        beforecomplete: 'onBeforeComplete',
+    },
+
+    onBeforeComplete: function () {
+        if (!this.validateTagsOrdering(this.getData())) {
+            alert('Wrong tags ordering');
+
+            return false;
+        }
+
+        return true;
+    },
+
     onEditComplete: function (remainVisible, cancelling) {
         const location = this.getLocation();
         let result = this.callParent([remainVisible, cancelling]);
@@ -25,23 +41,19 @@ Ext.define('Ext.translate5.Editor', {
         if (cancelling) {
             return result;
         }
-        let data = this.editor.getData();
 
-        // TODO move to a separate method
-        let dom = document.createElement('html');
-        dom.innerHTML = this.editor.getData(data);
-        let rawData = dom.getElementsByTagName('p')[0].innerHTML;
+        let data = this.getData();
 
         let tagHelper = Ext.create('TMMaintenance.helper.Tag');
-        rawData = tagHelper.reverseTransform(rawData);
+        data = tagHelper.reverseTransform(data);
 
-        if (location.record.get(this.config.editingDataIndex) === rawData) {
+        if (location.record.get(this.config.editingDataIndex) === data) {
             return result;
         }
 
         location.record.set('isSaving', true);
-        location.record.set(this.config.dataIndex, rawData);
-        location.record.set(this.config.editingDataIndex, rawData);
+        location.record.set(this.config.dataIndex, data);
+        location.record.set(this.config.editingDataIndex, data);
         location.record.save({
             success: function () {
                 location.record.set('isSaving', false);
@@ -110,5 +122,43 @@ Ext.define('Ext.translate5.Editor', {
                 // evt.stop();
             }
         );
+    },
+
+    validateTagsOrdering: function (data) {
+        let dom = document.createElement('html');
+        dom.innerHTML = data;
+
+        let isTagsOrderingRight = true;
+        let tags = [];
+        dom.getElementsByTagName('body')[0].childNodes.forEach(function (node) {
+            if (undefined === node.dataset) {
+                return;
+            }
+
+            if (undefined === node.dataset.tagType || 'single' === node.dataset.tagType) {
+                return;
+            }
+
+            if ('open' === node.dataset.tagType) {
+                tags.push(node.dataset.tagId);
+
+                return;
+            }
+
+            if (node.dataset.tagId !== tags[tags.length - 1]) {
+                isTagsOrderingRight = false;
+            }
+
+            tags.pop();
+        });
+
+        return isTagsOrderingRight && tags.length === 0;
+    },
+
+    getData: function () {
+        let dom = document.createElement('html');
+        dom.innerHTML = this.editor.getData();
+
+        return dom.getElementsByTagName('p')[0].innerHTML;
     },
 });

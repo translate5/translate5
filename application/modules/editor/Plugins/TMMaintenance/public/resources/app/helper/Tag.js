@@ -22,7 +22,7 @@ Ext.define('TMMaintenance.helper.Tag', {
 
         let index = 1;
         matches.forEach(function (match) {
-            let params = match.match(/data-original="(.+)" /);
+            let params = match.match(/data-original="([a-zA-Z0-9%=\/]+)"/);
             let replace = decodeURI(params[1]);
 
             result = result.replace(match, replace);
