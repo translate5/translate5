@@ -112,7 +112,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     initConfig: function(instanceConfig){
         var me = this,
             config = {};
-            config.columns = [{
+        config.title = me.title; //see EXT6UPD-9
+        config.columns = [{
                 xtype: 'gridcolumn',
                 dataIndex: 'id',
                 text: 'Id',

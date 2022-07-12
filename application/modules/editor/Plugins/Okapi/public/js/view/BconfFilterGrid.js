@@ -47,9 +47,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         bconf: null,
     },
     plugins: [
-        Ext.create('Editor.plugins.Okapi.view.BconfFilterRowEditing')
+        'bconffilterrowediting'
     ],
-    title: {text: 'Okapi Filters', flex: 0},
+    title: {
+        text: 'Filter in',
+        flex: 0
+    },
     helpSection: 'useroverview',
     searchValSet: '',
     searchValCache: '',
@@ -63,8 +66,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         actions: '#UT#Aktionen'
     },
     strings: {
+        title: '#UT#Filter in',
         configuration: '#UT#Filter konfigurieren',
-        showDefaultFilters: '#UT#Show Okapi Defaults Filters',
+        showDefaultFilters: '#UT#Standard Filter anzeigen',
+        hideDefaultFilters: '#UT#Standard Filter verstecken',
         refresh: '#UT#Aktualisieren',
         remove: '#UT#Löschen',
         emptySearch: '#UT#Suchen',
@@ -75,8 +80,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     },
     initComponent: function(){
         var me = this,
-            bconf = me.getBconf().getData();
-        me.title.text += ` in <i data-qtip="${bconf.description}">${bconf.name}.bconf</i>`;
+            bconf = me.getBconf(),
+            name = bconf.get('name').split('"').join(''),
+            description = bconf.get('description').split('"').join('');
+        if(name.length > 50){
+            name = name.substring(0, 47) + ' ...';
+        }
+        me.title.text = me.strings.title + ' <i data-qtip="'+description+'">“'+name+'”</i>';
         me.callParent();
         me.getStore().getProxy().setBconfId(bconf.id); // for records and backend filter
     },
@@ -95,7 +105,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     },
     initConfig: function(instanceConfig){
         var me = this,
-            itemFilter = function(item){ // TODO: Add authorization check
+            itemFilter = function(item){ // TODO BCONF: Add authorization check
                 return true;
             },
             config = {
@@ -193,7 +203,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         return value.join(', ');
                     },
                     text: me.text_cols.extensions,
-                    editor: { //TODO: add tooltip (tpl?) with current filter of extension
+                    editor: {
                         xtype: 'tagfield',
                         itemId: 'extensionMap',
                         queryMode: 'local',
@@ -217,6 +227,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     stateId: 'okapiGridActionColumn',
                     align: 'center',
                     text: me.text_cols.actions,
+                    hideMode: 'visibility',
+                    editRenderer: function(){ // disables showing the action-column in the RowEditor
+                        return '';
+                    },
                     items: Ext.Array.filter([{
                         tooltip: me.strings.configuration,
                         isAllowedFor: 'bconfEdit',

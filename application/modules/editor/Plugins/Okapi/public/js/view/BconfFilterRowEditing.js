@@ -30,26 +30,47 @@
  */
 Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
     extend: 'Ext.grid.plugin.RowEditing',
+    alias: 'plugin.bconffilterrowediting',
     clicksToEdit: 3, // QUIRK: 1 not possible, triggers on actioncolumns TODO: limit to non actionCols, add pointerCls
     removeUnmodified: true,
     errorSummary: false,
-    strings: {},
+    strings: {
+        infosMissing: '#UT#Informationen fehlen',
+        nameMustBeChanged: '#UT#Der ursprüngliche Name muss verändert werden',
+        nameMustBeSupplied: '#UT#Es muss ein endeutiger Name angegeben werden',
+        extensionMustBeSupplied: '#UT#Es muss mindestens ein Dateityp angegeben werden'
+    },
+    onEnterKey: function(){}, // deactivates the save-on-enter feature with interferes with the tagfields add-item-on-enter
     listeners: {
         beforeedit: function(rowEditing, cellContext){
-            console.log('BconfFilterRowEditing: beforeedit'); // TODO REMOVE
             var record = cellContext.record,
-                tagfield = rowEditing.getEditor().down('tagfield');
+                tagField = rowEditing.getEditor().down('tagfield');
             // set the tagfields extensions store
-            tagfield.setStore(Ext.getStore('bconffilterStore').getAllExtensions());
+            tagField.setStore(Ext.getStore('bconffilterStore').getAllExtensions());
             // adds the change listener needed to update our button position after tagfield changes
-            tagfield.addListener('change', rowEditing.delayedHeightChange, rowEditing);
+            tagField.addListener('change', rowEditing.delayedHeightChange, rowEditing);
             // needed for further processing in the controller
             record.extensionsBeforeEdit = record.get('extensions');
             // respects the initial height of the tagfield
             rowEditing.delayedHeightChange();
         },
+        validateedit: function(rowEditing, cellContext){
+            console.log('BconfFilterRowEditing: validateedit', cellContext.newValues, cellContext.originalValues, cellContext.record.isClonedRecord); // TODO REMOVE
+            if(cellContext.record.isClonedRecord && cellContext.newValues.name === cellContext.originalValues.name){
+                Ext.MessageBox.alert(this.strings.infosMissing, this.strings.nameMustBeChanged);
+                return false;
+            }
+            if(cellContext.record.isClonedRecord && (!cellContext.newValues.extensions || cellContext.newValues.extensions.length < 1)){
+                Ext.MessageBox.alert(this.strings.infosMissing, this.strings.extensionMustBeSupplied);
+                return false;
+            }
+            if(!cellContext.newValues.name || cellContext.newValues.name.length < 1){
+                Ext.MessageBox.alert(this.strings.infosMissing, this.strings.nameMustBeSupplied);
+                return false;
+            }
+            return true;
+        },
         edit: function(rowEditing, cellContext){
-            console.log('BconfFilterRowEditing: edit', rowEditing); // TODO REMOVE
             var tagfield = rowEditing.getEditor().down('tagfield'),
                 record = cellContext.record;
             if(tagfield){
@@ -59,28 +80,21 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
             // process the edited record
             rowEditing.saveRecord(record, cellContext.newValues, cellContext.originalValues);
             // unset the serach & clean a clone
-            if(crecord.isClonedRecord){
+            if(record.isClonedRecord){
                 delete record.isClonedRecord;
-                delete record.clonedFrom;
                 // invalidate the potential tmp search value set when cloning records
-                this.context.grid.unsetSearchValue();
+                cellContext.grid.unsetSearchValue();
             }
         },
-        validateedit: function(editor, context){
-            console.log('BconfFilterRowEditing: validateedit', editor, context); // TODO REMOVE
-
-        },
         canceledit: function(rowEditing, cellContext){
-            console.log('BconfFilterRowEditing: canceledit', rowEditing); // TODO REMOVE
             var record = cellContext.record;
             // remove temp data, drop new records when canceled
             delete record.extensionsBeforeEdit;
             if(record.isClonedRecord){
                 delete record.isClonedRecord;
-                delete record.clonedFrom;
                 record.drop();
                 // invalidate the potential tmp search value set when cloning records
-                this.context.grid.unsetSearchValue();
+                cellContext.grid.unsetSearchValue();
             }
         }
     },
@@ -95,23 +109,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
      * Re-positions the RowEditor Buttons to match the height of the height of the editor, which may was changed by the tagfield expanding it
      */
     updateButtonsPosition: function(){
-        var rowEditor = this.getEditor(),
-            height = rowEditor.getHeight(),
-            buttons = rowEditor.getFloatingButtons();
-        // we update the buttons position only, if we really have the buttons on bottom
-        // code copied from Ext.grid.RowEditorButtons.setButtonPosition
-        if(height && buttons){
-            var top = '', bottom = '';
-            if (buttons.position === 'top') {
-                bottom = (height - rowEditor.body.getBorderWidth('t')) + 'px';
-            } else {
-                top = (height - rowEditor.body.getBorderWidth('b')) + 'px';
-            }
-            buttons.el.setStyle({
-                top: top,
-                bottom: bottom
-            });
-        }
+        // this.getEditor().syncButtonPosition(this.context) // this triggers a complete recalculation incl. scroll position
+        // this.getFloatingButtons().setButtonPosition(this.getFloatingButtons().position) // this recalculates the button-positions relative to the editor
+        var buttons = this.getEditor().getFloatingButtons();
+        buttons.setButtonPosition(buttons.position);
     },
     /**
      * Save a changed record
@@ -152,7 +153,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
                     record.commit(true);
                     identifier = savedRecord.get('identifier'); // crucial: identifier was changed from the backend!
                     // update the maps in the store & remove extension from other items
-                    console.log('SAVED NEW RECORD: ', savedRecord, identifier, extensions); // TODO REMOVE
                     store.updateExtensionsByIdentifier(identifier, extensions, true);
                 }
             });
@@ -179,5 +179,5 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
             // to remove the "red corner" when the extension-editor changed anything
             record.commit();
         }
-    },
+    }
 });

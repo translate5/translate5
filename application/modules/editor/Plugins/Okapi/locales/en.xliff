@@ -120,6 +120,62 @@
     <source>Filter konfigurieren</source>
     <target>Configure filters</target>
 </trans-unit>
+<trans-unit id='UGlwZWxpbmU='>
+    <source>Pipeline</source>
+    <target>Pipeline</target>
+</trans-unit>
+<trans-unit id='QmNvbmYgaGluenVmw7xnZW4='>
+    <source>Bconf hinzufügen</source>
+    <target>Add Bconf</target>
+</trans-unit>
+<trans-unit id='d2lyZCBiZW7DtnRpZ3Q='>
+    <source>wird benötigt</source>
+    <target>is needed</target>
+</trans-unit>
+<trans-unit id='RHVyY2hzdWNoZW4uLi4='>
+    <source>Durchsuchen...</source>
+    <target>Search...</target>
+</trans-unit>
+<trans-unit id='RGF0ZWl0eXBlbg=='>
+    <source>Dateitypen</source>
+    <target>Filetypes</target>
+</trans-unit>
+<trans-unit id='TUlNRS1UeXA='>
+    <source>MIME-Typ</source>
+    <target>MIME-type</target>
+</trans-unit>
+<trans-unit id='S2VubnVuZw=='>
+    <source>Kennung</source>
+    <target>Identifier</target>
+</trans-unit>
+<trans-unit id='RmlsdGVyIGlu'>
+    <source>Filter in</source>
+    <target>Filters of</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQgRmlsdGVyIGFuemVpZ2Vu'>
+    <source>Standard Filter anzeigen</source>
+    <target>Show default filters</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQgRmlsdGVyIHZlcnN0ZWNrZW4='>
+    <source>Standard Filter verstecken</source>
+    <target>Hide default filters</target>
+</trans-unit>
+<trans-unit id='SW5mb3JtYXRpb25lbiBmZWhsZW4='>
+    <source>Informationen fehlen</source>
+    <target>Missing information</target>
+</trans-unit>
+<trans-unit id='RGVyIHVyc3Byw7xuZ2xpY2hlIE5hbWUgbXVzcyB2ZXLDpG5kZXJ0IHdlcmRlbg=='>
+    <source>Der ursprüngliche Name muss verändert werden</source>
+    <target>The original name has to be changed</target>
+</trans-unit>
+<trans-unit id='RXMgbXVzcyBlaW4gZW5kZXV0aWdlciBOYW1lIGFuZ2VnZWJlbiB3ZXJkZW4='>
+    <source>Es muss ein endeutiger Name angegeben werden</source>
+    <target>A unique name must be provided</target>
+</trans-unit>
+<trans-unit id='RXMgbXVzcyBtaW5kZXN0ZW5zIGVpbiBEYXRlaXR5cCBhbmdlZ2ViZW4gd2VyZGVu'>
+    <source>Es muss mindestens ein Dateityp angegeben werden</source>
+    <target>At least one filetype must be specified</target>
+</trans-unit>
 </body>
 </file>
 </xliff>
