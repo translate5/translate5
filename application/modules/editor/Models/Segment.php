@@ -561,9 +561,31 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     public function stripTags($segmentContent)
     {
+        //class_exists('editor_Utils');
+        //i($segmentContent, 'a');
         $segmentContent = $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
+        //i($segmentContent, 'a');
         $segmentContent = $this->tagHelper->restore($segmentContent, true);
-        return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#', '', $segmentContent));
+        //i($segmentContent, 'a');
+
+        // <tab ts="09" length="1"/>
+        //$segmentContent = preg_replace('~<tab.*?/>~', "\t", $segmentContent);
+        $segmentContent = preg_replace('~<tab.*?/>~', "→", $segmentContent);
+        //i($segmentContent, 'a');
+
+        // <softReturn/>
+        //$segmentContent = preg_replace('~<softReturn.*?/>~', "\n", $segmentContent);
+        $segmentContent = preg_replace('~<softReturn.*?/>~', "↵", $segmentContent);
+        //i($segmentContent, 'a');
+
+        // <char ts="c2a0" length="1"/>. FYI: replacement here is not an ordinary space with code 32, but the one with code 160
+        //$segmentContent = preg_replace('~<char ts="c2a0" length="1"/>~', " ", $segmentContent);
+        $segmentContent = preg_replace('~<char ts="c2a0" length="1"/>~', "⎵", $segmentContent);
+        //i($segmentContent, 'a');
+
+        $segmentContent = strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#', '', $segmentContent));
+        //i($segmentContent, 'a');
+        return $segmentContent;
     }
 
     /**

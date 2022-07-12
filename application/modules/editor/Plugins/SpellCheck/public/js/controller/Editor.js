@@ -981,7 +981,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     mindDelTags: function(match) {
         //console.log('html before', match.range.containerNode.innerHTML);
         //var html = match.range.containerNode.innerHTML.replace(/<ins.*?>(.*?)<\/ins>/g, '$1');
-        var html = Ext.util.Format.stripTags(match.range.containerNode.innerHTML, '<del>');
+        var html = Ext.util.Format.stripTags(match.range.containerNode.innerHTML.replace(/<([0-9]+)\/>/g, '&lt;$1&gt;'), '<del>')
+            .replace(/&lt;([0-9]+)\/&gt;/g, '<$1/>');
+            //.replace(/<[0-9]+\/>/g, '');
         //console.log('html after', html);
         var dels = html.matchAll(/(<del.*?>)(.+?)<\/del>/g), delA = [];
 
@@ -993,6 +995,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 break;
             }
         }
+
         var start = match.range.start + 0;
         var end = match.range.end + 0; // console.log(delA);
         //console.log('before', start, end);
@@ -1008,9 +1011,32 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 end += delA[i][2].length;
             }
         }
+
+        var space, spaces = html.matchAll(/<[0-9]+\/>/g), spaceA = [];
+
+        // Get array of regex matches of whitespace-tags found within node's innerHTML
+        while (space = spaces.next()) {
+            if (space.value) {
+                spaceA.push(space.value);
+            } else {
+                break;
+            }
+        }
+
+        var _start = match.range.start + 0, shift = 0;
+        for (var i = 0; i < spaceA.length; i++) {
+            for (var j = 0; j < i; j++) {
+                spaceA[i].index -= spaceA[j][0].length;
+            }
+            if (spaceA[i].index < _start + shift) {
+                shift += spaceA[i][0].length;
+            }
+        }
+        console.log(html, 'was', [match.range.start, match.range.end], shift);
         //console.log('after', start, end);
-        match.range.start = start;
-        match.range.end = end;
+        match.range.start = start + shift;
+        match.range.end = end + shift;
+        console.log(html, 'now', [match.range.start, match.range.end]);
     },
 
     onSegmentEditCancelled: function(plugin, context) {
