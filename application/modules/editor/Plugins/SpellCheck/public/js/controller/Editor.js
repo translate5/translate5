@@ -979,64 +979,70 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
 
     mindDelTags: function(match) {
+        var html = Ext.util.Format.stripTags(
+            match.range.containerNode.innerHTML.replace(/<([0-9]+)\/>/g, '&lt;$1&gt;'), '<del>'
+        ).replace(/&lt;([0-9]+)\/&gt;/g, '<$1/>'), tagm, tags = [], tag, start, end;
+
         //console.log('html before', match.range.containerNode.innerHTML);
-        //var html = match.range.containerNode.innerHTML.replace(/<ins.*?>(.*?)<\/ins>/g, '$1');
-        var html = Ext.util.Format.stripTags(match.range.containerNode.innerHTML.replace(/<([0-9]+)\/>/g, '&lt;$1&gt;'), '<del>')
-            .replace(/&lt;([0-9]+)\/&gt;/g, '<$1/>');
-            //.replace(/<[0-9]+\/>/g, '');
         //console.log('html after', html);
-        var dels = html.matchAll(/(<del.*?>)(.+?)<\/del>/g), delA = [];
 
-        // Get array of regex matches of del-tags found within node's innerHTML
-        while (del = dels.next()) {
-            if (del.value) {
-                delA.push(del.value);
+        // Get regexp iterator containing matches
+        tagm = html.matchAll(/(<del.*?>)(.+?)<\/del>|<[0-9]+\/>/g);
+
+        // Get array of matches for further use to be more handy
+        while (tag = tagm.next()) {
+            if (tag.value) {
+                tags.push(tag.value);
             } else {
                 break;
             }
         }
 
-        var start = match.range.start + 0;
-        var end = match.range.end + 0; // console.log(delA);
-        //console.log('before', start, end);
-        // Foreach del-tag
-        for (var i = 0; i < delA.length; i++) {
-            //console.log('del#', i, 'was index', delA[i].index);
-            for (j = 0; j < i; j++) {
-                delA[i].index -= delA[j][0].length - delA[j][2].length;
-            }
-            //console.log('del#', i, 'now index', delA[i].index, '-', start);
-            if (delA[i].index < start) {
-                start += delA[i][2].length;
-                end += delA[i][2].length;
-            }
-        }
+        // Shortcuts
+        start = match.range.start + 0;
+        end   = match.range.end + 0;                            // console.log(tags);
 
-        var space, spaces = html.matchAll(/<[0-9]+\/>/g), spaceA = [];
+        // Foreach tag
+        for (var i = 0; i < tags.length; i++) {                   // console.log('tag#', i, 'was index', tags[i].index);
 
-        // Get array of regex matches of whitespace-tags found within node's innerHTML
-        while (space = spaces.next()) {
-            if (space.value) {
-                spaceA.push(space.value);
-            } else {
-                break;
-            }
-        }
 
-        var _start = match.range.start + 0, shift = 0;
-        for (var i = 0; i < spaceA.length; i++) {
+            // Reduce current tag match index (offset position) by cutting off html stuff of previous tags to make
+            // it possible to rely on that index (offset position) while spell check styles coords calculation
             for (var j = 0; j < i; j++) {
-                spaceA[i].index -= spaceA[j][0].length;
-            }
-            if (spaceA[i].index < _start + shift) {
-                shift += spaceA[i][0].length;
+
+                // If it's one of the whitespace-tags
+                if (tags[j][2] === undefined) {
+                    tags[i].index -= tags[j][0].length;
+                } else {
+                    tags[i].index -= tags[j][0].length - tags[j][2].length;
+                }
+            }                                  // console.log('tag#', i, 'now index', tags[i].index, 'start is', start);
+
+            // If current tag appears before the word having spellcheck-error
+            if (tags[i].index < start) {
+
+                // If it's one of the whitespace-tags
+                if (tags[i][2] === undefined) {
+
+                    // Shift spellcheck coords to the right, by whitespace-tag's outerHTML length,
+                    // which is = 4 in most cases, as whitespace tags look like <1/>, <2/> etc
+                    start += tags[i][0].length;
+                    end   += tags[i][0].length;
+
+                // Else if it's one of the del-tags
+                } else {
+
+                    // Shift spellcheck coords to the right, by del-tags content length
+                    start += tags[i][2].length;
+                    end   += tags[i][2].length;
+                }
             }
         }
-        console.log(html, 'was', [match.range.start, match.range.end], shift);
-        //console.log('after', start, end);
-        match.range.start = start + shift;
-        match.range.end = end + shift;
-        console.log(html, 'now', [match.range.start, match.range.end]);
+
+        //console.log(html, 'was', [match.range.start, match.range.end], 'shifted by ', start - match.range.start);
+        match.range.start = start;
+        match.range.end = end;
+        //console.log(html, 'now', [match.range.start, match.range.end]);
     },
 
     onSegmentEditCancelled: function(plugin, context) {
