@@ -99,7 +99,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         }
 
         // Redirect to the stored redirectTo target - if any
-        //$this->getHelper('Access')->redirectToOrigin();
+        $this->getHelper('Access')->redirectToOrigin();
 
         //if we are not redirected, then we try to load the possible applet:
         \MittagQI\Translate5\Applet\Dispatcher::getInstance()->dispatch(); //no redirection was given, so dispatch by default

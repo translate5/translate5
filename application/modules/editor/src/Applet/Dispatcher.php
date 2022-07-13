@@ -54,16 +54,6 @@ class Dispatcher {
         return self::$instance;
     }
 
-    protected function __construct() {
-
-        // add the default applet editor, if this will change move the register into editor bootstrap
-        $this->registerApplet('editor', new class extends AppletAbstract {
-            protected int $weight = 100; //editor should have the heighest weight
-            protected string $urlPathPart = '/editor/';
-            protected string $initialPage = 'editor';
-        });
-    }
-
     public function registerApplet(string $name, AppletAbstract $applet) {
         $this->applets[$name] = $applet;
     }

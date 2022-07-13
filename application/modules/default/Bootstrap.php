@@ -28,6 +28,6 @@ END LICENSE AND COPYRIGHT
 
 class Default_Bootstrap extends Zend_Application_Module_Bootstrap
 {
-    public static function registerApplet(){
+    public static function initModuleSpecific(){
     }
 }

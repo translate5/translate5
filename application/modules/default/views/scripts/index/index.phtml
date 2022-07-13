@@ -33,6 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-Zend_Controller_Front::getInstance()->getResponse()->setRedirect(APPLICATION_RUNDIR.'/editor');
-
+try {
+    editor_User::instance();
+}catch (ZfExtended_NotAuthenticatedException $exception){
+    // redirect to login page when no user session is found
+    Zend_Controller_Front::getInstance()->getResponse()->setRedirect(APPLICATION_RUNDIR.'/login');
+}
 ?>
