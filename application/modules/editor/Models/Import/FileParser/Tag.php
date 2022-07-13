@@ -173,7 +173,7 @@ class editor_Models_Import_FileParser_Tag {
 
         return $this->renderedTag = self::$renderer[$this->type]->getHtmlTag([
             'class' => $this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags) . ($cls ?? ''),
-            'text' => $this->text ?? htmlentities($this->originalContent),
+            'text' => $this->text ?? htmlentities($this->originalContent, ENT_COMPAT), //PHP 8.1 fix - default changed!
             'shortTag' => $this->tagNr,
             'id' => $this->id, //mostly original tag id
             'length' => $length,
