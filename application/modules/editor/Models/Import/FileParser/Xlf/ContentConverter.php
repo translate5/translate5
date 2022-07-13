@@ -155,7 +155,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         
         $this->xmlparser->registerElement('x,bx,ex', null, [$this, 'handleReplacerTag']);
         $this->xmlparser->registerElement('g', [$this, 'handleGTagOpener'], [$this, 'handleGTagCloser']);
-        
+
         $this->xmlparser->registerElement('sub', function() {
             //disable this parser until the end of the sub tag.
             $this->xmlparser->disableHandlersUntilEndtag();
@@ -219,7 +219,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $tagObj->tag = $tag;
         $tagObj->text = $text;
         $tagObj->id = $this->getId($openerMeta, $originalContent, in_array($tag, self::TAGS_WITH_CONTENT));
-        $tagObj->rid = $this->getRid($openerMeta);;
+        $tagObj->rid = $this->getRid($openerMeta);
         $tagObj->originalContent = $originalContent;
 
         $this->shortTagNumbers->addTag($tagObj);
@@ -401,12 +401,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         }
         $this->result[] = $this->createTag($opener, $tag, $chunk);
     }
-    
+
     /**
      * Handler for G tags
      * @param string $tag
      * @param array $attributes
      * @param int $key
+     * @throws editor_Models_Import_FileParser_Xlf_Exception
      */
     public function handleGTagOpener($tag, $attributes, $key) {
         $chunk = $this->xmlparser->getChunk($key);

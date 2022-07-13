@@ -76,7 +76,7 @@ class editor_Models_Import_FileParser_Tag {
      * The short tag number used in the GUI
      * @var mixed
      */
-    public $tagNr = null;
+    public mixed $tagNr = null;
 
     /**
      * The original raw (un-encoded) content contained in the tag
@@ -155,15 +155,11 @@ class editor_Models_Import_FileParser_Tag {
      * @return string
      */
     public function __toString(): string {
-        switch (self::$mode) {
-            case self::RETURN_MODE_REMOVED:
-                return '';
-            case self::RETURN_MODE_ORIGINAL:
-                return $this->originalContent;
-            case self::RETURN_MODE_INTERNAL:
-            default:
-                return $this->renderedTag;
-        }
+        return match (self::$mode) {
+            self::RETURN_MODE_REMOVED => '',
+            self::RETURN_MODE_ORIGINAL => $this->originalContent,
+            default => $this->renderedTag,
+        };
     }
 
     /**
@@ -195,7 +191,7 @@ class editor_Models_Import_FileParser_Tag {
      */
     private function parseSegmentGetStorageClass(string $tag, bool $xmlTags): string {
         if($xmlTags) {
-            if(substr($tag, 0, 1) !== '<' || substr($tag, -1) !== '>'){
+            if(!str_starts_with($tag, '<') || !str_ends_with($tag, '>')){
                 trigger_error('The Tag ' . $tag . ' has not the structure of a tag.', E_USER_ERROR);
             }
             //we store the tag content without leading < and trailing >
