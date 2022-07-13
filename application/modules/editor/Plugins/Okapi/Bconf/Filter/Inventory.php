@@ -150,7 +150,7 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory {
                 'okapiId' => $item->id,
                 'name' => $item->name,
                 'description' => $item->description,
-                'mime' => $item->mime,
+                'mimeType' => $item->mime,
                 'identifier' => editor_Plugins_Okapi_Bconf_Filters::createIdentifier($item->type, $item->id), // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
                 'editable' => false,
                 'clonable' => $item->settings,

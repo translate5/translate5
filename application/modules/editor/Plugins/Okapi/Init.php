@@ -485,7 +485,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             // the normal behaviour: bconf is defined via task and set in import wizard
             $this->useCustomBconf = false;
         }
-        // TODO: use extension mapping from bconf
         if($this->useCustomBconf){
             $config->checkFileType = false;
             $config->ignoredUncheckedExtensions = implode(',', $this->okapiCustomBconfIgnoredFileTypes);

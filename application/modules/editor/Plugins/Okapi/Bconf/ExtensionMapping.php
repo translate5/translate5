@@ -100,7 +100,10 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                     // DEBUG
                     if($doDebug){ error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '.$identifier.' will be embedded'); }
                     // add a custom filter to the filesys & map (that later is flushed to the DB)
-                    $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($bconf->getPath().DIRECTORY_SEPARATOR.self::FILE, $unpackedContent);
+                    $fprmPath = $bconf->createPath(editor_Plugins_Okapi_Bconf_Filter_Entity::createFileFromIdentifier($identifier));
+                    $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($fprmPath, $unpackedContent);
+                    // TODO BCONF: validate FPRM for Import
+                    $fprm->flush();
                     $customFilters[$identifier] = $fprm->getHash();
                     return true;
                 } else {

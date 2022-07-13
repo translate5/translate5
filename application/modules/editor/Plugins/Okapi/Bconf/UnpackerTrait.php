@@ -135,10 +135,8 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
         for($i = 0; $i < $count; $i++){
             $identifier = $raf->readUTF();
             $data = $raf->readUTF();
-
             // save the fprm if it points to a valid custom identifier/filter
             if(editor_Plugins_Okapi_Bconf_ExtensionMapping::processUnpackedFilter($this->entity, $identifier, $data, $replacementMap, $customFilters)){
-                file_put_contents($identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION, $data);
                 $content['fprm'][] = $identifier;
             }
         }

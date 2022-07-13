@@ -27,15 +27,13 @@
  */
 
 /* @var $this ZfExtended_View */
-$this->trans
+
 ?>
 
 Editor.controller.Localizer.addPluginInit('okapi', function(){
     Ext.define('Editor.locale.plugins.Okapi.view.BconfGrid', {
         override: 'Editor.plugins.Okapi.view.BconfGrid',
-        config: {
-            title: '<?php echo $this->translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>',
-        },
+        title: '<?php echo $this->translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>',
         text_cols: {
             name: '<?php echo $this->translate->_('Name'); ?>',
             extensions: '<?php echo $this->translate->_('Erweiterungen'); ?>',
@@ -54,6 +52,7 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
             customerStandard: '<?php echo $this->translate->_('Kundenstandard'); ?>'
         },
         strings: {
+            title: '<?php echo $this->translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>',
             addBconf: '<?php echo $this->translate->_('Bconf hinzufügen'); ?>',
             bconfRequired: '<?php echo $this->translate->_('wird benötigt'); ?>',
             browse: '<?php echo $this->translate->_('Durchsuchen...'); ?>',
@@ -91,13 +90,23 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
             actions: '<?php echo $this->translate->_('Aktionen'); ?>'
         },
         strings: {
+            title: '<?php echo $this->translate->_('Filter in'); ?>',
             configuration: '<?php echo $this->translate->_('Filter konfigurieren'); ?>',
             showDefaultFilters: '<?php echo $this->translate->_('Standard Filter anzeigen'); ?>',
+            hideDefaultFilters: '<?php echo $this->translate->_('Standard Filter verstecken'); ?>',
             refresh: '<?php echo $this->translate->_('Aktualisieren'); ?>',
             remove: '<?php echo $this->translate->_('Löschen'); ?>',
             emptySearch: '<?php echo $this->translate->_('Suchen'); ?>',
             uniqueName: '<?php echo $this->translate->_('Eindeutiger Name'); ?>'
         }
     });
-
+    Ext.define('Editor.locale.plugins.Okapi.view.BconfFilterRowEditing', {
+        override: 'Editor.plugins.Okapi.view.BconfFilterRowEditing',
+        strings: {
+            infosMissing: '<?php echo $this->translate->_('Informationen fehlen'); ?>',
+            nameMustBeChanged: '<?php echo $this->translate->_('Der ursprüngliche Name muss verändert werden'); ?>',
+            nameMustBeSupplied: '<?php echo $this->translate->_('Es muss ein endeutiger Name angegeben werden'); ?>',
+            extensionMustBeSupplied: '<?php echo $this->translate->_('Es muss mindestens ein Dateityp angegeben werden'); ?>'
+        }
+    });
 });

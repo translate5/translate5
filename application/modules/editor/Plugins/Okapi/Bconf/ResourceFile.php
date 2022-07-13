@@ -74,7 +74,7 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
         if($content === NULL){
             $this->content = @file_get_contents($this->getPath());
             if(!$this->content || strlen($this->content) < 1){
-                throw new ZfExtended_Exception(get_class($this).' can only be instantiated for an existing and file ('.$this->path.') with contents');
+                throw new ZfExtended_Exception(get_class($this).' can only be instantiated for an existing file ('.$this->path.') with contents');
             }
         } else {
             $this->content = $content;

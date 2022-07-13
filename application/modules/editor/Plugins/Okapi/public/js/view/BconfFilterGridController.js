@@ -80,12 +80,19 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         field.getTrigger('clear').setVisible(searchFilterValue);
     },
 
+    /**
+     *
+     * @param {Ext.button.Button} btn
+     * @param {boolean} toggled
+     */
     toggleDefaultsFilter: function(btn, toggled){
         var store = this.getView().getStore();
         if(toggled){
             store.removeFilter('defaultsFilter');
+            btn.setText(this.getView().strings.hideDefaultFilters);
         } else {
             store.addFilter(store.defaultsFilter);
+            btn.setText(this.getView().strings.showDefaultFilters);
         }
     },
 
@@ -106,19 +113,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
             newRecData = Ext.clone(record.getData());
         // we temporarily set a search value to reduce the number of shown rows
         if(!view.grid.getSearchValue()){
-            view.grid.setSearchValue(record.get('name'));
+            view.grid.setSearchValue(record.get('okapiType'));
         }
         view.select(rowIndex);
         delete newRecData.id;
         delete newRecData.extensions;
         newRecData.bconfId = this.getView().getBconf().get('id');
         newRecData.identifier = 'NEW@FILTER'; // this is a special identifier that triggers creating a new identifier in the BconfFilterController
-        newRecData.isCustom = true;
+        newRecData.isCustom = true; // a cloned record always becomes a custom record and will be saved to the DB
         var newRec = store.add(newRecData)[0];
         newRec.isClonedRecord = true;
-        newRec.clonedFrom = record;
         // open roweditor for clone
-        var rowEditor = view.grid.findPlugin('rowediting');
+        var rowEditor = view.grid.findPlugin('bconffilterrowediting');
         rowEditor.startEdit(newRec);
     },
     /**
