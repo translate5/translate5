@@ -268,7 +268,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1145"></a>E1145  | Task Export | Could not create export-zip. |
 | <a id="E1146"></a>E1146  | Task Export | The task export folder does not exist, no export ZIP file can be created. | The user has probably clicked multiple times on the export button while the first export was still running.
 | <a id="E1147"></a>E1147  | Task Export | The task export folder does not exist or is not writeable, no export ZIP file can be created. | See E1146.
-| <a id="E1149"></a>E1149  | Task Export | Export: Some segments contains tag errors. | See error details for affected segments and details.
+| <a id="E1149"></a>E1149  | Task Export | Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"]. | See error details for affected segments and details.
 | <a id="E1157"></a>E1157  | Task Export | Export: the file &quot;{file}&quot; could not be exported, since had possibly already errors on import. | See error details for affected file and details.
 | <a id="E1170"></a>E1170  | Task Metadata Export | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
 

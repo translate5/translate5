@@ -98,7 +98,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
             
             //set shortTagIdent of the tagTrait to the next usable number if there are new tags
             $this->shortTagIdent = $this->highestTagShortCutNumber + 1;
-            $textNode = $this->utilities->whitespace->whitespaceTagReplacer($textNode, $this->shortTagIdent, $this->tagShortCutSpecialCharMap);
+            $textNode = $this->utilities->whitespace->convertToInternalTagsFromService($textNode, $this->shortTagIdent, $this->tagShortCutSpecialCharMap);
             $this->xmlparser->replaceChunk($key, $textNode);
         });
     }
@@ -134,7 +134,7 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     protected function importWhitespaceFromTagLessQuery(string $text): string {
         $wh = $this->utilities->whitespace;
         $text = $wh->protectWhitespace($text, $wh::ENTITY_MODE_KEEP);
-        return $wh->whitespaceTagReplacer($text, $this->shortTagIdent, $this->tagShortCutSpecialCharMap);
+        return $wh->convertToInternalTagsFromService($text, $this->shortTagIdent, $this->tagShortCutSpecialCharMap);
     }
 
     protected function restoreWhitespaceForQuery (string $queryString): string {

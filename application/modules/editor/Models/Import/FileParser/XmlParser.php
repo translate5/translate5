@@ -718,11 +718,11 @@ class editor_Models_Import_FileParser_XmlParser {
      * merges the separated XML chunks back into a string
      * @return string
      */
-    public function __toString() {
+    public function __toString(): string {
         return $this->join($this->xmlChunks);
     }
     
-    public function join(array $chunks) {
+    public static function join(array $chunks): string {
         return join('', $chunks);
     }
 }

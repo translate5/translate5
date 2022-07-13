@@ -367,9 +367,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         else {
             $text = $wh->protectWhitespace($text);
         }
-        
-        $text = $wh->replacePlaceholderTags($text, $this->shortTagNumbers->shortTagIdent);
-        $this->result[] = $text;
+
+        $xmlChunks = [];
+        $wh->convertToInternalTags($text, $this->shortTagNumbers->shortTagIdent, $xmlChunks);
+        //to keep the generated tag objects we have to use the chunklist instead of the returned string
+        array_push($this->result, ... $xmlChunks);
     }
     
     /**
