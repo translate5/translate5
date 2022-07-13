@@ -240,6 +240,7 @@ class editor_Models_Segment_Whitespace {
         $tag = new editor_Models_Import_FileParser_Tag($type);
         $tag->originalContent = $content;
         $tag->tagNr = $shortTag;
+        $tag->tag = 'protectedTag';
         $tag->id = $id;
         $tag->rid = $id;
         $tag->text = htmlspecialchars($content);
@@ -271,7 +272,7 @@ class editor_Models_Segment_Whitespace {
     public function convertToInternalTags(string $segment, int &$shortTagIdent, array &$xmlChunks = []): string {
         $this->currentShortTagNumber = &$shortTagIdent;
 
-        $xml = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        $xml = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser', [['normalizeTags' => false]]);
 
         $xml->registerElement(join(', ', self::WHITESPACE_TAG_LIST), null, function ($tagName, $key, $opener) use ($xml){
             //if there is no length attribute, use length = 1
@@ -361,6 +362,7 @@ class editor_Models_Segment_Whitespace {
         $tagObj->originalContent = $wholeTag;
         $tagObj->tagNr = $shortTagNumber;
         $tagObj->id = $tagName;
+        $tagObj->tag = $tagName;
         $tagObj->text = $text;
         //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
         $tagObj->renderTag($length, $title, $cls);
