@@ -411,12 +411,22 @@ Ext.define('Editor.util.Util', {
                 }, this, {single: true});
             });
         },
-
         closeWindows: function(){
             var win;
             while(win = Ext.WindowManager.getActive()) {
                 win.close && win.close() || win.hide && win.hide();
             }
+        },
+        /** @link https://stackoverflow.com/a/69200017 */
+        getXmlError: function(xmlStr){
+            const parser = new DOMParser();
+            const dom = parser.parseFromString(xmlStr, "application/xml");
+            const error = dom.querySelector("parsererror");
+            return !error || error.innerHTML || error.textContent;
+        },
+        /** @link https://stackoverflow.com/questions/1026069 */
+        ucfirst: function(s){
+            return s.charAt(0).toUpperCase() + s.slice(1);
         }
 
     }

@@ -24,8 +24,12 @@
 
  END LICENSE AND COPYRIGHT
  */
-Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
+Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
+    alternateClassName: [
+        'Editor.plugins.Okapi.view.fprm.Html',
+        'Editor.plugins.Okapi.view.fprm.Xmlstream'
+    ],
 
     width: '61%',
     defaultFocus: 'textarea',
@@ -35,7 +39,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
         width: '100%',
         minWidth: 800,
         height: '100%',
-        name: 'xml',
+        name: 'yaml',
         fieldCls: 'mono',
         scroll: true,
         validateOnBlur: false,
@@ -43,23 +47,40 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
         checkChangeBuffer: 500,
         checkChangeEvents: [],
         lastCheck: {},
-        validator: function(xml){
+        validator: function(yaml){
             var ret = true, lastCheck = this.lastCheck, me = this;
-            if(lastCheck.xml === xml){
+            if(lastCheck.yaml === yaml){
                 ret = lastCheck.ret
-            } else if(xml){
-                lastCheck.xml = xml;
-                ret = Editor.util.Util.getXmlError(xml || '<xml/>')
+            } else {
+                lastCheck.yaml = yaml;
+                var unevenMatch = lastCheck.unevenMatch = yaml.match(/^ ( {2})*[^ ]/m);
+                if(unevenMatch){
+                    var lineBreakAfter = yaml.indexOf('\n', unevenMatch.index),
+                        lineBreakBefore = yaml.lastIndexOf('\n', unevenMatch.index) + 1,
+                        line = yaml.substring(lineBreakBefore, lineBreakAfter);
+                        ret = '#UT#Uneven number of leading spaces at line <br>"<span style=\"font-family:monospace\"">'
+                            + line + '</span>"';
+                    if(lastCheck.highlightTask){
+                        lastCheck.highlightTask.destroy();
+                    }
+                    lastCheck.highlightTask = this.up('window').on('activate', function(){
+                        this.focus()
+                        setTimeout(function(){
+                            window.find(line + '\n', true, false, true)
+                            delete lastCheck.highlightTask;
+                        }, 50)
+                    }, this, {single: true, delay: 50, destroyable:true})
+                }
             }
             return lastCheck.ret = ret;
         }
     }],
 
     parseFprm(fprm){
-        return {xml: fprm}
+        return {yaml: fprm}
     },
 
     compileFprm: function(){
-        return this.down('[name=xml]').getValue()
+        return this.down('[name=yaml]').getValue()
     }
 })

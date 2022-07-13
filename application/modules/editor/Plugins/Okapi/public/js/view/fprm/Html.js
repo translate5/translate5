@@ -24,59 +24,7 @@
 
  END LICENSE AND COPYRIGHT
  */
-Ext.define('Editor.plugins.Okapi.view.fprm.Html', {
-    extend: 'Editor.plugins.Okapi.view.FprmEditor',
 
-    width: '61%',
-    defaultFocus: 'textarea',
+Ext.syncRequire('Editor.plugins.Okapi.view.fprm.Yaml')
 
-    formItems: [{
-        xtype: 'textarea',
-        width: '100%',
-        minWidth: 800,
-        height: '100%',
-        name: 'yaml',
-        fieldCls: 'mono',
-        scroll: true,
-        validateOnBlur: false,
-        inputAttrTpl: 'spellcheck="false"',
-        checkChangeBuffer: 500,
-        checkChangeEvents: [],
-        lastCheck: {},
-        validator: function(yaml){
-            var ret = true, lastCheck = this.lastCheck, me = this;
-            if(lastCheck.yaml === yaml){
-                ret = lastCheck.ret
-            } else {
-                lastCheck.yaml = yaml;
-                var unevenMatch = lastCheck.unevenMatch = yaml.match(/^ (  )*[^ ]/m);
-                if(unevenMatch){
-                    var lineBreakAfter = yaml.indexOf('\n', unevenMatch.index),
-                        lineBreakBefore = yaml.lastIndexOf('\n', unevenMatch.index) + 1,
-                        line = yaml.substring(lineBreakBefore, lineBreakAfter);
-                        ret = '#UT#Uneven number of leading spaces at line <br>"<span style=\"font-family:monospace\"">'
-                            + line + '</span>"';
-                    if(lastCheck.highlightTask){
-                        lastCheck.highlightTask.destroy();
-                    }
-                    lastCheck.highlightTask = this.up('window').on('activate', function(){
-                        this.focus()
-                        setTimeout(function(){
-                            window.find(line + '\n', true, false, true)
-                            delete lastCheck.highlightTask;
-                        }, 50)
-                    }, this, {single: true, delay: 50, destroyable:true})
-                }
-            }
-            return lastCheck.ret = ret;
-        }
-    }],
 
-    parseFprm(fprm){
-        return {yaml: fprm}
-    },
-
-    compileFprm: function(){
-        return this.down('[name=yaml]').getValue()
-    }
-})

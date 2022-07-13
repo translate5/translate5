@@ -65,6 +65,9 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
                 records.forEach(record => {
                     store.identifierMap.set(record.get('identifier'), record.id);
                     store.customIdentifierMap.set(record.get('identifier'), record.id);
+                    var type = record.get('okapiType').split('_').pop(),
+                        editorCls = 'Editor.plugins.Okapi.view.fprm.' + Editor.util.Util.ucfirst(type);
+                    Ext.require(editorCls) // Dynamically include required classes
                 });
                 var metadata = operation.getResultSet().getMetadata(),
                     defaultRecords = Ext.getStore('defaultBconfFilters').getRange();
