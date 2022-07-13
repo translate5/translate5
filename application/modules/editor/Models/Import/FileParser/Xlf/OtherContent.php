@@ -101,12 +101,12 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
     /**
      * @var int[]
      */
-    private array $sourceElementBoundary;
+    private ?array $sourceElementBoundary = null;
 
     /**
      * @var int[]
      */
-    private array $targetElementBoundary;
+    private ?array $targetElementBoundary = null;
 
     private array $midsToBeImported = [];
     private array $orphanedTags = [];
@@ -163,9 +163,10 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
         $data = $source ? $this->otherContentSource : $this->otherContentTarget;
         $containerBoundary = $source ? $this->sourceElementBoundary : $this->targetElementBoundary;
 
-        if(empty($data)) {
+        if(empty($data) || empty($containerBoundary)) {
             return;
         }
+
 
         //in source always, and on target only if source empty
         $resetTagNumbers = $source || empty($this->otherContentSource);
