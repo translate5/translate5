@@ -178,7 +178,10 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         }
         return false;
     },
-
+    /**
+     * Loads the content of the .fprm file
+     * @return {Promise<string>} Also fulfilled with undefined on unsuccessful requests
+     */
     loadFprm(){
         var me = this;
         return new Promise(function(resolve, reject){
@@ -191,7 +194,7 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
                     if(success){
                         resolve(response.responseText);
                     } else {
-                        reject();
+                        resolve();
                         Editor.app.getController('ServerException').handleException(response);
                     }
                 }

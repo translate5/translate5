@@ -25,7 +25,7 @@
  END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
-    extend: 'Editor.plugins.Okapi.view.FprmEditor',
+    extend: 'Editor.plugins.Okapi.view.fprm.Properties',
 
     formItems: []
 })

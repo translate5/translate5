@@ -27,21 +27,22 @@
 
 /**
  * @property {Editor.plugins.Okapi.model.BconfFilterModel} bconfFilter
- * @property {string} fprm
+ * @property {string} fprm The raw content of the .fprm file
  */
 Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     extend: 'Ext.Window',
     alias: 'widget.fprmeditor',
-    modal:true,
-    maximizable:true,
+    modal: true,
+    maximizable: true,
     margin: 50,
     width: '-50',
-    height: innerHeight-100,
+    height: innerHeight - 100,
     minHeight: 400,
+    minWidth: 800,
     layout: 'fit',
     constrainHeader: true,
     loadMask: true,
-    title: {text: 'Editing fprm ' },
+    title: {text: 'Editing fprm '},
     config: {
         bconfFilter: null,
         fprm: undefined,
@@ -59,9 +60,11 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     }],
 
     items: [{
-        xtype:'form',
+        xtype: 'form',
         itemId: 'fprm',
         height: '100%',
+        scrollable: true,
+        layout: 'form',
         items: [], // Fill in init method
     }],
 
@@ -91,9 +94,12 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     },
 
     load: function(){
-        this.setLoading()
-        const setFprm = this.setFprm.bind(this)
-        this.bconfFilter.loadFprm().then(setFprm, setFprm);
+        const me = this
+        me.setLoading()
+        this.bconfFilter.loadFprm().then(function(fprm){
+            me.setLoading(false)
+            me.setFprm(fprm)
+        });
     },
     initComponent: function(){
         this.title.text += ` of BconfFilter <i>${this.bconfFilter.get('name')}</i>, type ${this.bconfFilter.get('okapiType')}`;
@@ -106,37 +112,50 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     },
 
     afterRender: function(){
-
         if(this.fprm === undefined){
             this.setLoading() // has no effect in initComponent
         }
         return this.callParent(arguments);
     },
+    /**
+     * @method
+     * @param {object} keyValues
+     * Prepares the formPanel for setValues, adding formfields based on loaded fprm content
+     */
+    setupForm: Ext.emptyFn,
 
-    applyFprm: function(fprm){
-         if(fprm){
-            this.form.setValues(this.parseFprm(fprm))
-          // TODO BCONF only enable save btn when different from last disabled state
+    /**
+     * Called after fprm has been set
+     * @see Ext.Class.config
+     * @param fprm
+     */
+    updateFprm(fprm){
+        if(fprm !== undefined){
+            const parsed = this.parseFprm(fprm)
+            this.setupForm(parsed)
+            //this.form.setValues(parsed) // Done by setupForm
+            // TODO BCONF only enable save btn when different from last disabled state
             this.down('button#save').enable()
-
         }
-        this.setLoading(false);
     },
     /**
+     * @method
      * @abstract
      * Parses the raw fprm into an object that can be loaded into the form
+     * @param {string} fprm The content of the .fprm file
+     * @return object Contains keys and values, is fed to this.form.setValues()
      */
-    parseFprm(){
-        this.setLoading(false)
+    parseFprm(fprm){
         throw new Error('must be implemented by subclass!');
     },
     /**
      * @abstract
-     * Parses theform into an textstring that can be saved
+     * Parses the form into a textstring that can be saved
+     * @return string The content that will be sent to server and saved in the fprm file
      */
     compileFprm(){
-     this.setLoading(false)   
-     throw new Error('must be implemented by subclass!');
+        this.setLoading(false)
+        throw new Error('must be implemented by subclass!');
     },
 
     save: function(){
@@ -149,7 +168,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 me.close()
             })
         } else {
-            this.invalidFields = this.formPanel.query("field{getActiveErrors().length}")
+            this.invalidFields = this.formPanel.query('field{getActiveErrors().length}')
             this.lastInvalidValues = currentValues
             var response = {
                 status: 422,
