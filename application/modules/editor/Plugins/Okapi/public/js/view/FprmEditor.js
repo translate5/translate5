@@ -41,6 +41,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     minWidth: 800,
     layout: 'fit',
     constrainHeader: true,
+    iconCls: 'x-fa fa-edit',
     loadMask: true,
     title: {text: 'Editing fprm '},
     config: {
@@ -107,7 +108,8 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
 
         this.callParent();
         this.formPanel = this.down('form#fprm');
-        this.form = this.formPanel.getForm();
+        //TODO BCONF remove
+        f = this.form = this.formPanel.getForm();
 
         this.load();
     },

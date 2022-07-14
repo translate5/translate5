@@ -50,7 +50,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         for(name in fields){
             cfg = fields[name][config] || {}
             cfg.fieldLabel = fields[name][fieldLabel]
-            cfg.parentSelector = fields[name][parentSelector]
+            cfg.parentSelector = 'fprm_'+fields[name][parentSelector]
             fieldConfigs[name] = cfg;
         }
     },
@@ -71,10 +71,11 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     },
 
     setupForm(keyValues){
-        var entry, fieldConfig
+        var entry, fieldConfig, targetContainer;
         for(entry of keyValues){
             fieldConfig = this.getFieldConfig(entry)
-            this.formPanel.add(fieldConfig)
+            targetContainer = Ext.getCmp(fieldConfig.parentSelector) || this.formPanel
+            targetContainer.add(fieldConfig)
         }
     },
     getFieldConfig: function([name, value]){

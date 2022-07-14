@@ -28,14 +28,14 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
     requires: ['Editor.plugins.Okapi.view.fprm.gui.Openxml'],
 
-
     formItems: [{
         xtype: 'tabpanel',
+        defaults: {'bodyPadding': 15, layout: 'form'},
         items: [
-            {title: 'General Options', id: 'openxml_general'},
-            {title: 'Word Options', id: 'openxml_word'},
-            {title: 'Excel Options', id: 'openxml_excel'},
-            {title: 'Powerpoint Options', id: 'openxml_pp'},
+            {title: 'General Options', id: 'fprm_general'},
+            {title: 'Word Options', id: 'fprm_word'},
+            {title: 'Excel Options', id: 'fprm_excel'},
+            {title: 'Powerpoint Options', id: 'fprm_pp'},
         ]
     }],
 
@@ -57,6 +57,11 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         yyy: 'tsWordExcludedColors',
         hlt: 'tsWordHighlightColors',
         sln: 'tsPowerpointIncludedSlideNumbers',
+    },
+
+    initConfig: function(config){
+        this.items[0].layout = 'fit'
+        return this.callParent(arguments);
     },
 
 

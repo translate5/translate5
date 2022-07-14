@@ -18,7 +18,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.gui.Openxml', {
         bPreferenceTranslateWordExcludeGraphicMetaData: ['Exclude Graphical Metadata', 'word',],
         bPreferenceAutomaticallyAcceptRevisions: ['Automatically Accept Revisions', 'word',],
         bPreferenceIgnoreSoftHyphenTag: ['Ignore Soft Hyphens', 'word',],
-        bPreferenceReplaceNoBreakHyphenTag: ['Replace Non-Breaking Hyphen with Regular Hyphen', 'word',],
+        bPreferenceReplaceNoBreakHyphenTag: ['Replace Non-Breaking with Regular Hyphens', 'word',],
         bExtractExternalHyperlinks: ['Translate Hyperlink URLs', 'word',],
         tsComplexFieldDefinitionsToExtract: ['Translatable Fields', 'word',],
         bInExcludeMode: ['Exclude or Include Styles', 'word',],
