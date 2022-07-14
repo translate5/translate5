@@ -53,6 +53,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.gui.Openxml', {
 
         'sPreferenceLineSeparatorReplacement': ['', '', {hidden: true}], // not visible in Rainbow
         'bReorderPowerpointNotesAndComments.b': ['', '', {hidden: true}], // not visible in Rainbow
-        'bPreferenceAllowEmptyTargets': ['', '', {hidden: true}], // not visible in Rainbow
+        'bPreferenceAllowEmptyTargets.b': ['', '', {hidden: true}], // not visible in Rainbow
     }
 })

@@ -55,8 +55,10 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     tools: [{
         iconCls: 'x-fa fa-undo',
         tooltip: '#UT#Refresh',
-        handler: function(){
-            this.up('window').load();
+        handler: function(e, el, owner, tool){
+            var editor = owner.up('window')
+            editor.setFprm(); // unset old value
+            editor.load();
         }
     }],
 
@@ -120,12 +122,6 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         }
         return this.callParent(arguments);
     },
-    /**
-     * @method
-     * @param {object} keyValues
-     * Prepares the formPanel for setValues, adding formfields based on loaded fprm content
-     */
-    setupForm: Ext.emptyFn,
 
     /**
      * Called after fprm has been set
@@ -135,7 +131,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     updateFprm(fprm){
         if(fprm !== undefined){
             const parsed = this.parseFprm(fprm)
-            this.setupForm(parsed)
+            this.form.setValues(parsed)
             //this.form.setValues(parsed) // Done by setupForm
             // TODO BCONF only enable save btn when different from last disabled state
             this.down('button#save').enable()

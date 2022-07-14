@@ -69,21 +69,21 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         const parsed = this.callParent(arguments);
 
         for(var listName in this.listNames){
-            parsed.set(listName, []) // set empty lists
-            parsed.delete(listName + '.i') // length of list
+            parsed[listName] = [] // set empty lists
+            delete parsed[listName+'.i'] // length of list
         }
-        for(const [parsedName, value] of parsed){
+        for(const [parsedName, value] of Object.entries(parsed)){
             var [match, listId] = parsedName.match(/([a-z]{3})\d$/) || []
             if(listId){
-                parsed.delete(match)
+                delete parsed[match]
                 listName = this.listIdentifiers[listId]
-                parsed.get(listName).push(value)
+                parsed[listName].push(value)
             }
         }
         return parsed;
     },
 
-    getFieldConfig: function([name, value]){
+    getFieldConfig: function(name){
         var cfg = this.callParent(arguments);
         if(cfg.id.startsWith('ts') && this.listNames[name]){
             Object.assign(cfg, {

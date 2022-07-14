@@ -35,62 +35,53 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     fieldConfigs: {},
     initComponent: function(){
         this.callParent(arguments);
-        var descriptionClassName = this.self.getName().replace('fprm','fprm.gui')
-        descriptionClass = Ext.ClassManager.lookupName(descriptionClassName)
+        var descriptionClassName = this.self.getName().replace('fprm', 'fprm.gui')
+        var descriptionClass = Ext.ClassManager.lookupName(descriptionClassName)
         if(descriptionClass){ this.readDescription(descriptionClass) }
     },
 
     readDescription(descriptionClass){
         var fields = descriptionClass.fields,
             fieldConfigs = this.fieldConfigs = {},
-            name, cfg;
+            name, cfg, parent;
         /** Speaking names for indexes of the field arrays */
         const fieldLabel = 0, parentSelector = 1, config = 2;
 
         for(name in fields){
-            cfg = fields[name][config] || {}
+            cfg = Object.assign(this.getFieldConfig(name), fields[name][config])
             cfg.fieldLabel = fields[name][fieldLabel]
-            cfg.parentSelector = 'fprm_'+fields[name][parentSelector]
+            cfg.parentSelector = 'fprm_' + fields[name][parentSelector]
             fieldConfigs[name] = cfg;
+            parent = Ext.getCmp(cfg.parentSelector) || this.formPanel
+            parent.add(cfg)
         }
     },
 
     parseFprm: function(fprm){
-        var map = new Map();
+        var obj = {};
         fprm.split('\n').forEach(function(line){
             if(line.startsWith('#')){ return }
             var [, name, value] = line.match(/^(.+?)=(.*)$/) // line.split('=') is not enough, values can contain =
-            map.set(name, value);
+            obj[name] = value;
         })
-        return map;
+        return obj;
     },
 
     updateFprm(fprm){
         this.callParent(arguments);
-
     },
 
-    setupForm(keyValues){
-        var entry, fieldConfig, targetContainer;
-        for(entry of keyValues){
-            fieldConfig = this.getFieldConfig(entry)
-            targetContainer = Ext.getCmp(fieldConfig.parentSelector) || this.formPanel
-            targetContainer.add(fieldConfig)
-        }
-    },
-    getFieldConfig: function([name, value]){
+    getFieldConfig: function(name){
         var [id, typeSuffix] = name.split('.');
         console.log(id)
-            var xtype = this.suffixMap[typeSuffix],
-            fieldConfig = {
-                xtype,
-                id: id,
-                fieldLabel: id,
-                labelWidth: 'auto',
-                name,
-                value
-            };
-        return  Object.assign(fieldConfig, this.fieldConfigs[id])
+        var xtype = this.suffixMap[typeSuffix];
+        return {
+            xtype,
+            id: id,
+            fieldLabel: id,
+            labelWidth: 'auto',
+            name,
+        };
     },
 
     /**
