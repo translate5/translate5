@@ -32,15 +32,37 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
     alternateClassName: [],
 
+    fieldConfigs: {},
+    initComponent: function(){
+        this.callParent(arguments);
+        var descriptionClassName = this.self.getName().replace('fprm','fprm.gui')
+        descriptionClass = Ext.ClassManager.lookupName(descriptionClassName)
+        if(descriptionClass){ this.readDescription(descriptionClass) }
+    },
+
+    readDescription(descriptionClass){
+        var fields = descriptionClass.fields,
+            fieldConfigs = this.fieldConfigs = {},
+            name, cfg;
+        /** Speaking names for indexes of the field arrays */
+        const fieldLabel = 0, parentSelector = 1, config = 2;
+
+        for(name in fields){
+            cfg = fields[name][config] || {}
+            cfg.fieldLabel = fields[name][fieldLabel]
+            cfg.parentSelector = fields[name][parentSelector]
+            fieldConfigs[name] = cfg;
+        }
+    },
+
     parseFprm: function(fprm){
-        var ret = {};
+        var map = new Map();
         fprm.split('\n').forEach(function(line){
-            if(!line.startsWith('#')){
-                const [name, value] = line.split('=')
-                ret[name] = value;
-            }
+            if(line.startsWith('#')){ return }
+            var [, name, value] = line.match(/^(.+?)=(.*)$/) // line.split('=') is not enough, values can contain =
+            map.set(name, value);
         })
-        return ret;
+        return map;
     },
 
     updateFprm(fprm){
@@ -49,31 +71,40 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     },
 
     setupForm(keyValues){
-        var me = this;
-        f= me.formPanel
-        // TODO BCONF Load json description
-        Object.entries(keyValues).forEach(function addField([key, value]){
-            const [id, typeSuffix] = key.split('.'),
-                type = me.suffixMap[typeSuffix],
-                fieldConfig = {
-                    xtype: type,
-                    id,
-                    fieldLabel: id,
-                    labelWidth: 'auto',
-                    name: key,
-                    value
-                }
-            //TODO: add configs from description json
-            me.formPanel.add(fieldConfig)
-        })
+        var entry, fieldConfig
+        for(entry of keyValues){
+            fieldConfig = this.getFieldConfig(entry)
+            this.formPanel.add(fieldConfig)
+        }
     },
+    getFieldConfig: function([name, value]){
+        var [id, typeSuffix] = name.split('.');
+        console.log(id)
+            var xtype = this.suffixMap[typeSuffix],
+            fieldConfig = {
+                xtype,
+                id: id,
+                fieldLabel: id,
+                labelWidth: 'auto',
+                name,
+                value
+            };
+        return  Object.assign(fieldConfig, this.fieldConfigs[id])
+    },
+
+    /**
+     * @method
+     * @abstrace
+     * Template method to enable special field handling in subclasses
+     */
+    handleFieldconfigSpecial: Ext.emptyFn,
 
     suffixMap: {
         b: 'checkbox',
         i: 'numberfield',
-        s: 'textfield',
         undefined: 'textfield'
     },
+
 
     compileFprm(){
         this.setLoading(false)

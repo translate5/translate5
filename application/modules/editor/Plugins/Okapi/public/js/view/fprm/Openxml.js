@@ -26,6 +26,71 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
+    requires: ['Editor.plugins.Okapi.view.fprm.gui.Openxml'],
 
-    formItems: []
+
+    formItems: [{
+        xtype: 'tabpanel',
+        items: [
+            {title: 'General Options', id: 'openxml_general'},
+            {title: 'Word Options', id: 'openxml_word'},
+            {title: 'Excel Options', id: 'openxml_excel'},
+            {title: 'Powerpoint Options', id: 'openxml_pp'},
+        ]
+    }],
+
+    listNames: {
+        tsComplexFieldDefinitionsToExtract: 'cfd',
+        tsExcelExcludedColors: 'ccc',
+        tsExcelExcludedColumns: 'zzz',
+        tsExcludeWordStyles: 'sss',
+        tsWordExcludedColors: 'yyy',
+        tsWordHighlightColors: 'hlt',
+        tsPowerpointIncludedSlideNumbers: 'sln',
+    },
+
+    listIdentifiers: {
+        cfd: 'tsComplexFieldDefinitionsToExtract',
+        ccc: 'tsExcelExcludedColors',
+        zzz: 'tsExcelExcludedColumns',
+        sss: 'tsExcludeWordStyles',
+        yyy: 'tsWordExcludedColors',
+        hlt: 'tsWordHighlightColors',
+        sln: 'tsPowerpointIncludedSlideNumbers',
+    },
+
+
+    parseFprm: function(fprm){
+        const parsed = this.callParent(arguments);
+
+        for(var listName in this.listNames){
+            parsed.set(listName, []) // set empty lists
+            parsed.delete(listName + '.i') // length of list
+        }
+        for(const [parsedName, value] of parsed){
+            var [match, listId] = parsedName.match(/([a-z]{3})\d$/) || []
+            if(listId){
+                parsed.delete(match)
+                listName = this.listIdentifiers[listId]
+                parsed.get(listName).push(value)
+            }
+        }
+        return parsed;
+    },
+
+    getFieldConfig: function([name, value]){
+        var cfg = this.callParent(arguments);
+        if(cfg.id.startsWith('ts') && this.listNames[name]){
+            Object.assign(cfg, {
+                xtype: 'tagfield',
+                queryMode: 'local',
+                forceSelection: false,
+                createNewOnEnter: true,
+                createNewOnBlur: true,
+                store: []
+            });
+        }
+        return cfg
+    },
+
 })

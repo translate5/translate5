@@ -65,6 +65,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         height: '100%',
         scrollable: true,
         layout: 'form',
+        defaults: { labelClsExtra: Ext.baseCSSPrefix + 'selectable' },
         items: [], // Fill in init method
     }],
 
