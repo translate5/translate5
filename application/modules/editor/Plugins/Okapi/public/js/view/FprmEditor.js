@@ -123,6 +123,10 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         return this.callParent(arguments);
     },
 
+    getValues: function(){
+        return this.form.getValues()
+    },
+
     /**
      * Called after fprm has been set
      * @see Ext.Class.config

@@ -58,17 +58,20 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     },
 
     getFieldConfig: function(name){
-        var [id, typeSuffix] = name.split('.');
-        console.log(id)
-        var xtype = this.suffixMap[typeSuffix];
-        return {
-            xtype,
-            id: id,
+        var lastDot = name.lastIndexOf('.'), id, typeSuffix;
+        if(lastDot > 0){
+            [id, typeSuffix] = [name.slice(0, lastDot), name.slice(lastDot + 1)]
+        } else {
+            id = name // no dot in name
+        }
+        // TDOD BCONF Validate typeSuffix if it's not actually part of the id
+        return Object.assign({
+            id,
             fieldLabel: id,
             labelWidth: 'auto',
             labelClsExtra: 'x-selectable',
             name,
-        };
+        }, this.fieldDefaults[typeSuffix]);
     },
 
     parseFprm: function(fprm){
@@ -92,15 +95,15 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      */
     handleFieldconfigSpecial: Ext.emptyFn,
 
-    suffixMap: {
-        b: 'checkbox',
-        i: 'numberfield',
-        undefined: 'textfield'
+    fieldDefaults: {
+        b: {xtype: 'checkbox', inputValue: true},
+        i: {xtype: 'numberfield'},
+        undefined: {xtype: 'textfield'},
     },
 
-
     compileFprm(){
-        this.setLoading(false)
+        var values = this.getValues()
+        return Object.entries(values).map(nameVal => nameVal.join('=')).join('\n')
     },
 
 });

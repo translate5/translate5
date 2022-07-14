@@ -82,7 +82,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
 
     parseFprm: function(fprm){
         const parsed = this.callParent(arguments);
-
         for(var listName in this.listNames){
             parsed[listName] = [] // set empty lists
         }
