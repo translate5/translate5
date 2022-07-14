@@ -138,10 +138,14 @@ class XlfImportTest extends editor_Test_JsonTest {
         }
         
         //test editing of segments with preserved whitespace and segment length count
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=80&limit=6');
-        $segments = array_merge($segments, $this->api()->requestJson('editor/segment?page=1&start=106&limit=1'));
+        $segments = array_merge(
+            $this->api()->requestJson('editor/segment?page=1&start=80&limit=6'),
+            $this->api()->requestJson('editor/segment?page=1&start=106&limit=1'),
+            $this->api()->requestJson('editor/segment?page=1&start=116&limit=18'),
+        );
         foreach($segments as $idx => $segToEdit) {
-            $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToEdit->source.' - edited', $segToEdit->id);
+            $content = strlen($segToEdit->target) > 0 ? $segToEdit->target : $segToEdit->source;
+            $segmentData = $this->api()->prepareSegmentPut('targetEdit', $content.' - edited', $segToEdit->id);
             $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
         }
         
@@ -200,6 +204,7 @@ class XlfImportTest extends editor_Test_JsonTest {
         //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '05-Translate1971-de-en.xlf', 'Translate1971-exporttest.xlf');
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '06-Translate2525-de-en.xlf', 'Translate2525-exporttest.xlf');
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '09-Translate2786-en-de.xlf', 'Translate2786-exporttest.xlf');
     }
     
     /**
