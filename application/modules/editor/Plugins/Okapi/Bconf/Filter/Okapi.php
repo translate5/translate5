@@ -31,6 +31,19 @@
  */
 final class editor_Plugins_Okapi_Bconf_Filter_Okapi extends editor_Plugins_Okapi_Bconf_Filter_Inventory {
 
+    /*
+     * A filter-entry has the following structure:
+     {
+        "id": "okf_markdown",
+        "type": "okf_markdown",
+        "name": "Markdown",
+        "description": "Markdown files",
+        "mime": "text/markdown",
+        "extensions": ["md"],
+        "settings": true
+    },
+     */
+
     /**
      * @var editor_Plugins_Okapi_Bconf_Filter_Okapi|null
      */
@@ -41,7 +54,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_Okapi extends editor_Plugins_Okapi
      * @param string $identifier
      * @return bool
      */
-    public static function isValidDefaultIdentifier(string $identifier){
+    public static function isValidDefaultIdentifier(string $identifier) : bool {
         // avoid nonsense
         if(str_contains($identifier, editor_Plugins_Okapi_Bconf_Filters::IDENTIFIER_SEPERATOR)){
             throw new ZfExtended_BadMethodCallException('editor_Plugins_Okapi_Bconf_Filter_Okapi::isValidDefaultIdentifier can only check Okapi default filters that do not point to a fprm file');
@@ -58,7 +71,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_Okapi extends editor_Plugins_Okapi
      * @param $okapiType
      * @return bool
      */
-    public static function isValidType($okapiType){
+    public static function isValidType($okapiType) : bool {
         return (count(self::instance()->findFilter($okapiType)) > 0);
     }
     /**

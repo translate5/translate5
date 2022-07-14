@@ -57,6 +57,11 @@ class editor_Plugins_Okapi_Bconf_File {
     protected editor_Plugins_Okapi_Bconf_Entity $entity;
 
     /**
+     * @var string
+     */
+    protected string $bconfName;
+
+    /**
      * @var bool
      */
     protected bool $isNew;
@@ -69,6 +74,7 @@ class editor_Plugins_Okapi_Bconf_File {
     public function __construct(editor_Plugins_Okapi_Bconf_Entity $entity, bool $isNew=false) {
         $this->entity = $entity;
         $this->isNew = $isNew;
+        $this->bconfName = $this->entity->getName();
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfPackUnpack');
     }
 
@@ -81,60 +87,63 @@ class editor_Plugins_Okapi_Bconf_File {
     }
 
     /**
-     * @throws ZfExtended_UnprocessableEntity
-     * @throws editor_Plugins_Okapi_Exception
-     */
-    public function pack(): void {
-        try {
-            $this->doPack();
-        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity $e){
-            error_log('EXCEPTION: '.$e->getMessage());
-        } catch(Exception $e){
-            $this->invalidate($e->__toString(), 'EXCEP');
-        }
-    }
-
-    /**
      * @param string $pathToParse
+     * @throws ZfExtended_Exception
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
     public function unpack(string $pathToParse): void {
         try {
             $this->doUnpack($pathToParse);
-        } catch(editor_Plugins_Okapi_Exception|ZfExtended_UnprocessableEntity $e){
-            error_log('EXCEPTION: '.$e->getMessage());
+        } catch(editor_Plugins_Okapi_Bconf_InvalidException $e){
+            // in case of a editor_Plugins_Okapi_Bconf_InvalidException, the exception came from the invalidate-API and the entity is already invalidated
+            error_log('UNPACK EXCEPTION: '.$e->getMessage());
+            throw new editor_Plugins_Okapi_Exception('E4444', ['bconf' => $this->bconfName, 'details' => $e->getMessage()]);
         } catch(Exception $e){
-            $this->invalidate($e->__toString(), 'EXCEP');
+            // if an other exception than the explicitly thrown via invalidate occur we do a passthrough to be able to identify the origin
+            error_log('UNKNOWN UNPACK EXCEPTION: '.$e->__toString());
+            $this->invalidate($e->__toString(), false);
+            throw $e;
+        }
+    }
+
+    /**
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function pack(): void {
+        try {
+            $this->doPack();
+        } catch(editor_Plugins_Okapi_Bconf_InvalidException $e){
+            // in case of a editor_Plugins_Okapi_Bconf_InvalidException, the entity is already invalidated
+            error_log('PACK EXCEPTION: '.$e->getMessage());
+            throw new editor_Plugins_Okapi_Exception('E4445', ['bconf' => $this->bconfName, 'details' => $e->getMessage()]);
+        } catch(Exception $e){
+            // if an other exception than the explicitly thrown via invalidate occur we do a passthrough to be able to identify the origin
+            error_log('UNKNOWN PACK EXCEPTION: '.$e->__toString());
+            $this->invalidate($e->__toString(), false);
+            throw $e;
         }
     }
 
     /**
      * Handles occurred errors by deleting new records and throwing appropriate Exceptions
      * @param string $msg Message or exception to throw
-     * @param string $errorCode Defines which Exeption will be thrown
-     * @return never // TODO Add as return type on PHP8.1
-     * @throws ZfExtended_UnprocessableEntity
-     * @throws editor_Plugins_Okapi_Exception
+     * @param boolean $throwException If set an Invalid exception will be thrown
+     * @throws editor_Plugins_Okapi_Bconf_InvalidException
      */
-    protected function  invalidate(string $msg = '', string $errorCode = 'E1026') : void {
-        $errors = [[$msg]];
+    protected function  invalidate(string $msg, bool $throwException=true) : void {
         if($this->isNew){
             try {
                 $this->entity->delete();
             } catch(Exception $e){
-                if($errorCode === 'E1026'){
-                    $errors[] = [strval($e)];
-                } else {
-                    $msg .= PHP_EOL . strval($e);
-                }
+                $msg .= PHP_EOL.strval($e);
             }
         }
-        throw match ($errorCode) {
-            'E1057' => new editor_Plugins_Okapi_Exception($errorCode, ['okapiDataDir' => $msg]),
-            'E1026' => new ZfExtended_UnprocessableEntity($errorCode, ['errors' => $errors]),
-            default => new Exception($msg),
-        };
+        // will be triggered from errors inside the packer/unpacker
+        if($throwException){
+            throw new editor_Plugins_Okapi_Bconf_InvalidException($msg);
+        }
     }
-
 }

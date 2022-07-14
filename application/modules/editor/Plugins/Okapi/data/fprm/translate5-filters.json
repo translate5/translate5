@@ -57,9 +57,18 @@
         "id": "translate5-tbx-translate-definitions-setup-ITS",
         "type": "okf_xml",
         "replaceId": "",
-        "name": "T5 ITS Definitions Setup TBX",
+        "name": "t5 ITS Definitions Setup TBX",
         "description": "translate5 adjusted filter for ITS Definitions Setup TBX files",
         "mime": "text/xml",
         "extensions": ["tbx"]
+    },
+    {
+        "id": "translate5",
+        "type": "okf_idml",
+        "replaceId": "okf_idml",
+        "name": "t5 Adobe InDesign IDML documents",
+        "description": "translate5 adjusted filter for Adobe InDesign IDML documents",
+        "mime": "application/vnd.adobe.indesign-idml-package",
+        "extensions": ["idml"]
     }
 ]

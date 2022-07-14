@@ -33,22 +33,52 @@
 class editor_Plugins_Okapi_Bconf_Filters {
 
     /**
+     * General seperator in the OKAPI filter naming scheme
      * @var string
      */
     const IDENTIFIER_SEPERATOR = '@';
 
     /**
      * All Filters that have a GUI must be defined here
+     * Each filter must define extensions that can be tested alongside the filter. These files must exist in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER just as described with TESTABLE_EXTENSIONS
      * @var string[]
      */
     const GUIS = [
-        'okf_html',
-        'okf_xml',
-        'okf_xmlstream',
-        'okf_icml',
-        'okf_idml',
-        'okf_openxml'
+        'okf_html' => ['html'],
+        'okf_xml' => ['xml'],
+        'okf_xmlstream' => ['xml'],
+        /*
+        'okf_icml' => [], // TODO: a testfile is required for any filter-GUI
+        'okf_idml' => ['idml'],
+        'okf_openxml' => ['docx', 'pptx', 'xlsx']
+        */
     ];
+    /**
+     * A list of file-extensions, that validation files exist for.
+     * This files exist in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER and are all called "test.$EXTENSION"
+     * For each extension here a file must exist, the language must be english / en-GB
+     */
+    const TESTABLE_EXTENSIONS = ['txt', 'xml', 'strings', 'csv', 'htm', 'html', 'sdlxliff', 'docx', 'odp', 'ods', 'odt', 'pptx', 'tbx', 'xlsx', 'idml'];
+
+    /**
+     *
+     * @var string
+     */
+    const TESTFILE_FOLDER = 'testfiles';
+
+    /**
+     * Used for testing/validating bconfs
+     * English / en-GB
+     * @var int
+     */
+    const SOURCE_LANGUAGE = 5;
+
+    /**
+     * sed for testing/validating bconfs
+     * German / de-DE
+     * @var int
+     */
+    const TARGET_LANGUAGE = 4;
 
     /**
      * @var editor_Plugins_Okapi_Bconf_Filters|null
@@ -61,7 +91,7 @@ class editor_Plugins_Okapi_Bconf_Filters {
      * @return bool
      */
     public static function hasGui(string $filterType) : bool {
-        return in_array($filterType, self::GUIS);
+        return array_key_exists($filterType, self::GUIS);
     }
 
     /**
@@ -140,6 +170,17 @@ class editor_Plugins_Okapi_Bconf_Filters {
      */
     public static function createIdentifierFromPath(string $fprmPath) : string {
         return pathinfo($fprmPath, PATHINFO_FILENAME);
+    }
+
+    /**
+     * Creates the path of a testfile in the testfile-folder
+     * @param string $testFile
+     * @return string
+     * @throws editor_Models_ConfigException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public static function createTestfilePath(string $testFile) : string {
+        return editor_Plugins_Okapi_Init::getDataDir().self::TESTFILE_FOLDER.'/'.$testFile;
     }
 
     /**
@@ -271,5 +312,30 @@ class editor_Plugins_Okapi_Bconf_Filters {
             return $filters[0]->type;
         }
         return NULL;
+    }
+
+    /**
+     * Checks the existence of all the testfiles linked in our constants
+     * @return bool
+     */
+    public function validate() : bool {
+        $valid = true;
+        $extensions = self::TESTABLE_EXTENSIONS;
+        foreach(self::GUIS as $type => $guiExtensions){
+            foreach($guiExtensions as $guiExtension){
+                if(!in_array($guiExtension, $extensions)){
+                    $extensions[] = $guiExtension;
+                }
+            }
+        }
+        $folder = editor_Plugins_Okapi_Init::getDataDir().self::TESTFILE_FOLDER;
+        foreach($extensions as $extension){
+            if(!file_exists($folder.'/test.'.$extension)){
+                error_log('Okapi Filter Testfile '.get_class($this).': Missing filter testfile test.'.$extension.' in '.$folder);
+                $valid = false;
+            }
+        }
+        // TODO BCONF: add GUI-datafiles to this validation
+        return $valid;
     }
 }

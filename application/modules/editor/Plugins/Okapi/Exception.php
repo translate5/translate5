@@ -50,6 +50,9 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
         'E1406' => 'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}"',
         'E1407' => 'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed',
         'E1408' => 'Okapi Plug-In: The bconf "{bconf}" to import is not valid ({details})',
-        'E1409' => 'Okapi Plug-In: The edited filter file "{filterfile}" is not valid ({details})'
+        'E1409' => 'Okapi Plug-In: The edited filter file "{filterfile}" is not valid ({details})',
+        'E1414' => 'Okapi Plug-In: The fprm file "{file}" is not valid ({details})',
+        'E1415' => 'Okapi Plug-In: Error unpacking the bconf {bconf} ({details})',
+        'E1416' => 'Okapi Plug-In: Error packing the bconf {bconf} ({details})'
     ];
 }

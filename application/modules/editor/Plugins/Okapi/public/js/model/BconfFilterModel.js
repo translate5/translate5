@@ -38,7 +38,6 @@
  *  "description": "translate5 adjusted filter for OpenOffice.org documents",
  *  "mime": "application/x-openoffice",
  *  "editable": false,
- *  "clonable": true,
  *  "isCustom": false,
  *  "guiClass": ""
  * }
@@ -113,11 +112,6 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         critical: true
     }, {
         name: 'editable',
-        type: 'bool',
-        defaultValue: false,
-        persist: false
-    }, {
-        name: 'clonable',
         type: 'bool',
         defaultValue: false,
         persist: false

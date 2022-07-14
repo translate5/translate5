@@ -494,6 +494,9 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1407"></a>E1407  | Plug-In Okapi | Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed | Warning, that the invalid filter in the provided bconf was removed
 | <a id="E1408"></a>E1408  | Plug-In Okapi | Okapi Plug-In: The bconf "{bconf}" to import is not valid ({details}) | The provided bconf can not be imported to translate5
 | <a id="E1409"></a>E1409  | Plug-In Okapi | Okapi Plug-In: The edited filter file "{filterfile}" is not valid ({details}) | Please contact translate5 support to resolve this issue
+| <a id="E1414"></a>E1414  | Plug-In Okapi | Okapi Plug-In: The fprm file "{file}" is not valid ({details}) | An embedded fprm/filter file from an imported or uploaded bconf is not valid
+| <a id="E1415"></a>E1415  | Plug-In Okapi | Okapi Plug-In: Error unpacking the bconf {bconf} ({details}) | A bconf could not be unpacked on import
+| <a id="E1416"></a>E1416  | Plug-In Okapi | Okapi Plug-In: Error packing the bconf {bconf} ({details}) | A bconf could not be packed
 
 
 #### Plug-In PangeaMt

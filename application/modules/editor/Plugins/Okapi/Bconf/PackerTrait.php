@@ -36,6 +36,8 @@
 trait editor_Plugins_Okapi_Bconf_PackerTrait {
 
     /**
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
     private function doPack(): void {
@@ -98,10 +100,18 @@ trait editor_Plugins_Okapi_Bconf_PackerTrait {
         $raf->writeUTF(file_get_contents($path), false); // QUIRK: Need additional null byte. Where does it come from in Java?
     }
 
-    private function processPipeline($raf): void {
-        $pipelineFile = 'pipeline.pln';
+    /**
+     * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    private function processPipeline(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf){
+        $pipelineFile = editor_Plugins_Okapi_Bconf_File::PIPELINE_FILE;
         $pipelineSize = filesize($pipelineFile);
         $resource = fopen($pipelineFile, 'rb');
+        if($resource === false){
+            $this->invalidate('Unable to open file '.$pipelineFile);
+        }
         $xml = fread($resource, $pipelineSize);
         fclose($resource);
 
@@ -110,13 +120,14 @@ trait editor_Plugins_Okapi_Bconf_PackerTrait {
         foreach($xmlData as $key){
             $methods = explode("\n", $key);
             foreach($methods as $method){
+
                 if(str_contains($method, 'Path')){
 
                     $path = explode("=", $method)[1];
                     $path = str_replace('\\\\', '/', $path);
                     $path = str_replace('\\', '/', $path);
 
-                    $this::harvestReferencedFile($raf, ++$id, basename($path));
+                    $this->harvestReferencedFile($raf, ++$id, basename($path));
                 }
             }
         }
@@ -127,7 +138,14 @@ trait editor_Plugins_Okapi_Bconf_PackerTrait {
         $raf->writeUTF($xml, false);
     }
 
-    private function harvestReferencedFile($raf, $id, $fileName): void {
+    /**
+     * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
+     * @param int $id
+     * @param string $fileName
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    private function harvestReferencedFile(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf, int $id, string $fileName){
         $raf->writeInt($id);
         $raf->writeUTF($fileName, false);
 
@@ -138,16 +156,20 @@ trait editor_Plugins_Okapi_Bconf_PackerTrait {
             return;
         }
         //Open the file and read the content
-        $file = fopen($fileName, "rb") or die("Unable to open file!");
+        $resource = fopen($fileName, 'rb');
+        // can not really happen in normal operation but who knows
+        if($resource === false){
+            $this->invalidate('Unable to open file '.$fileName);
+        }
 
         $fileSize = filesize($fileName);
-        $fileContent = fread($file, $fileSize);
+        $fileContent = fread($resource, $fileSize);
         // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we write 2 32bit Ints here (limiting the encodable size to 4GB...)
         $raf->writeInt(0);
         $raf->writeInt($fileSize);
         if($fileSize > 0){
             $raf->fwrite($fileContent);
         }
-        fclose($file);
+        fclose($resource);
     }
 }

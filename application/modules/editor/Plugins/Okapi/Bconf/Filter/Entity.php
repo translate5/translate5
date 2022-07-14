@@ -221,8 +221,7 @@ class editor_Plugins_Okapi_Bconf_Filter_Entity extends ZfExtended_Models_Entity_
             unset($row['hash']);
             // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
             $row['identifier'] = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($row['okapiType'], $row['okapiId']);
-            $row['editable'] = true;
-            $row['clonable'] = true;
+            $row['editable'] = editor_Plugins_Okapi_Bconf_Filters::hasGui($row['okapiType']);
             $row['isCustom'] = true;
             $row['guiClass'] = editor_Plugins_Okapi_Bconf_Filters::getGuiClass($row['okapiType']);
             $rows[] = $row;

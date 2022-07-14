@@ -244,6 +244,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     }, {
                         tooltip: me.strings.configuration,
                         isAllowedFor: 'isFromTranslate5',
+                        isDisabled: 'isCloneDisabled',
                         glyph: 'f24d@FontAwesome5FreeSolid',
                         handler: 'cloneFilter'
                     }, {

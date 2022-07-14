@@ -46,5 +46,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
     public function test10_BconfFilterInventories() {
         $this->assertEquals(true, editor_Plugins_Okapi_Bconf_Filter_Okapi::instance()->validate());
         $this->assertEquals(true, editor_Plugins_Okapi_Bconf_Filter_Translate5::instance()->validate());
+        $this->assertEquals(true, editor_Plugins_Okapi_Bconf_Segmentation_Translate5::instance()->validate());
+        $this->assertEquals(true, editor_Plugins_Okapi_Bconf_Filters::instance()->validate());
     }
 }

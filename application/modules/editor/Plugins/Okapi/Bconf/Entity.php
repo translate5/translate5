@@ -128,6 +128,11 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     private $file = NULL;
 
     /**
+     * @var editor_Plugins_Okapi_Bconf_ExtensionMapping
+     */
+    private $extensionMapping = NULL;
+
+    /**
      * @var string
      */
     private string $dir = '';
@@ -187,21 +192,23 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $bconfFile->unpack($tmpPath);
         $bconfFile->pack();
 
-        // final step: validate the bconf
-        $validation = new editor_Plugins_Okapi_Bconf_Validation($this);
-        if($validation->validate()){
-            if(!$validation->wasTestable()){
-                // we generate a warning when a bconf could not be validated properly (what rarely can happen)
-                $logger = Zend_Registry::get('logger')->cloneMe('editor.okapi.bconf');
-                $logger->warn(
-                    'E1408',
-                    'Okapi Plug-In: The bconf "{bconf}" to import is not valid ({details})',
-                    ['bconf' => $this->getName(), 'bconfId' => $this->getId(), 'details' => $validation->getValidationError()]);
+        // final step: validate the bconf - if not the sys-default bconf
+        if(!$this->isSystemDefault()){
+            $validation = new editor_Plugins_Okapi_Bconf_Validation($this);
+            if($validation->validate()){
+                if(!$validation->wasTestable()){
+                    // we generate a warning when a bconf could not be validated properly (what rarely can happen)
+                    $logger = Zend_Registry::get('logger')->cloneMe('editor.okapi.bconf');
+                    $logger->warn(
+                        'E1408',
+                        'Okapi Plug-In: The bconf "{bconf}" to import is not valid ({details})',
+                        ['bconf' => $this->getName(), 'bconfId' => $this->getId(), 'details' => $validation->getValidationError()]);
+                }
+            } else {
+                $name = $this->getName();
+                $this->delete();
+                throw new editor_Plugins_Okapi_Exception('E1408', ['bconf' => $name, 'details' => $validation->getValidationError()]);
             }
-        } else {
-            $name = $this->getName();
-            $this->delete();
-            throw new editor_Plugins_Okapi_Exception('E1408', ['bconf' => $name, 'details' => $validation->getValidationError()]);
         }
     }
 
@@ -397,15 +404,15 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     /**
      * Retrieves the SRX as file-object, either "source" or "target"
      * @param string $purpose
-     * @return editor_Plugins_Okapi_Bconf_Srx
+     * @return editor_Plugins_Okapi_Bconf_Segmentation_Srx
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getSrx(string $purpose) : editor_Plugins_Okapi_Bconf_Srx {
+    public function getSrx(string $purpose) : editor_Plugins_Okapi_Bconf_Segmentation_Srx {
         $path = $this->createPath($this->getSrxNameFor($purpose));
-        return new editor_Plugins_Okapi_Bconf_Srx($path);
+        return new editor_Plugins_Okapi_Bconf_Segmentation_Srx($path);
     }
 
     /**
@@ -440,7 +447,10 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception
      */
     public function getExtensionMapping() : editor_Plugins_Okapi_Bconf_ExtensionMapping {
-        return new editor_Plugins_Okapi_Bconf_ExtensionMapping($this);
+        if($this->extensionMapping == NULL || $this->extensionMapping->getBconfId() !== $this->getId()){
+            $this->extensionMapping = new editor_Plugins_Okapi_Bconf_ExtensionMapping($this);
+        }
+        return $this->extensionMapping;
     }
 
     /**
@@ -568,9 +578,8 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      */
     public function findCustomFilterExtensions() : array {
         $extensions = [];
-        $extensionMapping = $this->getExtensionMapping();
         foreach($this->findCustomFilterIdentifiers() as $identifier){
-            $extensions = array_merge($extensionMapping->findExtensionsForFilter($identifier), $extensions);
+            $extensions = array_merge($this->getExtensionMapping()->findExtensionsForFilter($identifier), $extensions);
         }
         $extensions = array_unique($extensions);
         sort($extensions);

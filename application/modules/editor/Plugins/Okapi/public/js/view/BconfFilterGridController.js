@@ -58,10 +58,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     },
 
     isDeleteDisabled: function(view, rowIndex, colIndex, item, record){
-        return !record.data.isCustom;
+        return !record.get('isCustom');
     },
 
     isEditDisabled: function(view, rowIndex, colIndex, item, record){
+        return !record.get('isCustom') || !record.get('editable') || !record.get('editable') || record.crudState === 'C' || !record.get('guiClass');
+    },
+
+    isCloneDisabled: function(view, rowIndex, colIndex, item, record){
         return !record.get('editable') || record.crudState === 'C' || !record.get('guiClass');
     },
 
