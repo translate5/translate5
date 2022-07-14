@@ -545,7 +545,11 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
     {
         foreach ($content as $mid => $chunks) {
             foreach ($chunks as $chunk) {
-                if ($chunk instanceof editor_Models_Import_FileParser_Tag) {
+                if ($chunk instanceof editor_Models_Import_FileParser_WhitespaceTag) {
+                    $data[$mid]->contentChunks[] = $chunk->__toString();
+                    $data[$mid]->contentChunksOriginal[] = $chunk->rawContent;
+                }
+                elseif ($chunk instanceof editor_Models_Import_FileParser_Tag) {
                     $data[$mid]->contentChunks[] = $chunk->__toString();
                     $data[$mid]->contentChunksOriginal[] = $chunk->originalContent;
                 } else {

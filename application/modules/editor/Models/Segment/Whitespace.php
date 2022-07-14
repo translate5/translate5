@@ -358,8 +358,9 @@ class editor_Models_Segment_Whitespace {
                 }
         }
 
-        $tagObj = new editor_Models_Import_FileParser_Tag();
+        $tagObj = new editor_Models_Import_FileParser_WhitespaceTag();
         $tagObj->originalContent = $wholeTag;
+        $tagObj->rawContent = $this->unprotectWhitespace($wholeTag);
         $tagObj->tagNr = $shortTagNumber;
         $tagObj->id = $tagName;
         $tagObj->tag = $tagName;
