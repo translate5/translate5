@@ -155,7 +155,62 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
 
         return self::$languages['languageTool'] = $this->processResponse($response);
     }
-    
+
+    /**
+     * Pick contents of docs/LanguageTool.md and overwrite the list of supported languages there.
+     * This method can be call from anywhere using the following:
+     *
+     * ZfExtended_Factory
+     *     ::get('editor_Plugins_SpellCheck_SegmentProcessor')
+     *     ->getConnector()
+     *     ->renderSupportedLanguagesDoc();
+     *
+     * @return array
+     */
+    public function renderSupportedLanguagesDoc() {
+
+        // Get all translate5 languages
+        $langA = ZfExtended_Factory
+            ::get('editor_Models_Languages')
+            ->loadAllKeyValueCustom('rfc5646', 'langName');
+
+        // Sort by rfc
+        ksort($langA);
+
+        // Array of supported languages
+        $list = [];
+
+        // Foreach rfc-code
+        foreach ($langA as $rfc => $name) {
+
+            // If supported
+            if ($supported = $this->getSupportedLanguage($rfc)) {
+
+                // Collect the info for rendering the list further
+                $list []= [$name, $rfc, $supported->longCode];
+            }
+        }
+
+        // Get md file path
+        $file = '../docs/LanguageTool.md';
+
+        // Here is the line that will be used to split md file contents into
+        // two parts - any contents BEFORE supported languages list, and supported languages list itself
+        $line = '| :-------------- |:--------------- | :----------------';
+
+        // Get the first part, including the split-line
+        $text = explode($line, file_get_contents($file))[0] . $line . "\r\n";
+
+        // Append lines
+        foreach ($list as $item) $text .= '| ' . join(' | ', $item) . "\r\n";
+
+        // Overwrite md file
+        file_put_contents($file, $text);
+
+        // Return list of supported languages
+        return $list;
+    }
+
     /**
      * Get matches from LanguageTool.
      * @param string $text

@@ -1013,6 +1013,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 // If it's one of the whitespace-tags
                 if (tags[j][2] === undefined) {
                     tags[i].index -= tags[j][0].length;
+
+                // Else if it's one of the del-tags
                 } else {
                     tags[i].index -= tags[j][0].length - tags[j][2].length;
                 }
