@@ -53,13 +53,13 @@
         <!-- in this case the trans-unit is imported partly and therefore wrong, but the missing source mrks are displayed wrong, should be fixed with split/merging segments -->
         <source/>
         <seg-source><mrk mtype="seg" mid="1"></mrk></seg-source>
-        <target><mrk mtype="seg" mid="2">foo 2</mrk> </target>
+        <target> <mrk mtype="seg" mid="2">foo 2</mrk></target>
       </trans-unit>
       <trans-unit id="11" translate="yes">
         <!-- in this case the trans-unit is imported partly and therefore wrong, but the missing source mrks are displayed wrong, should be fixed with split/merging segments -->
         <source/>
         <seg-source><mrk mtype="seg" mid="1"/></seg-source>
-        <target><mrk mtype="seg" mid="2">foo 3</mrk> </target>
+        <target> <mrk mtype="seg" mid="2">foo 3</mrk></target>
       </trans-unit>
     </body>
   </file>
