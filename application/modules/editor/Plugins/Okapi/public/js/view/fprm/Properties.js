@@ -57,6 +57,20 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         }
     },
 
+    getFieldConfig: function(name){
+        var [id, typeSuffix] = name.split('.');
+        console.log(id)
+        var xtype = this.suffixMap[typeSuffix];
+        return {
+            xtype,
+            id: id,
+            fieldLabel: id,
+            labelWidth: 'auto',
+            labelClsExtra: 'x-selectable',
+            name,
+        };
+    },
+
     parseFprm: function(fprm){
         var obj = {};
         fprm.split('\n').forEach(function(line){
@@ -69,19 +83,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
 
     updateFprm(fprm){
         this.callParent(arguments);
-    },
-
-    getFieldConfig: function(name){
-        var [id, typeSuffix] = name.split('.');
-        console.log(id)
-        var xtype = this.suffixMap[typeSuffix];
-        return {
-            xtype,
-            id: id,
-            fieldLabel: id,
-            labelWidth: 'auto',
-            name,
-        };
     },
 
     /**

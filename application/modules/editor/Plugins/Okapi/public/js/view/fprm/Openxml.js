@@ -32,31 +32,31 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         xtype: 'tabpanel',
         defaults: {'bodyPadding': 15, layout: 'form'},
         items: [
-            {title: 'General Options', id: 'fprm_general'},
-            {title: 'Word Options', id: 'fprm_word'},
-            {title: 'Excel Options', id: 'fprm_excel'},
-            {title: 'Powerpoint Options', id: 'fprm_pp'},
+            {title: 'General Options', id: 'fprm_general', iconCls: 'x-fa fa-cog'},
+            {title: 'Word Options', id: 'fprm_word', iconCls: 'x-fa fa-file-word-o'},
+            {title: 'Excel Options', id: 'fprm_excel', iconCls: 'x-fa fa-file-excel-o'},
+            {title: 'Powerpoint Options', id: 'fprm_pp', iconCls: 'x-fa fa-file-powerpoint-o'},
         ]
     }],
 
     listNames: {
-        tsComplexFieldDefinitionsToExtract: 'cfd',
-        tsExcelExcludedColors: 'ccc',
-        tsExcelExcludedColumns: 'zzz',
-        tsExcludeWordStyles: 'sss',
-        tsWordExcludedColors: 'yyy',
-        tsWordHighlightColors: 'hlt',
-        tsPowerpointIncludedSlideNumbers: 'sln',
+        'tsComplexFieldDefinitionsToExtract.i': 'cfd',
+        'tsExcelExcludedColors.i': 'ccc',
+        'tsExcelExcludedColumns.i': 'zzz',
+        'tsExcludeWordStyles.i': 'sss',
+        'tsWordExcludedColors.i': 'yyy',
+        'tsWordHighlightColors.i': 'hlt',
+        'tsPowerpointIncludedSlideNumbers.i': 'sln',
     },
 
     listIdentifiers: {
-        cfd: 'tsComplexFieldDefinitionsToExtract',
-        ccc: 'tsExcelExcludedColors',
-        zzz: 'tsExcelExcludedColumns',
-        sss: 'tsExcludeWordStyles',
-        yyy: 'tsWordExcludedColors',
-        hlt: 'tsWordHighlightColors',
-        sln: 'tsPowerpointIncludedSlideNumbers',
+        cfd: 'tsComplexFieldDefinitionsToExtract.i',
+        ccc: 'tsExcelExcludedColors.i',
+        zzz: 'tsExcelExcludedColumns.i',
+        sss: 'tsExcludeWordStyles.i',
+        yyy: 'tsWordExcludedColors.i',
+        hlt: 'tsWordHighlightColors.i',
+        sln: 'tsPowerpointIncludedSlideNumbers.i',
     },
 
     initConfig: function(config){
@@ -64,28 +64,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         return this.callParent(arguments);
     },
 
-
-    parseFprm: function(fprm){
-        const parsed = this.callParent(arguments);
-
-        for(var listName in this.listNames){
-            parsed[listName] = [] // set empty lists
-            delete parsed[listName+'.i'] // length of list
-        }
-        for(const [parsedName, value] of Object.entries(parsed)){
-            var [match, listId] = parsedName.match(/([a-z]{3})\d$/) || []
-            if(listId){
-                delete parsed[match]
-                listName = this.listIdentifiers[listId]
-                parsed[listName].push(value)
-            }
-        }
-        return parsed;
-    },
-
     getFieldConfig: function(name){
         var cfg = this.callParent(arguments);
-        if(cfg.id.startsWith('ts') && this.listNames[name]){
+        if(name.startsWith('ts') && this.listNames[name]){
             Object.assign(cfg, {
                 xtype: 'tagfield',
                 queryMode: 'local',
@@ -97,5 +78,25 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         }
         return cfg
     },
+
+
+    parseFprm: function(fprm){
+        const parsed = this.callParent(arguments);
+
+        for(var listName in this.listNames){
+            parsed[listName] = [] // set empty lists
+        }
+        for(const [parsedName, value] of Object.entries(parsed)){
+            var [match, listId] = parsedName.match(/^([a-z]{3})\d/) || []
+            if(listId){
+                delete parsed[match]
+                listName = this.listIdentifiers[listId]
+                parsed[listName].push(value)
+            }
+        }
+        return parsed;
+    },
+
+
 
 })

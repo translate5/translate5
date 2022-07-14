@@ -53,6 +53,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         text: 'Filter in',
         flex: 0
     },
+    iconCls: 'x-fa fa-filter',
     helpSection: 'useroverview',
     searchValSet: '',
     searchValCache: '',
