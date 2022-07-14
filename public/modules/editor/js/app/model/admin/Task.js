@@ -119,14 +119,15 @@ Ext.define('Editor.model.admin.Task', {
         {name: 'diffExportUsable', type: 'boolean'},
         {name: 'description', type: 'string'},
         {
-            name: 'projectTasks', persist: false,
+            name: 'projectTasks',
+            persist: false,
             convert: function (tasks) {
                 if(!tasks){
                     return tasks;
                 }
                 for(var i=0;i<tasks.length;i++){
                     if(!tasks[i].isModel){
-                        tasks[i] = Ext.create('Editor.model.admin.TaskUserAssoc',tasks[i]);
+                        tasks[i] = Editor.model.admin.Task.create(tasks[i]);
                     }
                 }
                 return tasks;
