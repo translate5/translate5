@@ -4,55 +4,55 @@ Ext.define('Editor.plugins.Okapi.view.fprm.gui.Openxml', {
         //[ "text", "parentSelector", additionalConfig]
 
         //general
-        maxAttributeSize: ['Maximal attribute size of xml attributes', 'general', {hidden: true}],
+        'maxAttributeSize.i': ['Maximal attribute size of xml attributes', 'general', {hidden: true}],
 
-        bPreferenceTranslateDocProperties: ['Translate Document Properties', 'general',],
-        bPreferenceTranslateComments: ['Translate Comments', 'general',],
-        bPreferenceAggressiveCleanup: ['Clean Tags Aggressively', 'general',],
-        bPreferenceAddTabAsCharacter: ['Treat Tab as Character', 'general',],
-        bPreferenceAddLineSeparatorAsCharacter: ['Treat Line Break as Character', 'general',],
+        'bPreferenceTranslateDocProperties.b': ['Translate Document Properties', 'general',],
+        'bPreferenceTranslateComments.b': ['Translate Comments', 'general',],
+        'bPreferenceAggressiveCleanup.b': ['Clean Tags Aggressively', 'general',],
+        'bPreferenceAddTabAsCharacter.b': ['Treat Tab as Character', 'general',],
+        'bPreferenceAddLineSeparatorAsCharacter.b': ['Treat Line Break as Character', 'general',],
 
         //word
-        bPreferenceTranslateWordHeadersFooters: ['Translate Headers and Footers', 'word',],
-        bPreferenceTranslateWordHidden: ['Translate Hidden Text', 'word',],
-        bPreferenceTranslateWordExcludeGraphicMetaData: ['Exclude Graphical Metadata', 'word',],
-        bPreferenceAutomaticallyAcceptRevisions: ['Automatically Accept Revisions', 'word',],
-        bPreferenceIgnoreSoftHyphenTag: ['Ignore Soft Hyphens', 'word',],
-        bPreferenceReplaceNoBreakHyphenTag: ['Replace Non-Breaking with Regular Hyphens', 'word',],
-        bExtractExternalHyperlinks: ['Translate Hyperlink URLs', 'word',],
-        tsComplexFieldDefinitionsToExtract: ['Translatable Fields', 'word',],
-        bInExcludeMode: ['Exclude or Include Styles', 'word',],
-        bInExcludeHighlightMode: ['Exclude or Include Highlights', 'word',],
+        'bPreferenceTranslateWordHeadersFooters.b': ['Translate Headers and Footers', 'word',],
+        'bPreferenceTranslateWordHidden.b': ['Translate Hidden Text', 'word',],
+        'bPreferenceTranslateWordExcludeGraphicMetaData.b': ['Exclude Graphical Metadata', 'word',],
+        'bPreferenceAutomaticallyAcceptRevisions.b': ['Automatically Accept Revisions', 'word',],
+        'bPreferenceIgnoreSoftHyphenTag.b': ['Ignore Soft Hyphens', 'word',],
+        'bPreferenceReplaceNoBreakHyphenTag.b': ['Replace Non-Breaking with Regular Hyphens', 'word',],
+        'bExtractExternalHyperlinks.b': ['Translate Hyperlink URLs', 'word',],
+        'tsComplexFieldDefinitionsToExtract.i': ['Translatable Fields', 'word',],
+        'bInExcludeMode.b': ['Exclude or Include Styles', 'word',],
+        'bInExcludeHighlightMode.b': ['Exclude or Include Highlights', 'word',],
 
-        tsExcludeWordStyles: ['Styles to Exclude/Include', 'word',],
-        tsWordHighlightColors: ['Highlight Colours to Exclude/Include', 'word',],
-        tsWordExcludedColors: ['Text Colours to Exclude', 'word',],
-        bPreferenceTranslateWordExcludeColors: ['', 'word', {hidden: true}], // depends on tsWordExcludedColors.selection.length
+        'tsExcludeWordStyles.i': ['Styles to Exclude/Include', 'word',],
+        'tsWordHighlightColors.i': ['Highlight Colours to Exclude/Include', 'word',],
+        'tsWordExcludedColors.i': ['Text Colours to Exclude', 'word',],
+        'bPreferenceTranslateWordExcludeColors.b': ['', 'word', {hidden: true}], // depends on tsWordExcludedColors.selection.length
 
         //excel
-        bPreferenceTranslateExcelHidden: ['Translate Hidden Rows and Columns', 'excel',],
-        bPreferenceTranslatePowerpointHidden: ['', 'pp', {hidden: true}], // depends on bPreferenceTranslateExcelHidden,
+        'bPreferenceTranslateExcelHidden.b': ['Translate Hidden Rows and Columns', 'excel',],
+        'bPreferenceTranslatePowerpointHidden.b': ['', 'pp', {hidden: true}], // depends on bPreferenceTranslateExcelHidden,
 
-        bPreferenceTranslateExcelExcludeColumns: ['Exclude Marked Columns in Each Sheet', 'excel',],
-        bPreferenceTranslateExcelSheetNames: ['Translate Sheet Names', 'excel',],
-        bPreferenceTranslateExcelDiagramData: ['Translate Diagram Data (e.g. Smart Art)', 'excel',],
-        bPreferenceTranslateExcelDrawings: ['Translate Drawings (e.g. Text fields)', 'excel',],
+        'bPreferenceTranslateExcelExcludeColumns.b': ['Exclude Marked Columns in Each Sheet', 'excel',],
+        'bPreferenceTranslateExcelSheetNames.b': ['Translate Sheet Names', 'excel',],
+        'bPreferenceTranslateExcelDiagramData.b': ['Translate Diagram Data (e.g. Smart Art)', 'excel',],
+        'bPreferenceTranslateExcelDrawings.b': ['Translate Drawings (e.g. Text fields)', 'excel',],
 
-        tsExcelExcludedColors: ['Colours to Exclude', 'excel',],
-        bPreferenceTranslateExcelExcludeColors: ['text', 'excel', {hidden: true}], // depends on tsExcelExcludedColors.selection.length],
-        subfilter: ['Name of subfilter for cell content', 'excel',],
-        tsExcelExcludedColumns: ['Columns to Exclude', 'excel',],
+        'tsExcelExcludedColors.i': ['Colours to Exclude', 'excel',],
+        'bPreferenceTranslateExcelExcludeColors.b': ['text', 'excel', {hidden: true}], // depends on tsExcelExcludedColors.selection.length],
+        'subfilter': ['Name of subfilter for cell content', 'excel',],
+        'tsExcelExcludedColumns.i': ['Columns to Exclude', 'excel',],
 
         // powerpoint
-        bPreferenceTranslatePowerpointNotes: ['Translate Notes', 'pp',],
-        bPreferenceTranslatePowerpointMasters: ['Translate Masters', 'pp',],
-        bPreferenceIgnorePlaceholdersInPowerpointMasters: ['Ignore Placeholder Text in Masters', 'pp',],
-        bPreferencePowerpointIncludedSlideNumbersOnly: ['Translate included slide numbers only', 'pp',],
+        'bPreferenceTranslatePowerpointNotes.b': ['Translate Notes', 'pp',],
+        'bPreferenceTranslatePowerpointMasters.b': ['Translate Masters', 'pp',],
+        'bPreferenceIgnorePlaceholdersInPowerpointMasters.b': ['Ignore Placeholder Text in Masters', 'pp',],
+        'bPreferencePowerpointIncludedSlideNumbersOnly.b': ['Translate included slide numbers only', 'pp',],
 
-        tsPowerpointIncludedSlideNumbers: ['Included Slide Numbers', 'pp',],
+        'tsPowerpointIncludedSlideNumbers.i': ['Included Slide Numbers', 'pp',],
 
-        sPreferenceLineSeparatorReplacement: ['', '', {hidden: true}], // not visible in Rainbow
-        bReorderPowerpointNotesAndComments: ['', '', {hidden: true}], // not visible in Rainbow
-        bPreferenceAllowEmptyTargets: ['', '', {hidden: true}], // not visible in Rainbow
+        'sPreferenceLineSeparatorReplacement': ['', '', {hidden: true}], // not visible in Rainbow
+        'bReorderPowerpointNotesAndComments.b': ['', '', {hidden: true}], // not visible in Rainbow
+        'bPreferenceAllowEmptyTargets': ['', '', {hidden: true}], // not visible in Rainbow
     }
 })
