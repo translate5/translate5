@@ -14,7 +14,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "Satz 1.",
         "sourceMd5": "b0a4150b15840552c1b04f26e01debee",
         "sourceToSort": "Satz 1.",
@@ -23,8 +22,12 @@
         "targetToSort": "Satz 1.",
         "targetEdit": "Satz 1.",
         "targetEditToSort": "Satz 1.",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":39,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":9}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":10}},\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":19}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":39,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":7}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":7}},\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":15}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "2",
@@ -41,7 +44,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "Satz 2.",
         "sourceMd5": "14171bbf5793759b43915f4e6ace2733",
         "sourceToSort": "Satz 2.",
@@ -50,8 +52,12 @@
         "targetToSort": "Satz 2.",
         "targetEdit": "Satz 2.",
         "targetEditToSort": "Satz 2.",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":39,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":3,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":9}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":10}},\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":19}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":39,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":7}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":7}},\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":15}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "3",
@@ -68,7 +74,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "L\u00e4nge Soll = 39",
         "sourceMd5": "bee273a19e7d72f01fb2daf9982a38dd",
         "sourceToSort": "L\u00e4nge Soll = 39",
@@ -77,8 +82,12 @@
         "targetToSort": "L\u00e4nge Soll = 39",
         "targetEdit": "L\u00e4nge Soll = 39",
         "targetEditToSort": "L\u00e4nge Soll = 39",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":39,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":4,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":9}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":10}},\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":19}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":39,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":7}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":7}},\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":15}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "4",
@@ -95,7 +104,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "Satz 1.",
         "sourceMd5": "b0a4150b15840552c1b04f26e01debee",
         "sourceToSort": "Satz 1.",
@@ -104,8 +112,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":2}},\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":3}},\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":4}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":0}},\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":0}},\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "5",
@@ -122,7 +134,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "Satz 2.",
         "sourceMd5": "14171bbf5793759b43915f4e6ace2733",
         "sourceToSort": "Satz 2.",
@@ -131,8 +142,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":3,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":2}},\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":3}},\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":4}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":0}},\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":0}},\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "6",
@@ -149,7 +164,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "L\u00e4nge Soll = 39",
         "sourceMd5": "bee273a19e7d72f01fb2daf9982a38dd",
         "sourceToSort": "L\u00e4nge Soll = 39",
@@ -158,8 +172,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":4,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":2}},\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":3}},\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":4}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":0}},\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":0}},\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "7",
@@ -176,7 +194,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "Satz 1.",
         "sourceMd5": "b0a4150b15840552c1b04f26e01debee",
         "sourceToSort": "Satz 1.",
@@ -185,8 +202,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":2}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":3}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":4}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":0}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":0}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "8",
@@ -203,7 +224,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "Satz 2.",
         "sourceMd5": "14171bbf5793759b43915f4e6ace2733",
         "sourceToSort": "Satz 2.",
@@ -212,8 +232,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":3,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":2}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":3}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":4}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":0}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":0}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "9",
@@ -230,7 +254,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "L\u00e4nge Soll = 39",
         "sourceMd5": "bee273a19e7d72f01fb2daf9982a38dd",
         "sourceToSort": "L\u00e4nge Soll = 39",
@@ -239,8 +262,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":4,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":2}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":3}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":4}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":69,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":0}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":0}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "10",
@@ -257,7 +284,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "Satz 1.",
         "sourceMd5": "b0a4150b15840552c1b04f26e01debee",
         "sourceToSort": "Satz 1.",
@@ -266,8 +292,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":72,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_10\":{\"nr\":\"10\",\"length\":{\"targetEdit\":2}},\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":3}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":4}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":72,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_10\":{\"nr\":\"10\",\"length\":{\"targetEdit\":0}},\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":0}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "11",
@@ -284,7 +314,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "Satz 2.",
         "sourceMd5": "14171bbf5793759b43915f4e6ace2733",
         "sourceToSort": "Satz 2.",
@@ -293,8 +322,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":72,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":3,\"siblingData\":{\"fakeSegId_10\":{\"nr\":\"10\",\"length\":{\"targetEdit\":2}},\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":3}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":4}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":72,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_10\":{\"nr\":\"10\",\"length\":{\"targetEdit\":0}},\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":0}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "12",
@@ -311,7 +344,6 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
         "source": "L\u00e4nge Soll = 39",
         "sourceMd5": "bee273a19e7d72f01fb2daf9982a38dd",
         "sourceToSort": "L\u00e4nge Soll = 39",
@@ -320,8 +352,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":72,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":4,\"siblingData\":{\"fakeSegId_10\":{\"nr\":\"10\",\"length\":{\"targetEdit\":2}},\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":3}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":4}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":72,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_10\":{\"nr\":\"10\",\"length\":{\"targetEdit\":0}},\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":0}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "13",
@@ -338,17 +374,20 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "3",
-        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
+        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
         "sourceMd5": "1b836e6ad809f2764aed25bc5193d6c0",
         "sourceToSort": "across tags outside from mrk test",
-        "target": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
+        "target": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
         "targetMd5": "4d8b8408fa9cb6f29e86bca69a66fd30",
         "targetToSort": "zacross ztags zoutside zfrom zmrk ztest",
-        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
+        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
         "targetEditToSort": "zacross ztags zoutside zfrom zmrk ztest",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":32,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":50}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":43,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":39}}}}",
+        "isWatched": false,
+        "isRepeated": "3",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "14",
@@ -365,8 +404,7 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
-        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
+        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
         "sourceMd5": "1b836e6ad809f2764aed25bc5193d6c0",
         "sourceToSort": "across tags outside from mrk test",
         "target": "",
@@ -374,8 +412,12 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":32,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_14\":{\"nr\":\"14\",\"length\":{\"targetEdit\":11}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":43,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_14\":{\"nr\":\"14\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "15",
@@ -392,17 +434,20 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "3",
-        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
+        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
         "sourceMd5": "1b836e6ad809f2764aed25bc5193d6c0",
         "sourceToSort": "across tags outside from mrk test",
-        "target": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
+        "target": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
         "targetMd5": "4d8b8408fa9cb6f29e86bca69a66fd30",
         "targetToSort": "zacross ztags zoutside zfrom zmrk ztest",
-        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
+        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
         "targetEditToSort": "zacross ztags zoutside zfrom zmrk ztest",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":40}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":2,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":39}}}}",
+        "isWatched": false,
+        "isRepeated": "3",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     },
     {
         "segmentNrInTask": "16",
@@ -419,8 +464,7 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "isRepeated": "1",
-        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
+        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
         "sourceMd5": "1b836e6ad809f2764aed25bc5193d6c0",
         "sourceToSort": "across tags outside from mrk test",
         "target": "",
@@ -428,7 +472,11 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_16\":{\"nr\":\"16\",\"length\":{\"targetEdit\":1}}}}",
-        "isWatched": false
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":2,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_16\":{\"nr\":\"16\",\"length\":{\"targetEdit\":0}}}}",
+        "isWatched": false,
+        "isRepeated": "1",
+        "sourceEdit": null,
+        "segmentUserAssocId": null,
+        "isFirstofFile": null
     }
 ]
