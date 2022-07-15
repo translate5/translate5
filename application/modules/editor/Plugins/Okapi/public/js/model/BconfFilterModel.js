@@ -196,14 +196,15 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
         });
     },
 
-    saveFprm(fprm){
+    saveFprm(fprm, editor){
         var id = this.id;
         return Ext.Ajax.request({
             url: this.getProxy().getUrl() + '/savefprm',
             headers: {'Content-Type': 'application/octet-stream'},
             params: {id},
             rawData: fprm,
-            failure: function(options, response){
+            failure: function(response, options){
+                editor.setLoading(false)
                 Editor.app.getController('ServerException').handleException(response);
             }
         });

@@ -103,7 +103,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
 
     compileFprm(){
         var values = this.getValues()
-        return Object.entries(values).map(nameVal => nameVal.join('=')).join('\n')
+        return '#v1\n' + Object.entries(values).map(nameVal => nameVal.join('=')).join('\n')
     },
 
 });

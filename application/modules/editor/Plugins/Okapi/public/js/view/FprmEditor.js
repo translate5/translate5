@@ -166,7 +166,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             currentValues = me.form.getValues();
         if(/* !Ext.Object.equals(currentValues, me.lastInvalidValues) && */ this.form.isValid()){
             me.setLoading()
-            me.bconfFilter.saveFprm(me.compileFprm()).then(function(){
+            me.bconfFilter.saveFprm(me.compileFprm(), me).then(function resolve(){
                 me.setLoading(false)
                 me.close()
             })

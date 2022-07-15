@@ -30,7 +30,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
 
     formItems: [{
         xtype: 'tabpanel',
-        defaults: {'bodyPadding': 15, layout: 'form'},
+        defaults: {'bodyPadding': 15, layout: 'form', scrollable: true},
         items: [
             {title: 'General Options', id: 'fprm_general', iconCls: 'x-fa fa-cog'},
             {title: 'Word Options', id: 'fprm_word', iconCls: 'x-fa fa-file-word-o'},

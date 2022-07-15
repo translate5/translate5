@@ -50,8 +50,8 @@ class editor_Plugins_Okapi_Bconf_Filters {
         /*
         'okf_icml' => [], // TODO: a testfile is required for any filter-GUI
         'okf_idml' => ['idml'],
-        'okf_openxml' => ['docx', 'pptx', 'xlsx']
         */
+        'okf_openxml' => ['docx', 'pptx', 'xlsx']
     ];
     /**
      * A list of file-extensions, that validation files exist for.
