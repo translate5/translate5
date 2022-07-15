@@ -43,7 +43,7 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
      * 5) extensions -> filter configuration id mapping
      *
      * @param string $pathToParse
-     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
@@ -61,11 +61,11 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
         $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($pathToParse, "rb");
         $sig = $raf->readUTF();
         if($sig !== editor_Plugins_Okapi_Bconf_Entity::SIGNATURE){
-            $this->invalidate("Invalid signature '" . htmlspecialchars($sig) . "' in file header before byte " . $raf->ftell() . ". Must be '" . editor_Plugins_Okapi_Bconf_Entity::SIGNATURE . "'");
+            $this->invalidate("Invalid signature '".htmlspecialchars($sig)."' in file header before byte ".$raf->ftell().". Must be '".editor_Plugins_Okapi_Bconf_Entity::SIGNATURE."'");
         }
         $version = $raf->readInt();
         if(!($version >= 1 && $version <= editor_Plugins_Okapi_Bconf_Entity::VERSION)){
-            $this->invalidate("Invalid version '$version' in file header before byte " . $raf->ftell() . ". Must be in range 1-" . editor_Plugins_Okapi_Bconf_Entity::VERSION);
+            $this->invalidate("Invalid version '$version' in file header before byte ".$raf->ftell().'. Must be in range 1-'.editor_Plugins_Okapi_Bconf_Entity::VERSION);
         }
 
         //=== Section 1: plug-ins
@@ -79,7 +79,7 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
                 // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we read 2 32bit Ints here (limiting the decodable size to 4GB...)
                 $raf->readInt();
                 $size = $raf->readInt();
-                self::createReferencedFile($raf, $size, $relPath);
+                $this->createReferencedFile($raf, $size, $relPath);
             }
         }
 
@@ -94,15 +94,15 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
             $raf->readInt();
             $size = $raf->readInt();
             if($size > 0){
-                self::createReferencedFile($raf, $size, $filename);
+                $this->createReferencedFile($raf, $size, $filename);
             }
         }
 
         if($refIndex === NULL){
-            $this->invalidate("Malformed references list. Read NULL instead of integer before byte " . $raf->ftell());
+            $this->invalidate('Malformed references list. Read NULL instead of integer before byte ' . $raf->ftell());
         }
         if(($refCount = count($refMap)) < 2){
-            $this->invalidate("Only $refCount reference" . ($refCount ? '' : 's') . " included. Need sourceSRX and targetSRX.");
+            $this->invalidate("Only $refCount references included. Need sourceSRX and targetSRX.");
         }
 
         //=== Section 3 : the pipeline itself
@@ -118,7 +118,7 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
             'xml' => $pipelineXml,
         ];
 
-        self::parsePipeline($pipeline, $refMap, $content);
+        $this->parsePipeline($pipeline, $refMap, $content);
 
         file_put_contents(self::PIPELINE_FILE, $pipeline['xml']);
 
@@ -136,8 +136,12 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
             $identifier = $raf->readUTF();
             $data = $raf->readUTF();
             // save the fprm if it points to a valid custom identifier/filter
-            if(editor_Plugins_Okapi_Bconf_ExtensionMapping::processUnpackedFilter($this->entity, $identifier, $data, $replacementMap, $customFilters)){
-                $content['fprm'][] = $identifier;
+            try {
+                if(editor_Plugins_Okapi_Bconf_ExtensionMapping::processUnpackedFilter($this->entity, $identifier, $data, $replacementMap, $customFilters)){
+                    $content['fprm'][] = $identifier;
+                }
+            } catch (Exception $e){
+                $this->invalidate($e->getMessage());
             }
         }
         // DEBUG
@@ -149,7 +153,7 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
         //=== Section 5: the extensions -> filter configuration id mapping
         $count = $raf->readInt();
         if(!$count){
-            $this->invalidate("No extensions-mapping present in bconf.");
+            $this->invalidate('No extensions-mapping present in bconf.');
         }
         $rawMap = [];
         for($i = 0; $i < $count; $i++){
@@ -172,13 +176,14 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
      * @param SplFileObject $raf
      * @param int $size
      * @param string $path
+     * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
     private function createReferencedFile(SplFileObject $raf, int $size, string $path): void {
         /** @var resource $fos file output stream */
         $fos = fopen($path, 'wb');
-        if(!$fos){
-            $this->invalidate("Could not create '$path'", 'E1057');
+        if($fos === false){
+            $this->invalidate('Unable to open file '.$path);
         }
         // FIXME: when stream_copy_to_stream supports SplFileObjects use that
         // $written = stream_copy_to_stream($raf->getFp(), $fos, $size);
@@ -194,15 +199,23 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
         $written += fwrite($fos, $raf->fread($toWrite));
         fclose($fos);
         if($written !== $size){
-            $this->invalidate("Could " . ($written !== false ? "only write $written bytes of " : "not write") . "'$path'", 'E1057');
+            $this->invalidate('Could ' . ($written !== false ? "only write $written bytes of " : 'not write').' '.$path);
         }
     }
 
-    public function parsePipeline(&$pipeline, &$refMap, &$content): array {
+    /**
+     * Deconstructs the pipline and extracts the linked SRX files (and plugins when we support them)
+     * @param array $pipeline
+     * @param array $refMap
+     * @param array $content
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    private function parsePipeline(array &$pipeline, array &$refMap, array &$content){
         $doc = new editor_Utils_Dom();
         $pipeline['xml'] && $doc->loadXML($pipeline['xml']);
         if(!$pipeline['xml'] || !$doc->isValid()){
-            $this->invalidate("Invalid Pipeline inside bconf. " . $doc->getErrorMsg('', true));
+            $this->invalidate('Invalid Pipeline found in bconf. ' . $doc->getErrorMsg('', true));
         }
         foreach($doc->getElementsByTagName("step") as $i => $step){
             $class = $step->getAttribute("class");
@@ -220,11 +233,9 @@ trait editor_Plugins_Okapi_Bconf_UnpackerTrait {
                 $pipeline['xml'] = preg_replace($pathRegex, "$1$filename", $pipeline['xml']); // QUIRK: Original code includes absolute path in place of filename
             }
         }
-
         $refs = &$content['refs'];
         if(!isset($refs['sourceSrxPath'], $refs['targetSrxPath'])){
             $this->invalidate("Reference files missing. Need sourceSRX and targetSRX. Got " . print_r($refs, true));
         }
-        return $pipeline;
     }
 }

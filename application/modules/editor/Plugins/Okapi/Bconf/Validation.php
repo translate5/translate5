@@ -31,55 +31,39 @@
  * Therefore testfiles for all supported ::EXTENSIONS exist in data/testfiles
  * Be aware, that not all BCONFs can be validated this way
  */
-final class editor_Plugins_Okapi_Bconf_Validation {
-
-    /**
-     * @var array
-     */
-    const EXTENSIONS = ['txt', 'xml', 'strings', 'csv', 'htm', 'html', 'sdlxliff', 'docx', 'odp', 'ods', 'odt', 'pptx', 'tbx', 'xlsx', 'idml'];
+class editor_Plugins_Okapi_Bconf_Validation {
 
     /**
      * @var string
      */
-    const TESTFILE_FOLDER = 'testfiles';
-
-    /**
-     * English / en-GB
-     * @var int
-     */
-    const SOURCE_LANGUAGE = 5;
-
-    /**
-     * German / de-DE
-     * @var int
-     */
-    const TARGET_LANGUAGE = 4;
-
-    /**
-     * @var string
-     */
-    private editor_Plugins_Okapi_Bconf_Entity $bconf;
+    protected editor_Plugins_Okapi_Bconf_Entity $bconf;
 
     /**
      * @var bool
      */
-    private bool $valid = true;
+    protected bool $valid = true;
 
     /**
      * @var bool
      */
-    private bool $testable = true;
+    protected bool $testable = true;
 
     /**
      * @var string
      */
-    private string $validationError;
+    protected string $validationError;
+
+    /**
+     * @var bool
+     */
+    protected bool $doDebug;
 
     /**
      * @param editor_Plugins_Okapi_Bconf_Entity $bconf: The bconf that should be validated
      */
-    public function __construct($bconf){
+    public function __construct(editor_Plugins_Okapi_Bconf_Entity $bconf){
         $this->bconf = $bconf;
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfValidation');
     }
 
     /**
@@ -99,6 +83,8 @@ final class editor_Plugins_Okapi_Bconf_Validation {
                 return false;
             }
             $this->validationError = 'The bconf could not be tested as none of the available testfiles are supported';
+            // DEBUG
+            if($this->doDebug){ error_log('BCONF VALIDATION ERROR: '.$this->validationError); }
             $this->testable = false;
             return true;
         }
@@ -119,10 +105,10 @@ final class editor_Plugins_Okapi_Bconf_Validation {
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
-    private function getTestFilePath() : ?string {
-        foreach(self::EXTENSIONS as $extension){
+    protected function getTestFilePath() : ?string {
+        foreach(editor_Plugins_Okapi_Bconf_Filters::TESTABLE_EXTENSIONS as $extension){
             if($this->bconf->hasSupportFor($extension)){
-                return editor_Plugins_Okapi_Init::getDataDir().self::TESTFILE_FOLDER.'/test.'.$extension;
+                return editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('test.'.$extension);
             }
         }
         return NULL;
@@ -140,7 +126,7 @@ final class editor_Plugins_Okapi_Bconf_Validation {
      * @param string $testfilePath
      * @return bool
      */
-    private function process(string $testfilePath){
+    protected function process(string $testfilePath){
         $testDir = editor_Plugins_Okapi_Bconf_Entity::getUserDataDir().'/tmp';
         if(!is_dir($testDir)){
             @mkdir($testDir, 0777, true);
@@ -157,17 +143,21 @@ final class editor_Plugins_Okapi_Bconf_Validation {
             $api->createProject();
             $api->uploadOkapiConfig($this->bconf->getPath());
             $api->uploadInputFile($testfile, new SplFileInfo($testfilePath));
-            $api->executeTask($language->loadLangRfc5646(self::SOURCE_LANGUAGE), $language->loadLangRfc5646(self::TARGET_LANGUAGE));
+            $api->executeTask($language->loadLangRfc5646(editor_Plugins_Okapi_Bconf_Filters::SOURCE_LANGUAGE), $language->loadLangRfc5646(editor_Plugins_Okapi_Bconf_Filters::TARGET_LANGUAGE));
             $convertedFile = $api->downloadFile($testfile, $manifestFile, new SplFileInfo($testDir));
             // cleanup downloaded files
             unlink($convertedFile);
             unlink($testDir.'/'.$manifestFile);
         } catch (Exception $e){
             $this->validationError = 'Failed to convert '.$testfile.' for import with OKAPI ['.$e->getMessage().']';
+            // DEBUG
+            if($this->doDebug){ error_log('BCONF VALIDATION ERROR: '.$this->validationError); }
             return false;
         } finally {
             $api->removeProject();
         }
+        // DEBUG
+        if($this->doDebug){ error_log('BCONF VALIDATION SUCCESS: '.$this->bconf->getName().' is valid'); }
         return true;
     }
 }

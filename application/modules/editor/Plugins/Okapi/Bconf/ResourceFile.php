@@ -65,15 +65,23 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
     protected string $validationError;
 
     /**
+     * @var bool
+     */
+    protected bool $doDebug;
+
+    /**
      * @param string $path
      * @param string|null $content
      * @throws ZfExtended_Exception
      */
     public function __construct(string $path, string $content=NULL){
         $this->path = $path;
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfValidation');
         if($content === NULL){
             $this->content = @file_get_contents($this->getPath());
             if(!$this->content || strlen($this->content) < 1){
+                // DEBUG
+                if($this->doDebug){ error_log('RESOURCE FILE can only be instantiated for an existing file ('.$this->path.') with contents'); }
                 throw new ZfExtended_Exception(get_class($this).' can only be instantiated for an existing file ('.$this->path.') with contents');
             }
         } else {
@@ -154,9 +162,10 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
 
     /**
      * Validates the resource file
+     * @param bool $forImport: if set, this is an import-process
      * @return bool
      */
-    abstract public function validate() : bool;
+    abstract public function validate(bool $forImport=false) : bool;
 
     /**
      * Retrieves the error that caused the file to be invalid

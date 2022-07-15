@@ -27,6 +27,7 @@
  
 /**
  * Custom Row Editor for the bconf-filter grid
+ * This class is mainly needed to come around ExtJS Quirks
  */
 Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
     extend: 'Ext.grid.plugin.RowEditing',
@@ -56,14 +57,17 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
         },
         validateedit: function(rowEditing, cellContext){
             console.log('BconfFilterRowEditing: validateedit', cellContext.newValues, cellContext.originalValues, cellContext.record.isClonedRecord); // TODO REMOVE
+            // this case is superflous as the name-field has it's own validation
             if(cellContext.record.isClonedRecord && cellContext.newValues.name === cellContext.originalValues.name){
                 Ext.MessageBox.alert(this.strings.infosMissing, this.strings.nameMustBeChanged);
                 return false;
             }
+            // a freshly cloned item needs a extension
             if(cellContext.record.isClonedRecord && (!cellContext.newValues.extensions || cellContext.newValues.extensions.length < 1)){
                 Ext.MessageBox.alert(this.strings.infosMissing, this.strings.extensionMustBeSupplied);
                 return false;
             }
+            // case currently is superflous due to name-field's own validation
             if(!cellContext.newValues.name || cellContext.newValues.name.length < 1){
                 Ext.MessageBox.alert(this.strings.infosMissing, this.strings.nameMustBeSupplied);
                 return false;

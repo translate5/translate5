@@ -149,16 +149,41 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             $this->entity->getPath(),
             $this->getRequest()->getRawBody()
         );
+        $validationError = NULL;
         if($fprm->validate()){
-            // save FPRM
-            $fprm->flush();
-            // update/pack the related bconf
-            $this->entity->setHash($fprm->getHash());
-            $this->entity->getRelatedBconf()->getFile()->pack();
-            $this->entity->save();
+            // only x-properties based fprms can be properly tested by parsing the content. the others need a validation by using them in longhorn
+            if($fprm->getType() != editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XPROPERTIES){
+                $okapiValidation = new editor_Plugins_Okapi_Bconf_Filter_FprmValidation($this->entity->getRelatedBconf(), $fprm);
+                // this
+                if($okapiValidation->validate()){
+                    // update/pack the hash, flushing of bconf & fprm is already done by the validator
+                    $this->entity->setHash($fprm->getHash());
+                    $this->entity->save();
+                } else {
+                    $validationError = $okapiValidation->getValidationError();
+                }
+            } else {
+                // save x-properties fprm, set hash, pack bconf
+                $fprm->flush();
+                $this->entity->setHash($fprm->getHash());
+                $this->entity->getRelatedBconf()->getFile()->pack();
+                $this->entity->save();
+            }
         } else {
-            // this can only happen if the implementation of a filter-frontend generates faulty data
-            throw new editor_Plugins_Okapi_Exception('E1409', ['details' => $fprm->getValidationError(), 'filterfile' => $this->entity->getFile(), 'bconfId' => $this->entity->getBconfId()]);
+            // this can normally only happen if the implementation of a filter-frontend generated faulty data.
+            // Only with YAML currently this is a user-error, as YAML is edited as a whole in a big text-field
+            if($fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_YAML){
+                $validationError = $fprm->getValidationError();
+            } else {
+                throw new editor_Plugins_Okapi_Exception('E1409', ['details' => $fprm->getValidationError(), 'filterfile' => $this->entity->getFile(), 'bconfId' => $this->entity->getBconfId()]);
+            }
+        }
+        // the editor will stay open when a user-error occurs, therefore no server-exception then
+        if($validationError != NULL){
+            $this->view->success = false;
+            $this->view->error = $validationError;
+        } else {
+            $this->view->success = true;
         }
     }
 }

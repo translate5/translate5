@@ -750,8 +750,13 @@ Ext.define('Editor.controller.Segments', {
   updateSegmentFinishCountViewModel:function(record){
 	  var me=this,
 	  	grid = me.getSegmentGrid(),
-	  	vm = grid.getViewModel(),
+	  	vm = grid && grid.getViewModel(),
 	  	value = Ext.isNumber(record) ? record : record.get('segmentFinishCount');
+
+      if(!vm){
+          return;
+      }
+
 	  vm.set('segmentFinishCount',value);
   },
   /**

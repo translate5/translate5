@@ -140,7 +140,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $srxFilename = $this->entity->getSrxNameFor($this->getParam('purpose'));
         $srxPath = $this->entity->createPath($srxFilename);
         // createan SRX from the upload and validate it
-        $srx = new editor_Plugins_Okapi_Bconf_Srx($srxPath, file_get_contents($srxUploadFile));
+        $srx = new editor_Plugins_Okapi_Bconf_Segmentation_Srx($srxPath, file_get_contents($srxUploadFile));
         if($srx->validate()){
             // in case the uploaded SRX is valid we create a backup of the original we can restore after validating the bconf
             $srxPathBU = $srxPath.'.bu';

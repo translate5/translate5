@@ -102,10 +102,13 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                     // add a custom filter to the filesys & map (that later is flushed to the DB)
                     $fprmPath = $bconf->createPath(editor_Plugins_Okapi_Bconf_Filter_Entity::createFileFromIdentifier($identifier));
                     $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($fprmPath, $unpackedContent);
-                    // TODO BCONF: validate FPRM for Import
-                    $fprm->flush();
-                    $customFilters[$identifier] = $fprm->getHash();
-                    return true;
+                    if($fprm->validate(true)){
+                        $fprm->flush();
+                        $customFilters[$identifier] = $fprm->getHash();
+                        return true;
+                    } else {
+                        throw new ZfExtended_Exception($fprm->getValidationError());
+                    }
                 } else {
                     $replacementMap[$identifier] = self::INVALID_IDENTIFIER;
                     static::getLogger()->warn(
@@ -260,6 +263,21 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
+     * @return bool
+     */
+    public function hasEntries() : bool {
+        return (count($this->map) > 0);
+    }
+
+    /**
+     * Retrieves the related bconf id
+     * @return int
+     */
+    public function getBconfId() : int {
+        return $this->bconf->getId();
+    }
+
+    /**
      * Generates the frontend-model for the extension mapping, where identifier => extenasions
      * The non-embedded default identifiers like 'okf_xml-AndroidStrings' will be turned to embedded ones like 'okf_xml@okf_xml-AndroidStrings'
      * @return array
@@ -297,13 +315,6 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
-     * @return bool
-     */
-    public function hasEntries() : bool {
-        return (count($this->map) > 0);
-    }
-
-    /**
      * Retrieves the extensions a filter has
      * @param string $identifier
      * @return string[]
@@ -318,6 +329,33 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             }
         }
         return $extensions;
+    }
+
+    /**
+     * Removes extensions from the mapping and flushes the map if changed
+     * @param array $extensions
+     * @return bool
+     */
+    public function removeExtensions(array $extensions) : bool {
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping removeExtensions: [ '.implode(', ', $extensions).' ]'); }
+
+        $newMap = [];
+        $removed = false;
+        foreach($this->map as $extension => $filter){
+            if(in_array($extension, $extensions)){
+                $removed = true;
+            } else {
+                $newMap[$extension] = $filter;
+            }
+        }
+        if($removed){
+            $this->map = $newMap;
+            $this->flush();
+            // DEBUG
+            if($this->doDebug){ error_log('ExtensionMapping removeExtensions: [ '.implode(', ', $extensions).' ] have been removed'."\n".print_r($this->map, 1)); }
+        }
+        return $removed;
     }
 
     /**
@@ -493,10 +531,14 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
             $hashedEntity->loadByTypeAndHash($idata->type, $hash);
             $name = $hashedEntity->getName();
             $description = $hashedEntity->getDescription();
-
         } catch (ZfExtended_Models_Entity_NotFoundException $e){
             // revert secure filename to a somewhat human readable name, remove trailing counters like '-4'
-            $name = ucfirst(str_replace('_', ' ', rtrim($idata->id, '1234567890-_')));
+            $name = preg_replace('/\-[0-9]+$/', '', $idata->id);
+            // revert secure filename to a somewhat human readable name
+            $name = ucfirst(str_replace('_', ' ', $name));
+            if($name == ''){ // just to be sure ...
+                $name = $idata->id;
+            }
             $description = '';
         }
         // we must guarantee unique names

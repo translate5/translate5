@@ -28,19 +28,21 @@
 
 /**
  * Class representing a srx file
- * A srx is an xml with a defined structure
+ * A srx is an xml with a defined structure containing nodes with language specific RegEx rules
  */
-final class editor_Plugins_Okapi_Bconf_Srx extends editor_Plugins_Okapi_Bconf_ResourceFile {
+final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_Okapi_Bconf_ResourceFile {
+
+    const EXTENSION = 'srx';
 
     // a SRX is generally a XML variant
     protected string $mime = 'text/xml';
 
     /**
      * Validates a SRX
-     * TODO FIXME: this validation can be improved
+     * TODO FIXME: this basic validation can be improved
      * @return bool
      */
-    public function validate() : bool {
+    public function validate(bool $forImport=false) : bool {
         $parser = new editor_Utils_Dom();
         $parser->loadXML($this->content);
         // sloppy checking here as we do not know how tolerant longhorn actually is
@@ -49,9 +51,13 @@ final class editor_Plugins_Okapi_Bconf_Srx extends editor_Plugins_Okapi_Bconf_Re
             if($rootTag === 'srx'){
                 return true;
             } else {
-                $this->validationError = "No 'srx' root tag found";
+                // DEBUG
+                if($this->doDebug){ error_log('SRX FILE '.basename($this->path).' is invalid: No "srx" root tag found'); }
+                $this->validationError = 'No "srx" root tag found';
             }
         } else {
+            // DEBUG
+            if($this->doDebug){ error_log('SRX FILE '.basename($this->path).' is invalid: Invalid XML'); }
             $this->validationError = 'Invalid XML';
         }
         return false;

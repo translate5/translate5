@@ -32,8 +32,11 @@
  * There are several debug options for this Plugin:
  * runtimeOptions.debug.plugin.OkapiBconfPackUnpack => Turns general debugging for the packing/unpacking of bconfs
  * runtimeOptions.debug.plugin.OkapiBconfProcessing => Turns debugging for the processing of bconfs
+ * runtimeOptions.debug.plugin.OkapiBconfValidation => Turns debugging for validating bconfs, filters & srx
  * runtimeOptions.debug.plugin.OkapiExtensionMapping => Turns debugging for the processing of the extension-mapping
  * runtimeOptions.debug.plugin.OkapiKeepIntermediateFiles => All the files that are created in the various processing steps are kept
+ *
+ *
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
@@ -68,7 +71,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var string[]
      */
     const DEFAULT_EXTENSIONS = [
-        'okapi', //currently needed, see TRANSLATE-1019. TODO FIXME: is this still true, the issue is resolved ?? If you remove, also heal ::getAllExtensions
         //'csv' => ['text/csv'], disabled due our own importer
         'c', 'catkeys', 'cpp', 'dita', 'ditamap', 'docm', 'docx', 'dotm', 'dotx', 'dtd', 'h', 'htm', 'html',
         'idml', 'json', 'lang', 'md', 'mif', 'odg', 'odp', 'ods', 'odt', 'otg', 'otp', 'ots', 'ott',
@@ -171,9 +173,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     public static function getAllExtensions(){
         $extensions = self::DEFAULT_EXTENSIONS;
-        if (($key = array_search('okapi', $extensions)) !== false){
-            array_splice($extensions, $key, 1);
-        }
         sort($extensions);
         return $extensions;
     }

@@ -1,5 +1,0 @@
-#v1
-extractNotes.b=false
-extractReferences.b=false
-extractMetadata.b=true
-encodeCharacterEntityReferenceGlyphs.b=true

@@ -32,6 +32,19 @@
  */
 final class editor_Plugins_Okapi_Bconf_Filter_Translate5 extends editor_Plugins_Okapi_Bconf_Filter_Inventory {
 
+    /*
+     * A filter-entry has the following structure:
+     {
+        "id": "translate5",
+        "type": "okf_openoffice",
+        "replaceId": "okf_openoffice",
+        "name": "t5 OpenOffice.org Documents",
+        "description": "translate5 adjusted filter for OpenOffice.org documents",
+        "mime": "application/x-openoffice",
+        "extensions": ["odp","ods","odt"]
+    },
+     */
+
     /**
      * @var editor_Plugins_Okapi_Bconf_Filter_Translate5|null
      */
@@ -81,7 +94,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_Translate5 extends editor_Plugins_
      * @param string $filterId
      * @return array
      */
-    public function findOkapiDefaultReplacingFilter(string $filterId){
+    public function findOkapiDefaultReplacingFilter(string $filterId) : array {
         $result = [];
         foreach($this->inventory as $index => $item){
             if($item->replaceId === $filterId && !empty($item->replaceId)){

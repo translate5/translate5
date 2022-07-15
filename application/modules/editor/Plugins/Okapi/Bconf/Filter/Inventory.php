@@ -27,78 +27,9 @@
  */
 
 /**
- * Class representing the static data for all translate5 specific filters
+ * Class representing the static data for filter/fprm inventories
  */
-abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory {
-
-    /*
-     * A filter-entry has the following structure:
-     {
-        "id": "okf_xml-AndroidStrings",
-        "type": "okf_xml",
-        "name": "Android Strings",
-        "description": "Android Strings XML documents",
-        "mime": "text/xml",
-        "extensions": ["xml"],
-        "settings": true,
-        "gui": false
-    },
-     */
-
-    /**
-     * Relative to the static data-dir
-     * @var string
-     */
-    protected string $inventoryFile;
-
-    /**
-     * Relative to the static data-dir
-     * @var string
-     */
-    protected string $inventoryFolder;
-
-    /**
-     * @var stdClass[]
-     */
-    protected array $inventory;
-
-    protected function __construct(){
-        $this->inventory = json_decode(file_get_contents($this->getFilePath()));
-    }
-
-    /**
-     * Checks if all FPRM files of the inventory are present
-     * Used in the API Test for the Bconf filters
-     * @return bool
-     */
-    public function validate(){
-        $valid = true;
-        foreach($this->inventory as $filter){
-            if($filter->settings !== false && !file_exists($this->createFprmPath($filter))){
-                error_log('Okapi Filter Inventory '.get_class($this).': Missing FPRM file '.$this->createFprmPath($filter));
-                $valid = false;
-            }
-        }
-        return $valid;
-    }
-
-    /**
-     * @return string
-     * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
-     */
-    public function getFolderPath() : string {
-        return editor_Plugins_Okapi_Init::getDataDir() . $this->inventoryFolder;
-    }
-
-    /**
-     * @return string
-     * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
-     */
-    public function getFilePath() : string {
-        return editor_Plugins_Okapi_Init::getDataDir() . $this->inventoryFile;
-    }
+abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory extends editor_Plugins_Okapi_Bconf_FileInventory {
 
     /**
      * @param stdClass $filterItem
@@ -152,13 +83,28 @@ abstract class editor_Plugins_Okapi_Bconf_Filter_Inventory {
                 'description' => $item->description,
                 'mimeType' => $item->mime,
                 'identifier' => editor_Plugins_Okapi_Bconf_Filters::createIdentifier($item->type, $item->id), // the identifier can act as a unique ID in the frontend, akapiType and okapiId are not unique
-                'editable' => false,
-                'clonable' => $item->settings,
+                'editable' => $item->settings && editor_Plugins_Okapi_Bconf_Filters::hasGui($item->type),
                 'isCustom' => false,
                 'guiClass' => editor_Plugins_Okapi_Bconf_Filters::getGuiClass($item->type)
             ];
             $startIndex++;
         }
         return $rows;
+    }
+
+    /**
+     * Checks if all FPRM files of the inventory are present
+     * Used in the API Test for the Bconf filters
+     * @return bool
+     */
+    public function validate(){
+        $valid = true;
+        foreach($this->inventory as $filter){
+            if($filter->settings !== false && !file_exists($this->createFprmPath($filter))){
+                error_log('Okapi Filter Inventory '.get_class($this).': Missing FPRM file '.$this->createFprmPath($filter));
+                $valid = false;
+            }
+        }
+        return $valid;
     }
 }
