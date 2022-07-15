@@ -136,6 +136,21 @@ Ext.override(Ext.grid.column.Column, {
     }
 });
 
+
+/***
+ * Enable the text to be selectable for treepanels
+ */
+Ext.override(Ext.view.Table, {
+    enableTextSelection: true
+});
+
+/***
+ * Enable the text to be selectable for grids
+ */
+Ext.override(Ext.grid.View,  {
+    enableTextSelection: true
+});
+
 /**
  * Fixing EXT6UPD-131 (fixed natively in ext-6.0.1, must be removed then!)
  */
