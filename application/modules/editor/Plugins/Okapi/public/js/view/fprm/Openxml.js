@@ -96,6 +96,19 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         return parsed;
     },
 
-
+    getValues(){
+        var valueObj = this.callParent(arguments),
+            listId, name, value, index, entry;
+        for([name, value] of Object.entries(valueObj)){
+            if(this.listNames[name]){ // convert tagfield to length and individual list entries
+                listId = this.listNames[name];
+                valueObj[name] = value.length
+                for([index, entry] of Object.entries(value)){
+                    valueObj[listId + index] = entry
+                }
+            }
+        }
+        return valueObj;
+    }
 
 })

@@ -78,7 +78,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         var obj = {};
         fprm.split('\n').forEach(function(line){
             if(line.startsWith('#')){ return }
-            var [, name, value] = line.match(/^(.+?)=(.*)$/) // line.split('=') is not enough, values can contain =
+            var [, name, value] = line.match(/^(.+?)=(.*)$/) || [] // line.split('=') is not enough, values can contain =
             obj[name] = value;
         })
         return obj;
@@ -96,7 +96,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     handleFieldconfigSpecial: Ext.emptyFn,
 
     fieldDefaults: {
-        b: {xtype: 'checkbox', inputValue: true},
+        b: {xtype: 'checkbox', inputValue: true, uncheckedValue: false},
         i: {xtype: 'numberfield'},
         undefined: {xtype: 'textfield'},
     },
