@@ -114,6 +114,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     defaults: {margin: '0 10 0'},
                     items: [{
                         xtype: 'button',
+                        width: 160,
+                        iconCls: 'x-fa fa-eye',
                         reference: 'showDefaultsBtn',
                         enableToggle: true,
                         toggleHandler: 'toggleDefaultsFilter',

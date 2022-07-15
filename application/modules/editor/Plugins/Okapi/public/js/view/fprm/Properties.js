@@ -40,7 +40,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         if(descriptionClass){ this.readDescription(descriptionClass) }
     },
 
-    readDescription(descriptionClass){
+    readDescription: function(descriptionClass){
         var fields = descriptionClass.fields,
             fieldConfigs = this.fieldConfigs = {},
             name, cfg, parent;
@@ -48,7 +48,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         const fieldLabel = 0, parentSelector = 1, config = 2;
 
         for(name in fields){
-            cfg = Object.assign(this.getFieldConfig(name), fields[name][config])
+            cfg = Object.assign(this.getFieldConfig(name, fields[name][config]), fields[name][config])
             cfg.fieldLabel = fields[name][fieldLabel]
             cfg.parentSelector = 'fprm_' + fields[name][parentSelector]
             fieldConfigs[name] = cfg;
@@ -57,7 +57,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         }
     },
 
-    getFieldConfig: function(name){
+    getFieldConfig: function(name, configFromDescriptionFile){
         var lastDot = name.lastIndexOf('.'), id, typeSuffix;
         if(lastDot > 0){
             [id, typeSuffix] = [name.slice(0, lastDot), name.slice(lastDot + 1)]
@@ -84,7 +84,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         return obj;
     },
 
-    updateFprm(fprm){
+    updateFprm: function(fprm){
         this.callParent(arguments);
     },
 
@@ -101,7 +101,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         undefined: {xtype: 'textfield'},
     },
 
-    compileFprm(){
+    compileFprm: function(){
         var values = this.getValues()
         return '#v1\n' + Object.entries(values).map(nameVal => nameVal.join('=')).join('\n')
     },

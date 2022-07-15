@@ -44,6 +44,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     userCls: 't5actionColumnGrid t5leveledGrid',
     title: '#UT#Dateiformatkonvertierung',
     glyph: 'f1c9@FontAwesome5FreeSolid',
+    /** @property {string} routePrefix Used to setup routes on different view instances */
+    routePrefix: '',
     listeners: {
         beforeedit: 'handleBeforeedit',
         show: 'loadOkapiFilters'
@@ -187,6 +189,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             isSelect = oldDefaultId !== clicked.id, // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
                             id2Refresh = (isSelect && oldDefaultId) ? customer.get('defaultBconfId') : Editor.data.plugins.Okapi.systemDefaultBconfId,
                             value = isSelect ? clicked.id : null;
+                        view.select(clicked)
                         customer.set('defaultBconfId', value); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
                         Ext.Ajax.request({
                             url: Editor.data.restpath + 'customermeta',
@@ -196,6 +199,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                                 data: Ext.encode({
                                     defaultBconfId: value
                                 })
+                            },
+                            failure: function(response){
+                                Editor.app.getController('ServerException').handleException(response);
                             }
                         })
                         view.refresh(clicked);
@@ -230,6 +236,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             grid = view.ownerGrid,
                             store = grid.store,
                             oldDefault;
+                        view.select(record)
                         if(grid.isCustomerGrid || !checked){ // Cannot set in customerGrid, cannot deselect global default
                             return false;
                         } else if(checked){ // must uncheck old default
@@ -263,7 +270,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 xtype: 'actioncolumn',
                 stateId: 'okapiGridActionColumn',
                 align: 'center',
-                dataIndex: 'isDefault',
                 width: 100,
                 text: me.text_cols.action,
                 menuText: me.text_cols.action,

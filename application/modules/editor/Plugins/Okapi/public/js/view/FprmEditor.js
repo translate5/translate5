@@ -132,7 +132,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      * @see Ext.Class.config
      * @param fprm
      */
-    updateFprm(fprm){
+    updateFprm: function(fprm){
         if(fprm !== undefined){
             const parsed = this.parseFprm(fprm)
             this.form.setValues(parsed)
@@ -146,17 +146,17 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      * @abstract
      * Parses the raw fprm into an object that can be loaded into the form
      * @param {string} fprm The content of the .fprm file
-     * @return object Contains keys and values, is fed to this.form.setValues()
+     * @return {object} Contains keys and values, is fed to this.form.setValues()
      */
-    parseFprm(fprm){
-        throw new Error('must be implemented by subclass!');
+    parseFprm: function(fprm){
+            throw new Error('must be implemented by subclass!');
     },
     /**
      * @abstract
      * Parses the form into a textstring that can be saved
      * @return string The content that will be sent to server and saved in the fprm file
      */
-    compileFprm(){
+    compileFprm: function(){
         this.setLoading(false)
         throw new Error('must be implemented by subclass!');
     },
@@ -182,8 +182,6 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 })
             }
             Editor.app.getController('ServerException').handleException(response);
-            Ext.Msg.toFront() // QUIRK: Sometimes not on top
-
         }
     }
 

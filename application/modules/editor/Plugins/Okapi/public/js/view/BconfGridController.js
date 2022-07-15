@@ -37,7 +37,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                 customFilterExtensionsChanged: function(bconfId, extensions){
                     var record = this.getView().getStore().getById(bconfId);
                     if(record){
-                        record.set('customExtensions', extensions, { silent: true, dirty: false });
+                        record.set('customExtensions', extensions, {silent: true, dirty: false});
                     }
                 }
             }
@@ -63,6 +63,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     beforeInit: function(view){
         var itemId = view.getItemId(),
             routes = {};
+        /** @link Editor.controller.admin.Customer TODO support routing in Customer Controller */
         for(const [route, action] of Object.entries(this.routesToSet)){
             routes[view.routePrefix + itemId + '/' + route] = action;
         }
@@ -83,9 +84,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                     }
             }
     },
-
-    onBconfRoute: async function(bconfId){
-        var grid = this.getView();
+    /** The argument depends on the routePrefix of the view */
+    onBconfRoute: async function(/* bconfId */){
+        var grid = this.getView(),
+            bconfIdArgIndex = (grid.routePrefix.match(/\/:/g) || []).length,
+            bconfId = arguments[bconfIdArgIndex];
         Editor.util.Util.closeWindows();
         await Editor.util.Util.awaitStore(grid.getStore());
         var selected = grid.getSelectionModel().getSelectionStart(),
