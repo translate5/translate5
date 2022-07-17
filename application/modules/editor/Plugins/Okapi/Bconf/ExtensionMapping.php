@@ -98,7 +98,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 // "real" custom filters, check if they have a supported type
                 if(editor_Plugins_Okapi_Bconf_Filter_Okapi::isValidType($idata->type)){
                     // DEBUG
-                    if($doDebug){ error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '.$identifier.' will be embedded'); }
+                    if(true || $doDebug){ error_log('ExtensionMapping processUnpackedFilter: custom filter with identifier '.$identifier.' will be embedded'); }
                     // add a custom filter to the filesys & map (that later is flushed to the DB)
                     $fprmPath = $bconf->createPath(editor_Plugins_Okapi_Bconf_Filter_Entity::createFileFromIdentifier($identifier));
                     $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($fprmPath, $unpackedContent);

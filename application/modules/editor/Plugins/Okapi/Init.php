@@ -30,10 +30,10 @@
  * OKAPI file converter and segmenter plugin
  *
  * There are several debug options for this Plugin:
- * runtimeOptions.debug.plugin.OkapiBconfPackUnpack => Turns general debugging for the packing/unpacking of bconfs
- * runtimeOptions.debug.plugin.OkapiBconfProcessing => Turns debugging for the processing of bconfs
- * runtimeOptions.debug.plugin.OkapiBconfValidation => Turns debugging for validating bconfs, filters & srx
- * runtimeOptions.debug.plugin.OkapiExtensionMapping => Turns debugging for the processing of the extension-mapping
+ * runtimeOptions.debug.plugin.OkapiBconfPackUnpack => Turns general debugging on for the packing/unpacking of bconfs
+ * runtimeOptions.debug.plugin.OkapiBconfProcessing => Turns debugging on for the processing of bconfs
+ * runtimeOptions.debug.plugin.OkapiBconfValidation => Turns debugging on for validating bconfs, filters & srx
+ * runtimeOptions.debug.plugin.OkapiExtensionMapping => Turns debugging on for the processing of the extension-mapping
  * runtimeOptions.debug.plugin.OkapiKeepIntermediateFiles => All the files that are created in the various processing steps are kept
  *
  *

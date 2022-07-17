@@ -348,7 +348,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         tooltip: new Ext.Template(me.text_cols.fileDlTemplate)
                             .apply(['Target SRX', me.text_cols.fileSuffix]),
                         handler: 'downloadSRX'
-                    },
+                    }
                 ]
             },
 

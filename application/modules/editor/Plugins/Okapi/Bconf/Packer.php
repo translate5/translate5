@@ -28,43 +28,70 @@
  */
 
 /**
- * Generate new bconf file
- * @see editor_Plugins_Okapi_Bconf_File
- * @var editor_Plugins_Okapi_Bconf_Entity $entity
- * @var bool $doDebug
+ * Packs/Assembles a bconf
+ * Algorithmically a copy of the original JAVA implementation
  */
-trait editor_Plugins_Okapi_Bconf_PackerTrait {
+final class editor_Plugins_Okapi_Bconf_Packer {
 
     /**
+     * @var editor_Plugins_Okapi_Bconf_Entity
+     */
+    private editor_Plugins_Okapi_Bconf_Entity $bconf;
+    /**
+     * @var string
+     */
+    private string $folder;
+    /**
+     * @var editor_Plugins_Okapi_Bconf_RandomAccessFile
+     */
+    private editor_Plugins_Okapi_Bconf_RandomAccessFile $raf;
+    /**
+     * @var bool
+     */
+    private bool $doDebug;
+
+    public function __construct(editor_Plugins_Okapi_Bconf_Entity $bconf){
+        $this->bconf = $bconf;
+        $this->folder = $this->bconf->getDataDirectory();
+        $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfPackUnpack');
+    }
+
+    /**
+     * @param bool $isOutdatedRepack
      * @throws ZfExtended_Exception
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    private function doPack(): void {
+    public function process(bool $isOutdatedRepack): void {
 
         // so we can access all files in the bconf's data-dir with file name only
-        chdir($this->entity->getDataDirectory());
+        chdir($this->folder);
+        $fileName = basename($this->bconf->getPath());
+        $this->raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
 
-        $fileName = basename($this->entity->getPath());
-        $raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
-        $raf->writeUTF(editor_Plugins_Okapi_Bconf_Entity::SIGNATURE, false);
-        $raf->writeInt(editor_Plugins_Okapi_Bconf_Entity::VERSION);
+        $this->raf->writeUTF(editor_Plugins_Okapi_Bconf_Entity::SIGNATURE, false);
+        $this->raf->writeInt(editor_Plugins_Okapi_Bconf_Entity::VERSION);
         // TODO BCONF: currently plugins are not supported
-        $raf->writeInt(editor_Plugins_Okapi_Bconf_Entity::NUM_PLUGINS);
+        $this->raf->writeInt(editor_Plugins_Okapi_Bconf_Entity::NUM_PLUGINS);
 
-        // Read the pipeline and extract steps
-        $this->processPipeline($raf);
-
+        $content = $this->bconf->getContent();
+        $pipeline = $this->bconf->getPipeline();
+        $this->harvestReferencedFile(1, $content->getSrxFile('source'), $isOutdatedRepack);
+        $this->harvestReferencedFile(2, $content->getSrxFile('target'), $isOutdatedRepack);
+        // Last ID=-1 to mark no more references
+        $this->raf->writeInt(-1);
+        $this->raf->writeInt(1);
+        $this->raf->writeUTF($pipeline->getContent(), false);
         // process filters & extension mapping
         $customIdentifiers = [];
-        foreach($this->entity->getCustomFilterData() as $filterData){
+        foreach($this->bconf->getCustomFilterData() as $filterData){
             $customIdentifiers[] = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($filterData['okapiType'], $filterData['okapiId']);
         }
         // DEBUG
         if($this->doDebug) { error_log('PACKED CUSTOM FILTERS: '."\n".implode(', ', $customIdentifiers)); }
 
         // instantiate the extension mapping and evaluate the additional default okapi and translate5 filter files (this needs to know the "real" custom filters
-        $extensionMapping = $this->entity->getExtensionMapping();
+        $extensionMapping = $this->bconf->getExtensionMapping();
         $extensionMapData = $extensionMapping->getMapForPacking($customIdentifiers);
         $defaultFilterFiles = $extensionMapping->getOkapiDefaultFprmsForPacking($customIdentifiers); // retrieves an array of pathes !
 
@@ -75,100 +102,70 @@ trait editor_Plugins_Okapi_Bconf_PackerTrait {
         }
         $numAllEmbeddedFilters = count($customIdentifiers) + count($defaultFilterFiles);
         // write number of embedded filters
-        $raf->writeInt($numAllEmbeddedFilters);
+        $this->raf->writeInt($numAllEmbeddedFilters);
         foreach($customIdentifiers as $identifier){
             // we are already in the bconf's dir, so we can reference custom filters by filename only
-            $this->writeFprm($raf, $identifier, $identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
+            $this->writeFprm($identifier, $identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
         }
         foreach($defaultFilterFiles as $identifier => $path){
             // the static default filters will be added with explicit settings, These are either OKAPI defaults or translate5 adjusted defaults
-            $this->writeFprm($raf, $identifier, $path);
+            $this->writeFprm($identifier, $path);
         }
         // write the adjuated extension map
         $countLines = count($extensionMapData);
         $extMapBinary = ''; // we'll build up the binary format in memory instead of wirting every line itself to file
         foreach($extensionMapData as $lineData){
-            $extMapBinary .= $raf::toUTF($lineData[0]);
-            $extMapBinary .= $raf::toUTF($lineData[1]);
+            $extMapBinary .= $this->raf::toUTF($lineData[0]);
+            $extMapBinary .= $this->raf::toUTF($lineData[1]);
         }
-        $raf->writeInt($countLines);
-        $raf->fwrite($extMapBinary);
-    }
-
-    private function writeFprm(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf, string $identifier, string $path){
-        $raf->writeUTF($identifier, false);
-        $raf->writeUTF(file_get_contents($path), false); // QUIRK: Need additional null byte. Where does it come from in Java?
+        $this->raf->writeInt($countLines);
+        $this->raf->fwrite($extMapBinary);
     }
 
     /**
-     * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
-     * @throws ZfExtended_UnprocessableEntity
-     * @throws editor_Plugins_Okapi_Exception
+     * @param string $identifier
+     * @param string $path
      */
-    private function processPipeline(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf){
-        $pipelineFile = editor_Plugins_Okapi_Bconf_File::PIPELINE_FILE;
-        $pipelineSize = filesize($pipelineFile);
-        $resource = fopen($pipelineFile, 'rb');
-        if($resource === false){
-            $this->invalidate('Unable to open file '.$pipelineFile);
-        }
-        $xml = fread($resource, $pipelineSize);
-        fclose($resource);
-
-        $xmlData = new SimpleXMLElement($xml);
-        $id = 0;
-        foreach($xmlData as $key){
-            $methods = explode("\n", $key);
-            foreach($methods as $method){
-
-                if(str_contains($method, 'Path')){
-
-                    $path = explode("=", $method)[1];
-                    $path = str_replace('\\\\', '/', $path);
-                    $path = str_replace('\\', '/', $path);
-
-                    $this->harvestReferencedFile($raf, ++$id, basename($path));
-                }
-            }
-        }
-        // Last ID=-1 to mark no more references
-        $raf->writeInt(-1);
-
-        $raf->writeInt(1);
-        $raf->writeUTF($xml, false);
+    private function writeFprm(string $identifier, string $path){
+        $this->raf->writeUTF($identifier, false);
+        $this->raf->writeUTF(file_get_contents($path), false); // QUIRK: Need additional null byte. Where does it come from in Java?
     }
 
     /**
-     * @param editor_Plugins_Okapi_Bconf_RandomAccessFile $raf
      * @param int $id
      * @param string $fileName
-     * @throws ZfExtended_UnprocessableEntity
-     * @throws editor_Plugins_Okapi_Exception
+     * @param bool $isOutdatedRepack
+     * @throws editor_Plugins_Okapi_Bconf_InvalidException
      */
-    private function harvestReferencedFile(editor_Plugins_Okapi_Bconf_RandomAccessFile $raf, int $id, string $fileName){
-        $raf->writeInt($id);
-        $raf->writeUTF($fileName, false);
+    private function harvestReferencedFile(int $id, string $fileName, bool $isOutdatedRepack){
+        $this->raf->writeInt($id);
+        $this->raf->writeUTF($fileName, false);
 
         if($fileName == ''){
             // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we write 2 32bit Ints here
-            $raf->writeInt(0);
-            $raf->writeInt(0);
+            $this->raf->writeInt(0);
+            $this->raf->writeInt(0);
             return;
+        }
+        // check, if a SRX is a T5 default SRX and exchange it with the current version if we are in the process of repacking
+        // this will be a permanent change since the physical file is overwritten
+        // this happens without knowing/caring if this is the source/target bconf
+        if($isOutdatedRepack && pathinfo($fileName, PATHINFO_EXTENSION) === editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION){
+            editor_Plugins_Okapi_Bconf_Segmentation::instance()->onRepack($this->folder.'/'.$fileName);
         }
         //Open the file and read the content
         $resource = fopen($fileName, 'rb');
         // can not really happen in normal operation but who knows
         if($resource === false){
-            $this->invalidate('Unable to open file '.$fileName);
+            throw new editor_Plugins_Okapi_Bconf_InvalidException('Unable to open file '.$fileName);
         }
-
         $fileSize = filesize($fileName);
         $fileContent = fread($resource, $fileSize);
         // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we write 2 32bit Ints here (limiting the encodable size to 4GB...)
-        $raf->writeInt(0);
-        $raf->writeInt($fileSize);
+        $this->raf->writeInt(0);
+        $this->raf->writeInt($fileSize);
         if($fileSize > 0){
-            $raf->fwrite($fileContent);
+            $this->raf->fwrite($fileContent);
         }
         fclose($resource);
     }

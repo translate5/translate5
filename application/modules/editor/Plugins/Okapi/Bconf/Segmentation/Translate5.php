@@ -32,6 +32,17 @@
  */
 final class editor_Plugins_Okapi_Bconf_Segmentation_Translate5 extends editor_Plugins_Okapi_Bconf_FileInventory {
 
+    /*
+     * A srx-entry has the following structure:
+    {
+        "version": 1,
+        "source": "languages-1.srx",
+        "target": "languages-1.srx",
+        "sourceHash": "3f3c76d610eb4a7848bedeeb6734c4de",
+        "targetHash": "3f3c76d610eb4a7848bedeeb6734c4de"
+    }
+     */
+
     /**
      * @var editor_Plugins_Okapi_Bconf_Segmentation_Translate5|null
      */
@@ -61,6 +72,22 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Translate5 extends editor_Pl
     protected string $inventoryFolder = 'srx/translate5';
 
     /**
+     * @param string $field: must be "source"|"target"
+     * @return string
+     */
+    public function findCurrentPath(string $field) : string {
+        return $this->inventory[0]->$field;
+    }
+
+    /**
+     * Retrieves the current SRX
+     * @return stdClass
+     */
+    public function findCurrent() : stdClass {
+        return $this->inventory[0];
+    }
+
+    /**
      * Retrieves an Translate5 adjusted srx by it's hash
      * @param string $hash
      * @return stdClass|null
@@ -68,7 +95,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Translate5 extends editor_Pl
     public function findByHash(string $hash) : ?stdClass {
         $result = [];
         foreach($this->inventory as $index => $item){
-            if($item->hash === $item){
+            if($item->sourceHash === $hash || $item->targetHash === $hash){
                 return $item;
             }
         }

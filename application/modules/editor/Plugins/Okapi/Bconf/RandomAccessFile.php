@@ -30,6 +30,7 @@
  *
  * Common util class for bconf export and import
  * Java reads/writes/represents in BigEndian
+ * Algorithmically a copy of the original JAVA implementation
  */
 class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
 

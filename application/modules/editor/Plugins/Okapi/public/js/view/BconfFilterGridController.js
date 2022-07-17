@@ -62,7 +62,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     },
 
     isEditDisabled: function(view, rowIndex, colIndex, item, record){
-        return !record.get('isCustom') || !record.get('editable') || !record.get('editable') || record.crudState === 'C' || !record.get('guiClass');
+        return !record.get('isCustom') || !record.get('editable') || record.crudState === 'C' || !record.get('guiClass');
     },
 
     isCloneDisabled: function(view, rowIndex, colIndex, item, record){
@@ -79,7 +79,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
                 filterFn: ({data}) => searchRE.exec(JSON.stringify(Object.values(data)))
             });
         } else {
-            store.removeFilter('search');
+            store.clearFilter();
         }
         field.getTrigger('clear').setVisible(searchFilterValue);
     },

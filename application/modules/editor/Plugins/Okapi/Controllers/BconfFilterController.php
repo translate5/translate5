@@ -67,6 +67,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         parent::postAction();
         // extensions have been sent as put-data
         $extensions = explode(',', $this->data->extensions);
+        // we need to update the extension-mapping but not the content/TOC
         $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
         $extensionMapping->changeFilter($this->entity->getIdentifier(), $extensions);
         // the frontend needs to know about an adjusted identifier
@@ -83,8 +84,14 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         parent::putAction();
         // extensions have been sent as put-data
         $extensions = explode(',', $this->data->extensions);
-        $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
+        // update mapping
+        $bconf = $this->entity->getRelatedBconf();
+        $extensionMapping = $bconf->getExtensionMapping();
         $extensionMapping->addFilter($this->entity->getIdentifier(), $extensions);
+        // update content/TOC
+        $content = $bconf->getContent();
+        $content->addFilter($this->entity->getIdentifier());
+        $content->flush();
         // the frontend needs to know about an adjusted identifier
         $this->view->rows->identifier = $this->entity->getIdentifier();
     }
@@ -118,8 +125,15 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
      */
     public function deleteAction(){
         $this->entityLoad();
-        $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
+        $bconf = $this->entity->getRelatedBconf();
+        // remove the filter from the extension mapping
+        $extensionMapping = $bconf->getExtensionMapping();
         $extensionMapping->removeFilter($this->entity->getIdentifier());
+        // remove the filter from the content/TOC
+        $content = $bconf->getContent();
+        $content->removeFilter($this->entity->getIdentifier());
+        $content->flush();
+        // and delete
         $this->processClientReferenceVersion();
         $this->entity->delete();
     }
@@ -166,7 +180,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
                 // save x-properties fprm, set hash, pack bconf
                 $fprm->flush();
                 $this->entity->setHash($fprm->getHash());
-                $this->entity->getRelatedBconf()->getFile()->pack();
+                $this->entity->getRelatedBconf()->pack();
                 $this->entity->save();
             }
         } else {

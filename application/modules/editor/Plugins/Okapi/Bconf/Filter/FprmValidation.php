@@ -163,7 +163,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
         copy($bconfPath, $backupBconfPath);
         // flush the fprm to the bconf folder & pack the bconf
         $this->fprm->flush();
-        $this->bconf->getFile()->pack();
+        $this->bconf->pack();
         $valid = $this->process($testfilePath);
         if($keepOriginals || !$valid || $this->mappingChanged){
             // restore original bconf
@@ -186,7 +186,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
             $this->bconf->getExtensionMapping()->removeExtensions([ self::TMP_MAPPING_EXTENSION ]); // this flushes the reverted map !
             // a valid fprm will require another re-pack (to not have the adjusted mapping parsed in) if not originals shall be restored - which then already was done above
             if($valid && !$keepOriginals){
-                $this->bconf->getFile()->pack();
+                $this->bconf->pack();
             }
         }
         if(!$valid){

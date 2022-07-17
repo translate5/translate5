@@ -123,29 +123,40 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * @var editor_Plugins_Okapi_Bconf_File
-     */
-    private $file = NULL;
-
-    /**
+     * Cache for our extension mapping
      * @var editor_Plugins_Okapi_Bconf_ExtensionMapping
      */
-    private $extensionMapping = NULL;
+    private ?editor_Plugins_Okapi_Bconf_ExtensionMapping $extensionMapping = NULL;
 
     /**
-     * @var string
+     * Cache for our pipeline
+     * @var editor_Plugins_Okapi_Bconf_Pipeline
      */
-    private string $dir = '';
+    private ?editor_Plugins_Okapi_Bconf_Pipeline $pipeline = NULL;
+
+    /**
+     * Cache for our content/TOC
+     * @var editor_Plugins_Okapi_Bconf_Content
+     */
+    private ?editor_Plugins_Okapi_Bconf_Content $content = NULL;
+
+    /**
+     * Cache for our related customer
+     * @var editor_Models_Customer_Customer
+     */
+    private ?editor_Models_Customer_Customer $customer = NULL;
+
+    /**
+     * The isNew state is only set during the import: after the bconf is saved to DB but before all filebased operations/validations are finished, a bconf is regarded as "new"
+     * When Exceptions occurs while packing/unpacking, new bconfs will be deleted from DB
+     * @var bool
+     */
+    private bool $isNew = false;
 
     /**
      * @var bool
      */
     private bool $doDebug;
-
-    /**
-     * @var editor_Models_Customer_Customer
-     */
-    private ?editor_Models_Customer_Customer $customer = NULL;
 
     protected $dbInstanceClass = 'editor_Plugins_Okapi_Db_Bconf';
     protected $validatorInstanceClass = 'editor_Plugins_Okapi_Db_Validator_Bconf';
@@ -187,10 +198,12 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
             $errorMsg = "Could not create directory for bconf (in runtimeOptions.plugins.Okapi.dataDir)";
             throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
         }
-        $bconfFile = new editor_Plugins_Okapi_Bconf_File($this, true);
-        // parses the
-        $bconfFile->unpack($tmpPath);
-        $bconfFile->pack();
+        // when exceptions occur during unpacking/packing this flag ensures, the entity is removed from DB
+        $this->isNew = true;
+        // unpacks the imported file & saves the parts to filesys/DB
+        $this->unpack($tmpPath);
+        // packs a bconf from it that can be used for okapi-projects from now on
+        $this->pack();
 
         // final step: validate the bconf - if not the sys-default bconf
         if(!$this->isSystemDefault()){
@@ -210,6 +223,8 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
                 throw new editor_Plugins_Okapi_Exception('E1408', ['bconf' => $name, 'details' => $validation->getValidationError()]);
             }
         }
+        // after a successful unpack/pack, we're not new anymore
+        $this->isNew = false;
     }
 
     /**
@@ -256,22 +271,10 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
             // DEBUG
             if($this->doDebug){ error_log('Re-pack BCONF '.$this->getName().' to Version '.editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX); }
 
-            $this->getFile()->pack();
+            $this->pack(true);
             $this->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
             $this->save();
         }
-    }
-
-    /**
-     * Lazy accessor for our file wrapper
-     * @return editor_Plugins_Okapi_Bconf_File
-     */
-    public function getFile(): editor_Plugins_Okapi_Bconf_File {
-        // use cached file only with identical ID
-        if($this->file === NULL || $this->file->getBconfId() != $this->getId()){
-            $this->file = new editor_Plugins_Okapi_Bconf_File($this);
-        }
-        return $this->file;
     }
 
     /**
@@ -321,7 +324,15 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception
      */
     public function getPath() : string {
-        return $this->createPath('bconf-'.$this->getId().'.'.static::EXTENSION);
+        return $this->createPath($this->getFile());
+    }
+
+    /**
+     * Generates the file-name in our data-dir
+     * @return string
+     */
+    public function getFile(): string {
+        return 'bconf-'.$this->getId().'.'.static::EXTENSION;
     }
 
     /**
@@ -384,34 +395,32 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * Reads the name of one contained srx file from the pipeline
-     * @param string $purpose Which srx name to extract, one of 'source' or 'target'
+     * @param string $field
      * @return string
-     * @throws Zend_Exception
-     * @throws ZfExtended_UnprocessableEntity
+     * @throws ZfExtended_Exception
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getSrxNameFor(string $purpose): string {
-        $purpose .= 'SrxPath';
-        $descFile = $this->createPath(editor_Plugins_Okapi_Bconf_File::DESCRIPTION_FILE);
-        $content = json_decode(file_get_contents($descFile), true);
-
-        $srxFileName = $content['refs'][$purpose] ?? '';
-        !$srxFileName && throw new ZfExtended_Exception("Corrupt bconf record: Could not get '$purpose' from '$descFile'.");
-        return $srxFileName;
+    public function getSrxNameFor(string $field): string {
+        if($field !== 'source' && $field !== 'target'){
+            throw new ZfExtended_Mismatch('editor_Plugins_Okapi_Bconf_Entity::getSrxNameFor: Argument "field" must either be "source" or "target"');
+        }
+        return $this->getContent()->getSrxFile($field);
     }
 
     /**
      * Retrieves the SRX as file-object, either "source" or "target"
-     * @param string $purpose
+     * @param string $field: source|target
      * @return editor_Plugins_Okapi_Bconf_Segmentation_Srx
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      * @throws ZfExtended_UnprocessableEntity
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getSrx(string $purpose) : editor_Plugins_Okapi_Bconf_Segmentation_Srx {
-        $path = $this->createPath($this->getSrxNameFor($purpose));
+    public function getSrx(string $field) : editor_Plugins_Okapi_Bconf_Segmentation_Srx {
+        if($field !== 'source' && $field !== 'target'){
+            throw new ZfExtended_Mismatch('editor_Plugins_Okapi_Bconf_Entity::getSrx: Argument "field" must either be "source" or "target"');
+        }
+        $path = $this->createPath($this->getSrxNameFor($field));
         return new editor_Plugins_Okapi_Bconf_Segmentation_Srx($path);
     }
 
@@ -432,7 +441,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * Retrieves the server path to the extension mapping to a bconf
+     * Retrieves the server path to the extension-mapping file of a bconf
      * @return string
      * @throws editor_Plugins_Okapi_Exception
      */
@@ -451,6 +460,50 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
             $this->extensionMapping = new editor_Plugins_Okapi_Bconf_ExtensionMapping($this);
         }
         return $this->extensionMapping;
+    }
+
+    /**
+     * Retrieves the server path to the pipeline-file of a bconf
+     * @return string
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getPipelinePath() : string {
+        return $this->createPath(editor_Plugins_Okapi_Bconf_Pipeline::FILE);
+    }
+
+    /**
+     * Returns a pipline-object for our pipeline-file
+     * @return editor_Plugins_Okapi_Bconf_Pipeline
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getPipeline() : editor_Plugins_Okapi_Bconf_Pipeline {
+        if($this->pipeline == NULL || $this->pipeline->getBconfId() !== $this->getId()){
+            $this->pipeline = new editor_Plugins_Okapi_Bconf_Pipeline($this->getPipelinePath(), NULL, $this->getId());
+        }
+        return $this->pipeline;
+    }
+
+    /**
+     * Retrieves the server path to the content/TOC of a bconf
+     * @return string
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getContentPath() : string {
+        return $this->createPath(editor_Plugins_Okapi_Bconf_Content::FILE);
+    }
+
+    /**
+     * Returns a content-object for our content-file
+     * @return editor_Plugins_Okapi_Bconf_Content
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getContent() : editor_Plugins_Okapi_Bconf_Content {
+        if($this->content == NULL || $this->content->getBconfId() !== $this->getId()){
+            $this->content = new editor_Plugins_Okapi_Bconf_Content($this->getContentPath(), NULL, $this->getId());
+        }
+        return $this->content;
     }
 
     /**
@@ -617,9 +670,8 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception
      */
     private function removeFiles(int $id){
-        $dir = self::getUserDataDir().DIRECTORY_SEPARATOR.strval($id);
+        $dir = self::getUserDataDir().'/'.strval($id);
         if(is_dir($dir)){ // just to be safe
-            $this->dir = ''; // remove cached valid dir
             /** @var ZfExtended_Controller_Helper_Recursivedircleaner $cleaner */
             $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
             $cleaner->delete($dir);
@@ -639,5 +691,79 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
             $data[] = $bconfData;
         }
         return $data;
+    }
+
+    /**
+     * Disassembles an uploaded bconf into it's parts & flushes the parts into the file-system & DB
+     * @param string $pathToParse
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function unpack(string $pathToParse): void {
+        try {
+            $unpacker = new editor_Plugins_Okapi_Bconf_Unpacker($this);
+            $unpacker->process($pathToParse);
+        } catch(editor_Plugins_Okapi_Bconf_InvalidException $e){
+            // in case of a editor_Plugins_Okapi_Bconf_InvalidException, the exception came from the Unpacker
+            $name = $this->getName();
+            error_log('UNPACK EXCEPTION for bconf "'.$name.'": '.$e->getMessage());
+            $this->invalidateNew();
+            throw new editor_Plugins_Okapi_Exception('E1415', ['bconf' => $name, 'details' => $e->getMessage()]);
+        } catch(Exception $e){
+            // if an other exception than the explicitly thrown via invalidate occur we do a passthrough to be able to identify the origin
+            error_log('UNKNOWN UNPACK EXCEPTION: '.$e->__toString());
+            $this->invalidateNew();
+            throw $e;
+        }
+    }
+
+    /**
+     * Packs a bconf out of it parts (filters, srx, ...) to an assembled bconf
+     * @param bool $isOutdatedRepack
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function pack(bool $isOutdatedRepack=false): void {
+        try {
+            $packer = new editor_Plugins_Okapi_Bconf_Packer($this);
+            $packer->process($isOutdatedRepack);
+        } catch(editor_Plugins_Okapi_Bconf_InvalidException $e){
+            // in case of a editor_Plugins_Okapi_Bconf_InvalidException, the exception came from the packer
+            $name = $this->getName();
+            error_log('PACK EXCEPTION for bconf "'.$name.'": '.$e->getMessage());
+            $this->invalidateNew();
+            throw new editor_Plugins_Okapi_Exception('E1416', ['bconf' => $name, 'details' => $e->getMessage()]);
+        } catch(Exception $e){
+            // if an other exception than the explicitly thrown via invalidate occur we do a passthrough to be able to identify the origin
+            error_log('UNKNOWN PACK EXCEPTION: '.$e->__toString());
+            $this->invalidateNew();
+            throw $e;
+        }
+    }
+
+    /**
+     * Handles deleting new records when an exception ocurred in the import
+     */
+    protected function  invalidateNew() : void {
+        if($this->isNew){
+            try {
+                $this->delete();
+            } catch(Exception $e){
+                error_log('PROBLEMS DELETING BCONF: '.strval($e));
+            }
+            $this->isNew = false;
+        }
+    }
+
+    /**
+     * Invalidates all cached dependant objects
+     */
+    public function invalidateCaches(){
+        $this->pipeline = NULL;
+        $this->content = NULL;
+        $this->extensionMapping = NULL;
+        $this->customer = NULL;
     }
 }

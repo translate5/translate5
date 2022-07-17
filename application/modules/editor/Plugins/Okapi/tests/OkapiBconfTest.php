@@ -262,7 +262,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
             if(!is_dir($testDir)){
                 mkdir($testDir); // Created as test user for unit test. Make sure to remove in every circumstance!
             }
-            $bconffile = new editor_Plugins_Okapi_Bconf_File($bconf);
             $filesToTest = [
                 'Signature.bconf',
                 'Version.bconf',
@@ -274,7 +273,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
             foreach($filesToTest as $file){
                 $e = null;
                 try {
-                    $bconffile->unpack(self::$api->getFile("invalid/$file"));
+                    $bconf->unpack(self::$api->getFile("invalid/$file"));
                 } catch(ZfExtended_UnprocessableEntity $e){
                     self::assertNotNull($e, "Did not reject invalid/$file with ZfExtended_UnprocessableEntity.");
                 }

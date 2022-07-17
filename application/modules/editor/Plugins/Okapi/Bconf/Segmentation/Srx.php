@@ -62,4 +62,20 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
         }
         return false;
     }
+
+    /**
+     * Updates the contents of a SRX
+     * @param string $content
+     */
+    public function setContent(string $content) {
+        $this->content = $content;
+    }
+
+    /**
+     * Updates our path
+     * @param string $path
+     */
+    public function setPath(string $path) {
+        $this->path = $path;
+    }
 }

@@ -59,7 +59,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
      * There is no other way to detect yaml than by looking into it, so we need to encode that statically
      * @var array
      */
-    const YAML_TYPES = ['okf_html', 'okf_xml', 'okf_xmlstream', 'okf_doxygen'];
+    const YAML_TYPES = ['okf_html', 'okf_xmlstream', 'okf_doxygen'];
     /**
      * What kind of data 'okf_wiki' contains is really strange, it seems to be "JSON without quotes". We cannot validate it ...
      * @var array
@@ -135,18 +135,22 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
             return true;
         }
         if($this->type == self::TYPE_XPROPERTIES){
-            $xProperties = new editor_Plugins_Okapi_Bconf_Filter_XProperties($this->path, $this->content);
-            if($xProperties->validate($forImport)){
+            $propsValidation = new editor_Plugins_Okapi_Bconf_Filter_PropertiesValidation($this->path, $this->content);
+            if($propsValidation->validate($forImport)){
                 // if our content was missing some values, we "inherit" them by the default FPRMs
-                if($xProperties->hasToBeRepaired()){
-                    if($this->doDebug || ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfProcessing')){ error_log('FPRM prosessing: filter '.$this->getIdentifier().' was missing some values that have been complemented'); }
-                    $this->content = $xProperties->getContent();
+                if($propsValidation->hasToBeRepaired()){
+                    // DEBUG
+                    if($this->doDebug || ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfProcessing')){ error_log('FPRM processing: properties based filter '.$this->getIdentifier().' was missing some values that have been complemented'); }
+                    $this->content = $propsValidation->getContent();
+                } else if($this->doDebug) {
+                    // DEBUG
+                    error_log('FPRM processing: properties based filter '.$this->getIdentifier().' was valid');
                 }
                 return true;
             }
             // DEBUG
             if($this->doDebug){ error_log('FPRM FILE '.basename($this->path).' of type '.$this->type.' is invalid'); }
-            $this->validationError = 'Invalid x-properties: '."\n".$xProperties->getValidationError();
+            $this->validationError = 'Invalid x-properties: '."\n".$propsValidation->getValidationError();
             return false;
         }
         // plain text must have characters, what else can we check ?
