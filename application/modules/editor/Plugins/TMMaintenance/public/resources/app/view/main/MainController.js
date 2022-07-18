@@ -166,6 +166,10 @@ Ext.define('TMMaintenance.view.main.MainController', {
 
         this.saveCurrent();
 
+        if (this.getEditingPlugin().editing) {
+            return;
+        }
+
         let store = this.getListGrid().getStore();
         let nextEditingIndex = store.indexOf(currentEditingRecord) + 1;
         if (!store.getAt(nextEditingIndex)) {
@@ -182,6 +186,10 @@ Ext.define('TMMaintenance.view.main.MainController', {
         }
 
         this.saveCurrent();
+
+        if (this.getEditingPlugin().editing) {
+            return;
+        }
 
         let store = this.getListGrid().getStore();
         let nextEditingIndex = store.indexOf(currentEditingRecord) - 1;

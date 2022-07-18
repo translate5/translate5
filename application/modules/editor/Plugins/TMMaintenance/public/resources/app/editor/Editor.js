@@ -20,7 +20,10 @@ Ext.define('Ext.translate5.Editor', {
 
     onBeforeComplete: function () {
         if (!this.validateTagsOrdering(this.getData())) {
-            alert('Wrong tags ordering');
+            Ext.Msg.show({
+                title: 'Validation error',
+                message: 'Some of the tags used in the segment are in the wrong order',
+            });
 
             return false;
         }
