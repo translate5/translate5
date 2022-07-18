@@ -337,6 +337,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set('editor.toolbar.hideCloseButton', (boolean)$rop->editor->toolbar->hideCloseButton);
         //boolean config if the leave task button button in the segments editor header is visible or not
         $this->view->Php2JsVars()->set('editor.toolbar.hideLeaveTaskButton', (boolean)$rop->editor->toolbar->hideLeaveTaskButton);
+        $this->view->Php2JsVars()->set('editor.toolbar.askFinishOnClose', (boolean)$rop->editor->toolbar->askFinishOnClose);
 
         $this->view->Php2JsVars()->set('tasks.simultaneousEditingKey', editor_Models_Task::INTERNAL_LOCK . editor_Models_Task::USAGE_MODE_SIMULTANEOUS);
         $this->setLanguageResourceJsVars();
