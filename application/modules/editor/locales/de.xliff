@@ -2095,6 +2095,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3RhbmRhcmQgV29ya2Zsb3c='><source>Standard Workflow</source><target>Standard Workflow</target></trans-unit>
 <trans-unit id='Q29tcGxleCBXb3JrZmxvdw=='><source>Complex Workflow</source><target>Complex Workflow</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQgV29ya2Zsb3cgKMOcYmVyc2V0enVuZywgTGVrdG9yYXQsIFp3ZWl0ZXMgTGVrdG9yYXQp'><source>Standard Workflow (Übersetzung, Lektorat, Zweites Lektorat)</source><target>Standard Workflow</target></trans-unit>
+<trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='><source>Import abbrechen</source><target>Import abbrechen</target></trans-unit>
 <trans-unit id='QWxsZSBwYXNzZW5kZW4gendlaXNwcmFjaGlnZW4gRGF0ZWllbiBmw7xyIGRpZXNlIFNwcmFjaGUgd2VyZGVuIGF1cyBkZXIgTGlzdGUgaG9jaGdlbGFkZW5lciBEYXRlaWVuIGVudGZlcm50Lg=='><source>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</source><target>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</target></trans-unit>
 <trans-unit id='QXJiZWl0c2RhdGVpKGVuKQ=='><source>Arbeitsdatei(en)</source><target>Arbeitsdatei(en)</target></trans-unit>
 <trans-unit id='UGl2b3QtRGF0ZWkoZW4p'><source>Pivot-Datei(en)</source><target>Pivot-Datei(en)</target></trans-unit>
@@ -2143,6 +2144,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIGhvY2hnZWxhZGVuZW4gQXJiZWl0c2RhdGVpZW4gZ2VmdW5kZW4gb2RlciBkaWUgaG9jaGdlbGFkZW5lbiBEYXRlaWVuIMO8YmVyc2NocmVpdGVuIGRpZSBtYXhpbWFsIHp1bMOkc3NpZ2UgR3LDtsOfZS4='><source>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</source><target>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</target></trans-unit>
 <trans-unit id='U2luZ2xlIFNpZ24tb24='><source>Single Sign-on</source><target>Single Sign-on</target></trans-unit>
 <trans-unit id='RGllc2VzIEZlbGQgZGFyZiBuaWNodCBsZWVyIHNlaW4='><source>Dieses Feld darf nicht leer sein</source><target>Dieses Feld darf nicht leer sein</target></trans-unit>
+
 <trans-unit id='WmFobGVu'><source>Zahlen</source><target>Zahlen</target></trans-unit>
 <trans-unit id='WmFobGVuIFF1ZWxsZSDiiaAgWmllbA=='><source>Zahlen Quelle ≠ Ziel</source><target>Zahlen Quelle ≠ Ziel</target></trans-unit>
 <trans-unit id='QWxwaGFudW1lcmlzY2hlIFplaWNoZW5mb2xnZW46IFVudGVyc2NoaWVkZQ=='><source>Alphanumerische Zeichenfolgen: Unterschiede</source><target>Alphanumerische Zeichenfolgen: Unterschiede</target></trans-unit>
@@ -2156,6 +2158,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='Rm9ybWF0w6RuZGVydW5nIChPcmRpbmFsemFobGVuLCBmw7xocmVuZGUgTnVsbCB1LsOkLik='><source>Formatänderung (Ordinalzahlen, führende Null u.ä.)</source><target>Formatänderung (Ordinalzahlen, führende Null u.ä.)</target></trans-unit>
 <trans-unit id='VW50ZXJzY2guIFplaWNoZW4vRm9ybWF0aWVydW5nIGbDvHIgWmFobGVuLUludGVydmFsbA=='><source>Untersch. Zeichen/Formatierung für Zahlen-Intervall</source><target>Untersch. Zeichen/Formatierung für Zahlen-Intervall</target></trans-unit>
 <trans-unit id='MTAwMGVyLVRyZW5uZXIgbmljaHQgZXJsYXVidA=='><source>1000er-Trenner nicht erlaubt</source><target>1000er-Trenner nicht erlaubt</target></trans-unit>
+
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminologieübersetzungsprojekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Projekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Projekt</target></trans-unit>
@@ -2168,6 +2171,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='Tm91bnM='><source>Substantiv</source><target>Substantiv</target></trans-unit>
 <trans-unit id='UHLDpHBvc2l0aW9u'><source>Präposition</source><target>Präposition</target></trans-unit>
 <trans-unit id='UHJvbm9tZW4='><source>Pronomen</source><target>Pronomen</target></trans-unit>
+<trans-unit id='U29uc3RpZ2Vz'><source>Sonstiges</source><target>Sonstiges</target></trans-unit>
 <trans-unit id='V2FocnNjaGVpbmxpY2hrZWl0'><source>Wahrscheinlichkeit</source><target>Wahrscheinlichkeit</target></trans-unit>
 <trans-unit id='QWx0ZXJuYXRpdmVu'><source>Alternativen</source><target>Alternativen</target></trans-unit>
 <trans-unit id='UGl2b3QtU3ByYWNocmVzc291cmNlbg=='><source>Pivot-Sprachressourcen</source><target>Pivot-Sprachressourcen</target></trans-unit>
@@ -2175,31 +2179,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGFscyBQaXZvdCB2ZXJ3ZW5kZW4='><source>Standardmäßig als Pivot verwenden</source><target>Standardmäßig als Pivot verwenden</target></trans-unit>
 <trans-unit id='Vm9yw7xiZXJzZXR6dW5n'><source>Vorübersetzung</source><target>Vorübersetzung</target></trans-unit>
 <trans-unit id='U29sbHRlIGRhcyB6dSBpbXBvcnRpZXJlbmRlIFpJUC1QYWtldCBEYXRlaWVuIGbDvHIgZGllIEJlZsO8bGx1bmcgZGVyIFBpdm90LVNwYWx0ZSBlbnRoYWx0ZW4sIHdlcmRlbiBoaWVyIGdlbWFjaHQgRWluc3RlbGx1bmdlbiBpZ25vcmllcnQu'><source>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</source><target>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</target></trans-unit>
-<trans-unit id='U3lzdGVtYWRtaW4='><source>Systemadmin</source><target>Systemadmin</target></trans-unit>
-<trans-unit id='U3RhbmRhcmQtV29ya2Zsb3c='><source>Standard-Workflow</source><target>Standard-Workflow</target></trans-unit>
-<trans-unit id='ZGVmYXVsdA=='><source>default</source><target>default</target></trans-unit>
-<trans-unit id='U2VnbWVudC1Lb21tZW50YXI='><source>Segment-Kommentar</source><target>Segment-Kommentar</target></trans-unit>
-<trans-unit id='RGVmYXVsdA=='><source>Default</source><target>Default</target></trans-unit>
-<trans-unit id='RHVua2xlcyBMYXlvdXQgKEFyaWEp'><source>Dunkles Layout (Aria)</source><target>Dunkles Layout (Aria)</target></trans-unit>
-<trans-unit id='U3RhbmRhcmQgTGF5b3V0IChUcml0b24p'><source>Standard Layout (Triton)</source><target>Standard Layout (Triton)</target></trans-unit>
-<trans-unit id='QmVzdGltbWVy'><source>Bestimmer</source><target>Bestimmer</target></trans-unit>
-<trans-unit id='U3Vic3RhbnRpdg=='><source>Substantiv</source><target>Substantiv</target></trans-unit>
-<trans-unit id='T3RoZXI='><source>Other</source><target>Other</target></trans-unit>
-<trans-unit id='VVJMLUxpc3RlIGbDvHIgVmlzdWFs'><source>URL-Liste für Visual</source><target>URL-Liste für Visual</target></trans-unit>
-<trans-unit id='Q2hhbmdlIFZpc3VhbCBpbXBvcnQgdHlwZQ=='><source>Change Visual import type</source><target>Change Visual import type</target></trans-unit>
-<trans-unit id='U3dpdGNoaW5nIHRvIHRoZSBkaWZmZXJlbnQgaW1wb3J0IHR5cGUgd2lsbCByZW1vdmUgZXZlcnl0aGluZyBmcm9tIHRoZSBjdXJyZW50IHR5cGUuIEFyZSB5b3Ugc3VyZSA/'><source>Switching to the different import type will remove everything from the current type. Are you sure ?</source><target>Switching to the different import type will remove everything from the current type. Are you sure ?</target></trans-unit>
-<trans-unit id='VGhlIG9yZGVyIG9mIHRoZSB1cGxvYWRlZCBmaWxlcy91cmxzIHdpbGwgbWF0Y2ggd2l0aCB0aGUgb3JkZXIgb2YgdGhlIHVwbG9hZGVkIHdvcmsgZmlsZXMu'><source>The order of the uploaded files/urls will match with the order of the uploaded work files.</source><target>The order of the uploaded files/urls will match with the order of the uploaded work files.</target></trans-unit>
-<trans-unit id='VW1mYXNzdCBlaW5lIFFTIHVuZCBUZXJtaW5vbG9naWUgUHLDvGZ1bmc='><source>Umfasst eine QS und Terminologie Prüfung</source><target>Umfasst eine QS und Terminologie Prüfung</target></trans-unit>
-<trans-unit id='VE0gVm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'><source>TM Vorübersetzungs Match-Rate</source><target>TM Vorübersetzungs Match-Rate</target></trans-unit>
-<trans-unit id='RXhwb3J0IGFscyBFeGNlbA=='><source>Export als Excel</source><target>Export als Excel</target></trans-unit>
-<trans-unit id='RXhwb3J0IFRyYWRvcy1saWtlIFhNTA=='><source>Export Trados-like XML</source><target>Export Trados-like XML</target></trans-unit>
-<trans-unit id='RXMgd3VyZGUgYmlzaGVyIGtlaW5lIEFuYWx5c2UgZXJzdGVsbHQuIFN0YXJ0ZW4gU2llIGVpbmUgQW5hbHlzZSBpbSBUYWIg4oCcU3ByYWNocmVzc291cmNlbiB6dXdlaXNlbuKAnA=='><source>Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“</source><target>Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“</target></trans-unit>
-<trans-unit id='RGF0dW0gZGVyIEFuYWx5c2U='><source>Datum der Analyse</source><target>Datum der Analyse</target></trans-unit>
-<trans-unit id='R2VzcGVycnRlIDEwMCUtTWF0Y2hlcyBzaW5kIG5pY2h0IFRlaWwgZGVyIEFuYWx5c2Uu'><source>Gesperrte 100%-Matches sind nicht Teil der Analyse.</source><target>Gesperrte 100%-Matches sind nicht Teil der Analyse.</target></trans-unit>
-<trans-unit id='V29ydGJhc2llcnQ='><source>Wortbasiert</source><target>Wortbasiert</target></trans-unit>
-<trans-unit id='WmVpY2hlbmJhc2llcnQ='><source>Zeichenbasiert</source><target>Zeichenbasiert</target></trans-unit>
-<trans-unit id='QmFzaWVydCBhdWY='><source>Basiert auf</source><target>Basiert auf</target></trans-unit>
-<trans-unit id='SW5zdGFudC1UcmFuc2xhdGUgVE0='><source>Instant-Translate TM</source><target>Instant-Translate TM</target></trans-unit>
   </body>
  </file>
 </xliff>
