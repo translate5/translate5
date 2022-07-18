@@ -149,8 +149,9 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties {
     public function set(string $propName, $value){
         if($this->has($propName) && $this->validateProp($propName, $value)){
             $this->map[$propName] = $value;
+        } else {
+            throw new ZfExtended_NotFoundException('Property '.$propName.' not found');
         }
-        throw new ZfExtended_NotFoundException('Property '.$propName.' not found');
     }
 
     /**

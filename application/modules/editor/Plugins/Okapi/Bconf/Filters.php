@@ -46,7 +46,7 @@ class editor_Plugins_Okapi_Bconf_Filters {
     const GUIS = [
         'okf_html' => ['class' => 'Yaml', 'extensions' => ['html']],
         'okf_xml' => ['class' => 'Xml', 'extensions' => ['xml']],
-        'okf_xmlstream' => ['class' >= 'Yaml', 'extensions' => ['xml']],
+        'okf_xmlstream' => ['class' => 'Yaml', 'extensions' => ['xml']],
         /*
         'okf_idml' => ['class' => 'Idml', 'extensions' => ['idml']],
         'okf_icml' => ['class' => 'Icml', 'extensions' => ['icml']], // TODO: a testfile is required

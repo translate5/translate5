@@ -113,17 +113,17 @@ final class editor_Plugins_Okapi_Bconf_Filter_PropertiesValidation extends edito
         }
         $valid = true;
         $missingVals = [];
-        foreach($this->referenceProps->getProperties() as $validationVar => $validationVal){
-            if(!$this->props->has($validationVar)){
-                $missingVals[] = $validationVar;
+        foreach($this->referenceProps->getPropertyNames() as $varName){
+            if(!$this->props->has($varName)){
+                $missingVals[] = $varName;
             } else {
                 try {
-                    $this->referenceProps->set($validationVar, $this->props->get($validationVar));
+                    $this->referenceProps->set($varName, $this->props->get($varName));
                 } catch(Exception $e) {
                     // highly improbable but who knows ...
                     // DEBUG
-                    if($this->doDebug){ error_log('PROPERTIES VALIDATION PROBLEM: The file has an invalid value "'.$validationVar.'"'); }
-                    $this->validationError = trim($this->validationError."\n".' The file has an invalid value: '.$validationVar);
+                    if($this->doDebug){ error_log('PROPERTIES VALIDATION PROBLEM: The file has an invalid value "'.$varName.'": '.$e->getMessage()); }
+                    $this->validationError = trim($this->validationError."\n".' The file has an invalid value: '.$varName);
                     $valid = false;
                 }
             }
