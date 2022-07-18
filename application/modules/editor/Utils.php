@@ -272,6 +272,19 @@ class editor_Utils {
     }
 
     /**
+     * Helper to turn upload filenames into usable, re-identifiable filenames
+     * As an seperator either dashes "-" or underscores "_" are used
+     * Filecopy-indices like (1) are removed
+     * @param $text
+     * @param bool $useDashes
+     * @return string
+     */
+    public static function filenameFromUploadName($uploadName, $useDashes=true) : string {
+        $uploadName = preg_replace('/\([0-9]+\)/', '', $uploadName);
+        return static::filenameFromUserText($uploadName, $useDashes);
+    }
+
+    /**
      * Checks, if a filename is secure
      * @param string $fileName
      * @return bool

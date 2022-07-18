@@ -164,49 +164,11 @@ Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
             extensions.splice(index, 1);
             if(silent){
                 this.set('extensions', extensions, { silent: true, dirty: false });
-                // this.commit();
             } else {
                 this.set('extensions', extensions);
             }
             return true;
         }
         return false;
-    },
-    /**
-     * Loads the content of the .fprm file
-     * @return {Promise<string>} Also fulfilled with undefined on unsuccessful requests
-     */
-    loadFprm(){
-        var me = this;
-        return new Promise(function(resolve, reject){
-            Ext.Ajax.request({
-                url: me.getProxy().getUrl() + '/getfprm',
-                params: {
-                    id: me.id
-                },
-                callback: function(options, success, response){
-                    if(success){
-                        resolve(response.responseText);
-                    } else {
-                        resolve();
-                        Editor.app.getController('ServerException').handleException(response);
-                    }
-                }
-            });
-        });
-    },
-
-    saveFprm(fprm, editor){
-        var id = this.id;
-        return Ext.Ajax.request({
-            url: this.getProxy().getUrl() + '/savefprm',
-            headers: {'Content-Type': 'application/octet-stream'},
-            params: {id},
-            rawData: fprm,
-            failure: function(response, options){
-                editor.setLoading(false)
-                Editor.app.getController('ServerException').handleException(response);
-            }
-        });
     }
 });

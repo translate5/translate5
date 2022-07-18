@@ -82,12 +82,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     initComponent: function(){
         var me = this,
             bconf = me.getBconf(),
-            name = bconf.get('name').split('"').join(''),
-            description = bconf.get('description').split('"').join('');
+            name = bconf.get('name').split('"').join('');
         if(name.length > 50){
             name = name.substring(0, 47) + ' ...';
         }
-        me.title.text = me.strings.title + ' <i data-qtip="'+description+'">“'+name+'”</i>';
+        me.title.text = me.strings.title + ' <i>“'+name+'”</i>';
         me.callParent();
         me.getStore().getProxy().setBconfId(bconf.id); // for records and backend filter
     },

@@ -107,7 +107,7 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
      * @return int
      */
     public function getContentLength() : int {
-        return mb_strlen($this->content, 'UTF-8');
+        return mb_strlen($this->getContent(), 'UTF-8');
     }
 
     /**
@@ -121,7 +121,7 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
      * @return string
      */
     public function getHash() : string {
-        return self::createHash($this->content);
+        return self::createHash($this->getContent());
     }
 
     /**
@@ -135,7 +135,7 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
      * writes our content to our related file
      */
     public function flush() {
-        file_put_contents($this->path, $this->content);
+        file_put_contents($this->path, $this->getContent());
     }
 
     /**
@@ -147,7 +147,7 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
         header('Content-Disposition: attachment; filename="' . $downloadFilename . '"');
         header('Cache-Control: no-store');
         header('Content-Length: '.$this->getContentLength());
-        echo $this->content;
+        echo $this->getContent();
     }
 
     /**
@@ -157,7 +157,7 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
         header('Content-Type: '.$this->getMimeType());
         header('Cache-Control: no-store');
         header('Content-Length: '.$this->getContentLength());
-        echo rtrim($this->content);
+        echo rtrim($this->getContent());
     }
 
     /**

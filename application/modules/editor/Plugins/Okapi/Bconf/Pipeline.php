@@ -138,13 +138,13 @@ writerOptions.escapeGT.b=false
             throw new ZfExtended_Exception('A SRX file must have the file-extension "srx": '.$file);
         }
         if($field === 'source'){
-            $this->content = preg_replace('~sourceSrxPath\s*=\s*'.pathinfo($this->sourceSrxPath, PATHINFO_FILENAME).'~', 'sourceSrxPath='.pathinfo($file, PATHINFO_FILENAME));
+            $this->content = preg_replace('~sourceSrxPath\s*=\s*'.pathinfo($this->sourceSrxPath, PATHINFO_FILENAME).'~', 'sourceSrxPath='.pathinfo($file, PATHINFO_FILENAME), $this->content);
             $this->sourceSrxPath = $file;
         } else if($field === 'target'){
-            $this->content = preg_replace('~targetSrxPath\s*=\s*'.pathinfo($this->targetSrxPath, PATHINFO_FILENAME).'~', 'targetSrxPath='.pathinfo($file, PATHINFO_FILENAME));
+            $this->content = preg_replace('~targetSrxPath\s*=\s*'.pathinfo($this->targetSrxPath, PATHINFO_FILENAME).'~', 'targetSrxPath='.pathinfo($file, PATHINFO_FILENAME), $this->content);
             $this->targetSrxPath = $file;
         } else {
-            throw new ZfExtended_Exception('Invalid field "'.$field.'", must be "source" or "target"');
+            throw new ZfExtended_Mismatch('E2004', [ $field, 'field' ]);
         }
     }
 
@@ -162,8 +162,12 @@ writerOptions.escapeGT.b=false
     public function validate(bool $forImport=false) : bool {
         if(count($this->errors) > 0){
             $this->validationError = ucfirst(implode(', ', $this->errors));
+            // DEBUG
+            if($this->doDebug) { error_log('PIPELINE IS INVALID: '.$this->validationError); }
             return false;
         }
+        // DEBUG
+        if($this->doDebug) { error_log('PIPELINE '.$this->path.' IS VALID'); }
         return true;
     }
 

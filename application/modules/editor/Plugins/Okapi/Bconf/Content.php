@@ -91,7 +91,7 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfValidation');
         if(!$doCreateEmpty){
             if($content === NULL){
-                $this->parse(@file_get_contents($this->getPath()));
+                $this->parse(file_get_contents($path));
             } else {
                 $this->parse($content);
             }
@@ -113,7 +113,6 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
      */
     public function addFilter(string $identifier){
         $this->fprm[] = $identifier;
-        $this->update();
     }
 
     /**
@@ -122,7 +121,6 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
      */
     public function removeFilter(string $identifier){
         $this->fprm = array_diff($this->fprm, [ $identifier ]);
-        $this->update();
     }
 
     /**
@@ -131,7 +129,6 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
      */
     public function setFilters(array $identifiers){
         $this->fprm = $identifiers;
-        $this->update();
     }
 
     /**
@@ -166,7 +163,6 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
         } else {
             throw new ZfExtended_Exception('Invalid field "'.$field.'", must be "source" or "target"');
         }
-        $this->update();
     }
 
     /**
@@ -175,7 +171,6 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
      */
     public function setSteps(array $steps){
         $this->step = $steps;
-        $this->update();
     }
 
     /**
@@ -222,24 +217,16 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
         $this->refs = $json->refs;
         $this->step = $json->step;
         $this->fprm = $json->fprm;
-        $this->update();
     }
 
     /**
      * @return string
      */
-    private function unparse() : string {
+    public function getContent() : string {
         $data = new stdClass();
         $data->refs = $this->refs;
         $data->step = $this->step;
         $data->fprm = $this->fprm;
         return json_encode($data, JSON_PRETTY_PRINT);
-    }
-
-    /**
-     * Needs to be called after any content changes to keep the content in-sync
-     */
-    private function update(){
-        $this->content = $this->unparse();
     }
 }

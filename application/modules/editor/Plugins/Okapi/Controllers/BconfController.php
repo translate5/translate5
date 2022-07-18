@@ -163,83 +163,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
             ]);
         }
         $this->entityLoad();
-        $srxUploadFile = $_FILES['srx']['tmp_name'];
-        $srxUploadName = $_FILES['srx']['name'];
         $field = $this->getParam('purpose');
-        $otherField = ($field == 'source') ? 'target' : 'source';
-        $srx = $this->entity->getSrx($field);
-        $otherSrx = $this->entity->getSrx($otherField);
         $segmentation = editor_Plugins_Okapi_Bconf_Segmentation::instance();
-        $pipeline = $this->entity->getPipeline();
-        $content = $this->entity->getContent();
-        // set the srx-content from the upload and validate it
-        $srx->setContent(file_get_contents($srxUploadFile));
-        if($srx->validate()){
-            // if the SRX is a translate5 default SRX, we need no further validation
-            if($segmentation->isDefaultSrx($srx)){ // the isDefaultSrx call will update the content to the current revision if it is a default SRX
-                // if both srx's are identical, we copy the name/path over
-                if($srx->getHash() === $otherSrx->getHash()){
-                    $srx->setPath($otherSrx->getPath());
-                } else {
-                    $srx->setPath($this->entity->createPath('languages-'.$field));
-                    if($otherSrx->getPath() === $srx->getPath()){ // the almost impossible case: the target srx is called "languages-source" (or vice versa)
-                        $otherSrx->setPath($this->entity->createPath('languages-'.$otherField));
-                        $otherSrx->flush();
-                    }
-                }
-                $srx->flush();
-                $this->updateSrxInFiles($pipeline, $content, $field, $srx, $otherField, $otherSrx);
-            } else {
-                // real custom SRX uploads must be validated with OKAPI
-                $customFile = editor_Plugins_Okapi_Bconf_Segmentation::createCustomFile($srxUploadName, $field, $otherField);
-                $srx->setPath($this->entity->createPath($customFile));
-                if($otherSrx->getPath() === $srx->getPath()){ // another almost impossible case: custom name equals the other srx
-                    $customFile .= strval(rand(0, 9)); // so we put not much effort into this ...
-                    $srx->setPath($this->entity->createPath($customFile));
-                }
-                // create backups
-                rename($srx->getPath(), $srx->getPath().'.bu');
-                rename($pipeline->getPath(), $pipeline->getPath().'.bu');
-                rename($content->getPath(), $content->getPath().'.bu');
-                // write the uploaded srx to disk
-                $srx->flush();
-                // update the dependencies to disk
-                $this->updateSrxInFiles($pipeline, $content, $field, $srx, $otherField, $otherSrx);
-                // pack the bconf
-                $this->entity->pack();
-                // validate the bconf by testing it with okapi
-                $bconfValidationError = $this->entity->validate();
-                if($bconfValidationError !== NULL){
-                    // restore the original srx & pack the bconf
-                    unlink($srx->getPath());
-                    rename($srx->getPath().'.bu', $srx->getPath());
-                    unlink($pipeline->getPath());
-                    rename($pipeline->getPath().'.bu', $pipeline->getPath());
-                    unlink($content->getPath());
-                    rename($content->getPath().'.bu', $content->getPath());
-                    $this->entity->pack();
-                    $this->entity->invalidateCaches(); // invalidate the cached files, we changed the underlying files ...
-                    throw new editor_Plugins_Okapi_Exception('E1390', ['filename' => $srxUploadName, 'details' => $bconfValidationError]);
-                } else {
-                    // cleanup: remove backup files
-                    unlink($srx->getPath().'.bu');
-                    unlink($pipeline->getPath().'.bu');
-                    unlink($content->getPath().'.bu');
-                }
-            }
-        } else {
-            throw new editor_Plugins_Okapi_Exception('E1390', ['filename' => $srxUploadName, 'details' => $srx->getValidationError()]);
-        }
-    }
-
-    private function updateSrxInFiles(editor_Plugins_Okapi_Bconf_Pipeline $pipeline, editor_Plugins_Okapi_Bconf_Content $content,
-                                      string $field, editor_Plugins_Okapi_Bconf_Segmentation_Srx $srx,
-                                      string $otherField, editor_Plugins_Okapi_Bconf_Segmentation_Srx $otherSrx){
-        $pipeline->setSrxFile($field, $srx->getFile());
-        $pipeline->setSrxFile($otherField, $otherSrx->getFile());
-        $pipeline->flush();
-        $content->setSrxFile($field, $srx->getFile());
-        $content->setSrxFile($otherField, $otherSrx->getFile());
-        $content->flush();
+        $segmentation->processUpload($this->entity, $field, $_FILES['srx']['tmp_name'], basename($_FILES['srx']['name']));
     }
 }
