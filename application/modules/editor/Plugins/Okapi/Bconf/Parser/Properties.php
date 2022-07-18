@@ -162,8 +162,9 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties {
     public function add(string $propName, $value){
         if(!$this->has($propName) && $this->validateProp($propName, $value)){
             $this->map[$propName] = $value;
+        } else {
+            throw new ZfExtended_Exception('Property '.$propName.' already exists');
         }
-        throw new ZfExtended_Exception('Property '.$propName.' already exists');
     }
 
     /**
