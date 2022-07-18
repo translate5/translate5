@@ -82,7 +82,7 @@ class Dispatcher {
             return $appletB->getWeight() - $appletA->getWeight();
         });
 
-        //defaulting to editor applet if nothing given as target
+        //defaulting to the current registered module if nothing given as target
         $this->call($target ?? Zend_Registry::get('module'), false);
 
         //if we are still here (so not redirected away by above call),

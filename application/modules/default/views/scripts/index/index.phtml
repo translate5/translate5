@@ -33,10 +33,31 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+// default redirect to editor
+$redirectTo = 'editor';
 try {
-    editor_User::instance();
+    $user = editor_User::instance();
+
+    $acl = ZfExtended_Acl::getInstance();
+    /* @var $acl ZfExtended_Acl */
+
+    // get all initial_page acl records for all available user roles
+    $aclModules = $acl->getInitialPageModulesForRoles($user->getRoles());
+
+    $config = Zend_Registry::get('config');
+    $modulesOrder = explode(',',$config->runtimeOptions->modulesOrder);
+
+    // find the module redirect based on the modulesOrder config
+    foreach ($modulesOrder as $module){
+        if(in_array($module,$aclModules)){
+            $redirectTo = $module;
+            break;
+        }
+    }
 }catch (ZfExtended_NotAuthenticatedException $exception){
     // redirect to login page when no user session is found
-    Zend_Controller_Front::getInstance()->getResponse()->setRedirect(APPLICATION_RUNDIR.'/login');
+    $redirectTo = 'login';
 }
+
+Zend_Controller_Front::getInstance()->getResponse()->setRedirect(APPLICATION_RUNDIR.'/'.$redirectTo);
 ?>
