@@ -68,7 +68,7 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties {
 
     /**
      * Returns a hashtable of the decoded properties
-     * @return bool
+     * @return array
      */
     public function getProperties() : array {
         return $this->map;

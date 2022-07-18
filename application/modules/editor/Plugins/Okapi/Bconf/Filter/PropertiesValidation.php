@@ -118,7 +118,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_PropertiesValidation extends edito
                 $missingVals[] = $validationVar;
             } else {
                 try {
-                    $this->referenceProps->set($this->props->get($validationVar));
+                    $this->referenceProps->set($validationVar, $this->props->get($validationVar));
                 } catch(Exception $e) {
                     // highly improbable but who knows ...
                     // DEBUG
