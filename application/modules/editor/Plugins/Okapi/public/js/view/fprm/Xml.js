@@ -26,10 +26,8 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
-
     width: '61%',
     defaultFocus: 'textarea',
-
     formItems: [{
         xtype: 'textarea',
         width: '100%',
@@ -44,22 +42,27 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
         checkChangeEvents: [],
         lastCheck: {},
         validator: function(xml){
-            var ret = true, lastCheck = this.lastCheck, me = this;
+            var ret = true, lastCheck = this.lastCheck;
             if(lastCheck.xml === xml){
-                ret = lastCheck.ret
+                ret = lastCheck.ret;
             } else if(xml){
                 lastCheck.xml = xml;
-                ret = Editor.util.Util.getXmlError(xml || '<xml/>')
+                ret = Editor.util.Util.getXmlError(xml || '<xml/>');
             }
-            return lastCheck.ret = ret;
+            lastCheck.ret = ret;
+            return ret;
         }
     }],
 
+    dataLoaded: function(height){
+        this.down('[name=xml]').setHeight(height - 106);
+    },
+
     parseFprm(fprm){
-        return {xml: fprm}
+        return { xml: fprm };
     },
 
     compileFprm: function(){
-        return this.down('[name=xml]').getValue()
+        return this.down('[name=xml]').getValue();
     }
 })

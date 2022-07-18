@@ -44,14 +44,14 @@ class editor_Plugins_Okapi_Bconf_Filters {
      * @var string[]
      */
     const GUIS = [
-        'okf_html' => ['html'],
-        'okf_xml' => ['xml'],
-        'okf_xmlstream' => ['xml'],
+        'okf_html' => ['class' => 'Yaml', 'extensions' => ['html']],
+        'okf_xml' => ['class' => 'Xml', 'extensions' => ['xml']],
+        'okf_xmlstream' => ['class' >= 'Yaml', 'extensions' => ['xml']],
         /*
-        'okf_icml' => [], // TODO: a testfile is required for any filter-GUI
-        'okf_idml' => ['idml'],
+        'okf_idml' => ['class' => 'Idml', 'extensions' => ['idml']],
+        'okf_icml' => ['class' => 'Icml', 'extensions' => ['icml']], // TODO: a testfile is required
         */
-        'okf_openxml' => ['docx', 'pptx', 'xlsx']
+        'okf_openxml' => ['class' => 'Openxml', 'extensions' => ['docx', 'pptx', 'xlsx']]
     ];
     /**
      * A list of file-extensions, that validation files exist for.
@@ -105,11 +105,11 @@ class editor_Plugins_Okapi_Bconf_Filters {
         if(!self::hasGui($filterType)){
             return '';
         }
-        $name = ucfirst(substr($filterType, 4));
+        $className = self::GUIS[$filterType]['class'];
         if($fullPath){
-            return 'Editor.plugins.Okapi.view.fprm.'.$name;
+            return 'Editor.plugins.Okapi.view.fprm.'.$className;
         }
-        return $name;
+        return $className;
     }
 
     /**
@@ -321,8 +321,8 @@ class editor_Plugins_Okapi_Bconf_Filters {
     public function validate() : bool {
         $valid = true;
         $extensions = self::TESTABLE_EXTENSIONS;
-        foreach(self::GUIS as $type => $guiExtensions){
-            foreach($guiExtensions as $guiExtension){
+        foreach(self::GUIS as $type => $data){
+            foreach($data['extensions'] as $guiExtension){
                 if(!in_array($guiExtension, $extensions)){
                     $extensions[] = $guiExtension;
                 }
@@ -335,7 +335,7 @@ class editor_Plugins_Okapi_Bconf_Filters {
                 $valid = false;
             }
         }
-        // TODO BCONF: add GUI-datafiles to this validation
+        // TODO BCONF: add GUI-datafiles/translations to this validation
         return $valid;
     }
 }

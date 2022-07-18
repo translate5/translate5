@@ -146,8 +146,11 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     public function getfprmAction(){
         $this->entityLoad();
         $fprm = $this->entity->getFprm();
-        $fprm->output();
-        exit;
+        // Create the data to send to the Frontend GUIs
+        $this->view->type = $fprm->getType();
+        $this->view->raw = $fprm->getContent();
+        $this->view->transformed = $fprm->crateTransformedData();
+        $this->view->translations = $fprm->crateTranslationData();
     }
 
     /**

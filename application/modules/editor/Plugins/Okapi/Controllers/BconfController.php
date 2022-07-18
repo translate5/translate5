@@ -81,7 +81,6 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
 
     public function uploadbconfAction() {
         $ret = new stdClass();
-
         if(empty($_FILES)){
             throw new ZfExtended_ErrorCodeException('E1212', [
                 'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
@@ -91,7 +90,6 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $name = $this->getParam('name');
         $description = $this->getParam('description');
         $customerId = $this->getParam('customerId');
-
         if($name == NULL){
             $name = pathinfo($postFile['name'], PATHINFO_FILENAME);
         }
@@ -101,10 +99,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         if($customerId != NULL){
             $customerId = intval($customerId);
         }
-
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->import($postFile['tmp_name'], $name, $description, $customerId);
-
         $ret->id = $bconf->getId();
         $ret->success = !empty($ret->id);
 

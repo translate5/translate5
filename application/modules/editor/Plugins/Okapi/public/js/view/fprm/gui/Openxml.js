@@ -4,7 +4,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.gui.Openxml', {
         //[ "text", "parentSelector", additionalConfig]
 
         //general
-        'maxAttributeSize.i': ['Maximal attribute size of xml attributes', 'general', {hidden: true}],
+        'maxAttributeSize.i': ['Maximal attribute size of xml attributes', 'general', { hidden: true }],
 
         'bPreferenceTranslateDocProperties.b': ['Translate Document Properties', 'general',],
         'bPreferenceTranslateComments.b': ['Translate Comments', 'general',],
@@ -31,15 +31,13 @@ Ext.define('Editor.plugins.Okapi.view.fprm.gui.Openxml', {
 
         //excel
         'bPreferenceTranslateExcelHidden.b': ['Translate Hidden Rows and Columns', 'excel',],
-        'bPreferenceTranslatePowerpointHidden.b': ['', 'pp', {hidden: true}], // depends on bPreferenceTranslateExcelHidden,
-
+        'bPreferenceTranslatePowerpointHidden.b': ['', 'pp', { hidden: true }], // depends on bPreferenceTranslateExcelHidden,
         'bPreferenceTranslateExcelExcludeColumns.b': ['Exclude Marked Columns in Each Sheet', 'excel',],
         'bPreferenceTranslateExcelSheetNames.b': ['Translate Sheet Names', 'excel',],
         'bPreferenceTranslateExcelDiagramData.b': ['Translate Diagram Data (e.g. Smart Art)', 'excel',],
         'bPreferenceTranslateExcelDrawings.b': ['Translate Drawings (e.g. Text fields)', 'excel',],
-
         'tsExcelExcludedColors.i': ['Colours to Exclude', 'excel', {storeData: 'colors'}],
-        'bPreferenceTranslateExcelExcludeColors.b': ['text', 'excel', {hidden: true}], // depends on tsExcelExcludedColors.selection.length],
+        'bPreferenceTranslateExcelExcludeColors.b': ['text', 'excel', { hidden: true }], // depends on tsExcelExcludedColors.selection.length],
         'subfilter': ['Name of subfilter for cell content', 'excel',],
         'tsExcelExcludedColumns.i': ['Columns to Exclude', 'excel', {storeData: 'columns'}],
 
@@ -48,11 +46,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.gui.Openxml', {
         'bPreferenceTranslatePowerpointMasters.b': ['Translate Masters', 'pp',],
         'bPreferenceIgnorePlaceholdersInPowerpointMasters.b': ['Ignore Placeholder Text in Masters', 'pp',],
         'bPreferencePowerpointIncludedSlideNumbersOnly.b': ['Translate included slide numbers only', 'pp',],
-
         'tsPowerpointIncludedSlideNumbers.i': ['Included Slide Numbers', 'pp', {storeData: 'numbers'}],
-
-        'sPreferenceLineSeparatorReplacement': ['', '', {hidden: true}], // not visible in Rainbow
-        'bReorderPowerpointNotesAndComments.b': ['', '', {hidden: true}], // not visible in Rainbow
-        'bPreferenceAllowEmptyTargets.b': ['', '', {hidden: true}], // not visible in Rainbow
+        'sPreferenceLineSeparatorReplacement': ['', '', { hidden: true }], // not visible in Rainbow
+        'bReorderPowerpointNotesAndComments.b': ['', '', { hidden: true }], // not visible in Rainbow
+        'bPreferenceAllowEmptyTargets.b': ['', '', { hidden: true }], // not visible in Rainbow
     }
-})
+});

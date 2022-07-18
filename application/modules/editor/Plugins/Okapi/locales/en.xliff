@@ -176,6 +176,18 @@
     <source>Es muss mindestens ein Dateityp angegeben werden</source>
     <target>At least one filetype must be specified</target>
 </trans-unit>
+<trans-unit id='QmVhcmJlaXRlIEZpbHRlciBUeXAgezB9IHZvbiBCY29uZiB7MX0='>
+    <source>Bearbeite Filter Typ {0} von Bconf {1}</source>
+    <target>Editing filter type {0} of bconf {1}</target>
+</trans-unit>
+<trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZSwgZGFoZXIga29ubnRlIGRlciBGaWx0ZXIgbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu'>
+    <source>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</source>
+    <target>The filter could not be saved because your changes seem to be invalid</target>
+</trans-unit>
+<trans-unit id='RmlsdGVyIHd1cmRlIGVyZm9sZ3JlaWNoIGdlc3BlaWNoZXJ0'>
+    <source>Filter wurde erfolgreich gespeichert</source>
+    <target>The filter was saved successfully</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

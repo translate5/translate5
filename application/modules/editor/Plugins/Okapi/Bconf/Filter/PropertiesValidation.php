@@ -101,7 +101,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_PropertiesValidation extends edito
         return $this->needsRepair;
     }
 
-    /**
+    /**The file has an invalid value
      * Validates a FPRM based on it's type
      * We will ignore extra-values that may be in the FPRM compared to the reference
      * We will add missing values in comparision to the original file

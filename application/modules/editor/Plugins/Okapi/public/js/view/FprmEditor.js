@@ -30,7 +30,7 @@
  * @property {string} fprm The raw content of the .fprm file
  */
 Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
-    extend: 'Ext.Window',
+    extend: 'Ext.window.Window',
     alias: 'widget.fprmeditor',
     modal: true,
     maximizable: true,
@@ -46,31 +46,36 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     title: {
         text: "FPRM Editor"
     },
+    fprmType: null,
+    fprmRawData: null,
+    fprmData: null,
     config: {
+        // TODO: rework updateFprm, setFprm, getFprm, applyFprm
+        // TODO: rework updateBconfFilter, setBconfFilter, getBconfFilter, applyBconfFilter
         bconfFilter: null,
         fprm: undefined
     },
     // Shortcuts:
     formPanel: null,
+    formItems: [], // to be defined in extending classes
     form: null,
     strings: {
         title: "#UT#Editiere Filter Typ {0} von Bconf {1}",
         save: "#UT#Speichern",
         cancel: "#UT#Abbrechen",
+        invalidTitle: "#UT#Bearbeitung fehlerhaft",
         changesInvalid: "#UT#Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden",
-        successfullySaved: "#UT#Filter wurde erfolgreich gespeichert"
+        successfullySaved: "#UT#Der Filter wurde erfolgreich gespeichert"
     },
-
     tools: [{
         iconCls: 'x-fa fa-undo',
         tooltip: '#UT#Refresh',
         handler: function(e, el, owner){
             var editor = owner.up('window');
-            editor.setFprm(); // unset old value
+            editor.setFprm(''); // unset old value
             editor.load();
         }
     }],
-
     items: [{
         xtype: 'form',
         itemId: 'fprm',
@@ -80,7 +85,6 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         defaults: { labelClsExtra: Ext.baseCSSPrefix + 'selectable' },
         items: [], // Fill in init method
     }],
-
     fbar: [{
         xtype: 'button',
         text: 'Save',
@@ -109,13 +113,15 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     },
 
     load: function(){
-        var me = this;
-        me.setLoading();
-        this.loadFprmData().then(function(fprm){
-            me.setLoading(false);
-            me.setFprm(fprm);
-        });
+        this.setLoading();
+        this.loadFprmData();
     },
+    /**
+     * Can be overwritten to init the layout after the data has been loaded
+     * @param {int} height
+     */
+    dataLoaded: function(height){ },
+
     initComponent: function(){
         var titletext = this.strings.title.replace('{0}', '<i>“'+this.bconfFilter.get('okapiType')+'”</i>');
         this.title.text = titletext.replace('{1}', '<i>“'+this.bconfFilter.get('name')+'”</i>');
@@ -145,7 +151,6 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         if(fprm !== undefined){
             const parsed = this.parseFprm(fprm);
             this.form.setValues(parsed);
-            //this.form.setValues(parsed) // Done by setupForm
             // TODO BCONF only enable save btn when different from last disabled state
             this.down('button#save').enable();
         }
@@ -175,10 +180,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             currentValues = me.form.getValues();
         if(/* !Ext.Object.equals(currentValues, me.lastInvalidValues) && */ this.form.isValid()){
             me.setLoading();
-            me.saveFprmData(me.compileFprm()).then(function resolve(){
-                me.setLoading(false);
-                me.close();
-            });
+            me.saveFprmData(me.compileFprm());
         } else {
             this.invalidFields = this.formPanel.query('field{getActiveErrors().length}');
             this.lastInvalidValues = currentValues;
@@ -200,9 +202,37 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      */
     loadFprmData(){
         var me = this;
+        Ext.Ajax.request({
+            url: me.bconfFilter.getProxy().getUrl() + '/getfprm',
+            method: 'GET',
+            params: {
+                id: me.bconfFilter.id
+            },
+            success: function(response){
+                var data = Ext.util.JSON.decode(response.responseText),
+                    height = window.innerHeight - 100;
+                me.setLoading(false);
+                Ext.apply(me.strings, data.translations);
+                me.fprmType = data.type;
+                me.fprmRawData = data.raw;
+                me.fprmData = data.transformed;
+                // TODO BCONF: remove
+                me.setFprm(data.raw);
+                me.setHeight(height);
+                me.dataLoaded(height);
+            },
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+    },
+
+    loadFprmDataOLD(){
+        var me = this;
         return new Promise(function(resolve, reject){
             Ext.Ajax.request({
                 url: me.bconfFilter.getProxy().getUrl() + '/getfprm',
+                method: 'GET',
                 params: {
                     id: me.bconfFilter.id
                 },
@@ -210,7 +240,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                     if(success){
                         resolve(response.responseText);
                     } else {
-                        resolve();
+                        resolve('{}');
                         Editor.app.getController('ServerException').handleException(response);
                     }
                 }
@@ -225,16 +255,32 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      */
     saveFprmData(rawData){
         var me = this;
-        return Ext.Ajax.request({
+        Ext.Ajax.request({
             url: me.bconfFilter.getProxy().getUrl() + '/savefprm',
             headers: {'Content-Type': 'application/octet-stream'},
-            params: { id: me.bconfFilter.id },
+            params: {
+                id: me.bconfFilter.id,
+                type: me.fprmType
+            },
             rawData: rawData,
+            success: function(response){
+                var result = Ext.util.JSON.decode(response.responseText);
+                me.setLoading(false);
+                if(result.success){
+                    me.close();
+                    Editor.MessageBox.addSuccess(me.strings.successfullySaved);
+                } else {
+                    Ext.Msg.show({
+                        title: me.strings.invalidTitle,
+                        message: me.strings.changesInvalid+'<br/><i>('+result.error+')</i>',
+                        icon: Ext.Msg.ERROR
+                    });
+                }
+            },
             failure: function(response){
                 me.setLoading(false);
                 Editor.app.getController('ServerException').handleException(response);
             }
         });
     }
-
 });

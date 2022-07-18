@@ -26,10 +26,8 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Icml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
-
     width: '61%',
     defaultFocus: 'textarea',
-
     formItems: [{
         xtype: 'textarea',
         width: '100%',
@@ -60,23 +58,24 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Icml', {
                         lastCheck.highlightTask.destroy();
                     }
                     lastCheck.highlightTask = this.up('window').on('activate', function(){
-                        this.focus()
+                        this.focus();
                         setTimeout(function(){
-                            window.find(line + '\n', true, false, true)
+                            window.find(line + '\n', true, false, true);
                             delete lastCheck.highlightTask;
                         }, 50)
-                    }, this, {single: true, delay: 50, destroyable:true})
+                    }, this, {single: true, delay: 50, destroyable:true});
                 }
             }
-            return lastCheck.ret = ret;
+            lastCheck.ret = ret;
+            return ret;
         }
     }],
 
     parseFprm(fprm){
-        return {xml: fprm}
+        return { xml: fprm };
     },
 
     compileFprm: function(){
-        return this.down('[name=xml]').getValue()
+        return this.down('[name=xml]').getValue();
     }
 })

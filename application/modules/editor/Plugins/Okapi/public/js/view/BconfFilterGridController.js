@@ -94,11 +94,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         if(toggled){
             store.removeFilter('defaultsFilter');
             btn.setText(this.getView().strings.hideDefaultFilters);
-            btn.setIconCls('x-fa fa-eye-slash')
+            btn.setIconCls('x-fa fa-eye-slash');
         } else {
             store.addFilter(store.defaultsFilter);
             btn.setText(this.getView().strings.showDefaultFilters);
-            btn.setIconCls('x-fa fa-eye')
+            btn.setIconCls('x-fa fa-eye');
         }
     },
 

@@ -91,15 +91,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         me.getStore().getProxy().setBconfId(bconf.id); // for records and backend filter
     },
     viewConfig: {
-        getRowClass: function(bconf){
-            var cls = '';
-            if(!bconf.get('editable')){
-                cls +='t5noneditable ';
+        getRowClass: function(record){
+            if(record.get('isCustom')){
+                return 't5level0';
+            } else {
+                return 't5level1 t5default';
             }
-            if(!bconf.get('isCustom')){
-                cls += 't5level1 t5default ';
-            }
-            return cls;
         },
         reference: 'gridview'
     },

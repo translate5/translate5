@@ -26,18 +26,11 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
-    alternateClassName: [
-        'Editor.plugins.Okapi.view.fprm.Html',
-        'Editor.plugins.Okapi.view.fprm.Xmlstream'
-    ],
-
     width: '61%',
     defaultFocus: 'textarea',
-
     formItems: [{
         xtype: 'textarea',
         width: '100%',
-        minWidth: 800,
         height: '100%',
         name: 'yaml',
         fieldCls: 'mono',
@@ -48,9 +41,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
         checkChangeEvents: [],
         lastCheck: {},
         validator: function(yaml){
-            var ret = true, lastCheck = this.lastCheck, me = this;
+            var ret = true, lastCheck = this.lastCheck;
             if(lastCheck.yaml === yaml){
-                ret = lastCheck.ret
+                ret = lastCheck.ret;
             } else {
                 lastCheck.yaml = yaml;
                 var unevenMatch = lastCheck.unevenMatch = yaml.match(/^ ( {2})*[^ ]/m);
@@ -58,29 +51,33 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
                     var lineBreakAfter = yaml.indexOf('\n', unevenMatch.index),
                         lineBreakBefore = yaml.lastIndexOf('\n', unevenMatch.index) + 1,
                         line = yaml.substring(lineBreakBefore, lineBreakAfter);
-                        ret = '#UT#Uneven number of leading spaces at line <br>"<span style=\"font-family:monospace\"">'
-                            + line + '</span>"';
+                        ret = '#UT#Uneven number of leading spaces at line <br>"<span style=\"font-family:monospace\"">' + line + '</span>"';
                     if(lastCheck.highlightTask){
                         lastCheck.highlightTask.destroy();
                     }
                     lastCheck.highlightTask = this.up('window').on('activate', function(){
-                        this.focus()
-                        setTimeout(function(){
-                            window.find(line + '\n', true, false, true)
+                        this.focus();
+                        window.setTimeout(function(){
+                            window.find(line + '\n', true, false, true);
                             delete lastCheck.highlightTask;
-                        }, 50)
-                    }, this, {single: true, delay: 50, destroyable:true})
+                        }, 50);
+                    }, this, { single: true, delay: 50, destroyable: true });
                 }
             }
-            return lastCheck.ret = ret;
+            lastCheck.ret = ret;
+            return ret;
         }
     }],
 
+    dataLoaded: function(height){
+        this.down('[name=yaml]').setHeight(height - 106);
+    },
+
     parseFprm(fprm){
-        return {yaml: fprm}
+        return { yaml: fprm };
     },
 
     compileFprm: function(){
-        return this.down('[name=yaml]').getValue()
+        return this.down('[name=yaml]').getValue();
     }
 })

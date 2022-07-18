@@ -80,7 +80,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
             if($this->doDebug){ error_log('FPRM VALIDATION ERROR: Can not validate fprm file '.$this->fprm->getFile().' because for okapi-type "'.$this->type.'" there is no GUI set'); }
             throw new ZfExtended_Exception('Can not validate fprm file '.$this->fprm->getFile().' because for okapi-type "'.$this->type.'" there is no GUI set');
         }
-        if(count(editor_Plugins_Okapi_Bconf_Filters::GUIS[$this->type]) < 1){
+        if(count(editor_Plugins_Okapi_Bconf_Filters::GUIS[$this->type]['extensions']) < 1){
             // DEBUG
             if($this->doDebug){ error_log('FPRM VALIDATION ERROR: Can not validate fprm file '.$this->fprm->getFile().' because for okapi-type "'.$this->type.'" there are no testfiles in editor_Plugins_Okapi_Bconf_Filters::GUIS set'); }
             throw new ZfExtended_Exception('Can not validate fprm file '.$this->fprm->getFile().' because for okapi-type "'.$this->type.'" there are no testfiles in editor_Plugins_Okapi_Bconf_Filters::GUIS set');
@@ -97,7 +97,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
      */
     protected function getTestFilePath() : string {
         // existance already checked in constructor
-        $testExtensions = editor_Plugins_Okapi_Bconf_Filters::GUIS[$this->type];
+        $testExtensions = editor_Plugins_Okapi_Bconf_Filters::GUIS[$this->type]['extensions'];
         $mappedExtensions = $this->bconf->getExtensionMapping()->findExtensionsForFilter($this->fprm->getIdentifier());
         // the easy case: we have one of the testable extensions mapped
         foreach($mappedExtensions as $extension){

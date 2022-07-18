@@ -97,15 +97,15 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     },
     viewConfig: {
         enableTextSelection: true, // neccessary for pointer class to have effect on whole row
-        getRowClass: function({data: bconf}){
+        getRowClass: function(record){
             var classes = [],
                 customer = this.grid.isCustomerGrid ? this.grid.ownerCt.ownerCt.getViewModel().getData().list.selection : null;
-            if(!this.grid.isCustomerGrid || (customer && customer.get('id') === bconf.customerId)){
-                classes.push('pointer');
+            if(!this.grid.isCustomerGrid || (customer && customer.get('id') === record.get('customerId'))){
+                classes.push('t5level0 pointer');
             } else {
                 classes.push('t5level1');
             }
-            if((customer && customer.get('defaultBconfId')) ? (customer.get('defaultBconfId') === bconf.id) : bconf.isDefault){
+            if((customer && customer.get('defaultBconfId')) ? (customer.get('defaultBconfId') === record.id) : record.get('isDefault')){
                 classes.push('t5chosenDefault');
             }
             return classes.join(' ');
@@ -262,6 +262,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     tooltip: me.strings.configureFilters,
                     isAllowedFor: 'bconfEdit',
                     glyph: 'f0b0@FontAwesome5FreeSolid',
+                    isDisabled: 'isEditDisabled',
                     handler: 'showFilterGrid',
                     width: 50
                 }]
@@ -308,7 +309,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     {
                         isAllowedFor: 'bconfEdit',
                         glyph: 'f093@FontAwesome5FreeSolid',
-                        isDisabled: 'isSRXUploadDisabled',
+                        isDisabled: 'isEditDisabled',
                         purpose: 'source',
                         tooltip: new Ext.Template(me.text_cols.fileUpTemplate)
                             .apply(['Source SRX', me.text_cols.fileSuffix]),
@@ -335,7 +336,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     {
                         isAllowedFor: 'bconfEdit',
                         glyph: 'f093@FontAwesome5FreeSolid',
-                        isDisabled: 'isSRXUploadDisabled',
+                        isDisabled: 'isEditDisabled',
                         purpose: 'target',
                         tooltip: new Ext.Template(me.text_cols.fileUpTemplate)
                             .apply(['Target SRX', me.text_cols.fileSuffix]),

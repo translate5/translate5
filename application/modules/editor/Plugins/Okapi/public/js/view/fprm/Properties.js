@@ -30,14 +30,12 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
-    alternateClassName: [],
-
     fieldConfigs: {},
     initComponent: function(){
         this.callParent(arguments);
-        var descriptionClassName = this.self.getName().replace('fprm', 'fprm.gui')
-        var descriptionClass = Ext.ClassManager.lookupName(descriptionClassName)
-        if(descriptionClass){ this.readDescription(descriptionClass) }
+        var descriptionClassName = this.self.getName().replace('fprm', 'fprm.gui');
+        var descriptionClass = Ext.ClassManager.lookupName(descriptionClassName);
+        if(descriptionClass){ this.readDescription(descriptionClass); }
     },
 
     readDescription: function(descriptionClass){
@@ -53,7 +51,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             cfg.parentSelector = 'fprm_' + fields[name][parentSelector]
             fieldConfigs[name] = cfg;
             parent = Ext.getCmp(cfg.parentSelector) || this.formPanel
-            parent.add(cfg)
+            parent.add(cfg);
         }
     },
 
@@ -102,8 +100,8 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     },
 
     compileFprm: function(){
-        var values = this.getValues()
-        return '#v1\n' + Object.entries(values).map(nameVal => nameVal.join('=')).join('\n')
+        var values = this.getValues();
+        return '#v1\n' + Object.entries(values).map(nameVal => nameVal.join('=')).join('\n');
     },
 
 });

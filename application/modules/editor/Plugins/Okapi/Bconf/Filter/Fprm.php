@@ -65,6 +65,11 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
      * @var array
      */
     const PLAIN_TYPES = ['okf_wiki'];
+    /**
+     * This contradicts the translate5 standard "de" but "en" is the rainbow default language
+     * @var string
+     */
+    const DEFAULT_GUI_LANGUAGE = 'en';
 
     /**
      * Can be: "properties" | "xml" | "plain" | "yaml"
@@ -161,6 +166,40 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
         if($this->doDebug){ error_log('FPRM FILE '.basename($this->path).' of type '.$this->type.' is invalid: No content found'); }
         $this->validationError = 'No content found';
         return false;
+    }
+
+    /**
+     * Creates the transformed data for the frontend
+     * @return array|stdClass
+     */
+    public function crateTransformedData(){
+        if($this->type === self::TYPE_XPROPERTIES){
+            $parser = new editor_Plugins_Okapi_Bconf_Parser_Properties($this->content);
+            return $parser->getProperties();
+        } else if($this->type === self::TYPE_XML){
+            $xml = simplexml_load_string($this->content,'SimpleXMLElement',LIBXML_NOCDATA);
+            $json = json_encode($xml, JSON_UNESCAPED_UNICODE |  JSON_UNESCAPED_SLASHES);
+            return json_decode($json);
+        }
+        return [];
+    }
+
+    /**
+     * Retrieves the FPRM GUI translations for the current type.
+     * The convention is, that translationsare stored as JSON-files in /modules/editor/Plugins/Okapi/locales/
+     * with the naming-scheme "$okapiType.$locale.json"
+     * @return stdClass
+     */
+    public function crateTranslationData() : stdClass {
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $translationsDir = APPLICATION_PATH.'/modules/editor/Plugins/Okapi/locales/';
+        $json = '{}';
+        if(file_exists($translationsDir.$this->getOkapiType().'.'.$translate->getSourceCodeLocale().'.json')){
+            $json = file_get_contents($translationsDir.$this->getOkapiType().'.'.$translate->getSourceCodeLocale().'.json');
+        } else if(file_exists($translationsDir.$this->getOkapiType().'.'.self::DEFAULT_GUI_LANGUAGE.'.json')){
+            $json = file_get_contents($translationsDir.$this->getOkapiType().'.'.self::DEFAULT_GUI_LANGUAGE.'.json');
+        }
+        return json_decode($json);
     }
 
     /**

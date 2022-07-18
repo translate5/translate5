@@ -236,10 +236,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             }
         });
     },
-    isDeleteDisabled: function({grid}, rowIndex, colIndex, item, {data: bconf}){
-        return bconf.isDefault || grid.isCustomerGrid && !bconf.customerId || bconf.name === Editor.data.plugins.Okapi.systemStandardBconfName;
+    isDeleteDisabled: function(view, rowIndex, colIndex, item, record){
+        return record.get('isDefault') || view.grid.isCustomerGrid && !record.get('customerId') || record.get('name') === Editor.data.plugins.Okapi.systemStandardBconfName;
     },
-    isSRXUploadDisabled: function(view, rowIndex, colIndex, item, record){
+    isEditDisabled: function(view, rowIndex, colIndex, item, record){
         return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemStandardBconfName));
     },
 

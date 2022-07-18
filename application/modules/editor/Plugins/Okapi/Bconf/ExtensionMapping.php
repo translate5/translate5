@@ -475,7 +475,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         $bconfFilter = new editor_Plugins_Okapi_Bconf_Filter_Entity();
         $existingFilters = [];
         $existingNames = [];
-        $filesysFilters = [];
+        $allFilters = [];
         foreach($bconfFilter->getRowsByBconfId($this->bconf->getId()) as $filterData){
             $identifier = editor_Plugins_Okapi_Bconf_Filters::createIdentifier($filterData['okapiType'], $filterData['okapiId']);
             $existingFilters[$identifier] = $filterData['id'];
@@ -497,19 +497,25 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 if(!array_key_exists($identifier, $existingFilters)){
                     $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm($filterFile);
                     $this->flushFilterToDatabase($identifier, $fprm->getHash(), $existingNames);
+                    // DEBUG
+                    if($this->doDebug){ error_log('ExtensionMapping rescanFilters: added custom filter to DB '.$identifier); }
                 }
-                $filesysFilters[$identifier] = $identifier;
+                $allFilters[] = $identifier;
             }
          }
         // remove the filters that exist in the database but have no corresponding file
         foreach($existingFilters as $identifier => $id){
-            if(!array_key_exists($identifier, $filesysFilters)){
-                $bconfFilter->load($filesysFilters[$identifier]);
+            if(!in_array($identifier, $allFilters)){
+                $bconfFilter->load($id);
                 $bconfFilter->delete();
                 // DEBUG
                 if($this->doDebug){ error_log('ExtensionMapping rescanFilters: deleted non-existing filter '.$identifier.' from database'); }
             }
         }
+        // finally: adjust the content.json
+        $content = $this->bconf->getContent();
+        $content->setFilters($allFilters);
+        $content->flush();
     }
 
     /**
