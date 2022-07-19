@@ -516,6 +516,8 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         $content = $this->bconf->getContent();
         $content->setFilters($allFilters);
         $content->flush();
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping rescanFilters: The bconf "'.$this->bconf->getName().'" has '.count($allFilters).' custom filters: [ '.implode(', ', $allFilters).' ]'); }
     }
 
     /**
