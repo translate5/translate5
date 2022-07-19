@@ -47,7 +47,7 @@ class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
      */
     public function init()
     {
-        $this->addController('TMMaintenanceController');
+        $this->addController('TmmaintenanceController');
         $this->addController('ApiController');
         $this->initApplet();
         $this->initRoutes();
