@@ -25,4 +25,4 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-DELETE FROM `Zf_acl_rules` WHERE `role` = 'editor' AND `resource` IN ('editor_tmmaintenance', 'editor_plugins_tmmaintenance_api');
+DELETE FROM `Zf_acl_rules` WHERE `role` = 'TMMaintenance' OR `right` = 'TMMaintenance';

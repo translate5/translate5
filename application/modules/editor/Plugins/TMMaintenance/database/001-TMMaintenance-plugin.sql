@@ -25,5 +25,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'editor_tmmaintenance', 'all');
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'editor', 'editor_plugins_tmmaintenance_api', 'all');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'TMMaintenance', 'editor_tmmaintenance', 'all');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'TMMaintenance', 'editor_plugins_tmmaintenance_api', 'all');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'setaclrole', 'TMMaintenance');
