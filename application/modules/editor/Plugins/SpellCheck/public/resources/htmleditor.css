@@ -33,3 +33,4 @@ END LICENSE AND COPYRIGHT
 .spellcheck.grammarError, .spellcheck.grammarError .trackchanges {border-color: #ab8906;} /* dark yellow */
 .spellcheck.suggestion, .spellcheck.suggestion .trackchanges {border-color: #458fe6;}     /* blue */
 .spellcheck.spellError, .spellcheck.spellError .trackchanges {border-color: #e645a8;}     /* red-violet */
+.spellcheck {z-index: 1; position: relative;}

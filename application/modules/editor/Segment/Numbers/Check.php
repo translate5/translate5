@@ -108,13 +108,15 @@ class editor_Segment_Numbers_Check {
      */
     public function __construct(editor_Models_Task $task, $targetField, editor_Models_Segment $segment) {
 
-        // Get source text, strip tags, replace htmlentities, strip whitespace and punctuation chars
+        // Get source text, and replace whitespace-placeholder-characters for non-breaking space, linebreak and tab with themselves
+        // Note: the non-commented space (1st item in 2nd arg of str_replace call) is the non-breaking space with code 160
+        //       and the commented one is an ordinary space with code 32
         $source = $task->getEnableSourceEditing() ? $segment->getSourceEditToSort() : $segment->getSourceToSort();
-        $source = strip_tags($source);
+        $source = str_replace(['⎵', '↵', '→'], [" ", /*" ", */"\n", "\t"], $source);
 
-        // Get target text, strip tags, replace htmlentities, strip whitespace and punctuation chars
+        // Do same for target text
         $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
-        $target = strip_tags($target);
+        $target = str_replace(['⎵', '↵', '→'], [" ", /*" ", */"\n", "\t"], $target);
 
         // Load langs [id => rfc5646] pairs if not yet loaded
         self::$lang = self::$lang ?? ZfExtended_Factory

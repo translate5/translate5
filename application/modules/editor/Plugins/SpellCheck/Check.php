@@ -89,6 +89,11 @@ class editor_Plugins_SpellCheck_Check {
         $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
         $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
 
+        // Replace whitespace-placeholders with the actual characters they represent
+        // Note: first item in the second arg is not an ordinary space having code 32,
+        // but is a non-breaking space having code 160
+        $target = str_replace(['⎵', '↵', '→'], [" ", "\n", "\t"], $target);
+
         // Get LanguageTool response
         $data = $connector->getMatches($target, $spellCheckLang);
 

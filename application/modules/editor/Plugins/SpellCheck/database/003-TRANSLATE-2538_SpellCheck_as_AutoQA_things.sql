@@ -63,3 +63,6 @@ WHERE `name` = "runtimeOptions.plugins.SpellCheck.active";
 UPDATE `LEK_task_config`
 SET `name` = "runtimeOptions.plugins.SpellCheck.liveCheckOnEditing"
 WHERE `name` = "runtimeOptions.plugins.SpellCheck.active";
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
+('runtimeOptions.autoQA.segmentWhitespaceChars', 1, 'editor', 'system', '⎵↵→', '⎵↵→', '', 'string', 'If given, defines which characters are treated as segment whitespace characters', 8, 'Defines the segment whitespace characters', 'Editor: QA', '');

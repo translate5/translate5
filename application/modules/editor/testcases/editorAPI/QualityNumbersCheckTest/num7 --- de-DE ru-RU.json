@@ -130,6 +130,53 @@
         },
         {
             "qid": -1,
+            "qtype": "spellcheck",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "grammarError",
+                    "text": "Grammar",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "spellError",
+                    "text": "Spell",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "suggestion",
+                    "text": "Style",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "LanguageTool",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
             "qtype": "length",
             "qcount": 0,
             "qcomplete": true,
@@ -611,7 +658,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "92437",
+                    "qid": "38569",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
