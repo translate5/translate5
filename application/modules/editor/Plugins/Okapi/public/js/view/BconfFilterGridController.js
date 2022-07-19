@@ -41,6 +41,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
                     if(success && store.getCount() === 0 && store.loadCount === 1){
                         // Show defaults when no custom filters are available
                         this.lookup('showDefaultsBtn').setPressed(true);
+                    } else {
+                        // mimic behaviour of toggle button, when store is filtered, we do not show leveling
+                        this.getView().addCls('t5noLevels');
                     }
                     this.lookup('gridview').resumeEvent('refresh'); // enable repaint
                     this.lookup('gridview').refresh();
@@ -90,13 +93,16 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
      * @param {boolean} toggled
      */
     toggleDefaultsFilter: function(btn, toggled){
-        var store = this.getView().getStore();
+        var view = this.getView(),
+            store = view.getStore();
         if(toggled){
             store.removeFilter('defaultsFilter');
+            view.removeCls('t5noLevels');
             btn.setText(this.getView().strings.hideDefaultFilters);
             btn.setIconCls('x-fa fa-eye-slash');
         } else {
             store.addFilter(store.defaultsFilter);
+            view.addCls('t5noLevels'); // when only the default filters are shown, we do not need the levels in the grid
             btn.setText(this.getView().strings.showDefaultFilters);
             btn.setIconCls('x-fa fa-eye');
         }

@@ -939,8 +939,12 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     pointer-events: auto !important;
 }
 
-.t5chosenDefault { background-color: hsl(0deg 0% 0% / 20%); }
+
 .t5actionColumnGrid .x-action-col-icon { margin: 5px; }
+.t5leveledGrid .t5level0 { background-color: rgba(255, 239, 187, .2); }
+.t5leveledGrid.t5noLevels .t5level0 { background-color: transparent; }
+.t5chosenDefault, .t5leveledGrid .t5level0.t5chosenDefault, .t5leveledGrid.t5noLevels .t5level0.t5chosenDefault { background-color: rgba(0, 0, 0, .15); }
+.t5leveledGrid .t5level1.t5chosenDefault { background-color: rgba(0, 0, 0, .10); }
 .t5leveledGrid .t5level1 .x-grid-item,
 .t5leveledGrid .t5level1 .x-grid-item-selected,
 .t5leveledGrid .t5level1 .x-grid-checkcolumn-checked::after,
