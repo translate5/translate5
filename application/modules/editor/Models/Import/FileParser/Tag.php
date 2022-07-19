@@ -157,9 +157,17 @@ class editor_Models_Import_FileParser_Tag {
     public function __toString(): string {
         return match (self::$mode) {
             self::RETURN_MODE_REMOVED => '',
-            self::RETURN_MODE_ORIGINAL => $this->originalContent,
+            self::RETURN_MODE_ORIGINAL => $this->getOriginalModeContent(),
             default => $this->renderedTag,
         };
+    }
+
+    /**
+     * returns the content to be used for RETURN_ORIGINAL_MODE rendering
+     * @return string
+     */
+    protected function getOriginalModeContent(): string {
+        return $this->originalContent;
     }
 
     /**

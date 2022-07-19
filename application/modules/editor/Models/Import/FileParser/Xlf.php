@@ -171,7 +171,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * @var editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract
      */
-    protected $surroundingTags;
+    protected editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract $surroundingTags;
     
     /**
      * (non-PHPdoc)

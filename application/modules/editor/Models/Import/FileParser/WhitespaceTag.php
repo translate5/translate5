@@ -38,4 +38,7 @@ class editor_Models_Import_FileParser_WhitespaceTag extends editor_Models_Import
      */
     public string $rawContent;
 
+    protected function getOriginalModeContent(): string {
+        return $this->rawContent;
+    }
 }
