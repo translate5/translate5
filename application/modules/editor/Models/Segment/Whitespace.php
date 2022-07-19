@@ -213,10 +213,9 @@ class editor_Models_Segment_Whitespace {
      * @param string $type
      * @param string $id
      * @param string $content
-     * @param array $shortTagNrMap
      * @return editor_Models_Import_FileParser_Tag
      */
-    protected function handleProtectedTags(string $type, string $id, string $content, array &$shortTagNrMap): editor_Models_Import_FileParser_Tag {
+    protected function handleProtectedTags(string $type, string $id, string $content): editor_Models_Import_FileParser_Tag {
         $content = pack('H*', $content);
 
         //generate the html tag for the editor
@@ -224,12 +223,12 @@ class editor_Models_Segment_Whitespace {
             case 'open':
                 $type = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
                 $shortTag = $this->currentShortTagNumber++;
-                $shortTagNrMap[$id] = $shortTag;
+                $this->tagShortcutNumberMap[$id] = $shortTag;
                 break;
             case 'close':
                 //on tag protection it is ensured that tag pairs are wellformed, so on close we can rely that open nr exists:
                 $type = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
-                $shortTag = $shortTagNrMap[$id];
+                $shortTag = $this->tagShortcutNumberMap[$id];
                 break;
             case 'single':
             default:
@@ -281,11 +280,10 @@ class editor_Models_Segment_Whitespace {
         });
 
         $xml->registerElement('protectedTag', null, function ($tag, $key, $opener) use ($xml){
-            $shortTagNrMap = [];
             $type = $xml->getAttribute($opener['attributes'], 'data-type');
             $id = $xml->getAttribute($opener['attributes'], 'data-id');
             $content = $xml->getAttribute($opener['attributes'], 'data-content');
-            $xml->replaceChunk($key, $this->handleProtectedTags($type, $id, $content, $shortTagNrMap));
+            $xml->replaceChunk($key, $this->handleProtectedTags($type, $id, $content));
         });
 
         $validTags = self::WHITESPACE_TAG_LIST;
