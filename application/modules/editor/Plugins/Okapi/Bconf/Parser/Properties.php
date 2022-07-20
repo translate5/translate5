@@ -121,6 +121,19 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties {
     }
 
     /**
+     * The communication with the frontend is with data.ids. This generates them
+     * must matche the frontend API Editor.plugins.Okapi.view.fprm.Properties.getPropertyId
+     * @param $propName
+     * @return string
+     */
+    public function getDataId($propName) : string {
+        if(strlen($propName) > 2 && (substr($propName, -2) === '.i' || substr($propName, -2) === '.b')){
+            $propName = substr($propName, 0, -2);
+        }
+        return str_replace('.', '_', $propName);
+    }
+
+    /**
      * @param string $propName
      * @return bool
      */
@@ -168,6 +181,16 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties {
     }
 
     /**
+     * Removes an property
+     * @param string $propName
+     */
+    public function remove(string $propName){
+        if($this->has($propName)){
+            unset($this->map[$propName]);
+        }
+    }
+
+    /**
      * Generates content out of our parsed map (which will clean all comments & empty lines)
      * @return string
      */
@@ -185,6 +208,33 @@ final class editor_Plugins_Okapi_Bconf_Parser_Properties {
             $content .= "\n".$varName.'='.$val;
         }
         return $content;
+    }
+
+    /**
+     * Retrieves our contents as a json-object adjusted for the frontend
+     * This means, the type-hints (".b", ".i") will be removed from the property-names & the '.' is replaced by '_' in the remaining name
+     * @return stdClass
+     */
+    public function getJson() : stdClass {
+        $json = new stdClass();
+        foreach($this->map as $key => $val){
+            $key = $this->getDataId($key);
+            $json->$key = $val;
+        }
+        return $json;
+    }
+
+    /**
+     * Applies data in the format of our getJson-API back
+     * @param stdClass $json
+     */
+    public function setFromJson(stdClass $json) {
+        foreach($this->map as $key => $val){
+            $jsonKey = $this->getDataId($key);
+            if(property_exists($json, $jsonKey)){
+                $this->set($key, $json->$jsonKey);
+            }
+        }
     }
 
     /**

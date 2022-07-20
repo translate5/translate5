@@ -62,6 +62,11 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
      */
     private bool $mappingChanged = false;
     /**
+     * when we needed to create a temporary testfile that then must be removed after validation
+     * @var boolean
+     */
+    private bool $unlinkTestfile = false;
+    /**
      * @var editor_Plugins_Okapi_Bconf_Filter_Fprm
      */
     private editor_Plugins_Okapi_Bconf_Filter_Fprm $fprm;
@@ -96,6 +101,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
      * @throws editor_Plugins_Okapi_Exception
      */
     protected function getTestFilePath() : string {
+        $this->unlinkTestfile = false;
         // existance already checked in constructor
         $testExtensions = editor_Plugins_Okapi_Bconf_Filters::GUIS[$this->type]['extensions'];
         $mappedExtensions = $this->bconf->getExtensionMapping()->findExtensionsForFilter($this->fprm->getIdentifier());
@@ -119,6 +125,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
         }
         $source = editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('test.'.$testExtensions[0]);
         copy($source, $this->tmpTestfile);
+        $this->unlinkTestfile = true;
         // DEBUG
         if($this->doDebug){ error_log('FPRM VALIDATION: temporary testfile: '.$this->tmpTestfile.($this->mappingChanged?', Mapping had to be changed':'')); }
         return $this->tmpTestfile;
@@ -165,6 +172,11 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
         $this->fprm->flush();
         $this->bconf->pack();
         $valid = $this->process($testfilePath);
+        // cleanup testfile if it had to be created
+        if($this->unlinkTestfile){
+            unlink($testfilePath);
+            $this->unlinkTestfile = false;
+        }
         if($keepOriginals || !$valid || $this->mappingChanged){
             // restore original bconf
             unlink($bconfPath);

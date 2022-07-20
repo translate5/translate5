@@ -288,8 +288,7 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 <trans-unit id='VGhlIHR3byBnaXZlbiB0b2tlbnMgZG8gbm90IG1hdGNo'><source>The two given tokens do not match</source><target>The two given tokens do not match</target></trans-unit>
 <trans-unit id='UG1saWdodA=='><source>Pmlight</source><target>PM Light</target></trans-unit>
 <trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{CliYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/oUhUakQFmVw</target></trans-unit>
-<trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{CliYoutubeVideoGuideDescriptionContent}</source>
-<target><br/>
+<trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{CliYoutubeVideoGuideDescriptionContent}</source><target><br/>
 <figure>
     <figcaption><b>Übersicht:</b></figcaption>
       <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
@@ -300,11 +299,9 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
       <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=106&amp;autoplay=1" dir="auto">1:46</a> System log<br/>
       <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=141&amp;autoplay=1" dir="auto">2:21</a> Kontaktinformation<br/>
 </figure>
-</target>
-</trans-unit>
+</target></trans-unit>
 <trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{TaskOverviewYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/iZHRx6vpjCU</target></trans-unit>
-<trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{TaskOverviewYoutubeVideoGuideDescriptionContent}</source>
-<target><br/>
+<trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{TaskOverviewYoutubeVideoGuideDescriptionContent}</source><target><br/>
         <figure>
             <figcaption><b>Übersicht:</b></figcaption>
               <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
@@ -317,8 +314,7 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
         </figure>
 </target></trans-unit>
 <trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVVcmx9'><source>{CustomerYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/Z-RPoxq64cI</target></trans-unit>
-<trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'><source>{CustomerYoutubeVideoGuideDescriptionContent}</source>
-<target><br/>
+<trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'><source>{CustomerYoutubeVideoGuideDescriptionContent}</source><target><br/>
                 <figure>
                     <figcaption><b>Übersicht:</b></figcaption>
                       <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
@@ -328,9 +324,9 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
                       <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=335&amp;autoplay=1" dir="auto">5:35</a> Sprachressourcenzuweisung<br/>
                       <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=413&amp;autoplay=1" dir="auto">6:53</a> Kontaktinformationen<br/>
                 </figure>
-</target>
-</trans-unit>
+</target></trans-unit>
 <trans-unit id='UmVkaXJlY3QgdG8gbG9naW4uLi4='><source>Redirect to login...</source><target>Redirect to login...</target></trans-unit>
+<trans-unit id='Qml0dGUgZ2ViZW4gU2llIGVpbmVuIEJlbnV0emVybmFtZW4gYW4h'><source>Bitte geben Sie einen Benutzernamen an!</source><target>Bitte geben Sie einen Benutzernamen an!</target></trans-unit>
   </body>
  </file>
 </xliff>

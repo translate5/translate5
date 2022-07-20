@@ -26,6 +26,5 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
-
-    formItems: []
-})
+    width: '61%',
+});

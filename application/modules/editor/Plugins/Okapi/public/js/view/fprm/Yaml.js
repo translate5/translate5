@@ -26,7 +26,6 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
-    width: '61%',
     defaultFocus: 'textarea',
     formItems: [{
         xtype: 'textarea',
@@ -51,7 +50,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
                     var lineBreakAfter = yaml.indexOf('\n', unevenMatch.index),
                         lineBreakBefore = yaml.lastIndexOf('\n', unevenMatch.index) + 1,
                         line = yaml.substring(lineBreakBefore, lineBreakAfter);
-                        ret = '#UT#Uneven number of leading spaces at line <br>"<span style=\"font-family:monospace\"">' + line + '</span>"';
+                        ret = Ext.getCmp('bconfFprmEditor').translations.leadingSpacesUneven.replace('{0}', line);
                     if(lastCheck.highlightTask){
                         lastCheck.highlightTask.destroy();
                     }
@@ -69,15 +68,8 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
         }
     }],
 
-    dataLoaded: function(height){
+    fprmDataLoaded: function(height){
         this.down('[name=yaml]').setHeight(height - 106);
-    },
-
-    parseFprm(fprm){
-        return { yaml: fprm };
-    },
-
-    compileFprm: function(){
-        return this.down('[name=yaml]').getValue();
+        this.callParent(arguments);
     }
-})
+});

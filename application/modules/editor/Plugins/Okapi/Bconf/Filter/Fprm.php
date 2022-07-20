@@ -175,7 +175,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
     public function crateTransformedData(){
         if($this->type === self::TYPE_XPROPERTIES){
             $parser = new editor_Plugins_Okapi_Bconf_Parser_Properties($this->content);
-            return $parser->getProperties();
+            return $parser->getJson();
         } else if($this->type === self::TYPE_XML){
             $xml = simplexml_load_string($this->content,'SimpleXMLElement',LIBXML_NOCDATA);
             $json = json_encode($xml, JSON_UNESCAPED_UNICODE |  JSON_UNESCAPED_SLASHES);
@@ -188,18 +188,43 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
      * Retrieves the FPRM GUI translations for the current type.
      * The convention is, that translationsare stored as JSON-files in /modules/editor/Plugins/Okapi/locales/
      * with the naming-scheme "$okapiType.$locale.json"
-     * @return stdClass
+     * @return array
      */
-    public function crateTranslationData() : stdClass {
+    public function crateTranslationData() : array {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $translationsDir = APPLICATION_PATH.'/modules/editor/Plugins/Okapi/locales/';
-        $json = '{}';
-        if(file_exists($translationsDir.$this->getOkapiType().'.'.$translate->getSourceCodeLocale().'.json')){
-            $json = file_get_contents($translationsDir.$this->getOkapiType().'.'.$translate->getSourceCodeLocale().'.json');
-        } else if(file_exists($translationsDir.$this->getOkapiType().'.'.self::DEFAULT_GUI_LANGUAGE.'.json')){
-            $json = file_get_contents($translationsDir.$this->getOkapiType().'.'.self::DEFAULT_GUI_LANGUAGE.'.json');
+        $json = NULL;
+        $guiName = strtolower(editor_Plugins_Okapi_Bconf_Filters::getGuiClass($this->getOkapiType(), false));
+        if(!empty($guiName)){
+            if(file_exists($translationsDir.$guiName.'.'.$translate->getSourceCodeLocale().'.json')){
+                $json = file_get_contents($translationsDir.$guiName.'.'.$translate->getSourceCodeLocale().'.json');
+            } else if(file_exists($translationsDir.$guiName.'.'.self::DEFAULT_GUI_LANGUAGE.'.json')){
+                $json = file_get_contents($translationsDir.$guiName.'.'.self::DEFAULT_GUI_LANGUAGE.'.json');
+            }
         }
-        return json_decode($json);
+        if(!empty($json)){
+            $data = json_decode($json, true);
+            if(is_array($data)){
+                return $data;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * Some GUIs have static data (e.g. dropdown values) that will also be added to the /getfprm endpoint
+     * @return stdClass
+     */
+    public function createGuiData() : stdClass {
+        $guiDataDir = APPLICATION_PATH.'/modules/editor/Plugins/Okapi/data/fprm/gui/';
+        $guiName = strtolower(editor_Plugins_Okapi_Bconf_Filters::getGuiClass($this->getOkapiType(), false));
+        if(!empty($guiName)){
+            if(file_exists($guiDataDir.$guiName.'.json')){
+                $json = file_get_contents($guiDataDir.$guiName.'.json');
+                return json_decode($json, false);
+            }
+        }
+        return new stdClass();
     }
 
     /**

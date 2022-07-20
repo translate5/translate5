@@ -151,6 +151,7 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         $this->view->raw = $fprm->getContent();
         $this->view->transformed = $fprm->crateTransformedData();
         $this->view->translations = $fprm->crateTranslationData();
+        $this->view->guidata = $fprm->createGuiData();
     }
 
     /**

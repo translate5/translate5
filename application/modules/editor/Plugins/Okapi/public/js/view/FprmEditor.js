@@ -32,10 +32,11 @@
 Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     extend: 'Ext.window.Window',
     alias: 'widget.fprmeditor',
+    id: 'bconfFprmEditor',
     modal: true,
     maximizable: true,
     margin: 50,
-    width: '-50',
+    width: 800,
     height: window.innerHeight - 100,
     minHeight: 400,
     minWidth: 800,
@@ -47,18 +48,17 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         text: "FPRM Editor"
     },
     fprmType: null,
-    fprmRawData: null,
-    fprmData: null,
+    rawData: null,
+    transformedData: null,
+    guiData: null,
     config: {
-        // TODO: rework updateFprm, setFprm, getFprm, applyFprm
-        // TODO: rework updateBconfFilter, setBconfFilter, getBconfFilter, applyBconfFilter
-        bconfFilter: null,
-        fprm: undefined
+        bconfFilter: null
     },
     // Shortcuts:
     formPanel: null,
     formItems: [], // to be defined in extending classes
     form: null,
+    helpPage: null,
     strings: {
         title: "#UT#Editiere Filter Typ {0} von Bconf {1}",
         save: "#UT#Speichern",
@@ -67,6 +67,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         changesInvalid: "#UT#Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden",
         successfullySaved: "#UT#Der Filter wurde erfolgreich gespeichert"
     },
+    translations: {},
     tools: [{
         iconCls: 'x-fa fa-undo',
         tooltip: '#UT#Refresh',
@@ -104,24 +105,12 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             this.up('window').close();
         }
     }],
-
     initConfig: function(){
         this.items[0].items = this.formItems;
         this.fbar[0].text = this.strings.save;
         this.fbar[1].text = this.strings.cancel;
         return this.callParent(arguments);
     },
-
-    load: function(){
-        this.setLoading();
-        this.loadFprmData();
-    },
-    /**
-     * Can be overwritten to init the layout after the data has been loaded
-     * @param {int} height
-     */
-    dataLoaded: function(height){ },
-
     initComponent: function(){
         var titletext = this.strings.title.replace('{0}', '<i>“'+this.bconfFilter.get('okapiType')+'”</i>');
         this.title.text = titletext.replace('{1}', '<i>“'+this.bconfFilter.get('name')+'”</i>');
@@ -130,57 +119,82 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         this.form = this.formPanel.getForm();
         this.load();
     },
-
     afterRender: function(){
-        if(this.fprm === undefined){
-            this.setLoading(); // has no effect in initComponent
+        if(this.rawData === null){
+            this.setLoading(); // has no effect if done in initComponent
         }
         return this.callParent(arguments);
     },
 
-    getValues: function(){
+    load: function(){
+        this.setLoading();
+        this.loadFprmData();
+    },
+    /**
+     * Serts the fprm-data after load
+     * @param raw
+     * @param transformed
+     */
+    setFprmData: function(raw, transformed){
+        this.rawData = raw;
+        this.transformedData = transformed;
+    },
+    /**
+     * Can be overwritten to init the layout after the data has been loaded
+     * @param {int} height
+     */
+    fprmDataLoaded: function(height){
+        this.form.setValues(this.getFormInitValues());
+        this.down('button#save').enable();
+    },
+    /**
+     * Must be overwritten in subclasses to receive the raw content to send to the server
+     * @returns {string}
+     */
+    getRawResult: function(){
+        switch(this.fprmType){
+            case "xml":
+                return this.getFormValues().xml;
+
+            case "yaml":
+                return this.getFormValues().yaml;
+        }
+        throw new Error('getRawResult must be implemented in subclasses!');
+    },
+    /**
+     * Retrieves all values of our form
+     * @returns {object}
+     */
+    getFormValues: function(){
         return this.form.getValues();
     },
-
     /**
-     * Called after fprm has been set
-     * @see Ext.Class.config
-     * @param fprm
+     * Retrieves the values to initialy fill our form. can be overridden in subclasses
+     * @returns {object}
      */
-    updateFprm: function(fprm){
-        if(fprm !== undefined){
-            const parsed = this.parseFprm(fprm);
-            this.form.setValues(parsed);
-            // TODO BCONF only enable save btn when different from last disabled state
-            this.down('button#save').enable();
+    getFormInitValues: function(){
+        switch(this.fprmType){
+
+            case "properties":
+                return this.transformedData; // special: we have a JSON Object with parsed data in case of properties-based fprms
+
+            case "xml":
+                return { xml: this.rawData };
+
+            case "yaml":
+                return { yaml: this.rawData };
         }
+        throw new Error('getFormInitValues must be implemented in subclasses!');
     },
     /**
-     * @method
-     * @abstract
-     * Parses the raw fprm into an object that can be loaded into the form
-     * @param {string} fprm The content of the .fprm file
-     * @return {object} Contains keys and values, is fed to this.form.setValues()
+     * Save button handler
      */
-    parseFprm: function(fprm){
-        throw new Error('must be implemented by subclass!');
-    },
-    /**
-     * @abstract
-     * Parses the form into a textstring that can be saved
-     * @return string The content that will be sent to server and saved in the fprm file
-     */
-    compileFprm: function(){
-        this.setLoading(false);
-        throw new Error('must be implemented by subclass!');
-    },
-
     save: function(){
         var me = this,
             currentValues = me.form.getValues();
         if(/* !Ext.Object.equals(currentValues, me.lastInvalidValues) && */ this.form.isValid()){
             me.setLoading();
-            me.saveFprmData(me.compileFprm());
+            me.saveFprmData();
         } else {
             this.invalidFields = this.formPanel.query('field{getActiveErrors().length}');
             this.lastInvalidValues = currentValues;
@@ -198,7 +212,6 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
 
     /**
      * Loads the content of the .fprm file
-     * @return {Promise<string>} Also fulfilled with undefined on unsuccessful requests
      */
     loadFprmData(){
         var me = this;
@@ -212,14 +225,13 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 var data = Ext.util.JSON.decode(response.responseText),
                     height = window.innerHeight - 100;
                 me.setLoading(false);
-                Ext.apply(me.strings, data.translations);
+                me.translations = data.translations;
                 me.fprmType = data.type;
-                me.fprmRawData = data.raw;
-                me.fprmData = data.transformed;
-                // TODO BCONF: remove
-                me.setFprm(data.raw);
+                me.guiData = data.guidata;
+                me.rawData = data.raw;
+                me.transformedData = data.transformed;
                 me.setHeight(height);
-                me.dataLoaded(height);
+                me.fprmDataLoaded(height);
             },
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);
@@ -227,33 +239,11 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         });
     },
 
-    loadFprmDataOLD(){
-        var me = this;
-        return new Promise(function(resolve, reject){
-            Ext.Ajax.request({
-                url: me.bconfFilter.getProxy().getUrl() + '/getfprm',
-                method: 'GET',
-                params: {
-                    id: me.bconfFilter.id
-                },
-                callback: function(options, success, response){
-                    if(success){
-                        resolve(response.responseText);
-                    } else {
-                        resolve('{}');
-                        Editor.app.getController('ServerException').handleException(response);
-                    }
-                }
-            });
-        });
-    },
-
     /**
      * Saves the edited fprm back to the server
-     * @param {string} rawData
      * @returns {*}
      */
-    saveFprmData(rawData){
+    saveFprmData(){
         var me = this;
         Ext.Ajax.request({
             url: me.bconfFilter.getProxy().getUrl() + '/savefprm',
@@ -262,7 +252,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 id: me.bconfFilter.id,
                 type: me.fprmType
             },
-            rawData: rawData,
+            rawData: me.getRawResult(),
             success: function(response){
                 var result = Ext.util.JSON.decode(response.responseText);
                 me.setLoading(false);

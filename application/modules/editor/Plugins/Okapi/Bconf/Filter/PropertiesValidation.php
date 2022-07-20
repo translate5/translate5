@@ -40,6 +40,14 @@
  */
 final class editor_Plugins_Okapi_Bconf_Filter_PropertiesValidation extends editor_Plugins_Okapi_Bconf_ResourceFile {
 
+    /**
+     * UGLY: there are "volitile" variables that mimic a list (the properties-format has no support for arrays/lists)
+     * They are included as properties but are not mandatory and represent the state of other properties
+     * The concrete naming is like "zzz0", "hlt1", ...
+     * @var array
+     */
+    const VOLATILE_VARS = ['ccc', 'cfd', 'hlt', 'sln', 'sss', 'yyy', 'zzz']; // are from the openxml filter
+
     protected string $mime = 'text/x-properties';
 
     /**
@@ -112,10 +120,10 @@ final class editor_Plugins_Okapi_Bconf_Filter_PropertiesValidation extends edito
             return false;
         }
         $valid = true;
-        $missingVals = [];
+        $missingProps = [];
         foreach($this->referenceProps->getPropertyNames() as $varName){
             if(!$this->props->has($varName)){
-                $missingVals[] = $varName;
+                $missingProps[] = $varName;
             } else {
                 try {
                     $this->referenceProps->set($varName, $this->props->get($varName));
@@ -128,19 +136,31 @@ final class editor_Plugins_Okapi_Bconf_Filter_PropertiesValidation extends edito
                 }
             }
         }
+        // remove missing volatile props
+        if(count($missingProps) > 0){
+            $props = [];
+            foreach($missingProps as $prop){
+                if($this->isVolatileProperty($prop)){
+                    $this->referenceProps->remove($prop);
+                } else {
+                    $props[] = $prop;
+                }
+            }
+            $missingProps = $props;
+        }
         // if there are additional vars we add them to our reference props
-        $additionalVals = array_diff($this->props->getPropertyNames(), $this->referenceProps->getPropertyNames());
-        if(count($additionalVals) > 0){
-            if($this->doDebug){ error_log('PROPERTIES VALIDATION PROBLEM: The file has additional values compared to the reference: ('.implode(', ',$additionalVals ).')'); }
-            foreach($additionalVals as $propName){
+        $additionalProps = array_diff($this->props->getPropertyNames(), $this->referenceProps->getPropertyNames());
+        if(count($additionalProps) > 0){
+            if($this->doDebug){ error_log('PROPERTIES VALIDATION PROBLEM: The file has additional values compared to the reference: ('.implode(', ',$additionalProps ).')'); }
+            foreach($additionalProps as $propName){
                 $this->referenceProps->add($propName, $this->props->get($propName));
             }
             $this->needsRepair = true;
         }
-        if(count($missingVals) > 0){
+        if(count($missingProps) > 0){
             // DEBUG
-            if($this->doDebug){ error_log('PROPERTIES VALIDATION PROBLEM: The file has missing values compared to the reference: ('.implode(', ',$missingVals ).')'); }
-            $this->validationError = trim($this->validationError."\n".'The file has missing values ('.implode(', ',$missingVals ).')');
+            if($this->doDebug){ error_log('PROPERTIES VALIDATION PROBLEM: The file has missing values compared to the reference: ('.implode(', ',$missingProps ).')'); }
+            $this->validationError = trim($this->validationError."\n".'The file has missing values ('.implode(', ',$missingProps ).')');
             // SPECIAL: when importing, we silently ignore missing props, when validating edited FPRMs, we need to be more picky as this hints to an incomplete GUI (maybe due to rainbow updates)
             if(!$forImport){
                 $valid = false;
@@ -151,5 +171,9 @@ final class editor_Plugins_Okapi_Bconf_Filter_PropertiesValidation extends edito
             $this->content = $this->referenceProps->unparse();
         }
         return $valid;
+    }
+
+    private function isVolatileProperty($name) : bool {
+        return (in_array(substr($name, 0, 3), self::VOLATILE_VARS) && is_numeric(substr($name, 3)));
     }
 }
