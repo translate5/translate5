@@ -52,17 +52,15 @@ class editor_Task_Operation {
      * @return int The parent ID to use for all inner workers
      */
     public static function create(string $operationType, editor_Models_Task $task) : int {
-    
+        $taskState = $task->getState();
         // Only one operation is allowed to run at a time !
-        if(in_array($task->getState(), self::getAllOperations())){
-            throw new editor_Task_Operation_Exception('E1396', ['taskstate' => $task->getState()]);
+        if(in_array($taskState, self::getAllOperations())){
+            throw new editor_Task_Operation_Exception('E1396', ['taskstate' => $taskState]);
         }
-        // TODO FIXME: in what task states operations should not run (matchanalysis, pretranslation, autoqa) ?
-        /*
-        if($task->getState() != editor_Models_Task::STATE_OPEN){
-            throw new editor_Task_Operation_Exception('E1395', ['taskstate' => $task->getState(), 'operation' => $operationType]);
+        // we do not want excelExports to be manipulated
+        if($taskState === editor_Models_Task::STATE_EXCELEXPORTED){
+            throw new editor_Task_Operation_Exception('E1395', ['taskstate' => $taskState, 'operation' => $operationType]);
         }
-        */
         $worker = ZfExtended_Factory::get('editor_Task_Operation_StartingWorker');
         /* @var $worker editor_Task_Operation_StartingWorker */
         if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType ])) {
@@ -70,7 +68,7 @@ class editor_Task_Operation {
             // add finishing worker
             $worker = ZfExtended_Factory::get('editor_Task_Operation_FinishingWorker');
             /* @var $worker editor_Task_Operation_FinishingWorker */
-            if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType, 'taskInitialState' => $task->getState() ])) {
+            if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType, 'taskInitialState' => $taskState ])) {
                 $worker->queue($parentId, null, false);
                 return $parentId;
             }
