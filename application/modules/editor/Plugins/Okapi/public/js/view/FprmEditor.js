@@ -39,7 +39,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     width: 800,
     height: window.innerHeight - 100,
     minHeight: 400,
-    minWidth: 800,
+    minWidth: 600,
     layout: 'fit',
     constrainHeader: true,
     iconCls: 'x-fa fa-edit',
@@ -65,6 +65,11 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         save: "#UT#Speichern",
         cancel: "#UT#Abbrechen",
         invalidTitle: "#UT#Bearbeitung fehlerhaft",
+        invalidField: '#UT#Feld "{0}" vom Typ "{1}" ist nicht valide',
+        float: "#UT#Gleitkommazahl",
+        boolean : "#UT#Boolscher Wert",
+        integer : "#UT#Ganzzahl",
+        validationFailed: "#UT#Ihre Änderungen sind nicht valide",
         changesInvalid: "#UT#Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden",
         successfullySaved: "#UT#Der Filter wurde erfolgreich gespeichert"
     },
@@ -85,7 +90,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         scrollable: true,
         layout: 'form',
         defaults: { labelClsExtra: Ext.baseCSSPrefix + 'selectable' },
-        items: [], // Fill in init method
+        items: []
     }],
     fbar: [{
         xtype: 'button',
@@ -112,11 +117,10 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         itemId: 'cancel',
         iconCls: 'x-fa fa-times-circle',
         handler: function(){
-            this.up('window').close();
+            this.up('window').closeWindow();
         }
     }],
     initConfig: function(){
-        this.items[0].items = this.formItems;
         this.fbar[0].text = this.strings.help;
         this.fbar[1].text = this.strings.save;
         this.fbar[2].text = this.strings.cancel;
@@ -127,8 +131,6 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         var titletext = this.strings.title.replace('{0}', '<i>“'+this.okapiType+'”</i>');
         this.title.text = titletext.replace('{1}', '<i>“'+this.bconfFilter.get('name')+'”</i>');
         this.callParent();
-        this.formPanel = this.down('form#fprm');
-        this.form = this.formPanel.getForm();
         this.load();
     },
     afterRender: function(){
@@ -136,6 +138,19 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             this.setLoading(); // has no effect if done in initComponent
         }
         return this.callParent(arguments);
+    },
+    getFormItems: function(){
+        return this.formItems;
+    },
+    /**
+     * Creates the basic form that is
+     */
+    initForm: function(){
+        this.formPanel = this.down('form#fprm');
+        // this.formPanel.setLayout('form'); // Ext.create('Ext.layout.container.Form')
+        this.getFormItems().forEach(item => this.formPanel.add(item));
+        this.form = this.formPanel.getForm();
+        console.log('FORM PANEL LAYOUT: ', this.formPanel.getLayout()); // TODO REMOVE
     },
     /**
      * Enable save button & show help button after data is loaded
@@ -149,6 +164,9 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             helpButton.setStyle('left', '0px');
         }
     },
+    /**
+     *
+     */
     load: function(){
         this.setLoading();
         this.loadFprmData();
@@ -160,6 +178,15 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      */
     fprmDataLoaded: function(height){
         this.form.setValues(this.getFormInitValues());
+    },
+    /**
+     * Can be overwritten to add additional validations
+     * If this API returns a string, this will show up as additional error-msg in the dialog
+     * Only a return-value of true will be regarded as valid
+     * @returns {boolean|string}
+     */
+    validate: function(){
+        return this.form.isValid();
     },
     /**
      * Must be overwritten in subclasses to receive the raw content to send to the server
@@ -219,26 +246,20 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      * Save button handler
      */
     save: function(){
-        var me = this,
-            currentValues = me.form.getValues();
-        if(/* !Ext.Object.equals(currentValues, me.lastInvalidValues) && */ this.form.isValid()){
-            me.setLoading();
-            me.saveFprmData();
+        var valid = this.validate();
+        if(valid === true){
+            this.setLoading();
+            this.saveFprmData();
         } else {
-            this.invalidFields = this.formPanel.query('field{getActiveErrors().length}');
-            this.lastInvalidValues = currentValues;
-            var response = {
-                status: 422,
-                statusText: 'Unprocessable Entity',
-                responseText: JSON.stringify({
-                    errorMessage: 'Invalid form data',
-                    errors: Object.assign({}, this.invalidFields.map(f => f.getActiveErrors()))
-                })
-            };
-            Editor.app.getController('ServerException').handleException(response);
+            // no specific error given, create details from Form
+            if(valid === false || valid === "" || valid === null){
+                var invalidFields = this.formPanel.query('field{getActiveErrors().length}'),
+                    errors = invalidFields.map(f => f.getActiveErrors());
+                valid = (errors.length > 0) ? errors.join('<br/>') : 'Unknown error'; // Unknown Error just for completeness, can not happen
+            }
+            this.showValidationMsg(this.strings.validationFailed + '<br/><i>('+valid+')</i>');
         }
     },
-
     /**
      * Loads the content of the .fprm file
      */
@@ -253,6 +274,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             success: function(response){
                 var data = Ext.util.JSON.decode(response.responseText),
                     height = window.innerHeight - 100;
+                console.log('WINDOW HEIGHT: ', height); // TODO REMOVE
                 me.setLoading(false);
                 me.translations = data.translations;
                 me.fprmType = data.type;
@@ -260,8 +282,9 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 me.rawData = data.raw;
                 me.transformedData = data.transformed;
                 me.setHeight(height);
-                me.fprmDataLoaded(height);
+                me.initForm();
                 me.initButtons();
+                me.fprmDataLoaded(height);
             },
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);
@@ -287,14 +310,10 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 var result = Ext.util.JSON.decode(response.responseText);
                 me.setLoading(false);
                 if(result.success){
-                    me.close();
                     Editor.MessageBox.addSuccess(me.strings.successfullySaved);
+                    me.closeWindow();
                 } else {
-                    Ext.Msg.show({
-                        title: me.strings.invalidTitle,
-                        message: me.strings.changesInvalid+'<br/><i>('+result.error+')</i>',
-                        icon: Ext.Msg.ERROR
-                    });
+                    me.showValidationMsg(me.strings.changesInvalid+'<br/><i>('+result.error+')</i>');
                 }
             },
             failure: function(response){
@@ -302,5 +321,22 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 Editor.app.getController('ServerException').handleException(response);
             }
         });
+    },
+    /**
+     *
+     * @param {string} msg
+     */
+    showValidationMsg: function(msg){
+        Ext.Msg.show({
+            title: this.strings.invalidTitle,
+            message: msg,
+            icon: Ext.Msg.ERROR,
+            buttons: Ext.Msg.OK
+        });
+    },
+    closeWindow: function(){
+        this.formPanel.removeAll();
+        this.removeAll();
+        this.close();
     }
 });

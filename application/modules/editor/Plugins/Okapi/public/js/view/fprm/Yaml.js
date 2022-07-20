@@ -26,6 +26,7 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
+    width: 800,
     defaultFocus: 'textarea',
     formItems: [{
         xtype: 'textarea',

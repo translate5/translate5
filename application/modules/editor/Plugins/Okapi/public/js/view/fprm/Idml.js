@@ -54,5 +54,50 @@
 Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
     width: 700,
-    fieldDefinitions: {}
+    fieldDefinitions: {
+        'maxAttributeSize.i': { config: { hidden: true }},  // not visible in Rainbow
+        "untagXmlStructures.b": { config: {}},
+        "extractNotes.b": { config: {}},
+        "extractMasterSpreads.b": { config: {}},
+        "extractHiddenLayers.b": { config: {}},
+        "extractHiddenPasteboardItems.b": { config: {}},
+        "skipDiscretionaryHyphens.b": { config: {}},
+        "extractBreaksInline.b": { config: {}},
+        "extractCustomTextVariables.b": { config: {}},
+        "extractIndexTopics.b": { config: {}},
+        "ignoreCharacterKerning.b": { config: {}},
+        "characterKerningMinIgnoranceThreshold": { config: { valueType: "float" }},
+        "characterKerningMaxIgnoranceThreshold": { config: { valueType: "float" }},
+        "ignoreCharacterTracking.b": { config: {}},
+        "characterTrackingMinIgnoranceThreshold": { config: { valueType: "float" }},
+        "characterTrackingMaxIgnoranceThreshold": { config: { valueType: "float" }},
+        "ignoreCharacterLeading.b": { config: {}},
+        "characterLeadingMinIgnoranceThreshold": { config: { valueType: "float" }},
+        "characterLeadingMaxIgnoranceThreshold": { config: { valueType: "float" }},
+        "ignoreCharacterBaselineShift.b": { config: {}},
+        "characterBaselineShiftMinIgnoranceThreshold": { config: { valueType: "float" }},
+        "characterBaselineShiftMaxIgnoranceThreshold": { config: { valueType: "float" }}
+    },
+    /**
+     * Overridden to resolve our dependencies
+     */
+    resolvePropertyDependencies: function(){
+        // if the ckeckbox is not set we need to remove the related Kerning-Values
+        if(this.form.findField('ignoreCharacterKerning.b').getValue() == false){
+            this.form.findField('characterKerningMinIgnoranceThreshold').setRawValue(null);
+            this.form.findField('characterKerningMaxIgnoranceThreshold').setRawValue(null);
+        }
+        if(this.form.findField('ignoreCharacterTracking.b').getValue() == false){
+            this.form.findField('characterTrackingMinIgnoranceThreshold').setRawValue(null);
+            this.form.findField('characterTrackingMaxIgnoranceThreshold').setRawValue(null);
+        }
+        if(this.form.findField('ignoreCharacterLeading.b').getValue() == false){
+            this.form.findField('characterLeadingMinIgnoranceThreshold').setRawValue(null);
+            this.form.findField('characterLeadingMaxIgnoranceThreshold').setRawValue(null);
+        }
+        if(this.form.findField('ignoreCharacterBaselineShift.b').getValue() == false){
+            this.form.findField('characterBaselineShiftMinIgnoranceThreshold').setRawValue(null);
+            this.form.findField('characterBaselineShiftMaxIgnoranceThreshold').setRawValue(null);
+        }
+    }
 });

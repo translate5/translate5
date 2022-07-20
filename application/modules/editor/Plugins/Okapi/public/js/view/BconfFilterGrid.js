@@ -39,6 +39,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     alias: 'widget.bconffiltergrid',
     id: 'bconfFilterGrid',
     controller: 'bconffilterGridController',
+    minWidth: 800,
+    maxWidth: 1280,
     config: {
         /**
          * @method getBconf

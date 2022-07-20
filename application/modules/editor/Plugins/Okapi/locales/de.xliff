@@ -180,6 +180,10 @@
     <source>Bearbeite Filter Typ {0} von Bconf {1}</source>
     <target>Bearbeite Filter Typ {0} von Bconf {1}</target>
 </trans-unit>
+<trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZQ=='>
+    <source>Ihre Änderungen sind nicht valide</source>
+    <target>Ihre Änderungen sind nicht valide</target>
+</trans-unit>
 <trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZSwgZGFoZXIga29ubnRlIGRlciBGaWx0ZXIgbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu'>
     <source>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</source>
     <target>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</target>

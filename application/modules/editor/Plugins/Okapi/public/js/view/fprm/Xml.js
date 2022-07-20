@@ -26,11 +26,11 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
+    width: 800,
     defaultFocus: 'textarea',
     formItems: [{
         xtype: 'textarea',
         width: '100%',
-        minWidth: 800,
         height: '100%',
         name: 'xml',
         fieldCls: 'mono',

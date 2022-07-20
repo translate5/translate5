@@ -33,7 +33,8 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     fieldDefinitions: {},
     fieldDefaults: {
         "boolean": { xtype: 'checkbox', inputValue: true, uncheckedValue: false, defaultValue: false },
-        "integer": { xtype: 'numberfield', defaultValue: 0 },
+        "integer": { xtype: 'numberfield', allowDecimals: false, allowExponential: false, defaultValue: 0 },
+        "float": { xtype: 'numberfield', allowDecimals: true, allowExponential: false, defaultValue: 0 },
         "string": { xtype: 'textfield', defaultValue: "" },
     },
     /**
@@ -51,11 +52,23 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             data = this.fieldDefinitions[name];
             id = this.getPropertyId(name);
             type = this.getPropertyType(name);
+            // we may have custom types defined in the config
+            if(!data.config.valueType){
+                data.config.valueType = type;
+            } else {
+                type = data.config.valueType;
+            }
             config = Object.assign(this.getFieldConfig(id, type, name, data.config), data.config);
-            config.parentSelector = (data.parent) ? ('fprmh_' + data.parent) : null;
-            parent = (config.parentSelector) ? (Ext.getCmp(config.parentSelector) || this.formPanel) : this.formPanel;
-            parent.add(config);
+            this.getFieldTarget(data).add(config);
         }
+    },
+    /**
+     * Retrieves the target component for a form-field
+     * @param {object} config
+     * @returns {Ext.Component}
+     */
+    getFieldTarget(data){
+        return this.formPanel;
     },
     /**
      *
@@ -142,7 +155,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      *
      * @param {string}type
      * @param {string|boolean|integer} value
-     * @returns {{string|boolean|integer}
+     * @returns {string|boolean|integer}
      */
     parseTypedValue: function(type, value){
         switch(type){
@@ -150,16 +163,25 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
                 return (value === true) ? true : false;
             case 'integer':
                 return Number.isInteger(value) ? value : parseInt(value);
+            case 'float':
+                return (typeof value === 'number') ? value : parseFloat(String(value).split(',').join('.'));
             case 'string':
             default:
                 return (typeof value === 'string') ? value : String(value);
         }
     },
-
+    /**
+     * @returns {object}
+     */
     getFormValues: function(){
-        var name, vals = this.form.getValues();
+        var name, type, vals = this.form.getValues();
         for(name in vals){
-            vals[name] = this.parseTypedValue(this.getPropertyType(name), vals[name]);
+            // we may have a custom type set
+            type = (this.fieldDefinitions.hasOwnProperty(name)) ? this.fieldDefinitions[name].config.valueType : null;
+            if(!type || type === 'boolean' && type === 'integer' && type === 'string'){
+                type = this.getPropertyType(name);
+            }
+            vals[name] = this.parseTypedValue(type, vals[name]);
         }
         return vals;
     },
@@ -191,5 +213,63 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             default:
                 return name + '=' + value;
         }
+    },
+    /**
+     *
+     * @returns {boolean|string}
+     */
+    validate: function(){
+        this.resolvePropertyDependencies();
+        if(this.form.isValid()){
+            var data, name, val, id, type, errors = [];
+            for(name in this.fieldDefinitions){
+                data = this.fieldDefinitions[name];
+                if(data.valueType && data.valueType !== 'boolean' && data.valueType !== 'integer' && data.valueType !== 'string'){
+                    val = this.form.findField(name).getValue();
+                    id = this.getPropertyId(name);
+                    if(!this.validateValue(val, data.valueType)){
+                        type = this.strings.hasOwnProperty(data.valueType) ? this.strings[data.valueType] : data.valueType;
+                        errors.push(this.strings.invalidField.split('{0}').join(this.translations[id]).split('{0}').join(type));
+                    }
+                }
+            }
+            if(errors.length > 0){
+                return errors.join('<br/>');
+            }
+            return true;
+        }
+        return false;
+    },
+    /**
+     * Validates a single value
+     * @param {string|number|boolean} value
+     * @param {strong} type
+     * @returns {boolean}
+     */
+    validateValue: function(value, type){
+        switch(type){
+            case 'boolean':
+                return (value === 'true' || value === 'false' || value === true || value === false);
+            case 'integer':
+                return (String(value).match(/^\-?[0-9]+$/) !== null);
+            case 'float':
+                return (String(value).split(',').join('.').match(/^\-?0?\.[0-9]+$/) !== null);
+            case 'string':
+            default:
+                return true;
+        }
+    },
+    /**
+     * Override this function to resolve property-dependencies a la "variableX can only be filled if variableY set to true"
+     */
+    resolvePropertyDependencies: function(){
+
+    },
+    /**
+     * Cleanup
+     */
+    closeWindow: function(){
+        this.fieldDefinitions = {};
+        this.callParent(arguments);
     }
 });
