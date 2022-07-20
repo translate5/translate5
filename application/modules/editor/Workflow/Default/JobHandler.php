@@ -80,7 +80,7 @@ class editor_Workflow_Default_JobHandler extends editor_Workflow_Default_Abstrac
         //ensure that segment MV is createad
         $actionConfig->task->createMaterializedView();
         $state = $this->getTriggeredState($actionConfig->oldTua, $actionConfig->newTua);
-        $this->doDebug($state);
+        $this->doDebug($state ?? 'No state was given on job handler execute save.');
         if(!empty($state)) {
             if(method_exists($this, $state)) {
                 $this->{$state}();
