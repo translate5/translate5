@@ -101,18 +101,56 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
     public function __construct($slot = null) {
         $this->apiBaseUrl = $slot ?? Zend_Registry::get('config')->runtimeOptions->plugins->SpellCheck->languagetool->url->gui;
     }
-    
+
+    /**
+     * Checks if there is a LanguageTool-instance available behind $url.
+     *
+     * @param string $url url of the LanguageTool-instance
+     * @return boolean
+     */
+    public function testServerUrl(string $url, &$version = null) {
+
+        // Spoof value if $this->apiBaseUrl with value given by $url arg
+        $this->apiBaseUrl = $url;
+
+        // Try to check a simple phrase
+        try {
+            $response = $this->getMatches('a simple test', 'en-US');
+        }
+        catch (editor_Plugins_SpellCheck_Exception_TimeOut $e) {
+            return true; // can not respond due it is processing data
+        }
+        catch (editor_Plugins_SpellCheck_Exception_Down $e) {
+            return false;
+        }
+        catch (editor_Plugins_SpellCheck_Exception_Malfunction $e) {
+            return false;
+        }
+        catch (editor_Plugins_SpellCheck_Exception_Request $e) {
+            return false;
+        }
+
+        // Get version and assign into $version arg passed by reference
+        $version = $response->software->version;
+
+        // Return response
+        return $response;
+    }
+
     /**
      * Create the http object and set the url
      * 
      * @param string $url
      * @return Zend_Http_Client
      */
-    private function getHttpClient($path){
-        $http = ZfExtended_Factory::get('Zend_Http_Client');
+    private function getHttpClient($path) {
+
         /* @var $http Zend_Http_Client */
-        $http->setUri($this->apiBaseUrl.$path);
-        $http->setConfig(array('timeout'=>self::REQUEST_TIMEOUT_SECONDS));
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        $http->setUri($this->apiBaseUrl . $path);
+        $http->setConfig(['timeout'=>self::REQUEST_TIMEOUT_SECONDS]);
+
+        // Return http client with pre-configured request uri
         return $http;
     }
     
@@ -391,5 +429,30 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
      */
     public function getLastStatus() {
         return (int) $this->lastStatus;
+    }
+
+    /**
+     * Returns the configured LanguageTool URLs
+     *
+     * @return array
+     */
+    public function getConfiguredUrls() {
+
+        // Get urls grouped by resource pools
+        $groups = Zend_Registry::get('config')->runtimeOptions->plugins->SpellCheck->languagetool->url->toArray();
+
+        // Foreach group
+        foreach ($groups as &$group) {
+
+            // If some group is not an array
+            if (!is_array($group)) {
+
+                // Convert it into array
+                $group = [$group];
+            }
+        }
+
+        // Return groups
+        return $groups;
     }
 }

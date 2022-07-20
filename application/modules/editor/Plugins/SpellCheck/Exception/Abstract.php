@@ -53,5 +53,6 @@ abstract class editor_Plugins_SpellCheck_Exception_Abstract extends ZfExtended_E
         'E1411' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
         'E1412' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.',
         'E1413' => 'SpellCheck can not work when target language is not supported by LanguageTool.',
+        'E1417' => 'SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList}',
     ];
 }

@@ -56,8 +56,89 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
     protected function initEvents() {
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+
+        // Checks spell checkers availability.
+        $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'handleSpellCheckerCheck'));
     }
-    
+
+    /**
+     * Is called periodically to check the LanguageTool instances
+     */
+    public function handleSpellCheckerCheck() {
+
+        // Get spellchecker state
+        $status = $this->spellcheckerState();
+        $serverList = [];
+        $offline = [];
+
+        // Foreach spellchecker
+        foreach ($status->running as $url => $stat) {
+
+            // Get text line
+            $serverList []= "\n" . $url . ': ' . ($stat ? 'ONLINE': 'OFFLINE!');
+
+            // If offline - append to separate array
+            if (!$stat) {
+                $offline[] = $url;
+            }
+        }
+
+        // Save offline instances list to memcache
+        editor_Plugins_SpellCheck_Configuration::saveDownListToMemCache($offline);
+
+        // If not all spellcheckers available
+        if (!$status->runningAll) {
+
+            // Log error
+            Zend_Registry::get('logger')
+                ->cloneMe('editor.spellcheck')
+                ->error('E1417', 'SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList}', $_ = [
+                'serverList' => join('; ', $serverList),
+                'serverStatus' => $status,
+            ]);
+        }
+    }
+
+    /**
+     * Checks if the configured spellcheckers are available and returns the result as stdClass
+     *
+     * @return stdClass
+     */
+    public function spellcheckerState() {
+
+        //
+        $spellchecker = new stdClass();
+
+        // Get SpellCheck-plugin's LanguageTool-adapter
+        $scAdapter = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter');
+
+        /* @var $scAdapter editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter */
+        $spellchecker->configured = $scAdapter->getConfiguredUrls();
+
+        // Get all unique LanguageTool unique url endpoints
+        $allUrls = array_unique(call_user_func_array('array_merge', array_values((array) $spellchecker->configured)));
+
+        // Prepare variables
+        $running = []; $version = []; $spellchecker->runningAll = true;
+
+        // Foreach unique endpoint
+        foreach($allUrls as $url) {
+
+            // Check whether it's running
+            $running[$url] = $scAdapter->testServerUrl($url, $version[$url]);
+
+            // Update $this->runningAll flag
+            $spellchecker->runningAll = $running[$url] && $spellchecker->runningAll;
+        }
+
+        // Assign variables to object to be returned
+        $spellchecker->running = $running;
+        $spellchecker->version = $version;
+
+        // Return object containing the info
+        return $spellchecker;
+    }
+
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         /* @var $view Zend_View_Interface */
