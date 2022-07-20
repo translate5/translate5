@@ -127,9 +127,10 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 }],
                 sorters: [{
                     property: 'customerId',
-                    direction: 'DESC'
+                    direction: 'ASC'
                 }, {
                     property: 'name',
+                    direction: 'ASC'
                 }]
             };
             vm.setStores(vmStores);

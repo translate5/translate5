@@ -69,7 +69,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
     }],
 
     fprmDataLoaded: function(height){
-        this.down('[name=yaml]').setHeight(height - 106);
+        this.down('[name=yaml]').setHeight(height - 114);
         this.callParent(arguments);
     }
 });

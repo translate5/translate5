@@ -41,7 +41,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      */
     fprmDataLoaded: function(height){
         this.createForm();
-        this.down('button#save').enable();
     },
     /**
      * Creates our forms & attaches them to our view

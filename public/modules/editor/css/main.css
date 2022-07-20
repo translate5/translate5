@@ -951,3 +951,4 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 .t5leveledGrid .t5level1 .x-grid-hd-checker-on .x-column-header-checkbox::after,
 .t5leveledGrid .t5level1 .x-action-col-icon { opacity: 0.7; }
 .t5leveledGrid .t5level1 .x-action-col-cell .x-item-disabled { opacity: 0.3; }
+#bconfFprmEditor textarea.mono { background-color: rgba(160, 160, 160, 0.35); }

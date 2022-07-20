@@ -188,6 +188,10 @@
     <source>Filter wurde erfolgreich gespeichert</source>
     <target>Filter wurde erfolgreich gespeichert</target>
 </trans-unit>
+<trans-unit id='T0tBUEkgSGlsZmU='>
+    <source>OKAPI Hilfe</source>
+    <target>OKAPI Hilfe</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

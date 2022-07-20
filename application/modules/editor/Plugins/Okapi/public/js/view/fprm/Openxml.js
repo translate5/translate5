@@ -26,71 +26,48 @@
  */
 
 /*
+    For easy reference: This is what the tagfield creating props and their hilarious "volatile" data looks like in the saved fprm/properties.
+    Note we have 3 different color-formats !
+    ...
+    bPreferenceTranslateExcelExcludeColumns.b=true
+    ...
+    tsComplexFieldDefinitionsToExtract.i=2
+    cfd0=FORMTEXT
+    tsExcelExcludedColors.i=2
+    tsExcelExcludedColumns.i=6
+    tsExcludeWordStyles.i=2
+    tsWordHighlightColors.i=2
+    tsWordExcludedColors.i=1
+    ...
+    tsPowerpointIncludedSlideNumbers.i=3
+    cfd1=HYPERLINK
+    ccc0=FF002060
+    ccc1=FF00B0F0
+    sss0=ExcludeCharacterStyle
+    sss1=ExcludeParagraphStyle
+    hlt0=blue
+    hlt1=green
+    yyy0=002060
+    sln0.i=1
+    sln1.i=2
+    sln2.i=3
+    zzz0=1AC
+    zzz1=1AD
+    zzz2=2A
+    zzz3=2F
+    zzz4=3B
+    zzz5=3C
+ */
 
-maxAttributeSize.i=4194304
-bPreferenceTranslateDocProperties.b=true
-bPreferenceTranslateComments.b=true
-bPreferenceTranslatePowerpointNotes.b=true
-bPreferenceTranslatePowerpointMasters.b=true
-bPreferenceIgnorePlaceholdersInPowerpointMasters.b=false
-bPreferenceTranslateWordHeadersFooters.b=true
-bPreferenceTranslateWordHidden.b=false
-bPreferenceTranslateWordExcludeGraphicMetaData.b=false
-bPreferenceTranslatePowerpointHidden.b=true
-bPreferenceTranslateExcelHidden.b=true
-bPreferenceTranslateExcelExcludeColors.b=true
-bPreferenceTranslateExcelExcludeColumns.b=true
-bPreferenceTranslateExcelSheetNames.b=false
-bPreferenceAddLineSeparatorAsCharacter.b=false
-sPreferenceLineSeparatorReplacement=$0a$
-bPreferenceReplaceNoBreakHyphenTag.b=false
-bPreferenceIgnoreSoftHyphenTag.b=false
-bPreferenceAddTabAsCharacter.b=true
-bPreferenceAggressiveCleanup.b=false
-bPreferenceAutomaticallyAcceptRevisions.b=true
-bPreferencePowerpointIncludedSlideNumbersOnly.b=true
-bPreferenceTranslateExcelDiagramData.b=true
-bPreferenceTranslateExcelDrawings.b=true
-subfilter=
-bInExcludeMode.b=true
-bInExcludeHighlightMode.b=true
-bPreferenceTranslateWordExcludeColors.b=true
-bReorderPowerpointNotesAndComments.b=false
-bPreferenceAllowEmptyTargets.b=false
-tsComplexFieldDefinitionsToExtract.i=2
-cfd0=FORMTEXT
-tsExcelExcludedColors.i=2
-tsExcelExcludedColumns.i=6
-tsExcludeWordStyles.i=2
-tsWordHighlightColors.i=2
-tsWordExcludedColors.i=1
-tsPowerpointIncludedSlideNumbers.i=3
-bExtractExternalHyperlinks.b=false
-cfd1=HYPERLINK
-ccc0=FF002060
-ccc1=FF00B0F0
-sss0=ExcludeCharacterStyle
-sss1=ExcludeParagraphStyle
-hlt0=blue
-hlt1=green
-yyy0=002060
-sln0.i=1
-sln1.i=2
-sln2.i=3
-zzz0=1AC
-zzz1=1AD
-zzz2=2A
-zzz3=2F
-zzz4=3B
-zzz5=3C
+/**
+ * MS Office Filter: this is the most complicated frontend especially because of the crazy way, list-data is saved in the fprm
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
     width: 800,
-    helpPage: 'http://okapiframework.org/wiki/index.php?title=OpenOffice_Filter',
     fieldDefinitions: {
         //general
-        'maxAttributeSize.i': { parent: 'general', config: { hidden: true }},
+        'maxAttributeSize.i': { parent: 'general', config: { hidden: true }},  // not visible in Rainbow
         'bPreferenceTranslateDocProperties.b': { parent: 'general', config: null },
         'bPreferenceTranslateComments.b': { parent: 'general', config: null },
         'bPreferenceAggressiveCleanup.b': { parent: 'general', config: null },
@@ -110,22 +87,21 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         'tsExcludeWordStyles.i': { parent: 'word', config: { guiData: 'wordStyles' }},
         'tsWordHighlightColors.i': { parent: 'word', config: { guiData: 'colorNames' }},
         'tsWordExcludedColors.i': { parent: 'word', config: { guiData: 'colors' }},
-        'bPreferenceTranslateWordExcludeColors.b': { parent: 'word', config: { hidden: true }}, // depends on tsWordExcludedColors.selection.length
+        'bPreferenceTranslateWordExcludeColors.b': { parent: 'word', config: { hidden: true }},
         //excel
         'bPreferenceTranslateExcelHidden.b': { parent: 'excel', config: null },
-        'bPreferenceTranslatePowerpointHidden.b': { parent: 'powerpoint', config: { hidden: true }}, // depends on bPreferenceTranslateExcelHidden,
-        'bPreferenceTranslateExcelExcludeColumns.b': { parent: 'excel', config: null },
+        'bPreferenceTranslatePowerpointHidden.b': { parent: 'powerpoint', config: { hidden: true }},
+        'bPreferenceTranslateExcelExcludeColumns.b': { parent: 'excel', config: null }, // if not true, tsExcelExcludedColumns, tsExcelExcludedColumnsSheetN will not be processed
         'bPreferenceTranslateExcelSheetNames.b': { parent: 'excel', config: null },
         'bPreferenceTranslateExcelDiagramData.b': { parent: 'excel', config: null },
         'bPreferenceTranslateExcelDrawings.b': { parent: 'excel', config: null },
         'tsExcelExcludedColors.i': { parent: 'excel', config: { guiData: 'colors', dataPrefix: 'FF' }},
-        'bPreferenceTranslateExcelExcludeColors.b': { parent: 'excel', config: { hidden: true }}, // depends on tsExcelExcludedColors.selection.length },
+        'bPreferenceTranslateExcelExcludeColors.b': { parent: 'excel', config: { hidden: true }},
         'subfilter': { parent: 'excel', config: null },
         'tsExcelExcludedColumns.i': { parent: 'excel', config: { hidden: true }}, // this provides the data for the following 3 fields
         'tsExcelExcludedColumnsSheet1.i': { parent: 'excel', config: { guiData: 'columns', dataPrefix: '1' }}, // this is a "virtual" field that does not show up in the data
         'tsExcelExcludedColumnsSheet2.i': { parent: 'excel', config: { guiData: 'columns', dataPrefix: '2' }}, // this is a "virtual" field that does not show up in the data
         'tsExcelExcludedColumnsSheet3.i': { parent: 'excel', config: { guiData: 'columns', dataPrefix: '3' }}, // this is a "virtual" field that does not show up in the data
-
         // powerpoint
         'bPreferenceTranslatePowerpointNotes.b': { parent: 'powerpoint', config: null },
         'bPreferenceTranslatePowerpointMasters.b': { parent: 'powerpoint', config: null },
@@ -187,7 +163,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         this.down('#fprmh_word').setTitle(this.translations.captionWordOptions);
         this.down('#fprmh_excel').setTitle(this.translations.captionExcelOptions);
         this.down('#fprmh_powerpoint').setTitle(this.translations.captionPowerpointOptions);
-        this.callParent(arguments);
+        this.createForm();
     },
 
     // QUIRK This is the only GUI with lists, so list support is implemented here
@@ -252,7 +228,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         return vals;
     },
     /**
-     *
+     * Creates the stores for the tagfields. A prefix can be applied to generate the "crazy" formats for "tsExcelExcludedColumnsSheetN" (=> e.g. "2AB") or the color-formats ("002060" vs "FF002060")
      * @param {string} id
      * @param {string} name
      * @param {string} prefix

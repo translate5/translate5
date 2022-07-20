@@ -54,7 +54,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
     }],
 
     fprmDataLoaded: function(height){
-        this.down('[name=xml]').setHeight(height - 106);
+        this.down('[name=xml]').setHeight(height - 114);
         this.callParent(arguments);
     }
 });

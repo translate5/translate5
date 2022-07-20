@@ -47,7 +47,8 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     title: {
         text: "FPRM Editor"
     },
-    fprmType: null,
+    okapiType: null, /* the okapi-type, e.g. okf_xml */
+    fprmType: null, /* the fprm-type, properties|xml|yaml|plain */
     rawData: null,
     transformedData: null,
     guiData: null,
@@ -58,9 +59,9 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     formPanel: null,
     formItems: [], // to be defined in extending classes
     form: null,
-    helpPage: null,
     strings: {
         title: "#UT#Editiere Filter Typ {0} von Bconf {1}",
+        help: "#UT#OKAPI Hilfe",
         save: "#UT#Speichern",
         cancel: "#UT#Abbrechen",
         invalidTitle: "#UT#Bearbeitung fehlerhaft",
@@ -88,6 +89,15 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     }],
     fbar: [{
         xtype: 'button',
+        text: 'Help',
+        itemId: 'help',
+        hidden: true,
+        iconCls: 'x-fa fa-book',
+        handler: function(){
+            this.up('#bconfFprmEditor').openHelpLink();
+        }
+    },{
+        xtype: 'button',
         text: 'Save',
         itemId: 'save',
         disabled: true,
@@ -96,7 +106,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         handler: function(){
             this.up('window').save();
         }
-    }, {
+    },{
         xtype: 'button',
         text: 'Cancel',
         itemId: 'cancel',
@@ -107,12 +117,14 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     }],
     initConfig: function(){
         this.items[0].items = this.formItems;
-        this.fbar[0].text = this.strings.save;
-        this.fbar[1].text = this.strings.cancel;
+        this.fbar[0].text = this.strings.help;
+        this.fbar[1].text = this.strings.save;
+        this.fbar[2].text = this.strings.cancel;
         return this.callParent(arguments);
     },
     initComponent: function(){
-        var titletext = this.strings.title.replace('{0}', '<i>“'+this.bconfFilter.get('okapiType')+'”</i>');
+        this.okapiType = this.bconfFilter.get('okapiType');
+        var titletext = this.strings.title.replace('{0}', '<i>“'+this.okapiType+'”</i>');
         this.title.text = titletext.replace('{1}', '<i>“'+this.bconfFilter.get('name')+'”</i>');
         this.callParent();
         this.formPanel = this.down('form#fprm');
@@ -125,27 +137,29 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         }
         return this.callParent(arguments);
     },
-
+    /**
+     * Enable save button & show help button after data is loaded
+     */
+    initButtons: function(){
+        this.down('button#save').enable();
+        if(this.getHelpLink() != null){
+            var helpButton = this.down('button#help');
+            helpButton.show();
+            // positioning only possible programmatical ...
+            helpButton.setStyle('left', '0px');
+        }
+    },
     load: function(){
         this.setLoading();
         this.loadFprmData();
     },
     /**
-     * Serts the fprm-data after load
-     * @param raw
-     * @param transformed
-     */
-    setFprmData: function(raw, transformed){
-        this.rawData = raw;
-        this.transformedData = transformed;
-    },
-    /**
      * Can be overwritten to init the layout after the data has been loaded
+     * This is the main entry-point in extending classes to create custom forms after the fprm-data is loaded
      * @param {int} height
      */
     fprmDataLoaded: function(height){
         this.form.setValues(this.getFormInitValues());
-        this.down('button#save').enable();
     },
     /**
      * Must be overwritten in subclasses to receive the raw content to send to the server
@@ -185,6 +199,21 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 return { yaml: this.rawData };
         }
         throw new Error('getFormInitValues must be implemented in subclasses!');
+    },
+    /**
+     * The helpLinks are stored in the translations.
+     * In case of GUIs, which represent multiple okapi-types, there may be a helpLink for each type with a fixed naming-scheme: "helpLink-" + okapiType
+     */
+    getHelpLink: function(){
+        if(this.translations.hasOwnProperty('helpLink-' + this.okapiType)){
+            return this.translations['helpLink-' + this.okapiType];
+        } else if(this.translations.hasOwnProperty('helpLink')){
+            return this.translations.helpLink;
+        }
+        return null;
+    },
+    openHelpLink: function(){
+        window.open(this.getHelpLink(), '_blank');
     },
     /**
      * Save button handler
@@ -232,6 +261,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 me.transformedData = data.transformed;
                 me.setHeight(height);
                 me.fprmDataLoaded(height);
+                me.initButtons();
             },
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);

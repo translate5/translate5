@@ -24,7 +24,35 @@
 
  END LICENSE AND COPYRIGHT
  */
+/**
+
+ maxAttributeSize.i=4194304
+ untagXmlStructures.b=true
+ extractNotes.b=false
+ extractMasterSpreads.b=true
+ extractHiddenLayers.b=false
+ extractHiddenPasteboardItems.b=false
+ skipDiscretionaryHyphens.b=false
+ extractBreaksInline.b=false
+ ignoreCharacterKerning.b=true
+ ignoreCharacterTracking.b=true
+ ignoreCharacterLeading.b=true
+ ignoreCharacterBaselineShift.b=true
+
+ // optional string-params that actually must be validated as floats
+ characterTrackingMaxIgnoranceThreshold=63636.0
+ characterBaselineShiftMinIgnoranceThreshold=1.345
+ characterKerningMaxIgnoranceThreshold=44.44
+ characterLeadingMaxIgnoranceThreshold=66.0
+ characterBaselineShiftMaxIgnoranceThreshold=753475.0
+ characterKerningMinIgnoranceThreshold=33.33
+ characterLeadingMinIgnoranceThreshold=75375.0
+ characterTrackingMinIgnoranceThreshold=6364.0
+
+ see /var/www/okapi/okapi/filters/idml/src/main/java/net/sf/okapi/filters/idml/Parameters.java
+ */
 Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
-    extend: 'Editor.plugins.Okapi.view.FprmEditor',
-    width: '61%',
+    extend: 'Editor.plugins.Okapi.view.fprm.Properties',
+    width: 700,
+    fieldDefinitions: {}
 });

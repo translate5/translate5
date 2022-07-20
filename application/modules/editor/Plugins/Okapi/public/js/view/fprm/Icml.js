@@ -24,7 +24,20 @@
 
  END LICENSE AND COPYRIGHT
  */
+
+/**
+
+ extractNotes.b=false
+ simplifyCodes.b=true
+ extractMasterSpreads.b=true
+ skipThreshold.i=1000 (max: 32000, min: 1, has tooltip)
+ newTuOnBr.b=false
+
+ see /var/www/okapi/okapi/filters/icml/src/main/java/net/sf/okapi/filters/icml/Parameters.java
+
+ */
 Ext.define('Editor.plugins.Okapi.view.fprm.Icml', {
-    extend: 'Editor.plugins.Okapi.view.FprmEditor',
-    width: '61%',
+    extend: 'Editor.plugins.Okapi.view.fprm.Properties',
+    width: 700,
+    fieldDefinitions: {}
 });
