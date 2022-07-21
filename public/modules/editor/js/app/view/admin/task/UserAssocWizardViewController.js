@@ -141,7 +141,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
     onSaveAssocBtnClick : function(){
         var me = this,
             formPanel = me.lookup('assocForm'),
-            taskStore = Ext.StoreManager.get('admin.Tasks'),
+            taskStore = Ext.StoreManager.get('projectTasks'),
             form = formPanel.getForm(),
             rec = formPanel.getRecord(),
             task = me.getFormTask();
@@ -314,7 +314,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizardViewController', {
      */
     getFormTask: function (){
         var me = this,
-            taskStore = Ext.StoreManager.get('admin.Tasks'),
+            taskStore = Ext.StoreManager.get('projectTasks'),
             task = me.getView().task,
             projectTasks = task.get('projectTasks'),
             form = me.lookup('assocForm').getForm(),

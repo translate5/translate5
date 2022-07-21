@@ -1305,11 +1305,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         // in the import wizard, fresh tasks are required
         me.getAdminTasksStore().load({
             callback:function (){
+
+                // update the project route based on the current task
+                me.handleProjectAfterImport(task);
+
                 // reload the project store after the task store is reloaded
                 me.getProjectGrid().getController().reloadProjects().then(function(){
 
-                    // update the project route based on the current task
-                    me.handleProjectAfterImport(task);
                     //set the store reference to the model(it is missing), it is used later when the task is deleted
                     task.store = me.getAdminTasksStore();
 
