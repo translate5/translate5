@@ -2,16 +2,19 @@
 
 declare(strict_types=1);
 
+use MittagQI\Translate5\Plugins\TMMaintenance\DTO\DeleteDTO;
+use MittagQI\Translate5\Plugins\TMMaintenance\DTO\GetListDTO;
+use MittagQI\Translate5\Plugins\TMMaintenance\DTO\UpdateDTO;
+use MittagQI\Translate5\Plugins\TMMaintenance\Helper\Json;
+use MittagQI\Translate5\Plugins\TMMaintenance\Service\SegmentProcessor;
+
 class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestController
 {
-    // TODO move somewhere
-    private const JSON_DEFAULT_DEPTH = 512;
-
     private Zend_Session_Namespace $session;
 
     protected $entityClass = editor_Models_Segment::class;
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -28,13 +31,13 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
         $data['l10n'] = $this->readLocalization();
 
-        $this->view->assign($data);
+        $this->assignView($data);
     }
 
     public function tmsAction(): void
     {
         /** @var editor_Models_LanguageResources_LanguageResource $model */
-        $model = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        $model = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
 
         //get all resources for the customers of the user by language combination
         $resources = $model->loadByUserCustomerAssocs();
@@ -46,153 +49,54 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
             $resources
         );
 
-        $this->view->assign($tms);
+        $this->assignView($tms);
     }
 
     public function getAction(): void
     {
-        if (null !== $this->getRequest()?->getParam('segments')) {
-            $this->getOne($this->getRequest()?->getParam('segments'));
+        // TODO seems to be not needed
+//        $segmentId = $this->getRequest()?->getParam('segments');
+//
+//        if (null !== $segmentId) {
+//            $this->assignView([
+//                $this->getSegmentsProcessor()->getOne($segmentId),
+//            ]);
+//
+//            return;
+//        }
 
-            return;
-        }
-
-        $this->getList();
+        $this->assignView(
+            $this->getSegmentsProcessor()->getList(GetListDTO::fromRequest($this->getRequest()))
+        );
     }
 
+    // TODO this is never called
     public function postAction(): void
     {
-        $this->view->assign([]);
+        $this->assignView([]);
     }
 
     public function putAction(): void
     {
-        $data = $this->jsonDecode($this->getRequest()?->getParam('data'));
-        $api = $this->getApi((int)$data['tm']);
-        /** @var editor_Models_Segment_Whitespace $whitespace */
-        $whitespace = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
-        try {
-            $api->updateEntry($data['rawSource'], $whitespace->unprotectWhitespace($data['rawTarget']));
-        } catch (\Exception $e) {
-            // TODO error
-        }
-
-        $this->view->assign([$data]);
+        $dto = UpdateDTO::fromRequest($this->getRequest());
+        $this->getSegmentsProcessor()->update($dto);
+//        $data = $this->getSegmentsProcessor()->getOne($dto->getId());
+        $this->assignView([Json::decode($this->getRequest()?->getParam('data'))]);
     }
 
     public function deleteAction(): void
     {
-        $data = $this->jsonDecode($this->getRequest()?->getParam('data'));
-        $api = $this->getApi((int)$data['tm']);
-        /** @var editor_Models_Segment_Whitespace $whitespace */
-        $whitespace = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
-        $api->deleteEntry($data['source'], $whitespace->unprotectWhitespace($data['target']));
+        $dto = DeleteDTO::fromRequest($this->getRequest());
+        $this->getSegmentsProcessor()->deleteAction($dto);
 
-        $this->view->assign([]);
+        $this->assignView([]);
     }
 
     #endregion Actions
 
-    private function getOne(string $id): void
+    private function getSegmentsProcessor(): SegmentProcessor
     {
-        $idParts = explode('_', $id);
-        $tmId = array_shift($idParts);
-        $searchCriteria = urldecode(substr($id, strlen($tmId) + 1));
-
-        $connector = $this->getOpenTM2Connector((int)$tmId);
-        $resultList = $connector->search($searchCriteria);
-        $data = $resultList->getResult();
-        $data = $this->reformatData($data, (int)$tmId);
-
-        $this->view->assign([
-            array_shift($data),
-        ]);
-    }
-
-    private function getList(): void
-    {
-        $tmId = (int)$this->getRequest()?->getParam('tm');
-
-        $connector = $this->getOpenTM2Connector($tmId);
-
-        // TODO extract to somewhere
-        $totalAmount = 0;
-        $limit = (int)$this->getRequest()?->getParam('limit');
-        $result = [];
-        $offset = $this->getRequest()?->getParam('offset');
-
-        // TODO remove once id on tm side is implemented
-        $fakeIdIndex = 1;
-        while ($totalAmount < $limit) {
-            $resultList = $connector->search(
-                $this->getRequest()?->getParam('searchCriteria'),
-                $this->getRequest()?->getParam('searchField'),
-                $offset
-            );
-
-            $data = $resultList->getResult();
-            $data = $this->reformatData($data, $tmId);
-            $data = $this->replaceSymbols($data);
-
-            // TODO remove once id on tm side is implemented
-            $data = array_map(function (array $item) use ($tmId, &$fakeIdIndex) {
-                $item['id'] = $tmId . '_' . urlencode($item['rawSource']) . '_' . ++$fakeIdIndex;
-
-                return $item;
-            }, $data);
-
-            $offset = $resultList->getNextOffset();
-
-            $totalAmount += count($data);
-            $result[] = $data;
-
-            if (null === $offset) {
-                break;
-            }
-        }
-
-        $this->view->assign([
-            'items' => array_merge(...$result),
-            'metaData' => ['offset' => $offset],
-        ]);
-    }
-
-    private function reformatData(array $data, int $tmId): array
-    {
-        $result = [];
-
-        foreach ($data as $index => $item) {
-            $item = (array)$item;
-            $metadata = [];
-
-            foreach ($item['metaData'] as $metadataum) {
-                $metadata[$metadataum->name] = $metadataum->value;
-            }
-
-            $item['metaData'] = $metadata;
-            $item['tm'] = $tmId;
-
-            $result[] = $item;
-        }
-
-        return $result;
-    }
-
-    private function replaceSymbols(array $data): array
-    {
-        /** @var editor_Models_Segment_Whitespace $whitespace */
-        $whitespace = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
-        $result = [];
-
-        foreach ($data as $item) {
-            foreach (['source', 'target', 'rawTarget'] as $field) {
-                $item[$field] = $whitespace->protectWhitespace($item[$field], editor_Models_Segment_Whitespace::ENTITY_MODE_OFF);
-            }
-
-            $result[] = $item;
-        }
-
-        return $result;
+        return ZfExtended_Factory::get(SegmentProcessor::class);
     }
 
     private function readLocalization(): array
@@ -201,7 +105,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
 
         $fileContent = file_get_contents(__DIR__ . '/../locales/' . $this->session->data->locale . '.json');
         try {
-            $data = $this->jsonDecode($fileContent);
+            $data = Json::decode($fileContent);
         } catch (JsonException $exception) {
             // TODO do something
         }
@@ -223,52 +127,8 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         return $this->session->data->locale;
     }
 
-    private function getOpenTM2Connector(int $languageResourceId): editor_Services_Connector
+    private function assignView(array $data): void
     {
-        /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
-        $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        $languageResource->load($languageResourceId);
-
-        //TODO move to class
-        ZfExtended_Factory::addOverwrite('editor_Services_Connector_TagHandler_Xliff', new class extends editor_Services_Connector_TagHandler_Abstract {
-            public function prepareQuery(string $queryString, int $segmentId = -1): string
-            {
-                return $queryString;
-            }
-
-            public function restoreInResult(string $resultString, int $segmentId = -1): ?string
-            {
-                return $resultString;
-            }
-        });
-
-        /** @var editor_Services_Manager $manager */
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-
-        return $manager->getConnector($languageResource);
-    }
-
-    private function getApi(int $languageResourceId): editor_Services_OpenTM2_HttpApi
-    {
-        /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
-        $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        $languageResource->load($languageResourceId);
-
-        $api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
-        $api->setLanguageResource($languageResource);
-
-        return $api;
-    }
-
-    /**
-     * @param string $data
-     *
-     * @return array
-     *
-     * @throws JsonException
-     */
-    private function jsonDecode(string $data): array
-    {
-        return json_decode($data, true, self::JSON_DEFAULT_DEPTH, JSON_THROW_ON_ERROR);
+        $this->view->assign($data);
     }
 }
