@@ -34,7 +34,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     fieldDefaults: {
         "boolean": { xtype: 'checkbox', inputValue: true, uncheckedValue: false, defaultValue: false },
         "integer": { xtype: 'numberfield', allowDecimals: false, allowExponential: false, defaultValue: 0 },
-        "float": { xtype: 'numberfield', allowDecimals: true, allowExponential: false, defaultValue: 0 },
+        "float": { xtype: 'numberfield', allowDecimals: true, allowExponential: false, defaultValue: null }, // a virtual data-type, so we do not force it to be "02 as "in reality" it's a string which supports empty values
         "string": { xtype: 'textfield', defaultValue: "" },
     },
     /**

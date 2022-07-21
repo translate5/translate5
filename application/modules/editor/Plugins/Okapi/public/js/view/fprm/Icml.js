@@ -38,5 +38,11 @@
 Ext.define('Editor.plugins.Okapi.view.fprm.Icml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
     width: 700,
-    fieldDefinitions: {}
+    fieldDefinitions: {
+        'extractNotes.b': { config: {}},
+        "simplifyCodes.b": { config: {}},
+        "extractMasterSpreads.b": { config: {}},
+        "skipThreshold.i": { config: { minValue: 1, maxValue: 32000, hasTooltip: true }},
+        "newTuOnBr.b": { config: {}}
+    }
 });

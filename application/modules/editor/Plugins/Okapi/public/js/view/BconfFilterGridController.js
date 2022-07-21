@@ -31,6 +31,8 @@
 Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.bconffilterGridController',
+    isCustomFiltered: false,
+    isSearchFiltered: false,
     listen: {
         store: {
             'bconffilterStore': {
@@ -73,18 +75,48 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     },
 
     handleSearch: function(field, searchString){
-        var store = this.getView().getStore(),
-            searchFilterValue = searchString.trim();
+        var searchFilterValue = searchString.trim();
         if(searchFilterValue){
-            var searchRE = new RegExp(Editor.util.Util.escapeRegex(searchFilterValue), 'i');
-            store.addFilter({
-                id: 'search',
-                filterFn: ({data}) => searchRE.exec(JSON.stringify(Object.values(data)))
-            });
+            this.setSearchFilter(searchFilterValue)
         } else {
-            store.clearFilter();
+            this.removeSearchFilter();
         }
-        field.getTrigger('clear').setVisible(searchFilterValue);
+        if(field){
+            field.getTrigger('clear').setVisible(searchFilterValue);
+        }
+    },
+
+    /**
+     *
+     * @param {string} query
+     */
+    setSearchFilter: function(query){
+        var view = this.getView(),
+            store = view.getStore(),
+            searchRE = new RegExp(Editor.util.Util.escapeRegex(query), 'i');
+        store.clearFilter();
+        store.addFilter({
+            id: 'search',
+            filterFn: ({data}) => searchRE.exec(JSON.stringify(Object.values(data)))
+        });
+        view.removeCls('t5noLevels'); // when searching, we will distinguish custom/real filters
+        this.isSearchFiltered = true;
+    },
+
+    /**
+     *
+     */
+    removeSearchFilter: function(){
+        if(this.isSearchFiltered){
+            var view = this.getView(),
+                store = view.getStore();
+            store.clearFilter();
+            if(this.isCustomFiltered){
+                store.addFilter(store.customizedFilter);
+                view.addCls('t5noLevels'); // was removed in setSearchFilter
+            }
+            this.isSearchFiltered = false;
+        }
     },
 
     /**
@@ -96,15 +128,17 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         var view = this.getView(),
             store = view.getStore();
         if(toggled){
-            store.removeFilter('defaultsFilter');
+            store.removeFilter('customizedFilter');
             view.removeCls('t5noLevels');
             btn.setText(this.getView().strings.hideDefaultFilters);
             btn.setIconCls('x-fa fa-eye-slash');
+            this.isCustomFiltered = false;
         } else {
-            store.addFilter(store.defaultsFilter);
+            store.addFilter(store.customizedFilter);
             view.addCls('t5noLevels'); // when only the default filters are shown, we do not need the levels in the grid
             btn.setText(this.getView().strings.showDefaultFilters);
             btn.setIconCls('x-fa fa-eye');
+            this.isCustomFiltered = true;
         }
     },
 
@@ -123,9 +157,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     cloneFilter: function(view, rowIndex, colIndex, item, e, record){
         var store = view.getStore(),
             newRecData = Ext.clone(record.getData());
-        // we temporarily set a search value to reduce the number of shown rows
-        if(!view.grid.getSearchValue()){
-            view.grid.setSearchValue(record.get('okapiType'));
+        // we temporarily set a search value to reduce the number of shown rows, but only if all filters are shown and no search is active
+        if(!view.grid.getSearchValue() && !this.isCustomFiltered){
+            view.grid.setSearchValue(record.get('okapiType'), true);
         }
         view.select(rowIndex);
         delete newRecData.id;

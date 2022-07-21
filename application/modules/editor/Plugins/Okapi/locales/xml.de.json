@@ -1,3 +1,4 @@
 {
-    "helpLink": "http://okapiframework.org/wiki/index.php/XML_Filter"
+    "helpLink-okf_xml": "http://okapiframework.org/wiki/index.php/XML_Filter",
+    "helpLink-okf_itshtml5": "https://okapiframework.org/wiki/index.php/HTML5-ITS_Filter"
 }

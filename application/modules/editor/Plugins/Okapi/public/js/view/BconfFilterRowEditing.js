@@ -86,7 +86,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
             if(record.isClonedRecord){
                 delete record.isClonedRecord;
                 // invalidate the potential tmp search value set when cloning records
-                cellContext.grid.unsetSearchValue();
+                cellContext.grid.unsetSearchValue(true);
             }
         },
         canceledit: function(rowEditing, cellContext){
@@ -97,7 +97,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
                 delete record.isClonedRecord;
                 record.drop();
                 // invalidate the potential tmp search value set when cloning records
-                cellContext.grid.unsetSearchValue();
+                cellContext.grid.unsetSearchValue(true);
             }
         }
     },

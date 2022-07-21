@@ -1,9 +1,9 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/ICML_Filter",
-    "extractNotes.b": "Extract notes",
-    "simplifyCodes.b": "Simplify inline codes when possible",
-    "extractMasterSpreads.b": "Extract master spreads",
-    "skipThreshold.i": "Maximum spread size",
-    "skipThreshold.i.tooltip": "Skip any spread larger than the given value (in Kbytes)",
-    "newTuOnBr.b": "Create new paragraphs on hard returns (&lt;br/&gt; elements) [BETA]"
+    "extractNotes": "Notizen extrahieren",
+    "simplifyCodes": "Inline-HTML vereinfachen wenn möglich",
+    "extractMasterSpreads": "Musterseiten extrahieren",
+    "skipThreshold": "Maximale Musterseiten Größe",
+    "skipThresholdTooltip": "Größere Musterseiten als dieser Wert ignorieren (in Kbytes)",
+    "newTuOnBr": "Neuen Textabschnitt erzeugen bei harten Zeilenumbrüchen<br/>(&lt;br/&gt; elements) [BETA]"
 }

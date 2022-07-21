@@ -89,33 +89,46 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 defaults: { labelClsExtra: Ext.baseCSSPrefix + 'selectable' },
                 items: []
             }],
-                fbar: [{
-                xtype: 'button',
-                text: this.strings.help,
-                itemId: 'help',
-                hidden: true,
-                iconCls: 'x-fa fa-book',
-                handler: function(){
-                    this.up('#bconfFprmEditor').openHelpLink();
-                }
-            },{
-                xtype: 'button',
-                text: this.strings.save,
-                itemId: 'save',
-                disabled: true,
-                formBind: true,
-                iconCls: 'x-fa fa-check',
-                handler: function(){
-                    this.up('window').save();
-                }
-            },{
-                xtype: 'button',
-                text: this.strings.cancel,
-                itemId: 'cancel',
-                iconCls: 'x-fa fa-times-circle',
-                handler: function(){
-                    this.up('window').closeWindow();
-                }
+            dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                listeners: {
+                    afterlayout: function(toolbar){
+                        // the button-position gets lost every time the layout is applied (e.g. when changing between tabs in Openxml)
+                        // positioning only possible programmatical ...
+                        toolbar.down('button#help').setStyle('left', '0px');
+                    }
+                },
+                items: [
+                    { xtype: 'component', flex: 1 },{
+                    xtype: 'button',
+                    text: this.strings.help,
+                    itemId: 'help',
+                    hidden: true,
+                    iconCls: 'x-fa fa-book',
+                    handler: function(){
+                        this.up('#bconfFprmEditor').openHelpLink();
+                    }
+                },{
+                    xtype: 'button',
+                    text: this.strings.save,
+                    itemId: 'save',
+                    disabled: true,
+                    formBind: true,
+                    iconCls: 'x-fa fa-check',
+                    handler: function(){
+                        this.up('window').save();
+                    }
+                },{
+                    xtype: 'button',
+                    text: this.strings.cancel,
+                    itemId: 'cancel',
+                    iconCls: 'x-fa fa-times-circle',
+                    handler: function(){
+                        this.up('window').closeWindow();
+                    }
+                }]
             }]
         };
         return this.callParent([Ext.apply(config, instanceConfig)]);
@@ -155,10 +168,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     finalizeLayout: function(){
         this.down('button#save').enable();
         if(this.getHelpLink() != null){
-            var helpButton = this.down('button#help');
-            helpButton.show();
-            // positioning only possible programmatical ...
-            helpButton.setStyle('left', '0px');
+            this.down('button#help').show();
         }
         var top = Math.floor((window.innerHeight - this.getHeight()) / 2);
         this.setY((top < 10) ? 10 : top);

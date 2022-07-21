@@ -1,7 +1,7 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/IDML_Filter",
     "maxAttributeSize": "Maximale Attribut-Größe von IDML Attributen",
-    "untagXmlStructures": "XML-Strukturen",
+    "untagXmlStructures": "XML-Strukturen auflösen",
     "extractNotes": "Notizen extrahieren",
     "extractMasterSpreads": "Musterseiten extrahieren",
     "extractHiddenLayers": "Versteckte Ebenen extrahieren",

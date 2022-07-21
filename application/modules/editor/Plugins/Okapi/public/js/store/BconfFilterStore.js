@@ -50,8 +50,8 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
     customIdentifierMap: null,
     /** @var {Array} */
     allExtensions: [],
-    defaultsFilter: {
-        id: 'defaultsFilter',
+    customizedFilter: {
+        id: 'customizedFilter',
         filterFn: function(rec){
             return rec.data.isCustom;
         }
@@ -82,7 +82,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
         if(!config.filters){
             config.filters = [];
         }
-        config.filters.push(this.defaultsFilter); // Enable filter initially
+        config.filters.push(this.customizedFilter); // Enable filter initially
         return this.callParent([config]);
     },
     /**
@@ -145,7 +145,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
      * @param {Array} extensions
      * @param {boolean} isCustom
      */
-    updateExtensionsByIdentifier(identifier, extensions, isCustom){
+    updateExtensionsByIdentifier: function(identifier, extensions, isCustom){
         console.log('BconfFilterStore.updateExtensionsByIdentifier: ', identifier, ', extensions: ', extensions, ', isCustom:', isCustom); // TODO REMOVE
         var record,
             extBefore = [], // represents the extensions the changed item currently has
@@ -191,7 +191,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
      * Retrieves all exensions that shall be shown in the tagfield selector
      * @returns {[]}
      */
-    getAllExtensions(){
+    getAllExtensions: function(){
         return this.allExtensions;
     }
 });

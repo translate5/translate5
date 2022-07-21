@@ -45,13 +45,12 @@ class editor_Plugins_Okapi_Bconf_Filters {
      */
     const GUIS = [
         'okf_html' => ['class' => 'Yaml', 'extensions' => ['html']],
-        'okf_xml' => ['class' => 'Xml', 'extensions' => ['xml']],
-        'okf_xmlstream' => ['class' => 'Yaml', 'extensions' => ['xml']],
+        'okf_icml' => ['class' => 'Icml', 'extensions' => []], // TODO BCONF: a testfile would be great
         'okf_idml' => ['class' => 'Idml', 'extensions' => ['idml']],
-        /*
-        'okf_icml' => ['class' => 'Icml', 'extensions' => ['icml']], // TODO: a testfile is required
-        */
-        'okf_openxml' => ['class' => 'Openxml', 'extensions' => ['docx', 'pptx', 'xlsx']]
+        'okf_itshtml5' => ['class' => 'Xml', 'extensions' => ['html']],
+        'okf_openxml' => ['class' => 'Openxml', 'extensions' => ['docx', 'pptx', 'xlsx']],
+        'okf_xml' => ['class' => 'Xml', 'extensions' => ['xml']],
+        'okf_xmlstream' => ['class' => 'Yaml', 'extensions' => ['xml']]
     ];
     /**
      * A list of file-extensions, that validation files exist for.
@@ -335,7 +334,6 @@ class editor_Plugins_Okapi_Bconf_Filters {
                 $valid = false;
             }
         }
-        // TODO BCONF: add GUI-datafiles/translations to this validation
         return $valid;
     }
 }

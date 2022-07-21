@@ -59,6 +59,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     helpSection: 'useroverview',
     searchValSet: '',
     searchValCache: '',
+    isNewRecordSearchSet: false,
     cls: 't5actionColumnGrid t5leveledGrid',
     text_cols: {
         name: '#UT#Name',
@@ -266,21 +267,32 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         return this.down('textfield#search').getValue();
     },
     /**
+     *
      * @param {string} newVal
+     * @param {boolean} isNewRecordSearch
      */
-    setSearchValue: function(newVal){
+    setSearchValue: function(newVal, isNewRecordSearch){
         var searchField = this.down('textfield#search');
         this.searchValSet = newVal;
         this.searchValCache = searchField.getValue();
         searchField.setValue(newVal);
         searchField.checkChange();
+        this.isNewRecordSearchSet = isNewRecordSearch;
     },
-    unsetSearchValue: function(){
+    /**
+     * @param {boolean} isNewRecordSearch
+     */
+    unsetSearchValue: function(isNewRecordSearch){
+        // we do not always set a search-value when cloning records, so we must prevent removing user-seraches
+        if(isNewRecordSearch && !this.isNewRecordSearchSet){
+            return;
+        }
         var searchField = this.down('textfield#search');
         if(this.searchValSet && this.searchValSet === this.getSearchValue()){
             searchField.setValue(this.searchValCache);
             searchField.checkChange();
         }
         this.searchValCache = this.searchValCache = '';
+        this.isNewRecordSearchSet = false;
     }
 });

@@ -63,7 +63,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     beforeInit: function(view){
         var itemId = view.getItemId(),
             routes = {};
-        /** @link Editor.controller.admin.Customer TODO support routing in Customer Controller */
+        /** @link Editor.controller.admin.Customer TODO FIXME: support routing in Customer Controller */
         for(const [route, action] of Object.entries(this.routesToSet)){
             routes[view.routePrefix + itemId + '/' + route] = action;
         }

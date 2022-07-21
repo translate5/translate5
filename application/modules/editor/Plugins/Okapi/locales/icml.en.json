@@ -5,5 +5,5 @@
     "extractMasterSpreads": "Extract master spreads",
     "skipThreshold": "Maximum spread size",
     "skipThresholdTooltip": "Skip any spread larger than the given value (in Kbytes)",
-    "newTuOnBr": "Create new paragraphs on hard returns (&lt;br/&gt; elements) [BETA]"
+    "newTuOnBr": "Create new paragraphs on hard returns<br/>(&lt;br/&gt; elements) [BETA]"
 }
