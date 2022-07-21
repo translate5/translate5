@@ -96,7 +96,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * @returns {string}
      */
     getFieldCaption: function(id, config){
-        //
+        // Tooltips can be configured in the fieldDefinitions and expect a translation with the same id + 'Tooltip'
         if(this.translations.hasOwnProperty(id)){
             if(config.hasTooltip && this.translations.hasOwnProperty(id + 'Tooltip')){
                 return '<span data-qtip="' + this.translations[id + 'Tooltip'] + '">' + this.translations[id] + '</span>';
