@@ -15,7 +15,7 @@ Ext.define('TMMaintenance.view.main.CreateFormController', {
         record.set({tm: this.getViewModel().get('selectedTm')});
         record.save({
             success: () => {
-                this.getView().up('app-main').controller.hideForm()
+                this.getView().up('app-main').controller.hideForm();
             }
         });
     },

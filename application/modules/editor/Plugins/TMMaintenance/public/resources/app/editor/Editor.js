@@ -61,6 +61,10 @@ Ext.define('Ext.translate5.Editor', {
             success: function () {
                 location.record.set('isSaving', false);
             },
+            error: function () {
+                // TODO show error
+                location.record.set('isSaving', false);
+            }
         });
 
         location.view.refresh();
