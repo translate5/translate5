@@ -59,8 +59,7 @@ class editor_Plugins_SpellCheck_Check {
         'register'      => self::STYLE,
         'typographical' => self::GRAMMAR,
         'uncategorized' => self::GRAMMAR,
-        'whitespace'    => self::GRAMMAR,
-        'default'       => ''
+        'whitespace'    => self::GRAMMAR
     ];
 
     /**
@@ -101,20 +100,21 @@ class editor_Plugins_SpellCheck_Check {
         foreach ($data->matches as $index => $match) {
 
             // Get quality category
-            $category = self::$map[$match->rule->issueType] ?? 'default';
+            if ($category = self::$map[$match->rule->issueType] ?? 0) {
 
-            // Convert into special data structure
-            $this->states[$category] []= (object) [
-                'matchIndex'        => $index,                                                       // Integer
-                'range'             => [                                                             // Rangy bookmark
-                    'start' => $match->offset,
-                    'end'   => $match->offset + $match->context->length
-                ],
-                'message'           => $match->message,                                              // String
-                'replacements'      => array_column($match->replacements ?? [], 'value'),            // Array
-                'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'),            // Array
-                'cssClassErrorType' => $category                                                     // String
-            ];
+                // Convert into special data structure
+                $this->states[$category] []= (object) [
+                    'matchIndex'        => $index,                                                       // Integer
+                    'range'             => [                                                             // Rangy bookmark
+                        'start' => $match->offset,
+                        'end'   => $match->offset + $match->context->length
+                    ],
+                    'message'           => $match->message,                                              // String
+                    'replacements'      => array_column($match->replacements ?? [], 'value'),            // Array
+                    'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'),            // Array
+                    'cssClassErrorType' => $category                                                     // String
+                ];
+            }
         }
     }
 
