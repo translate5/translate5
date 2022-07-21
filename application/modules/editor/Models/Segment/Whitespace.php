@@ -295,12 +295,12 @@ class editor_Models_Segment_Whitespace {
 
     /**
      * replaces whitespace placeholder tags with internal tags
-     * @param $wholeTag
-     * @param $tagName
-     * @param $length
+     * @param string $wholeTag
+     * @param string $tagName
+     * @param string $length
      * @return editor_Models_Import_FileParser_Tag
      */
-    private function handleWhitespaceTags($wholeTag, $tagName, $length): editor_Models_Import_FileParser_Tag {
+    private function handleWhitespaceTags(string $wholeTag, string $tagName, string $length): editor_Models_Import_FileParser_Tag {
         $cls = ' '.$tagName;
 
         //either we get a reusable shortcut number in the map, or we have to increment one

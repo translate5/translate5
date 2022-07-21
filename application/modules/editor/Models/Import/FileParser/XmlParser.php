@@ -574,11 +574,11 @@ class editor_Models_Import_FileParser_XmlParser {
                 
             // tag[attr=foo] attribute value equals
             case '=':
-                return $value == $comparator;
+                return $value === $comparator;
 
             // tag[attr!=foo] attribute value is not equal
             case '!=':
-                return $value != $comparator;
+                return $value !== $comparator;
 
             // tag[attr^=foo] attribute value starts with
             case '^=':
@@ -745,7 +745,7 @@ class editor_Models_Import_FileParser_XmlParser {
         return $this->join($this->xmlChunks);
     }
     
-    public static function join(array $chunks): string {
+    public function join(array $chunks): string {
         return join('', $chunks);
     }
 }

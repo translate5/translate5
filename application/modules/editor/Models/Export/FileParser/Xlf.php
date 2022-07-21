@@ -117,7 +117,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         });
 
         //some special content (for example orphaned tags) is masked as internal placeholder in the skeleton
-        $xmlparser->registerElement('t5:placeholder', null, function($tag, $key, $opener) use ($xmlparser){
+        $xmlparser->registerElement('t5:placeholder', null, static function($tag, $key, $opener) use ($xmlparser){
             $xmlparser->replaceChunk($key, base64_decode($xmlparser->getAttribute($opener['attributes'], 'data-content')));
         });
 

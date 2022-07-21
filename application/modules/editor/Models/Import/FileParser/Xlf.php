@@ -399,7 +399,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 
         $mid = $this->calculateMid($opener, true);
 
-        if($tag == 'mrk') {
+        if($tag === 'mrk') {
             $this->otherContent->addSource($mid, $opener['openerKey'], $key); //add a new container for the content after the current mrk
         }
 

@@ -36,6 +36,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Exception\RuntimeException;
 
+/**
+ * List and show the content of a tasks import data skeleton file(s)
+ */
 class TaskSkeletonfileCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
@@ -45,11 +48,11 @@ class TaskSkeletonfileCommand extends Translate5AbstractCommand
     {
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('')
+            ->setDescription('List and show the content of a tasks import data skeleton file(s)')
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('');
+            ->setHelp('Task ID or GUID must be given, then the available skeleton files could be listed or the content of one or all skeleton files can be shown.');
 
         $this->addArgument('identifier', InputArgument::REQUIRED, 'Either a complete numeric task ID or the task GUID (with or without curly braces)');
 

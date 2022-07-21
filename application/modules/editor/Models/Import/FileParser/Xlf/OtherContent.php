@@ -158,7 +158,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
      * Prepare the other contents with preserved whitespace, returning already split the convert content on MRK boundaries
      * @param bool $source
      */
-    private function prepareContentPreserved(bool $source)
+    private function prepareContentPreserved(bool $source): void
     {
         $data = $source ? $this->otherContentSource : $this->otherContentTarget;
         $containerBoundary = $source ? $this->sourceElementBoundary : $this->targetElementBoundary;
@@ -559,54 +559,5 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
                 $data[$mid]->contentOriginal = $this->xmlparser->join($data[$mid]->contentChunksOriginal);
             }
         }
-    }
-}
-
-class editor_Models_Import_FileParser_Xlf_OtherContent_Data {
-    public string $mid;
-    public int $startMrkIdx;
-    public int $endMrkIdx;
-
-    /**
-     * Contains the content as string with internal tags,
-     *  with or without preserved whitespace, depending on the same name flag,
-     * @var string
-     */
-    public string $content = '';
-
-    /**
-     * Contains the above content as chunks - so no reparse is needed
-     * @var array
-     */
-    public array $contentChunks = [];
-
-    /**
-     * Contains the above content as original chunks - so no reparse is needed
-     *  original means: internal tags are converted back - but all after the multiple whitespaces were condensed
-     * @var array
-     */
-    public array $contentChunksOriginal = [];
-
-    /**
-     * Contains the above content as original content in one string
-     * @var string
-     */
-    public string $contentOriginal = '';
-
-    /**
-     * Flag if current element should be imported
-     * @var bool
-     */
-    public bool $toBeImported = false;
-
-    /**
-     * @param string $mid
-     * @param int $startIdx
-     * @param int $endIdx
-     */
-    public function __construct(string $mid, int $startIdx, int $endIdx) {
-        $this->mid = $mid;
-        $this->startMrkIdx = $startIdx;
-        $this->endMrkIdx = $endIdx;
     }
 }

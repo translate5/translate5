@@ -300,7 +300,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param bool $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
      * @return array
      */
-    public function convert(mixed $chunks, bool $source, bool $preserveWhitespace = false): array {
+    public function convert(array|string $chunks, bool $source, bool $preserveWhitespace = false): array {
         $this->result = [];
         $this->removeTags = false;
         $this->shortTagNumbers->init($source);

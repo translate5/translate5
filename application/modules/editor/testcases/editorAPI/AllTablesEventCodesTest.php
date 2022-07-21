@@ -68,8 +68,6 @@ class AllTablesEventCodesTest extends \ZfExtended_Test_ApiTestcase {
         }
         
         $collectedCodes = array_unique($collectedCodes);
-        //FIXME CHANGE URL HERE - AND validate ecode.txt against existing ones, this may never be! Check Pavels codes, he just jumped.
-        // how to find gaps?
         $docuUrl = ZfExtended_Logger_Writer_EcodeWriter::ECODE_FILE;
         $text = file_get_contents($docuUrl);
         $codes = [];
