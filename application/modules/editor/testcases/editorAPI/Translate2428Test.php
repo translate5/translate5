@@ -42,6 +42,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         $appState = self::assertAppState();
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
         self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
+        self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
@@ -59,8 +60,8 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         ]);
         
         $this->createTask();
-        $this->addMosesMt("one");
-        $this->addMosesMt("two");
+        $this->addZDemoMTMt("one");
+        $this->addZDemoMTMt("two");
         self::$api->addTaskAssoc();
         $this->queueAnalysys();
         self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
@@ -157,19 +158,19 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
     }
     
     /***
-     * Create moses mt resource.
+     * Create dummy mt resource.
      */
-    protected function addMosesMt(string $sufix){
+    protected function addZDemoMTMt(string $sufix){
         $params=[
-            'resourceId'=>'editor_Services_Moses_1',
+            'resourceId'=>'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Services_Moses',
-            'serviceName'=> 'Moses',
-            'name' => 'API Testing::MosesMt_'.__CLASS__.'_'.$sufix
+            'serviceType' => 'editor_Plugins_ZDemoMT',
+            'serviceName'=> 'ZDemoMT',
+            'name' => 'API Testing::ZDemoMT_'.__CLASS__.'_'.$sufix
         ];
         
         self::$api->addResource($params);
