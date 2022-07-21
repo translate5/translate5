@@ -72,6 +72,9 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
      */
     public function process(array $segmentsTags, string $slot = null, $processingMode, $spellCheckLang = false) {
 
+        /* @var editor_Models_Db_SegmentQuality $qualityM */
+        $qualityM = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+
         // Get connector
         $connector = $this->getConnector($slot);
 
@@ -84,42 +87,20 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
             // Get segment and task shortcut
             $segment = $tags->getSegment();
 
-            class_exists('editor_Utils');
+            // If existing qualities won't be marked for deletion
+            if ($tags->processingMode != editor_Segment_Processing::EDIT) {
 
-            //i($tags->processingMode, 'a');
-            $tags->processingMode = editor_Segment_Processing::EDIT;
+                // Clean existing spellcheck-qualities
+                $qualityM->removeBySegmentAndType($segment->getId(), editor_Plugins_SpellCheck_QualityProvider::qualityType());
+                //$qualityM->removeBySegmentAndType($segment->getId(), editor_Plugins_SpellCheck_QualityProvider::getType());
+                //$qualityM->removeBySegmentAndType($segment->getId(), 'spellcheck');
+            }
 
             // Foreach target
             foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
 
                 // Do check
                 $check = new editor_Plugins_SpellCheck_Check($segment, $target->getField(), $connector, $spellCheckLang);
-
-                //$text = $segment->getTargetEditToSort();
-                /*if (preg_match('~MOBILE24~', $text)) {
-                    //i($text, 'a');
-                    //i('mobile ' . $segment->getId(), 'a');
-
-                    i([
-                        'database',
-                        editor_Utils::db()->query('
-                            SELECT * FROM `LEK_segment_quality` WHERE `segmentId` = ?
-                        ', $segment->getId())->fetchAll()
-                    ], 'a');
-
-                    // Drop existing spellcheck-qualities
-                    //$tags->getQualities()->dropByType($target->getField(), $type);
-                    foreach ($tags->getQualities()->getExisting() as &$existing) {
-                        i([$existing->processingState, $existing->toArray()], 'a');
-                    }
-                }*/
-
-                // Drop existing spellcheck-qualities
-                //$tags->getQualities()->dropByType($target->getField(), $type);
-                /*foreach ($tags->getQualities()->getExisting() as &$existing) {
-                    i($existing->toArray(), 'a');
-                    $existing->processingState = 'delete';
-                }*/
 
                 // Process check results
                 foreach ($check->getStates() as $category => $qualityA) {
