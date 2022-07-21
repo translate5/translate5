@@ -35,30 +35,15 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     id: 'bconfFprmEditor',
     modal: true,
     maximizable: true,
-    margin: 50,
-    width: 800,
-    height: window.innerHeight - 100,
-    minHeight: 400,
-    minWidth: 600,
-    layout: 'fit',
     constrainHeader: true,
     iconCls: 'x-fa fa-edit',
     loadMask: true,
     title: {
         text: "FPRM Editor"
     },
-    okapiType: null, /* the okapi-type, e.g. okf_xml */
-    fprmType: null, /* the fprm-type, properties|xml|yaml|plain */
-    rawData: null,
-    transformedData: null,
-    guiData: null,
     config: {
         bconfFilter: null
     },
-    // Shortcuts:
-    formPanel: null,
-    formItems: [], // to be defined in extending classes
-    form: null,
     strings: {
         title: "#UT#Editiere Filter Typ {0} von Bconf {1}",
         help: "#UT#OKAPI Hilfe",
@@ -73,58 +58,67 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         changesInvalid: "#UT#Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden",
         successfullySaved: "#UT#Der Filter wurde erfolgreich gespeichert"
     },
-    translations: {},
-    tools: [{
-        iconCls: 'x-fa fa-undo',
-        tooltip: '#UT#Refresh',
-        handler: function(e, el, owner){
-            var editor = owner.up('window');
-            editor.setFprm(''); // unset old value
-            editor.load();
-        }
-    }],
-    items: [{
-        xtype: 'form',
-        itemId: 'fprm',
-        height: '100%',
-        scrollable: true,
-        layout: 'form',
-        defaults: { labelClsExtra: Ext.baseCSSPrefix + 'selectable' },
-        items: []
-    }],
-    fbar: [{
-        xtype: 'button',
-        text: 'Help',
-        itemId: 'help',
-        hidden: true,
-        iconCls: 'x-fa fa-book',
-        handler: function(){
-            this.up('#bconfFprmEditor').openHelpLink();
-        }
-    },{
-        xtype: 'button',
-        text: 'Save',
-        itemId: 'save',
-        disabled: true,
-        formBind: true,
-        iconCls: 'x-fa fa-check',
-        handler: function(){
-            this.up('window').save();
-        }
-    },{
-        xtype: 'button',
-        text: 'Cancel',
-        itemId: 'cancel',
-        iconCls: 'x-fa fa-times-circle',
-        handler: function(){
-            this.up('window').closeWindow();
-        }
-    }],
-    initConfig: function(){
-        this.fbar[0].text = this.strings.help;
-        this.fbar[1].text = this.strings.save;
-        this.fbar[2].text = this.strings.cancel;
-        return this.callParent(arguments);
+    initConfig: function(instanceConfig){
+        var config = {
+            minHeight: 400,
+            minWidth: 600,
+            layout: (this.formPanelLayout) ? this.formPanelLayout : 'form', /* this way it can be defined by inheritance */
+            okapiType: null, /* the okapi-type, e.g. okf_xml */
+            fprmType: null, /* the fprm-type, properties|xml|yaml|plain */
+            rawData: null,
+            transformedData: null,
+            guiData: null,
+            translations: {},
+            formPanel: null,
+            form: null,
+            tools: [{
+                iconCls: 'x-fa fa-undo',
+                tooltip: '#UT#Refresh',
+                handler: function(e, el, owner){
+                    var editor = owner.up('window');
+                    editor.unload();
+                    editor.load();
+                }
+            }],
+            items: [{
+                xtype: 'form',
+                itemId: 'fprm',
+                height: '100%',
+                scrollable: true,
+                layout: 'form',
+                defaults: { labelClsExtra: Ext.baseCSSPrefix + 'selectable' },
+                items: []
+            }],
+                fbar: [{
+                xtype: 'button',
+                text: this.strings.help,
+                itemId: 'help',
+                hidden: true,
+                iconCls: 'x-fa fa-book',
+                handler: function(){
+                    this.up('#bconfFprmEditor').openHelpLink();
+                }
+            },{
+                xtype: 'button',
+                text: this.strings.save,
+                itemId: 'save',
+                disabled: true,
+                formBind: true,
+                iconCls: 'x-fa fa-check',
+                handler: function(){
+                    this.up('window').save();
+                }
+            },{
+                xtype: 'button',
+                text: this.strings.cancel,
+                itemId: 'cancel',
+                iconCls: 'x-fa fa-times-circle',
+                handler: function(){
+                    this.up('window').closeWindow();
+                }
+            }]
+        };
+        return this.callParent([Ext.apply(config, instanceConfig)]);
     },
     initComponent: function(){
         this.okapiType = this.bconfFilter.get('okapiType');
@@ -139,23 +133,26 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         }
         return this.callParent(arguments);
     },
-    getFormItems: function(){
-        return this.formItems;
-    },
     /**
      * Creates the basic form that is
      */
-    initForm: function(){
+    createBaseForm: function(){
         this.formPanel = this.down('form#fprm');
         // this.formPanel.setLayout('form'); // Ext.create('Ext.layout.container.Form')
-        this.getFormItems().forEach(item => this.formPanel.add(item));
+        this.getBaseFormItems().forEach(item => this.formPanel.add(item));
         this.form = this.formPanel.getForm();
-        console.log('FORM PANEL LAYOUT: ', this.formPanel.getLayout()); // TODO REMOVE
+    },
+    /**
+     * retrieves the base form items we have
+     * @returns {array}
+     */
+    getBaseFormItems: function(){
+        return [];
     },
     /**
      * Enable save button & show help button after data is loaded
      */
-    initButtons: function(){
+    finalizeLayout: function(){
         this.down('button#save').enable();
         if(this.getHelpLink() != null){
             var helpButton = this.down('button#help');
@@ -163,20 +160,14 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             // positioning only possible programmatical ...
             helpButton.setStyle('left', '0px');
         }
-    },
-    /**
-     *
-     */
-    load: function(){
-        this.setLoading();
-        this.loadFprmData();
+        var top = Math.floor((window.innerHeight - this.getHeight()) / 2);
+        this.setY((top < 10) ? 10 : top);
     },
     /**
      * Can be overwritten to init the layout after the data has been loaded
      * This is the main entry-point in extending classes to create custom forms after the fprm-data is loaded
-     * @param {int} height
      */
-    fprmDataLoaded: function(height){
+    fprmDataLoaded: function(){
         this.form.setValues(this.getFormInitValues());
     },
     /**
@@ -215,7 +206,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      */
     getFormInitValues: function(){
         switch(this.fprmType){
-
+            
             case "properties":
                 return this.transformedData; // special: we have a JSON Object with parsed data in case of properties-based fprms
 
@@ -261,6 +252,21 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         }
     },
     /**
+     * starts loading the resources (raw data, transformed data, translations, gui-data)
+     */
+    load: function(){
+        this.setLoading();
+        this.loadFprmData();
+    },
+    /**
+     *
+     */
+    unload: function(){
+        this.formPanel.removeAll();
+        this.rawData = null;
+        this.transformedData = null;
+    },
+    /**
      * Loads the content of the .fprm file
      */
     loadFprmData(){
@@ -272,19 +278,16 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 id: me.bconfFilter.id
             },
             success: function(response){
-                var data = Ext.util.JSON.decode(response.responseText),
-                    height = window.innerHeight - 100;
-                console.log('WINDOW HEIGHT: ', height); // TODO REMOVE
+                var data = Ext.util.JSON.decode(response.responseText);
                 me.setLoading(false);
                 me.translations = data.translations;
                 me.fprmType = data.type;
                 me.guiData = data.guidata;
                 me.rawData = data.raw;
                 me.transformedData = data.transformed;
-                me.setHeight(height);
-                me.initForm();
-                me.initButtons();
-                me.fprmDataLoaded(height);
+                me.createBaseForm();
+                me.fprmDataLoaded();
+                me.finalizeLayout();
             },
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);
@@ -334,6 +337,9 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             buttons: Ext.Msg.OK
         });
     },
+    /**
+     *
+     */
     closeWindow: function(){
         this.formPanel.removeAll();
         this.removeAll();

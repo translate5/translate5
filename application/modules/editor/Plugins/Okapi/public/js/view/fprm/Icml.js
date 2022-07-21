@@ -33,8 +33,7 @@
  skipThreshold.i=1000 (max: 32000, min: 1, has tooltip)
  newTuOnBr.b=false
 
- see /var/www/okapi/okapi/filters/icml/src/main/java/net/sf/okapi/filters/icml/Parameters.java
-
+ see /okapi/okapi/filters/icml/src/main/java/net/sf/okapi/filters/icml/Parameters.java
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Icml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',

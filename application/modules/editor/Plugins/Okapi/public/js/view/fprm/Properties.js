@@ -81,7 +81,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     getFieldConfig: function(id, type, name, config){
         var control = this.fieldDefaults[type];
         return Object.assign({
-            fieldLabel: this.getFieldCaption(id),
+            fieldLabel: this.getFieldCaption(id, config),
             value: this.getFieldValue(id, control.defaultValue, type),
             labelWidth: 'auto',
             labelClsExtra: 'x-selectable',
@@ -92,10 +92,15 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     /**
      *
      * @param {string} id
+     * @param {object} config
      * @returns {string}
      */
-    getFieldCaption: function(id){
+    getFieldCaption: function(id, config){
+        //
         if(this.translations.hasOwnProperty(id)){
+            if(config.hasTooltip && this.translations.hasOwnProperty(id + 'Tooltip')){
+                return '<span data-qtip="' + this.translations[id + 'Tooltip'] + '">' + this.translations[id] + '</span>';
+            }
             return this.translations[id];
         }
         return 'TRANSLATION MISSING';

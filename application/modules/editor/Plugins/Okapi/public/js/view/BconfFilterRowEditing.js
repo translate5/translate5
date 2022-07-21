@@ -56,7 +56,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
             rowEditing.delayedHeightChange();
         },
         validateedit: function(rowEditing, cellContext){
-            console.log('BconfFilterRowEditing: validateedit', cellContext.newValues, cellContext.originalValues, cellContext.record.isClonedRecord); // TODO REMOVE
             // this case is superflous as the name-field has it's own validation
             if(cellContext.record.isClonedRecord && cellContext.newValues.name === cellContext.originalValues.name){
                 Ext.MessageBox.alert(this.strings.infosMissing, this.strings.nameMustBeChanged);

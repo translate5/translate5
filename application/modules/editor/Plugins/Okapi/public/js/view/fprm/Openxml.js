@@ -58,6 +58,9 @@
     zzz3=2F
     zzz4=3B
     zzz5=3C
+
+    see /okapi/okapi-ui/swt/filters/openxml-ui/src/main/java/net/sf/okapi/filters/openxml/ui/Editor.java
+    see /okapi/okapi/filters/openxml/src/main/java/net/sf/okapi/filters/openxml/ConditionalParameters.java
  */
 
 /**
@@ -66,6 +69,7 @@
 Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
     width: 900,
+    formPanelLayout: 'fit',
     fieldDefinitions: {
         //general
         'maxAttributeSize.i': { parent: 'general', config: { hidden: true }},  // not visible in Rainbow
@@ -113,18 +117,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         'bReorderPowerpointNotesAndComments.b': { parent: null, config: { hidden: true }}, // not visible in Rainbow
         'bPreferenceAllowEmptyTargets.b': { parent: null, config: { hidden: true }} // not visible in Rainbow
     },
-
-    formItems: [{
-        xtype: 'tabpanel',
-        defaults: { 'bodyPadding': 15, layout: 'form', scrollable: true },
-        items: [
-            { title: 'General Options', id: 'fprmh_general', iconCls: 'x-fa fa-cog' },
-            { title: 'Word Options', id: 'fprmh_word', iconCls: 'x-fa fa-file-word-o' },
-            { title: 'Excel Options', id: 'fprmh_excel', iconCls: 'x-fa fa-file-excel-o' },
-            { title: 'Powerpoint Options', id: 'fprmh_powerpoint', iconCls: 'x-fa fa-file-powerpoint-o' },
-        ]
-    }],
-
     /**
      * Which variables become tagfields
      */
@@ -139,7 +131,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         'tsWordHighlightColors.i': 'hlt',
         'tsPowerpointIncludedSlideNumbers.i': 'sln'
     },
-
     /**
      * where the number of items of the specified identifier is saved in
      */
@@ -152,21 +143,29 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         hlt: 'tsWordHighlightColors.i',
         sln: 'tsPowerpointIncludedSlideNumbers.i'
     },
-
     initConfig: function(config){
-        this.items[0].layout = 'fit';
-        return this.callParent(arguments);
+        config.minHeight = 765;
+        return this.callParent([config]);
     },
-
-    getFormItems: function(){
-        // overridden to add the titles dynamically
-        this.formItems[0].items[0].title = this.translations.captionGeneralOptions;
-        this.formItems[0].items[1].title = this.translations.captionWordOptions;
-        this.formItems[0].items[2].title = this.translations.captionExcelOptions;
-        this.formItems[0].items[3].title = this.translations.captionPowerpointOptions;
-        return this.formItems;
+    /**
+     * @returns {array}
+     */
+    getBaseFormItems: function(){
+        return [{
+            xtype: 'tabpanel',
+            defaults: { 'bodyPadding': 15, layout: 'form', scrollable: true },
+            items: [
+                { title: this.translations.captionGeneralOptions, id: 'fprmh_general', iconCls: 'x-fa fa-cog' },
+                { title: this.translations.captionWordOptions, id: 'fprmh_word', iconCls: 'x-fa fa-file-word-o' },
+                { title: this.translations.captionExcelOptions, id: 'fprmh_excel', iconCls: 'x-fa fa-file-excel-o' },
+                { title: this.translations.captionPowerpointOptions, id: 'fprmh_powerpoint', iconCls: 'x-fa fa-file-powerpoint-o' },
+            ]
+        }];
     },
-
+    /**
+     * @param {object} data
+     * @returns {Ext.Component}
+     */
     getFieldTarget(data){
         if(data.parent){
             return Ext.getCmp('fprmh_' + data.parent) || this.formPanel;

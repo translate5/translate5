@@ -27,50 +27,58 @@
 Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
     width: 800,
+    formPanelLayout: 'fit',
     defaultFocus: 'textarea',
-    formItems: [{
-        xtype: 'textarea',
-        width: '100%',
-        height: '100%',
-        name: 'yaml',
-        fieldCls: 'mono',
-        scroll: true,
-        validateOnBlur: false,
-        inputAttrTpl: 'spellcheck="false"',
-        checkChangeBuffer: 500,
-        checkChangeEvents: [],
-        lastCheck: {},
-        validator: function(yaml){
-            var ret = true, lastCheck = this.lastCheck;
-            if(lastCheck.yaml === yaml){
-                ret = lastCheck.ret;
-            } else {
-                lastCheck.yaml = yaml;
-                var unevenMatch = lastCheck.unevenMatch = yaml.match(/^ ( {2})*[^ ]/m);
-                if(unevenMatch){
-                    var lineBreakAfter = yaml.indexOf('\n', unevenMatch.index),
-                        lineBreakBefore = yaml.lastIndexOf('\n', unevenMatch.index) + 1,
-                        line = yaml.substring(lineBreakBefore, lineBreakAfter);
+    /**
+     * @returns {array}
+     */
+    getBaseFormItems: function(){
+        return [{
+            xtype: 'textarea',
+            width: '100%',
+            height: '100%',
+            name: 'yaml',
+            fieldCls: 'mono',
+            scroll: true,
+            validateOnBlur: false,
+            inputAttrTpl: 'spellcheck="false"',
+            checkChangeBuffer: 500,
+            checkChangeEvents: [],
+            lastCheck: {},
+            validator: function(yaml){
+                var ret = true, lastCheck = this.lastCheck;
+                if(lastCheck.yaml === yaml){
+                    ret = lastCheck.ret;
+                } else {
+                    lastCheck.yaml = yaml;
+                    var unevenMatch = lastCheck.unevenMatch = yaml.match(/^ ( {2})*[^ ]/m);
+                    if(unevenMatch){
+                        var lineBreakAfter = yaml.indexOf('\n', unevenMatch.index),
+                            lineBreakBefore = yaml.lastIndexOf('\n', unevenMatch.index) + 1,
+                            line = yaml.substring(lineBreakBefore, lineBreakAfter);
                         ret = Ext.getCmp('bconfFprmEditor').translations.leadingSpacesUneven.replace('{0}', line);
-                    if(lastCheck.highlightTask){
-                        lastCheck.highlightTask.destroy();
+                        if(lastCheck.highlightTask){
+                            lastCheck.highlightTask.destroy();
+                        }
+                        lastCheck.highlightTask = this.up('window').on('activate', function(){
+                            this.focus();
+                            window.setTimeout(function(){
+                                window.find(line + '\n', true, false, true);
+                                delete lastCheck.highlightTask;
+                            }, 50);
+                        }, this, { single: true, delay: 50, destroyable: true });
                     }
-                    lastCheck.highlightTask = this.up('window').on('activate', function(){
-                        this.focus();
-                        window.setTimeout(function(){
-                            window.find(line + '\n', true, false, true);
-                            delete lastCheck.highlightTask;
-                        }, 50);
-                    }, this, { single: true, delay: 50, destroyable: true });
                 }
+                lastCheck.ret = ret;
+                return ret;
             }
-            lastCheck.ret = ret;
-            return ret;
-        }
-    }],
-
-    fprmDataLoaded: function(height){
-        this.down('[name=yaml]').setHeight(height - 114);
+        }];
+    },
+    /**
+     * @param {int} height
+     */
+    fprmDataLoaded: function(){
+        this.down('[name=yaml]').setHeight(window.innerHeight - 214);
         this.callParent(arguments);
     }
 });

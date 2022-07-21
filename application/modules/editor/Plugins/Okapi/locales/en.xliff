@@ -184,6 +184,22 @@
     <source>Ihre Änderungen sind nicht valide</source>
     <target>Your changes are not valid</target>
 </trans-unit>
+<trans-unit id='RmVsZCAiezB9IiB2b20gVHlwICJ7MX0iIGlzdCBuaWNodCB2YWxpZGU='>
+    <source>Feld "{0}" vom Typ "{1}" ist nicht valide</source>
+    <target>Feld "{0}" vom Typ "{1}" ist nicht valide</target>
+</trans-unit>
+<trans-unit id='R2xlaXRrb21tYXphaGw='>
+    <source>Gleitkommazahl</source>
+    <target>Floating-point number</target>
+</trans-unit>
+<trans-unit id='Qm9vbHNjaGVyIFdlcnQ='>
+    <source>Boolscher Wert</source>
+    <target>Boolean</target>
+</trans-unit>
+<trans-unit id='R2FuenphaGw='>
+    <source>Ganzzahl</source>
+    <target>Integer</target>
+</trans-unit>
 <trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZSwgZGFoZXIga29ubnRlIGRlciBGaWx0ZXIgbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu'>
     <source>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</source>
     <target>The filter could not be saved because your changes seem to be invalid</target>

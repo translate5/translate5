@@ -27,34 +27,42 @@
 Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
     width: 800,
+    formPanelLayout: 'fit',
     defaultFocus: 'textarea',
-    formItems: [{
-        xtype: 'textarea',
-        width: '100%',
-        height: '100%',
-        name: 'xml',
-        fieldCls: 'mono',
-        scroll: true,
-        validateOnBlur: false,
-        inputAttrTpl: 'spellcheck="false"',
-        checkChangeBuffer: 500,
-        checkChangeEvents: [],
-        lastCheck: {},
-        validator: function(xml){
-            var ret = true, lastCheck = this.lastCheck;
-            if(lastCheck.xml === xml){
-                ret = lastCheck.ret;
-            } else if(xml){
-                lastCheck.xml = xml;
-                ret = Editor.util.Util.getXmlError(xml || '<xml/>');
+    /**
+     * @returns {array}
+     */
+    getBaseFormItems: function(){
+        return [{
+            xtype: 'textarea',
+            width: '100%',
+            height: '100%',
+            name: 'xml',
+            fieldCls: 'mono',
+            scroll: true,
+            validateOnBlur: false,
+            inputAttrTpl: 'spellcheck="false"',
+            checkChangeBuffer: 500,
+            checkChangeEvents: [],
+            lastCheck: {},
+            validator: function(xml){
+                var ret = true, lastCheck = this.lastCheck;
+                if(lastCheck.xml === xml){
+                    ret = lastCheck.ret;
+                } else if(xml){
+                    lastCheck.xml = xml;
+                    ret = Editor.util.Util.getXmlError(xml || '<xml/>');
+                }
+                lastCheck.ret = ret;
+                return ret;
             }
-            lastCheck.ret = ret;
-            return ret;
-        }
-    }],
-
-    fprmDataLoaded: function(height){
-        this.down('[name=xml]').setHeight(height - 114);
+        }];
+    },
+    /**
+     * @param {int} height
+     */
+    fprmDataLoaded: function(){
+        this.down('[name=xml]').setHeight(window.innerHeight - 214);
         this.callParent(arguments);
     }
 });
