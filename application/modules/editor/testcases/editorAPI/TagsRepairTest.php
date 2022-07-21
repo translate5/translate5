@@ -104,7 +104,6 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
         $expected = ' what <span data-text="(this is a) &gt; it\'s comment">seven is > six</span>  <a href="http://www.google.de">Some < Link</a> <!-- some comment with <b>markup</b> --> AND OTHER " TEXT';
         $protectedData = Markup::protectTags($expected);
         $markup = $protectedData->markup;
-        echo "\n\n".$markup."\n\n";
         $this->assertEquals($expected, Markup::unprotectTags($markup, $protectedData));
     }
 
@@ -112,7 +111,6 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
         $expected = ' < ? " < (\') '.$this->htmlTags['<10/>'].' > ? " < (\') '.$this->htmlTags['<11/>'].' < ? " > (") '.$this->htmlTags['<12/>'].' > ? " > (!) ';
         $protectedData = Markup::protectTags($expected);
         $markup = $protectedData->markup;
-        echo "\n\n".$markup."\n\n";
         $this->assertEquals($expected, Markup::unprotectTags($markup, $protectedData));
     }
 
