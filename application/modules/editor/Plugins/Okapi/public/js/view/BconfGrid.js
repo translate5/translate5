@@ -226,38 +226,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             }
                         });
                         return false; // checked state handled manually via view.refresh
-                    },
-                    'beforecheckchangenew': function(col, recordIndex, checked, clicked){
-                        var view = col.getView(),
-                            store = view.getStore(),
-                            customer = view.grid.getCustomer(),
-                            oldDefaultId = customer.get('defaultBconfId'),
-                            isSelect = oldDefaultId !== clicked.id, // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
-                            id2Refresh = (isSelect && oldDefaultId) ? customer.get('defaultBconfId') : Editor.data.plugins.Okapi.systemDefaultBconfId,
-                            value = isSelect ? clicked.id : null;
-                        view.select(clicked)
-                        customer.set('defaultBconfId', value); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
-                        Ext.Ajax.request({
-                            url: Editor.data.restpath + 'customermeta',
-                            method: 'PUT',
-                            params: {
-                                id: customer.id,
-                                data: Ext.encode({
-                                    defaultBconfId: value
-                                })
-                            },
-                            failure: function(response){
-                                Editor.app.getController('ServerException').handleException(response);
-                            }
-                        })
-                        view.refresh(clicked);
-                        if(id2Refresh !== clicked.id){
-                            var oldDefaultRec = store.getById(id2Refresh);
-                            if(oldDefaultRec){
-                                view.refreshNode(oldDefaultRec);
-                            }
-                        }
-                        return false; // checked state handled manually via view.refresh
                     }
                 }
             },{
@@ -291,7 +259,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                                 oldDefault.commit();
                             }
                         }
-                        Editor.data.plugins.Okapi.systemDefaultBconfId = record.id;
+                        Editor.data.plugins.Okapi.systemDefaultBconfId = record.id; // Crucial: the default-id is a global that must be updated!
                     }
                 }
             },{
