@@ -304,7 +304,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     /**
      * Overridden to resolve our dependencies
      */
-    resolvePropertyDependencies: function(){
+    resolveFieldDependencies: function(){
         // if the ckeckbox is not set we need to remove the Column-Choices
         if(this.form.findField('bPreferenceTranslateExcelExcludeColumns.b').getValue() == false){
             this.form.findField('tsExcelExcludedColumnsSheet1.i').setRawValue([]);

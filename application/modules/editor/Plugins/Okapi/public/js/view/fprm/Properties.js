@@ -30,12 +30,38 @@
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
-    fieldDefinitions: {},
+    /**
+     * These are the data-types a property/field can have. boolean and integer are defined by the property-names (".i" for integer, ".b" for boolean)
+     * A x-properties file can only have string, boolen or integer
+     * "float" is a virtual data-type that will be sent/received as string
+     */
+    statics: {
+        DATA_TYPES: [ 'boolean', 'integer', 'float', 'string' ]
+    },
+    /**
+     * Hashtable of our default controls
+     * These will be instantiated for the given data-type
+     * @var {object}
+     */
     fieldDefaults: {
-        "boolean": { xtype: 'checkbox', inputValue: true, uncheckedValue: false, defaultValue: false },
-        "integer": { xtype: 'numberfield', allowDecimals: false, allowExponential: false, defaultValue: 0 },
-        "float": { xtype: 'numberfield', allowDecimals: true, allowExponential: false, defaultValue: null }, // a virtual data-type, so we do not force it to be "02 as "in reality" it's a string which supports empty values
-        "string": { xtype: 'textfield', defaultValue: "" },
+        'boolean': { xtype: 'checkbox', inputValue: true, uncheckedValue: false, defaultValue: false },
+        'integer': { xtype: 'numberfield', allowDecimals: false, allowExponential: false, defaultValue: 0 },
+        'float': { xtype: 'numberfield', allowDecimals: true, allowExponential: false, defaultValue: null }, // a virtual data-type, so we do not force it to be "02 as "in reality" it's a string which supports empty values
+        'string': { xtype: 'textfield', defaultValue: "" },
+    },
+    /**
+     * Hashtable of our field definitions. These reflect the real property-names as used in the FPRM (and not the id's as used in translations etc)
+     * Generally these are a variable, that pints to an object holding a config-object, which may further specify the control e.g. with "hidden" for invisible props, defaultValue, valueType or ignoreEmpty
+     * See e.g. Editor.plugins.Okapi.view.fprm.Idml for how these shall look
+     * @var {object}
+     */
+    fieldDefinitions: {},
+    /**
+     * Override this function to resolve property-dependencies a la "variableX can only be filled if variableY set to true"
+     * This will be called as the first step when validating the form
+     */
+    resolveFieldDependencies: function(){
+
     },
     /**
      * overridden
@@ -47,7 +73,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * Creates our forms & attaches them to our view
      */
     createForm: function(){
-        var name, config, parent, data, id, type;
+        var name, config, data, id, type;
         for(name in this.fieldDefinitions){
             data = this.fieldDefinitions[name];
             id = this.getPropertyId(name);
@@ -179,14 +205,17 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * @returns {object}
      */
     getFormValues: function(){
-        var name, type, vals = this.form.getValues();
+        var name, type, conf, vals = this.form.getValues();
         for(name in vals){
             // we may have a custom type set
-            type = (this.fieldDefinitions.hasOwnProperty(name)) ? this.fieldDefinitions[name].config.valueType : null;
-            if(!type || type === 'boolean' && type === 'integer' && type === 'string'){
-                type = this.getPropertyType(name);
+            conf = (this.fieldDefinitions.hasOwnProperty(name)) ? this.fieldDefinitions[name].config : null; // we may have a programmatical
+            type = (conf && conf.valueType) ? conf.valueType : this.getPropertyType(name);
+            // we have to remove optional fields that shall be removed if empty
+            if(conf && conf.ignoreEmpty && (vals[name] === '' || vals[name] === null)){
+                delete vals[name];
+            } else {
+                vals[name] = this.parseTypedValue(type, vals[name]);
             }
-            vals[name] = this.parseTypedValue(type, vals[name]);
         }
         return vals;
     },
@@ -224,17 +253,19 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * @returns {boolean|string}
      */
     validate: function(){
-        this.resolvePropertyDependencies();
+        this.resolveFieldDependencies();
         if(this.form.isValid()){
             var data, name, val, id, type, errors = [];
             for(name in this.fieldDefinitions){
                 data = this.fieldDefinitions[name];
                 if(data.valueType && data.valueType !== 'boolean' && data.valueType !== 'integer' && data.valueType !== 'string'){
                     val = this.form.findField(name).getValue();
-                    id = this.getPropertyId(name);
-                    if(!this.validateValue(val, data.valueType)){
-                        type = this.strings.hasOwnProperty(data.valueType) ? this.strings[data.valueType] : data.valueType;
-                        errors.push(this.strings.invalidField.split('{0}').join(this.translations[id]).split('{0}').join(type));
+                    if(!(data.ignoreEmpty && (val === '' && val === null))){
+                        id = this.getPropertyId(name);
+                        if(!this.validateValue(val, data.valueType)){
+                            type = this.strings.hasOwnProperty(data.valueType) ? this.strings[data.valueType] : data.valueType;
+                            errors.push(this.strings.invalidField.split('{0}').join(this.translations[id]).split('{0}').join(type));
+                        }
                     }
                 }
             }
@@ -263,12 +294,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             default:
                 return true;
         }
-    },
-    /**
-     * Override this function to resolve property-dependencies a la "variableX can only be filled if variableY set to true"
-     */
-    resolvePropertyDependencies: function(){
-
     },
     /**
      * Cleanup

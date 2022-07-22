@@ -57,46 +57,46 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
     formPanelLayout: 'form',
     fieldDefinitions: {
         'maxAttributeSize.i': { config: { hidden: true }},  // not visible in Rainbow
-        "untagXmlStructures.b": { config: {}},
-        "extractNotes.b": { config: {}},
-        "extractMasterSpreads.b": { config: {}},
-        "extractHiddenLayers.b": { config: {}},
-        "extractHiddenPasteboardItems.b": { config: {}},
-        "skipDiscretionaryHyphens.b": { config: {}},
-        "extractBreaksInline.b": { config: {}},
-        "extractCustomTextVariables.b": { config: {}},
-        "extractIndexTopics.b": { config: {}},
-        "ignoreCharacterKerning.b": { config: {}},
-        "characterKerningMinIgnoranceThreshold": { config: { valueType: "float" }},
-        "characterKerningMaxIgnoranceThreshold": { config: { valueType: "float" }},
-        "ignoreCharacterTracking.b": { config: {}},
-        "characterTrackingMinIgnoranceThreshold": { config: { valueType: "float" }},
-        "characterTrackingMaxIgnoranceThreshold": { config: { valueType: "float" }},
-        "ignoreCharacterLeading.b": { config: {}},
-        "characterLeadingMinIgnoranceThreshold": { config: { valueType: "float" }},
-        "characterLeadingMaxIgnoranceThreshold": { config: { valueType: "float" }},
-        "ignoreCharacterBaselineShift.b": { config: {}},
-        "characterBaselineShiftMinIgnoranceThreshold": { config: { valueType: "float" }},
-        "characterBaselineShiftMaxIgnoranceThreshold": { config: { valueType: "float" }}
+        'untagXmlStructures.b': { config: {}},
+        'extractNotes.b': { config: {}},
+        'extractMasterSpreads.b': { config: {}},
+        'extractHiddenLayers.b': { config: {}},
+        'extractHiddenPasteboardItems.b': { config: {}},
+        'skipDiscretionaryHyphens.b': { config: {}},
+        'extractBreaksInline.b': { config: {}},
+        'extractCustomTextVariables.b': { config: {}},
+        'extractIndexTopics.b': { config: {}},
+        'ignoreCharacterKerning.b': { config: {}},
+        'characterKerningMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+        'characterKerningMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+        'ignoreCharacterTracking.b': { config: {}},
+        'characterTrackingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+        'characterTrackingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+        'ignoreCharacterLeading.b': { config: {}},
+        'characterLeadingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+        'characterLeadingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+        'ignoreCharacterBaselineShift.b': { config: {}},
+        'characterBaselineShiftMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+        'characterBaselineShiftMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
     },
     /**
      * Overridden to resolve our dependencies
      */
-    resolvePropertyDependencies: function(){
+    resolveFieldDependencies: function(){
         // if the ckeckbox is not set we need to remove the related Kerning-Values
-        if(this.form.findField('ignoreCharacterKerning.b').getValue() == false){
+        if(this.form.findField('ignoreCharacterKerning.b').getValue() === false){
             this.form.findField('characterKerningMinIgnoranceThreshold').setRawValue(null);
             this.form.findField('characterKerningMaxIgnoranceThreshold').setRawValue(null);
         }
-        if(this.form.findField('ignoreCharacterTracking.b').getValue() == false){
+        if(this.form.findField('ignoreCharacterTracking.b').getValue() === false){
             this.form.findField('characterTrackingMinIgnoranceThreshold').setRawValue(null);
             this.form.findField('characterTrackingMaxIgnoranceThreshold').setRawValue(null);
         }
-        if(this.form.findField('ignoreCharacterLeading.b').getValue() == false){
+        if(this.form.findField('ignoreCharacterLeading.b').getValue() === false){
             this.form.findField('characterLeadingMinIgnoranceThreshold').setRawValue(null);
             this.form.findField('characterLeadingMaxIgnoranceThreshold').setRawValue(null);
         }
-        if(this.form.findField('ignoreCharacterBaselineShift.b').getValue() == false){
+        if(this.form.findField('ignoreCharacterBaselineShift.b').getValue() === false){
             this.form.findField('characterBaselineShiftMinIgnoranceThreshold').setRawValue(null);
             this.form.findField('characterBaselineShiftMaxIgnoranceThreshold').setRawValue(null);
         }
