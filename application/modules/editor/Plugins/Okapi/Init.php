@@ -749,8 +749,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      * @see ZfExtended_RestController::afterActionEvent
      */
-    public function handleCustomerAfterIndex(Zend_EventManager_Event $event)
-    {
+    public function handleCustomerAfterIndex(Zend_EventManager_Event $event) {
         /** @var ZfExtended_View $view */
         $view = $event->getParam('view');
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
@@ -761,7 +760,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             if(array_key_exists($customer['id'], $bconfIds)){
                 $customer['defaultBconfId'] = (int) $bconfIds[$customer['id']];
             } else {
-                $customer['defaultBconfId'] = $bconf->getDefaultBconfId();
+                $customer['defaultBconfId'] = null;
             }
         }
     }

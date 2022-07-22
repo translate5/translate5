@@ -46,7 +46,6 @@
 
 Ext.define('Editor.plugins.Okapi.model.BconfFilterModel', {
     extend: 'Ext.data.Model',
-    requires: ['Editor.util.type.StringSet'],
     alias: 'model.bconffilterModel',
     idProperty: 'id',
     proxy: {

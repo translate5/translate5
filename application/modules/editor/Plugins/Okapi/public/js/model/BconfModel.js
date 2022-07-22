@@ -59,7 +59,8 @@ Ext.define('Editor.plugins.Okapi.model.BconfModel', {
     }, {
         name: 'customerId',
         type: 'int',
-        reference: 'Editor.model.admin.Customer',
+        allowNull: true,
+        reference: 'Editor.model.admin.Customer'
     }, {
         name: 'name',
         type: 'string',

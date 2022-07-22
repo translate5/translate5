@@ -44,12 +44,12 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             type: 'int',
             name: 'defaultBconfId',
             persist: false,
+            allowNull: true
         }]);
 
     },
     onLaunch: function(){
         Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
-
     },
 
     listen: {
@@ -66,21 +66,16 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                     priority: 900 // we want after customersCombo has been added
                 }
             },
-            'combobox#customerId': {
+            '#taskMainCard combobox#customerId': {
                 change: {
                     fn: function(customerCombo, customerId){
-                        if(!customerId){ // QUIRK: Emptying can set value to null even with forceSelection set
-                            return;
-                        }
-                        var bconfCombo = Ext.getCmp('bconfCombo'),
-                            bconfFilters = bconfCombo.getStore().getFilters(),
-                            customerFilter = bconfFilters.getByKey('customerFilter');
-                        customerFilter.setValue(customerId);
-                        bconfFilters.add(customerFilter); // trigger filter
-
-                        bconfCombo.setValue(customerCombo.getSelection().get('defaultBconfId'));
-                        bconfCombo.enable();
-                    },
+                        customerId = (!customerId) ? null : customerId; // may be ''
+                        var store = Ext.getStore('bconfStore').createImportWizardSelectionData(customerId, customerCombo.getSelection().get('defaultBconfId')),
+                            combo = Ext.getCmp('taskImportBconfId');
+                        combo.setStore(store);
+                        combo.setValue(store.selectedId);
+                        combo.enable();
+                    }
                 }
             }
         }
@@ -154,37 +149,17 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             queryMode: 'local',
             forceSelection: true,
             displayField: 'name',
-            id: 'bconfCombo',
+            id: 'taskImportBconfId',
             name: 'bconfId',
             valueField: 'id',
             disabled: true,
             value: Editor.data.plugins.Okapi.systemDefaultBconfId,
             fieldLabel: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.titleLong,
-            listConfig: {
-                getInnerTpl: function(displayField){
-                    return `<span data-qtip="{description}">{${displayField}}</span>`;
-                },
-            },
-            store: {
-                type: 'chained',
-                storeId: 'bconfImportWizard',
-                source: 'bconfStore',
-                autoLoad: true,
-                filters: [{
-                    id: 'customerFilter',
-                    property: 'customerId',
-                    value: null,
-                    filterFn: function({data: bconf}){
-                        return !bconf.customerId || (this._value === bconf.customerId);
-                    },
-                }],
-                sorters: [{
-                    property: 'customerId',
-                    direction: 'DESC'
-                }, {
-                    property: 'name',
-                }],
-            }
+            tpl: Ext.create('Ext.XTemplate',
+                '<ul class="x-list-plain t5leveledList"><tpl for=".">',
+                '<li role="option" class="{[values.cid == 0 ? "x-boundlist-item t5level1" : "x-boundlist-item"]}" title="{description}">{name}</li>',
+                '</tpl></ul>'
+            )
         });
     }
 

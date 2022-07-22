@@ -398,17 +398,17 @@ Ext.define('Editor.util.Util', {
             Editor.app.redirectTo(parentRoute);
         },
         awaitStore: async function(store){
-            return store.isLoaded() || await new Promise(function(resolve, reject){
-                store.on('load', function(store, records, successful){
-                        resolve()
-                }, this, {single: true});
+            return store.isLoaded() || await new Promise(function(resolve){
+                store.on('load', function(){
+                        resolve();
+                }, this, { single: true });
             });
         },
         awaitSelection: async function(grid, recId){
-            return (!recId || grid.selection?.id == recId) && grid.selection || await new Promise(function(resolve, reject){
-                grid.on('selectionchange', function(store, records, successful){
-                    resolve(grid.selection)
-                }, this, {single: true});
+            return (!recId || grid.selection?.id === recId) && grid.selection || await new Promise(function(resolve){
+                grid.on('selectionchange', function(){
+                    resolve(grid.selection);
+                }, this, { single: true });
             });
         },
         closeWindows: function(){
@@ -420,8 +420,8 @@ Ext.define('Editor.util.Util', {
         /** @link https://stackoverflow.com/a/69200017 */
         getXmlError: function(xmlStr){
             const parser = new DOMParser();
-            const dom = parser.parseFromString(xmlStr, "application/xml");
-            const error = dom.querySelector("parsererror");
+            const dom = parser.parseFromString(xmlStr, 'application/xml');
+            const error = dom.querySelector('parsererror');
             return !error || error.innerHTML || error.textContent;
         },
         /** @link https://stackoverflow.com/questions/1026069 */

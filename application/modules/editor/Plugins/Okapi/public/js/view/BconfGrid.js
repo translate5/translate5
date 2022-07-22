@@ -155,8 +155,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 },
                 text: me.text_cols.description,
                 flex: 3
-            },
-            {
+            },{
                 xtype: 'checkcolumn',
                 text: me.text_cols.customerStandard,
                 width: 90,
@@ -168,9 +167,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 // QUIRK: This is a purely synthetic column that renders based on the associated customer, so no dataIndex is set
                 // This is way easier than trying to model this dynamic relation canonically
                 renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
-                    const customer = view.grid.ownerCt.ownerCt.getViewModel().getData().list.selection || {};
-                    arguments[0] = (record.id === customer.data.defaultBconfId); // customer is always set, else panel wouldn't be active
-                    return this.defaultRenderer.apply(this, arguments);
+                    var selection = view.grid.ownerCt.ownerCt.getViewModel().getData().list.selection,
+                        customerDefaultBconfId = (selection) ? selection.get('defaultBconfId') : -1;
+                    isDefault = (record.id === customerDefaultBconfId); // customer is always set, else panel wouldn't be active
+                    return this.defaultRenderer.apply(this, [isDefault, metaData, record, rowIdx, colIdx, store, view]);
                 },
                 listeners: {
                     /** @method
@@ -183,6 +183,51 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                      * @returns {boolean}
                      */
                     'beforecheckchange': function(col, recordIndex, checked, clicked){
+                        var gridView = col.getView(),
+                            customer = gridView.grid.getCustomer(),
+                            customerId = customer.id,
+                            oldBconfId = customer.get('defaultBconfId'),
+                            newChecked = (oldBconfId !== clicked.id), // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
+                            newBconfId = newChecked ? clicked.id : null;
+                        gridView.select(clicked);
+                        Ext.Ajax.request({
+                            url: Editor.data.restpath + 'customermeta',
+                            method: 'PUT',
+                            params: {
+                                id: customerId,
+                                data: Ext.encode({
+                                    defaultBconfId: newBconfId
+                                })
+                            },
+                            success: function() {
+                                var store, storeId;
+                                // unfortunately there are two customer stores, which both act as source for the TaskImport customer selector, so we have to update them both
+                                for(storeId of ['customersStore', 'userCustomers']){
+                                    if(store = Ext.getStore(storeId)){
+                                        if(customer = store.getById(customerId)){
+                                            if(customer){
+                                                customer.set('defaultBconfId', newBconfId, { commit: true, silent: true });
+                                            }
+                                        }
+                                    }
+                                }
+                                // refresh the grid for the changed record
+                                gridView.refresh(clicked);
+                                if(oldBconfId !== null){
+                                    // if there was a old record, refresh the grid for the old record
+                                    var bconf = gridView.getStore().getById(oldBconfId);
+                                    if(bconf){
+                                        gridView.refreshNode(bconf);
+                                    }
+                                }
+                            },
+                            failure: function(response){
+                                Editor.app.getController('ServerException').handleException(response);
+                            }
+                        });
+                        return false; // checked state handled manually via view.refresh
+                    },
+                    'beforecheckchangenew': function(col, recordIndex, checked, clicked){
                         var view = col.getView(),
                             store = view.getStore(),
                             customer = view.grid.getCustomer(),
@@ -215,8 +260,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         return false; // checked state handled manually via view.refresh
                     }
                 }
-            },
-            {
+            },{
                 xtype: 'checkcolumn',
                 text: me.text_cols.standard,
                 dataIndex: 'isDefault',
@@ -237,21 +281,20 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                             grid = view.ownerGrid,
                             store = grid.store,
                             oldDefault;
-                        view.select(record)
+                        view.select(record);
                         if(grid.isCustomerGrid || !checked){ // Cannot set in customerGrid, cannot deselect global default
                             return false;
                         } else if(checked){ // must uncheck old default
                             oldDefault = store.getAt(store.findBy(({data}) => data.isDefault && !data.customerId));
                             if(oldDefault && oldDefault !== record){
-                                oldDefault.set('isDefault', {commit: false}); // QUIRK: prevent saving twice this way
+                                oldDefault.set('isDefault', { commit: false }); // QUIRK: prevent saving twice this way
                                 oldDefault.commit();
                             }
                         }
                         Editor.data.plugins.Okapi.systemDefaultBconfId = record.id;
                     }
                 }
-            },
-            {
+            },{
                 xtype: 'actioncolumn',
                 align: 'center',
                 itemId: 'bconfFilters',
@@ -267,8 +310,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     handler: 'showFilterGrid',
                     width: 50
                 }]
-            },
-            {
+            },{
                 xtype: 'actioncolumn',
                 stateId: 'okapiGridActionColumn',
                 align: 'center',
@@ -298,8 +340,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         handler: 'downloadBconf'
                     }
                 ]
-            },
-            {
+            },{
                 xtype: 'actioncolumn',
                 align: 'center',
                 text: me.text_cols.sourceSrx,
@@ -325,8 +366,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         handler: 'downloadSRX'
                     },
                 ]
-            },
-            {
+            },{
                 xtype: 'actioncolumn',
                 align: 'center',
                 text: me.text_cols.targetSrx,
@@ -352,8 +392,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         handler: 'downloadSRX'
                     }
                 ]
-            },
-
+            }
         ];
         config.dockedItems = [{
             xtype: 'toolbar',

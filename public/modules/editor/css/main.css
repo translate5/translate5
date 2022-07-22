@@ -953,3 +953,4 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 .t5leveledGrid .t5level1 .x-action-col-cell .x-item-disabled { opacity: 0.3; }
 #bconfFprmEditor textarea.mono { background-color: rgba(160, 160, 160, 0.35); }
 #bconfFprmEditor .x-form-form-item.x-form-item-no-label::before { content:''; display:none; }
+.t5leveledList .t5level1 { font-style: italic; opacity:0.85; }
