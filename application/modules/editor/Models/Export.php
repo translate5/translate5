@@ -135,7 +135,9 @@ class editor_Models_Export {
             return;
         }
         $log = Zend_Registry::get('logger')->cloneMe('editor.export');
-        $log->warn('E1149', 'Export: Some segments contain tag errors [Task '.$this->task->getTaskGuid().' "'.$this->task->getTaskName().'"].', [
+        $log->warn('E1149', 'Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"].', [
+            'taskName' => $this->task->getTaskName(),
+            'taskGuid' => $this->task->getTaskGuid(),
             'task' => $this->task,
             'segments' => $segmentErrors,
         ]);

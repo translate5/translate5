@@ -76,7 +76,7 @@ class editor_Models_Import_FileParser_Tag {
      * The short tag number used in the GUI
      * @var mixed
      */
-    public $tagNr = null;
+    public mixed $tagNr = null;
 
     /**
      * The original raw (un-encoded) content contained in the tag
@@ -155,15 +155,19 @@ class editor_Models_Import_FileParser_Tag {
      * @return string
      */
     public function __toString(): string {
-        switch (self::$mode) {
-            case self::RETURN_MODE_REMOVED:
-                return '';
-            case self::RETURN_MODE_ORIGINAL:
-                return $this->originalContent;
-            case self::RETURN_MODE_INTERNAL:
-            default:
-                return $this->renderedTag;
-        }
+        return match (self::$mode) {
+            self::RETURN_MODE_REMOVED => '',
+            self::RETURN_MODE_ORIGINAL => $this->getOriginalModeContent(),
+            default => $this->renderedTag,
+        };
+    }
+
+    /**
+     * returns the content to be used for RETURN_ORIGINAL_MODE rendering
+     * @return string
+     */
+    protected function getOriginalModeContent(): string {
+        return $this->originalContent;
     }
 
     /**
@@ -177,7 +181,7 @@ class editor_Models_Import_FileParser_Tag {
 
         return $this->renderedTag = self::$renderer[$this->type]->getHtmlTag([
             'class' => $this->parseSegmentGetStorageClass($this->originalContent, $this->xmlTags) . ($cls ?? ''),
-            'text' => $this->text ?? htmlentities($this->originalContent),
+            'text' => $this->text ?? htmlentities($this->originalContent, ENT_COMPAT), //PHP 8.1 fix - default changed!
             'shortTag' => $this->tagNr,
             'id' => $this->id, //mostly original tag id
             'length' => $length,
@@ -195,7 +199,7 @@ class editor_Models_Import_FileParser_Tag {
      */
     private function parseSegmentGetStorageClass(string $tag, bool $xmlTags): string {
         if($xmlTags) {
-            if(substr($tag, 0, 1) !== '<' || substr($tag, -1) !== '>'){
+            if(!str_starts_with($tag, '<') || !str_ends_with($tag, '>')){
                 trigger_error('The Tag ' . $tag . ' has not the structure of a tag.', E_USER_ERROR);
             }
             //we store the tag content without leading < and trailing >

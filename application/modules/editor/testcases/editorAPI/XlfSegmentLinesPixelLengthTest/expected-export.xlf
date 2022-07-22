@@ -34,20 +34,20 @@ kurz.</target>
 <trans-unit id="6" translate5:maxNumberOfLines="2" maxwidth="600" size-unit="pixel">
 <source> Dies ist ein Satz zum Testen für maximal 2 Zeilen und maxWidth 600.    </source>
 <target>Edited: Dies ist ein Satz zum Testen f\u00fcr
-maximal 2 Zeilen\u00a0und maxWidth 600.    </target>
+maximal 2 Zeilen\u00a0und maxWidth 600.   </target>
 </trans-unit>
 
 <trans-unit id="7" translate5:maxNumberOfLines="3" maxwidth="600" size-unit="pixel">
 <source> Dies ist ein Satz zum Testen für maximal 3 Zeilen und maxWidth 600.    </source>
 <target>Edited: Dies ist ein Satz zum Testen f\u00fcr
 maximal 3 Zeilen
- und maxWidth 600.    </target>
+ und maxWidth 600.   </target>
 </trans-unit>
 
 <trans-unit id="8" maxwidth="600" size-unit="char">
 <source> Dies ist ein Satz zum Testen für maxWidth 600 und size-unit char.    </source>
 <target>Edited: Dies ist ein Satz zum Testen
-f\u00fcr maxWidth 600 und size-unit char.    </target>
+f\u00fcr maxWidth 600 und size-unit char.   </target>
 </trans-unit>
 
 </body>

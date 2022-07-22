@@ -372,7 +372,7 @@ The German and the English Comment tag of the string must be imported as comment
         
         //since there are no other tags we can just take the string and protect whitespace there (no tag protection needed!)
         $segment = $this->utilities->whitespace->protectWhitespace($segment);
-        $segment = $this->utilities->whitespace->replacePlaceholderTags($segment, $this->shortTagIdent);
+        $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
         
         $segment = $this->utilities->internalTag->unprotect($segment);
         
