@@ -48,7 +48,12 @@ class Translate2362Test extends editor_Test_JsonTest {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        
+
+        $tests = array(
+            'runtimeOptions.import.xlf.ignoreFramingTags' => 'all',
+        );
+        self::$api->testConfig($tests);
+
         $zipfile = $api->zipTestFiles('testfiles/','testTask.zip');
         
         $api->addImportFile($zipfile);
@@ -129,6 +134,6 @@ class Translate2362Test extends editor_Test_JsonTest {
         self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }

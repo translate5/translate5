@@ -37,12 +37,7 @@ END LICENSE AND COPYRIGHT
  * TODO: move this whole Excel-package to Segments-folder.
  */
 abstract class editor_Models_Excel_AbstractExImport {
-    /**
-     * task-state to identify a task as "excel exported"
-     * @var string
-     */
-    const TASK_STATE_ISEXCELEXPORTED = 'ExcelExported';
-    
+
     /**
      * @var ZfExtended_Logger
      */
@@ -58,12 +53,12 @@ abstract class editor_Models_Excel_AbstractExImport {
      * @return bool
      */
     public function taskLock(editor_Models_Task $task) : bool {
-        if(!$task->lock(NOW_ISO, self::TASK_STATE_ISEXCELEXPORTED)) {
+        if(!$task->lock(NOW_ISO, editor_Models_Task::STATE_EXCELEXPORTED)) {
             $this->log->debug('E0000', 'Excel Export: task lock failed');
             return FALSE;
         }
         
-        $task->setState(self::TASK_STATE_ISEXCELEXPORTED);
+        $task->setState(editor_Models_Task::STATE_EXCELEXPORTED);
         $task->save();
         $this->log->debug('E0000', 'Excel Export: task lock success');
         return TRUE;

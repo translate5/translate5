@@ -268,7 +268,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1145"></a>E1145  | Task Export | Could not create export-zip. |
 | <a id="E1146"></a>E1146  | Task Export | The task export folder does not exist, no export ZIP file can be created. | The user has probably clicked multiple times on the export button while the first export was still running.
 | <a id="E1147"></a>E1147  | Task Export | The task export folder does not exist or is not writeable, no export ZIP file can be created. | See E1146.
-| <a id="E1149"></a>E1149  | Task Export | Export: Some segments contains tag errors. | See error details for affected segments and details.
+| <a id="E1149"></a>E1149  | Task Export | Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"]. | See error details for affected segments and details.
 | <a id="E1157"></a>E1157  | Task Export | Export: the file &quot;{file}&quot; could not be exported, since had possibly already errors on import. | See error details for affected file and details.
 | <a id="E1170"></a>E1170  | Task Metadata Export | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
 
@@ -367,7 +367,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | EventCode        | Context       | EventMessage  | Description/Solution
 | :--------------- |:------------- | :------------ | :-------------------
 | <a id="E1065"></a>E1065  | Segment | The data of the saved segment is not valid. | The data of the saved segment contains invalid data, see error details for more information.
-| <a id="E1066"></a>E1066  | Segment | The data of the saved segment is not valid. | See E1065, in addition that the validations contain at least an error where the segment is either to long or to short. This error is separate since it should produce an warning instead just a debug level entry.
+| <a id="E1066"></a>E1066  | Segment | The data of the saved segment is not valid. The segment content is either to long or to short. | See E1065, in addition that the validations contain at least an error where the segment is either to long or to short. This error is separate since it should produce an warning instead just a debug level entry.
 | <a id="E1259"></a>E1259  | Segment | The data of the saved segment is not valid. | See E1065, in addition that the validations contain at least an error where the lines in the segment are either too many or (at least one of them is) too long. This error is separate since it should produce an warning instead just a debug level entry.
 | <a id="E1155"></a>E1155  | Segment | Unable to save the segment. The segment model tried to save to the materialized view directly. | Programming error: The writeable table of the segment is set to the materialized view. This is wrong, since the way is: write to the LEK_segments table, write to the data table, then update the view with the data from there.
 | <a id="E1081"></a>E1081  | Segment Pixellength | Textlength by pixel failed; most probably data about the pixelWidth is missing: fontFamily: &quot;{fontFamily} fontSize: &quot;{fontSize}&quot;. | Same as E1082 below, but no default width is available for that font and font size.

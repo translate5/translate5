@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 class editor_Task_Operation {
     
     // Every operation (also from Plugins) should define their type here to have an overview about the possible operations
-    // these kays presumably also be used to find code related to the operation, so please keep them pretty unique !
+    // these keys presumably also be used to find code related to the operation, so please keep them pretty unique !
     /**
      * @var string
      */
@@ -40,8 +40,10 @@ class editor_Task_Operation {
     /**
      * @var string
      */
-    const AUTOQA = 'opautoqa';
-
+    const AUTOQA = 'autoqa';
+    /**
+     * @var string
+     */
     const PIVOT_PRE_TRANSLATION = 'pivotpretranslation';
     /**
      * 
@@ -50,7 +52,15 @@ class editor_Task_Operation {
      * @return int The parent ID to use for all inner workers
      */
     public static function create(string $operationType, editor_Models_Task $task) : int {
-        
+        $taskState = $task->getState();
+        // Only one operation is allowed to run at a time !
+        if(in_array($taskState, self::getAllOperations())){
+            throw new editor_Task_Operation_Exception('E1396', ['taskstate' => $taskState]);
+        }
+        // we do not want excelExports to be manipulated
+        if($taskState === editor_Models_Task::STATE_EXCELEXPORTED){
+            throw new editor_Task_Operation_Exception('E1395', ['taskstate' => $taskState, 'operation' => $operationType]);
+        }
         $worker = ZfExtended_Factory::get('editor_Task_Operation_StartingWorker');
         /* @var $worker editor_Task_Operation_StartingWorker */
         if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType ])) {
@@ -58,11 +68,19 @@ class editor_Task_Operation {
             // add finishing worker
             $worker = ZfExtended_Factory::get('editor_Task_Operation_FinishingWorker');
             /* @var $worker editor_Task_Operation_FinishingWorker */
-            if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType, 'taskInitialState' => $task->getState() ])) {
+            if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType, 'taskInitialState' => $taskState ])) {
                 $worker->queue($parentId, null, false);
                 return $parentId;
             }
         }
         return 0;
+    }
+
+    /**
+     * retrieves all Operations
+     * @return string[]
+     */
+    public static function getAllOperations() : array {
+        return [ self::AUTOQA, self::MATCHANALYSIS, self::PIVOT_PRE_TRANSLATION ];
     }
 }

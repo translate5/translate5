@@ -236,6 +236,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
       
       settype($meta['additionalUnitLength'], 'integer');
       $length += $meta['additionalUnitLength'];
+      // additionalMrkLength is deprecated but still needed for legacy tasks
       settype($meta['additionalMrkLength'], 'integer');
       $length += $meta['additionalMrkLength'];
       

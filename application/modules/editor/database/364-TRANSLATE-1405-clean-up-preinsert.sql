@@ -3,7 +3,7 @@
 --
 --  This file is part of translate5
 --
---  Copyright (c) 2013 - 2020 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+--  Copyright (c) 2013 - '.(date('Y')).' Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 --
 --  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 --
@@ -24,3 +24,7 @@
 --
 -- END LICENSE AND COPYRIGHT
 -- */
+
+-- preinsert terms are a leftover from a intermediate version of the termportal and must be deleted.
+DELETE FROM terms_term
+WHERE termTbxId = 'preinsert' AND term = '';

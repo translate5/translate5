@@ -132,11 +132,13 @@ class XlfSegmentPixelLengthTest extends editor_Test_JsonTest {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/'.$fileToExport);
+
+        if($this->api()->isCapturing()) {
+            file_put_contents($this->api()->getFile($fileToCompare, null, false), rtrim($exportedFile));
+        }
+
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
-        //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
-        //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
-        //file_put_contents('/home/tlauria/foo-'.$fileToCompare, rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
     

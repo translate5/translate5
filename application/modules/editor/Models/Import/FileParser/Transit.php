@@ -251,7 +251,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         
         $segment = $this->parseTags($segment);
         
-        $segment = $this->utilities->whitespace->replacePlaceholderTags($segment, $this->shortTagIdent);
+        $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
         $this->checkForUndefinedTags($segment);
 
         return $segment;

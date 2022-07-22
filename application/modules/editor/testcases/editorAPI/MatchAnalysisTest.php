@@ -149,7 +149,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      * @param bool $characterBased
      * @return void
      */
-    public function validateResults(bool $characterBased = false): void
+    protected function validateResults(bool $characterBased = false): void
     {
 
         $unitType = $characterBased ? 'character' : 'word';
@@ -210,7 +210,8 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'autoStartImport'=>0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('test-analyse.html'));
+        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
+        self::$api->addImportFile($zipfile);
         self::$api->import($task,false,false);
         error_log('Task created. '.$this->api()->getTask()->taskName);
     }
