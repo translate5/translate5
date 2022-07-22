@@ -1310,7 +1310,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 me.handleProjectAfterImport(task);
 
                 // reload the project store after the task store is reloaded
-                me.getProjectGrid().getController().reloadProjects().then(function(){
+                me.getProjectGrid().getController().reloadProjects(function(){
 
                     //set the store reference to the model(it is missing), it is used later when the task is deleted
                     task.store = me.getAdminTasksStore();

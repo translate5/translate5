@@ -34,7 +34,8 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     	deleteProjectDialogMessage:'#UT#Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?',
     	projectDeleteButtonText:'#UT#Projekt löschen',
     	projectCanceltButtonText:'#UT#Nein',
-    	projectRemovedMessage:'#UT#Das Projekt "{0}" wurde erfolgreich entfernt!'
+    	projectRemovedMessage:'#UT#Das Projekt "{0}" wurde erfolgreich entfernt!',
+        taskDestroy: '#UT#Projekt "{0}" wird gelöscht...'
     },
     listen: {
         messagebus: {
@@ -58,7 +59,12 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         else {
             project = store.findRecord( 'taskGuid', params.taskGuid, 0, false, true, true);
         }
-        project && project.load();
+        // ignore the removed records
+        if(!project || project.dropped){
+            return;
+        }
+
+        project.load();
     },
 
     handleProjectReload: function (task, ev) {
@@ -128,6 +134,13 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
      */
     deleteProject:function(project){
     	var me=this;
+
+        Editor.app.mask(Ext.String.format(me.strings.taskDestroy, project.get('taskName')), project.get('taskName'));
+
+        // remove all project records from the store before the project is removed
+        // this will only remove the records locally
+        Ext.getStore('projectTasks').removeAll();
+
     	project.dropped = true; //doing the drop / erase manually
     	project.save({
             //prevent default ServerException handling
@@ -136,16 +149,20 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
                 Editor.MessageBox.addByOperation(op);
             },
             success: function() {
+
                 // clean the route so the old hash is not kept in the url
                 me.redirectTo(Editor.util.Util.getCurrentBaseRoute());
 
                 me.reloadProjects();
 
-            	Ext.StoreManager.get('admin.Tasks').reload();
+            	Ext.StoreManager.get('admin.Tasks').load();
+
+                Editor.app.unmask();
 
             	Editor.MessageBox.addSuccess(Ext.String.format(me.strings.projectRemovedMessage, project.get('taskName')),2);
             },
             failure: function(records, op){
+                Editor.app.unmask();
             	Editor.app.getController('ServerException').handleException(op.error.response);
             }
         });
@@ -153,15 +170,19 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     
     /***
      * Reload the project store. Return promisse after the store is loaded
+     *
+     * @param loadCallback callback function on store load
      */
-    reloadProjects:function(){
+    reloadProjects:function(loadCallback){
          var store = this.getView().getStore();
-         return new Ext.Promise(function (resolve, reject) {
-             store.load({
-                 callback: function(records, operation, success) {
-                	 success ? resolve(records) : reject(operation); 
+         store.load({
+             callback: function (records,operation,success){
+                 if(success){
+                     loadCallback && loadCallback(records,operation,success);
+                 }else{
+                     Editor.app.getController('ServerException').handleException(operation.error.response);
                  }
-             });
+             }
          });
     },
 
