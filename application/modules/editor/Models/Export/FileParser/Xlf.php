@@ -99,7 +99,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             if(empty($attributes['id']) && $attributes['id'] !== '0') {
                 throw new Zend_Exception('Missing id attribute in '.$xmlparser->getChunk($key));
             }
-            
+
             $id = $attributes['id'];
             //alternate field is optional, use target as default
             if(isset($attributes['field'])) {
@@ -115,7 +115,12 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                 $this->_exportChunksWithSourceFallback[$key] = $this->getSegmentContent($id, editor_Models_SegmentField::TYPE_SOURCE);
             }
         });
-        
+
+        //some special content (for example orphaned tags) is masked as internal placeholder in the skeleton
+        $xmlparser->registerElement('t5:placeholder', null, static function($tag, $key, $opener) use ($xmlparser){
+            $xmlparser->replaceChunk($key, base64_decode($xmlparser->getAttribute($opener['attributes'], 'data-content')));
+        });
+
         //convert empty <target></target> tags to single ones: <target />
         $xmlparser->registerElement('target', null, function($tag, $key, $opener) use ($xmlparser){
             $content = $xmlparser->getRange($opener['openerKey']+1, $key-1, true);

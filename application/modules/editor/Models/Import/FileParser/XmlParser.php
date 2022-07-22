@@ -60,7 +60,7 @@ class editor_Models_Import_FileParser_XmlParser {
     protected $handlerElementCloser = [];
     protected $handlerOther;
     protected $handlerError;
-    
+
     /**
      * if >0 disables the processing of the registered handlers
      * @var integer
@@ -74,6 +74,24 @@ class editor_Models_Import_FileParser_XmlParser {
     protected $preserveWhitespace;
     
     protected $nonXmlBlocks = [];
+
+    /**
+     * Internal options
+     * @var array|bool[]
+     */
+    private array $options = [
+        'normalizeTags' => true,
+    ];
+
+    /**
+     * Options:
+     * normalizeTags:   true by default: all tags are lowerized. According to XML spec, tags ARE case sensitive,
+     *                  but on XLF import we ignore the case. Nevermind there are some cases where it must be disabled.
+     * @param array $options
+     */
+    public function __construct(array $options = []) {
+        $this->options = array_merge($this->options, $options);
+    }
 
     /**
      * walks through the given XML string and fires the registered callbacks for each found node
@@ -443,13 +461,18 @@ class editor_Models_Import_FileParser_XmlParser {
         $selectorParts = $parts; //return the selectorparts as referenced variable
         return $this->normalizeTag($selector[2]);
     }
-    
+
     /**
      * normalizes a given tag
+     * @param $tag
      * @return string
      */
-    protected function normalizeTag($tag) {
-        return strtolower($tag);
+    protected function normalizeTag($tag): string
+    {
+        if($this->options['normalizeTags']) {
+            return strtolower($tag);
+        }
+        return $tag;
     }
     
     /**
@@ -523,7 +546,7 @@ class editor_Models_Import_FileParser_XmlParser {
             return true;
         }
         
-        if(preg_match('/([^\^=$*]+)([^\^=$*]{0,1}=)([^=]+)$/', $filter, $parts)) {
+        if(preg_match('/([^\^=$*!]+)([^\^=$*!]{0,1}=)([^=]+)$/', $filter, $parts)) {
             $attribute = $parts[1];
             $operator = $parts[2];
             $comparator = $parts[3];
@@ -532,6 +555,7 @@ class editor_Models_Import_FileParser_XmlParser {
             //empty filter is excluded above, so reaching here can mean only the "existence" operator
             $attribute = $filter;
             $operator = 'has';
+            $comparator = null;
         }
 
         //since the attributes are stored normalized (lower case), the filter attribute must also be lowercase
@@ -550,8 +574,12 @@ class editor_Models_Import_FileParser_XmlParser {
                 
             // tag[attr=foo] attribute value equals
             case '=':
-                return $value == $comparator;
-                
+                return $value === $comparator;
+
+            // tag[attr!=foo] attribute value is not equal
+            case '!=':
+                return $value !== $comparator;
+
             // tag[attr^=foo] attribute value starts with
             case '^=':
                 return mb_strpos($value, $comparator) === 0;
@@ -713,11 +741,11 @@ class editor_Models_Import_FileParser_XmlParser {
      * merges the separated XML chunks back into a string
      * @return string
      */
-    public function __toString() {
+    public function __toString(): string {
         return $this->join($this->xmlChunks);
     }
     
-    public function join(array $chunks) {
+    public function join(array $chunks): string {
         return join('', $chunks);
     }
 }

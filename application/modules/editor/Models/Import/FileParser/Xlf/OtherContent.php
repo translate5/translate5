@@ -27,75 +27,90 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Handles OtherContent stuff (recognition and length calculation) on XLIFF import 
+ * Handles OtherContent (recognition and length calculation) on XLIFF import
+ * OtherContent is content outside of MRK type seg tags in a segment containing such MRKs
+ * In our initial interpretation of the XLIFF standard this should not be possible that there is content apart of whitespace and tags,
+ * but some other systems don't care about that and create content inbetween / out of the segmented MRK content
  */
 class editor_Models_Import_FileParser_Xlf_OtherContent {
+    const T5_MRK_TAG = 't5:mrk-import';
+    const OTC_MID_PREFIX = 'OTC-';
+
     /**
      * Container for plain text content in target tags
-     * @var array
+     * index for the first data is always 0, the others have the mid of the previuos MRK tag
+     * @var editor_Models_Import_FileParser_Xlf_OtherContent_Data[]
      */
-    protected $otherContentTarget = [];
-    
+    protected array $otherContentTarget = [];
+
     /**
      * Container for plain text content in source tags
-     * @var array
+     * index for the first data is always 0, the others have the mid of the previuos MRK tag
+     * @var editor_Models_Import_FileParser_Xlf_OtherContent_Data[]
      */
-    protected $otherContentSource = [];
-    
-    /**
-     * Flag if unknown content should be collected or not
-     * @var boolean
-     */
-    protected $checkContentOutsideMrk = false;
+    protected array $otherContentSource = [];
     
     /**
      * Flag if we should preserve whitespace or not
      * @var boolean
      */
-    protected $preserveWhitespace = false;
+    protected bool $preserveWhitespace = false;
     
     /**
      * Flag if we should use source or target other content 
      * @var boolean
      */
-    protected $useSource = false;
+    protected bool $useSource = false;
     
     /**
      * @var editor_Models_Import_FileParser_Xlf_ContentConverter
      */
-    protected $contentConverter = null;
+    protected editor_Models_Import_FileParser_Xlf_ContentConverter $contentConverter;
     
     /**
      * @var editor_Models_Segment
      */
-    protected $segmentBareInstance;
+    protected editor_Models_Segment $segmentBareInstance;
     
     /**
      * @var editor_Models_Segment_Meta
      */
-    protected $segmentMetaBareInstance;
+    protected editor_Models_Segment_Meta $segmentMetaBareInstance;
     
     /**
      * @var editor_Models_Task
      */
-    protected $task;
+    protected editor_Models_Task $task;
     
     /**
      * @var int
      */
-    protected $fileId;
+    protected int $fileId;
     
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
-    protected $xmlparser;
+    protected editor_Models_Import_FileParser_XmlParser $xmlparser;
     
     /**
      * contains the additional unit length 
      * @var integer
      */
-    protected $additionalUnitLength = 0;
-    
+    protected int $additionalUnitLength = 0;
+
+    /**
+     * @var int[]
+     */
+    private ?array $sourceElementBoundary = null;
+
+    /**
+     * @var int[]
+     */
+    private ?array $targetElementBoundary = null;
+
+    private array $midsToBeImported = [];
+    private array $orphanedTags = [];
+
     /**
      * Constructor
      * @param editor_Models_Import_FileParser_Xlf_ContentConverter $converter
@@ -120,8 +135,8 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
         $this->xmlparser = $parser;
         $this->initSource(); //reset otherContent for new source
         $this->initTarget(); //reset otherContent for new target
-        $this->checkContentOutsideMrk = false;
         $this->additionalUnitLength = 0;
+        $this->midsToBeImported = [];
     }
     
     /**
@@ -132,35 +147,171 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
     public function initOnUnitEnd(bool $useSource, bool $preserveWhitespace) {
         $this->useSource = $useSource;
         $this->preserveWhitespace = $preserveWhitespace;
+
+        //CRUCIAL - source must be called before target! due tag numbering in contentconverter
+        $this->prepareContentPreserved(true);
+        $this->prepareContentPreserved(false);
     }
-    
+
+
     /**
-     * Add other content to the wither source or target container
-     * @param string $otherContent
-     * @param bool $isSource
+     * Prepare the other contents with preserved whitespace, returning already split the convert content on MRK boundaries
+     * @param bool $source
      */
-    public function add(string $otherContent, bool $isSource) {
-        if($isSource) {
-            $container = &$this->otherContentSource;
+    private function prepareContentPreserved(bool $source): void
+    {
+        $data = $source ? $this->otherContentSource : $this->otherContentTarget;
+        $containerBoundary = $source ? $this->sourceElementBoundary : $this->targetElementBoundary;
+
+        if(empty($data) || empty($containerBoundary)) {
+            return;
+        }
+
+
+        //in source always, and on target only if source empty
+        $resetTagNumbers = $source || empty($this->otherContentSource);
+
+        $concatContent = $this->xmlparser->join($this->convertBoundaryToContent($containerBoundary, $data));
+        $content = $this->contentConverter->convert($concatContent, $resetTagNumbers, $this->preserveWhitespace);
+
+        //add the other data container for the first content BEFORE the first MRK:
+        $firstOtherContent = new editor_Models_Import_FileParser_Xlf_OtherContent_Data(0, $containerBoundary[0], reset($data)->startMrkIdx);
+        if($source) {
+            array_unshift($this->otherContentSource, $firstOtherContent);
+            $data = $this->otherContentSource;
         }
         else {
-            $container = &$this->otherContentTarget;
+            array_unshift($this->otherContentTarget, $firstOtherContent);
+            $data = $this->otherContentTarget;
         }
-        if(count($container) === 0) {
-            //if there is no content, this is the first content before the first mrk at all
-            $container[] = '';
-        }
-        $keys = array_keys($container);
-        //always add content to the current last element of the array. new elements per MRKs are added elsewhere
-        $container[end($keys)] .= $otherContent;
+
+        $content = $this->splitAtMrk($content);
+
+        $this->checkAndPrepareContent($content, $data);
+        $this->protectOrphanedTags($data);
+        $this->fillOtherData($content, $data);
     }
-    
+
     /**
-     * Sets if the content outside a mrk should be checked or not
-     * @param bool $enable
+     * Adds the editable other contents to the outer containers in XLF parser, so that they are imported
+     * @param array $sourceProcessOrder
+     * @param array $currentSource
+     * @param array $currentTarget
      */
-    public function setCheckContentOutsideMrk(bool $enable) {
-        $this->checkContentOutsideMrk = $enable;
+    public function injectEditableOtherContent(array &$sourceProcessOrder, array &$currentSource, array &$currentTarget) {
+        $mids = array_unique($this->midsToBeImported);
+        foreach($mids as $mid) {
+            $newMid = self::OTC_MID_PREFIX.$mid;
+
+            if(array_key_exists($mid, $this->otherContentSource)) {
+                $currentSource[$newMid] = $this->otherContentSource[$mid];
+            }
+            if(array_key_exists($mid, $this->otherContentTarget)) {
+                $currentTarget[$newMid] = $this->otherContentTarget[$mid];
+            }
+
+            // the first other content does not belong to an mid and must be always added as first segment
+            if($mid === 0) {
+                array_unshift($sourceProcessOrder, $newMid);
+                continue;
+            }
+
+            //if the mrk mid exists in sourceProcessOrder, we add the other content behind it
+            $found = array_search($mid, $sourceProcessOrder);
+            if($found === false) {
+                array_splice($sourceProcessOrder, $found, 0, $newMid);
+                continue;
+            }
+            $sourceProcessOrder[] = $newMid;
+        }
+    }
+
+    /**
+     * Checks if the given MID belongs to an other content fragment
+     * @param string $mid
+     * @return bool
+     */
+    public function isOtherContent(string $mid): bool
+    {
+        return str_starts_with($mid, self::OTC_MID_PREFIX);
+    }
+
+
+    /**
+     * Loop over the given array with mrk boundaries and convert them to text portions, adding temporary place holders for the MRKs itself
+     * containing the content outside of the MRK boundaries
+     * @param array $containerBoundary
+     * @param array $boundaries
+     * @return array
+     */
+    private function convertBoundaryToContent(array $containerBoundary, array $boundaries): array {
+        $newSource = [];
+        $otherContentStart = $containerBoundary[0];
+        //the content between the source/target start tag and the first MRK is added to the beginning,
+        // its the not MRK related additional unit content, so we use just index 0
+        $indexToAdd = 0;
+
+        foreach($boundaries as $mid => $boundary) {
+            /** @var editor_Models_Import_FileParser_Xlf_OtherContent_Data $boundary */
+            // on the first run through the loop the content between start of parent and MRK is added
+            $newSource[$indexToAdd] = $this->xmlparser->getRange($otherContentStart + 1, $boundary->startMrkIdx - 1, true);
+            $newSource[$indexToAdd] .= '<'.self::T5_MRK_TAG.' mid="'.$mid.'"/>';
+            $indexToAdd = $mid;
+            $otherContentStart = $boundary->endMrkIdx;
+        }
+        //add the content between the last MRK and the end of the parent segment
+        $newSource[$indexToAdd] = $this->xmlparser->getRange($otherContentStart + 1, $containerBoundary[1] - 1, true);
+        return $newSource;
+    }
+
+    /**
+     * splits the converted content back as array
+     * where the keys are the corresponding MRK IDs from the main otherContent array
+     *
+     * @param array $content
+     * @return array
+     */
+    private function splitAtMrk(array $content): array {
+        $mid = 0;
+        $result = [];
+        $current = [];
+        $matches = [];
+        $tags = [];
+        $this->orphanedTags = [];
+        foreach($content as $chunk) {
+            //collect the mids of each tag
+            if($chunk instanceof editor_Models_Import_FileParser_Tag) {
+                $objHash = spl_object_hash($chunk);
+                $tags[$objHash] = $mid;
+
+                //if we get the second tag of a pair, and both are in different other content containers: <mrk /><g><mrk /></g>
+                if(!is_null($chunk->partner) && ($partnerHash = spl_object_hash($chunk->partner)) && isset($tags[$partnerHash]) && $mid != $tags[$partnerHash]) {
+                    // then they should be rendered as single tag
+                    $chunk->setSingle();
+                    $chunk->renderTag();
+                    $chunk->partner->setSingle();
+                    $chunk->partner->renderTag();
+                    //collect them as orphaned tag with their mid for latter processing
+                    $this->orphanedTags[$objHash] = ['tag' => $chunk, 'mid' => $mid];
+                    $this->orphanedTags[$partnerHash] = ['tag' => $chunk->partner, 'mid' => $tags[$partnerHash]];
+                }
+            }
+
+            if(preg_match('#^<'.self::T5_MRK_TAG.' mid="([^"]+)"/>$#', $chunk, $matches)) {
+                // save collected chunks into a container
+                $result[$mid] = $current;
+
+                //define new container for next chunks
+                $mid = $matches[1];
+                $current = [];
+                //we do not collect the T5_MRK_TAG itself
+                continue;
+            }
+            $current[] = $chunk;
+        }
+        //at the end collect the rest
+        $result[$mid] = $current;
+        return $result;
     }
     
     /**
@@ -176,28 +327,48 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
     public function initSource() {
         $this->otherContentSource = [];
     }
-    
+
+    /**
+     * Stores the seg-source start and end idx internally, enables MRK outside content check
+     * @param int $start
+     * @param int $end
+     */
+    public function setSourceBoundary(int $start, int $end) {
+        $this->sourceElementBoundary = [$start, $end];
+    }
+
+    /**
+     * Stores the target start and end idx internally, enables MRK outside content check
+     * @param int $start
+     * @param int $end
+     */
+    public function setTargetBoundary(int $start, int $end) {
+        $this->targetElementBoundary = [$start, $end];
+    }
+
     /**
      * add a new other content value to a mid
      * @param string $mid
-     * @param string $value
+     * @param int $startIdx
+     * @param int $endIdx
      */
-    public function addTarget(string $mid, string $value) {
-        $this->otherContentTarget[$mid] = $value;
+    public function addTarget(string $mid, int $startIdx, int $endIdx) {
+        $this->otherContentTarget[$mid] = new editor_Models_Import_FileParser_Xlf_OtherContent_Data($mid, $startIdx, $endIdx);
     }
-    
+
     /**
-     * add a new other content value to a mid
+     * add a new mrk boundary (mrk start/end index)
      * @param string $mid
-     * @param string $value
+     * @param int $startIdx
+     * @param int $endIdx
      */
-    public function addSource(string $mid, string $value) {
-        $this->otherContentSource[$mid] = $value;
+    public function addSource(string $mid, int $startIdx, int $endIdx) {
+        $this->otherContentSource[$mid] = new editor_Models_Import_FileParser_Xlf_OtherContent_Data($mid, $startIdx, $endIdx);
     }
-    
+
     /**
-     * Adds
-     * @param string $content
+     * Adds the length of a ignored segment to the length calculation
+     * @param array $content
      * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
      */
     public function addIgnoredSegmentLength(array $content, editor_Models_Import_FileParser_SegmentAttributes $attributes) {
@@ -205,185 +376,188 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
         $contentLength = $this->segmentBareInstance->textLengthByImportattributes($this->xmlparser->join($content), $attributes, $this->task->getTaskGuid(), $this->fileId);
         $this->additionalUnitLength += $contentLength;
         
-        //we add the additional mrk length of the ignored segment to the additionalUnitLength
+        //we add the additional mrk length of the ignored segment to the additionalUnitLength too
         $this->additionalUnitLength += $attributes->additionalMrkLength;
     }
     
     /**
-     * The length of other content (outside/between mrk mtype seg tags) is also saved for length calculation
+     * calculates the additionalUnitLength for the whole transunit, needs at least a SegmentAttributes for several parameters
+     *
+     * The length of other content (whitespace and tags only outside/between mrk mtype seg tags) is also saved for length calculation
      * Assume the following <target>, where bef, betweenX and aft are assumed as whitespace
-     *  (since other content as whitespace outside of mrks gices an error)
-     * <target>bef<mrk>text 1</mrk>between1<mrk>text 2</mrk>between1<mrk>text 3</mrk>aft</target>
-     *   the length of "bef" is saved as "additionalUnitLength" to each segment
-     *   the length of each whitespace after a closed mrk is saved to that mrk as "additionalMrkLength"
-     *   each additionalMrkLength is added automatically to the segments content length in siblingData
-     *   the additionalUnitLength instead must be only added once on each length calculation (where siblingData is used)
+     * <target>bef<mrk>text 1</mrk>between1<mrk>text 2</mrk>between2<mrk>text 3</mrk>aft</target>
+     *   the length of "bef", "between1", "between2" and "aft" is saved as "additionalUnitLength" to each segment
+     *   the additionalUnitLength must then be only added once on each length calculation (where siblingData is used)
      * preserveWhitespace influences the otherContent:
      *   preserveWhitespace = true: length of otherContent is always the real length,
-     *   preserveWhitespace = false: length of otherContent is always length of the padded whitespace between the MRK tags,
+     *   preserveWhitespace = false: length of otherContent is always length of the condensed/padded whitespace between the MRK tags,
      * source and target MRK padding if MRKs are different in source vs target:
      *    if $useSourceOtherContent is true, this is no problem since there is no target to compare and add missing MRKs
      *    if its false and targetOtherContent is used: just use the target otherContent since padded target MRKs could
      *      not be edited and are not added as new MRKs in the target. So no otherContent must be considered here.
      *    This will change with implementing merging and splitting.
-     *
-     * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
-     * @param bool $useSourceOtherContent
-     */
-    public function saveTargetOtherContentLength(editor_Models_Import_FileParser_SegmentAttributes $attributes) {
-        $otherContent = $this->useSource ? $this->otherContentSource : $this->otherContentTarget;
-        //debug START
-        /*
-         $x = array_map(function($i){
-         return '#'.$i.'#'.strlen($i);
-         }, $otherContent);
-         error_log("\n\n".$attributes->transunitId."\n\n");
-         error_log(print_r($x,1));
-         error_log(print_r($this->currentTarget,1));
-         */
-        //debug END
-        
-        //the other lengths are stored per affected segment, so if there is none, do nothing
-        if(empty($otherContent[$attributes->mrkMid])) {
-            return;
-        }
-        
-        if($this->preserveWhitespace) {
-            //with preserve whitespace we use the original content
-            $content = $this->convertText($otherContent[$attributes->mrkMid]);
-        } else {
-            //with ignoring whitespace we prepare the otherContent like in checkAndPrepareOtherContent, but only if we are not
-            //in the last MRK: here we may not save any additionalLength, since we consider only the content inbetween MRKs
-            //<target>additionalUnitLength ignored<mrk>content</mrk> this length is needed<mrk>content</mrk>this length is ignored again</target>
-            $mrkMidKeys = array_keys($otherContent);
-            if($attributes->mrkMid != end($mrkMidKeys)) {
-                //Attention: if there is a tag between two MRKs in a formatted XML this tag has leading and trailing multiple whitespace and newline characters.
-                // If $preserveWhitespace is true, this whitespace remains as it is, and is counted completely (10 lines above from here)
-                // If $preserveWhitespace is false, the whitespace before and after the tag is condensed to one single whitespace character each,
-                //  so that in sum this part of the segments has a length of at least 2 characters
-                $content = $this->convertText($this->prepareMrkInbetweenContent($otherContent[$attributes->mrkMid]));
-            }
-            else {
-                $content = '';
-            }
-        }
-        //the other lengths are stored per affected segment (and is already added to the length stored in metaCache per segment)
-        $attributes->additionalMrkLength = $this->segmentBareInstance->textLengthByImportattributes($content, $attributes, $this->task->getTaskGuid(), $this->fileId);
-    }
-    
-    /**
-     * for other content length calculation we have to convert the othercontent to translate5 content (mainly because of the tags)
-     *  this must be done with preserve whitespace true (otherwise the length of tags would be ignored)
-     * @param string $text
-     * @return string
-     */
-    protected function convertText(string $text): string {
-        $preserveWhitespace = true;
-        return $this->xmlparser->join($this->contentConverter->convert($text, true, $preserveWhitespace));
-    }
-    
-    /**
-     * calculates the additionalUnitLength for the whole transunit, needs at least a SegmentAttributes for several parameters
      * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
      */
     public function updateAdditionalUnitLength(editor_Models_Import_FileParser_SegmentAttributes $attributes) {
         $otherContent = $this->useSource ? $this->otherContentSource : $this->otherContentTarget;
-        //by definition the first otherContent belongs to the whole transunit - this value is stored in each segment
-        // only of preserveWhitespace is true
-        if($this->preserveWhitespace && !empty($otherContent[0])) {
-            $this->additionalUnitLength += $this->segmentBareInstance->textLengthByImportattributes($this->convertText($otherContent[0]), $attributes, $this->task->getTaskGuid(), $this->fileId);
+        $collectedContents = [];
+
+        foreach($otherContent as $content) {
+            //the contents which are imported can be ignored here, since the length comes from the segment then
+            if($content->toBeImported || strlen($content->content) === 0) {
+                continue;
+            }
+            $collectedContents[] = $content->content;
         }
-        
-        if($this->additionalUnitLength > 0) {
+        $collectedContents = join('', $collectedContents);
+        if(strlen($collectedContents) > 0){
+            //with the ability of editing content between MRKs and importing MRKs in a g tag pair,
+            // the length is completely saved in $additionalUnitLength. The length per MRK is not filled anymore,
+            // but the related code still remains for legacy tasks having there a value set
+            $this->additionalUnitLength += $this->segmentBareInstance->textLengthByImportattributes($collectedContents, $attributes, $this->task->getTaskGuid(), $this->fileId);
             $this->segmentMetaBareInstance->updateAdditionalUnitLength($this->task->getTaskGuid(), $attributes->transunitId, $this->additionalUnitLength);
         }
     }
     
     /**
-     * Prepares and checks the internally stored other content (content outside MRK mtype seg tags)
-     * check: there may not be other content as tags and whitespace
-     * prepare: - converts the multidimensional otherContent arrays to onedimensional ones and returns the one to be used.
-     *          - does whitespace handling: preserve completly if configured or defined in trans-unit,
-     *          or default behaviour: remove all whitespace, keep a single whitepace between MRKs
-     * @return array the other content to be used for skeleton placeholder generation
+     * Merges the collected other contents with the placeholders of the saved segment content
+     * @return string the placeholder string to be used in skeleton
      */
-    public function checkAndPrepareOtherContent() {
-        if(!$this->checkContentOutsideMrk) {
-            //if we don't check the mrk outside content, we assume that there is no outside content
-            return [];
-        }
-        //if we need otherContent below for further checks, we have to remove the assoc keys for proper working of the array_merge commands
-        $otherContentSource = array_values($this->otherContentSource);
-        $otherContentTarget = array_values($this->otherContentTarget);
-        
-        //if there is any other text content as whitespace between the mrk type seg tags, this is invalid xliff and therefore not allowed
-        // example: <mrk mtype="seg">allowed</mrk> not allowed <mrk...
-        // we allow tags between the mrk tags, they are preserved too, so we remove them for the check before
-        $otherContent = join(array_merge($otherContentSource, $otherContentTarget));
-        if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTagsAndProtectedWhitespace($otherContent))) {
-            $data = array_merge($otherContentSource, $otherContentTarget);
-            foreach ($data as &$d) {
-                //print the code point for non printable characters
-                if(!ctype_print($d) && mb_strlen($d)>0){
-                    $tmp = [];
-                    $tmp['unicode'] = json_encode((string)$d);
-                    $tmp['codepoint'] = mb_ord($d);
-                    $d=[];
-                    $d = $tmp;
+    public function mergeWithPlaceholders(array $placeHolders): string {
+        // get the affected other content
+        $otherContent = $this->useSource ? $this->otherContentSource : $this->otherContentTarget;
+        $result = [];
+
+        // merging with the placeholders
+        // 1. pre-assumptions: the placeholders may contain only OTC-mrk or mrk- IDs. All other, like sub,
+        //    are removed previously due different usage
+        // 2. the order is given by the othercontent structure, so given placeholders are sorted to the other content
+        foreach($otherContent as $mid => $data) {
+            //we process always first the real MRKs placeholder
+            $midsToTakeOver = [$mid];
+            if($data->toBeImported) {
+                //after that we take the OTC placeholder of the other content - if it was imported as segment
+                $midsToTakeOver[] = self::OTC_MID_PREFIX.$mid;
+            }
+
+            //if there are usual MRK placeholders, add them after the othercontent chunks
+            foreach($midsToTakeOver as $mid) {
+                if(array_key_exists($mid, $placeHolders)){
+                    $result[] = $placeHolders[$mid];
+                    unset($placeHolders[$mid]);
                 }
             }
-            $this->throwSegmentationException('E1069', [
-                'content' => print_r($data,1),
-                'filename' => $this->contentConverter->getFileName()
-            ]);
-        }
-        
-        $otherContent = $this->useSource ? $otherContentSource : $otherContentTarget;
-        
-        
-        // default behaviour for whitespace hanling in translate5 is:
-        if($this->preserveWhitespace) {
-            return $otherContent;
-        }
-        
-        $firstIdx = 0;
-        $lastIdx = count($otherContent) - 1;
-        foreach($otherContent as $idx => $content) {
-            //since the below regex deletes only whitespace before and after possible tags,
-            // whitespace inside tags (<ph> for example) are preserved here.
-            // But this should be ok, since the content inside the tag coming from "otherContent" is not editable.
-            if($idx == $firstIdx || $idx == $lastIdx) {
-                //before and after the first / last mrk the whitespace is stripped completly
-                $otherContent[$idx] = preg_replace('/^[\s]+|[\s]+$/', '', $content);
-                continue;
+
+            // if it was not processed as segment, we just take the original content - but after the real MRK (if any)
+            if(!$data->toBeImported) {
+                $result[] = $data->contentOriginal;
             }
-            //between MRKs we keep a single whitespace:
-            $otherContent[$idx] = $this->prepareMrkInbetweenContent($content);
         }
-        
-        return $otherContent;
+
+        // 3. merge and join all the collected data, add the remaining placeholders to the end
+        return join(array_merge($result, $placeHolders));
     }
-    
+
     /**
      * prepares whitespace on content inbetween mrk tags, only to be used with preserveWhitespace = false
      * @param string $content
+     * @param bool $remove if true multiple whitespaces are removed, if false, they are condensed to one whitespace
      * @return string
      */
-    protected function prepareMrkInbetweenContent($content) {
-        return preg_replace('/^[\s]+|[\s]+$/', ' ', $content);
+    protected function condenseWhitespace(string $content, bool $remove = false): string
+    {
+        return preg_replace('/(^[\s]+)|([\s]+$)/', $remove ? '' : ' ', $content);
     }
-    
+
     /**
-     * Throws Xlf Exception
-     * @param string $errorCode
-     * @param string $data
-     * @throws ZfExtended_Exception
+     * loops over content, checks if there is importable content and condense whitespace
+     * stores the results in the data objects in $data
+     *
+     * @param array $content
+     * @param array $data
      */
-    protected function throwSegmentationException($errorCode, array $data) {
-        if(!array_key_exists('transUnitId', $data)) {
-            $data['transUnitId'] = $this->xmlparser->getParent('trans-unit')['attributes']['id'];
+    private function checkAndPrepareContent(array $content, array $data)
+    {
+        $mids = array_keys($content);
+        $lastIdx = end($mids);
+
+        foreach ($content as $mid => $chunks) {
+            // before the first and after the last mrk, whitespace should be removed (if not preserved)
+            $removeWhitespace = ($mid === 0 || $lastIdx === $mid);
+            //after condensing, check for content to be imported / could be also before...
+            $toBeImported = false;
+
+            foreach ($chunks as $idx => $chunk) {
+                //ignore chunk if it is a tag
+                if ($chunk instanceof editor_Models_Import_FileParser_Tag || str_starts_with($chunk, '<') && str_ends_with($chunk, '>')) {
+                    continue;
+                }
+                if (!$this->preserveWhitespace) {
+                    //the whitespace between MRKs should be condensed to one whitespace,
+                    $chunks[$idx] = $chunk = $this->condenseWhitespace($chunk, $removeWhitespace);
+                }
+                //if remaining chunk is containing other content as whitespace, add it to the import list
+                if (!$toBeImported && strlen($chunk) > 0 && preg_match('/[^\s]+/', $chunk)) {
+                    //collect the mids to be imported for further processing
+                    $toBeImported = true;
+                    $this->midsToBeImported[] = $mid;
+                }
+            }
+
+            $data[$mid]->toBeImported = $toBeImported;
+            $data[$mid]->content = $this->xmlparser->join($chunks);
+            $data[$mid]->contentChunks = [];
+            $data[$mid]->contentChunksOriginal = [];
         }
-        $data['task'] = $this->task;
-        throw new editor_Models_Import_FileParser_Xlf_Exception($errorCode, $data);
+    }
+
+    /**
+     * @param array $data
+     */
+    private function protectOrphanedTags(array $data)
+    {
+        foreach ($this->orphanedTags as $orphan) {
+            /** @var editor_Models_Import_FileParser_Tag $tag */
+            $tag = $orphan['tag'];
+            $mid = $orphan['mid'];
+            //ignore real single tags or if whole content is going to be imported anyway
+            if (is_null($tag->partner) || $data[$mid]->toBeImported) {
+                continue;
+            }
+            $partnerHash = spl_object_hash($tag->partner);
+            $partnerMid = $this->orphanedTags[$partnerHash]['mid'] ?? null;
+
+            //if partner mid is be imported (but me not)
+            if ($data[$partnerMid]->toBeImported ?? false) {
+                // convert me to a single tag placeholder to be stored in the skeleton for later restoring on export
+                // otherwise for example a </g> may be stored in the SKEL (the <g> is in the imported segment) which
+                // would be invalid XML then
+                $tag->originalContent = '<t5:placeholder data-content="' . base64_encode($tag->originalContent) . '" />';
+            }
+        }
+    }
+
+    /**
+     * @param array $content
+     * @param array $data
+     */
+    private function fillOtherData(array $content, array $data): void
+    {
+        foreach ($content as $mid => $chunks) {
+            foreach ($chunks as $chunk) {
+                if ($chunk instanceof editor_Models_Import_FileParser_WhitespaceTag) {
+                    $data[$mid]->contentChunks[] = $chunk->__toString();
+                    $data[$mid]->contentChunksOriginal[] = $chunk->rawContent;
+                }
+                elseif ($chunk instanceof editor_Models_Import_FileParser_Tag) {
+                    $data[$mid]->contentChunks[] = $chunk->__toString();
+                    $data[$mid]->contentChunksOriginal[] = $chunk->originalContent;
+                } else {
+                    $data[$mid]->contentChunks[] = $chunk;
+                    $data[$mid]->contentChunksOriginal[] = $chunk;
+                }
+                $data[$mid]->contentOriginal = $this->xmlparser->join($data[$mid]->contentChunksOriginal);
+            }
+        }
     }
 }
