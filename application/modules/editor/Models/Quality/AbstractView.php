@@ -319,13 +319,13 @@ abstract class editor_Models_Quality_AbstractView {
                     sort($rubricCats);
                     foreach($rubricCats as $category){
                         if($category != self::RUBRIC){
-                            if(array_key_exists($category, $this->rowsByType[$rubric->qtype])){
-                                $rubric->children[] = $this->rowsByType[$rubric->qtype][$category];
-                            } else {
-                                $row = $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $category, $this->task), $rubric->qtype, $category);
-                                $row->textTooltip = $qualityProvider->translateCategoryTooltip($this->translate, $category, $this->task);
-                                $rubric->children[] = $row;
-                            }
+
+                            $row = array_key_exists($category, $this->rowsByType[$rubric->qtype])
+                                ? $this->rowsByType[$rubric->qtype][$category]
+                                : $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $category, $this->task), $rubric->qtype, $category);
+
+                            $row->textTooltip = $qualityProvider->translateCategoryTooltip($this->translate, $category, $this->task);
+                            $rubric->children[] = $row;
                         }
                     }
                 } 

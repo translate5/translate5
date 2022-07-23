@@ -54,6 +54,7 @@ function numbers_check($source, $target, $sourceLang, $targetLang, editor_Models
         'Formatänderung (Ordinalzahlen, führende Null u.ä.)'  => 'num10',
         'Untersch. Zeichen/Formatierung für Zahlen-Intervall' => 'num11',
         '1000er-Trenner in'                                   => 'num12',
+        'Dubiose Zahl'                                        => 'num13',
     ];
 
     $res = current(current(current($res ?? [[]])));
@@ -70,7 +71,7 @@ function numbers_check($source, $target, $sourceLang, $targetLang, editor_Models
             if (!$found) {
                 $notFound []= $msg;
                 if ($task) {
-                    $task->logger('editor.task.autoqa')->error('E1392', 'AutoQA Numbers check: new kind of error detected', [
+                    $task->logger('editor.task.autoqa')->error('E1392', 'SNC lib (which stands behind AutoQA Numbers Check) detected an error of a kind previously unknown to translate5 app', [
                         'error' => $msg,
                         'sourceLang' => $sourceLang,
                         'targetLang' => $targetLang,
