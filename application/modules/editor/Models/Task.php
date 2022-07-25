@@ -131,12 +131,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
     /**
-     * Sequenzer for QM SubSegmentFlags
-     * @var integer
-     */
-    protected $qmFlagId = 0;
-
-    /**
      * @var editor_Models_Task_Meta
      */
     protected $meta;
@@ -150,6 +144,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var int[][]
      */
     protected $faultySegmentsCache = [];
+    /**
+     * A Cache for the evaluation of similar languages
+     * @var int[][]
+     */
+    protected $languageCache = [];
 
     
     /**
@@ -600,8 +599,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Convenience API
      * @return boolean
      */
-    public function isTranslation(): bool
-    {
+    public function isTranslation() : bool {
         return $this->getEmptyTargets();
     }
 
@@ -609,9 +607,41 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Convenience API
      * @return boolean
      */
-    public function isReview(): bool
-    {
+    public function isReview() : bool {
         return !$this->getEmptyTargets();
+    }
+
+    /**
+     * Retrieves, if the full source and target language are equal, eg. en-GB === en-GB
+     * @return bool
+     */
+    public function isSourceAndTargetLanguageEqual() : bool {
+        return ($this->getSourceLang() === $this->getTargetLang());
+    }
+
+    /**
+     * Retrieves, if the rfc5646 source and target language are equal, eg. en === en
+     * @return bool
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function isSourceAndTargetLanguageSimilar() : bool {
+        return ($this->isSourceAndTargetLanguageEqual()
+            || ($this->getCachedLanguage($this->getSourceLang())->getRfc5646() == $this->getCachedLanguage($this->getTargetLang())->getRfc5646()));
+    }
+
+    /**
+     * Retrieves a cached language
+     * @param int $id
+     * @return editor_Models_Languages
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    protected function getCachedLanguage(int $id){
+        if(array_key_exists($id, $this->languageCache)){
+            return $this->languageCache[$id];
+        }
+         $this->languageCache[$id] = new editor_Models_Languages();
+        $this->languageCache[$id]->load($id);
+        return $this->languageCache[$id];
     }
 
     /**
