@@ -432,7 +432,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $task = $event->getParam('task');
             /* @var $requestData array */
             $requestData = $event->getParam('requestData');
-            $bconfId = array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : NULL;
+            $bconfId = array_key_exists('bconfId', $requestData) ? intval($requestData['bconfId']) : NULL;
             $orderer = array_key_exists('orderer', $requestData) ? $requestData['orderer'] : NULL;
             $bconf = self::getImportBconfById($task, $bconfId, $orderer);
             // we add the bconf with it's visual name as filename to the archive for easier maintainability
