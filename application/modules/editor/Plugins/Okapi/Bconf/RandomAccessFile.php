@@ -49,8 +49,8 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
      */
     const OVERFLOW_SUB = 0x100000000; // == PHP_UINT32_MAX +1
 
-    public function __construct(string $filename, string $mode = "r", bool $useIncludePath = false, ?object $context = null) {
-        return parent::__construct($filename, $mode, $useIncludePath, $context);
+    public function __construct(string $filename, string $mode = "r", bool $useIncludePath = false, ?object $context = null){
+        parent::__construct($filename, $mode, $useIncludePath, $context);
     }
 
     /**
