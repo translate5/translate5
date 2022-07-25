@@ -14,6 +14,57 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.5] - 2022-07-22
+
+### Important Notes:
+#### [TRANSLATE-3002](https://jira.translate5.net/browse/TRANSLATE-3002)
+Activate in client instance, see TS-1787!
+ 
+
+
+### Added
+**[TRANSLATE-3002](https://jira.translate5.net/browse/TRANSLATE-3002): Workflows - Ask for task finish on task close too** <br>
+Added dialog shown on leaving the application in embedded mode, with finish task and just leave as possible choices. Added config option to control whether such dialog should be shown.
+
+
+### Changed
+**[TRANSLATE-2999](https://jira.translate5.net/browse/TRANSLATE-2999): TermPortal - Create missing term attributes datatype foreign key** <br>
+Fixed problem with missing data types for term attributes in term portal.
+
+
+### Bugfixes
+**[TRANSLATE-3007](https://jira.translate5.net/browse/TRANSLATE-3007): InstantTranslate - Instant translate search content with tags** <br>
+FIXED Bug in Instanttranslate when segmented results are processed due to a missing API
+
+**[TRANSLATE-3006](https://jira.translate5.net/browse/TRANSLATE-3006): LanguageResources - Problem with DeepL target language** <br>
+Fixes problem where the DeepL language resource target language was saved as lowercase value.
+
+**[TRANSLATE-3004](https://jira.translate5.net/browse/TRANSLATE-3004): Editor general - Error on deleting project** <br>
+Solves problem where error pop-up was shown when deleting project.
+
+**[TRANSLATE-3000](https://jira.translate5.net/browse/TRANSLATE-3000): Editor general - Use project task store for task reference in import wizard** <br>
+Solves problem in import wizard when assigning task users.
+
+**[TRANSLATE-2996](https://jira.translate5.net/browse/TRANSLATE-2996): MatchAnalysis & Pretranslation - Analysis grid reconfigure leads to an error** <br>
+Solves problem with front-end error in match analysis overview.
+
+**[TRANSLATE-2995](https://jira.translate5.net/browse/TRANSLATE-2995): Main back-end mechanisms (Worker, Logging, etc.) - Event logger error** <br>
+Fixed back-end error with workflow actions info logging.
+
+**[TRANSLATE-2987](https://jira.translate5.net/browse/TRANSLATE-2987): Task Management - Routing problems when jumping from and to project overview** <br>
+Fixed a problem where the selected task was not focused after switching between the overviews.
+
+**[TRANSLATE-2963](https://jira.translate5.net/browse/TRANSLATE-2963): Main back-end mechanisms (Worker, Logging, etc.), MatchAnalysis & Pretranslation - Queuing matchanalysis multiple times leads to locked tasks** <br>
+FIX: Prevent running multiple operations for the same task
+
+**[TRANSLATE-2813](https://jira.translate5.net/browse/TRANSLATE-2813): Client management, LanguageResources, Task Management, User Management - Copy&paste content of PM grids** <br>
+Now you can copy text from all grids cells in translate5.
+
+**[TRANSLATE-2786](https://jira.translate5.net/browse/TRANSLATE-2786): Import/Export - xliff 1.2 import fails if a g tag contains a mrk segment tag** <br>
+The XLF import fails if there are g tags surrounding the mrk segmentation tags.
+
+
 ## [5.7.4] - 2022-06-30
 
 ### Important Notes:

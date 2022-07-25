@@ -3,7 +3,7 @@
 --
 --  This file is part of translate5
 --
---  Copyright (c) 2013 - 2020 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+--  Copyright (c) 2013 - '.(date('Y')).' Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 --
 --  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 --
@@ -24,9 +24,6 @@
 --
 -- END LICENSE AND COPYRIGHT
 -- */
-ALTER TABLE `LEK_match_analysis_batchresults` RENAME TO  `LEK_languageresources_batchresults` ;
 
-UPDATE `Zf_configuration`
-SET `name` = 'runtimeOptions.LanguageResources.Pretranslation.enableBatchQuery',
-    `description` = 'Enables batch query requests for pretranslations only for the associated language resource that support batch query. Batch query is much faster for many language resources for imports and InstantTranslate'
-WHERE (`name` = 'runtimeOptions.plugins.MatchAnalysis.enableBatchQuery');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `typeClass`, `description`, `level`, `guiName`, `guiGroup`, `comment`) 
+values('runtimeOptions.editor.toolbar.askFinishOnClose','1','editor','editor','0','0','','boolean',NULL,'1 if on task close user should be asked for finishing the task','1','','','');

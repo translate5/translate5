@@ -4785,5 +4785,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</source>
   <target>If the ZIP package to be imported contains files for filling the pivot column, settings made here will be ignored.</target>
 </trans-unit>
+<trans-unit id='UHJvamVrdCAiezB9IiB3aXJkIGdlbMO2c2NodC4uLg=='>
+  <source>Projekt "{0}" wird gelöscht...</source>
+  <target>Deleting "{0}" project...</target>
+</trans-unit>
   </file>
 </xliff>

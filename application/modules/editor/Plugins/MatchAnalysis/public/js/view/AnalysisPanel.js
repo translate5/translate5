@@ -117,17 +117,21 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                                 '{strings.noAnalysis}',
                             '</tpl>'
                         ],
-                        items:[{
+                        bbar:[{
                             xtype: 'combo',
                             name:'unitType',
                             itemId:'unitType',
+                            editable : true,
+                            typeAhead : true,
+                            forceSelection : true,
+                            disableKeyFilter : true,
                             fieldLabel: me.strings.basedOn,
-                            store: Ext.create('Ext.data.Store', {
-                                fields: ['id', 'type'],
-                                data : [
-                                    {"id":"word", "type":me.strings.wordBased},
-                                    {"id":"character", "type":me.strings.characterBased}
-                                ]
+                            store: Ext.create('Ext.data.ArrayStore',{
+                            fields: ['id', 'type'],
+                            data : [
+                                ['word',me.strings.wordBased],
+                                ['character',me.strings.characterBased]
+                            ]
                             }),
                             listeners: {
                                 select: 'onUnitTypeSelect'

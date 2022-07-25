@@ -68,7 +68,7 @@ class AllTablesEventCodesTest extends \ZfExtended_Test_ApiTestcase {
         }
         
         $collectedCodes = array_unique($collectedCodes);
-        $docuUrl = "https://confluence.translate5.net/display/TAD/EventCodes";
+        $docuUrl = ZfExtended_Logger_Writer_EcodeWriter::ECODE_FILE;
         $text = file_get_contents($docuUrl);
         $codes = [];
         preg_match_all("/(E[0-9]{4})/", $text, $codes);

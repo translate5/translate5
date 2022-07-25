@@ -90,7 +90,7 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract {
 
             $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$this->task]);
             $remover->remove();
-            $this->log->info('E1402', 'Task successfully removed. ID: {id} {name}', [
+            $this->log->info('E1402', 'Task successfully removed (with backup before). ID: {id} {name}', [
                 'id' => $taskJson->id,
                 'name' => $taskJson->taskName,
                 'targetPath' => $targetFile,
@@ -112,12 +112,13 @@ class ArchiveWorker extends ZfExtended_Worker_Abstract {
      * @return string
      */
     protected function replaceTargetPathVariables(string $targetPath, object $taskJson): string {
-        return preg_replace_callback('#{([a-zA-Z0-9_-]+)}#', function($matches) use ($taskJson) {
+        $charsToProtect = str_split('#%&{}\\<>*?/$!\'":@+`|=');
+        return preg_replace_callback('#{([a-zA-Z0-9_-]+)}#', function($matches) use ($taskJson, $charsToProtect) {
             $var = $matches[1];
             if($var === 'time') {
                 return \NOW_ISO;
             }
-            return $taskJson->$var ?? $var;
+            return str_replace($charsToProtect, '-', $taskJson->$var ?? $var);
         }, $targetPath);
     }
 

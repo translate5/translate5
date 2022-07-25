@@ -97,15 +97,26 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      * if no project is selected in route we get here
      */
     onProjectBaseRoute:function(){
-        var store = this.lookup('projectGrid').store;
-        if(store.hasPendingLoad()) {
+        var me = this,
+            projectGrid = me.lookup('projectGrid'),
+            projectStore = projectGrid.getStore(),
+            projectTaskGrid = me.lookup('projectTaskGrid'),
+            selectedRecordsArray = projectTaskGrid.getView().getSelectionModel().getSelection();
+
+
+        if(projectStore.hasPendingLoad()) {
             //do nothing since will be handled in the load handler then
             return;
         }
 
+        // if there is already selection in the grid, use it as "task to focus"
+        if(selectedRecordsArray.length > 0){
+            me.redirectFocus(selectedRecordsArray[0], true);
+            return;
+        }
+
         //if no project selected in route we just choose the first one and try to select that
-        //no selected record is found, use the first in the store
-        this.redirectFocus(store.getAt(0), false);
+        me.redirectFocus(projectStore.getAt(0), false);
     },
 
 
@@ -250,9 +261,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
         me.resetSelection();
 
-        grid.getController().reloadProjects().then(function(records) {}, function(operation) {
-            Editor.app.getController('ServerException').handleException(operation.error.response);
-        });
+        grid.getController().reloadProjects();
     },
 
     /***
@@ -294,7 +303,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                         me.selectProjectTaskRecord(taskId);
                         return;
                     }
-                    grid.getController().reloadProjects().then(function(){
+                    grid.getController().reloadProjects(function(){
                         record=grid.getStore().getById(parseInt(id));
                         me.focusRecordSilent(grid,record,'projectSelection');
                         me.selectProjectTaskRecord(taskId);
