@@ -903,8 +903,7 @@ Ext.define('Editor.controller.Localizer', {
             deleteProjectDialogMessage: '<?php echo $this->translate->_('Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?');?>',
             projectDeleteButtonText: '<?php echo $this->translate->_('Projekt löschen');?>',
             projectCanceltButtonText: '<?php echo $this->translate->_('Nein');?>',
-            projectRemovedMessage: '<?php echo $this->translate->_('Das Projekt "{0}" wurde erfolgreich entfernt!');?>',
-            taskDestroy: '<?php echo $this->translate->_('Projekt "{0}" wird gelöscht...');?>'
+            projectRemovedMessage: '<?php echo $this->translate->_('Das Projekt "{0}" wurde erfolgreich entfernt!');?>'
         }
     });
 
@@ -2065,7 +2064,11 @@ Editor.data.l10n = {
             segmentLockBtn: '<?php echo $this->translate->_('Segment sperren bzw. entsperren (STRG + L)');?>',
             bookmarkBtn: '<?php echo $this->translate->_('Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen (STRG + D)');?>'
         }
+    },
+    projectGrid:{
+        taskDestroy: '<?php echo $this->translate->_('Projekt "{0}" wird gelöscht...');?>'
     }
+
 };
 
 <?php
