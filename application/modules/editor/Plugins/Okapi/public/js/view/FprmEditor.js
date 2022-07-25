@@ -62,7 +62,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         var config = {
             minHeight: 400,
             minWidth: 600,
-            layout: (this.formPanelLayout) ? this.formPanelLayout : 'form', /* this way it can be defined by inheritance */
+            layout: 'fit', /* this way it can be defined by inheritance */
             okapiType: null, /* the okapi-type, e.g. okf_xml */
             fprmType: null, /* the fprm-type, properties|xml|yaml|plain */
             rawData: null,
@@ -85,7 +85,9 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 itemId: 'fprm',
                 height: '100%',
                 scrollable: true,
-                layout: 'form',
+                layout: (this.formPanelLayout) ? this.formPanelLayout : 'form',
+                bodyPadding: (this.formPanelPadding) ? this.formPanelPadding : 10,
+                border: false,
                 defaults: { labelClsExtra: Ext.baseCSSPrefix + 'selectable' },
                 items: []
             }],
@@ -147,20 +149,29 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         return this.callParent(arguments);
     },
     /**
-     * Creates the basic form that is
+     * Initializes the base-form
      */
-    createBaseForm: function(){
+    initForm: function(){
         this.formPanel = this.down('form#fprm');
-        // this.formPanel.setLayout('form'); // Ext.create('Ext.layout.container.Form')
-        this.getBaseFormItems().forEach(item => this.formPanel.add(item));
         this.form = this.formPanel.getForm();
     },
     /**
-     * retrieves the base form items we have
-     * @returns {array}
+     * The main entry-point to create the form
      */
-    getBaseFormItems: function(){
-        return [];
+    createForm: function(){
+        throw new Error('createForm must be implemented in subclasses!');
+    },
+    /**
+     * Can be used to apply final tweaks after the form was completely created
+     */
+    finalizeForm: function(){
+
+    },
+    /**
+     * Loads the values into the created form
+     */
+    loadForm: function(){
+        this.form.setValues(this.getFormInitValues());
     },
     /**
      * Enable save button & show help button after data is loaded
@@ -172,13 +183,6 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         }
         var top = Math.floor((window.innerHeight - this.getHeight()) / 2);
         this.setY((top < 10) ? 10 : top);
-    },
-    /**
-     * Can be overwritten to init the layout after the data has been loaded
-     * This is the main entry-point in extending classes to create custom forms after the fprm-data is loaded
-     */
-    fprmDataLoaded: function(){
-        this.form.setValues(this.getFormInitValues());
     },
     /**
      * Can be overwritten to add additional validations
@@ -295,8 +299,10 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 me.guiData = data.guidata;
                 me.rawData = data.raw;
                 me.transformedData = data.transformed;
-                me.createBaseForm();
-                me.fprmDataLoaded();
+                me.initForm();
+                me.createForm();
+                me.finalizeForm();
+                me.loadForm();
                 me.finalizeLayout();
             },
             failure: function(response){

@@ -30,10 +30,10 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
     formPanelLayout: 'fit',
     defaultFocus: 'textarea',
     /**
-     * @returns {array}
+     * Creates our single Textarea
      */
-    getBaseFormItems: function(){
-        return [{
+    createForm: function(){
+        this.formPanel.add({
             xtype: 'textarea',
             width: '100%',
             height: '100%',
@@ -56,13 +56,12 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Xml', {
                 lastCheck.ret = ret;
                 return ret;
             }
-        }];
+        });
     },
     /**
-     * @param {int} height
+     * adjusts the textfield-height to cover most of the available space
      */
-    fprmDataLoaded: function(){
+    finalizeForm: function(){
         this.down('[name=xml]').setHeight(window.innerHeight - 214);
-        this.callParent(arguments);
     }
 });

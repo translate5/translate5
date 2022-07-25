@@ -64,58 +64,70 @@
  */
 
 /**
- * MS Office Filter: this is the most complicated frontend especially because of the crazy way, list-data is saved in the fprm
+ * MS Office Filter: this is a more complicated frontend with tabs and especially because of the crazy way, list-data is saved in the fprm
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
     width: 900,
     formPanelLayout: 'fit',
+    formPanelPadding: 2,
     fieldDefinitions: {
-        //general
-        'maxAttributeSize.i': { parent: 'general', config: { hidden: true }},  // not visible in Rainbow
-        'bPreferenceTranslateDocProperties.b': { parent: 'general', config: {}},
-        'bPreferenceTranslateComments.b': { parent: 'general', config: {}},
-        'bPreferenceAggressiveCleanup.b': { parent: 'general', config: {}},
-        'bPreferenceAddTabAsCharacter.b': { parent: 'general', config: {}},
-        'bPreferenceAddLineSeparatorAsCharacter.b': { parent: 'general', config: {}},
-        //word
-        'bPreferenceTranslateWordHeadersFooters.b': { parent: 'word', config: {}},
-        'bPreferenceTranslateWordHidden.b': { parent: 'word', config: {}},
-        'bPreferenceTranslateWordExcludeGraphicMetaData.b': { parent: 'word', config: {}},
-        'bPreferenceAutomaticallyAcceptRevisions.b': { parent: 'word', config: {}},
-        'bPreferenceIgnoreSoftHyphenTag.b': { parent: 'word', config: {}},
-        'bPreferenceReplaceNoBreakHyphenTag.b': { parent: 'word', config: {}},
-        'bExtractExternalHyperlinks.b': { parent: 'word', config: {}},
-        'tsComplexFieldDefinitionsToExtract.i': { parent: 'word', config: { guiData: 'translateableHyperlinkFields' }},
-        'bInExcludeMode.b': { parent: 'word', config: {}},
-        'bInExcludeHighlightMode.b': { parent: 'word', config: {}},
-        'tsExcludeWordStyles.i': { parent: 'word', config: { guiData: 'wordStyles' }},
-        'tsWordHighlightColors.i': { parent: 'word', config: { guiData: 'colorNames' }},
-        'tsWordExcludedColors.i': { parent: 'word', config: { guiData: 'colors' }},
-        'bPreferenceTranslateWordExcludeColors.b': { parent: 'word', config: { hidden: true }},
-        //excel
-        'bPreferenceTranslateExcelHidden.b': { parent: 'excel', config: {}},
-        'bPreferenceTranslatePowerpointHidden.b': { parent: 'powerpoint', config: { hidden: true }},
-        'bPreferenceTranslateExcelExcludeColumns.b': { parent: 'excel', config: {}}, // if not true, tsExcelExcludedColumns, tsExcelExcludedColumnsSheetN will not be processed
-        'bPreferenceTranslateExcelSheetNames.b': { parent: 'excel', config: {}},
-        'bPreferenceTranslateExcelDiagramData.b': { parent: 'excel', config: {}},
-        'bPreferenceTranslateExcelDrawings.b': { parent: 'excel', config: {}},
-        'tsExcelExcludedColors.i': { parent: 'excel', config: { guiData: 'colors', dataPrefix: 'FF' }},
-        'bPreferenceTranslateExcelExcludeColors.b': { parent: 'excel', config: { hidden: true }},
-        'subfilter': { parent: 'excel', config: {}},
-        'tsExcelExcludedColumns.i': { parent: 'excel', config: { hidden: true }}, // this provides the data for the following 3 fields
-        'tsExcelExcludedColumnsSheet1.i': { parent: 'excel', config: { guiData: 'columns', dataPrefix: '1' }}, // this is a "virtual" field that does not show up in the data
-        'tsExcelExcludedColumnsSheet2.i': { parent: 'excel', config: { guiData: 'columns', dataPrefix: '2' }}, // this is a "virtual" field that does not show up in the data
-        'tsExcelExcludedColumnsSheet3.i': { parent: 'excel', config: { guiData: 'columns', dataPrefix: '3' }}, // this is a "virtual" field that does not show up in the data
-        // powerpoint
-        'bPreferenceTranslatePowerpointNotes.b': { parent: 'powerpoint', config: {}},
-        'bPreferenceTranslatePowerpointMasters.b': { parent: 'powerpoint', config: {}},
-        'bPreferenceIgnorePlaceholdersInPowerpointMasters.b': { parent: 'powerpoint', config: {}},
-        'bPreferencePowerpointIncludedSlideNumbersOnly.b': { parent: 'powerpoint', config: {}},
-        'tsPowerpointIncludedSlideNumbers.i': { parent: 'powerpoint', config: { guiData: 'numbers' }},
-        'sPreferenceLineSeparatorReplacement': { parent: null, config: { hidden: true }}, // not visible in Rainbow
-        'bReorderPowerpointNotesAndComments.b': { parent: null, config: { hidden: true }}, // not visible in Rainbow
-        'bPreferenceAllowEmptyTargets.b': { parent: null, config: { hidden: true }} // not visible in Rainbow
+        /* General Options */
+        'tabGeneralOptions': { type: 'tab', icon: 'fa-cog', children: {
+            'maxAttributeSize.i': { config: { hidden: true }},  // not visible in Rainbow
+            'sPreferenceLineSeparatorReplacement': { config: { hidden: true }}, // not visible in Rainbow
+            'bPreferenceAllowEmptyTargets.b': { config: { hidden: true }}, // not visible in Rainbow
+            'bPreferenceTranslateDocProperties.b': {},
+            'bPreferenceTranslateComments.b': {},
+            'bPreferenceAggressiveCleanup.b': {},
+            'bPreferenceAddTabAsCharacter.b': {},
+            'bPreferenceAddLineSeparatorAsCharacter.b': {}
+
+        }},
+        /* Word Options */
+        'tabWordOptions': { type: 'tab', icon: 'fa-file-word-o', children: {
+            'bPreferenceTranslateWordHeadersFooters.b': {},
+            'bPreferenceTranslateWordHidden.b': {},
+            'bPreferenceTranslateWordExcludeGraphicMetaData.b': {},
+            'bPreferenceAutomaticallyAcceptRevisions.b': {},
+            'bPreferenceIgnoreSoftHyphenTag.b': {},
+            'bPreferenceReplaceNoBreakHyphenTag.b': {},
+            'bExtractExternalHyperlinks.b': {},
+            'tsComplexFieldDefinitionsToExtract.i': { config: { guiData: 'translateableHyperlinkFields' }},
+            'bInExcludeMode.b': {},
+            'bInExcludeHighlightMode.b': {},
+            'tsExcludeWordStyles.i': { config: { guiData: 'wordStyles' }},
+            'tsWordHighlightColors.i': { config: { guiData: 'colorNames' }},
+            'tsWordExcludedColors.i': { config: { guiData: 'colors' }},
+            'bPreferenceTranslateWordExcludeColors.b': { config: { hidden: true }}
+        }},
+        /* Excel Options */
+        'tabExcelOptions': { type: 'tab', icon: 'fa-file-excel-o', children: {
+            'bPreferenceTranslateExcelHidden.b': {},
+            'bPreferenceTranslateExcelSheetNames.b': {},
+            'bPreferenceTranslateExcelDiagramData.b': {},
+            'bPreferenceTranslateExcelDrawings.b': {},
+            'tsExcelExcludedColors.i': { config: { guiData: 'colors', dataPrefix: 'FF' }},
+            'bPreferenceTranslateExcelExcludeColors.b': { config: { hidden: true }},
+            'subfilter': { config: {}},
+            'bPreferenceTranslateExcelExcludeColumns.b': { type: 'boolset', children: { // if not true, tsExcelExcludedColumns, tsExcelExcludedColumnsSheetN will not be processed
+                'tsExcelExcludedColumnsSheet1.i': { config: { guiData: 'columns', dataPrefix: '1' }}, // this is a "virtual" field that does not show up in the data
+                'tsExcelExcludedColumnsSheet2.i': { config: { guiData: 'columns', dataPrefix: '2' }}, // this is a "virtual" field that does not show up in the data
+                'tsExcelExcludedColumnsSheet3.i': { config: { guiData: 'columns', dataPrefix: '3' }} // this is a "virtual" field that does not show up in the data
+            }},
+            'tsExcelExcludedColumns.i': { config: { hidden: true }} // this stores the number of values for the 3 fields in bPreferenceTranslateExcelExcludeColumns.b
+
+        }},
+        /* PowerPoint Options */
+        'tabPowerpointOptions': { type: 'tab', icon: 'fa-file-powerpoint-o', children: {
+            'bPreferenceTranslatePowerpointHidden.b': { config: { hidden: true }},
+            'bReorderPowerpointNotesAndComments.b': { config: { hidden: true }}, // not visible in Rainbow
+            'bPreferenceTranslatePowerpointNotes.b': {},
+            'bPreferenceTranslatePowerpointMasters.b': {},
+            'bPreferenceIgnorePlaceholdersInPowerpointMasters.b': {},
+            'bPreferencePowerpointIncludedSlideNumbersOnly.b': {},
+            'tsPowerpointIncludedSlideNumbers.i': { config: { guiData: 'numbers' }}
+        }}
     },
     /**
      * Which variables become tagfields
@@ -146,31 +158,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     initConfig: function(config){
         config.minHeight = 765;
         return this.callParent([config]);
-    },
-    /**
-     * @returns {array}
-     */
-    getBaseFormItems: function(){
-        return [{
-            xtype: 'tabpanel',
-            defaults: { 'bodyPadding': 15, layout: 'form', scrollable: true },
-            items: [
-                { title: this.translations.captionGeneralOptions, id: 'fprmh_general', iconCls: 'x-fa fa-cog' },
-                { title: this.translations.captionWordOptions, id: 'fprmh_word', iconCls: 'x-fa fa-file-word-o' },
-                { title: this.translations.captionExcelOptions, id: 'fprmh_excel', iconCls: 'x-fa fa-file-excel-o' },
-                { title: this.translations.captionPowerpointOptions, id: 'fprmh_powerpoint', iconCls: 'x-fa fa-file-powerpoint-o' },
-            ]
-        }];
-    },
-    /**
-     * @param {object} data
-     * @returns {Ext.Component}
-     */
-    getFieldTarget(data){
-        if(data.parent){
-            return Ext.getCmp('fprmh_' + data.parent) || this.formPanel;
-        }
-        return this.formPanel;
     },
 
     // QUIRK This is the only GUI with lists, so list support is implemented here
@@ -268,7 +255,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             formvals = this.form.getValues(),
             result = {},
             zzzVals = [];
-        for(name in this.fieldDefinitions){
+        for(name in this.fields){
             if(this.listNames.hasOwnProperty(name)){
                 vals = formvals[name];
                 identifier = this.listNames[name];
@@ -306,7 +293,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
      */
     resolveFieldDependencies: function(){
         // if the ckeckbox is not set we need to remove the Column-Choices
-        if(this.form.findField('bPreferenceTranslateExcelExcludeColumns.b').getValue() == false){
+        if(this.form.findField('bPreferenceTranslateExcelExcludeColumns.b').getValue() === false){
             this.form.findField('tsExcelExcludedColumnsSheet1.i').setRawValue([]);
             this.form.findField('tsExcelExcludedColumnsSheet2.i').setRawValue([]);
             this.form.findField('tsExcelExcludedColumnsSheet3.i').setRawValue([]);

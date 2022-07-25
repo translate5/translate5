@@ -31,12 +31,19 @@
 Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
     /**
-     * These are the data-types a property/field can have. boolean and integer are defined by the property-names (".i" for integer, ".b" for boolean)
-     * A x-properties file can only have string, boolen or integer
-     * "float" is a virtual data-type that will be sent/received as string
+     * DATA_TYPES:
+     * - These are the data-types a property/field can have. boolean and integer are defined by the property-names (".i" for integer, ".b" for boolean)
+     * - A x-properties file can only have string, boolean or integer
+     * - "float" is a virtual data-type that will be sent/received as string
+     * FIELD_TYPES:
+     * - defaults to "field" representing a normal field generating a form-field
+     * - "tab": represents a tab of the form panel. Can only be added on the highest level and if so, all toplevel-items must be tabs
+     * - "fieldset": adds a fieldset to the form
+     * - "boolset": special fieldset that is enabled/disabled by a checkbox. Therefore the definition must represent a "boolset" and a bool property at the same time like: "examleBoolset.b": { type: "boolset", config: {...}, children: {...}}
      */
     statics: {
-        DATA_TYPES: [ 'boolean', 'integer', 'float', 'string' ]
+        DATA_TYPES: [ 'boolean', 'integer', 'float', 'string' ],
+        FIELD_TYPES: [ 'field', 'tab', 'fieldset', 'boolset' ]
     },
     /**
      * Hashtable of our default controls
@@ -47,7 +54,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         'boolean': { xtype: 'checkbox', inputValue: true, uncheckedValue: false, defaultValue: false },
         'integer': { xtype: 'numberfield', allowDecimals: false, allowExponential: false, defaultValue: 0 },
         'float': { xtype: 'numberfield', allowDecimals: true, allowExponential: false, defaultValue: null }, // a virtual data-type, so we do not force it to be "02 as "in reality" it's a string which supports empty values
-        'string': { xtype: 'textfield', defaultValue: "" },
+        'string': { xtype: 'textfield', defaultValue: "" }
     },
     /**
      * Hashtable of our field definitions. These reflect the real property-names as used in the FPRM (and not the id's as used in translations etc)
@@ -57,6 +64,10 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      */
     fieldDefinitions: {},
     /**
+     * All added controls that actually have data will be added to this store when creating the form (to have a flat list)
+     */
+    fields: {},
+    /**
      * Override this function to resolve property-dependencies a la "variableX can only be filled if variableY set to true"
      * This will be called as the first step when validating the form
      */
@@ -64,37 +75,136 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
 
     },
     /**
-     * overridden
-     */
-    fprmDataLoaded: function(height){
-        this.createForm();
-    },
-    /**
-     * Creates our forms & attaches them to our view
+     * Creates our form by attaching the defined fieldDefinitions to the form
+     * The definitions may have tabs defined on the highest level, it is expected that there is only one set of tabs in the highest level and that tabs only can be on the highest level
      */
     createForm: function(){
-        var name, config, data, id, type;
+        var name, data, id, tab, iconClass, tabs = null;
         for(name in this.fieldDefinitions){
             data = this.fieldDefinitions[name];
             id = this.getPropertyId(name);
-            type = this.getPropertyType(name);
-            // we may have custom types defined in the config
-            if(!data.config.valueType){
-                data.config.valueType = type;
+            if(data.type && data.type === 'tab' && data.children){
+                // create the tabs-holder if not already exists
+                if(tabs === null){
+                    tabs = this.createHolder('tabs', this.formPanel, null);
+                }
+                iconClass = data.icon ? 'x-fa ' + data.icon : null;
+                tab = tabs.add({ xtype: 'panel', title: this.translations[id], iconCls: iconClass });
+                this.addHolderChildren(data.children, tab, false);
+                tabs.setActiveTab(0);
             } else {
-                type = data.config.valueType;
+                // adding a field directly to the form panel
+                this.createField(id, name, data, this.formPanel, false);
             }
-            config = Object.assign(this.getFieldConfig(id, type, name, data.config), data.config);
-            this.getFieldTarget(data).add(config);
+        }
+        this.fieldDefinitions = {}; // cleanup of the hierarchical data. The "real" fields will be accessible via this.fields[propertyname]
+    },
+    /**
+     * Overridden to disable useless API for our purposes: the form-values are applied when creating the fields ...
+     */
+    loadForm: function(){
+
+    },
+    /**
+     * Adds a field-control, what may be a subform/fieldset or a "real" field
+     * @param {string} id
+     * @param {string} name
+     * @param {object} data
+     * @param {Ext.panel.Panel} holder
+     * @param {boolean} disabled
+     */
+    createField: function(id, name, data, holder, disabled){
+        var config = data.config || {};
+        // we may have custom types defined in the config
+        if(!config.valueType){
+            config.valueType = this.getPropertyType(name);
+        }
+        if(!data.type || data.type === 'field'){
+            this.addFieldControl(id, name, config, holder, disabled);
+        } else if(data.type === 'fieldset' && data.children){
+            holder = this.createHolder('fieldset', holder, (this.translations.hasOwnProperty(id) ? this.translations[id] : null));
+            this.addHolderChildren(data.children, holder);
+        } else if(data.type === 'boolset' && data.children && config.valueType === 'boolean'){
+            var checkbox = this.addFieldControl(id, name, config, holder, disabled),
+                dependentDisabled = (this.transformedData.hasOwnProperty(id) && this.transformedData[id] === false);
+            checkbox.dependentControls = this.addHolderChildren(data.children, holder, dependentDisabled); // adds a prop to the checkbox with all dependent fields
+            checkbox.on('change', this.onBoolsetChanged, this); // add the handler, that will enable/disable the dependent fields
+        } else {
+            throw new Error('createField: unknown field type "'+data.type+'" or type requiring children without children');
         }
     },
     /**
-     * Retrieves the target component for a form-field
+     * Adds a "real" field control that handles one of the types as defined in statics.DATA_TYPES
+     * @param {string} id
+     * @param {string} name
      * @param {object} config
-     * @returns {Ext.Component}
+     * @param {Ext.panel.Panel} holder
+     * @param {boolean} disabled
+     * @returns {Ext.panel.Panel}
      */
-    getFieldTarget(data){
-        return this.formPanel;
+    addFieldControl: function(id, name, config, holder, disabled){
+        config = Object.assign(this.getFieldConfig(id, config.valueType, name, config), config);
+        config.disabled = disabled; // ome fields are disabled if booleans they depend on are not set
+        this.fields[name] = config;
+        return holder.add(config);
+    },
+    /**
+     *
+     * @param {string} type
+     * @param {Ext.panel.Panel}panel
+     * @param {string} title
+     * @returns {*}
+     */
+    createHolder: function(type, panel, title){
+        switch(type){
+            case 'tabs':
+                return panel.add({
+                    xtype: 'tabpanel',
+                    defaults: { 'bodyPadding': 15, layout: 'form', scrollable: true }
+                });
+            case 'fieldset':
+                return panel.add({
+                    xtype: 'fieldset',
+                    width: '100%',
+                    title: title,
+                    labelWidth: 0.45,
+                    anchor: '100%',
+                    layout: {
+                        type: 'vbox',
+                        align: 'stretch'
+                    },
+                    bodyPadding: 10,
+                    collapsible: false
+                });
+        }
+        throw new Error('createHolder: unknown holder type "'+type+'"');
+    },
+    /**
+     *
+     * @param {object} definitions
+     * @param {Ext.panel.Panel} holder
+     * @param {boolean} disabled
+     * @returns {string[]}
+     */
+    addHolderChildren: function(definitions, holder, disabled){
+        var id, data, name, names = [];
+        for(name in definitions){
+            id = this.getPropertyId(name);
+            data = definitions[name];
+            this.createField(id, name, data, holder, disabled);
+            names.push(name);
+        }
+        return names;
+    },
+    /**
+     * Handler for the "boolset" types, which are a checkbox that enables/disables the dependant controls
+     * @param checkbox
+     * @param isChecked
+     */
+    onBoolsetChanged: function(checkbox, isChecked){
+        checkbox.dependentControls.forEach(fieldName => {
+            this.form.findField(fieldName).setDisabled(!isChecked);
+        });
     },
     /**
      *
@@ -208,7 +318,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         var name, type, conf, vals = this.form.getValues();
         for(name in vals){
             // we may have a custom type set
-            conf = (this.fieldDefinitions.hasOwnProperty(name)) ? this.fieldDefinitions[name].config : null; // we may have a programmatical
+            conf = (this.fields.hasOwnProperty(name)) ? this.fields[name].config : null; // we may have a programmatical field
             type = (conf && conf.valueType) ? conf.valueType : this.getPropertyType(name);
             // we have to remove optional fields that shall be removed if empty
             if(conf && conf.ignoreEmpty && (vals[name] === '' || vals[name] === null)){
@@ -255,16 +365,17 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     validate: function(){
         this.resolveFieldDependencies();
         if(this.form.isValid()){
-            var data, name, val, id, type, errors = [];
-            for(name in this.fieldDefinitions){
-                data = this.fieldDefinitions[name];
+            var data, name, val, id, typeName, errors = [];
+            for(name in this.fields){
+                data = this.fields[name];
                 if(data.valueType && data.valueType !== 'boolean' && data.valueType !== 'integer' && data.valueType !== 'string'){
                     val = this.form.findField(name).getValue();
-                    if(!(data.ignoreEmpty && (val === '' && val === null))){
+                    // custom data-types need a special validation as long as they shall not be ignored
+                    if(!(data.ignoreEmpty && (val === '' || val === null))){
                         id = this.getPropertyId(name);
                         if(!this.validateValue(val, data.valueType)){
-                            type = this.strings.hasOwnProperty(data.valueType) ? this.strings[data.valueType] : data.valueType;
-                            errors.push(this.strings.invalidField.split('{0}').join(this.translations[id]).split('{0}').join(type));
+                            typeName = this.strings.hasOwnProperty(data.valueType) ? this.strings[data.valueType] : data.valueType;
+                            errors.push(this.strings.invalidField.split('{0}').join(this.translations[id]).split('{1}').join(typeName));
                         }
                     }
                 }
@@ -279,7 +390,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     /**
      * Validates a single value
      * @param {string|number|boolean} value
-     * @param {strong} type
+     * @param {string} type
      * @returns {boolean}
      */
     validateValue: function(value, type){
@@ -289,7 +400,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             case 'integer':
                 return (String(value).match(/^\-?[0-9]+$/) !== null);
             case 'float':
-                return (String(value).split(',').join('.').match(/^\-?0?\.[0-9]+$/) !== null);
+                return (String(value).split(',').join('.').match(/^\-?[0-9]*\.?[0-9]+$/) !== null);
             case 'string':
             default:
                 return true;
@@ -299,7 +410,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * Cleanup
      */
     closeWindow: function(){
-        this.fieldDefinitions = {};
+        this.fields = {};
         this.callParent(arguments);
     }
 });

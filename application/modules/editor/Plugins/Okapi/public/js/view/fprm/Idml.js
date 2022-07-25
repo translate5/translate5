@@ -57,27 +57,33 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
     formPanelLayout: 'form',
     fieldDefinitions: {
         'maxAttributeSize.i': { config: { hidden: true }},  // not visible in Rainbow
-        'untagXmlStructures.b': { config: {}},
-        'extractNotes.b': { config: {}},
-        'extractMasterSpreads.b': { config: {}},
-        'extractHiddenLayers.b': { config: {}},
-        'extractHiddenPasteboardItems.b': { config: {}},
-        'skipDiscretionaryHyphens.b': { config: {}},
-        'extractBreaksInline.b': { config: {}},
-        'extractCustomTextVariables.b': { config: {}},
-        'extractIndexTopics.b': { config: {}},
-        'ignoreCharacterKerning.b': { config: {}},
-        'characterKerningMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-        'characterKerningMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-        'ignoreCharacterTracking.b': { config: {}},
-        'characterTrackingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-        'characterTrackingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-        'ignoreCharacterLeading.b': { config: {}},
-        'characterLeadingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-        'characterLeadingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-        'ignoreCharacterBaselineShift.b': { config: {}},
-        'characterBaselineShiftMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
-        'characterBaselineShiftMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+        'untagXmlStructures.b': {},
+        'extractNotes.b': {},
+        'extractMasterSpreads.b': {},
+        'extractHiddenLayers.b': {},
+        'extractHiddenPasteboardItems.b': {},
+        'skipDiscretionaryHyphens.b': {},
+        'extractBreaksInline.b': {},
+        'extractCustomTextVariables.b': {},
+        'extractIndexTopics.b': {},
+        'ignoreCharacterKerning.b': { type: 'boolset', children: {
+            'characterKerningMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+            'characterKerningMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+        }},
+        'ignoreCharacterTracking.b': { type: 'boolset', children: {
+            'characterTrackingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+            'characterTrackingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+        }},
+
+        'ignoreCharacterLeading.b': { type: 'boolset', children: {
+            'characterLeadingMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+            'characterLeadingMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+        }},
+
+        'ignoreCharacterBaselineShift.b': { type: 'boolset', children: {
+            'characterBaselineShiftMinIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }},
+            'characterBaselineShiftMaxIgnoranceThreshold': { config: { valueType: 'float', ignoreEmpty: true }}
+        }}
     },
     /**
      * Overridden to resolve our dependencies

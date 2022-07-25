@@ -1,9 +1,9 @@
 {
     "helpLink": "http://okapiframework.org/wiki/index.php/OpenXML_Filter",
-    "captionGeneralOptions": "General Options",
-    "captionWordOptions": "Word Options",
-    "captionExcelOptions": "Excel Options",
-    "captionPowerpointOptions": "PowerPoint Options",
+    "tabGeneralOptions": "General Options",
+    "tabWordOptions": "Word Options",
+    "tabExcelOptions": "Excel Options",
+    "tabPowerpointOptions": "PowerPoint Options",
     "maxAttributeSize": "Maximal attribute size of xml attributes",
     "bPreferenceTranslateDocProperties": "Translate document properties",
     "bPreferenceTranslateComments": "Translate comments",
