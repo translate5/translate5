@@ -34,8 +34,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     	deleteProjectDialogMessage:'#UT#Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?',
     	projectDeleteButtonText:'#UT#Projekt löschen',
     	projectCanceltButtonText:'#UT#Nein',
-    	projectRemovedMessage:'#UT#Das Projekt "{0}" wurde erfolgreich entfernt!',
-        taskDestroy: '#UT#Projekt "{0}" wird gelöscht...'
+    	projectRemovedMessage:'#UT#Das Projekt "{0}" wurde erfolgreich entfernt!'
     },
     listen: {
         messagebus: {
@@ -135,7 +134,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     deleteProject:function(project){
     	var me=this;
 
-        Editor.app.mask(Ext.String.format(me.strings.taskDestroy, project.get('taskName')), project.get('taskName'));
+        Editor.app.mask(Ext.String.format(me.getViewModel().get('l10n.projectGrid.taskDestroy'), project.get('taskName')), project.get('taskName'));
 
         // remove all project records from the store before the project is removed
         // this will only remove the records locally
