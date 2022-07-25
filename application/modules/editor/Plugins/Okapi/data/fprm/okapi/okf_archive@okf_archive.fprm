@@ -1,0 +1,4 @@
+#v1
+mimeType=application/x-archive
+fileNames=*.tmx,*.xlf,*.xlff
+configIds=okf_tmx,okf_xliff,okf_xliff

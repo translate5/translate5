@@ -1,0 +1,15 @@
+#v1
+bilingualMode.b=false
+makeID.b=true
+protectApproved.b=false
+useCodeFinder.b=true
+allowEmptyOutputTarget.b=false
+useLD.b=true
+localizeOutside.b=true
+codeFinderRules.count.i=3
+codeFinderRules.rule0=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn]
+codeFinderRules.rule1=(\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v
+codeFinderRules.rule2=\{\d.*?\}
+codeFinderRules.sample=%s, %d, {1}, \n, \r, \t, etc.
+codeFinderRules.useAllRulesWhenTesting.b=true
+includeMsgContextInNote.b=false

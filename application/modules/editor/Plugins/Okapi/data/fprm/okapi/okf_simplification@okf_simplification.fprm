@@ -1,0 +1,4 @@
+#v1
+filterConfigId=okf_xmlstream
+simplifyResources.b=true
+simplifyCodes.b=true

@@ -42,29 +42,27 @@ Ext.define('Editor.store.admin.UserCustomers', {
      * Load the customers assigned to the user
      */
     loadCustom:function(){
-        var me=this;
+        var me = this;
         //get fresh user data
         Editor.model.admin.User.load(Editor.data.app.user.id, {
             scope: this,
             failure: function(record, operation) {
                 Editor.app.getController('ServerException').handleCallback(record, operation, false);
             },
-            success: function(record, operation) {
-
-                var userCustomers=record.get('customers').split(',');//get the user customers as array
-                    userCustomers=userCustomers.filter(function(v){
-                        return v!='';
-                    });//remove the empty array fields
+            success: function(record) {
+                var userCustomers = record.get('customers').split(','); // get the user customers as array
+                    userCustomers = userCustomers.filter(function(v){
+                        return v != '';
+                    }); // remove the empty array fields
     
                 //if no customers to the user are assigned, set empty store
-                if(userCustomers.length<1){
+                if(userCustomers.length < 1){
                     return;
                 }
-
                 //get only the customers assigned to the user
                 me.load({
                     params:{
-                        filter: Ext.encode([{property: 'id',operator:'in', value: userCustomers}])
+                        filter: Ext.encode([{property: 'id', operator: 'in', value: userCustomers}])
                     }
                 });
             }

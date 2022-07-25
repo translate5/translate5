@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><its:rules xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsx="http://www.w3.org/2008/12/its-extensions" xmlns:okp="okapi-framework:xmlfilter-options" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0">
+<!-- See ITS specification at: http://www.w3.org/TR/its/ -->
+ <its:translateRule selector="//martifHeader|//transacGrp|//termNote|//admin|//ref|//xref|//back|//termEntry/descripGrp/descrip|//termEntry/descrip|//descrip[not(@type=&quot;definition&quot; or @type=&quot;context&quot; or @type=&quot;Definition&quot; or @type=&quot;Context&quot;)]" translate="no"/>
+</its:rules>

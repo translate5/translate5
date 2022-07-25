@@ -29,15 +29,24 @@
 /**
  *
  * Common util class for bconf export and import
- *
+ * Java reads/writes/represents in BigEndian
+ * Algorithmically a copy of the original JAVA implementation
  */
 class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
 
-    const SIGNATURE = "batchConf";
-    const VERSION = 2;
-    const NUMPLUGINS = 0; // FIXME: Implement plugin support
+    /**
+     * @var int
+     */
     const PHP_INT32_MAX = 0x7FFFFFFF;
+
+    /**
+     * @var int
+     */
     const PHP_UINT32_MAX = 0xFFFFFFFF;
+
+    /**
+     * @var int
+     */
     const OVERFLOW_SUB = 0x100000000; // == PHP_UINT32_MAX +1
 
     public function __construct(string $filename, string $mode = "r", bool $useIncludePath = false, ?object $context = null) {
@@ -74,6 +83,7 @@ class editor_Plugins_Okapi_Bconf_RandomAccessFile extends SplFileObject {
     }
 
     /** Read the Integer value in bconf
+     * QUIRK: PHP unpack has no option for signed 32bit Integer, so we have to convert after reading
      * @return int|mixed
      */
     public function readInt(): mixed {

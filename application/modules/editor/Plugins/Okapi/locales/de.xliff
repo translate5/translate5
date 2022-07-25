@@ -32,21 +32,21 @@
     <source>Aktionen</source>
     <target>Aktionen</target>
 </trans-unit>
-<trans-unit id='QmNvbmYgaG9jaGxhZGVuLi4u'>
-    <source>Bconf hochladen...</source>
-    <target>Bconf hochladen...</target>
+<trans-unit id='QmNvbmYgaG9jaGxhZGVu'>
+    <source>Bconf hochladen</source>
+    <target>Bconf hochladen</target>
 </trans-unit>
 <trans-unit id='U1JYLURhdGVp'>
     <source>SRX-Datei</source>
     <target>SRX-Datei</target>
 </trans-unit>
-<trans-unit id='U291cmNlU1JY'>
-    <source>SourceSRX</source>
-    <target>SourceSRX</target>
+<trans-unit id='U291cmNlIFNSWA=='>
+    <source>Source SRX</source>
+    <target>Source SRX</target>
 </trans-unit>
-<trans-unit id='VGFyZ2V0U1JY'>
-    <source>TargetSRX</source>
-    <target>TargetSRX</target>
+<trans-unit id='VGFyZ2V0IFNSWA=='>
+    <source>Target SRX</source>
+    <target>Target SRX</target>
 </trans-unit>
 <trans-unit id='QmVhcmJlaXRlbg=='>
     <source>Bearbeiten</source>
@@ -80,17 +80,17 @@
     <source>Bconf-Datei gelöscht</source>
     <target>Bconf-Datei gelöscht</target>
 </trans-unit>
-<trans-unit id='VW5nw7xsdGlnZSB7fS1EYXRlaQ=='>
-    <source>Ungültige {}-Datei</source>
-    <target>Ungültige {}-Datei</target>
+<trans-unit id='VW5nw7xsdGlnZSB7MH0tRGF0ZWk='>
+    <source>Ungültige {0}-Datei</source>
+    <target>Ungültige {0}-Datei</target>
 </trans-unit>
-<trans-unit id='e30tRGF0ZWkgZXJmb2xncmVpY2ggaG9jaGdlbGFkZW4u'>
-    <source>{}-Datei erfolgreich hochgeladen.</source>
-    <target>{}-Datei erfolgreich hochgeladen.</target>
+<trans-unit id='ezB9LURhdGVpIGVyZm9sZ3JlaWNoIGhvY2hnZWxhZGVuLg=='>
+    <source>{0}-Datei erfolgreich hochgeladen.</source>
+    <target>{0}-Datei erfolgreich hochgeladen.</target>
 </trans-unit>
-<trans-unit id='RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2Uge30tRGF0ZWku'>
-    <source>Die hochgeladene Datei ist keine gültige {}-Datei.</source>
-    <target>Die hochgeladene Datei ist keine gültige {}-Datei.</target>
+<trans-unit id='RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2UgezB9LURhdGVpLg=='>
+    <source>Die hochgeladene Datei ist keine gültige {0}-Datei.</source>
+    <target>Die hochgeladene Datei ist keine gültige {0}-Datei.</target>
 </trans-unit>
 <trans-unit id='TmV1ZSBCY29uZi1EYXRlaQ=='>
     <source>Neue Bconf-Datei</source>
@@ -111,6 +111,106 @@
 <trans-unit id='ezB9ezF9IGhvY2hsYWRlbg=='>
     <source>{0}{1} hochladen</source>
     <target>{0}{1} hochladen</target>
+</trans-unit>
+<trans-unit id='RmlsdGVy=='>
+    <source>Filter</source>
+    <target>Filter</target>
+</trans-unit>
+<trans-unit id='RmlsdGVyIGtvbmZpZ3VyaWVyZW4='>
+    <source>Filter konfigurieren</source>
+    <target>Filter konfigurieren</target>
+</trans-unit>
+<trans-unit id='UGlwZWxpbmU='>
+    <source>Pipeline</source>
+    <target>Pipeline</target>
+</trans-unit>
+<trans-unit id='QmNvbmYgaGluenVmw7xnZW4='>
+    <source>Bconf hinzufügen</source>
+    <target>Bconf hinzufügen</target>
+</trans-unit>
+<trans-unit id='d2lyZCBiZW7DtnRpZ3Q='>
+    <source>wird benötigt</source>
+    <target>wird benötigt</target>
+</trans-unit>
+<trans-unit id='RHVyY2hzdWNoZW4uLi4='>
+    <source>Durchsuchen...</source>
+    <target>Durchsuchen...</target>
+</trans-unit>
+<trans-unit id='RGF0ZWl0eXBlbg=='>
+    <source>Dateitypen</source>
+    <target>Dateitypen</target>
+</trans-unit>
+<trans-unit id='TUlNRS1UeXA='>
+    <source>MIME-Typ</source>
+    <target>MIME-Typ</target>
+</trans-unit>
+<trans-unit id='S2VubnVuZw=='>
+    <source>Kennung</source>
+    <target>Kennung</target>
+</trans-unit>
+<trans-unit id='RmlsdGVyIGlu'>
+    <source>Filter in</source>
+    <target>Filter in</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQgRmlsdGVyIGFuemVpZ2Vu'>
+    <source>Standard Filter anzeigen</source>
+    <target>Standard Filter anzeigen</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmQgRmlsdGVyIHZlcnN0ZWNrZW4='>
+    <source>Standard Filter verstecken</source>
+    <target>Standard Filter verstecken</target>
+</trans-unit>
+<trans-unit id='SW5mb3JtYXRpb25lbiBmZWhsZW4='>
+    <source>Informationen fehlen</source>
+    <target>Informationen fehlen</target>
+</trans-unit>
+<trans-unit id='RGVyIHVyc3Byw7xuZ2xpY2hlIE5hbWUgbXVzcyB2ZXLDpG5kZXJ0IHdlcmRlbg=='>
+    <source>Der ursprüngliche Name muss verändert werden</source>
+    <target>Der ursprüngliche Name muss verändert werden</target>
+</trans-unit>
+<trans-unit id='RXMgbXVzcyBlaW4gZW5kZXV0aWdlciBOYW1lIGFuZ2VnZWJlbiB3ZXJkZW4='>
+    <source>Es muss ein endeutiger Name angegeben werden</source>
+    <target>Es muss ein endeutiger Name angegeben werden</target>
+</trans-unit>
+<trans-unit id='RXMgbXVzcyBtaW5kZXN0ZW5zIGVpbiBEYXRlaXR5cCBhbmdlZ2ViZW4gd2VyZGVu'>
+    <source>Es muss mindestens ein Dateityp angegeben werden</source>
+    <target>Es muss mindestens ein Dateityp angegeben werden</target>
+</trans-unit>
+<trans-unit id='QmVhcmJlaXRlIEZpbHRlciBUeXAgezB9IHZvbiBCY29uZiB7MX0='>
+    <source>Bearbeite Filter Typ {0} von Bconf {1}</source>
+    <target>Bearbeite Filter Typ {0} von Bconf {1}</target>
+</trans-unit>
+<trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZQ=='>
+    <source>Ihre Änderungen sind nicht valide</source>
+    <target>Ihre Änderungen sind nicht valide</target>
+</trans-unit>
+<trans-unit id='RmVsZCAiezB9IiB2b20gVHlwICJ7MX0iIGlzdCBuaWNodCB2YWxpZGU='>
+    <source>Feld "{0}" vom Typ "{1}" ist nicht valide</source>
+    <target>Feld "{0}" vom Typ "{1}" ist nicht valide</target>
+</trans-unit>
+<trans-unit id='R2xlaXRrb21tYXphaGw='>
+    <source>Gleitkommazahl</source>
+    <target>Gleitkommazahl</target>
+</trans-unit>
+<trans-unit id='Qm9vbHNjaGVyIFdlcnQ='>
+    <source>Boolscher Wert</source>
+    <target>Boolscher Wert</target>
+</trans-unit>
+<trans-unit id='R2FuenphaGw='>
+    <source>Ganzzahl</source>
+    <target>Ganzzahl</target>
+</trans-unit>
+<trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZSwgZGFoZXIga29ubnRlIGRlciBGaWx0ZXIgbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu'>
+    <source>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</source>
+    <target>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</target>
+</trans-unit>
+<trans-unit id='RmlsdGVyIHd1cmRlIGVyZm9sZ3JlaWNoIGdlc3BlaWNoZXJ0'>
+    <source>Filter wurde erfolgreich gespeichert</source>
+    <target>Filter wurde erfolgreich gespeichert</target>
+</trans-unit>
+<trans-unit id='T0tBUEkgSGlsZmU='>
+    <source>OKAPI Hilfe</source>
+    <target>OKAPI Hilfe</target>
 </trans-unit>
 </body>
 </file>

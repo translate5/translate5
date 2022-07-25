@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><its:rules xmlns:its="http://www.w3.org/2005/11/its" xmlns:a="http://schemas.android.com/apk/res/android" xmlns:itsx="http://www.w3.org/2008/12/its-extensions" xmlns:okp="okapi-framework:xmlfilter-options" version="1.0">
+  <its:translateRule selector="/*" translate="no"/>
+  <its:translateRule itsx:whiteSpaces="preserve" selector="//*/@a:text[not(starts-with(.,'@'))]" translate="yes"/>
+  <its:translateRule itsx:idValue="./@name" itsx:whiteSpaces="preserve" selector="//string[not(@product)]" translate="yes"/>
+  <its:translateRule itsx:idValue="concat(@name, '_', @product)" itsx:whiteSpaces="preserve" selector="//string[@product]" translate="yes"/>
+  <its:translateRule itsx:idValue="concat(../@name, '_', @quantity)" itsx:whiteSpaces="preserve" selector="//item[@quantity]" translate="yes"/>
+  <its:translateRule itsx:idValue="concat(../@name, '_', count(preceding-sibling::item))" itsx:whiteSpaces="preserve" selector="//item[not(@quantity)]" translate="yes"/>
+  <its:withinTextRule selector="//string/descendant::*|//item/descendant::*" withinText="yes"/>
+  <its:translateRule selector="//*[@translatable = 'false']" translate="no"/>
+  <okp:codeFinder useCodeFinder="yes">#v1
+count.i=2
+rule0=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn]
+rule1=\{\d.*?\}
+  </okp:codeFinder>
+</its:rules>

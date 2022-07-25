@@ -1,0 +1,502 @@
+preserve_whitespace: false
+custom_commands: null
+doxygen_commands:
+  addtogroup:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: title, length: LINE, required: false, translatable: true}
+  callgraph: {type: PLACEHOLDER}
+  callergraph: {type: PLACEHOLDER}
+  category:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: header-file, length: WORD, required: false, translatable: false}
+    - {name: header-name, length: WORD, required: false, translatable: false}
+  class:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: header-file, length: WORD, required: false, translatable: false}
+    - {name: header-name, length: WORD, required: false, translatable: false}
+  def:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  defgroup:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: group title, length: LINE, required: true, translatable: true}
+  dir:
+    type: PLACEHOLDER
+    parameters:
+    - {name: path fragment, length: WORD, required: false, translatable: false}
+  enum:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  example:
+    type: PLACEHOLDER
+    parameters:
+    - {name: file-name, length: WORD, required: true, translatable: false}
+  endinternal: {type: CLOSING, pair: internal}
+  extends:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  file:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: false, translatable: false}
+  fn:
+    type: PLACEHOLDER
+    parameters:
+    - {name: function declaration, length: LINE, required: true, translatable: false}
+  headerfile:
+    type: PLACEHOLDER
+    parameters:
+    - {name: header-file, length: WORD, required: true, translatable: false}
+    - {name: header-name, length: WORD, required: false, translatable: false}
+  hideinitializer: {type: PLACEHOLDER}
+  implements:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  ingroup:
+    type: PLACEHOLDER
+    parameters:
+    - {name: groupname, length: LINE, required: true, translatable: false}
+  interface:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: header-file, length: WORD, required: false, translatable: false}
+    - {name: header-name, length: WORD, required: false, translatable: false}
+  internal: {type: OPENING, parameters: null}
+  mainpage:
+    type: PLACEHOLDER
+    parameters:
+    - {name: title, length: LINE, required: false, translatable: false}
+  memberof:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: false, translatable: false}
+  name:
+    type: PLACEHOLDER
+    parameters:
+    - {name: header, length: LINE, required: false, translatable: true}
+  namespace:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  nosubgrouping: {type: PLACEHOLDER, parameters: null}
+  overload:
+    type: PLACEHOLDER
+    parameters:
+    - {name: function declaration, length: LINE, required: false, translatable: false}
+  package:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  page:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: title, length: LINE, required: true, translatable: true}
+  private: {type: PLACEHOLDER, parameters: null}
+  privatesection: {type: PLACEHOLDER, parameters: null}
+  property:
+    type: PLACEHOLDER
+    parameters:
+    - {name: qualified property name, length: LINE, required: true, translatable: false}
+  protected: {type: PLACEHOLDER, parameters: null}
+  protectedsection: {type: PLACEHOLDER, parameters: null}
+  protocol:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: header-file, length: WORD, required: false, translatable: false}
+    - {name: header-name, length: WORD, required: false, translatable: false}
+  public: {type: PLACEHOLDER, parameters: null}
+  publicsection: {type: PLACEHOLDER, parameters: null}
+  relates:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  related:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  relatesalso:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  relatedalso:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+  showinitializer: {type: PLACEHOLDER, parameters: null}
+  struct:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: header-file, length: WORD, required: false, translatable: false}
+    - {name: header-name, length: WORD, required: false, translatable: false}
+  typedef:
+    type: PLACEHOLDER
+    parameters:
+    - {name: typdef declaration, length: LINE, required: true, translatable: false}
+  union:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: header-file, length: WORD, required: false, translatable: false}
+    - {name: header-name, length: WORD, required: false, translatable: false}
+  var:
+    type: PLACEHOLDER
+    parameters:
+    - {name: variable declaration, length: LINE, required: true, translatable: false}
+  weakgroup:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: title, length: LINE, required: false, translatable: true}
+  attention: {type: PLACEHOLDER, parameters: null}
+  author: {type: PLACEHOLDER, parameters: null}
+  authors: {type: PLACEHOLDER, parameters: null}
+  brief: {type: PLACEHOLDER, parameters: null}
+  bug: {type: PLACEHOLDER, parameters: null}
+  cond:
+    type: PLACEHOLDER
+    parameters:
+    - {name: section-label, length: WORD, required: false, translatable: false}
+  copyright: {type: PLACEHOLDER, parameters: null}
+  date: {type: PLACEHOLDER, parameters: null}
+  deprecated: {type: PLACEHOLDER, parameters: null}
+  details: {type: PLACEHOLDER, parameters: null}
+  else: {type: PLACEHOLDER, parameters: null}
+  elseif:
+    type: PLACEHOLDER
+    parameters:
+    - {name: section-label, length: WORD, required: true, translatable: false}
+  endcond: {type: PLACEHOLDER, parameters: null}
+  endif: {type: CLOSING, pair: if, parameters: null}
+  exception:
+    type: PLACEHOLDER
+    parameters:
+    - {name: exception-object, length: WORD, required: true, translatable: false}
+  if:
+    type: OPENING
+    pair: endif
+    parameters:
+    - {name: section-label, length: WORD, required: true, translatable: false}
+  ifnot:
+    type: OPENING
+    pair: endif
+    parameters:
+    - {name: section-label, length: WORD, required: true, translatable: false}
+  invariant: {type: PLACEHOLDER, parameters: null}
+  note: {type: PLACEHOLDER, parameters: null}
+  par:
+    type: PLACEHOLDER
+    parameters:
+    - {name: paragraph title, length: LINE, required: false, translatable: true}
+  param:
+    type: PLACEHOLDER
+    parameters:
+    - {name: parameter-name, length: WORD, required: true, translatable: false}
+  tparam:
+    type: PLACEHOLDER
+    parameters:
+    - {name: template-parameter-name, length: WORD, required: true, translatable: false}
+  post: {type: PLACEHOLDER, parameters: null}
+  pre: {type: PLACEHOLDER, parameters: null}
+  remark: {type: PLACEHOLDER, parameters: null}
+  remarks: {type: PLACEHOLDER, parameters: null}
+  result: {type: PLACEHOLDER, parameters: null}
+  return: {type: PLACEHOLDER, parameters: null}
+  returns: {type: PLACEHOLDER, parameters: null}
+  retval:
+    type: PLACEHOLDER
+    parameters:
+    - {name: return value, length: WORD, required: true, translatable: false}
+  sa:
+    type: PLACEHOLDER
+    parameters:
+    - {name: references, length: PARAGRAPH, required: true, translatable: true}
+  see:
+    type: PLACEHOLDER
+    parameters:
+    - {name: references, length: PARAGRAPH, required: true, translatable: false}
+  short: {type: PLACEHOLDER, parameters: null}
+  since: {type: PLACEHOLDER, parameters: null}
+  test: {type: PLACEHOLDER, parameters: null}
+  throw:
+    type: PLACEHOLDER
+    parameters:
+    - {name: exception-object, length: WORD, required: true, translatable: false}
+  throws:
+    type: PLACEHOLDER
+    parameters:
+    - {name: exception-object, length: WORD, required: true, translatable: false}
+  todo: {type: PLACEHOLDER, parameters: null}
+  version: {type: PLACEHOLDER, parameters: null}
+  warning: {type: PLACEHOLDER, parameters: null}
+  xrefitem:
+    type: PLACEHOLDER
+    parameters:
+    - {name: key, length: WORD, required: true, translatable: false}
+    - {name: heading, length: PHRASE, required: true, translatable: true}
+    - {name: list title, length: PHRASE, required: true, translatable: true}
+  addindex:
+    type: PLACEHOLDER
+    parameters:
+    - {name: text, length: LINE, required: true, translatable: true}
+  anchor:
+    type: PLACEHOLDER
+    parameters:
+    - {name: word, length: WORD, required: true, translatable: false}
+  cite:
+    type: PLACEHOLDER
+    parameters:
+    - {name: label, length: WORD, required: true, translatable: false}
+  endlink: {type: CLOSING, inline: true, pair: link}
+  link:
+    type: OPENING
+    inline: true
+    pair: endlink
+    parameters:
+    - {name: link-object, length: WORD, required: true, translatable: false}
+  ref:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: text, length: PHRASE, required: false, translatable: true}
+  subpage:
+    type: PLACEHOLDER
+    parameters:
+    - {name: name, length: WORD, required: true, translatable: false}
+    - {name: text, length: PHRASE, required: false, translatable: true}
+  tableofcontents: {type: PLACEHOLDER}
+  section:
+    type: PLACEHOLDER
+    parameters:
+    - {name: section-name, length: WORD, required: true, translatable: false}
+    - {name: section title, length: LINE, required: true, translatable: true}
+  subsection:
+    type: PLACEHOLDER
+    parameters:
+    - {name: subsection-name, length: WORD, required: true, translatable: false}
+    - {name: subsection title, length: LINE, required: true, translatable: true}
+  subsubsection:
+    type: PLACEHOLDER
+    parameters:
+    - {name: subsubsection-name, length: WORD, required: true, translatable: false}
+    - {name: subsubsection title, length: LINE, required: true, translatable: true}
+  paragraph:
+    type: PLACEHOLDER
+    parameters:
+    - {name: paragraph-name, length: WORD, required: true, translatable: false}
+    - {name: paragraph title, length: WORD, required: true, translatable: true}
+  dontinclude:
+    type: PLACEHOLDER
+    parameters:
+    - {name: file-name, length: WORD, required: true, translatable: false}
+  include:
+    type: PLACEHOLDER
+    parameters:
+    - {name: file-name, length: WORD, required: true, translatable: false}
+  includelineno:
+    type: PLACEHOLDER
+    parameters:
+    - {name: file-name, length: WORD, required: true, translatable: false}
+  line:
+    type: PLACEHOLDER
+    parameters:
+    - {name: pattern, length: LINE, required: true, translatable: false}
+  skip:
+    type: PLACEHOLDER
+    parameters:
+    - {name: pattern, length: LINE, required: true, translatable: false}
+  skipline:
+    type: PLACEHOLDER
+    parameters:
+    - {name: pattern, length: LINE, required: true, translatable: false}
+  snippet:
+    type: PLACEHOLDER
+    parameters:
+    - {name: file-name, length: WORD, required: true, translatable: false}
+    - {name: block_id, length: LINE, required: true, translatable: false}
+  until:
+    type: PLACEHOLDER
+    parameters:
+    - {name: pattern, length: LINE, required: true, translatable: false}
+  verbinclude:
+    type: PLACEHOLDER
+    parameters:
+    - {name: file-name, length: WORD, required: true, translatable: false}
+  htmlinclude:
+    type: PLACEHOLDER
+    parameters:
+    - {name: file-name, length: WORD, required: true, translatable: false}
+  a:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: word, length: WORD, required: true, translatable: true}
+  arg: {type: PLACEHOLDER, parameters: null}
+  b:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: word, length: WORD, required: true, translatable: true}
+  c:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: word, length: WORD, required: true, translatable: true}
+  code: {type: OPENING, translatable: false, pair: endcode, parameters: null}
+  copydoc:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: link-object, length: WORD, required: true, translatable: false}
+  copybrief:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: link-object, length: WORD, required: true, translatable: false}
+  copydetails:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: link-object, length: WORD, required: true, translatable: false}
+  dot: {type: OPENING, pair: enddot, translatable: false}
+  msc: {type: OPENING, pair: endmsc, translatable: false}
+  dotfile:
+    type: PLACEHOLDER
+    parameters:
+    - {name: file, length: WORD, required: true, translatable: false}
+    - {name: caption, length: PHRASE, required: false, translatable: true}
+  mscfile:
+    type: PLACEHOLDER
+    parameters:
+    - {name: file, length: WORD, required: true, translatable: false}
+    - {name: caption, length: PHRASE, required: false, translatable: true}
+  e:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: word, length: WORD, required: true, translatable: true}
+  em:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: word, length: WORD, required: true, translatable: true}
+  endcode: {type: CLOSING, pair: code}
+  enddot: {type: CLOSING, pair: dot}
+  endmsc: {type: CLOSING, pair: msc}
+  endhtmlonly: {type: CLOSING, pair: htmlonly}
+  endlatexonly: {type: CLOSING, pair: latexonly}
+  endmanonly: {type: CLOSING, pair: manonly}
+  endrtfonly: {type: CLOSING, pair: rtfonly}
+  endverbatim: {type: CLOSING, pair: verbatim}
+  endxmlonly: {type: CLOSING, pair: xmlonly}
+  f$: {type: PLACEHOLDER, inline: true, translatable: false}
+  f[: {type: OPENING, pair: 'f]', translatable: false}
+  f]: {type: CLOSING, pair: 'f['}
+  f{: {type: OPENING, pair: 'f}', translatable: false, parameters: null}
+  f}: {type: CLOSING, pair: 'f{'}
+  htmlonly: {type: OPENING, pair: endhtmlonly, translatable: false}
+  image:
+    type: PLACEHOLDER
+    parameters:
+    - {name: format, length: WORD, required: true, translatable: false}
+    - {name: file, length: WORD, required: true, translatable: false}
+    - {name: caption, length: PHRASE, required: false, translatable: true}
+    - {name: <sizeindication>=<size>, length: WORD, required: false, translatable: false}
+  latexonly: {type: OPENING, pair: endlatexonly, translatable: false}
+  manonly: {type: OPENING, pair: endmanonly, translatable: false}
+  li: {type: PLACEHOLDER, parameters: null}
+  n: {type: PLACEHOLDER, inline: true}
+  p:
+    type: PLACEHOLDER
+    inline: true
+    parameters:
+    - {name: word, length: WORD, required: true, translatable: true}
+  rtfonly: {type: OPENING, pair: endrtfonly, translatable: false}
+  verbatim: {type: OPENING, pair: endverbatim, preserve_whitespace: true}
+  xmlonly: {type: OPENING, pair: endxmlonly, translatable: false}
+  '~':
+    type: PLACEHOLDER
+    parameters:
+    - {name: LanguageId, length: WORD, required: true, translatable: true}
+  '@{': {type: PLACEHOLDER}
+  '@}': {type: PLACEHOLDER}
+html_commands:
+  a: {type: OPENING, inline: true}
+  b: {type: OPENING, inline: true}
+  blockquote: {type: OPENING}
+  body: {type: OPENING}
+  br: {type: PLACEHOLDER}
+  center: {type: OPENING}
+  caption: {type: OPENING}
+  dd: {type: PLACEHOLDER}
+  dfn: {type: OPENING, inline: true}
+  div: {type: OPENING}
+  dl: {type: OPENING}
+  dt: {type: OPENING}
+  em: {type: OPENING, inline: true}
+  form: {type: OPENING}
+  hr: {type: PLACEHOLDER}
+  h1: {type: OPENING}
+  h2: {type: OPENING}
+  h3: {type: OPENING}
+  i: {type: OPENING, inline: true}
+  input: {type: PLACEHOLDER}
+  img: {type: PLACEHOLDER}
+  li: {type: OPENING}
+  meta: {type: PLACEHOLDER}
+  multicol: {type: OPENING}
+  ol: {type: OPENING}
+  p: {type: OPENING}
+  pre: {type: OPENING}
+  small: {type: OPENING, inline: true}
+  span: {type: OPENING}
+  strong: {type: OPENING, inline: true}
+  sub: {type: OPENING, inline: true}
+  sup: {type: OPENING, inline: true}
+  table: {type: OPENING}
+  td: {type: OPENING}
+  th: {type: OPENING}
+  tr: {type: OPENING}
+  tt: {type: OPENING, inline: true}
+  kbd: {type: OPENING, inline: true}
+  ul: {type: OPENING}
+  var: {type: OPENING, inline: true}
+  c: {type: OPENING, inline: true}
+  code: {type: OPENING, inline: true}
+  description: {type: OPENING}
+  example: {type: OPENING}
+  exception: {type: OPENING}
+  include: {type: OPENING}
+  inheritdoc: {type: OPENING}
+  item: {type: OPENING}
+  list: {type: OPENING}
+  listheader: {type: OPENING}
+  para: {type: OPENING}
+  param: {type: OPENING}
+  paramref: {type: OPENING, inline: true}
+  permission: {type: OPENING}
+  remarks: {type: OPENING}
+  returns: {type: OPENING}
+  see: {type: OPENING}
+  seealso: {type: OPENING}
+  summary: {type: OPENING}
+  term: {type: OPENING}
+  typeparam: {type: OPENING}
+  typeparamref: {type: OPENING}
+  value: {type: OPENING}

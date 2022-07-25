@@ -256,6 +256,35 @@ class editor_Utils {
     }
 
     /**
+     * Helper to turn names/escriptions into usable, re-identifiable filenames
+     * As an seperator either dashes "-" or underscores "_" are used
+     * @param $text
+     * @param bool $useDashes
+     * @return string
+     */
+    public static function filenameFromUserText($text, $useDashes=true) : string {
+        $seperator = $useDashes ? '-' : '_';
+        $replaceSeperator = $useDashes ? '_' : '-';
+        $text = preg_replace('/\s+/', $seperator, $text);
+        // normalize seperator, remove any dots to create proper filenames/extensions
+        $text = str_replace($replaceSeperator, $seperator, str_replace('.', '', $text));
+        return static::secureFilename($text);
+    }
+
+    /**
+     * Helper to turn upload filenames into usable, re-identifiable filenames
+     * As an seperator either dashes "-" or underscores "_" are used
+     * Filecopy-indices like (1) are removed
+     * @param $text
+     * @param bool $useDashes
+     * @return string
+     */
+    public static function filenameFromUploadName($uploadName, $useDashes=true) : string {
+        $uploadName = preg_replace('/\([0-9]+\)/', '', $uploadName);
+        return static::filenameFromUserText($uploadName, $useDashes);
+    }
+
+    /**
      * Checks, if a filename is secure
      * @param string $fileName
      * @return bool
@@ -991,6 +1020,23 @@ class editor_Utils {
         }
         return false;
     }
+
+    /**
+     * Removes an item from the array and returns its value.
+     * @param array $arr The input array
+     * @param string|int $key The key pointing to the desired value
+     * @return ?mixed The value mapped to $key or null if none
+     * @see https://stackoverflow.com/a/10898827
+     */
+    public static function removeArrayKey(array &$arr, mixed $key) : mixed {
+        $val = NULL;
+        if (array_key_exists($key, $arr)) {
+            $val = &$arr[$key];
+            unset($arr[$key]);
+        }
+        return $val;
+    }
+
 }
 
 class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {
