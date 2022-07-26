@@ -226,9 +226,9 @@ class editor_Services_Connector {
     private function convertMarkupToInternalTags(string $markup, editor_Models_Segment_UtilityBroker $utilities) : string {
         $shortTagIdent = 1;
         $markup = $utilities->tagProtection->protectTags($markup, false);
-        $markup = $utilities->whitespace->replacePlaceholderTags($markup, $shortTagIdent);
+        $markup = $utilities->whitespace->convertToInternalTags($markup, $shortTagIdent);
         $markup = $utilities->whitespace->protectWhitespace($markup, $utilities->whitespace::ENTITY_MODE_OFF);
-        $markup = $utilities->whitespace->replacePlaceholderTags($markup, $shortTagIdent);
+        $markup = $utilities->whitespace->convertToInternalTags($markup, $shortTagIdent);
         return $markup;
     }
     /**

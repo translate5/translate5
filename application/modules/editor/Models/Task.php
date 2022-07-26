@@ -111,6 +111,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_PROJECT = 'project'; //seems to be used as import status for projects!
     const STATE_ERROR = 'error';
     const STATE_UNCONFIRMED = 'unconfirmed';
+    const STATE_EXCELEXPORTED = 'ExcelExported';
 
     const USAGE_MODE_COMPETITIVE = 'competitive';
     const USAGE_MODE_COOPERATIVE = 'cooperative';

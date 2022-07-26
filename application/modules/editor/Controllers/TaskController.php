@@ -1012,7 +1012,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->handleCancelImport();
 
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
-        $this->entity->checkStateAllowsActions([editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED]);
+        $this->entity->checkStateAllowsActions([editor_Models_Task::STATE_EXCELEXPORTED]);
 
         $taskguid = $this->entity->getTaskGuid();
         $this->log->request();

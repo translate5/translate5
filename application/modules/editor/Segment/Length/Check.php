@@ -155,6 +155,7 @@ class editor_Segment_Length_Check {
                 }
             }
             $length += intval($this->metaCache['additionalUnitLength']);
+            // additionalMrkLength is deprecated for new tasks, but still needed for legacy tasks
             $length += intval($this->metaCache['additionalMrkLength']);
             if($restriction->maxLength > 0 && $length > $restriction->maxLength){
                 $this->states[] = self::TOO_LONG;

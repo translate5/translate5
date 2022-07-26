@@ -261,9 +261,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
         me.resetSelection();
 
-        grid.getController().reloadProjects().then(function(records) {}, function(operation) {
-            Editor.app.getController('ServerException').handleException(operation.error.response);
-        });
+        grid.getController().reloadProjects();
     },
 
     /***
@@ -305,7 +303,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                         me.selectProjectTaskRecord(taskId);
                         return;
                     }
-                    grid.getController().reloadProjects().then(function(){
+                    grid.getController().reloadProjects(function(){
                         record=grid.getStore().getById(parseInt(id));
                         me.focusRecordSilent(grid,record,'projectSelection');
                         me.selectProjectTaskRecord(taskId);

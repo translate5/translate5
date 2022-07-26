@@ -41,6 +41,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     DevelopmentNewdbchangeCommand,
     DevelopmentRuntestCommand,
     DevelopmentTriggerworkflowCommand,
+    DevelopmentOkapiBconfNextVersionCommand,
     L10nAddCommand,
     L10nRemoveCommand,
     LogCommand,
@@ -60,6 +61,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     SystemMailtestCommand,
     TaskCleanCommand,
     TaskInfoCommand,
+    TaskSkeletonfileCommand,
     TermportalReindexCommand,
     TermportalDatatypecheckCommand,
     UserCreateCommand,
@@ -94,6 +96,7 @@ $commands = [
     new SystemMailtestCommand(),
     new TaskCleanCommand(),
     new TaskInfoCommand(),
+    new TaskSkeletonfileCommand(),
     new TermportalReindexCommand(),
     new TermportalDatatypecheckCommand(),
     new UserCreateCommand(),
@@ -113,6 +116,7 @@ if(file_exists('.git')) {
     $commands[] = new DevelopmentTriggerworkflowCommand();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
+    $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
 }
 $app->addCommands($commands);
 $app->run();

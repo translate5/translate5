@@ -1041,15 +1041,17 @@ Ext.override(Ext.data.Model, {
             readAssoc = function(record) {
                 //basicly this is the same code as in readAssociated to loop through the associations
                 var roles = record.associations,
-                    key, role,assocStore;
+                    key, role,
+                    /** @type {Ext.data.Store | Ext.data.Model} store for 1:n relations, record for 1:1 */
+                    assocStore;
                 for (key in roles) {
                     if (roles.hasOwnProperty(key)) {
                         role = roles[key];
                         // The class for the other role may not have loaded yet
                         if (role.cls) {
                         	assocStore=record[role.getterName]();
-                        	//update the assocStore if exist
-                        	if(assocStore){
+                        	// update the assocStore if exist
+                        	if(assocStore && assocStore.isStore){
                         		//update the assoc store too                            
                         		assocStore.loadRawData(role.reader.getRoot(record.data));
                         		delete record.data[role.role];
@@ -1409,7 +1411,6 @@ Ext.override(Ext.grid.feature.Grouping, {
  */
 Ext.define('Translate5.override.form.field.VTypes', {
     override: 'Ext.form.field.VTypes',
-
     tmFileUploadSize: function(val, field) {
         var files = field.fileInputEl.dom.files;
 
@@ -1484,6 +1485,25 @@ Ext.override(Ext.util.Format, {
         return (input + '').replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {
             return allowedTags.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
         });
+    }
+});
+
+/***
+ * Up-to-date implementation that works on modern iterables via Array.from
+ * @see https://stackoverflow.com/q/18884249
+ */
+Ext.define('Translate5.override.Ext.Array.from', {
+    override: 'Ext.Array',
+    from: function(value = null, newReference){
+        if(value === null){
+            return [];
+        } else if(Array.isArray(value)){
+            return newReference ? value.slice() : value;
+        } else if(typeof value[Symbol.iterator] === 'function' && typeof value !== 'string'){
+            return Array.from(value);
+        } else {
+            return [value];
+        }
     }
 });
 

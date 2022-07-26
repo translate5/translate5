@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><its:rules xmlns:its="http://www.w3.org/2005/11/its" xmlns:db="http://docbook.org/ns/docbook" xmlns:itsx="http://www.w3.org/2008/12/its-extensions" version="1.0">
+	<!-- Inline elements -->
+	<its:withinTextRule selector="  //db:abbrev|//db:acronym|//db:emphasis|//db:phrase|//db:quote|//db:trademark|  //db:ancor|//db:citation|//db:citerefentry|//db:citetitle|//db:firstterm|//db:glossterm|//db:link|//db:olink|//db:xref|  //db:foreignphrase|//db:wordasword|//db:computeroutput|//db:literal|//db:markup|//db:prompt|//db:replaceable|//db:tag|//db:userinput|  //db:inlineequation|//db:mathphrase|//db:subscript|//db:superscript|  //db:accel|//db:guibutton|//db:guiicon|//db:guilabel|//db:guimenu|//db:guimenuitem|//db:guisubmenu|  //db:keycap|//db:keycode|//db:keycombo|//db:keysym|//db:menuchoice|//db:mousebutton|//db:shortcut|  //db:classname|//db:constant|//db:errorcode|//db:errorname|//db:errortype|//db:function|  //db:msgtext|//db:parameter|//db:property|//db:replaceable|//db:returnvalue|//db:symbol|//db:token|//db:type|//db:varname|  //db:application|//db:comand|//db:envar|//db:filename|//db:msgtext|//db:option|//db:parameter|//db:prompt|//db:systemitem|  //db:database|//db:email|//db:hardware|//db:optional" withinText="yes"/>
+
+	<!-- Elements that should not be translated. -->
+	<its:translateRule selector="  //db:computeroutput|//db:programlisting|//db:screen|//db:screenshot|//db:synopsis|  //db:literallayout|  //db:mathphrase/*|//db:inlineequation/*" translate="no"/>
+
+	<!-- These should be translated and the spaces have to be preserved. -->
+	<!-- Currently, literallayout would be the only one where the spaces should be preserved
+		 but it is set not to be translated, as it is listed in translateRule/@selector above.
+	     To make literallayout translatable, remove it from the selector and uncomment the line below. -->
+	<!-- its:preserveSpaceRule selector="//db:literallayout" space="preserve"/ -->
+
+	<!-- These elements should generate a separate flaw of text.
+		 Based on https://www.w3.org/TR/xml-i18n-bp/#docbook
+	     ITSFilter DOES NOT HANDLE withinText="nested" as of March 2021, however,
+	     and this has no real effect. -->
+	<its:withinTextRule selector="  //db:alt|  //db:footnote|  //db:remark|  //db:indexterm|  //db:primary|  //db:secondary|  //db:tertiary" withinText="nested"/>
+</its:rules>

@@ -179,4 +179,69 @@ class Markup {
         $text = str_replace("\r", "\n", $text);
         return str_replace("\n", $breaktag, $text);
     }
+
+    /**
+     * Protects tags with special t5 tags like '<t5tag17/>'
+     * This protection can help avoiding problems with texts / characters in attributes or with inalid nestings since the returned text just contains simple single tags
+     * The non-tag will be escaped and unescaped when reverting back
+     * The protected markup is accessibe via $protectionResult->markup
+     * @param string $markup
+     * @return \stdClass
+     */
+    public static function protectTags(string $markup) : \stdClass {
+        $result = new \stdClass();
+        $result->map = [];
+        $result->markup = '';
+        // first, replace Comments
+        $count = 0;
+        $converted = '';
+        $parts = preg_split(self::COMMENT_PATTERN.'Us', $markup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        foreach($parts as $part){
+            if(preg_match(self::COMMENT_PATTERN.'s', $part) === 1){
+                $key = '<t5protectedcomment'.$count.'/>';
+                $converted .= $key;
+                $result->map[$key] = $part;
+                $count++;
+            } else {
+                $converted .= $part;
+            }
+        }
+        // second, replace the tags (but keep comment-tags alive)
+        $count = 0;
+        $parts = preg_split(self::PATTERN.'U', $converted, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        foreach($parts as $part){
+            if(preg_match(self::PATTERN, $part) === 1){
+                if(substr($part, 0, 19) === '<t5protectedcomment'){
+                    $result->markup .= $part;
+                } else {
+                    $key = '<t5protectedtag'.$count.'/>';
+                    $result->markup .= $key;
+                    $result->map[$key] = $part;
+                    $count++;
+                }
+            } else {
+                $result->markup .= self::escapeText($part);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $tagProtectedMarkup
+     * @param \stdClass $protectionResult: must be what ::protectTags returns
+     * @return string
+     */
+    public static function unprotectTags(string $tagProtectedMarkup, \stdClass $protectionResult) : string {
+        $parts = preg_split(self::PATTERN.'U', $tagProtectedMarkup, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $result = '';
+        foreach($parts as $part){
+            if(preg_match(self::PATTERN, $part) === 1){
+                $result .= (array_key_exists($part, $protectionResult->map) ? $protectionResult->map[$part] : $part);
+            } else {
+                $result .= self::unescapeText($part);
+            }
+        }
+        return $result;
+    }
+
 }

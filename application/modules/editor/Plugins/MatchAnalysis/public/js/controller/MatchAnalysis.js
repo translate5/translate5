@@ -76,7 +76,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         startTermCheck:'#UT#Terminologie Prüfung starten',
         preTranslation:'#UT#Analyse &amp; Vorübersetzungen starten',
         preTranslationTooltip:'#UT#Die Vorübersetzung löst auch eine neue Analyse aus',
-        startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
+        startOperationMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
         finishAnalysisMsg:'#UT#Die Match-Analyse und die Vorübersetzung sind abgeschlossen.',
         internalFuzzy:'#UT#Zähle interne Fuzzy',
         pretranslateMatchRate:'#UT#TM Vorübersetzungs Match-Rate',
@@ -86,10 +86,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         pretranslateMt:'#UT#Vorübersetzen (MT)',
         pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
         analysisLoadingMsg:'#UT#Analyse läuft'
-    },
-    
-    listeners:{
-        beforeStartAnalysis:'onBeforeStartAnalysis'  
     },
     listen:{
         component:{
@@ -104,7 +100,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 activate:'onLanguageResourcesPanelActivate',
             },
             '#languageResourcesWizardPanel':{
-                startMatchAnalysis:'onStartMatchAnalysis'
+                startMatchAnalysis: 'onStartOperation'
             },
             'taskActionMenu': {
                 itemsinitialized: 'onTaskActionColumnItemsInitialized'
@@ -141,28 +137,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * @param task
      */
     onWizardCardImportDefaults: function (task) {
-        this.startAnalysis(task.get('id'),'pretranslation',true);
+        this.startOperation(task.get('id'), 'pretranslation', true);
     },
 
-    /***
-     * Before analysis event handler
-     */
-    onBeforeStartAnalysis:function(taskId,operation){
-        var me = this,
-            setAnalysisRecordState=function(store,taskId){
-                var record = store ? store.getById(taskId) : null;
-                if(!record){
-                    return;
-                }
-                record.set('state','matchanalysis');
-            };
-        //before the analysis is started, set the task state to 'matchanalysis'
-        //the matchanalysis and languageresourcesassoc panel loading masks are binded 
-        //to the task status. Changing the status to analysis will automaticly apply the loading masks for those panels
-        setAnalysisRecordState(Ext.StoreManager.get('admin.Tasks'),taskId);
-        setAnalysisRecordState(me.getProjectTaskGrid().getStore(),taskId);
-    },
-    
     /**
      * Task action column items initialized event handler.
      */
@@ -371,19 +348,19 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         this.updateDefaultFields();
     },
 
-    onStartMatchAnalysis:function(taskId,operation){
-        this.startAnalysis(taskId,operation);
+    onStartOperation: function(taskId, operation){
+        this.startOperation(taskId, operation, false);
     },
     
     matchAnalysisButtonHandler:function(button){
-        var me=this,
-            win=button.up('#adminTaskPreferencesWindow'),
-            tmAndTermChecked=me.isCheckboxChecked('pretranslateTmAndTerm'),
-            mTChecked=me.isCheckboxChecked('pretranslateMt'),
-            task=win.getCurrentTask(),
-            operation=(mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
+        var me = this,
+            win = button.up('#adminTaskPreferencesWindow'),
+            tmAndTermChecked = me.isCheckboxChecked('pretranslateTmAndTerm'),
+            mTChecked = me.isCheckboxChecked('pretranslateMt'),
+            task = win.getCurrentTask(),
+            operation = (mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
         
-        me.startAnalysis(task.get('id'),operation);
+        me.startOperation(task.get('id'), operation, false);
     },
     
     /***
@@ -392,41 +369,23 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      *    'analysis' -> runs only match analysis
      *    'pretranslation' -> runs match analysis with pretranslation
      *
-     * @param taskId
-     * @param operation
-     * @param importDefaults : run analysis with defaults
+     * @param {int} taskId
+     * @param {string} operation
+     * @param {bool} importDefaults: run analysis with defaults
      */
-    startAnalysis:function(taskId,operation,importDefaults){
-        //'editor/:entity/:id/operation/:operation',
-        var me = this,
-            removeDefaults = importDefaults === undefined ? false : importDefaults,
-            params = {
-                internalFuzzy: me.isCheckboxChecked('cbInternalFuzzy'),
-                pretranslateTmAndTerm: me.isCheckboxChecked('pretranslateTmAndTerm'),
-                pretranslateMt: me.isCheckboxChecked('pretranslateMt'),
-                pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
-                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
-                batchQuery:me.isCheckboxChecked('batchQuery')
-            };
-
-        me.fireEvent('beforeStartAnalysis',taskId,operation);
-
+    startOperation: function(taskId, operation, importDefaults){
+        var params = {
+            pretranslateMatchrate: this.getComponentByItemId('cbMinMatchrate').getValue(),
+            isTaskImport: this.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
+            batchQuery: this.isCheckboxChecked('batchQuery')
+        };
         // when importing with defaults, those fields will be set on the backend
-        if(removeDefaults){
-            delete params.internalFuzzy;
-            delete params.pretranslateTmAndTerm;
-            delete params.pretranslateMt;
+        if(!importDefaults){
+            params.internalFuzzy = this.isCheckboxChecked('cbInternalFuzzy');
+            params.pretranslateTmAndTerm = this.isCheckboxChecked('pretranslateTmAndTerm');
+            params.pretranslateMt = this.isCheckboxChecked('pretranslateMt');
         }
-
-        Ext.Ajax.request({
-            url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
-            method: "PUT",
-            params:params,
-            scope: this,
-            failure: function(response){
-                Editor.app.getController('ServerException').handleException(response);
-            }
-        });
+        Editor.util.TaskActions.operation(operation, taskId, params);
     },
     
     /***

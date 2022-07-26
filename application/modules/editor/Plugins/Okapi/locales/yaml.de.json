@@ -1,0 +1,5 @@
+{
+    "helpLink-okf_html": "http://okapiframework.org/wiki/index.php/HTML_Filter",
+    "helpLink-okf_xmlstream": "http://okapiframework.org/wiki/index.php/XML_Stream_Filter",
+    "leadingSpacesUneven": "Ungerade Zahl führender Leerzeichen in Zeile {0}"
+}

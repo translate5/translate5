@@ -1,0 +1,9 @@
+#v1
+unescapeSource.b=true
+trimLeading.b=false
+trimTrailing.b=true
+preserveWS.b=false
+useCodeFinder.b=false
+codeFinderRules=#v1$0a$count.i=2$0a$rule0=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn]$0a$rule1=(\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v$0a$sample=$0a$useAllRulesWhenTesting.b=false
+wrapMode.i=0
+parametersClass=net.sf.okapi.filters.plaintext.base.Parameters

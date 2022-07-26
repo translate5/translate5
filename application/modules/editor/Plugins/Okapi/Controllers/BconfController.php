@@ -27,13 +27,9 @@
  */
 
 /**
- *
  * REST Endpoint Controller to serve the Bconf List for the Bconf-Management in the Preferences
  *
- */
-
-/**
- * @property editor_Plugins_Okapi_Models_Bconf $entity
+ * @property editor_Plugins_Okapi_Bconf_Entity $entity
  */
 class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     /***
@@ -42,11 +38,16 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      */
     protected bool $decodePutAssociative = true;
 
+    /**
+     * The param-name of the sent bconf
+     * @var string
+     */
     const FILE_UPLOAD_NAME = 'bconffile';
+
     /**
      * @var string
      */
-    protected $entityClass = 'editor_Plugins_Okapi_Models_Bconf';
+    protected $entityClass = 'editor_Plugins_Okapi_Bconf_Entity';
 
     /**
      * sends all bconfs as JSON
@@ -54,13 +55,13 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {
-        $this->view->rows = $this->entity->loadAll();
+        $this->view->rows = $this->entity->getGridRows();
         $this->view->total = count($this->view->rows);
         // auto-import of default-bconf: when there are no rows we can assume the feature was just installed and the DB is empty
         // then we automatically add the system default bconf
         if($this->view->total < 1){
             $this->entity->importDefaultWhenNeeded();
-            $this->view->rows = $this->entity->loadAll();
+            $this->view->rows = $this->entity->getGridRows();
             $this->view->total = count($this->view->rows);
         }
     }
@@ -73,31 +74,82 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="'.$this->entity->getDownloadFilename());
         header('Cache-Control: no-cache');
-        header('Content-Length: ' . filesize($this->entity->getFilePath()));
-        ob_clean();
-        flush();
-        readfile($this->entity->getFilePath());
+        header('Content-Length: ' . filesize($this->entity->getPath()));
+        readfile($this->entity->getPath());
         exit;
     }
 
     public function uploadbconfAction() {
         $ret = new stdClass();
-
         if(empty($_FILES)){
             throw new ZfExtended_ErrorCodeException('E1212', [
                 'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
             ]);
         }
-
-        $bconf = new editor_Plugins_Okapi_Models_Bconf($_FILES[self::FILE_UPLOAD_NAME], $this->getAllParams());
-
-        $ret->success = is_object($bconf);
+        $postFile = $_FILES[self::FILE_UPLOAD_NAME];
+        $name = $this->getParam('name');
+        $description = $this->getParam('description');
+        $customerId = $this->getParam('customerId');
+        if($name == NULL){
+            $name = pathinfo($postFile['name'], PATHINFO_FILENAME);
+        }
+        if($description == NULL){
+            $description = '';
+        }
+        if($customerId != NULL){
+            $customerId = intval($customerId);
+        }
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $bconf->import($postFile['tmp_name'], $name, $description, $customerId);
         $ret->id = $bconf->getId();
+        $ret->success = !empty($ret->id);
 
         echo json_encode($ret);
     }
 
     /**
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function cloneAction() {
+        $this->entityLoad();
+        $name = $this->getParam('name');
+        $description = $this->getParam('description');
+        $customerId = $this->getParam('customerId');
+        if($description == NULL){
+            $description = '';
+        }
+        if($customerId != NULL){
+            $customerId = intval($customerId);
+        }
+        $clone = new editor_Plugins_Okapi_Bconf_Entity();
+        $clone->import($this->entity->getPath(), $name, $description, $customerId);
+
+        echo json_encode($clone->toArray());
+    }
+
+    /**
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function downloadsrxAction() {
+        $this->entityLoad();
+        $srx = $this->entity->getSrx($this->getParam('purpose'));
+        $downloadFilename = editor_Utils::filenameFromUserText($this->entity->getName(), false).'-'.$srx->getFile();
+        $srx->download($downloadFilename);
+        exit;
+    }
+
+    /**
+     * Uploads a updated SRX
+     * This action has a lot of challenges:
+     * - The sent SRX is a (maybe outdated) T5 default SRX and needs to be updated. The naming then will be the default name
+     * - the sent name is a real custom srx and we need to validate it & change the name
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
     public function uploadsrxAction() {
@@ -107,62 +159,8 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
             ]);
         }
         $this->entityLoad();
-        $bconf = $this->entity;
-        $srxUploadFile = $_FILES['srx']['tmp_name'];
-        $srx = new editor_Utils_Dom();
-        $xmlErrors = '';
-        if($srx->load($srxUploadFile)){
-            $rootTag = strtolower($srx->firstChild?->tagName);
-            if($rootTag !== 'srx'){
-                $xmlErrors .= "\nInvalid root tag '$rootTag'.";
-            }
-        } else {
-            $xmlErrors .= "\n".$srx->getErrorMsg('', true);
-        }
-
-
-        if(!empty($xmlErrors)){
-            throw new editor_Plugins_Okapi_Exception('E1390', ['details' => $xmlErrors]);
-        }
-
-        $srxNameToBe = $bconf->srxNameFor($this->getParam('purpose'));
-        move_uploaded_file($srxUploadFile, $bconf->getFilePath(fileName: $srxNameToBe));
-        $bconf->getFile()->pack();
+        $field = $this->getParam('purpose');
+        $segmentation = editor_Plugins_Okapi_Bconf_Segmentation::instance();
+        $segmentation->processUpload($this->entity, $field, $_FILES['srx']['tmp_name'], basename($_FILES['srx']['name']));
     }
-
-    public function downloadsrxAction() {
-        $this->entityLoad();
-        $bconf = $this->entity;
-        $fileName = $bconf->srxNameFor($this->getParam('purpose'));
-        $file = $bconf->getFilePath(fileName: $fileName);
-
-        $dlName = $bconf->getName() . '-' . $fileName;
-        header('Content-Type: text/xml');
-        header('Content-Disposition: attachment; filename="' . $dlName . '"');
-        header('Cache-Control: no-store');
-        header('Content-Length: ' . filesize($file));
-        ob_clean();
-        flush();
-        readfile($file);
-        exit;
-    }
-
-    /**
-     * @return void
-     * @throws Zend_Db_Statement_Exception
-     * @throws Zend_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     * @throws editor_Plugins_Okapi_Exception
-     */
-    public function cloneAction() {
-        $clone = new editor_Plugins_Okapi_Models_Bconf(
-            ['tmp_name' => $this->entity->getFilePath($this->getParam('id'))],
-            $this->getAllParams()
-        );
-
-        echo json_encode($clone->toArray());
-        exit;
-    }
-
 }

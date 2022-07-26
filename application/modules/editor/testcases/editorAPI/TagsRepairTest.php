@@ -100,6 +100,20 @@ class TagsRepairTest extends editor_Test_MockedTaskTest {
         $this->assertEquals($unescaped, Markup::unescape($escaped));
     }
 
+    public function testMarkupProtect0(){
+        $expected = ' what <span data-text="(this is a) &gt; it\'s comment">seven is > six</span>  <a href="http://www.google.de">Some < Link</a> <!-- some comment with <b>markup</b> --> AND OTHER " TEXT';
+        $protectedData = Markup::protectTags($expected);
+        $markup = $protectedData->markup;
+        $this->assertEquals($expected, Markup::unprotectTags($markup, $protectedData));
+    }
+
+    public function testMarkupProtect1(){
+        $expected = ' < ? " < (\') '.$this->htmlTags['<10/>'].' > ? " < (\') '.$this->htmlTags['<11/>'].' < ? " > (") '.$this->htmlTags['<12/>'].' > ? " > (!) ';
+        $protectedData = Markup::protectTags($expected);
+        $markup = $protectedData->markup;
+        $this->assertEquals($expected, Markup::unprotectTags($markup, $protectedData));
+    }
+
     public function testTagRepair0(){
         $markup = '<1><8/>Ein kurzer Satz</1>,<6/> der übersetzt<7/> werden <2>muss<9/></2>';
         $translated = '<1><8/>Ein kurzer Satz</1>,<6/> der übersetzt<7/> werden <2>muss<9/></2>';

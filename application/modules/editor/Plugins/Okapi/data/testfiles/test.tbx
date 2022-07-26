@@ -1,0 +1,476 @@
+<?xml version='1.0'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Export of translate5 termCollection MittagQI</title>
+                <note>Contains the languages: de, en, ru, hy</note>
+            </titleStmt>
+            <sourceDesc>
+                <p>File is exported from translate5 instance at https://personal-demo.translate5.net by the user Marc Mittag</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="1">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-04-19</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-04-19</date>
+                </transacGrp>
+                <langSet xml:lang="de">
+                    <tig>
+                        <term id="1">Mission</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferred</termNote>
+                    </tig>
+                    <tig>
+                        <term id="2">Aufgabe</term>
+                        <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">deprecatedTerm-admn-sts</termNote>
+                    </tig>
+                    <tig>
+                        <term id="3">Sendung</term>
+                        <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">deprecatedTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en">
+                    <tig>
+                        <term id="4">Mission</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferred</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="hy">
+                    <tig>
+                        <term id="74ba6607-a822-448b-a2f6-d98c76ffadcb">առաջադրանք</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <note >sdfasdfaysdf</note>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-04-19</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-04-19</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="ru">
+                    <tig>
+                        <term id="12558d2a-fc62-4919-b41a-de86bf5da857">Миссия</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <note >kjklj</note>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-04-23</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-04-23</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="2">
+				<descrip type="Definition">entry Level without descripGrp Continuous development means a continuous cycle of improvement according to the steps development, usage, extension, reusage.</descrip>
+                    <descrip type="context">entry Level without descripGrp sedfasdfgsdfreusage.</descrip>
+                    <descrip type="asydf">entry Level without descripGrp ssssssssssssssss.</descrip>
+                    <descripGrp>
+						<descrip type="definition" xml:lang="de">entry Level within descripGrp Das ist die Definition.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<descripGrp>
+						<descrip type="context" xml:lang="de">entry Level within descripGrp Das ist der Context.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">awsdfsdf</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">asdfsadf</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<descripGrp>
+						<descrip type="asdfasdf" xml:lang="de">entry Level within descripGrp Das ist die asdfasdf.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">sdfsdf</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">ssssss</transacNote>
+						</transacGrp>
+					</descripGrp>
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-02-03</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-02-03</date>
+                </transacGrp>
+                <langSet xml:lang="de">
+                    <descrip type="Definition">language Level without descripGrp Definition Continuous development means a continuous cycle of improvement according to the steps development, usage, extension, reusage.</descrip>
+                    <descrip type="context">language Level without descripGrp context sedfasdfgsdfreusage.</descrip>
+                    <descrip type="irgendwasattribut">language Level without descripGrp irgendwasattribut ssssssssssssssss.</descrip>
+                    <descripGrp>
+						<descrip type="definition" xml:lang="de">language Level within descripGrp Definition auf Sprachebene.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<descripGrp>
+						<descrip type="context" xml:lang="de">language Level within descripGrp Context.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">awsdfsdf</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">asdfsadf</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<descripGrp>
+						<descrip type="asdfasdf" xml:lang="de">language Level within descripGrp asdfasdf.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">sdfsdf</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">ssssss</transacNote>
+						</transacGrp>
+					</descripGrp>
+                    <tig>
+                        <term id="5">kontinuierliche Weiterentwicklung</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferred</termNote>
+                    </tig>
+                    <tig>
+                        <term id="6">kontinuierliche Entwicklung</term>
+                        <termNote type="normativeAuthorization">admittedTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                    </tig>
+                    <tig>
+                        <term id="7">fortlaufende Entwicklung</term>
+                        <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">deprecatedTerm-admn-sts</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-02-03</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-02-03</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en">
+                    <descrip type="Definition">Continuous development means a continuous cycle of improvement according to the steps development, usage, extension, reusage.</descrip>
+                    <tig>
+                        <term id="8">continuous development</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferred</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="ru">
+                    <tig>
+                        <term id="2e12fdfb-59df-4a69-8536-6405cf8970b5">постоянная разработка</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-02-03</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-02-03</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="3">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-04-26</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-04-26</date>
+                </transacGrp>
+                <langSet xml:lang="de">
+                    <tig>
+                        <term id="9">Entwicklungsleitung</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">preferred</termNote>
+                    </tig>
+                    <tig>
+                        <term id="10">Lead-Entwicklung</term>
+                        <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">deprecatedTerm-admn-sts</termNote>
+                    </tig>
+                    <tig>
+                        <term id="12c5d6cf-35d0-49f8-99ef-46566e2501f2">Entwicklungsleiter</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-04-26</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-04-26</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en">
+                    <tig>
+                        <term id="11">lead development</term>
+                        <termNote type="normativeAuthorization">admittedTerm</termNote>
+                        <termNote type="processStatus">finalized</termNote>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="07238ae6-3b08-44bc-bb9b-9fa47b03487c">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-03-26</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-03-26</date>
+                </transacGrp>
+                <langSet xml:lang="en">
+                    <tig>
+                        <term id="e6f3a3a3-ca05-4f57-97c2-e5067fdf5a51">Across Language Server</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-03-26</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-03-26</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <tig>
+                        <term id="e6f3a3a3-ca05-4f57-97c2-e5067fdf5a51">Across Language Server</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <note >Added from MT</note>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-03-26</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-03-26</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="hy">
+                    <tig>
+                        <term id="d450a466-506f-4302-ad6e-c7a9fb25ff0b">Լեզվի սերվերի ամբողջություն</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-03-26</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-03-26</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="aecae3fd-718a-4aaf-99ef-281dab24d65e">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-04-27</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-04-27</date>
+                </transacGrp>
+                <langSet xml:lang="de">
+                    <tig>
+                        <term id="b92b4a97-37cd-43ca-bb8e-eb334836336d">translate5</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <termNote type="administrativeStatus">admitted</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-04-27</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                            <date>2021-04-27</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="idb9f3308d-df15-473d-8ba1-905001d14b04">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-11-19</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                    <date>2021-11-19</date>
+                </transacGrp>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                        <date>2021-11-19</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                        <date>2021-11-19</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="idc4904af3-7b7d-4f49-a300-9518d799c7af">Testeintrag</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                            <date>2021-11-19</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                            <date>2021-11-19</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="idfdf77321-8b89-4cce-8a86-a43883b2588c">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Marc Mittag</transacNote>
+                    <date>2021-11-19</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                    <date>2021-11-19</date>
+                </transacGrp>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                        <date>2021-11-19</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                        <date>2021-11-19</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="ide9dcbfbf-774b-4b0a-ab1f-b24ec1ad9e95">Test</term>
+                        <termNote type="processStatus">unprocessed</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                            <date>2021-11-19</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">Marc Mittag</transacNote>
+                            <date>2021-11-19</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+        <back>
+            <refObjectList type="respPerson">
+                <refObject id="{06872783-7a2c-11ea-82c3-c2d81394b7aa}">
+                    <item type="fn">Marc Mittag</item>
+                    <item type="role">admin,api,editor,instantTranslate,pm,termCustomerSearch,termProposer,termFinalizer,termPM,termPM_allClients,termReviewer</item>
+                    <item type="email">support@translate5.net</item>
+                </refObject>
+            </refObjectList>
+        </back>
+    </text>
+</martif>

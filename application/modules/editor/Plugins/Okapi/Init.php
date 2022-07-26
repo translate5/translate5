@@ -27,6 +27,16 @@
  */
 
 /**
+ * OKAPI file converter and segmenter plugin
+ *
+ * There are several debug options for this Plugin:
+ * runtimeOptions.debug.plugin.OkapiBconfPackUnpack => Turns general debugging on for the packing/unpacking of bconfs
+ * runtimeOptions.debug.plugin.OkapiBconfProcessing => Turns debugging on for the processing of bconfs
+ * runtimeOptions.debug.plugin.OkapiBconfValidation => Turns debugging on for validating bconfs, filters & srx
+ * runtimeOptions.debug.plugin.OkapiExtensionMapping => Turns debugging on for the processing of the extension-mapping
+ * runtimeOptions.debug.plugin.OkapiKeepIntermediateFiles => All the files that are created in the various processing steps are kept
+ *
+ *
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
@@ -34,7 +44,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     /**
      * The current internal version index of the bconf's
-     * This must be increased each time, a git-based fprm or the default bconf (next const) is changed
+     * This must be increased each time, a git-based fprm or srx is changed
      * @var int
      */
     const BCONF_VERSION_INDEX = 1;
@@ -52,19 +62,25 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     const BCONF_SYSDEFAULT_IMPORT_NAME = 'Translate5-Standard';
 
     /**
-     *
      * @var string
      */
     const BCONF_SYSDEFAULT_EXPORT = 'okapi_default_export.bconf';
 
     /**
-     * The filename of the system default export bconf
-     * @var string
+     * The default supported file-types by okapi
+     * @var string[]
      */
-    const BCONF_EXTENSION = 'bconf';
+    const DEFAULT_EXTENSIONS = [
+        //'csv' => ['text/csv'], disabled due our own importer
+        'c', 'catkeys', 'cpp', 'dita', 'ditamap', 'docm', 'docx', 'dotm', 'dotx', 'dtd', 'h', 'htm', 'html',
+        'idml', 'json', 'lang', 'md', 'mif', 'odg', 'odp', 'ods', 'odt', 'otg', 'otp', 'ots', 'ott',
+        'pdf', 'pentm', 'php', 'po', 'potm', 'potx', 'ppsm', 'ppsx', 'pptm', 'pptx', 'properties',
+        'rdf', 'resx', 'rkm', 'rtf', 'srt', 'strings', 'tbx', 'tmx', 'ts', 'tsv', 'ttx', 'txml', 'txp', 'txt',
+        'vrsz', 'vsdm', 'vsdx', 'wcml', 'wix', 'xlsm', 'xlsx', 'xltm', 'xltx', 'xml', 'yaml', 'yml'
+    ];
 
     /**
-     * @var editor_Plugins_Okapi_Models_Bconf
+     * @var editor_Plugins_Okapi_Bconf_Entity
      */
     private static $cachedBconf = NULL;
     
@@ -81,17 +97,17 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         if(empty($defaultExportBconf)){
             throw new editor_Plugins_Okapi_Exception('E1340');
         }
-        return self::getBconfStaticDataDir().$defaultExportBconf;
+        return self::getDataDir().$defaultExportBconf;
     }
 
     /**
      * Retrieves the bconf to use for a task
      * This requiers the task to be saved and thus having valid meta entries!
      * @param editor_Models_Task $task
-     * @return editor_Plugins_Okapi_Models_Bconf
+     * @return editor_Plugins_Okapi_Bconf_Entity
      * @throws Zend_Exception
      */
-    public static function getImportBconf(editor_Models_Task $task) : editor_Plugins_Okapi_Models_Bconf {
+    public static function getImportBconf(editor_Models_Task $task) : editor_Plugins_Okapi_Bconf_Entity {
         $meta = $task->meta(true);
         return self::getImportBconfById($task, $meta->getBconfId());
     }
@@ -100,14 +116,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * Fetches the import BCONF to use by id
      * @param editor_Models_Task $task
      * @param int|null $bconfId
-     * @return editor_Plugins_Okapi_Models_Bconf
+     * @return editor_Plugins_Okapi_Bconf_Entity
      * @throws Zend_Exception
      */
-    private static function getImportBconfById(editor_Models_Task $task, int $bconfId=NULL, string $orderer=NULL) : editor_Plugins_Okapi_Models_Bconf {
+    private static function getImportBconfById(editor_Models_Task $task, int $bconfId=NULL, string $orderer=NULL) : editor_Plugins_Okapi_Bconf_Entity {
         // this may be called multiple times when processing the import upload, so we better cache it
         if(!empty($bconfId) && static::$cachedBconf != NULL && static::$cachedBconf->getId() === $bconfId){
             return static::$cachedBconf;
         }
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         // empty covers "not set" and also invalid id '0'
         // somehow dirty: unit tests pass a virtual" bconf-id of "0" to signal to use the system default bconf
         if(empty($bconfId)){
@@ -116,10 +133,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             if($bconfId === NULL && $orderer != 'unittest' && $orderer != 'termportal'){
                 $task->logger('editor.task.okapi')->warn('E1055', 'Okapi Plug-In: Bconf not given or not found: {bconfFile}', ['bconfFile' => 'No bconf-id was set for task meta']);
             }
-            $bconf = new editor_Plugins_Okapi_Models_Bconf();
             $bconfId = $bconf->getDefaultBconfId();
         }
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
         $bconf->load($bconfId);
         // we update outdated bconfs when accessing them
         $bconf->repackIfOutdated();
@@ -132,7 +147,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @return string
      * @throws editor_Plugins_Okapi_Exception|editor_Models_ConfigException
      */
-    public static function getBconfStaticDataDir(): string {
+    public static function getDataDir(): string {
         return APPLICATION_PATH.'/modules/editor/Plugins/Okapi/data/';
     }
     /**
@@ -145,87 +160,25 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $directory = new DirectoryIterator($dir);
         foreach ($directory as $fileinfo) {
             /* @var $fileinfo SplFileInfo */
-            if (strtolower($fileinfo->getExtension()) === self::BCONF_EXTENSION) {
+            if (strtolower($fileinfo->getExtension()) === editor_Plugins_Okapi_Bconf_Entity::EXTENSION) {
                 return $fileinfo->getPathname();
             }
         }
         return NULL;
     }
-    
-    protected $localePath = 'locales';
-    
+
     /**
-     * Supported file-types by okapi
-     *
-     * @var array
+     * Retrieves all file-extensions that can generally be handled by okapi
+     * @return string[]
      */
-    private array $okapiFileTypes = array(
-        'okapi', //currently needed, see TRANSLATE-1019
-        'c',
-        'catkeys',
-        //'csv' => ['text/csv'], disabled due our own importer
-        'cpp',
-        'dita',
-        'ditamap',
-        'docm',
-        'docx',
-        'dotm',
-        'dotx',
-        'dtd',
-        'h',
-        'htm',
-        'html',
-        'idml',
-        'json',
-        'lang',
-        'md',
-        'mif',
-        'odg',
-        'odp',
-        'ods',
-        'odt',
-        'otg',
-        'otp',
-        'ots',
-        'ott',
-        'pdf',
-        'pentm',
-        'php',
-        'po',
-        'potm',
-        'potx',
-        'ppsm',
-        'ppsx',
-        'pptm',
-        'pptx',
-        'properties',
-        'rdf',
-        'resx',
-        'rkm',
-        'rtf',
-        'srt',
-        'strings',
-        'tbx',
-        'tmx',
-        'ts',
-        'tsv',
-        'ttx',
-        'txml',
-        'txp',
-        'txt',
-        'vrsz',
-        'vsdm',
-        'vsdx',
-        'wcml',
-        'wix',
-        'xlsm',
-        'xlsx',
-        'xltm',
-        'xltx',
-        'xml',
-        'yaml',
-        'yml',
-    );
+    public static function getAllExtensions(){
+        $extensions = self::DEFAULT_EXTENSIONS;
+        sort($extensions);
+        return $extensions;
+    }
+
+    protected $localePath = 'locales';
+
     /**
      * Ignored filetypes if a custom bconf is provided (which skips the check for supported files)
      *
@@ -251,15 +204,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var editor_Models_Task
      */
     protected editor_Models_Task $task;
-    
+
     /**
      * @var array
      */
     protected $frontendControllers = array(
         'pluginOkapiBconfPrefs' => 'Editor.plugins.Okapi.controller.BconfPrefs'
-
     );
-    
+
     /**
      * @var editor_Models_Import_SupportedFileTypes
      */
@@ -268,81 +220,136 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     public function init() {
         $this->fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
-        foreach ($this->okapiFileTypes as $ext) {
+        foreach (self::DEFAULT_EXTENSIONS as $ext) {
             $this->fileTypes->register($ext);
         }
         $this->initEvents();
         $this->addController('BconfController');
+        $this->addController('BconfFilterController');
+        $this->addController('BconfDefaultFilterController');
         $this->initRoutes();
     }
-    
+
     protected function initRoutes() {
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
         $r = $f->getRouter();
-        
-        // route for bconf
-        $route = new Zend_Rest_Route($f, [], array(
+
+        // routes for bconfs
+        $route = new Zend_Rest_Route($f, [], [
             'editor' => ['plugins_okapi_bconf'],
-        ));
-        $r->addRoute('plugins_okapibconf_restdefault', $route);
-        // New get route to export the bconf file.
+        ]);
+        $r->addRoute('plugins_okapi_bconf_restdefault', $route);
+
+        // route to export the bconf file.
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/downloadbconf',
-            array(
-                'module' => 'editor',
+            [
+                'module'     => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'downloadbconf'
-            ));
+                'action'     => 'downloadbconf'
+            ]);
         $r->addRoute('plugins_okapi_bconf_downloadbconf', $route);
-        
-        // New post route to upload a bconf file.
+        // post route to upload a bconf file.
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/uploadbconf',
-            array(
-                'module' => 'editor',
+            [
+                'module'     => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'uploadbconf'
-            ));
+                'action'     => 'uploadbconf'
+            ]);
         $r->addRoute('plugins_okapi_bconf_uploadbconf', $route);
-        // New post route to upload the SRX file.
+        // post route to upload the SRX file.
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/uploadsrx',
-            array(
-                'module' => 'editor',
+            [
+                'module'     => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'uploadsrx'
-            ));
+                'action'     => 'uploadsrx'
+            ]);
         $r->addRoute('plugins_okapi_bconf_uploadsrx', $route);
-        // New route to download the SRX file.
+        // route to download the SRX file.
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/downloadsrx',
-            array(
-                'module' => 'editor',
+            [
+                'module'     => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'downloadsrx'
-            ));
+                'action'     => 'downloadsrx'
+            ]);
         $r->addRoute('plugins_okapi_bconf_downloadsrx', $route);
+        // clone bconf
         $route = new ZfExtended_Controller_RestLikeRoute(
             'editor/plugins_okapi_bconf/clone',
-            array(
-                'module' => 'editor',
+            [
+                'module'     => 'editor',
                 'controller' => 'plugins_okapi_bconf',
-                'action' => 'clone'
-            ));
+                'action'     => 'clone'
+            ]);
         $r->addRoute('plugins_okapi_bconf_clone', $route);
-        
-        // route for bconf filter
-        $route = new Zend_Rest_Route($f, [], array(
+
+
+        // routes for bconf filters
+        $route = new Zend_Rest_Route($f, [], [
             'editor' => ['plugins_okapi_bconffilter'],
-        ));
-        $r->addRoute('plugins_okapibconffilter_restdefault', $route);
+        ]);
+        $r->addRoute('plugins_okapi_bconffilter_restdefault', $route);
+
+        // get fprm settings file content route
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconffilter/getfprm',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconffilter',
+                'action'     => 'getfprm'
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconffilter_getfprm', $route);
+
+        // save fprm settings file content route
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconffilter/savefprm',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconffilter',
+                'action'     => 'savefprm'
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconffilter_savefprm', $route);
+
+
+        // routes for default bconf filters
+        $route = new Zend_Rest_Route($f, [], [
+            'editor' => ['plugins_okapi_bconfdefaultfilter'],
+        ]);
+        $r->addRoute('plugins_okapi_bconfdefaultfilter_restdefault', $route);
+
+        // default filters list route
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconfdefaultfilter/getall',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconfdefaultfilter',
+                'action'     => 'getall'
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconfdefaultfilter_getall', $route);
+
+        // save extensions for a non-custom filter route
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconfdefaultfilter/setextensions',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconfdefaultfilter',
+                'action'     => 'setextensions'
+            ]
+        );
+        $r->addRoute('plugins_okapi_bconfdefaultfilter_setextensions', $route);
     }
-    
+
     public function getFrontendControllers(): array {
         return $this->getFrontendControllersFromAcl();
     }
-    
+
     protected function initEvents() {
 
         // plugin basics
@@ -364,19 +371,20 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         // imported files for Okapi are in the source format and do not end on .xlf.
         // Therefore the filenames do not match, this is corrected here.
         $this->eventManager->attach('editor_Models_RelaisFoldertree', 'customHandleFile', [$this, 'handleCustomHandleFileForRelais']);
-        
+
         //Archives the temporary data folder again after converting the files with okapi:
         $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', [$this, 'handleAfterImport']);
-        
+
         //allows the manipulation of the export fileparser configuration
         $this->eventManager->attach('editor_Models_Export', 'exportFileParserConfiguration', [$this, 'handleExportFileparserConfig']);
-        
+
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', [$this, 'handleApplicationState']);
 
         //attach to the config after index to check the config values
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
         $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'handleCustomerAfterIndex']);
+
     }
 
     /**
@@ -386,8 +394,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     public function handleAfterIndex(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
-        /* @var $view Zend_View_Interface */
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        /** @var $view ZfExtended_View */
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $view->Php2JsVars()->set('plugins.Okapi.systemDefaultBconfId', $bconf->getDefaultBconfId());
         $view->Php2JsVars()->set('plugins.Okapi.systemStandardBconfName', self::BCONF_SYSDEFAULT_IMPORT_NAME);
     }
@@ -424,11 +432,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $task = $event->getParam('task');
             /* @var $requestData array */
             $requestData = $event->getParam('requestData');
-            $bconfId = array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : NULL;
+            $bconfId = array_key_exists('bconfId', $requestData) ? intval($requestData['bconfId']) : NULL;
             $orderer = array_key_exists('orderer', $requestData) ? $requestData['orderer'] : NULL;
             $bconf = self::getImportBconfById($task, $bconfId, $orderer);
             // we add the bconf with it's visual name as filename to the archive for easier maintainability
-            $dataProvider->addAdditonalFileToArchive($bconf->getFilePath(), $bconf->getDownloadFilename());
+            $dataProvider->addAdditonalFileToArchive($bconf->getPath(), $bconf->getDownloadFilename());
         }
     }
 
@@ -445,7 +453,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $customerId = array_key_exists('customerId', $requestData) ? $requestData['customerId'] : NULL;
         // empty makes sense here since we anly accept an bconf-id > 0
         if(empty($bconfId)){
-            $bconf = new editor_Plugins_Okapi_Models_Bconf();
+            $bconf = new editor_Plugins_Okapi_Bconf_Entity();
             $bconfId = $bconf->getDefaultBconfId($customerId);
         }
         $meta->setBconfId($bconfId);
@@ -474,10 +482,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             ]);
         } else {
             // the normal behaviour: bconf is defined via task and set in import wizard
-            $bconfPath = static::getImportBconf($event->getParam('task'))->getFilePath();
-            $this->useCustomBconf = basename($bconfPath) != self::BCONF_SYSDEFAULT_IMPORT_NAME;
+            $this->useCustomBconf = false;
         }
-        // TODO: use extension mapping from bconf
         if($this->useCustomBconf){
             $config->checkFileType = false;
             $config->ignoredUncheckedExtensions = implode(',', $this->okapiCustomBconfIgnoredFileTypes);
@@ -495,15 +501,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $params = $event->getParams();
         $filelist = $params['filelist'];
         $importFolder = $params['importFolder'];
-        
+
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
         /* @var $fileFilter editor_Models_File_FilterManager */
-        
+
         foreach($filelist as $fileId => $filePath) {
             $fileInfo = new SplFileInfo($importFolder.'/'.ZfExtended_Utils::filesystemEncode($filePath));
-            
-            //if there is a filefilter or a fileparser (isProcessable) we do not process the file with Okapi
-            if($fileFilter->hasFilter($fileId, $fileFilter::TYPE_IMPORT) || !$this->isProcessable($fileInfo)) {
+
+            //if there is a filefilter or a fileparser (isProcessableFile) we do not process the file with Okapi
+            if($fileFilter->hasFilter($fileId, $fileFilter::TYPE_IMPORT) || !$this->isProcessableFile($fileInfo, $params['task'])) {
                 continue;
             }
             $this->queueWorker($fileId, $fileInfo, $params);
@@ -521,7 +527,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $suffix = '.xlf'; //TODO should come from the worker. there the suffix is determined from the okapi output
         $child = $event->getParam('fileChild'); //children stdClass, containing several information about the file to be parsed
         $fullpath = $event->getParam('fullPath'); //absolute path to the relais file to be parsed
-        
+
         $importConfig = $event->getParam('importConfig');//INFO:(TRANSLATE-1596) this is the workfiles directory (for now this can be proofRead or workfiles). Afte we remove the depricate support for proofRead this can be removed
         /* @var $importConfig editor_Models_Import_Configuration */
         if(empty($this->task)) {
@@ -534,7 +540,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $relaisDirectory = '/'.trim($config->runtimeOptions->import->relaisDirectory,'/').'/';
             $fullpath = $fullpath.$suffix;
             $bilingualSourceFile = str_replace($relaisDirectory, $workfiles, $fullpath);
-            
+
             //check for manifest file, to ensure that the file was processed via Okapi:
             if(file_exists($fullpath) && file_exists($bilingualSourceFile) && $this->wasImportedWithOkapi($this->task, $child->id)) {
                 $child->filename .= $suffix;
@@ -542,7 +548,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             }
         }
     }
-    
+
     /**
      * Checks if the file was imported via Okapi (via existence of the manifest file).
      * This gives no information if the import via Okapi was successful!
@@ -572,7 +578,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
             /* @var $worker ZfExtended_Models_Worker */
             $worker->loadFirstOf('editor_Plugins_Okapi_Worker', $task->getTaskGuid());
-            
+
             //proceed with the archive only, if a okapi worker was found for the current task
             $directoryProvider = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Directory', [$config->importFolder]);
             /* @var $directoryProvider editor_Models_Import_DataProvider_Directory */
@@ -582,7 +588,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         catch(ZfExtended_Models_Entity_NotFoundException) {
             //no okapi worker -> do nothing
         }
-        
+
     }
 
     /***
@@ -591,27 +597,27 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     protected function findDefaultBconfFiles(): array {
         $filenames = [];
-        $directory = new DirectoryIterator(self::getBconfStaticDataDir());
+        $directory = new DirectoryIterator(self::getDataDir());
         foreach ($directory as $fileinfo) {
             /* @var $fileinfo SplFileInfo */
-            if (strtolower($fileinfo->getExtension()) === self::BCONF_EXTENSION) {
+            if (strtolower($fileinfo->getExtension()) === editor_Plugins_Okapi_Bconf_Entity::EXTENSION) {
                 $filenames[] = $fileinfo->getFilename();
             }
         }
         return $filenames;
     }
-    
+
     /**
      * Checks if the given file should be processed by okapi
      * @param SplFileInfo $fileinfo
      * @return boolean
      */
-    protected function isProcessable(SplFileInfo $fileinfo): bool {
+    protected function isProcessableFile(SplFileInfo $fileinfo, editor_Models_Task $task): bool {
         $extension = strtolower($fileinfo->getExtension());
         if(!$fileinfo->isFile()){
             return false;
         }
-        
+
         $infoMsg = '';
         $parsers = $this->fileTypes->getParser($extension);
         // loop over all registered parsers by the given extension
@@ -623,7 +629,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 return false;
             }
         }
-        
+
         //if there is a custom bconf, this bconf can contain "new" allowed file types.
         // Since we currently can not get the information from the bconf which additional types are allowed,
         // we just pass all filetypes (expect the ones with a native fileparser) to be parsed via Okapi
@@ -636,8 +642,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 return true;
             }
         }
-        
-        return in_array($extension, $this->okapiFileTypes);
+        // by default we check the real extensions the current import bconf supports
+        return static::getImportBconf($task)->hasSupportFor($extension);
     }
 
     /**
@@ -656,7 +662,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $workerParentId = $params['workerParentId'];
         // retrieving the bconf to use
         $bconfFilePath = ($this->bconfInZip == NULL) ?
-            static::getImportBconf($task)->getFilePath() // the normal way: retrieve the bconf to use from the task meta
+            static::getImportBconf($task)->getPath() // the normal way: retrieve the bconf to use from the task meta
             : $this->bconfInZip; // COMPATIBILITY: we use the bconf from the ZIP file here if there was one bypassing the bconf management
         $params = [
             'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
@@ -675,7 +681,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         $worker->queue($workerParentId);
     }
-    
+
     /**
      * Checks if the configured okapi instance is reachable
      * @param Zend_EventManager_Event $event
@@ -687,7 +693,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         /* @var $connector editor_Plugins_Okapi_Connector */
         $applicationState->okapi->server = $connector->ping();
     }
-    
+
     /**
      * Sets additional file parser configurations if file was imported with Okapi
      * @param Zend_EventManager_Event $event
@@ -699,7 +705,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         /* @var $file editor_Models_File */
         $config = $event->getParam('config');
         /* @var $config stdClass */
-        
+
         if($this->wasImportedWithOkapi($task, $file->getId())) {
             //files imported with okapi have always source to empty target on (TRANSLATE-2384)
             $config->options['sourcetoemptytarget'] = true;
@@ -743,12 +749,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      * @see ZfExtended_RestController::afterActionEvent
      */
-    public function handleCustomerAfterIndex(Zend_EventManager_Event $event)
-    {
+    public function handleCustomerAfterIndex(Zend_EventManager_Event $event) {
         /** @var ZfExtended_View $view */
         $view = $event->getParam('view');
-        // cache to prevent multiple fetching of the non-customer default bconf
-        $defaultBconfId = NULL;
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $meta = new editor_Models_Db_CustomerMeta();
         $metas = $meta->fetchAll('defaultBconfId IS NOT NULL')->toArray();
         $bconfIds = array_column($metas, 'defaultBconfId', 'customerId');
@@ -756,13 +760,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             if(array_key_exists($customer['id'], $bconfIds)){
                 $customer['defaultBconfId'] = (int) $bconfIds[$customer['id']];
             } else {
-                if($defaultBconfId === NULL){
-                    $bconf = new editor_Plugins_Okapi_Models_Bconf();
-                    $defaultBconfId = $bconf->getDefaultBconfId();
-                }
-                $customer['defaultBconfId'] = $defaultBconfId;
+                $customer['defaultBconfId'] = null;
             }
         }
     }
-
 }

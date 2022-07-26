@@ -52,7 +52,7 @@ END LICENSE AND COPYRIGHT
  * @method integer getAdditionalUnitLength() getAdditionalUnitLength()
  * @method void setAdditionalUnitLength() setAdditionalUnitLength(int $length)
  * @method integer getAdditionalMrkLength() getAdditionalMrkLength()
- * @method void setAdditionalMrkLength() setAdditionalMrkLength(int $length)
+ * @method void setAdditionalMrkLength() setAdditionalMrkLength(int $length) DEPRECATED!
  * @method integer getAutopropagated() getAutopropagated()
  * @method void setAutopropagated() setAutopropagated(int $autopropagated)
  * @method integer getLocked() getLocked()
