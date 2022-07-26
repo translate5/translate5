@@ -4785,5 +4785,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Projekt "{0}" wird gelöscht...</source>
   <target>Deleting "{0}" project...</target>
 </trans-unit>
+<trans-unit id='U3VjaHQgaW4gZGVyIEF1c2dhbmdzc3ByYWNoZQ=='>
+  <source>Sucht in der Ausgangssprache</source>
+  <target>Searches in the source language</target>
+</trans-unit>
   </file>
 </xliff>

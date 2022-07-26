@@ -33,10 +33,10 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
     
     protected static $languageResourceId;
     
-    protected static $sourceLangRfc='de';
-    protected static $targetLangRfc='en';
-    protected static $serviceName = 'Microsoft';
-    protected static $languageResourceName = 'API Testing::'.__CLASS__;
+    protected static string $sourceLangRfc = 'de';
+    protected static string $targetLangRfc = 'en';
+    protected static string $serviceName = 'Microsoft';
+    protected static string $languageResourceName = 'API Testing::'.__CLASS__;
     
     /**
      */
