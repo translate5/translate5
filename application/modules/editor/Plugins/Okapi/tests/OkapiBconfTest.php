@@ -274,7 +274,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
                 $e = null;
                 try {
                     $bconf->unpack(self::$api->getFile("invalid/$file"));
-                } catch(ZfExtended_UnprocessableEntity $e){
+                } catch(ZfExtended_UnprocessableEntity|editor_Plugins_Okapi_Exception $e){
                     self::assertNotNull($e, "Did not reject invalid/$file with ZfExtended_UnprocessableEntity.");
                 }
             }
