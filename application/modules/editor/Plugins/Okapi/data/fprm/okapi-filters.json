@@ -1,0 +1,758 @@
+[
+    {
+        "id": "okf_xml-AndroidStrings",
+        "type": "okf_xml",
+        "name": "Android Strings",
+        "description": "Android Strings XML documents",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_xml-AppleStringsdict",
+        "type": "okf_xml",
+        "name": "Apple Stringsdict",
+        "description": "Apple Stringsdict files",
+        "mime": "text/xml",
+        "extensions": ["stringsdict"],
+        "settings": true
+    },
+    {
+        "id": "okf_archive",
+        "type": "okf_archive",
+        "name": "Archive Files",
+        "description": "Archive files",
+        "mime": "application/x-archive",
+        "extensions": ["zip"],
+        "settings": true
+    },
+    {
+        "id": "okf_xmlstream-dita",
+        "type": "okf_xmlstream",
+        "name": "DITA",
+        "description": "DITA XML",
+        "mime": "text/xml",
+        "extensions": ["dita","ditamap","xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_xml-docbook",
+        "type": "okf_xml",
+        "name": "DocBook",
+        "description": "DocBook v5 files",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_doxygen",
+        "type": "okf_doxygen",
+        "name": "Doxygen-commented Text",
+        "description": "Doxygen-commented Text Documents",
+        "mime": "text/x-doxygen-txt",
+        "extensions": ["c","h","cpp"],
+        "settings": true
+    },
+    {
+        "id": "okf_dtd",
+        "type": "okf_dtd",
+        "name": "DTD (Document Type Definition)",
+        "description": "XML DTD documents (entities content)",
+        "mime": "application/xml+dtd",
+        "extensions": ["dtd"],
+        "settings": true
+    },
+    {
+        "id": "okf_xml",
+        "type": "okf_xml",
+        "name": "Generic XML",
+        "description": "Generic XML documents (default ITS rules)",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_table_catkeys",
+        "type": "okf_table",
+        "name": "Haiku CatKeys",
+        "description": "Haiku CatKeys resource files",
+        "mime": "text/csv",
+        "extensions": ["catkeys"],
+        "settings": true
+    },
+    {
+        "id": "okf_html",
+        "type": "okf_html",
+        "name": "HTML",
+        "description": "HTML or XHTML documents",
+        "mime": "text/html",
+        "extensions": ["html","htm"],
+        "settings": true
+    },
+    {
+        "id": "okf_html-wellFormed",
+        "type": "okf_html",
+        "name": "HTML (Well-Formed)",
+        "description": "XHTML and well-formed HTML documents",
+        "mime": "text/html",
+        "extensions": ["html","htm"],
+        "settings": true
+    },
+    {
+        "id": "okf_icml",
+        "type": "okf_icml",
+        "name": "ICML",
+        "description": "Adobe InDesign ICML documents",
+        "mime": "application/x-icml+xml",
+        "extensions": ["wcml"],
+        "settings": true
+    },
+    {
+        "id": "okf_idml",
+        "type": "okf_idml",
+        "name": "IDML",
+        "description": "Adobe InDesign IDML documents",
+        "mime": "application/vnd.adobe.indesign-idml-package",
+        "extensions": ["idml"],
+        "settings": true
+    },
+    {
+        "id": "okf_xliff-iws",
+        "type": "okf_xliff",
+        "name": "IWSXLIFF",
+        "description": "IWS XLIFF documents. Supports IWS specific metadata",
+        "mime": "application/x-xliff+xml",
+        "extensions": ["xlf"],
+        "settings": true
+    },
+    {
+        "id": "okf_properties",
+        "type": "okf_properties",
+        "name": "Java Properties",
+        "description": "Java properties files (Output used \\uHHHH escapes)",
+        "mime": "text/x-properties",
+        "extensions": ["properties"],
+        "settings": true
+    },
+    {
+        "id": "okf_properties-outputNotEscaped",
+        "type": "okf_properties",
+        "name": "Java Properties (Output not escaped)",
+        "description": "Java properties files (Characters in the output encoding are not escaped)",
+        "mime": "text/x-properties",
+        "extensions": ["properties"],
+        "settings": true
+    },
+    {
+        "id": "okf_xml-JavaProperties",
+        "type": "okf_xml",
+        "name": "Java Properties XML",
+        "description": "Java Properties files in XML",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_xmlstream-JavaPropertiesHTML",
+        "type": "okf_xmlstream",
+        "name": "Java Properties XML + HTML",
+        "description": "Java Properties XML with Embedded HTML",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_json",
+        "type": "okf_json",
+        "name": "JSON (JavaScript Object Notation)",
+        "description": "JSON files",
+        "mime": "application/json",
+        "extensions": ["json"],
+        "settings": true
+    },
+    {
+        "id": "okf_markdown",
+        "type": "okf_markdown",
+        "name": "Markdown",
+        "description": "Markdown files",
+        "mime": "text/markdown",
+        "extensions": ["md"],
+        "settings": true
+    },
+    {
+        "id": "okf_openxml",
+        "type": "okf_openxml",
+        "name": "Microsoft Office Document",
+        "description": "Microsoft Office documents (docx, docm, dotx, dotm, pptx, pptm, ppsx, ppsm, potx, potm, xlsx, xlsm, xltx, xltm, vsdx, vsdm)",
+        "mime": "text/xml",
+        "extensions": ["xlsx","xlsm","xltx","xltm","pptx","pptm","potx","potm","ppsx","ppsm","vsdx","vsdm","docx","docm","dotx","dotm"],
+        "settings": true
+    },
+    {
+        "id": "okf_mif",
+        "type": "okf_mif",
+        "name": "MIF(BETA)",
+        "description": "Adobe FrameMaker MIF documents",
+        "mime": "application/vnd.mif",
+        "extensions": ["mif"],
+        "settings": true
+    },
+    {
+        "id": "okf_mosestext",
+        "type": "okf_mosestext",
+        "name": "Moses Text Default",
+        "description": "Default Moses Text configuration",
+        "mime": "text/x-mosestext",
+        "extensions": ["txt"],
+        "settings": false
+    },
+    {
+        "id": "okf_xml-MozillaRDF",
+        "type": "okf_xml",
+        "name": "Mozilla RDF",
+        "description": "Mozilla RDF documents",
+        "mime": "text/xml",
+        "extensions": ["rdf"],
+        "settings": true
+    },
+    {
+        "id": "okf_multiparsers",
+        "type": "okf_multiparsers",
+        "name": "Multi-Parsers: CSV with Plain-Text",
+        "description": "CSV files with plain-text on all columns",
+        "mime": "text/csv",
+        "extensions": ["csv"],
+        "settings": true
+    },
+    {
+        "id": "okf_odf",
+        "type": "okf_odf",
+        "name": "OpenDocument",
+        "description": "XML OpenDocument files (e.g. use inside OpenOffice.org documents)",
+        "mime": "text/x-odf",
+        "extensions": ["ods","ots","odg","otg","odp","otp","odt","ott"],
+        "settings": true
+    },
+    {
+        "id": "okf_openoffice",
+        "type": "okf_openoffice",
+        "name": "OpenOffice.org Documents",
+        "description": "OpenOffice.org documents (odt, ods, odp, odg, ott, ots, otp, otg)",
+        "mime": "application/x-openoffice",
+        "extensions": ["odt","ods","odp","odg","ott","ots","otp","otg"],
+        "settings": true
+    },
+    {
+        "id": "okf_pdf",
+        "type": "okf_pdf",
+        "name": "PDF (Portable Document Format)",
+        "description": "PDF documents",
+        "mime": "application/pdf",
+        "extensions": ["pdf"],
+        "settings": true
+    },
+    {
+        "id": "okf_pensieve",
+        "type": "okf_pensieve",
+        "name": "Pensieve TM",
+        "description": "Pensieve translation memories",
+        "mime": "application/x-pensieve-tm",
+        "extensions": ["pentm"],
+        "settings": false
+    },
+    {
+        "id": "okf_phpcontent",
+        "type": "okf_phpcontent",
+        "name": "PHP Content Default",
+        "description": "Default PHP Content configuration",
+        "mime": "application/x-php",
+        "extensions": ["php"],
+        "settings": true
+    },
+    {
+        "id": "okf_plaintext",
+        "type": "okf_plaintext",
+        "name": "PlainText",
+        "description": "Plain text files",
+        "mime": "text/plain",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_plaintext_paragraphs",
+        "type": "okf_plaintext",
+        "name": "Plain Text (Paragraphs)",
+        "description": "Text files extracted by paragraphs (separated by 1 or more empty lines)",
+        "mime": "text/plain",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_plaintext_regex_paragraphs",
+        "type": "okf_plaintext",
+        "name": "Plain Text (Regex, Block=Paragraph)",
+        "description": "Plain Text Filter using regex-based linebreak search, extracts by paragraphs",
+        "mime": "text/plain",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_plaintext_regex_lines",
+        "type": "okf_plaintext",
+        "name": "Plain Text (Regex, Line=Paragraph)",
+        "description": "Plain Text Filter using regex-based linebreak search, extracts by lines",
+        "mime": "text/plain",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_plaintext_trim_all",
+        "type": "okf_plaintext",
+        "name": "PlainText (Trim All)",
+        "description": "Text files, leading and trailing spaces and tabs removed from extracted lines",
+        "mime": "text/plain",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_plaintext_trim_trail",
+        "type": "okf_plaintext",
+        "name": "PlainText (TrimTrail)",
+        "description": "Text files, trailing spaces and tabs removed from extracted lines",
+        "mime": "text/plain",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_po-monolingual",
+        "type": "okf_po",
+        "name": "PO (Monolingual)",
+        "description": "Monolingual PO files (msgid is a real ID, not the source text)",
+        "mime": "application/x-gettext",
+        "extensions": ["po"],
+        "settings": true
+    },
+    {
+        "id": "okf_po",
+        "type": "okf_po",
+        "name": "PO (Standard)",
+        "description": "Standard bilingual PO files",
+        "mime": "application/x-gettext",
+        "extensions": ["po"],
+        "settings": true
+    },
+    {
+        "id": "okf_properties-html-subfilter",
+        "type": "okf_properties",
+        "name": "Properties with complex HTML Content",
+        "description": "Java Property content processed by an HTML subfilter",
+        "mime": "text/x-properties",
+        "extensions": ["properties"],
+        "settings": true
+    },
+    {
+        "id": "okf_rainbowkit",
+        "type": "okf_rainbowkit",
+        "name": "RainbowTranslation Kit",
+        "description": "Rainbow translation kit",
+        "mime": "application/x-rainbowkit",
+        "extensions": ["rkm"],
+        "settings": true
+    },
+    {
+        "id": "okf_rainbowkit-noprompt",
+        "type": "okf_rainbowkit",
+        "name": "RainbowTranslation Kit (No prompt)",
+        "description": "Rainbow translation kit (without prompt)",
+        "mime": "application/x-rainbowkit",
+        "extensions": ["rkm"],
+        "settings": true
+    },
+    {
+        "id": "okf_rainbowkit-package",
+        "type": "okf_rainbowkit",
+        "name": "RainbowTranslation Kit Package",
+        "description": "Rainbow translation kit package",
+        "mime": "application/x-rainbowkit-package",
+        "extensions": ["rkp"],
+        "settings": true
+    },
+    {
+        "id": "okf_regex",
+        "type": "okf_regex",
+        "name": "Regex Default",
+        "description": "Default Regex configuration",
+        "mime": "text/x-regex",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_xml-resx",
+        "type": "okf_xml",
+        "name": "RESX",
+        "description": "Microsoft RESX documents (without binary data)",
+        "mime": "text/xml",
+        "extensions": ["resx"],
+        "settings": true
+    },
+    {
+        "id": "okf_sdlpackage",
+        "type": "okf_sdlpackage",
+        "name": "SDLTrados Package Files",
+        "description": "SDL Trados 2017 SDLPPX and SDLRPX files",
+        "mime": "application/x-sdlpackage",
+        "extensions": ["sdlppx","sdlrpx"],
+        "settings": true
+    },
+    {
+        "id": "okf_xliff-sdl",
+        "type": "okf_xliff",
+        "name": "SDLXLIFF",
+        "description": "SDL XLIFF documents, supports SDL specific metadata",
+        "mime": "application/x-xliff+xml",
+        "extensions": ["sdlxlf"],
+        "settings": true
+    },
+    {
+        "id": "okf_properties-skypeLang",
+        "type": "okf_properties",
+        "name": "Skype Language Files",
+        "description": "Skype language properties files (including support for HTML codes)",
+        "mime": "text/x-properties",
+        "extensions": ["lang"],
+        "settings": true
+    },
+    {
+        "id": "okf_plaintext_spliced_backslash",
+        "type": "okf_plaintext",
+        "name": "Spliced Lines (Backslash)",
+        "description": "Spliced lines filter with the backslash character (\\) used as the splicer",
+        "mime": "text/plain",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_plaintext_spliced_custom",
+        "type": "okf_plaintext",
+        "name": "Spliced Lines (Custom)",
+        "description": "Spliced lines filter with a user-defined splicer",
+        "mime": "text/plain",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_plaintext_spliced_underscore",
+        "type": "okf_plaintext",
+        "name": "Spliced Lines (Underscore)",
+        "description": "Spliced lines filter with the underscore character (_) used as the splicer",
+        "mime": "text/plain",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_regex-srt",
+        "type": "okf_regex",
+        "name": "SRT Sub-Titles",
+        "description": "SRT (Sub-Rip Text) sub-titles files",
+        "mime": "text/x-regex",
+        "extensions": ["srt"],
+        "settings": true
+    },
+    {
+        "id": "okf_itshtml5",
+        "type": "okf_itshtml5",
+        "name": "Standard HTML5",
+        "description": "Standard HTML5 documents",
+        "mime": "text/html",
+        "extensions": ["html","htm"],
+        "settings": true
+    },
+    {
+        "id": "okf_table_csv",
+        "type": "okf_table",
+        "name": "Table (Comma-Separated Values)",
+        "description": "Comma-separated values, optional header with field names",
+        "mime": "text/csv",
+        "extensions": ["csv","txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_table_fwc",
+        "type": "okf_table",
+        "name": "Table (Fixed-Width Columns)",
+        "description": "Fixed-width columns table padded with white-spaces",
+        "mime": "text/csv",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_table_src-tab-trg",
+        "type": "okf_table_src",
+        "name": "Table (Tab-Separated Values)",
+        "description": "2-column (source + target), tab separated files",
+        "mime": "text/csv",
+        "extensions": ["csv","txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_table_tsv",
+        "type": "okf_table",
+        "name": "Table (Tab-Separated Values)",
+        "description": "Columns, separated by one or more tabs",
+        "mime": "text/csv",
+        "extensions": ["tsv","txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_table",
+        "type": "okf_table",
+        "name": "Table Files",
+        "description": "Table-like files such as tab-delimited, csv, fixed-width columns, etc.",
+        "mime": "text/csv",
+        "extensions": ["csv","txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_tex",
+        "type": "okf_tex",
+        "name": "Tex",
+        "description": "Tex files",
+        "mime": "text/x-tex-text",
+        "extensions": ["tex"],
+        "settings": false
+    },
+    {
+        "id": "okf_regex-textBlock",
+        "type": "okf_regex",
+        "name": "Text (Block=Paragraph)",
+        "description": "Text files where text units are separated by 2 or more line-breaks",
+        "mime": "text/x-regex",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_regex-textLine",
+        "type": "okf_regex",
+        "name": "Text (Line=Paragraph)",
+        "description": "Text files where each line is a text unit",
+        "mime": "text/x-regex",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_regex-macStrings",
+        "type": "okf_regex",
+        "name": "Text (Mac Strings)",
+        "description": "Macintosh-strings files",
+        "mime": "text/x-regex",
+        "extensions": ["strings"],
+        "settings": true
+    },
+    {
+        "id": "okf_tmx",
+        "type": "okf_tmx",
+        "name": "TMX",
+        "description": "Translation Memory eXchange (TMX) documents",
+        "mime": "application/x-tmx+xml",
+        "extensions": ["tmx"],
+        "settings": true
+    },
+    {
+        "id": "okf_tradosrtf",
+        "type": "okf_tradosrtf",
+        "name": "Trados-Tagged RTF",
+        "description": "Trados-tagged RTF files - READING ONLY",
+        "mime": "application/rtf",
+        "extensions": ["rtf"],
+        "settings": false
+    },
+    {
+        "id": "okf_transifex",
+        "type": "okf_transifex",
+        "name": "TransifexProject",
+        "description": "Transifex project with prompt when starting",
+        "mime": "application/x-transifex",
+        "extensions": ["txp"],
+        "settings": true
+    },
+    {
+        "id": "okf_transifex-noPrompt",
+        "type": "okf_transifex",
+        "name": "Transifex Project (without prompt)",
+        "description": "Transifex project without prompt when starting",
+        "mime": "application/x-transifex",
+        "extensions": ["txp"],
+        "settings": true
+    },
+    {
+        "id": "okf_transtable",
+        "type": "okf_transtable",
+        "name": "Translation Table Default",
+        "description": "Default TransTable configuration",
+        "mime": "text/x-transtable",
+        "extensions": ["txt"],
+        "settings": false
+    },
+    {
+        "id": "okf_ts",
+        "type": "okf_ts",
+        "name": "TS",
+        "description": "Qt TS files",
+        "mime": "application/x-ts",
+        "extensions": ["ts"],
+        "settings": true
+    },
+    {
+        "id": "okf_ttx",
+        "type": "okf_ttx",
+        "name": "TTX",
+        "description": "Trados TTX documents",
+        "mime": "application/x-ttx+xml",
+        "extensions": ["ttx"],
+        "settings": true
+    },
+    {
+        "id": "okf_txml",
+        "type": "okf_txml",
+        "name": "TXML",
+        "description": "Wordfast Pro TXML documents",
+        "mime": "text/xml",
+        "extensions": ["txml"],
+        "settings": true
+    },
+    {
+        "id": "okf_txml-fillEmptyTargets",
+        "type": "okf_txml",
+        "name": "TXML (Fill empty targets in output)",
+        "description": "Wordfast Pro TXML documents with empty targets filled on output",
+        "mime": "text/xml",
+        "extensions": ["txml"],
+        "settings": true
+    },
+    {
+        "id": "okf_vignette",
+        "type": "okf_vignette",
+        "name": "Vignette Export/Import Content",
+        "description": "Default Vignette Export/Import Content configuration",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_vignette-nocdata",
+        "type": "okf_vignette",
+        "name": "Vignette Export/Import Content (escaped HTML)",
+        "description": "Vignette files without CDATA sections",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_wiki",
+        "type": "okf_wiki",
+        "name": "Wiki Markup",
+        "description": "Text with wiki-style markup",
+        "mime": "text/x-wiki-txt",
+        "extensions": ["txt"],
+        "settings": true
+    },
+    {
+        "id": "okf_xml-WixLocalization",
+        "type": "okf_xml",
+        "name": "WiXLocalization",
+        "description": "WiX (Windows Installer XML) Localization files",
+        "mime": "text/xml",
+        "extensions": ["wix"],
+        "settings": true
+    },
+    {
+        "id": "okf_xini",
+        "type": "okf_xini",
+        "name": "XINI",
+        "description": "XINI documents from ONTRAM",
+        "mime": "text/x-xini",
+        "extensions": ["xini"],
+        "settings": true
+    },
+    {
+        "id": "okf_xini-noOutputSegmentation",
+        "type": "okf_xini",
+        "name": "XINI (no output Segmentation)",
+        "description": "XINI documents from ONTRAM (fields in the output are not segmented)",
+        "mime": "text/x-xini",
+        "extensions": ["xini"],
+        "settings": true
+    },
+    {
+        "id": "okf_xliff",
+        "type": "okf_xliff",
+        "name": "XLIFF",
+        "description": "XML Localisation Interchange File Format (XLIFF) documents",
+        "mime": "application/x-xliff+xml",
+        "extensions": ["xlf","xliff"],
+        "settings": true
+    },
+    {
+        "id": "okf_autoxliff",
+        "type": "okf_autoxliff",
+        "name": "XLIFF 1.2 and 2.0 Filter",
+        "description": "Calls the appropriate filter for any version of XLIFF",
+        "mime": "application/xliff+xml",
+        "extensions": ["xlf","xliff"],
+        "settings": true
+    },
+    {
+        "id": "okf_xliff2",
+        "type": "okf_xliff2",
+        "name": "XLIFF-2",
+        "description": "XLIFF-2 documents",
+        "mime": "application/xliff+xml",
+        "extensions": ["xlf"],
+        "settings": true
+    },
+    {
+        "id": "okf_simplification-xmlCodes",
+        "type": "okf_simplification",
+        "name": "XML (Simplified codes)",
+        "description": "Extracting resources from an XML file, codes are simplified",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_simplification-xmlResources",
+        "type": "okf_simplification",
+        "name": "XML (Simplified resources)",
+        "description": "Extracting resources from an XML file, resources are simplified",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_simplification",
+        "type": "okf_simplification",
+        "name": "XML (Simplified resources and codes)",
+        "description": "Extracting resources from an XML file, resources and then codes are simplified",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_xmlstream",
+        "type": "okf_xmlstream",
+        "name": "XML Stream",
+        "description": "Large XML Documents",
+        "mime": "text/xml",
+        "extensions": ["xml"],
+        "settings": true
+    },
+    {
+        "id": "okf_yaml",
+        "type": "okf_yaml",
+        "name": "YAML",
+        "description": "YAML files",
+        "mime": "text/x-yaml",
+        "extensions": ["yml","yaml"],
+        "settings": true
+    }
+]

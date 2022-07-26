@@ -1,0 +1,13 @@
+#v1
+unescapeSource.b=true
+trimLeading.b=false
+trimTrailing.b=false
+preserveWS.b=true
+useCodeFinder.b=false
+codeFinderRules=#v1$0a$count.i=2$0a$rule0=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn]$0a$rule1=(\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v$0a$sample=$0a$useAllRulesWhenTesting.b=false
+wrapMode.i=0
+rule=(^(?=.+))(.*?)$
+sourceGroup.i=2
+regexOptions.i=8
+sample=$0d$$0a$This is the first sentence. And this is the second one.$0d$$0a$Second paragraph. Each one ends at the line-break.$0d$$0a$$0d$$0a$Third paragraph.$0d$$0a$And the last paragraph may have no line-break.
+parametersClass=net.sf.okapi.filters.plaintext.regex.Parameters

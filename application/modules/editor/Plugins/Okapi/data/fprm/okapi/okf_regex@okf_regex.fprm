@@ -1,0 +1,13 @@
+#v1
+regexOptions.i=40
+startString="
+endString="
+extractOuterStrings.b=false
+useBSlashEscape.b=true
+useDoubleCharEscape.b=false
+mimeType=text/plain
+oneLevelGroups.b=false
+useLd.b=true
+localizeOutside.b=true
+ruleCount.i=0
+metaRuleCount.i=0

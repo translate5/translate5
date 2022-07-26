@@ -25,106 +25,124 @@
  END LICENSE AND COPYRIGHT
  */
 /**
- * @class okapiBconfGrid
+ * Lists and manages the available Input Bconfs to choose from when creating a task
+ * On import the chosen one is sent together with the input files to Okapi Longhorn for Segmentation
  */
 Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     extend: 'Ext.grid.Panel',
     requires: [
         'Editor.plugins.Okapi.view.BconfGridController',
+        'Editor.plugins.Okapi.view.BconfFilterGrid',
         'Editor.plugins.Okapi.store.BconfStore',
     ],
     alias: 'widget.okapiBconfGrid',
     plugins: ['cellediting'],
-    itemId: 'okapiBconfGrid',
-    controller: 'bconfGridController',
+    itemId: 'bconf',
+    controller: 'Editor.plugins.Okapi.view.BconfGridController',
     store: 'bconfStore',
     isCustomerGrid: false,
-    userCls: 'actionColGrid',
+    userCls: 't5actionColumnGrid t5leveledGrid',
     title: '#UT#Dateiformatkonvertierung',
     glyph: 'f1c9@FontAwesome5FreeSolid',
+    /** @property {string} routePrefix Used to setup routes on different view instances */
+    routePrefix: '',
     listeners: {
-        beforeedit: 'handleBeforeedit'
+        beforeedit: 'handleBeforeedit',
+        show: 'loadOkapiFilters'
     },
     config: {
         customer: null
     },
     text_cols: {
         name: '#UT#Name',
-        extensions: '#UT#Extensions',
-        description: '#UT#Description',
-        action: '#UT#Actions',
-        uploadBconf: '#UT#upload',
-        _file: '#UT#-Datei',
+        extensions: '#UT#Erweiterungen',
+        description: '#UT#Beschreibung',
+        action: '#UT#Aktionen',
+        uploadBconf: '#UT#Bconf hochladen',
+        fileSuffix: '#UT#-Datei',
         fileDlTemplate: '#UT#{0}{1} herunterladen',
         fileUpTemplate: '#UT#{0}{1} hochladen',
-        srx: '#UT#SRX',
-        sourceSrx: '#UT#SourceSRX',
-        targetSrx: '#UT#TargetSRX',
+        filters: '#UT#Filter',
+        srx: '#UT#SRX-Datei',
+        sourceSrx: '#UT#Source SRX',
+        targetSrx: '#UT#Target SRX',
         pipeline: '#UT#Pipeline',
+        standard: '#UT#Standard',
         customerStandard: '#UT#Kundenstandard'
     },
     strings: {
-        addBconf: '#UT#Add Bconf',
-        bconfRequired: '#UT#Bconf required',
-        browse: '#UT#Browse',
+        addBconf: '#UT#Bconf hinzufügen',
+        bconfRequired: '#UT#wird benötigt',
+        browse: '#UT#Durchsuchen...',
         confirmDeleteMessage: '#UT#Möchten Sie diese Bconf-Datei wirklich löschen?',
         confirmDeleteTitle: '#UT#Bconf löschen',
-        copy: '#UT#Copy',
+        copy: '#UT#Kopieren',
         deleteSuccess: '#UT#Bconf-Datei gelöscht',
-        edit: '#UT#Edit',
+        edit: '#UT#Bearbeiten',
         editBconf: '#UT#Bconf-Datei bearbeiten',
-        export: '#UT#Export',
-        fileUploaded: '#UT#{}-Datei erfolgreich hochgeladen.',
-        invalidMsg: '#UT#Die hochgeladene Datei ist keine gültige {}-Datei.',
-        invalidTitle: '#UT#Ungültige {}-Datei',
+        export: '#UT#Exportieren',
+        fileUploaded: '#UT#{0}-Datei erfolgreich hochgeladen.',
+        invalidMsg: '#UT#Die hochgeladene Datei ist keine gültige {0}-Datei.',
+        invalidTitle: '#UT#Ungültige {0}-Datei',
         name: '#UT#Name',
         nameExists: '#UT#Dieser Name ist schon vergeben',
         newBconf: '#UT#Neue Bconf-Datei',
         refresh: '#UT#Aktualisieren',
-        remove: '#UT#Remove',
-        searchEmptyText: '#UT#Search Bconf',
-        searchText: '#UT#Search',
+        remove: '#UT#Löschen',
+        searchEmptyText: '#UT#Suchen',
         uniqueName: '#UT#Eindeutiger Name',
         upload: '#UT#Upload',
-        uploadBconf: '#UT#Upload Bconf',
+        uploadBconf: '#UT#Bconf hochladen',
+        configureFilters: '#UT#Filter konfigurieren'
     },
     viewConfig: {
         enableTextSelection: true, // neccessary for pointer class to have effect on whole row
-        getRowClass: function({data: bconf}){
-            var cls = '',
+        getRowClass: function(record){
+            var classes = [],
                 customer = this.grid.isCustomerGrid ? this.grid.ownerCt.ownerCt.getViewModel().getData().list.selection : null;
-            if(customer && customer.get('id') === bconf.customerId){
-                cls += ' pointer ';
-            } //else not editable
-            if((customer && customer.get('defaultBconfId')) ? (customer.get('defaultBconfId') === bconf.id) : bconf.isDefault){
-                cls += ' chosenDefault ';
+            if(!this.grid.isCustomerGrid || (customer && customer.get('id') === record.get('customerId'))){
+                classes.push('t5level0 pointer');
+            } else {
+                classes.push('t5level1');
             }
-            return cls;
+            if((customer && customer.get('defaultBconfId')) ? (customer.get('defaultBconfId') === record.id) : record.get('isDefault')){
+                classes.push('t5chosenDefault');
+            }
+            return classes.join(' ');
         }
     },
     initConfig: function(instanceConfig){
         var me = this,
             config = {};
-        config.columns = [
-            {
+        config.title = me.title; //see EXT6UPD-9
+        config.userCls = instanceConfig.isCustomerGrid ? 't5actionColumnGrid t5leveledGrid' : 't5actionColumnGrid'; // for the non-customer view, we do not need the leveled grid decorations
+        config.columns = [{
                 xtype: 'gridcolumn',
-                width: 50,
                 dataIndex: 'id',
                 text: 'Id',
-                hidden: true,
+                hidden: true
             },
             {
                 xtype: 'gridcolumn',
-                width: 200,
+                width: 260,
                 dataIndex: 'name',
                 stateId: 'name',
                 flex: 1,
                 editor: 'textfield',
-                text: me.text_cols.name,
+                text: me.text_cols.name
             },
             {
                 xtype: 'gridcolumn',
-                width: 300,
+                width: 110,
+                dataIndex: 'customExtensions',
+                stateId: 'customExtensions',
+                renderer: function(value){
+                    return value.join(', ');
+                },
+                text: me.text_cols.extensions
+            },
+            {
+                xtype: 'gridcolumn',
                 alias: 'desc',
                 dataIndex: 'description',
                 stateId: 'description',
@@ -137,11 +155,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 },
                 text: me.text_cols.description,
                 flex: 3
-            },
-            {
+            },{
                 xtype: 'checkcolumn',
                 text: me.text_cols.customerStandard,
-                width: 150,
+                width: 90,
                 itemId: 'customerDefaultColumn',
                 hidden: !instanceConfig.isCustomerGrid,
                 hideable: instanceConfig.isCustomerGrid,
@@ -150,12 +167,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 // QUIRK: This is a purely synthetic column that renders based on the associated customer, so no dataIndex is set
                 // This is way easier than trying to model this dynamic relation canonically
                 renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
-                    const customer = view.grid.ownerCt.ownerCt.getViewModel().getData().list.selection || {};
-                    arguments[0] = (record.id === customer.data.defaultBconfId); // customer is always set, else panel wouldn't be active
-                    return this.defaultRenderer.apply(this, arguments);
+                    var selection = view.grid.ownerCt.ownerCt.getViewModel().getData().list.selection,
+                        customerDefaultBconfId = (selection) ? selection.get('defaultBconfId') : -1;
+                    isDefault = (record.id === customerDefaultBconfId); // customer is always set, else panel wouldn't be active
+                    return this.defaultRenderer.apply(this, [isDefault, metaData, record, rowIdx, colIdx, store, view]);
                 },
                 listeners: {
-                    /**
+                    /** @method
                      * There is always a row to be highlighted and one to be unhighlighted
                      * The exception is, when system default is (de)selected as customer default - then don't refresh old
                      * @param col
@@ -165,43 +183,59 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                      * @returns {boolean}
                      */
                     'beforecheckchange': function(col, recordIndex, checked, clicked){
-                        var view = col.getView(),
-                            store = view.getStore(),
-                            customer = view.grid.getCustomer(),
-                            oldDefaultId = customer.get('defaultBconfId'),
-                            isSelect = oldDefaultId !== clicked.id, // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
-                            id2Refresh = (isSelect && oldDefaultId) ? customer.get('defaultBconfId') : Editor.data.plugins.Okapi.systemDefaultBconfId,
-                            value = isSelect ? clicked.id : null;
-                        customer.set('defaultBconfId', value); // TODO: why doesn't {commit:true} trigger save but even prevent it?!
+                        var gridView = col.getView(),
+                            customer = gridView.grid.getCustomer(),
+                            customerId = customer.id,
+                            oldBconfId = customer.get('defaultBconfId'),
+                            newChecked = (oldBconfId !== clicked.id), // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
+                            newBconfId = newChecked ? clicked.id : null;
+                        gridView.select(clicked);
                         Ext.Ajax.request({
                             url: Editor.data.restpath + 'customermeta',
                             method: 'PUT',
                             params: {
-                                id: customer.id,
+                                id: customerId,
                                 data: Ext.encode({
-                                    defaultBconfId: value
+                                    defaultBconfId: newBconfId
                                 })
+                            },
+                            success: function() {
+                                var store, storeId;
+                                // unfortunately there are two customer stores, which both act as source for the TaskImport customer selector, so we have to update them both
+                                for(storeId of ['customersStore', 'userCustomers']){
+                                    if(store = Ext.getStore(storeId)){
+                                        if(customer = store.getById(customerId)){
+                                            if(customer){
+                                                customer.set('defaultBconfId', newBconfId, { commit: true, silent: true });
+                                            }
+                                        }
+                                    }
+                                }
+                                // refresh the grid for the changed record
+                                gridView.refresh(clicked);
+                                if(oldBconfId !== null){
+                                    // if there was a old record, refresh the grid for the old record
+                                    var bconf = gridView.getStore().getById(oldBconfId);
+                                    if(bconf){
+                                        gridView.refreshNode(bconf);
+                                    }
+                                }
+                            },
+                            failure: function(response){
+                                Editor.app.getController('ServerException').handleException(response);
                             }
-                        })
-                        view.refresh(clicked);
-                        if(id2Refresh !== clicked.id){
-                            var oldDefaultRec = store.getById(id2Refresh);
-                            if(oldDefaultRec){
-                                view.refreshNode(oldDefaultRec);
-                            }
-                        }
+                        });
                         return false; // checked state handled manually via view.refresh
                     }
                 }
-            },
-            {
+            },{
                 xtype: 'checkcolumn',
                 text: me.text_cols.standard,
                 dataIndex: 'isDefault',
                 itemId: 'globalDefaultColumn',
                 tooltip: '', // QUIRK: needed to work
                 disabled: instanceConfig.isCustomerGrid,
-                width: 95,
+                width: 60,
                 renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
                     var grid = view.ownerGrid;
                     if(!isDefault && !grid.isCustomerGrid){
@@ -210,31 +244,45 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     return this.defaultRenderer.apply(this, arguments);
                 },
                 listeners: {
-                    'beforecheckchange':
-                        function(col, recordIndex, checked, record){
-                            var view = col.getView(),
-                                grid = view.ownerGrid,
-                                store = grid.store,
-                                oldDefault;
-                            if(grid.isCustomerGrid || !checked){ // Cannot set in customerGrid, cannot deselect global default
-                                return false;
-                            } else if(checked){ // must uncheck old default
-                                oldDefault = store.getAt(store.findBy(({data}) => data.isDefault && !data.customerId));
-                                if(oldDefault && oldDefault !== record){
-                                    oldDefault.set('isDefault', {commit: false}); // QUIRK: prevent saving twice this way
-                                    oldDefault.commit();
-                                }
+                    'beforecheckchange': function(col, recordIndex, checked, record){
+                        var view = col.getView(),
+                            grid = view.ownerGrid,
+                            store = grid.store,
+                            oldDefault;
+                        view.select(record);
+                        if(grid.isCustomerGrid || !checked){ // Cannot set in customerGrid, cannot deselect global default
+                            return false;
+                        } else if(checked){ // must uncheck old default
+                            oldDefault = store.getAt(store.findBy(({data}) => data.isDefault && !data.customerId));
+                            if(oldDefault && oldDefault !== record){
+                                oldDefault.set('isDefault', { commit: false }); // QUIRK: prevent saving twice this way
+                                oldDefault.commit();
                             }
-                            Editor.data.plugins.Okapi.systemDefaultBconfId = record.id;
                         }
+                        Editor.data.plugins.Okapi.systemDefaultBconfId = record.id; // Crucial: the default-id is a global that must be updated!
+                    }
                 }
-            },
-            {
+            },{
+                xtype: 'actioncolumn',
+                align: 'center',
+                itemId: 'bconfFilters',
+                menuDisabled: true,
+                width: 60,
+                text: me.text_cols.filters,
+                menuText: me.text_cols.filters,
+                items: [{
+                    tooltip: me.strings.configureFilters,
+                    isAllowedFor: 'bconfEdit',
+                    glyph: 'f0b0@FontAwesome5FreeSolid',
+                    isDisabled: 'isEditDisabled',
+                    handler: 'showFilterGrid',
+                    width: 50
+                }]
+            },{
                 xtype: 'actioncolumn',
                 stateId: 'okapiGridActionColumn',
                 align: 'center',
-                dataIndex: 'isDefault',
-                width: 3 * 28 + 8 + 28,
+                width: 100,
                 text: me.text_cols.action,
                 menuText: me.text_cols.action,
                 menuDisabled: true,
@@ -243,39 +291,38 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         tooltip: me.strings.remove,
                         isAllowedFor: 'bconfDelete',
                         glyph: 'f2ed@FontAwesome5FreeSolid',
-                        handler: 'deletebconf',
-                        isDisabled: 'isDeleteDisabled'
+                        isDisabled: 'isDeleteDisabled',
+                        handler: 'deleteBconf'
                     },
                     {
                         tooltip: me.strings.copy,
                         isAllowedFor: 'bconfCopy',
                         margin: '0 0 0 10px',
                         glyph: 'f24d@FontAwesome5FreeSolid',
-                        handler: 'clonebconf',
+                        handler: 'cloneBconf'
                     },
                     {
                         tooltip: me.strings.export,
                         isAllowedFor: 'bconfDelete',
                         glyph: 'f019@FontAwesome5FreeSolid',
-                        handler: 'downloadBconf',
-                    },
-                ],
-            },
-            {
+                        handler: 'downloadBconf'
+                    }
+                ]
+            },{
                 xtype: 'actioncolumn',
                 align: 'center',
                 text: me.text_cols.sourceSrx,
                 menuText: me.text_cols.sourceSrx,
-                width: 2 * 28 + 8 + 28,
+                width: 90,
                 menuDisabled: true,
                 items: [
                     {
                         isAllowedFor: 'bconfEdit',
                         glyph: 'f093@FontAwesome5FreeSolid',
-                        isDisabled: 'isSRXUploadDisabled',
+                        isDisabled: 'isEditDisabled',
                         purpose: 'source',
                         tooltip: new Ext.Template(me.text_cols.fileUpTemplate)
-                            .apply(['SourceSRX', me.text_cols._file]),
+                            .apply(['Source SRX', me.text_cols.fileSuffix]),
                         handler: 'showSRXChooser',
                     },
                     {
@@ -283,26 +330,25 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         glyph: 'f019@FontAwesome5FreeSolid',
                         purpose: 'source',
                         tooltip: new Ext.Template(me.text_cols.fileDlTemplate)
-                            .apply(['SourceSRX', me.text_cols._file]),
+                            .apply(['Source SRX', me.text_cols.fileSuffix]),
                         handler: 'downloadSRX'
                     },
                 ]
-            },
-            {
+            },{
                 xtype: 'actioncolumn',
                 align: 'center',
                 text: me.text_cols.targetSrx,
                 menuText: me.text_cols.targetSrx,
-                width: 2 * 28 + 8 + 28,
+                width: 90,
                 menuDisabled: true,
                 items: [
                     {
                         isAllowedFor: 'bconfEdit',
                         glyph: 'f093@FontAwesome5FreeSolid',
-                        isDisabled: 'isSRXUploadDisabled',
+                        isDisabled: 'isEditDisabled',
                         purpose: 'target',
                         tooltip: new Ext.Template(me.text_cols.fileUpTemplate)
-                            .apply(['TargetSRX', me.text_cols._file]),
+                            .apply(['Target SRX', me.text_cols.fileSuffix]),
                         handler: 'showSRXChooser',
                     },
                     {
@@ -310,12 +356,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         glyph: 'f019@FontAwesome5FreeSolid',
                         purpose: 'target',
                         tooltip: new Ext.Template(me.text_cols.fileDlTemplate)
-                            .apply(['TargetSRX', me.text_cols._file]),
+                            .apply(['Target SRX', me.text_cols.fileSuffix]),
                         handler: 'downloadSRX'
-                    },
+                    }
                 ]
-            },
-
+            }
         ];
         config.dockedItems = [{
             xtype: 'toolbar',
@@ -362,8 +407,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     flex: 1.6,
                 },
             ],
-        },
-        ];
+        }];
         return me.callParent([Ext.apply(config, instanceConfig)]);
     },
 });

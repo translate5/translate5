@@ -47,5 +47,13 @@ Ext.define('Editor.model.quality.Segment', {
         { name:'tagName', type:'string' },
         { name:'cssClass', type:'string' }
     ],
-    idProperty: 'id'    
+    idProperty: 'id',
+    proxy: {
+        type: 'rest',
+        url: Editor.data.restpath+'quality/segment',
+        reader: {
+            rootProperty: 'rows',
+            type: 'json'
+        }
+    }
 });

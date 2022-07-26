@@ -39,12 +39,4 @@ Ext.define('Editor.store.quality.Segment', {
     autoSync: false,
     isLoaded: false,
     pageSize: 0,
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath+'quality/segment',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json'
-        }
-    }
 });

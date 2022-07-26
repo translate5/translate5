@@ -1,0 +1,6 @@
+#v1
+extractNotes.b=false
+simplifyCodes.b=true
+extractMasterSpreads.b=true
+skipThreshold.i=1000
+newTuOnBr.b=false
