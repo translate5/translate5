@@ -31,7 +31,8 @@ END LICENSE AND COPYRIGHT
  * For details see the issue.
  */
 class OkapiBconfTest extends editor_Test_JsonTest {
-    private static editor_Plugins_Okapi_Models_Bconf $bconf;
+
+    private static editor_Plugins_Okapi_Bconf_Entity $bconf;
     private static int $bconfId = 0;
     private static Zend_Config $okapiConf;
     public const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
@@ -49,7 +50,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         self::assertNotEmpty($okapiConf->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
         self::assertNotEmpty($okapiConf->api->url, self::OKAPI_CONFIG . ".api.url not set");
 
-        $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getBconfStaticDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
+        $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists($t5defaultImportBconf,
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
 
@@ -72,10 +73,10 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         ]);
         self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true');
         self::$bconfId = $res->id;
-        self::$bconf = new editor_Plugins_Okapi_Models_Bconf();
+        self::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
         self::$bconf->load(self::$bconfId);
         self::assertEquals(self::$bconf->getName(), $bconfName, "Imported bconf's name is not '$bconfName' but '" . self::$bconf->getName() . "'");
-        $output = self::$bconf->getFilePath();
+        $output = self::$bconf->getPath();
 
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
         self::assertFileEquals($input, $output, $failureMsg);
@@ -128,7 +129,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $bconf = self::$bconf;
         $bconf->importDefaultWhenNeeded();
 
-        $systemBconf = new editor_Plugins_Okapi_Models_Bconf();
+        $systemBconf = new editor_Plugins_Okapi_Bconf_Entity();
         $systemBconf->loadRow('name = ? ', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
         $systemBconf->setName('NotSystemBconfAnymore-' . time() . rand()); // Unmark as system bconf
         $systemBconf->save();
@@ -140,11 +141,11 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
         $autoImportFailureMsg = 'AutoImport of missing system bconf failed.';
         self::assertEquals($total + 1, $newTotal, $autoImportFailureMsg . ' Totalcount not increased');
-        $newSystemBconf = new editor_Plugins_Okapi_Models_Bconf();
+        $newSystemBconf = new editor_Plugins_Okapi_Bconf_Entity();
         $expectedName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
         $newSystemBconf->loadRow('name = ?', $expectedName);
         self::assertEquals($expectedName, $newSystemBconf->getName(), $autoImportFailureMsg . " No record name matches '$expectedName'");
-        $newBconfFile = $newSystemBconf->getFilePath();
+        $newBconfFile = $newSystemBconf->getPath();
         self::assertFileExists($newBconfFile, $autoImportFailureMsg . " File '$newBconfFile' does not exist");
 
         // Ensure system bconf dir can't be deleted
@@ -163,11 +164,11 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $newSystemBconf->save();
         $newSystemBconf->repackIfOutdated();
         self::assertEquals(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX, $newSystemBconf->getVersionIdx(), 'Bconf version was not updated after being outdated');
-        self::assertFileExists($newSystemBconf->getFilePath(), $autoImportFailureMsg . " Version Auto Update failed. File '$newBconfFile' does not exist.");
+        self::assertFileExists($newSystemBconf->getPath(), $autoImportFailureMsg . " Version Auto Update failed. File '$newBconfFile' does not exist.");
 
         // Reset to initial system bconf, delete  newly imported
         $newSystemBconfId = $newSystemBconf->getId();
-        $newSystemBconfDir = $newSystemBconf->getDir();
+        $newSystemBconfDir = $newSystemBconf->getDataDirectory();
         $newSystemBconf->setName('ToDelete-' . time() . rand());
         $newSystemBconf->save();
         $systemBconf->setName(editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
@@ -253,15 +254,14 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * @depends test10_BconfImportExport
      */
     public function test60_InvalidFiles() {
-        $bconf = new editor_Plugins_Okapi_Models_Bconf();
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $testDir = NULL;
         try {
             $bconf->setId(0);
-            $testDir = $bconf->getDir();
+            $testDir = $bconf->getDataDirectory();
             if(!is_dir($testDir)){
                 mkdir($testDir); // Created as test user for unit test. Make sure to remove in every circumstance!
             }
-            $bconffile = new editor_Plugins_Okapi_Bconf_File($bconf);
             $filesToTest = [
                 'Signature.bconf',
                 'Version.bconf',
@@ -273,7 +273,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
             foreach($filesToTest as $file){
                 $e = null;
                 try {
-                    $bconffile->unpack(self::$api->getFile("invalid/$file"));
+                    $bconf->unpack(self::$api->getFile("invalid/$file"));
                 } catch(ZfExtended_UnprocessableEntity $e){
                     self::assertNotNull($e, "Did not reject invalid/$file with ZfExtended_UnprocessableEntity.");
                 }
@@ -299,7 +299,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $bconf = self::$bconf;
         $bconf->load(self::$bconfId);
 
-        $bconfDir = $bconf->getDir();
+        $bconfDir = $bconf->getDataDirectory();
         $bconf->delete(); // delete record, which deletes directory as well
         self::assertDirectoryDoesNotExist($bconfDir);
     }

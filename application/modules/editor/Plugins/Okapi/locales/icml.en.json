@@ -1,0 +1,9 @@
+{
+    "helpLink": "http://okapiframework.org/wiki/index.php/ICML_Filter",
+    "extractNotes": "Extract notes",
+    "simplifyCodes": "Simplify inline codes when possible",
+    "extractMasterSpreads": "Extract master spreads",
+    "skipThreshold": "Maximum spread size",
+    "skipThresholdTooltip": "Skip any spread larger than the given value (in Kbytes)",
+    "newTuOnBr": "Create new paragraphs on hard returns<br/>(&lt;br/&gt; elements) [BETA]"
+}

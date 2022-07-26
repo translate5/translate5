@@ -221,7 +221,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
     loadAllPreferences: function (task) {
         var me = this;
         me.getPrefGrid() && me.getPrefGrid().getStore().load({
-            callback: function () {
+            callback: function() {
                 me.calculateAvailableCombinations();
             }
         });

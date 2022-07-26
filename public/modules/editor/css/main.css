@@ -51,6 +51,13 @@ div.x-container.x-container-default {position: initial;}
   	white-space: normal;
 }
 
+.mono {
+    font-family: "Source Code Pro", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    white-space: pre-wrap;
+    font-size: larger;
+    background: rgba(160, 160, 160, 0.75);
+}
+
 .editorAdminTaskLogGrid .x-property-grid .x-grid-row td.x-grid-cell-last .x-grid-cell-inner {
 	font-family: monospace;
     white-space: pre;
@@ -917,14 +924,9 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 #commentNavList>div.usernr8::before {background-color: var(--color-usernr8);}
 #commentNavList>div.usernrX::before {background-color: var(--color-usernrX);}
 
-.actionColGrid .x-action-col-icon {
-    margin: 5px;
-}
-
 td.x-grid-cell.pointer,
-tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"] /* Only enable for normal, especially disable for action and check columns */
-{
-    cursor: pointer;
+tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
+    cursor: pointer; /* Only enable for normal, especially disable for action and check columns */
 }
 
 .invalidGridBorder{
@@ -937,6 +939,18 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"] /* Only enable for 
     pointer-events: auto !important;
 }
 
-.chosenDefault {
-    background-color: hsl(0deg 0% 0% / 20%);
-}
+
+.t5actionColumnGrid .x-action-col-icon { margin: 5px; }
+.t5leveledGrid .t5level0 { background-color: rgba(255, 239, 187, .2); }
+.t5leveledGrid.t5noLevels .t5level0 { background-color: transparent; }
+.t5chosenDefault, .t5leveledGrid .t5level0.t5chosenDefault, .t5leveledGrid.t5noLevels .t5level0.t5chosenDefault { background-color: rgba(0, 0, 0, .15); }
+.t5leveledGrid .t5level1.t5chosenDefault { background-color: rgba(0, 0, 0, .10); }
+.t5leveledGrid .t5level1 .x-grid-item,
+.t5leveledGrid .t5level1 .x-grid-item-selected,
+.t5leveledGrid .t5level1 .x-grid-checkcolumn-checked::after,
+.t5leveledGrid .t5level1 .x-grid-hd-checker-on .x-column-header-checkbox::after,
+.t5leveledGrid .t5level1 .x-action-col-icon { opacity: 0.7; }
+.t5leveledGrid .t5level1 .x-action-col-cell .x-item-disabled { opacity: 0.3; }
+#bconfFprmEditor textarea.mono { background-color: rgba(160, 160, 160, 0.35); }
+#bconfFprmEditor .x-form-form-item.x-form-item-no-label::before { content:''; display:none; }
+.t5leveledList .t5level1 { font-style: italic; opacity:0.85; }

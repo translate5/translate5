@@ -1,0 +1,17 @@
+{
+    "refs": {
+        "sourceSrxPath": "languages.srx",
+        "targetSrxPath": "languages.srx"
+    },
+    "step": [
+        "net.sf.okapi.steps.common.RawDocumentToFilterEventsStep",
+        "net.sf.okapi.steps.segmentation.SegmentationStep",
+        "net.sf.okapi.steps.rainbowkit.creation.ExtractionStep"
+    ],
+    "fprm": [
+        "okf_html@translate5local-html_customized",
+        "okf_plaintext@translate5local-plaintext_customized",
+        "okf_wiki@translate5local-wiki_markup_customized",
+        "okf_xml@translate5local-generic_xml_customized"
+    ]
+}
