@@ -112,8 +112,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
      * Re-positions the RowEditor Buttons to match the height of the height of the editor, which may was changed by the tagfield expanding it
      */
     updateButtonsPosition: function(){
-        // this.getEditor().syncButtonPosition(this.context) // this triggers a complete recalculation incl. scroll position
-        // this.getFloatingButtons().setButtonPosition(this.getFloatingButtons().position) // this recalculates the button-positions relative to the editor
         var buttons = this.getEditor().getFloatingButtons();
         buttons.setButtonPosition(buttons.position);
     },

@@ -59,10 +59,6 @@ class editor_Plugins_Okapi_BconfDefaultFilterController extends ZfExtended_RestC
     public function setextensionsAction(){
         $identifier = $this->getParam('identifier');
         $extensions = explode(',', $this->getParam('extensions', ''));
-
-
-        error_log('setextensionsAction: for '.$identifier.' with extensions [ '.implode(', ', $extensions).' ]');
-
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->load($this->getParam('bconfId'));
         $extensionMapping = $bconf->getExtensionMapping();
