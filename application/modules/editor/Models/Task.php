@@ -639,7 +639,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(array_key_exists($id, $this->languageCache)){
             return $this->languageCache[$id];
         }
-         $this->languageCache[$id] = new editor_Models_Languages();
+         $this->languageCache[$id] = ZfExtended_Factory::get('editor_Models_Languages');
         $this->languageCache[$id]->load($id);
         return $this->languageCache[$id];
     }
