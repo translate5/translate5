@@ -33,6 +33,10 @@ use editor_Plugins_Okapi_Init;
 use editor_Plugins_Okapi_Bconf_Segmentation_Translate5;
 use editor_Plugins_Okapi_Bconf_ResourceFile;
 
+/**
+ * Command to increase the version-index and add FPRM hashes for the BCONF management of the OKAPI plugin
+ * see translate5/application/modules/editor/Plugins/Okapi/data/README.md for further explanation
+ */
 class DevelopmentOkapiBconfNextVersionCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")

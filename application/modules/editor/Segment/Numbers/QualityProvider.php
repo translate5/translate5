@@ -190,6 +190,9 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
 
             case editor_Segment_Numbers_Check::NUM12:
                 return $translate->_('1000er-Trenner nicht erlaubt');
+
+            case editor_Segment_Numbers_Check::NUM13:
+                return $translate->_('Dubiose Zahl aus Quelle unverändert in Ziel');
         }
         return NULL;
     }
@@ -203,6 +206,10 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      * @return string|null
      */
     public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
+        switch($category){
+            case editor_Segment_Numbers_Check::NUM13:
+                return $translate->_('Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.');
+        }
         return '';
     }
 
@@ -225,7 +232,8 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
             editor_Segment_Numbers_Check::NUM9,
             editor_Segment_Numbers_Check::NUM10,
             editor_Segment_Numbers_Check::NUM11,
-            editor_Segment_Numbers_Check::NUM12
+            editor_Segment_Numbers_Check::NUM12,
+            editor_Segment_Numbers_Check::NUM13
         ];
     }
 }

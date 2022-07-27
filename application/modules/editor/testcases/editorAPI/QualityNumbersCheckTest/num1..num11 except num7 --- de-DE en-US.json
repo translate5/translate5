@@ -605,6 +605,17 @@
                 {
                     "qid": "38556",
                     "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num13",
+                    "text": "Dubious number from source unchanged in target",
+                    "textTooltip": "If this is not a decimal number but a list with missing spaces between list elements, please insert spaces between list elements in target. In case of wrongly used decimal separator in the source please ignore message.",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "92424",
+                    "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num2",

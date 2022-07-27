@@ -57,7 +57,8 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         // CSV-files with such names should be placed in testfiles-dir
         $csvA = [
             'num1..num11 except num7 --- de-DE en-US' => 10, // 10 - expected qty of segments to be imported
-            'num7 --- de-DE ru-RU' => 1
+            'num7 --- de-DE ru-RU' => 1,
+            'num12,num13 --- en-GB de-DE' => 2
         ];
 
         // Foreach csv file specified in $numA array
