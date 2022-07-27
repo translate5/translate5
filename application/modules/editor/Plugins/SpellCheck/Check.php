@@ -34,32 +34,123 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_SpellCheck_Check {
 
-    /**
-     * Css class and quality categoáry name for spell errors
-     */
-    const SPELL   = 'spellError';
+    // Css classes
+    const CSS_GROUP_GENERAL     = 'suggestion';
+    const CSS_GROUP_STYLE       = 'suggestion';
+    const CSS_GRAMMAR           = 'grammarError';
+    const CSS_MISPELLING        = 'spellError';
+    const CSS_TYPOGRAPHICAL     = 'grammarError';
 
-    /**
-     * Css class and quality category name for grammar errors
-     */
-    const GRAMMAR = 'grammarError';
+    // General error types
+    const GROUP_GENERAL         = 'group-general';
+    const CHARACTERS            = 'characters';
+    const MISTRANSLATION        = 'mistranslation';
+    const OMISSION              = 'omission';
+    const UNTRANSLATED          = 'untranslated';
+    const ADDITION              = 'addition';
+    const DUPLICATION           = 'duplication';
+    const INCONSISTENCY         = 'inconsistency';
+    const LEGAL                 = 'legal';
+    const FORMATTING            = 'formatting';
+    const INCONSISTENT_ENTITIES = 'inconsistent-entities';
+    const NUMBERS               = 'numbers';
+    const MARKUP                = 'markup';
+    const LENGTH                = 'length';
+    const NON_CONFORMANCE       = 'non-conformance';
+    const UNCATEGORIZED         = 'uncategorized';
+    const OTHER                 = 'other';
 
-    /**
-     * Css class and quality category name for style suggestions
-     */
-    const STYLE   = 'suggestion';
+    // Style error types
+    const GROUP_STYLE             = 'group-style';
+    const REGISTER                = 'register';
+    const LOCALE_SPECIFIC_CONTENT = 'locale-specific-content';
+    const LOCALE_VIOLATION        = 'locale-violation';
+    const GENERAL_STYLE           = 'style';
+    const PATTERN_PROBLEM         = 'pattern-problem';
+    const WHITESPACE              = 'whitespace';
+    const TERMINOLOGY             = 'terminology';
+    const INTERNATIONALIZATION    = 'internationalization';
+
+    // Remaining error types
+    const GRAMMAR         = 'grammar';
+    const MISPELLING      = 'mispelling';
+    const TYPOGRAPHICAL   = 'typographical';
 
     /**
      * Mappings for issueType-values provided by LanguageTool API response
      *
      * @var array
      */
+    public static $css = [
+
+        // General
+        self::CHARACTERS            => self::CSS_GROUP_GENERAL,
+        self::MISTRANSLATION        => self::CSS_GROUP_GENERAL,
+        self::OMISSION              => self::CSS_GROUP_GENERAL,
+        self::UNTRANSLATED          => self::CSS_GROUP_GENERAL,
+        self::ADDITION              => self::CSS_GROUP_GENERAL,
+        self::DUPLICATION           => self::CSS_GROUP_GENERAL,
+        self::INCONSISTENCY         => self::CSS_GROUP_GENERAL,
+        self::LEGAL                 => self::CSS_GROUP_GENERAL,
+        self::FORMATTING            => self::CSS_GROUP_GENERAL,
+        self::INCONSISTENT_ENTITIES => self::CSS_GROUP_GENERAL,
+        self::NUMBERS               => self::CSS_GROUP_GENERAL,
+        self::MARKUP                => self::CSS_GROUP_GENERAL,
+        self::LENGTH                => self::CSS_GROUP_GENERAL,
+        self::NON_CONFORMANCE       => self::CSS_GROUP_GENERAL,
+        self::UNCATEGORIZED         => self::CSS_GROUP_GENERAL,
+        self::OTHER                 => self::CSS_GROUP_GENERAL,
+
+        // Style
+        self::REGISTER                => self::CSS_GROUP_STYLE,
+        self::LOCALE_SPECIFIC_CONTENT => self::CSS_GROUP_STYLE,
+        self::LOCALE_VIOLATION        => self::CSS_GROUP_STYLE,
+        self::GENERAL_STYLE           => self::CSS_GROUP_STYLE,
+        self::PATTERN_PROBLEM         => self::CSS_GROUP_STYLE,
+        self::WHITESPACE              => self::CSS_GROUP_STYLE,
+        self::TERMINOLOGY             => self::CSS_GROUP_STYLE,
+        self::INTERNATIONALIZATION    => self::CSS_GROUP_STYLE,
+
+        // Remaining
+        self::GRAMMAR       => self::CSS_GRAMMAR,
+        self::MISPELLING    => self::CSS_MISPELLING,
+        self::TYPOGRAPHICAL => self::CSS_TYPOGRAPHICAL,
+    ];
+
     public static $map = [
-        'misspelling'   => self::SPELL,
-        'register'      => self::STYLE,
-        'typographical' => self::GRAMMAR,
-        'uncategorized' => self::GRAMMAR,
-        'whitespace'    => self::GRAMMAR
+
+        // General error types
+        'characters'            => SELF::CHARACTERS,
+        'mistranslation'        => SELF::MISTRANSLATION,
+        'omission'              => SELF::OMISSION,
+        'untranslated'          => SELF::UNTRANSLATED,
+        'addition'              => SELF::ADDITION,
+        'duplication'           => SELF::DUPLICATION,
+        'inconsistency'         => SELF::INCONSISTENCY,
+        'legal'                 => SELF::LEGAL,
+        'formatting'            => SELF::FORMATTING,
+        'inconsistent-entities' => SELF::INCONSISTENT_ENTITIES,
+        'numbers'               => SELF::NUMBERS,
+        'markup'                => SELF::MARKUP,
+        'length'                => SELF::LENGTH,
+        'non-conformance'       => SELF::NON_CONFORMANCE,
+        'uncategorized'         => SELF::UNCATEGORIZED,
+        'other'                 => SELF::OTHER,
+
+        // Style error types
+        'register'                => SELF::REGISTER,
+        'locale-specific-content' => SELF::LOCALE_SPECIFIC_CONTENT,
+        'locale-violation'        => SELF::LOCALE_VIOLATION,
+        'style'                   => SELF::GENERAL_STYLE,
+        'pattern-problem'         => SELF::PATTERN_PROBLEM,
+        'whitespace'              => SELF::WHITESPACE,
+        'terminology'             => SELF::TERMINOLOGY,
+        'internationalization'    => SELF::INTERNATIONALIZATION,
+
+        // Remaining error types
+        'grammar'                 => SELF::GRAMMAR,
+        'mispelling'              => SELF::MISPELLING,
+        'typographical'           => SELF::TYPOGRAPHICAL,
     ];
 
     /**
