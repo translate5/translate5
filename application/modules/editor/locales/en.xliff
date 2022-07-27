@@ -4663,6 +4663,10 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Mindestens ein Kunde muss ausgewählt sein</source>
   <target>At least one customer must be selected</target>
 </trans-unit>
+<trans-unit id='WnVyw7xjayB6dW0gRVJQ'>
+  <source>Zurück zum ERP</source>
+  <target>Back to ERP</target>
+</trans-unit>
 <trans-unit id='WmlwLVVwbG9hZCBpc3QgbnVyIGFscyBBcmJlaXRzZGF0ZWkgbcO2Z2xpY2g='>
   <source>Zip-Upload ist nur als Arbeitsdatei möglich</source>
   <target>Zip upload is only possible as a working file</target>

@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Applet;
 
 use JetBrains\PhpStorm\NoReturn;
+use Zend_Registry;
 
 /**
  * Applet dispatcher for translate5 applets (termportal, instanttranslate, etc)
@@ -51,16 +52,6 @@ class Dispatcher {
             return self::$instance = new self();
         }
         return self::$instance;
-    }
-
-    protected function __construct() {
-
-        // add the default applet editor, if this will change move the register into editor bootstrap
-        $this->registerApplet('editor', new class extends AppletAbstract {
-            protected int $weight = 100; //editor should have the heighest weight
-            protected string $urlPathPart = '/editor/';
-            protected string $initialPage = 'editor';
-        });
     }
 
     public function registerApplet(string $name, AppletAbstract $applet) {
@@ -91,8 +82,8 @@ class Dispatcher {
             return $appletB->getWeight() - $appletA->getWeight();
         });
 
-        //defaulting to editor applet if nothing given as target
-        $this->call($target ?? 'editor', false);
+        //defaulting to the current registered module if nothing given as target
+        $this->call($target ?? Zend_Registry::get('module'), false);
 
         //if we are still here (so not redirected away by above call),
         // we try to load the last used app
