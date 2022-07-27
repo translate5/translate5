@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 1,
-    "qtotal": 1,
+    "qcount": 2,
+    "qtotal": 2,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -508,7 +508,7 @@
         {
             "qid": -1,
             "qtype": "numbers",
-            "qcount": 1,
+            "qcount": 2,
             "qcomplete": true,
             "children": [
                 {
@@ -545,22 +545,24 @@
                     "checked": false
                 },
                 {
-                    "qid": -1,
+                    "qid": "42506",
                     "qtype": "numbers",
-                    "qcount": 0,
+                    "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num12",
+                    "qcatidx": "-1",
                     "text": "1000-separator not allowed",
                     "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": -1,
+                    "qid": "42507",
                     "qtype": "numbers",
-                    "qcount": 0,
+                    "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num13",
+                    "qcatidx": "-1",
                     "text": "Dubious number from source unchanged in target",
                     "textTooltip": "If this is not a decimal number but a list with missing spaces between list elements, please insert spaces between list elements in target. In case of wrongly used decimal separator in the source please ignore message.",
                     "leaf": true,
@@ -622,13 +624,13 @@
                     "checked": false
                 },
                 {
-                    "qid": "92437",
+                    "qid": -1,
                     "qtype": "numbers",
-                    "qcount": 1,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num7",
-                    "qcatidx": "-1",
                     "text": "Separator from source altered",
+                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -658,7 +660,7 @@
             "qcategory": null,
             "qtooltip": "",
             "text": "Numbers",
-            "qtotal": 1,
+            "qtotal": 2,
             "expanded": true,
             "checked": false
         },
