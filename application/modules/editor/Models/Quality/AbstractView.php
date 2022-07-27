@@ -324,7 +324,7 @@ abstract class editor_Models_Quality_AbstractView {
                                 ? $this->rowsByType[$rubric->qtype][$category]
                                 : $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $category, $this->task), $rubric->qtype, $category);
 
-                            $row->textTooltip = $qualityProvider->translateCategoryTooltip($this->translate, $category, $this->task);
+                            $row->qtooltip = $qualityProvider->translateCategoryTooltip($this->translate, $category, $this->task);
                             $rubric->children[] = $row;
                         }
                     }
