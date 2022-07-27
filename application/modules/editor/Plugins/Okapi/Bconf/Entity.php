@@ -290,9 +290,8 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $sysBconfRow = $this->db->fetchRow($this->db->select()->where('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME));
         // when the system default bconf does not exist we have to generate it
         if($sysBconfRow == NULL){
-
             $sysBconfPath = editor_Plugins_Okapi_Init::getDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
-            $sysBconfName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME . '.' .  static::EXTENSION;
+            $sysBconfName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
             $sysBconfDescription = 'The default .bconf used for file imports unless another one is configured';
             $sysBconf = new editor_Plugins_Okapi_Bconf_Entity();
             $sysBconf->import($sysBconfPath, $sysBconfName, $sysBconfDescription, NULL);

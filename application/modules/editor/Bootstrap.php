@@ -33,6 +33,8 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+use MittagQI\Translate5\Applet\AppletAbstract;
+
 /**
  * Klasse zur Portalinitialisierung
  *
@@ -89,7 +91,16 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
     }
     
-    
+    public static function initModuleSpecific(){
+
+        // add the default applet editor, if this will change move the register into editor bootstrap
+        \MittagQI\Translate5\Applet\Dispatcher::getInstance()->registerApplet('editor', new class extends AppletAbstract {
+            protected int $weight = 100; //editor should have the heighest weight
+            protected string $urlPathPart = '/editor/';
+            protected string $initialPage = 'editor';
+        });
+    }
+
     public function _initController()
     {
         $this->front = Zend_Controller_Front::getInstance();

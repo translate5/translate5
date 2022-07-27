@@ -91,7 +91,6 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
             this.bconfPanel = panel.insert(2, {
                 xtype: 'okapiBconfGrid',
-                id: 'okapiBconfGrid',
                 routePrefix: 'preferences/',
                 store: {
                     type: 'chained',
@@ -132,7 +131,6 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             // add the bconf grid to the tabPanel and bind it to the customer
             tabPanel.insert(2, {
                 xtype: 'okapiBconfGrid',
-                id: 'bconfCustomerGrid',
                 routePrefix: 'client/:clientId/',
                 bind: {
                     customer: '{list.selection}', // list is reference name of customerGrid

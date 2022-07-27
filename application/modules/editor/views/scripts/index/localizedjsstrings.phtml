@@ -1423,7 +1423,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.HeadPanel",
         strings: {
             logout: '<?php echo $this->translate->_('Abmelden');?>',
-            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
+            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>',
+            erpModuleButtonText: '<?php echo $this->translate->_('Zurück zum ERP');?>'
         }
     });
 
@@ -2067,6 +2068,9 @@ Editor.data.l10n = {
     },
     projectGrid:{
         taskDestroy: '<?php echo $this->translate->_('Projekt "{0}" wird gelöscht...');?>'
+    },
+    synonymSearch: {
+        searchSourceInfoText: '<?php echo $this->translate->_('Sucht in der Ausgangssprache');?>'
     }
 
 };
