@@ -1942,13 +1942,28 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     public function getConfig()
     {
         if (!isset($this->config)) {
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($this->getTaskGuid());
-            $this->setConfig($task->getConfig());
+            $this->setConfig($this->getTask()->getConfig());
         }
         return $this->config;
     }
+
+    /**
+     * Get task
+     *
+     * @return editor_Models_Task
+     */
+    public function getTask() {
+
+        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+
+        // Load task
+        $task->loadByTaskGuid($this->getTaskGuid());
+
+        // Return task
+        return $task;
+    }
+
     /**
      * Retrieves the Field-tags for a certain field
      * Keep in mind that the saveTo & termTaggerName fields will be set simply with the field name

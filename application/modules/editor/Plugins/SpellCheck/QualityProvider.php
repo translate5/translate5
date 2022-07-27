@@ -200,21 +200,10 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch ($category) {
             case editor_Plugins_SpellCheck_Check::CHARACTERS              : return $translate->_('The text contains characters that are garbled or incorrect or that are not used in the language in which the content appears.');
-            case editor_Plugins_SpellCheck_Check::MISTRANSLATION          : return $translate->_('The content of the target mistranslates the content of the source.');
-            case editor_Plugins_SpellCheck_Check::OMISSION                : return $translate->_('Necessary text has been omitted from the localization or source.');
-            case editor_Plugins_SpellCheck_Check::UNTRANSLATED            : return $translate->_('Content that has been intended for translation is left untranslated.');
-            case editor_Plugins_SpellCheck_Check::ADDITION                : return $translate->_('The translated text contains inappropriate additions.');
             case editor_Plugins_SpellCheck_Check::DUPLICATION             : return $translate->_('Content has been duplicated improperly.');
             case editor_Plugins_SpellCheck_Check::INCONSISTENCY           : return $translate->_('The text is inconsistent with itself or is translated inconsistently (NB: not for use with terminology inconsistency).');
             case editor_Plugins_SpellCheck_Check::LEGAL                   : return $translate->_('The text is legally problematic (e.g., it is specific to the wrong legal system).');
-            case editor_Plugins_SpellCheck_Check::FORMATTING              : return $translate->_('The text is formatted incorrectly.');
-            case editor_Plugins_SpellCheck_Check::INCONSISTENT_ENTITIES   : return $translate->_('The source and target text contain different named entities (dates, times, place names, individual names, etc.)');
-            case editor_Plugins_SpellCheck_Check::NUMBERS                 : return $translate->_('Numbers are inconsistent between source and target.');
-            case editor_Plugins_SpellCheck_Check::MARKUP                  : return $translate->_('There is an issue related to markup or a mismatch in markup between source and target.');
-            case editor_Plugins_SpellCheck_Check::LENGTH                  : return $translate->_('There is a significant difference in source and target length.');
-            case editor_Plugins_SpellCheck_Check::NON_CONFORMANCE         : return $translate->_('The content is deemed to show poor statistical conformance to a reference corpus. Higher severity values reflect poorer conformance.');
             case editor_Plugins_SpellCheck_Check::UNCATEGORIZED           : return $translate->_('The issue either has not been categorized or cannot be categorized.');
-            case editor_Plugins_SpellCheck_Check::OTHER                   : return $translate->_('Any issue that cannot be assigned to any values listed above.');
 
             case editor_Plugins_SpellCheck_Check::REGISTER                : return $translate->_('The text is written in the wrong linguistic register of uses slang or other language variants inappropriate to the text.');
             case editor_Plugins_SpellCheck_Check::LOCALE_SPECIFIC_CONTENT : return $translate->_('The localization contains content that does not apply to the locale for which it was prepared.');
@@ -226,7 +215,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             case editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION    : return $translate->_('There is an issue related to the internationalization of content.');
 
             case editor_Plugins_SpellCheck_Check::GRAMMAR                 : return $translate->_('The text contains a grammatical error (including errors of syntax and morphology).');
-            case editor_Plugins_SpellCheck_Check::MISPELLING              : return $translate->_('The text contains a misspelling.');
+            case editor_Plugins_SpellCheck_Check::MISSPELLING             : return $translate->_('The text contains a misspelling.');
             case editor_Plugins_SpellCheck_Check::TYPOGRAPHICAL           : return $translate->_('The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.');
         }
         return NULL;
@@ -244,21 +233,10 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         switch ($category) {
             case editor_Plugins_SpellCheck_Check::GROUP_GENERAL           : return $translate->_('General');
             case editor_Plugins_SpellCheck_Check::CHARACTERS              : return $translate->_('Characters');
-            case editor_Plugins_SpellCheck_Check::MISTRANSLATION          : return $translate->_('Mistranslation');
-            case editor_Plugins_SpellCheck_Check::OMISSION                : return $translate->_('Omission');
-            case editor_Plugins_SpellCheck_Check::UNTRANSLATED            : return $translate->_('Untranslated');
-            case editor_Plugins_SpellCheck_Check::ADDITION                : return $translate->_('Addition');
             case editor_Plugins_SpellCheck_Check::DUPLICATION             : return $translate->_('Duplication');
             case editor_Plugins_SpellCheck_Check::INCONSISTENCY           : return $translate->_('Inconsistency');
             case editor_Plugins_SpellCheck_Check::LEGAL                   : return $translate->_('Legal');
-            case editor_Plugins_SpellCheck_Check::FORMATTING              : return $translate->_('Formatting');
-            case editor_Plugins_SpellCheck_Check::INCONSISTENT_ENTITIES   : return $translate->_('Inconsistent entities');
-            case editor_Plugins_SpellCheck_Check::NUMBERS                 : return $translate->_('Numbers');
-            case editor_Plugins_SpellCheck_Check::MARKUP                  : return $translate->_('Markup');
-            case editor_Plugins_SpellCheck_Check::LENGTH                  : return $translate->_('Length');
-            case editor_Plugins_SpellCheck_Check::NON_CONFORMANCE         : return $translate->_('Non-conformance');
             case editor_Plugins_SpellCheck_Check::UNCATEGORIZED           : return $translate->_('Uncategorized');
-            case editor_Plugins_SpellCheck_Check::OTHER                   : return $translate->_('Other');
 
             case editor_Plugins_SpellCheck_Check::GROUP_STYLE             : return $translate->_('Style');
             case editor_Plugins_SpellCheck_Check::REGISTER                : return $translate->_('Register');
@@ -271,7 +249,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             case editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION    : return $translate->_('Internationalization');
 
             case editor_Plugins_SpellCheck_Check::GRAMMAR                 : return $translate->_('Grammar');
-            case editor_Plugins_SpellCheck_Check::MISPELLING              : return $translate->_('Spelling');
+            case editor_Plugins_SpellCheck_Check::MISSPELLING             : return $translate->_('Spelling');
             case editor_Plugins_SpellCheck_Check::TYPOGRAPHICAL           : return $translate->_('Typographical');
         }
         return NULL;
@@ -286,21 +264,10 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     public function getAllCategories(editor_Models_Task $task) : array {
         return [
             editor_Plugins_SpellCheck_Check::CHARACTERS,
-            editor_Plugins_SpellCheck_Check::MISTRANSLATION,
-            editor_Plugins_SpellCheck_Check::OMISSION,
-            editor_Plugins_SpellCheck_Check::UNTRANSLATED,
-            editor_Plugins_SpellCheck_Check::ADDITION,
             editor_Plugins_SpellCheck_Check::DUPLICATION,
             editor_Plugins_SpellCheck_Check::INCONSISTENCY,
             editor_Plugins_SpellCheck_Check::LEGAL,
-            editor_Plugins_SpellCheck_Check::FORMATTING,
-            editor_Plugins_SpellCheck_Check::INCONSISTENT_ENTITIES,
-            editor_Plugins_SpellCheck_Check::NUMBERS,
-            editor_Plugins_SpellCheck_Check::MARKUP,
-            editor_Plugins_SpellCheck_Check::LENGTH,
-            editor_Plugins_SpellCheck_Check::NON_CONFORMANCE,
             editor_Plugins_SpellCheck_Check::UNCATEGORIZED,
-            editor_Plugins_SpellCheck_Check::OTHER,
 
             editor_Plugins_SpellCheck_Check::REGISTER,
             editor_Plugins_SpellCheck_Check::LOCALE_SPECIFIC_CONTENT,
@@ -312,7 +279,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION,
 
             editor_Plugins_SpellCheck_Check::GRAMMAR,
-            editor_Plugins_SpellCheck_Check::MISPELLING,
+            editor_Plugins_SpellCheck_Check::MISSPELLING,
             editor_Plugins_SpellCheck_Check::TYPOGRAPHICAL,
         ];
     }

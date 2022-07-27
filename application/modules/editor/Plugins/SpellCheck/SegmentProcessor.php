@@ -92,8 +92,6 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
 
                 // Clean existing spellcheck-qualities
                 $qualityM->removeBySegmentAndType($segment->getId(), editor_Plugins_SpellCheck_QualityProvider::qualityType());
-                //$qualityM->removeBySegmentAndType($segment->getId(), editor_Plugins_SpellCheck_QualityProvider::getType());
-                //$qualityM->removeBySegmentAndType($segment->getId(), 'spellcheck');
             }
 
             // Foreach target

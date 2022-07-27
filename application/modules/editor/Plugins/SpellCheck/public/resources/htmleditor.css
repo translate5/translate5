@@ -28,9 +28,10 @@ END LICENSE AND COPYRIGHT
 
 @CHARSET "UTF-8";
 
-.spellcheck {cursor: pointer;}
-.spellcheck, .spellcheck .trackchanges {border-bottom: 3px dotted; border-color: red;}
-.spellcheck.grammarError, .spellcheck.grammarError .trackchanges {border-color: #ab8906;} /* dark yellow */
-.spellcheck.suggestion, .spellcheck.suggestion .trackchanges {border-color: #458fe6;}     /* blue */
-.spellcheck.spellError, .spellcheck.spellError .trackchanges {border-color: #e645a8;}     /* red-violet */
-.spellcheck {z-index: 1; position: relative;}
+.spellcheck {cursor: pointer; z-index: 1; position: relative;}
+.spellcheck,               .spellcheck               .trackchanges {border-bottom: 3px dotted; border-color: red;}
+.spellcheck.general,       .spellcheck.general       .trackchanges {border-color: #808080;}     /* gray */
+.spellcheck.style,         .spellcheck.style         .trackchanges {border-color: #458fe6;}     /* blue */
+.spellcheck.grammar,       .spellcheck.grammar       .trackchanges {border-color: #ab8906;}     /* dark yellow */
+.spellcheck.misspelling,   .spellcheck.misspelling   .trackchanges {border-color: #e645a8;}     /* red-violet */
+.spellcheck.typographical, .spellcheck.typographical .trackchanges {border-color: #4d004d;}     /* dark-purple */

@@ -35,30 +35,19 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_SpellCheck_Check {
 
     // Css classes
-    const CSS_GROUP_GENERAL     = 'suggestion';
-    const CSS_GROUP_STYLE       = 'suggestion';
-    const CSS_GRAMMAR           = 'grammarError';
-    const CSS_MISPELLING        = 'spellError';
-    const CSS_TYPOGRAPHICAL     = 'grammarError';
+    const CSS_GROUP_GENERAL     = 'general';
+    const CSS_GROUP_STYLE       = 'style';
+    const CSS_GRAMMAR           = 'grammar';
+    const CSS_MISSPELLING       = 'misspelling';
+    const CSS_TYPOGRAPHICAL     = 'typographical';
 
     // General error types
     const GROUP_GENERAL         = 'group-general';
     const CHARACTERS            = 'characters';
-    const MISTRANSLATION        = 'mistranslation';
-    const OMISSION              = 'omission';
-    const UNTRANSLATED          = 'untranslated';
-    const ADDITION              = 'addition';
     const DUPLICATION           = 'duplication';
     const INCONSISTENCY         = 'inconsistency';
     const LEGAL                 = 'legal';
-    const FORMATTING            = 'formatting';
-    const INCONSISTENT_ENTITIES = 'inconsistent-entities';
-    const NUMBERS               = 'numbers';
-    const MARKUP                = 'markup';
-    const LENGTH                = 'length';
-    const NON_CONFORMANCE       = 'non-conformance';
     const UNCATEGORIZED         = 'uncategorized';
-    const OTHER                 = 'other';
 
     // Style error types
     const GROUP_STYLE             = 'group-style';
@@ -73,7 +62,7 @@ class editor_Plugins_SpellCheck_Check {
 
     // Remaining error types
     const GRAMMAR         = 'grammar';
-    const MISPELLING      = 'mispelling';
+    const MISSPELLING     = 'misspelling';
     const TYPOGRAPHICAL   = 'typographical';
 
     /**
@@ -85,21 +74,10 @@ class editor_Plugins_SpellCheck_Check {
 
         // General
         self::CHARACTERS            => self::CSS_GROUP_GENERAL,
-        self::MISTRANSLATION        => self::CSS_GROUP_GENERAL,
-        self::OMISSION              => self::CSS_GROUP_GENERAL,
-        self::UNTRANSLATED          => self::CSS_GROUP_GENERAL,
-        self::ADDITION              => self::CSS_GROUP_GENERAL,
         self::DUPLICATION           => self::CSS_GROUP_GENERAL,
         self::INCONSISTENCY         => self::CSS_GROUP_GENERAL,
         self::LEGAL                 => self::CSS_GROUP_GENERAL,
-        self::FORMATTING            => self::CSS_GROUP_GENERAL,
-        self::INCONSISTENT_ENTITIES => self::CSS_GROUP_GENERAL,
-        self::NUMBERS               => self::CSS_GROUP_GENERAL,
-        self::MARKUP                => self::CSS_GROUP_GENERAL,
-        self::LENGTH                => self::CSS_GROUP_GENERAL,
-        self::NON_CONFORMANCE       => self::CSS_GROUP_GENERAL,
         self::UNCATEGORIZED         => self::CSS_GROUP_GENERAL,
-        self::OTHER                 => self::CSS_GROUP_GENERAL,
 
         // Style
         self::REGISTER                => self::CSS_GROUP_STYLE,
@@ -113,7 +91,7 @@ class editor_Plugins_SpellCheck_Check {
 
         // Remaining
         self::GRAMMAR       => self::CSS_GRAMMAR,
-        self::MISPELLING    => self::CSS_MISPELLING,
+        self::MISSPELLING   => self::CSS_MISSPELLING,
         self::TYPOGRAPHICAL => self::CSS_TYPOGRAPHICAL,
     ];
 
@@ -121,21 +99,10 @@ class editor_Plugins_SpellCheck_Check {
 
         // General error types
         'characters'            => SELF::CHARACTERS,
-        'mistranslation'        => SELF::MISTRANSLATION,
-        'omission'              => SELF::OMISSION,
-        'untranslated'          => SELF::UNTRANSLATED,
-        'addition'              => SELF::ADDITION,
         'duplication'           => SELF::DUPLICATION,
         'inconsistency'         => SELF::INCONSISTENCY,
         'legal'                 => SELF::LEGAL,
-        'formatting'            => SELF::FORMATTING,
-        'inconsistent-entities' => SELF::INCONSISTENT_ENTITIES,
-        'numbers'               => SELF::NUMBERS,
-        'markup'                => SELF::MARKUP,
-        'length'                => SELF::LENGTH,
-        'non-conformance'       => SELF::NON_CONFORMANCE,
         'uncategorized'         => SELF::UNCATEGORIZED,
-        'other'                 => SELF::OTHER,
 
         // Style error types
         'register'                => SELF::REGISTER,
@@ -149,7 +116,7 @@ class editor_Plugins_SpellCheck_Check {
 
         // Remaining error types
         'grammar'                 => SELF::GRAMMAR,
-        'mispelling'              => SELF::MISPELLING,
+        'misspelling'             => SELF::MISSPELLING,
         'typographical'           => SELF::TYPOGRAPHICAL,
     ];
 
@@ -190,7 +157,7 @@ class editor_Plugins_SpellCheck_Check {
         // Foreach match given by LanguageTool API response
         foreach ($data->matches as $index => $match) {
 
-            // Get quality category
+            // If match's issueType is known to Translate5
             if ($category = self::$map[$match->rule->issueType] ?? 0) {
 
                 // Convert into special data structure
@@ -203,8 +170,16 @@ class editor_Plugins_SpellCheck_Check {
                     'message'           => $match->message,                                              // String
                     'replacements'      => array_column($match->replacements ?? [], 'value'),            // Array
                     'infoURLs'          => array_column($match->rule->urls   ?? [], 'value'),            // Array
-                    'cssClassErrorType' => $category                                                     // String
+                    'cssClassErrorType' => self::$css[$category]                                         // String
                 ];
+
+            // Else log that detected error is of a kind previously unknown to translate5 app
+            } else {
+                $segment->getTask()->logger('editor.task.autoqa')->error('E1418', 'LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app', [
+                    'lang' => $spellCheckLang,
+                    'text' => $target,
+                    'match' => $match
+                ]);
             }
         }
     }
