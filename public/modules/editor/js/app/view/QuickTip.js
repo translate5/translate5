@@ -96,7 +96,7 @@ Ext.define('Editor.view.QuickTip', {
      */
     getTipText: function (target) {
         if(this.loadedTipText){
-            return loadedTipText;
+            return this.loadedTipText;
         }
         if(this.loader){
             return this.strings.loading;

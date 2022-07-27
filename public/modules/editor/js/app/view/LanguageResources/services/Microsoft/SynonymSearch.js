@@ -55,7 +55,8 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearch', {
         PRON:'#UT#Pronomen',
         VERB:'#UT#Verb',
         OTHER:'#UT#Sonstiges',
-        unknown:'#UT#unbekannt'
+        unknown:'#UT#unbekannt',
+        searchSourceInfoText:'#UT#Sucht in der Ausgangssprache'
     },
     itemId:'synonymSearch',
     border: false,
@@ -128,11 +129,15 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearch', {
                     xtype: 'textfield',
                     itemId:'textSearch',
                     checkChangeBuffer:500,
+                    enableKeyEvents:true,
                     fieldLabel: me.strings.synonymSearch
                 },{
                     xtype: 'button',
                     itemId: 'searchButton',
                     glyph: 'f002@FontAwesome5FreeSolid'
+                },{
+                    xtype: 'displayfield',
+                    value:Editor.data.l10n.synonymSearch.searchSourceInfoText
                 }]
 		    };
 		if (instanceConfig) {

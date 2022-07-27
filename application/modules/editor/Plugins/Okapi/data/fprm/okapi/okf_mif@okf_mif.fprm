@@ -1,0 +1,25 @@
+#v1
+extractBodyPages.b=true
+extractMasterPages.b=true
+extractReferencePages.b=true
+extractHiddenPages.b=true
+extractVariables.b=true
+extractIndexMarkers.b=true
+extractLinks.b=false
+extractPgfNumFormatsInline.b=false
+extractReferenceFormats.b=false
+useCodeFinder.b=true
+codeFinderRules.count.i=11
+codeFinderRules.rule0=^[A-Z]{1}:
+codeFinderRules.rule1=•
+codeFinderRules.rule2=\\t
+codeFinderRules.rule3=<[naArR ]{1}[+]*\>
+codeFinderRules.rule4=<[naArR]{1}=[0-9]+\>
+codeFinderRules.rule5=<\$.*?>
+codeFinderRules.rule6=<Default ¶ Font\>
+codeFinderRules.rule7=<(zenkaku|kanji|full-width|chinese|Indic|Farsi|Hebrew|Abjad|Alif Ba Ta|Thai) [naA]{1}[+]*\>
+codeFinderRules.rule8=<(zenkaku|kanji|full-width|chinese|Indic|Farsi|Hebrew|Abjad|Alif Ba Ta|Thai) [naA]{1}=[0-9]+\>
+codeFinderRules.rule9=<(kanji kazu|daiji|hira iroha|kata iroha|hira gojuon|kata gojuon)[+]*\>
+codeFinderRules.rule10=<(kanji kazu|daiji|hira iroha|kata iroha|hira gojuon|kata gojuon)=[0-9]+\>
+codeFinderRules.sample=H: •\\t<n\><n+\><n=1\><a\><a+\><a=1\><A\><A+\><A=1\><r\><r+\><r=1\><R\><R+\><R=1\><$volnum\><$chapnum\><$sectionnum\><$subsectionnum\>< \><zenkaku a\><zenkaku a+\><zenkaku a=1\><zenkaku A\><zenkaku A+\><zenkaku A=1\><zenkaku n\><zenkaku n+\><zenkaku n=1\><kanji kazu\><kanji kazu+\><kanji kazu=1\><kanji n\><kanji n+\><kanji n=1\><daiji\><daiji+\><daiji=1\><hira iroha\><hira iroha+\><hira iroha=1\><kata iroha\><kata iroha+\><kata iroha=1\><hira gojuon\><hira gojuon+\><hira gojuon=1\><kata gojuon\><kata gojuon+\><kata gojuon=1\><full-width a\><full-width a+\><full-width a=1\><full-width A\><full-width A+\><full-width A=1\><full-width n\><full-width n+\><full-width n=1\><chinese n\><chinese n+\><chinese n=1\><Indic n\><Indic n=1\><Indic n+\><Farsi n\><Farsi n=1\><Farsi n+\><Farsi a\><Farsi a=1\><Farsi a+\><Hebrew n\><Hebrew n=1\><Hebrew n+\><Hebrew a\><Hebrew a=1\><Hebrew a+\><Abjad n\><Abjad n=1\><Abjad n+\><Alif Ba Ta n\><Alif Ba Ta n=1\><Alif Ba Ta n+\><Thai n\><Thai n=1\><Thai n+\><Thai a\><Thai a=1\><Thai a+\> text <$varName\> text <$varName[PgfTag]\> <Default ¶ Font\>
+codeFinderRules.useAllRulesWhenTesting.b=true

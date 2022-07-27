@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><its:rules xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsx="http://www.w3.org/2008/12/its-extensions" xmlns:w="http://schemas.microsoft.com/wix/2006/localization" its:translate="no" version="1.0">
+
+  <its:translateRule selector="/w:WixLocalization" translate="no"/>
+  <its:translateRule itsx:idValue="./@Id" selector="//w:String[@Overridable!='no']" translate="yes"/>
+
+</its:rules>

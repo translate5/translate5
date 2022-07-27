@@ -375,7 +375,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $segment = $this->utilities->tagProtection->protectTags($segment, false);
             
             //now we have to protect thw so protected tags with the internal char based replacers
-            $segment = $this->utilities->whitespace->replacePlaceholderTags($segment, $this->shortTagIdent);
+            $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
             $segment = $this->parseSegmentInsertPlaceholders($segment, $this->regexInternalTags);
         }
         
@@ -386,7 +386,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $segment = $this->utilities->whitespace->protectWhitespace($segment, $this->utilities->whitespace::ENTITY_MODE_KEEP);
         
         // if there are now internal tags added by the whitespace protection we have to protect them locally too
-        $segment = $this->utilities->whitespace->replacePlaceholderTags($segment, $this->shortTagIdent);
+        $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
         $segment = $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);
         
         return $this->parseSegmentReplacePlaceholders($segment);

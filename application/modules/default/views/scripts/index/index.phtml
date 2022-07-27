@@ -33,5 +33,11 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-Zend_Controller_Front::getInstance()->getResponse()->setRedirect(APPLICATION_RUNDIR.'/editor')
+//if we are not redirected, then we try to load the possible applet:
+$redirectTo = \MittagQI\Translate5\Applet\Dispatcher::getInstance()->getDefaultAppletForUser(); //no redirection was given, so dispatch by default
+if(empty($redirectTo)){
+    // the user has no session -> redirect to login
+    $redirectTo = 'login';
+}
+Zend_Controller_Front::getInstance()->getResponse()->setRedirect(APPLICATION_RUNDIR.'/'.$redirectTo);
 ?>

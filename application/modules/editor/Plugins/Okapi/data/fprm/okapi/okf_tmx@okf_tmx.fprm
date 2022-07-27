@@ -1,0 +1,7 @@
+#v1
+escapeGT.b=false
+processAllTargets.b=true
+consolidateDpSkeleton.b=true
+exitOnInvalid.b=false
+segType.i=2
+propValueSep=, 

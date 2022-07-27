@@ -93,7 +93,7 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
         $task->loadByTaskGuid($this->taskGuid);
         
         // do nothing if task is not in state "is Excel exported"
-        if ($task->getState() != editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED) {
+        if ($task->getState() != editor_Models_Task::STATE_EXCELEXPORTED) {
             return false;
         }
         

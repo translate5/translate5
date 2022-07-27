@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><its:rules xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsx="http://www.w3.org/2008/12/its-extensions" xmlns:okp="okapi-framework:xmlfilter-options" version="1.0">
+  
+  <its:translateRule itsx:idValue="concat(                                    ../preceding-sibling::key[position()=1],                                    '_',                                    preceding-sibling::key[position()=1])" selector="/plist/dict/dict/string" translate="yes"/>
+
+  <its:translateRule itsx:idValue="concat(                                    ../../preceding-sibling::key[position()=1],                                    '_',                                    ../preceding-sibling::key[position()=1],                                    '_',                                    preceding-sibling::key[position()=1])" selector="/plist/dict/dict/dict/string" translate="yes"/>
+  
+  <!-- Do not translate strings for keys NSStringFormatSpecTypeKey, NSStringFormatValueTypeKey -->
+  <its:translateRule selector="//dict/dict/key[. = 'NSStringFormatSpecTypeKey' or . = 'NSStringFormatValueTypeKey']/following-sibling::string[position()=1]" translate="no"/>
+  <its:translateRule selector="//key" translate="no"/>
+
+  <okp:codeFinder useCodeFinder="yes">#v1
+count.i=4
+rule0=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn@]
+rule1=(\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v
+rule2=\&lt;(/?)\w+[^&gt;]*?&gt;
+rule3=%\d?\$?#@[^@]+@
+  </okp:codeFinder>
+</its:rules>

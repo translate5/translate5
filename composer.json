@@ -98,9 +98,11 @@
 		"translate5/instanttranslate-roboto-font": "26",
 		"axelbecher/material-design-icons": "^1.0",
 		"wilsonglasser/spout": "^3.0",
+		"setasign/tfpdf": "1.32",
 		"joshtronic/php-loremipsum": "^2.1",
 		"league/flysystem": "^3.0",
-		"league/flysystem-sftp": "^3.0"
+		"league/flysystem-sftp": "^3.0",
+		"symfony/yaml": "^6.0"
     },
 	"extra" : {
 		"merge-plugin" : {

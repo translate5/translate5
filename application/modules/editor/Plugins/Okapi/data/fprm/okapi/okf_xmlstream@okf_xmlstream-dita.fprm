@@ -1,0 +1,149 @@
+assumeWellformed: true
+preserve_whitespace: false
+attributes:
+  xml:lang:
+    ruleTypes: [ATTRIBUTE_WRITABLE]
+  xml:id:
+    ruleTypes: [ATTRIBUTE_ID]
+  id:
+    ruleTypes: [ATTRIBUTE_ID]
+  xml:space:
+    ruleTypes: [ATTRIBUTE_PRESERVE_WHITESPACE]
+    preserve: ['xml:space', EQUALS, preserve]
+    default: ['xml:space', EQUALS, default]
+elements:
+  othermeta:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [content]
+  topicref:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [navtitle]
+  topicgroup:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [navtitle]
+  topichead:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [navtitle]
+  note:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [othertype]
+  lq:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [reftitle]
+  object:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [standby]
+  map:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [title]
+  data:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [label]
+  vrm:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [version]
+  pre:
+    ruleTypes: [PRESERVE_WHITESPACE]
+  lines:
+    ruleTypes: [PRESERVE_WHITESPACE]
+  screen:
+    ruleTypes: [PRESERVE_WHITESPACE]
+  .*:
+    ruleTypes: [EXCLUDE]
+    conditions: [translate, EQUALS, 'no']
+  stylesheet:
+    ruleTypes: [EXCLUDE]
+  coords:
+    ruleTypes: [EXCLUDE]
+  draft-comment:
+    ruleTypes: [EXCLUDE]
+  required-cleanup:
+    ruleTypes: [EXCLUDE]
+  shape:
+    ruleTypes: [EXCLUDE]
+  alt:
+    ruleTypes: [INLINE]
+  apiname:
+    ruleTypes: [INLINE]
+  b:
+    ruleTypes: [INLINE]
+  boolean:
+    ruleTypes: [INLINE]
+  cite:
+    ruleTypes: [INLINE]
+  cmdname:
+    ruleTypes: [INLINE]
+  codeph:
+    ruleTypes: [INLINE]
+  delim:
+    ruleTypes: [INLINE]
+  filepath:
+    ruleTypes: [INLINE]
+  fragref:
+    ruleTypes: [INLINE]
+  i:
+    ruleTypes: [INLINE]
+  image:
+    ruleTypes: [INLINE]
+    translatableAttributes: [alt]
+    conditions: [placement, NOT_EQUALS, break]
+  itemgroup:
+    ruleTypes: [INLINE]
+  keyword:
+    ruleTypes: [INLINE]
+  kwd:
+    ruleTypes: [INLINE]
+  menucascade:
+    ruleTypes: [INLINE]
+  msgnum:
+    ruleTypes: [INLINE]
+  msgph:
+    ruleTypes: [INLINE]
+  oper:
+    ruleTypes: [INLINE]
+  option:
+    ruleTypes: [INLINE]
+  parmname:
+    ruleTypes: [INLINE]
+  ph:
+    ruleTypes: [INLINE]
+  q:
+    ruleTypes: [INLINE]
+  repsep:
+    ruleTypes: [INLINE]
+  sep:
+    ruleTypes: [INLINE]
+  shortcut:
+    ruleTypes: [INLINE]
+  state:
+    ruleTypes: [INLINE]
+  sub:
+    ruleTypes: [INLINE]
+  sup:
+    ruleTypes: [INLINE]
+  synnoteref:
+    ruleTypes: [INLINE]
+  synph:
+    ruleTypes: [INLINE]
+  systemoutput:
+    ruleTypes: [INLINE]
+  term:
+    ruleTypes: [INLINE]
+  tm:
+    ruleTypes: [INLINE]
+  tt:
+    ruleTypes: [INLINE]
+  u:
+    ruleTypes: [INLINE]
+  uicontrol:
+    ruleTypes: [INLINE]
+  userinput:
+    ruleTypes: [INLINE]
+  var:
+    ruleTypes: [INLINE]
+  varname:
+    ruleTypes: [INLINE]
+  wintitle:
+    ruleTypes: [INLINE]
+  xref:
+    ruleTypes: [INLINE]

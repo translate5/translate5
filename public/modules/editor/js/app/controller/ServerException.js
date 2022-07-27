@@ -58,7 +58,7 @@ Ext.define('Editor.controller.ServerException', {
     
     /**
      * Handle unproccessable entities
-     * @param {Ext.form.BasicForm} form
+     * @param {Ext.form.Basic} form
      * @param {Ext.data.Model} record
      * @param {Ext.data.Operation} operation with operation.error = {response.status, response.statusText, response}
      */
@@ -96,6 +96,7 @@ Ext.define('Editor.controller.ServerException', {
     /**
      * Interceptor handler used in proxy exceptions
      * @param {Object} response
+     * @see Ext.data.request.Ajax.createResponse
      * @returns void
      */
     handleException: function(response){

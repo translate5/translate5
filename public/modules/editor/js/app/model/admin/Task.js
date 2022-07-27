@@ -281,18 +281,26 @@ Ext.define('Editor.model.admin.Task', {
     isErroneous: function () {
         return this.get('state') === this.states.ERROR;
     },
-
     /***
      * Is the task state matchanalysis
+     * @returns {boolean}
      */
     isAnalysis: function () {
         return (this.get('state') === 'matchanalysis');
     },
     /***
      * Is the task state autoqa (which also applies for being match analysis since the match analysis incorporates an auto qa
+     * @returns {boolean}
      */
     isAutoqa: function () {
-        return (this.get('state') === 'opautoqa' || this.get('state') === 'matchanalysis');
+        return (this.get('state') === 'autoqa' || this.get('state') === 'matchanalysis');
+    },
+    /**
+     * Is the task in an operation state, a operation is running
+     * @returns {boolean}
+     */
+    isOperation: function () {
+        return (this.get('state') === 'autoqa' || this.get('state') === 'matchanalysis');
     },
 
     /***

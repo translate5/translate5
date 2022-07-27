@@ -851,7 +851,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if (in_array($tagName, $whitespaceTags)) {
             //tagtrait is working with shortTagIdent internally, so we have to feed it here
             $this->shortTagIdent = $data->j++;
-            $tag = $this->utilities->whitespace->replacePlaceholderTags($tag, $this->shortTagIdent);
+            $tag = $this->utilities->whitespace->convertToInternalTags($tag, $this->shortTagIdent);
             return $data;
         }
         $this->verifyTagName($tagName, $data);

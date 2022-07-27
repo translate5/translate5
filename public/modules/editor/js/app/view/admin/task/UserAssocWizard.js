@@ -92,6 +92,7 @@ Ext.define('Editor.view.admin.task.UserAssocWizard', {
         me.setCustomConfig();
     },
 
+
     setCustomConfig:function (){
         var me = this,
             grid = me.down('grid'),

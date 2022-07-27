@@ -268,7 +268,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1145"></a>E1145  | Task Export | Could not create export-zip. |
 | <a id="E1146"></a>E1146  | Task Export | The task export folder does not exist, no export ZIP file can be created. | The user has probably clicked multiple times on the export button while the first export was still running.
 | <a id="E1147"></a>E1147  | Task Export | The task export folder does not exist or is not writeable, no export ZIP file can be created. | See E1146.
-| <a id="E1149"></a>E1149  | Task Export | Export: Some segments contains tag errors. | See error details for affected segments and details.
+| <a id="E1149"></a>E1149  | Task Export | Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"]. | See error details for affected segments and details.
 | <a id="E1157"></a>E1157  | Task Export | Export: the file &quot;{file}&quot; could not be exported, since had possibly already errors on import. | See error details for affected file and details.
 | <a id="E1170"></a>E1170  | Task Metadata Export | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
 
@@ -367,7 +367,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | EventCode        | Context       | EventMessage  | Description/Solution
 | :--------------- |:------------- | :------------ | :-------------------
 | <a id="E1065"></a>E1065  | Segment | The data of the saved segment is not valid. | The data of the saved segment contains invalid data, see error details for more information.
-| <a id="E1066"></a>E1066  | Segment | The data of the saved segment is not valid. | See E1065, in addition that the validations contain at least an error where the segment is either to long or to short. This error is separate since it should produce an warning instead just a debug level entry.
+| <a id="E1066"></a>E1066  | Segment | The data of the saved segment is not valid. The segment content is either to long or to short. | See E1065, in addition that the validations contain at least an error where the segment is either to long or to short. This error is separate since it should produce an warning instead just a debug level entry.
 | <a id="E1259"></a>E1259  | Segment | The data of the saved segment is not valid. | See E1065, in addition that the validations contain at least an error where the lines in the segment are either too many or (at least one of them is) too long. This error is separate since it should produce an warning instead just a debug level entry.
 | <a id="E1155"></a>E1155  | Segment | Unable to save the segment. The segment model tried to save to the materialized view directly. | Programming error: The writeable table of the segment is set to the materialized view. This is wrong, since the way is: write to the LEK_segments table, write to the data table, then update the view with the data from there.
 | <a id="E1081"></a>E1081  | Segment Pixellength | Textlength by pixel failed; most probably data about the pixelWidth is missing: fontFamily: &quot;{fontFamily} fontSize: &quot;{fontSize}&quot;. | Same as E1082 below, but no default width is available for that font and font size.
@@ -487,7 +487,16 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1151"></a>E1151  | Plug-In Okapi | Okapi Plug-In: Error in converting file {file} on export. See log details for more information. | An error described in message happend on converting the file.<br />Check the message, since the error could be independent from the given file, for example if some Okapi configuration was wrong, or the Okapi server is not available.<br />A full log of the happened exception is available in the log (level debug).
 | <a id="E1340"></a>E1340  | Plug-In Okapi | Okapi Plug-In: The default bconf configuration file-name is not set. | The value was empty for the config with name:&nbsp;runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName or&nbsp;runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName<br />For more info see error log.
 | <a id="E1387"></a>E1387  | Plug-In Okapi | Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated | This is just a warning hinting to the use of the deprecated feature to provide the BCONF to use in the import ZIP
-| <a id="E1390"></a>E1390  | Plug-In Okapi | Okapi Plug-In: The SRX file is not valid | The uploaded segmentation/SRX file is not valid. Details will be part of the message
+| <a id="E1390"></a>E1390  | Plug-In Okapi | Okapi Plug-In: The uploaded SRX file is not valid ({details}) | The uploaded segmentation/SRX file is not valid. Details will be part of the message
+| <a id="E1404"></a>E1404  | Plug-In Okapi | Okapi Plug-In: The filter/fprm "{filter}" from the imported bconf "{bconf}" is not valid | The provided bconf can not be imported to translate5
+| <a id="E1405"></a>E1405  | Plug-In Okapi | Okapi Plug-In: Invalid extension-mapping found in the bconf "{bconf}" to import | The provided bconf can not be imported to translate5
+| <a id="E1406"></a>E1406  | Plug-In Okapi | Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" | The provided bconf can not be imported to translate5
+| <a id="E1407"></a>E1407  | Plug-In Okapi | Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed | Warning, that the invalid filter in the provided bconf was removed
+| <a id="E1408"></a>E1408  | Plug-In Okapi | Okapi Plug-In: The bconf "{bconf}" to import is not valid ({details}) | The provided bconf can not be imported to translate5
+| <a id="E1409"></a>E1409  | Plug-In Okapi | Okapi Plug-In: The edited filter file "{filterfile}" is not valid ({details}) | Please contact translate5 support to resolve this issue
+| <a id="E1414"></a>E1414  | Plug-In Okapi | Okapi Plug-In: The fprm file "{file}" is not valid ({details}) | An embedded fprm/filter file from an imported or uploaded bconf is not valid
+| <a id="E1415"></a>E1415  | Plug-In Okapi | Okapi Plug-In: Error unpacking the bconf {bconf} ({details}) | A bconf could not be unpacked on import
+| <a id="E1416"></a>E1416  | Plug-In Okapi | Okapi Plug-In: Error packing the bconf {bconf} ({details}) | A bconf could not be packed
 
 
 #### Plug-In PangeaMt

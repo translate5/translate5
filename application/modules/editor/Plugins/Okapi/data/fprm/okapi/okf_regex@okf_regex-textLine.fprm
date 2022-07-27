@@ -1,0 +1,27 @@
+#v1
+regexOptions.i=8
+startString="
+endString="
+extractOuterStrings.b=false
+useBSlashEscape.b=true
+useDoubleCharEscape.b=false
+mimeType=text/plain
+oneLevelGroups.b=false
+useLD.b=true
+localizeOutside.b=true
+ruleCount.i=1
+rule0.ruleName=Para
+rule0.ruleType.i=1
+rule0.expr=(^(?=.+))(.*?)$
+rule0.groupSource.i=2
+rule0.groupTarget.i=-1
+rule0.groupName.i=-1
+rule0.groupNote.i=-1
+rule0.preserveWS.b=true
+rule0.useCodeFinder.b=false
+rule0.sample=Text 1$0a$Text 2$0a$$0a$Text 3$0a$Text 4
+rule0.codeFinderRules.count.i=0
+rule0.codeFinderRules.sample=
+rule0.codeFinderRules.useAllRulesWhenTesting.b=false
+useLd.b=true
+metaRuleCount.i=0

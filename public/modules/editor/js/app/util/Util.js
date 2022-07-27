@@ -38,22 +38,22 @@ Ext.define('Editor.util.Util', {
         '16': 'debug',
         '32': 'trace'
     },
-    statics:{
+    statics: {
 
         /***
-        *
-        * @param {Date} date The date to modify
-        * @param {Number} days The amount to add to the current date. If decimal provided, it will be converted to hours
-        * @return {Date} The new Date instance.
-        */
-        addBusinessDays:function(date,days){
+         *
+         * @param {Date} date The date to modify
+         * @param {Number} days The amount to add to the current date. If decimal provided, it will be converted to hours
+         * @return {Date} The new Date instance.
+         */
+        addBusinessDays: function(date, days){
             // if it is float number, calculate the hours from the floating point number.
             var hours = days - parseInt(days);
             if(hours > 0){
                 hours = 24 * hours;
                 date = Ext.Date.add(date, Ext.Date.HOUR, hours);
             }
-            for(var i=1;i<=days;){
+            for(var i = 1; i <= days;){
                 date = Ext.Date.add(date, Ext.Date.DAY, 1);
                 if(!Ext.Date.isWeekend(date)){
                     i++;
@@ -76,7 +76,7 @@ Ext.define('Editor.util.Util', {
             if(dataProps && Array.isArray(dataProps)){
                 dataProps.forEach(function(prop){
                     if(prop.name && prop.value){
-                        selector += ("[data-" + prop.name + "='" + prop.value + "']");
+                        selector += ('[data-' + prop.name + '=\'' + prop.value + '\']');
                     }
                 });
             }
@@ -88,7 +88,7 @@ Ext.define('Editor.util.Util', {
          * @param {String} val
          * @returns {String}
          */
-        gridColumnLanguageRenderer: function(val, md) {
+        gridColumnLanguageRenderer: function(val, md){
             var lang = Ext.StoreMgr.get('admin.Languages').getById(val),
                 label;
             if(lang){
@@ -205,7 +205,7 @@ Ext.define('Editor.util.Util', {
             if(!level){
                 level = this.prototype.get('level');
             }
-            if(this.prototype.errorLevel[level]) {
+            if(this.prototype.errorLevel[level]){
                 return this.prototype.errorLevel[level];
             }
             return '';
@@ -264,21 +264,21 @@ Ext.define('Editor.util.Util', {
                         let contentType = (response.headers.get('Content-Type') || '').split('/').pop();
                         switch(contentType){
                             case 'json':
-                                response.responseJson = contentLength ? await response.json() : {}
+                                response.responseJson = contentLength ? await response.json() : {};
                                 if(response.status !== 200){
-                                    response.responseText = JSON.stringify(response.responseJson)
+                                    response.responseText = JSON.stringify(response.responseJson);
                                 }
                                 break;
                             case 'xml':
-                                response.responseText = contentLength ? await response.text() : ''
+                                response.responseText = contentLength ? await response.text() : '';
                                 response.responseXML = new window.DOMParser().parseFromString(response.responseText, 'text/xml');
                                 if(response.status !== 200){
-                                    delete response.responseText // QUIRK: match ServerException.handleFailedRequest
+                                    delete response.responseText; // QUIRK: match ServerException.handleFailedRequest
                                 }
                                 break;
                             case 'text':
                             default:
-                                response.responseText = contentLength ? await response.text() : ''
+                                response.responseText = contentLength ? await response.text() : '';
                         }
                     }
                     options.url = url;
@@ -288,7 +288,7 @@ Ext.define('Editor.util.Util', {
 
                 var headers = options.headers || (options.headers = new Headers());
                 if(!headers.has('Accept')){
-                    headers.append('Accept', 'application/json')
+                    headers.append('Accept', 'application/json');
                 }
                 if(options.formData){
                     var body = options.body = new FormData();
@@ -300,7 +300,7 @@ Ext.define('Editor.util.Util', {
             });
         },
 
-        // @see https://stackoverflow.com/a/3561711
+        /** @see https://stackoverflow.com/a/3561711 */
         escapeRegex: function(string){
             return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         },
@@ -315,6 +315,60 @@ Ext.define('Editor.util.Util', {
             return base.length > 0 ? base[0] : '';
         },
 
+        /**
+         * Checks changed properties from an edited object to an original object
+         * Supports primitives and objects with/iterables of primitive property values
+         * Does not suppert complex iterables or objects as values
+         * By default, the order of array does not matter
+         * @param {Object} before
+         * @param {Object} after
+         * @param {Array} keys
+         * @param {boolean} orderIsIrrelevant
+         * @returns {boolean}
+         */
+        objectWasChanged: function(before, after, keys, orderIsIrrelevant=true){
+            // if not given we use all object keys.
+            if(!Array.isArray(keys)){
+                keys = before.keys();
+                var afterKeys = before.keys();
+                // when the keys are differnt, there was something changed obviously ...
+                if(keys.sort().join('|') !== afterKeys.sort().join('|')){
+                    return true;
+                }
+            }
+            var bval, aval;
+            keys.forEach(key => {
+                bval = before.hasOwnProperty(key) ? before[key] : undefined;
+                aval = after.hasOwnProperty(key) ? after[key] : undefined;
+                if(Array.isArray(aval) && Array.isArray(bval) && !this.arraysAreEqual(aval, bval, orderIsIrrelevant)){
+                    return false;
+                } else if(aval !== bval){
+                    return false;
+                }
+            });
+            return false;
+        },
+        /**
+         * Checks if to arrays are equal. By default, the order of items is irrelevant
+         * @param {Array} a
+         * @param {Array} b
+         * @param {boolean} orderIsIrrelevant
+         * @returns {boolean}
+         */
+        arraysAreEqual: function(a, b, orderIsIrrelevant=true) {
+            if(a === b) { return true; }
+            if(!a || !b) { return false; }
+            if(a.length !== b.length) { return false; }
+            for (var i=0; i < a.length; i++) {
+                if((orderIsIrrelevant && b.indexOf(a[i]) === -1) || (!orderIsIrrelevant && a[i] !== b[i])){
+                    return false;
+                }
+            }
+            return true;
+        },
+        isIterable: function(value, includeString = false){
+            return typeof value[Symbol.iterator] === 'function' && (typeof value !== 'string' || includeString);
+        },
         /***
          * Check if the given language id/string is empty.
          * 0 / "0" is treated as empty
@@ -333,6 +387,47 @@ Ext.define('Editor.util.Util', {
                 default:
                     return false;
             }
+        },
+
+        trimLastSlash: function(str){
+            return str.substring(0, str.lastIndexOf('/'));
+        },
+        parentRoute: async function(route){
+            route = route || Ext.util.History.getToken();
+            var parentRoute = Editor.util.Util.trimLastSlash(route);
+            Editor.app.redirectTo(parentRoute);
+        },
+        awaitStore: async function(store){
+            return store.isLoaded() || await new Promise(function(resolve){
+                store.on('load', function(){
+                        resolve();
+                }, this, { single: true });
+            });
+        },
+        awaitSelection: async function(grid, recId){
+            return (!recId || grid.selection?.id === recId) && grid.selection || await new Promise(function(resolve){
+                grid.on('selectionchange', function(){
+                    resolve(grid.selection);
+                }, this, { single: true });
+            });
+        },
+        closeWindows: function(){
+            var win;
+            while(win = Ext.WindowManager.getActive()) {
+                win.close && win.close() || win.hide && win.hide();
+            }
+        },
+        /** @link https://stackoverflow.com/a/69200017 */
+        getXmlError: function(xmlStr){
+            const parser = new DOMParser();
+            const dom = parser.parseFromString(xmlStr, 'application/xml');
+            const error = dom.querySelector('parsererror');
+            return !error || error.innerHTML || error.textContent;
+        },
+        /** @link https://stackoverflow.com/questions/1026069 */
+        ucfirst: function(s){
+            return s.charAt(0).toUpperCase() + s.slice(1);
         }
+
     }
 });

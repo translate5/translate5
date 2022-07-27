@@ -131,18 +131,20 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
             $this->handleIntegrityConstraintException($e);
         }
     }
-    
+
     /***
      * Copy all task specific config from $odlTaskGuid to $newTaskGuid
-     * @param string $sourceTaskGuid
-     * @param string $targetTaskGuid
+     * @param string $oldTaskGuid
+     * @param string $newTaskGuid
      */
-    public function cloneTaskConfig(string $odlTaskGuid, string $newTaskGuid) {
+    public function cloneTaskConfig(string $oldTaskGuid, string $newTaskGuid) {
         $adapter = $this->db->getAdapter();
         $sql = "INSERT INTO LEK_task_config (taskGuid, name, value)
-        SELECT ".$adapter->quote($newTaskGuid).", name, value
-        FROM  LEK_task_config WHERE taskGuid = ".$adapter->quote($odlTaskGuid)."; ";
-        $adapter->query($sql);
+        SELECT ?, old.name, old.value
+        FROM  LEK_task_config old WHERE taskGuid = ?
+        ON DUPLICATE KEY UPDATE value = old.value";
+        //duplicates may occur in combination with a task-config.ini, in that case we take over the value from the DB
+        $adapter->query($sql, [$newTaskGuid, $oldTaskGuid]);
     }
     
     /**
