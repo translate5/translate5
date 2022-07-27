@@ -33,31 +33,11 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-// default redirect to editor
-$redirectTo = 'editor';
-try {
-    $user = editor_User::instance();
-
-    $acl = ZfExtended_Acl::getInstance();
-    /* @var $acl ZfExtended_Acl */
-
-    // get all initial_page acl records for all available user roles
-    $aclModules = $acl->getInitialPageModulesForRoles($user->getRoles());
-
-    $config = Zend_Registry::get('config');
-    $modulesOrder = explode(',',$config->runtimeOptions->modulesOrder);
-
-    // find the module redirect based on the modulesOrder config
-    foreach ($modulesOrder as $module){
-        if(in_array($module,$aclModules)){
-            $redirectTo = $module;
-            break;
-        }
-    }
-}catch (ZfExtended_NotAuthenticatedException $exception){
-    // redirect to login page when no user session is found
+//if we are not redirected, then we try to load the possible applet:
+$redirectTo = \MittagQI\Translate5\Applet\Dispatcher::getInstance()->getDefaultAppletForUser(); //no redirection was given, so dispatch by default
+if(empty($redirectTo)){
+    // the user has no session -> redirect to login
     $redirectTo = 'login';
 }
-
 Zend_Controller_Front::getInstance()->getResponse()->setRedirect(APPLICATION_RUNDIR.'/'.$redirectTo);
 ?>
