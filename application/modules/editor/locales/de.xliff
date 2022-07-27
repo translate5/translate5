@@ -2159,6 +2159,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='Rm9ybWF0w6RuZGVydW5nIChPcmRpbmFsemFobGVuLCBmw7xocmVuZGUgTnVsbCB1LsOkLik='><source>Formatänderung (Ordinalzahlen, führende Null u.ä.)</source><target>Formatänderung (Ordinalzahlen, führende Null u.ä.)</target></trans-unit>
 <trans-unit id='VW50ZXJzY2guIFplaWNoZW4vRm9ybWF0aWVydW5nIGbDvHIgWmFobGVuLUludGVydmFsbA=='><source>Untersch. Zeichen/Formatierung für Zahlen-Intervall</source><target>Untersch. Zeichen/Formatierung für Zahlen-Intervall</target></trans-unit>
 <trans-unit id='MTAwMGVyLVRyZW5uZXIgbmljaHQgZXJsYXVidA=='><source>1000er-Trenner nicht erlaubt</source><target>1000er-Trenner nicht erlaubt</target></trans-unit>
+<trans-unit id='RHViaW9zZSBaYWhsIGF1cyBRdWVsbGUgdW52ZXLDpG5kZXJ0IGluIFppZWw='><source>Dubiose Zahl aus Quelle unverändert in Ziel</source><target>Dubiose Zahl aus Quelle unverändert in Ziel</target></trans-unit>
+<trans-unit id='RmFsbHMgZXMgc2ljaCBkYWJlaSB1bSBrZWluZSBEZXppbWFsemFobCwgc29uZGVybiBlaW5lICBMaXN0ZSBtaXQgZmVobGVuZGVuIExlZXJ6ZWljaGVuIHp3aXNjaGVuIExpc3RlbmVsZW1lbnRlbiBoYW5kZWx0LCBiaXR0ZSBpbSBaaWVsIExlZXJ6ZWljaGVuIHp3aXNjaGVuIExpc3RlbmVsZW1lbnRlbiBlaW5mw7xnZW4uIEJlaSBmYWxzY2ggdmVyd2VuZGV0ZW0gRGV6aW1hbHRyZW5uZXIgaW4gZGVyIFF1ZWxsZSBiaXR0ZSBNZWxkdW5nIGlnbm9yaWVyZW4u'>
+  <source>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</source>
+  <target>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</target>
+</trans-unit>
 
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminologieübersetzungsprojekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Projekt</target></trans-unit>
@@ -2181,6 +2186,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='Vm9yw7xiZXJzZXR6dW5n'><source>Vorübersetzung</source><target>Vorübersetzung</target></trans-unit>
 <trans-unit id='U29sbHRlIGRhcyB6dSBpbXBvcnRpZXJlbmRlIFpJUC1QYWtldCBEYXRlaWVuIGbDvHIgZGllIEJlZsO8bGx1bmcgZGVyIFBpdm90LVNwYWx0ZSBlbnRoYWx0ZW4sIHdlcmRlbiBoaWVyIGdlbWFjaHQgRWluc3RlbGx1bmdlbiBpZ25vcmllcnQu'><source>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</source><target>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</target></trans-unit>
 <trans-unit id='UHJvamVrdCAiezB9IiB3aXJkIGdlbMO2c2NodC4uLg=='><source>Projekt "{0}" wird gelöscht...</source><target>Projekt "{0}" wird gelöscht...</target></trans-unit>
+<trans-unit id='U3VjaHQgaW4gZGVyIEF1c2dhbmdzc3ByYWNoZQ=='><source>Sucht in der Ausgangssprache</source><target>Sucht in der Ausgangssprache</target></trans-unit>
   </body>
  </file>
 </xliff>

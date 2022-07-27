@@ -1,0 +1,9 @@
+{
+    "helpLink": "http://okapiframework.org/wiki/index.php/ICML_Filter",
+    "extractNotes": "Notizen extrahieren",
+    "simplifyCodes": "Inline-HTML vereinfachen wenn möglich",
+    "extractMasterSpreads": "Musterseiten extrahieren",
+    "skipThreshold": "Maximale Musterseiten Größe",
+    "skipThresholdTooltip": "Größere Musterseiten als dieser Wert ignorieren (in Kbytes)",
+    "newTuOnBr": "Neuen Textabschnitt erzeugen bei harten Zeilenumbrüchen<br/>(&lt;br/&gt; elements) [BETA]"
+}

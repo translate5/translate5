@@ -92,6 +92,11 @@ class editor_Segment_Numbers_Check {
     const NUM12 = 'num12';
 
     /**
+     * @var string
+     */
+    const NUM13 = 'num13';
+
+    /**
      * @var array
      */
     private $states = [];

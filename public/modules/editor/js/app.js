@@ -183,6 +183,9 @@ Ext.application({
 
         // the init of the QuickTips has to be done here otherwise it's too late to set the internal tip class
         Ext.tip.QuickTipManager.init(true, {className: 'Editor.view.QuickTip'});
+        // make errors selectable
+        Ext.Msg.addBodyCls(Ext.dom.Element.selectableCls);
+
 
         this.handleMissingSlash();
         this.callParent(arguments);

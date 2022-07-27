@@ -101,7 +101,8 @@
 		"setasign/tfpdf": "1.32",
 		"joshtronic/php-loremipsum": "^2.1",
 		"league/flysystem": "^3.0",
-		"league/flysystem-sftp": "^3.0"
+		"league/flysystem-sftp": "^3.0",
+		"symfony/yaml": "^6.0"
     },
 	"extra" : {
 		"merge-plugin" : {

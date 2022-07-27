@@ -25,63 +25,105 @@
 
  END LICENSE AND COPYRIGHT
  */
-/**
- * @var Zend_View $this
- * @var ZfExtended_Zendoverwrites_Translate $translate
- * */
-$translate = $this->translate;
+
+/* @var $this ZfExtended_View */
+
 ?>
 
-Editor.controller.Localizer.addPluginInit('okapi', function() {
-
-    /** @class okapi_l18n */
-    Ext.define("Editor.locale.plugins.Okapi.view.BconfGrid", {
-        override: "Editor.plugins.Okapi.view.BconfGrid",
-        config: { // configs need direct override
-            title: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
-        },
+Editor.controller.Localizer.addPluginInit('okapi', function(){
+    Ext.define('Editor.locale.plugins.Okapi.view.BconfGrid', {
+        override: 'Editor.plugins.Okapi.view.BconfGrid',
+        title: '<?php echo $this->translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>',
         text_cols: {
-            name: `<?= $translate->_('Name'); ?>`,
-            extensions: `<?= $translate->_('Erweiterungen'); ?>`,
-            description: `<?= $translate->_('Beschreibung'); ?>`,
-            action: `<?= $translate->_('Aktionen'); ?>`,
-            uploadBconf: `<?= $translate->_('Bconf hochladen...'); ?>`,
-            _file: `<?= $translate->_('-Datei'); ?>`,
-            fileDlTemplate: `<?= $translate->_('{0}{1} herunterladen'); ?>`,
-            fileUpTemplate:`<?= $translate->_('{0}{1} hochladen'); ?>`,
-            srx: `<?= $translate->_('SRX-Datei'); ?>`,
-            sourceSrx: `<?= $translate->_('SourceSRX'); ?>`,
-            targetSrx: `<?= $translate->_('TargetSRX'); ?>`,
-            pipeline: `<?= $translate->_('Pipeline'); ?>`,
-            standard: `<?= $translate->_('Standard'); ?>`,
-            customerStandard: `<?= $translate->_('Kundenstandard'); ?>`,
+            name: '<?php echo $this->translate->_('Name'); ?>',
+            extensions: '<?php echo $this->translate->_('Erweiterungen'); ?>',
+            description: '<?php echo $this->translate->_('Beschreibung'); ?>',
+            action: '<?php echo $this->translate->_('Aktionen'); ?>',
+            uploadBconf: '<?php echo $this->translate->_('Bconf hochladen'); ?>',
+            fileSuffix: '<?php echo $this->translate->_('-Datei'); ?>',
+            fileDlTemplate: '<?php echo $this->translate->_('{0}{1} herunterladen'); ?>',
+            fileUpTemplate: '<?php echo $this->translate->_('{0}{1} hochladen'); ?>',
+            filters: '<?php echo $this->translate->_('Filter'); ?>',
+            srx: '<?php echo $this->translate->_('SRX-Datei'); ?>',
+            sourceSrx: '<?php echo $this->translate->_('Source SRX'); ?>',
+            targetSrx: '<?php echo $this->translate->_('Target SRX'); ?>',
+            pipeline: '<?php echo $this->translate->_('Pipeline'); ?>',
+            standard: '<?php echo $this->translate->_('Standard'); ?>',
+            customerStandard: '<?php echo $this->translate->_('Kundenstandard'); ?>'
         },
         strings: {
-            addBconf: `<?= $translate->_('Bconf hinzufügen'); ?>`,
-            bconfRequired: `<?= $translate->_('wird benötigt'); ?>`,
-            browse: `<?= $translate->_('Durchsuchen...'); ?>`,
-            confirmDeleteMessage: `<?= $translate->_('Möchten Sie diese Bconf-Datei wirklich löschen?'); ?>`,
-            confirmDeleteTitle: `<?= $translate->_('Bconf löschen'); ?>`,
-            copy: `<?= $translate->_('Kopieren'); ?>`,
-            deleteSuccess: `<?= $translate->_('Bconf-Datei gelöscht'); ?>`,
-            edit: `<?= $translate->_('Bearbeiten'); ?>`,
-            editBconf: `<?= $translate->_('Bconf-Datei bearbeiten'); ?>`,
-            fileUploaded: `<?= $translate->_('{}-Datei erfolgreich hochgeladen.'); ?>`,
-            export: `<?= $translate->_('Exportieren'); ?>`,
-            invalidMsg: `<?= $translate->_('Die hochgeladene Datei ist keine gültige {}-Datei.'); ?>`,
-            invalidTitle: `<?= $translate->_('Ungültige {}-Datei'); ?>`,
-            name:`<?= $translate->_('Name'); ?>`,
-            nameExists:`<?= $translate->_('Dieser Name ist schon vergeben'); ?>`,
-            newBconf: `<?= $translate->_('Neue Bconf-Datei'); ?>`,
-            refresh: `<?= $translate->_('Aktualisieren'); ?>`,
-            remove: `<?= $translate->_('Löschen'); ?>`,
-            searchEmptyText: `<?= $translate->_('Suchen'); ?>`,
-            searchText: `<?= $translate->_('Suchen'); ?>`,
-            titleLong: `<?= $translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>`,
-            uniqueName:`<?= $translate->_('Eindeutiger Name'); ?>`,
-            upload: `<?= $translate->_('Hochladen'); ?>`,
-            uploadBconf: `<?= $translate->_('Bconf hochladen...'); ?>`,
-},
-
+            title: '<?php echo $this->translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>',
+            addBconf: '<?php echo $this->translate->_('Bconf hinzufügen'); ?>',
+            bconfRequired: '<?php echo $this->translate->_('wird benötigt'); ?>',
+            browse: '<?php echo $this->translate->_('Durchsuchen...'); ?>',
+            confirmDeleteMessage: '<?php echo $this->translate->_('Möchten Sie diese Bconf-Datei wirklich löschen?'); ?>',
+            confirmDeleteTitle: '<?php echo $this->translate->_('Bconf löschen'); ?>',
+            copy: '<?php echo $this->translate->_('Kopieren'); ?>',
+            deleteSuccess: '<?php echo $this->translate->_('Bconf-Datei gelöscht'); ?>',
+            edit: '<?php echo $this->translate->_('Bearbeiten'); ?>',
+            editBconf: '<?php echo $this->translate->_('Bconf-Datei bearbeiten'); ?>',
+            fileUploaded: '<?php echo $this->translate->_('{0}-Datei erfolgreich hochgeladen.'); ?>',
+            export: '<?php echo $this->translate->_('Exportieren'); ?>',
+            invalidMsg: '<?php echo $this->translate->_('Die hochgeladene Datei ist keine gültige {0}-Datei.'); ?>',
+            invalidTitle: '<?php echo $this->translate->_('Ungültige {0}-Datei'); ?>',
+            name: '<?php echo $this->translate->_('Name'); ?>',
+            nameExists: '<?php echo $this->translate->_('Dieser Name ist schon vergeben'); ?>',
+            newBconf: '<?php echo $this->translate->_('Neue Bconf-Datei'); ?>',
+            refresh: '<?php echo $this->translate->_('Aktualisieren'); ?>',
+            remove: '<?php echo $this->translate->_('Löschen'); ?>',
+            searchEmptyText: '<?php echo $this->translate->_('Suchen'); ?>',
+            titleLong: '<?php echo $this->translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>',
+            uniqueName: '<?php echo $this->translate->_('Eindeutiger Name'); ?>',
+            upload: '<?php echo $this->translate->_('Hochladen'); ?>',
+            uploadBconf: '<?php echo $this->translate->_('Bconf hochladen'); ?>',
+            configureFilters: '<?php echo $this->translate->_('Filter konfigurieren'); ?>'
+        }
+    });
+    Ext.define('Editor.locale.plugins.Okapi.view.BconfFilterGrid', {
+        override: 'Editor.plugins.Okapi.view.BconfFilterGrid',
+        text_cols: {
+            name: '<?php echo $this->translate->_('Name'); ?>',
+            extensions: '<?php echo $this->translate->_('Dateitypen'); ?>',
+            description: '<?php echo $this->translate->_('Beschreibung'); ?>',
+            mime: '<?php echo $this->translate->_('MIME-Typ'); ?>',
+            identifier: '<?php echo $this->translate->_('Kennung'); ?>',
+            actions: '<?php echo $this->translate->_('Aktionen'); ?>'
+        },
+        strings: {
+            title: '<?php echo $this->translate->_('Filter in'); ?>',
+            configuration: '<?php echo $this->translate->_('Filter konfigurieren'); ?>',
+            showDefaultFilters: '<?php echo $this->translate->_('Standard Filter anzeigen'); ?>',
+            hideDefaultFilters: '<?php echo $this->translate->_('Standard Filter verstecken'); ?>',
+            refresh: '<?php echo $this->translate->_('Aktualisieren'); ?>',
+            remove: '<?php echo $this->translate->_('Löschen'); ?>',
+            emptySearch: '<?php echo $this->translate->_('Suchen'); ?>',
+            uniqueName: '<?php echo $this->translate->_('Eindeutiger Name'); ?>'
+        }
+    });
+    Ext.define('Editor.locale.plugins.Okapi.view.BconfFilterRowEditing', {
+        override: 'Editor.plugins.Okapi.view.BconfFilterRowEditing',
+        strings: {
+            infosMissing: '<?php echo $this->translate->_('Informationen fehlen'); ?>',
+            nameMustBeChanged: '<?php echo $this->translate->_('Der ursprüngliche Name muss verändert werden'); ?>',
+            nameMustBeSupplied: '<?php echo $this->translate->_('Es muss ein endeutiger Name angegeben werden'); ?>',
+            extensionMustBeSupplied: '<?php echo $this->translate->_('Es muss mindestens ein Dateityp angegeben werden'); ?>'
+        }
+    });
+    Ext.define('Editor.locale.plugins.Okapi.view.FprmEditor', {
+        override: 'Editor.plugins.Okapi.view.FprmEditor',
+        strings: {
+            title: '<?php echo $this->translate->_('Bearbeite Filter Typ {0} von Bconf {1}'); ?>',
+            help: '<?php echo $this->translate->_('OKAPI Hilfe'); ?>',
+            save: '<?php echo $this->translate->_('Speichern'); ?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen'); ?>',
+            invalidTitle: '<?php echo $this->translate->_('Bearbeitung fehlerhaft'); ?>',
+            invalidField: '<?php echo $this->translate->_('Feld "{0}" vom Typ "{1}" ist nicht valide'); ?>',
+            float: '<?php echo $this->translate->_('Gleitkommazahl'); ?>',
+            boolean : '<?php echo $this->translate->_('Boolscher Wert'); ?>',
+            integer : '<?php echo $this->translate->_('Ganzzahl'); ?>',
+            validationFailed: '<?php echo $this->translate->_('Ihre Änderungen sind nicht valide'); ?>',
+            changesInvalid: '<?php echo $this->translate->_('Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden'); ?>',
+            successfullySaved: '<?php echo $this->translate->_('Filter wurde erfolgreich gespeichert'); ?>'
+        }
     });
 });

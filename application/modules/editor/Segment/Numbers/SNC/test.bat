@@ -9,3 +9,5 @@
 :: php snc_main.php "Mit Buchung der Option sind die ersten 2 MultiSIM kostenlos." "The first two MultiSIMs are free when you order the option." de-DE en-US
 :: php snc_main.php "<g id=\"1294\">Rückruf:</g> innerhalb von 3 Stunden, Mo - Do 08:00-18:00, Fr 08:00-16:00" "<g id=\"1294\">Callback: </g>Within 3 hours, Mon to Thu from 8:00 a.m. to 6:00 p.m. and Fri from 8:00 a.m. to 4:00 p.m." de-DE en-US
 :: php snc_main.php "Din1 offen oder Spannung 5...50 VDC" "Din1 open or voltage 5-50 VDC" de-DE en-US :: 2
+:: php snc_main.php "Use commas to separate thousands: £1,150" "Verwenden Sie Punkte, um die Tausenderstelle abzutrennen: 1.150€" en-GB de-DE
+:: php snc_main.php "2,2" "2,2" en-GB de-DE

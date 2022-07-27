@@ -44,6 +44,15 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
         'E1150' => 'Okapi Plug-In: The exported XLIFF contains empty targets, the Okapi process will probably fail then.',
         'E1340' => 'Okapi Plug-In: The default bconf configuration file-name is not set.',
         'E1387' => 'Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated',
-        'E1390' => 'Okapi Plug-In: The SRX file is not valid. {details}',
+        'E1390' => 'Okapi Plug-In: The uploaded SRX file is not valid ({details})',
+        'E1404' => 'Okapi Plug-In: The filter/fprm "{filter}" from the imported bconf "{bconf}" is not valid',
+        'E1405' => 'Okapi Plug-In: Invalid extension-mapping found in the bconf "{bconf}" to import',
+        'E1406' => 'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}"',
+        'E1407' => 'Okapi Plug-In: The extension mapping of the bconf "{bconf}" contains an invalid filter identifier "{identifier}" which has been removed',
+        'E1408' => 'Okapi Plug-In: The bconf "{bconf}" to import is not valid ({details})',
+        'E1409' => 'Okapi Plug-In: The edited filter file "{filterfile}" is not valid ({details})',
+        'E1414' => 'Okapi Plug-In: The fprm file "{file}" is not valid ({details})',
+        'E1415' => 'Okapi Plug-In: Error unpacking the bconf {bconf} ({details})',
+        'E1416' => 'Okapi Plug-In: Error packing the bconf {bconf} ({details})'
     ];
 }

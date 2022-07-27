@@ -1,0 +1,10 @@
+font;fontSize;unicodeChar;pixelWidth;Character (not needed for import, for convienence on development only);;
+Arial;12;80;11;P;;The unicodeChar column contains the decimal unicode codepoint of the represented character.
+Arial;13;80;11;P;;See https://en.wikipedia.org/wiki/List_of_Unicode_characters
+Arial;14;80;12;P;;
+Arial;12;72;10;H;;
+Arial;12;80;11;P;;
+Arial;13;80;11;P;;
+Arial;14;80;12;P;;
+Arial;12;72;10;H;;
+Arial;13;83;11;S;;

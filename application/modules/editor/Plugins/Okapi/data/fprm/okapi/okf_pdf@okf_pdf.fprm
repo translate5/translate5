@@ -1,0 +1,11 @@
+#v1
+useCodeFinder.b=true
+indentThreshold=2.0
+spacingTolerance=0.5
+lineSeparator=$0a$
+paragraphSeparator=$0a$
+preserveWhitespace.b=false
+codeFinderRules.count.i=1
+codeFinderRules.rule0=</?([A-Z0-9a-z]*)\b[^>]*>
+codeFinderRules.sample=&name; <tag></at><tag/> <tag attr='val'> </tag="val">
+codeFinderRules.useAllRulesWhenTesting.b=true

@@ -26,39 +26,66 @@
  */
 
 /**
- * Store for the visual review fonts endpoint
- * @class Editor.plugins.VisualReview.store.Fonts
+ * Store for the Bconfs og the translate5 installation
  * @extends Ext.data.Store
  */
 Ext.define('Editor.plugins.Okapi.store.BconfStore', {
     extend: 'Ext.data.Store',
+    requires: ['Editor.plugins.Okapi.model.BconfModel'],
     storeId: 'bconfStore',
+    model: 'Editor.plugins.Okapi.model.BconfModel',
     autoLoad: true,
     autoSync: true,
     pageSize: 0,
-    idProperty: 'id',
-    proxy: {
-        type: 'rest',
-        url: Editor.data.restpath + 'plugins_okapi_bconf',
-        reader: {
-            rootProperty: 'rows',
-            type: 'json'
-        },
-        writer: {
-            encode: true,
-            rootProperty: 'data',
-            writeAllFields: false
-        }
+    /**
+     * Retrieves all records independetly of filtering
+     * @see https://forum.sencha.com/forum/showthread.php?310616
+     * @returns {Ext.util.Collection}
+     */
+    getUnfilteredData: function(){
+        return (this.isFiltered() || this.isSorted()) ? this.getData().getSource() : this.getData();
     },
-    fields: [{
-        name: 'id',
-        type: 'int',
-    }, {
-        name: 'customerId',
-        type: 'int',
-        reference: 'customer',
-    }, {
-        name: 'isDefault', // global setting
-        type: 'boolean'
-    }]
+    /**
+     * Retrieves an item by name
+     * @param {string} name
+     * @returns {Editor.plugins.Okapi.model.BconfModel|null}
+     */
+    findUnfilteredByName: function(name){
+        return this.getUnfilteredData().find('name', name, 0, true, true, true);
+    },
+    /**
+     * Creates the data-source for the import wizard
+     * This store will only contain the customers bconfs or the bconfs bound to no customer
+     * The store also has a property "selectedId" that will define the initial selected item
+     * @param {int} customerId
+     * @param {int} customerDefaultBconfId
+     * @returns {Ext.data.Store}
+     */
+    createImportWizardSelectionData(customerId, customerDefaultBconfId){
+        var cid, item, items = [], defaultName = 'UNDEFINED';
+        this.getUnfilteredData().each(record => {
+            cid = record.get('customerId');
+            if(cid === null || cid === customerId){
+                item = { 'id': record.id, 'name': record.get('name'), 'description': record.get('description'), 'cid': (cid === null ? 0 : cid) };
+                // if no customer specific default given we look for the system default (which can only be attached to a record with id 'null'
+                if(!customerDefaultBconfId && record.get('isDefault')){
+                    customerDefaultBconfId = item.id;
+                    defaultName = item.name;
+                } else if(customerDefaultBconfId && record.id === customerDefaultBconfId){
+                    defaultName = item.name;
+                }
+                items.push(item);
+            }
+            return true;
+        });
+        return Ext.create('Ext.data.Store', {
+            fields: ['id', 'name', 'cid' ],
+            sorters: [
+                { 'property': 'cid', 'direction': 'DESC' },
+                { 'property': 'name', 'direction': 'ASC' }
+            ],
+            data : items,
+            selectedId: customerDefaultBconfId
+        });
+    }
 });

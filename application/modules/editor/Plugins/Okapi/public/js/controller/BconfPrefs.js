@@ -29,7 +29,6 @@
  * Main Controller of the Okapi Plugin
  * Adds the BconfGrids and BconfCombo
  *
- * @class BconfPrefs
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
@@ -45,7 +44,9 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             type: 'int',
             name: 'defaultBconfId',
             persist: false,
+            allowNull: true
         }]);
+
     },
     onLaunch: function(){
         Ext.create('Editor.plugins.Okapi.store.BconfStore'); // in onLaunch so customerStore can import default bconf before if needed
@@ -65,21 +66,16 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                     priority: 900 // we want after customersCombo has been added
                 }
             },
-            'combobox#customerId': {
+            '#taskMainCard combobox#customerId': {
                 change: {
                     fn: function(customerCombo, customerId){
-                        if(!customerId){ // QUIRK: Emptying can set value to null even with forceSelection set
-                            return;
-                        }
-                        var bconfCombo = Ext.getCmp('bconfCombo'),
-                            bconfFilters = bconfCombo.getStore().getFilters(),
-                            customerFilter = bconfFilters.getByKey('customerFilter');
-                        customerFilter.setValue(customerId);
-                        bconfFilters.add(customerFilter); // trigger filter
-
-                        bconfCombo.setValue(customerCombo.getSelection().get('defaultBconfId'));
-                        bconfCombo.enable();
-                    },
+                        customerId = (!customerId) ? null : customerId; // may be ''
+                        var store = Ext.getStore('bconfStore').createImportWizardSelectionData(customerId, customerCombo.getSelection().get('defaultBconfId')),
+                            combo = Ext.getCmp('taskImportBconfId');
+                        combo.setStore(store);
+                        combo.setValue(store.selectedId);
+                        combo.enable();
+                    }
                 }
             }
         }
@@ -88,26 +84,14 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         ref: 'preferencesOverviewPanel',
         selector: '#preferencesOverviewPanel'
     }],
-    routes: {
-        'bconfprefs': 'onBconfRoute'
-    },
-    // just a reference to our view
+    /** @property {Editor.plugins.Okapi.view.BconfGrid} bconfPanel reference to our main view */
     bconfPanel: null,
-    // shows the preference panel in the preferences (bconf-section is shown via 'showBconfInOverviewPanel' afterwards)
-    onBconfRoute: function(){
-        if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
-            // QUIRK: just to make sure, not the same thing can happen as with Quirk in ::showBconfInOverviewPanel
-            var pop = this.getPreferencesOverviewPanel();
-            if(pop){
-                Editor.app.openAdministrationSection(pop, 'reviewbconf');
-            }
-        }
-    },
     // adds the Font-Prefs-Panel to the Overview Panel if the right is present
     addBconfToSettingsPanel: function(panel){
         if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
             this.bconfPanel = panel.insert(2, {
                 xtype: 'okapiBconfGrid',
+                routePrefix: 'preferences/',
                 store: {
                     type: 'chained',
                     source: 'bconfStore',
@@ -137,16 +121,17 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 }],
                 sorters: [{
                     property: 'customerId',
-                    direction: 'DESC'
+                    direction: 'ASC'
                 }, {
                     property: 'name',
+                    direction: 'ASC'
                 }]
             };
             vm.setStores(vmStores);
             // add the bconf grid to the tabPanel and bind it to the customer
             tabPanel.insert(2, {
                 xtype: 'okapiBconfGrid',
-                id: 'bconfCustomerGrid',
+                routePrefix: 'client/:clientId/',
                 bind: {
                     customer: '{list.selection}', // list is reference name of customerGrid
                     store: '{customersBconfStore}'
@@ -162,37 +147,17 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             queryMode: 'local',
             forceSelection: true,
             displayField: 'name',
-            id: 'bconfCombo',
+            id: 'taskImportBconfId',
             name: 'bconfId',
             valueField: 'id',
             disabled: true,
             value: Editor.data.plugins.Okapi.systemDefaultBconfId,
             fieldLabel: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.titleLong,
-            listConfig: {
-                getInnerTpl: function(displayField){
-                    return `<span data-qtip="{description}">{${displayField}}</span>`;
-                },
-            },
-            store: {
-                type: 'chained',
-                storeId: 'bconfImportWizard',
-                source: 'bconfStore',
-                autoLoad: true,
-                filters: [{
-                    id: 'customerFilter',
-                    property: 'customerId',
-                    value: null,
-                    filterFn: function({data: bconf}){
-                        return !bconf.customerId || (this._value === bconf.customerId);
-                    },
-                }],
-                sorters: [{
-                    property: 'customerId',
-                    direction: 'DESC'
-                }, {
-                    property: 'name',
-                }],
-            }
+            tpl: Ext.create('Ext.XTemplate',
+                '<ul class="x-list-plain t5leveledList"><tpl for=".">',
+                '<li role="option" class="{[values.cid == 0 ? "x-boundlist-item t5level1" : "x-boundlist-item"]}" title="{description}">{name}</li>',
+                '</tpl></ul>'
+            )
         });
     }
 
