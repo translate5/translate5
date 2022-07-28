@@ -37,9 +37,14 @@
  * When compiling/packing a bconf, the customized, translate5 adjusted and okapi-default FPRMs will all be embedded into the packed BCONF-file depending on which filters are referenced in the BCONFs extension-mapping
  * On unpacking, the okapi-default files will be reverted to non-embedded, see editor_Plugins_Okapi_Bconf_ExtensionMapping
  *
- * see also editor_Plugins_Okapi_Bconf_Filter_Fprm
+ * This class also defines the filters/FPRMs, the frontend has a editing-GUI for, ::GUIS
+ * Generally, an editor relates to an OKAPI-type. The OKAPI-ids like "okf_xml-AndroidStrings" reference the base type "okf_xml" with certain settings.
+ * Each frontend-editable okapi-type must have an entry here; all non x-properties types must also have one or more extensions defined, which relate to a testfile in translate5/application/modules/editor/Plugins/Okapi/data/testfiles/
+ * The referenced Class must exist in the ExtJS FPRM-editor directory translate5/application/modules/editor/Plugins/Okapi/public/js/view/fprm/
+ * Note, that non X-Properties FPRMs cannot be validated other than testing it with a concrete testfile and therefore all non X-Prperties editors must have a testfile
+ * Note, that multiple filter-types may have the same Frontend
  *
- *
+ * see also editor_Plugins_Okapi_Bconf_Filter_Fprm for more documentation
  */
 class editor_Plugins_Okapi_Bconf_Filters {
 
