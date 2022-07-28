@@ -83,7 +83,7 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfig', {
             title: me.strings.title,
             height: 600,
             modal: true,
-            width: 400,
+            width: 600,
             layout: 'fit',
             bbar: ['->', {
                 text: me.strings.save,
@@ -99,6 +99,7 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfig', {
                 selModel: 'rowmodel',
                 plugins: [{
                     ptype: 'rowediting',
+                    pluginId: 'urlConfigRowEditor',
                     clicksToEdit: 2
                 }],
                 border: false,
@@ -115,14 +116,16 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfig', {
                 }],
                 columns: [{
                     header: me.strings.name,
-                    dataIndex: 'name',
+                    dataIndex: 'id',
+                    flex:0.5,
                     editor: {
                         xtype: 'textfield',
-                        itemId: 'name'
+                        itemId: 'id'
                     }
                 },{
                     header: me.strings.url,
                     dataIndex: 'url',
+                    flex:0.5,
                     editor: {
                         xtype: 'textfield',
                         itemId: 'url'
@@ -130,12 +133,8 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfig', {
                 }],
                 store: Ext.create('Ext.data.ArrayStore', {
                     data: data,
-                    sorters: [{
-                        property: 'end',
-                        direction: 'DESC'
-                    }],
                     fields: [
-                        {name: 'name', type: 'string'},
+                        {name: 'id', type: 'string'},
                         {name: 'url', type: 'string'}
                     ]
                 })

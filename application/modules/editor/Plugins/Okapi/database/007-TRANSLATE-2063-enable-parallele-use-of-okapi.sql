@@ -25,6 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE `Zf_configuration` SET `value` = '{"Okapi default name":"http://localhost:8080/okapi-longhorn/"}', 
+# this is just for testing.
+UPDATE `Zf_configuration` SET `value` = '{"Okapi default url":"http://localhost:8080/okapi-longhorn/","Okapi another url":"http://localhost:8080/okapi-longhorn/"}',
 `type` = 'map', `typeClass` = 'editor_Plugins_Okapi_DbConfig_OkapiConfigType' 
 WHERE (`name` = 'runtimeOptions.plugins.Okapi.api.url');

@@ -48,14 +48,13 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfigViewController', {
      * on save button click
      */
     onSave: function() {
-        debugger;
         var win = this.getView(),
             grid = win.down('grid'),
             newValue = {},
             confRec = this.record;
 
         grid.store.each(function(rec) {
-            newValue[rec.get('name')] = rec.get('url');
+            newValue[rec.get('id')] = rec.get('url');
         });
         confRec.set('value', newValue);
         win.setLoading('saving...');
@@ -101,11 +100,13 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfigViewController', {
             rec;
         
         rec = grid.store.insert(0, {
-            name: null,
+            id: null,
             url: null
         })[0];
         //we set the values after creation, so that the record looks dirty
-        rec.set('name', '');
+        rec.set('id', '');
         rec.set('url', '');
+
+        grid.getPlugin('urlConfigRowEditor').startEdit(rec);
     }
 });

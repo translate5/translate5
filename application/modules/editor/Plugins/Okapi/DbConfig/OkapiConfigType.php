@@ -42,6 +42,10 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
         if(!$rawType) {
             return false;
         }
+
+        //TODO: validate if there is removed url/route from the config and if the removed one is in use.
+        // If it is in use (one of the tasks uses the removed okapi url/route as import),
+        // throw exception so the user knows what is t
         return true;
     }
 }
