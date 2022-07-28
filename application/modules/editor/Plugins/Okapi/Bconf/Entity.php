@@ -566,11 +566,19 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     public function getCustomFilterProviderId() : string {
         if(empty($this->getCustomerId())){
             $config = Zend_Registry::get('config');
-            return editor_Utils::filenameFromUserText($config->runtimeOptions->server->name, false);
+            $name = editor_Utils::filenameFromUserText($config->runtimeOptions->server->name, false);
+        } else {
+            $name = editor_Utils::filenameFromUserText($this->getCustomerName(), false);
+            if(empty($name)){
+                $name = 'customer'.$this->getCustomerId();
+            }
         }
-        $name = editor_Utils::filenameFromUserText($this->getCustomerName(), false);
-        if(empty($name)){
-            $name = 'customer'.$this->getCustomerId();
+        // we must not create okapi-id's that start with or contain "translate5"
+        if(str_contains($name, 'translate5')){
+            $name = str_replace(['_translate5_', '_translate5', 'translate5_', 'translate5'], ['', '', '', ''], $name);
+            if(empty($name)){
+                $name = 'customized';
+            }
         }
         if(strlen($name) > 50){
             return substr($name, 0, 50);

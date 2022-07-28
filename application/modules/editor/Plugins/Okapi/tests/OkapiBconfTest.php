@@ -65,13 +65,13 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      */
     public function test10_BconfImportExport() {
         $input = new SplFileInfo(self::$api->getFile('minimal/batchConfiguration.t5.bconf'));
-        $bconfName = 'Translate2266BconfTest-' . time() . '.bconf';
+        $bconfName = 'OkapiBconfTest' . microtime() . '.bconf';
         self::$api->addFile('bconffile', $input->getPathname(), 'application/octet-stream');
         // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
         $res = self::$api->requestJson('editor/plugins_okapi_bconf/uploadbconf', 'POST', [
             'name' => $bconfName,
         ]);
-        self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true');
+        self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true for bconf '.$bconfName);
         self::$bconfId = $res->id;
         self::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
         self::$bconf->load(self::$bconfId);

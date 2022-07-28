@@ -39,6 +39,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
         infosMissing: '#UT#Informationen fehlen',
         nameMustBeChanged: '#UT#Der ursprüngliche Name muss verändert werden',
         nameMustBeSupplied: '#UT#Es muss ein endeutiger Name angegeben werden',
+        nameMustNotBeLikeT5: '#UT#Der Name darf nicht den Begriff "translate5" enthalten',
         extensionMustBeSupplied: '#UT#Es muss mindestens ein Dateityp angegeben werden'
     },
     onEnterKey: function(){}, // deactivates the save-on-enter feature with interferes with the tagfields add-item-on-enter
@@ -69,6 +70,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
             // case currently is superflous due to name-field's own validation
             if(!cellContext.newValues.name || cellContext.newValues.name.length < 1){
                 Ext.MessageBox.alert(this.strings.infosMissing, this.strings.nameMustBeSupplied);
+                return false;
+            }
+            // case currently is superflous due to name-field's own validation
+            if(cellContext.newValues.name.indexOf('translate5') > -1){
+                Ext.MessageBox.alert(this.strings.infosMissing, this.strings.nameMustNotBeLikeT5);
                 return false;
             }
             return true;
