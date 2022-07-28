@@ -298,7 +298,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     public function test70_DeleteBconf() {
         $bconf = self::$bconf;
         $bconf->load(self::$bconfId);
-
         $bconfDir = $bconf->getDataDirectory();
         $bconf->delete(); // delete record, which deletes directory as well
         self::assertDirectoryDoesNotExist($bconfDir);

@@ -70,8 +70,8 @@ class editor_Plugins_Okapi_Bconf_Filters {
     ];
     /**
      * A list of file-extensions, that validation files exist for.
-     * This files exist in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER and are all called "test.$EXTENSION"
-     * For each extension here a file must exist, the language must be english / en-GB
+     * These files reside in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER and are all called "test.$EXTENSION"
+     * For each extension here a file must exist, the language is expected to be be english / en
      */
     const TESTABLE_EXTENSIONS = ['txt', 'xml', 'strings', 'csv', 'htm', 'html', 'sdlxliff', 'docx', 'odp', 'ods', 'odt', 'pptx', 'tbx', 'xlsx', 'idml'];
 
