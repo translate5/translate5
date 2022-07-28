@@ -31,8 +31,17 @@
  * It is able to parse the extension-mapping from file, build an internal model, manipulate it and write it back to file
  * Also the mapping for the actual bconf-file can be retrieved where the okapi-default entries are actually mapped to the mapping files
  * The processing when unpacking bconfs is also implemented here, including writing the extracted custom fprms to the DB and file-system
+ * The extension mapping is always stored as a filein a BCONFs file-repository with the name "extensions-mapping.txt"
  *
- * Types of filter-identifiers in a bconf
+ * There are 4 types of filter-identifiers in a bconf:
+ * OKAPI defaults: Identifiers like "okf_xml-AndroidStrings"; These names represent bconf-id's as used in Rainbow and Longhorn
+ * OKAPI embedded defaults: Identifiers like "okf_xml@okf_xml-AndroidStrings"; These names have the formal bconf-type @ bconf-id. The id's are the ones used as OKAPI defaults.
+ * translate5 adjusted defaults: Identifiers like "okf_xml@translate5-AndroidStrings"; Here the okapi-id always is "translate5" or srtarts with "translate5-"
+ * User customized filters: Identifiers like "okf_xml@worldtranslation-my_special_setting"; Here the okapi-id has a special format: [ customerName or domain ] + "-" + [ websafe bconf name ]
+ *
+ * When packing BCONFs, the Okapi default filters will all be embedded into the BCONF to ensure maximal compatibility over time and between different Okapi-Versions
+ * When unpacking BCONFs, that have embedded OKAPI defaults, the OKAPI embedded default identifiers will be reverted to simple OKAPI defaults
+ * Only user customized filters will actually have FPRM-files in the BCONF's file store, all other types will always be taken from the git-based stores in translate5/application/modules/editor/Plugins/Okapi/data/fprm/
  */
 class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 

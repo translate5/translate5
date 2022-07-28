@@ -29,6 +29,18 @@
 /**
  * Okapi Bconf Entity Object
  *
+ * A OKAPI Batch Configuration aka "BCONF" is a Bitstream-based file that bundles several components:
+ * 2 SRX files (source & target, may be equal), Pipeline, FPRM files (0-n) and the Extension-Mapping
+ * Generally, a BCONF is represented by it's parts in the Filesystem and a corresponding database-entry
+ * The filesystem-parts are stored in a configurable base-directory (usually /data/editorOkapiBconf/) in a folder with the database-id as name
+ * In this folder the parts are stored in another file "content.json", which is an inventory of the parts and contains the steps found in the pipeline
+ * The packing/unpacking of the parts is implemented in the Packer/Unpacker class
+ * When a bconf is packed, the embedded FPRM and SRX components are updated to the current state/revision of the git-based files.
+ * The Revision is hold in editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX, every time the revision is increased in the code, all existing bconfs will be repacked with updated FPRMs/SRXs
+ * All File-based parts of a BCONF generally have a corresponding clas, that is able to validate the file
+ *
+ * see editor_Plugins_Okapi_Bconf_Filters, editor_Plugins_Okapi_Bconf_ExtensionMapping, editor_Plugins_Okapi_Bconf_Filter_Fprm and editor_Plugins_Okapi_Bconf_Segmentation for more documentation
+ *
  * @method integer getId()
  * @method void setId(int $id)
  * @method string getName()

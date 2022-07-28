@@ -36,7 +36,7 @@
  * runtimeOptions.debug.plugin.OkapiExtensionMapping => Turns debugging on for the processing of the extension-mapping
  * runtimeOptions.debug.plugin.OkapiKeepIntermediateFiles => All the files that are created in the various processing steps are kept
  *
- *
+ * for documentation of the BCONF management, see editor_Plugins_Okapi_Bconf_Entity
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
@@ -68,6 +68,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     /**
      * The default supported file-types by okapi
+     * Note, that generally the supported filetypes are defined by the used BCONF, these are just general defaults
      * @var string[]
      */
     const DEFAULT_EXTENSIONS = [

@@ -29,6 +29,17 @@
 /**
  * Class representing the Filters a bconf can have
  * These consist of okapi default-filters, translate5-adjusted filters and the user customized filters from the database
+ *
+ * There are 3 different sources for FPRMs in a BCONF:
+ * - User customized FPRM: will have a database-entry (for name, description & mime) and also exist as file in the BCONFs component folder
+ * - translate5 adjusted FPRM: Will exist in the folder /translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5 with the inventory-file translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5-filters.json
+ * - OKAPI default adjusted FPRM: Will exist in the folder /translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi with the inventory-file translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi-filters.json
+ * When compiling/packing a bconf, the customized, translate5 adjusted and okapi-default FPRMs will all be embedded into the packed BCONF-file depending on which filters are referenced in the BCONFs extension-mapping
+ * On unpacking, the okapi-default files will be reverted to non-embedded, see editor_Plugins_Okapi_Bconf_ExtensionMapping
+ *
+ * see also editor_Plugins_Okapi_Bconf_Filter_Fprm
+ *
+ *
  */
 class editor_Plugins_Okapi_Bconf_Filters {
 
