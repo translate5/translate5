@@ -341,7 +341,24 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
+     * @return array
+     * @throws ZfExtended_Exception
+     */
+    public function findCustomIdentifiers(){
+        $customIdentifiers = [];
+        foreach($this->map as $extension => $filter){
+            if(editor_Plugins_Okapi_Bconf_Filters::instance()->isCustomFilter($filter)){
+                $customIdentifiers[$filter] = true;
+            }
+        }
+        $identifiers = array_keys($customIdentifiers);
+        sort($identifiers);
+        return $identifiers;
+    }
+
+    /**
      * Removes extensions from the mapping and flushes the map if changed
+     * Also updates the related content-file
      * @param array $extensions
      * @return bool
      */
@@ -361,6 +378,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         if($removed){
             $this->map = $newMap;
             $this->flush();
+            $this->updateBconfContent();
             // DEBUG
             if($this->doDebug){ error_log('ExtensionMapping removeExtensions: [ '.implode(', ', $extensions).' ] have been removed'."\n".print_r($this->map, 1)); }
         }
@@ -369,6 +387,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
     /**
      * Removes a filter from the mapping and deletes the corresponding fprm-file anf flushes the map if changed
+     * Also updates the related content-file
      * @param string $identifier
      * @return bool
      */
@@ -393,6 +412,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 @unlink($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
             }
             $this->flush();
+            $this->updateBconfContent();
             // DEBUG
             if($this->doDebug){ error_log('ExtensionMapping removeFilter: '.$identifier.' has been removed'."\n".print_r($this->map, 1)); }
         }
@@ -401,6 +421,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
     /**
      * Adds a filter with it's extensions
+     * Also updates the related content-file
      * @param string $identifier
      * @param array $extensions
      * @return bool
@@ -415,6 +436,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
     /**
      * Changes a filter with it's extensions
+     * Also updates the related content-file
      * @param string $identifier
      * @param array $extensions
      * @return bool
@@ -460,6 +482,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         if($changed){
             $this->map = $newMap;
             $this->flush();
+            $this->updateBconfContent();
             // DEBUG
             if($this->doDebug){ error_log('ExtensionMapping changeFilter: '.$identifier.' with extensions [ '.implode(', ', $extensions).' ] has been changed: '."\n".print_r($this->map, 1)); }
         }
@@ -707,5 +730,16 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 }
             }
         }
+    }
+
+    /**
+     * Updates the content-inventory, which is always done alongside the extension-mapping
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    private function updateBconfContent(){
+        $content =  $this->bconf->getContent();
+        $content->setFilters($this->findCustomIdentifiers());
+        $content->flush();
     }
 }

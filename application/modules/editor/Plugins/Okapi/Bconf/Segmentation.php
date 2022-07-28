@@ -143,6 +143,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation {
                 }
                 $srx->flush();
                 $this->updateSrxInFiles($pipeline, $content, $field, $srx, $otherField, $otherSrx);
+                $bconf->pack();
             } else {
                 // real custom SRX uploads must be validated with OKAPI
                 $srxOriginalPath = $srx->getPath();

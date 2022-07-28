@@ -33,6 +33,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
     extend: 'Ext.grid.plugin.RowEditing',
     alias: 'plugin.bconffilterrowediting',
     clicksToEdit: 3, // QUIRK: 1 not possible, triggers on actioncolumns TODO: limit to non actionCols, add pointerCls
+    pluginId: 'rowEditing',
     removeUnmodified: true,
     errorSummary: false,
     strings: {
@@ -46,7 +47,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
     listeners: {
         beforeedit: function(rowEditing, cellContext){
             var record = cellContext.record,
-                tagField = rowEditing.getEditor().down('tagfield');
+                editor = rowEditing.getEditor(),
+                form = editor.getForm(),
+                tagField = editor.down('tagfield');
             // set the tagfields extensions store
             tagField.setStore(Ext.getStore('bconffilterStore').getAllExtensions());
             // adds the change listener needed to update our button position after tagfield changes
@@ -55,6 +58,16 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
             record.extensionsBeforeEdit = record.get('extensions');
             // respects the initial height of the tagfield
             rowEditing.delayedHeightChange();
+            // we disable name, mimeType & description editing for non-custom rows
+            if(record.get('isCustom')){
+                form.findField('name').enable();
+                form.findField('mimeType').enable();
+                form.findField('description').enable();
+            } else {
+                form.findField('name').disable();
+                form.findField('mimeType').disable();
+                form.findField('description').disable();
+            }
         },
         validateedit: function(rowEditing, cellContext){
             // this case is superflous as the name-field has it's own validation

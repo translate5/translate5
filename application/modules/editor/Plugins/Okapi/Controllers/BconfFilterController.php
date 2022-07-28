@@ -67,9 +67,12 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         parent::postAction();
         // extensions have been sent as put-data
         $extensions = explode(',', $this->data->extensions);
-        // we need to update the extension-mapping but not the content/TOC
-        $extensionMapping = $this->entity->getRelatedBconf()->getExtensionMapping();
-        $extensionMapping->changeFilter($this->entity->getIdentifier(), $extensions);
+        // we need to update the extension-mapping
+        $bconf = $this->entity->getRelatedBconf();
+        $extensionMapping = $bconf->getExtensionMapping();
+        $extensionMapping->addFilter($this->entity->getIdentifier(), $extensions);
+        // re-pack the bconf after update
+        $bconf->pack();
         // the frontend needs to know about an adjusted identifier
         $this->view->rows->identifier = $this->entity->getIdentifier();
     }
@@ -84,37 +87,14 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
         parent::putAction();
         // extensions have been sent as put-data
         $extensions = explode(',', $this->data->extensions);
-        // update mapping
+        // update mapping (which also updates the content/TOC)
         $bconf = $this->entity->getRelatedBconf();
         $extensionMapping = $bconf->getExtensionMapping();
-        $extensionMapping->addFilter($this->entity->getIdentifier(), $extensions);
-        // update content/TOC
-        $content = $bconf->getContent();
-        $content->addFilter($this->entity->getIdentifier());
-        $content->flush();
+        $extensionMapping->changeFilter($this->entity->getIdentifier(), $extensions);
+        // re-pack the bconf after update
+        $bconf->pack();
         // the frontend needs to know about an adjusted identifier
         $this->view->rows->identifier = $this->entity->getIdentifier();
-    }
-
-    /**
-     * Overwritten for additional processing on postAction
-     */
-    protected function decodePutData(){
-        // crucial: new entries are sent with a temp identifier 'NEW@FILTER' which needs to be turned to a valid custom identifier and id
-        // this represents a clone-operation and the original identifier can be restored from the (cloned) okapiType / okapiId
-        parent::decodePutData();
-        if($this->data->identifier === 'NEW@FILTER'){
-            // we need to copy the FPRM-file and generate the new identifier (returns Object with properties okapiId | identifier | path | hash
-            $newData = editor_Plugins_Okapi_Bconf_Filter_Entity::preProcessNewEntry(
-                intval($this->data->bconfId),
-                $this->data->okapiType,
-                $this->data->okapiId,
-                $this->data->name
-            );
-            $this->data->okapiId = $newData->okapiId;
-            $this->data->identifier = $newData->identifier;
-            $this->data->hash = $newData->hash;
-        }
     }
 
     /**
@@ -126,16 +106,14 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
     public function deleteAction(){
         $this->entityLoad();
         $bconf = $this->entity->getRelatedBconf();
-        // remove the filter from the extension mapping
+        // remove the filter from the extension mapping (which also updates the content/TOC)
         $extensionMapping = $bconf->getExtensionMapping();
         $extensionMapping->removeFilter($this->entity->getIdentifier());
-        // remove the filter from the content/TOC
-        $content = $bconf->getContent();
-        $content->removeFilter($this->entity->getIdentifier());
-        $content->flush();
         // and delete
         $this->processClientReferenceVersion();
         $this->entity->delete();
+        // re-pack the bconf after deletion of filter
+        $bconf->pack();
     }
 
     /**
@@ -189,8 +167,8 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             }
         } else {
             // this can normally only happen if the implementation of a filter-frontend generated faulty data.
-            // Only with YAML currently this is a user-error, as YAML is edited as a whole in a big text-field
-            if($fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_YAML){
+            // Only with YAML or XML currently this is a user-error, as both are edited as a whole in a big textfield
+            if($fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_YAML || $fprm->getType() == editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XML){
                 $validationError = $fprm->getValidationError();
             } else {
                 throw new editor_Plugins_Okapi_Exception('E1409', ['details' => $fprm->getValidationError(), 'filterfile' => $this->entity->getFile(), 'bconfId' => $this->entity->getBconfId()]);
@@ -202,6 +180,27 @@ class editor_Plugins_Okapi_BconfFilterController extends ZfExtended_RestControll
             $this->view->error = $validationError;
         } else {
             $this->view->success = true;
+        }
+    }
+
+    /**
+     * Overwritten for additional processing on postAction
+     */
+    protected function decodePutData(){
+        // crucial: new entries are sent with a temp identifier 'NEW@FILTER' which needs to be turned to a valid custom identifier and id
+        // this represents a clone-operation and the original identifier can be restored from the (cloned) okapiType / okapiId
+        parent::decodePutData();
+        if($this->data->identifier === 'NEW@FILTER'){
+            // we need to copy the FPRM-file and generate the new identifier (returns Object with properties okapiId | identifier | path | hash
+            $newData = editor_Plugins_Okapi_Bconf_Filter_Entity::preProcessNewEntry(
+                intval($this->data->bconfId),
+                $this->data->okapiType,
+                $this->data->okapiId,
+                $this->data->name
+            );
+            $this->data->okapiId = $newData->okapiId;
+            $this->data->identifier = $newData->identifier;
+            $this->data->hash = $newData->hash;
         }
     }
 }

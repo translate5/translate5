@@ -146,7 +146,6 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
      * @param {boolean} isCustom
      */
     updateExtensionsByIdentifier: function(identifier, extensions, isCustom){
-        console.log('BconfFilterStore.updateExtensionsByIdentifier: ', identifier, ', extensions: ', extensions, ', isCustom:', isCustom); // TODO REMOVE
         var record,
             extBefore = [], // represents the extensions the changed item currently has
             customChanged = isCustom; // evaluates, if the custom extensions have been changed
@@ -165,6 +164,7 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
                 record = this.getByIdentifier(this.extensionMap.get(extension));
                 if(record){
                     record.removeExtension(extension, true);
+                    record.commit();
                     if(!customChanged && record.get('isCustom')){
                         customChanged = true;
                     }

@@ -236,6 +236,20 @@ class editor_Plugins_Okapi_Bconf_Filters {
     }
 
     /**
+     * Retrieves, if a filter identifier represents a customized filter
+     * @param string $identifier
+     * @return bool
+     * @throws ZfExtended_Exception
+     */
+    public function isCustomFilter(string $identifier) : bool {
+        if(self::isOkapiDefaultIdentifier($identifier)){
+            return false;
+        }
+        $idata = self::parseIdentifier($identifier);
+        return !$this->isEmbeddedDefaultFilter($idata->type, $idata->id);
+    }
+
+    /**
      * Checks, whether the $identifier is a default identifier, either OKAPI default, OKAPI embedded default or translate5 adjusted default
      * @param string $type
      * @param string $id

@@ -78,6 +78,9 @@ final class editor_Plugins_Okapi_Bconf_Unpacker {
      */
     public function process($bconfPath): void {
 
+        // DEBUG
+        if($this->doDebug){ error_log('UNPACK BCONF: '.$this->bconf->getName()); }
+
         // so we can access all files in the bconf's data-dir with file name only
         chdir($this->folder);
 
