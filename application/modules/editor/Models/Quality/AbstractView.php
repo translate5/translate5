@@ -316,15 +316,49 @@ abstract class editor_Models_Quality_AbstractView {
                     if($hasNonEditableInternalTagFaults && $rubric->qtype == editor_Segment_Tag::TYPE_INTERNAL && !in_array(editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE, $rubricCats)){
                         $rubricCats[] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE;
                     }
-                    sort($rubricCats);
-                    foreach($rubricCats as $category){
-                        if($category != self::RUBRIC){
 
+                    // Sort but maintain indexes
+                    asort($rubricCats);
+
+                    // Foreach category
+                    foreach ($rubricCats as $key => $value){
+
+                        // If $value is an array it means we have subcategories
+                        $subCategories = is_array($value) ? $value : [];
+
+                        // And if so, category is the $key
+                        $category = $subCategories ? $key : $value;
+
+                        //
+                        if ($category != self::RUBRIC) {
+
+                            // Create category row for extjs tree store
                             $row = array_key_exists($category, $this->rowsByType[$rubric->qtype])
                                 ? $this->rowsByType[$rubric->qtype][$category]
-                                : $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $category, $this->task), $rubric->qtype, $category);
+                                : $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $category, $this->task) , $rubric->qtype, $category);
 
+                            // Setup tooltip for category row
                             $row->qtooltip = $qualityProvider->translateCategoryTooltip($this->translate, $category, $this->task);
+
+                            // If have subcategories, for each do
+                            foreach ($subCategories as $subCategory) {
+
+                                // Create subcategory row for extjs categories tree store's category row
+                                $subrow = array_key_exists($subCategory, $this->rowsByType[$rubric->qtype])
+                                    ? $this->rowsByType[$rubric->qtype][$subCategory]
+                                    : $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $subCategory, $this->task), $rubric->qtype, $subCategory);
+
+                                // Setup tooltip for subcategory row
+                                $subrow->qtooltip = $qualityProvider->translateCategoryTooltip($this->translate, $subCategory, $this->task);
+
+                                // Sum qualities quantity
+                                $row->qcount += $subrow->qcount;
+
+                                // Append subcategory row into category row's childrens list
+                                $row->children [] = $subrow;
+                            }
+
+                            // Append category row into quality row's children list
                             $rubric->children[] = $row;
                         }
                     }

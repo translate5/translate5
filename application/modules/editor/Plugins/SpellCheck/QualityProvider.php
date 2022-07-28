@@ -263,21 +263,23 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      */
     public function getAllCategories(editor_Models_Task $task) : array {
         return [
-            editor_Plugins_SpellCheck_Check::CHARACTERS,
-            editor_Plugins_SpellCheck_Check::DUPLICATION,
-            editor_Plugins_SpellCheck_Check::INCONSISTENCY,
-            editor_Plugins_SpellCheck_Check::LEGAL,
-            editor_Plugins_SpellCheck_Check::UNCATEGORIZED,
-
-            editor_Plugins_SpellCheck_Check::REGISTER,
-            editor_Plugins_SpellCheck_Check::LOCALE_SPECIFIC_CONTENT,
-            editor_Plugins_SpellCheck_Check::LOCALE_VIOLATION,
-            editor_Plugins_SpellCheck_Check::GENERAL_STYLE,
-            editor_Plugins_SpellCheck_Check::PATTERN_PROBLEM,
-            editor_Plugins_SpellCheck_Check::WHITESPACE,
-            editor_Plugins_SpellCheck_Check::TERMINOLOGY,
-            editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION,
-
+            editor_Plugins_SpellCheck_Check::GROUP_GENERAL => [
+                editor_Plugins_SpellCheck_Check::CHARACTERS,
+                editor_Plugins_SpellCheck_Check::DUPLICATION,
+                editor_Plugins_SpellCheck_Check::INCONSISTENCY,
+                editor_Plugins_SpellCheck_Check::LEGAL,
+                editor_Plugins_SpellCheck_Check::UNCATEGORIZED,
+            ],
+            editor_Plugins_SpellCheck_Check::GROUP_STYLE => [
+                editor_Plugins_SpellCheck_Check::REGISTER,
+                editor_Plugins_SpellCheck_Check::LOCALE_SPECIFIC_CONTENT,
+                editor_Plugins_SpellCheck_Check::LOCALE_VIOLATION,
+                editor_Plugins_SpellCheck_Check::GENERAL_STYLE,
+                editor_Plugins_SpellCheck_Check::PATTERN_PROBLEM,
+                editor_Plugins_SpellCheck_Check::WHITESPACE,
+                editor_Plugins_SpellCheck_Check::TERMINOLOGY,
+                editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION,
+            ],
             editor_Plugins_SpellCheck_Check::GRAMMAR,
             editor_Plugins_SpellCheck_Check::MISSPELLING,
             editor_Plugins_SpellCheck_Check::TYPOGRAPHICAL,
