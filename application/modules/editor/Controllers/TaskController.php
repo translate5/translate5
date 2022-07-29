@@ -568,6 +568,9 @@ class editor_TaskController extends ZfExtended_RestController {
             $c = $this->config;
         }
 
+        // check and set the default pivot language is configured
+        $this->setDefaultPivotOnTaskCreate();
+
         // set the usageMode from config if not set
         $this->entity->setUsageMode($this->data['usageMode'] ?? $c->runtimeOptions->import->initialTaskUsageMode);
 
@@ -890,12 +893,12 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $model = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $model editor_Models_Task */
-        foreach ($tasks as $task){
+        foreach ($tasks as $t){
 
-            if(is_array($task)){
-                $model->load($task['id']);
+            if(is_array($t)){
+                $model->load($t['id']);
             } else {
-                $model = $task;
+                $model = $t;
             }
 
             //import workers can only be started for tasks
@@ -2000,5 +2003,31 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $this->entity->unlock();
         $this->log->info('E1011', 'Task import cancelled', ['task' => $this->entity]);
+    }
+
+    /***
+     * Check and set the default pivot langauge based on customer specific config.
+     * If the pivot field is not provided on task post and for the current task customer
+     * there is configured defaultPivotLanguage, the configured pivot language will be set as task pivot
+     * @return void
+     */
+    protected function setDefaultPivotOnTaskCreate(): void
+    {
+        // check if the relasiLang field is provided. If it is not provided, check and set default value from config.
+        $pivotLang = $this->data['relaisLang'] ?? false;
+
+        if($pivotLang === false && !empty($c->runtimeOptions->project->defaultPivotLanguage)){
+            // get default pivot language value from the config
+            $defaultPivot = $c->runtimeOptions->project->defaultPivotLanguage;
+            try {
+                /** @var editor_Models_Languages $language */
+                $language = ZfExtended_Factory::get('editor_Models_Languages');
+                $language->loadByRfc5646($defaultPivot);
+
+                $this->entity->setRelaisLang($language->getId());
+            }catch (Throwable $exception){
+                // in case of wrong configured variable and the load language fails, do nothing
+            }
+        }
     }
 }
