@@ -31,11 +31,21 @@ use Symfony\Component\Yaml\Exception\ParseException;
 
 /**
  * Class representing a fprm file
- * There are generally three types of FPRM settings:
+ * There are generally four types of FPRM settings:
  * - properties: Java properties text/x-properties (key-value pairs seperated by "=", these always start with "#v1", e.g. okf_html
  * - xml: xml-based, which always start with "<?xml", e.g. okf_xml
  * - yaml: indented hierarchy of properties, e.g. okf_html
- * - plain: a special format seems "okf_wiki", which seems to be JSON-like (without quotes), we include this in "indented hierarchy"
+ * - plain: a special format, only used for "okf_wiki", which seems to be JSON-like (without quotes).
+ *
+ * X-Properties Validation:
+ * X-Properties are validated against their counterparts OKAPI defaults (translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi/).
+ * In this process, it is ensured, that all properties are of the right type and missing properties will be complemented by taking over the values from the OKAPI default
+ *
+ * XML/YAML/PLAIN Validation:
+ * All other FPRM types are validated, by processing a testfile against the packed BCONF with the changed filter.
+ * When this test is not successful, all changes made for packing & using the BCONF have to be reverted, see editor_Plugins_Okapi_Bconf_Filter_FprmValidation
+ *
+ * general documentation about filters, see editor_Plugins_Okapi_Bconf_Filters
  */
 final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_Bconf_ResourceFile {
 
@@ -54,14 +64,14 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
     /**
      * @var string
      */
-    const TYPE_PLAIN = 'plain';
+    const TYPE_PLAIN = 'plain'; // may be renamed to JSON in case we make a parser for it
     /**
      * There is no other way to detect yaml than by looking into it, so we need to encode that statically
      * @var array
      */
     const YAML_TYPES = ['okf_html', 'okf_xmlstream', 'okf_doxygen'];
     /**
-     * What kind of data 'okf_wiki' contains is really strange, it seems to be "JSON without quotes". We cannot validate it ...
+     * What kind of data 'okf_wiki' contains is really strange, it seems to be "JSON without quotes". Currently we cannot validate it ...
      * @var array
      */
     const PLAIN_TYPES = ['okf_wiki'];

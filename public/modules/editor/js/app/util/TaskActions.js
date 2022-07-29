@@ -123,7 +123,8 @@ Ext.define('Editor.util.TaskActions', {
             //'editor/:entity/:id/operation/:operation'
             var taskStore = Ext.StoreManager.get('admin.Tasks'),
                 adminTask = (taskStore && taskId) ? taskStore.getById(taskId) : null,
-                projectTaskGrid = Ext.ComponentQuery.query('#projectTaskGrid').at(0),
+                projectTaskGridQuery = Ext.ComponentQuery.query('#projectTaskGrid'),
+                projectTaskGrid = (projectTaskGridQuery && projectTaskGridQuery.length > 0) ? projectTaskGridQuery[0] : null,
                 projectTask = (projectTaskGrid && projectTaskGrid.getStore()) ? projectTaskGrid.getStore().getById(taskId) : null,
                 taskInitialState = (adminTask || projectTask) ? (adminTask ? adminTask.get('state') : projectTask.get('state')) : null,
                 // this API might be called from the editor or the global context

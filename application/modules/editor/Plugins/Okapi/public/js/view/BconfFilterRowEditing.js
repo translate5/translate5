@@ -33,19 +33,23 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
     extend: 'Ext.grid.plugin.RowEditing',
     alias: 'plugin.bconffilterrowediting',
     clicksToEdit: 3, // QUIRK: 1 not possible, triggers on actioncolumns TODO: limit to non actionCols, add pointerCls
+    pluginId: 'rowEditing',
     removeUnmodified: true,
     errorSummary: false,
     strings: {
         infosMissing: '#UT#Informationen fehlen',
         nameMustBeChanged: '#UT#Der ursprüngliche Name muss verändert werden',
         nameMustBeSupplied: '#UT#Es muss ein endeutiger Name angegeben werden',
+        nameMustNotBeLikeT5: '#UT#Der Name darf nicht den Begriff "translate5" enthalten',
         extensionMustBeSupplied: '#UT#Es muss mindestens ein Dateityp angegeben werden'
     },
     onEnterKey: function(){}, // deactivates the save-on-enter feature with interferes with the tagfields add-item-on-enter
     listeners: {
         beforeedit: function(rowEditing, cellContext){
             var record = cellContext.record,
-                tagField = rowEditing.getEditor().down('tagfield');
+                editor = rowEditing.getEditor(),
+                form = editor.getForm(),
+                tagField = editor.down('tagfield');
             // set the tagfields extensions store
             tagField.setStore(Ext.getStore('bconffilterStore').getAllExtensions());
             // adds the change listener needed to update our button position after tagfield changes
@@ -54,6 +58,16 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
             record.extensionsBeforeEdit = record.get('extensions');
             // respects the initial height of the tagfield
             rowEditing.delayedHeightChange();
+            // we disable name, mimeType & description editing for non-custom rows
+            if(record.get('isCustom')){
+                form.findField('name').enable();
+                form.findField('mimeType').enable();
+                form.findField('description').enable();
+            } else {
+                form.findField('name').disable();
+                form.findField('mimeType').disable();
+                form.findField('description').disable();
+            }
         },
         validateedit: function(rowEditing, cellContext){
             // this case is superflous as the name-field has it's own validation
@@ -69,6 +83,11 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
             // case currently is superflous due to name-field's own validation
             if(!cellContext.newValues.name || cellContext.newValues.name.length < 1){
                 Ext.MessageBox.alert(this.strings.infosMissing, this.strings.nameMustBeSupplied);
+                return false;
+            }
+            // case currently is superflous due to name-field's own validation
+            if(cellContext.newValues.name.indexOf('translate5') > -1){
+                Ext.MessageBox.alert(this.strings.infosMissing, this.strings.nameMustNotBeLikeT5);
                 return false;
             }
             return true;

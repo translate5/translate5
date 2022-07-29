@@ -172,6 +172,10 @@
     <source>Es muss ein endeutiger Name angegeben werden</source>
     <target>A unique name must be provided</target>
 </trans-unit>
+<trans-unit id='RGVyIE5hbWUgZGFyZiBuaWNodCBkZW4gQmVncmlmZiAidHJhbnNsYXRlNSIgZW50aGFsdGVu'>
+    <source>Der Name darf nicht den Begriff "translate5" enthalten</source>
+    <target>The name must not contain the term "translate5"</target>
+</trans-unit>
 <trans-unit id='RXMgbXVzcyBtaW5kZXN0ZW5zIGVpbiBEYXRlaXR5cCBhbmdlZ2ViZW4gd2VyZGVu'>
     <source>Es muss mindestens ein Dateityp angegeben werden</source>
     <target>At least one filetype must be specified</target>

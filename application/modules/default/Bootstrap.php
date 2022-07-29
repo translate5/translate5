@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -26,18 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package trantlate5
- * @version 0.7
- *
- */
-
-//if we are not redirected, then we try to load the possible applet:
-$redirectTo = \MittagQI\Translate5\Applet\Dispatcher::getInstance()->getDefaultAppletForUser(); //no redirection was given, so dispatch by default
-if(empty($redirectTo)){
-    // the user has no session -> redirect to login
-    $redirectTo = 'login';
+class Default_Bootstrap extends Zend_Application_Module_Bootstrap
+{
+    public static function initModuleSpecific(){
+    }
 }
-Zend_Controller_Front::getInstance()->getResponse()->setRedirect(APPLICATION_RUNDIR.'/'.$redirectTo);
-?>

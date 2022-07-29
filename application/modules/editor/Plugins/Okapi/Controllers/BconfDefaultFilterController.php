@@ -68,5 +68,7 @@ class editor_Plugins_Okapi_BconfDefaultFilterController extends ZfExtended_RestC
             // no extensions means, we remove the filter
             $extensionMapping->removeFilter($identifier);
         }
+        // must be reflected in the bconf as well ...
+        $bconf->pack();
     }
 }
