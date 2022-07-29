@@ -57,6 +57,10 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
 
+        // Adds needed data to the Segment-Editor
+        $this->eventManager->attach('Editor_SegmentController', 'afterIndexAction', [$this, 'handleAfterSegmentIndex']);
+        $this->eventManager->attach('Editor_SegmentController', 'afterPutAction',   [$this, 'handleAfterSegmentPut']);
+
         // Checks spell checkers availability.
         $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'handleSpellCheckerCheck'));
     }
@@ -186,5 +190,42 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
                         'action' => 'matches'
                 ));
         $r->addRoute('plugins_spellcheck_matches', $matchesRoute);
+    }
+
+    /**
+     * Append spellcheck data for each segment within segments store data
+     *
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterSegmentIndex(Zend_EventManager_Event $event) {
+
+        // Get array of segment ids
+        $segmentIds = array_column($event->getParam('view')->rows, 'id');
+
+        // Get [segmentId => spellCheckData] pairs
+        $segmentSpellCheckDataById = ZfExtended_Factory
+            ::get('editor_Models_SegmentQuality')
+            ->getSpellCheckData($segmentIds);
+
+        // Apply to response
+        foreach ($event->getParam('view')->rows as &$row) {
+            $row['spellCheck'] = $segmentSpellCheckDataById[$row['id']];
+        }
+    }
+
+    /**
+     * Append spellcheck data for updated segment
+     *
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterSegmentPut(Zend_EventManager_Event $event) {
+
+        // Get [segmentId => spellCheckData] pairs
+        $segmentSpellCheckDataByIds = ZfExtended_Factory
+            ::get('editor_Models_SegmentQuality')
+            ->getSpellCheckData([$event->getParam('view')->rows->id]);
+
+        // Apply spellCheck prop
+        $event->getParam('view')->rows->spellCheck = $segmentSpellCheckDataByIds[$event->getParam('view')->rows->id];
     }
 }

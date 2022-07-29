@@ -88,7 +88,7 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
             $segment = $tags->getSegment();
 
             // If existing qualities won't be marked for deletion
-            if ($tags->processingMode != editor_Segment_Processing::EDIT) {
+            if ($tags->getProcessingMode() != editor_Segment_Processing::EDIT) {
 
                 // Clean existing spellcheck-qualities
                 $qualityM->removeBySegmentAndType($segment->getId(), editor_Plugins_SpellCheck_QualityProvider::qualityType());

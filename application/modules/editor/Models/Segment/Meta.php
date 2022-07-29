@@ -180,10 +180,7 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
      */
     public function getSpellcheckSegmentProgress(string $taskGuid): float {
         $states = [
-            editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_CHECKED,
-            //editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_DEFECT,
-            //editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE,
-            //editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_IGNORE
+            editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_CHECKED
         ];
         $adapter = $this->db->getAdapter();
         $sql = "SELECT (SELECT COUNT(*) FROM LEK_segments_meta WHERE ".$adapter->quoteInto('spellcheckState IN(?)',$states)." AND taskGuid = ?) / COUNT(*) AS 'progress'

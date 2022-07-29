@@ -24,3 +24,9 @@
 --
 -- END LICENSE AND COPYRIGHT
 -- */
+DELETE FROM `Zf_configuraton` WHERE
+    `name` LIKE 'runtimeOptions.plugins.SpellCheck%'               OR
+    `name` LIKE 'runtimeOptions.worker.editor_Plugins_SpellCheck%' OR
+    `name` LIKE 'runtimeOptions.autoQA.enableSegmentSpellCheck';
+
+DELETE FROM `Zf_worker_dependencies` WHERE 'editor_Plugins_SpellCheck_Worker_Import' IN (`worker`, `dependency`);

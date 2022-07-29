@@ -134,57 +134,6 @@ class Editor_SegmentController extends ZfExtended_RestController
             }
         }
 
-        // Get array of segment ids
-        $segmentIds = array_column($this->view->rows, 'id');
-
-        // Get [segmentId => spellCheckData] pairs
-        $segmentSpellCheckDataById = ZfExtended_Factory
-            ::get('editor_Models_SegmentQuality')
-            ->getSpellCheckData($segmentIds);
-
-        // Apply to response
-        foreach ($this->view->rows as &$row) {
-            $row['spellCheck'] = $segmentSpellCheckDataById[$row['id']];
-
-            /*if ($row['id'] == 261346) {
-                foreach ($row['spellCheck'] as $field => &$matchA) {
-                    preg_match_all('~(?<open><del.*?>)(?<content>.*?)(?<close></del>)~', $row[$field . 'Edit'], $m, PREG_OFFSET_CAPTURE);
-                    foreach ($matchA as &$matchI) {
-                        $matchSince = $matchI->range->start;
-                        $matchUntil = $matchI->range->end;
-                        $shift = 0;
-                        for ($i = 0; $i < count($m[0]); $i ++) {
-                            i("$i: was matchSince $matchSince and matchUntil $matchUntil", 'a');
-                            if ($i) $shitf = 1;
-                            $shift = $m['open'][$i][1];
-                            $start = $m['content'][$i][1] - mb_strlen($m['open'][$i][0]) - $shift;
-                            $end = $start + mb_strlen($m['close'][$i][0]);
-                            if ($start > $matchSince && $end > $matchUntil) {
-                                i("break due to $start > $matchSince and $end > $matchUntil", 'a');
-                                break;
-                            } else {
-                                i("dont break due to $start > $matchSince and $end > $matchUntil", 'a');
-                            }
-                            $lengthOfDelNode = mb_strlen($m['content'][$i][0]);
-                            i('- length: ' . $lengthOfDelNode . ' - ' . $m['content'][$i][0], 'a');
-                            if ($start <= $matchSince) {
-                                $matchSince = $matchSince + $lengthOfDelNode;
-                                $matchUntil = $matchUntil + $lengthOfDelNode;
-                                i('- match NOW (start and end moved): ' . $matchSince . ' / ' . $matchUntil, 'a');
-                            } else if ($end <= $matchUntil) {
-                                $matchUntil = $matchUntil + $lengthOfDelNode;
-                                i('- match NOW (only end moved): ' . $matchSince . ' / ' . $matchUntil, 'a');
-                            }
-                            $matchI->range->start = $matchSince;
-                            $matchI->range->end   = $matchUntil;
-                        }
-                    }
-                    i($m, 'a');
-                    break;
-                }
-            }*/
-        }
-
         // ----- Specific handling of rows (end) -----
     }
 
@@ -406,14 +355,6 @@ class Editor_SegmentController extends ZfExtended_RestController
         //set the segmentFinishCount so the frontend viewmodel is updated
         //TODO: this should be updated from the websockets
         $this->view->segmentFinishCount = $task->getSegmentFinishCount();
-
-        // Get [segmentId => spellCheckData] pairs
-        $segmentSpellCheckDataByIds = ZfExtended_Factory
-            ::get('editor_Models_SegmentQuality')
-            ->getSpellCheckData([$this->view->rows->id]);
-
-        // Apply spellCheck prop
-        $this->view->rows->spellCheck = $segmentSpellCheckDataByIds[$this->view->rows->id];
     }
 
     /***

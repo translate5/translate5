@@ -107,16 +107,6 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
             return;
         }
 
-        // If task source and target language are same
-        if ($task->getSourceLang() === $task->getTargetLang()) {
-
-            // Log event
-            $worker->getLogger()->error('E1326', 'TermTagger can not work when source and target language are equal.', ['task' => $this->task]);
-
-            // Prevent worker from being initialized/queued
-            return false;
-        }
-
         $worker->queue($parentWorkerId);
     }
     

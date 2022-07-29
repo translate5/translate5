@@ -46,9 +46,6 @@ INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) values('editor_Plu
 INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) values('editor_Segment_Quality_OperationFinishingWorker','editor_Plugins_SpellCheck_Worker_Import');
 INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) values('editor_Segment_Quality_ImportFinishingWorker'   ,'editor_Plugins_SpellCheck_Worker_Import');
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `typeClass`, `description`, `level`, `guiName`, `guiGroup`, `comment`) values
-('runtimeOptions.plugins.SpellCheck.languagetool.maxSegmentCharacterCount' ,'1','editor','plugins','20000','20000','','integer',NULL,'Maximum number of characters per request to LanguageTool server','1','','','');
-
 UPDATE `Zf_configuration`
 SET
     `description` = "If set to active, spell- grammar and style check is active while typing in the editor (based on languagetool)",

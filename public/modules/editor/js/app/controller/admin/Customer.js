@@ -357,8 +357,7 @@ Ext.define('Editor.controller.admin.Customer', {
         if (!me.handleFiltering) {
             return;
         }
-        //console.log('beforebreakpoint11');
-        //console.log('customerswitch233');
+
         var customerId = me.getCustomerSwitchValue();
         val = me.getCustomerName(customerId);
         me.customerSwitchLastClientsValue = customerId;
@@ -485,6 +484,3 @@ Ext.define('Editor.controller.admin.Customer', {
         return val;
     },
 });
-/*window.testDebugFn = function() {
-    console.log('inside1');
-}*/

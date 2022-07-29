@@ -1463,31 +1463,6 @@ Ext.define('Translate5.override.grid.feature.Grouping', {
 
 });
 
-Ext.override(Ext.util.Format, {
-
-    /**
-     * Equivalent for php's strip_tags function. Source code got from http://phpjs.org/functions/strip_tags/
-     * Overridden due to that ExtJS's version of this function is not supporting allowedTags-argument
-     *
-     * @param input
-     * @param allowedTags
-     * @return {*}
-     */
-    stripTags: function(input, allowedTags) {
-
-        // Making sure the allowedTags arg is a string containing only tags in lowercase (<a><b><c>)
-        allowedTags = (((allowedTags || "") + "").toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
-
-        // Regular expression for html tags, php tags and php comments
-        var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi, commentsAndPhpTags = /<!--[\s\S]*?-->|<\?(?:php)?[\s\S]*?\?>/gi;
-
-        // Stripping
-        return (input + '').replace(commentsAndPhpTags, '').replace(tags, function ($0, $1) {
-            return allowedTags.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
-        });
-    }
-});
-
 /***
  * Up-to-date implementation that works on modern iterables via Array.from
  * @see https://stackoverflow.com/q/18884249

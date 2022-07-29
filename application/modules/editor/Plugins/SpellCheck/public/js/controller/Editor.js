@@ -979,7 +979,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
 
     mindTags: function(match) {
-        var html = Ext.util.Format.stripTags(
+        var html = new Editor.util.HtmlCleanup().cleanHtmlTags(
             match.range.containerNode.innerHTML.replace(/<([0-9]+)\/>/g, '&lt;$1&gt;'), '<del>'
         ).replace(/&lt;([0-9]+)\/&gt;/g, '<$1/>'), tagm, tags = [], tag, start, end;
 

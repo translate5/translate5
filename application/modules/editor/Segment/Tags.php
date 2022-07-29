@@ -117,7 +117,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * see modes in editor_Segment_Processing
      * @var string
      */
-    public $processingMode;
+    private $processingMode;
     /**
      *
      * @var bool

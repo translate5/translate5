@@ -55,6 +55,9 @@ Ext.define('Editor.model.quality.Filter', {
     isCategory: function(){
         return (this.get('qcategory') != '' && this.get('qtype') != 'root');
     },
+    isCategoryGroup: function(){
+        return this.isCategory() && this.get('children') && !this.get('qcategory').match(/^mqm_/);
+    },
     isEmptyQuality: function(){
         return (this.get('qcategory') != '' && this.get('qtype') != 'root' && this.get('qcount') == 0);
     },
@@ -77,8 +80,8 @@ Ext.define('Editor.model.quality.Filter', {
         return (this.get('qfaulty') == true);
     },
     propagateChecked: function(checked){
-        var isQRoot = this.isQualityRoot(), isRubric = this.isRubric();
-        if(isQRoot || isRubric){
+        var isQRoot = this.isQualityRoot(), isRubric = this.isRubric(), isCategoryGroup = this.isCategoryGroup();
+        if(isQRoot || isRubric || isCategoryGroup){
             this.propagateCheckedDown(checked);
         }
         if(!isQRoot && this.parentNode){
@@ -102,13 +105,13 @@ Ext.define('Editor.model.quality.Filter', {
      * Propagate the checked state up
      */
     propagateCheckedUp: function(checked, rubricId){
-        var isQRoot = this.isQualityRoot(), isRubric = this.isRubric();
+        var isQRoot = this.isQualityRoot(), isRubric = this.isRubric(), isCategoryGroup = this.isCategoryGroup();
         if(checked){
-            if((isQRoot || isRubric) && this.allChildrenChecked(isRubric, rubricId)){
+            if((isQRoot || isRubric || isCategoryGroup) && this.allChildrenChecked(isRubric, rubricId)){
                 this.set('checked', true);
             }
         } else {
-            if((isQRoot || isRubric) && this.get('checked')){
+            if((isQRoot || isRubric || isCategoryGroup) && this.get('checked')){
                 this.set('checked', false);
             } 
         }

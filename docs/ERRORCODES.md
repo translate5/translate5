@@ -360,7 +360,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1393"></a>E1393  | Terminology | TBX Import: The XML structure of the TBX file is invalid: {message} | In this case the XML of the given TBX file is invalid and can not be parsed.
 | <a id="E1360"></a>E1360  | Terminology | TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states. | The listed states are unknown and can not be mapped to the usual administrative status values.<br />Please configure them in the runtimeOptions.tbx.termImportMap configuration.
 | <a id="E1361"></a>E1361  | Terminology | TBX Import: Unable to import terms due invalid Rfc5646 language code &quot;{code}&quot; | The listed language code is invalid / not configured in translate5, the corresponding terms could not be imported.
-| <a id="E1364"></a>E1364  | Terminology | SpellCheck overall run done - {segmentCounts} | Reports that the whole task was tagged with the termtagger and shows the segment status counts.
+| <a id="E1364"></a>E1364  | Terminology | TermTagger overall run done - {segmentCounts} | Reports that the whole task was tagged with the termtagger and shows the segment status counts.
 
 
 ### Segment
@@ -587,6 +587,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1413"></a>E1413  | Plug-In SpellCheck | SpellCheck can not work when target language is not supported by LanguageTool. | Check task target language
 | <a id="E1417"></a>E1417  | Plug-In SpellCheck | SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList} | One or more LanguageTool instances are not available. All LanguageTool instances are listed with their status. Please check them manually and restart them if needed.
 | <a id="E1418"></a>E1418  | Plug-In SpellCheck | LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app | Create a ticket for this issue with the event added.
+| <a id="E1419"></a>E1419  | Plug-In SpellCheck | SpellCheck overall run done - {segmentCounts} | Reports that the whole task was checked with the spellchecker and shows the segment status counts.
 
 
 ## EventCode Design rules / decisions
