@@ -25,7 +25,20 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-# this is just for testing.
-UPDATE `Zf_configuration` SET `value` = '{"Okapi default url":"http://localhost:8080/okapi-longhorn/","Okapi another url":"http://localhost:8080/okapi-longhorn/"}',
-`type` = 'map', `typeClass` = 'editor_Plugins_Okapi_DbConfig_OkapiConfigType' 
-WHERE (`name` = 'runtimeOptions.plugins.Okapi.api.url');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `typeClass`, `description`, `level`, `guiName`, `guiGroup`)
+VALUES ('runtimeOptions.plugins.Okapi.server', '1', 'editor', 'plugins', '', '', '', 'map', 'editor_Plugins_Okapi_DbConfig_OkapiConfigType', 'Available okapi instances with unique names. Do not change the name after the instance is assigned to a task.', '2', 'Okapi longhorn available instances', 'System setup: General');
+
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`)
+VALUES ('runtimeOptions.plugins.Okapi.serverUsed', '1', 'editor', 'plugins', '', '', '', 'string', 'Okapi server used for the a task. All available values are automatically generated out of the runtimeOptions.plugins.Okapi.server config', '8', 'Okapi longhorn server used for a task', 'System setup: General');
+
+
+# Update the available okapi servers from the okapi api url config
+UPDATE `Zf_configuration` as `m`, (SELECT `value` FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.plugins.Okapi.api.url') as `p`
+SET `m`.`value` = CONCAT('{"used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE()),'":"',(`p`.`value`),'"}')
+WHERE (`m`.`name` = 'runtimeOptions.plugins.Okapi.server');
+
+# Update the server used value with the same value as the okapi server
+UPDATE `Zf_configuration`
+SET `value` = CONCAT('used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE())),`defaults` = CONCAT('used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE()))
+WHERE (`name` = 'runtimeOptions.plugins.Okapi.serverUsed');

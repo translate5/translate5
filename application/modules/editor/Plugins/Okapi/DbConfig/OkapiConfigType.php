@@ -42,10 +42,50 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
         if(!$rawType) {
             return false;
         }
+        if($this->checkTaskUsage() === false){
+            //TODO: better messge
+            $errorStr.= 'Unable to remove the server. It is already used by one of the tasks.';
+            return false;
+        }
 
+        $this->updateServerUsedDefaults($value);
+
+        return true;
+    }
+
+    /***
+     * Update server used config defaults when new server is added (runtimeOptions.plugins.Okapi.server)
+     * @param string $value
+     * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    private function updateServerUsedDefaults(string $value = ''){
+        if( empty($value)){
+            return;
+        }
+        $configUrls = json_decode($value,true);
+        $defaults = implode(',',array_keys($configUrls));
+
+        /** @var editor_Models_Config $config */
+        $config = ZfExtended_Factory::get('editor_Models_Config');
+        $config->loadByName('runtimeOptions.plugins.Okapi.serverUsed');
+
+        $config->setDefaults($defaults);
+        $config->save();
+    }
+
+    /***
+     * Check if the removed config is used from the tasks. If yes, this action is not allowed. We can not remove
+     * used config name/server.
+     * @return false
+     */
+    private function checkTaskUsage(){
         //TODO: validate if there is removed url/route from the config and if the removed one is in use.
         // If it is in use (one of the tasks uses the removed okapi url/route as import),
         // throw exception so the user knows what is t
-        return true;
+        return false;
     }
+
 }
