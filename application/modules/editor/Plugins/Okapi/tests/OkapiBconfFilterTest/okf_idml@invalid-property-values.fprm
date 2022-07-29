@@ -1,0 +1,15 @@
+#v1
+maxAttributeSize.i=INVALID
+untagXmlStructures.b=true
+extractNotes.b=false
+extractMasterSpreads.b=true
+extractHiddenLayers.b=false
+extractHiddenPasteboardItems.b=false
+skipDiscretionaryHyphens.b=false
+extractBreaksInline.b=false
+extractCustomTextVariables.b=true
+extractIndexTopics.b=true
+ignoreCharacterKerning.b=INVALID
+ignoreCharacterTracking.b=false
+ignoreCharacterLeading.b=false
+ignoreCharacterBaselineShift.b=false
