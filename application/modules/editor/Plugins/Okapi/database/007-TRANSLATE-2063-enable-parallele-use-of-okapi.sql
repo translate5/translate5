@@ -35,10 +35,13 @@ VALUES ('runtimeOptions.plugins.Okapi.serverUsed', '1', 'editor', 'plugins', '',
 
 # Update the available okapi servers from the okapi api url config
 UPDATE `Zf_configuration` as `m`, (SELECT `value` FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.plugins.Okapi.api.url') as `p`
-SET `m`.`value` = CONCAT('{"used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE()),'":"',(`p`.`value`),'"}')
+SET `m`.`value` = CONCAT('{"used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE()),'":"',(`p`.`value`),'"}'),
+`m`.`default` = CONCAT('{"used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE()),'":"',(`p`.`value`),'"}')
 WHERE (`m`.`name` = 'runtimeOptions.plugins.Okapi.server');
 
 # Update the server used value with the same value as the okapi server
 UPDATE `Zf_configuration`
-SET `value` = CONCAT('used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE())),`defaults` = CONCAT('used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE()))
+SET `value` = CONCAT('used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE())),
+    `defaults` = CONCAT('used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE())),
+    `default` = CONCAT('used-on-',YEAR(CURRENT_DATE()),'-',MONTH(CURRENT_DATE()))
 WHERE (`name` = 'runtimeOptions.plugins.Okapi.serverUsed');

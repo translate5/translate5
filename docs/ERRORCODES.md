@@ -497,6 +497,9 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1414"></a>E1414  | Plug-In Okapi | Okapi Plug-In: The fprm file "{file}" is not valid ({details}) | An embedded fprm/filter file from an imported or uploaded bconf is not valid
 | <a id="E1415"></a>E1415  | Plug-In Okapi | Okapi Plug-In: Error unpacking the bconf {bconf} ({details}) | A bconf could not be unpacked on import
 | <a id="E1416"></a>E1416  | Plug-In Okapi | Okapi Plug-In: Error packing the bconf {bconf} ({details}) | A bconf could not be packed
+| <a id="E1412"></a>E1412  | Plug-In Okapi    | Okapi Plug-In: The server used can not be found in all available configured servers | For the serverUsed there is no url defined in servers config
+| <a id="E1410"></a>E1410  | Plug-In Okapi    | Okapi Plug-In: No configuration found for okapi server(s) | Empty okapi servers configuration (runtimeOptions.plugins.Okapi.server config)
+| <a id="E1411"></a>E1411  | Plug-In Okapi    | Okapi Plug-In: No configuration found for okapi server used | Empty okapi server used configuration (runtimeOptions.plugins.Okapi.serverUsed)
 
 
 #### Plug-In PangeaMt

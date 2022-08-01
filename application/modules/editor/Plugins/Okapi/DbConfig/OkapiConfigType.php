@@ -42,13 +42,13 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
         if(!$rawType) {
             return false;
         }
-        if($this->checkTaskUsage() === false){
-            //TODO: better messge
+        if($this->checkTaskUsage($value) === false){
             $errorStr.= 'Unable to remove the server. It is already used by one of the tasks.';
             return false;
         }
 
         $this->updateServerUsedDefaults($value);
+        $this->cleanUpNotUsed($value);
 
         return true;
     }
@@ -77,15 +77,61 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
     }
 
     /***
+     * Remove non existing server values from client overwrites
+     * @param string $value
+     * @return void
+     */
+    private function cleanUpNotUsed(string $value = ''): void
+    {
+        /** @var editor_Models_Customer_CustomerConfig $config */
+        $config = ZfExtended_Factory::get('editor_Models_Customer_CustomerConfig');
+        $db = $config->db;
+
+        $where = ['name = ? ' => 'runtimeOptions.plugins.Okapi.serverUsed'];
+
+        $names = json_decode($value,true);
+
+        if( !empty($names)){
+            $where['value NOT IN (?)'] = array_keys($names);
+        }
+        // remove all serverUsed configs with non existing server values
+        $db->delete($where);
+
+
+        /** @var editor_Models_Config $config */
+        $config = ZfExtended_Factory::get('editor_Models_Config');
+        $config->loadByName('runtimeOptions.plugins.Okapi.serverUsed');
+
+        // if the new values are not valid for serverUsed config (instance level) -> remove the current value from there
+        if( !in_array($config->getValue(), array_keys($names))){
+            $config->setValue('');
+            $config->save();
+        }
+    }
+
+    /***
      * Check if the removed config is used from the tasks. If yes, this action is not allowed. We can not remove
      * used config name/server.
      * @return false
      */
-    private function checkTaskUsage(){
-        //TODO: validate if there is removed url/route from the config and if the removed one is in use.
-        // If it is in use (one of the tasks uses the removed okapi url/route as import),
-        // throw exception so the user knows what is t
-        return false;
+    private function checkTaskUsage(string $value = ''){
+        /** @var editor_Models_TaskConfig $config */
+        $config = ZfExtended_Factory::get('editor_Models_TaskConfig');
+        $db = $config->db;
+
+        $names = json_decode($value,true);
+
+        $s = $db->select()
+            ->where('name = ?','runtimeOptions.plugins.Okapi.serverUsed');
+
+        if( !empty($names)){
+            $s->where('value NOT IN (?)',array_keys($names));
+        }
+
+        // if result has values this means the removed config is used for one of the existing tasks
+        $result = $db->getAdapter()->fetchAll($s);
+
+        return empty($result);
     }
 
 }

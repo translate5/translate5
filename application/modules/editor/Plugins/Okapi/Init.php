@@ -691,6 +691,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $applicationState->okapi = new stdClass();
         $connector = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
         /* @var $connector editor_Plugins_Okapi_Connector */
+        // the default current configured serverUsed will be checked
         $applicationState->okapi->server = $connector->ping();
     }
 
