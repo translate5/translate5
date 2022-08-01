@@ -70,11 +70,14 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 change: {
                     fn: function(customerCombo, customerId){
                         customerId = (!customerId) ? null : customerId; // may be ''
-                        var store = Ext.getStore('bconfStore').createImportWizardSelectionData(customerId, customerCombo.getSelection().get('defaultBconfId')),
-                            combo = Ext.getCmp('taskImportBconfId');
-                        combo.setStore(store);
-                        combo.setValue(store.selectedId);
-                        combo.enable();
+                        var selection = customerCombo.getSelection();
+                        if(selection){
+                            var store = Ext.getStore('bconfStore').createImportWizardSelectionData(customerId, selection.get('defaultBconfId')),
+                                combo = Ext.getCmp('taskImportBconfId');
+                            combo.setStore(store);
+                            combo.setValue(store.selectedId);
+                            combo.enable();
+                        }
                     }
                 }
             }
