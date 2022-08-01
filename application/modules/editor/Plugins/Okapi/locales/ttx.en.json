@@ -1,0 +1,7 @@
+{
+    "segmentMode": "Extraction mode",
+    "segmentMode0": "Auto-detect existing segments (If found: extract only those, otherwise extract all)",
+    "segmentMode1": "Extract only existing segments",
+    "segmentMode2": "Extract all (existing segments and un-segmented text parts)",
+    "escapeGT": "Escape the greater-than characters in output"
+}

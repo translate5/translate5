@@ -180,8 +180,10 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
             // collect all custom extensions
             this.customIdentifierMap.forEach(id => {
                 record = this.getById(id);
-                allCustomExts = allCustomExts.concat(record.get('extensions'));
-                bconfId = record.get('bconfId');
+                if(record){
+                    allCustomExts = allCustomExts.concat(record.get('extensions'));
+                    bconfId = record.get('bconfId');
+                }
             });
             // the bconf grid will listen and update a bconf accordingly
             this.fireEvent('customFilterExtensionsChanged', bconfId, allCustomExts);

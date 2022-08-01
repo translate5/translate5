@@ -155,7 +155,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
     /**
      * Test Pipeline & Content validation
      */
-    public function test50_OtherValidators() {
+    public function test60_OtherValidators() {
         // invalid Pipeline
         $invalidPipeline = self::$api->getFileContent('pipeline-invalid.pln');
         $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline(self::$bconf->getPipelinePath(), $invalidPipeline, self::$bconf->getId());
@@ -164,6 +164,43 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
         $invalidContent = file_get_contents(self::$api->getFile('content-invalid.json'));
         $content = new editor_Plugins_Okapi_Bconf_Content(self::$bconf->getContentPath(), $invalidContent, self::$bconf->getId());
         $this->_createResourceFileTest($content, false, ['no source SRX set', 'no step found']);
+    }
+
+    /**
+     * Uploads a SRX and checks if it was changed, on file-base and in all places this is referenced
+     */
+    public function test70_UploadSrx() {
+        $result = $this->_uploadResourceFile('languages-changed.srx', 'editor/plugins_okapi_bconf/uploadsrx', 'srx', [
+            'id' => self::$bconfId,
+            'purpose' => 'source'
+        ]);
+        self::assertEquals(true, $result->success, 'Failed to upload changed SRX "languages-changed.srx" as new source SRX');
+        // check update in pipeline
+        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline(self::$bconf->getPipelinePath(), NULL, self::$bconf->getId());
+        self::assertEquals('languages-changed.srx', $pipeline->getSrxFile('source'), 'Failed to change pipeline.pln for updated source SRX "languages-changed.srx"');
+        // check update in content
+        $content = new editor_Plugins_Okapi_Bconf_Content(self::$bconf->getContentPath(), NULL, self::$bconf->getId());
+        self::assertEquals('languages-changed.srx', $content->getSrxFile('source'), 'Failed to change content.json for updated source SRX "languages-changed.srx"');
+        try {
+            $srx = new editor_Plugins_Okapi_Bconf_Segmentation_Srx(self::$bconf->createPath('languages-changed.srx'));
+            self::assertEquals(true, str_contains($srx->getContent(), 'JUSTACHANGEDSTRING'), 'The updated SRX "languages-changed.srx" did not contain the expected contents');
+        } catch (Exception $e){
+            self::fail('Uploaded changed source SRX "languages-changed.srx" was not found in the BCONFs files ['.$e->getMessage().']');
+        }
+    }
+
+    /**
+     * Tests the saving of changed FPRMs for the 3 main FPRM types
+     */
+    public function test80_ChangeFprm() {
+        // this string is embedded in all the changed FPRMs
+        $searchedString = 'JUSTACHANGEDSTRING';
+        // changed YAML FPRM
+        $this->_saveChangedFprmTest('okf_html_changed.fprm', 'okf_html@local-html_customized', editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_YAML, $searchedString);
+        // changed XML FPRM
+        $this->_saveChangedFprmTest('okf_itshtml5_changed.fprm', 'okf_itshtml5@local-standard_html5_customized', editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XML, $searchedString);
+        // changed PROPERTIES FPRM
+        $this->_saveChangedFprmTest('okf_openxml_changed.fprm', 'okf_openxml@local-microsoft_office_document_customized', editor_Plugins_Okapi_Bconf_Filter_Fprm::TYPE_XPROPERTIES, $searchedString);
     }
 
     /**
@@ -274,5 +311,72 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
                 self::assertEquals(true, str_contains(strtolower($error), strtolower($errorPart)));
             }
         }
+    }
+
+    /**
+     * Creates a test that mimics the saving of a FPRM file
+     * @param string $filename
+     * @param string $identifier
+     * @param string $fprmType
+     * @param string $searchedString
+     * @throws Zend_Http_Client_Exception
+     * @throws ZfExtended_Exception
+     */
+    public function _saveChangedFprmTest(string $filename, string $identifier, string $fprmType, string $searchedString) {
+        $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
+        $filterEntity = self::$bconf->findCustomFilterEntry($idata->type, $idata->id);
+        if($filterEntity == NULL){
+            self::fail('Could not find filter "'.$identifier.'" in tested BCONF');
+        } else {
+            $params = [
+                'id' => $filterEntity->getId(),
+                'type' => $fprmType
+            ];
+            $content = file_get_contents(self::$api->getFile($filename));
+            $result = self::$api->postRaw('editor/plugins_okapi_bconffilter/savefprm', $content, $params);
+            $result = $this->_getFullResult($result);
+            self::assertEquals(true, $result->success, 'Failed to save changed FPRM "'.$filename.'"');
+            try {
+                $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm(self::$bconf->createPath($filterEntity->getFile()));
+                self::assertEquals(true, str_contains($fprm->getContent(), $searchedString), 'The updated SRX "'.$filterEntity->getFile().'" did not contain the expected contents');
+            } catch (Exception $e){
+                self::fail('Can not find "'.$filterEntity->getFile().'" in the BCONFs files ['.$e->getMessage().']');
+            }
+        }
+    }
+
+    /**
+     * @param string $filename
+     * @param string $endpoint
+     * @param string $uploadName
+     * @param array $uploadParams
+     * @param string $uploadMime
+     * @return mixed
+     */
+    private function _uploadResourceFile(string $filename, string $endpoint, string $uploadName, array $uploadParams=[], string $uploadMime='application/octet-stream'){
+        $input = new SplFileInfo(self::$api->getFile($filename));
+        self::$api->addFile($uploadName, $input->getPathname(), $uploadMime);
+        // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
+        $result = self::$api->requestJson($endpoint, 'POST', $uploadParams);
+        return $this->_getFullResult($result);
+    }
+
+    /**
+     * turns the multitype-result of the API to an object that also represents the result of a failed request
+     * @param $result
+     * @return mixed|stdClass
+     */
+    private function _getFullResult($result){
+        if($result === false){
+            $responseBody = self::$api->getLastResponse()->getBody();
+            $result = json_decode($responseBody);
+            $result->success = false;
+        } else if(!$result) {
+            $result = new stdClass();
+            $result->success = true;
+        } else {
+            $result->success = true;
+        }
+        return $result;
     }
 }

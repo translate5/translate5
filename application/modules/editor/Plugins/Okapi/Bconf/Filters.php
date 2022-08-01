@@ -65,6 +65,7 @@ class editor_Plugins_Okapi_Bconf_Filters {
         'okf_idml' => ['class' => 'Idml', 'extensions' => ['idml']],
         'okf_itshtml5' => ['class' => 'Xml', 'extensions' => ['html']],
         'okf_openxml' => ['class' => 'Openxml', 'extensions' => ['docx', 'pptx', 'xlsx']],
+        'okf_ttx' => ['class' => 'Ttx', 'extensions' => []],
         'okf_xml' => ['class' => 'Xml', 'extensions' => ['xml']],
         'okf_xmlstream' => ['class' => 'Yaml', 'extensions' => ['xml']]
     ];

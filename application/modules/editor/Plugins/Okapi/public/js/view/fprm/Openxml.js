@@ -59,8 +59,8 @@
     zzz4=3B
     zzz5=3C
 
-    see /okapi/okapi-ui/swt/filters/openxml-ui/src/main/java/net/sf/okapi/filters/openxml/ui/Editor.java
-    see /okapi/okapi/filters/openxml/src/main/java/net/sf/okapi/filters/openxml/ConditionalParameters.java
+    see /okapi-ui/swt/filters/openxml-ui/src/main/java/net/sf/okapi/filters/openxml/ui/Editor.java
+    see /okapi/filters/openxml/src/main/java/net/sf/okapi/filters/openxml/ConditionalParameters.java
  */
 
 /**
@@ -74,9 +74,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     fieldDefinitions: {
         /* General Options */
         'tabGeneralOptions': { type: 'tab', icon: 'fa-cog', children: {
-            'maxAttributeSize.i': { config: { hidden: true }},  // not visible in Rainbow
-            'sPreferenceLineSeparatorReplacement': { config: { hidden: true }}, // not visible in Rainbow
-            'bPreferenceAllowEmptyTargets.b': { config: { hidden: true }}, // not visible in Rainbow
+            'maxAttributeSize.i': { config: { hidden: true, valueDefault: 4194304 }},  // not visible in Rainbow, default value = 4kB as defined in rainbow-code
+            'sPreferenceLineSeparatorReplacement': { config: { hidden: true, valueDefault: '\n' }}, // not visible in Rainbow, default value as defined in default-fprm
+            'bPreferenceAllowEmptyTargets.b': { config: { hidden: true, valueDefault: false }}, // not visible in Rainbow, default value as defined in default-fprm
             'bPreferenceTranslateDocProperties.b': {},
             'bPreferenceTranslateComments.b': {},
             'bPreferenceAggressiveCleanup.b': {},
