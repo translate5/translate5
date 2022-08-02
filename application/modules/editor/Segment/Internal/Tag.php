@@ -37,7 +37,7 @@ use MittagQI\Translate5\Tools\Markup;
  * 
  * @method editor_Segment_Internal_Tag createBaseClone()
  */
-final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
+final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
  
     /**
      * REGEX to remove internal tags from a markup string
@@ -48,6 +48,11 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * @var string
      */
     const REGEX_REMOVE = '~<div\s*class="[^"]*internal-tag[^"]*"[^>]*><span[^>]*title="[^"]*"[^>]*>[^<]*</span><span[^>]*full[^>]*>[^<]*</span></div>~s';
+    /**
+     * As above, but only for single internal tags
+     * Is agnostic to the order of internal-tag / single but expects, they can not be contained more than once
+     */
+    const REGEX_REMOVE_SINGLE = '~<div\s*class="[^"]*(single|internal-tag)[^"]*(internal-tag|single)[^"]*"[^>]*><span[^>]*title="[^"]*"[^>]*>[^<]*</span><span[^>]*full[^>]*>[^<]*</span></div>~s';
     /**
      * Same as above, but intended to capture the contents of the classes & short-tag (which encodes the internal tag index)
      */
@@ -90,6 +95,26 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
     protected static $nodeName = 'div';
     
     protected static $identificationClass = self::CSS_CLASS;
+
+    /**
+     * Replaces all Internal Tags in a segment-text
+     * @param string $markup
+     * @param string $replacement
+     * @return string
+     */
+    public static function replaceInternalTags(string $markup, string $replacement='') : string {
+        return preg_replace(self::REGEX_REMOVE, $replacement, $markup);
+    }
+
+    /**
+     * Replaces all singular Internal Tags in a segment-text
+     * @param string $markup
+     * @param string $replacement
+     * @return string
+     */
+    public static function replaceSingleInternalTags(string $markup, string $replacement='') : string {
+        return preg_replace(self::REGEX_REMOVE_SINGLE, $replacement, $markup);
+    }
 
     /**
      * Provides validating a list of DOMchildren to be the inner elements of a proper internal tag
