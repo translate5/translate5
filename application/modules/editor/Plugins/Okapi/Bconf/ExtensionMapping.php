@@ -185,6 +185,12 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     private array $fprmsToPack;
 
     /**
+     * Captures validatiopn errors during validation
+     * @var array
+     */
+    private array $validationErrors;
+
+    /**
      * @var bool
      */
     private bool $doDebug;
@@ -287,7 +293,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
-     * Generates the frontend-model for the extension mapping, where identifier => extenasions
+     * Generates the frontend-model for the extension mapping, where identifier => extensions
      * The non-embedded default identifiers like 'okf_xml-AndroidStrings' will be turned to embedded ones like 'okf_xml@okf_xml-AndroidStrings'
      * @return array
      * @throws ZfExtended_Exception
@@ -466,7 +472,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 $newMap[$extension] = $filter;
             }
         }
-        // append extensions that could not be distribued to existing entries for $identifier
+        // append extensions that could not be distributed to existing entries for $identifier
         if(count($extToAdd) > 0){
             // in the map on disk we always use default identifiers
             $filter = ($defaultIdentifier === NULL) ? $identifier : $defaultIdentifier;
@@ -638,6 +644,46 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     public function getOkapiDefaultFprmsForPacking(array $addedCustomIdentifiers) : array {
         $this->preparePacking($addedCustomIdentifiers);
         return $this->fprmsToPack;
+    }
+
+    /**
+     * Validates the extenion-mapping. Checks, there are only valid identifiers and the custom identifiers exist in the DB and the filesystem
+     * @return bool
+     */
+    public function validate() : bool {
+        $this->validationErrors = [];
+        $filters = editor_Plugins_Okapi_Bconf_Filters::instance();
+        $customFiltersFromDB = $this->bconf->findCustomFilterIdentifiers(); // thr custom identifiers in the DB
+        foreach($this->getAllFilters() as $identifier){
+            if(editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)){
+                if(!$filters->isValidOkapiDefaultFilter($identifier)){
+                    $this->validationErrors[] = 'Invalid OKAPI default filter "'.$identifier.'"';
+                }
+            } else {
+                $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
+                if($filters->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)){
+                    $this->validationErrors[] = 'Embedded OKAPI default filter "'.$identifier.'" not allowed in extension-mapping';
+                } else if(!$filters->isEmbeddedTranslate5Filter($idata->type, $idata->id)){
+                    // custom filter, must exist in database & file-system
+                    if(!in_array($identifier, $customFiltersFromDB)){
+                        $this->validationErrors[] = 'Embedded custom filter "'.$identifier.'" not found in the database';
+                    }
+                    $fprmPath = $this->bconf->createPath(editor_Plugins_Okapi_Bconf_Filter_Entity::createFileFromIdentifier($identifier));
+                    if(!file_exists($fprmPath)){
+                        $this->validationErrors[] = 'Embedded custom filter "'.$identifier.'" not found in the bconfs files';
+                    }
+                }
+            }
+        }
+        return (count($this->validationErrors) === 0);
+    }
+
+    /**
+     * Retrieves the error that caused the extension-mapping to be invalid
+     * @return string
+     */
+    public function getValidationError() : string {
+        return implode("\n", $this->validationErrors);
     }
 
     /**

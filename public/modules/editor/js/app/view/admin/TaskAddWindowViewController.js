@@ -34,6 +34,47 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.adminTaskAddWindow',
 
+    listen: {
+        component: {
+            '#taskMainCard combobox#customerId': {
+                change: 'onCustomerChange'
+            }
+        }
+    },
+
+    selectedCustomersConfigStore: null,
+
+    /***
+     *  On customer chagne load the customer specific store with the selected customer.
+     *  This will set the pivot language out of the customer specific store if exist
+     */
+    onCustomerChange: function (comboBox, customerId){
+        var me = this,
+            pivotLanguageCombo = me.getView().down('#relaisLangaugeTaskUploadWizard');
+
+        if(! me.selectedCustomersConfigStore){
+            me.selectedCustomersConfigStore = Ext.create('Editor.store.admin.CustomerConfig');
+        }
+
+        me.getView().mask();
+
+        // reset the pivot langauge on each customer change
+        pivotLanguageCombo.setValue(null);
+
+        me.selectedCustomersConfigStore.loadByCustomerId(customerId,function (){
+            var config = me.selectedCustomersConfigStore.getConfig('project.defaultPivotLanguage'),
+                langId = config ? Ext.getStore('admin.Languages').getIdByRfc(config) : null;
+
+            me.getView().unmask();
+
+            if( !langId){
+                return;
+            }
+
+            pivotLanguageCombo.setValue(langId);
+        })
+    },
+
     /***
      *
      * @param win

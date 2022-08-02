@@ -40,25 +40,27 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * - "tab": represents a tab of the form panel. Can only be added on the highest level and if so, all toplevel-items must be tabs
      * - "fieldset": adds a fieldset to the form
      * - "boolset": special fieldset that is enabled/disabled by a checkbox. Therefore the definition must represent a "boolset" and a bool property at the same time like: "examleBoolset.b": { type: "boolset", config: {...}, children: {...}}
+     * - "radio"
      */
     statics: {
         DATA_TYPES: [ 'boolean', 'integer', 'float', 'string' ],
-        FIELD_TYPES: [ 'field', 'tab', 'fieldset', 'boolset' ]
+        FIELD_TYPES: [ 'field', 'tab', 'fieldset', 'boolset', 'radio' ]
     },
     /**
      * Hashtable of our default controls
      * These will be instantiated for the given data-type
+     * HINT: "valueDefault" can not be called "defaultValue" since the later has a meaning in ExtJS
      * @var {object}
      */
     fieldDefaults: {
-        'boolean': { xtype: 'checkbox', inputValue: true, uncheckedValue: false, defaultValue: false },
-        'integer': { xtype: 'numberfield', allowDecimals: false, allowExponential: false, defaultValue: 0 },
-        'float': { xtype: 'numberfield', allowDecimals: true, allowExponential: false, defaultValue: null }, // a virtual data-type, so we do not force it to be "02 as "in reality" it's a string which supports empty values
-        'string': { xtype: 'textfield', defaultValue: "" }
+        'boolean': { xtype: 'checkbox', inputValue: true, uncheckedValue: false, valueDefault: false },
+        'integer': { xtype: 'numberfield', allowDecimals: false, allowExponential: false, valueDefault: 0 },
+        'float': { xtype: 'numberfield', allowDecimals: true, allowExponential: false, valueDefault: null }, // a virtual data-type, so we do not force it to be "02 as "in reality" it's a string which supports empty values
+        'string': { xtype: 'textfield', valueDefault: "" }
     },
     /**
      * Hashtable of our field definitions. These reflect the real property-names as used in the FPRM (and not the id's as used in translations etc)
-     * Generally these are a variable, that pints to an object holding a config-object, which may further specify the control e.g. with "hidden" for invisible props, defaultValue, valueType or ignoreEmpty
+     * Generally these are a variable, that pints to an object holding a config-object, which may further specify the control e.g. with "hidden" for invisible props, valueDefault, valueType or ignoreEmpty
      * See e.g. Editor.plugins.Okapi.view.fprm.Idml for how these shall look
      * @var {object}
      */
@@ -80,6 +82,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      */
     createForm: function(){
         var name, data, id, tab, iconClass, tabs = null;
+        this.fields = {};
         for(name in this.fieldDefinitions){
             data = this.fieldDefinitions[name];
             id = this.getPropertyId(name);
@@ -129,8 +132,10 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
                 dependentDisabled = (this.transformedData.hasOwnProperty(id) && this.transformedData[id] === false);
             checkbox.dependentControls = this.addHolderChildren(data.children, holder, dependentDisabled); // adds a prop to the checkbox with all dependent fields
             checkbox.on('change', this.onBoolsetChanged, this); // add the handler, that will enable/disable the dependent fields
+        } else if(data.type === 'radio' && data.children && config.valueType === 'integer'){
+            this.addRadio(id, name, config, data.children, holder);
         } else {
-            throw new Error('createField: unknown field type "'+data.type+'" or type requiring children without children');
+            throw new Error('createField: unknown field type "'+data.type+'" or type requiring children');
         }
     },
     /**
@@ -147,6 +152,36 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         config.disabled = disabled; // ome fields are disabled if booleans they depend on are not set
         this.fields[name] = config;
         return holder.add(config);
+    },
+    /**
+     * Adds a radio-button group, which adds it's selected index as integer to the main property
+     * @param {string} id
+     * @param {string} name
+     * @param {object} config
+     * @param {object} children
+     * @param {Ext.panel.Panel} holder
+     */
+    addRadio: function(id, name, config, children, holder){
+        var count = 0,
+            value = this.getFieldValue(id, 0, config.valueType);
+        var radio = {
+            xtype: 'radiogroup',
+            fieldLabel: this.getFieldCaption(id, config),
+            columns: 1,
+            name: name,
+            value: String(value),
+            valueType: config.valueType,
+            items: []
+        };
+        for(name in children){
+            radio.items.push({
+                boxLabel: this.getFieldCaption(this.getPropertyId(name), {}),
+                inputValue: String(count),
+                checked: (count === value)
+            });
+            count++;
+        }
+        return holder.add(radio);
     },
     /**
      *
@@ -215,10 +250,11 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * @returns {object}
      */
     getFieldConfig: function(id, type, name, config){
-        var control = this.fieldDefaults[type];
+        var control = this.fieldDefaults[type],
+            defaultValue = (config.hasOwnProperty('valueDefault')) ? config.valueDefault : control.valueDefault;
         return Object.assign({
             fieldLabel: this.getFieldCaption(id, config),
-            value: this.getFieldValue(id, control.defaultValue, type),
+            value: this.getFieldValue(id, defaultValue, type),
             labelWidth: 'auto',
             labelClsExtra: 'x-selectable',
             valueType: type,
@@ -363,6 +399,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * @returns {boolean|string}
      */
     validate: function(){
+        console.log('VALIDATE: ', this.fields);
         this.resolveFieldDependencies();
         if(this.form.isValid()){
             var data, name, val, id, typeName, errors = [];
@@ -407,10 +444,10 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         }
     },
     /**
-     * Cleanup
+     * Removes our fields-cache ...
      */
-    closeWindow: function(){
+    doDestroy: function() {
         this.fields = {};
-        this.callParent(arguments);
+        this.callParent();
     }
 });

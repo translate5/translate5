@@ -26,23 +26,21 @@
  */
 
 /**
+ 
+ escapeGT.b=false
+ segmentMode.i=0
 
- extractNotes.b=false
- simplifyCodes.b=true
- extractMasterSpreads.b=true
- skipThreshold.i=1000 (max: 32000, min: 1, has tooltip)
- newTuOnBr.b=false
-
- see /okapi/filters/icml/src/main/java/net/sf/okapi/filters/icml/Parameters.java
+ see /okapi/filters/ttx/src/main/java/net/sf/okapi/filters/ttx/Parameters.java
  */
-Ext.define('Editor.plugins.Okapi.view.fprm.Icml', {
+Ext.define('Editor.plugins.Okapi.view.fprm.Ttx', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
-    width: 700,
+    width: 600,
     fieldDefinitions: {
-        'extractNotes.b': {},
-        "simplifyCodes.b": {},
-        "extractMasterSpreads.b": {},
-        "skipThreshold.i": { config: { minValue: 1, maxValue: 32000, hasTooltip: true }},
-        "newTuOnBr.b": {}
+        'segmentMode.i': { type: 'radio', children: {
+            'segmentMode0': {},
+            'segmentMode1': {},
+            'segmentMode2': {}
+        }},
+        "escapeGT.b": {}
     }
 });

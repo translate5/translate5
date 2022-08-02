@@ -1,0 +1,6 @@
+#v1
+extractNotes.b=false
+=true
+extractMasterSpreads.b=true
+skipThreshold.invalid
+newTuOnBr.b=false
