@@ -119,8 +119,12 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     createField: function(id, name, data, holder, disabled){
         var config = data.config || {};
         // we may have custom types defined in the config
-        if(!config.valueType){
+        if(!config.hasOwnProperty('valueType')){
             config.valueType = this.getPropertyType(name);
+        }
+        // only multiline-textfields will be able to handle newlines
+        if(!config.hasOwnProperty('canHandleNewlines')){
+            config.canHandleNewlines = false;
         }
         if(!data.type || data.type === 'field'){
             this.addFieldControl(id, name, config, holder, disabled);
@@ -134,8 +138,11 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             checkbox.on('change', this.onBoolsetChanged, this); // add the handler, that will enable/disable the dependent fields
         } else if(data.type === 'radio' && data.children && config.valueType === 'integer'){
             this.addRadio(id, name, config, data.children, holder);
+        } else if(this.statics().FIELD_TYPES.indexOf(data.type) === -1){
+            config.customFieldType = data.type; // add a marker so custom field types can be detected during validation
+            this.addCustomFieldControl(data, id, name, config, holder, disabled);
         } else {
-            throw new Error('createField: unknown field type "'+data.type+'" or type requiring children');
+            throw new Error('createField: invalid field type "'+data.type+'", there are further configs missing');
         }
     },
     /**
@@ -149,9 +156,22 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      */
     addFieldControl: function(id, name, config, holder, disabled){
         config = Object.assign(this.getFieldConfig(id, config.valueType, name, config), config);
-        config.disabled = disabled; // ome fields are disabled if booleans they depend on are not set
+        config.disabled = disabled; // some fields are disabled if booleans they depend on are not set
         this.fields[name] = config;
         return holder.add(config);
+    },
+    /**
+     * Adds a custom field control that handles one of the types not defined in statics.DATA_TYPES
+     * @param {object} data
+     * @param {string} id
+     * @param {string} name
+     * @param {object} config
+     * @param {Ext.panel.Panel} holder
+     * @param {boolean} disabled
+     * @returns {Ext.panel.Panel}
+     */
+    addCustomFieldControl: function(data, id, name, config, holder, disabled){
+        throw new Error('addCustomFieldControl: unknown field type "'+data.type+'"');
     },
     /**
      * Adds a radio-button group, which adds it's selected index as integer to the main property
@@ -163,7 +183,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      */
     addRadio: function(id, name, config, children, holder){
         var count = 0,
-            value = this.getFieldValue(id, 0, config.valueType);
+            value = this.getFieldValue(id, 0, config.valueType, config.canHandleNewlines);
         var radio = {
             xtype: 'radiogroup',
             fieldLabel: this.getFieldCaption(id, config),
@@ -254,7 +274,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             defaultValue = (config.hasOwnProperty('valueDefault')) ? config.valueDefault : control.valueDefault;
         return Object.assign({
             fieldLabel: this.getFieldCaption(id, config),
-            value: this.getFieldValue(id, defaultValue, type),
+            value: this.getFieldValue(id, defaultValue, type, config.canHandleNewlines),
             labelWidth: 'auto',
             labelClsExtra: 'x-selectable',
             valueType: type,
@@ -282,11 +302,18 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * @param {string} id
      * @param {string|integer|boolean} defaultValue
      * @param {string} type
+     * @param {boolean} canHandleNewlines: special config for string's: if the target field is not multiline-capable, the newlines must be escaped before setting the field-value
      * @returns {string|integer|boolean}
      */
-    getFieldValue: function(id, defaultValue, type){
+    getFieldValue: function(id, defaultValue, type, canHandleNewlines){
         if(this.transformedData.hasOwnProperty(id)){
-            return this.parseTypedValue(type, this.transformedData[id]);
+            if(type === 'string' && canHandleNewlines){
+                return this.unescapeStringValue(this.parseTypedValue(type, this.transformedData[id]));
+            } else if(type === 'string' && !canHandleNewlines){
+                return this.escapeStringValue(this.parseTypedValue(type, this.transformedData[id]));
+            } else {
+                return this.parseTypedValue(type, this.transformedData[id]);
+            }
         }
         return defaultValue;
     },
@@ -330,7 +357,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     },
     /**
      *
-     * @param {string}type
+     * @param {string} type
      * @param {string|boolean|integer} value
      * @returns {string|boolean|integer}
      */
@@ -348,17 +375,33 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
         }
     },
     /**
+     * This API can be overwritten if additional logic is needed for valus derived from custom Fields
+     * Also additional values can be added to the form if required
+     * @param {string} name
+     * @param {string} type
+     * @param {string} customType
+     * @param {string|boolean|integer} value
+     * @param {object} formVals
+     * @param {object} fieldConfig
+     * @returns {string|boolean|integer}
+     */
+    parseCustomValue: function(name, type, customType, value, formVals, fieldConfig){
+        return this.parseTypedValue(type, value); // routes back to the default behavious so extending classes are not forced to implement this
+    },
+    /**
      * @returns {object}
      */
     getFormValues: function(){
         var name, type, conf, vals = this.form.getValues();
         for(name in vals){
             // we may have a custom type set
-            conf = (this.fields.hasOwnProperty(name)) ? this.fields[name].config : null; // we may have a programmatical field
+            conf = (this.fields.hasOwnProperty(name)) ? this.fields[name] : null; // we may have a programmatical field
             type = (conf && conf.valueType) ? conf.valueType : this.getPropertyType(name);
             // we have to remove optional fields that shall be removed if empty
             if(conf && conf.ignoreEmpty && (vals[name] === '' || vals[name] === null)){
                 delete vals[name];
+            } else if(conf && conf.customFieldType) {
+                vals[name] = this.parseCustomValue(name, type, conf.customFieldType, vals[name], vals, conf);
             } else {
                 vals[name] = this.parseTypedValue(type, vals[name]);
             }
@@ -374,7 +417,13 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             values = this.getFormValues(),
             lines = ['#v1'];
         for(name in values){
-            lines.push(this.createRawResultLine(name, values[name]));
+            if(this.getPropertyType(name) === 'string'){
+                // Crucial: \r and \n van not be transfered, so we must escape them as defined in OKAPIs x-properties format
+                // Although the Okapi-Spec enables \r, it is encoded as $0d$ we remove it to get consistent settings between windows & linux
+                lines.push(this.createRawResultLine(name, this.escapeStringValue(values[name])));
+            } else {
+                lines.push(this.createRawResultLine(name, values[name]));
+            }
         }
         return lines.join("\n");
     },
@@ -399,7 +448,6 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
      * @returns {boolean|string}
      */
     validate: function(){
-        console.log('VALIDATE: ', this.fields);
         this.resolveFieldDependencies();
         if(this.form.isValid()){
             var data, name, val, id, typeName, errors = [];
@@ -442,6 +490,23 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             default:
                 return true;
         }
+    },
+    /**
+     * Escapes a string value, x-properties use a special whitespace encoding for strings. See net.sf.okapi.common.ParametersString
+     * QUIRK: to enable a consistent editing between LINUX and WINDOWS, we remove \r\n
+     * @param {string} value
+     * @returns {string}
+     */
+    escapeStringValue: function(value){
+        return value.split('\r\n').join('\n').split('\r').join('$0d$').split('\n').join('$0a$');
+    },
+    /**
+     * Unescapes a string value, x-properties use a special whitespace encoding for strings. See net.sf.okapi.common.ParametersString
+     * @param {string} value
+     * @returns {string}
+     */
+    unescapeStringValue: function(value){
+        return value.split('$0a$').join('\n').split('$0d$').join('\r').split('\r\n').join('\n');
     },
     /**
      * Removes our fields-cache ...

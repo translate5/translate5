@@ -84,7 +84,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         pretranslateTmAndTerm:'#UT#Vorübersetzen (TM &amp; Terme)',
         pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
         pretranslateMt:'#UT#Vorübersetzen (MT)',
-        pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
+        pretranslateMtTooltip:'#UT#Wenn diese Option aktiviert ist, werden alle Treffer, die nicht aus dem TM vorübersetzt sind, von der MT vorübersetzt.',
         analysisLoadingMsg:'#UT#Analyse läuft'
     },
     listen:{

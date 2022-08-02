@@ -110,9 +110,9 @@
 		    <target>Pre-translate (TM &amp; Terms)</target>
 		</trans-unit>
 
-		<trans-unit id='VHJlZmZlciBhdXMgZGVtIFRNIHdlcmRlbiBiZXZvcnp1Z3Qgdm9yw7xiZXJzZXR6dA=='>
-		    <source>Treffer aus dem TM werden bevorzugt vorübersetzt</source>
-		    <target>Hits from the TM are preferably pre-translated</target>
+		<trans-unit id='V2VubiBkaWVzZSBPcHRpb24gYWt0aXZpZXJ0IGlzdCwgd2VyZGVuIGFsbGUgVHJlZmZlciwgZGllIG5pY2h0IGF1cyBkZW0gVE0gdm9yw7xiZXJzZXR6dCBzaW5kLCB2b24gZGVyIE1UIHZvcsO8YmVyc2V0enQu'>
+		    <source>Wenn diese Option aktiviert ist, werden alle Treffer, die nicht aus dem TM vorübersetzt sind, von der MT vorübersetzt.</source>
+		    <target>If this option is enabled, all hits that are not pre-translated from the TM will be pre-translated from the MT.</target>
 		</trans-unit>
 
 		<trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKE1UKQ=='>

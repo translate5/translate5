@@ -75,7 +75,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         // Crucial: add processing-mode to worker params
         $workerParams['processingMode'] = $processingMode;
         
-        // if no terminology is present we usually to not queue a worker, only a re-tag or analysis must cover the case we actually have to remove the terms !
+        // if no terminology is present we usually do not queue a worker, only a re-tag or analysis must cover the case we actually have to remove the terms !
         /* @var $task editor_Models_Task */
         if (!$task->getTerminologie()) {
             if($processingMode == editor_Segment_Processing::ANALYSIS || $processingMode == editor_Segment_Processing::RETAG){
@@ -86,6 +86,10 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
                 }
                 $worker->queue($parentWorkerId);
             }
+            return;
+        }
+        // if source & target language is similar, we simply do nothing, since the termtagger would crash in this case, see TRANSLATE-2373
+        if($task->isSourceAndTargetLanguageSimilar()){
             return;
         }
 
@@ -111,6 +115,11 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     }
     
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
+
+        // disable when source/target language similar, see TRANSLATE-2373
+        if($task->isSourceAndTargetLanguageSimilar()){
+            return $tags;
+        }
 
         if($processingMode == editor_Segment_Processing::ALIKE){
             
@@ -193,6 +202,10 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
      * @param editor_Models_Segment_Meta $meta
      */
     private function prepareSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta) {
+        // disable when source/target language similar, see TRANSLATE-2373
+        if($task->isSourceAndTargetLanguageSimilar()){
+            return;
+        }
         $config = Zend_Registry::get('config');
         $maxWordCount = $config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150;
         $meta->db->update([
