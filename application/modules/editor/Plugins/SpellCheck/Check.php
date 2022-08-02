@@ -35,11 +35,11 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_SpellCheck_Check {
 
     // Css classes
-    const CSS_GROUP_GENERAL     = 'general';
-    const CSS_GROUP_STYLE       = 'style';
-    const CSS_GRAMMAR           = 'grammar';
-    const CSS_MISSPELLING       = 'misspelling';
-    const CSS_TYPOGRAPHICAL     = 'typographical';
+    const CSS_GROUP_GENERAL     = 't5general';
+    const CSS_GROUP_STYLE       = 't5style';
+    const CSS_GRAMMAR           = 't5grammar';
+    const CSS_MISSPELLING       = 't5misspelling';
+    const CSS_TYPOGRAPHICAL     = 't5typographical';
 
     // General error types
     const GROUP_GENERAL         = 'group-general';

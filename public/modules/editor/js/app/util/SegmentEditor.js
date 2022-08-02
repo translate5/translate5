@@ -378,7 +378,7 @@ Ext.define('Editor.util.SegmentEditor', {
     cleanSpellCheckMarkupInEditor:function(){
         var me = this,
             el = me.getEditorBodyExtDomElement(),
-            allSpellCheckNodes = Ext.fly(el).query('.spellcheck');
+            allSpellCheckNodes = Ext.fly(el).query('.t5spellcheck');
         Ext.Array.each(allSpellCheckNodes, function(spellCheckNode, index) {
             me.removeMarkupAroundNode(spellCheckNode);
         });
