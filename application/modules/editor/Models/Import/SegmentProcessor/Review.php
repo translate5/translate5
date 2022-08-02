@@ -117,7 +117,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $seg->setFieldContents($sfm, $parser->getFieldContents());
         
         $this->events->trigger("process", $this, [
-            'config'=>$this->taskConf,
+            'config' => $this->taskConf,
             'segment' => $seg, //editor_Models_Segment
             'segmentAttributes' => $attributes, //editor_Models_Import_FileParser_SegmentAttributes
             'importConfig' => $this->importConfig //editor_Models_Import_Configuration
