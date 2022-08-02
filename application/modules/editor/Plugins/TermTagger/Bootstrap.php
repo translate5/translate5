@@ -30,14 +30,16 @@ END LICENSE AND COPYRIGHT
  * Initial Class of Plugin "TermTagger"
  */
 class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
+
     const TASK_STATE = 'termtagging';
 
     protected static $description = 'Provides term-tagging';
-    
+
     /**
      * @var ZfExtended_Logger
      */
     protected $log;
+
     /**
      * @var editor_Plugins_TermTagger_RecalcTransFound
      */
@@ -262,6 +264,13 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         /* @var $masterSegment editor_Models_Segment */
         $alikeSegment = $event->getParam('alikeSegment');
         /* @var $alikeSegment editor_Models_Segment */
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+
+        // disable when source/target language similar, see TRANSLATE-2373
+        if($task->isSourceAndTargetLanguageSimilar()){
+            return;
+        }
         
         // take over source original only for non editing source, see therefore TRANSLATE-549
         // Attention for alikes and if source is editable:
@@ -290,12 +299,16 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $task = $event->getParam('entity');
         /* @var $task editor_Models_Task */
 
+        // disable when source/target language similar, see TRANSLATE-2373
+        if($task->isSourceAndTargetLanguageSimilar()){
+            return;
+        }
+
         $initialTaskState = $task->getState();
         $task->checkStateAllowsActions();
         if(!$task->lock(NOW_ISO, self::TASK_STATE)) {
             return;
         }
-
         $task->setState(self::TASK_STATE);
         $task->save();
 
