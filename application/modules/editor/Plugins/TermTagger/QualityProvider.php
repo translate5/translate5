@@ -110,6 +110,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
             $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [ 'parameters' => $workerParams ]);
             return;
         }
+
         $worker->queue($parentWorkerId);
     }
     

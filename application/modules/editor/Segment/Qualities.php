@@ -148,6 +148,22 @@ final class editor_Segment_Qualities {
             $quality->delete();
         }
     }
+
+    /**
+     * Drop qualities by type
+     *
+     * @param string $field
+     * @param string $type
+     * @throws Zend_Db_Table_Row_Exception
+     */
+    public function dropByType(string $field, string $type) {
+        foreach ($this->getExisting() as $quality) {
+            if ($quality->field == $field && $quality->type === $type) {
+                $quality->delete();
+            }
+        }
+    }
+
     /**
      * Adds a quality by it's associated tag
      * @param editor_Segment_Tag $tag
@@ -231,6 +247,7 @@ final class editor_Segment_Qualities {
             }
         }
         $this->table->deleteByIds($deleteIds);
+
         foreach($this->added as $quality){
             if($quality->processingState == 'new'){
                 $newQualities[] = $quality;

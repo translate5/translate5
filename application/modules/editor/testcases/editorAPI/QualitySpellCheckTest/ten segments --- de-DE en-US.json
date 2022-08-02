@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 1,
-    "qtotal": 1,
+    "qcount": 33,
+    "qtotal": 33,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -131,7 +131,7 @@
         {
             "qid": -1,
             "qtype": "spellcheck",
-            "qcount": 0,
+            "qcount": 19,
             "qcomplete": true,
             "children": [
                 {
@@ -146,13 +146,13 @@
                     "checked": false
                 },
                 {
-                    "qid": -1,
+                    "qid": "37847",
                     "qtype": "spellcheck",
-                    "qcount": 0,
+                    "qcount": 19,
                     "qcomplete": true,
                     "qcategory": "spellError",
+                    "qcatidx": "-1",
                     "text": "Spell",
-                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -171,8 +171,8 @@
             "qcategory": null,
             "qtooltip": "",
             "text": "LanguageTool",
-            "qtotal": 0,
-            "expanded": false,
+            "qtotal": 19,
+            "expanded": true,
             "checked": false
         },
         {
@@ -555,127 +555,105 @@
         {
             "qid": -1,
             "qtype": "numbers",
-            "qcount": 1,
+            "qcount": 14,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": -1,
+                    "qid": "37865",
                     "qtype": "numbers",
-                    "qcount": 0,
+                    "qcount": 3,
                     "qcomplete": true,
                     "qcategory": "num1",
+                    "qcatidx": "-1",
                     "text": "Numbers source \u2260 target",
-                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num10",
-                    "text": "Format alteration (ordinal numbers, leading zero etc.)",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num11",
-                    "text": "Different character\/formatting for number interval",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num12",
-                    "text": "1000-separator not allowed",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num13",
-                    "text": "Dubious number from source unchanged in target",
-                    "textTooltip": "If this is not a decimal number but a list with missing spaces between list elements, please insert spaces between list elements in target. In case of wrongly used decimal separator in the source please ignore message.",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num2",
-                    "text": "Alphanumerical character sequences: Differences",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num3",
-                    "text": "Format alteration (date information etc.)",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num4",
-                    "text": "Separator(s) not localised",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num5",
-                    "text": "Formatting of 1000s number altered",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "numbers",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "num6",
-                    "text": "Different minus characters",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "38569",
+                    "qid": "37862",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
-                    "qcategory": "num7",
+                    "qcategory": "num10",
                     "qcatidx": "-1",
-                    "text": "Separator from source altered",
+                    "text": "Format alteration (ordinal numbers, leading zero etc.)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37864",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num11",
+                    "qcatidx": "-1",
+                    "text": "Different character\/formatting for number interval",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37858",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num12",
+                    "qcatidx": "-1",
+                    "text": "1000-separator not allowed",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37853",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num2",
+                    "qcatidx": "-1",
+                    "text": "Alphanumerical character sequences: Differences",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37854",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num3",
+                    "qcatidx": "-1",
+                    "text": "Format alteration (date information etc.)",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37855",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num4",
+                    "qcatidx": "-1",
+                    "text": "Separator(s) not localised",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37856",
+                    "qtype": "numbers",
+                    "qcount": 2,
+                    "qcomplete": true,
+                    "qcategory": "num5",
+                    "qcatidx": "-1",
+                    "text": "Formatting of 1000s number altered",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37859",
+                    "qtype": "numbers",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "num6",
+                    "qcatidx": "-1",
+                    "text": "Different minus characters",
                     "leaf": true,
                     "checked": false
                 },
@@ -683,21 +661,32 @@
                     "qid": -1,
                     "qtype": "numbers",
                     "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num7",
+                    "text": "Separator from source altered",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "37860",
+                    "qtype": "numbers",
+                    "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num8",
+                    "qcatidx": "-1",
                     "text": "Numeral from source found as number in target",
-                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": -1,
+                    "qid": "37861",
                     "qtype": "numbers",
-                    "qcount": 0,
+                    "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num9",
+                    "qcatidx": "-1",
                     "text": "Number from source found as numeral in target",
-                    "textTooltip": "",
                     "leaf": true,
                     "checked": false
                 }
@@ -705,66 +694,8 @@
             "qcategory": null,
             "qtooltip": "",
             "text": "Numbers",
-            "qtotal": 1,
+            "qtotal": 14,
             "expanded": true,
-            "checked": false
-        },
-        {
-            "qid": -1,
-            "qtype": "term",
-            "qcount": 0,
-            "qcomplete": true,
-            "children": [
-                {
-                    "qid": -1,
-                    "qtype": "term",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "forbidden_in_source",
-                    "text": "Forbidden in source",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "term",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "forbidden_in_target",
-                    "text": "Forbidden in target",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "term",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "not_defined_in_target",
-                    "text": "Not defined in target terminology",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "term",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "not_found_in_target",
-                    "text": "Not found in target",
-                    "textTooltip": "",
-                    "leaf": true,
-                    "checked": false
-                }
-            ],
-            "qcategory": null,
-            "qtooltip": "",
-            "text": "Terminology",
-            "qtotal": 0,
-            "expanded": false,
             "checked": false
         },
         {

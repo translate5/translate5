@@ -1,7 +1,7 @@
 [
     {
-        "id": "35759",
-        "segmentId": "231565",
+        "id": "38451",
+        "segmentId": "261741",
         "field": "target",
         "type": "consistent",
         "category": "source",
@@ -16,8 +16,8 @@
         "cssClass": "any"
     },
     {
-        "id": "35758",
-        "segmentId": "231565",
+        "id": "38450",
+        "segmentId": "261741",
         "field": "target",
         "type": "consistent",
         "category": "target",
@@ -25,6 +25,22 @@
         "falsePositive": "0",
         "typeText": "Consistency",
         "text": "Inconsistent target",
+        "filterable": true,
+        "falsifiable": true,
+        "hasTag": true,
+        "tagName": "span",
+        "cssClass": "any"
+    },
+    {
+        "id": "38414",
+        "segmentId": "261741",
+        "field": "target",
+        "type": "spellcheck",
+        "category": "spellError",
+        "categoryIndex": "-1",
+        "falsePositive": "0",
+        "typeText": "LanguageTool",
+        "text": "Spell",
         "filterable": true,
         "falsifiable": true,
         "hasTag": true,

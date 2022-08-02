@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,12 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-@CHARSET "UTF-8";
+/**
+ * Exception Class to get detailed information on SpellCheck-Error.
+ */
+class editor_Plugins_SpellCheck_Exception_Malfunction extends editor_Plugins_SpellCheck_Exception_Abstract {
 
-.t5spellcheck {cursor: pointer; z-index: 1; position: relative;}
-.t5spellcheck,                 .t5spellcheck                 .trackchanges {border-bottom: 3px dotted; border-color: red;}
-.t5spellcheck.t5general,       .t5spellcheck.t5general       .trackchanges {border-color: #808080;}     /* gray */
-.t5spellcheck.t5style,         .t5spellcheck.t5style         .trackchanges {border-color: #458fe6;}     /* blue */
-.t5spellcheck.t5grammar,       .t5spellcheck.t5grammar       .trackchanges {border-color: #ab8906;}     /* dark yellow */
-.t5spellcheck.t5misspelling,   .t5spellcheck.t5misspelling   .trackchanges {border-color: #e645a8;}     /* red-violet */
-.t5spellcheck.t5typographical, .t5spellcheck.t5typographical .trackchanges {border-color: #4d004d;}     /* dark-purple */
+}

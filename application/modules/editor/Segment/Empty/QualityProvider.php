@@ -89,8 +89,8 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
             // Get segment shortcut
             $segment = $tags->getSegment();
 
-            // Get punctuation chars shortcut
-            $chars = $qualityConfig->segmentPunctuationChars;
+            // Get punctuation chars concatenated with whitespace chars
+            $chars = $qualityConfig->segmentPunctuationChars . $qualityConfig->segmentWhitespaceChars;
 
             // Distinct states
             $states = [];

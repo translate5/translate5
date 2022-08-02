@@ -357,6 +357,7 @@ Ext.define('Editor.controller.admin.Customer', {
         if (!me.handleFiltering) {
             return;
         }
+
         var customerId = me.getCustomerSwitchValue();
         val = me.getCustomerName(customerId);
         me.customerSwitchLastClientsValue = customerId;

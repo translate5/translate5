@@ -171,4 +171,23 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
         $result = $statement->fetch();
         return $result['progress'] ?? 0;
     }
+
+    /***
+     * Get the spellcheck progress of the segments for given taskguid.
+     * The return value will be between 0 and 1
+     * @param string $taskGuid
+     * @return float
+     */
+    public function getSpellcheckSegmentProgress(string $taskGuid): float {
+        $states = [
+            editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_CHECKED
+        ];
+        $adapter = $this->db->getAdapter();
+        $sql = "SELECT (SELECT COUNT(*) FROM LEK_segments_meta WHERE ".$adapter->quoteInto('spellcheckState IN(?)',$states)." AND taskGuid = ?) / COUNT(*) AS 'progress'
+                FROM LEK_segments_meta
+                WHERE taskGuid = ?";
+        $statement = $this->db->getAdapter()->query($sql,[$taskGuid,$taskGuid]);
+        $result = $statement->fetch();
+        return $result['progress'] ?? 0;
+    }
 }

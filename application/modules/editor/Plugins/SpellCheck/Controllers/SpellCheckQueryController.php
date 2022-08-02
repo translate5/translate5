@@ -60,51 +60,12 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
             $this->view->rows = false;
             return;
         }
-        $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
-        /* @var $connector editor_Plugins_SpellCheck_LanguageTool_Connector */
-        $supportedLanguages= $connector->getLanguages();
-        $this->view->rows = $this->getSupportedLanguage($supportedLanguages, $targetLangCode);
+
+        $this->view->rows = ZfExtended_Factory
+            ::get('editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter')
+            ->getSupportedLanguage($targetLangCode);
     }
-    
-    /**
-     * Is the language supported by the LanguageTool?
-     * Examples:
-     * |----------------------------------------------------------------------------|
-     * |---from Editor-----|--see LEK_languages---|--------see LanguageTool---------|
-     * |----------------------------------------------------------------------------|
-     * | targetLang (=rfc) | mainl. | sublanguage | longcode | needed result for LT |
-     * |----------------------------------------------------------------------------|
-     * |      de           |   de   |   de-DE     |   de-DE  |       de-DE          |
-     * |     de-DE         |   de   |   de-DE     |   de-DE  |       de-DE          |
-     * |     de-AT         |   de   |   de-AT     |   de-AT  |       de-AT          |
-     * |      fr           |   fr   |   fr-FR     |     fr   |         fr           |
-     * |     fr-FR         |   fr   |   fr-FR     |     fr   |         fr           |
-     * |      he           |   he   |   he-IL     |     he   |         he           |
-     * |      cs           |   cs   |   cs-CZ     |     cs   |         cs           |
-     * |     cs-CZ         |   cs   |   cs-CZ     |     cs   |         cs           |
-     * |----------------------------------------------------------------------------|
-     * @param array $supportedLanguages
-     * @param string $targetLangCode
-     * @return object|false
-     */
-    private function getSupportedLanguage($supportedLanguages, $targetLangCode){
-        $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languagesModel editor_Models_Languages */
-        $sublanguage = $languagesModel->getSublanguageByRfc5646($targetLangCode);
-        $mainlanguage = $languagesModel->getMainlanguageByRfc5646($targetLangCode);
-        foreach ($supportedLanguages as $lang) {
-            if ($lang->longCode == $sublanguage) {      // priority: check if longCode (e.g. "de-DE","cs") is the default sublanguage ("de-DE", "cs-CZ") of the targetLangCode ("de", "cs-CZ")
-                return $lang;
-            }
-        }
-        foreach ($supportedLanguages as $lang) {
-            if ($lang->longCode == $mainlanguage) {     // fallback: check if longCode (e.g. "fr", "cs") is the mainlanguage ("fr", "cs") of the targetLangCode ("fr", "cs-CZ")
-                return $lang;
-            }
-        }
-        return false;
-    }
-    
+
     /**
      * The matches that our tool finds (currently: LanguageTool).
      */
@@ -117,7 +78,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
             return;
         }
         
-        $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
+        $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter');
         $this->view->rows = $connector->getMatches($text,$language);
     }
     
