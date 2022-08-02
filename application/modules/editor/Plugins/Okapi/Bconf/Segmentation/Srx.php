@@ -27,8 +27,9 @@
  */
 
 /**
- * Class representing a srx file
- * A srx is an xml with a defined structure containing nodes with language specific RegEx rules
+ * Class representing a SRX file
+ * A SRX is an xml with a defined structure containing nodes with language specific RegEx rules
+ * for more documentation, see editor_Plugins_Okapi_Bconf_Segmentation
  */
 final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_Okapi_Bconf_ResourceFile {
 

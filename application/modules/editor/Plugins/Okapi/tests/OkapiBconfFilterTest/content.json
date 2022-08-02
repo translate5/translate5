@@ -1,0 +1,20 @@
+{
+    "refs": {
+        "sourceSrxPath": "languages.srx",
+        "targetSrxPath": "languages.srx"
+    },
+    "step": [
+        "net.sf.okapi.steps.common.RawDocumentToFilterEventsStep",
+        "net.sf.okapi.steps.segmentation.SegmentationStep",
+        "net.sf.okapi.steps.rainbowkit.creation.ExtractionStep"
+    ],
+    "fprm": [
+        "okf_html@local-html_customized",
+        "okf_icml@local-icml_customized",
+        "okf_idml@local-adobe_indesign_idml_documents_customized",
+        "okf_itshtml5@local-standard_html5_customized",
+        "okf_openxml@local-microsoft_office_document_customized",
+        "okf_xml@local-generic_xml_customized",
+        "okf_xmlstream@local-xml_stream_customized"
+    ]
+}

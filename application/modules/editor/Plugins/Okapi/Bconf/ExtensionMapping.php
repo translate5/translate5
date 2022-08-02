@@ -31,8 +31,17 @@
  * It is able to parse the extension-mapping from file, build an internal model, manipulate it and write it back to file
  * Also the mapping for the actual bconf-file can be retrieved where the okapi-default entries are actually mapped to the mapping files
  * The processing when unpacking bconfs is also implemented here, including writing the extracted custom fprms to the DB and file-system
+ * The extension mapping is always stored as a filein a BCONFs file-repository with the name "extensions-mapping.txt"
  *
- * Types of filter-identifiers in a bconf
+ * There are 4 types of filter-identifiers in a bconf:
+ * OKAPI defaults: Identifiers like "okf_xml-AndroidStrings"; These names represent bconf-id's as used in Rainbow and Longhorn
+ * OKAPI embedded defaults: Identifiers like "okf_xml@okf_xml-AndroidStrings"; These names have the formal bconf-type @ bconf-id. The id's are the ones used as OKAPI defaults.
+ * translate5 adjusted defaults: Identifiers like "okf_xml@translate5-AndroidStrings"; Here the okapi-id always is "translate5" or srtarts with "translate5-"
+ * User customized filters: Identifiers like "okf_xml@worldtranslation-my_special_setting"; Here the okapi-id has a special format: [ customerName or domain ] + "-" + [ websafe bconf name ]
+ *
+ * When packing BCONFs, the Okapi default filters will all be embedded into the BCONF to ensure maximal compatibility over time and between different Okapi-Versions
+ * When unpacking BCONFs, that have embedded OKAPI defaults, the OKAPI embedded default identifiers will be reverted to simple OKAPI defaults
+ * Only user customized filters will actually have FPRM-files in the BCONF's file store, all other types will always be taken from the git-based stores in translate5/application/modules/editor/Plugins/Okapi/data/fprm/
  */
 class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
@@ -176,6 +185,12 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     private array $fprmsToPack;
 
     /**
+     * Captures validatiopn errors during validation
+     * @var array
+     */
+    private array $validationErrors;
+
+    /**
      * @var bool
      */
     private bool $doDebug;
@@ -278,7 +293,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
-     * Generates the frontend-model for the extension mapping, where identifier => extenasions
+     * Generates the frontend-model for the extension mapping, where identifier => extensions
      * The non-embedded default identifiers like 'okf_xml-AndroidStrings' will be turned to embedded ones like 'okf_xml@okf_xml-AndroidStrings'
      * @return array
      * @throws ZfExtended_Exception
@@ -332,7 +347,24 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
+     * @return array
+     * @throws ZfExtended_Exception
+     */
+    public function findCustomIdentifiers(){
+        $customIdentifiers = [];
+        foreach($this->map as $extension => $filter){
+            if(editor_Plugins_Okapi_Bconf_Filters::instance()->isCustomFilter($filter)){
+                $customIdentifiers[$filter] = true;
+            }
+        }
+        $identifiers = array_keys($customIdentifiers);
+        sort($identifiers);
+        return $identifiers;
+    }
+
+    /**
      * Removes extensions from the mapping and flushes the map if changed
+     * Also updates the related content-file
      * @param array $extensions
      * @return bool
      */
@@ -352,6 +384,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         if($removed){
             $this->map = $newMap;
             $this->flush();
+            $this->updateBconfContent();
             // DEBUG
             if($this->doDebug){ error_log('ExtensionMapping removeExtensions: [ '.implode(', ', $extensions).' ] have been removed'."\n".print_r($this->map, 1)); }
         }
@@ -360,6 +393,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
     /**
      * Removes a filter from the mapping and deletes the corresponding fprm-file anf flushes the map if changed
+     * Also updates the related content-file
      * @param string $identifier
      * @return bool
      */
@@ -384,6 +418,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 @unlink($this->dir.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
             }
             $this->flush();
+            $this->updateBconfContent();
             // DEBUG
             if($this->doDebug){ error_log('ExtensionMapping removeFilter: '.$identifier.' has been removed'."\n".print_r($this->map, 1)); }
         }
@@ -392,6 +427,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
     /**
      * Adds a filter with it's extensions
+     * Also updates the related content-file
      * @param string $identifier
      * @param array $extensions
      * @return bool
@@ -406,6 +442,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
 
     /**
      * Changes a filter with it's extensions
+     * Also updates the related content-file
      * @param string $identifier
      * @param array $extensions
      * @return bool
@@ -435,7 +472,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 $newMap[$extension] = $filter;
             }
         }
-        // append extensions that could not be distribued to existing entries for $identifier
+        // append extensions that could not be distributed to existing entries for $identifier
         if(count($extToAdd) > 0){
             // in the map on disk we always use default identifiers
             $filter = ($defaultIdentifier === NULL) ? $identifier : $defaultIdentifier;
@@ -451,6 +488,7 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
         if($changed){
             $this->map = $newMap;
             $this->flush();
+            $this->updateBconfContent();
             // DEBUG
             if($this->doDebug){ error_log('ExtensionMapping changeFilter: '.$identifier.' with extensions [ '.implode(', ', $extensions).' ] has been changed: '."\n".print_r($this->map, 1)); }
         }
@@ -609,6 +647,46 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
+     * Validates the extenion-mapping. Checks, there are only valid identifiers and the custom identifiers exist in the DB and the filesystem
+     * @return bool
+     */
+    public function validate() : bool {
+        $this->validationErrors = [];
+        $filters = editor_Plugins_Okapi_Bconf_Filters::instance();
+        $customFiltersFromDB = $this->bconf->findCustomFilterIdentifiers(); // thr custom identifiers in the DB
+        foreach($this->getAllFilters() as $identifier){
+            if(editor_Plugins_Okapi_Bconf_Filters::isOkapiDefaultIdentifier($identifier)){
+                if(!$filters->isValidOkapiDefaultFilter($identifier)){
+                    $this->validationErrors[] = 'Invalid OKAPI default filter "'.$identifier.'"';
+                }
+            } else {
+                $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
+                if($filters->isEmbeddedOkapiDefaultFilter($idata->type, $idata->id)){
+                    $this->validationErrors[] = 'Embedded OKAPI default filter "'.$identifier.'" not allowed in extension-mapping';
+                } else if(!$filters->isEmbeddedTranslate5Filter($idata->type, $idata->id)){
+                    // custom filter, must exist in database & file-system
+                    if(!in_array($identifier, $customFiltersFromDB)){
+                        $this->validationErrors[] = 'Embedded custom filter "'.$identifier.'" not found in the database';
+                    }
+                    $fprmPath = $this->bconf->createPath(editor_Plugins_Okapi_Bconf_Filter_Entity::createFileFromIdentifier($identifier));
+                    if(!file_exists($fprmPath)){
+                        $this->validationErrors[] = 'Embedded custom filter "'.$identifier.'" not found in the bconfs files';
+                    }
+                }
+            }
+        }
+        return (count($this->validationErrors) === 0);
+    }
+
+    /**
+     * Retrieves the error that caused the extension-mapping to be invalid
+     * @return string
+     */
+    public function getValidationError() : string {
+        return implode("\n", $this->validationErrors);
+    }
+
+    /**
      * Internal API to parse our contents from string (from filesystem)
      * @param string $content
      */
@@ -698,5 +776,16 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
                 }
             }
         }
+    }
+
+    /**
+     * Updates the content-inventory, which is always done alongside the extension-mapping
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    private function updateBconfContent(){
+        $content =  $this->bconf->getContent();
+        $content->setFilters($this->findCustomIdentifiers());
+        $content->flush();
     }
 }

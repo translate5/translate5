@@ -29,6 +29,9 @@
 /**
  * Okapi Bconf Filter Entity Object
  *
+ * Represent a single customized FPRM file that has been customized by the user.
+ * see editor_Plugins_Okapi_Bconf_Filters and editor_Plugins_Okapi_Bconf_Filter_Fprm for more documentation
+ *
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
  * @method integer getBconfId() getBconfId()

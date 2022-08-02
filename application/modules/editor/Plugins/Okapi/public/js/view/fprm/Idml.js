@@ -49,14 +49,14 @@
  characterLeadingMinIgnoranceThreshold=75375.0
  characterTrackingMinIgnoranceThreshold=6364.0
 
- see /okapi/okapi/filters/idml/src/main/java/net/sf/okapi/filters/idml/Parameters.java
+ see /okapi/filters/idml/src/main/java/net/sf/okapi/filters/idml/Parameters.java
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Idml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
     width: 700,
     formPanelLayout: 'form',
     fieldDefinitions: {
-        'maxAttributeSize.i': { config: { hidden: true }},  // not visible in Rainbow
+        'maxAttributeSize.i': { config: { hidden: true, valueDefault: 4194304 }},  // not visible in Rainbow, default value = 4kB as defined in rainbow-code
         'untagXmlStructures.b': {},
         'extractNotes.b': {},
         'extractMasterSpreads.b': {},

@@ -27,8 +27,16 @@
  */
 
 /**
- * Class processing SRX files on import and repacking outdated bconfs
- * Also the upload/processing of SRX files is covered here
+ * Class processing SRX files on import and repacking outdated bconfs, also the upload/processing of SRX files is covered here
+ *
+ *  Updating / Identifying translate5 adjusted SRX files:
+ * translate 5 holds a set of adjusted SRX files, they are stored in translate5/application/modules/editor/Plugins/Okapi/data/srx/translate5/
+ * When a bconf is packed, it will be checked, if the referenced SRX is a translate5 default SRX, in this case, the most recent version is taken/updated
+ * This comparision is done by md5 hashing of the SRX file, there is no database-based data as with FPRMs
+ *
+ * Validating SRX files
+ * Since we currently cannot validate the rules in a SRX file we validate a SRX by using the packed BCONF against a testfile.
+ * This is done with editor_Plugins_Okapi_Bconf_Validation
  */
 final class editor_Plugins_Okapi_Bconf_Segmentation {
 
@@ -135,6 +143,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation {
                 }
                 $srx->flush();
                 $this->updateSrxInFiles($pipeline, $content, $field, $srx, $otherField, $otherSrx);
+                $bconf->pack();
             } else {
                 // real custom SRX uploads must be validated with OKAPI
                 $srxOriginalPath = $srx->getPath();

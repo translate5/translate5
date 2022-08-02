@@ -1,0 +1,7 @@
+{
+    "segmentMode": "Extraktions Modus",
+    "segmentMode0": "Segmente automatisch erkennen und extrahieren (Wenn keine ermittelbar werden alle extrahiert)",
+    "segmentMode1": "Nur bereits existierende Segmente",
+    "segmentMode2": "Alle extrahieren (existierende Segmente und unsegmentierte Textabschnitte)",
+    "escapeGT": "Größer-als-Zeichen in der Ausgabe schützen"
+}

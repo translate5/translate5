@@ -28,7 +28,7 @@
 
 /**
  * This class processes an example file to validate a bconf
- * Therefore testfiles for all supported ::EXTENSIONS exist in data/testfiles
+ * Therefore testfiles for all supported editor_Plugins_Okapi_Bconf_Filters::TESTABLE_EXTENSIONS exist in data/testfiles
  * Be aware, that not all BCONFs can be validated this way
  */
 class editor_Plugins_Okapi_Bconf_Validation {

@@ -1,0 +1,13 @@
+assumeWellformed: true
+preserve_whitespace: INVALID
+attributes:
+  xml:lang:
+    ruleTypes: [ATTRIBUTE_WRITABLE]
+  xml:id:
+    ruleTypes: [ATTRIBUTE_ID]
+  id:
+    ruleTypes: [ATTRIBUTE_ID]
+  xml:space:
+    ruleTypes: INVALID
+    preserve: ['xml:space', EQUALS, preserve]
+    default: ['xml:space', EQUALS, default]

@@ -327,26 +327,17 @@ Ext.define('Editor.util.Util', {
          * @returns {boolean}
          */
         objectWasChanged: function(before, after, keys, orderIsIrrelevant=true){
-            // if not given we use all object keys.
-            if(!Array.isArray(keys)){
-                keys = before.keys();
-                var afterKeys = before.keys();
-                // when the keys are differnt, there was something changed obviously ...
-                if(keys.sort().join('|') !== afterKeys.sort().join('|')){
-                    return true;
-                }
-            }
-            var bval, aval;
+            var bval, aval, changed = false;
             keys.forEach(key => {
                 bval = before.hasOwnProperty(key) ? before[key] : undefined;
                 aval = after.hasOwnProperty(key) ? after[key] : undefined;
                 if(Array.isArray(aval) && Array.isArray(bval) && !this.arraysAreEqual(aval, bval, orderIsIrrelevant)){
-                    return false;
+                    changed = true;
                 } else if(aval !== bval){
-                    return false;
+                    changed = true;
                 }
             });
-            return false;
+            return changed;
         },
         /**
          * Checks if to arrays are equal. By default, the order of items is irrelevant

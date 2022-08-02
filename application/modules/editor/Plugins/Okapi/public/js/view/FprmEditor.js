@@ -128,7 +128,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                     itemId: 'cancel',
                     iconCls: 'x-fa fa-times-circle',
                     handler: function(){
-                        this.up('window').closeWindow();
+                        this.up('window').close();
                     }
                 }]
             }]
@@ -330,7 +330,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                 me.setLoading(false);
                 if(result.success){
                     Editor.MessageBox.addSuccess(me.strings.successfullySaved);
-                    me.closeWindow();
+                    me.close();
                 } else {
                     me.showValidationMsg(me.strings.changesInvalid+'<br/><i>('+result.error+')</i>');
                 }
@@ -354,11 +354,11 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         });
     },
     /**
-     *
+     * Destructs all relevant fields to guarantee a fresh construction
      */
-    closeWindow: function(){
+    doDestroy: function() {
         this.formPanel.removeAll();
         this.removeAll();
-        this.close();
+        this.callParent();
     }
 });

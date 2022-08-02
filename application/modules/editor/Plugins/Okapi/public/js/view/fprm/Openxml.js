@@ -59,8 +59,8 @@
     zzz4=3B
     zzz5=3C
 
-    see /okapi/okapi-ui/swt/filters/openxml-ui/src/main/java/net/sf/okapi/filters/openxml/ui/Editor.java
-    see /okapi/okapi/filters/openxml/src/main/java/net/sf/okapi/filters/openxml/ConditionalParameters.java
+    see /okapi-ui/swt/filters/openxml-ui/src/main/java/net/sf/okapi/filters/openxml/ui/Editor.java
+    see /okapi/filters/openxml/src/main/java/net/sf/okapi/filters/openxml/ConditionalParameters.java
  */
 
 /**
@@ -74,9 +74,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
     fieldDefinitions: {
         /* General Options */
         'tabGeneralOptions': { type: 'tab', icon: 'fa-cog', children: {
-            'maxAttributeSize.i': { config: { hidden: true }},  // not visible in Rainbow
-            'sPreferenceLineSeparatorReplacement': { config: { hidden: true }}, // not visible in Rainbow
-            'bPreferenceAllowEmptyTargets.b': { config: { hidden: true }}, // not visible in Rainbow
+            'maxAttributeSize.i': { config: { hidden: true, valueDefault: 4194304 }},  // not visible in Rainbow, default value = 4kB as defined in rainbow-code
+            'sPreferenceLineSeparatorReplacement': { config: { hidden: true, valueDefault: '\n' }}, // not visible in Rainbow, default value as defined in default-fprm
+            'bPreferenceAllowEmptyTargets.b': { config: { hidden: true, valueDefault: false }}, // not visible in Rainbow, default value as defined in default-fprm
             'bPreferenceTranslateDocProperties.b': {},
             'bPreferenceTranslateComments.b': {},
             'bPreferenceAggressiveCleanup.b': {},
@@ -93,12 +93,12 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'bPreferenceIgnoreSoftHyphenTag.b': {},
             'bPreferenceReplaceNoBreakHyphenTag.b': {},
             'bExtractExternalHyperlinks.b': {},
-            'tsComplexFieldDefinitionsToExtract.i': { config: { guiData: 'translateableHyperlinkFields' }},
+            'tsComplexFieldDefinitionsToExtract.i': { type: 'tagfield', identifier: 'cfd', guiData: 'translateableHyperlinkFields' },
             'bInExcludeMode.b': {},
             'bInExcludeHighlightMode.b': {},
-            'tsExcludeWordStyles.i': { config: { guiData: 'wordStyles' }},
-            'tsWordHighlightColors.i': { config: { guiData: 'colorNames' }},
-            'tsWordExcludedColors.i': { config: { guiData: 'colors' }},
+            'tsExcludeWordStyles.i': { type: 'tagfield', identifier: 'sss', guiData: 'wordStyles' },
+            'tsWordHighlightColors.i': { type: 'tagfield', identifier: 'hlt', guiData: 'colorNames' },
+            'tsWordExcludedColors.i': { type: 'tagfield', identifier: 'yyy', guiData: 'colors' },
             'bPreferenceTranslateWordExcludeColors.b': { config: { hidden: true }}
         }},
         /* Excel Options */
@@ -107,13 +107,13 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'bPreferenceTranslateExcelSheetNames.b': {},
             'bPreferenceTranslateExcelDiagramData.b': {},
             'bPreferenceTranslateExcelDrawings.b': {},
-            'tsExcelExcludedColors.i': { config: { guiData: 'colors', dataPrefix: 'FF' }},
+            'tsExcelExcludedColors.i': { type: 'tagfield', identifier: 'ccc', guiData: 'colors', dataPrefix: 'FF' },
             'bPreferenceTranslateExcelExcludeColors.b': { config: { hidden: true }},
             'subfilter': { config: {}},
             'bPreferenceTranslateExcelExcludeColumns.b': { type: 'boolset', children: { // if not true, tsExcelExcludedColumns, tsExcelExcludedColumnsSheetN will not be processed
-                'tsExcelExcludedColumnsSheet1.i': { config: { guiData: 'columns', dataPrefix: '1' }}, // this is a "virtual" field that does not show up in the data
-                'tsExcelExcludedColumnsSheet2.i': { config: { guiData: 'columns', dataPrefix: '2' }}, // this is a "virtual" field that does not show up in the data
-                'tsExcelExcludedColumnsSheet3.i': { config: { guiData: 'columns', dataPrefix: '3' }} // this is a "virtual" field that does not show up in the data
+                'tsExcelExcludedColumnsSheet1.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '1' }, // this is a "virtual" field that does not show up in the data
+                'tsExcelExcludedColumnsSheet2.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '2' }, // this is a "virtual" field that does not show up in the data
+                'tsExcelExcludedColumnsSheet3.i': { type: 'tagfield', identifier: 'zzz', guiData: 'columns', dataPrefix: '3' } // this is a "virtual" field that does not show up in the data
             }},
             'tsExcelExcludedColumns.i': { config: { hidden: true }} // this stores the number of values for the 3 fields in bPreferenceTranslateExcelExcludeColumns.b
 
@@ -126,63 +126,55 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'bPreferenceTranslatePowerpointMasters.b': {},
             'bPreferenceIgnorePlaceholdersInPowerpointMasters.b': {},
             'bPreferencePowerpointIncludedSlideNumbersOnly.b': {},
-            'tsPowerpointIncludedSlideNumbers.i': { config: { guiData: 'numbers' }}
+            'tsPowerpointIncludedSlideNumbers.i': { type: 'tagfield', identifier: 'sln', guiData: 'numbers' }
         }}
-    },
-    /**
-     * Which variables become tagfields
-     */
-    listNames: {
-        'tsComplexFieldDefinitionsToExtract.i': 'cfd',
-        'tsExcelExcludedColors.i': 'ccc',
-        'tsExcelExcludedColumnsSheet1.i': 'zzz',
-        'tsExcelExcludedColumnsSheet2.i': 'zzz',
-        'tsExcelExcludedColumnsSheet3.i': 'zzz',
-        'tsExcludeWordStyles.i': 'sss',
-        'tsWordExcludedColors.i': 'yyy',
-        'tsWordHighlightColors.i': 'hlt',
-        'tsPowerpointIncludedSlideNumbers.i': 'sln'
-    },
-    /**
-     * where the number of items of the specified identifier is saved in
-     */
-    listTargets: {
-        cfd: 'tsComplexFieldDefinitionsToExtract.i',
-        ccc: 'tsExcelExcludedColors.i',
-        zzz: 'tsExcelExcludedColumns.i',
-        sss: 'tsExcludeWordStyles.i',
-        yyy: 'tsWordExcludedColors.i',
-        hlt: 'tsWordHighlightColors.i',
-        sln: 'tsPowerpointIncludedSlideNumbers.i'
     },
     initConfig: function(config){
         config.minHeight = 765;
         return this.callParent([config]);
     },
 
-    // QUIRK This is the only GUI with lists, so list support is implemented here
-    getFieldConfig: function(id, type, name, config){
-        var identifier, control = this.callParent(arguments);
-        if(this.listNames.hasOwnProperty(name)){
-            identifier = this.listNames[name];
-            Object.assign(control, {
+    /**
+     * Overwritten to create tagfield-controls
+     * @param {object} data
+     * @param {string} id
+     * @param {string} name
+     * @param {object} config
+     * @param {Ext.panel.Panel} holder
+     * @param {boolean} disabled
+     * @returns {Ext.panel.Panel}
+     */
+    addCustomFieldControl: function(data, id, name, config, holder, disabled){
+        if(data.type === 'tagfield'){
+            config = Object.assign(config, {
                 xtype: 'tagfield',
+                fieldLabel: this.getFieldCaption(id, config),
+                labelClsExtra: 'x-selectable',
+                labelWidth: 'auto',
                 queryMode: 'local',
                 createNewOnEnter: true,
                 createNewOnBlur: true,
                 forceSelection: true,
+                disabled: disabled,
+                valueType: config.valueType,
+                name: name,
+                fieldDataIdentifier: data.identifier,
                 triggers: {
                     clear: {
                         cls: Ext.baseCSSPrefix + 'form-clear-trigger',
                         handler: field => field.setValue([]) || field.focus(),
                     }
                 },
-                value: this.getTagfieldValue(id, identifier, config.dataPrefix),
-                store: this.getTagfieldStore(id, config.guiData, config.dataPrefix)
+                value: this.getTagfieldValue(id, data.identifier, data.dataPrefix),
+                store: this.getTagfieldStore(id, data.guiData, data.dataPrefix)
             });
+            this.fields[name] = config;
+            return holder.add(config);
+        } else {
+            throw new Error('addCustomFieldControl: unknown field type "'+data.type+'"');
         }
-        return control;
     },
+
     /**
      *
      * @param {string} id
@@ -194,9 +186,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         var i, val, numVals, vals = [];
         // very special coding for the 3 tsExcelExcludedColumnsSheet. they save their data combined as zzz0 ... zzzN
         if(id.includes('tsExcelExcludedColumnsSheet')){
-            numVals = this.getFieldValue('tsExcelExcludedColumns', 0, 'integer');
+            numVals = this.getFieldValue('tsExcelExcludedColumns', 0, 'integer', false);
             //  excel excluded columns only when bPreferenceTranslateExcelExcludeColumns.b is true !
-            if(numVals > 0 && this.getFieldValue('bPreferenceTranslateExcelExcludeColumns', false, 'boolean') === true){
+            if(numVals > 0 && this.getFieldValue('bPreferenceTranslateExcelExcludeColumns', false, 'boolean', false) === true){
                 for(i = 0; i < numVals; i++){
                     if(this.transformedData.hasOwnProperty(identifier + i)){
                         // data has a crazy structure like "zzz1=1AD" meaning: tsExcelExcludedColumnsSheet1 has value "AD"
@@ -209,7 +201,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             }
         } else {
             // the "normal" case: collect by identifier
-            numVals = this.getFieldValue(id, 0, 'integer');
+            numVals = this.getFieldValue(id, 0, 'integer', false);
             if(numVals > 0){
                 for(i = 0; i < numVals; i++){
                     if(this.transformedData.hasOwnProperty(identifier + i)){
@@ -246,47 +238,69 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         return result;
     },
     /**
+     * Overwritten to process tagfield-values
+     * @param {string} name
+     * @param {string} type
+     * @param {string} customType
+     * @param {string|boolean|integer} value
+     * @param {object} formVals
+     * @param {object} fieldConfig
+     * @returns {string|boolean|integer}
+     */
+    parseCustomValue: function(name, type, customType, value, formVals, fieldConfig){
+        if(customType === 'tagfield'){
+            // init additional values cache
+            if(!this.hasOwnProperty('additionalFormVals')){
+                this.additionalFormVals = {};
+                this.additionalFormVals.zzz = [];
+            }
+            var identifier = fieldConfig.fieldDataIdentifier;
+            if(value && Array.isArray(value) && value.length > 0){
+                // all 3 tsExcelExcludedColumnsSheetN fields will be sent with the same identifier and need further processing
+                if(name.includes('tsExcelExcludedColumnsSheet')){
+                    this.additionalFormVals.zzz = this.additionalFormVals.zzz.concat(value);
+                } else {
+                    // only the powerpoint-slidenumbers are integers and thus need a type-suffix
+                    type = (name === 'tsPowerpointIncludedSlideNumbers') ? '.i' : '';
+                    for(var i = 0; i < value.length; i++){
+                        this.additionalFormVals[identifier + String(i) + type] = (type === '.i') ? parseInt(value[i]) : value[i];
+                    }
+                    return value.length;
+                }
+            }
+            return 0;
+        }
+        return this.parseTypedValue(type, value);
+    },
+    /**
+     * Overwritten
      * Deconstructs the multivalue-tagfield values to the ugly "numbered lists with strange names"
-     * type-checks all other vals
-     * @returns {*}
      */
     getFormValues: function(){
-        var i, name, vals, identifier, target, type,
-            formvals = this.form.getValues(),
-            result = {},
-            zzzVals = [];
-        for(name in this.fields){
-            if(this.listNames.hasOwnProperty(name)){
-                vals = formvals[name];
-                identifier = this.listNames[name];
-                target = this.listTargets[identifier];
-                result[target] = 0;
-                if(vals && Array.isArray(vals) && vals.length > 0){
-                    // only the powerpoint-slidenums are integers and thus need a type-suffix
-                    if(name.includes('tsExcelExcludedColumnsSheet')){
-                        // all 3 tsExcelExcludedColumnsSheetN fields will be sent with the same identifier
-                        zzzVals = zzzVals.concat(vals);
-                    } else {
-                        type = (name === 'tsPowerpointIncludedSlideNumbers') ? '.i' : '';
-                        for(i = 0; i < vals.length; i++){
-                            result[identifier + String(i) + type] = (type === '.i') ? parseInt(vals[i]) : vals[i];
+        var vals = this.callParent();
+        // adding the tagfield-contents cached in additionalFormVals the crazy way (especially for "zzz")
+        if(this.additionalFormVals){
+            for(var name in this.additionalFormVals){
+                if(name === 'zzz'){
+                    if(this.additionalFormVals.zzz.length > 0 && vals['bPreferenceTranslateExcelExcludeColumns.b'] === true){
+                        vals['tsExcelExcludedColumns.i'] = this.additionalFormVals.zzz.length; // holds the number of "zzz" values
+                        for(var i = 0; i < this.additionalFormVals.zzz.length; i++){
+                            vals['zzz' + i] = this.additionalFormVals.zzz[i];
                         }
-                        result[target] = vals.length;
+                    } else {
+                        vals['tsExcelExcludedColumns.i'] = 0;
                     }
+                } else {
+                    vals[name] = this.additionalFormVals[name];
                 }
-            } else {
-                result[name] = this.parseTypedValue(this.getPropertyType(name), formvals[name]);
             }
+            delete this.additionalFormVals;
         }
-        // last step: add entries of combined excluded excel-columns - only if the general option is set
-        if(zzzVals.length > 0 && result['bPreferenceTranslateExcelExcludeColumns.b'] === true){
-            target = this.listTargets.zzz;
-            result[target] = zzzVals.length;
-            for(i = 0; i < zzzVals.length; i++){
-                result['zzz' + i] = zzzVals[i];
-            }
-        }
-        return result;
+        // cleanup virtual fields
+        delete vals['tsExcelExcludedColumnsSheet1.i'];
+        delete vals['tsExcelExcludedColumnsSheet2.i'];
+        delete vals['tsExcelExcludedColumnsSheet3.i'];
+        return vals;
     },
     /**
      * Overridden to resolve our dependencies
