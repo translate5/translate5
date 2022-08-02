@@ -1507,7 +1507,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKFRNICZhbXA7IFRlcm1lKQ=='><source>Vorübersetzen (TM &amp; Terme)</source><target>Vorübersetzen (TM &amp; Terme)</target></trans-unit>
 <trans-unit id='VHJlZmZlciBhdXMgZGVyIFRlcm1pbm9sb2dpZSB3ZXJkZW4gYmV2b3J6dWd0IHZvcsO8YmVyc2V0enQu'><source>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</source><target>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</target></trans-unit>
 <trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKE1UKQ=='><source>Vorübersetzen (MT)</source><target>Vorübersetzen (MT)</target></trans-unit>
-<trans-unit id='VHJlZmZlciBhdXMgZGVtIFRNIHdlcmRlbiBiZXZvcnp1Z3Qgdm9yw7xiZXJzZXR6dA=='><source>Treffer aus dem TM werden bevorzugt vorübersetzt</source><target>Treffer aus dem TM werden bevorzugt vorübersetzt</target></trans-unit>
+<trans-unit id='V2VubiBkaWVzZSBPcHRpb24gYWt0aXZpZXJ0IGlzdCwgd2VyZGVuIGFsbGUgVHJlZmZlciwgZGllIG5pY2h0IGF1cyBkZW0gVE0gdm9yw7xiZXJzZXR6dCBzaW5kLCB2b24gZGVyIE1UIHZvcsO8YmVyc2V0enQu'><source>Wenn diese Option aktiviert ist, werden alle Treffer, die nicht aus dem TM vorübersetzt sind, von der MT vorübersetzt.</source><target>Wenn diese Option aktiviert ist, werden alle Treffer, die nicht aus dem TM vorübersetzt sind, von der MT vorübersetzt.</target></trans-unit>
 <trans-unit id='QW5hbHlzZSBsw6R1ZnQ='><source>Analyse läuft</source><target>Analyse läuft</target></trans-unit>
 <trans-unit id='S2VpbmUgVHJlZmZlcg=='><source>Keine Treffer</source><target>Keine Treffer</target></trans-unit>
 <trans-unit id='R2VzYW10emFobCBkZXIgV8O2cnRlcg=='><source>Gesamtzahl der Wörter</source><target>Gesamtzahl der Wörter</target></trans-unit>
