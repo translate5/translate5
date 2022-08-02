@@ -1970,15 +1970,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @return editor_Models_Task
      */
     public function getTask() {
-
-        /* @var $task editor_Models_Task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-
-        // Load task
-        $task->loadByTaskGuid($this->getTaskGuid());
-
-        // Return task
-        return $task;
+        return editor_ModelInstances::taskByGuid($this->getTaskGuid());
     }
 
     /**

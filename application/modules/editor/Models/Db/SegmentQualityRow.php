@@ -64,18 +64,14 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
         }
         return new stdClass();
     }
+
     /**
-     * Sets the additionalData, which can only be a flat stdClass Object, as encoded JSON
+     * Sets the additionalData, which can only be an stdClass Object, as encoded JSON
      * An empy or missing Object will lead to NULL as column value
      * @param stdClass $data
      */
     public function setAdditionalData(?stdClass $data){
         if(is_object($data)){
-            foreach((array) $data as $key => $val){
-                if(is_object($val) || is_int($key)){
-                    //throw new ZfExtended_Exception('Additional data for quality entities must be flat !');
-                }
-            }
             $jsonString = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             $this->additionalData = (empty($jsonString)) ? NULL : $jsonString;
         } else {

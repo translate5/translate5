@@ -56,7 +56,7 @@ Ext.define('Editor.model.quality.Filter', {
         return (this.get('qcategory') != '' && this.get('qtype') != 'root');
     },
     isCategoryGroup: function(){
-        return this.isCategory() && this.get('children') && !this.get('qcategory').match(/^mqm_/);
+        return this.isCategory() && this.get('children') && this.get('qtype') != 'mqm';
     },
     isEmptyQuality: function(){
         return (this.get('qcategory') != '' && this.get('qtype') != 'root' && this.get('qcount') == 0);
