@@ -339,14 +339,14 @@ class Editor_SegmentController extends ZfExtended_RestController
         /* @var $updater editor_Models_Segment_Updater */
         $updater->update($this->entity, $history);
 
-        $this->view->rows = $this->entity->getDataObject();
+        // To always have a consistent view-model, we convert the stdClass to an assoc array, no matter if anonymization is required or not
+        $this->view->rows = json_decode(json_encode($this->entity->getDataObject()), true);
 
         // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         if ($task->anonymizeUsers()) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
-            $row = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 3 must be of the type array
-            $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $row['userGuid'], $row);
+            $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $this->view->rows['userGuid'], $this->view->rows);
         }
 
         //reload the task so the segment finish count is updated
