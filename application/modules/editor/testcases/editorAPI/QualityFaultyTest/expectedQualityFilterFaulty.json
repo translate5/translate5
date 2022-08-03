@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 16,
-    "qtotal": 16,
+    "qcount": 31,
+    "qtotal": 31,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -17,13 +17,14 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "81852",
+                    "qid": "98769",
                     "qtype": "consistent",
                     "qcount": 3,
                     "qcomplete": true,
                     "qcategory": "source",
                     "qcatidx": "-1",
                     "text": "Inconsistent source",
+                    "qtooltip": "Finds segments with the same target, but different source (tags ignored)",
                     "leaf": true,
                     "checked": false
                 },
@@ -34,7 +35,7 @@
                     "qcomplete": true,
                     "qcategory": "target",
                     "text": "Inconsistent target",
-                    "textTooltip": "Finds segments with the same source, but different target (tags ignored)",
+                    "qtooltip": "Finds segments with the same source, but different target (tags ignored)",
                     "leaf": true,
                     "checked": false
                 }
@@ -65,13 +66,14 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "81850",
+                    "qid": "98759",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "internal_tag_structure_faulty",
                     "qcatidx": "-1",
                     "text": "Internal tags have an incorrect structure",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false,
                     "qfaulty": true
@@ -83,18 +85,19 @@
                     "qcomplete": true,
                     "qcategory": "internal_tags_added",
                     "text": "Internal tags have been added",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "81851",
+                    "qid": "98768",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "internal_tags_missing",
                     "qcatidx": "-1",
                     "text": "Internal tags missing",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -105,7 +108,7 @@
                     "qcomplete": true,
                     "qcategory": "whitespace_tags_added",
                     "text": "Whitespace has been added",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -116,7 +119,7 @@
                     "qcomplete": true,
                     "qcategory": "whitespace_tags_missing",
                     "text": "Whitespace has been removed",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 }
@@ -125,6 +128,224 @@
             "qtooltip": "",
             "text": "Internal tags",
             "qtotal": 2,
+            "expanded": true,
+            "checked": false
+        },
+        {
+            "qid": -1,
+            "qtype": "spellcheck",
+            "qcount": 15,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "grammar",
+                    "text": "Grammar",
+                    "qtooltip": "The text contains a grammatical error (including errors of syntax and morphology).",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": "98735",
+                    "qtype": "spellcheck",
+                    "qcount": 14,
+                    "qcomplete": true,
+                    "qcategory": "misspelling",
+                    "qcatidx": "-1",
+                    "text": "Spelling",
+                    "qtooltip": "The text contains a misspelling.",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "typographical",
+                    "text": "Typographical",
+                    "qtooltip": "The text has typographical errors such as omitted\/incorrect punctuation, incorrect capitalization, etc.",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "characters",
+                            "text": "Characters",
+                            "qtooltip": "The text contains characters that are garbled or incorrect or that are not used in the language in which the content appears.",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "duplication",
+                            "text": "Duplication",
+                            "qtooltip": "Content has been duplicated improperly.",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "inconsistency",
+                            "text": "Inconsistency",
+                            "qtooltip": "The text is inconsistent with itself or is translated inconsistently (NB: not for use with terminology inconsistency).",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "legal",
+                            "text": "Legal",
+                            "qtooltip": "The text is legally problematic (e.g., it is specific to the wrong legal system).",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": "98750",
+                            "qtype": "spellcheck",
+                            "qcount": 1,
+                            "qcomplete": true,
+                            "qcategory": "uncategorized",
+                            "qcatidx": "-1",
+                            "text": "Uncategorized",
+                            "qtooltip": "The issue either has not been categorized or cannot be categorized.",
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "group-general",
+                    "text": "General",
+                    "qtooltip": null,
+                    "expanded": false,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "children": [
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "register",
+                            "text": "Register",
+                            "qtooltip": "The text is written in the wrong linguistic register of uses slang or other language variants inappropriate to the text.",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "locale-specific-content",
+                            "text": "Locale-specific content",
+                            "qtooltip": "The localization contains content that does not apply to the locale for which it was prepared.",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "locale-violation",
+                            "text": "Locale violation",
+                            "qtooltip": "Text violates norms for the intended locale.",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "style",
+                            "text": "General style",
+                            "qtooltip": "The text contains stylistic errors.",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "pattern-problem",
+                            "text": "Pattern problem",
+                            "qtooltip": "The text fails to match a pattern that defines allowable content (or matches one that defines non-allowable content).",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "whitespace",
+                            "text": "Whitespace",
+                            "qtooltip": "There is a mismatch in whitespace between source and target content or the text violates specific rules related to the use of whitespace.",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "terminology",
+                            "text": "Terminology",
+                            "qtooltip": "An incorrect term or a term from the wrong domain was used or terms are used inconsistently.",
+                            "leaf": true,
+                            "checked": false
+                        },
+                        {
+                            "qid": -1,
+                            "qtype": "spellcheck",
+                            "qcount": 0,
+                            "qcomplete": true,
+                            "qcategory": "internationalization",
+                            "text": "Internationalization",
+                            "qtooltip": "There is an issue related to the internationalization of content.",
+                            "leaf": true,
+                            "checked": false
+                        }
+                    ],
+                    "qcategory": "group-style",
+                    "text": "Style",
+                    "qtooltip": null,
+                    "expanded": false,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "LanguageTool",
+            "qtotal": 15,
             "expanded": true,
             "checked": false
         },
@@ -141,7 +362,7 @@
                     "qcomplete": true,
                     "qcategory": "not_long_enough",
                     "text": "Segment relevantly shorter than allowed (more than 20% shorter or at least 100 Pixel shorter or at least 20 characters shorter)",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -152,7 +373,7 @@
                     "qcomplete": true,
                     "qcategory": "too_long",
                     "text": "Segment longer than allowed",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -163,7 +384,7 @@
                     "qcomplete": true,
                     "qcategory": "too_many_lines",
                     "text": "Segment has too many lines",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -174,7 +395,7 @@
                     "qcomplete": true,
                     "qcategory": "too_short",
                     "text": "Segment shorter than allowed",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 }
@@ -199,7 +420,7 @@
                     "qcomplete": true,
                     "qcategory": "qm_1",
                     "text": "Demo QM error 1",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -210,7 +431,7 @@
                     "qcomplete": true,
                     "qcategory": "qm_2",
                     "text": "Mistranslation",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -221,7 +442,7 @@
                     "qcomplete": true,
                     "qcategory": "qm_3",
                     "text": "Terminology problem",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -232,7 +453,7 @@
                     "qcomplete": true,
                     "qcategory": "qm_4",
                     "text": "Fluency issue",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -243,7 +464,7 @@
                     "qcomplete": true,
                     "qcategory": "qm_5",
                     "text": "Inconsistency",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 }
@@ -538,13 +759,14 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "81849",
+                    "qid": "98758",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num1",
                     "qcatidx": "-1",
-                    "text": "Numbers SRC \u2260 TRG",
+                    "text": "Numbers source \u2260 target",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -555,7 +777,7 @@
                     "qcomplete": true,
                     "qcategory": "num10",
                     "text": "Format alteration (ordinal numbers, leading zero etc.)",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -566,7 +788,7 @@
                     "qcomplete": true,
                     "qcategory": "num11",
                     "text": "Different character\/formatting for number interval",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -577,7 +799,18 @@
                     "qcomplete": true,
                     "qcategory": "num12",
                     "text": "1000-separator not allowed",
-                    "textTooltip": "",
+                    "qtooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "num13",
+                    "text": "Dubious number from source unchanged in target",
+                    "qtooltip": "If this is not a decimal number but a list with missing spaces between list elements, please insert spaces between list elements in target. In case of wrongly used decimal separator in the source please ignore message.",
                     "leaf": true,
                     "checked": false
                 },
@@ -587,8 +820,8 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num2",
-                    "text": "Alphanumerical character sequences",
-                    "textTooltip": "",
+                    "text": "Alphanumerical character sequences: Differences",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -599,7 +832,7 @@
                     "qcomplete": true,
                     "qcategory": "num3",
                     "text": "Format alteration (date information etc.)",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -610,7 +843,7 @@
                     "qcomplete": true,
                     "qcategory": "num4",
                     "text": "Separator(s) not localised",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -621,7 +854,7 @@
                     "qcomplete": true,
                     "qcategory": "num5",
                     "text": "Formatting of 1000s number altered",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -632,7 +865,7 @@
                     "qcomplete": true,
                     "qcategory": "num6",
                     "text": "Different minus characters",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -642,8 +875,8 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num7",
-                    "text": "Separator from SRC altered",
-                    "textTooltip": "",
+                    "text": "Separator from source altered",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -653,8 +886,8 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num8",
-                    "text": "Numeral from SRC found as number in TRG",
-                    "textTooltip": "",
+                    "text": "Numeral from source found as number in target",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -664,8 +897,8 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num9",
-                    "text": "Number from SRC found as numeral in TRG",
-                    "textTooltip": "",
+                    "text": "Number from source found as numeral in target",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 }
@@ -690,40 +923,43 @@
                     "qcomplete": true,
                     "qcategory": "forbidden_in_source",
                     "text": "Forbidden in source",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "81842",
+                    "qid": "98728",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
                     "qcategory": "forbidden_in_target",
                     "qcatidx": "-1",
                     "text": "Forbidden in target",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "81838",
+                    "qid": "98724",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
                     "qcategory": "not_defined_in_target",
                     "qcatidx": "-1",
                     "text": "Not defined in target terminology",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "81844",
+                    "qid": "98730",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "not_found_in_target",
                     "qcatidx": "-1",
                     "text": "Not found in target",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 }
@@ -748,7 +984,7 @@
                     "qcomplete": true,
                     "qcategory": "edited_100percent_match",
                     "text": "Edited 100% match",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -759,7 +995,7 @@
                     "qcomplete": true,
                     "qcategory": "unedited_fuzzy_match",
                     "text": "Unedited fuzzy match",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 }
@@ -784,7 +1020,7 @@
                     "qcomplete": true,
                     "qcategory": "lnbr_begin",
                     "text": "Line break at the beginning",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -795,7 +1031,7 @@
                     "qcomplete": true,
                     "qcategory": "lnbr_end",
                     "text": "Line break at the end",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -806,7 +1042,7 @@
                     "qcomplete": true,
                     "qcategory": "lnbr_space",
                     "text": "Space after line break",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -817,7 +1053,7 @@
                     "qcomplete": true,
                     "qcategory": "nbsp_begin",
                     "text": "Non-breaking space at the beginning",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -828,7 +1064,7 @@
                     "qcomplete": true,
                     "qcategory": "nbsp_end",
                     "text": "Non-breaking space at the end",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -839,7 +1075,7 @@
                     "qcomplete": true,
                     "qcategory": "space_lnbr",
                     "text": "Space before line break",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -850,7 +1086,7 @@
                     "qcomplete": true,
                     "qcategory": "space_tag_end",
                     "text": "Segment ends with a space followed by a tag",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -861,7 +1097,7 @@
                     "qcomplete": true,
                     "qcategory": "tab_begin",
                     "text": "Tab at the beginning",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -872,7 +1108,7 @@
                     "qcomplete": true,
                     "qcategory": "tab_end",
                     "text": "Tab at the end",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
@@ -883,7 +1119,7 @@
                     "qcomplete": true,
                     "qcategory": "tag_space_begin",
                     "text": "Segment begins with a tag followed by a space",
-                    "textTooltip": "",
+                    "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 }
