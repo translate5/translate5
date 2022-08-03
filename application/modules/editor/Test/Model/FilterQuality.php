@@ -35,5 +35,7 @@ class editor_Test_Model_FilterQuality extends editor_Test_Model_Abstract {
     
     protected $treeRootSanitized = [ 'text' => 'testtext' ];
 
+    protected $treeRootFilteredSanitized = [ 'qcount' => 'onecounter', 'qtotal' => 'onecounter' ];
+
     protected $messageField = 'text';
 }

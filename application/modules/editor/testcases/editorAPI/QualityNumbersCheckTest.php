@@ -121,9 +121,6 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
             $tree = $env['api']->getJsonTree('/editor/quality', [], $jsonFile);
             $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'numbers');
             $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
-
-            // Close task
-            $env['api']->requestJson('editor/task/' . $env['task']->id, 'PUT', ['userState' => 'open', 'id' => $env['task']->id]);
         }
     }
 
@@ -134,6 +131,9 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
 
         // Foreach task based on imported csv file
         foreach (self::$taskA as $name => $env) {
+
+            // Close task
+            $env['api']->requestJson('editor/task/' . $env['task']->id, 'PUT', ['userState' => 'open', 'id' => $env['task']->id]);
 
             // Print the step where we are
             // error_log("\nDeleting task based on file: $name.csv\n");
