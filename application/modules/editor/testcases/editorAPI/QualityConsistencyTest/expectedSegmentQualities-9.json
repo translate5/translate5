@@ -20,7 +20,7 @@
         "segmentId": "261745",
         "field": "target",
         "type": "spellcheck",
-        "category": "spellError",
+        "category": "misspelling",
         "categoryIndex": "-1",
         "falsePositive": "0",
         "typeText": "LanguageTool",

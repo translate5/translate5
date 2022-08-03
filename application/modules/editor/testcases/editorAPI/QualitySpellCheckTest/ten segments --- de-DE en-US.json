@@ -150,7 +150,7 @@
                     "qtype": "spellcheck",
                     "qcount": 19,
                     "qcomplete": true,
-                    "qcategory": "spellError",
+                    "qcategory": "misspelling",
                     "qcatidx": "-1",
                     "text": "Spell",
                     "leaf": true,
