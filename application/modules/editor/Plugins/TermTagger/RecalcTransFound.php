@@ -58,6 +58,11 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      */
     protected $notPresentInTbxTarget = array();
 
+    /**
+     * @var array
+     */
+    protected $termByTbxId = [];
+
     public function __construct(editor_Models_Task $task) {
         $this->task = $task;
         $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
@@ -100,49 +105,93 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         $taskGuid = $this->task->getTaskGuid();
         $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $assoc editor_Models_TermCollection_TermCollection */
-        $collectionIds = $assoc->getCollectionsForTask($taskGuid);
+        $collectionIds = $assoc->getCollectionsForTask($taskGuid); // This DB-query runs on each segment ?? Not good
 
         if (empty($collectionIds)) {
             return $source;
         }
-
+        class_exists('editor_Utils');
+        i(['was source', $source], 'a');
+        i(['was target', $target], 'a');
+        //$source = str_replace('id162dcd89-6aef-48a3-9c2a-d7d412bd9e0f', 'id4abddb97-5f14-4e7b-becd-ec51c232c76e', $source);
         $source = $this->removeExistingFlags($source);
+        i(['flags removed from source', $source], 'a');
         $target = $this->removeExistingFlags($target);
+        i(['flags removed from target', $target], 'a');
         $sourceTermIds = $this->termModel->getTermMidsFromSegment($source);
         $targetTermIds = $this->termModel->getTermMidsFromSegment($target);
+        i(['$sourceTermIds', $sourceTermIds], 'a');
+        i(['$targetTermIds', $targetTermIds], 'a');
         $toMarkMemory = [];
         $this->groupCounter = [];
 
         foreach ($sourceTermIds as $sourceTermId) {
             try {
+
+                // Check whether source term having given termTbxId ($sourceTermId) exists within task's termcollections
                 $this->termModel->loadByMid($sourceTermId, $collectionIds);
+
+                // Get source term text
+                $this->termByTbxId[$sourceTermId] = $this->termModel->getTerm();
             }
             catch (ZfExtended_Models_Entity_NotFoundException $e) {
-                $toMarkMemory[$sourceTermId] = null; //so the source terms are marked as notfound in the repetitions
+
+                // So the source terms are marked as notfound in the repetitions
+                $toMarkMemory[$sourceTermId] = null;
                 continue;
             }
+            //$termEntryTbxId = 'id60093f56-da59-4074-9d1a-9803464a9402';
+
+            // Get termEntryId of the given source term
             $termEntryTbxId = $this->termModel->getTermEntryTbxId();
 
+            // Find translations of the given source term for target fuzzy languages
             $groupedTerms = $this->termModel->getAllTermsOfGroup($collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
+
+            // If no translations
             if (empty($groupedTerms)) {
+
+                // Setup a flag indicating that there are no translations for the current source term for the languages we need
                 $this->notPresentInTbxTarget[$termEntryTbxId] = true;
             }
 
+            // Counter for those of translations which are found in segment target
             $transFound = $this->groupCounter[$termEntryTbxId] ?? 0;
+
+            // Foreach translation existing in task's termcollection(s) for the given source term
             foreach ($groupedTerms as $groupedTerm) {
+
+                // Check whether translation does exist in segment target
                 $targetTermIdKey = array_search($groupedTerm['termTbxId'], $targetTermIds);
+
+                // If exists
                 if ($targetTermIdKey !== false) {
+
+                    // Increment translation-which-is-found-in-segment-target counter
                     $transFound++;
+
+                    // Unset it from $targetTermIds-array, so that the only tbx ids of terms to be kept where
                     unset($targetTermIds[$targetTermIdKey]);
                 }
             }
+
+            //
             $toMarkMemory[$sourceTermId] = $termEntryTbxId;
+
+            // Apply into class vaiable to be accessed from othe methods
             $this->groupCounter[$termEntryTbxId] = $transFound;
         }
+        i(['before now', $source], 'a');
+        i(['$toMarkMemory', $toMarkMemory], 'a');
+
+        //
+        $hasTermsInTarget = count($targetTermIds);
 
         foreach ($toMarkMemory as $sourceTermId => $termEntryTbxId) {
-            $source = $this->insertTransFoundInSegmentClass($source, $sourceTermId, $termEntryTbxId);
+            $source = $this->insertTransFoundInSegmentClass($source, $sourceTermId, $termEntryTbxId, $hasTermsInTarget);
         }
+        i(['now', $source], 'a');
+
 
         return $source;
     }
@@ -169,14 +218,28 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      * @param $groupId
      * @return string
      */
-    protected function insertTransFoundInSegmentClass(string $seg, $mid, $groupId) {
+    protected function insertTransFoundInSegmentClass(string $seg, $mid, $groupId, $hasTermsInTarget) {
+        class_exists('editor_Utils');
+        i([$seg, $mid, $groupId, $this->groupCounter], 'a');
+
         settype($this->groupCounter[$groupId], 'integer');
+
+        // $mid is source term termTbxId
+        // $groupId is termEntryTbxId
         $transFound =& $this->groupCounter[$groupId];
         $presentInTbxTarget = empty($this->notPresentInTbxTarget[$groupId]);
         $rCallback = function($matches) use (&$seg, &$transFound, $presentInTbxTarget){
             foreach ($matches as $match) {
                 if($presentInTbxTarget) {
                     $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
+
+                    if ($cssClassToInsert == 'transNotFound' && $hasTermsInTarget) {
+
+                        // Get term text, what will be red-underlined unless we do addditional check
+                        $red = $this->termByTbxId[$mid];
+
+
+                    }
                 }
                 else {
                     $cssClassToInsert = 'transNotDefined';

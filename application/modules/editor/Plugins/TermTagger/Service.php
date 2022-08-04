@@ -364,10 +364,13 @@ class editor_Plugins_TermTagger_Service {
      * @return stdClass
      */
     private function decodeSegments(stdClass $data, editor_Plugins_TermTagger_Service_ServerCommunication $request) {
+        class_exists('editor_Utils');
+        i(['decodeSegments before', $data->segments], 'a');
         foreach ($data->segments as & $segment) {
             $segment->source = $this->decodeSegment($segment, 'source', $request);
             $segment->target = $this->decodeSegment($segment, 'target', $request);
         }
+        i(['decodeSegments after', $data->segments], 'a');
         return $data;
     }
     
