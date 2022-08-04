@@ -126,13 +126,19 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         $this->groupCounter = [];
 
         foreach ($sourceTermIds as $sourceTermId) {
+
+            // Goto label to be used in case when $sourceTermId initially detected by TermTagger contains termTbxId of a term
+            // located under NOT the same termEntry as term(s) detected in segment target text, so that such a term in
+            // segment source text will be red-inderlined to inidicate that it's translation(s) was not found in segment
+            // target text, despite there actually are correct translations but just in another termEnteies. So, this
+            // label will be used as a pointer for goto operator executed in case if such scenario was detected and
+            // alternative termTbxId was found to solve that problem so we'll have to run same iteration from the
+            // beginning but with using spoofed value of $sourceTermId variable
+            correct_sourceTermId:
+
+            // Check whether source term having given termTbxId ($sourceTermId) exists within task's termcollections
             try {
-
-                // Check whether source term having given termTbxId ($sourceTermId) exists within task's termcollections
                 $this->termModel->loadByMid($sourceTermId, $collectionIds);
-
-                // Get source term text
-                $this->termByTbxId[$sourceTermId] = $this->termModel->getTerm();
             }
             catch (ZfExtended_Models_Entity_NotFoundException $e) {
 
@@ -140,7 +146,6 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 $toMarkMemory[$sourceTermId] = null;
                 continue;
             }
-            //$termEntryTbxId = 'id60093f56-da59-4074-9d1a-9803464a9402';
 
             // Get termEntryId of the given source term
             $termEntryTbxId = $this->termModel->getTermEntryTbxId();
@@ -172,6 +177,41 @@ class editor_Plugins_TermTagger_RecalcTransFound {
 
                     // Unset it from $targetTermIds-array, so that the only tbx ids of terms to be kept where
                     unset($targetTermIds[$targetTermIdKey]);
+                }
+            }
+
+            // If there are terms detected in segment target text but none of them are translations for source text's current term
+            if ($targetTermIds && !$transFound) {
+
+                // Shortcut to db adapter instance
+                $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+
+                // Get distinct termEntryTbx ids of target terms
+                $termEntryTbxIdA = $db->query('
+                    SELECT DISTINCT termEntryTbxId 
+                    FROM `terms_term` 
+                    WHERE `termTbxId` IN ("'. join('","', $targetTermIds) . '")
+                ')->fetchAll(PDO::FETCH_COLUMN);
+
+                // Try to find source term's homonym under the target terms' termEntries
+                $sourceTermId_homonym = $db->query('
+                    SELECT `termTbxId` 
+                    FROM `terms_term` 
+                    WHERE 1
+                      AND `termEntryTbxId` IN ("'. join('","', $termEntryTbxIdA) . '") 
+                      AND `term` = ?
+                ', $this->termModel->getTerm())->fetchColumn();
+
+                // If found
+                if ($sourceTermId_homonym) {
+
+                    i('spoofed ' . $sourceTermId . ' with ' . $sourceTermId_homonym, 'a');
+
+                    // Spoof value of $sourceTermId with found homonym's termTbxId
+                    $sourceTermId = $sourceTermId_homonym;
+
+                    // Spoof value of $sourceTermId initially detected by TermTagger with the right one and try again
+                    goto correct_sourceTermId;
                 }
             }
 
@@ -229,34 +269,6 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             foreach ($matches as $match) {
                 if($presentInTbxTarget) {
                     $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
-
-                    if ($cssClassToInsert == 'transNotFound' && $targetTermIds) {
-
-                        // Get term text, what will be red-underlined unless we do addditional check
-                        $red = $this->termByTbxId[$mid];
-
-                        //
-                        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
-
-                        // Get distinct termEntryTbx ids of target terms
-                        $termEntryTbxIdA = $db->query('
-                            SELECT DISTINCT termEntryTbxId 
-                            FROM `terms_term` 
-                            WHERE `termTbxId` IN ("'. join('","', $targetTermIds) . '")
-                        ')->fetchAll(PDO::FETCH_COLUMN);
-
-                        $sourceTermId_homonym = $db->query('
-                            SELECT `termTbxId` 
-                            FROM `terms_term` 
-                            WHERE 1
-                              AND `termEntryTbxId` IN ("'. join('","', $termEntryTbxIdA) . '") 
-                              AND `term` = ?
-                        ', $red)->fetchColumn();
-
-                        if ($sourceTermId_homonym) {
-                            $cssClassToInsert = 'transFound';
-                        }
-                    }
                 }
                 else {
                     $cssClassToInsert = 'transNotDefined';
