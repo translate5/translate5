@@ -549,7 +549,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             catch(Throwable $e){
                 $msg = $e->getMessage()."\n".'In trans-unit '.print_r($opener['attributes']);
-                if(method_exists($e,'setMessage')){
+                if($e instanceof ZfExtended_Exception){
                     $e->setMessage($msg,1);
                     throw $e;
                 }
