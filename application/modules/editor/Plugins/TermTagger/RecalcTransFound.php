@@ -168,7 +168,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 if ($targetTermIdKey !== false) {
 
                     // Increment translation-which-is-found-in-segment-target counter
-                    $transFound++;
+                    $transFound ++;
 
                     // Unset it from $targetTermIds-array, so that the only tbx ids of terms to be kept where
                     unset($targetTermIds[$targetTermIdKey]);
@@ -184,11 +184,8 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         i(['before now', $source], 'a');
         i(['$toMarkMemory', $toMarkMemory], 'a');
 
-        //
-        $hasTermsInTarget = count($targetTermIds);
-
         foreach ($toMarkMemory as $sourceTermId => $termEntryTbxId) {
-            $source = $this->insertTransFoundInSegmentClass($source, $sourceTermId, $termEntryTbxId, $hasTermsInTarget);
+            $source = $this->insertTransFoundInSegmentClass($source, $sourceTermId, $termEntryTbxId, $targetTermIds);
         }
         i(['now', $source], 'a');
 
@@ -218,7 +215,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      * @param $groupId
      * @return string
      */
-    protected function insertTransFoundInSegmentClass(string $seg, $mid, $groupId, $hasTermsInTarget) {
+    protected function insertTransFoundInSegmentClass(string $seg, $mid, $groupId, array $targetTermIds) {
         class_exists('editor_Utils');
         i([$seg, $mid, $groupId, $this->groupCounter], 'a');
 
@@ -228,17 +225,37 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         // $groupId is termEntryTbxId
         $transFound =& $this->groupCounter[$groupId];
         $presentInTbxTarget = empty($this->notPresentInTbxTarget[$groupId]);
-        $rCallback = function($matches) use (&$seg, &$transFound, $presentInTbxTarget){
+        $rCallback = function($matches) use (&$seg, &$transFound, $presentInTbxTarget, $mid, $targetTermIds){
             foreach ($matches as $match) {
                 if($presentInTbxTarget) {
                     $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
 
-                    if ($cssClassToInsert == 'transNotFound' && $hasTermsInTarget) {
+                    if ($cssClassToInsert == 'transNotFound' && $targetTermIds) {
 
                         // Get term text, what will be red-underlined unless we do addditional check
                         $red = $this->termByTbxId[$mid];
 
+                        //
+                        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 
+                        // Get distinct termEntryTbx ids of target terms
+                        $termEntryTbxIdA = $db->query('
+                            SELECT DISTINCT termEntryTbxId 
+                            FROM `terms_term` 
+                            WHERE `termTbxId` IN ("'. join('","', $targetTermIds) . '")
+                        ')->fetchAll(PDO::FETCH_COLUMN);
+
+                        $sourceTermId_homonym = $db->query('
+                            SELECT `termTbxId` 
+                            FROM `terms_term` 
+                            WHERE 1
+                              AND `termEntryTbxId` IN ("'. join('","', $termEntryTbxIdA) . '") 
+                              AND `term` = ?
+                        ', $red)->fetchColumn();
+
+                        if ($sourceTermId_homonym) {
+                            $cssClassToInsert = 'transFound';
+                        }
                     }
                 }
                 else {
