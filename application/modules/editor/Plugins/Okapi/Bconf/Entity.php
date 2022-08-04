@@ -29,6 +29,18 @@
 /**
  * Okapi Bconf Entity Object
  *
+ * A OKAPI Batch Configuration aka "BCONF" is a Bitstream-based file that bundles several components:
+ * 2 SRX files (source & target, may be equal), Pipeline, FPRM files (0-n) and the Extension-Mapping
+ * Generally, a BCONF is represented by it's parts in the Filesystem and a corresponding database-entry
+ * The filesystem-parts are stored in a configurable base-directory (usually /data/editorOkapiBconf/) in a folder with the database-id as name
+ * In this folder the parts are stored in another file "content.json", which is an inventory of the parts and contains the steps found in the pipeline
+ * The packing/unpacking of the parts is implemented in the Packer/Unpacker class
+ * When a bconf is packed, the embedded FPRM and SRX components are updated to the current state/revision of the git-based files.
+ * The Revision is hold in editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX, every time the revision is increased in the code, all existing bconfs will be repacked with updated FPRMs/SRXs
+ * All File-based parts of a BCONF generally have a corresponding clas, that is able to validate the file
+ *
+ * see editor_Plugins_Okapi_Bconf_Filters, editor_Plugins_Okapi_Bconf_ExtensionMapping, editor_Plugins_Okapi_Bconf_Filter_Fprm and editor_Plugins_Okapi_Bconf_Segmentation for more documentation
+ *
  * @method integer getId()
  * @method void setId(int $id)
  * @method string getName()
@@ -290,9 +302,8 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $sysBconfRow = $this->db->fetchRow($this->db->select()->where('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME));
         // when the system default bconf does not exist we have to generate it
         if($sysBconfRow == NULL){
-
             $sysBconfPath = editor_Plugins_Okapi_Init::getDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
-            $sysBconfName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME . '.' .  static::EXTENSION;
+            $sysBconfName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
             $sysBconfDescription = 'The default .bconf used for file imports unless another one is configured';
             $sysBconf = new editor_Plugins_Okapi_Bconf_Entity();
             $sysBconf->import($sysBconfPath, $sysBconfName, $sysBconfDescription, NULL);
@@ -555,11 +566,19 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     public function getCustomFilterProviderId() : string {
         if(empty($this->getCustomerId())){
             $config = Zend_Registry::get('config');
-            return editor_Utils::filenameFromUserText($config->runtimeOptions->server->name, false);
+            $name = editor_Utils::filenameFromUserText($config->runtimeOptions->server->name, false);
+        } else {
+            $name = editor_Utils::filenameFromUserText($this->getCustomerName(), false);
+            if(empty($name)){
+                $name = 'customer'.$this->getCustomerId();
+            }
         }
-        $name = editor_Utils::filenameFromUserText($this->getCustomerName(), false);
-        if(empty($name)){
-            $name = 'customer'.$this->getCustomerId();
+        // we must not create okapi-id's that start with or contain "translate5"
+        if(str_contains($name, 'translate5')){
+            $name = str_replace(['_translate5_', '_translate5', 'translate5_', 'translate5'], ['', '', '', ''], $name);
+            if(empty($name)){
+                $name = 'customized';
+            }
         }
         if(strlen($name) > 50){
             return substr($name, 0, 50);

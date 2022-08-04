@@ -77,13 +77,46 @@ class editor_Plugins_Okapi_Connector {
      * @var string
      */
     private $inputFile;
-    
-    public function __construct() {
-        $this->okapiConfig = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
-        
-        $this->apiUrl = $this->okapiConfig->api->url;
+
+    /**
+     * @param Zend_Config|null $config
+     * @throws Zend_Exception
+     */
+    public function __construct(Zend_Config $config = null) {
+
+        $this->okapiConfig = !is_null($config) ? $config->runtimeOptions->plugins->Okapi : Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
+
+        $this->apiUrl = $this->getApiUrl();
     }
-    
+
+    /**
+     * Get the okapi api url from the configured servers and server used
+     * @return mixed
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getApiUrl(){
+
+        $servers = $this->okapiConfig->server;
+        if(empty($servers)){
+            throw new editor_Plugins_Okapi_Exception('E1410', ['servers' => $servers]);
+        }
+
+        $serverUsed = $this->okapiConfig->serverUsed;
+        if(empty($serverUsed)){
+            throw new editor_Plugins_Okapi_Exception('E1411', ['serverUsed' => $serverUsed]);
+        }
+
+        $apiUrl = $servers->$serverUsed ?? null;
+        if(empty($apiUrl)){
+            throw new editor_Plugins_Okapi_Exception('E1412', [
+                'servers' => $servers,
+                'serverUsed' => $serverUsed
+            ]);
+        }
+
+        return $apiUrl;
+    }
+
     /**
      * Create the http object, set the authentication and set the url
      * 

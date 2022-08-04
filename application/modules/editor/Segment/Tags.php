@@ -689,4 +689,8 @@ class editor_Segment_Tags implements JsonSerializable {
     public function debugJson(){
         return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     }
+
+    public function getTask() {
+        return $this->task;
+    }
 }

@@ -67,6 +67,14 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     }
 
     /**
+     * Overwritten to add the custom-extensions
+     */
+    public function getAction(){
+        parent::getAction();
+        $this->view->rows->customExtensions = $this->entity->findCustomFilterExtensions(); // needed to match the grids data model
+    }
+
+    /**
      * Export bconf
      */
     public function downloadbconfAction() {
@@ -127,8 +135,10 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         }
         $clone = new editor_Plugins_Okapi_Bconf_Entity();
         $clone->import($this->entity->getPath(), $name, $description, $customerId);
+        $returnData = $clone->toArray();
+        $returnData['customExtensions'] = $clone->findCustomFilterExtensions(); // needed to match the grids data model
 
-        echo json_encode($clone->toArray());
+        echo json_encode($returnData);
     }
 
     /**

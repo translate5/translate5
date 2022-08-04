@@ -28,7 +28,11 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Applet;
 
+use editor_User;
 use JetBrains\PhpStorm\NoReturn;
+use Zend_Registry;
+use ZfExtended_Acl;
+use ZfExtended_NotAuthenticatedException;
 
 /**
  * Applet dispatcher for translate5 applets (termportal, instanttranslate, etc)
@@ -51,16 +55,6 @@ class Dispatcher {
             return self::$instance = new self();
         }
         return self::$instance;
-    }
-
-    protected function __construct() {
-
-        // add the default applet editor, if this will change move the register into editor bootstrap
-        $this->registerApplet('editor', new class extends AppletAbstract {
-            protected int $weight = 100; //editor should have the heighest weight
-            protected string $urlPathPart = '/editor/';
-            protected string $initialPage = 'editor';
-        });
     }
 
     public function registerApplet(string $name, AppletAbstract $applet) {
@@ -91,8 +85,11 @@ class Dispatcher {
             return $appletB->getWeight() - $appletA->getWeight();
         });
 
-        //defaulting to editor applet if nothing given as target
-        $this->call($target ?? 'editor', false);
+        if(empty($target)){
+            $target = $this->getDefaultAppletForUser();
+        }
+        //defaulting to the current registered module if nothing given as target
+        $this->call($target ?? Zend_Registry::get('module'), false);
 
         //if we are still here (so not redirected away by above call),
         // we try to load the last used app
@@ -140,6 +137,43 @@ class Dispatcher {
     public function getApplet(string|null $name): ?AppletAbstract
     {
         return $this->applets[$name] ?? null;
+    }
+
+
+    /***
+     * Calculate the default applet/module for the currently authenticated.
+     * @return string
+     * @throws \Zend_Db_Table_Exception
+     * @throws \Zend_Exception
+     */
+    public function getDefaultAppletForUser(): string
+    {
+        // default redirect to editor
+        $applett = 'editor';
+        try {
+            $user = editor_User::instance();
+
+            $acl = ZfExtended_Acl::getInstance();
+            /* @var ZfExtended_Acl $acl */
+
+            // get all initial_page acl records for all available user roles
+            $aclModules = $acl->getInitialPageModulesForRoles($user->getRoles());
+
+            $config = Zend_Registry::get('config');
+            $modulesOrder = explode(',',$config->runtimeOptions->modulesOrder);
+
+            // find the module redirect based on the modulesOrder config
+            foreach ($modulesOrder as $module){
+                if(in_array($module,$aclModules)){
+                    $applett = $module;
+                    break;
+                }
+            }
+        }catch (ZfExtended_NotAuthenticatedException $exception){
+            // the user has no session -> no applet can be found
+            $applett = '';
+        }
+        return $applett;
     }
 
     #[NoReturn] private function redirect(AppletAbstract $app)

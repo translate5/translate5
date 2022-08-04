@@ -33,16 +33,16 @@
  skipThreshold.i=1000 (max: 32000, min: 1, has tooltip)
  newTuOnBr.b=false
 
- see /okapi/okapi/filters/icml/src/main/java/net/sf/okapi/filters/icml/Parameters.java
+ see /okapi/filters/icml/src/main/java/net/sf/okapi/filters/icml/Parameters.java
  */
 Ext.define('Editor.plugins.Okapi.view.fprm.Icml', {
     extend: 'Editor.plugins.Okapi.view.fprm.Properties',
     width: 700,
     fieldDefinitions: {
-        'extractNotes.b': { config: {}},
-        "simplifyCodes.b": { config: {}},
-        "extractMasterSpreads.b": { config: {}},
+        'extractNotes.b': {},
+        "simplifyCodes.b": {},
+        "extractMasterSpreads.b": {},
         "skipThreshold.i": { config: { minValue: 1, maxValue: 32000, hasTooltip: true }},
-        "newTuOnBr.b": { config: {}}
+        "newTuOnBr.b": {}
     }
 });

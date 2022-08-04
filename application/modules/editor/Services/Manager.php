@@ -292,7 +292,7 @@ class editor_Services_Manager {
 
                 //UGLY: remove on refactoring of ZfExtended_BadGateway
                 if($e instanceof ZfExtended_BadGateway) {
-                    $this->setErrors(array_merge($e->getErrors(), $extraData));
+                    $e->setErrors(array_merge($e->getErrors(), $extraData));
                 } else {
                     $e->addExtraData($extraData);
                 }

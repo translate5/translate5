@@ -84,6 +84,7 @@ class LoginController extends ZfExtended_Controllers_Login {
     }
     
     protected function initDataAndRedirect() {
+
         //@todo do this with events
         if(class_exists('editor_Models_Segment_MaterializedView')) {
             $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');

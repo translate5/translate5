@@ -211,6 +211,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
 
                 //is called before save the alike to the DB, after doing all alike data handling (include recalc of the autostate)
                 $this->events->trigger('beforeSaveAlike', $this, array(
+                    'task' => $task,
                     'masterSegment' => $this->entity,
                     'alikeSegment' => $entity,
                     'isSourceEditable' => $this->isSourceEditable,

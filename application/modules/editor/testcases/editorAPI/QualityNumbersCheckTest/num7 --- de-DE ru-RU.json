@@ -130,6 +130,53 @@
         },
         {
             "qid": -1,
+            "qtype": "spellcheck",
+            "qcount": 0,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "grammarError",
+                    "text": "Grammar",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "misspelling",
+                    "text": "Spell",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "spellcheck",
+                    "qcount": 0,
+                    "qcomplete": true,
+                    "qcategory": "suggestion",
+                    "text": "Style",
+                    "textTooltip": "",
+                    "leaf": true,
+                    "checked": false
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "text": "LanguageTool",
+            "qtotal": 0,
+            "expanded": false,
+            "checked": false
+        },
+        {
+            "qid": -1,
             "qtype": "length",
             "qcount": 0,
             "qcomplete": true,
@@ -560,6 +607,17 @@
                     "qtype": "numbers",
                     "qcount": 0,
                     "qcomplete": true,
+                    "qcategory": "num13",
+                    "text": "Dubious number from source unchanged in target",
+                    "textTooltip": "If this is not a decimal number but a list with missing spaces between list elements, please insert spaces between list elements in target. In case of wrongly used decimal separator in the source please ignore message.",
+                    "leaf": true,
+                    "checked": false
+                },
+                {
+                    "qid": -1,
+                    "qtype": "numbers",
+                    "qcount": 0,
+                    "qcomplete": true,
                     "qcategory": "num2",
                     "text": "Alphanumerical character sequences: Differences",
                     "textTooltip": "",
@@ -611,7 +669,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "92437",
+                    "qid": "38569",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,

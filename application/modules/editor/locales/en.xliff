@@ -4663,6 +4663,10 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Mindestens ein Kunde muss ausgewählt sein</source>
   <target>At least one customer must be selected</target>
 </trans-unit>
+<trans-unit id='WnVyw7xjayB6dW0gRVJQ'>
+  <source>Zurück zum ERP</source>
+  <target>Back to ERP</target>
+</trans-unit>
 <trans-unit id='WmlwLVVwbG9hZCBpc3QgbnVyIGFscyBBcmJlaXRzZGF0ZWkgbcO2Z2xpY2g='>
   <source>Zip-Upload ist nur als Arbeitsdatei möglich</source>
   <target>Zip upload is only possible as a working file</target>
@@ -4709,6 +4713,11 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='Rm9ybWF0w6RuZGVydW5nIChPcmRpbmFsemFobGVuLCBmw7xocmVuZGUgTnVsbCB1LsOkLik='><source>Formatänderung (Ordinalzahlen, führende Null u.ä.)</source><target>Format alteration (ordinal numbers, leading zero etc.)</target></trans-unit>
 <trans-unit id='VW50ZXJzY2guIFplaWNoZW4vRm9ybWF0aWVydW5nIGbDvHIgWmFobGVuLUludGVydmFsbA=='><source>Untersch. Zeichen/Formatierung für Zahlen-Intervall</source><target>Different character/formatting for number interval</target></trans-unit>
 <trans-unit id='MTAwMGVyLVRyZW5uZXIgbmljaHQgZXJsYXVidA=='><source>1000er-Trenner nicht erlaubt</source><target>1000-separator not allowed</target></trans-unit>
+<trans-unit id='RHViaW9zZSBaYWhsIGF1cyBRdWVsbGUgdW52ZXLDpG5kZXJ0IGluIFppZWw='><source>Dubiose Zahl aus Quelle unverändert in Ziel</source><target>Dubious number from source unchanged in target</target></trans-unit>
+<trans-unit id='RmFsbHMgZXMgc2ljaCBkYWJlaSB1bSBrZWluZSBEZXppbWFsemFobCwgc29uZGVybiBlaW5lICBMaXN0ZSBtaXQgZmVobGVuZGVuIExlZXJ6ZWljaGVuIHp3aXNjaGVuIExpc3RlbmVsZW1lbnRlbiBoYW5kZWx0LCBiaXR0ZSBpbSBaaWVsIExlZXJ6ZWljaGVuIHp3aXNjaGVuIExpc3RlbmVsZW1lbnRlbiBlaW5mw7xnZW4uIEJlaSBmYWxzY2ggdmVyd2VuZGV0ZW0gRGV6aW1hbHRyZW5uZXIgaW4gZGVyIFF1ZWxsZSBiaXR0ZSBNZWxkdW5nIGlnbm9yaWVyZW4u'>
+  <source>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</source>
+  <target>If this is not a decimal number but a list with missing spaces between list elements, please insert spaces between list elements in target. In case of wrongly used decimal separator in the source please ignore message.</target>
+</trans-unit>
 
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminology Translation Project</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Project</target></trans-unit>
@@ -4784,6 +4793,22 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdCAiezB9IiB3aXJkIGdlbMO2c2NodC4uLg=='>
   <source>Projekt "{0}" wird gelöscht...</source>
   <target>Deleting "{0}" project...</target>
+</trans-unit>
+<trans-unit id='U3VjaHQgaW4gZGVyIEF1c2dhbmdzc3ByYWNoZQ=='>
+  <source>Sucht in der Ausgangssprache</source>
+  <target>Searches in the source language</target>
+</trans-unit>
+<trans-unit id='RHLDvGNrZW4gU2llIEYzLCB1bSBkYXMgbWFya2llcnRlIFdvcnQgYW4gZGllIEtvbmtvcmRhbnpzdWNoZSB6dSBzZW5kZW4u'>
+  <source>Drücken Sie F3, um das markierte Wort an die Konkordanzsuche zu senden.</source>
+  <target>Press F3 to send the highlighted word to the concoredance search.</target>
+</trans-unit>
+<trans-unit id='VW5kIEFMVCtGMyBmw7xyIGRpZSBTeW5vbnltc3VjaGUu'>
+  <source>Und ALT+F3 für die Synonymsuche.</source>
+  <target>And ALT+F3 to the synonym search.</target>
+</trans-unit>
+<trans-unit id='U3VjaGVuIHVuZCBFcnNldHplbiBhbnplaWdlbiAoU1RSRyArIEYsIFNUUkcgKyBIKQ=='>
+  <source>Suchen und Ersetzen anzeigen (STRG + F, STRG + H)</source>
+  <target>Show search and replace (CTRL + F, CTRL + H)</target>
 </trans-unit>
   </file>
 </xliff>

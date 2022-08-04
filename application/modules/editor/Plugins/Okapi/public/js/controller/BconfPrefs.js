@@ -37,7 +37,8 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     requires: [
         'Editor.plugins.Okapi.view.BconfGrid',
         'Editor.plugins.Okapi.store.BconfStore',
-        'Editor.model.admin.Customer'
+        'Editor.model.admin.Customer',
+        'Editor.plugins.Okapi.view.UrlConfig'
     ],
     init: function(){
         Editor.model.admin.Customer.addFields([{
@@ -70,11 +71,14 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
                 change: {
                     fn: function(customerCombo, customerId){
                         customerId = (!customerId) ? null : customerId; // may be ''
-                        var store = Ext.getStore('bconfStore').createImportWizardSelectionData(customerId, customerCombo.getSelection().get('defaultBconfId')),
-                            combo = Ext.getCmp('taskImportBconfId');
-                        combo.setStore(store);
-                        combo.setValue(store.selectedId);
-                        combo.enable();
+                        var selection = customerCombo.getSelection();
+                        if(selection){
+                            var store = Ext.getStore('bconfStore').createImportWizardSelectionData(customerId, selection.get('defaultBconfId')),
+                                combo = Ext.getCmp('taskImportBconfId');
+                            combo.setStore(store);
+                            combo.setValue(store.selectedId);
+                            combo.enable();
+                        }
                     }
                 }
             }
@@ -91,7 +95,6 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
         if(Editor.app.authenticatedUser.isAllowed('pluginOkapiBconfPrefs')){
             this.bconfPanel = panel.insert(2, {
                 xtype: 'okapiBconfGrid',
-                id: 'okapiBconfGrid',
                 routePrefix: 'preferences/',
                 store: {
                     type: 'chained',
@@ -132,7 +135,6 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             // add the bconf grid to the tabPanel and bind it to the customer
             tabPanel.insert(2, {
                 xtype: 'okapiBconfGrid',
-                id: 'bconfCustomerGrid',
                 routePrefix: 'client/:clientId/',
                 bind: {
                     customer: '{list.selection}', // list is reference name of customerGrid

@@ -53,6 +53,9 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
         'E1409' => 'Okapi Plug-In: The edited filter file "{filterfile}" is not valid ({details})',
         'E1414' => 'Okapi Plug-In: The fprm file "{file}" is not valid ({details})',
         'E1415' => 'Okapi Plug-In: Error unpacking the bconf {bconf} ({details})',
-        'E1416' => 'Okapi Plug-In: Error packing the bconf {bconf} ({details})'
+        'E1416' => 'Okapi Plug-In: Error packing the bconf {bconf} ({details})',
+        'E1410' => 'Okapi Plug-In: No configuration found for okapi server(s)',
+        'E1411' => 'Okapi Plug-In: No configuration found for okapi server used',
+        'E1412' => 'Okapi Plug-In: The server used can not be found in all available configured servers'
     ];
 }

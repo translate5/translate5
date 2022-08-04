@@ -163,6 +163,7 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
                     },{
                         xtype:'splitbutton',
                         name:'btnSubmit',
+                        itemId:'searchButton',
                         text:me.strings.search,
                         iconCls:'ico-tm-magnifier',
                         menu: {

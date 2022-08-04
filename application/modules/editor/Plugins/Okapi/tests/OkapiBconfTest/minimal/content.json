@@ -1,0 +1,10 @@
+{
+    "refs": {
+        "sourceSrxPath": "s.srx",
+        "targetSrxPath": "t.srx"
+    },
+    "step": [
+        "net.sf.okapi.steps.segmentation.SegmentationStep"
+    ],
+    "fprm": []
+}

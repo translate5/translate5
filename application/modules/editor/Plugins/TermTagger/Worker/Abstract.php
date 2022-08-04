@@ -155,19 +155,25 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
         }
         return $segments;
     }
-    
+
+    /**
+     * Process segments
+     *
+     * @param array $segments
+     * @param string $slot
+     * @return bool
+     */
     protected function processSegments(array $segments, string $slot) : bool {
-        if($this->skipDueToEqualLangs){
-            if($this->isWorkerThread){
-                $this->getLogger()->error('E1326', 'TermTagger can not work when source and target language are equal.', ['task' => $this->task]);
-                return false;
-            }
-            return true;
-        }
-        
-        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, editor_Segment_Processing::isOperation($this->processingMode)), $slot);
+
+        // Get segments tags from segments
+        $segmentsTags = editor_Segment_Tags::fromSegments(
+            $this->task, $this->processingMode, $segments, editor_Segment_Processing::isOperation($this->processingMode)
+        );
+
+        // Process segments tags
+        return $this->processSegmentsTags($segmentsTags, $slot);
     }
-    
+
     protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {
         try {
             $processor = new editor_Plugins_TermTagger_SegmentProcessor($this->task, $this->config, $this->processingMode, $this->isWorkerThread);

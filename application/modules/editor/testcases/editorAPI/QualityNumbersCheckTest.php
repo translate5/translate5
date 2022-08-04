@@ -57,7 +57,8 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         // CSV-files with such names should be placed in testfiles-dir
         $csvA = [
             'num1..num11 except num7 --- de-DE en-US' => 10, // 10 - expected qty of segments to be imported
-            'num7 --- de-DE ru-RU' => 1
+            'num7 --- de-DE ru-RU' => 1,
+            'num12,num13 --- en-GB de-DE' => 2
         ];
 
         // Foreach csv file specified in $numA array
@@ -120,9 +121,6 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
             $tree = $env['api']->getJsonTree('/editor/quality', [], $jsonFile);
             $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'numbers');
             $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
-
-            // Close task
-            $env['api']->requestJson('editor/task/' . $env['task']->id, 'PUT', ['userState' => 'open', 'id' => $env['task']->id]);
         }
     }
 
@@ -133,6 +131,9 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
 
         // Foreach task based on imported csv file
         foreach (self::$taskA as $name => $env) {
+
+            // Close task
+            $env['api']->requestJson('editor/task/' . $env['task']->id, 'PUT', ['userState' => 'open', 'id' => $env['task']->id]);
 
             // Print the step where we are
             // error_log("\nDeleting task based on file: $name.csv\n");

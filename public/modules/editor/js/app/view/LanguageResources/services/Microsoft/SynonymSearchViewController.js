@@ -34,6 +34,9 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearchViewCo
         component: {
             "#searchButton": {
                 click: 'onSearchButtonClick'
+            },
+            '#textSearch':{
+                'keypress': 'onTextSearchKeyPress'
             }
         }
     },
@@ -44,6 +47,19 @@ Ext.define('Editor.view.LanguageResources.services.Microsoft.SynonymSearchViewCo
      * @param newValue
      */
     onSearchButtonClick: function (){
+        this.search();
+    },
+
+    onTextSearchKeyPress: function(field,event){
+        if (event.getKey() == event.ENTER){
+            this.search();
+        }
+    },
+
+    /***
+     * Synonym search request
+     */
+    search: function (){
         var me = this,
             view = me.getView(),
             searchValue = view && view.down('#textSearch').getValue(),

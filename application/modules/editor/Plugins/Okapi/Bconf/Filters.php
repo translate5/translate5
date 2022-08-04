@@ -29,6 +29,22 @@
 /**
  * Class representing the Filters a bconf can have
  * These consist of okapi default-filters, translate5-adjusted filters and the user customized filters from the database
+ *
+ * There are 3 different sources for FPRMs in a BCONF:
+ * - User customized FPRM: will have a database-entry (for name, description & mime) and also exist as file in the BCONFs component folder
+ * - translate5 adjusted FPRM: Will exist in the folder /translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5 with the inventory-file translate5/application/modules/editor/Plugins/Okapi/data/fprm/translate5-filters.json
+ * - OKAPI default adjusted FPRM: Will exist in the folder /translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi with the inventory-file translate5/application/modules/editor/Plugins/Okapi/data/fprm/okapi-filters.json
+ * When compiling/packing a bconf, the customized, translate5 adjusted and okapi-default FPRMs will all be embedded into the packed BCONF-file depending on which filters are referenced in the BCONFs extension-mapping
+ * On unpacking, the okapi-default files will be reverted to non-embedded, see editor_Plugins_Okapi_Bconf_ExtensionMapping
+ *
+ * This class also defines the filters/FPRMs, the frontend has a editing-GUI for, ::GUIS
+ * Generally, an editor relates to an OKAPI-type. The OKAPI-ids like "okf_xml-AndroidStrings" reference the base type "okf_xml" with certain settings.
+ * Each frontend-editable okapi-type must have an entry here; all non x-properties types must also have one or more extensions defined, which relate to a testfile in translate5/application/modules/editor/Plugins/Okapi/data/testfiles/
+ * The referenced Class must exist in the ExtJS FPRM-editor directory translate5/application/modules/editor/Plugins/Okapi/public/js/view/fprm/
+ * Note, that non X-Properties FPRMs cannot be validated other than testing it with a concrete testfile and therefore all non X-Prperties editors must have a testfile
+ * Note, that multiple filter-types may have the same Frontend
+ *
+ * see also editor_Plugins_Okapi_Bconf_Filter_Fprm for more documentation
  */
 class editor_Plugins_Okapi_Bconf_Filters {
 
@@ -49,13 +65,14 @@ class editor_Plugins_Okapi_Bconf_Filters {
         'okf_idml' => ['class' => 'Idml', 'extensions' => ['idml']],
         'okf_itshtml5' => ['class' => 'Xml', 'extensions' => ['html']],
         'okf_openxml' => ['class' => 'Openxml', 'extensions' => ['docx', 'pptx', 'xlsx']],
+        'okf_ttx' => ['class' => 'Ttx', 'extensions' => []],
         'okf_xml' => ['class' => 'Xml', 'extensions' => ['xml']],
         'okf_xmlstream' => ['class' => 'Yaml', 'extensions' => ['xml']]
     ];
     /**
      * A list of file-extensions, that validation files exist for.
-     * This files exist in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER and are all called "test.$EXTENSION"
-     * For each extension here a file must exist, the language must be english / en-GB
+     * These files reside in /application/modules/editor/Plugins/Okapi/data/$self::TESTFILE_FOLDER and are all called "test.$EXTENSION"
+     * For each extension here a file must exist, the language is expected to be be english / en
      */
     const TESTABLE_EXTENSIONS = ['txt', 'xml', 'strings', 'csv', 'htm', 'html', 'sdlxliff', 'docx', 'odp', 'ods', 'odt', 'pptx', 'tbx', 'xlsx', 'idml'];
 
@@ -217,6 +234,20 @@ class editor_Plugins_Okapi_Bconf_Filters {
             return false;
         }
         return (count($this->okapiFilters->findFilter(NULL, $identifier)) === 1);
+    }
+
+    /**
+     * Retrieves, if a filter identifier represents a customized filter
+     * @param string $identifier
+     * @return bool
+     * @throws ZfExtended_Exception
+     */
+    public function isCustomFilter(string $identifier) : bool {
+        if(self::isOkapiDefaultIdentifier($identifier)){
+            return false;
+        }
+        $idata = self::parseIdentifier($identifier);
+        return !$this->isEmbeddedDefaultFilter($idata->type, $idata->id);
     }
 
     /**

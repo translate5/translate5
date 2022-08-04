@@ -231,8 +231,7 @@ Ext.define('Editor.controller.SearchReplace', {
         characterLimitError:'#UT#Der Suchstring ist zu groß',
         noIndexFound:'#UT#Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.',
         searchAndReplaceMenuItem:'#UT#Suchen und ersetzen',
-        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.",
-        searchReplaceToolbarBtn:'#UT#Suche'
+        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten."
     },
     
     constructor:function(){
@@ -317,7 +316,8 @@ Ext.define('Editor.controller.SearchReplace', {
     onSegmentsToolbarRender:function(toolbar){
     	var me=this,
     		index=7,
-    		segmentsToolbar=Ext.ComponentQuery.query('segmentsToolbar');
+    		segmentsToolbar=Ext.ComponentQuery.query('segmentsToolbar'),
+            vm = toolbar.getViewModel();
     	
     	//calculate the index of the search button
     	if(segmentsToolbar.length>0){
@@ -333,7 +333,10 @@ Ext.define('Editor.controller.SearchReplace', {
             itemId: 'searchReplaceToolbarBtn',
             cls: 'searchReplaceToolbarBtn',
             icon: Editor.data.moduleFolder+'images/magnifier.png',
-            text: me.strings.searchReplaceToolbarBtn,
+            bind: {
+                text: '{l10n.segmentGrid.toolbar.searchReplaceToolbarBtn}',
+                tooltip: '{l10n.segmentGrid.toolbar.searchAndReplaceButtonTooltip}'
+            },
             handler:function(){
             	me.showSearchAndReplaceWindow(null);
             }

@@ -1,5 +1,5 @@
 {
-    "text": "{8bffa4e5-3f2e-49af-89b5-66a30c2fd0f4}",
+    "text": "{92800d72-6714-4bae-a300-6157e41431bf}",
     "children": [
         {
             "qid": -1,
@@ -8,7 +8,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "81852",
+                    "qid": "98901",
                     "qtype": "consistent",
                     "qcount": 3,
                     "qcomplete": true,
@@ -16,6 +16,7 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Inconsistent source",
+                    "qtooltip": "Finds segments with the same target, but different source (tags ignored)",
                     "leaf": true
                 }
             ],
@@ -45,7 +46,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "81850",
+                    "qid": "98891",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -53,11 +54,12 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Internal tags have an incorrect structure",
+                    "qtooltip": "",
                     "leaf": true,
                     "qfaulty": true
                 },
                 {
-                    "qid": "81851",
+                    "qid": "98900",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -65,6 +67,7 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Internal tags missing",
+                    "qtooltip": "",
                     "leaf": true
                 }
             ],
@@ -73,6 +76,44 @@
             "qcountfp": 0,
             "text": "Internal tags",
             "qtotal": 2,
+            "expanded": false
+        },
+        {
+            "qid": -1,
+            "qtype": "spellcheck",
+            "qcount": 15,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "98867",
+                    "qtype": "spellcheck",
+                    "qcount": 14,
+                    "qcomplete": true,
+                    "qcategory": "misspelling",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Spelling",
+                    "qtooltip": "The text contains a misspelling.",
+                    "leaf": true
+                },
+                {
+                    "qid": "98882",
+                    "qtype": "spellcheck",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "uncategorized",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Uncategorized",
+                    "qtooltip": "The issue either has not been categorized or cannot be categorized.",
+                    "leaf": true
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "qcountfp": 0,
+            "text": "LanguageTool",
+            "qtotal": 15,
             "expanded": false
         },
         {
@@ -118,14 +159,15 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "81849",
+                    "qid": "98890",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num1",
                     "qcatidx": "-1",
                     "qcountfp": 0,
-                    "text": "Numbers SRC \u2260 TRG",
+                    "text": "Numbers source \u2260 target",
+                    "qtooltip": "",
                     "leaf": true
                 }
             ],
@@ -143,7 +185,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "81842",
+                    "qid": "98860",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -151,10 +193,11 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Forbidden in target",
+                    "qtooltip": "",
                     "leaf": true
                 },
                 {
-                    "qid": "81838",
+                    "qid": "98856",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -162,10 +205,11 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Not defined in target terminology",
+                    "qtooltip": "",
                     "leaf": true
                 },
                 {
-                    "qid": "81844",
+                    "qid": "98862",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -173,6 +217,7 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Not found in target",
+                    "qtooltip": "",
                     "leaf": true
                 }
             ],
@@ -209,7 +254,7 @@
         }
     ],
     "metaData": {
-        "numSegments": 16,
+        "numSegments": 31,
         "hasFaultyInternalTags": true
     }
 }

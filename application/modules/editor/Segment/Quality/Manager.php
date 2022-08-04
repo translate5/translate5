@@ -400,6 +400,20 @@ final class editor_Segment_Quality_Manager {
         throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityTypeTooltip: provider of type "'.$type.'" not present.');
         return '';
     }
+
+    /**
+     * Translates a Segment Quality Category tooltip
+     * @param string $type
+     * @throws ZfExtended_Exception
+     * @return string
+     */
+    public function translateQualityCategoryTooltip(string $type, string $category, editor_Models_Task $task = null) : string {
+        if ($this->hasProvider($type)) {
+            return $this->getProvider($type)->translateCategoryTooltip($this->getTranslate(), $category, $task);
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityCategoryTooltip: provider of type "'.$type.'" not present.');
+        return '';
+    }
     /**
      * Translates a Segment Quality Code that is referenced in LEK_segment_quality category in conjunction with type
      * @param string $type

@@ -282,12 +282,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             body: data
         }).then(function(response){
             if(response.status === 200 && response.responseJson){
-                var id = response.responseJson.id;
-                var store = Ext.getStore('bconfStore');
+                // successful upload
+                var id = response.responseJson.id,
+                    store = Ext.getStore('bconfStore');
                 new store.model({id}).load({
-                    callback: function(rec){
-                        store.add(rec);
-                        me.startEditDescription();
+                    callback: function(record){
+                        store.add(record);
                     }
                 });
             } else if(response.status === 422){

@@ -142,17 +142,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
      * @returns {String}
      */
     getCSSForMatchFromTool: function (match) {
-        var me = this,
-            cssForMatch = {
-              // match.rule.issueType : CSS-classname; see me.injectCSSForEditor()
-                'misspelling'         : me.self.CSS_CLASSNAME_SPELLERROR,
-                'register'            : me.self.CSS_CLASSNAME_SUGGESTION,
-                'typographical'       : me.self.CSS_CLASSNAME_GRAMMERERROR,
-                'uncategorized'       : me.self.CSS_CLASSNAME_GRAMMERERROR,
-                'whitespace'          : me.self.CSS_CLASSNAME_GRAMMERERROR,
-                'default'             : ''
-              };
-          return (cssForMatch[match.rule.issueType] || cssForMatch['default']);
+        return Editor.data.plugins.SpellCheck.cssMap[match.rule.issueType] || '';
     },
     /**
      * extract data from match: message

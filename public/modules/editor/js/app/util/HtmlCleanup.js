@@ -165,7 +165,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 	
 	cleanSpellcheckTags: function(html){
 		// removes any spellchecker tags
-		return this.cleanByTagAndClassKeepContent(html, 'span', 'spellcheck');
+		return this.cleanByTagAndClassKeepContent(html, 'span', 't5spellcheck');
 	},
 
 	cleanTermTags: function(html){

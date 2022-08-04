@@ -75,6 +75,12 @@ abstract class editor_Test_Model_Abstract {
      */
     protected $treeRootSanitized = [];
     /**
+     * Defines the fields of the root-node of a tree being sanitized if the tree has a filter applied
+     * ONLY the root node fields will be sanitized, this is to come around issues with root-nodes usually containing the count of children which is incorrect if we filter the children
+     * @var array
+     */
+    protected $treeRootFilteredSanitized = [];
+    /**
      * This defines a field that will be added to the default message to identify the model
      * This can be a field not added to the equation
      * @var string
@@ -168,6 +174,16 @@ abstract class editor_Test_Model_Abstract {
         // additional sanitization of the Root field of a tree
         if($this->isTree && $isRoot && count($this->treeRootSanitized) > 0){
             foreach($this->treeRootSanitized as $field => $functionName){
+                if(property_exists($data, $field)){
+                    $result->$field = editor_Test_Sanitizer::$functionName($data->$field);
+                } else {
+                    $result->$field = NULL;
+                }
+            }
+        }
+        // additional sanitization of the Root field of a tree that is filtered
+        if($this->isTree && $isRoot && $treeFilter !== NULL && count($this->treeRootFilteredSanitized) > 0){
+            foreach($this->treeRootFilteredSanitized as $field => $functionName){
                 if(property_exists($data, $field)){
                     $result->$field = editor_Test_Sanitizer::$functionName($data->$field);
                 } else {

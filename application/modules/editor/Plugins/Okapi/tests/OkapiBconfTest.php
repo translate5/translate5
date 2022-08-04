@@ -47,8 +47,12 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
         // Test essential configs
         $okapiConf = self::$okapiConf = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
+
+        /** @var editor_Plugins_Okapi_Connector $api */
+        $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+
         self::assertNotEmpty($okapiConf->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
-        self::assertNotEmpty($okapiConf->api->url, self::OKAPI_CONFIG . ".api.url not set");
+        self::assertNotEmpty($api->getApiUrl(), self::OKAPI_CONFIG . ".api.url not set");
 
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists($t5defaultImportBconf,
@@ -65,13 +69,13 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      */
     public function test10_BconfImportExport() {
         $input = new SplFileInfo(self::$api->getFile('minimal/batchConfiguration.t5.bconf'));
-        $bconfName = 'Translate2266BconfTest-' . time() . '.bconf';
+        $bconfName = 'OkapiBconfTest' . microtime() . '.bconf';
         self::$api->addFile('bconffile', $input->getPathname(), 'application/octet-stream');
         // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
         $res = self::$api->requestJson('editor/plugins_okapi_bconf/uploadbconf', 'POST', [
             'name' => $bconfName,
         ]);
-        self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true');
+        self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true for bconf '.$bconfName);
         self::$bconfId = $res->id;
         self::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
         self::$bconf->load(self::$bconfId);
@@ -192,8 +196,11 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      */
     public function test40_OkapiTaskImport() {
         try {
-            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapiConf->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
-            $longHornResponse = (new Zend_Http_Client($this::$okapiConf->api->url))->request();
+            /** @var editor_Plugins_Okapi_Connector $api */
+            $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+
+            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . $api->getApiUrl() . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
+            $longHornResponse = (new Zend_Http_Client($api->getApiUrl()))->request();
             self::assertTrue($longHornResponse->getStatus() === 200, $msg);
         } catch(Exception $e){
             self::fail($msg . "\n" . $e->getMessage());
@@ -274,7 +281,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
                 $e = null;
                 try {
                     $bconf->unpack(self::$api->getFile("invalid/$file"));
-                } catch(ZfExtended_UnprocessableEntity $e){
+                } catch(ZfExtended_UnprocessableEntity|editor_Plugins_Okapi_Exception $e){
                     self::assertNotNull($e, "Did not reject invalid/$file with ZfExtended_UnprocessableEntity.");
                 }
             }
@@ -298,7 +305,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     public function test70_DeleteBconf() {
         $bconf = self::$bconf;
         $bconf->load(self::$bconfId);
-
         $bconfDir = $bconf->getDataDirectory();
         $bconf->delete(); // delete record, which deletes directory as well
         self::assertDirectoryDoesNotExist($bconfDir);

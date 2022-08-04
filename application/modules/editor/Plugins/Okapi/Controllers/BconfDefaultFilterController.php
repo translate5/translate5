@@ -59,10 +59,6 @@ class editor_Plugins_Okapi_BconfDefaultFilterController extends ZfExtended_RestC
     public function setextensionsAction(){
         $identifier = $this->getParam('identifier');
         $extensions = explode(',', $this->getParam('extensions', ''));
-
-
-        error_log('setextensionsAction: for '.$identifier.' with extensions [ '.implode(', ', $extensions).' ]');
-
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->load($this->getParam('bconfId'));
         $extensionMapping = $bconf->getExtensionMapping();
@@ -72,5 +68,7 @@ class editor_Plugins_Okapi_BconfDefaultFilterController extends ZfExtended_RestC
             // no extensions means, we remove the filter
             $extensionMapping->removeFilter($identifier);
         }
+        // must be reflected in the bconf as well ...
+        $bconf->pack();
     }
 }
