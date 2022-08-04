@@ -114,14 +114,19 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
                 return editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('test.'.$extension);
             }
         }
+        // create a folder for the temp test-file (can only be in the user space!)
+        $testFolder = editor_Plugins_Okapi_Bconf_Entity::getUserDataDir().'/tmp';
+        if(!is_dir($testFolder)){
+            mkdir($testFolder, 0777, true);
+        }
         if(count($mappedExtensions) < 1){
             // the hardest case: there are no extensions set for the edited filter
             $this->bconf->getExtensionMapping()->addFilter($this->fprm->getIdentifier(), [ self::TMP_MAPPING_EXTENSION ]); // this flushes the adjusted map !
             $this->mappingChanged = true;
-            $this->tmpTestfile = editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('fprmtest.'.self::TMP_MAPPING_EXTENSION);
+            $this->tmpTestfile = $testFolder.'/fprmtest.'.self::TMP_MAPPING_EXTENSION;
         } else {
             // we simply take the first mapped extension and temporarily create a testfile with this extension
-            $this->tmpTestfile = editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('fprmtest.'.$mappedExtensions[0]);
+            $this->tmpTestfile = $this->tmpTestfile = $testFolder.'/fprmtest.'.$mappedExtensions[0];
         }
         $source = editor_Plugins_Okapi_Bconf_Filters::createTestfilePath('test.'.$testExtensions[0]);
         copy($source, $this->tmpTestfile);
