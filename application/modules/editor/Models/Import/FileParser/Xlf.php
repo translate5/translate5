@@ -547,9 +547,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $e->addExtraData(['trans-unit' => $opener['attributes']]);
                 throw $e;
             }
-            catch(Exception $e){
-                $e->setMessage($e->getMessage()."\n".'In trans-unit '.print_r($opener['attributes'],1));
-                throw $e;
+            catch(Throwable $e){
+                $msg = $e->getMessage()."\n".'In trans-unit '.print_r($opener['attributes']);
+                if(method_exists($e,'setMessage')){
+                    $e->setMessage($msg,1);
+                    throw $e;
+                }
+
+                throw new ZfExtended_Exception($msg,0,$e);
             }
             //leaving a transunit means disable segment processing
             $this->processSegment = false;
