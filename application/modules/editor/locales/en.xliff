@@ -4798,5 +4798,17 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Sucht in der Ausgangssprache</source>
   <target>Searches in the source language</target>
 </trans-unit>
+<trans-unit id='RHLDvGNrZW4gU2llIEYzLCB1bSBkYXMgbWFya2llcnRlIFdvcnQgYW4gZGllIEtvbmtvcmRhbnpzdWNoZSB6dSBzZW5kZW4u'>
+  <source>Drücken Sie F3, um das markierte Wort an die Konkordanzsuche zu senden.</source>
+  <target>Press F3 to send the highlighted word to the concoredance search.</target>
+</trans-unit>
+<trans-unit id='VW5kIEFMVCtGMyBmw7xyIGRpZSBTeW5vbnltc3VjaGUu'>
+  <source>Und ALT+F3 für die Synonymsuche.</source>
+  <target>And ALT+F3 to the synonym search.</target>
+</trans-unit>
+<trans-unit id='U3VjaGVuIHVuZCBFcnNldHplbiBhbnplaWdlbiAoU1RSRyArIEYsIFNUUkcgKyBIKQ=='>
+  <source>Suchen und Ersetzen anzeigen (STRG + F, STRG + H)</source>
+  <target>Show search and replace (CTRL + F, CTRL + H)</target>
+</trans-unit>
   </file>
 </xliff>

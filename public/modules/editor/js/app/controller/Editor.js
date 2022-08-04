@@ -37,7 +37,8 @@ Ext.define('Editor.controller.Editor', {
         'Editor.view.segments.EditorKeyMap',
         'Editor.controller.editor.PrevNextSegment',
         'Editor.view.task.ConfirmationWindow',
-        'Editor.view.ReferenceFilesInfoMessage'
+        'Editor.view.ReferenceFilesInfoMessage',
+        'Editor.view.task.QuickSearchInfoMessage'
     ],
     mixins: ['Editor.util.Event',
         	 'Editor.util.Range'
@@ -82,6 +83,9 @@ Ext.define('Editor.controller.Editor', {
     },{
         ref: 'languageResourceEditorPanel',
         selector: 'languageResourceEditorPanel'
+    },{
+        ref:'synonymSearch',
+        selector: '#synonymSearch'
     }],
     registeredTooltips: [],
     isEditing: false,
@@ -94,6 +98,9 @@ Ext.define('Editor.controller.Editor', {
     copiedSelectionWithTagHandling: null,
     resetSegmentValueForEditor: null,
     htmlEditor: null,
+
+    quickSearchInfoMessage: null,
+
     listen: {
         controller: {
             '#Editor.$application': {
@@ -211,6 +218,7 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-shift-comma': [188,{ctrl: true, alt: false, shift: true}, me.handleDigitPreparation(me.handleInsertTagShift), true],
             'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'F3':             [Ext.EventObjectImpl.F3,{ctrl: false, alt: false}, me.handleF3KeyPress, true],
+            'alt-F3':         [Ext.EventObjectImpl.F3,{ctrl: false, alt: true}, me.handleAltF3KeyPress, true],
             'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
             'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget], //Mac Alternative key code,
             // DEC_DIGITS:
@@ -572,6 +580,12 @@ Ext.define('Editor.controller.Editor', {
                 delegated: false,
                 priority: 5000,
                 fn: me.pasteContent,
+                scope: me
+            },
+            selectionchange: {
+                delegated: false,
+                priority: 5000,
+                fn: me.onEditorSelectionChange,
                 scope: me
             }
         });
@@ -1317,9 +1331,55 @@ Ext.define('Editor.controller.Editor', {
     handleF3KeyPress: function() {
         var me = this,
             searchGrid = me.getLanguageResourceSearchGrid(),
+            searchField;
+
+        me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
+            searchField = searchGrid.down('#sourceSearch');
+            if( selectedText === ''){
+                searchField.focus(false,500);
+                return;
+            }
+            searchField.setValue(selectedText);
+            searchGrid.getController().setLastActiveField(searchField);
+            searchGrid.getController().handleSearchAll();
+        });
+
+    },
+
+    /***
+     * Event handler for alt+f3 shortcut.
+     * This will trigger synonym search with the selected text editor
+     */
+    handleAltF3KeyPress: function (){
+        var me = this,
+            searchGrid = me.getSynonymSearch(),
+            searchField;
+
+        me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
+            searchField = searchGrid.down('#textSearch');
+            if( selectedText === ''){
+                searchField.focus(false,500);
+                return;
+            }
+            searchField = searchGrid.down('#textSearch');
+            searchField.setValue(selectedText);
+            searchGrid.getController().search();
+        });
+    },
+
+    /***
+     * Trigger search with selected text in the editor for given component(synonym or concordence).
+     *
+     * @param component
+     * @param textCallback
+     */
+    searchConcordenceOrSynonym: function (component, textCallback){
+        var me = this,
             editorPanel = me.getLanguageResourceEditorPanel(),
-            delay;
-        if(!editorPanel || !searchGrid){
+            delay,
+            selectedText;
+
+        if(!editorPanel || !component){
             return;
         }
         // expand if collapsed and set the delay to 0.5 sec (delay because of expand animation)
@@ -1327,9 +1387,12 @@ Ext.define('Editor.controller.Editor', {
             editorPanel.expand();
             delay = 500;
         }
-        editorPanel.setActiveTab(searchGrid);
-        searchGrid.down('#sourceSearch').focus(false,delay);
+        editorPanel.setActiveTab(component);
+
+        selectedText = me.getSelectedTextInEditor();
+        textCallback(selectedText);
     },
+
     removeSelectionAfterCut: function(e) {
         if(!e.defaultPrevented || !e.stopped) {
             return;
@@ -1510,6 +1573,33 @@ Ext.define('Editor.controller.Editor', {
         me.htmlEditor.insertMarkup(toInsert);
         me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
     },
+
+    /***
+     * Event handler for text selection change in editor
+     */
+    onEditorSelectionChange: function (){
+        var me = this,
+            selectedText = me.getSelectedTextInEditor(),
+            synonymGridExist =  me.getSynonymSearch() !== undefined,
+            editorPanelExist = me.getLanguageResourceEditorPanel() !== undefined;
+
+        if( !synonymGridExist && !editorPanelExist){
+            return;
+        }
+
+        // for less than 4 characters do not show the message
+        if( selectedText.length < 4){
+            return;
+        }
+        if(!me.quickSearchInfoMessage){
+            me.quickSearchInfoMessage = Ext.create('Editor.view.task.QuickSearchInfoMessage');
+        }
+
+        me.quickSearchInfoMessage.synonymGridExist = synonymGridExist;
+
+        me.quickSearchInfoMessage.showMessage();
+    },
+
     copySourceToTarget: function() {
         var plug = this.getEditPlugin();
         //do only something when editing targets:
@@ -1894,5 +1984,26 @@ Ext.define('Editor.controller.Editor', {
         if(this.prevNextSegment){
             this.prevNextSegment.addType(type, parser, additionalParams);
         }
+    },
+
+    /***
+     * Return the current selected text in editor without tags.
+     * @returns {string|*}
+     */
+    getSelectedTextInEditor: function (){
+        var me = this,
+            plug = me.getEditPlugin(),
+            editor = plug.editor.mainEditor,
+            selectionInEditor,
+            rangeForSelection,
+            selectedText;
+
+
+        selectionInEditor = rangy.getSelection(editor.getEditorBody());
+        rangeForSelection = selectionInEditor.rangeCount ? selectionInEditor.getRangeAt(0) : null;
+        if (rangeForSelection == null || rangeForSelection.collapsed){
+            return '';
+        }
+        return rangeForSelection.text();
     }
 });
