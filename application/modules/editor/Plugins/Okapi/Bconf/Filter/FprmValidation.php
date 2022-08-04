@@ -115,7 +115,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_FprmValidation extends editor_Plug
             }
         }
         // create a folder for the temp test-file (can only be in the user space!)
-        $testFolder = editor_Plugins_Okapi_Init::getDataDir().'tmp';
+        $testFolder = editor_Plugins_Okapi_Bconf_Entity::getUserDataDir().'/tmp';
         if(!is_dir($testFolder)){
             mkdir($testFolder, 0777, true);
         }
