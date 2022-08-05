@@ -45,6 +45,11 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     /**
      * @var array
      */
+    protected $sourceFuzzyLanguages;
+
+    /**
+     * @var array
+     */
     protected $targetFuzzyLanguages;
 
     /**
@@ -58,17 +63,13 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      */
     protected $notPresentInTbxTarget = array();
 
-    /**
-     * @var array
-     */
-    protected $termByTbxId = [];
-
     public function __construct(editor_Models_Task $task) {
         $this->task = $task;
         $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $lang editor_Models_Languages */
         $this->targetFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getTargetLang(),'id',true);
+        $this->sourceFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getSourceLang(),'id',true);
     }
 
     /**
@@ -90,6 +91,11 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     }
 
     /**
+     * @var null
+     */
+    public $collectionIds = null;
+
+    /**
      * recalculates one single segment content
      * @param string $source
      * @param string $target is given as reference, if the modified target is needed too
@@ -103,25 +109,22 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             return $source;
         }
         $taskGuid = $this->task->getTaskGuid();
-        $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $assoc editor_Models_TermCollection_TermCollection */
-        $collectionIds = $assoc->getCollectionsForTask($taskGuid); // This DB-query runs on each segment ?? Not good
 
-        if (empty($collectionIds)) {
+        // Lazy load collectionIds defined for current task
+        if ($this->collectionIds === null) {
+            /* @var $assoc editor_Models_TermCollection_TermCollection */
+            $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            $this->collectionIds = $assoc->getCollectionsForTask($taskGuid); // This DB-query runs on each segment ?? Not good
+        }
+
+        if (empty($this->collectionIds)) {
             return $source;
         }
-        class_exists('editor_Utils');
-        i(['was source', $source], 'a');
-        i(['was target', $target], 'a');
-        //$source = str_replace('id162dcd89-6aef-48a3-9c2a-d7d412bd9e0f', 'id4abddb97-5f14-4e7b-becd-ec51c232c76e', $source);
         $source = $this->removeExistingFlags($source);
-        i(['flags removed from source', $source], 'a');
         $target = $this->removeExistingFlags($target);
-        i(['flags removed from target', $target], 'a');
         $sourceTermIds = $this->termModel->getTermMidsFromSegment($source);
         $targetTermIds = $this->termModel->getTermMidsFromSegment($target);
-        i(['$sourceTermIds', $sourceTermIds], 'a');
-        i(['$targetTermIds', $targetTermIds], 'a');
+        $targetTermIds_initial = $targetTermIds; $targetTermIds_unset = [];
         $toMarkMemory = [];
         $this->groupCounter = [];
 
@@ -130,15 +133,15 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             // Goto label to be used in case when $sourceTermId initially detected by TermTagger contains termTbxId of a term
             // located under NOT the same termEntry as term(s) detected in segment target text, so that such a term in
             // segment source text will be red-inderlined to inidicate that it's translation(s) was not found in segment
-            // target text, despite there actually are correct translations but just in another termEnteies. So, this
-            // label will be used as a pointer for goto operator executed in case if such scenario was detected and
+            // target text, despite there actually are correct translations but just in another termEntries. So, this
+            // label will be used as a pointer for goto operator executed in case if such situation was detected and
             // alternative termTbxId was found to solve that problem so we'll have to run same iteration from the
             // beginning but with using spoofed value of $sourceTermId variable
             correct_sourceTermId:
 
             // Check whether source term having given termTbxId ($sourceTermId) exists within task's termcollections
             try {
-                $this->termModel->loadByMid($sourceTermId, $collectionIds);
+                $this->termModel->loadByMid($sourceTermId, $this->collectionIds);
             }
             catch (ZfExtended_Models_Entity_NotFoundException $e) {
 
@@ -151,67 +154,102 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             $termEntryTbxId = $this->termModel->getTermEntryTbxId();
 
             // Find translations of the given source term for target fuzzy languages
-            $groupedTerms = $this->termModel->getAllTermsOfGroup($collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
+            $groupedTerms = $this->termModel->getAllTermsOfGroup($this->collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
 
-            // If no translations
+            // If no translations found
             if (empty($groupedTerms)) {
 
                 // Setup a flag indicating that there are no translations for the current source term for the languages we need
                 $this->notPresentInTbxTarget[$termEntryTbxId] = true;
             }
 
-            // Counter for those of translations which are found in segment target
+            // Counter for those of translations which are found in segment target text
             $transFound = $this->groupCounter[$termEntryTbxId] ?? 0;
 
-            // Foreach translation existing in task's termcollection(s) for the given source term
+            // Foreach translation existing for the given source term under the same termEntry
             foreach ($groupedTerms as $groupedTerm) {
 
-                // Check whether translation does exist in segment target
+                // Check whether translation does exist in segment target text
                 $targetTermIdKey = array_search($groupedTerm['termTbxId'], $targetTermIds);
 
-                // If exists
+                // If so
                 if ($targetTermIdKey !== false) {
 
                     // Increment translation-which-is-found-in-segment-target counter
                     $transFound ++;
 
-                    // Unset it from $targetTermIds-array, so that the only tbx ids of terms to be kept where
+                    // Collect target terms tbx ids, that were unset from $targetTermIds
+                    $targetTermIds_unset []= $groupedTerm['termTbxId'];
+
+                    // Unset it from $targetTermIds-array, so that the only tbx ids of terms will be kept
+                    // there which are not translations to any of terms detected in segment source text
                     unset($targetTermIds[$targetTermIdKey]);
                 }
             }
 
-            // If there are terms detected in segment target text but none of them are translations for source text's current term
+            // If there are terms detected in segment target text but none of them is a translation for source text's current term
             if ($targetTermIds && !$transFound) {
 
                 // Shortcut to db adapter instance
                 $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 
-                // Get distinct termEntryTbx ids of target terms
-                $termEntryTbxIdA = $db->query('
-                    SELECT DISTINCT termEntryTbxId 
+                // Lazy load distinct termEntryTbx ids of target terms
+                $termEntryTbxIdA = $termEntryTbxIdA ?? $db->query('
+                    SELECT `termTbxId`, `termEntryTbxId` 
                     FROM `terms_term` 
-                    WHERE `termTbxId` IN ("'. join('","', $targetTermIds) . '")
-                ')->fetchAll(PDO::FETCH_COLUMN);
+                    WHERE `termTbxId` IN ("'. join('","', $targetTermIds_initial) . '")
+                ')->fetchAll(PDO::FETCH_KEY_PAIR);
 
-                // Try to find source term's homonym under the target terms' termEntries
+                // Unset values from $termEntryTbxIdA if need
+                foreach ($targetTermIds_unset as $targetTermId_unset) {
+                    unset($termEntryTbxIdA[$targetTermId_unset]);
+                }
+
+                // Try to find current source term's homonym under the target terms' termEntries
                 $sourceTermId_homonym = $db->query('
                     SELECT `termTbxId` 
                     FROM `terms_term` 
                     WHERE 1
                       AND `termEntryTbxId` IN ("'. join('","', $termEntryTbxIdA) . '") 
                       AND `term` = ?
+                      AND `languageId` IN (' . join(',', $this->sourceFuzzyLanguages) . ')
                 ', $this->termModel->getTerm())->fetchColumn();
 
                 // If found
                 if ($sourceTermId_homonym) {
 
-                    i('spoofed ' . $sourceTermId . ' with ' . $sourceTermId_homonym, 'a');
-
                     // Spoof value of $sourceTermId with found homonym's termTbxId
                     $sourceTermId = $sourceTermId_homonym;
 
-                    // Spoof value of $sourceTermId initially detected by TermTagger with the right one and try again
+                    // Re-run current iteration
                     goto correct_sourceTermId;
+
+                // Else
+                } else {
+
+                    // Fetch target terms texts for all target terms tbx ids
+                    $targetTermTexts = $targetTermTexts ?? $db->query('
+                        SELECT DISTINCT term 
+                        FROM `terms_term` 
+                        WHERE `termTbxId` IN ("'. join('","', $targetTermIds) . '")
+                    ')->fetchAll(PDO::FETCH_COLUMN);
+
+                    // Foreach translation existing for the current source term under it's termEntry
+                    foreach ($groupedTerms as $groupedTerm) {
+
+                        // Check whether translation does exist in segment target
+                        $targetTermTextKey = array_search($groupedTerm['term'], $targetTermTexts);
+
+                        // If exists
+                        if ($targetTermTextKey !== false) {
+
+                            // Increment translation-which-is-found-in-segment-target counter
+                            $transFound ++;
+
+                            // Unset it from $targetTermIds-array, so that the only tbx ids of terms to be kept where
+                            unset($targetTermTexts[$targetTermTextKey]);
+                        }
+                    }
                 }
             }
 
@@ -221,15 +259,13 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             // Apply into class vaiable to be accessed from othe methods
             $this->groupCounter[$termEntryTbxId] = $transFound;
         }
-        i(['before now', $source], 'a');
-        i(['$toMarkMemory', $toMarkMemory], 'a');
 
+        // Reapply css class names where need
         foreach ($toMarkMemory as $sourceTermId => $termEntryTbxId) {
-            $source = $this->insertTransFoundInSegmentClass($source, $sourceTermId, $termEntryTbxId, $targetTermIds);
+            $source = $this->insertTransFoundInSegmentClass($source, $sourceTermId, $termEntryTbxId);
         }
-        i(['now', $source], 'a');
 
-
+        // Return source text
         return $source;
     }
 
@@ -255,17 +291,11 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      * @param $groupId
      * @return string
      */
-    protected function insertTransFoundInSegmentClass(string $seg, $mid, $groupId, array $targetTermIds) {
-        class_exists('editor_Utils');
-        i([$seg, $mid, $groupId, $this->groupCounter], 'a');
-
+    protected function insertTransFoundInSegmentClass(string $seg, $mid, $groupId) {
         settype($this->groupCounter[$groupId], 'integer');
-
-        // $mid is source term termTbxId
-        // $groupId is termEntryTbxId
         $transFound =& $this->groupCounter[$groupId];
         $presentInTbxTarget = empty($this->notPresentInTbxTarget[$groupId]);
-        $rCallback = function($matches) use (&$seg, &$transFound, $presentInTbxTarget, $mid, $targetTermIds){
+        $rCallback = function($matches) use (&$seg, &$transFound, $presentInTbxTarget){
             foreach ($matches as $match) {
                 if($presentInTbxTarget) {
                     $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
