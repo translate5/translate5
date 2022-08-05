@@ -114,7 +114,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         if ($this->collectionIds === null) {
             /* @var $assoc editor_Models_TermCollection_TermCollection */
             $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            $this->collectionIds = $assoc->getCollectionsForTask($taskGuid); // This DB-query runs on each segment ?? Not good
+            $this->collectionIds = $assoc->getCollectionsForTask($taskGuid);
         }
 
         if (empty($this->collectionIds)) {
