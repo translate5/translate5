@@ -2187,6 +2187,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U29sbHRlIGRhcyB6dSBpbXBvcnRpZXJlbmRlIFpJUC1QYWtldCBEYXRlaWVuIGbDvHIgZGllIEJlZsO8bGx1bmcgZGVyIFBpdm90LVNwYWx0ZSBlbnRoYWx0ZW4sIHdlcmRlbiBoaWVyIGdlbWFjaHQgRWluc3RlbGx1bmdlbiBpZ25vcmllcnQu'><source>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</source><target>Sollte das zu importierende ZIP-Paket Dateien für die Befüllung der Pivot-Spalte enthalten, werden hier gemacht Einstellungen ignoriert.</target></trans-unit>
 <trans-unit id='UHJvamVrdCAiezB9IiB3aXJkIGdlbMO2c2NodC4uLg=='><source>Projekt "{0}" wird gelöscht...</source><target>Projekt "{0}" wird gelöscht...</target></trans-unit>
 <trans-unit id='U3VjaHQgaW4gZGVyIEF1c2dhbmdzc3ByYWNoZQ=='><source>Sucht in der Ausgangssprache</source><target>Sucht in der Ausgangssprache</target></trans-unit>
+<trans-unit id='RHLDvGNrZW4gU2llIEYzLCB1bSBkYXMgbWFya2llcnRlIFdvcnQgYW4gZGllIEtvbmtvcmRhbnpzdWNoZSB6dSBzZW5kZW4u'><source>Drücken Sie F3, um das markierte Wort an die Konkordanzsuche zu senden.</source><target>Drücken Sie F3, um das markierte Wort an die Konkordanzsuche zu senden.</target></trans-unit>
+<trans-unit id='VW5kIEFMVCtGMyBmw7xyIGRpZSBTeW5vbnltc3VjaGUu'><source>Und ALT+F3 für die Synonymsuche.</source><target>Und ALT+F3 für die Synonymsuche.</target></trans-unit>
+<trans-unit id='U3VjaGVuIHVuZCBFcnNldHplbiBhbnplaWdlbiAoU1RSRyArIEYsIFNUUkcgKyBIKQ=='><source>Suchen und Ersetzen anzeigen (STRG + F, STRG + H)</source><target>Suchen und Ersetzen anzeigen (STRG + F, STRG + H)</target></trans-unit>
   </body>
  </file>
 </xliff>

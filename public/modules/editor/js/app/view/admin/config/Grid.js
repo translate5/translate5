@@ -30,7 +30,8 @@ Ext.define('Editor.view.admin.config.Grid', {
     extend: 'Ext.grid.Panel',
     requires: [
         'Editor.view.admin.config.GridViewModel',
-        'Editor.view.admin.config.GridViewController'
+        'Editor.view.admin.config.GridViewController',
+        'Editor.plugins.Okapi.view.UrlConfig'
     ],
     controller: 'adminConfigGrid',
     viewModel:{

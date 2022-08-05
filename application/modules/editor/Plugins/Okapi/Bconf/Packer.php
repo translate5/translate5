@@ -68,9 +68,7 @@ final class editor_Plugins_Okapi_Bconf_Packer {
         if($this->doDebug){ error_log('PACK BCONF: '.$this->bconf->getName()); }
 
         // so we can access all files in the bconf's data-dir with file name only
-        chdir($this->folder);
-        $fileName = basename($this->bconf->getPath());
-        $this->raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($fileName, 'wb');
+        $this->raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($this->bconf->getPath(), 'wb');
 
         $this->raf->writeUTF(editor_Plugins_Okapi_Bconf_Entity::SIGNATURE, false);
         $this->raf->writeInt(editor_Plugins_Okapi_Bconf_Entity::VERSION);
@@ -108,7 +106,7 @@ final class editor_Plugins_Okapi_Bconf_Packer {
         $this->raf->writeInt($numAllEmbeddedFilters);
         foreach($customIdentifiers as $identifier){
             // we are already in the bconf's dir, so we can reference custom filters by filename only
-            $this->writeFprm($identifier, $identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
+            $this->writeFprm($identifier, $this->folder.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
         }
         foreach($defaultFilterFiles as $identifier => $path){
             // the static default filters will be added with explicit settings, These are either OKAPI defaults or translate5 adjusted defaults
@@ -157,12 +155,12 @@ final class editor_Plugins_Okapi_Bconf_Packer {
             editor_Plugins_Okapi_Bconf_Segmentation::instance()->onRepack($this->folder.'/'.$fileName);
         }
         //Open the file and read the content
-        $resource = fopen($fileName, 'rb');
+        $resource = fopen($this->folder.'/'.$fileName, 'rb');
         // can not really happen in normal operation but who knows
         if($resource === false){
             throw new editor_Plugins_Okapi_Bconf_InvalidException('Unable to open file '.$fileName);
         }
-        $fileSize = filesize($fileName);
+        $fileSize = filesize($this->folder.'/'.$fileName);
         $fileContent = fread($resource, $fileSize);
         // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we write 2 32bit Ints here (limiting the encodable size to 4GB...)
         $this->raf->writeInt(0);

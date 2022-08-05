@@ -316,5 +316,13 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
             return;
         }
         Ext.getCmp("sourceSearch").setValue(""); 
+    },
+
+    /***
+     * Set the active search field
+     * @param field
+     */
+    setLastActiveField: function (field){
+        this.lastActiveField = field;
     }
 });
