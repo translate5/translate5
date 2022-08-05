@@ -156,10 +156,16 @@ class editor_Plugins_SpellCheck_Configuration {
 
         // Get slot(s) declared for given $resourcePool
         switch ($resourcePool) {
-            case 'gui'   :   $declared = [$url->gui];              break;
-            case 'import':   $declared = $url->import->toArray();  break;
+            case 'gui':
+                $declared = [$url->gui];
+                break;
+            case 'import':
+                $declared = $url->import->toArray();
+                break;
             case 'default':
-            default:         $declared = $url->default->toArray(); break;
+            default:
+                $declared = $url->default->toArray();
+                break;
         }
 
         // Get list of offline slots

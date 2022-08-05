@@ -53,7 +53,7 @@ class Translate2417Test extends editor_Test_JsonTest {
     /***
      * Import all required resources and task before the validation
      */
-    public function testSetupData(){
+    public function test10_SetupData(){
         $this->addTm('resource1.tmx',self::$prefix.'resource1');
         $this->createTask();
         $this->startImport();
@@ -65,21 +65,19 @@ class Translate2417Test extends editor_Test_JsonTest {
 
     /***
      * Test if all the segments are as expected after import.
-     * @depends testSetupData
+     * @depends test10_SetupData
      */
-    public function testSegmentValuesAfterImport() {
+    public function test20_SegmentValuesAfterImport() {
         $segments = $this->api()->requestJson('editor/segment');
-        //file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($segments,JSON_PRETTY_PRINT));
         $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
     }
 
     /***
      * Test the tm->query results before and after segment editing. After the segment is edited, and because of the writable as default flag,
      * the translated targetEdit should be offered as result from the tm when we query for the segment
-     * @depends testSetupData
-     * @depends testSegmentValuesAfterImport
+     * @depends test20_SegmentValuesAfterImport
      */
-    public function testTmResultQuery() {
+    public function test30_TmResultQuery() {
         $tm = $this->api()->getResources()[0];
 
         // load the first segment
@@ -92,7 +90,6 @@ class Translate2417Test extends editor_Test_JsonTest {
 
         $this->assertIsArray($tmResults, 'GET editor/languageresourceinstance/'.$tm->id.'/query does not return an array but: '.print_r($tmResults,1).' and raw result is '.print_r($this->api()->getLastResponse(),1));
 
-        //file_put_contents($this->api()->getFile('/tmResultsBeforeEdit.json', null, false), json_encode($tmResults,JSON_PRETTY_PRINT));
         $this->assertTmResultEqualsJsonFile('tmResultsBeforeEdit.json', $tmResults, 'The received tm results before segment modification are not as expected!');
 
         // set dummy translation for the first segment and save it. This should upload this translation to the tm to.
@@ -103,7 +100,7 @@ class Translate2417Test extends editor_Test_JsonTest {
 
         // after the segment save, check for the tm results for the same segment
         $tmResults = $this->api()->requestJson('editor/languageresourceinstance/'.$tm->id.'/query','GET',['segmentId' => $segToTest->id]);
-        //file_put_contents($this->api()->getFile('/tmResultsAfterEdit.json', null, false), json_encode($tmResults, JSON_PRETTY_PRINT));
+
         $this->assertTmResultEqualsJsonFile('tmResultsAfterEdit.json', $tmResults, 'The received tm results after segment modification are not as expected!');
     }
 
