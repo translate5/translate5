@@ -45,6 +45,11 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     /**
      * @var array
      */
+    protected $sourceFuzzyLanguages;
+
+    /**
+     * @var array
+     */
     protected $targetFuzzyLanguages;
 
     /**
@@ -64,6 +69,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $lang editor_Models_Languages */
         $this->targetFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getTargetLang(),'id',true);
+        $this->sourceFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getSourceLang(),'id',true);
     }
 
     /**
@@ -85,6 +91,11 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     }
 
     /**
+     * @var null
+     */
+    public $collectionIds = null;
+
+    /**
      * recalculates one single segment content
      * @param string $source
      * @param string $target is given as reference, if the modified target is needed too
@@ -98,52 +109,151 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             return $source;
         }
         $taskGuid = $this->task->getTaskGuid();
-        $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $assoc editor_Models_TermCollection_TermCollection */
-        $collectionIds = $assoc->getCollectionsForTask($taskGuid);
 
-        if (empty($collectionIds)) {
-            return $source;
+        // Lazy load collectionIds defined for current task
+        if ($this->collectionIds === null) {
+            /* @var $assoc editor_Models_TermCollection_TermCollection */
+            $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            $this->collectionIds = $assoc->getCollectionsForTask($taskGuid);
         }
 
+        if (empty($this->collectionIds)) {
+            return $source;
+        }
         $source = $this->removeExistingFlags($source);
         $target = $this->removeExistingFlags($target);
         $sourceTermIds = $this->termModel->getTermMidsFromSegment($source);
         $targetTermIds = $this->termModel->getTermMidsFromSegment($target);
+        $targetTermIds_initial = $targetTermIds; $targetTermIds_unset = [];
         $toMarkMemory = [];
         $this->groupCounter = [];
 
         foreach ($sourceTermIds as $sourceTermId) {
+
+            // Goto label to be used in case when $sourceTermId initially detected by TermTagger contains termTbxId of a term
+            // located under NOT the same termEntry as term(s) detected in segment target text, so that such a term in
+            // segment source text will be red-inderlined to inidicate that it's translation(s) was not found in segment
+            // target text, despite there actually are correct translations but just in another termEntries. So, this
+            // label will be used as a pointer for goto operator executed in case if such situation was detected and
+            // alternative termTbxId was found to solve that problem so we'll have to run same iteration from the
+            // beginning but with using spoofed value of $sourceTermId variable
+            correct_sourceTermId:
+
+            // Check whether source term having given termTbxId ($sourceTermId) exists within task's termcollections
             try {
-                $this->termModel->loadByMid($sourceTermId, $collectionIds);
+                $this->termModel->loadByMid($sourceTermId, $this->collectionIds);
             }
             catch (ZfExtended_Models_Entity_NotFoundException $e) {
-                $toMarkMemory[$sourceTermId] = null; //so the source terms are marked as notfound in the repetitions
+
+                // So the source terms are marked as notfound in the repetitions
+                $toMarkMemory[$sourceTermId] = null;
                 continue;
             }
+
+            // Get termEntryId of the given source term
             $termEntryTbxId = $this->termModel->getTermEntryTbxId();
 
-            $groupedTerms = $this->termModel->getAllTermsOfGroup($collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
+            // Find translations of the given source term for target fuzzy languages
+            $groupedTerms = $this->termModel->getAllTermsOfGroup($this->collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
+
+            // If no translations found
             if (empty($groupedTerms)) {
+
+                // Setup a flag indicating that there are no translations for the current source term for the languages we need
                 $this->notPresentInTbxTarget[$termEntryTbxId] = true;
             }
 
+            // Counter for those of translations which are found in segment target text
             $transFound = $this->groupCounter[$termEntryTbxId] ?? 0;
+
+            // Foreach translation existing for the given source term under the same termEntry
             foreach ($groupedTerms as $groupedTerm) {
+
+                // Check whether translation does exist in segment target text
                 $targetTermIdKey = array_search($groupedTerm['termTbxId'], $targetTermIds);
+
+                // If so
                 if ($targetTermIdKey !== false) {
-                    $transFound++;
+
+                    // Increment translation-which-is-found-in-segment-target counter
+                    $transFound ++;
+
+                    // Collect target terms tbx ids, that were unset from $targetTermIds
+                    $targetTermIds_unset []= $groupedTerm['termTbxId'];
+
+                    // Unset it from $targetTermIds-array, so that the only tbx ids of terms will be kept
+                    // there which are not translations to any of terms detected in segment source text
                     unset($targetTermIds[$targetTermIdKey]);
                 }
             }
+
+            // If there are terms detected in segment target text but none of them is a translation for source text's current term
+            if ($targetTermIds && !$transFound) {
+
+                // Shortcut to db adapter instance
+                $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+
+                // Lazy load distinct termEntryTbx ids of target terms
+                $termEntryTbxIdA = $termEntryTbxIdA
+                    ?? $this->termModel->loadTermEntryTbxIdsByTermTbxIds($targetTermIds_initial);
+
+                // Unset values from $termEntryTbxIdA if need
+                foreach ($targetTermIds_unset as $targetTermId_unset) {
+                    unset($termEntryTbxIdA[$targetTermId_unset]);
+                }
+
+                // Try to find current source term's homonym under the target terms' termEntries
+                $sourceTermId_homonym = $this->termModel->findHomonym(
+                    $this->termModel->getTerm(), $termEntryTbxIdA, $this->sourceFuzzyLanguages,
+                );
+
+                // If found
+                if ($sourceTermId_homonym) {
+
+                    // Spoof value of $sourceTermId with found homonym's termTbxId
+                    $sourceTermId = $sourceTermId_homonym;
+
+                    // Re-run current iteration
+                    goto correct_sourceTermId;
+
+                // Else
+                } else {
+
+                    // Fetch target terms texts for all target terms tbx ids
+                    $targetTermTexts = $targetTermTexts ?? $this->termModel->loadDistinctByTbxIds($targetTermIds);
+
+                    // Foreach translation existing for the current source term under it's termEntry
+                    foreach ($groupedTerms as $groupedTerm) {
+
+                        // Check whether translation does exist in segment target
+                        $targetTermTextKey = array_search($groupedTerm['term'], $targetTermTexts);
+
+                        // If exists
+                        if ($targetTermTextKey !== false) {
+
+                            // Increment translation-which-is-found-in-segment-target counter
+                            $transFound ++;
+
+                            // Unset it from $targetTermIds-array, so that the only tbx ids of terms to be kept where
+                            unset($targetTermTexts[$targetTermTextKey]);
+                        }
+                    }
+                }
+            }
+
+            //
             $toMarkMemory[$sourceTermId] = $termEntryTbxId;
+
+            // Apply into class vaiable to be accessed from othe methods
             $this->groupCounter[$termEntryTbxId] = $transFound;
         }
 
+        // Reapply css class names where need
         foreach ($toMarkMemory as $sourceTermId => $termEntryTbxId) {
             $source = $this->insertTransFoundInSegmentClass($source, $sourceTermId, $termEntryTbxId);
         }
 
+        // Return source text
         return $source;
     }
 

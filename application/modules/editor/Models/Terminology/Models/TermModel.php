@@ -1907,6 +1907,55 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         return $db->fetchAll($s)->toArray();
     }
+
+    /**
+     * Load [termTbxId => termEntryTbxId] pairs for terms having termTbxId given by $termTbxIds arg
+     *
+     * @param array $termTbxIds
+     * @return array
+     */
+    public function loadTermEntryTbxIdsByTermTbxIds(array $termTbxIds) {
+        return $this->db->getAdapter()->query('
+            SELECT `termTbxId`, `termEntryTbxId` 
+            FROM `terms_term` 
+            WHERE `termTbxId` IN ("'. join('","', $termTbxIds) . '")
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
+    /**
+     * Find first homonym for the given $term, stored under any of termEntries
+     * identified by $termEntryTbxIds arg, and having language from $languageIds list
+     *
+     * @param string $term
+     * @param array $termEntryTbxIds
+     * @param array $languageIds
+     */
+    public function findHomonym(string $term, array $termEntryTbxIds, array $languageIds) {
+        return $this->db->getAdapter()->query('
+            SELECT `termTbxId` 
+            FROM `terms_term` 
+            WHERE 1
+              AND `termEntryTbxId` IN ("'. join('","', $termEntryTbxIds) . '") 
+              AND `term` = ?
+              AND `languageId` IN (' . join(',', $languageIds) . ')
+              LIMIT 1
+        ', $term)->fetchColumn();
+    }
+
+    /**
+     * Load distinct terms themselves, by their tbx ids
+     *
+     * @param array $termTbxIds
+     * @return array
+     */
+    public function loadDistinctByTbxIds(array $termTbxIds) : array {
+        return $this->db->getAdapter()->query('
+            SELECT DISTINCT term 
+            FROM `terms_term` 
+            WHERE `termTbxId` IN ("'. join('","', $termTbxIds) . '")
+        ')->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     /**
      * returns mids and term flags (css classes) found in a string
      * @param string $seg
