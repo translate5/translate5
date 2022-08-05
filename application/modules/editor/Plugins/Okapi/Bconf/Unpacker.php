@@ -51,7 +51,7 @@ final class editor_Plugins_Okapi_Bconf_Unpacker {
     /**
      * @var editor_Plugins_Okapi_Bconf_RandomAccessFile
      */
-    private editor_Plugins_Okapi_Bconf_RandomAccessFile $raf;
+    private ?editor_Plugins_Okapi_Bconf_RandomAccessFile $raf;
     /**
      * @var bool
      */
@@ -77,139 +77,149 @@ final class editor_Plugins_Okapi_Bconf_Unpacker {
      * @throws editor_Plugins_Okapi_Exception
      */
     public function process($bconfPath): void {
+        // we must catch all exceptions of the RandomAccessFile to be able to release the file-pointer properly!
+        try {
+            // DEBUG
+            if($this->doDebug){ error_log('UNPACK BCONF: '.$this->bconf->getName()); }
 
-        // DEBUG
-        if($this->doDebug){ error_log('UNPACK BCONF: '.$this->bconf->getName()); }
+            $this->raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($bconfPath, 'rb');
+            $sig = $this->raf->readUTF();
+            if($sig !== editor_Plugins_Okapi_Bconf_Entity::SIGNATURE){
+                throw new editor_Plugins_Okapi_Bconf_InvalidException("Invalid signature '".htmlspecialchars($sig)."' in file header before byte ".$this->raf->ftell().". Must be '".editor_Plugins_Okapi_Bconf_Entity::SIGNATURE."'");
+            }
+            $version = $this->raf->readInt();
+            if(!($version >= 1 && $version <= editor_Plugins_Okapi_Bconf_Entity::VERSION)){
+                throw new editor_Plugins_Okapi_Bconf_InvalidException("Invalid version '$version' in file header before byte ".$this->raf->ftell().'. Must be in range 1-'.editor_Plugins_Okapi_Bconf_Entity::VERSION);
+            }
 
-        $this->raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($bconfPath, 'rb');
-        $sig = $this->raf->readUTF();
-        if($sig !== editor_Plugins_Okapi_Bconf_Entity::SIGNATURE){
-            throw new editor_Plugins_Okapi_Bconf_InvalidException("Invalid signature '".htmlspecialchars($sig)."' in file header before byte ".$this->raf->ftell().". Must be '".editor_Plugins_Okapi_Bconf_Entity::SIGNATURE."'");
-        }
-        $version = $this->raf->readInt();
-        if(!($version >= 1 && $version <= editor_Plugins_Okapi_Bconf_Entity::VERSION)){
-            throw new editor_Plugins_Okapi_Bconf_InvalidException("Invalid version '$version' in file header before byte ".$this->raf->ftell().'. Must be in range 1-'.editor_Plugins_Okapi_Bconf_Entity::VERSION);
-        }
+            $referencedFiles = []; // stores the referenced files we write to disk
 
-        $referencedFiles = []; // stores the referenced files we write to disk
+            //=== Section 1: plug-ins: Currently not further processed
+            if($version > 1){ // Remain compatible with v.1 bconf files
 
-        //=== Section 1: plug-ins: Currently not further processed
-        if($version > 1){ // Remain compatible with v.1 bconf files
+                $numPlugins = $this->raf->readInt();
+                for($i = 0; $i < $numPlugins; $i++){
+                    $file = $this->raf->readUTF();
+                    $this->raf->readInt(); // Skip ID
+                    $this->raf->readUTF(); // Skip original full filename
+                    // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we read 2 32bit Ints here (limiting the decodable size to 4GB...)
+                    $this->raf->readInt();
+                    $size = $this->raf->readInt();
+                    $this->createReferencedFile($size, $file);
+                    $referencedFiles[] = basename($file); // can the read filename contain pathes ?
+                }
+            }
 
-            $numPlugins = $this->raf->readInt();
-            for($i = 0; $i < $numPlugins; $i++){
-                $file = $this->raf->readUTF();
-                $this->raf->readInt(); // Skip ID
-                $this->raf->readUTF(); // Skip original full filename
+            //=== Section 2: Read contained reference files
+
+            $refMap = []; // numeric indices are read from the bconf, starting with 1
+
+            while(($refIndex = $this->raf->readInt()) != -1 && !is_null($refIndex)) {
+                $file = $refMap[$refIndex] = $this->raf->readUTF();
+                // Skip over the data to move to the next reference
                 // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we read 2 32bit Ints here (limiting the decodable size to 4GB...)
                 $this->raf->readInt();
                 $size = $this->raf->readInt();
-                $this->createReferencedFile($size, $file);
-                $referencedFiles[] = basename($file); // can the read filename contain pathes ?
-            }
-        }
-
-        //=== Section 2: Read contained reference files
-
-        $refMap = []; // numeric indices are read from the bconf, starting with 1
-
-        while(($refIndex = $this->raf->readInt()) != -1 && !is_null($refIndex)) {
-            $file = $refMap[$refIndex] = $this->raf->readUTF();
-            // Skip over the data to move to the next reference
-            // QUIRK: this value is encoded as BIG ENDIAN long long in the bconf. En/Decoding of 64 byte values creates Exceptions on 32bit OS, so we read 2 32bit Ints here (limiting the decodable size to 4GB...)
-            $this->raf->readInt();
-            $size = $this->raf->readInt();
-            if($size > 0){
-                // this is a bit of unneccessary, we save the srx first and then exchange it if it is a standard T5 srx
-                $this->createReferencedFile($size, $file);
-                $referencedFiles[] = basename($file); // can the read filename contain pathes ?
-            }
-        }
-
-        if($refIndex === NULL){
-            throw new editor_Plugins_Okapi_Bconf_InvalidException('Malformed references list. Read NULL instead of integer before byte ' . $this->raf->ftell());
-        }
-        if(($refCount = count($refMap)) < 2){
-            throw new editor_Plugins_Okapi_Bconf_InvalidException("Only $refCount references included. Need sourceSRX and targetSRX.");
-        }
-
-        //=== Section 3 : the pipeline itself
-        $xmlWordCount = $this->raf->readInt();
-        $pipelineXml = '';
-        for($i = 0; $i < $xmlWordCount; $i++){
-            $pipelineXml .= $this->raf->readUTF();
-        }
-        // create & validate the pipeline
-        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline($this->bconf->getPipelinePath(), trim($pipelineXml), $this->bconf->getId());
-        if(!$pipeline->validate(true)){
-            throw new editor_Plugins_Okapi_Bconf_InvalidException('Invalid Pipeline: '.$pipeline->getValidationError());
-        } else {
-            // the piplene is only valid if the contained SRX files have been saved to disk
-            if(!in_array($pipeline->getSrxFile('source'), $referencedFiles)){
-                throw new editor_Plugins_Okapi_Bconf_InvalidException('Invalid Pipeline: the given source-srx file was not embedded in the bconf.');
-            }
-            if(!in_array($pipeline->getSrxFile('target'), $referencedFiles)){
-                throw new editor_Plugins_Okapi_Bconf_InvalidException('Invalid Pipeline: the given target-srx file was not embedded in the bconf.');
-            }
-        }
-        // if the embedded SRX files are outdated T5 default SRX files this will trigger updating them to current revisions
-        editor_Plugins_Okapi_Bconf_Segmentation::instance()->onUnpack($pipeline, $this->folder);
-        // save the pipeline to disk
-        $pipeline->flush();
-        // transfer parsed props/references
-        $content = new editor_Plugins_Okapi_Bconf_Content($this->bconf->getContentPath(), NULL, $this->bconf->getId(), true);
-        $content->setSteps($pipeline->getSteps());
-        $content->setSrxFile('source', $pipeline->getSrxFile('source'));
-        $content->setSrxFile('target', $pipeline->getSrxFile('target'));
-
-        $startFilterConfigs = $this->raf->ftell();
-        //=== Section 4 : the filter configurations
-        $this->raf->fseek($startFilterConfigs);
-        // Get the number of filter configurations
-        $count = $this->raf->readInt();
-
-        // needed for data-exchange in the processing API in editor_Plugins_Okapi_Bconf_ExtensionMapping
-        $replacementMap = [];
-        $customFilters = [];
-
-        // Read each one
-        for($i = 0; $i < $count; $i++){
-            $identifier = $this->raf->readUTF();
-            $data = $this->raf->readUTF();
-            // save the fprm if it points to a valid custom identifier/filter
-            try {
-                if(editor_Plugins_Okapi_Bconf_ExtensionMapping::processUnpackedFilter($this->bconf, $identifier, $data, $replacementMap, $customFilters)){
-                    $content->addFilter($identifier);
+                if($size > 0){
+                    // this is a bit of unneccessary, we save the srx first and then exchange it if it is a standard T5 srx
+                    $this->createReferencedFile($size, $file);
+                    $referencedFiles[] = basename($file); // can the read filename contain pathes ?
                 }
-            } catch (Exception $e){
-                throw new editor_Plugins_Okapi_Bconf_InvalidException($e->getMessage());
             }
-        }
-        // DEBUG
-        if($this->doDebug){
-            error_log('UNPACK CUSTOM FILTERS: '.print_r($customFilters, 1));
-            error_log('UNPACK REPLACEMENT folder MAP: '.print_r($replacementMap, 1));
-        }
 
-        //=== Section 5: the extensions -> filter configuration id mapping
-        $count = $this->raf->readInt();
-        if(!$count){
-            throw new editor_Plugins_Okapi_Bconf_InvalidException('No extensions-mapping present in bconf.');
-        }
-        $rawMap = [];
-        for($i = 0; $i < $count; $i++){
-            $rawMap[] = [ $this->raf->readUTF(), $this->raf->readUTF() ];
-        }
-        // the extension-mapping will validate the raw data and applies any adjustments cached in the replacement-map
-        $extensionMapping = new editor_Plugins_Okapi_Bconf_ExtensionMapping($this->bconf, $rawMap, $replacementMap);
-        // this saves the custom-filters as entries to the DB and writes the mapping-file
-        $extensionMapping->flushUnpacked($customFilters);
+            if($refIndex === NULL){
+                throw new editor_Plugins_Okapi_Bconf_InvalidException('Malformed references list. Read NULL instead of integer before byte ' . $this->raf->ftell());
+            }
+            if(($refCount = count($refMap)) < 2){
+                throw new editor_Plugins_Okapi_Bconf_InvalidException("Only $refCount references included. Need sourceSRX and targetSRX.");
+            }
 
-        // last thing to do: save our inventory/TOC
-        $content->flush();
+            //=== Section 3 : the pipeline itself
+            $xmlWordCount = $this->raf->readInt();
+            $pipelineXml = '';
+            for($i = 0; $i < $xmlWordCount; $i++){
+                $pipelineXml .= $this->raf->readUTF();
+            }
+            // create & validate the pipeline
+            $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline($this->bconf->getPipelinePath(), trim($pipelineXml), $this->bconf->getId());
+            if(!$pipeline->validate(true)){
+                throw new editor_Plugins_Okapi_Bconf_InvalidException('Invalid Pipeline: '.$pipeline->getValidationError());
+            } else {
+                // the piplene is only valid if the contained SRX files have been saved to disk
+                if(!in_array($pipeline->getSrxFile('source'), $referencedFiles)){
+                    throw new editor_Plugins_Okapi_Bconf_InvalidException('Invalid Pipeline: the given source-srx file was not embedded in the bconf.');
+                }
+                if(!in_array($pipeline->getSrxFile('target'), $referencedFiles)){
+                    throw new editor_Plugins_Okapi_Bconf_InvalidException('Invalid Pipeline: the given target-srx file was not embedded in the bconf.');
+                }
+            }
+            // if the embedded SRX files are outdated T5 default SRX files this will trigger updating them to current revisions
+            editor_Plugins_Okapi_Bconf_Segmentation::instance()->onUnpack($pipeline, $this->folder);
+            // save the pipeline to disk
+            $pipeline->flush();
+            // transfer parsed props/references
+            $content = new editor_Plugins_Okapi_Bconf_Content($this->bconf->getContentPath(), NULL, $this->bconf->getId(), true);
+            $content->setSteps($pipeline->getSteps());
+            $content->setSrxFile('source', $pipeline->getSrxFile('source'));
+            $content->setSrxFile('target', $pipeline->getSrxFile('target'));
 
-        // DEBUG
-        if($this->doDebug) { error_log('UNPACKED MAP: '."\n".print_r($extensionMapping->getMap(), 1)); }
+            $startFilterConfigs = $this->raf->ftell();
+            //=== Section 4 : the filter configurations
+            $this->raf->fseek($startFilterConfigs);
+            // Get the number of filter configurations
+            $count = $this->raf->readInt();
+
+            // needed for data-exchange in the processing API in editor_Plugins_Okapi_Bconf_ExtensionMapping
+            $replacementMap = [];
+            $customFilters = [];
+
+            // Read each one
+            for($i = 0; $i < $count; $i++){
+                $identifier = $this->raf->readUTF();
+                $data = $this->raf->readUTF();
+                // save the fprm if it points to a valid custom identifier/filter
+                try {
+                    if(editor_Plugins_Okapi_Bconf_ExtensionMapping::processUnpackedFilter($this->bconf, $identifier, $data, $replacementMap, $customFilters)){
+                        $content->addFilter($identifier);
+                    }
+                } catch (Exception $e){
+                    throw new editor_Plugins_Okapi_Bconf_InvalidException($e->getMessage());
+                }
+            }
+            // DEBUG
+            if($this->doDebug){
+                error_log('UNPACK CUSTOM FILTERS: '.print_r($customFilters, 1));
+                error_log('UNPACK REPLACEMENT folder MAP: '.print_r($replacementMap, 1));
+            }
+
+            //=== Section 5: the extensions -> filter configuration id mapping
+            $count = $this->raf->readInt();
+            if(!$count){
+                throw new editor_Plugins_Okapi_Bconf_InvalidException('No extensions-mapping present in bconf.');
+            }
+            $rawMap = [];
+            for($i = 0; $i < $count; $i++){
+                $rawMap[] = [ $this->raf->readUTF(), $this->raf->readUTF() ];
+            }
+            // the extension-mapping will validate the raw data and applies any adjustments cached in the replacement-map
+            $extensionMapping = new editor_Plugins_Okapi_Bconf_ExtensionMapping($this->bconf, $rawMap, $replacementMap);
+            // this saves the custom-filters as entries to the DB and writes the mapping-file
+            $extensionMapping->flushUnpacked($customFilters);
+
+            // last thing to do: save our inventory/TOC
+            $content->flush();
+
+            // explicitly close file-pointer
+            $this->raf = NULL;
+
+            // DEBUG
+            if($this->doDebug) { error_log('UNPACKED MAP: '."\n".print_r($extensionMapping->getMap(), 1)); }
+
+        } catch (Exception $e){
+
+            $this->raf = NULL;
+            throw $e;
+        }
     }
 
     /**
