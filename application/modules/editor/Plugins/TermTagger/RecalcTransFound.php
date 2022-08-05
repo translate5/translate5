@@ -194,11 +194,8 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 
                 // Lazy load distinct termEntryTbx ids of target terms
-                $termEntryTbxIdA = $termEntryTbxIdA ?? $db->query('
-                    SELECT `termTbxId`, `termEntryTbxId` 
-                    FROM `terms_term` 
-                    WHERE `termTbxId` IN ("'. join('","', $targetTermIds_initial) . '")
-                ')->fetchAll(PDO::FETCH_KEY_PAIR);
+                $termEntryTbxIdA = $termEntryTbxIdA
+                    ?? $this->termModel->loadTermEntryTbxIdsByTermTbxIds($targetTermIds_initial);
 
                 // Unset values from $termEntryTbxIdA if need
                 foreach ($targetTermIds_unset as $targetTermId_unset) {
@@ -206,14 +203,9 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 }
 
                 // Try to find current source term's homonym under the target terms' termEntries
-                $sourceTermId_homonym = $db->query('
-                    SELECT `termTbxId` 
-                    FROM `terms_term` 
-                    WHERE 1
-                      AND `termEntryTbxId` IN ("'. join('","', $termEntryTbxIdA) . '") 
-                      AND `term` = ?
-                      AND `languageId` IN (' . join(',', $this->sourceFuzzyLanguages) . ')
-                ', $this->termModel->getTerm())->fetchColumn();
+                $sourceTermId_homonym = $this->termModel->findHomonym(
+                    $this->termModel->getTerm(), $termEntryTbxIdA, $this->sourceFuzzyLanguages,
+                );
 
                 // If found
                 if ($sourceTermId_homonym) {
@@ -228,11 +220,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 } else {
 
                     // Fetch target terms texts for all target terms tbx ids
-                    $targetTermTexts = $targetTermTexts ?? $db->query('
-                        SELECT DISTINCT term 
-                        FROM `terms_term` 
-                        WHERE `termTbxId` IN ("'. join('","', $targetTermIds) . '")
-                    ')->fetchAll(PDO::FETCH_COLUMN);
+                    $targetTermTexts = $targetTermTexts ?? $this->termModel->loadDistinctByTbxIds($targetTermIds);
 
                     // Foreach translation existing for the current source term under it's termEntry
                     foreach ($groupedTerms as $groupedTerm) {
