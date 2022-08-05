@@ -273,6 +273,9 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
                 $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm(self::$bconf->createPath($identifier.'.fprm'));
                 self::assertEquals(trim($originalContent), trim($fprm->getContent()), 'Extended validation of '.$identifier.'.fprm failed to revert the tested invalid content back to its original state');
             }
+            // HACKY: The Unit-Test may not run as www-data and thus the file may not be accessible anymore for following tests.
+            exec( 'chmod 777 ' . self::$bconf->getPath());
+            exec( 'chmod 777 ' . $fprmPath);
         }
     }
 
