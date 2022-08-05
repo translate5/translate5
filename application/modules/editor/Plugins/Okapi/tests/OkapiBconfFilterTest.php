@@ -256,26 +256,27 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
         }
         // validate with real OKAPI processing
         if($validExtended !== NULL){
-            $okapiValidation = new editor_Plugins_Okapi_Bconf_Filter_FprmValidation(self::$bconf, $fprm);
-            $validValidation = $okapiValidation->validateWithoutPacking();
-            self::assertEquals($validExtended, $validValidation, $filename.' failed to validate with the extended validation to the expected state: '.($validExtended ? 'valid' : 'invalid'));
-            if(!$validValidation && count($extendedValidationErrors) > 0){
-                $error = $okapiValidation->getValidationError();
-                // echo "\n\n FPRM $identifier EXTENDED VALIDATION ERROR:\n$error\n";
-                foreach($extendedValidationErrors as $errorPart){
-                    self::assertEquals(true, str_contains(strtolower($error), strtolower($errorPart)));
+            $idata = editor_Plugins_Okapi_Bconf_Filters::parseIdentifier($identifier);
+            $filterEntity = self::$bconf->findCustomFilterEntry($idata->type, $idata->id);
+            if($filterEntity == NULL){
+                self::fail('Could not find filter "'.$identifier.'" in tested BCONF');
+            } else {
+                $params = [
+                    'id' => $filterEntity->getId(),
+                    'type' => $fprm->getType()
+                ];
+                $content = file_get_contents(self::$api->getFile($filename));
+                $result = self::$api->postRaw('editor/plugins_okapi_bconffilter/savefprm', $content, $params);
+                if($validExtended){
+                    self::assertEquals(true, $result->success, 'Failed to save FPRM "'.$filename.'"');
+                } else {
+                    self::assertEquals(false, $result->success, 'Failed to save FPRM "'.$filename.'"');
+                    $error = strtolower($result->error);
+                    foreach($extendedValidationErrors as $errorPart){
+                        self::assertEquals(true, str_contains($error, strtolower($errorPart)));
+                    }
                 }
             }
-            if(!empty($identifier)){
-                unset($fprm);
-                // this tests, if after the the extended validation the fprm is back in the original state
-                $originalContent = self::$api->getFileContent($identifier.'.fprm');
-                $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm(self::$bconf->createPath($identifier.'.fprm'));
-                self::assertEquals(trim($originalContent), trim($fprm->getContent()), 'Extended validation of '.$identifier.'.fprm failed to revert the tested invalid content back to its original state');
-            }
-            // HACKY: The Unit-Test may not run as www-data and thus the file may not be accessible anymore for following tests.
-            exec( 'chmod 777 ' . self::$bconf->getPath());
-            exec( 'chmod 777 ' . $fprmPath);
         }
     }
 
@@ -344,7 +345,6 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
             ];
             $content = file_get_contents(self::$api->getFile($filename));
             $result = self::$api->postRaw('editor/plugins_okapi_bconffilter/savefprm', $content, $params);
-            $result = $this->_getFullResult($result);
             self::assertEquals(true, $result->success, 'Failed to save changed FPRM "'.$filename.'"');
             try {
                 $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm(self::$bconf->createPath($filterEntity->getFile()));
