@@ -99,16 +99,16 @@ class Translate2756Test extends editor_Test_JsonTest {
     /**
      * Testing segment values directly after import
      */
-    public function testSegmentValuesAfterImport() {
+    public function test10_SegmentValuesAfterImport() {
         $jsonFileName = 'expectedSegments.json';
         $segments = $this->api()->getJson('editor/segment?page=1&start=0&limit=10', [], $jsonFileName);
         $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
     /**
-     * @depends testSegmentValuesAfterImport
+     * @depends test10_SegmentValuesAfterImport
      */
-    public function testSegmentEditing() {
+    public function test20_SegmentEditing() {
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
         
@@ -141,9 +141,9 @@ class Translate2756Test extends editor_Test_JsonTest {
     }
 
     /**
-     * @depends testSegmentEditing
+     * @depends test20_SegmentEditing
      */
-    public function testAnalysisResult() {
+    public function test30_AnalysisResult() {
         $this->api()->login('testmanager');
         $jsonFileName = 'expectedAnalysis.json';
         $analysis = $this->api()->getJson('editor/plugins_matchanalysis_matchanalysis', [

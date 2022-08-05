@@ -51,7 +51,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
         self::assertLogin('testmanager');
     }
     
-    public function testSetupCustomerAndResources() {
+    public function test10_SetupCustomerAndResources() {
         self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
@@ -68,8 +68,9 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
 
     /***
      * Test the excel export.
+     * @depends test10_SetupCustomerAndResources
      */
-    public function testExportResourcesLog() {
+    public function test20_ExportResourcesLog() {
         $result = self::$api->requestJson('editor/customer/exportresource','GET',[
             'customerId' =>self::$customerTest->id
         ]);
