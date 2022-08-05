@@ -76,7 +76,7 @@ final class editor_Test_Sanitizer {
                 ksort($data);
                 $meta['siblingData'] = $data;
             }
-            return json_encode($meta, JSON_FORCE_OBJECT);
+            return json_encode($meta, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
         return NULL;
     }
