@@ -81,9 +81,6 @@ final class editor_Plugins_Okapi_Bconf_Unpacker {
         // DEBUG
         if($this->doDebug){ error_log('UNPACK BCONF: '.$this->bconf->getName()); }
 
-        // so we can access all files in the bconf's data-dir with file name only
-        chdir($this->folder);
-
         $this->raf = new editor_Plugins_Okapi_Bconf_RandomAccessFile($bconfPath, 'rb');
         $sig = $this->raf->readUTF();
         if($sig !== editor_Plugins_Okapi_Bconf_Entity::SIGNATURE){
@@ -222,7 +219,7 @@ final class editor_Plugins_Okapi_Bconf_Unpacker {
      */
     private function createReferencedFile(int $size, string $file): void {
         /** @var resource $fos file output stream */
-        $fos = fopen($file, 'wb');
+        $fos = fopen($this->folder.'/'.$file, 'wb');
         if($fos === false){
             throw new editor_Plugins_Okapi_Bconf_InvalidException('Unable to open file '.$file);
         }
