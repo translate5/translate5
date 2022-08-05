@@ -80,6 +80,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
 
     /**
      * Tests the extension Mapping of the bconf
+     * @depends test20_ImportBconf
      */
     public function test30_ExtensionMapping() {
         $extensionMapping = self::$bconf->getExtensionMapping();
@@ -88,6 +89,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
 
     /**
      * Tests the validation of FPRMs and checks, if the expected errors are found
+     * @depends test30_ExtensionMapping
      */
     public function test40_FprmValidators() {
         // checking the valid FPRMS
@@ -113,6 +115,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
 
     /**
      * Test SRX validation and validation during upload processing
+     * @depends test40_FprmValidators
      */
     public function test50_SrxValidators() {
         // source SRX
@@ -154,6 +157,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
 
     /**
      * Test Pipeline & Content validation
+     * @depends test50_SrxValidators
      */
     public function test60_OtherValidators() {
         // invalid Pipeline
@@ -168,6 +172,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
 
     /**
      * Uploads a SRX and checks if it was changed, on file-base and in all places this is referenced
+     * @depends test60_OtherValidators
      */
     public function test70_UploadSrx() {
         $result = $this->_uploadResourceFile('languages-changed.srx', 'editor/plugins_okapi_bconf/uploadsrx', 'srx', [
@@ -191,6 +196,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
 
     /**
      * Tests the saving of changed FPRMs for the 3 main FPRM types
+     * @depends test70_UploadSrx
      */
     public function test80_ChangeFprm() {
         // this string is embedded in all the changed FPRMs
@@ -205,6 +211,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
 
     /**
      * Last step: Cleanup
+     * @depends test80_ChangeFprm
      */
     public function test90_RemoveImportedBconf() {
         $bconfDir = self::$bconf->getDataDirectory();
