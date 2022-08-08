@@ -29,9 +29,9 @@ SELECT (SELECT `value` FROM `Zf_configuration` WHERE `name` = "runtimeOptions.pl
 INTO @languagetool;
 
 UPDATE `Zf_configuration`
-SET `value` = IF (LENGTH(@languagetool) > 0, CONCAT('["', @languagetool, '"]', '[]'))
+SET `value` = IF (LENGTH(@languagetool) > 0, CONCAT('[\"', @languagetool, '\"]'), '[]')
 WHERE `name` = "runtimeOptions.plugins.SpellCheck.languagetool.url.default" AND `value` = '["http://localhost:8081/v2"]';
 
 UPDATE `Zf_configuration`
-SET `value` = IF (LENGTH(@languagetool) > 0, CONCAT('["', @languagetool, '"]', '[]'))
-WHERE `name` = "runtimeOptions.plugins.SpellCheck.languagetool.url.import" AND `value` = '["http://localhost:8081/v2", "http://localhost:8082/v2"]';
+SET `value` = IF (LENGTH(@languagetool) > 0, CONCAT('[\"', @languagetool, '\"]'), '[]')
+WHERE `name` = "runtimeOptions.plugins.SpellCheck.languagetool.url.import" AND `value` LIKE '["http://localhost:8081/v2",%"http://localhost:8082/v2"]';
