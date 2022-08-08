@@ -229,7 +229,7 @@ final class editor_Plugins_Okapi_Bconf_Unpacker {
      */
     private function createReferencedFile(int $size, string $file): void {
         /** @var resource $fos file output stream */
-        $fos = fopen($this->folder.'/'.$file, 'wb');
+        $fos = fopen($this->folder.'/'.basename($file), 'wb');
         if($fos === false){
             throw new editor_Plugins_Okapi_Bconf_InvalidException('Unable to open file '.$file);
         }
