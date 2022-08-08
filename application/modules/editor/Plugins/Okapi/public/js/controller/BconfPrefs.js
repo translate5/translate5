@@ -37,7 +37,8 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
     requires: [
         'Editor.plugins.Okapi.view.BconfGrid',
         'Editor.plugins.Okapi.store.BconfStore',
-        'Editor.model.admin.Customer'
+        'Editor.model.admin.Customer',
+        'Editor.plugins.Okapi.view.UrlConfig'
     ],
     init: function(){
         Editor.model.admin.Customer.addFields([{

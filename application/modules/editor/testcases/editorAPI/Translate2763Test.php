@@ -49,7 +49,7 @@ class Translate2763Test extends editor_Test_JsonTest {
 
     /**
      */
-    public function testInitialTbxImport() {
+    public function test10_InitialTbxImport() {
         $this->api()->addFile('tmUpload', $this->api()->getFile('testfiles/term-import-1.tbx'), 'application/xml');
         $result = $this->api()->requestJson('editor/languageresourceinstance', 'POST', [
             //format jsontext???
@@ -74,9 +74,9 @@ class Translate2763Test extends editor_Test_JsonTest {
 
     /**
      * Merge in the TBX with one additional term, set deleteTermsOlderThanCurrentImport
-     * @depends testInitialTbxImport
+     * @depends test10_InitialTbxImport
      */
-    public function testMergeImport() {
+    public function test20_MergeImport() {
         $this->api()->addFile('tmUpload', $this->api()->getFile('testfiles/term-import-2.tbx'), 'application/xml');
         $this->api()->requestJson('editor/languageresourceinstance/'.self::$TC_ID.'/import/', 'POST', [
             'deleteTermsOlderThanCurrentImport' => 'on',

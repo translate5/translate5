@@ -149,14 +149,15 @@ class QualityBaseTest extends editor_Test_JsonTest {
      * @depends testSetUnsetQm
      */
     public function testSetFalsePositive(){
-        // http://translate5.local/editor/quality/falsepositive?_dc=1620166854404&id=13158&falsePositive=1
-        $qualities = $this->api()->requestJson('/editor/quality/segment?segmentId='.static::$segments[0]->id);
-        $qualityId = $qualities[0]->id;
+
+        // we test with the mqm-qualities only
+        $qualities = $this->_fetchMqmQualities(static::$segments[0]->id);
+        $qualities0id = $qualities[0]->id; // needed for later revert false positive test
         
         $fileName = 'expectedFalsePositive0-0.json';
-        $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities[0]->id.'&falsePositive=1', [], $fileName);
+        $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities0id.'&falsePositive=1', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
-        
+
         $fileName = 'expectedFalsePositive0-1.json';
         $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities[1]->id.'&falsePositive=1', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
@@ -165,16 +166,17 @@ class QualityBaseTest extends editor_Test_JsonTest {
         $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities[2]->id.'&falsePositive=1', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
         
-        $qualities = $this->api()->getJson('/editor/quality/segment?segmentId='.static::$segments[9]->id);
-        
+        $qualities = $this->_fetchMqmQualities(static::$segments[9]->id);
+
         $fileName = 'expectedFalsePositive9-0.json';
         $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities[0]->id.'&falsePositive=1', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
-        
+
         $fileName = 'expectedNotFalsePositive0-0.json';
-        $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualityId.'&falsePositive=0', [], $fileName);
+        $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities0id.'&falsePositive=0', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
     }
+
     /**
      * Tests the filter & task model again after the added Qms & added falsePositives
      * @depends testSetUnsetQm
@@ -198,5 +200,20 @@ class QualityBaseTest extends editor_Test_JsonTest {
         self::$api->requestJson('/editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
         self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+    }
+
+    /**
+     * @param int $segmentId
+     * @return array
+     */
+    private function _fetchMqmQualities(int $segmentId) : array {
+        $qualities = $this->api()->requestJson('/editor/quality/segment?segmentId='.$segmentId);
+        $mqmQualities = [];
+        foreach($qualities as $quality){
+            if($quality->type == 'mqm'){
+                $mqmQualities[] = $quality;
+            }
+        }
+        return $mqmQualities;
     }
 }

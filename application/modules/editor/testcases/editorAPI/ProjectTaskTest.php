@@ -173,6 +173,9 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');
+
+        //close the task for editing
+        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
         
         //when removing the task, all task project will be removed
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');

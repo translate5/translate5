@@ -60,6 +60,7 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
             if($availableSlots > $usedSlots){
                 for($i=0; $i < ($availableSlots - $usedSlots); $i++){
                     $worker = ZfExtended_Factory::get(get_class($this));
+                    /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
                     $worker->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
                     $worker->queue($parentId, $state, false);
                 }
@@ -107,18 +108,20 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
     protected function calculateSlot($resourcePool = 'default') {
         // detect defined slots for the resourcePool
         $availableSlots = $this->getAvailableSlots($resourcePool);
+        $numAvailableSlots = count($availableSlots);
         $usedSlots = $this->workerModel->getListSlotsCount(self::$resourceName, $availableSlots);
-        
-        if(empty($availableSlots)) {
+        $numUsedSlots = count($usedSlots);
+
+        if($numAvailableSlots < 1) {
             return ['resource' => self::$resourceName, 'slot' => null];
         }
         // all slots in use
-        if (count($usedSlots) == count($availableSlots)) {
+        if ($numUsedSlots > 0 && $numUsedSlots === $numAvailableSlots) {
             // take first slot in list of usedSlots which is the one with the min. number of counts
             return ['resource' => self::$resourceName, 'slot' => $usedSlots[0]['slot']];
         }
         // some slots in use
-        if (!empty($usedSlots)) {
+        if ($numUsedSlots > 0) {
             // sort out the used slots
             $unusedSlots = $availableSlots;
             foreach ($usedSlots as $usedSlot) {

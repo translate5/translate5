@@ -69,9 +69,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
      * @return string
      */
     public static function createConvertedFilePath($absoluteTaskDataPath, $fileId, $extension){
-        $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
-        /* @var $api editor_Plugins_Okapi_Connector */
-        return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension).$api::OUTPUT_FILE_EXTENSION;
+        return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension).editor_Plugins_Okapi_Connector::OUTPUT_FILE_EXTENSION;
     }
     /**
      * @var ZfExtended_Logger
@@ -132,7 +130,9 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
         
         try {
-            $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+            $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector',[
+                $this->task->getConfig()
+            ]);
             /* @var $api editor_Plugins_Okapi_Connector */
             $api->createProject();
             // upload the BCONF set by worker-params
@@ -156,7 +156,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         } catch (Exception $e){
             $this->handleException($e, $file, $fileId, true);
         } finally {
-            $api->removeProject();
+            $api && $api->removeProject();
         }
         return true;
     }
@@ -175,7 +175,9 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         /* @var $pm ZfExtended_Plugin_Manager */
         $plugin = $pm->get($pm->classToName(get_class($this)));
         
-        $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+        $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector',[
+            $this->task->getConfig()
+        ]);
         /* @var $api editor_Plugins_Okapi_Connector */
         
         $language = ZfExtended_Factory::get('editor_Models_Languages');

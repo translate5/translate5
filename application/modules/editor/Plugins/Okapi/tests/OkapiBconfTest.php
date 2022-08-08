@@ -47,8 +47,12 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
         // Test essential configs
         $okapiConf = self::$okapiConf = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
+
+        /** @var editor_Plugins_Okapi_Connector $api */
+        $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+
         self::assertNotEmpty($okapiConf->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
-        self::assertNotEmpty($okapiConf->api->url, self::OKAPI_CONFIG . ".api.url not set");
+        self::assertNotEmpty($api->getApiUrl(), self::OKAPI_CONFIG . ".api.url not set");
 
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists($t5defaultImportBconf,
@@ -192,8 +196,11 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      */
     public function test40_OkapiTaskImport() {
         try {
-            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . self::$okapiConf->api->url . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
-            $longHornResponse = (new Zend_Http_Client($this::$okapiConf->api->url))->request();
+            /** @var editor_Plugins_Okapi_Connector $api */
+            $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+
+            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . $api->getApiUrl() . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
+            $longHornResponse = (new Zend_Http_Client($api->getApiUrl()))->request();
             self::assertTrue($longHornResponse->getStatus() === 200, $msg);
         } catch(Exception $e){
             self::fail($msg . "\n" . $e->getMessage());

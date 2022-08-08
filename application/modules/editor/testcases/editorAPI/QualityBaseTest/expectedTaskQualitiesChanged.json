@@ -1,5 +1,5 @@
 {
-    "text": "{0a57ecd5-7cd7-4c6b-ba2e-8d2901ceb880}",
+    "text": "{b206a937-74cf-4173-9c2a-77034a4b69b8}",
     "children": [
         {
             "qid": -1,
@@ -8,7 +8,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "92220",
+                    "qid": "98455",
                     "qtype": "consistent",
                     "qcount": 2,
                     "qcomplete": true,
@@ -16,6 +16,7 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Inconsistent source",
+                    "qtooltip": "Finds segments with the same target, but different source (tags ignored)",
                     "leaf": true
                 }
             ],
@@ -52,6 +53,92 @@
         },
         {
             "qid": -1,
+            "qtype": "spellcheck",
+            "qcount": 306,
+            "qcomplete": true,
+            "children": [
+                {
+                    "qid": "97743",
+                    "qtype": "spellcheck",
+                    "qcount": 1,
+                    "qcomplete": true,
+                    "qcategory": "duplication",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Duplication",
+                    "qtooltip": "Content has been duplicated improperly.",
+                    "leaf": true
+                },
+                {
+                    "qid": "97655",
+                    "qtype": "spellcheck",
+                    "qcount": 220,
+                    "qcomplete": true,
+                    "qcategory": "misspelling",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Spelling",
+                    "qtooltip": "The text contains a misspelling.",
+                    "leaf": true
+                },
+                {
+                    "qid": "97761",
+                    "qtype": "spellcheck",
+                    "qcount": 3,
+                    "qcomplete": true,
+                    "qcategory": "style",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "General style",
+                    "qtooltip": "The text contains stylistic errors.",
+                    "leaf": true
+                },
+                {
+                    "qid": "97692",
+                    "qtype": "spellcheck",
+                    "qcount": 15,
+                    "qcomplete": true,
+                    "qcategory": "typographical",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Typographical",
+                    "qtooltip": "The text has typographical errors such as omitted\/incorrect punctuation, incorrect capitalization, etc.",
+                    "leaf": true
+                },
+                {
+                    "qid": "97706",
+                    "qtype": "spellcheck",
+                    "qcount": 62,
+                    "qcomplete": true,
+                    "qcategory": "uncategorized",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Uncategorized",
+                    "qtooltip": "The issue either has not been categorized or cannot be categorized.",
+                    "leaf": true
+                },
+                {
+                    "qid": "97862",
+                    "qtype": "spellcheck",
+                    "qcount": 5,
+                    "qcomplete": true,
+                    "qcategory": "whitespace",
+                    "qcatidx": "-1",
+                    "qcountfp": 0,
+                    "text": "Whitespace",
+                    "qtooltip": "There is a mismatch in whitespace between source and target content or the text violates specific rules related to the use of whitespace.",
+                    "leaf": true
+                }
+            ],
+            "qcategory": null,
+            "qtooltip": "",
+            "qcountfp": 0,
+            "text": "LanguageTool",
+            "qtotal": 306,
+            "expanded": false
+        },
+        {
+            "qid": -1,
             "qtype": "length",
             "qcount": 0,
             "qcomplete": true,
@@ -69,7 +156,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "92223",
+                    "qid": "98458",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
@@ -77,23 +164,25 @@
                     "qcatidx": "1",
                     "qcountfp": 0,
                     "text": "Demo QM error 1",
+                    "qtooltip": "",
                     "leaf": true
                 },
                 {
-                    "qid": "92224",
+                    "qid": "98459",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "qm_3",
                     "qcatidx": "3",
-                    "qcountfp": 1,
+                    "qcountfp": 0,
                     "text": "Terminology problem",
+                    "qtooltip": "",
                     "leaf": true
                 }
             ],
             "qcategory": null,
             "qtooltip": "",
-            "qcountfp": 1,
+            "qcountfp": 0,
             "text": "Manual QA (complete segment)",
             "qtotal": 2,
             "expanded": false
@@ -105,18 +194,18 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "91738",
+                    "qid": "97973",
                     "qtype": "mqm",
                     "qcount": 171,
                     "qcomplete": true,
                     "qcategory": "mqm_2",
                     "qcatidx": "2",
-                    "qcountfp": 0,
+                    "qcountfp": 1,
                     "text": "Terminology",
                     "leaf": true
                 },
                 {
-                    "qid": "91733",
+                    "qid": "97968",
                     "qtype": "mqm",
                     "qcount": 105,
                     "qcomplete": true,
@@ -127,7 +216,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91864",
+                    "qid": "98099",
                     "qtype": "mqm",
                     "qcount": 12,
                     "qcomplete": true,
@@ -138,7 +227,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91737",
+                    "qid": "97972",
                     "qtype": "mqm",
                     "qcount": 3,
                     "qcomplete": true,
@@ -149,7 +238,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91727",
+                    "qid": "97962",
                     "qtype": "mqm",
                     "qcount": 13,
                     "qcomplete": true,
@@ -160,7 +249,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91730",
+                    "qid": "97965",
                     "qtype": "mqm",
                     "qcount": 21,
                     "qcomplete": true,
@@ -171,7 +260,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91867",
+                    "qid": "98102",
                     "qtype": "mqm",
                     "qcount": 6,
                     "qcomplete": true,
@@ -182,7 +271,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91726",
+                    "qid": "97961",
                     "qtype": "mqm",
                     "qcount": 12,
                     "qcomplete": true,
@@ -193,7 +282,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91761",
+                    "qid": "97996",
                     "qtype": "mqm",
                     "qcount": 2,
                     "qcomplete": true,
@@ -204,7 +293,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91774",
+                    "qid": "98009",
                     "qtype": "mqm",
                     "qcount": 4,
                     "qcomplete": true,
@@ -215,7 +304,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91755",
+                    "qid": "97990",
                     "qtype": "mqm",
                     "qcount": 10,
                     "qcomplete": true,
@@ -226,7 +315,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91728",
+                    "qid": "97963",
                     "qtype": "mqm",
                     "qcount": 32,
                     "qcomplete": true,
@@ -237,7 +326,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91745",
+                    "qid": "97980",
                     "qtype": "mqm",
                     "qcount": 28,
                     "qcomplete": true,
@@ -248,7 +337,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91736",
+                    "qid": "97971",
                     "qtype": "mqm",
                     "qcount": 51,
                     "qcomplete": true,
@@ -259,7 +348,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "91888",
+                    "qid": "98123",
                     "qtype": "mqm",
                     "qcount": 17,
                     "qcomplete": true,
@@ -272,7 +361,7 @@
             ],
             "qcategory": null,
             "qtooltip": "",
-            "qcountfp": 2,
+            "qcountfp": 3,
             "text": "Manual QA (inside segment)",
             "qtotal": 487,
             "expanded": false
@@ -284,7 +373,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "92216",
+                    "qid": "98451",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -292,10 +381,11 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Numbers source \u2260 target",
+                    "qtooltip": "",
                     "leaf": true
                 },
                 {
-                    "qid": "92213",
+                    "qid": "98448",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -303,10 +393,11 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Different character\/formatting for number interval",
+                    "qtooltip": "",
                     "leaf": true
                 },
                 {
-                    "qid": "92217",
+                    "qid": "98452",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -314,10 +405,11 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "1000-separator not allowed",
+                    "qtooltip": "",
                     "leaf": true
                 },
                 {
-                    "qid": "92214",
+                    "qid": "98449",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -325,10 +417,11 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Separator(s) not localised",
+                    "qtooltip": "",
                     "leaf": true
                 },
                 {
-                    "qid": "92215",
+                    "qid": "98450",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -336,6 +429,7 @@
                     "qcatidx": "-1",
                     "qcountfp": 0,
                     "text": "Different minus characters",
+                    "qtooltip": "",
                     "leaf": true
                 }
             ],
@@ -384,7 +478,7 @@
         }
     ],
     "metaData": {
-        "numSegments": 498,
+        "numSegments": 804,
         "hasFaultyInternalTags": false
     }
 }

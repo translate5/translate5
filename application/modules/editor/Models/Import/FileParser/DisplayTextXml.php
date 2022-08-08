@@ -50,7 +50,7 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
     
     /**
      * the current font when parsing meta data
-     * @var boolean
+     * @var string
      */
     protected $currentFont;
     

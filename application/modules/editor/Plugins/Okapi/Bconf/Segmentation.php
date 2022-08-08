@@ -154,10 +154,10 @@ final class editor_Plugins_Okapi_Bconf_Segmentation {
                 if($this->doDebug){ error_log('SRX UPLOAD: The sent '.$field.'-SRX '.$uploadName.' is a customized SRX and the filename will be '.$customFile); }
 
                 if($otherSrx->getPath() === $srx->getPath()){ // another almost impossible case: custom name equals the other srx
-                    $customFile .= strval(rand(0, 9)); // so we put not much effort into this ...
+                    $customFile = pathinfo($customFile, PATHINFO_FILENAME).'-'.$field.'.'.editor_Plugins_Okapi_Bconf_Segmentation_Srx::EXTENSION; // so we put not much effort into this ...
                     $srx->setPath($bconf->createPath($customFile));
                     // DEBUG
-                    if($this->doDebug){ error_log('SRX UPLOAD: The '.$field.'-SRX new filename needs to be adjusted to '.$customFile.' because it mathes the '.$otherField.'-SRX'); }
+                    if($this->doDebug){ error_log('SRX UPLOAD: The '.$field.'-SRX new filename needs to be adjusted to '.$customFile.' because it matches the '.$otherField.'-SRX'); }
                 }
                 // create backups
                 if($srxOriginalPath !== $otherSrxOriginalPath){ // when pathes are identical the other SRX is our backup

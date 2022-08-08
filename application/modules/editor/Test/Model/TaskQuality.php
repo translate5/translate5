@@ -28,12 +28,14 @@ END LICENSE AND COPYRIGHT
 
 class editor_Test_Model_TaskQuality extends editor_Test_Model_Abstract {
 
-    //FIXME make a black list instead a whitelist here!!!
+    //FIXME make a black list instead of a whitelist here!!!
     protected $compared = [ 'text', 'qtype', 'qcount', 'qcountfp', 'qcomplete', 'qfaulty' ];
     
     protected $isTree = true;
     
     protected $treeRootSanitized = [ 'text' => 'testtext' ];
+
+    protected $treeRootFilteredSanitized = [ 'qcount' => 'onecounter', 'qtotal' => 'onecounter' ];
 
     protected $messageField = 'text';
 }

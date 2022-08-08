@@ -76,7 +76,7 @@ final class editor_Test_Sanitizer {
                 ksort($data);
                 $meta['siblingData'] = $data;
             }
-            return json_encode($meta, JSON_FORCE_OBJECT);
+            return json_encode($meta, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
         return NULL;
     }
@@ -87,6 +87,15 @@ final class editor_Test_Sanitizer {
      */
     public static function testtext(?string $text) : string {
         return 'TEST';
+    }
+
+    /**
+     * sanitizes a counter field by setting it's value to "1"
+     * @param int $count
+     * @return int
+     */
+    public static function onecounter(int $count) : int {
+        return 1;
     }
     /**
      *

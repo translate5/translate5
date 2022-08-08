@@ -215,6 +215,7 @@ writerOptions.escapeGT.b=false
             $this->errors[] = 'the pipeline had no or invalid entries for the source or target segmentation srx file';
         } else {
             // we will remove any path from the SRX-Files to normalize the value (it usually contains the rainbow workspace path)
+            // this also is a security-related neccesity since an attack with pathes on the server's file-system could be attempted
             if(basename($this->sourceSrxPath) != $this->sourceSrxPath){
                 $this->setSrxFile('source', basename($this->sourceSrxPath));
             }
