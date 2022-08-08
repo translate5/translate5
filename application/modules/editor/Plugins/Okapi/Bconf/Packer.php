@@ -107,7 +107,7 @@ final class editor_Plugins_Okapi_Bconf_Packer {
             $this->raf->writeInt($numAllEmbeddedFilters);
             foreach($customIdentifiers as $identifier){
                 // we are already in the bconf's dir, so we can reference custom filters by filename only
-                $this->writeFprm($identifier, $this->folder.'/'.$identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION);
+                $this->writeFprm($identifier, $this->folder.'/'.basename($identifier.'.'.editor_Plugins_Okapi_Bconf_Filter_Entity::EXTENSION));
             }
             foreach($defaultFilterFiles as $identifier => $path){
                 // the static default filters will be added with explicit settings, These are either OKAPI defaults or translate5 adjusted defaults
@@ -149,6 +149,7 @@ final class editor_Plugins_Okapi_Bconf_Packer {
      * @throws editor_Plugins_Okapi_Bconf_InvalidException
      */
     private function harvestReferencedFile(int $id, string $fileName, bool $isOutdatedRepack){
+        $fileName = basename($fileName); // security!
         $this->raf->writeInt($id);
         $this->raf->writeUTF($fileName, false);
 
