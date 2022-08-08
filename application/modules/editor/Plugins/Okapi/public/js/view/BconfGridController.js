@@ -213,14 +213,15 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     },
     uploadSRX: function(id, srx, purpose){
         var controller = this,
-            s = this.getView().strings;
+            grid = this.getView();
         var [invalidTitle, invalidMsg, fileUploaded]
-            = [s.invalidTitle, s.invalidMsg, s.fileUploaded].map(x => x.replace('{0}', 'SRX'));
-
+            = [grid.strings.invalidTitle, grid.strings.invalidMsg, grid.strings.fileUploaded].map(x => x.replace('{0}', 'SRX'));
+        grid.setLoading(true);
         Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconf/uploadsrx/?id=' + id, {
             method: 'POST', formData: {purpose, srx}
         }).then(function(response){
-            var {status, responseJson: json = {}} = response;
+            grid.setLoading(false);
+            var { status, responseJson: json = {}} = response;
             if(json.errorCode === 'E1390'){
                 var extraInfo = controller.createInfoSpan(json);
                 Ext.Msg.show({
@@ -277,10 +278,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             var customer = grid.getCustomer() || {};
             data.append('customerId', customer.id);
         }
+        grid.setLoading(true);
         Editor.util.Util.fetchXHRLike(Editor.data.restpath + 'plugins_okapi_bconf/uploadbconf', {
             method: 'POST',
             body: data
         }).then(function(response){
+            grid.setLoading(false);
             if(response.status === 200 && response.responseJson){
                 // successful upload
                 var id = response.responseJson.id,
