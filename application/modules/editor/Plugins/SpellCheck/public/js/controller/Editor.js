@@ -86,14 +86,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             '#segmentStatusStrip #btnRunSpellCheck': {
                 click: 'startSpellCheckViaButton'
             },
-            '#segmentgrid': {
-                canceledit: 'onSegmentEditCancelled'
-            },
-        },
-        store: {
-            '#Segments':{
-                load: 'applySpellCheckStyles',
-                update: 'applySpellCheckStylesForRecord'
+            'contentEditableColumn': {
+                render: 'onEditableColumnRender'
             }
         },
     },
@@ -931,28 +925,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.spellCheckTooltip.showAt(posX,posY);
     },
     applySpellCheckStylesForRecord: function(store, rec, operation) {
-        if (!operation || operation == 'commit' || operation == 'cancelled') {
-            var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, cellNode, matches;
-            for (target in rec.get('spellCheck')) {
-                rec.get('spellCheck')[target].forEach(function(item){
-                    item.range.containerNode = document.querySelector(
-                        '#' + view.id + '-record-' + rec.internalId
-                        + ' [data-columnid="' + target + 'EditColumn"] .x-grid-cell-inner'
-                    );
-                });
-                cellNode = rec.get('spellCheck')[target][0].range.containerNode;
-                matches = rec.get('spellCheck')[target];
-                this.applyCustomMatches(cellNode, matches, operation == 'cancelled');
-            }
+        var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, cellNode, matches;
+        for (target in rec.get('spellCheck')) {
+            rec.get('spellCheck')[target].forEach(function(item){
+                item.range.containerNode = document.querySelector(
+                    '#' + view.id + '-record-' + rec.internalId
+                    + ' [data-columnid="' + target + 'EditColumn"] .x-grid-cell-inner'
+                );
+            });
+            cellNode = rec.get('spellCheck')[target][0].range.containerNode;
+            matches = rec.get('spellCheck')[target];
+            this.applyCustomMatches(cellNode, matches, operation == 'cancelled');
         }
-    },
-    applySpellCheckStyles: function(store) {
-        var me = this;
-        setTimeout(function(){
-            for (var i = 0; i < store.getCount(); i++) {
-                me.applySpellCheckStylesForRecord(null, store.getAt(i));
-            }
-        }, 300);
     },
     applyCustomMatches: function(cellNode, matches, skipMindDelTags) {
         if (!cellNode) return;
@@ -1044,8 +1028,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         //console.log(html, 'now', [match.range.start, match.range.end]);
     },
 
-    onSegmentEditCancelled: function(plugin, context) {
-        this.applySpellCheckStylesForRecord(context.store, context.record, 'cancelled');
+    onEditableColumnRender: function(column) {
+        var me = this;
+        column.renderer = function(value, meta, record, rowIndex, colIndex, store, view) {
+            setTimeout(function(){
+                me.applySpellCheckStylesForRecord(store, record);
+            }, 50);
+            return value;
+        };
     }
 });
 // var matches = Ext.getCmp('segment-grid').getStore().getAt(1).get('spellCheck').target;
