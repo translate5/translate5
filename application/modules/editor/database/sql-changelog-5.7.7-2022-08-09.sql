@@ -28,4 +28,3 @@
 
 -- userGroup calculation: basic: 1; editor: 2; pm: 4; admin: 8
             
-INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ;
