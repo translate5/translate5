@@ -792,6 +792,15 @@ class Editor_SegmentController extends ZfExtended_RestController
         $terms = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         $this->view->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
         $this->view->termGroups = $terms->getByTaskGuidAndSegment($this->getCurrentTask()->getTaskGuid(), (int)$this->_getParam('id'));
+
+        $termEntryIds = [];
+        foreach ($this->view->termGroups as $termGroup) {
+            foreach ($termGroup as $term){
+                $termEntryIds[] = $term->termEntryId;
+            }
+        }
+        $this->view->attributeGroups = $terms->getAttributesGroups(array_filter($termEntryIds));
+
         $this->view->termStatMap = editor_Models_Terminology_Models_TermModel::getTermStatusMap();
         $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }

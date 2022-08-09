@@ -37,9 +37,80 @@ $termDivParams = function($class, $rtl) {
         $params[] = 'direction-rtl"';
         $params[] = 'dir="rtl';
     }
-    return join(' ', $params);
-}
+    return implode(' ', $params);
+};
+
+$attributes = $this->attributeGroups;
+$renderAttributes = static function (int $termId, int $termEntryId, string $language) use ($attributes) {
+
+    $renderHtml = '<div class="tooltiptext">';
+    $html = [];
+
+    foreach ($attributes['entry'] as $attribute){
+        if((int)$attribute['termEntryId'] === $termEntryId){
+            $html[] = '<li>'.$attribute['elementName'].' : '.$attribute['value'].'</li>';
+        }
+    }
+    if(count($html) > 0){
+        $renderHtml .= '<h3>Entry</h3>';
+        $renderHtml .= '<ul>'.implode($html).'</ul>';
+    }
+
+    $html = [];
+
+    foreach ($attributes['language'] as $attribute){
+        if($attribute['language'] === $language){
+            $html[] = '<li>'.$attribute['elementName'].' : '.$attribute['value'].'</li>';
+        }
+    }
+    if(count($html) > 0) {
+        $renderHtml .= '<h3>en</h3><img src="/modules/editor/images/flags/'.$language.'.png">';
+        $renderHtml .= '<ul>' . implode($html) . '</ul>';
+    }
+
+
+    $html = [];
+
+    foreach ($attributes['term'] as $attribute){
+        if((int)$attribute['termId'] === $termId){
+            $html[] = '<li>'.$attribute['elementName'].' : '.$attribute['value'].'</li>';
+        }
+    }
+
+    if(count($html) > 0) {
+        $renderHtml .= '<h3>Term</h3>';
+        $renderHtml .= '<ul>' . implode($html) . '</ul>';
+    }
+
+    $renderHtml .= '</div>';
+
+    return $renderHtml;
+
+};
+
 ?>
+<style type="text/css">
+    .tooltip {
+        display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: auto;
+        background-color: black;
+        color: #fff;
+        text-align: left;
+        border-radius: 6px;
+        padding: 5px;
+
+        position: absolute;
+        z-index: 9999999999 !important;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+    }
+</style>
 <div class="term-box">
 <?php
     $i = 0;
@@ -54,6 +125,8 @@ $termDivParams = function($class, $rtl) {
         $source = array();
         $isSourceRtl = false;
         $isTargetRtl = false;
+
+
         foreach($termGroup as $term) {
             settype($term->rtl, 'boolean');
             $guiStatus = $term->status;
@@ -91,12 +164,16 @@ $termDivParams = function($class, $rtl) {
                 $termText = $term->term;
             }
 
-            $itemStr .= sprintf('<span class="%3$s" title="%2$s">%1$s</span>', $termText, $definition, join(' ', $class));
+            $itemStr .= sprintf('<span class="%3$s" title="%2$s">%1$s</span>', $termText, $definition, implode(' ', $class));
 
-            if(!empty($term->definition)){
+            //if(!empty($term->definition)){
                 $src = $this->publicModulePath.'/images/termStatus/information-small-white.png';
-                $itemStr .= sprintf(' <img src="%1$s" alt="%2$s" title="%2$s"/>', $src, $definition);
-            }
+                $itemStr .= '<div class="tooltip">';
+                $itemStr .= sprintf(' <img class="tooltip" src="%1$s" alt="%2$s" title="%2$s"/>', $src, $definition);
+                $itemStr .= $renderAttributes($term->id,$term->termEntryId,$term->language);
+                $itemStr .= '</div>';
+                
+            //}
             if($term->isSource) {
                 $source[] = $itemStr;
                 $isSourceRtl = $term->rtl || $isSourceRtl;
@@ -107,12 +184,13 @@ $termDivParams = function($class, $rtl) {
             }
         }
 ?>
+
         <div class="term-group <?php echo ($i++ % 2 == 0)?'even':'odd'; ?>">
             <div class="<?php echo $termDivParams('source-terms', $isSourceRtl);?>">
-                <?php echo join("<br />\n", $source); ?>
+                <?php echo implode("<br />\n", $source); ?>
             </div>
             <div class="<?php echo $termDivParams('target-terms', $isTargetRtl);?>">
-                <?php echo join("<br />\n", $target); ?>
+                <?php echo implode("<br />\n", $target); ?>
             </div>
         </div>
 <?php

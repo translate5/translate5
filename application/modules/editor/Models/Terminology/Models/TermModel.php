@@ -1483,10 +1483,13 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $terms = $this->db->getAdapter()->fetchAll($sql);
 
         $termGroups = [];
+
         foreach($terms as $term) {
             $term = (object) $term;
 
-            settype($termGroups[$term->termEntryTbxId], 'array');
+            if( !isset($termGroups[$term->termEntryTbxId])){
+                $termGroups[$term->termEntryTbxId] = [];
+            }
 
             $term->used = in_array($term->termTbxId, $allIds);
             $term->isSource = in_array($term->languageId, $sourceLanguages);
@@ -1500,6 +1503,38 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         return $termGroups;
     }
+
+    /***
+     * @return void
+     */
+    public function getAttributesGroups(array $termEntries){
+
+        $sql = $this->db->getAdapter()->select()
+            ->from(['t1' =>'terms_attributes'], ['t1.*'])
+            ->where('t1.termEntryId IN (?)', $termEntries);
+
+        $attributes = $this->db->getAdapter()->fetchAll($sql);
+
+        $template = [];
+        $template['entry'] = [];
+        $template['language'] = [];
+        $template['term'] = [];
+
+        $entryGroup = [];
+        foreach ($attributes as $attribute) {
+
+            if( empty($attribute['language'])){
+                $template['entry'][] = $attribute;
+            }elseif ( empty($attribute['termId'])){
+                $template['language'][] = $attribute;
+            }else{
+                $template['term'][] = $attribute;
+            }
+        }
+
+        return $template;
+    }
+
     /***
      * Remove terms where the updated date is older than the given one.
      * TODO: Import performance bottleneck. Optimize this if possible!
