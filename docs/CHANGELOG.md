@@ -16,6 +16,13 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.7] - 2022-08-09
+
+### Important Notes:
+ 
+
+
 ## [5.7.6] - 2022-08-05
 
 ### Important Notes:
