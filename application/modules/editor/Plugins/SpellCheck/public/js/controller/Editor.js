@@ -960,15 +960,28 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
 
     mindTags: function(match) {
-        var html = new Editor.util.HtmlCleanup().cleanHtmlTags(
-            match.range.containerNode.innerHTML.replace(/<([0-9]+)\/>/g, '&lt;$1&gt;'), '<del>'
-        ).replace(/&lt;([0-9]+)\/&gt;/g, '<$1/>'), tagm, tags = [], tag, start, end;
+        var shift, html = new Editor.util.HtmlCleanup().cleanHtmlTags(
+            match.range.containerNode.innerHTML
+                .replace(/title="[^"]+"/g, (attr) => {
+                    return attr.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                })
+                .replace(/<([0-9]+)\/>/g, '&lt;$1/&gt;'), '<del>'
+        ).replace(/&lt;/g, '<').replace(/&gt;/g, '>'), tagm, tags = [], tag, start, end, debug = false; //html.match('Hinweis') && html.match('©');
 
-        //console.log('html before', match.range.containerNode.innerHTML);
-        //console.log('html after', html);
+        // Create backup for initial offsets
+        if (!('backup' in match)) match.backup = {
+            start: match.range.start + 0,
+            end: match.range.end + 0
+        }
+
+        // Debug
+        if (debug) {
+            console.log('html before', match.range.containerNode.innerHTML);
+            console.log('html after', html);
+        }
 
         // Get regexp iterator containing matches
-        tagm = html.matchAll(/(<del.*?>)(.+?)<\/del>|<[0-9]+\/>/g);
+        tagm = html.matchAll(/(?<del><del.*?>)(.+?)<\/del>|(?<white><[0-9]+\/>)|(?<other><\/?[^>]+>)/g);
 
         // Get array of matches for further use to be more handy
         while (tag = tagm.next()) {
@@ -979,53 +992,77 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             }
         }
 
+        // Debug
+        if (debug) {
+            console.log(tags);
+            console.log('match.backup.start', match.backup.start);
+        }
+
         // Shortcuts
-        start = match.range.start + 0;
-        end   = match.range.end + 0;                            // console.log(tags);
+        start = match.backup.start + 0;
+        end   = match.backup.end + 0;
 
         // Foreach tag
-        for (var i = 0; i < tags.length; i++) {                   // console.log('tag#', i, 'was index', tags[i].index);
+        for (var i = 0; i < tags.length; i++) {
 
+            // Debug
+            if (debug) console.log('tag#', i, 'was index', tags[i].index);
 
             // Reduce current tag match index (offset position) by cutting off html stuff of previous tags to make
             // it possible to rely on that index (offset position) while spell check styles coords calculation
             for (var j = 0; j < i; j++) {
 
                 // If it's one of the whitespace-tags
-                if (tags[j][2] === undefined) {
-                    tags[i].index -= tags[j][0].length;
+                if (tags[j].groups.white) {
+
+                    // For del and whitespace tags - deduct the index
+                    if (!tags[i].groups.other) {
+                        tags[i].index -= tags[j][0].length;
+                    }
 
                 // Else if it's one of the del-tags
-                } else {
+                } else if (tags[j].groups.del) {
                     tags[i].index -= tags[j][0].length - tags[j][2].length;
                 }
-            }                                  // console.log('tag#', i, 'now index', tags[i].index, 'start is', start);
+            }
+
+            // Debug
+            if (debug) console.log('tag#', i, 'now index', tags[i].index, 'start is', start);
 
             // If current tag appears before the word having spellcheck-error
-            if (tags[i].index < start) {
+            if (tags[i].index <= start) {
 
                 // If it's one of the whitespace-tags
                 if (tags[i][2] === undefined) {
 
                     // Shift spellcheck coords to the right, by whitespace-tag's outerHTML length,
                     // which is = 4 in most cases, as whitespace tags look like <1/>, <2/> etc
-                    start += tags[i][0].length;
-                    end   += tags[i][0].length;
+                    shift = tags[i][0].length;
 
                 // Else if it's one of the del-tags
                 } else {
 
                     // Shift spellcheck coords to the right, by del-tags content length
-                    start += tags[i][2].length;
-                    end   += tags[i][2].length;
+                    shift = tags[i][2].length;
                 }
+
+                // Debug
+                if (debug) console.log('tag#', i, 'start was', start, 'start now', start + shift);
+
+                // Do shift
+                start += shift; end += shift;
             }
         }
 
-        //console.log(html, 'was', [match.range.start, match.range.end], 'shifted by ', start - match.range.start);
+        // Debug
+        if (debug) console.log(html, 'was', [match.backup.start, match.backup.end], 'shifted by ', start - match.backup.start);
+
+        // Update offsets
         match.range.start = start;
         match.range.end = end;
-        //console.log(html, 'now', [match.range.start, match.range.end]);
+
+        // Debug
+        if (debug) console.log(html, 'now', [match.range.start, match.range.end]);
     },
 
     onEditableColumnRender: function(column) {
