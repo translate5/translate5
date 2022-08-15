@@ -115,11 +115,6 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         /* @var $meta editor_Models_Segment_Meta */
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
 
-        // Create segments_meta-field 'spellcheckState' if not exists
-        $meta->addMeta('spellcheckState', $meta::META_TYPE_STRING,
-            editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_UNCHECKED,
-            'Contains the SpellCheck-state for this segment while importing', 36);
-
         // Reset already checked segments back to unchecked
         $this->prepareSegments($task, $meta);
 
@@ -131,12 +126,9 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
 
         // If task target language is not supported by LanguageTool
         if (!$spellCheckLang) {
-
             // Log event
             $worker->getLogger()->error('E1413', 'SpellCheck can not work when target language is not supported by LanguageTool.', ['task' => $task]);
-
-            // Prevent worker from being initialized/queued
-            return false;
+            return;
         }
 
         // Add to queue

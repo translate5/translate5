@@ -144,7 +144,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     },
     afterRender: function(){
         if(this.rawData === null){
-            this.setLoading(); // has no effect if done in initComponent
+            this.setLoading(true); // has no effect if done in initComponent
         }
         return this.callParent(arguments);
     },
@@ -253,7 +253,6 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     save: function(){
         var valid = this.validate();
         if(valid === true){
-            this.setLoading();
             this.saveFprmData();
         } else {
             // no specific error given, create details from Form
@@ -269,7 +268,6 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      * starts loading the resources (raw data, transformed data, translations, gui-data)
      */
     load: function(){
-        this.setLoading();
         this.loadFprmData();
     },
     /**
@@ -285,6 +283,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      */
     loadFprmData(){
         var me = this;
+        me.setLoading(true);
         Ext.Ajax.request({
             url: me.bconfFilter.getProxy().getUrl() + '/getfprm',
             method: 'GET',
@@ -317,6 +316,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
      */
     saveFprmData(){
         var me = this;
+        me.setLoading(true);
         Ext.Ajax.request({
             url: me.bconfFilter.getProxy().getUrl() + '/savefprm',
             headers: {'Content-Type': 'application/octet-stream'},

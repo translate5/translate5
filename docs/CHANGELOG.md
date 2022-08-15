@@ -15,6 +15,71 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [5.7.7] - 2022-08-09
+
+### Important Notes:
+ 
+
+
+## [5.7.6] - 2022-08-05
+
+### Important Notes:
+#### [TRANSLATE-3022](https://jira.translate5.net/browse/TRANSLATE-3022)
+Stay in field: This issue is security related!
+
+#### [TRANSLATE-3020](https://jira.translate5.net/browse/TRANSLATE-3020)
+This issue is security related!
+ 
+
+
+### Added
+**[TRANSLATE-3010](https://jira.translate5.net/browse/TRANSLATE-3010): LanguageResources - Set default pivot language in systemconfiguration** <br>
+Default task pivot languages can be configured for each customer.
+
+**[TRANSLATE-2812](https://jira.translate5.net/browse/TRANSLATE-2812): Editor general, LanguageResources - Send highlighted word in segment to concordance search or synonym search** <br>
+Enables selected text in editor to be send as synonym or concordance search.
+
+**[TRANSLATE-2538](https://jira.translate5.net/browse/TRANSLATE-2538): Auto-QA - AutoQA: Include Spell-, Grammar- and Style-Check** <br>
+All spelling, grammar and style errors found by languagetool for all segments of a task are now listed in AutoQA and it is possible to filter the segments by error type.
+In addition errors are now not only marked in the segment open for editing, but also in all other segments.
+In addition there are now many more subtypes for errors (before we had only spelling, grammar and style).
+
+
+### Changed
+**[TRANSLATE-3008](https://jira.translate5.net/browse/TRANSLATE-3008): LanguageResources - Change tooltip for checkbox "Pre-translate (MT)"** <br>
+Improves tooltip texts in match analysis.
+
+**[TRANSLATE-2932](https://jira.translate5.net/browse/TRANSLATE-2932): Okapi integration, Task Management - BCONF Management Milestone 2** <br>
+BCONF Management Milestone 2
+* adds capabilities to upload/update the SRX files embedded in a BCONF
+* adds the frontend to manage the embedded filters/FPRM's of a bconf together with the related extension-mapping
+* New filters can be created by cloning existing (customized or default) ones
+* adds capabilities to generally edit and validate filters/FPRM's
+* adds frontend editors for the following filters: okf_html, okf_icml, okf_idml, okf_itshtml5, okf_openxml, okf_xml, okf_xmlstream
+
+
+### Bugfixes
+**[TRANSLATE-3022](https://jira.translate5.net/browse/TRANSLATE-3022): Editor general - RXSS with help page editordocumentation possible** <br>
+Security related fix.
+
+**[TRANSLATE-3020](https://jira.translate5.net/browse/TRANSLATE-3020): Editor general - PXSS on showing reference files** <br>
+Security related fix.
+
+**[TRANSLATE-3011](https://jira.translate5.net/browse/TRANSLATE-3011): Import/Export - Extend error handling in xlf parser** <br>
+Error handling code improvement for xlf parser.
+
+**[TRANSLATE-3009](https://jira.translate5.net/browse/TRANSLATE-3009): Editor general - Base tooltip class problem** <br>
+Fix for a general problem when tooltips are shown in some places in the application.
+
+**[TRANSLATE-2935](https://jira.translate5.net/browse/TRANSLATE-2935): Auto-QA, TermTagger integration - Avoid term-check false positive in case of homonyms and display homonyms in source and target** <br>
+TermTagger: Fixed term-check false positives in case of homonyms
+
+**[TRANSLATE-2063](https://jira.translate5.net/browse/TRANSLATE-2063): Import/Export - Enable parallele use of multiple okapi versions to fix Okapi bugs** <br>
+Multiple okapi instances can be configured and used for task imports.
+
+
 ## [5.7.5] - 2022-07-22
 
 ### Important Notes:

@@ -429,6 +429,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | EventCode               | Context             | EventMessage  | Description/Solution                                   
 |:------------------------|:--------------------| :------------ |:-------------------------------------------------------
 | <a id="E1417"></a>E1417 | Plug-In 24Translate | 24Translate authorization failed. Please supply a valid private key and key id. | The configured private key and/or key id is not valid. |
+| <a id="E1418"></a>E1418 | Plug-In 24Translate | 24Translate is returning an error: {message} | See the error message what is going wrong.                                                      |
 
 #### Plug-In Groupshare
 | EventCode        | Context       | EventMessage  | Description/Solution

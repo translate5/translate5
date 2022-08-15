@@ -144,6 +144,9 @@ class editor_Services_OpenTM2_FixLanguageCodes {
             $replace[] = 'xml:lang="'.$targetLang.'"';
         }
 
+        //it may happen that source lang is empty, so we set that (its the first tuv after a prop)
+        $tmxData = preg_replace('#</prop>(\s+<tuv[^>]+)xml:lang=""#', '</prop>\1xml:lang="'.$sourceLang.'"', $tmxData);
+
         //Since the prop type tmgr:language is openTM2 proprietary, we just remove it:
         $tmxData = preg_replace('#<prop type="tmgr:language">[^<]+</prop>(\s)*#', '', $tmxData);
 
