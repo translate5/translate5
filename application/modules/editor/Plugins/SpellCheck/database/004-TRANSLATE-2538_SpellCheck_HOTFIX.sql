@@ -35,3 +35,20 @@ WHERE `name` = "runtimeOptions.plugins.SpellCheck.languagetool.url.default" AND 
 UPDATE `Zf_configuration`
 SET `value` = IF (LENGTH(@languagetool) > 0, CONCAT('[\"', @languagetool, '\"]'), '[]')
 WHERE `name` = "runtimeOptions.plugins.SpellCheck.languagetool.url.import" AND `value` LIKE '["http://localhost:8081/v2",%"http://localhost:8082/v2"]';
+
+SET @db = DATABASE();
+SET @tbl = "LEK_segments_meta";
+SET @col = "spellcheckState";
+SET @sql = (SELECT IF(
+       (
+           SELECT COUNT(*) FROM `INFORMATION_SCHEMA`.`COLUMNS`
+           WHERE `table_name`   = @tbl
+             AND `table_schema` = @db
+             AND `column_name`  = @col
+       ) > 0,
+       "SELECT 1",
+       CONCAT("ALTER TABLE ", @tbl, " ADD ", @col, " VARCHAR(36) DEFAULT 'unchecked' COMMENT 'Contains the SpellCheck-state for this segment while importing';")
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
