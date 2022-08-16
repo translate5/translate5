@@ -19,7 +19,7 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 ## [5.7.7] - 2022-08-09
 
-### Bugfixes:
+### Bugfixes
 
 **[TRANSLATE-2538](https://jira.translate5.net/browse/TRANSLATE-2538): Auto-QA - AutoQA: Include Spell-, Grammar- and Style-Check**<br>
 Hotfixed flawed SQL update
