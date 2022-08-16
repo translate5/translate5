@@ -229,7 +229,9 @@ class editor_Services_Manager {
      * @throws editor_Models_ConfigException
      */
     public function updateSegment(editor_Models_Segment $segment) {
-        if(empty($segment->getTargetEdit())&&$segment->getTargetEdit()!=="0"){
+        // segments with empty sources or targets will not be updated
+        // TODO FIXME: In the Frontend we should show an error when editing segments without source and save-back is active
+        if($segment->hasEmptySource() || $segment->hasEmptyTarget()){
             return;
         }
         $task = ZfExtended_Factory::get('editor_Models_Task');
