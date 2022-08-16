@@ -19,7 +19,10 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 ## [5.7.7] - 2022-08-09
 
-### Important Notes:
+### Bugfixes:
+
+**[TRANSLATE-2538](https://jira.translate5.net/browse/TRANSLATE-2538): Auto-QA - AutoQA: Include Spell-, Grammar- and Style-Check**<br>
+Hotfixed flawed SQL update
  
 
 
@@ -27,7 +30,7 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 ### Important Notes:
 #### [TRANSLATE-3022](https://jira.translate5.net/browse/TRANSLATE-3022)
-Stay in field: This issue is security related!
+This issue is security related!
 
 #### [TRANSLATE-3020](https://jira.translate5.net/browse/TRANSLATE-3020)
 This issue is security related!
