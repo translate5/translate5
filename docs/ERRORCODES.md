@@ -426,10 +426,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1389"></a>E1389  | Plug-In DeepL | DeepL Plug-In: Unable to delete glossary. | Api error calling the DELETE /v2/glossaries/\[glossary_id\] endpoint. For more info see the error log.
 
 ### Plug-In 24Translate
-| EventCode               | Context             | EventMessage  | Description/Solution                                   
-|:------------------------|:--------------------| :------------ |:-------------------------------------------------------
+| EventCode               | Context             | EventMessage                                                                    | Description/Solution                                   
+|:------------------------|:--------------------|:--------------------------------------------------------------------------------|:-------------------------------------------------------
 | <a id="E1417"></a>E1417 | Plug-In 24Translate | 24Translate authorization failed. Please supply a valid private key and key id. | The configured private key and/or key id is not valid. |
-| <a id="E1418"></a>E1418 | Plug-In 24Translate | 24Translate is returning an error: {message} | See the error message what is going wrong.                                                      |
+| <a id="E1418"></a>E1418 | Plug-In 24Translate | 24Translate can not find the requested API endpoint                             | The configured API endpoint is not valid.              |
+| <a id="E1419"></a>E1419 | Plug-In 24Translate | 24Translate is returning an error: {message}                                    | See the error message what is going wrong.             |
+| <a id="E1420"></a>E1420 | Plug-In 24Translate | 24Translate is returning unexpected response                                    | See the error message what is going wrong.             |
 
 #### Plug-In Groupshare
 | EventCode        | Context       | EventMessage  | Description/Solution
