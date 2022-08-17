@@ -32,61 +32,6 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_SegmentWorker {
 
     /**
-     * Resource pool key
-     *
-     * @var string
-     */
-    protected $resourcePool = 'import';
-    
-    /***
-     * Spell checking takes approximately 15 % of the import time
-     *
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::getWeight()
-     */
-    public function getWeight(): int {
-        return 15;
-    }
-
-    /**
-     * Load next bunch of segments to be process
-     *
-     * @param string $slot
-     * @return array
-     */
-    protected function loadNextSegments(string $slot): array
-    {
-        // Load segments to be processed
-        $result = $this->_loadNextSegments($slot);
-
-        // If nothing left
-        if (empty($result)) {
-
-            /* @var $db editor_Models_Db_SegmentMeta */
-            $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
-
-            // Get quantities-by-spellcheckState
-            $sql = $db->select()
-                ->from($db, ['spellcheckState', 'cnt' => 'count(id)'])
-                ->where('taskGuid = ?', $this->task->getTaskGuid());
-            $segmentCounts = $db->fetchAll($sql)->toArray();
-            $data = array_column($segmentCounts, 'cnt', 'spellcheckState');
-
-            // Convert to human-readable log format
-            $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: '%s'", $k, $v); }, $data, array_keys($data)));
-
-            // Log we're done
-            $this->getLogger()->info('E1419', 'SpellCheck overall run done - {segmentCounts}', [
-                'task' => $this->task,
-                'segmentCounts' => $data,
-            ]);
-        }
-
-        // Return bunch
-        return $result;
-    }
-
-    /**
      * Allowed values for setting resourcePool
      *
      * @var array(strings)
@@ -99,6 +44,21 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
      * @var string
      */
     protected static $praefixResourceName = 'SpellCheck_';
+
+    /**
+     * SpellCheck segment processor instance
+     *
+     * @var editor_Plugins_SpellCheck_SegmentProcessor
+     */
+    protected static $_processor = null;
+
+
+    /**
+     * Resource pool key
+     *
+     * @var string
+     */
+    protected $resourcePool = 'import';
 
     /**
      * overwrites $this->workerModel->maxLifetime
@@ -137,12 +97,6 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
      */
     private $proccessedTags;
 
-    /**
-     * SpellCheck segment processor instance
-     *
-     * @var editor_Plugins_SpellCheck_SegmentProcessor
-     */
-    protected static $_processor = null;
 
     /**
      * Language that will be passed as a param within LanguageTool-request along with segment text for spellcheck
@@ -154,7 +108,7 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
     /**
      * Init worker
      *
-     * @param null $taskGuid
+     * @param string $taskGuid
      * @param array $parameters
      * @return bool
      */
@@ -175,6 +129,41 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
 
         // Return flag indicating whether worker initialization was successful
         return $return;
+    }
+
+    /**
+     * Spell checking takes approximately 15 % of the import time
+     *
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight(): int {
+        return 15;
+    }
+
+    /**
+     * The final worker will report the work we've done
+     */
+    protected function onRunQueuedFinalize() {
+
+        /* @var $db editor_Models_Db_SegmentMeta */
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+
+        // Get quantities-by-spellcheckState
+        $sql = $db->select()
+            ->from($db, ['spellcheckState', 'cnt' => 'count(id)'])
+            ->where('taskGuid = ?', $this->task->getTaskGuid());
+        $segmentCounts = $db->fetchAll($sql)->toArray();
+        $data = array_column($segmentCounts, 'cnt', 'spellcheckState');
+
+        // Convert to human-readable log format
+        $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: %s", $k, $v); }, $data, array_keys($data)));
+
+        // Log we're done
+        $this->getLogger()->info('E1419', 'SpellCheck overall run done - {segmentCounts}', [
+            'task' => $this->task,
+            'segmentCounts' => $data,
+        ]);
     }
 
     /**
@@ -245,7 +234,7 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
      * @param string $slot
      * @return array
      */
-    protected function _loadNextSegments(string $slot): array {
+    protected function loadNextSegments(string $slot): array {
 
         // At this stage we assume that malfunction state is a state indicating that
         // something went wrong while last attempt to spell-check loaded segments
@@ -274,6 +263,7 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
             }
         }
 
+        $segments = [];
         // Foreach segmentId - load segment instance and add to $segments array
         foreach ($this->loadedSegmentIds as $segmentId) {
             /* @var $segment editor_Models_Segment */
@@ -283,7 +273,7 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
         }
 
         // Return array of loaded segment instances
-        return $segments ?? [];
+        return $segments;
     }
 
     /**

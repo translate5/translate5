@@ -144,8 +144,8 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
     protected function onRunQueuedFinished($success) {
         // only queue workers if the work was successful
         // the last worker must return false if no segments to process could be found, otherwise we will work endlessly...
-        if($success){        
-            $taskGuid = $this->workerModel->getTaskGuid();
+        $taskGuid = $this->workerModel->getTaskGuid();
+        if($success){
             $parameters = $this->workerModel->getParameters();
             $worker = ZfExtended_Factory::get(get_class($this));
             /* @var $worker editor_Models_Import_Worker_ResourceAbstract */
@@ -154,9 +154,26 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
                     'taskGuid' => $taskGuid,
                     'parameters' => $parameters
                 ]);
+            } else {
+                $worker->queue($this->workerModel->getParentId(), ZfExtended_Models_Worker::STATE_WAITING);
             }
-            $worker->queue($this->workerModel->getParentId(), ZfExtended_Models_Worker::STATE_WAITING);
+        } else {
+            // check if we are the final worker
+            // since we started working a simultaneously started worker may already changed our state via setRemainingToDone
+            $this->workerModel->refresh();
+            if($this->workerModel->getState() == ZfExtended_Models_Worker::STATE_RUNNING){
+                $this->workerModel->setRemainingToDone();
+                $this->onRunQueuedFinalize();
+            }
         }
+    }
+
+    /**
+     * Plugin-function to run code after the last worker has done it's job
+     * This Code will only run once and will run BEFORE the "done" state is set for the worker-model
+     */
+    protected function onRunQueuedFinalize() {
+        // error_log('RESOURCE WORKER: LAST '.get_class($this).' HAS WORKED!');
     }
     /**
      * Needs to be defined in the real worker. Performs the threaded work
