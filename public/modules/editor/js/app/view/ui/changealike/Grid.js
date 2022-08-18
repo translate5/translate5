@@ -51,8 +51,9 @@ Ext.define('Editor.view.ui.changealike.Grid', {
   item_targetColumn: 'Ziel', 
   item_filterColumn: 'In aktueller Filterung enthalten', 
   item_sourceMatchColumn: 'Quell-Treffer', 
-  item_targetMatchColumn: 'Ziel-Treffer', 
-  
+  item_targetMatchColumn: 'Ziel-Treffer',
+  item_sameContextColumn: 'Kontext-Treffer',
+
   requires: [
       'Editor.view.segments.column.Matchrate',
       'Editor.view.segments.column.AutoState'
@@ -92,6 +93,7 @@ Ext.define('Editor.view.ui.changealike.Grid', {
         {
           xtype: 'gridcolumn',
           dataIndex: 'target',
+          isAlikeTarget: true,
           filter: {
               type: 'string'
           },
@@ -131,6 +133,15 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           },
           width: 80, 
           text: me.item_targetMatchColumn
+        },
+        {
+          xtype: 'booleancolumn',
+          dataIndex: 'contextMatch',
+          filter: {
+              type: 'boolean'
+          },
+          width: 80,
+          text: me.item_sameContextColumn
         },{
         	xtype:'matchrateColumn'
         },{
@@ -142,7 +153,42 @@ Ext.define('Editor.view.ui.changealike.Grid', {
       },
       selModel: Ext.create('Ext.selection.CheckboxModel', {
         injectCheckbox: 3
-      })
+      }),
+      plugins: [{
+        ptype: 'rowwidget',
+        widget: {
+          xtype: 'grid',
+          //maxWidth: me.up('window').getWidth() - 100,
+          //autoLoad: true,
+          bind: {
+            store: '{record.context}',
+            title: 'Context for segment No. {record.segmentNrInTask}'
+          },
+          columns: [{
+            text: me.item_segmentNrInTaskColumn,
+            dataIndex: 'segmentNrInTask',
+            width: 50
+          }, {
+            text: 'Type',
+            dataIndex: 'type',
+            width: 50
+          }, {
+            text: 'File',
+            dataIndex: 'fileId',
+            width: 50
+          }, {
+            text: me.item_targetColumn,
+            dataIndex: 'target',
+            isContextTarget: true,
+            tdCls: 'segment-tag-column',
+            listeners: {
+              beforerender: function(c) {
+                c.width = c.up('changealikeGrid').down('[isAlikeTarget]').getWidth() + 163;
+              }
+            }
+          }]
+        }
+      }],
     };
 
     if (instanceConfig) {

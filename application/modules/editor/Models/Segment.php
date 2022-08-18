@@ -205,6 +205,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected static $pixelLength;
 
     /**
+     * @var null
+     */
+    protected $contextData = null;
+
+    /**
      * init the internal segment field and the DB object
      */
     public function __construct()
@@ -1655,6 +1660,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             self::EMPTY_STRING_HASH,
             $taskGuid));
         $alikes = $stmt->fetchAll();
+
+        // Prepare context data
+        $this->prepareSegmentsContext($alikes, $segmentsViewName);
+
+        // Get context for current segment
+        $selfContext = $this->getSegmentContextByNr($this->getSegmentNrInTask());
+
         //gefilterte Segmente bestimmen und flag setzen
         $hasIdFiltered = $this->getIdsAfterFilter($segmentsViewName, $taskGuid);
         foreach ($alikes as $key => $alike) {
@@ -1662,9 +1674,77 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             //das aktuelle eigene Segment, zu dem die Alikes gesucht wurden, aus der Liste entfernen
             if ($alike['id'] == $this->get('id')) {
                 unset($alikes[$key]);
+            } else {
+
+                // Get context for alike segment
+                $alikeContext = $this->getSegmentContextByNr($alike['segmentNrInTask']);
+
+                // Setup contextMatch-flag
+                $alikes[$key]['contextMatch'] = $selfContext['hash'] == $alikeContext['hash'];
+
+                // Setup store for context-segments grid for current alike segment
+                $alikes[$key]['context'] = $alikeContext['store'];
             }
         }
         return array_values($alikes); //neues numerisches Array für JSON Rückgabe, durch das unset oben macht json_decode ein Object draus
+    }
+
+    /**
+     * Fetch prev and next segments for each segment among given alike-segments
+     *
+     * @param array $alikeA
+     * @param $segmentsViewName
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function prepareSegmentsContext(array $alikeA, string $segmentsViewName) {
+
+        // If no alike-segments given return empty array
+        if (!$alikeA) return [];
+
+        // Collect segmentNrInTask-values for alike-segments themselves and their prev and next segments
+        $nrA = [];
+        foreach (array_column($alikeA, 'segmentNrInTask') as $nr) {
+            array_push($nrA, $nr, $nr - 1, $nr + 1);
+        }
+
+        // Fetch context data
+        return $this->contextData = $this->db->getAdapter()->query('
+            SELECT `segmentNrInTask`, `segmentNrInTask`, `id`, `fileId`, `targetMd5`, `target` 
+            FROM `' . $segmentsViewName . '`
+            WHERE `segmentNrInTask` IN (' . join(',', $nrA) . ') 
+        ')->fetchAll(PDO::FETCH_UNIQUE);
+    }
+
+    /**
+     * Get context data for a segment, identified by it's segmentNrInTask-prop, given as $nr arg
+     *
+     * @param int $nr
+     * @return array
+     */
+    public function getSegmentContextByNr(int $nr) {
+
+        // Get context
+        $self = $this->contextData[$nr];
+        $prev = $this->contextData[$nr - 1];
+        $next = $this->contextData[$nr + 1];
+
+        // Get hashes
+        $prevMd5 = $prev && $prev['fileId'] == $self['fileId'] ? $prev['targetMd5'] : '';
+        $nextMd5 = $next && $next['fileId'] == $self['fileId'] ? $next['targetMd5'] : '';
+        $selfMd5 = $self['targetMd5'];
+
+        // Return contenxt hash and store
+        return [
+            'hash' => md5($prevMd5 . $selfMd5 . $nextMd5),
+            'store' => [
+                'fields' => ['segmentNrInTask', 'target', 'type'],
+                'data' => [
+                    ['segmentNrInTask' => $prev['segmentNrInTask'] ?? '', 'type' => 'Prev', 'target' => $prev['target'] ?? '', 'fileId' => $prev['fileId'] ?? ''],
+                    ['segmentNrInTask' => $next['segmentNrInTask'] ?? '', 'type' => 'Next', 'target' => $next['target'] ?? '', 'fileId' => $next['fileId'] ?? '']
+                ]
+            ]
+        ];
     }
 
     /**

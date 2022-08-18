@@ -120,6 +120,9 @@ Ext.define('Editor.controller.ChangeAlike', {
           },
           '#segmentgrid': {
               afterrender: 'initEditPluginHandler'
+          },
+          '[isAlikeTarget]': {
+              resize: 'onAlikeTargetColumnResize'
           }
       },
       controller: {
@@ -423,21 +426,40 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @return {Number[]}
    */
   getAlikesToProcess: function() {
-      var me = this, 
-          allIds = me.getAllAlikeIds();
-      if(me.isAutoProcessing()){
-          return allIds;
+      var me = this, byRepetitionType, bySameContextOnly,
+          repetitionType = Editor.app.getUserConfig('alike.repetitionType'),
+          sameContextOnly = Editor.app.getUserConfig('alike.sameContextOnly');
+
+      // If alike-segments should be automatically processed
+      if (me.isAutoProcessing()) {
+
+          // Return all found alike-segments ids, filtered according to repetitionType and sameContextOnly configs
+          return me.getAllAlikeIds(function(rec) {
+
+              // Check whether current alike-segment conforms repetitionType-clause
+                   if (repetitionType == 'both'  ) byRepetitionType = true;
+              else if (repetitionType == 'source') byRepetitionType = rec.get('sourceMatch');
+              else if (repetitionType == 'target') byRepetitionType = rec.get('targetMatch');
+
+              // Check whether current alike-segment conforms sameContextOnly-clause
+              bySameContextOnly = sameContextOnly ? rec.get('contextMatch') : true;
+
+              // Return true of both conditions are ok
+              return byRepetitionType && bySameContextOnly;
+          });
       }
-      return me.getSelectedAlikeIds(allIds);
+
+      // Else return all alike-segments, currently selected in repetitions-dialog
+      return me.getSelectedAlikeIds(me.getAllAlikeIds());
   },
   /**
    * returns an array with all alike ids
    * @returns {Array}
    */
-  getAllAlikeIds: function() {
+  getAllAlikeIds: function(filterFn) {
     var result = [];
     Ext.Array.each(this.fetchedAlikes, function(rec){
-        result.push(rec.get('id'));
+        if (typeof filterFn != 'function' || filterFn(rec)) result.push(rec.get('id'));
     });
     return result;
   },
@@ -590,5 +612,10 @@ Ext.define('Editor.controller.ChangeAlike', {
   }, 
   isManualProcessing: function() {
     return (Editor.app.getUserConfig('alike.defaultBehaviour') == 'individual');
-  }
+  },
+    onAlikeTargetColumnResize: function(c, width) {
+        c.up('grid').query('[isContextTarget]').forEach(function(col){
+            col.setWidth(width + 163);
+        });
+    }
 });

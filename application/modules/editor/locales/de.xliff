@@ -160,6 +160,7 @@
 <trans-unit id='SW4gYWt0dWVsbGVyIEZpbHRlcnVuZyBlbnRoYWx0ZW4='><source>In aktueller Filterung enthalten</source><target>In aktueller Filterung enthalten</target></trans-unit>
 <trans-unit id='UXVlbGwtVHJlZmZlcg=='><source>Quell-Treffer</source><target>Quell-Treffer</target></trans-unit>
 <trans-unit id='WmllbC1UcmVmZmVy'><source>Ziel-Treffer</source><target>Ziel-Treffer</target></trans-unit>
+<trans-unit id="S29udGV4dC1UcmVmZmVy"><source>Kontext-Treffer</source><target>Kontext-Treffer</target></trans-unit>
 <trans-unit id='UmVsYWlzLVRyZWZmZXI='><source>Relais-Treffer</source><target>Relais-Treffer</target></trans-unit>
 <trans-unit id='ezB9IFdpZWRlcmhvbHVuZyB3dXJkZSBiZWFyYmVpdGV0IHVuZCBnZXNwZWljaGVydA=='><source>{0} Wiederholung wurde bearbeitet und gespeichert</source><target>{0} Wiederholung wurde bearbeitet und gespeichert</target></trans-unit>
 <trans-unit id='ezB9IFdpZWRlcmhvbHVuZ2VuIHd1cmRlbiBiZWFyYmVpdGV0IHVuZCBnZXNwZWljaGVydA=='><source>{0} Wiederholungen wurden bearbeitet und gespeichert</source><target>{0} Wiederholungen wurden bearbeitet und gespeichert</target></trans-unit>

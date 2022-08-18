@@ -40,7 +40,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.preferences.Window', {
     extend: 'Ext.window.Window',
 
-    height: 274,
+    height: 414,
     itemId: 'preferencesWindow',
     width: 460,
     resizable: false, //needed for boxLabel width
@@ -80,6 +80,35 @@ Ext.define('Editor.view.preferences.Window', {
                     width: 426, //needed for long labels to wrap
                     boxLabel: this.item_alikeBehaviour_always_boxLabel,
                     inputValue: 'always'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'repetitionType',
+                    width: 426, //needed for long labels to wrap
+                    margin: '0 0 0 30',
+                    boxLabel: 'Source repetitions',
+                    inputValue: 'source'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'repetitionType',
+                    width: 426, //needed for long labels to wrap
+                    margin: '0 0 0 30',
+                    boxLabel: 'Target repetitions',
+                    inputValue: 'target'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'repetitionType',
+                    width: 426, //needed for long labels to wrap
+                    margin: '0 0 0 30',
+                    boxLabel: 'Both types',
+                    inputValue: 'both'
+                  }, {
+                    xtype: 'checkbox',
+                    name: 'sameContextOnly',
+                    margin: '0 0 0 30',
+                    boxLabel: 'Same context only',
                   },
                   {
                     xtype: 'radiofield',

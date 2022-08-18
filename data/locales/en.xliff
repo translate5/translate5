@@ -404,6 +404,10 @@
                 <source>Ziel-Treffer</source>
                 <target>Target hits</target>
             </trans-unit>
+            <trans-unit id="S29udGV4dC1UcmVmZmVy">
+                <source>Kontext-Treffer</source>
+                <target>Context hits</target>
+            </trans-unit>
             <trans-unit id="UmVsYWlzLVRyZWZmZXI=">
                 <source>Relais-Treffer</source>
                 <target>Relay hits</target>
