@@ -69,18 +69,10 @@ class Editor_ReferencefileController extends ZfExtended_RestController {
             throw new ZfExtended_NotFoundException();
         }
 
-        if(function_exists('apache_setenv')){
-            apache_setenv('no-gzip', '1');
-        }
-        //header("HTTP/1.1 200 OK");
-        //header('HTTP/1.1 304 Not Modified');
-        header('Content-Description: File Transfer');
-        header('Content-Transfer-Encoding: binary');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Pragma: public');
         header("Content-Type: ".$this->getMime($file), TRUE);
-        flush();
+        header('Content-Disposition: attachment; filename="'.$file->getFilename().'"');
+        header('Cache-Control: no-cache');
+        header('Content-Length: ' . filesize($file));
         readfile($file);
         exit;
     }
@@ -123,13 +115,14 @@ class Editor_ReferencefileController extends ZfExtended_RestController {
      * returns the file path part of the REQUEST URL
      * @return string
      */
-    protected function getRequestedFileRelPath() {
+    protected function getRequestedFileRelPath(): string
+    {
         $zcf = Zend_Controller_Front::getInstance();
         $urlBase = array();
         $urlBase[] = $zcf->getBaseUrl();
         $urlBase[] = $this->getRequest()->getModuleName();
         $urlBase[] = $this->getRequest()->getControllerName();
-        $urlBase = join('/', $urlBase);
+        $urlBase = implode('/', $urlBase);
         $file = str_replace('!#START'.$urlBase, '', '!#START'.$zcf->getRequest()->getRequestUri());
         $file = str_replace('/', DIRECTORY_SEPARATOR, $file); //URL to file system
         /** @var $localEncoded ZfExtended_Controller_Helper_LocalEncoded */

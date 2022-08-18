@@ -126,12 +126,9 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
 
         // If task target language is not supported by LanguageTool
         if (!$spellCheckLang) {
-
             // Log event
             $worker->getLogger()->error('E1413', 'SpellCheck can not work when target language is not supported by LanguageTool.', ['task' => $task]);
-
-            // Prevent worker from being initialized/queued
-            return false;
+            return;
         }
 
         // Add to queue

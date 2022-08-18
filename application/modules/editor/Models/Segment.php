@@ -1983,6 +1983,25 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         return false;
     }
 
+    /**
+     * Retrieves, if the current (= editable in case of source-editing) source is empty
+     * @return bool
+     */
+    public function hasEmptySource() : bool {
+        $sourceField = $this->segmentFieldManager->getByName(editor_Models_SegmentField::TYPE_SOURCE);
+        if($sourceField->editable){
+            return (mb_strlen($this->getFieldEdited(editor_Models_SegmentField::TYPE_SOURCE)) === 0);
+        }
+        return (mb_strlen($this->getFieldOriginal(editor_Models_SegmentField::TYPE_SOURCE)) === 0);
+    }
+
+    /**
+     * retrieves, if the current/edited first target is empty
+     * @return bool
+     */
+    public function hasEmptyTarget() : bool {
+        return (mb_strlen($this->getTargetEdit()) === 0);
+    }
 
     /***
      * Set the default values for the required search parameters when no value is provided
