@@ -181,8 +181,15 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         if(this.getHelpLink() != null){
             this.down('button#help').show();
         }
-        var top = Math.floor((window.innerHeight - this.getHeight()) / 2);
-        this.setY((top < 10) ? 10 : top);
+        var height = this.getHeight(),
+            vpHeight = document.documentElement.clientHeight,
+            top = Math.max(10, Math.floor((vpHeight - height) / 2));
+        this.setY(top);
+        // if window is too large, we reduce the height and force inner scrollbars
+        // NOTE: we respect the minHeight as tabbed UIs otherwise have hidden tabs then
+        if(vpHeight < (top + height) && height > this.minHeight){
+            this.setHeight(Math.max((vpHeight - top - 10), this.minHeight));
+        }
     },
     /**
      * Can be overwritten to add additional validations
