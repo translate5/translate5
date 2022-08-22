@@ -17,6 +17,31 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.8] - 2022-08-18
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2380](https://jira.translate5.net/browse/TRANSLATE-2380): VisualReview / VisualTranslation - Visual: Also connect segments, that contain variables with the layout** <br>
+Visual: Segmentation of PDF/HTML based reviews now finds segments containing variables in the layout
+FIX: The Segmentation result is now calculated for all visual files together
+FIX: Alike Segments may have been not updated in the layout when changing the master
+
+
+### Bugfixes
+**[TRANSLATE-3025](https://jira.translate5.net/browse/TRANSLATE-3025): OpenTM2 integration - OpenTM2 returns sometimes empty source language** <br>
+On TMX export from OpenTM2 the source xml:lang attribute of a segment was sometimes empty. This is fixed now for a proper migration to t5memory.
+
+**[TRANSLATE-3024](https://jira.translate5.net/browse/TRANSLATE-3024): LanguageResources - Solve Problems with Empty Sources and TMs** <br>
+FIX: Empty sources in segments lead to errors when saving them to Translation Memories
+
+**[TRANSLATE-2916](https://jira.translate5.net/browse/TRANSLATE-2916): VisualReview / VisualTranslation - Repetitions in the segment grid are not linked to the visual** <br>
+NOTHING TO MENTION, issue resolved with TRANSLATE-2380
+
+
 ## [5.7.7] - 2022-08-09
 
 ### Important Notes:
