@@ -954,3 +954,7 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 #bconfFprmEditor textarea.mono { background-color: rgba(160, 160, 160, 0.35); }
 #bconfFprmEditor .x-form-form-item.x-form-item-no-label::before { content:''; display:none; }
 .t5leveledList .t5level1 { font-style: italic; opacity:0.85; }
+
+.t5alikeGrid .x-grid-header-ct .t5source-match > div {background:url("../images/sourceLanguage.png") no-repeat 10px 9px;}
+.t5alikeGrid .x-grid-header-ct .t5target-match > div {background:url("../images/targetLanguage.png") no-repeat 10px 9px;}
+.t5alikeGrid .x-grid-header-ct .t5auto-state > div {background: url("../images/autoStateFlags-0.png?v=2") no-repeat 10px center;}

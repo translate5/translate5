@@ -134,9 +134,16 @@
 <trans-unit id='S2VpbiBTdWJzZWdtZW50IGF1c2dld8OkaGx0Lg=='><source>Kein Subsegment ausgewählt.</source><target>Kein Subsegment ausgewählt.</target></trans-unit>
 <trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgaW0gRWRpdG9yIGVpbiBTdWJzZWdtZW50IGF1cyE='><source>Bitte wählen Sie im Editor ein Subsegment aus!</source><target>Bitte wählen Sie im Editor ein Subsegment aus!</target></trans-unit>
 <trans-unit id='VmVyaGFsdGVuIGRlcyBXaWVkZXJob2x1bmdzZWRpdG9y'><source>Verhalten des Wiederholungseditor</source><target>Verhalten des Wiederholungseditor</target></trans-unit>
-<trans-unit id='SW1tZXIgYXV0b21hdGlzY2ggZXJzZXR6ZW4gdW5kIFN0YXR1cyBzZXR6ZW4='><source>Immer automatisch ersetzen und Status setzen</source><target>Immer automatisch ersetzen und Status setzen</target></trans-unit>
+<trans-unit id='SW1tZXIgYXV0b21hdGlzY2ggZXJzZXR6ZW4gdW5kIFN0YXR1cyBzZXR6ZW4sIHdlbm4='><source>Immer automatisch ersetzen und Status setzen, wenn</source><target>Immer automatisch ersetzen und Status setzen, wenn</target></trans-unit>
 <trans-unit id='QmVpIGplZGVyIFdpZWRlcmhvbHVuZyBlaW56ZWxuIGVudHNjaGVpZGVu'><source>Bei jeder Wiederholung einzeln entscheiden</source><target>Bei jeder Wiederholung einzeln entscheiden</target></trans-unit>
 <trans-unit id='TmllIGF1dG9tYXRpc2NoIGVyc2V0emVuIHVuZCBTdGF0dXMgc2V0emVu'><source>Nie automatisch ersetzen und Status setzen</source><target>Nie automatisch ersetzen und Status setzen</target></trans-unit>
+
+<trans-unit id='UXVlbGxlIHdpZWRlcmhvbHQgd2lyZA=='><source>Quelle wiederholt wird</source><target>Quelle wiederholt wird</target></trans-unit>
+<trans-unit id='WmllbCB3aWVkZXJob2x0IHdpcmQ='><source>Ziel wiederholt wird</source><target>Ziel wiederholt wird</target></trans-unit>
+<trans-unit id='UXVlbGxlIFVORCBaaWVsIHdpZWRlcmhvbHQgd2VyZGVu'><source>Quelle UND Ziel wiederholt werden</source><target>Quelle UND Ziel wiederholt werden</target></trans-unit>
+<trans-unit id='UXVlbGxlIE9ERVIgWmllbCB3aWVkZXJob2x0IHdlcmRlbg=='><source>Quelle ODER Ziel wiederholt werden</source><target>Quelle ODER Ziel wiederholt werden</target></trans-unit>
+<trans-unit id='TnVyIGdsZWljaGVyIEtvbnRleHQ='><source>Nur gleicher Kontext</source><target>Nur gleicher Kontext</target></trans-unit>
+
 <trans-unit id='QWJicmVjaGVu'><source>Abbrechen</source><target>Abbrechen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJu'><source>Speichern</source><target>Speichern</target></trans-unit>
 <trans-unit id='U2VnbWVudC1NZXRhZGF0ZW4='><source>Segment-Metadaten</source><target>Segment-Metadaten</target></trans-unit>

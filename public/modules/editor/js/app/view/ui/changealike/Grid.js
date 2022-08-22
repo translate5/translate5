@@ -75,8 +75,15 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           width: 50
         },
         {
+          xtype: 'autoStateColumn',
+          userCls: 't5auto-state',
+          width: 36,
+          text: ''
+        },
+        {
           xtype: 'gridcolumn',
           dataIndex: 'source',
+          flex: 1,
           filter: {
               type: 'string'
           },
@@ -91,9 +98,20 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           text: me.item_sourceColumn
         },
         {
+          xtype: 'booleancolumn',
+          dataIndex: 'sourceMatch',
+          userCls: 't5source-match',
+          filter: {
+            type: 'boolean'
+          },
+          width: 49,
+          tooltip: me.item_sourceMatchColumn
+        },
+        {
           xtype: 'gridcolumn',
           dataIndex: 'target',
           isAlikeTarget: true,
+          flex: 1,
           filter: {
               type: 'string'
           },
@@ -109,30 +127,23 @@ Ext.define('Editor.view.ui.changealike.Grid', {
         },
         {
           xtype: 'booleancolumn',
+          dataIndex: 'targetMatch',
+          userCls: 't5target-match',
+          filter: {
+            type: 'boolean'
+          },
+          width: 49,
+          tooltip: me.item_targetMatchColumn
+        },
+        {
+          xtype: 'booleancolumn',
           dataIndex: 'infilter',
           filter: {
               type: 'boolean'
           },
-          width: 180,
-          text: me.item_filterColumn
-        },
-        {
-          xtype: 'booleancolumn',
-          dataIndex: 'sourceMatch',
-          filter: {
-              type: 'boolean'
-          },
-          width: 90, 
-          text: me.item_sourceMatchColumn
-        },
-        {
-          xtype: 'booleancolumn',
-          dataIndex: 'targetMatch',
-          filter: {
-              type: 'boolean'
-          },
-          width: 80, 
-          text: me.item_targetMatchColumn
+          width: 41,
+          tooltip: me.item_filterColumn,
+          text: '<div class="x-fa fa-filter" style="width: 100%; text-align: center; font-size: 18px; color: #919191;"></div>'
         },
         {
           xtype: 'booleancolumn',
@@ -140,52 +151,39 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           filter: {
               type: 'boolean'
           },
-          width: 80,
+          width: 41,
           text: me.item_sameContextColumn
-        },{
-        	xtype:'matchrateColumn'
-        },{
-        	xtype:'autoStateColumn'
+        }, {
+        	xtype:'matchrateColumn',
+            width: 43
         }
       ],
-      viewConfig: {
-        //loadMask: false
-      },
+      userCls: 't5alikeGrid',
       selModel: Ext.create('Ext.selection.CheckboxModel', {
-        injectCheckbox: 3
+        injectCheckbox: 0
       }),
       plugins: [{
         ptype: 'rowwidget',
         widget: {
           xtype: 'grid',
-          //maxWidth: me.up('window').getWidth() - 100,
-          //autoLoad: true,
+          header: false,
+          hideHeaders: true,
+          bodyStyle: 'border-top-width: 1px;',
           bind: {
             store: '{record.context}',
-            title: 'Context for segment No. {record.segmentNrInTask}'
+            title: me.item_contextGrid_header
           },
           columns: [{
-            text: me.item_segmentNrInTaskColumn,
-            dataIndex: 'segmentNrInTask',
-            width: 50
-          }, {
-            text: 'Type',
             dataIndex: 'type',
-            width: 50
+            width: 99
           }, {
-            text: 'File',
-            dataIndex: 'fileId',
-            width: 50
-          }, {
-            text: me.item_targetColumn,
             dataIndex: 'target',
-            isContextTarget: true,
             tdCls: 'segment-tag-column',
-            listeners: {
-              beforerender: function(c) {
-                c.width = c.up('changealikeGrid').down('[isAlikeTarget]').getWidth() + 163;
-              }
-            }
+            flex: 1
+          }, {
+            dataIndex: 'source',
+            tdCls: 'segment-tag-column',
+            flex: 1
           }]
         }
       }],

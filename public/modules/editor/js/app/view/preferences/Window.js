@@ -40,7 +40,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.preferences.Window', {
     extend: 'Ext.window.Window',
 
-    height: 414,
+    height: 440,
     itemId: 'preferencesWindow',
     width: 460,
     resizable: false, //needed for boxLabel width
@@ -49,9 +49,14 @@ Ext.define('Editor.view.preferences.Window', {
     
     //Item Strings:
     item_radiogroup_fieldLabel: 'Verhalten des Wiederholungseditor',
-    item_alikeBehaviour_always_boxLabel: 'Immer automatisch ersetzen und Status setzen',
+    item_alikeBehaviour_always_boxLabel: 'Immer automatisch ersetzen und Status setzen, wenn',
     item_alikeBehaviour_individual_boxLabel: 'Bei jeder Wiederholung einzeln entscheiden',
     item_alikeBehaviour_never_boxLabel: 'Nie automatisch ersetzen und Status setzen',
+    item_repetitionType_source_boxLabel: 'Quelle wiederholt wird',
+    item_repetitionType_target_boxLabel: 'Ziel wiederholt wird',
+    item_repetitionType_bothAnd_boxLabel: 'Quelle UND Ziel wiederholt werden',
+    item_repetitionType_bothOr_boxLabel: 'Quelle ODER Ziel wiederholt werden',
+    item_sameContextOnly_boxLabel: 'Nur gleicher Kontext',
     item_cancelBtn: 'Abbrechen',
     item_saveBtn: 'Speichern',
     item_show_on_empty_target:'Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist',
@@ -84,31 +89,39 @@ Ext.define('Editor.view.preferences.Window', {
                   {
                     xtype: 'radiofield',
                     name: 'repetitionType',
-                    width: 426, //needed for long labels to wrap
+                    width: 426,
                     margin: '0 0 0 30',
-                    boxLabel: 'Source repetitions',
+                    boxLabel: this.item_repetitionType_source_boxLabel,
                     inputValue: 'source'
                   },
                   {
                     xtype: 'radiofield',
                     name: 'repetitionType',
-                    width: 426, //needed for long labels to wrap
+                    width: 426,
                     margin: '0 0 0 30',
-                    boxLabel: 'Target repetitions',
+                    boxLabel: this.item_repetitionType_target_boxLabel,
                     inputValue: 'target'
                   },
                   {
                     xtype: 'radiofield',
                     name: 'repetitionType',
-                    width: 426, //needed for long labels to wrap
+                    width: 426,
                     margin: '0 0 0 30',
-                    boxLabel: 'Both types',
-                    inputValue: 'both'
+                    boxLabel: this.item_repetitionType_bothAnd_boxLabel,
+                    inputValue: 'bothAnd'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'repetitionType',
+                    width: 426,
+                    margin: '0 0 0 30',
+                    boxLabel: this.item_repetitionType_bothOr_boxLabel,
+                    inputValue: 'bothOr'
                   }, {
                     xtype: 'checkbox',
                     name: 'sameContextOnly',
                     margin: '0 0 0 30',
-                    boxLabel: 'Same context only',
+                    boxLabel: this.item_sameContextOnly_boxLabel,
                   },
                   {
                     xtype: 'radiofield',

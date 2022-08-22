@@ -120,9 +120,6 @@ Ext.define('Editor.controller.ChangeAlike', {
           },
           '#segmentgrid': {
               afterrender: 'initEditPluginHandler'
-          },
-          '[isAlikeTarget]': {
-              resize: 'onAlikeTargetColumnResize'
           }
       },
       controller: {
@@ -437,9 +434,10 @@ Ext.define('Editor.controller.ChangeAlike', {
           return me.getAllAlikeIds(function(rec) {
 
               // Check whether current alike-segment conforms repetitionType-clause
-                   if (repetitionType == 'both'  ) byRepetitionType = true;
-              else if (repetitionType == 'source') byRepetitionType = rec.get('sourceMatch');
-              else if (repetitionType == 'target') byRepetitionType = rec.get('targetMatch');
+                   if (repetitionType == 'bothOr' ) byRepetitionType = true;
+              else if (repetitionType == 'bothAnd') byRepetitionType = rec.get('sourceMatch') && rec.get('targetMatch');
+              else if (repetitionType == 'source' ) byRepetitionType = rec.get('sourceMatch');
+              else if (repetitionType == 'target' ) byRepetitionType = rec.get('targetMatch');
 
               // Check whether current alike-segment conforms sameContextOnly-clause
               bySameContextOnly = sameContextOnly ? rec.get('contextMatch') : true;
@@ -612,10 +610,5 @@ Ext.define('Editor.controller.ChangeAlike', {
   }, 
   isManualProcessing: function() {
     return (Editor.app.getUserConfig('alike.defaultBehaviour') == 'individual');
-  },
-    onAlikeTargetColumnResize: function(c, width) {
-        c.up('grid').query('[isContextTarget]').forEach(function(col){
-            col.setWidth(width + 163);
-        });
-    }
+  }
 });

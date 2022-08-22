@@ -1710,7 +1710,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
         // Fetch context data
         return $this->contextData = $this->db->getAdapter()->query('
-            SELECT `segmentNrInTask`, `segmentNrInTask`, `id`, `fileId`, `targetMd5`, `target` 
+            SELECT `segmentNrInTask`, `id`, `fileId`, `sourceMd5`, `source`, `target` 
             FROM `' . $segmentsViewName . '`
             WHERE `segmentNrInTask` IN (' . join(',', $nrA) . ') 
         ')->fetchAll(PDO::FETCH_UNIQUE);
@@ -1730,18 +1730,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $next = $this->contextData[$nr + 1];
 
         // Get hashes
-        $prevMd5 = $prev && $prev['fileId'] == $self['fileId'] ? $prev['targetMd5'] : '';
-        $nextMd5 = $next && $next['fileId'] == $self['fileId'] ? $next['targetMd5'] : '';
-        $selfMd5 = $self['targetMd5'];
+        $prevMd5 = $prev && $prev['fileId'] == $self['fileId'] ? $prev['sourceMd5'] : '';
+        $nextMd5 = $next && $next['fileId'] == $self['fileId'] ? $next['sourceMd5'] : '';
+        $selfMd5 = $self['sourceMd5'];
 
         // Return contenxt hash and store
         return [
             'hash' => md5($prevMd5 . $selfMd5 . $nextMd5),
             'store' => [
-                'fields' => ['segmentNrInTask', 'target', 'type'],
+                'fields' => ['type', 'source', 'target'],
                 'data' => [
-                    ['segmentNrInTask' => $prev['segmentNrInTask'] ?? '', 'type' => 'Prev', 'target' => $prev['target'] ?? '', 'fileId' => $prev['fileId'] ?? ''],
-                    ['segmentNrInTask' => $next['segmentNrInTask'] ?? '', 'type' => 'Next', 'target' => $next['target'] ?? '', 'fileId' => $next['fileId'] ?? '']
+                    ['type' => 'Previous', 'source' => $prev['source'] ?? '', 'target' => $prev['target'] ?? ''],
+                    ['type' => 'Next',     'source' => $next['source'] ?? '', 'target' => $next['target'] ?? '']
                 ]
             ]
         ];

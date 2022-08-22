@@ -335,9 +335,16 @@ Ext.define('Editor.controller.Localizer', {
 	};
 
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
-    Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
+    Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen, wenn');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_individual_boxLabel = '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_never_boxLabel = '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>';
+
+    Editor.view.preferences.Window.prototype.item_repetitionType_source_boxLabel = '<?php echo $this->translate->_('Quelle wiederholt wird');?>';
+    Editor.view.preferences.Window.prototype.item_repetitionType_target_boxLabel = '<?php echo $this->translate->_('Ziel wiederholt wird');?>';
+    Editor.view.preferences.Window.prototype.item_repetitionType_bothAnd_boxLabel = '<?php echo $this->translate->_('Quelle UND Ziel wiederholt werden');?>';
+    Editor.view.preferences.Window.prototype.item_repetitionType_bothOr_boxLabel = '<?php echo $this->translate->_('Quelle ODER Ziel wiederholt werden');?>';
+    Editor.view.preferences.Window.prototype.item_sameContextOnly_boxLabel = '<?php echo $this->translate->_('Nur gleicher Kontext');?>';
+
     Editor.view.preferences.Window.prototype.item_show_on_empty_target = '<?php echo $this->translate->_('Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist');?>';
     Editor.view.preferences.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
