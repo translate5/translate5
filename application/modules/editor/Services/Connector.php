@@ -69,7 +69,7 @@ class editor_Services_Connector {
      * @var editor_Services_Connector_Abstract
      */
     protected $adapter;
-    
+
     /***
      *
      * @var editor_Models_LanguageResources_LanguageResource
@@ -93,7 +93,7 @@ class editor_Services_Connector {
      * @var boolean
      */
     protected $batchEnabled = false;
-    
+
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang = null, $targetLang = null){
         $this->connectToResourceOnly($languageResource->getResource());
         $this->adapter->connectTo($languageResource, $sourceLang, $targetLang);
@@ -346,26 +346,48 @@ class editor_Services_Connector {
     
     /***
      * Load the query results from batch query table
+     * @return void
      */
-    public function enableBatch() {
+    public function enableBatch(): void
+    {
         $this->batchEnabled = true;
     }
     
     /***
      * Load the results with calling the adapters query action
+     * @return void
      */
-    public function disableBatch() {
+    public function disableBatch(): void
+    {
         $this->batchEnabled = false;
     }
 
     /***
      * Is the current adapter of mt type
-     * @return boolean
+     * @return bool
      */
-    protected function isMtAdapter(){
+    protected function isMtAdapter(): bool
+    {
         if(!isset($this->adapter)){
             return false;
         }
         return $this->adapter->getLanguageResource()->isMt();
+    }
+
+    /***
+     * Set the adapters batch content field with the given value. This is required so the batch supported connectors can
+     * make difference if segment should be queried based on if there is segment value for the contentField.
+     * For segments where the contentField has value no resource is queried
+     * @param string $contentField
+     * @return void
+     */
+    public function setAdapterBatchContentField(string $contentField = editor_Models_SegmentField::TYPE_SOURCE): void
+    {
+        if(!isset($this->adapter) || $this->adapter->isBatchQuery() === false){
+            return;
+        }
+        // for batch query supported resources, set the content field to relais. For pre-translation based on the content field,
+        // we check if the field is empty. Pretranslation is posible only for empty content fields
+        $this->adapter->setContentField($contentField);
     }
 }

@@ -77,7 +77,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
     handleSearch: function(field, searchString){
         var searchFilterValue = searchString.trim();
         if(searchFilterValue){
-            this.setSearchFilter(searchFilterValue)
+            this.setSearchFilter(searchFilterValue);
         } else {
             this.removeSearchFilter();
         }
@@ -190,6 +190,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
      * Handles closing the Filter panel
      */
     handleClose: function(){
-        location.hash = location.hash.replace(/\/filters.*$/,'');
+        window.location.hash = window.location.hash.replace(/\/filters.*$/,'');
     }
 });

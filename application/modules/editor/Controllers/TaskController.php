@@ -569,7 +569,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         // check and set the default pivot language is configured
-        $this->setDefaultPivotOnTaskCreate();
+        $this->setDefaultPivotOnTaskCreate($c);
 
         // set the usageMode from config if not set
         $this->entity->setUsageMode($this->data['usageMode'] ?? $c->runtimeOptions->import->initialTaskUsageMode);
@@ -655,12 +655,16 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->entity->setTargetLang(reset($this->data['targetLang']));
         }
 
-        if(empty($this->data['relaisLang'])){
-            $this->data['relaisLang'] = 0;
-        } else {
-            $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+        // If the relaisLang is not set, do nothing. In that case, the language default is set later on in the import
+        if(isset($this->data['relaisLang'])){
+            if(empty($this->data['relaisLang'])){
+                $this->data['relaisLang'] = 0;
+            } else {
+                $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+            }
+            $this->entity->setRelaisLang($this->data['relaisLang']);
         }
-        $this->entity->setRelaisLang($this->data['relaisLang']);
+
 
         return $targetLangCount;
     }
@@ -2009,9 +2013,10 @@ class editor_TaskController extends ZfExtended_RestController {
      * Check and set the default pivot langauge based on customer specific config.
      * If the pivot field is not provided on task post and for the current task customer
      * there is configured defaultPivotLanguage, the configured pivot language will be set as task pivot
+     * @param Zend_Config $c
      * @return void
      */
-    protected function setDefaultPivotOnTaskCreate(): void
+    protected function setDefaultPivotOnTaskCreate(Zend_Config $c): void
     {
         // check if the relasiLang field is provided. If it is not provided, check and set default value from config.
         $pivotLang = $this->data['relaisLang'] ?? false;

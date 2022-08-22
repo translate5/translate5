@@ -175,7 +175,7 @@ class editor_Plugins_SpellCheck_Check {
 
             // Else log that detected error is of a kind previously unknown to translate5 app
             } else {
-                $segment->getTask()->logger('editor.task.autoqa')->error('E1418', 'LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app', [
+                $segment->getTask()->logger('editor.task.autoqa')->warn('E1418', 'LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app', [
                     'lang' => $spellCheckLang,
                     'text' => $target,
                     'match' => $match
