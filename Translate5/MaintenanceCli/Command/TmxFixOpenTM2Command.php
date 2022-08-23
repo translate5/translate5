@@ -50,9 +50,9 @@ class TmxFixOpenTM2Command extends Translate5AbstractCommand
     protected function configure()
     {
         $this
-        ->setDescription('Helper tool to convert TMX files according to TS-1040')
-        ->setHelp('Helper tool to convert TMX files according to TS-1040');
-        
+        ->setDescription('Helper tool to sanitize TMX files with invalid XML exported from OpenTM2 according to TRANSLATE-2835')
+        ->setHelp('Helper tool to sanitize TMX files with invalid XML exported from OpenTM2 according to TRANSLATE-2835');
+
         $this->addArgument('file', InputArgument::REQUIRED, 'The TMX file to be converted.');
 
         $this->addOption(
