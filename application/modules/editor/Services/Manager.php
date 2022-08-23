@@ -123,10 +123,6 @@ class editor_Services_Manager {
             'editor_Plugins_PangeaMt_Init' => (object) ['name' => '[PangeaMT]',
                                                      'serviceName' => 'PangeaMT',
                                                      'helppage' => urldecode('https://confluence.translate5.net/display/CON/PangeaMT')],
-            editor_Plugins_Translate24_Init::class => (object) ['name' => '[24Translate]',
-                                                     'serviceName' => '24Translate',
-                                                      // TODO real link
-                                                     'helppage' => urldecode('https://confluence.translate5.net/')],
         ];
         // The (plug-in-)services that the user is supposed to see are by default activated on installation.
         $config = Zend_Registry::get('config');
