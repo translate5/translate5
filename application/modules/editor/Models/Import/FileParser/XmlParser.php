@@ -125,46 +125,45 @@ class editor_Models_Import_FileParser_XmlParser {
         //          underscores (_), and periods (.)                                    => not explicitly checked
         //    Element names cannot contain spaces                                       => is implicitly checked on parsing the tag chunk below, since spaces are used as separator for the attributes.
 
-        // see also the regex in parseList!
-        if(empty($validTags)) {
-            $regex = '#(</?[a-zA-Z_][^>]*>)#i';
-        }
-        else {
-            $regex = '#(</?('.join('|', $validTags).')[^>]*>)#i';
-        }
-        $chunks = preg_split($regex, $xml, flags: PREG_SPLIT_DELIM_CAPTURE);
+        $chunks = preg_split($this->getTagRegex($validTags, false), $xml, flags: PREG_SPLIT_DELIM_CAPTURE);
         if(!empty($validTags)) {
-            //with validTags we have a 2nd pair of parentheses, we have to clean the captured content then:
+            //with validTags we have a 2nd and a 3pair pair of parentheses, we have to clean the captured content then:
 /*
  *             Array
                 (
                     [0] =>
                     [1] => <foo>
                     [2] => foo                  → to be removed
-                    [3] =>  & <test &amp;
-                    [4] => <ph type="lb"/>
-                    [5] => ph                   → to be removed
-                    [6] =>
-                    [7] => </foo>
-                    [8] => foo                  → to be removed
-                    [9] =>
+                    [3] => >                    → to be removed
+                    [4] =>  & <test &amp;
+                    [5] => <ph type="lb"/>
+                    [6] => ph                   → to be removed
+                    [7] =>  type="lb"/>         → to be removed
+                    [8] =>
+                    [9] => </foo>
+                    [10] => foo                 → to be removed
+                    [11] => >                   → to be removed
+                    [12] =>
                 )
 */
             $chunks = array_values(array_filter($chunks, function ($key){
-                //if key modulo 3 is 2, then this is the second regex parenthesis content and can be ignored!
-                return $key % 3 !== 2;
+                //if key modulo 4 is 2 or 3, then this is the second and third regex parenthesis content and can be ignored!
+                $mod4 = $key % 4;
+                return $mod4 !== 2 && $mod4 !== 3;
             },  ARRAY_FILTER_USE_KEY));
         }
-        $this->parseList($chunks, $preserveWhitespaceRoot);
+        $this->parseList($chunks, $preserveWhitespaceRoot, $validTags);
         return str_replace(array_keys($this->nonXmlBlocks), array_values($this->nonXmlBlocks), $this->__toString());
     }
-    
+
     /**
      * walks through the given XML chunk array and fires the registered callbacks for each found node
      * @param array $chunks
      * @param bool $preserveWhitespaceRoot see method parse
+     * @param array $validTags
+     * @throws ZfExtended_Exception
      */
-    public function parseList(array $chunks, $preserveWhitespaceRoot = false) {
+    public function parseList(array $chunks, $preserveWhitespaceRoot = false, array $validTags = []) {
         $this->xmlStack = [];
         $this->xmlChunks = $chunks;
         $this->preserveWhitespace = $preserveWhitespaceRoot;
@@ -172,11 +171,7 @@ class editor_Models_Import_FileParser_XmlParser {
         foreach($this->xmlChunks as $key => $chunk) {
             $this->currentOffset = $key;
             //ensure that chunk is a tag (see XML naming rules in parse() ):
-            if(!empty($chunk)
-                && $chunk[0] === '<'
-                && preg_match('#^</?[a-zA-Z_]#i', $chunk)
-                && mb_substr($chunk, -1) === '>'
-            ) {
+            if(!empty($chunk) && preg_match($this->getTagRegex($validTags, true), $chunk)) {
                 $isSingle = mb_substr($chunk, -2) === '/>';
                 $parts = explode(' ', trim($chunk,'</> '));
                 $tag = trim(reset($parts));
@@ -203,6 +198,25 @@ class editor_Models_Import_FileParser_XmlParser {
             }
             $this->handleOther($key, $chunk);
         }
+    }
+
+    /**
+     * returns the regex to determine if a string is a valid tag or not
+     * @param array $validTags
+     * @param bool $terminated
+     * @return string
+     */
+    protected function getTagRegex(array $validTags, bool $terminated): string {
+        if(empty($validTags)) {
+            $regex = '(</?[a-zA-Z_][^>]*>)';
+        }
+        else {
+            $regex = '(</?('.join('|', $validTags).')(/?>| [^>]*>))';
+        }
+        if($terminated) {
+            $regex = '^'.$regex.'$';
+        }
+        return '#'.$regex.'#i';
     }
     
     /**
