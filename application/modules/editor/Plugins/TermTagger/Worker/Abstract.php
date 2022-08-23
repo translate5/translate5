@@ -95,24 +95,24 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
         $this->skipDueToEqualLangs = ($this->task->getSourceLang() === $this->task->getTargetLang());
         return $return;
     }
-    /***
-     * Update the progres based on the tagged field in lek segments meta
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::updateProgress()
+
+    /**
+     * Calculates the progress based on the termtagState field in LEK_segments_meta
+     * @return float
      */
-    public function updateProgress(float $progress = 1){
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+    protected function calculateProgressDone() : float {
         /* @var $meta editor_Models_Segment_Meta */
-        $progress = $meta->getTermtaggerSegmentProgress($this->taskGuid);
-        parent::updateProgress($progress);
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        return $meta->getTermtaggerSegmentProgress($this->taskGuid);
     }
+
     /**
      *
      * @return ZfExtended_Logger
      */
     protected function getLogger() : ZfExtended_Logger {
         if($this->logger == null){
-            $this->logger = Zend_Registry::get('logger')->cloneMe($this->config->getLoggerDomain($this->processingMode));
+            $this->logger = Zend_Registry::get('logger')->cloneMe(editor_Plugins_TermTagger_Configuration::getLoggerDomain($this->processingMode));
         }
         return $this->logger;
     }
@@ -190,7 +190,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             ]);
             $this->getLogger()->exception($exception, [
                 'level' => ZfExtended_Logger::LEVEL_WARN,
-                'domain' => $this->config->getLoggerDomain($this->processingMode)
+                'domain' => editor_Plugins_TermTagger_Configuration::getLoggerDomain($this->processingMode)
             ]);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
@@ -212,7 +212,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
                 'task' => $this->task
             ]);
             $this->getLogger()->exception($exception, [
-                'domain' => $this->config->getLoggerDomain($this->processingMode)
+                'domain' => editor_Plugins_TermTagger_Configuration::getLoggerDomain($this->processingMode)
             ]);
             if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
                 //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
@@ -352,7 +352,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
                 'termTagData' => $processor->getCommunicationsService(),
             ]);
             $this->getLogger()->exception($exception, [
-                'domain' => $this->config->getLoggerDomain($this->processingMode)
+                'domain' => editor_Plugins_TermTagger_Configuration::getLoggerDomain($this->processingMode)
             ]);
             if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
                 //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data

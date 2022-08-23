@@ -111,6 +111,29 @@ class editor_Plugins_TermTagger_Configuration {
         $memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
         $memCache->save($offlineUrls, editor_Plugins_TermTagger_Configuration::DOWN_CACHE_KEY);
     }
+
+    /**
+     *
+     * @param string $processingType
+     * @return string
+     */
+    public static function getLoggerDomain(string $processingType) : string {
+        switch($processingType){
+
+            case editor_Segment_Processing::IMPORT:
+                return self::IMPORT_LOGGER_DOMAIN;
+
+            case editor_Segment_Processing::ANALYSIS:
+            case editor_Segment_Processing::RETAG:
+            case editor_Segment_Processing::TAGTERMS:
+                return self::ANALYSIS_LOGGER_DOMAIN;
+
+            case editor_Segment_Processing::EDIT:
+            default:
+                return self::EDITOR_LOGGER_DOMAIN;
+        }
+    }
+
     /**
      * @var editor_Models_Task
      */
@@ -143,27 +166,6 @@ class editor_Plugins_TermTagger_Configuration {
             return self::IMPORT_TIMEOUT_REQUEST;
         }
         return self::EDITOR_TIMEOUT_REQUEST;
-    }
-    /**
-     * 
-     * @param string $processingType
-     * @return string
-     */
-    public function getLoggerDomain(string  $processingType) : string {
-        switch($processingType){
-            
-            case editor_Segment_Processing::IMPORT:
-                return self::IMPORT_LOGGER_DOMAIN;
-                
-            case editor_Segment_Processing::ANALYSIS:
-            case editor_Segment_Processing::RETAG:
-            case editor_Segment_Processing::TAGTERMS:
-                return self::ANALYSIS_LOGGER_DOMAIN;
-                
-            case editor_Segment_Processing::EDIT:
-            default:
-                return self::EDITOR_LOGGER_DOMAIN;
-        }
     }
     /**
      * 
