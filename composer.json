@@ -102,8 +102,7 @@
 		"joshtronic/php-loremipsum": "^2.1",
 		"league/flysystem": "^3.0",
 		"league/flysystem-sftp": "^3.0",
-		"symfony/yaml": "^6.0",
-		"lcobucci/jwt": "^4.1"
+		"symfony/yaml": "^6.0"
     },
 	"extra" : {
 		"merge-plugin" : {
