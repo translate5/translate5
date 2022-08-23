@@ -89,10 +89,10 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
 
     /**
      * This method will be called for all Providers that have operation workers to finalize the operation
-     * @param string $processingMode
      * @param editor_Models_Task $task
+     * @param string $processingMode
      */
-    public function finalizeOperation(string $processingMode, editor_Models_Task $task){
+    public function finalizeOperation(editor_Models_Task $task, string $processingMode){
 
     }
     /**

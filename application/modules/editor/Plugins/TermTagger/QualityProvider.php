@@ -114,7 +114,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         $worker->queue($parentWorkerId);
     }
 
-    public function finalizeOperation(string $processingMode, editor_Models_Task $task){
+    public function finalizeOperation(editor_Models_Task $task, string $processingMode){
         $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $db editor_Models_Db_SegmentMeta */
         $sql = $db->select()

@@ -59,7 +59,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      */
     protected static $_processor = null;
 
-    public function finalizeOperation(string $processingMode, editor_Models_Task $task){
+    public function finalizeOperation(editor_Models_Task $task, string $processingMode){
         /* @var $db editor_Models_Db_SegmentMeta */
         $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         // Get quantities-by-spellcheckState

@@ -267,7 +267,7 @@ final class editor_Segment_Quality_Manager {
             foreach ($this->registry as $type => $provider) {
                 /* @var $provider editor_Segment_Quality_Provider */
                 if ($provider->hasOperationWorker($processingMode)) {
-                    $provider->finalizeOperation($processingMode, $task);
+                    $provider->finalizeOperation($task, $processingMode);
                 } else {
                     // Append qualities, that can be detected only after all segments are created
                     $provider->postProcessTask($task, $qualityConfig, $processingMode);
