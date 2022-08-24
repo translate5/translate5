@@ -136,7 +136,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         if(hasToSwap && me.columnToEdit){
             me.stopTimeTrack(me.columnToEdit);
         }
-        me.startTimeTrack(me.toEdit);
+        me.startTimeTrack();
         
         me.items.each(function(field){
             if(!me.columns.containsKey(field.id)) {
@@ -368,9 +368,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
     },
     /**
      * starts tracking the editing time for the given field
-     * @param {String} field
      */
-    startTimeTrack: function(field) {
+    startTimeTrack: function() {
         if(!this.timeTrackingData) {
             this.timeTrackingData = {};
         }
