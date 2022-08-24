@@ -158,11 +158,15 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
                 $worker->queue($this->workerModel->getParentId(), ZfExtended_Models_Worker::STATE_WAITING);
             }
         } else {
-            // TODO: The evaluation of the segments to process causes strain on the DB, this update also causes strain. What is worse?
+            /*
+            TODO:
+            The evaluation of the segments to process causes strain on the DB, so we could set all remaining to "done" here
+            Otherwise this update also causes strain and is prone to deadlocks
             $this->workerModel->refresh();
             if($this->workerModel->getState() == ZfExtended_Models_Worker::STATE_RUNNING){
                 $this->workerModel->setRemainingToDone();
             }
+            */
         }
     }
 
