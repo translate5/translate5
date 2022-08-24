@@ -73,7 +73,6 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         'LEK_languageresources_batchresults' => false,
         'LEK_match_analysis_taskassoc' => 'taskGuid',
         'LEK_okapi_bconf' => false,
-        'LEK_okapi_bconf_default_filter' => false,
         'LEK_okapi_bconf_filter' => false,
         'LEK_pixel_mapping' => false,
         'LEK_plugin_segmentstatistic_terms' => 'taskGuid',

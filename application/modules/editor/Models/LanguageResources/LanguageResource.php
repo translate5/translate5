@@ -145,7 +145,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
 
     /***
-     * Load all language resource by given name and service name
+     * Load language resource by given name and type associated with particular task
      *
      * @param string $type
      * @param string $name
