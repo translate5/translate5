@@ -4810,5 +4810,17 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Suchen und Ersetzen anzeigen (STRG + F, STRG + H)</source>
   <target>Show search and replace (CTRL + F, CTRL + H)</target>
 </trans-unit>
+<trans-unit id='QXR0cmlidXRlIGF1ZiBFaW50cmFnc2ViZW5l'>
+  <source>Attribute auf Eintragsebene</source>
+  <target>Entry attributes</target>
+</trans-unit>
+<trans-unit id='QXR0cmlidXRlIGF1ZiBTcHJhY2hlYmVuZQ=='>
+  <source>Attribute auf Sprachebene</source>
+  <target>Language-level attributes</target>
+</trans-unit>
+<trans-unit id='QXR0cmlidXRlIGF1ZiBCZW5lbm51bmdzZWJlbmU='>
+  <source>Attribute auf Benennungsebene</source>
+  <target>Term attributes</target>
+</trans-unit>
   </file>
 </xliff>

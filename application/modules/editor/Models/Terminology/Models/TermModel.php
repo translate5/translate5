@@ -1498,6 +1498,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->termTbxId]);
             }
 
+            $term->rtl = (bool)$term->rtl;
+
             $termGroups[$term->termEntryTbxId][] = $term;
         }
 
@@ -1505,10 +1507,12 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     }
 
     /***
-     * @return void
+     * Get all attributes for given term entries grouped by attribute type (language, entry and term)
+     * @param array $termEntries
+     * @return array
      */
-    public function getAttributesGroups(array $termEntries){
-
+    public function getAttributesGroups(array $termEntries): array
+    {
         $sql = $this->db->getAdapter()->select()
             ->from(['t1' =>'terms_attributes'], ['t1.*'])
             ->where('t1.termEntryId IN (?)', $termEntries);
@@ -1520,8 +1524,13 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $template['language'] = [];
         $template['term'] = [];
 
-        $entryGroup = [];
+        /** @var editor_Models_Terminology_Models_AttributeDataType $dataTypeLocale */
+        $dataTypeLocale = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
+        $locales = $dataTypeLocale->loadAllWithTranslations();
+
         foreach ($attributes as $attribute) {
+
+            $attribute['nameTranslated'] = $locales[$attribute['dataTypeId']] ?: $attribute['elementName'];
 
             if( empty($attribute['language'])){
                 $template['entry'][] = $attribute;
