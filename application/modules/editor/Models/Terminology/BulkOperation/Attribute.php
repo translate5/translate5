@@ -37,6 +37,12 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
      */
     protected $importObject;
 
+    /***
+     * Internal cache of the toBeProcessed attributes used for checking duplicates
+     * @var array
+     */
+    protected array $duplicateCheck = [];
+
     public function __construct() {
         $this->model = new editor_Models_Terminology_Models_AttributeModel();
         $this->importObject = new editor_Models_Terminology_TbxObjects_Attribute();
@@ -80,12 +86,37 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
      */
     private function checkForDuplicates(editor_Models_Terminology_TbxObjects_Abstract $importObject): bool
     {
+        if( !isset($this->duplicateCheck[$importObject->getCollectionKey()])){
+            $this->duplicateCheck[$importObject->getCollectionKey()] = true;
+            return false;
+        }
+
+        // duplicate exist -> find the original element and merge the values
         foreach ($this->toBeProcessed as $processed) {
             if($processed->getCollectionKey() === $importObject->getCollectionKey()){
                 $processed->value .= ', '.$importObject->value;
                 return true;
             }
         }
+
         return false;
+    }
+
+    /**
+     * frees the internal storage
+     */
+    public function freeMemory()
+    {
+        parent::freeMemory();
+        $this->duplicateCheck = [];
+    }
+
+    /***
+     * @return void
+     */
+    public function resetToBeProcessed()
+    {
+        parent::resetToBeProcessed();
+        $this->duplicateCheck = [];
     }
 }
