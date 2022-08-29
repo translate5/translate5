@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 /** @var editor_Models_Languages $langs */
 $langs = ZfExtended_Factory::get('editor_Models_Languages');
-$available = array_keys($langs->loadAllKeyCustom('rfc5646'));
+$available = array_keys($langs->loadAllKeyCustom('rfc5646',true));
 
 $locale = filter_var($_REQUEST['lang'], FILTER_SANITIZE_SPECIAL_CHARS);
 
