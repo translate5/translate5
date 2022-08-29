@@ -120,7 +120,11 @@ Ext.define('Editor.plugins.TermTagger.view.TermPortlet', {
                     termHtml += '<span data-qtip="' // tooltip start
                         +this.renderAttributes(term.id,term.termEntryId,term.language,parent)
                         +'" ' + // tooltip end
-                        'class="'+classes.join(' ')+'">' + termValue + '</span>' ;
+                        'class="'+classes.join(' ')+'">' + termValue +
+                        '</span>' ;
+
+                    // render the term collection color box at the end of the term
+                    termHtml += this.getTermCollectionColor(term.collectionColor);
 
                     // put the term in the correct group (source or target)
                     if(term.isSource){
@@ -249,6 +253,17 @@ Ext.define('Editor.plugins.TermTagger.view.TermPortlet', {
                 title = parent.termStatus[guiStatus] + ' (' + status + ')';
 
                 return '<img src="'+src+'" alt="'+title+'" title="'+title+'"/>';
+            },
+
+            /***
+             * Get collection color box html
+             * @param color
+             * @returns {string}
+             */
+            getTermCollectionColor: function (color){
+                return '<svg width="10px" height="10px" style="margin-left: 5px;"> '+
+                    '<rect width="10px" height="10px" style="fill:#' + color + ';"></rect>'+
+                '</svg>';
             }
         }),
 });

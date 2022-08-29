@@ -1501,6 +1501,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
 
         $termGroups = [];
 
+        /** @var editor_Models_TermCollection_TermCollection $collectionColors */
+        $collectionColors = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        $collectionColors = $collectionColors->loadAllKeyValue('id','color');
+
         foreach($terms as $term) {
             $term = (object) $term;
 
@@ -1516,6 +1520,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             }
 
             $term->rtl = (bool)$term->rtl;
+
+            $term->collectionColor = $collectionColors[$term->collectionId] ?? editor_Services_ServiceAbstract::DEFAULT_COLOR;
 
             $termGroups[$term->termEntryTbxId][] = $term;
         }
