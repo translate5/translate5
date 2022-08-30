@@ -1482,3 +1482,19 @@ Ext.define('Translate5.override.Ext.Array.from', {
     }
 });
 
+Ext.define('Translate5.override.Ext.grid.feature.RowBody', {
+    override: 'Ext.grid.feature.RowBody',
+    init: function() {
+        var me = this;
+
+        // If me.extraRowTpl is an array (e.g. is not an XTemplate so far)
+        if (Ext.isArray(me.extraRowTpl)) {
+
+            // Force using own instance of feature rather than the one stored in values.view.rowBodyFeature
+            me.extraRowTpl[6] = me.extraRowTpl[6].replace('values.view.rowBodyFeature', 'this.rowBody');
+        }
+
+        // Call parent
+        me.callParent(arguments);
+    }
+});

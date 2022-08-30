@@ -143,7 +143,7 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           },
           width: 41,
           tooltip: me.item_filterColumn,
-          text: '<div class="x-fa fa-filter" style="width: 100%; text-align: center; font-size: 18px; color: #919191;"></div>'
+          text: '<span class="fa fa-filter"></span>'
         },
         {
           xtype: 'booleancolumn',
@@ -152,41 +152,45 @@ Ext.define('Editor.view.ui.changealike.Grid', {
               type: 'boolean'
           },
           width: 41,
-          text: me.item_sameContextColumn
+          tooltip: me.item_sameContextColumn,
+          text: '<span class="fa fa-table-list"></span>',
         }, {
         	xtype:'matchrateColumn',
-            width: 43
+            width: 43,
+            text: '<span class="fa fa-percent"></span>',
+            tooltip: 'Matchrate'
         }
       ],
       userCls: 't5alikeGrid',
       selModel: Ext.create('Ext.selection.CheckboxModel', {
         injectCheckbox: 0
       }),
-      plugins: [{
-        ptype: 'rowwidget',
-        widget: {
-          xtype: 'grid',
-          header: false,
-          hideHeaders: true,
-          bodyStyle: 'border-top-width: 1px;',
-          bind: {
-            store: '{record.context}',
-            title: me.item_contextGrid_header
-          },
-          columns: [{
-            dataIndex: 'type',
-            width: 99
-          }, {
-            dataIndex: 'target',
-            tdCls: 'segment-tag-column',
-            flex: 1
-          }, {
-            dataIndex: 'source',
-            tdCls: 'segment-tag-column',
-            flex: 1
-          }]
+      features: [{
+        ftype: 'rowbody',
+        bodyBefore: true,
+        getAdditionalData: (data, idx, record) => {
+          return {
+            rowBody:
+                '<span class="x-grid-cell-inner">' + record.get('context').data[0].type + '</span>' +
+                '<span class="x-grid-cell-inner">' + record.get('context').data[0].source + '</span>' +
+                '<span class="x-grid-cell-inner"></span>' +
+                '<span class="x-grid-cell-inner">' + record.get('context').data[0].target + '</span>',
+            rowBodyCls: 'segment-tag-column'
+          }
         }
-      }],
+      }, {
+        ftype: 'rowbody',
+        getAdditionalData: (data, idx, record) => {
+          return {
+            rowBody:
+                '<span class="x-grid-cell-inner">' + record.get('context').data[1].type + '</span>' +
+                '<span class="x-grid-cell-inner">' + record.get('context').data[1].source + '</span>' +
+                '<span class="x-grid-cell-inner"></span>' +
+                '<span class="x-grid-cell-inner">' + record.get('context').data[1].target + '</span>',
+            rowBodyCls: 'segment-tag-column'
+          }
+        }
+      }]
     };
 
     if (instanceConfig) {
