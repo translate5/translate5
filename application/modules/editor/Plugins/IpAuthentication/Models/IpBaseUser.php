@@ -211,10 +211,6 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
     public function isIpBasedRequest(): bool{
         $ipConfig = $this->getConfiguredIps();
 
-        if (0 === count($ipConfig)) {
-            return false;
-        }
-
         foreach ($ipConfig as $ipRange) {
             if ($this->isIpInRange($this->ip, $ipRange)) {
                 return true;
