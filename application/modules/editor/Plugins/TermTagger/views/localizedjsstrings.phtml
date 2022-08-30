@@ -25,16 +25,15 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-/** @var editor_Models_Languages $langs */
-$langs = ZfExtended_Factory::get('editor_Models_Languages');
-$available = array_keys($langs->loadAllKeyCustom('rfc5646',true));
 
-$locale = filter_var($_REQUEST['lang'], FILTER_SANITIZE_SPECIAL_CHARS);
-
-if(!in_array($locale, $available, true)){
-    $locale = 'en';
-}
-
+/* @var $this Zend_View */
 ?>
 
-<iframe width="100%" height="100%" src="/documentation/Translate5 Guide <?php echo strtoupper($locale);?>.pdf" </iframe>
+
+Editor.data.l10n.TermTagger = {
+
+    termPortletFieldset:{
+        title: '<?php echo $this->translate->_('Terminologie');?>'
+    },
+
+};
