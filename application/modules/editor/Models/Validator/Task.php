@@ -36,7 +36,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('id', 'int');
     $this->addValidator('taskGuid', 'guid');
     $this->addValidator('taskNr', 'stringLength', array('min' => 0, 'max' => 120));
-    $this->addValidator('foreignId', 'stringLength', array('min' => 0, 'max' => 120));
+    $this->addValidator('foreignId', 'stringLength', array('min' => 0, 'max' => 1024));
     $this->addValidator('taskName', 'stringLength', array('min' => 0, 'max' => 255));
     $this->addValidator('foreignName', 'stringLength', array('min' => 0, 'max' => 255));
     $this->addValidator('sourceLang', 'int');
