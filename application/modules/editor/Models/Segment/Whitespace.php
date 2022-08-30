@@ -120,6 +120,12 @@ class editor_Models_Segment_Whitespace {
     private array $tagShortcutNumberMap = [];
 
     /**
+     * flag if tagShortcutNumbers should be collected on usage into $this->tagShortcutNumberMap
+     * @var bool
+     */
+    public bool $collectTagNumbers = false;
+
+    /**
      * protects all whitespace and special characters coming from the import formats
      * WARNING: should be called only on plain text fragments without tags!
      * @param string $textNode should not contain tags, since special characters in the tag content would also be protected then
@@ -303,12 +309,19 @@ class editor_Models_Segment_Whitespace {
     private function handleWhitespaceTags(string $wholeTag, string $tagName, string $length): editor_Models_Import_FileParser_Tag {
         $cls = ' '.$tagName;
 
-        //either we get a reusable shortcut number in the map, or we have to increment one
-        if(empty($this->tagShortcutNumberMap) || empty($this->tagShortcutNumberMap[$wholeTag])) {
-            $shortTagNumber = $this->currentShortTagNumber++;
+        //if collecting, we just collect and do not check the map
+        if($this->collectTagNumbers) {
+            $this->tagShortcutNumberMap[$wholeTag][] = $shortTagNumber = $this->currentShortTagNumber++;
         }
+        //tag numbers are not collected, we just look into the map
         else {
-            $shortTagNumber = array_shift($this->tagShortcutNumberMap[$wholeTag]);
+            //either we get a reusable shortcut number in the map, or we have to increment one
+            if(empty($this->tagShortcutNumberMap) || empty($this->tagShortcutNumberMap[$wholeTag])) {
+                $shortTagNumber = $this->currentShortTagNumber++;
+            }
+            else {
+                $shortTagNumber = array_shift($this->tagShortcutNumberMap[$wholeTag]);
+            }
         }
         $title = '&lt;'.$shortTagNumber.'/&gt;: ';
 
@@ -366,5 +379,13 @@ class editor_Models_Segment_Whitespace {
         //title: Only translatable with using ExtJS QTips in the frontend, as title attribute not possible
         $tagObj->renderTag($length, $title, $cls);
         return $tagObj;
+    }
+
+    /**
+     * resets the internal tag number map
+     */
+    public function resetTagNumberMap()
+    {
+        $this->tagShortcutNumberMap = [];
     }
 }
