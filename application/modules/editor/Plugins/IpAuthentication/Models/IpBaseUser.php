@@ -127,32 +127,34 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
             //reset to empty model
             $this->init([]);
         }
-
-        $configuredCustomerId = $this->resolveCustomerIdByIp($this->ip);
-
-        $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+        
+        $rop = $this->config->runtimeOptions;
+        
+        $customersMap = $rop->authentication->ipbased->IpCustomerMap->toArray();
+        
+        $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
+        /* @var $customer editor_Models_Customer_Customer */
         
         //is customer configured for the client ip
-        if($configuredCustomerId !== null){
+        if(isset($customersMap[$this->ip])){
             try {
-                $customer->loadByNumber($configuredCustomerId);
+                $customer->loadByNumber($customersMap[$this->ip]);
             } catch (Exception $e) {
                 $logger = Zend_Registry::get('logger')->cloneMe('authentication.ipbased');
-                $logger->warn('E1289',str_replace("{number}", $configuredCustomerId,"Ip based authentication: Customer with number ({number}) does't exist."), [
-                    'number' => $configuredCustomerId
+                $logger->warn('E1289',str_replace("{number}", $customersMap[$this->ip],"Ip based authentication: Customer with number ({number}) does't exist."), [
+                    'number' => $customersMap[$this->ip]
                 ]);
             }
         }
-
         //no customer configuration found for the client ip. Use the default customer
-        if($customer->getId() === null){
+        if($customer->getId() == null){
             $customer->loadByDefaultCustomer();
         }
         
         $this->setCustomers(','.$customer->getId().',');
         
         //load all roles wich the ip based user will have after login
-        $roles = $this->config->runtimeOptions->authentication->ipbased->userRoles->toArray();
+        $roles = $rop->authentication->ipbased->userRoles->toArray();
         
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
@@ -174,7 +176,6 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
         }
         
         $this->setRoles($allowedRoles);
-
         return $this;
     }
     
@@ -210,18 +211,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      */
     public function isIpBasedRequest(): bool{
         $ipConfig = $this->getConfiguredIps();
-
-        if (0 === count($ipConfig)) {
-            return false;
-        }
-
-        foreach ($ipConfig as $ipRange) {
-            if ($this->isIpInRange($this->ip, $ipRange)) {
-                return true;
-            }
-        }
-
-        return false;
+        return !empty($ipConfig) && in_array($this->ip, $ipConfig);
     }
     
     /***
@@ -238,50 +228,5 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      */
     public function getIp(): string{
         return $this->ip;
-    }
-
-    /**
-     * Resolve customer id based on particular ip if exists in configuration, otherwise return null
-     *
-     * @param string $ip - IP in dot notation
-     *
-     * @return int|null
-     */
-    private function resolveCustomerIdByIp(string $ip): ?int
-    {
-        $customersMap = $this->config->runtimeOptions->authentication->ipbased->IpCustomerMap->toArray();
-
-        foreach ($customersMap as $ipRange => $customerId) {
-            if ($this->isIpInRange($ip, $ipRange)) {
-                return $customerId;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Checks if particular ip address is within the provided range
-     *
-     * @param string $ipToCheck - ip address in dot notation to check against the particular range
-     * @param string $range - ip range in dot notation with subnet mask e.g. (192.168.0.1/32)
-     *
-     * @return bool
-     */
-    private function isIpInRange(string $ipToCheck, string $range): bool
-    {
-        [$subnet, $bits] = explode('/', $range);
-
-        // In case $range doesn't contain a subnet
-        if ($bits === null) {
-            $bits = 32;
-        }
-
-        $subnet = ip2long($subnet);
-        $mask = -1 << (32 - $bits);
-        $subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
-        $ip = ip2long($ipToCheck);
-
-        return ($ip & $mask) === $subnet;
     }
 }
