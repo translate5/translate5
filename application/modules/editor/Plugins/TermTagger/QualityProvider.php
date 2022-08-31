@@ -113,6 +113,22 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
 
         $worker->queue($parentWorkerId);
     }
+
+    public function finalizeOperation(editor_Models_Task $task, string $processingMode){
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+        /* @var $db editor_Models_Db_SegmentMeta */
+        $sql = $db->select()
+            ->from($db, ['termtagState', 'cnt' => 'count(id)'])
+            ->where('taskGuid = ?', $task->getTaskGuid());
+        $segmentCounts = $db->fetchAll($sql)->toArray();
+        $data = array_column($segmentCounts, 'cnt', 'termtagState');
+        $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: %s", $k, $v); }, $data, array_keys($data)));
+        $logger = Zend_Registry::get('logger')->cloneMe(editor_Plugins_TermTagger_Configuration::getLoggerDomain($processingMode));
+        $logger->info('E1364', 'TermTagger overall run done - {segmentCounts}', [
+            'task' => $task,
+            'segmentCounts' => $data,
+        ]);
+    }
     
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
 
