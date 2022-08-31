@@ -195,8 +195,8 @@ trait editor_Services_Connector_BatchTrait {
      * @param array $batchQuery
      */
     protected function handleBatchQuerys(array $batchQuery) {
-        $sourceLang = $this->languageResource->getSourceLangCode();
-        $targetLang = $this->languageResource->getTargetLangCode();
+        $sourceLang = $this->getSourceLanguageCode();
+        $targetLang = $this->getTargetLanguageCode();
         $this->resultList->resetResult();
         
         //we handle only our own exceptions, since the connector should only throw such

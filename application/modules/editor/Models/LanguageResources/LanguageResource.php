@@ -149,15 +149,17 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      *
      * @param string $type
      * @param string $name
+     * @param array $data
      * @param editor_Models_Task $task
      *
-     * @return self|null
+     * @return array
      */
-    public function loadOneByTypeAndNameForTask(
+    public function getByTypeNameAndSpecificDataForTask(
         string $type,
         string $name,
+        array $data,
         editor_Models_Task $task
-    ): ?self {
+    ): array {
         $s = $this->db
             ->select()
             ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
@@ -174,19 +176,13 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             )
             ->where('lr.serviceType = ?', $type)
             ->where('lr.name = ?', $name)
-            ->where('l.sourceLang = ?', $task->getSourceLang())
-            ->where('l.targetLang = ?', $task->getTargetLang())
             ->where('lca.customerId = ?', $task->getCustomerId());
 
-        $languageResources = $this->db->fetchAll($s)->toArray();
-        if (count($languageResources) === 0) {
-            return null;
+        foreach ($data as $key => $value) {
+            $s->where('JSON_EXTRACT(lr.specificData, "$.' . $key . '") = ?', $value);
         }
 
-        $result = new self();
-        $result->init(array_shift($languageResources));
-
-        return $result;
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /***
