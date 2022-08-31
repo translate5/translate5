@@ -50,7 +50,6 @@ Ext.define('Editor.view.segments.MetaPanel', {
     segmentStateId: -1, // caches the segment state to safely capture user originating radio changes. ExtJs suspendEvent && resumeEvent do not work for radios :-(
     layout: 'auto',
 
-    item_metaTerms_title: '#UT#Terminologie',
     item_metaStates_title: '#UT#Status',
     item_metaStates_tooltip: '#UT#Segment auf den ausgewählten Status setzen (ALT + S danach {0})',
     item_metaStates_tooltip_nokey: '#UT#Segment auf den ausgewählten Status setzen',
@@ -66,25 +65,6 @@ Ext.define('Editor.view.segments.MetaPanel', {
                 border: 0,
                 itemId: 'metaInfoForm',
                 items: [{
-                      xtype: 'fieldset',
-                      itemId: 'metaTerms',
-                      collapsible: true,
-                      title: me.item_metaTerms_title,
-                      anchor: '100%',
-                      items: [{
-                          autoScroll: true,
-                          xtype: 'panel',
-                          border: 0,
-                          minHeight: 60, //needed so that loader is fully shown on segments without terms
-                          itemId: 'metaTermPanel',
-                          cls: 'metaTermPanel',
-                          loader: {
-                              url: Editor.data.restpath+'segment/terms',
-                              loadMask: true,
-                              renderer: 'html'
-                          }
-                      }]
-                  },{
                       xtype: 'falsePositives',
                       itemId: 'falsePositives',
                       collapsible: true

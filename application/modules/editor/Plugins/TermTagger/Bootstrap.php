@@ -44,6 +44,13 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @var editor_Plugins_TermTagger_RecalcTransFound
      */
     private $markTransFound = null;
+
+    /**
+     * @var array
+     */
+    protected $frontendControllers = array(
+        'pluginTermTaggerMain' => 'Editor.plugins.TermTagger.controller.Main'
+    );
     
     public function init() {
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.terminology');
@@ -51,6 +58,10 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         if(!$this->assertConfig()) {
             return false;
         }
+
+        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
+
         // Adds our Quality Provider to the global Quality Manager
         editor_Segment_Quality_Manager::registerProvider('editor_Plugins_TermTagger_QualityProvider');
         
@@ -72,6 +83,27 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
 
         $this->eventManager->attach('editor_TaskController', 'tagtermsOperation', [$this, 'handleTagtermsOperation']);
+    }
+
+    /***
+     * @param Zend_EventManager_Event $event
+     * @return void
+     */
+    public function initJsTranslations(Zend_EventManager_Event $event): void
+    {
+        $view = $event->getParam('view');
+        $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
+    }
+
+    /***
+     * @param Zend_EventManager_Event $event
+     * @return void
+     */
+    public function injectFrontendConfig(Zend_EventManager_Event $event): void
+    {
+        $view = $event->getParam('view');
+        /* @var $view Zend_View_Interface */
+        $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
     }
 
     /**

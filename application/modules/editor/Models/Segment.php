@@ -590,6 +590,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         // <char ts="c2a0" length="1"/>
         $segmentContent = preg_replace('~<char ts="c2a0" length="1"/>~', "⎵", $segmentContent);
 
+        // <space ts="202020" length="3"/>
+        $segmentContent = preg_replace_callback('~<space ts=".*?" length="([0-9]+)"/>~', function($m) {
+            return str_repeat('·', $m[1]);
+        }, $segmentContent);
+
         return $segmentContent;
     }
 

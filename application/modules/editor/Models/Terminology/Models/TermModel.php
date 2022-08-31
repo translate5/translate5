@@ -664,18 +664,24 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
     }
 
     /***
-     * Load terms in given collection and languages. The returned data will be sorted by termEntryTbxId,language and id
+     *
+     * Load all terms for export and term tagging for given collections, languages and processStatusess
      * @param array $collectionIds
      * @param array $langs
-     * @return NULL|Zend_Db_Table_Rowset_Abstract
+     * @param array $processStatus
+     * @return Zend_Db_Table_Rowset_Abstract|null
      */
-    public function loadSortedByCollectionAndLanguages(array $collectionIds, $langs = []): ?Zend_Db_Table_Rowset_Abstract
+    public function loadSortedForExport(array $collectionIds,array $langs = [], array $processStatus = []): ?Zend_Db_Table_Rowset_Abstract
     {
         $s = $this->db->select()
             ->where('collectionId IN(?)', $collectionIds);
 
         if (!empty($langs)) {
             $s->where('languageId in (?)', $langs);
+        }
+
+        if( !empty($processStatus)){
+            $s->where('processStatus in (?)', $processStatus);
         }
 
         $s->order('termEntryTbxId ASC')
@@ -1107,7 +1113,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         if (empty($collections)) {
             return array();
         }
-        $result = $this->getSortedTermGroups($collections, $termIds, $task->getSourceLang(), $task->getTargetLang());
+        $result = $this->getSortedTermGroups($collections, $termIds, $task);
 
         if (empty($result)) {
             return array();
@@ -1318,7 +1324,9 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
         $langs = array_unique(array_merge(... $langs));
 
-        $data = $this->loadSortedByCollectionAndLanguages($collectionIds, $langs);
+        $statuses = $task->getConfig()->runtimeOptions->termTagger->usedTermProcessStatus->toArray() ?? [];
+
+        $data = $this->loadSortedForExport($collectionIds, $langs, $statuses);
         if (!$data) {
             //The associated collections don't contain terms in the languages of the task.
             // Should not be, should be checked already on assignment of collection to task.
@@ -1458,17 +1466,21 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
      *
      * @return array
      */
-    protected function getSortedTermGroups(array $collectionIds, array $termIds, $sourceLang, $targetLang): array
+    protected function getSortedTermGroups(array $collectionIds, array $termIds, editor_Models_Task $task): array
     {
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $lang editor_Models_Languages */
-        $sourceLanguages = $lang->getFuzzyLanguages($sourceLang, includeMajor: true);
-        $targetLanguages = $lang->getFuzzyLanguages($targetLang, includeMajor: true);
+        $sourceLanguages = $lang->getFuzzyLanguages($task->getSourceLang(), includeMajor: true);
+        $targetLanguages = $lang->getFuzzyLanguages($task->getTargetLang(), includeMajor: true);
         $allLanguages = array_unique(array_merge($sourceLanguages, $targetLanguages));
         $sourceIds = array_column($termIds['source'], 1);
         $targetIds = array_column($termIds['target'], 1);
         $transFoundSearch = array_column($termIds['source'], 0, 1) + array_column($termIds['target'], 0, 1);
         $allIds = array_merge($sourceIds, $targetIds);
+
+        // show only the terms with the config staus values
+        $statuses = $task->getConfig()->runtimeOptions->termTagger->usedTermProcessStatus->toArray() ?? [];
+
 
         $sql = $this->db->getAdapter()->select()
             ->from(['t1' =>'terms_term'], ['t2.*'])
@@ -1480,13 +1492,25 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             ->where('t1.languageId IN (?)', $allLanguages)
             ->where('t2.languageId IN (?)', $allLanguages);
 
+        if( !empty($statuses)){
+            $sql->where('t1.processStatus in (?)', $statuses);
+            $sql->where('t2.processStatus in (?)', $statuses);
+        }
+
         $terms = $this->db->getAdapter()->fetchAll($sql);
 
         $termGroups = [];
+
+        /** @var editor_Models_TermCollection_TermCollection $collectionColors */
+        $collectionColors = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        $collectionColors = $collectionColors->loadAllKeyValue('id','color');
+
         foreach($terms as $term) {
             $term = (object) $term;
 
-            settype($termGroups[$term->termEntryTbxId], 'array');
+            if( !isset($termGroups[$term->termEntryTbxId])){
+                $termGroups[$term->termEntryTbxId] = [];
+            }
 
             $term->used = in_array($term->termTbxId, $allIds);
             $term->isSource = in_array($term->languageId, $sourceLanguages);
@@ -1495,11 +1519,54 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
                 $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->termTbxId]);
             }
 
+            $term->rtl = (bool)$term->rtl;
+
+            $term->collectionColor = $collectionColors[$term->collectionId] ?? editor_Services_ServiceAbstract::DEFAULT_COLOR;
+
             $termGroups[$term->termEntryTbxId][] = $term;
         }
 
         return $termGroups;
     }
+
+    /***
+     * Get all attributes for given term entries grouped by attribute type (language, entry and term)
+     * @param array $termEntries
+     * @return array
+     */
+    public function getAttributesGroups(array $termEntries): array
+    {
+        $sql = $this->db->getAdapter()->select()
+            ->from(['t1' =>'terms_attributes'], ['t1.*'])
+            ->where('t1.termEntryId IN (?)', $termEntries);
+
+        $attributes = $this->db->getAdapter()->fetchAll($sql);
+
+        $template = [];
+        $template['entry'] = [];
+        $template['language'] = [];
+        $template['term'] = [];
+
+        /** @var editor_Models_Terminology_Models_AttributeDataType $dataTypeLocale */
+        $dataTypeLocale = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
+        $locales = $dataTypeLocale->loadAllWithTranslations();
+
+        foreach ($attributes as $attribute) {
+
+            $attribute['nameTranslated'] = $locales[$attribute['dataTypeId']] ?: $attribute['elementName'];
+
+            if( empty($attribute['language'])){
+                $template['entry'][] = $attribute;
+            }elseif ( empty($attribute['termId'])){
+                $template['language'][] = $attribute;
+            }else{
+                $template['term'][] = $attribute;
+            }
+        }
+
+        return $template;
+    }
+
     /***
      * Remove terms where the updated date is older than the given one.
      * TODO: Import performance bottleneck. Optimize this if possible!
