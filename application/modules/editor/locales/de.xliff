@@ -2190,6 +2190,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RHLDvGNrZW4gU2llIEYzLCB1bSBkYXMgbWFya2llcnRlIFdvcnQgYW4gZGllIEtvbmtvcmRhbnpzdWNoZSB6dSBzZW5kZW4u'><source>Drücken Sie F3, um das markierte Wort an die Konkordanzsuche zu senden.</source><target>Drücken Sie F3, um das markierte Wort an die Konkordanzsuche zu senden.</target></trans-unit>
 <trans-unit id='VW5kIEFMVCtGMyBmw7xyIGRpZSBTeW5vbnltc3VjaGUu'><source>Und ALT+F3 für die Synonymsuche.</source><target>Und ALT+F3 für die Synonymsuche.</target></trans-unit>
 <trans-unit id='U3VjaGVuIHVuZCBFcnNldHplbiBhbnplaWdlbiAoU1RSRyArIEYsIFNUUkcgKyBIKQ=='><source>Suchen und Ersetzen anzeigen (STRG + F, STRG + H)</source><target>Suchen und Ersetzen anzeigen (STRG + F, STRG + H)</target></trans-unit>
+<trans-unit id='QXR0cmlidXRlIGF1ZiBFaW50cmFnc2ViZW5l'><source>Attribute auf Eintragsebene</source><target>Attribute auf Eintragsebene</target></trans-unit>
+<trans-unit id='QXR0cmlidXRlIGF1ZiBTcHJhY2hlYmVuZQ=='><source>Attribute auf Sprachebene</source><target>Attribute auf Sprachebene</target></trans-unit>
+<trans-unit id='QXR0cmlidXRlIGF1ZiBCZW5lbm51bmdzZWJlbmU='><source>Attribute auf Benennungsebene</source><target>Attribute auf Benennungsebene</target></trans-unit>
   </body>
  </file>
 </xliff>

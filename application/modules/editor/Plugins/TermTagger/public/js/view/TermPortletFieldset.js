@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -25,16 +24,23 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-/** @var editor_Models_Languages $langs */
-$langs = ZfExtended_Factory::get('editor_Models_Languages');
-$available = array_keys($langs->loadAllKeyCustom('rfc5646',true));
 
-$locale = filter_var($_REQUEST['lang'], FILTER_SANITIZE_SPECIAL_CHARS);
+/**
+ * @class Editor.plugins.TermTagger.view.TermPortletFieldset
+ */
+Ext.define('Editor.plugins.TermTagger.view.TermPortletFieldset', {
+    extend: 'Ext.form.FieldSet',
+    alias: 'widget.termPortalTermPortletFieldset',
+    requires: ['Editor.plugins.TermTagger.view.TermPortlet'],
 
-if(!in_array($locale, $available, true)){
-    $locale = 'en';
-}
-
-?>
-
-<iframe width="100%" height="100%" src="/documentation/Translate5 Guide <?php echo strtoupper($locale);?>.pdf" </iframe>
+    itemId: 'metaTerms',
+    collapsible: true,
+    title: '#UT#Terminologie',
+    bind: {
+        title: '{l10n.TermTagger.termPortletFieldset.title}',
+    },
+    anchor: '100%',
+    items: [{
+        xtype: 'termPortalTermPortlet'
+    }]
+});
