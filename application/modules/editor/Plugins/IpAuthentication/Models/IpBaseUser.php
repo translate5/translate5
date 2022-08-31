@@ -199,8 +199,11 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      * Get the configured ip addresses in zf configuration
      * @return array
      */
-    public function getConfiguredIps(): array{
-        return $this->config->runtimeOptions?->authentication?->ipbased?->IpAddresses?->toArray() ?? [];
+    public function getConfiguredIps(): array
+    {
+        $map = $this->config->runtimeOptions?->authentication?->ipbased?->IpCustomerMap?->toArray() ?? [];
+
+        return array_keys($map);
     }
 
 
