@@ -70,7 +70,7 @@ class editor_Models_Import_FileParser_Tag {
     /**
      * @var string|null optional, the rid to match opening and closing tag, if given
      */
-    public ?string $rid;
+    public ?string $rid = null;
 
     /**
      * The short tag number used in the GUI

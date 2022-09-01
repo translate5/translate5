@@ -135,10 +135,12 @@ div.single + div {
 .hide-tag div span.full{display:none;}
 
 /* special characters are always showing the fulltag, the same is done for the img tags in HtmlEditor.js */
+.short-tag div.internal-tag.char span.short,
 .short-tag div.internal-tag.tab span.short,
 .short-tag div.internal-tag.space span.short,
 .short-tag div.internal-tag.newline span.short,
 .short-tag div.internal-tag.nbsp span.short {display:none;}
+.short-tag div.internal-tag.char span.full,
 .short-tag div.internal-tag.tab span.full,
 .short-tag div.internal-tag.space span.full,
 .short-tag div.internal-tag.newline span.full,
