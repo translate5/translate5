@@ -104,8 +104,9 @@ class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
         unset($data->qmSubsegmentFlags);
         $http->setRawData(json_encode($data, JSON_PRETTY_PRINT));
         $response = $http->request();
-        //we consider all non 200 status values as invalid and log that!
-        if($response->getStatus() !== 200) {
+        //we consider all non 200 and 204 status values as invalid and log that!
+        $validStats = [200, 204];
+        if(!in_array($response->getStatus(), $validStats, true)) {
             $task->logger('editor.task.import')->warn('E1378', 'The task import callback HTTP status code is {code} instead 200.', [
                 'code' => $response->getStatus(),
                 'result' => $response->getBody(),

@@ -70,6 +70,29 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
     }
 
     /***
+     * Load all data type attributes translated for the current user locale.
+     *
+     * @return array|false
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function loadAllWithTranslations(): bool|array
+    {
+
+        $locale = (new Zend_Session_Namespace('user'))->data->locale;
+        $labels = $this->db->getAdapter()->query('
+            SELECT `id`,`l10nSystem` FROM `terms_attributes_datatype`
+        ')->fetchAll(PDO::FETCH_KEY_PAIR);
+        foreach ($labels as $id => &$json){
+            if(!empty($json)){
+                $json = json_decode($json);
+                $json = $json->$locale;
+            }
+        }
+
+        return $labels;
+    }
+
+    /***
      * Return all labels with translated labelText
      * @return array
      */

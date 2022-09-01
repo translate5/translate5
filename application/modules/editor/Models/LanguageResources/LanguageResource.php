@@ -143,6 +143,47 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             ->where('LEK_languageresources.serviceName = ?',$serviceName);
         return $this->db->fetchAll($s)->toArray();
     }
+
+    /***
+     * Load language resource by given name and type associated with particular task
+     *
+     * @param string $type
+     * @param string $name
+     * @param array $data
+     * @param editor_Models_Task $task
+     *
+     * @return array
+     */
+    public function getByTypeNameAndSpecificDataForTask(
+        string $type,
+        string $name,
+        array $data,
+        editor_Models_Task $task
+    ): array {
+        $s = $this->db
+            ->select()
+            ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
+            ->setIntegrityCheck(false)
+            ->joinLeft(
+                ['l' => 'LEK_languageresources_languages'],
+                'lr.id = l.languageResourceId',
+                ['sourceLang','targetLang']
+            )
+            ->joinLeft(
+                ['lca' => 'LEK_languageresources_customerassoc'],
+                'lr.id = lca.languageResourceId',
+                ['customerId']
+            )
+            ->where('lr.serviceType = ?', $type)
+            ->where('lr.name = ?', $name)
+            ->where('lca.customerId = ?', $task->getCustomerId());
+
+        foreach ($data as $key => $value) {
+            $s->where('JSON_EXTRACT(lr.specificData, "$.' . $key . '") = ?', $value);
+        }
+
+        return $this->db->fetchAll($s)->toArray();
+    }
     
     /***
      * Get all available language resources for customers of loged user
