@@ -102,6 +102,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->filename = $filename;
 
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        $this->utilities->whitespace->collectTagNumbers = true;
+
         $this->shortTagNumbers = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ShortTagNumbers');
 
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
@@ -304,6 +306,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->result = [];
         $this->removeTags = false;
         $this->shortTagNumbers->init($source);
+
+        if($source) {
+            $this->utilities->whitespace->resetTagNumberMap();
+        }
+        //on source we collect the tag numbers, on target we use them:
+        $this->utilities->whitespace->collectTagNumbers = $source;
 
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content
         $this->preserveWhitespace = $preserveWhitespace;

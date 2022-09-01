@@ -115,7 +115,7 @@ Ext.define('Editor.view.ToolTip', {
         
 
         //Workaround to show the titles of the img tags always in fulltag mode
-        if(fly.hasCls('internal-tag') && (fly.hasCls('tab')||fly.hasCls('space')||fly.hasCls('newline')||fly.hasCls('nbsp'))) {
+        if(fly.hasCls('internal-tag') && (fly.hasCls('tab')||fly.hasCls('space')||fly.hasCls('newline')||fly.hasCls('nbsp')||fly.hasCls('char'))) {
             result = fly.down('span.short').getAttribute('title') + (result ? '<br>'+result : '');
         };
         tip.update(result);

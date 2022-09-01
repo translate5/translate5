@@ -26,8 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Segment_Whitespace as Whitespace;
+
 /**
- * 
+ *
  * Checks the consistency of translations: Segments with an identical target but different sources or with identical sources but different targets
  * This Check can only be done for all segments of a task at once
  *
@@ -147,9 +149,7 @@ class editor_Plugins_SpellCheck_Check {
         $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
 
         // Replace whitespace-placeholders with the actual characters they represent
-        // Note: first item in the second arg is not an ordinary space having code 32,
-        // but is a non-breaking space having code 160
-        $target = str_replace(['⎵', '↵', '→'], [" ", "\n", "\t"], $target);
+        $target = Whitespace::replaceLabelledCharacters($target);
 
         // Get LanguageTool response
         $data = $connector->getMatches($target, $spellCheckLang);
