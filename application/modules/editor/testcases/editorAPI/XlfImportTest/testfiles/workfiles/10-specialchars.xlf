@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" >
+  <file source-language="en-GB" target-language="de-DE">
+    <header>
+      <tool tool-id="translate5 test" tool-name="translate5" />
+    </header>
+    <body>
+        <!-- test the tagging of special chars -->
+        <trans-unit id="1" datatype="html">
+            <source>&#xE000;03:  08:  09: 	 0b:  0c:  c285:  c2a0:   e19a80:   e1a08e: ᠎ e28080:   e28081:   e28082:   e28083:   e28084:   e28085:   e28086:   e28087:   e28088:   e28089:   e2808a:   e2808b: ​ e280a8:
+                e280a9:   e280af:   e2819f:   e38080: 　 efbbbf: ﻿ </source>
+            <target>&#xE000;03:  08:  09: 	 0b:  0c:  c285:  c2a0:   e19a80:   e1a08e: ᠎ e28080:   e28081:   e28082:   e28083:   e28084:   e28085:   e28086:   e28087:   e28088:   e28089:   e2808a:   e2808b: ​ e280a8:
+                e280a9:   e280af:   e2819f:   e38080: 　 efbbbf: ﻿ </target>
+        </trans-unit>
+    </body>
+  </file>
+</xliff>
