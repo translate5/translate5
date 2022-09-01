@@ -480,4 +480,18 @@ abstract class editor_Services_Connector_Abstract {
     public function getTagHandler() : editor_Services_Connector_TagHandler_Abstract {
         return $this->tagHandler;
     }
+
+    protected function getSourceLanguageCode(): string
+    {
+        $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $langModel->load($this->sourceLang);
+        return $langModel->getRfc5646();
+    }
+
+    protected function getTargetLanguageCode(): string
+    {
+        $langModel = ZfExtended_Factory::get(editor_Models_Languages::class);
+        $langModel->load($this->targetLang);
+        return $langModel->getRfc5646();
+    }
 }
