@@ -28,8 +28,34 @@ END LICENSE AND COPYRIGHT
 
 /* @var $this Zend_View */
 
-// include the default mail data
-$this->render('defaultGeneral.phtml');
+//check if there is customer domain defined for the user
+//and use it as portal link in the mail
+//otherwise use the defined domain in the zf config as portal link
+$currentDomain=$_SERVER['HTTP_HOST'].APPLICATION_RUNDIR.'/';
+$user=ZfExtended_Factory::get('ZfExtended_Models_User');
+/* @var $user ZfExtended_Models_User */
+$costomerId=$user->isValidCustomerDomain($this->receiver->userGuid, $currentDomain);
+if(!$costomerId){
+    $currentDomain=$this->config->runtimeOptions->server->name.APPLICATION_RUNDIR;
+}
+$portal = $this->config->runtimeOptions->server->protocol.$currentDomain;
+
+$salutation=$this->translate->_('Sehr geehrte(r)');
+if($this->receiver->gender == 'f'){
+    $salutation=$this->translate->_('Sehr geehrte Frau');
+}else if($this->receiver->gender == 'm'){
+    $salutation=$this->translate->_('Sehr geehrter Herr');
+}
+
+//fill data with generally needed variables
+$data = [
+    'portalUrl' => $portal,
+    'portalLink' => '<a href="'.$portal.'">'.$portal.'</a>',
+    'companyName' => htmlspecialchars($this->config->runtimeOptions->companyName),
+    'appName' => $this->config->runtimeOptions->appName,
+    'salutation' => $salutation,
+    'surName' => $this->receiver->gender=='n' ? ($this->receiver->firstName.' '.$this->receiver->surName) : $this->receiver->surName,
+];
 
 $dateFormater=function($date){
     if(!isset($date) || empty($date)){
@@ -61,11 +87,14 @@ if(isset($this->previousUsers) && !empty($this->previousUsers)){
         
 }
 
+
+//prepare the htmlOnly disclaimer
+$this->htmlOnly = $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -');
+
 //prepare the default taskFragment if a task is provided
 if(!empty($this->pm)) {
-    $this->data['pm'] = $this->pm->getDataObject();
+    $data['pm'] = $this->pm->getDataObject();
 }
-
 if(!empty($this->project)) {
 
     // Build project focus url
@@ -77,10 +106,10 @@ if(!empty($this->project)) {
 
     // If the customer domain is set, use this domain as portal url and link
     if (empty($customer->getDomain())) {
-        $this->data['portalLink']='<a href="' . $this->data['portalUrl'] . $urlPart . '">' . $this->data['portalUrl'] . '</a>';
+        $data['portalLink']='<a href="' . $portal . $urlPart . '">' . $portal . '</a>';
     } else {
-        $this->data['portalUrl'] = $customer->getDomain();
-        $this->data['portalLink'] = '<a href="' . $this->data['portalUrl'] . $urlPart . '">' . $customer->getDomain() . '</a>';
+        $data['portalUrl'] = $customer->getDomain();
+        $data['portalLink'] = '<a href="' . $data['portalUrl'] . $urlPart . '">' . $customer->getDomain() . '</a>';
     }
 }
 if(!empty($this->task)) {
@@ -97,21 +126,35 @@ if(!empty($this->task)) {
     $customer->load($this->task->getCustomerId());
     //if the customer domain is set, use this domain as portal url and link
     if(empty($customer->getDomain())){
-        $this->data['portalLink']='<a href="'.$this->data['portalUrl'].$urlPart.'">'.$this->data['portalUrl'].'</a>';
+        $data['portalLink']='<a href="'.$portal.$urlPart.'">'.$portal.'</a>';
     }
     else {
-        $this->data['portalUrl']=$customer->getDomain();
-        $this->data['portalLink']='<a href="'.$customer->getDomain().$urlPart.'">'.$customer->getDomain().'</a>';
+        $data['portalUrl']=$customer->getDomain();
+        $data['portalLink']='<a href="'.$customer->getDomain().$urlPart.'">'.$customer->getDomain().'</a>';
     }
     
     //we have to pre-apply the relaisLang Fragment to inject the language itself
     $taskData['relaisLanguageFragment'] = $this->templateApply($taskData['relaisLanguageFragment'], $taskData);
     
-    $this->data['taskFragment'] = $this->templateApply('<b>Aufgabe:</b> {task.taskName}<br />
+    $data['taskFragment'] = $this->templateApply('<b>Aufgabe:</b> {task.taskName}<br />
     <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
     <b>Zielsprache:</b> {targetLanguageTranslated}<br />
     {relaisLanguageFragment}<b>Lieferdatum:</b> {deadlineDate}<br />
     <b>Wortanzahl:</b> {wordCount}<br />', $taskData);
 }
 
-$this->taskData = isset($taskData) ? $taskData : null;
+//prepare the header
+$this->header = $this->templateApply('{salutation} {surName},<br/>
+<br/>', $data);
+
+//prepare the footer
+$this->footer = $this->templateApply('<br/>
+<br/>Vielen Dank und viele Grüße,
+<br/>Ihr Projektmanagement Team
+<br/>{companyName}
+<br/>
+<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!', $data);
+
+//set the variables so they can be used when this template is rendered in other views
+$this->data=$data;
+$this->taskData=isset($taskData) ? $taskData : null;
