@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<martif noNamespaceSchemaLocation="TBXcsV02.xsd" type="TBX" TBX="en">
+  <martifHeader>
+    <fileDesc>
+      <sourceDesc>
+        <p>TBX recovered from Translate5 DB</p>
+      </sourceDesc>
+    </fileDesc>
+  </martifHeader>
+  <text>
+    <body>
+      <termEntry id="c1">
+        <langSet lang="en">
+          <tig id="tig_123456789">
+            <term id="123456789">scheduled operation</term>
+            <termNote type="normativeAuthorization">preferredTerm</termNote>
+          </tig>
+        </langSet>
+      </termEntry>
+    </body>
+  </text>
+</martif>

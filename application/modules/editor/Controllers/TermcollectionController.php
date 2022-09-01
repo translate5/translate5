@@ -84,7 +84,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
         $export = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
         /* @var $export editor_Models_Export_Terminology_Tbx */
 
-        $data = $term->loadSortedByCollectionAndLanguages([$this->data->collectionId]);
+        $data = $term->loadSortedForExport([$this->data->collectionId]);
         $export->setData($data);
         $exportData = $export->export((bool) $this->getParam('format', false));
 

@@ -37,9 +37,24 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
      */
     protected $importObject;
 
+    /***
+     * Internal cache of the toBeProcessed attributes used for checking duplicates
+     * @var array
+     */
+    protected array $duplicateCheck = [];
+
     public function __construct() {
         $this->model = new editor_Models_Terminology_Models_AttributeModel();
         $this->importObject = new editor_Models_Terminology_TbxObjects_Attribute();
+    }
+
+    public function add(editor_Models_Terminology_TbxObjects_Abstract $importObject) {
+
+        // check and merge if the imported object exist in the toBeProcessed array
+        if($this->checkForDuplicates($importObject)){
+            return;
+        }
+        $this->toBeProcessed[] = $importObject;
     }
 
     /**
@@ -61,5 +76,47 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
         $elementObject->termId = $elementObject->parentTerm->id ?? null;
         $elementObject->termTbxId = $elementObject->parentTerm->termTbxId ?? null;
         $elementObject->termGuid = $elementObject->parentTerm->guid ?? null;
+    }
+
+    /***
+     * Check if in the currently imported attribute buffer there is already the same attribute. If match is found,
+     * the 2 attributes will be merged into one with comma separated values
+     * @param editor_Models_Terminology_TbxObjects_Abstract $importObject
+     * @return bool
+     */
+    private function checkForDuplicates(editor_Models_Terminology_TbxObjects_Abstract $importObject): bool
+    {
+        if( !isset($this->duplicateCheck[$importObject->getCollectionKey()])){
+            $this->duplicateCheck[$importObject->getCollectionKey()] = true;
+            return false;
+        }
+
+        // duplicate exist -> find the original element and merge the values
+        foreach ($this->toBeProcessed as $processed) {
+            if($processed->getCollectionKey() === $importObject->getCollectionKey()){
+                $processed->value .= ', '.$importObject->value;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * frees the internal storage
+     */
+    public function freeMemory()
+    {
+        parent::freeMemory();
+        $this->duplicateCheck = [];
+    }
+
+    /***
+     * @return void
+     */
+    public function resetToBeProcessed()
+    {
+        parent::resetToBeProcessed();
+        $this->duplicateCheck = [];
     }
 }

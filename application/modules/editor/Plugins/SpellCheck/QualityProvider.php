@@ -59,6 +59,25 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      */
     protected static $_processor = null;
 
+    public function finalizeOperation(editor_Models_Task $task, string $processingMode){
+        /* @var $db editor_Models_Db_SegmentMeta */
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
+        // Get quantities-by-spellcheckState
+        $sql = $db->select()
+            ->from($db, ['spellcheckState', 'cnt' => 'count(id)'])
+            ->where('taskGuid = ?', $task->getTaskGuid());
+        $segmentCounts = $db->fetchAll($sql)->toArray();
+        $data = array_column($segmentCounts, 'cnt', 'spellcheckState');
+        // Convert to human-readable log format
+        $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: %s", $k, $v); }, $data, array_keys($data)));
+        // Log we're done
+        $logger = Zend_Registry::get('logger')->cloneMe(editor_Plugins_SpellCheck_Configuration::getLoggerDomain($processingMode));
+        $logger->info('E1419', 'SpellCheck overall run done - {segmentCounts}', [
+            'task' => $task,
+            'segmentCounts' => $data,
+        ]);
+    }
+
     /**
      * Method to check whether this quality is turned On
      *

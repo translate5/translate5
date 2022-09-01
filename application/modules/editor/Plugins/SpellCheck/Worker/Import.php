@@ -142,31 +142,6 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
     }
 
     /**
-     * The final worker will report the work we've done
-     */
-    protected function onRunQueuedFinalize() {
-
-        /* @var $db editor_Models_Db_SegmentMeta */
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
-
-        // Get quantities-by-spellcheckState
-        $sql = $db->select()
-            ->from($db, ['spellcheckState', 'cnt' => 'count(id)'])
-            ->where('taskGuid = ?', $this->task->getTaskGuid());
-        $segmentCounts = $db->fetchAll($sql)->toArray();
-        $data = array_column($segmentCounts, 'cnt', 'spellcheckState');
-
-        // Convert to human-readable log format
-        $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: %s", $k, $v); }, $data, array_keys($data)));
-
-        // Log we're done
-        $this->getLogger()->info('E1419', 'SpellCheck overall run done - {segmentCounts}', [
-            'task' => $this->task,
-            'segmentCounts' => $data,
-        ]);
-    }
-
-    /**
      * Get SpellCheck segment processor instance
      *
      * @return editor_Plugins_SpellCheck_SegmentProcessor|null
@@ -176,22 +151,13 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
     }
 
     /**
-     * Update the progres based on the checked field in lek segments meta
-     *
-     * @inheritdoc
-     * @see ZfExtended_Worker_Abstract::updateProgress()
-     * @param float $progress
+     * Calculates the progress based on the spellcheckState field in LEK_segments_meta
+     * @return float
      */
-    public function updateProgress(float $progress = 1) {
-
+    protected function calculateProgressDone() : float {
         /* @var $meta editor_Models_Segment_Meta */
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-
-        // Get progress
-        $progress = $meta->getSpellcheckSegmentProgress($this->taskGuid);
-
-        // Call parent
-        parent::updateProgress($progress);
+        return $meta->getSpellcheckSegmentProgress($this->taskGuid);
     }
 
     /**
@@ -200,9 +166,8 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
      * @return ZfExtended_Logger
      */
     public function getLogger() : ZfExtended_Logger {
-        return $this->logger ?? $this->logger = Zend_Registry
-                ::get('logger')->cloneMe(
-                    $this->config->getLoggerDomain($this->processingMode)
+        return $this->logger ?? $this->logger = Zend_Registry::get('logger')->cloneMe(
+                    editor_Plugins_SpellCheck_Configuration::getLoggerDomain($this->processingMode)
                 );
     }
 
@@ -335,7 +300,7 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
             // Do log
             $this->getLogger()->exception($exception, [
                 'level' => ZfExtended_Logger::LEVEL_WARN,
-                'domain' => $this->config->getLoggerDomain($this->processingMode) // processingType ?
+                'domain' => editor_Plugins_SpellCheck_Configuration::getLoggerDomain($this->processingMode) // processingType ?
             ]);
         }
 
@@ -365,7 +330,7 @@ class editor_Plugins_SpellCheck_Worker_Import extends editor_Segment_Quality_Seg
 
             // Do log
             $this->getLogger()->exception($exception, [
-                'domain' => $this->config->getLoggerDomain($this->processingMode)
+                'domain' => editor_Plugins_SpellCheck_Configuration::getLoggerDomain($this->processingMode)
             ]);
         }
         return true;

@@ -1,0 +1,69 @@
+<?xml version='1.0'?>
+<martif type="TBX-Basic" xml:lang="en-US">
+	<text>
+		<body>
+			<termEntry id="c1">
+				<descrip type="subjectField">manufacturing</descrip>
+				<descrip type="subjectField">production</descrip>
+				<descripGrp>
+					<descrip type="definition">This is a sample definition at the entry level.</descrip>
+					<admin type="source">Terminology SIG</admin>
+					<transacGrp>
+						<transac type="transactionType">origination</transac>
+						<transacNote type="responsibility" target="US5001">Jane</transacNote>
+						<date>2007-07-22</date>
+					</transacGrp>
+				</descripGrp>
+				<transacGrp>
+					<transac type="transactionType">origination</transac>
+					<transacNote type="responsibility" target="US5001">Jane</transacNote>
+					<date>2007-07-22</date>
+				</transacGrp>
+				<transacGrp>
+					<transac type="transactionType">modification</transac>
+					<transacNote type="responsibility" target="US5002">John</transacNote>
+					<date>2007-07-23</date>
+				</transacGrp>
+				<note>This is a sample entry with some data categories at the entry level. </note>
+				<ref type="crossReference" target="c2">unscheduled operation</ref>
+				<xref type="externalCrossReference" target="wikipedia.org">Wikipedia web site</xref>
+				<xref type="xGraphic" target="http://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg">Wikipedia logo</xref>
+				<langSet xml:lang="en">
+					<descrip type='langId'>1031</descrip>
+					<descrip type='langId'>1032</descrip>
+					<tig>
+						<term id="123456789">scheduled operation</term>
+						<termNote type="partOfSpeech">verb</termNote>
+						<termNote type="termType">fullForm</termNote>
+						<termNote type="grammaticalGender">masculine</termNote>
+						<termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+						<termNote type="geographicalUsage">Canada</termNote>
+						<termNote type="geographicalUsage">USA</termNote>
+						<termNote type="termLocation">menuItem</termNote>
+						<admin type="customerSubset">IBM</admin>
+						<admin type="source">IBM</admin>
+						<admin type="projectSubset">Tivoli Storage Manager</admin>
+					</tig>
+				</langSet>
+			</termEntry>
+		</body>
+		<back>
+
+			<!-- Simple example of personal information in the backmatter.  -->
+
+			<refObjectList type="respPerson">
+				<refObject id="US5001">
+					<item type="fn">Jane Doe</item>
+					<item type="email">jane_doe@mymail.com</item>
+					<item type="role">approver</item>
+				</refObject>
+				<refObject id="US5002">
+					<item type="fn">John Smith</item>
+					<item type="email">john_smith@mymail.com</item>
+					<item type="role">inputter</item>
+				</refObject>
+			</refObjectList>
+
+		</back>
+	</text>
+</martif>

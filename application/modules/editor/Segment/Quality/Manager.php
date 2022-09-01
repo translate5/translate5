@@ -263,11 +263,14 @@ final class editor_Segment_Quality_Manager {
             // save qualities
             editor_Models_Db_SegmentQuality::saveRows($qualities);
 
-            // Append qualities, that can be detected only after all segments are created
+            // post actions: poet-processing (needed for quality-workers that need to centextualize all segments) or finalization for qualities with operation workers
             foreach ($this->registry as $type => $provider) {
                 /* @var $provider editor_Segment_Quality_Provider */
-                if (!$provider->hasOperationWorker($processingMode)) {
-                    $tags = $provider->postProcessTask($task, $qualityConfig, $processingMode);
+                if ($provider->hasOperationWorker($processingMode)) {
+                    $provider->finalizeOperation($task, $processingMode);
+                } else {
+                    // Append qualities, that can be detected only after all segments are created
+                    $provider->postProcessTask($task, $qualityConfig, $processingMode);
                 }
             }
             $db->getAdapter()->commit();

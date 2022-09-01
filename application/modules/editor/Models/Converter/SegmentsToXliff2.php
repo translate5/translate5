@@ -170,6 +170,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 
             editor_Models_Segment_AutoStates::TRANSLATED=>self::XLIFF2_SEGMENT_STATE_TRANSLATED,
             editor_Models_Segment_AutoStates::TRANSLATED_AUTO=>self::XLIFF2_SEGMENT_STATE_TRANSLATED,
+            editor_Models_Segment_AutoStates::PRETRANSLATED=>self::XLIFF2_SEGMENT_STATE_TRANSLATED,
 
             editor_Models_Segment_AutoStates::REVIEWED_AUTO=>self::XLIFF2_SEGMENT_STATE_REVIEWED,
             editor_Models_Segment_AutoStates::REVIEWED_UNTOUCHED=>self::XLIFF2_SEGMENT_STATE_REVIEWED,

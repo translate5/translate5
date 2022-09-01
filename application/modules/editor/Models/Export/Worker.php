@@ -42,7 +42,7 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
      * Disable the update progress trigger on export
      * @param float $progress
      */
-    protected function triggerUpdateProgressEvent(float $progress) {
+    protected function onProgressUpdated(float $progress) {
         //do nothing on export
         //DANGER: currently we inherit from ZfExtended_Worker_Abstract, all fine then.
         //But if inheritence is changed so that we might inherit from editor_Models_Task_AbstractWorker in the future,
