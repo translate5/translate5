@@ -1022,6 +1022,16 @@ class editor_Utils {
     }
 
     /**
+     * Formats a duration
+     * @param int $startTime: expected in seconds
+     * @param int $endTime: expected in seconds
+     * @return string
+     */
+    public static function formatDuration(int $startTime, int $endTime) : string {
+        return floor(($endTime - $startTime) / 60).' min '.(($endTime - $startTime) % 60).' sec';
+    }
+
+    /**
      * Removes an item from the array and returns its value.
      * @param array $arr The input array
      * @param string|int $key The key pointing to the desired value
