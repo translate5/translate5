@@ -87,7 +87,7 @@
 		"wikimedia/composer-merge-plugin" : "~2.0",
 		"comcast/php-legal-licenses" : "~1.1",
 		"gportela85/datetimefield" : "^1.9",
-		"fortawesome/font-awesome" : "^5.13",
+		"fortawesome/font-awesome" : "^6.2",
 		"phpoffice/phpspreadsheet" : "~1.12",
 		"querypath/querypath" : "dev-master",
 		"google/cloud-translate" : "~1.7",
