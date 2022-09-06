@@ -43,6 +43,11 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     protected $termModel;
 
     /**
+     * @var editor_Plugins_TermTagger_TermCache
+     */
+    protected $termCache;
+
+    /**
      * @var array
      */
     protected $sourceFuzzyLanguages;
@@ -66,10 +71,18 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     public function __construct(editor_Models_Task $task) {
         $this->task = $task;
         $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
+
         /* @var $lang editor_Models_Languages */
+        $lang = ZfExtended_Factory::get('editor_Models_Languages');
         $this->targetFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getTargetLang(),'id',true);
         $this->sourceFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getSourceLang(),'id',true);
+
+        // Lazy load collectionIds defined for current task
+        $this->collectionIds = $this->collectionIds ?? ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->getCollectionsForTask($this->task->getTaskGuid());
+
+        $this->termCache = ZfExtended_Factory::get('editor_Plugins_TermTagger_TermCache', [$task, $this->collectionIds]);
     }
 
     /**
@@ -108,14 +121,6 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         if (!empty($config->runtimeOptions->termTagger->markTransFoundLegacy)) {
             return $source;
         }
-        $taskGuid = $this->task->getTaskGuid();
-
-        // Lazy load collectionIds defined for current task
-        if ($this->collectionIds === null) {
-            /* @var $assoc editor_Models_TermCollection_TermCollection */
-            $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            $this->collectionIds = $assoc->getCollectionsForTask($taskGuid);
-        }
 
         if (empty($this->collectionIds)) {
             return $source;
@@ -141,7 +146,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
 
             // Check whether source term having given termTbxId ($sourceTermId) exists within task's termcollections
             try {
-                $this->termModel->loadByMid($sourceTermId, $this->collectionIds);
+                $this->termCache->loadByMid($sourceTermId, $this->collectionIds);
             }
             catch (ZfExtended_Models_Entity_NotFoundException $e) {
 
@@ -151,10 +156,10 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             }
 
             // Get termEntryId of the given source term
-            $termEntryTbxId = $this->termModel->getTermEntryTbxId();
+            $termEntryTbxId = $this->termCache->getTermEntryTbxId();
 
             // Find translations of the given source term for target fuzzy languages
-            $groupedTerms = $this->termModel->getAllTermsOfGroup($this->collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
+            $groupedTerms = $this->termCache->getAllTermsOfGroup($this->collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
 
             // If no translations found
             if (empty($groupedTerms)) {
@@ -195,7 +200,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
 
                 // Lazy load distinct termEntryTbx ids of target terms
                 $termEntryTbxIdA = $termEntryTbxIdA
-                    ?? $this->termModel->loadTermEntryTbxIdsByTermTbxIds($targetTermIds_initial);
+                    ?? $this->termCache->loadTermEntryTbxIdsByTermTbxIds($targetTermIds_initial);
 
                 // Unset values from $termEntryTbxIdA if need
                 foreach ($targetTermIds_unset as $targetTermId_unset) {
@@ -203,8 +208,8 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 }
 
                 // Try to find current source term's homonym under the target terms' termEntries
-                $sourceTermId_homonym = $this->termModel->findHomonym(
-                    $this->termModel->getTerm(), $termEntryTbxIdA, $this->sourceFuzzyLanguages,
+                $sourceTermId_homonym = $this->termCache->findHomonym(
+                    $this->termCache->getTerm(), $termEntryTbxIdA, $this->sourceFuzzyLanguages,
                 );
 
                 // If found
@@ -220,7 +225,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 } else {
 
                     // Fetch target terms texts for all target terms tbx ids
-                    $targetTermTexts = $targetTermTexts ?? $this->termModel->loadDistinctByTbxIds($targetTermIds);
+                    $targetTermTexts = $targetTermTexts ?? $this->termCache->loadDistinctByTbxIds($targetTermIds);
 
                     // Foreach translation existing for the current source term under it's termEntry
                     foreach ($groupedTerms as $groupedTerm) {
