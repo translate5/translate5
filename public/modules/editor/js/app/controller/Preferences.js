@@ -100,6 +100,7 @@ Ext.define('Editor.controller.Preferences', {
    */
   handleSave: function() {
     var me = this, value,
+        store = Ext.state.Manager.getProvider().store,
         alike = Editor.app.getUserConfig('alike.defaultBehaviour',true),
         emptyTarget = Editor.app.getUserConfig('alike.showOnEmptyTarget',true),
         repetitionType = Editor.app.getUserConfig('alike.repetitionType',true),
@@ -119,23 +120,26 @@ Ext.define('Editor.controller.Preferences', {
     emptyTarget.set('value', values.showOnEmptyTarget);
     repetitionType.set('value', values.repetitionType);
     sameContextOnly.set('value', values.sameContextOnly);
-    emptyTarget.save({
-        success: function() {
-            alike.save({
-                success: function() {
-                    repetitionType.save({
-                        success: function() {
-                            sameContextOnly.save({
-                                success: function() {
-                                    me.window.close();
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        } 
-    });
+
+    // If there are some configs changed
+    if (store.getModifiedRecords().length) {
+
+        // Sync each changed config with server-side, sequentually
+        store.sync({
+            success: function() {
+
+                // Commit changes within local store
+                store.commitChanges();
+
+                // Close preferences window
+                me.window.close();
+            }
+        });
+
+    // Else just close the window
+    } else {
+        me.window.close();
+    }
   },
   handleCancel: function() {
     this.window.close();
