@@ -45,12 +45,27 @@ class editor_Services_OpenTM2_FixLanguageCodes {
 
     /**
      * The mapping of language keys.
-     * WARNING: if adding a language here, add it in function tmxOnDownload too!
      * In tmxOnDownload the concrete values send by OpenTM2 to be replaced back must be tested out.
      * @var array
      */
     protected array $languageMap = [
         //langcode_search => langcode_replace
+        'mn'    => 'ru',
+        'mn-MN' => 'ru',
+        'hi'    => 'ar',
+        'hi-IN' => 'ar',
+        'fr-CH' => 'fr',
+        'it-CH' => 'it'
+    ];
+
+    /**
+     * The mapping of language keys when exporting Memory.
+     * WARNING: if adding a language here, add it in function tmxOnDownload too!
+     * In tmxOnDownload the concrete values send by OpenTM2 to be replaced back must be tested out.
+     * TODO: this is temp fix and it will be remove with t5 memory
+     * @var array
+     */
+    protected array $languageMapExport = [
         'mn'    => 'ru',
         'mn-MN' => 'ru',
         'hi'    => 'ar',
@@ -121,11 +136,11 @@ class editor_Services_OpenTM2_FixLanguageCodes {
         $search = [];
         $replace = [];
         
-        if(!empty($this->languageMap[$sourceLang])) {
+        if(!empty($this->languageMapExport[$sourceLang])) {
             
             $tmxData = preg_replace('#(<header[^>]+)srclang="[^"]*"([^>]+>)#i', '${1}srclang="'.$sourceLang.'"${2}', $tmxData, 1);
             
-            $sourceLangMapped = $this->languageMap[$sourceLang];
+            $sourceLangMapped = $this->languageMapExport[$sourceLang];
             $search[] = 'xml:lang="'.$sourceLangMapped.'"';
             //OpenTM2 returns sometimes the language as "fr" and sometimes as "fr-FR",
             // so we replace just both:
@@ -134,8 +149,8 @@ class editor_Services_OpenTM2_FixLanguageCodes {
             $replace[] = 'xml:lang="'.$sourceLang.'"';
         }
 
-        if(!empty($this->languageMap[$targetLang])) {
-            $targetLangMapped = $this->languageMap[$targetLang];
+        if(!empty($this->languageMapExport[$targetLang])) {
+            $targetLangMapped = $this->languageMapExport[$targetLang];
             $search[] = 'xml:lang="'.$targetLangMapped.'"';
             //OpenTM2 returns sometimes the language as "fr" and sometimes as "fr-FR",
             // so we replace just both:
