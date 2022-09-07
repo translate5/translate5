@@ -270,7 +270,7 @@ class editor_Models_Segment_Whitespace {
         return preg_replace_callback($pattern, function ($match) {
             $wholeTag = $match[0];
             $tagName = $match[1];
-            $length = strlen($match[5]) > 0 ? $match[5] : '1'; //if length not given defaults to 1
+            $length = strlen($match[5] ?? '') > 0 ? $match[5] : '1'; //if length not given defaults to 1
             $renderData = $this->getTagRenderData($tagName, $length, $wholeTag);
             $tagLabel = $renderData['text'];
             if($tagName == 'char' && strlen($tagLabel) > 1) {
