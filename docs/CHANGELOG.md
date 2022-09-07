@@ -14,6 +14,50 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.9] - 2022-09-01
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3019](https://jira.translate5.net/browse/TRANSLATE-3019): Configuration - Support Subnets in IP-based authentication** <br>
+Change IpAuthentication plugin to support subnet masks, e.g. 192.168.0.1/24
+
+**[TRANSLATE-3016](https://jira.translate5.net/browse/TRANSLATE-3016): Configuration, Editor general, TermTagger integration - Show and use only terms of a certain process level in the editor** <br>
+What kind of process status the terms has, used for term tagging and listed in the editor term-portlet  can be configured as system, client and task level.
+
+**[TRANSLATE-3015](https://jira.translate5.net/browse/TRANSLATE-3015): TBX-Import - Merge multiple attributes of the same type in TBX import** <br>
+Two attributes will be merged into one if they are from the same type and appear on same level.
+
+**[TRANSLATE-3014](https://jira.translate5.net/browse/TRANSLATE-3014): Editor general - Show color of TermCollection behind term in editors termportlet** <br>
+Term collection color will be listed in the term portlet for each term.
+
+**[TRANSLATE-3003](https://jira.translate5.net/browse/TRANSLATE-3003): Editor general - Show term attributes in term-portlet of translate5s editor** <br>
+Tooltip with the term entry, language and term attributes will be show with mouse over the terms in the term portlet in editor.
+
+
+### Bugfixes
+**[TRANSLATE-3045](https://jira.translate5.net/browse/TRANSLATE-3045): TermTagger integration - Optimize terms_term indexes** <br>
+Improve the DB indizes for the terms_term table.
+
+**[TRANSLATE-3043](https://jira.translate5.net/browse/TRANSLATE-3043): SpellCheck (LanguageTool integration) - spellcheck markup is destroying internal tags** <br>
+SpellCheck: Multi-whitespaces are now respected while applying spellcheck styles
+
+**[TRANSLATE-3041](https://jira.translate5.net/browse/TRANSLATE-3041): Auto-QA, Editor general - Wrong whitespace tag numbering leads to non working whitespace added QA check** <br>
+The internal numbering of whitespace tags (newline, tab etc) was not consistent anymore between source and target, therefore the whitespace added auto QA is producing a lot of false positives.
+
+**[TRANSLATE-3030](https://jira.translate5.net/browse/TRANSLATE-3030): Auto-QA - Fixes Spellcheck-QA-Worker: Index for state-field, proper solution for logging / "last worker"** <br>
+FIX: Spellcheck AutoQA-worker was lacking an database-Index, with the index spellchecking should be faster on import
+
+**[TRANSLATE-3029](https://jira.translate5.net/browse/TRANSLATE-3029): file format settings - IDML FPRM Editor too heigh** <br>
+FIX: Height of IDML FPRM Editor too big on smaller screens so that buttons are not visible
+
+**[TRANSLATE-3028](https://jira.translate5.net/browse/TRANSLATE-3028): Main back-end mechanisms (Worker, Logging, etc.) - Reset password error** <br>
+Fix for a problem where the user was not able to reset the password.
+
+
 ## [5.7.8] - 2022-08-18
 
 ### Important Notes:
