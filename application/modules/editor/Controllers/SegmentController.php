@@ -319,6 +319,14 @@ class Editor_SegmentController extends ZfExtended_RestController
         //update the segment
         $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task]);
 
+        $allowedAlternatesToChange = $this->entity->getEditableDataIndexList(true);
+
+        // CRUCIAL: we need to exclude the segment-content fields from sanitization and sanitize them as HTML
+        $this->dataSanitizationMap = [];
+        foreach($allowedAlternatesToChange as $key){
+            $this->dataSanitizationMap[$key] = ZfExtended_Sanitizer::MARKUP;
+        }
+
         $this->decodePutData();
 
         //set the editing durations for time tracking into the segment object
@@ -326,8 +334,6 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->entity->setTimeTrackData($this->data->durations, $this->durationsDivisor);
 
         $allowedToChange = array('stateId', 'autoStateId', 'matchRate', 'matchRateType');
-
-        $allowedAlternatesToChange = $this->entity->getEditableDataIndexList(true);
 
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);
         $this->sanitizeEditedContent($updater, $allowedAlternatesToChange);
