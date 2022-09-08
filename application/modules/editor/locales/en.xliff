@@ -4822,5 +4822,9 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Attribute auf Benennungsebene</source>
   <target>Term attributes</target>
 </trans-unit>
+<trans-unit id='QWx0ZXMgUGFzc3dvcnQ='>
+  <source>Altes Passwort</source>
+  <target>Old password</target>
+</trans-unit>
   </file>
 </xliff>

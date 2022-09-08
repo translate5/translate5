@@ -38,18 +38,7 @@ Ext.define('Editor.view.admin.preferences.User', {
     controller: 'preferencesUser',
     alias: 'widget.preferencesUser',
     title: '#UT#Meine Einstellungen',
-    //glyph: 'xf007@FontAwesome',
     glyph: 'xf4fe@FontAwesome5FreeSolid',
-    strings: {
-        editPassword: '#UT#Passwort ändern',
-        password: '#UT#Passwort',
-        password_check: '#UT#Passwort Kontrolle',
-        passwordMisMatch: '#UT#Die Passwörter stimmern nicht überein!',
-        saveBtn: '#UT#speichern',
-        cancelBtn: '#UT#Abbrechen',
-        uiThemeComboLabelText:'#UT#Layout',
-        changeUiLangaugeLabelText:'#UT#Sprache ändern'
-    },
     //layout: 'fit',
 
     bodyPadding: 10,
@@ -76,7 +65,9 @@ Ext.define('Editor.view.admin.preferences.User', {
                 border:false,
                 items: [{
                     xtype: 'fieldset',
-                    title: me.strings.editPassword,
+                    bind: {
+                        title: '{l10n.preferences.user.editPassword}'
+                    },
                     defaultType: 'textfield',
                     defaults: {
                         labelWidth: 160,
@@ -86,15 +77,24 @@ Ext.define('Editor.view.admin.preferences.User', {
                         allowBlank: false
                     },
                     items: [{
+                        name: 'oldpasswd',
+                        bind: {
+                            fieldLabel: '{l10n.preferences.user.oldpasswd}'
+                        }
+                    },{
                         name: 'passwd',
-                        fieldLabel: me.strings.password
+                        bind: {
+                            fieldLabel: '{l10n.preferences.user.password}'
+                        },
                     }, {
                         name: 'passwd_check',
                         validator: function (value) {
                             var pwd = this.previousSibling('[name=passwd]');
-                            return (value === pwd.getValue()) ? true : me.strings.passwordMisMatch;
+                            return (value === pwd.getValue()) ? true : Editor.data.l10n.preferences.user.passwordMisMatch;
                         },
-                        fieldLabel: me.strings.password_check
+                        bind: {
+                            fieldLabel: '{l10n.preferences.user.password_check}'
+                        },
                     },{
                         xtype: 'toolbar',
                         ui: 'footer',
@@ -109,18 +109,24 @@ Ext.define('Editor.view.admin.preferences.User', {
                             xtype: 'button',
                             itemId: 'saveBtn',
                             glyph: 'f0c7@FontAwesome5FreeSolid',
-                            text: me.strings.saveBtn
+                            bind: {
+                                text: '{l10n.preferences.user.saveBtn}'
+                            }
                         },{
                             xtype: 'button',
                             itemId: 'cancelBtn',
                             glyph: 'f00d@FontAwesome5FreeSolid',
-                            text: me.strings.cancelBtn
+                            bind: {
+                                text: '{l10n.preferences.user.cancelBtn}'
+                            }
                         }]
                     }]
                 }]
             },{
                 xtype: 'fieldset',
-                title: me.strings.uiThemeComboLabelText,
+                bind: {
+                    title: '{l10n.preferences.user.uiThemeComboLabelText}'
+                },
                 width: 400,
                 items:[{
                     xtype: 'combo',
@@ -134,7 +140,9 @@ Ext.define('Editor.view.admin.preferences.User', {
                 }]
             },{
                 xtype: 'fieldset',
-                title: me.strings.changeUiLangaugeLabelText,
+                bind: {
+                    title: '{l10n.preferences.user.changeUiLangaugeLabelText}'
+                },
                 width: 400,
                 items:[{
                     xtype: 'combo',

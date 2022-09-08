@@ -1441,21 +1441,6 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-    Ext.define("Editor.locale.de.admin.preferences.User", {
-        override: "Editor.view.admin.preferences.User",
-        title: '<?php echo $this->translate->_('Meine Einstellungen');?>',
-        strings: {
-            editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
-            password: '<?php echo $this->translate->_('Passwort');?>',
-            password_check: '<?php echo $this->translate->_('Passwort Kontrolle');?>',
-            passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>',
-            saveBtn: '<?php echo $this->translate->_('Speichern');?>',
-            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
-            uiThemeComboLabelText: '<?php echo $this->translate->_('Layout');?>',
-            changeUiLangaugeLabelText: '<?php echo $this->translate->_('Sprache ändern');?>',
-        }
-    });
-
     Ext.define("Editor.locale.de.view.admin.user.GridViewController", {
         override: "Editor.view.admin.user.GridViewController",
         strings: {
@@ -2077,6 +2062,19 @@ Editor.data.l10n = {
     quickSearchInfoMessage: {
         synonymSearchMessage: '<?php echo $this->translate->_('Und ALT+F3 für die Synonymsuche.');?>',
         concordenceSearchMessage: '<?php echo $this->translate->_('Drücken Sie F3, um das markierte Wort an die Konkordanzsuche zu senden.');?>'
+    },
+    preferences: {
+        user: {
+            oldpasswd: '<?php echo $this->translate->_('Altes Passwort');?>',
+            editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
+            password: '<?php echo $this->translate->_('Passwort');?>',
+            password_check: '<?php echo $this->translate->_('Passwort Kontrolle');?>',
+            saveBtn: '<?php echo $this->translate->_('Speichern');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            uiThemeComboLabelText: '<?php echo $this->translate->_('Layout');?>',
+            changeUiLangaugeLabelText: '<?php echo $this->translate->_('Sprache ändern');?>',
+            passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>'
+        }
     }
 
 };

@@ -2193,6 +2193,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QXR0cmlidXRlIGF1ZiBFaW50cmFnc2ViZW5l'><source>Attribute auf Eintragsebene</source><target>Attribute auf Eintragsebene</target></trans-unit>
 <trans-unit id='QXR0cmlidXRlIGF1ZiBTcHJhY2hlYmVuZQ=='><source>Attribute auf Sprachebene</source><target>Attribute auf Sprachebene</target></trans-unit>
 <trans-unit id='QXR0cmlidXRlIGF1ZiBCZW5lbm51bmdzZWJlbmU='><source>Attribute auf Benennungsebene</source><target>Attribute auf Benennungsebene</target></trans-unit>
+<trans-unit id='QWx0ZXMgUGFzc3dvcnQ='><source>Altes Passwort</source><target>Altes Passwort</target></trans-unit>
   </body>
  </file>
 </xliff>
