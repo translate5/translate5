@@ -77,28 +77,22 @@ class editor_Services_Connector {
     protected $languageResource;
     
     /***
-     * Requested source language id
-     * @var integer
-     */
-    protected $sourceLang;
-    
-    /***
-     * Requested target language id
-     * @var integer
-     */
-    protected $targetLang;
-    
-    /***
      * if set to true, it will get the results from the batch cache table when using the query action
      * @var boolean
      */
     protected $batchEnabled = false;
 
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang = null, $targetLang = null){
+    /**
+     * @param editor_Models_LanguageResources_LanguageResource $languageResource
+     * @param $sourceLang
+     * @param $targetLang
+     * @return void
+     * @throws editor_Services_Exceptions_NoService
+     */
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang = null, $targetLang = null): void
+    {
         $this->connectToResourceOnly($languageResource->getResource());
         $this->adapter->connectTo($languageResource, $sourceLang, $targetLang);
-        $this->sourceLang = $sourceLang;
-        $this->targetLang = $targetLang;
     }
     
     /**

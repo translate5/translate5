@@ -5,7 +5,11 @@ namespace MittagQI\Translate5\LanguageResource\Pretranslation;
 use editor_Models_Task;
 use editor_Models_Task_AbstractWorker;
 use ZfExtended_Factory;
+use MittagQI\Translate5\LanguageResource\Pretranslation\Pivot;
 
+/**
+ *
+ */
 class PivotWorker extends editor_Models_Task_AbstractWorker
 {
 
@@ -25,20 +29,14 @@ class PivotWorker extends editor_Models_Task_AbstractWorker
     protected function work()
     {
         try {
+
             // lock the task dedicated for pivot pre-translation
-            if ($this->task->lock(NOW_ISO, 'pivotpretranslation')) {
-                // else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
-            } else if ($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
-                $this->log->error('E1397', 'Pivot pre-translation: task can not be locked for pivot pre-translation.', [
-                    'task' => $this->task
-                ]);
-                return false;
-            }
+            $this->task->lock(NOW_ISO, 'pivotpretranslation');
 
             $params = $this->workerModel->getParameters();
 
             /** @var Pivot $pivot */
-            $pivot = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\Pivot',[
+            $pivot = ZfExtended_Factory::get(Pivot::class,[
                 $this->task
             ]);
             $pivot->setUserGuid($params['userGuid']);

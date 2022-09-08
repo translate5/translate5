@@ -156,17 +156,18 @@ class editor_Services_Manager {
         /* @var $resources editor_Services_ServiceAbstract */
         return $resources->getResourceById($id);
     }
-    
+
     /***
      * returns the desired connector, connection to the given resource
      *
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
-     * @param int $sourceLang
-     * @param int $targetLang
-     * @param Zend_Config $config : this will overwritte the default connector config value
+     * @param int|null $sourceLang
+     * @param int|null $targetLang
+     * @param Zend_Config|null $config : this will overwritte the default connector config value
      * @return editor_Services_Connector
+     * @throws ZfExtended_Exception
      */
-    public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null,Zend_Config $config = null) {
+    public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource, int $sourceLang=null, int $targetLang=null, Zend_Config $config = null) {
         $serviceType = $languageResource->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get('editor_Services_Connector');
