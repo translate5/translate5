@@ -71,14 +71,14 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         $login = $this->input->getArgument('login');
         $this->writeTitle('Impersonate as user "'.$login.'"');
 
-        $config = \Zend_Registry::get('config');
-        $userModel = \ZfExtended_Factory::get($config->authentication->userEntityClass);
-        /* @var $userModel \ZfExtended_Models_User */
-        $userModel->setUserSessionNamespaceWithoutPwCheck($login);
+        $auth = \ZfExtended_Authentication::getInstance();
+        if(! $auth->authenticateByLogin($login)) {
+            return $this->io->error('User '.$login.' not found.');
+        }
         
         
         $session = new \Zend_Session_Namespace();
-        $locale = $userModel->getLocale();
+        $locale = $auth->getUser()->getLocale();
         if(\Zend_Locale::isLocale($locale)){
             $session->locale = $locale;
         } else {
@@ -89,13 +89,13 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         $sessionId = session_id();
         $token = $sessionDb->updateAuthToken($sessionId);
         $this->io->text([
-            '<info>Impersonate as:</info> <options=bold>'.$userModel->getUsernameLong().'</>',
+            '<info>Impersonate as:</info> <options=bold>'.$auth->getUser()->getUsernameLong().'</>',
             '    <info>Session Id:</info> '.$sessionId,
-            '       <info>User Id:</info> '.$userModel->getId(),
-            '        <info>E-Mail:</info> '.$userModel->getEmail(),
+            '       <info>User Id:</info> '.$auth->getUser()->getId(),
+            '        <info>E-Mail:</info> '.$auth->getUser()->getEmail(),
             '',
             'Navigate to the following URL in your browser to authenticate as the desired User: ',
-            '  <options=bold>'.$config->runtimeOptions->server->protocol.$this->makeUrlPath($token).'</>',
+            '  <options=bold>'.\Zend_Registry::get('config')->runtimeOptions->server->protocol.$this->makeUrlPath($token).'</>',
             ''
         ]);
         

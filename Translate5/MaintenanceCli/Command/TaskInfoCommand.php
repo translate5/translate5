@@ -66,7 +66,7 @@ class TaskInfoCommand extends Translate5AbstractCommand
             'detail',
             'd',
             InputOption::VALUE_NONE,
-            'Shows all data fields of the task (expect qmSubsegmentFlags) instead the overview'
+            'Shows all data fields of the task (expect qmSubsegmentFlags) and task meta instead the overview'
         );
 
     }
@@ -113,6 +113,8 @@ class TaskInfoCommand extends Translate5AbstractCommand
         }
         else {
             $this->writeAssoc($data);
+            $this->io->section('Meta Table:');
+            $this->writeAssoc((array) $task->meta()->getDataObject());
         }
         return 0;
     }

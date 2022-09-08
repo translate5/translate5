@@ -266,9 +266,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return array|array
      */
     public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=array(),$targetLang=array()){
-        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $customers=$userModel->getUserCustomersFromSession();
+        $customers = ZfExtended_Authentication::getInstance()->getUser()->getCustomersArray();
         if(!empty($customers)){
             
             //each sdlcloud language resource can have only one language combination

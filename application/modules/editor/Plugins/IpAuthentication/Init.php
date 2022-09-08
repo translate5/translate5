@@ -77,7 +77,7 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
             'user' => $user->getLogin(),
             'ip' => $user->getIp(),
         ]);
-        $user->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
+        ZfExtended_Authentication::getInstance()->authenticateUser($user);
     }
     /**
      * On garbage collection clean up remove all temrporary users with expired session

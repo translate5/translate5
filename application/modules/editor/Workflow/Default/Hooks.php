@@ -76,10 +76,10 @@ class editor_Workflow_Default_Hooks {
     protected $newTaskUserAssoc;
     
     /**
-     * @var ZfExtended_Models_User
+     * @var ZfExtended_Models_User|null
      */
-    protected $authenticatedUser;
-    
+    protected ?ZfExtended_Models_User $authenticatedUser = null;
+
     /**
      * Import config, only available on workflow stuff triggerd in the context of an import
      * @var editor_Models_Import_Configuration
@@ -141,29 +141,22 @@ class editor_Workflow_Default_Hooks {
     protected function loadAuthenticatedUser(){
         if(Zend_Session::isDestroyed()) {
             //if there is no session anymore (in the case of garbage cleanup) we can not load any authenticated user
-            // but this should be no problem since on garbace collection no user specific stuff is done
+            // but this should be no problem since on garbage collection no user specific stuff is done
             return;
         }
-        $userSession = new Zend_Session_Namespace('user');
-        if(isset($userSession->data) && isset($userSession->data->userGuid)) {
-            $userGuid = $userSession->data->userGuid;
-        }
-        else {
-            $userGuid = false;
-        }
+        $auth = ZfExtended_Authentication::getInstance();
+        $this->authenticatedUser = $auth->getUser();
         $config = Zend_Registry::get('config');
         $isCron = $config->runtimeOptions->cronIP === ($_SERVER['REMOTE_ADDR'] ?? null);
         $isWorker = defined('ZFEXTENDED_IS_WORKER_THREAD');
-        $this->authenticatedUser = ZfExtended_Factory::get('ZfExtended_Models_User');
-        
-        if($userGuid === false){
+
+        if(is_null($this->authenticatedUser)){
             if(!$isCron && !$isWorker) {
                 throw new ZfExtended_NotAuthenticatedException("Cannot authenticate the system user!");
             }
             //set session user data with system user
-            $this->authenticatedUser->setUserSessionNamespaceWithoutPwCheck(ZfExtended_Models_User::SYSTEM_LOGIN);
+            $auth->authenticateByLogin(ZfExtended_Models_User::SYSTEM_LOGIN);
         }
-        $this->authenticatedUser->loadByGuid($userSession->data->userGuid);
     }
     
     /**
