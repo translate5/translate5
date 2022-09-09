@@ -88,7 +88,7 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
         }
 
         // Save offline instances list to memcache
-        editor_Plugins_SpellCheck_Configuration::saveDownListToMemCache($offline);
+        (new editor_Plugins_SpellCheck_Configuration)->saveDownListToMemCache($offline);
 
         // If not all spellcheckers available
         if (!$status->runningAll) {
@@ -108,7 +108,7 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
      *
      * @return stdClass
      */
-    public function spellcheckerState() {
+    private function spellcheckerState() {
 
         //
         $spellchecker = new stdClass();
@@ -122,6 +122,7 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
         // Get all unique LanguageTool unique url endpoints
         $allUrls = array_unique(call_user_func_array('array_merge', array_values((array) $spellchecker->configured)));
 
+        // TODO next 18 lines of code are copypasted from term tagger Bootstrap.php
         // Prepare variables
         $running = []; $version = []; $spellchecker->runningAll = true;
 

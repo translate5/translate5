@@ -26,17 +26,28 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
-class editor_Plugins_SpellCheck_SegmentProcessor {
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\MalfunctionException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\RequestException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\TimeOutException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\SegmentProcessorInterface;
+
+class editor_Plugins_SpellCheck_SegmentProcessor implements SegmentProcessorInterface
+{
 
     /**
      * LanguageTool connector instance
      *
-     * @var editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter
+     * @var editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter[]
      */
-    protected static $_connector = [];
+    private static array $connector = [];
+
+    private ?string $spellcheckLanguage;
+
+    public function __construct(?string $spellcheckLanguage)
+    {
+        $this->spellcheckLanguage = $spellcheckLanguage;
+    }
 
     /**
      * Get LanguageTool connector instance
@@ -55,23 +66,28 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
             $slot = $connector->getApiBaseUrl();
 
             // Put connector instance into $_connector array under $slot key for further accessibility, if not there yet
-            if (!isset(self::$_connector[$slot])) self::$_connector[$slot] = $connector;
+            if (!isset(self::$connector[$slot])) {
+                self::$connector[$slot] = $connector;
+            }
         }
 
         // Get connector instance for given $slot
-        return self::$_connector[$slot] ?? self::$_connector[$slot] = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter', [$slot]);
+        return self::$connector[$slot] ?? self::$connector[$slot] = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter', [$slot]);
     }
 
     /**
      * Do process
      *
      * @param editor_Segment_Tags[] $segmentsTags
-     * @param string|null $slo
-     * @param $processingMode
-     * @param bool|string $spellCheckLang
+     * @param string|null $slot
+     *
+     * @throws DownException
+     * @throws MalfunctionException
+     * @throws RequestException
+     * @throws TimeOutException
      */
-    public function process(array $segmentsTags, string $slot = null, $processingMode, $spellCheckLang = false) {
-
+    public function process(array $segmentsTags, ?string $slot = null): void
+    {
         /* @var editor_Models_Db_SegmentQuality $qualityM */
         $qualityM = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
 
@@ -82,7 +98,7 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
         $type = editor_Plugins_SpellCheck_QualityProvider::qualityType();
 
         // Foreach segment
-        foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
+        foreach ($segmentsTags as $tags) {
 
             // Get segment and task shortcut
             $segment = $tags->getSegment();
@@ -95,10 +111,10 @@ class editor_Plugins_SpellCheck_SegmentProcessor {
             }
 
             // Foreach target
-            foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
+            foreach ($tags->getTargets() as $target) {
 
                 // Do check
-                $check = new editor_Plugins_SpellCheck_Check($segment, $target->getField(), $connector, $spellCheckLang);
+                $check = new editor_Plugins_SpellCheck_Check($segment, $target->getField(), $connector, $this->spellcheckLanguage);
 
                 // Process check results
                 foreach ($check->getStates() as $category => $qualityA) {

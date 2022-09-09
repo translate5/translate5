@@ -32,6 +32,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Enum\SegmentState;
+
 /**
  * The Quality provider 
  * This class just provides the translations for the filter backend
@@ -92,10 +94,13 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     /**
      * Get SpellCheck segment processor instance
      *
-     * @return editor_Plugins_SpellCheck_SegmentProcessor|null
+     * @return editor_Plugins_SpellCheck_SegmentProcessor
      */
-    public function getProcessor() {
-        return self::$_processor ?? self::$_processor = ZfExtended_Factory::get('editor_Plugins_SpellCheck_SegmentProcessor');
+    public function getProcessor(?string $spellcheckLang = null): editor_Plugins_SpellCheck_SegmentProcessor
+    {
+        return self::$_processor ?? self::$_processor = ZfExtended_Factory::get(editor_Plugins_SpellCheck_SegmentProcessor::class, [
+            'spellcheckLanguage' => $spellcheckLang,
+        ]);
     }
 
     /**
@@ -167,8 +172,10 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             return $tags;
         }
 
+        $processor = $this->getProcessor();
+
         // If current task's target lang is not supported by LanguageTool - return
-        if (!$spellCheckLang = $this->getProcessor()->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())) {
+        if (!$spellCheckLang = $processor->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())) {
             return $tags;
         }
 
@@ -182,7 +189,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         } else if ($processingMode == editor_Segment_Processing::EDIT) {
 
             // Do process
-            $this->getProcessor()->process([$tags], null, false, $spellCheckLang);
+            $processor->process([$tags]);
         }
 
         // Return
@@ -307,10 +314,10 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
 
         // Reset status to unchecked for checked segments
         $meta->db->update([
-            'spellcheckState' => editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_UNCHECKED
+            'spellcheckState' => SegmentState::SEGMENT_STATE_UNCHECKED
         ],[
             'taskGuid = ?' => $task->getTaskGuid(),
-            'spellcheckState = ?' => editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_CHECKED,
+            'spellcheckState = ?' => SegmentState::SEGMENT_STATE_CHECKED,
         ]);
     }
 }

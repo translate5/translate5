@@ -26,83 +26,53 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Plugins\SpellCheck\Base\ConfigurationInterface;
+
 /**
  * Separate holder of certain configurations to accompany editor_Plugins_SpellCheck_Worker_Import
  */
-class editor_Plugins_SpellCheck_Configuration {
-    
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_UNCHECKED = 'unchecked';
-
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_INPROGRESS = 'inprogress';
-
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_CHECKED = 'checked';
-
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_RECHECK = 'recheck';
-
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_DEFECT = 'defect';
-
+class editor_Plugins_SpellCheck_Configuration implements ConfigurationInterface
+{
     /**
      * Defines, how much segments can be processed per one worker call
      *
      * @var integer
      */
-    const IMPORT_SEGMENTS_PER_CALL = 5;
+    private const IMPORT_SEGMENTS_PER_CALL = 5;
 
     /**
      * Defines the timeout in seconds how long a spell-check call with multiple segments may need
      *
      * @var integer
      */
-    const IMPORT_TIMEOUT_REQUEST = 300;
+    private const IMPORT_TIMEOUT_REQUEST = 300;
 
     /**
      * Logger Domain Import
      * @var string
      */
-    const IMPORT_LOGGER_DOMAIN = 'editor.spellcheck.import';
+    private const IMPORT_LOGGER_DOMAIN = 'editor.spellcheck.import';
 
     /**
      * Logger Domain Editing
      * @var string
      */
-    const EDITOR_LOGGER_DOMAIN = 'editor.spellcheck.segmentediting';
+    private const EDITOR_LOGGER_DOMAIN = 'editor.spellcheck.segmentediting';
 
     /**
      * Cache key to point to the list of LanguageTool connectors which are down
      *
      * @var string
      */
-    const DOWN_CACHE_KEY = 'SpellCheckDownList';
+    private const DOWN_CACHE_KEY = 'SpellCheckDownList';
 
-    /**
-     * Get logger domain
-     *
-     * @param string $processingType
-     * @return string
-     */
-    public static function getLoggerDomain(string $processingType) : string {
+    private ?Zend_Cache_Core $memCache = null;
+
+    public static function getLoggerDomain(string $processingType): string
+    {
         switch ($processingType) {
-
             case editor_Segment_Processing::IMPORT:
                 return self::IMPORT_LOGGER_DOMAIN;
-
-            case editor_Segment_Processing::EDIT:
-                return self::EDITOR_LOGGER_DOMAIN;
 
             default:
                 return self::EDITOR_LOGGER_DOMAIN;
@@ -110,30 +80,14 @@ class editor_Plugins_SpellCheck_Configuration {
     }
 
     /**
-     * Memcache instance
-     *
-     * @var Zend_Cache_Core
-     */
-    private $memCache = null;
-
-    /**
      * Get request timeout
      *
      * @param bool $isWorkerThread
      * @return int
      */
-    public function getRequestTimeout(bool $isWorkerThread) : int {
+    public function getRequestTimeout(bool $isWorkerThread): int
+    {
         return self::IMPORT_TIMEOUT_REQUEST;
-    }
-
-    /**
-     * Get memcache instance
-     *
-     * @return Zend_Cache_Core
-     */
-    public function getMemCache() : Zend_Cache_Core {
-        return $this->memCache ?? $this->memCache = Zend_Cache
-            ::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
     }
 
     /**
@@ -141,18 +95,13 @@ class editor_Plugins_SpellCheck_Configuration {
      *
      * @param array $offlineSpots
      */
-    public static function saveDownListToMemCache(array $offlineSpots) {
-        Zend_Cache
-            ::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true])
-            ->save($offlineSpots, self::DOWN_CACHE_KEY);
+    public function saveDownListToMemCache(array $offlineSpots): void
+    {
+        $this->getMemCache()->save($offlineSpots, self::DOWN_CACHE_KEY);
     }
 
-    /**
-     * Get array of available resource slots for the given $resourcePool
-     *
-     * @return array
-     */
-    public function getAvailableResourceSlots($resourcePool) {
+    public function getAvailableResourceSlots(string $resourcePool): array
+    {
 
         // Get config
         $config = Zend_Registry::get('config');
@@ -181,7 +130,7 @@ class editor_Plugins_SpellCheck_Configuration {
         $online = array_diff($declared, is_array($offline) ? $offline : []);
 
         // If given $resourcePool is not 'default' and no online slots detected
-        if (empty($online) && $resourcePool != 'default') {
+        if (empty($online) && $resourcePool !== 'default') {
 
             // Pick slots for 'default'-resourcePool
             return $this->getAvailableResourceSlots('default');
@@ -191,12 +140,8 @@ class editor_Plugins_SpellCheck_Configuration {
         return $online;
     }
 
-    /**
-     * Append slot (URL) to the list of down slots to be able to skip it further
-     *
-     * @param string $url
-     */
-    public function disableResourceSlot(string $url) : void {
+    public function disableResourceSlot(string $url): void
+    {
 
         // Get current list of down slots
         $list = $this->getMemCache()->load(self::DOWN_CACHE_KEY);
@@ -207,9 +152,28 @@ class editor_Plugins_SpellCheck_Configuration {
         }
 
         // Append $url arg to the list
-        $list []= $url;
+        $list[] = $url;
 
         // Save list back to memcache
         $this->getMemCache()->save($list, self::DOWN_CACHE_KEY);
+    }
+
+    public function getSegmentsPerCallAmount(): int
+    {
+        return self::IMPORT_SEGMENTS_PER_CALL;
+    }
+
+    /**
+     * Get memcache instance
+     *
+     * @return Zend_Cache_Core
+     *
+     * @throws Zend_Cache_Exception
+     */
+    private function getMemCache(): Zend_Cache_Core
+    {
+        return $this->memCache ?? $this->memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), [
+            'automatic_serialization' => true
+        ]);
     }
 }

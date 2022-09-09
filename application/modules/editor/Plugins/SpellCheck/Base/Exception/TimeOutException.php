@@ -26,33 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Plugins\SpellCheck\Base\Exception;
+
 /**
- * Abstract Exception Class to get more details Information on SpellCheck-Error.
+ * A timeout exception is not the same as a DOWN exception.
+ * Timout means in the most cases that the LanguageTool is running but it is checking and therefore could not respond
  */
-abstract class editor_Plugins_SpellCheck_Exception_Abstract extends ZfExtended_ErrorCodeException {
+class TimeOutException extends AbstractException
+{
 
     /**
-     * @var string
-     */
-    protected $domain = 'editor.spellcheck';
-    
-    /**
-     * Basically the spell-check exceptions produce just a warning
+     * Timeouts are just an info
      *
      * @var integer
      */
-    protected $level = ZfExtended_Logger::LEVEL_WARN;
-
-    /**
-     * Error codes for spellcheck messages
-     *
-     * @var array
-     */
-    protected static $localErrorCodes = [
-        'E1410' => 'SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary.',
-        'E1411' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
-        'E1412' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.',
-        'E1413' => 'SpellCheck can not work when target language is not supported by LanguageTool.',
-        'E1417' => 'SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList}',
-    ];
+    protected $level = \ZfExtended_Logger::LEVEL_INFO;
 }
