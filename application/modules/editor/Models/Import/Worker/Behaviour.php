@@ -81,7 +81,8 @@ class editor_Models_Import_Worker_Behaviour extends ZfExtended_Worker_Behaviour_
             $error = error_get_last();
             if(!is_null($error) && ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
                 /* @var $task editor_Models_Task */
-                if(!is_null($task)) {
+                if(!is_null($task) && $task->isImporting()) {
+                    // should only set to error if task was really on import
                     $task->setErroneous();
                 }
                 if(!is_null($worker)) {
