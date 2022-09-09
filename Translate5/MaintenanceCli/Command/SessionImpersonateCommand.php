@@ -73,7 +73,8 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
 
         $auth = \ZfExtended_Authentication::getInstance();
         if(! $auth->authenticateByLogin($login)) {
-            return $this->io->error('User '.$login.' not found.');
+            $this->io->error('User '.$login.' not found.');
+            return 1;
         }
         
         
