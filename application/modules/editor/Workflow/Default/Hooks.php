@@ -134,9 +134,10 @@ class editor_Workflow_Default_Hooks {
             $this->handleImportCompleted();
         });
     }
-    
+
     /**
      * loads the system user as authenticatedUser, if no user is logged in
+     * @throws ZfExtended_NotAuthenticatedException
      */
     protected function loadAuthenticatedUser(){
         if(Zend_Session::isDestroyed()) {
@@ -151,11 +152,13 @@ class editor_Workflow_Default_Hooks {
         $isWorker = defined('ZFEXTENDED_IS_WORKER_THREAD');
 
         if(is_null($this->authenticatedUser)){
-            if(!$isCron && !$isWorker) {
+            //if cron or worker set session user data with system user
+            if(($isCron || $isWorker) && $auth->authenticateByLogin(ZfExtended_Models_User::SYSTEM_LOGIN)) {
+                $this->authenticatedUser = $auth->getUser();
+            }
+            else {
                 throw new ZfExtended_NotAuthenticatedException("Cannot authenticate the system user!");
             }
-            //set session user data with system user
-            $auth->authenticateByLogin(ZfExtended_Models_User::SYSTEM_LOGIN);
         }
     }
     
