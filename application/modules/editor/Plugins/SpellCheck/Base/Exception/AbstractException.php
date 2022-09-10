@@ -54,6 +54,7 @@ abstract class AbstractException extends \ZfExtended_ErrorCodeException
      * @var array
      */
     protected static array $localErrorCodes = [
+        // TODO how to change spell check to 24 translate
         'E1410' => 'SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary.',
         'E1411' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
         'E1412' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.',

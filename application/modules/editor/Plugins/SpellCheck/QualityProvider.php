@@ -179,20 +179,20 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             return $tags;
         }
 
+        $processor->setSpellcheckLanguage($spellCheckLang);
+
         // If processing mode is 'alike'
-        if ($processingMode == editor_Segment_Processing::ALIKE){
+        if ($processingMode === editor_Segment_Processing::ALIKE){
 
             // the only task in an alike process is cloning the qualities ...
             $tags->cloneAlikeQualitiesByType(static::$type);
 
-        // Else
-        } else if ($processingMode == editor_Segment_Processing::EDIT) {
+        } else if ($processingMode === editor_Segment_Processing::EDIT) {
 
             // Do process
             $processor->process([$tags]);
         }
 
-        // Return
         return $tags;
     }
 

@@ -32,6 +32,7 @@ namespace MittagQI\Translate5\Plugins\SpellCheck\Base\Worker;
 
 use editor_Models_Db_SegmentMeta;
 use editor_Models_Segment;
+use editor_Models_Segment_Meta;
 use editor_Models_SegmentFieldManager;
 use editor_Segment_Processing;
 use editor_Segment_Quality_SegmentWorker;
@@ -88,8 +89,6 @@ abstract class AbstractImport extends editor_Segment_Quality_SegmentWorker
 
     abstract protected function getProcessor(): SegmentProcessorInterface;
 
-    abstract protected function getLoggerDomain(): string;
-
     abstract protected function getMetaColumnName(): string;
 
     /**
@@ -111,6 +110,23 @@ abstract class AbstractImport extends editor_Segment_Quality_SegmentWorker
 
         // Return flag indicating whether worker initialization was successful
         return $return;
+    }
+
+    /**
+     * Get logger instance (will be created if not exists)
+     *
+     * @return ZfExtended_Logger
+     *
+     * @throws Zend_Exception
+     */
+    public function getLogger(): ZfExtended_Logger
+    {
+        return $this->logger ?? $this->logger = Zend_Registry::get('logger')->cloneMe($this->getLoggerDomain());
+    }
+
+    protected function getLoggerDomain(): string
+    {
+        return $this->getConfiguration()::getLoggerDomain($this->processingMode);
     }
 
     /**
@@ -383,14 +399,33 @@ abstract class AbstractImport extends editor_Segment_Quality_SegmentWorker
     }
 
     /**
-     * Get logger instance (will be created if not exists)
-     *
-     * @return ZfExtended_Logger
-     *
-     * @throws Zend_Exception
+     * @throws DownException
      */
-    public function getLogger(): ZfExtended_Logger
+    protected function raiseNoAvailableResourceException() {
+        // E1411 No reachable LanguageTool instances available, please specify LanguageTool urls to import this task.
+        throw new DownException('E1411', [
+            'task' => $this->task
+        ]);
+    }
+
+    /*************************** SINGLE SEGMENT PROCESSING ***************************/
+    protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool {
+        return true;
+    }
+
+    /**
+     * Calculates the progress based on the spellcheckState field in LEK_segments_meta
+     *
+     * @return float
+     */
+    protected function calculateProgressDone() : float
     {
-        return $this->logger ?? $this->logger = Zend_Registry::get('logger')->cloneMe($this->getLoggerDomain());
+        $meta = ZfExtended_Factory::get(editor_Models_Segment_Meta::class);
+
+        $states = [
+            SegmentState::SEGMENT_STATE_CHECKED,
+        ];
+
+        return $meta->calculateSegmentProgressByStatesAndColumn($this->taskGuid, $states, $this->getMetaColumnName());
     }
 }

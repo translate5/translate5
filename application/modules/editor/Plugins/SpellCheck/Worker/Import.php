@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Plugins\SpellCheck\Base\Enum\SegmentState;
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\DownException;
 use MittagQI\Translate5\Plugins\SpellCheck\Base\Worker\AbstractImport;
 
 /**
@@ -91,44 +90,8 @@ class editor_Plugins_SpellCheck_Worker_Import extends AbstractImport
         return new editor_Plugins_SpellCheck_SegmentProcessor($this->spellCheckLang);
     }
 
-    protected function getLoggerDomain(): string
-    {
-        return editor_Plugins_SpellCheck_Configuration::getLoggerDomain($this->processingMode);
-    }
-
     protected function getMetaColumnName(): string
     {
         return 'spellcheckState';
-    }
-
-    /**
-     * Calculates the progress based on the spellcheckState field in LEK_segments_meta
-     *
-     * @return float
-     */
-    protected function calculateProgressDone() : float
-    {
-        $meta = ZfExtended_Factory::get(editor_Models_Segment_Meta::class);
-
-        $states = [
-            SegmentState::SEGMENT_STATE_CHECKED,
-        ];
-
-        return $meta->calculateSegmentProgressByStatesAndColumn($this->taskGuid, $states, $this->getMetaColumnName());
-    }
-
-    /**
-     * @throws DownException
-     */
-    protected function raiseNoAvailableResourceException() {
-        // E1411 No reachable LanguageTool instances available, please specify LanguageTool urls to import this task.
-        throw new DownException('E1411', [
-            'task' => $this->task
-        ]);
-    }
-
-    /*************************** SINGLE SEGMENT PROCESSING ***************************/
-    protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool {
-        return true;
     }
 }

@@ -42,11 +42,8 @@ class editor_Plugins_SpellCheck_SegmentProcessor implements SegmentProcessorInte
      */
     private static array $connector = [];
 
-    private ?string $spellcheckLanguage;
-
-    public function __construct(?string $spellcheckLanguage)
+    public function __construct(private ?string $spellcheckLanguage)
     {
-        $this->spellcheckLanguage = $spellcheckLanguage;
     }
 
     /**
@@ -135,5 +132,13 @@ class editor_Plugins_SpellCheck_SegmentProcessor implements SegmentProcessorInte
             // Save qualities
             $tags->getQualities()->save();
         }
+    }
+
+    /**
+     * @param string $spellcheckLanguage
+     */
+    public function setSpellcheckLanguage(string $spellcheckLanguage): void
+    {
+        $this->spellcheckLanguage = $spellcheckLanguage;
     }
 }
