@@ -44,7 +44,7 @@ final class editor_Plugins_Okapi_Bconf_Segmentation_Srx extends editor_Plugins_O
      * @return bool
      */
     public function validate(bool $forImport=false) : bool {
-        $parser = new editor_Utils_Dom();
+        $parser = new ZfExtended_Dom();
         $parser->loadXML($this->content);
         // sloppy checking here as we do not know how tolerant longhorn actually is
         if($parser->isValid()){

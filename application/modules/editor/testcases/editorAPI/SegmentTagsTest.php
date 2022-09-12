@@ -33,7 +33,7 @@ class SegmentTagsTest extends editor_Test_SegmentTagsTest {
 
     public function testUnicodeTag(){
         $expected = '<div><p>イリノイ州シカゴにて、アイルランド系の家庭に、</p></div>';
-        $dom = new editor_Utils_Dom();
+        $dom = new ZfExtended_Dom();
         $element = $dom->loadUnicodeElement($expected);
         $result = $dom->saveHTML($element);
         $this->assertEquals($result, $expected);
@@ -41,7 +41,7 @@ class SegmentTagsTest extends editor_Test_SegmentTagsTest {
     
     public function testUnicodeWhitespaceTag(){
         $expected = '<div><p>イリノイ州シカゴにて、アイルランド系の家庭に、</p></div>';
-        $dom = new editor_Utils_Dom();
+        $dom = new ZfExtended_Dom();
         $element = $dom->loadUnicodeElement('  Hello! '.$expected.', something else, ...');
         $result = $dom->saveHTML($element);
         $this->assertEquals($expected, $result);
@@ -49,7 +49,7 @@ class SegmentTagsTest extends editor_Test_SegmentTagsTest {
     
     public function testMultipleUnicodeWhitespaceTag(){
         $expected = ' ÜüÖöÄäß? Japanisch: <div>イリノイ州シカゴにて、</div><p>アイルランド系の家庭に、</p> additional Textnode :-)';
-        $dom = new editor_Utils_Dom();
+        $dom = new ZfExtended_Dom();
         $elements = $dom->loadUnicodeMarkup($expected);
         $result = '';
         foreach($elements as $element){

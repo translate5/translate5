@@ -127,7 +127,7 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
 
         // XML can be validated with the XML-Parser
         if($this->type == self::TYPE_XML){
-            $parser = new editor_Utils_Dom();
+            $parser = new ZfExtended_Dom();
             $parser->loadXML($this->content);
             // sloppy checking here as we do not know how tolerant longhorn actually is
             if($parser->isValid()){
