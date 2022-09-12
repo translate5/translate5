@@ -29,21 +29,23 @@ END LICENSE AND COPYRIGHT
 /**
  * FIXME must be moved to ZfExtended since there is the authenticated user used too!!!
  * Represents the session based User and provides a convenience API accessing it
+ * @deprecated use ZfExtended_Authentication instead!
  */
 class editor_User {
     
     /**
-     * @var editor_User
+     * @var editor_User|null
      */
-    private static $_instance = NULL;
+    private static ?editor_User $_instance = NULL;
 
     /**
-     * @var ZfExtended_Models_User
+     * @var ZfExtended_Models_User|null
+     * @deprecated use ZfExtended_Authentication::getInstance()->getUser() instead!
      */
-    private static $modelInstance = NULL;
+    private static ?ZfExtended_Models_User $modelInstance = NULL;
 
     /**
-     * 
+     *
      * @return editor_User
      */
     public static function instance() : editor_User {
@@ -52,24 +54,22 @@ class editor_User {
         }
         return self::$_instance;
     }
+
+    public static function create(ZfExtended_Models_User $user) {
+        self::$modelInstance = $user;
+        self::instance();
+    }
+
     /**
-     * 
+     *
      * @var Zend_Session_Namespace
      */
     private $session;
 
     /**
-     * @throws ZfExtended_NotAuthenticatedException
-     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     private function __construct(){
         $this->session = new Zend_Session_Namespace('user');
-        // TODO FIXME: add some validation to catch an inexisting session or an invalid user
-        self::$modelInstance = ZfExtended_Factory::get('ZfExtended_Models_User');
-        if($this->getId() === 0) {
-            throw new ZfExtended_NotAuthenticatedException();
-        }
-        self::$modelInstance->load($this->getId());
     }
     /**
      * 

@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Applet;
 
-use editor_User;
+use ZfExtended_Authentication as Auth;
 use JetBrains\PhpStorm\NoReturn;
 use Zend_Registry;
 use ZfExtended_Acl;
@@ -95,7 +95,7 @@ class Dispatcher {
         // we try to load the last used app
         /** @var \editor_Models_UserMeta $meta */
         $meta = \ZfExtended_Factory::get('editor_Models_UserMeta');
-        $meta->loadOrSet(\editor_User::instance()->getId());
+        $meta->loadOrSet(Auth::getInstance()->getUser()->getId());
         if($meta->getId() != null && !empty($meta->getLastUsedApp())){
             $this->call($meta->getLastUsedApp());
         }
@@ -151,13 +151,11 @@ class Dispatcher {
         // default redirect to editor
         $applett = 'editor';
         try {
-            $user = editor_User::instance();
-
             $acl = ZfExtended_Acl::getInstance();
             /* @var ZfExtended_Acl $acl */
 
             // get all initial_page acl records for all available user roles
-            $aclModules = $acl->getInitialPageModulesForRoles($user->getRoles());
+            $aclModules = $acl->getInitialPageModulesForRoles(Auth::getInstance()->getRoles());
 
             $config = Zend_Registry::get('config');
             $modulesOrder = explode(',',$config->runtimeOptions->modulesOrder);
