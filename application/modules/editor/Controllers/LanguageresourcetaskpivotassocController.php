@@ -142,7 +142,7 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
         $workerParameters['batchQuery'] = (boolean) Zend_Registry::get('config')->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
         if($workerParameters['batchQuery']){
 
-            // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
+            // trigger event before the pivot pre-transaltion worker is queued
             $this->events->trigger("beforePivotPreTranslationQueue", $this, array(
                 'task' => $task,
                 'pivotAssociations' => $assoc,

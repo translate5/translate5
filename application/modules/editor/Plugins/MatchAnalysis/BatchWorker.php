@@ -65,11 +65,17 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
         $task->loadByTaskGuid($this->taskGuid);
         
         $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
+        /* @var editor_Models_LanguageResources_LanguageResource $languageResource */
         $languageResource->load($params['languageResourceId']);
+
+        $targetLang = $task->getTargetLang();
+
+        if( isset($params['contentField']) && $params['contentField'] === editor_Models_SegmentField::TYPE_RELAIS){
+            $targetLang = $task->getRelaisLang();
+        }
         
-        $connector = $manager->getConnector($languageResource, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
-        /* @var $connector editor_Services_Connector */
+        $connector = $manager->getConnector($languageResource, $task->getSourceLang(), $targetLang, $task->getConfig());
+        /* @var editor_Services_Connector $connector */
 
         // set the worker user for the connector. This is required for the resource usage log
         $connector->setWorkerUserGuid($params['userGuid']);

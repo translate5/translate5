@@ -201,8 +201,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $services=[];
         //get all available tm resources
         foreach($resources as $resource) {
-            $tmpType=null;
-            $tmpType=$resourceType ?? $resource->getType();
+            $tmpType = $resourceType ?? $resource->getType();
             /* @var $resource editor_Models_LanguageResources_Resource */
             if(!in_array($resource->getService(), $services) && $tmpType==$resource->getType()){
                 $services[]=$resource->getService();
@@ -210,7 +209,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         }
         
         //filter assoc resources by services
-        $engines=$this->loadByUserCustomerAssocs($services);
+        $engines = $this->loadByUserCustomerAssocs($services);
         //check if results are found
         if(empty($engines)){
             return $engines;
