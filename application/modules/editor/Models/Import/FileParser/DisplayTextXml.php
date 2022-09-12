@@ -261,7 +261,7 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
         });
         
         //we just replace the linefeed tags with a raw newline. So it is replaced as new line tag then
-        $this->xmlparser->registerElement('comment linefeed, displaymessage linefeed', function($tag, $attributes, $key) {
+        $this->xmlparser->registerElement('displaymessage linefeed', function($tag, $attributes, $key) {
             $this->xmlparser->replaceChunk($key, "\n");
         });
         
@@ -285,7 +285,9 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
             //$currentComment->
             $currentComment->setUserName($this->xmlparser->getAttribute($opener['attributes'], 'language'),);
             $currentComment->setUserGuid('imported');
-            $currentComment->setComment($this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true));
+            $comment = $this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
+            //comments may contain also line breaks:
+            $currentComment->setComment(str_replace('<Linefeed/>', "\n", $comment));
         });
         
         $this->xmlparser->registerElement('displaymessage inset', null, function($tag, $key, $opener) {
@@ -371,7 +373,7 @@ The German and the English Comment tag of the string must be imported as comment
         $segment = $this->utilities->internalTag->protect($segment);
         
         //since there are no other tags we can just take the string and protect whitespace there (no tag protection needed!)
-        $segment = $this->utilities->whitespace->protectWhitespace($segment);
+        $segment = $this->utilities->whitespace->protectWhitespace($segment, $this->utilities->whitespace::ENTITY_MODE_OFF);
         $segment = $this->utilities->whitespace->convertToInternalTags($segment, $this->shortTagIdent);
         
         $segment = $this->utilities->internalTag->unprotect($segment);

@@ -604,6 +604,11 @@ class Models_Installer_Standalone {
         if(!empty($this->dbCredentials['executable'])) {
             $content[] = 'resources.db.executable = "'.$this->dbCredentials['executable'].'"';
         }
+        $content[] = '';
+        $content[] = '; secret for encryption of the user passwords';
+        $content[] = '; WHEN YOU CHANGE THAT ALL PASSWORDS WILL BE INVALID!';
+        $content[] = 'runtimeOptions.authentication.secret = '.bin2hex(random_bytes(32));
+
         if(!empty($additionalParameters['timezone'])) {
             $content[] = '';
             $content[] = 'phpSettings.date.timezone = "'.$additionalParameters['timezone'].'"';

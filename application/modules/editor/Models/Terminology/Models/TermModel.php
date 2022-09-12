@@ -1554,7 +1554,8 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         foreach ($attributes as $attribute) {
 
             $attribute['nameTranslated'] = $locales[$attribute['dataTypeId']] ?: $attribute['elementName'];
-
+            $attribute['value'] = htmlentities($attribute['value']);
+            
             if( empty($attribute['language'])){
                 $template['entry'][] = $attribute;
             }elseif ( empty($attribute['termId'])){
