@@ -69,7 +69,7 @@ class Translate2855Test extends editor_Test_JsonTest {
     private static function createResource(){
         self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
             'name' => 'API Testing::Pivot pre-translation',
-            'number' => uniqid('API Testing::Pivot pre-translation'),
+            'number' => uniqid('API Testing::Pivot pre-translation', true),
         ]);
 
         $params=[

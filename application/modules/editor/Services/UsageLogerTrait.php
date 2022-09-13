@@ -189,9 +189,7 @@ trait editor_Services_UsageLogerTrait {
      */
     protected function getInstantTranslateRequestSourceCustomers(){
         if(!isset($this->userFilePretranslate)){
-            $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-            /* @var $userModel ZfExtended_Models_User */
-            $userCustomers=$userModel->getUserCustomersFromSession();
+            $userCustomers = ZfExtended_Authentication::getInstance()->getUser()->getCustomersArray();
         }else{
             $userCustomers = $this->userFilePretranslate->getCustomersArray();
         }

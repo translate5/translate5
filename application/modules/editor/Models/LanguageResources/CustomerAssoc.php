@@ -234,9 +234,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * @return array
      */
     public function findAsDefaultForUser(){
-        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $customers=$userModel->getUserCustomersFromSession();
+        $customers = ZfExtended_Authentication::getInstance()->getUser()->getCustomersArray();
         
         if(empty($customers)){
             return [];

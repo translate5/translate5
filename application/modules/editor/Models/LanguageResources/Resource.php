@@ -272,7 +272,7 @@ class editor_Models_LanguageResources_Resource {
      * returns the resource as stdClass data object for the ResourceController
      * @return stdClass
      */
-    public function getDataObject() {
+    public function getDataObject(): stdClass {
         $data = new stdClass();
         foreach($this->fieldsForController as $key => $index) {
             $method = 'get'.ucfirst($index);

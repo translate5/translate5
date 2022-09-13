@@ -37,6 +37,8 @@ use MittagQI\Translate5\Authentication\OpenId\{
     ClientException as OpenIdClientException
 };
 
+use ZfExtended_Authentication as Auth;
+
 /**
  * Klasse der Nutzermethoden
  */
@@ -66,7 +68,7 @@ class LoginController extends ZfExtended_Controllers_Login {
 
         parent::indexAction();
         //if the login status is required, try to authenticate with openid connect
-        if($this->view->loginStatus==ZfExtended_Models_SessionUserInterface::LOGIN_STATUS_OPENID){
+        if($this->view->loginStatus==ZfExtended_Authentication::LOGIN_STATUS_OPENID){
             $this->handleOpenIdRequest();
         }
     }
@@ -94,7 +96,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         
         $this->localeSetup();
 
-        if(editor_User::instance()->getLogin() == Zfextended_Models_User::SYSTEM_LOGIN) {
+        if(Auth::getInstance()->getUser()->getLogin() == Zfextended_Models_User::SYSTEM_LOGIN) {
             $this->logoutAction();
         }
 
@@ -187,7 +189,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                 $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
                 ZfExtended_Models_LoginLog::addSuccess($user, "openid");
 
-                $this->_userModel->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
+                Auth::getInstance()->authenticateUser($user);
 
                 ZfExtended_Session::updateSession(true,true);
 
