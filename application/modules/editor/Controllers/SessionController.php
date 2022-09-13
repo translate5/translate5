@@ -76,10 +76,7 @@ class editor_SessionController extends ZfExtended_SessionController {
                 ['login' => 'Der Parameter login mit dem gewünschten Benutzernamen fehlt.']
             );
         }
-        $config = Zend_Registry::get('config');
-        $userModel = ZfExtended_Factory::get($config->authentication->userEntityClass);
-        /* @var $userModel \ZfExtended_Models_User */
-        $userModel->setUserSessionNamespaceWithoutPwCheck($login);
+        ZfExtended_Authentication::getInstance()->authenticateByLogin($login);
     }
     
     public function postAction() {
@@ -143,13 +140,12 @@ class editor_SessionController extends ZfExtended_SessionController {
         /* @var $user ZfExtended_Models_User */
         $user->loadByGuid($taskUserAssoc->getUserGuid());
         $this->setLocale(new Zend_Session_Namespace(), $user);
-        $login = $user->getLogin();
 
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskUserAssoc->getTaskGuid());
         
-        $user->setUserSessionNamespaceWithoutPwCheck($login);
+        ZfExtended_Authentication::getInstance()->authenticateUser($user);
 
         $userSession = new Zend_Session_Namespace('user');
 

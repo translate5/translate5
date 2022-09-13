@@ -387,14 +387,21 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      *
      * @param bool $dict if true return ids mapped to name, if false array of IDs only
      * @param array $clientIds if given, intersect the loaded collection IDs with the ones given as parameter
-     * @param bool $termportal Is passed to getUserCustomersFromSession($termportal) call
+     * @param bool $termportal defines if we are in termportal or not
      * @return array
+     * @throws Zend_Db_Statement_Exception
      */
     public function getCollectionForAuthenticatedUser(bool $dict = false, array $clientIds = [], $termportal = false): array
     {
-        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $customers = $userModel->getUserCustomersFromSession($termportal);
+        $user = ZfExtended_Authentication::getInstance()->getUser();
+
+        if ($termportal && in_array('termPM_allClients', $user->getRoles())) {
+            $customers = Zend_Db_Table_Abstract::getDefaultAdapter()->query('SELECT `id` FROM `LEK_customer`')->fetchAll(PDO::FETCH_COLUMN);
+        }
+        else {
+            $customers = $user->getCustomersArray();
+        }
+
 
         if (!empty($clientIds)) {
             $customers = array_intersect($customers, $clientIds);
@@ -599,5 +606,21 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         ', $collectionId);
 
         //i($_, 'a');
+    }
+
+    /**
+     * @param ZfExtended_Models_User $user
+     * @return array
+     */
+    public function getAccessibleCollectionIds(ZfExtended_Models_User $user): array {
+        $s = $this->db->select()
+            ->distinct()
+            ->from(['lr' => 'LEK_languageresources'], ['id'])
+            ->setIntegrityCheck(false)
+            ->join(['lr2c' => 'LEK_languageresources_customerassoc'], '`lr2c`.`languageResourceId` = `lr`.`id`', [])
+            ->where('`lr`.`resourceType` = ?', editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION)
+            ->where('customerId IN (?)', $user->getCustomersArray());
+
+        return array_column($this->db->fetchAll($s)->toArray(),'id');
     }
 }
