@@ -108,6 +108,46 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      */
     public $collectionIds = null;
 
+    public $detected               = [];
+    public $trgLangTermsBySrcEntry = [];
+    public $targetTermIds          = [];
+    public $targetTermTexts        = [];
+
+    /**
+     * @param string $sourceTermId
+     * @return string
+     */
+    protected function recalcSingleSourceTerm(string $sourceTermId) {
+
+        // Case 1: If given source term is NOT found in db
+        if (!$src = $this->detected[$sourceTermId] ?? 0) {
+
+            // Setup 'transNotDefined'-class
+            return 'transNotDefined';
+
+        // Case 2: Else if found, but it has NO translations in db for the target fuzzy languages
+        } else if (!$transTermIds = array_column($this->trgLangTermsBySrcEntry[$src['termEntryTbxId']] ?? [], 'termTbxId')) {
+
+            // Setup 'transNotDefined'-class
+            return 'transNotDefined';
+
+        // Case 3: Else if at least one of target terms is a translation for the current source term
+        } else if ($transTermId = array_intersect($transTermIds, $this->targetTermIds)[0] ?? 0) {
+
+            // Remove first found tbxId from $targetTermIds
+            unset($this->targetTermIds[array_search($transTermId, $this->targetTermIds)]);
+
+            // Setup 'transFound'-class
+            return 'transFound';
+
+        // Else setup default css class to be used if kept unmodified by below
+        } else {
+
+            // Default css class for other cases
+            return 'transNotFound';
+        }
+    }
+
     /**
      * recalculates one single segment content
      * @param string $source
@@ -116,24 +156,156 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      */
     public function recalc(string $source, string &$target): string
     {
-        //TODO: this config and return can be removed after finishing the initial big transit project
-        $config = Zend_Registry::get('config');
-        if (!empty($config->runtimeOptions->termTagger->markTransFoundLegacy)) {
+        //
+        if (!empty(Zend_Registry::get('config')->runtimeOptions->termTagger->markTransFoundLegacy)) {
             return $source;
         }
 
+        // If no term collections - return source as is
         if (empty($this->collectionIds)) {
             return $source;
         }
+
+        // Get source and target
         $source = $this->removeExistingFlags($source);
         $target = $this->removeExistingFlags($target);
+
+        // Get source and target tbx ids
         $sourceTermIds = $this->termModel->getTermMidsFromSegment($source);
-        $targetTermIds = $this->termModel->getTermMidsFromSegment($target);
-        $targetTermIds_initial = $targetTermIds; $targetTermIds_unset = [];
+        $this->targetTermIds = $this->termModel->getTermMidsFromSegment($target);
+
+        // If no source terms detected - return $source as is
+        if (!count($sourceTermIds)) {
+            return $source;
+        }
+
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
+
+        // Get merged list of term tbx ids detected in source and target
+        $mergedTbxIdA = array_unique(array_merge($sourceTermIds, $this->targetTermIds));
+
+        // Get merged list of source and target fuzzy languages
+        $mergedLangIdA = array_merge($this->sourceFuzzyLanguages, $this->targetFuzzyLanguages);
+
+        //
+        $homonym = $this->trgLangTermsBySrcEntry = $this->targetTermTexts = [];
+
+        // Get `termEntryTbxId` and `term` for each term detected in source and target
+        $this->detected = $db->query('
+            SELECT `termTbxId`, `termEntryTbxId`, `term` 
+            FROM `terms_term` 
+            WHERE 1
+             AND `termTbxId` IN ("'. join('","', $mergedTbxIdA) . '")
+             AND `collectionId` IN (' . join(',', $this->collectionIds) . ')
+            LIMIT ' . count($mergedTbxIdA) . '             
+        ')->fetchAll(PDO::FETCH_UNIQUE);
+
+        // Collect target terms texts
+        foreach ($this->targetTermIds as $targetTermId) {
+            if ($trg = $this->detected[$targetTermId] ?? 0) {
+                $this->targetTermTexts []= $trg['term'];
+            }
+        }
+
+        // Get all terms (from source and target), grouped by their termEntryTbxId
+        $termsByEntry = $db->query('
+            SELECT `termEntryTbxId`, `termEntryTbxId`, `term`, `termTbxId`, `languageId`
+            FROM `terms_term`
+            WHERE 1
+              AND `termEntryTbxId` IN ("' . join('","', array_column($detected, 'termEntryTbxId')) . '")
+              AND `collectionId`   IN (' . join(',', $this->collectionIds) . ')
+              AND `languageId`     IN (' . join(',', $mergedLangIdA) . ')
+        ')->fetchAll(PDO::FETCH_GROUP);
+
+        // Foreach source term
+        foreach ($sourceTermIds as $srcTbxId) {
+
+            // If detected in db
+            if ($src = $this->detected[$srcTbxId] ?? 0) {
+
+                // Pick translations for target fuzzy languages
+                foreach ($termsByEntry[$src['termEntryTbxId']] as $term) {
+                    if (in_array($term['languageId'], $this->targetFuzzyLanguages)) {
+                        $this->trgLangTermsBySrcEntry[$src['termEntryTbxId']] []= $term;
+                    }
+                }
+
+                // Pick homonyms under the target terms' termEntries
+                foreach ($this->targetTermIds as $trgTbxId) {
+                    if ($trg = $this->detected[$trgTbxId] ?? 0) {
+                        foreach ($termsByEntry[$trg['termEntryTbxId']] as $term) {
+                            if (in_array($term['languageId'], $this->sourceFuzzyLanguages)
+                                && $term['term'] == $src['term']
+                                && $term['termTbxId'] != $srcTbxId) {
+                                $homonym[$srcTbxId] []= $term['termTbxId'];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Foreach source term tbx id
+        foreach ($sourceTermIds as $sourceTermId) {
+
+            // Get css class
+            $css[$sourceTermId] = $this->recalcSingleSourceTerm($sourceTermId);
+
+            // If translation was found or such source term does not exists in db
+            if ($css[$sourceTermId] == 'transFound' || !isset($this->detected[$sourceTermId])) {
+
+                // Skip to next source term
+                continue;
+            }
+
+            // if source term has homonyms among target terms' termEntries
+            if ($homonym[$sourceTermId] ?? 0) {
+
+                // Foreach homonym
+                foreach ($homonym[$sourceTermId] as $homonym_sourceTermId) {
+
+                    // Get css class
+                    $css[$sourceTermId] = $this->recalcSingleSourceTerm($homonym_sourceTermId);
+
+                    // If it's 'transFound' - stop homonym walkthrough
+                    if ($css[$sourceTermId] == 'transFound') {
+                        break;
+                    }
+                }
+
+            // Else
+            } else {
+
+                //
+                $src = $this->detected[$sourceTermId];
+
+                //
+                if (!$transTermTexts = array_column($this->trgLangTermsBySrcEntry[$src['termEntryTbxId']] ?? [], 'term')) {
+
+                    // Setup 'transNotDefined'-class
+                    $css[$sourceTermId] = 'transNotDefined';
+
+                // Else if at least one of target terms is a translation for the current source term
+                } else if ($transTermText = array_intersect($transTermTexts, $this->targetTermTexts)[0] ?? 0) {
+
+                    // Remove first found term text from $targetTermTexts
+                    unset($this->targetTermTexts[array_search($transTermText, $this->targetTermTexts)]);
+
+                    // Setup 'transFound'-class
+                    $css[$sourceTermId] = 'transFound';
+                }
+            }
+        }
+
+        //class_exists('editor_Utils');
+        //i(compact('source', 'target', 'detected', 'termsByEntry', 'homonym', 'trgLangTermsBySrcEntry'), 'a');
+
+        /*$targetTermIds_initial = $targetTermIds; $targetTermIds_unset = [];
         $toMarkMemory = [];
         $this->groupCounter = [];
 
         foreach ($sourceTermIds as $sourceTermId) {
+            $endlessLoopQty = 0;
 
             // Goto label to be used in case when $sourceTermId initially detected by TermTagger contains termTbxId of a term
             // located under NOT the same termEntry as term(s) detected in segment target text, so that such a term in
@@ -142,24 +314,20 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             // label will be used as a pointer for goto operator executed in case if such situation was detected and
             // alternative termTbxId was found to solve that problem so we'll have to run same iteration from the
             // beginning but with using spoofed value of $sourceTermId variable
-            correct_sourceTermId:
+            //correct_sourceTermId:
 
-            // Check whether source term having given termTbxId ($sourceTermId) exists within task's termcollections
-            try {
-                $this->termCache->loadByMid($sourceTermId, $this->collectionIds);
-            }
-            catch (ZfExtended_Models_Entity_NotFoundException $e) {
-
-                // So the source terms are marked as notfound in the repetitions
+            // Check whether source term having given termTbxId ($sourceTermId) exists
+            // within task's termcollections and if not - mark this term as not found
+            if (!$src = $detected[$sourceTermId] ?? false) {
                 $toMarkMemory[$sourceTermId] = null;
                 continue;
             }
 
             // Get termEntryId of the given source term
-            $termEntryTbxId = $this->termCache->getTermEntryTbxId();
+            $termEntryTbxId = $src['termEntryTbxId'];
 
             // Find translations of the given source term for target fuzzy languages
-            $groupedTerms = $this->termCache->getAllTermsOfGroup($this->collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
+            $groupedTerms = $trgLangTermsBySrcEntry[$termEntryTbxId] ?? [];
 
             // If no translations found
             if (empty($groupedTerms)) {
@@ -183,9 +351,6 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                     // Increment translation-which-is-found-in-segment-target counter
                     $transFound ++;
 
-                    // Collect target terms tbx ids, that were unset from $targetTermIds
-                    $targetTermIds_unset []= $groupedTerm['termTbxId'];
-
                     // Unset it from $targetTermIds-array, so that the only tbx ids of terms will be kept
                     // there which are not translations to any of terms detected in segment source text
                     unset($targetTermIds[$targetTermIdKey]);
@@ -193,30 +358,27 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             }
 
             // If there are terms detected in segment target text but none of them is a translation for source text's current term
-            if ($targetTermIds && !$transFound) {
-
-                // Shortcut to db adapter instance
-                $db = Zend_Db_Table_Abstract::getDefaultAdapter();
-
-                // Lazy load distinct termEntryTbx ids of target terms
-                $termEntryTbxIdA = $termEntryTbxIdA
-                    ?? $this->termCache->loadTermEntryTbxIdsByTermTbxIds($targetTermIds_initial);
+            /*if ($targetTermIds && !$transFound) {
 
                 // Unset values from $termEntryTbxIdA if need
                 foreach ($targetTermIds_unset as $targetTermId_unset) {
-                    unset($termEntryTbxIdA[$targetTermId_unset]);
+                    unset($termEntryTbxIdA_target[$targetTermId_unset]);
                 }
 
-                // Try to find current source term's homonym under the target terms' termEntries
-                $sourceTermId_homonym = $this->termCache->findHomonym(
-                    $this->termCache->getTerm(), $termEntryTbxIdA, $this->sourceFuzzyLanguages,
-                );
-
                 // If found
-                if ($sourceTermId_homonym) {
+                if ($homonym[$sourceTermId]) {
 
                     // Spoof value of $sourceTermId with found homonym's termTbxId
-                    $sourceTermId = $sourceTermId_homonym;
+                    $sourceTermId = $homonym[$sourceTermId][1]['termTbxId'];
+
+                    $endlessLoopQty ++;
+
+                    if ($endlessLoopQty > 10) {
+                        i('loopQty: ' . $endlessLoopQty . ' - skip' , 'a');
+                        continue;
+                    } else {
+                        i('loopQty: ' . $endlessLoopQty . ' - try spoofed ', 'a');
+                    }
 
                     // Re-run current iteration
                     goto correct_sourceTermId;
@@ -256,7 +418,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         // Reapply css class names where need
         foreach ($toMarkMemory as $sourceTermId => $termEntryTbxId) {
             $source = $this->insertTransFoundInSegmentClass($source, $sourceTermId, $termEntryTbxId);
-        }
+        }*/
 
         // Return source text
         return $source;
