@@ -78,7 +78,6 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
             $pathParts = explode('/', trim($zip->getNameIndex($i), '/'));
             $numParts = count($pathParts);
             if($numParts > 1 && $pathParts[0] === $refDir && in_array(pathinfo($pathParts[$numParts - 1], PATHINFO_EXTENSION), self::FORBIDDEN_EXTENSIONS)){
-                error_log('ZIP DELETE: '.$zip->getNameIndex($i));
                 $idxToDelete[] = $i;
             }
         }
