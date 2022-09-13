@@ -1831,7 +1831,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function positionAction() {
         //TODO The optimal way to implement this, is like similar to the segment::positionAction in a general way so that it is usable for all entities.
-        
+        $this->addDefaultSort();
         $this->handleProjectRequest();
         $rows=$this->loadAll();
         $id = (int) $this->_getParam('id');
