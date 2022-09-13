@@ -126,25 +126,15 @@ class editor_Models_Import_FileList {
      * @return string
      */
     protected function getReferenceFileTree() {
-        $config = Zend_Registry::get('config');
-        $refTarget = $this->getAbsReferencePath();
-        $refDir = $config->runtimeOptions->import->referenceDirectory;
+        $refDir = editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
         $refAbsDir = $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir;
+        $refTarget = $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$refDir;
         ZfExtended_Utils::recursiveCopy($refAbsDir, $refTarget);
-    
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_ReferenceFiles');
         /* @var $parser editor_Models_Import_DirectoryParser_ReferenceFiles */
         return $parser->parse($refTarget, $this->task);
     }
-    
-    /**
-     * returns the absolute path to the tasks folder for reference files
-     */
-    protected function getAbsReferencePath() {
-        $config = Zend_Registry::get('config');
-        return $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$config->runtimeOptions->import->referenceDirectory;
-    }
-    
+
     public function processRelaisFiles() {
         $this->relaisFolderTree = ZfExtended_Factory::get('editor_Models_RelaisFoldertree');
         $this->relaisFolderTree->setImportConfig($this->importConfig);
@@ -161,10 +151,9 @@ class editor_Models_Import_FileList {
      * @return boolean
      */
     public function hasReferenceFiles() {
-        $config = Zend_Registry::get('config');
-        //If no review directory is set, the reference files must be ignored  
+        //If no review directory is set, the reference files must be ignored
         $workfilesDirectory = $this->importConfig->getFilesDirectory();
-        $refDir = $config->runtimeOptions->import->referenceDirectory;
+        $refDir = editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
         return !empty($workfilesDirectory) && is_dir($this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir);
     }
 

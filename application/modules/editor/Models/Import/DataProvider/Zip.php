@@ -49,6 +49,7 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
         $this->setTask($task);
         $this->checkAndMakeTempImportFolder();
         $this->unzip();
+        $this->securityCleanup();
     }
 
     /**
@@ -83,6 +84,7 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
                 foreach($this->additionalArchiveFiles as $fileName => $filePath){
                     $zip->addFile($filePath, $fileName);
                 }
+                $this->securityArchiveCleanup($zip);
                 $zip->close();
             }
         }
@@ -109,6 +111,24 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
             ]);
         }
         $zip->close();
+    }
+
+    /**
+     * cleans the unzipped files from security relevant stuff
+     * @throws Zend_Exception
+     */
+    protected function securityCleanup(){
+        // for now, we only clean the reference-files folder
+        editor_Models_Import_DirectoryParser_ReferenceFiles::cleanImportDirectory($this->importFolder);
+    }
+
+    /**
+     * cleans the archive from security relevant stuff
+     * @param ZipArchive $zip
+     */
+    protected function securityArchiveCleanup(ZipArchive $zip){
+        // for now, we only clean the reference-files folder
+        editor_Models_Import_DirectoryParser_ReferenceFiles::cleanImportArchive($zip);
     }
 
     /**
