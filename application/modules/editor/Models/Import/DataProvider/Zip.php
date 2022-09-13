@@ -77,16 +77,17 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
                 'target' => $target,
             ]);
         }
-        // add additional Archive-files if set
-        if(count($this->additionalArchiveFiles) > 0){
-            $zip = new ZipArchive();
-            if ($zip->open($target) === TRUE) {
+        // prepare the zip for archiving
+        $zip = new ZipArchive();
+        if ($zip->open($target) === TRUE){
+            // add additional Archive-files if set
+            if(count($this->additionalArchiveFiles) > 0){
                 foreach($this->additionalArchiveFiles as $fileName => $filePath){
                     $zip->addFile($filePath, $fileName);
                 }
-                $this->securityArchiveCleanup($zip);
-                $zip->close();
             }
+            $this->securityArchiveCleanup($zip);
+            $zip->close();
         }
     }
 
