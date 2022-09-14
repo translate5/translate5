@@ -108,21 +108,33 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      */
     public $collectionIds = null;
 
-    public $exists               = [];
-    public $trans = [];
-    public $homonym                = [];
-    public $srcIdA          = [];
-    public $trgIdA          = [];
-    public $trgTextA        = [];
+    public $exists       = [];
+    public $trans        = [];
+    public $termsByEntry = [];
+    public $homonym      = [];
+    public $srcIdA       = [];
+    public $trgIdA       = [];
+    public $trgTextA     = [];
 
     /**
+     * Get translation status mark for source term having tbxId given by $srcId arg,
+     * or for source term's homonym, identified by termEntryTbxId still given by $srcId but with `true` as value of 2nd arg
+     *
      * @param string $srcId
      * @return string
      */
-    protected function getMarkByTbxId(string $srcId) {
+    protected function getMarkByTbxId(string $srcId, $isHomonym = false) {
+
+        // If $isHomonym arg is true, it means that $srcId arg contains termEntryTbxId of a homonym term for some source term
+        // so that we set up $src variable for it to be an array containing termEntryTbxId-key for it to be possible to use for
+        // finding translations. We do that to avoid excessive SQL-query as the only thing we need for homonym term is it's
+        // termEntryTbxId, which we did preload but not in $this->exists array
+        $src = $isHomonym
+            ? ['termEntryTbxId' => $srcId]
+            : ($this->exists[$srcId] ?? 0);
 
         // If given source term is NOT found in db
-        if (!$src = $this->exists[$srcId] ?? 0) {
+        if (!$src) {
 
             // Setup 'transNotDefined'-class
             return 'transNotDefined';
@@ -151,7 +163,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     }
 
     /**
-     * Preload data, sufficient for being further used to detect correct source terms marks
+     * Preload data, sufficient for being further used to detect correct source terms translation status marks
      *
      * @throws Zend_Db_Statement_Exception
      */
@@ -178,7 +190,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         ')->fetchAll(PDO::FETCH_UNIQUE);
 
         // Get all terms (from source and target), grouped by their termEntryTbxId
-        $termsByEntry = $db->query('
+        $this->termsByEntry = $db->query('
             SELECT `termEntryTbxId`, `termEntryTbxId`, `term`, `termTbxId`, `languageId`
             FROM `terms_term`
             WHERE 1
@@ -196,20 +208,34 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             }
 
             // Pick translations for target fuzzy languages
-            foreach ($termsByEntry[$src['termEntryTbxId']] as $term) {
+            foreach ($this->termsByEntry[$src['termEntryTbxId']] as $term) {
                 if (in_array($term['languageId'], $this->targetFuzzyLanguages)) {
-                    $this->trans[$src['termEntryTbxId']] []= $term['termTbxId'];
+                    $this->trans[$src['termEntryTbxId']] []= $term;
                 }
             }
 
             // Pick homonyms under the target terms' termEntries
             foreach ($this->trgIdA as $trgTbxId) {
                 if ($trg = $this->exists[$trgTbxId] ?? 0) {
-                    foreach ($termsByEntry[$trg['termEntryTbxId']] as $term) {
+                    foreach ($this->termsByEntry[$trg['termEntryTbxId']] as $term) {
                         if (in_array($term['languageId'], $this->sourceFuzzyLanguages)
                             && $term['term'] == $src['term']
                             && $term['termTbxId'] != $srcId) {
-                            $this->homonym[$srcId] []= $term['termTbxId'];
+                            $this->homonym[$srcId] []= $term['termEntryTbxId'];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Add translations for source-terms-homonyms to be able to find those among target terms
+        // in case if we won't find translations for source-terms-themselves among target terms
+        foreach ($this->homonym as $srcId => $termEntryIdA) {
+            foreach ($termEntryIdA as $termEntryId) {
+                if (!isset($this->trans[$termEntryId])) {
+                    foreach ($this->termsByEntry[$termEntryId] as $term) {
+                        if (in_array($term['languageId'], $this->targetFuzzyLanguages)) {
+                            $this->trans[$termEntryId] []= $term;
                         }
                     }
                 }
@@ -225,7 +251,8 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     }
 
     /**
-     * recalculates one single segment content
+     * Recalculates translation status makrs for all terms found by termtagger within single segment source text
+     *
      * @param string $source
      * @param string $target is given as reference, if the modified target is needed too
      * @return string the modified source field
@@ -254,22 +281,25 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         if (!count($this->srcIdA)) {
             return $source;
         }
+        // class_exists('editor_Utils');
 
         // Preload data
         $this->preload();
 
-        //
+        // Get [termTbxId => mark] pairs for all terms detected in segment source text
         $markA = $this->getMarkBySrcIdA();
 
-        class_exists('editor_Utils');
-        i([
+        /*i([
             'source' => $source,
             'target' => $target,
             'srcIdA' => $this->srcIdA,
             'trgIdA' => $this->trgIdA,
             'exists' => $this->exists,
+            'termsByEntry' => $this->termsByEntry,
             'trans' => $this->trans,
-        ], 'a');
+            'homonym' => $this->homonym,
+            'markA' => $markA,
+        ], 'a');*/
 
         // Recalc transNotFound/transNotDefined/transFound marks
         foreach ($markA as $tbxId => $mark) {
@@ -281,7 +311,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     }
 
     /**
-     *
+     * Get marks to be later injected as css class for term tags in segment source text
      */
     public function getMarkBySrcIdA() {
 
@@ -294,23 +324,21 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             // Get css class
             $mark[$srcId] = $this->getMarkByTbxId($srcId);
 
-            // If translation was found or such source term does not exists in db
-            if ($mark[$srcId] == 'transFound' || !isset($this->detected[$srcId])) {
+            // If translation was found or such source term does not exists in db at all
+            if ($mark[$srcId] == 'transFound' || !isset($this->exists[$srcId])) {
 
-                // Skip to next source term
+                // Keep the mark we have for current source term and goto next source term
                 continue;
             }
-
-            continue; // temporary
 
             // If source term has homonyms among target terms' termEntries
             if ($this->homonym[$srcId] ?? 0) {
 
                 // Foreach homonym
-                foreach ($this->homonym[$srcId] as $homonym_srcId) {
+                foreach ($this->homonym[$srcId] as $termEntryId) {
 
-                    // Get css class
-                    $mark[$srcId] = $this->getMarkByTbxId($homonym_srcId);
+                    // Get mark for homonym
+                    $mark[$srcId] = $this->getMarkByTbxId($termEntryId, true);
 
                     // If it's 'transFound' - stop homonym walkthrough
                     if ($mark[$srcId] == 'transFound') {
@@ -322,7 +350,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             } else {
 
                 // Get source term's termEntryTbxId
-                $entryId = $this->detected[$srcId]['termEntryTbxId'];
+                $entryId = $this->exists[$srcId]['termEntryTbxId'];
 
                 // If there are no source term translations
                 if (!$transTextA = array_column($this->trans[$entryId] ?? [], 'term')) {
@@ -354,18 +382,17 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      */
     protected function removeExistingFlags($content) {
 
-        // List
-        $del = ['transFound', 'transNotFound', 'transNotDefined'];
+        // List of termtagger-assigned statuses to be stripped prior recalculation
+        $strip = ['transFound', 'transNotFound', 'transNotDefined'];
 
-        //
-        return preg_replace_callback('/(<div[^>]*class=")([^"]*term[^"]*)("[^>]*>)/', function($matches) use ($del){
+        // Strip statuses
+        return preg_replace_callback('/(<div[^>]*class=")([^"]*term[^"]*)("[^>]*>)/', function($matches) use ($strip) {
 
-            //
+            // Get array of found classes
             $classesFound = explode(' ', $matches[2]);
 
             // Remove the unwanted css classes by array_diff:
-            return $matches[1] . join(' ', array_diff($classesFound, $del)) . $matches[3];
-
+            return $matches[1] . join(' ', array_diff($classesFound, $strip)) . $matches[3];
         }, $content);
     }
 
