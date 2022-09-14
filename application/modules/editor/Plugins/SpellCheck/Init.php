@@ -37,7 +37,8 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginSpellCheck' => 'Editor.plugins.SpellCheck.controller.Editor'
+        'pluginSpellCheck' => 'Editor.plugins.SpellCheck.controller.Editor',
+        'pluginSpellCheckMain' => 'Editor.plugins.SpellCheck.controller.Main'
     );
     
     protected $localePath = 'locales';
