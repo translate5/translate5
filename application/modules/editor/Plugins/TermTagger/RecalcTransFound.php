@@ -140,7 +140,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             return 'transNotDefined';
 
         // Else if found, but it has NO translations in db for the target fuzzy languages
-        } else if (!$transIdA = array_column($this->trans[$src['termEntryTbxId']] ?? [], 'termTbxId')) {
+        } else if (!$transIdA = array_keys($this->trans[$src['termEntryTbxId']] ?? [])) {
 
             // Setup 'transNotDefined'-class
             return 'transNotDefined';
@@ -186,6 +186,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             WHERE 1
              AND `termTbxId` IN ("'. join('","', $tbxIdA) . '")
              AND `collectionId` IN (' . join(',', $this->collectionIds) . ')
+             AND `processStatus` = "finalized"
             LIMIT ' . count($tbxIdA) . '             
         ')->fetchAll(PDO::FETCH_UNIQUE);
 
@@ -197,6 +198,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
               AND `termEntryTbxId` IN ("' . join('","', array_column($this->exists, 'termEntryTbxId')) . '")
               AND `collectionId`   IN (' . join(',', $this->collectionIds) . ')
               AND `languageId`     IN (' . join(',', $fuzzy) . ')
+              AND `processStatus` = "finalized"
         ')->fetchAll(PDO::FETCH_GROUP);
 
         // Foreach source term
@@ -210,7 +212,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             // Pick translations for target fuzzy languages
             foreach ($this->termsByEntry[$src['termEntryTbxId']] as $term) {
                 if (in_array($term['languageId'], $this->targetFuzzyLanguages)) {
-                    $this->trans[$src['termEntryTbxId']] []= $term;
+                    $this->trans[ $src['termEntryTbxId'] ][ $term['termTbxId'] ] = $term['term'];
                 }
             }
 
@@ -235,7 +237,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 if (!isset($this->trans[$termEntryId])) {
                     foreach ($this->termsByEntry[$termEntryId] as $term) {
                         if (in_array($term['languageId'], $this->targetFuzzyLanguages)) {
-                            $this->trans[$termEntryId] []= $term;
+                            $this->trans[ $termEntryId ] [ $term['termTbxId'] ] = $term['term'];
                         }
                     }
                 }
@@ -281,15 +283,12 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         if (!count($this->srcIdA)) {
             return $source;
         }
-        // class_exists('editor_Utils');
+        //class_exists('editor_Utils');
 
         // Preload data
         $this->preload();
 
-        // Get [termTbxId => mark] pairs for all terms detected in segment source text
-        $markA = $this->getMarkBySrcIdA();
-
-        /*i([
+        /*$debug = [
             'source' => $source,
             'target' => $target,
             'srcIdA' => $this->srcIdA,
@@ -298,12 +297,16 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             'termsByEntry' => $this->termsByEntry,
             'trans' => $this->trans,
             'homonym' => $this->homonym,
-            'markA' => $markA,
-        ], 'a');*/
+        ];*/
+
+        // Get [termTbxId => mark] pairs for all terms detected in segment source text
+        $markA = $this->getMarkBySrcIdA();
+
+        //i($debug + ['markA' => $markA], 'a');
 
         // Recalc transNotFound/transNotDefined/transFound marks
-        foreach ($markA as $tbxId => $mark) {
-            $source = $this->insertMark($source, $tbxId, $mark);
+        foreach ($markA as $srcId => $values) {
+            $source = $this->insertMark($source, $srcId, $values);
         }
 
         // Return source text
@@ -322,10 +325,13 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         foreach ($this->srcIdA as $srcId) {
 
             // Get css class
-            $mark[$srcId] = $this->getMarkByTbxId($srcId);
+            $value = $this->getMarkByTbxId($srcId);
 
             // If translation was found or such source term does not exists in db at all
-            if ($mark[$srcId] == 'transFound' || !isset($this->exists[$srcId])) {
+            if ($value == 'transFound' || !isset($this->exists[$srcId])) {
+
+                //
+                $mark[$srcId] []= $value;
 
                 // Keep the mark we have for current source term and goto next source term
                 continue;
@@ -338,10 +344,10 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 foreach ($this->homonym[$srcId] as $termEntryId) {
 
                     // Get mark for homonym
-                    $mark[$srcId] = $this->getMarkByTbxId($termEntryId, true);
+                    $value = $this->getMarkByTbxId($termEntryId, true);
 
                     // If it's 'transFound' - stop homonym walkthrough
-                    if ($mark[$srcId] == 'transFound') {
+                    if ($value == 'transFound') {
                         break;
                     }
                 }
@@ -353,10 +359,10 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 $entryId = $this->exists[$srcId]['termEntryTbxId'];
 
                 // If there are no source term translations
-                if (!$transTextA = array_column($this->trans[$entryId] ?? [], 'term')) {
+                if (!$transTextA = $this->trans[$entryId] ?? 0) {
 
                     // Setup 'transNotDefined'-class
-                    $mark[$srcId] = 'transNotDefined';
+                    $value = 'transNotDefined';
 
                 // Else if at least one of target terms is a translation for the current source term
                 } else if ($transText = array_intersect($transTextA, $this->trgTextA)[0] ?? 0) {
@@ -365,9 +371,12 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                     unset($this->trgTextA[array_search($transText, $this->trgTextA)]);
 
                     // Setup 'transFound'-class
-                    $mark[$srcId] = 'transFound';
+                    $value = 'transFound';
                 }
             }
+
+            //
+            $mark[$srcId] []= $value;
         }
 
         // Return marks for all terms within current segment source text
@@ -404,36 +413,26 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      * @param $mark
      * @return string
      */
-    protected function insertMark(string $source, $tbxId, $mark) {
+    protected function insertMark(string $source, string $srcId, array $values) {
 
-        // Tag regular expression
-        $rex = '~<div[^>]*data-tbxid="' . $tbxId .'"[^>]*>~';
+        // Tag regular expression and replacements counter
+        $rex = '~<div[^>]*data-tbxid="' . $srcId .'"[^>]*>~'; $idx = 0;
 
-        // Inject $mark into css classes list
-        preg_replace_callback($rex, function($matches) use (&$source, $mark) {
+        // For each occurence inject the value according occurence index
+        return preg_replace_callback($rex, function($matches) use ($srcId, &$idx, $values) {
 
-            // Foreach matched tag (e.g. if more than one match it means that terms having same tbxId were detected)
-            foreach ($matches as $match) {
+            // Replacement
+            $replace = $matches[0];
 
-                // Replacement
-                $replace = $match;
+            // If there is no class-attrbite at all
+            if (strpos($replace, ' class=') === false) {
 
-                // If there is no class-attrbite at all
-                if (strpos($match, ' class=') === false) {
-
-                    // Append it, empty for now
-                    $replace = str_replace('<div', '<div class=""', $replace);
-                }
-
-                // Append $mark to class list
-                $replace = preg_replace('~( class="[^"]*)"~', '$1 ' . $mark . '"', $replace);
-
-                // Replace original version opening tag with modified one
-                $source = preg_replace('~' . $match . '~', $replace, $source, 1);
+                // Append it, empty for now
+                $replace = str_replace('<div', '<div class=""', $replace);
             }
-        }, $source);
 
-        // Return
-        return $source;
+            // Append $mark to class list
+            return preg_replace('~( class="[^"]*)"~', '$1 ' . $values[$idx++] . '"', $replace);
+        }, $source);
     }
 }
