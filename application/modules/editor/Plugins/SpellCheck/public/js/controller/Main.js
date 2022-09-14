@@ -44,7 +44,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Main', {
      * On editor config load event
      */
     onEditorConfigLoaded:function(app, task){
-        debugger;
         var me=this,
             isPluginActive = app.getTaskConfig('plugins.SpellCheck.liveCheckOnEditing'),
             controller = Editor.app.getController('Editor.plugins.SpellCheck.controller.Editor');
