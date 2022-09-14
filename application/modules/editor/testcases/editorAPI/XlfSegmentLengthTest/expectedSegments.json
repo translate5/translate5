@@ -60,10 +60,10 @@
         "isFirstofFile": null
     },
     {
-        "source": "L\u00e4nge Soll = 39",
+        "source": "Länge Soll = 39",
         "sourceEdit": null,
-        "target": "L\u00e4nge Soll = 39",
-        "targetEdit": "L\u00e4nge Soll = 39",
+        "target": "Länge Soll = 39",
+        "targetEdit": "Länge Soll = 39",
         "comments": null,
         "metaCache": "{\"minWidth\":20,\"maxWidth\":39,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":10,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":7}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":7}},\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":15}}}}",
         "segmentNrInTask": "3",
@@ -80,10 +80,10 @@
         "workflowStep": null,
         "isRepeated": "1",
         "sourceMd5": "bee273a19e7d72f01fb2daf9982a38dd",
-        "sourceToSort": "L\u00e4nge Soll = 39",
+        "sourceToSort": "Länge Soll = 39",
         "targetMd5": "bee273a19e7d72f01fb2daf9982a38dd",
-        "targetToSort": "L\u00e4nge Soll = 39",
-        "targetEditToSort": "L\u00e4nge Soll = 39",
+        "targetToSort": "Länge Soll = 39",
+        "targetEditToSort": "Länge Soll = 39",
         "isWatched": false,
         "segmentUserAssocId": null,
         "matchRateType": "import;none",
@@ -150,7 +150,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "L\u00e4nge Soll = 39",
+        "source": "Länge Soll = 39",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -170,7 +170,7 @@
         "workflowStep": null,
         "isRepeated": "1",
         "sourceMd5": "bee273a19e7d72f01fb2daf9982a38dd",
-        "sourceToSort": "L\u00e4nge Soll = 39",
+        "sourceToSort": "Länge Soll = 39",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
         "targetEditToSort": "",
@@ -240,7 +240,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "L\u00e4nge Soll = 39",
+        "source": "Länge Soll = 39",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -260,7 +260,7 @@
         "workflowStep": null,
         "isRepeated": "1",
         "sourceMd5": "bee273a19e7d72f01fb2daf9982a38dd",
-        "sourceToSort": "L\u00e4nge Soll = 39",
+        "sourceToSort": "Länge Soll = 39",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
         "targetEditToSort": "",
@@ -330,7 +330,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "L\u00e4nge Soll = 39",
+        "source": "Länge Soll = 39",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -350,7 +350,7 @@
         "workflowStep": null,
         "isRepeated": "1",
         "sourceMd5": "bee273a19e7d72f01fb2daf9982a38dd",
-        "sourceToSort": "L\u00e4nge Soll = 39",
+        "sourceToSort": "Länge Soll = 39",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
         "targetEditToSort": "",
@@ -360,10 +360,10 @@
         "isFirstofFile": null
     },
     {
-        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
+        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;</span></div>across tags outside from mrk test",
         "sourceEdit": null,
-        "target": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
-        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
+        "target": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;</span></div>zacross ztags zoutside zfrom zmrk ztest",
+        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;</span></div>zacross ztags zoutside zfrom zmrk ztest",
         "comments": null,
         "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":43,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":39}}}}",
         "segmentNrInTask": "13",
@@ -390,7 +390,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
+        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;</span></div>across tags outside from mrk test",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -420,10 +420,10 @@
         "isFirstofFile": null
     },
     {
-        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
+        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;</span></div>across tags outside from mrk test",
         "sourceEdit": null,
-        "target": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
-        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
+        "target": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;</span></div>zacross ztags zoutside zfrom zmrk ztest",
+        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;</span></div>zacross ztags zoutside zfrom zmrk ztest",
         "comments": null,
         "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"maxNumberOfLines\":null,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":2,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":39}}}}",
         "segmentNrInTask": "15",
@@ -450,7 +450,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
+        "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span class=\"short\" title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;/ph&gt;</span></div>across tags outside from mrk test",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
