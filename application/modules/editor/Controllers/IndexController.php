@@ -92,22 +92,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     }
 
     /**
-     *
-     * This is to be able to start a worker as a developer indepently through the browser
-     *
-     * public function startworkerAction() {
-     *
-     * $this->_helper->viewRenderer->setNoRender();
-     * $taskGuid = $this->getParam('taskGuid');
-     * $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
-     *
-     * // init worker and queue it
-     * if (!$worker->init($taskGuid, array('resourcePool' => 'import', 'processingMode' => editor_Segment_Processing::IMPORT))) {
-     * $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
-     * return false;
-     * }
-     * $worker->queue();
-     * }
+     * load base page
      */
     public function indexAction()
     {
@@ -152,6 +137,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->setJsVarsInView();
         $this->setThemeVarsInView($userConfig['runtimeOptions.extJs.theme']['defaults']);
         $this->checkForUpdates($this->view->appVersion);
+    }
+
+    public function systemstatusAction() {
+        $this->_helper->layout->disableLayout();
+        $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
+        $this->view->validationResults = $validator->validate();
     }
 
     /**
@@ -645,31 +636,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         if ($isCronIP || $hasAppStateACL) {
             $this->view->applicationstate = ZfExtended_Debug::applicationState($hasAppStateACL);
         }
-    }
-
-    public function generateqmsubsegmenttagsAction()
-    {
-        set_time_limit(0);
-        $path = array(APPLICATION_PATH, '..', 'public',
-            $this->config->runtimeOptions->dir->tagImagesBasePath . '/');
-        $path = join(DIRECTORY_SEPARATOR, $path);
-
-        /* @var $left editor_ImageTag_QmSubSegmentLeft */
-        $left = ZfExtended_Factory::get('editor_ImageTag_QmSubSegmentLeft');
-        $left->setSaveBasePath($path);
-
-        /* @var $right editor_ImageTag_QmSubSegmentRight */
-        $right = ZfExtended_Factory::get('editor_ImageTag_QmSubSegmentRight');
-        $right->setSaveBasePath($path);
-
-        for ($i = 1; $i < 120; $i++) {
-            $left->create('[ ' . $i);
-            $right->create($i . ' ]');
-            $left->save('qmsubsegment-' . $i);
-            $right->save('qmsubsegment-' . $i);
-        }
-
-        exit;
     }
 
     public function localizedjsstringsAction()

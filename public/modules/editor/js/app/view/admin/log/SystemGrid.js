@@ -26,9 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-//FIXME HERE revoke eventCodeInfoText translation to original btw add the new one to the Grid.js
-// add missing title to translations
-
 Ext.define('Editor.view.admin.log.SystemGrid', {
     extend: 'Ext.grid.Panel',
     requires: ['Editor.model.admin.Log'],

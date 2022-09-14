@@ -293,8 +293,8 @@ class editor_Models_Segment_Whitespace {
             self::LABEL_NEWLINE,
             self::LABEL_TAB,
             self::LABEL_SPACE
-            // Note: first item in the second arg is not an ordinary space having code 32,
-            // but is a non-breaking space having code 16
+            // Note: first item in the second arg is not an ordinary space having code 32 (20),
+            // but is a non-breaking space having code 160 (C2A0)
         ], [" ", "\n", "\t", ' '], $content);
     }
     
