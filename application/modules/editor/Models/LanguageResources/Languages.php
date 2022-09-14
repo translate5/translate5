@@ -90,6 +90,23 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
         }
         return $this->db->fetchAll($s)->toArray();
     }
+
+    /**
+     * Load langauge pairs for given resource and languages
+     * @param int $langageresource
+     * @param array $sourceLang
+     * @param array $targetLang
+     * @return array
+     */
+    public function loadFilteredPairs(int $langageresource, array $sourceLang, array $targetLang): array
+    {
+        $s=$this->db->select()
+            ->where('languageResourceId=?',$langageresource)
+            ->where('sourceLang IN(?)',$sourceLang)
+            ->where('targetLang IN(?)',$targetLang);
+
+        return $this->db->fetchAll($s)->toArray();
+    }
     
     /***
      * Load assocs by source language ids

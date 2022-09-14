@@ -123,7 +123,7 @@ class Pivot
 
             $connector = null;
             try {
-                $connector = $manager->getConnector($languageresource, $this->task->getSourceLang(), $this->task->getTargetLang(), $this->task->getConfig());
+                $connector = $manager->getConnector($languageresource, $this->task->getSourceLang(), $this->task->getRelaisLang(), $this->task->getConfig());
 
                 // set the analysis running user to the connector
                 $connector->setWorkerUserGuid($this->userGuid);

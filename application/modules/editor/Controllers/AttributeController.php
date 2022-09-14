@@ -95,11 +95,13 @@ class editor_AttributeController extends ZfExtended_RestController
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
 
+        $termCollection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+
         // If current user has 'termPM_allClients' role, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
             in_array('termPM_allClients', $this->_session->roles)
-                ?: ZfExtended_Factory::get('ZfExtended_Models_User')->getAccessibleCollectionIds();
+                ?: $termCollection->getAccessibleCollectionIds(editor_User::instance()->getModel());
     }
 
     /**

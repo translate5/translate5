@@ -183,16 +183,67 @@ abstract class editor_Services_Connector_Abstract {
      * @param int $targetLang language id
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
-        $this->sourceLang = $sourceLang;
-        $this->targetLang = $targetLang;
         $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
-        if($languageResource->getId()!=null){
+        $this->setServiceLanguages($sourceLang,$targetLang);
+        if($languageResource->getId() !== null){
             $this->languageResource->sourceLangCode=$this->languageResource->getSourceLangCode();
             $this->languageResource->targetLangCode=$this->languageResource->getTargetLangCode();
         }
         $this->logger = $this->logger->cloneMe('editor.languageresource.'.strtolower($this->resource->getService()).'.connector');
+    }
+
+    /**
+     * @param int|null $sourceLang
+     * @param int|null $targetLang
+     * @return void
+     */
+    private function setServiceLanguages(?int $sourceLang, ?int $targetLang): void
+    {
+        if($this->languageResource === null || $sourceLang === null || $targetLang === null ){
+            $this->sourceLang = $sourceLang;
+            $this->targetLang = $targetLang;
+            return;
+        }
+
+        /** @var editor_Models_Languages $fuzzy */
+        $fuzzy = ZfExtended_Factory::get('editor_Models_Languages');
+        $sourceFuzzy = $fuzzy->getFuzzyLanguages($sourceLang,includeMajor: true);
+        $targetFuzzy = $fuzzy->getFuzzyLanguages($targetLang,includeMajor: true);
+
+        /** @var editor_Models_LanguageResources_Languages $languages */
+        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+
+        // load only the required languages
+        $langaugepair = $languages->loadFilteredPairs($this->languageResource->getId(),$sourceFuzzy,$targetFuzzy);
+
+        // if only 1 language combination is available for the langauge resource, use it.
+        if( count($langaugepair) === 1){
+            $langaugepair = $langaugepair[0];
+            $this->sourceLang = (int)$langaugepair['sourceLang'];
+            $this->targetLang = (int)$langaugepair['targetLang'];
+            return;
+        }
+
+        // check for direct match
+        foreach ($langaugepair as $item) {
+            if( ($item['sourceLang'] === $sourceLang) && ($item['targetLang'] === $targetLang) ){
+                $this->sourceLang = $item['sourceLang'];
+                $this->targetLang = $item['targetLang'];
+                return;
+            }
+        }
+
+        // check for fuzzy match
+        foreach ($langaugepair as $item) {
+            // find the langauges using fuzzy matching
+            if( in_array($item['sourceLang'], $sourceFuzzy, true) && in_array($item['targetLang'], $targetFuzzy, true)){
+                $this->sourceLang = $item['sourceLang'];
+                $this->targetLang = $item['targetLang'];
+                return;
+            }
+        }
     }
     
     /**

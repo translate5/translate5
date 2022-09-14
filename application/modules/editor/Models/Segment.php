@@ -990,7 +990,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::getDataObject()
      */
-    public function getDataObject()
+    public function getDataObject(): stdClass
     {
         $res = parent::getDataObject();
         $this->segmentFieldManager->mergeData($this->segmentdata, $res);
