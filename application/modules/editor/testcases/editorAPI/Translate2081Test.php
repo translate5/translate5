@@ -49,7 +49,7 @@ class Translate2081Test extends editor_Test_JsonTest {
 
         self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
             'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
+            'number'=>uniqid('API Testing::ResourcesLogCustomer', true),
         ]);
     }
 
@@ -81,11 +81,24 @@ class Translate2081Test extends editor_Test_JsonTest {
 
     /***
      * Create the task and validate if the auto assign is done
+     *
+     * @depends testDefaultUserAssoc
      */
     public function testTaskAutoAssign(){
 
         // create the task and wait for the import
-        self::createTask();
+        $task =[
+            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'customerId'=>self::$customerTest->id,
+            'edit100PercentMatch' => true,
+            'autoStartImport'=>1
+        ];
+        self::assertLogin('testmanager');
+        self::$api->addImportFile(self::$api->getFile('TRANSLATE-2545-de-en.xlf'));
+        self::$api->import($task,false);
+        error_log('Task created. '.$this->api()->getTask()->taskName);
 
 
         // after the task is created/imported, check if the users are auto assigned.
@@ -107,24 +120,6 @@ class Translate2081Test extends editor_Test_JsonTest {
 
         //file_put_contents($this->api()->getFile('expected.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expected.json'), $data, 'The expected users are not auto assigned to the task');
-    }
-
-    /***
-     * Create and import the task
-     */
-    protected function createTask(){
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId'=>self::$customerTest->id,
-            'edit100PercentMatch' => true,
-            'autoStartImport'=>1
-        ];
-        self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('TRANSLATE-2545-de-en.xlf'));
-        self::$api->import($task,false);
-        error_log('Task created. '.$this->api()->getTask()->taskName);
     }
 
     /***
