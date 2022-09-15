@@ -149,14 +149,20 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
                     error: null
                 });
 
-            // no validation is needed for reference files, everything is allowed to be set as reference file
+            // a blacklist validation is needed for reference files, as some types have to be rejected for security reasons
             if(rec.get('type') === Editor.model.admin.projectWizard.File.TYPE_REFERENCE){
-                rec.commit();
-                store.addSorted(rec);
+                if(Ext.Array.contains(Editor.data.import.forbiddenReferenceExtensions, rec.getExtension())) {
+                    new Ext.util.DelayedTask(function(){
+                        Ext.Msg.alert(me.getView().strings.errorColumnText, Ext.String.format(msg.extension, file.name, rec.getExtension()));
+                    }).delay(100);// needs to be delayed because it is not shown when the error pops-up when drag and drop on "Add project" button
+                } else {
+                    rec.commit();
+                    store.addSorted(rec);
+                }
                 return true;
             }
 
-            if(!Ext.Array.contains(Editor.data.import.validExtensions,rec.getExtension())){
+            if(!Ext.Array.contains(Editor.data.import.validExtensions, rec.getExtension())){
                 new Ext.util.DelayedTask(function(){
                     Ext.Msg.alert(me.getView().strings.errorColumnText, Ext.String.format(msg.extension, file.name, rec.getExtension()));
                 }).delay(100);// needs to be delayed because it is not shown when the error pops-up when drag and drop on "Add project" button

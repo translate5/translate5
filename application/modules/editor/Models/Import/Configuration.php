@@ -220,7 +220,7 @@ class editor_Models_Import_Configuration {
     public function getReferenceFilesDir() {
         $config = Zend_Registry::get('config');
         $prefix = $this->importFolder;
-        $refDir = $config->runtimeOptions->import->referenceDirectory;
+        $refDir = editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
         return $refDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$refDir;
     }
 

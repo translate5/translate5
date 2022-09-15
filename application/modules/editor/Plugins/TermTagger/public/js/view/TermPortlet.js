@@ -107,7 +107,7 @@ Ext.define('Editor.plugins.TermTagger.view.TermPortlet', {
                             '', //empty client-id filter
                             term.collectionId,
                         ];
-                        var url = parent.applicationRundir  + '/editor/termportal#termportal/search/' + btoa(JSON.stringify(search));
+                        var url = parent.applicationRundir  + '/editor/termportal#termportal/search/' + Ext.util.Base64.encode(JSON.stringify(search));
                         termValue = '<a href="' + url + '" target="termportalandinstanttranslate">' + term.term + '</a>';
                     }else {
                         termValue = term.term;
