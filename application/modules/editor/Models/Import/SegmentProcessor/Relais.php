@@ -170,17 +170,17 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
             'fileName' => $this->fileName,
         ];
         if(!empty($this->errors['source-not-found'])){
-            $msg = 'Errors in processing relais files: '."\n";
+            $msg = 'Errors in processing relais files: ';
             $msg .= 'The following MIDs are present in the relais file "{fileName}" but could not be found in the source file, the relais segment(s) was/were ignored.﻿ See Details.';
             $logger->warn('E1020', $msg, array_merge($logData, ['midList' => join(', ', $this->errors['source-not-found'])]));
         }
         if(!empty($this->errors['source-different'])){
-            $msg = 'Errors in processing relais files: '."\n";
+            $msg = 'Errors in processing relais files: ';
             $msg .= 'Source-content of relais file "{fileName}" is not identical with source of translated file. Relais target is left empty. See Details.';
             $logger->warn('E1021', $msg, array_merge($logData, ['segments' => join(",\n ", $this->errors['source-different'])]));
         }
         if(!empty($this->errors['source-missing'])){
-            $msg = 'Errors in adding relais segment: '."\n";
+            $msg = 'Errors in adding relais segment: ';
             $msg .= 'Source-content of relais file "{fileName}" is identical with source of translated file, but still original segment not found in the database.﻿ See Details.';
             $logger->warn('E1022', $msg, array_merge($logData, ['segments' => join(",\n ", $this->errors['source-missing'])]));
         }
