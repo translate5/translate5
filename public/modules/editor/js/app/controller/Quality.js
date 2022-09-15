@@ -40,7 +40,20 @@ Ext.define('Editor.controller.Quality', {
             '#qualityFilterPanel #modeSelector': {
                 change:'onFilterModeChanged'
             }
-        }
+        },
+        controller: {
+            '#Editor.$application': {
+                editorConfigLoaded:'onEditorConfigLoaded'
+            }
+        },
+    },
+    /**
+     * After task config load event handler.
+     */
+    onEditorConfigLoaded:function(app){
+        app.getController('Editor.controller.QualityMqm').setActive(
+            app.getTaskConfig('autoQA.enableMqmTags')
+        );
     },
     /**
      * Changes the globally managed filter mode to ensure persistence
