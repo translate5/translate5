@@ -69,6 +69,12 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             'Use this option when re-capturing segment test data to use the old order of the segment data. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c');
 
         $this->addOption(
+            'legacy-json',
+            'j',
+            InputOption::VALUE_NONE,
+            'Use this option when re-capturing test data to use the old json style. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c');
+
+        $this->addOption(
             'xdebug',
             'x',
             InputOption::VALUE_NONE,
@@ -128,6 +134,9 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             $this->io->confirm('Yes, I will check the modified data files thoroughly!');
             if($this->input->getOption('legacy-segment')){
                 putenv('LEGACY_DATA=1');
+            }
+            if($this->input->getOption('legacy-json')){
+                putenv('LEGACY_JSON=1');
             }
         }
         else {

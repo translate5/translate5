@@ -222,6 +222,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $workerParameters['languageResourceId'] = $languageRessource->getId();
             $workerParameters['userGuid'] = editor_User::instance()->getGuid();
 
+            $workerParameters['contentField'] = editor_Models_SegmentField::TYPE_RELAIS;
+
             if (!$batchWorker->init($task->getTaskGuid(), $workerParameters)) {
                 //we log that fact, queue nothing and rely on the normal match analysis processing
                 $this->addWarn($task,'MatchAnalysis-Error on batchWorker init(). Batch worker for pivot pre-translation could not be initialized');
@@ -255,7 +257,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $manager = ZfExtended_Factory::get('editor_Services_Manager');
             /* @var $manager editor_Services_Manager */
 
-            $connector = $manager->getConnector($languageresource, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
+            $connector = $manager->getConnector($languageresource, $task->getSourceLang(), $task->getRelaisLang(), $task->getConfig());
             /* @var $connector editor_Services_Connector */
             //collect all connectors which are supporting batch query
             if($connector->isBatchQuery()){

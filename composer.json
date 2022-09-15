@@ -108,7 +108,8 @@
 		"merge-plugin" : {
 			"include" : [
 				"application/modules/editor/Plugins/*/composer.local.json",
-				"library/*/composer-php8.local.json"
+				"application/modules/editor/PrivatePlugins/*/composer.local.json",
+				"library/*/composer.local.json"
 			],
 			"recurse" : true
 		},

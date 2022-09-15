@@ -137,7 +137,7 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
     public function freeMemory() {
         $this->existing = [];
         $this->unchangedIds = [];
-        $this->toBeProcessed = [];
+        $this->resetToBeProcessed();
     }
 
     /**
@@ -189,7 +189,8 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
         if (!empty($sqlInsertData)) {
             $this->model->createImportTbx(join(',', $sqlInsertBindings), array_keys($this->importObject::TABLE_FIELDS), $sqlInsertData);
         }
-        $this->toBeProcessed = [];
+
+        $this->resetToBeProcessed();
     }
 
     /**
@@ -262,5 +263,13 @@ abstract class editor_Models_Terminology_BulkOperation_Abstract
      */
     public function getStatistics(): array {
         return $this->processedCount;
+    }
+
+    /***
+     * Reset the toBeProcessed internal array to empty
+     * @return void
+     */
+    public function resetToBeProcessed(){
+        $this->toBeProcessed = [];
     }
 }

@@ -568,34 +568,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     {
         $segmentContent = $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
         $segmentContent = $this->tagHelper->restore($segmentContent, true);
-        $segmentContent = $this->spoofWhitespaceTagsWithPlaceholderChars($segmentContent);
+        $segmentContent = $this->whitespaceHelper->convertForStripping($segmentContent);
 
         return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#', '', $segmentContent));
-    }
-
-    /**
-     * Spoof whitespace-tags with their, so to say, placeholder-characters.
-     *
-     * This is done for several reasons:
-     * 1.Prevent 'hello<tab..>world' to be converted to 'helloworld', so no even ordinary space between those words is kept
-     * 2.Make it more visually obvious for developers what's inside by looking at segment's *EditToSort-column contents directly in database
-     * 3.Make it simplier for Editor.plugins.SpellCheck.controller.Editor.mindTags() to calculate words/phrases coords adjustments
-     *
-     * @param $segmentContent
-     * @return string|string[]|null
-     */
-    public function spoofWhitespaceTagsWithPlaceholderChars($segmentContent) {
-
-        // <tab ts="09" length="1"/>
-        $segmentContent = preg_replace('~<tab.*?/>~', "→", $segmentContent);
-
-        // <softReturn/>
-        $segmentContent = preg_replace('~<softReturn.*?/>~', "↵", $segmentContent);
-
-        // <char ts="c2a0" length="1"/>
-        $segmentContent = preg_replace('~<char ts="c2a0" length="1"/>~', "⎵", $segmentContent);
-
-        return $segmentContent;
     }
 
     /**
@@ -1020,7 +995,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::getDataObject()
      */
-    public function getDataObject()
+    public function getDataObject(): stdClass
     {
         $res = parent::getDataObject();
         $this->segmentFieldManager->mergeData($this->segmentdata, $res);

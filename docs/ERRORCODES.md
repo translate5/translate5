@@ -99,6 +99,8 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1095"></a>E1095  | User | User can not be saved: the chosen userGuid does already exist. | Use a different userGuid, if no userGuid was provided explicitly, just save again to generate a new one.
 | <a id="E1104"></a>E1104  | Customer | The given domain is already in use. | The given domain is already defined for one of the customers.
 | <a id="E1347"></a>E1347  | User | Auto user&nbsp;assignment with defining source and target language for a user is no longer possible. Please use &quot;user assoc default&quot; api endpoint. | The auto user&nbsp;assignment&nbsp; via user source and target is removed. From now on, there is new api endpoint to do this: Default Task User Associations.
+| <a id="E1421"></a>E1421  | User    | Old password does not match | The provided old password on password change does not match.
+| <a id="E1420"></a>E1420  | User    | Old password is required | On password resset, the old password was not provided.
 
 ### Task &amp; Workflow
 | EventCode        | Context       | EventMessage  | Description/Solution

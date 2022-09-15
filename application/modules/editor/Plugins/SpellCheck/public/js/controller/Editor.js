@@ -71,8 +71,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             },
             '#Editor.$application': {
                 // editorViewportOpened: 'initSpellCheckPlugin' // NOW VIA #segmentStatusStrip afterRender (= comes first and needs this infos already)
-                editorViewportClosed: 'onDestroy',
-                editorConfigLoaded:'onEditorConfigLoaded'
+                editorViewportClosed: 'onDestroy'
             }
         },
         component: {
@@ -149,15 +148,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this;
         this.callParent(arguments);
         me.consoleLog('0.1 init Editor.plugins.SpellCheck.controller.Editor');
-    },
-    
-    /***
-     * After task config load event handler.
-     */
-    onEditorConfigLoaded:function(app, task){
-        var me=this,
-            isPluginActive = app.getTaskConfig('plugins.SpellCheck.liveCheckOnEditing');
-        me.setActive(isPluginActive);
     },
     
     onDestroy:function(){
@@ -966,7 +956,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                     return attr.replace(/</g, '&lt;').replace(/>/g, '&gt;')
                 })
                 .replace(/<([0-9]+)\/>/g, '&lt;$1/&gt;'), '<del>'
-        ).replace(/&lt;/g, '<').replace(/&gt;/g, '>'), tagm, tags = [], tag, start, end, debug = false; //html.match('Hinweis') && html.match('©');
+        ).replace(/&lt;/g, '<').replace(/&gt;/g, '>'), tagm, tags = [], tag, start, end, debug = false; //html.match('shouldz');
 
         // Create backup for initial offsets
         if (!('backup' in match)) match.backup = {
@@ -1012,16 +1002,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             // it possible to rely on that index (offset position) while spell check styles coords calculation
             for (var j = 0; j < i; j++) {
 
-                // If it's one of the whitespace-tags
-                if (tags[j].groups.white) {
-
-                    // For del and whitespace tags - deduct the index
-                    if (!tags[i].groups.other) {
-                        tags[i].index -= tags[j][0].length;
-                    }
-
-                // Else if it's one of the del-tags
-                } else if (tags[j].groups.del) {
+                // If it's one of the del-tags
+                if (tags[j].groups.del) {
                     tags[i].index -= tags[j][0].length - tags[j][2].length;
                 }
             }

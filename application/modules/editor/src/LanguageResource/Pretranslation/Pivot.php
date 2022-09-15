@@ -9,6 +9,7 @@ use editor_Models_Segment_InternalTag;
 use editor_Models_Segment_Iterator;
 use editor_Models_Segment_MatchRateType;
 use editor_Models_Segment_RepetitionHash;
+use editor_Models_SegmentField;
 use editor_Models_Task;
 use editor_Models_Terminology_Models_TermModel;
 use editor_Services_Connector;
@@ -107,14 +108,13 @@ class Pivot
             return [];
         }
 
-        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
 
         foreach ($assocs as $assoc) {
 
+            $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var editor_Models_LanguageResources_LanguageResource $languageresource */
 
             $languageresource->load($assoc['languageResourceId']);
 
@@ -123,7 +123,7 @@ class Pivot
 
             $connector = null;
             try {
-                $connector = $manager->getConnector($languageresource, $this->task->getSourceLang(), $this->task->getTargetLang(), $this->task->getConfig());
+                $connector = $manager->getConnector($languageresource, $this->task->getSourceLang(), $this->task->getRelaisLang(), $this->task->getConfig());
 
                 // set the analysis running user to the connector
                 $connector->setWorkerUserGuid($this->userGuid);
@@ -140,8 +140,14 @@ class Pivot
                     ]);
                     continue;
                 }
+
+
+                // for batch query supported resources, set the content field to relais. Basedo on the content field,
+                // we check if the field is empty. Pretranslation is posible only for empty content fields
+                $connector->setAdapterBatchContentField(editor_Models_SegmentField::TYPE_RELAIS);
+
                 //collect the mt resource, so it can be used for pretranslations if needed
-                if ($resource->getType() == editor_Models_Segment_MatchRateType::TYPE_MT) {
+                if ($resource->getType() === editor_Models_Segment_MatchRateType::TYPE_MT) {
                     $this->mtConnectors[] = $connector;
                 }
                 //store the languageResource

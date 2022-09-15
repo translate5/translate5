@@ -123,7 +123,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
         $this->communicationService = $this->config->createServerCommunicationServiceFromTags($segmentsTags);
         $termTagger = ZfExtended_Factory::get(
             'editor_Plugins_TermTagger_Service',
-            [$this->config->getLoggerDomain($this->processingMode),
+            [editor_Plugins_TermTagger_Configuration::getLoggerDomain($this->processingMode),
                 $this->config->getRequestTimeout($this->isWorkerThread),
                 editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT]);
         /* @var $termTagger editor_Plugins_TermTagger_Service */

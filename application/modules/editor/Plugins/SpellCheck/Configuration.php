@@ -90,6 +90,26 @@ class editor_Plugins_SpellCheck_Configuration {
     const DOWN_CACHE_KEY = 'SpellCheckDownList';
 
     /**
+     * Get logger domain
+     *
+     * @param string $processingType
+     * @return string
+     */
+    public static function getLoggerDomain(string $processingType) : string {
+        switch ($processingType) {
+
+            case editor_Segment_Processing::IMPORT:
+                return self::IMPORT_LOGGER_DOMAIN;
+
+            case editor_Segment_Processing::EDIT:
+                return self::EDITOR_LOGGER_DOMAIN;
+
+            default:
+                return self::EDITOR_LOGGER_DOMAIN;
+        }
+    }
+
+    /**
      * Memcache instance
      *
      * @var Zend_Cache_Core
@@ -104,20 +124,6 @@ class editor_Plugins_SpellCheck_Configuration {
      */
     public function getRequestTimeout(bool $isWorkerThread) : int {
         return self::IMPORT_TIMEOUT_REQUEST;
-    }
-
-    /**
-     * Get logger domain
-     *
-     * @param string $processingType
-     * @return string
-     */
-    public function getLoggerDomain(string  $processingType) : string {
-        switch ($processingType) {
-            case editor_Segment_Processing::IMPORT: return self::IMPORT_LOGGER_DOMAIN;
-            case editor_Segment_Processing::EDIT:   return self::EDITOR_LOGGER_DOMAIN;
-            default:                                return self::EDITOR_LOGGER_DOMAIN;
-        }
     }
 
     /**

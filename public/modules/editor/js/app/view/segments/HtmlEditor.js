@@ -791,7 +791,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   hasAndDisplayErrors: function() {
       var me = this, 
-          msg,
+          msg = '',
           meta = me.currentSegment.get('metaCache');
       
       //if the segment length is not in the defined range, add an error message - not disableable, so before disableErrorCheck
@@ -817,18 +817,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       
       if(me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0){
-          var msg = '', 
-              //first item the field to check, second item: the error text:
-              todo = [['missingContentTags', 'tagMissingText'],['duplicatedContentTags','tagDuplicatedText']],
-              missingSvg='';
+          //first item the field to check, second item: the error text:
+          var todo = [['missingContentTags', 'tagMissingText'],['duplicatedContentTags','tagDuplicatedText']],
+              missingSvg = '';
           
-          for(var i = 0;i<todo.length;i++) {
+          for(var i = 0; i < todo.length; i++) {
               if(me[todo[i][0]].length > 0) {
                   msg += me.strings[todo[i][1]];
-                  Ext.each(me[todo[i][0]], function(tag) {
+                  Ext.each(me[todo[i][0]], function(tag){
                 	  missingSvg+= '<img src="'+me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth)+'"> ';
                       //msg += '<img src="'+me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth)+'"> ';
-                  })
+                  });
                   msg = Ext.String.format(msg,missingSvg);
                   msg += '<br /><br />';
               }
@@ -875,10 +874,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           if(ignoreWhitespace && /whitespace/.test(img.className) || /^\s*$/.test(img.id)) {
               return;
           }
-          if(Ext.Array.contains(foundIds, img.id) && img.parentNode.nodeName.toLowerCase()!=="del") {
+          if(Ext.Array.contains(foundIds, img.id) && img.parentNode.nodeName.toLowerCase() !== "del") {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
-          }
-          else {
+          } else {
         	  if(img.parentNode.nodeName.toLowerCase()!=="del") {
                   foundIds.push(img.id);
               }
@@ -888,11 +886,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           if(ignoreWhitespace && item.whitespaceTag) {
               return;
           }
-          if(!Ext.Array.contains(foundIds, me.idPrefix+key)) {
+          if(!Ext.Array.contains(foundIds, me.idPrefix + key)) {
               me.missingContentTags.push(item);
           }
       });
-      return me.missingContentTags.length == 0 && me.duplicatedContentTags.length == 0;
+      return (me.missingContentTags.length === 0 && me.duplicatedContentTags.length === 0);
   },
   /**
    * Tag Order Check (MQM and content tags)

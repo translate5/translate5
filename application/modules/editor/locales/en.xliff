@@ -1170,7 +1170,7 @@
 	</trans-unit>
     <trans-unit id='Rm9sZ2VuZGUgVGFncyBmZWhsZW46PGJyLz48dWw+PGxpPnswfTwvbGk+PC91bD5TbyBlbnRmZXJuZW4gU2llIGRlbiBGZWhsZXI6PGJyLz48dWw+PGxpPktsaWNrZW4gU2llIGF1ZiBPSywgdW0gZGllc2UgTmFjaHJpY2h0IHp1IGVudGZlcm5lbjwvbGk+PGxpPkRyw7xja2VuIFNpZSBFU0MsIHVtIGRhcyBTZWdtZW50IG9obmUgU3BlaWNoZXJuIHp1IHZlcmxhc3NlbjwvbGk+PGxpPsOWZmZuZW4gU2llIGRhcyBTZWdtZW50IGVybmV1dDwvbGk+PC91bD5XaWVkZXJob2xlbiBTaWUgamV0enQgSWhyZSDDhG5kZXJ1bmdlbi48YnIvPlZlcndlbmRlbiBTaWUgYWx0ZXJuYXRpdiBkaWUgSGlsZmVzY2hhbHRmbMOkY2hlLCB1bmQgc3VjaGVuIFNpZSBuYWNoIFRhc3RlbmtvbWJpbmF0aW9uZW4sIHVtIGRpZSBmZWhsZW5kZW4gVGFncyBhdXMgZGVyIFF1ZWxsZSBlaW56dWdlYmVuLg=='>
         <source>Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.</source>
-        <target>Following tags are missing:<br/><ul><li>{0}</li></ul>To remove the error:<br/><ul><li>Click OK to remove this message</li><li>Press ESC to leave the segment without saving</li><li>Open the segment again</li></ul>Now redo your edits.<br/>Alternatively use the help button and look for keyboard shortcuts to enter the  missing tags from the source.</target>
+        <target>The following tags are missing:<br/><ul><li>{0}</li></ul>To remove the error:<br/><ul><li>Click OK to remove this message</li><li>Press ESC to leave the segment without saving</li><li>Open the segment again</li></ul>Now redo your edits.<br/>Alternatively use the help button and look for keyboard shortcuts to enter the  missing tags from the source.</target>
     </trans-unit>
 	<trans-unit id='RmVobGVyIGJlaGViZW4='>
 	  <source>Fehler beheben</source>
@@ -4611,12 +4611,8 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>InstantTranslateWriteTm</source>
     <target>Instant-Translate write TM</target>
 </trans-unit>
-<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbikgaGluenVmw7xnZW4='>
-    <source>Referenz-Dateien(en) hinzufügen</source>
-    <target>Add reference file(s)</target>
-</trans-unit>
-<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbik='>
-    <source>Referenz-Dateien(en)</source>
+<trans-unit id='UmVmZXJlbnotRGF0ZWkoZW4p'>
+    <source>Referenz-Datei(en)</source>
     <target>Reference file(s)</target>
 </trans-unit>
 <trans-unit id='UmVmZXJlbnotRGF0ZWk='>
@@ -4809,6 +4805,22 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='U3VjaGVuIHVuZCBFcnNldHplbiBhbnplaWdlbiAoU1RSRyArIEYsIFNUUkcgKyBIKQ=='>
   <source>Suchen und Ersetzen anzeigen (STRG + F, STRG + H)</source>
   <target>Show search and replace (CTRL + F, CTRL + H)</target>
+</trans-unit>
+<trans-unit id='QXR0cmlidXRlIGF1ZiBFaW50cmFnc2ViZW5l'>
+  <source>Attribute auf Eintragsebene</source>
+  <target>Entry attributes</target>
+</trans-unit>
+<trans-unit id='QXR0cmlidXRlIGF1ZiBTcHJhY2hlYmVuZQ=='>
+  <source>Attribute auf Sprachebene</source>
+  <target>Language-level attributes</target>
+</trans-unit>
+<trans-unit id='QXR0cmlidXRlIGF1ZiBCZW5lbm51bmdzZWJlbmU='>
+  <source>Attribute auf Benennungsebene</source>
+  <target>Term attributes</target>
+</trans-unit>
+<trans-unit id='QWx0ZXMgUGFzc3dvcnQ='>
+  <source>Altes Passwort</source>
+  <target>Old password</target>
 </trans-unit>
   </file>
 </xliff>

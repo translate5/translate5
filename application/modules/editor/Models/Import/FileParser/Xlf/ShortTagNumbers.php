@@ -27,7 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * handles the generation of the tag shorttagnumbers
+ * handles the generation of the tag shorttagnumbers for internal tags (source / target and tag pairs only,
+ *  whitespace numbering is done in the whitespace tag helper
  *
  * TRANSLATE-2658
  * with memoQ XLF we had the following problem - the id is correct to match between source and target, the rid indeed not.

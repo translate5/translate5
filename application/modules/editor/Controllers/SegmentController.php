@@ -778,22 +778,59 @@ class Editor_SegmentController extends ZfExtended_RestController
 
     public function termsAction()
     {
-        //REST Default Controller Settings umgehen um wieder View Scripte zu verwenden:
-        $this->getResponse()->setHeader('Content-Type', 'text/html', TRUE);
-        $this->_helper->viewRenderer->setNoRender(false);
-
         $pluginmanager = Zend_Registry::get('PluginManager');
         /* @var $pluginmanager ZfExtended_Plugin_Manager */
         $plugin = $pluginmanager->get('TermPortal');
-        $this->view->linkPortal = $this->isAllowed('editor_termportal') && !empty($plugin);
+
+        $context = new stdClass();
+
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+
+        $context->linkPortal = $this->isAllowed('editor_termportal') && !empty($plugin);
 
         //Erstellung und Setzen der Nutzdaten:
         /** @var editor_Models_Terminology_Models_TermModel $terms */
         $terms = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $this->view->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
-        $this->view->termGroups = $terms->getByTaskGuidAndSegment($this->getCurrentTask()->getTaskGuid(), (int)$this->_getParam('id'));
-        $this->view->termStatMap = editor_Models_Terminology_Models_TermModel::getTermStatusMap();
-        $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $context->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
+        $context->termGroups = $terms->getByTaskGuidAndSegment($this->getCurrentTask()->getTaskGuid(), (int)$this->_getParam('id'));
+
+        $context->locales = new stdClass();
+
+        $context->locales->entryAttrs = $translate->_('Attribute auf Eintragsebene');
+        $context->locales->languageAttrs = $translate->_('Attribute auf Sprachebene');
+        $context->locales->termAttrs = $translate->_('Attribute auf Benennungsebene');
+
+        $context->noTerms = empty($context->termGroups);
+        if($context->noTerms){
+            $context->locales->noTermsMessage = $translate->_('Keine Terminologie vorhanden!');
+        }
+
+        $termEntryIds = [];
+        foreach ($context->termGroups as $termGroup) {
+            foreach ($termGroup as $term){
+                $termEntryIds[] = $term->termEntryId;
+            }
+        }
+
+        $context->attributeGroups = !empty($termEntryIds) ? $terms->getAttributesGroups(array_filter($termEntryIds)) : [];
+
+        $context->termStatMap = editor_Models_Terminology_Models_TermModel::getTermStatusMap();
+
+        $context->termStatus = [
+            'permitted' => $translate->_('erlaubte Benennung'),
+            'forbidden' => $translate->_('verbotene Benennung'),
+            'preferred' => $translate->_('Vorzugsbenennung'),
+            'unknown' => $translate->_('Unbekannter Term Status'),
+        ];
+
+        
+        /** @var editor_Models_Languages $languages */
+        $languages = ZfExtended_Factory::get('editor_Models_Languages');
+        $context->flags = $languages->loadAllKeyCustom('rfc5646');
+
+        $context->applicationRundir = APPLICATION_RUNDIR;
+
+        echo Zend_Json::encode((object) $context, Zend_Json::TYPE_OBJECT);
     }
 
     /**

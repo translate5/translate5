@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 trait editor_Services_Connector_BatchTrait {
-    
+
     /***
      * Number of segments which the batch query sends at once
      * @var integer
@@ -52,7 +52,15 @@ trait editor_Services_Connector_BatchTrait {
      * @var array
      */
     protected $batchExceptions = [];
-    
+
+    /***
+     * Where to check if the segment field has content (only possible target and pivot).
+     * This is MT only relevant because for segments where the $contentField contains data (ex: target field has
+     * content) no query should be done.
+     * @var string
+     */
+    private string $contentField = editor_Models_SegmentField::TYPE_TARGET;
+
     /**
      * returns the collected batchExceptions or an empty array
      * @return array
@@ -95,9 +103,12 @@ trait editor_Services_Connector_BatchTrait {
             //or analysis, the empty target segments for mt resources should not be send to batch processor
             //TODO: in future, when the matchrate is provided/calculated for mt, this should be changed
 
-            
-            $target = $segment->getTarget();
-            if(strlen($target) > 0 && $this->languageResource->isMt()){
+
+
+            $contentField = $segment->get($this->getContentField());
+
+            // check if the contentField already has translations/data
+            if(strlen($contentField) > 0 && $this->languageResource->isMt()){
                 continue;
             }
             $querySegment = $this->tagHandler->prepareQuery($this->getQueryString($segment), $segment->getId());
@@ -184,8 +195,8 @@ trait editor_Services_Connector_BatchTrait {
      * @param array $batchQuery
      */
     protected function handleBatchQuerys(array $batchQuery) {
-        $sourceLang = $this->languageResource->getSourceLangCode();
-        $targetLang = $this->languageResource->getTargetLangCode();
+        $sourceLang = $this->getSourceLanguageCode();
+        $targetLang = $this->getTargetLanguageCode();
         $this->resultList->resetResult();
         
         //we handle only our own exceptions, since the connector should only throw such
@@ -258,5 +269,21 @@ trait editor_Services_Connector_BatchTrait {
      */
     public function isBatchQuery(): bool {
         return $this->batchQueryBuffer > 1;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContentField(): string
+    {
+        return $this->contentField;
+    }
+
+    /**
+     * @param string $contentField
+     */
+    public function setContentField(string $contentField): void
+    {
+        $this->contentField = $contentField;
     }
 }

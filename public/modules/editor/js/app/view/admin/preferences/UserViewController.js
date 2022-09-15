@@ -52,13 +52,20 @@ Ext.define('Editor.view.admin.preferences.UserViewController', {
         var me = this,
             form = me.getView().down('form').getForm(),
             pw = form.getValues().passwd,
+            oldpasswd = form.getValues().oldpasswd,
             user = Editor.app.authenticatedUser;
         if (form.isValid()) {
             user.set('passwd', pw);
             user.save({
+                params:{
+                    oldpasswd: oldpasswd
+                },
                 url: Editor.data.restpath + 'user/authenticated',
                 success: function () {
                     Editor.MessageBox.addSuccess(me.strings.pwSave);
+                },
+                failure: function(record, operation) {
+                    Editor.app.getController('ServerException').handleException(operation.error.response);
                 }
             });
         }
