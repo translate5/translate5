@@ -51,9 +51,11 @@ Ext.define('Editor.controller.Quality', {
      * After task config load event handler.
      */
     onEditorConfigLoaded:function(app){
-        app.getController('Editor.controller.QualityMqm').setActive(
-            app.getTaskConfig('autoQA.enableMqmTags')
-        );
+        if(app.getTaskConfig('autoQA.enableMqmTags')){
+            app.getController('Editor.controller.QualityMqm').activate();
+        } else {
+            app.getController('Editor.controller.QualityMqm').deactivate();
+        }
     },
     /**
      * Changes the globally managed filter mode to ensure persistence
