@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
  * Makes a recalculation of the transFound transNotFound and transNotDefined Information out of and in the given segment content
  */
 class editor_Plugins_TermTagger_RecalcTransFound {
+
     /**
      *
      * @var editor_Models_Task
@@ -58,16 +59,12 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     protected $targetFuzzyLanguages;
 
     /**
-     * @var array
+     * Constructor
+     *
+     * editor_Plugins_TermTagger_RecalcTransFound constructor.
+     * @param editor_Models_Task $task
+     * @throws Zend_Cache_Exception
      */
-    protected $groupCounter = array();
-
-    /**
-     * must be reset if task changes. Since task can only be given on construction, no need to reset.
-     * @var array
-     */
-    protected $notPresentInTbxTarget = array();
-
     public function __construct(editor_Models_Task $task) {
         $this->task = $task;
         $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
@@ -216,7 +213,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 }
             }
 
-            // Pick homonyms under the target terms' termEntries
+            // Pick target terms' termEntries having homonyms for current source term
             foreach ($this->trgIdA as $trgTbxId) {
                 if ($trg = $this->exists[$trgTbxId] ?? 0) {
                     foreach ($this->termsByEntry[$trg['termEntryTbxId']] as $term) {
@@ -330,7 +327,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             // If translation was found or such source term does not exists in db at all
             if ($value == 'transFound' || !isset($this->exists[$srcId])) {
 
-                //
+                // Append mark for current occurence of term tag
                 $mark[$srcId] []= $value;
 
                 // Keep the mark we have for current source term and goto next source term
@@ -359,7 +356,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 $entryId = $this->exists[$srcId]['termEntryTbxId'];
 
                 // If there are no source term translations
-                if (!$transTextA = $this->trans[$entryId] ?? 0) {
+                if (!$transTextA = array_values($this->trans[$entryId]) ?? 0) {
 
                     // Setup 'transNotDefined'-class
                     $value = 'transNotDefined';
@@ -375,7 +372,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 }
             }
 
-            //
+            // Append mark for current occurence of term tag
             $mark[$srcId] []= $value;
         }
 
