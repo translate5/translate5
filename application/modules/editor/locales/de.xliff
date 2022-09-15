@@ -2124,7 +2124,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UGl2b3QtRGF0ZWk='><source>Pivot-Datei</source><target>Pivot-Datei</target></trans-unit>
 <trans-unit id='RGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'><source>Datei(en) hinzufügen</source><target>Datei(en) hinzufügen</target></trans-unit>
 <trans-unit id='SW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0'><source>InstantTranslateWriteTm</source><target>Instant-Translate TM schreiben</target></trans-unit>
-<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbik='><source>Referenz-Dateien(en)</source><target>Referenz-Dateien(en)</target></trans-unit>
+<trans-unit id='UmVmZXJlbnotRGF0ZWkoZW4p'><source>Referenz-Datei(en)</source><target>Referenz-Datei(en)</target></trans-unit>
 <trans-unit id='UmVmZXJlbnotRGF0ZWk='><source>Referenz-Datei</source><target>Referenz-Datei</target></trans-unit>
 <trans-unit id='S3VuZGVuZWluc3RlbGx1bmdlbiBpbiBkZW4gYWt0dWVsbGVuIEt1bmRlbiDDvGJlcm5laG1lbg=='><source>Kundeneinstellungen in den aktuellen Kunden übernehmen</source><target>Kundeneinstellungen in den aktuellen Kunden übernehmen</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQtQmVudXR6ZXJ6dXdlaXN1bmdlbiBrb3BpZXJlbiB2b24='><source>Standard-Benutzerzuweisungen kopieren von</source><target>Standard-Benutzerzuweisungen kopieren von</target></trans-unit>
@@ -2193,6 +2193,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QXR0cmlidXRlIGF1ZiBFaW50cmFnc2ViZW5l'><source>Attribute auf Eintragsebene</source><target>Attribute auf Eintragsebene</target></trans-unit>
 <trans-unit id='QXR0cmlidXRlIGF1ZiBTcHJhY2hlYmVuZQ=='><source>Attribute auf Sprachebene</source><target>Attribute auf Sprachebene</target></trans-unit>
 <trans-unit id='QXR0cmlidXRlIGF1ZiBCZW5lbm51bmdzZWJlbmU='><source>Attribute auf Benennungsebene</source><target>Attribute auf Benennungsebene</target></trans-unit>
+<trans-unit id='QWx0ZXMgUGFzc3dvcnQ='><source>Altes Passwort</source><target>Altes Passwort</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -40,11 +40,59 @@ END LICENSE AND COPYRIGHT
  *  For the reference no id must be set, so that auto ids are generated on client side
  */
 class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_Import_DirectoryParser_WorkingFiles {
+
+    /**
+     * Defines the file-types we do not want as reference files for security reasons
+     */
+    const FORBIDDEN_EXTENSIONS = ['exe', 'com', 'bat', 'js', 'sh', 'php', 'py'];
+
+    /**
+     * @return string
+     * @throws Zend_Exception
+     */
+    public static function getDirectory() : string {
+        return Zend_Registry::get('config')->runtimeOptions->import->referenceDirectory;
+    }
+
+    /**
+     * Delete unwanted files from the unzipped import
+     * @param string $importDirectory
+     * @throws Zend_Exception
+     */
+    public static function cleanImportDirectory(string $importFolder) {
+        $referenceFilesDir = $importFolder.DIRECTORY_SEPARATOR.self::getDirectory();
+        if(is_dir($referenceFilesDir)){
+            // for security reasons we want to get rid of all unwanted reference files (so they won't be archived)
+            ZfExtended_Utils::recursiveDelete($referenceFilesDir, self::FORBIDDEN_EXTENSIONS);
+        }
+    }
+
+    /**
+     * Delete unwanted files from the import archive
+     * @param ZipArchive $zip
+     */
+    public static function cleanImportArchive(ZipArchive $zip) {
+        $idxToDelete = [];
+        $refDir = self::getDirectory();
+        for ($i = 0; $i < $zip->numFiles; $i++){
+            $pathParts = explode('/', trim($zip->getNameIndex($i), '/'));
+            $numParts = count($pathParts);
+            if($numParts > 1 && $pathParts[0] === $refDir && in_array(pathinfo($pathParts[$numParts - 1], PATHINFO_EXTENSION), self::FORBIDDEN_EXTENSIONS)){
+                $idxToDelete[] = $i;
+            }
+        }
+        if(count($idxToDelete) > 0){
+            foreach($idxToDelete as $index){
+                $zip->deleteIndex($index);
+            }
+        }
+    }
+
     public function __construct() {
         //disable (empty) the filter for reference files:
         $this->supportedFiles = null;
         // disable any ignored extensions
-        $this->ignoreExtensionsList = [];
+        $this->ignoreExtensionsList = self::FORBIDDEN_EXTENSIONS;
     }
     
     /**
