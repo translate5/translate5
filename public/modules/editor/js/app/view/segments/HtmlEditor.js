@@ -645,7 +645,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       switch(whitespaceType){
           case 'nbsp':
               classNameForTagType = 'single 636861722074733d226332613022206c656e6774683d2231222f nbsp';
-              data.title = '&lt;'+data.nr+'/&gt;: Non breaking space';
+              data.title = '&lt;'+data.nr+'/&gt;: No-Break Space (NBSP)';
               data.id = 'char';
               data.length = '1';
               data.text = '⎵';
