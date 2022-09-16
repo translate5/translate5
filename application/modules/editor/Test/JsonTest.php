@@ -203,7 +203,7 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function assertModelEqualsJsonFileRow(string $modelName, string $fileToCompare, stdClass $actual, string $message=''){
         $expected = $this->api()->getFileContent($fileToCompare);
-        $this->assertModelEqualsObject('SegmentQuality', $expected->row, $actual->row);
+        $this->assertModelEqualsObject($modelName, $expected->row, $actual->row);
     }
     /**
      * Compares an expected with an actual model of the given type/name

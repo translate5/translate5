@@ -27,46 +27,34 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Encapsulates all logic for global quality management
- * Currently that is only the opening of the statistics window and the persistance of the filter mode of the qualities filter panel
+ * @class Editor.plugins.SpellCheck.controller.Main
+ * @extends Ext.app.Controller
  */
-Ext.define('Editor.controller.Quality', {
-    extend : 'Ext.app.Controller',
-    models: ['Editor.model.quality.Filter'],
-    stores: ['Editor.store.quality.Filter'],
-    filterPanelMode: 'all', // the initial filter mode of the filter panel. Can be 'all' | 'error' | 'falsepositive'
+Ext.define('Editor.plugins.SpellCheck.controller.Main', {
+    extend: 'Ext.app.Controller',
     listen: {
-        component: {
-            '#qualityFilterPanel #modeSelector': {
-                change:'onFilterModeChanged'
-            }
-        },
         controller: {
             '#Editor.$application': {
                 editorConfigLoaded:'onEditorConfigLoaded'
             }
-        },
-    },
-    /**
-     * After task config load event handler.
-     */
-    onEditorConfigLoaded:function(app){
-        if(app.getTaskConfig('autoQA.enableMqmTags')){
-            app.getController('Editor.controller.QualityMqm').activate();
-        } else {
-            app.getController('Editor.controller.QualityMqm').deactivate();
         }
     },
-    /**
-     * Changes the globally managed filter mode to ensure persistence
+
+    /***
+     * On editor config load event
      */
-    onFilterModeChanged: function(comp, newVal, oldVal) {
-        this.filterPanelMode = newVal;
-    },
-    /**
-     * Accessor for the filter mode
-     */
-    getFilterMode: function(){
-        return this.filterPanelMode;
+    onEditorConfigLoaded:function(app, task){
+        var me=this,
+            isPluginActive = app.getTaskConfig('plugins.SpellCheck.liveCheckOnEditing'),
+            controller = Editor.app.getController('Editor.plugins.SpellCheck.controller.Editor');
+
+        if(isPluginActive){
+            // this will enable the event buss for the controller
+            controller.activate();
+        }else{
+             // this will disable the event buss for the controller
+            controller.deactivate();
+        }
     }
+
 });

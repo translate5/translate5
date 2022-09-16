@@ -93,7 +93,6 @@ class editor_Models_Import_UploadProcessor {
         //examples for adding relais and reference files to single upload too
         //$config = Zend_Registry::get('config')->runtimeOptions->import;
         //self::addUploadProcessor(ZfExtended_Factory::get('editor_Models_Import_UploadProcessor_GenericUpload', [ TO_BE_DEFINED, $config->relaisDirectory]));
-        //self::addUploadProcessor(ZfExtended_Factory::get('editor_Models_Import_UploadProcessor_GenericUpload', [ TO_BE_DEFINED, $config->referenceDirectory]));
     }
 
     /**

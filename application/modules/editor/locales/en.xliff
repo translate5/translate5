@@ -4611,12 +4611,8 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>InstantTranslateWriteTm</source>
     <target>Instant-Translate write TM</target>
 </trans-unit>
-<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbikgaGluenVmw7xnZW4='>
-    <source>Referenz-Dateien(en) hinzufügen</source>
-    <target>Add reference file(s)</target>
-</trans-unit>
-<trans-unit id='UmVmZXJlbnotRGF0ZWllbihlbik='>
-    <source>Referenz-Dateien(en)</source>
+<trans-unit id='UmVmZXJlbnotRGF0ZWkoZW4p'>
+    <source>Referenz-Datei(en)</source>
     <target>Reference file(s)</target>
 </trans-unit>
 <trans-unit id='UmVmZXJlbnotRGF0ZWk='>
@@ -4821,6 +4817,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QXR0cmlidXRlIGF1ZiBCZW5lbm51bmdzZWJlbmU='>
   <source>Attribute auf Benennungsebene</source>
   <target>Term attributes</target>
+</trans-unit>
+<trans-unit id='QWx0ZXMgUGFzc3dvcnQ='>
+  <source>Altes Passwort</source>
+  <target>Old password</target>
 </trans-unit>
   </file>
 </xliff>

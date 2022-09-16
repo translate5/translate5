@@ -209,6 +209,9 @@ class editor_Models_Segment_Whitespace {
             //see https://stackoverflow.com/questions/9587751/decoding-numeric-html-entities-via-php
             // and https://caves.org.uk/charset_test.html  Section: Another Problem with PHP's htmlentities()
             //since entityCleanup was called aready, we have to begin the regex with &amp; instead &
+            // 2022 additional Info - the here escaped characters 128 - 159 are non printable
+            // control characters (C1 Controls) - therefore we escape them.
+            // Attention caveat: copying the character &#128; into the browser vonverts it to € - assuming that not UTF8 but wincp was used!
             $textNode = preg_replace_callback('/&amp;#(128|129|1[3-5][0-9]);/', function ($match) {
                 //always one single character is masked, so length = 1
                 return $this->maskSpecialContent('char', '&#'.$match[1].';', 1);
@@ -273,7 +276,7 @@ class editor_Models_Segment_Whitespace {
             $length = (array_key_exists(5, $match) && strlen($match[5]) > 0) ? $match[5] : '1'; //if length not given defaults to 1
             $renderData = $this->getTagRenderData($tagName, $length, $wholeTag);
             $tagLabel = $renderData['text'];
-            if($tagName == 'char' && strlen($tagLabel) > 1) {
+            if($tagName == 'char' && mb_strlen($tagLabel) > 1) {
                 //characters may not have a length, but labels with a longer text "[BOM]",
                 // therefore we replace them with one replacement char
                 return self::LABEL_REPLACEMENT_CHARACTER;
@@ -293,8 +296,8 @@ class editor_Models_Segment_Whitespace {
             self::LABEL_NEWLINE,
             self::LABEL_TAB,
             self::LABEL_SPACE
-            // Note: first item in the second arg is not an ordinary space having code 32,
-            // but is a non-breaking space having code 16
+            // Note: first item in the second arg is not an ordinary space having code 32 (20),
+            // but is a non-breaking space having code 160 (C2A0)
         ], [" ", "\n", "\t", ' '], $content);
     }
     

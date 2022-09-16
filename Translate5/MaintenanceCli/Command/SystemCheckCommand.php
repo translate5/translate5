@@ -116,6 +116,7 @@ class SystemCheckCommand extends Translate5AbstractCommand
             }
             if($oneResult->hasError() || $oneResult->hasWarning()) {
                 $this->io->text($oneResult->badSummary);
+                $this->io->info('Please recall the system:check in the UI to exclude CLI related problems.');
                 $this->io->writeln('');
             }
         }

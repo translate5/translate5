@@ -99,9 +99,8 @@ class Editor_ReferencefileController extends ZfExtended_RestController {
      */
     protected function getRequestedFileAbsPath() {
         $task = $this->getCurrentTask();
-        $config = Zend_Registry::get('config');
         $taskPath = $task->getAbsoluteTaskDataPath();
-        $refDir = $taskPath.DIRECTORY_SEPARATOR.$config->runtimeOptions->import->referenceDirectory;
+        $refDir = $taskPath.DIRECTORY_SEPARATOR.editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
         $requestedFile = $this->getRequestedFileRelPath();
         $baseReal = realpath($refDir);
         $fileReal = realpath($refDir.$requestedFile);

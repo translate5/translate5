@@ -194,7 +194,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         return match ($type) {
             'workfile' => editor_Models_Import_Configuration::WORK_FILES_DIRECTORY,
             'pivot' => editor_Models_Import_Configuration::RELAIS_FILES_DIRECTORY,
-            'reference' => Zend_Registry::get('config')->runtimeOptions->import->referenceDirectory ?? 'referenceFiles',
+            'reference' => editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory() ?? 'referenceFiles',
             default => $type,
         };
     }

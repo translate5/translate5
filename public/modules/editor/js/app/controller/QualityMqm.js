@@ -53,9 +53,6 @@ Ext.define('Editor.controller.QualityMqm', {
         controller: {
             '#Editor': {
                 'assignMQMTag': 'handleAddMqmKey'
-            },
-            '#Editor.$application': {
-                editorConfigLoaded:'onEditorConfigLoaded'
             }
         },
         component: {
@@ -71,17 +68,7 @@ Ext.define('Editor.controller.QualityMqm', {
     	buttonTooltip10: '#UT# (ALT+{0})',
     	buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
     },
-    
-    /***
-     * After task config load event handler.
-     */
-    onEditorConfigLoaded:function(app, task){
-        var me = this,
-            isControllerActive = app.getTaskConfig('autoQA.enableMqmTags');
-        // this controller is active when enableMqmTags is set
-        me.setActive(isControllerActive);
-    },
-    
+
     handleInitEditor: function() {
         this.initFieldSet();
         var combo = this.getMetaSevCombo(),
