@@ -72,7 +72,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         this.editor = editor;
     },
 
-    applySpellCheckStylesForRecord: function (store, rec, operation) {
+    applyQualityStylesForRecord: function (store, rec, operation) {
         let grid = this.getSegmentGrid(),
             view = grid.down('tableview'),
             target,
@@ -232,14 +232,14 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         let me = this;
         column.renderer = function (value, meta, record, rowIndex, colIndex, store) {
             setTimeout(function () {
-                me.applySpellCheckStylesForRecord(store, record);
+                me.applyQualityStylesForRecord(store, record);
             }, 50);
             return value;
         };
     },
 
     /**
-     * Create and return a new node for SpellCheck-Match of the given index.
+     * Create and return a new node for Quality-Match of the given index.
      * For match-specific data, get the data from the tool.
      *
      * @param {integer} index
