@@ -79,19 +79,32 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             cellNode,
             matches;
 
-        for (const field of ['24translate', 'spellCheck']) {
-            let data = rec.get(field);
+        let qualityTargets = [
+            {
+                field: '24translate',
+                columnPostfixes: ['EditColumn', 'Column']
+            },
+            {
+                field: 'spellCheck',
+                columnPostfixes: ['EditColumn']
+            },
+        ];
+
+        for (const field of qualityTargets) {
+            let data = rec.get(field.field);
 
             for (target in data) {
-                data[target].forEach(function (item) {
-                    item.range.containerNode = document.querySelector(
-                        '#' + view.id + '-record-' + rec.internalId
-                        + ' [data-columnid="' + target + 'EditColumn"] .x-grid-cell-inner'
-                    );
-                });
-                cellNode = data[target][0].range.containerNode;
-                matches = data[target];
-                this.applyCustomMatches(cellNode, matches, operation === 'cancelled');
+                for (let columnPostfix of field.columnPostfixes) {
+                    data[target].forEach(function (item) {
+                        item.range.containerNode = document.querySelector(
+                            '#' + view.id + '-record-' + rec.internalId
+                            + ' [data-columnid="' + target + columnPostfix + '"] .x-grid-cell-inner'
+                        );
+                    });
+                    cellNode = data[target][0].range.containerNode;
+                    matches = data[target];
+                    this.applyCustomMatches(cellNode, matches, operation === 'cancelled');
+                }
             }
         }
     },
