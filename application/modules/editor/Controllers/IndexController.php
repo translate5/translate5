@@ -82,7 +82,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'TmOverview'                    => ['languageResourcesOverview'], //controlled by ACL, enabling frontend rights given here
         'Localizer'                     => true,
         'Quality'                       => true,
-        'QualityMqm'                    => true //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
+        'QualityMqm'                    => true, //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
+        'SegmentQualitiesBase'          => true,
     ];
 
     public function init()

@@ -35,10 +35,15 @@ END LICENSE AND COPYRIGHT
 /**
  * @class Editor.plugins.SpellCheck.controller.Editor
  * @extends Ext.app.Controller
+ *
+ * FIXME Refactor this to make it reusable by other plugins
  */
 Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     extend: 'Ext.app.Controller',
-    requires: ['Editor.util.SegmentContent'],
+    requires: [
+        'Editor.util.SegmentContent',
+        'Editor.controller.SegmentQualitiesBase'
+    ],
     mixins: ['Editor.util.DevelopmentTools',
              'Editor.util.Event',
              'Editor.util.Range',
@@ -86,9 +91,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             '#segmentStatusStrip #btnRunSpellCheck': {
                 click: 'startSpellCheckViaButton'
             },
-            'contentEditableColumn': {
-                render: 'onEditableColumnRender'
-            }
         },
     },
     spellCheckMessages: {
@@ -98,10 +100,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // spellcheck-Node
         NODE_NAME_MATCH: 'span',
         // CSS-Classes for the spellcheck-Node
-        CSS_CLASSNAME_MATCH: 't5spellcheck',
+        CSS_CLASSNAME_MATCH: 't5quality',
         // CSS-Classes for error-types
         // Attributes for the spellcheck-Node
-        ATTRIBUTE_ACTIVEMATCHINDEX: 'data-spellcheck-activeMatchIndex',
+        ATTRIBUTE_ACTIVEMATCHINDEX: 'data-quality-activeMatchIndex',
         // In ToolTips
         CSS_CLASSNAME_TOOLTIP_HEADER:  'spellcheck-tooltip-header',
         CSS_CLASSNAME_REPLACEMENTLINK:  'spellcheck-replacement',
@@ -140,7 +142,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // TRANSLATE-1630 "Workaround for east asian problems with spellchecker" 
     languagesToStopIdle: ['ja','ko','zh'],  // target-languages that cause problems when using SpellCheck via keyboard-idle
     disableSpellCheckByIdle: null,          // = use button instead of idle (will be set according to the target-language)
-    
+
     // =========================================================================
     // Init
     // =========================================================================
@@ -924,147 +926,5 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.initTooltips(); // me.spellCheckTooltip.hide() is not enough (e.g. after a contextmenu had been shown with a long list of replacements, the next contextmenu was placed as if it still has that height)
         me.spellCheckTooltip.showAt(posX,posY);
     },
-    applySpellCheckStylesForRecord: function(store, rec, operation) {
-        var grid = this.getRef('segmentGrid'), view = grid.down('tableview'), rec, target, cellNode, matches;
-        for (target in rec.get('spellCheck')) {
-            rec.get('spellCheck')[target].forEach(function(item){
-                item.range.containerNode = document.querySelector(
-                    '#' + view.id + '-record-' + rec.internalId
-                    + ' [data-columnid="' + target + 'EditColumn"] .x-grid-cell-inner'
-                );
-            });
-            cellNode = rec.get('spellCheck')[target][0].range.containerNode;
-            matches = rec.get('spellCheck')[target];
-            this.applyCustomMatches(cellNode, matches, operation == 'cancelled');
-        }
-    },
-    applyCustomMatches: function(cellNode, matches, skipMindDelTags) {
-        if (!cellNode) return;
-        var me = this,
-            rangeForMatch,
-            documentFragmentForMatch,
-            spellCheckNode;
-
-        // apply the matches (iterate in reverse order; otherwise the ranges get lost due to DOM-changes "in front of them")
-        me.cleanUpNode(cellNode);
-        rangeForMatch = rangy.createRange(cellNode);
-        Ext.Array.each(matches, function(match, index) {
-            if (!skipMindDelTags) me.mindTags(match);
-            rangeForMatch.moveToBookmark(match.range);
-            rangeForMatch = me.cleanBordersOfCharacterbasedRange(rangeForMatch);
-            documentFragmentForMatch = rangeForMatch.extractContents();
-            spellCheckNode = me.createSpellcheckNode(index, matches);
-            spellCheckNode.appendChild(documentFragmentForMatch);
-            rangeForMatch.insertNode(spellCheckNode);
-        }, me, true);
-    },
-
-    mindTags: function(match) {
-        var shift, html = new Editor.util.HtmlCleanup().cleanHtmlTags(
-            match.range.containerNode.innerHTML
-                .replace(/title="[^"]+"/g, (attr) => {
-                    return attr.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                })
-                .replace(/<([0-9]+)\/>/g, '&lt;$1/&gt;'), '<del>'
-        ).replace(/&lt;/g, '<').replace(/&gt;/g, '>'), tagm, tags = [], tag, start, end, debug = false; //html.match('shouldz');
-
-        // Create backup for initial offsets
-        if (!('backup' in match)) match.backup = {
-            start: match.range.start + 0,
-            end: match.range.end + 0
-        }
-
-        // Debug
-        if (debug) {
-            console.log('html before', match.range.containerNode.innerHTML);
-            console.log('html after', html);
-        }
-
-        // Get regexp iterator containing matches
-        tagm = html.matchAll(/(?<del><del.*?>)(.+?)<\/del>|(?<white><[0-9]+\/>)|(?<other><\/?[^>]+>)/g);
-
-        // Get array of matches for further use to be more handy
-        while (tag = tagm.next()) {
-            if (tag.value) {
-                tags.push(tag.value);
-            } else {
-                break;
-            }
-        }
-
-        // Debug
-        if (debug) {
-            console.log(tags);
-            console.log('match.backup.start', match.backup.start);
-        }
-
-        // Shortcuts
-        start = match.backup.start + 0;
-        end   = match.backup.end + 0;
-
-        // Foreach tag
-        for (var i = 0; i < tags.length; i++) {
-
-            // Debug
-            if (debug) console.log('tag#', i, 'was index', tags[i].index);
-
-            // Reduce current tag match index (offset position) by cutting off html stuff of previous tags to make
-            // it possible to rely on that index (offset position) while spell check styles coords calculation
-            for (var j = 0; j < i; j++) {
-
-                // If it's one of the del-tags
-                if (tags[j].groups.del) {
-                    tags[i].index -= tags[j][0].length - tags[j][2].length;
-                }
-            }
-
-            // Debug
-            if (debug) console.log('tag#', i, 'now index', tags[i].index, 'start is', start);
-
-            // If current tag appears before the word having spellcheck-error
-            if (tags[i].index <= start) {
-
-                // If it's one of the whitespace-tags
-                if (tags[i][2] === undefined) {
-
-                    // Shift spellcheck coords to the right, by whitespace-tag's outerHTML length,
-                    // which is = 4 in most cases, as whitespace tags look like <1/>, <2/> etc
-                    shift = tags[i][0].length;
-
-                // Else if it's one of the del-tags
-                } else {
-
-                    // Shift spellcheck coords to the right, by del-tags content length
-                    shift = tags[i][2].length;
-                }
-
-                // Debug
-                if (debug) console.log('tag#', i, 'start was', start, 'start now', start + shift);
-
-                // Do shift
-                start += shift; end += shift;
-            }
-        }
-
-        // Debug
-        if (debug) console.log(html, 'was', [match.backup.start, match.backup.end], 'shifted by ', start - match.backup.start);
-
-        // Update offsets
-        match.range.start = start;
-        match.range.end = end;
-
-        // Debug
-        if (debug) console.log(html, 'now', [match.range.start, match.range.end]);
-    },
-
-    onEditableColumnRender: function(column) {
-        var me = this;
-        column.renderer = function(value, meta, record, rowIndex, colIndex, store, view) {
-            setTimeout(function(){
-                me.applySpellCheckStylesForRecord(store, record);
-            }, 50);
-            return value;
-        };
-    }
 });
 // var matches = Ext.getCmp('segment-grid').getStore().getAt(1).get('spellCheck').target;
