@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 37,
-    "qtotal": 37,
+    "qcount": 33,
+    "qtotal": 33,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -131,7 +131,7 @@
         {
             "qid": -1,
             "qtype": "spellcheck",
-            "qcount": 23,
+            "qcount": 19,
             "qcomplete": true,
             "children": [
                 {
@@ -146,9 +146,9 @@
                     "checked": false
                 },
                 {
-                    "qid": "99399",
+                    "qid": "45834",
                     "qtype": "spellcheck",
-                    "qcount": 21,
+                    "qcount": 19,
                     "qcomplete": true,
                     "qcategory": "misspelling",
                     "qcatidx": "-1",
@@ -158,14 +158,13 @@
                     "checked": false
                 },
                 {
-                    "qid": "99420",
+                    "qid": -1,
                     "qtype": "spellcheck",
-                    "qcount": 2,
+                    "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "typographical",
-                    "qcatidx": "-1",
                     "text": "Typographical",
-                    "qtooltip": "The text has typographical errors such as omitted\/incorrect punctuation, incorrect capitalization, etc.",
+                    "qtooltip": "The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.",
                     "leaf": true,
                     "checked": false
                 },
@@ -342,7 +341,7 @@
             "qcategory": null,
             "qtooltip": "",
             "text": "LanguageTool",
-            "qtotal": 23,
+            "qtotal": 19,
             "expanded": true,
             "checked": false
         },
@@ -730,19 +729,19 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "99422",
+                    "qid": "45852",
                     "qtype": "numbers",
                     "qcount": 3,
                     "qcomplete": true,
                     "qcategory": "num1",
                     "qcatidx": "-1",
-                    "text": "Numbers source \u2260 target",
+                    "text": "Numbers source ≠ target",
                     "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "99432",
+                    "qid": "45849",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -754,19 +753,19 @@
                     "checked": false
                 },
                 {
-                    "qid": "99434",
+                    "qid": "45851",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num11",
                     "qcatidx": "-1",
-                    "text": "Different character\/formatting for number interval",
+                    "text": "Different character/formatting for number interval",
                     "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "99428",
+                    "qid": "45845",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -789,7 +788,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99423",
+                    "qid": "45840",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -801,7 +800,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99424",
+                    "qid": "45841",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -813,7 +812,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99425",
+                    "qid": "45842",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -825,7 +824,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99426",
+                    "qid": "45843",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -837,7 +836,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99429",
+                    "qid": "45846",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -860,7 +859,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99430",
+                    "qid": "45847",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -872,7 +871,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99431",
+                    "qid": "45848",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -1104,7 +1103,7 @@
             ],
             "qcategory": null,
             "qtooltip": "",
-            "text": "White space at the beginning\/end",
+            "text": "White space at the beginning/end",
             "qtotal": 0,
             "expanded": false,
             "checked": false

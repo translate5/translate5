@@ -244,7 +244,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
             'sourceLang' => 'de',
             'targetLang' => 'en',
         ];
-        $api->addImportFile($api->getFile('workfiles/BconfWithin.zip'));
+        $api->addImportFile($api->getFile('workfiles/BconfWithin-de-en.zip'));
         $api->import($task);
         $task = $api->getTask();
         $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
