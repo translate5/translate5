@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Represents an Internal tag's content-tags
  * This class is not a segment-tag but a special implementation only for usage "inside" of an internal tag
  * Examples of internal content tags:
- * <span class="short" title="&lt;13/&gt;: Non breaking space">&lt;13/&gt;</span>
+ * <span class="short" title="&lt;13/&gt;: No-Break Space (NBSP)">&lt;13/&gt;</span>
  * <span class="full" data-originalid="char" data-length="1">⎵</span>
  */
 final class  editor_Segment_Internal_ContentTag extends editor_Tag implements JsonSerializable {
