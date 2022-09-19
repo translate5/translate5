@@ -26,7 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 
 /**
@@ -94,10 +93,6 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             $pivotAssoc->setTaskGuid($taskGuid);
             $pivotAssoc->save();
         });
-
-        /** @var PivotQueuer $queuer */
-        $queuer = ZfExtended_Factory::get(PivotQueuer::class);
-        $queuer->queuePivotWorker($taskGuid);
     }
 
     /***
