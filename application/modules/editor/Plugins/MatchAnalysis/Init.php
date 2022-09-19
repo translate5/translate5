@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
+
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     protected static $description = 'Provides the match-analysis and pre-translation against language-resources.';
     
@@ -94,7 +96,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleOnPretranslationOperation'));
         $this->eventManager->attach('Editor_CronController', 'afterDailyAction', array($this, 'handleAfterDailyAction'));
 
-        $this->eventManager->attach('editor_LanguageresourcetaskpivotassocController', 'beforePivotPreTranslationQueue', array($this, 'handleBeforePivotPreTranslationQueue'));
+        $this->eventManager->attach('MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuerPivotQueuer', 'beforePivotPreTranslationQueue', array($this, 'handleBeforePivotPreTranslationQueue'));
 
     }
     
@@ -231,7 +233,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             }
 
             //we may not trigger the queue here, just add the workers!
-            $batchWorker->queue($parentWorkerId, null, false);
+            $workerId = $batchWorker->queue($parentWorkerId, null, false);
+
+            $this->queueBatchCleanUpWorker($workerId,$task->getTaskGuid());
         }
     }
 
@@ -364,9 +368,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             }
             
             //we may not trigger the queue here, just add the workers!
-            $batchWorker->queue($parentWorkerId, null, false);
+            $workerId = $batchWorker->queue($parentWorkerId, null, false);
+
+            $this->queueBatchCleanUpWorker($workerId,$task->getTaskGuid());
         }
     }
+
     /**
      *
      * @param string $taskGuid
@@ -382,6 +389,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         }
         return 0;
     }
+
     /***
      * Check if the given task has associated language resources
      * @param string $taskGuid
@@ -432,6 +440,33 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             
         }
         return $valid;
+    }
+
+    /***
+     * Queue batch cleanup worker. This will clean the batch results after the batch results are used.
+     *
+     * @param int $parent
+     * @param string $taskGuid
+     * @return void
+     */
+    protected function queueBatchCleanUpWorker(int $parent, string $taskGuid): void
+    {
+        /** @var BatchCleanupWorker $batchCleanupWorker */
+        $batchCleanupWorker = ZfExtended_Factory::get(BatchCleanupWorker::class);
+
+        if (!$batchCleanupWorker->init($taskGuid, ['taskGuid' => $taskGuid])) {
+
+            /** @var editor_Models_Task $task */
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            $task->loadByTaskGuid($taskGuid);
+
+            //we log that fact, queue nothing and rely on the normal match analysis processing
+            $this->addWarn($task,'MatchAnalysis-Error on BatchCleanupWorker init(). BatchCleanupWorker can not be initialized');
+            return;
+        }
+
+        //we may not trigger the queue here, just add the workers!
+        $batchCleanupWorker->queue($parent, null, false);
     }
     
     /***

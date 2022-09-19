@@ -267,4 +267,18 @@ class TaskAssociation extends ZfExtended_Models_Entity_Abstract {
         ->where('languageResourceId=?',$languageResourceId);
         return $this->db->fetchAll($s)->toArray();
     }
+
+    /***
+     * Check if given resource is assigned to a task
+     * @param int $resourceId
+     * @param string $taskGuid
+     * @return bool
+     */
+    public function isAssigned(int $resourceId, string $taskGuid): bool
+    {
+        $s = $this->db->select()
+            ->where('taskGuid = ?',$taskGuid)
+            ->where('languageResourceId = ?',$resourceId);
+        return empty($this->db->getAdapter()->fetchAll($s)) === false;
+    }
 }
