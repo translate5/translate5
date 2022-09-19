@@ -58,12 +58,17 @@ Ext.define('Editor.view.ui.changealike.Grid', {
       'Editor.view.segments.column.Matchrate',
       'Editor.view.segments.column.AutoState'
   ],
-  
+  rowBodyTpl: new Ext.XTemplate([
+      '<span class="x-grid-cell-inner">{type}</span>',
+      '<span class="x-grid-cell-inner">{source}</span>',
+      '<span class="x-grid-cell-inner"></span>',
+      '<span class="x-grid-cell-inner">{target}</span>'
+  ]),
   initConfig: function(instanceConfig) {
     var me = this,
     segField = Editor.model.segment.Field,
     config;
-
+    console.log(me.rowBodyTpl.apply)
     config = {
       columns: [
         {
@@ -170,11 +175,11 @@ Ext.define('Editor.view.ui.changealike.Grid', {
         bodyBefore: true,
         getAdditionalData: (data, idx, record) => {
           return {
-            rowBody:
-                '<span class="x-grid-cell-inner">' + record.get('context').data[0].type + '</span>' +
-                '<span class="x-grid-cell-inner">' + record.get('context').data[0].source + '</span>' +
-                '<span class="x-grid-cell-inner"></span>' +
-                '<span class="x-grid-cell-inner">' + record.get('context').data[0].target + '</span>',
+            rowBody: me.rowBodyTpl.apply({
+              type: record.get('context').data[0].type,
+              source: record.get('context').data[0].source,
+              target: record.get('context').data[0].target
+            }),
             rowBodyCls: 'segment-tag-column'
           }
         }
@@ -182,11 +187,11 @@ Ext.define('Editor.view.ui.changealike.Grid', {
         ftype: 'rowbody',
         getAdditionalData: (data, idx, record) => {
           return {
-            rowBody:
-                '<span class="x-grid-cell-inner">' + record.get('context').data[1].type + '</span>' +
-                '<span class="x-grid-cell-inner">' + record.get('context').data[1].source + '</span>' +
-                '<span class="x-grid-cell-inner"></span>' +
-                '<span class="x-grid-cell-inner">' + record.get('context').data[1].target + '</span>',
+            rowBody: me.rowBodyTpl.apply({
+              type: record.get('context').data[1].type,
+              source: record.get('context').data[1].source,
+              target: record.get('context').data[1].target
+            }),
             rowBodyCls: 'segment-tag-column'
           }
         }

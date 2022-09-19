@@ -324,10 +324,6 @@
                 <source>Verhalten des Wiederholungseditor</source>
                 <target>Repetition editor setting</target>
             </trans-unit>
-            <trans-unit id="SW1tZXIgYXV0b21hdGlzY2ggZXJzZXR6ZW4gdW5kIFN0YXR1cyBzZXR6ZW4sIHdlbm4=">
-                <source>Immer automatisch ersetzen und Status setzen, wenn</source>
-                <target>Always replace automatically and set status, if</target>
-            </trans-unit>
             <trans-unit id="QmVpIGplZGVyIFdpZWRlcmhvbHVuZyBlaW56ZWxuIGVudHNjaGVpZGVu">
                 <source>Bei jeder Wiederholung einzeln entscheiden</source>
                 <target>Decide individually for each repetition</target>
@@ -336,13 +332,6 @@
                 <source>Nie automatisch ersetzen und Status setzen</source>
                 <target>Never replace automatically and set status</target>
             </trans-unit>
-
-<trans-unit id='UXVlbGxlIHdpZWRlcmhvbHQgd2lyZA=='><source>Quelle wiederholt wird</source><target>Source is repeated</target></trans-unit>
-<trans-unit id='WmllbCB3aWVkZXJob2x0IHdpcmQ='><source>Ziel wiederholt wird</source><target>Target is repeated</target></trans-unit>
-<trans-unit id='UXVlbGxlIFVORCBaaWVsIHdpZWRlcmhvbHQgd2VyZGVu'><source>Quelle UND Ziel wiederholt werden</source><target>Source AND target are repeated</target></trans-unit>
-<trans-unit id='UXVlbGxlIE9ERVIgWmllbCB3aWVkZXJob2x0IHdlcmRlbg=='><source>Quelle ODER Ziel wiederholt werden</source><target>Source OR target are repeated</target></trans-unit>
-<trans-unit id='TnVyIGdsZWljaGVyIEtvbnRleHQ='><source>Nur gleicher Kontext</source><target>Same context only</target></trans-unit>
-
             <trans-unit id="QWJicmVjaGVu">
                 <source>Abbrechen</source>
                 <target>Cancel</target>
@@ -410,10 +399,6 @@
             <trans-unit id="WmllbC1UcmVmZmVy">
                 <source>Ziel-Treffer</source>
                 <target>Target hits</target>
-            </trans-unit>
-            <trans-unit id="S29udGV4dC1UcmVmZmVy">
-                <source>Kontext-Treffer</source>
-                <target>Context hits</target>
             </trans-unit>
             <trans-unit id="UmVsYWlzLVRyZWZmZXI=">
                 <source>Relais-Treffer</source>

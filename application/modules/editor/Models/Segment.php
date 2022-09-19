@@ -205,9 +205,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     protected static $pixelLength;
 
     /**
-     * @var null
+     * @var array
      */
-    protected $contextData = null;
+    protected array $contextData = [];
 
     /**
      * init the internal segment field and the DB object
@@ -1672,10 +1672,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function prepareSegmentsContext(array $alikeA, string $segmentsViewName) {
+    protected function prepareSegmentsContext(array $alikeA, string $segmentsViewName) : array {
 
         // If no alike-segments given return empty array
-        if (!$alikeA) return [];
+        if (!$alikeA) {
+            return [];
+        }
 
         // Collect segmentNrInTask-values for alike-segments themselves and their prev and next segments
         $nrA = [];
@@ -1697,7 +1699,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @param int $nr
      * @return array
      */
-    public function getSegmentContextByNr(int $nr) {
+    protected function getSegmentContextByNr(int $nr) : array {
 
         // Get context
         $self = $this->contextData[$nr];

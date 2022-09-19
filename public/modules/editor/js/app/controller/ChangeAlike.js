@@ -434,10 +434,12 @@ Ext.define('Editor.controller.ChangeAlike', {
           return me.getAllAlikeIds(function(rec) {
 
               // Check whether current alike-segment conforms repetitionType-clause
-                   if (repetitionType == 'bothOr' ) byRepetitionType = true;
-              else if (repetitionType == 'bothAnd') byRepetitionType = rec.get('sourceMatch') && rec.get('targetMatch');
-              else if (repetitionType == 'source' ) byRepetitionType = rec.get('sourceMatch');
-              else if (repetitionType == 'target' ) byRepetitionType = rec.get('targetMatch');
+              switch (repetitionType) {
+                  case 'bothOr' : byRepetitionType = true;                                             break;
+                  case 'bothAnd': byRepetitionType = rec.get('sourceMatch') && rec.get('targetMatch'); break;
+                  case 'source' : byRepetitionType = rec.get('sourceMatch');                           break;
+                  case 'target' : byRepetitionType = rec.get('targetMatch');                           break;
+              }
 
               // Check whether current alike-segment conforms sameContextOnly-clause
               bySameContextOnly = sameContextOnly ? rec.get('contextMatch') : true;
