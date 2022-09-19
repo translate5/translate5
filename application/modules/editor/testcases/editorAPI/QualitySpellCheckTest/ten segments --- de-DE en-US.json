@@ -146,7 +146,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99399",
+                    "qid": "135480",
                     "qtype": "spellcheck",
                     "qcount": 21,
                     "qcomplete": true,
@@ -158,14 +158,14 @@
                     "checked": false
                 },
                 {
-                    "qid": "99420",
+                    "qid": "135501",
                     "qtype": "spellcheck",
                     "qcount": 2,
                     "qcomplete": true,
                     "qcategory": "typographical",
                     "qcatidx": "-1",
                     "text": "Typographical",
-                    "qtooltip": "The text has typographical errors such as omitted\/incorrect punctuation, incorrect capitalization, etc.",
+                    "qtooltip": "The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.",
                     "leaf": true,
                     "checked": false
                 },
@@ -730,19 +730,19 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "99422",
+                    "qid": "135503",
                     "qtype": "numbers",
                     "qcount": 3,
                     "qcomplete": true,
                     "qcategory": "num1",
                     "qcatidx": "-1",
-                    "text": "Numbers source \u2260 target",
+                    "text": "Numbers source ≠ target",
                     "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "99432",
+                    "qid": "135513",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -754,19 +754,19 @@
                     "checked": false
                 },
                 {
-                    "qid": "99434",
+                    "qid": "135515",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num11",
                     "qcatidx": "-1",
-                    "text": "Different character\/formatting for number interval",
+                    "text": "Different character/formatting for number interval",
                     "qtooltip": "",
                     "leaf": true,
                     "checked": false
                 },
                 {
-                    "qid": "99428",
+                    "qid": "135509",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -789,7 +789,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99423",
+                    "qid": "135504",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -801,7 +801,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99424",
+                    "qid": "135505",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -813,7 +813,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99425",
+                    "qid": "135506",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -825,7 +825,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99426",
+                    "qid": "135507",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -837,7 +837,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99429",
+                    "qid": "135510",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -860,7 +860,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99430",
+                    "qid": "135511",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -872,7 +872,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "99431",
+                    "qid": "135512",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -1104,7 +1104,7 @@
             ],
             "qcategory": null,
             "qtooltip": "",
-            "text": "White space at the beginning\/end",
+            "text": "White space at the beginning/end",
             "qtotal": 0,
             "expanded": false,
             "checked": false

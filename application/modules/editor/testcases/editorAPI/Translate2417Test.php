@@ -56,11 +56,6 @@ class Translate2417Test extends editor_Test_JsonTest {
     public function test10_SetupData(){
         $this->addTm('resource1.tmx',self::$prefix.'resource1');
         $this->createTask();
-        $this->startImport();
-        $this->checkTaskState();
-        $task = $this->api()->getTask();
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
-
     }
 
     /***
@@ -68,6 +63,12 @@ class Translate2417Test extends editor_Test_JsonTest {
      * @depends test10_SetupData
      */
     public function test20_SegmentValuesAfterImport() {
+
+        $this->api()->addUser('testmanager');
+
+        $task = $this->api()->getTask();
+        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
+
         $segments = $this->api()->requestJson('editor/segment');
         $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
     }
@@ -78,6 +79,9 @@ class Translate2417Test extends editor_Test_JsonTest {
      * @depends test20_SegmentValuesAfterImport
      */
     public function test30_TmResultQuery() {
+
+        self::assertLogin('testmanager');
+
         $tm = $this->api()->getResources()[0];
 
         // load the first segment
@@ -134,13 +138,13 @@ class Translate2417Test extends editor_Test_JsonTest {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerId'=>self::$api->getCustomer()->id,
-            'autoStartImport'=>0
+            'autoStartImport'=>1
         ];
         self::assertLogin('testmanager');
 
         $zipfile = self::$api->zipTestFiles('testfiles/','test.zip');
         self::$api->addImportFile($zipfile);
-        self::$api->import($task,false,false);
+        self::$api->import($task,false);
         error_log('Task created. '.$this->api()->getTask()->taskName);
     }
 

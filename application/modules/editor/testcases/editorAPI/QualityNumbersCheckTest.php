@@ -31,16 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class QualityNumbersCheckTest extends editor_Test_JsonTest {
 
-    /**
-     * @var array
-     */
-    public static $taskA = [];
-
-    /**
-     * @throws Zend_Exception
-     */
     public static function setUpBeforeClass(): void {
-
         // Prepare initial API instance
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
 
@@ -50,96 +41,69 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         // Assert users. Last authed user is testmanager
         self::assertNeededUsers();
         self::assertLogin('testmanager');
-
-        // Array of csv-files for each to be imported as separate task
-        // Each file contains data to trigger different types of error messages
-        // detected by tiny version of SNC lib which was adopted for use for numbers-check
-        // CSV-files with such names should be placed in testfiles-dir
-        $csvA = [
-            'num1..num11 except num7 --- de-DE en-US' => 10, // 10 - expected qty of segments to be imported
-            'num7 --- de-DE ru-RU' => 1,
-            'num12,num13 --- en-GB de-DE' => 2
-        ];
-
-        // Foreach csv file specified in $numA array
-        foreach ($csvA as $name => $segmentQty) {
-
-            // Use separate clone of api object for use with each task
-            $api = self::$taskA[$name]['api'] = clone self::$api;
-
-            // Setup planned qty of segments to be imported for further check
-            self::$taskA[$name]['planQty'] = $segmentQty;
-
-            // Detect source and target languages from filename
-            preg_match('~ --- ([^ ]+) ([^ ]+)$~', $name, $lang);
-
-            // Get absolute file path to be used as 1st arg in below addImportFile() call
-            $abs = $api->getFile($rel = 'testfiles/' . $name . '.csv');
-
-            // Print the step where we are
-            // error_log("\nCreating task based on file: '$rel', source lang: '{$lang[1]}', target lang: '{$lang[2]}'\n");
-
-            // Add csv-file for import
-            $api->addImportFile($abs);
-
-            // Do import
-            $api->import([
-                'sourceLang' => $lang[1],
-                'targetLang' => $lang[2],
-                'edit100PercentMatch' => true,
-                'lockLocked' => 1,
-            ]);
-
-            // Get task
-            $task = self::$taskA[$name]['task'] = $api->getTask();
-
-            // Print imported task ID
-            // error_log("Task ID: {$task->id} \n");
-        }
     }
 
-    /**
-     * Tests the generally availability and validity of the filter tree
-     */
-    public function testFilterQualityTrees(){
-
-        // Foreach task based on imported csv file
-        foreach (self::$taskA as $name => $env) {
-
-            // Print the step where we are
-            // error_log("\nTesting task based on file: $name.csv\n");
-
-            // Open task for whole testcase
-            $env['api']->requestJson('editor/task/' . $env['task']->id, 'PUT', ['userState' => 'edit', 'id' => $env['task']->id]);
-
-            // Get segments and check their quantity
-            $factQty = count($env['api']->requestJson('editor/segment?page=1&start=0&limit=10'));
-            static::assertEquals($factQty, $env['planQty'], 'Not enough segments in the imported task');
-
-            // Check qualities
-            $jsonFile = "$name.json";
-            $tree = $env['api']->getJsonTree('/editor/quality', [], $jsonFile);
-            $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'numbers');
-            $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
-        }
+    public function testTask0(){
+        $this->performTestForTask('num1..num11 except num7 --- de-DE en-US', 10);
     }
 
-    /**
-     * Cleanup
-     */
-    public static function tearDownAfterClass(): void {
+    public function testTask1(){
+        $this->performTestForTask('num7 --- de-DE ru-RU', 1);
+    }
 
-        // Foreach task based on imported csv file
-        foreach (self::$taskA as $name => $env) {
+    public function testTask2(){
+        $this->performTestForTask('num12,num13 --- en-GB de-DE', 2);
+    }
 
-            // Close task
-            $env['api']->requestJson('editor/task/' . $env['task']->id, 'PUT', ['userState' => 'open', 'id' => $env['task']->id]);
+    private function performTestForTask(string $taskName, int $expectedSegmentQuantity){
 
-            // Print the step where we are
-            // error_log("\nDeleting task based on file: $name.csv\n");
+        // Detect source and target languages from filename
+        $lang = [];
+        preg_match('~ --- ([^ ]+) ([^ ]+)$~', $taskName, $lang);
 
-            // Delete task
-            $env['api']->requestJson('editor/task/' . $env['task']->id, 'DELETE');
-        }
+        // Get absolute file path to be used as 1st arg in below addImportFile() call
+        $absolutePath = self::$api->getFile('testfiles/' . $taskName . '.csv');
+
+        // Print the step where we are
+        // error_log("\nCreating task based on file: 'testfiles/" . $taskName . ".csv', source lang: '{$lang[1]}', target lang: '{$lang[2]}'\n");
+
+        // Add csv-file for import
+        self::$api->addImportFile($absolutePath);
+
+        // Do import
+        self::$api->import([
+            'sourceLang' => $lang[1],
+            'targetLang' => $lang[2],
+            'edit100PercentMatch' => true,
+            'lockLocked' => 1,
+        ]);
+
+        // Get task
+        $task = self::$api->getTask();
+
+        // Print the step where we are
+        // error_log("\nTesting task based on file: 'testfiles/" . $taskName . ".csv'\n");
+
+        // Open task for whole testcase
+        self::$api->requestJson('editor/task/' . $task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
+
+        // Get segments and check their quantity
+        $segmentQuantity = count(self::$api->requestJson('editor/segment?page=1&start=0&limit=10'));
+        static::assertEquals($expectedSegmentQuantity, $segmentQuantity, 'Not enough segments in the imported task');
+
+        // Check qualities
+        $jsonFile = $taskName.'.json';
+        $tree = self::$api->getJsonTree('/editor/quality', [], $jsonFile);
+        $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'numbers');
+        $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
+
+        // Close task
+        self::$api->requestJson('editor/task/' . $task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
+
+        // Print the step where we are
+        // error_log("\nDeleting task based on file: 'testfiles/" . $taskName . ".csv'\n");
+
+        // Delete task
+        self::$api->requestJson('editor/task/' . $task->id, 'DELETE');
     }
 }

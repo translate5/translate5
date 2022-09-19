@@ -81,7 +81,8 @@ class QualitySegmentEmptyTest extends editor_Test_JsonTest {
     public function testSegmentQualities(){
         $fileName = 'expectedSegmentQualities.json';
         $qualities = self::$api->getJson('/editor/quality/segment?segmentId=' . static::$segments[0]->id, [], $fileName);
-        $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities);
+        $filter = editor_Test_Model_Filter::createSingle('type', 'empty');
+        $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, '', $filter);
     }
 
     /**

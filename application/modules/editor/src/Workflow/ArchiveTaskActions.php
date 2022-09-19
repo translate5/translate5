@@ -58,6 +58,8 @@ class ArchiveTaskActions {
     public function __construct(editor_Workflow_Actions_Config $triggerConfig)
     {
         $this->triggerConfig = $triggerConfig;
+        //configurable limit per call, defaulting to 5, to reduce DB load per each call
+        $limit = $triggerConfig->parameters->limit ?? 5;
 
         $config = Zend_Registry::get('config');
         $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
@@ -74,7 +76,8 @@ class ArchiveTaskActions {
         $daysOffset = (int)$daysOffset; //ensure that it is plain integer
         $s = $taskEntity->db->select()
             ->where('`state` = ?', $taskEntity::STATE_END)
-            ->where('`modified` < (CURRENT_DATE - INTERVAL ? DAY)', $daysOffset);
+            ->where('`modified` < (CURRENT_DATE - INTERVAL ? DAY)', $daysOffset)
+            ->limit($limit); // since this action should be normally called periodically, we limit that on a specific amount
         $this->tasks = $taskEntity->db->getAdapter()->fetchAll($s) ?? [];
         foreach($this->tasks as $id => $task) {
             $taskEntity->load($task['id']);

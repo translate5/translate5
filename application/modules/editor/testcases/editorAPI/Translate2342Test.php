@@ -55,7 +55,7 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
     public function testSetupCustomerAndResources() {
         self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
             'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
+            'number'=>uniqid('API Testing::ResourcesLogCustomer', true),
         ]);
         
         $this->createTask();
@@ -66,6 +66,7 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
     
     /***
      * This will test the queued worker progress before and after the import.
+     * @depends testSetupCustomerAndResources
      */
     public function testImportProgress() {
         
@@ -103,8 +104,8 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
         //check for differences between the expected and the actual content
         self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
     }
-    
-    
+
+
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
