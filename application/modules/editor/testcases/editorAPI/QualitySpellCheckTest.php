@@ -41,6 +41,8 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         // Assert users. Last authed user is testmanager
         self::assertNeededUsers();
         self::assertLogin('testmanager');
+
+        self::assertContains('editor_Plugins_SpellCheck_Init', $appState->pluginsLoaded, 'SpellCheck must be activated for this test case!');
     }
 
     public function testTask0(){
