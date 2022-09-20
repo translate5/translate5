@@ -706,7 +706,8 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param editor_Models_Task $task
      * @throws Zend_Cache_Exception
      */
-    protected function setTaskDefaults(editor_Models_Task $task){
+    protected function setTaskDefaults(editor_Models_Task $task): void
+    {
         $defaults = $this->_helper->taskDefaults;
         /* @var Editor_Controller_Helper_TaskDefaults $defaults */
         $defaults->addDefaultLanguageResources($task);

@@ -661,32 +661,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     }
 
     /***
-     * Remove batch cache for all batch connectors if the batch query is enabled
-     */
-    protected function removeBatchCache()
-    {
-        if (empty($this->connectors) || !$this->batchQuery) {
-            return;
-        }
-        $model = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult');
-        /* @var $model MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult */
-        foreach ($this->connectors as $connector) {
-            if ($connector->isBatchQuery()) {
-                $model->deleteForLanguageresource($connector->getLanguageResource()->getId());
-            }
-        }
-    }
-
-    /***
      * Remove not required analysis object and data
      */
     public function clean()
     {
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
-        //clean the batch query cache if there is one
-        $this->removeBatchCache();
-
         $this->connectors = null;
     }
 

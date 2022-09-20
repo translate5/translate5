@@ -208,6 +208,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
         foreach (self::$taskIds as $taskId) {
+            self::$api->requestJson('editor/task/'.$taskId, 'PUT', ['userState' => 'open', 'id' =>$taskId]);
             self::$api->requestJson('editor/task/'.$taskId, 'DELETE');
         }
     }
