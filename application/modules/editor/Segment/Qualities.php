@@ -104,7 +104,15 @@ final class editor_Segment_Qualities {
      * @param int $endIndex
      * @param stdClass|array|null $additionalData
      */
-    public function add(string $field, string $type, string $category, int $startIndex, int $endIndex, stdClass|array|null $additionalData = null): void
+    public function add(
+        string $field,
+        string $type,
+        string $category,
+        int $startIndex,
+        int $endIndex,
+        stdClass|array|null $additionalData = null,
+        bool $hidden = false
+    ): void
     {
         // we can not compare the text indices because qualities added vie ->add() are qualities that relate to the whole segment content !
         $quality = $this->findExistingByProps($field, $type, $category, $additionalData);
@@ -119,6 +127,7 @@ final class editor_Segment_Qualities {
             $quality->startIndex = $startIndex;
             $quality->endIndex = $endIndex;
             $quality->falsePositive = 0;
+            $quality->hidden = $hidden;
             if($additionalData !== null){
                 $quality->setAdditionalData($additionalData);
             }

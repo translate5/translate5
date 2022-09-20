@@ -515,9 +515,17 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param int $endIndex
      * @param stdClass|array|null $additionalData : a FLAT object with additional data needed for re-identification. Deeper nested objects will be ignored
      */
-    public function addQuality(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1, stdClass|array $additionalData = null): void
+    public function addQuality(
+        string $field,
+        string $type,
+        string $category,
+        int $startIndex=0,
+        int $endIndex=-1,
+        stdClass|array $additionalData = null,
+        bool $hidden = false
+    ): void
     {
-        $this->getQualities()->add($field, $type, $category, $startIndex, $endIndex, $additionalData);
+        $this->getQualities()->add($field, $type, $category, $startIndex, $endIndex, $additionalData, $hidden);
     }
     /**
      * Drops a general quality from the tags (segment-quality model)
