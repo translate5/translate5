@@ -57,7 +57,8 @@ foreach($this->validationResults as $module => $oneResult) {
         echo "\n\n";
     }
     if($oneResult->hasError() || $oneResult->hasWarning()) {
-        print_r ($oneResult->badSummary."\n");
+        print_r ($oneResult->badSummary);
+        echo "\n";
     }
 }
 
