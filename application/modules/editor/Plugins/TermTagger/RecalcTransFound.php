@@ -277,26 +277,11 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         // Get target tbx ids
         $this->trgIdA = $this->termModel->getTermMidsFromSegment($target);
 
-        class_exists('editor_Utils');
-
         // Preload data
         $this->preload($srcIdA);
 
-        $debug = [
-            'source' => $source,
-            'target' => $target,
-            'srcIdA' => $srcIdA,
-            'trgIdA' => $this->trgIdA,
-            'exists' => $this->exists,
-            'termsByEntry' => $this->termsByEntry,
-            'trans' => $this->trans,
-            'homonym' => $this->homonym,
-        ];
-
         // Get [termTbxId => [mark1, mark2, ...]] pairs for all terms detected in segment source text
         $markA = $this->getMarkBySrcIdA($srcIdA);
-
-        i($debug + ['markA' => $markA], 'a');
 
         // Recalc transNotFound/transNotDefined/transFound marks
         foreach ($markA as $srcId => $values) {
