@@ -27,8 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Testcase for TRANSLATE-2266 Custom file filter configuration with GUI / BCONF Management
- * For details see the issue.
+ * Testcase for the Custom file filter configuration with GUI / BCONF Management
+ * This Test currently has uncommented parts due to the phenomenon, the target-srx is not respected on some systems and OKAPI always uses the source-SRX for segmentation
  */
 class OkapiBconfFilterTest extends editor_Test_JsonTest {
 
