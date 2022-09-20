@@ -15,6 +15,59 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.10] - 2022-09-20
+
+### Important Notes:
+#### [TRANSLATE-3051](https://jira.translate5.net/browse/TRANSLATE-3051)
+Ensure that a DB backup is done. All user passwords will get additionally encrypted with a random secret (pepper) created and stored in the installation.ini
+
+#### [TRANSLATE-3016](https://jira.translate5.net/browse/TRANSLATE-3016)
+Until our last release, terms with all kind of statuses were used for term tagging. From now on, only terms which are with status finalized (finalized is default value and additional statuses can be configured) are used for term tagging.
+ 
+
+
+### Added
+**[TRANSLATE-3038](https://jira.translate5.net/browse/TRANSLATE-3038): Editor general - Integrate anti virus software (4.6)** <br>
+SECURITY ENHANCEMENT: Added blacklist to limit uploadable reference file types
+
+**[TRANSLATE-3016](https://jira.translate5.net/browse/TRANSLATE-3016): Configuration, Editor general, TermTagger integration - Show and use only terms of a certain process level in the editor** <br>
+Only the terms with a defined process status are used for term tagging and listed in the editor term-portlet. The configuration is runtimeOptions.termTagger.usedTermProcessStatus. 
+
+
+### Changed
+**[TRANSLATE-3057](https://jira.translate5.net/browse/TRANSLATE-3057): TermPortal - Extend term status map** <br>
+Extend the term status mapping with additional types.
+
+**[TRANSLATE-3040](https://jira.translate5.net/browse/TRANSLATE-3040): User Management - On password change the old one must be given (4.8)** <br>
+If a user is changing his password, the old password must be given and validated too, to prevent taking over stolen user accounts.
+
+
+### Bugfixes
+**[TRANSLATE-3056](https://jira.translate5.net/browse/TRANSLATE-3056): Auto-QA - MQM Controller does not activate when changing task after deactivation** <br>
+FIX: After deactivating MQM, it was not activated anymore when opening the next task
+
+**[TRANSLATE-3051](https://jira.translate5.net/browse/TRANSLATE-3051): User Management - Add SALT to MD5 user password (4.4)** <br>
+The user passwords are now stored in a more secure way.
+
+**[TRANSLATE-3050](https://jira.translate5.net/browse/TRANSLATE-3050): Import/Export - Whitespace tag handling did encode internal tag placeholders on display text import filter** <br>
+Fix for a proprietary import filter.
+
+**[TRANSLATE-3041](https://jira.translate5.net/browse/TRANSLATE-3041): Auto-QA, Editor general - Wrong whitespace tag numbering leads to non working whitespace added QA check** <br>
+The internal numbering of whitespace tags (newline, tab etc) was not consistent anymore between source and target, therefore the whitespace added auto QA is producing a lot of false positives.
+
+**[TRANSLATE-3036](https://jira.translate5.net/browse/TRANSLATE-3036): VisualReview / VisualTranslation - Visual: Do not update blocked empty segments, fix multiple-variables segments in variable segmentation** <br>
+FIX: Visual: Segments with several singular internal tags seen as variables were not detected
+FIX: Visual: A hidden left iframe may prevented a proper update with the current segments in the right iframes layout
+ENHANCEMENT: Visual: Empty blocked segments are not updated (=deleted) in the layout anymore
+
+**[TRANSLATE-3035](https://jira.translate5.net/browse/TRANSLATE-3035): SpellCheck (LanguageTool integration) - UI spellcheck is not working after a task with disabled spellcheck was opened** <br>
+Spellcheck remained disabled for other tasks after opening one task where spellcheck was explicitly disabled with liveCheckOnEditing config.
+
+**[TRANSLATE-3026](https://jira.translate5.net/browse/TRANSLATE-3026): Editor general - Jump to task from task overview to project overview** <br>
+Fix for the problem when clicking on jump to task action button in task overview, the project grid is stuck in endless reload loop.
+
+
 ## [5.7.9] - 2022-09-01
 
 ### Important Notes:
