@@ -56,12 +56,22 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
      */
     public function work() {
         $params = $this->workerModel->getParameters();
+
+        $isRelaisContentField = isset($params['contentField']) && $params['contentField'] === editor_Models_SegmentField::TYPE_RELAIS;
+
+        // if no assoc exist, do not run pretranslations
+        if($this->checkTaskAssociation($params['languageResourceId'],$this->taskGuid,$isRelaisContentField) === false){
+            // In the case when the worker is queued, but there are no assigments found, do not run the batch worker.
+            // This can happen when default user associations and workers will be assigned/queued, but later int the import
+            // process the assignments are removed (pivot import from zip files)
+            return true;
+        }
         
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
 
         $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+        /* @var editor_Models_Task $task */
         $task->loadByTaskGuid($this->taskGuid);
         
         $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
@@ -70,7 +80,7 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
 
         $targetLang = $task->getTargetLang();
 
-        if( isset($params['contentField']) && $params['contentField'] === editor_Models_SegmentField::TYPE_RELAIS){
+        if( $isRelaisContentField){
             $targetLang = $task->getRelaisLang();
         }
         
@@ -96,6 +106,19 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
             $this->log->exception($e);
         }
         return true;
+    }
+
+    /***
+     * Check if given langauge resource is assigned for the current task
+     * @param int $resourceId
+     * @param string $taskGuid
+     * @param bool $isRelaisContentField
+     * @return false
+     */
+    private function checkTaskAssociation(int $resourceId, string $taskGuid,bool $isRelaisContentField){
+        $class = $isRelaisContentField ? '\MittagQI\Translate5\LanguageResource\TaskPivotAssociation' : '\MittagQI\Translate5\LanguageResource\TaskAssociation';
+        $assoc = ZfExtended_Factory::get($class);
+        return $assoc->isAssigned($resourceId,$taskGuid);
     }
     
     /***

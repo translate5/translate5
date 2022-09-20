@@ -2,6 +2,7 @@
 
 namespace MittagQI\Translate5\LanguageResource;
 
+use editor_Models_Languages;
 use Zend_Db_Expr;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Abstract;
@@ -96,6 +97,20 @@ class TaskPivotAssociation extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
             ->where('taskGuid = ?',$taskGuid);
         return $this->db->getAdapter()->fetchAll($s);
+    }
+
+    /***
+     * Check if given resource is assigned to a task
+     * @param int $resourceId
+     * @param string $taskGuid
+     * @return bool
+     */
+    public function isAssigned(int $resourceId, string $taskGuid): bool
+    {
+        $s = $this->db->select()
+            ->where('taskGuid = ?',$taskGuid)
+            ->where('languageResourceId = ?',$resourceId);
+        return empty($this->db->getAdapter()->fetchAll($s)) === false;
     }
 
     /***

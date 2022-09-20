@@ -204,9 +204,7 @@ final class editor_Segment_Quality_Manager {
      * @param int $parentWorkerId
      */
     public function prepareTagTerms(editor_Models_Task $task, int $parentWorkerId) {
-        if(self::ACTIVE) {
-            $this->prepareOperation(editor_Segment_Processing::TAGTERMS, $task, $parentWorkerId);
-        }
+        $this->prepareOperation(editor_Segment_Processing::TAGTERMS, $task, $parentWorkerId);
     }
     /**
      * Prepares the quality workers depending on the context/processing type

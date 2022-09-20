@@ -105,75 +105,14 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
     }
 
     /***
-     * Queue the match analysis worker
-     *
+     * Queue pivot pretranslation and batch worker
      * @param string $taskGuid
      * @throws Zend_Exception
      */
     protected function queuePivotWorker(string $taskGuid) : void {
-
-        /** @var TaskPivotAssociation $pivotAssoc */
-        $pivotAssoc = ZfExtended_Factory::get('\MittagQI\Translate5\LanguageResource\TaskPivotAssociation');
-        $assoc = $pivotAssoc->loadTaskAssociated($taskGuid);
-
-        if(empty($assoc)){
-            return;
-        }
-
-
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-
-        if($task->isImporting()) {
-            //on import, we use the import worker as parentId
-            $parentWorkerId = $this->fetchImportWorkerId($task->getTaskGuid());
-        } else {
-            // crucial: add a different behaviour for the workers when Cperforming an operation
-            $workerParameters['workerBehaviour'] = 'ZfExtended_Worker_Behaviour_Default';
-            // this creates the operation start/finish workers
-            $parentWorkerId = editor_Task_Operation::create(editor_Task_Operation::PIVOT_PRE_TRANSLATION, $task);
-        }
-
-        $workerParameters['userGuid'] = editor_User::instance()->getGuid();
-        $workerParameters['userName'] = editor_User::instance()->getUserName();
-
-        //enable batch query via config
-        $workerParameters['batchQuery'] = (boolean) Zend_Registry::get('config')->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
-        if($workerParameters['batchQuery']){
-
-            // trigger event before the pivot pre-transaltion worker is queued
-            $this->events->trigger("beforePivotPreTranslationQueue", $this, array(
-                'task' => $task,
-                'pivotAssociations' => $assoc,
-                'parentWorkerId' => $parentWorkerId
-            ));
-        }
-
-        /** @var MittagQI\Translate5\LanguageResource\Pretranslation\PivotWorker $pivotWorker */
-        $pivotWorker = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Pretranslation\PivotWorker');
-
-        if (!$pivotWorker->init($taskGuid, $workerParameters)) {
-            $this->addWarn($task,'Pivot pre-translation Error on worker init(). Worker could not be initialized');
-            return;
-        }
-        $pivotWorker->queue($parentWorkerId, null, false);
-    }
-
-    /**
-     *
-     * @param string $taskGuid
-     * @return NULL|int
-     */
-    private function fetchImportWorkerId(string $taskGuid): ?int
-    {
-        $parent = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $parent ZfExtended_Models_Worker */
-        $result = $parent->loadByState(ZfExtended_Models_Worker::STATE_PREPARE, 'editor_Models_Import_Worker', $taskGuid);
-        if(count($result) > 0){
-            return $result[0]['id'];
-        }
-        return 0;
+        /** @var \MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer $queuer */
+        $queuer = ZfExtended_Factory::get('\MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer');
+        $queuer->queuePivotWorker($taskGuid);
     }
 
     /***
