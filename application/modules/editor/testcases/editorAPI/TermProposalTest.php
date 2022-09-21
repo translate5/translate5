@@ -172,7 +172,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             'language' => 'en',
             'term' => 'Term2',
         ];
-        $Term2 = $this->api()->postJson('editor/term', );
+        $Term2 = $this->api()->postJson('editor/term', $data);
         $this->assertTrue(is_object($Term2)
             && $Term2->query == $data['term']
             && $Term2->termEntryId == $data['termEntryId']
