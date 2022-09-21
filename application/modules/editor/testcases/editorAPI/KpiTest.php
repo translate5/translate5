@@ -157,12 +157,12 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
     protected function runExcelExportAndImport(string $taskNameSuffix) {
         $taskId = self::$taskIds[$taskNameSuffix];
         
-        $response = $this->api()->request('editor/task/'.$taskId.'/excelexport');
+        $response = $this->api()->get('editor/task/'.$taskId.'/excelexport');
         self::$tempExcel = $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
         file_put_contents($tempExcel, $response->getBody());
         
         $this->api()->addFile('excelreimportUpload', self::$tempExcel, 'application/data');
-        $this->api()->request('editor/task/'.$taskId.'/excelreimport', 'POST');
+        $this->api()->post('editor/task/'.$taskId.'/excelreimport');
         $this->api()->reloadTask();
     }
     

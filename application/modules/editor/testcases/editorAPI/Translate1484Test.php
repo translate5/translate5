@@ -30,15 +30,13 @@ END LICENSE AND COPYRIGHT
  * This test class will create test task and pretranslate it with ZDemoMT and OpenTm2 TM
  * Then the export result from the logg will be compared against the expected result.
  */
-class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
+class Translate1484Test extends editor_Test_JsonTest {
     /* @var $this Translate1484Test */
     
     protected static $customerTest;
     protected static $sourceLangRfc = 'en';
     protected static $targetLangRfc = 'de';
 
-
-    
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -71,18 +69,24 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
      * @depends test10_SetupCustomerAndResources
      */
     public function test20_ExportResourcesLog() {
-        $result = self::$api->getJson('editor/customer/exportresource',[
-            'customerId' =>self::$customerTest->id
-        ]);
-        
-        //file_put_contents(self::$api->getFile('exportResults.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
-        $expected=self::$api->getFileContent('exportResults.txt');
-        $actual=json_encode($result, JSON_PRETTY_PRINT);
-        //check for differences between the expected and the actual content
-        self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
+
+        $jsonFileName = 'exportResults.json';
+        $actualObject = self::$api->getJson('editor/customer/exportresource', [ 'customerId' => self::$customerTest->id ], $jsonFileName);
+        $expectedObject = self::$api->getFileContent($jsonFileName);
+        // we need to order the results to avoid tests failing due to runtime-differences
+        $this->sortExportResource($actualObject);
+        $this->sortExportResource($expectedObject);
+        $this->assertEquals($expectedObject, $actualObject, "The expected file (exportResults) an the result file does not match.");
     }
-    
-    
+
+    /**
+     * @param stdClass $exportResource
+     */
+    private function sortExportResource(stdClass $exportResource){
+        usort($exportResource->MonthlySummaryByResource, function($a, $b) { return ($a->totalCharacters === $b->totalCharacters) ? 0 : ($a->totalCharacters < $b->totalCharacters ? -1 : 1); });
+        usort($exportResource->UsageLogByCustomer, function($a, $b) { return ($a->charactersPerCustomer === $b->charactersPerCustomer) ? 0 : ($a->charactersPerCustomer < $b->charactersPerCustomer ? -1 : 1); });
+    }
+
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase

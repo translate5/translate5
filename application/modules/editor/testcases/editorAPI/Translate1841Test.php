@@ -101,7 +101,7 @@ class Translate1841Test extends \ZfExtended_Test_ApiTestcase {
         $task = $this->api()->getTask();
         //start task export 
         $this->api()->login('testmanager');
-        $this->api()->request('editor/task/export/id/'.$task->id.'?format=xliff2');
+        $this->api()->get('editor/task/export/id/'.$task->id.'?format=xliff2');
         
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();

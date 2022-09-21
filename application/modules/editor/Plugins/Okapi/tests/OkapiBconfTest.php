@@ -95,27 +95,27 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
         // Upload sourceSRX
         $api->addFile('srx', $api->getFile('srx/idSource.srx'), 'application/octet-stream');
-        $res = $api->request("editor/plugins_okapi_bconf/uploadsrx?id=$id", 'POST', [
+        $res = $api->post("editor/plugins_okapi_bconf/uploadsrx?id=$id", [
             'purpose' => 'source',
         ]);
         self::assertEquals(200, $res->getStatus());
         // Upload targetSRX
         $api->addFile('srx', $api->getFile('srx/idTarget.srx'), 'application/octet-stream');
-        $res = $api->request("editor/plugins_okapi_bconf/uploadsrx?id=$id", 'POST', [
+        $res = $api->post("editor/plugins_okapi_bconf/uploadsrx?id=$id", [
             'purpose' => 'target',
         ]);
         self::assertEquals(200, $res->getStatus());
 
-        $res = $api->request("editor/plugins_okapi_bconf/downloadbconf?id=$id");
+        $res = $api->get("editor/plugins_okapi_bconf/downloadbconf?id=$id");
         self::assertEquals(200, $res->getStatus());
         $bconfString = $res->getBody();
 
-        $res = $api->request("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=source");
+        $res = $api->get("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=source");
         self::assertEquals(200, $res->getStatus());
         $sourceSrx = $res->getBody();
         self::assertStringContainsString($sourceSrx, $bconfString, "sourceSrx update failed for bconf #$id");
 
-        $targetSrx = $api->request("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=target")->getBody();
+        $targetSrx = $api->get("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=target")->getBody();
         self::assertStringContainsString($targetSrx, $bconfString, "targetSrx update failed for bconf #$id");
     }
 

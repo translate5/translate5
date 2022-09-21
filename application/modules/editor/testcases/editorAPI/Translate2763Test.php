@@ -63,7 +63,7 @@ class Translate2763Test extends editor_Test_JsonTest {
 
         self::$TC_ID = $result->id ?? null;
 
-        $data = $this->api()->request('/editor/languageresourceinstance/tbxexport', 'GET', [
+        $data = $this->api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$TC_ID,
             'tbxBasicOnly' => '1',
             'exportImages' => '0',
@@ -83,7 +83,7 @@ class Translate2763Test extends editor_Test_JsonTest {
             'deleteProposalsLastTouchedOlderThan' => null,
         ]);
 
-        $data = $this->api()->request('/editor/languageresourceinstance/tbxexport', 'GET', [
+        $data = $this->api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$TC_ID,
             'tbxBasicOnly' => '1',
             'exportImages' => '0',

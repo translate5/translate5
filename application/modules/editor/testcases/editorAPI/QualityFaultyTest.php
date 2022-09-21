@@ -134,7 +134,7 @@ class QualityFaultyTest extends editor_Test_JsonTest {
     public function testTaskTooltip(){
         
         $file = $this->api()->getFile('expectedTaskToolTipFaulty.html', null, false);
-        $response = $this->api()->request('editor/quality/tasktooltip?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
+        $response = $this->api()->get('editor/quality/tasktooltip?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
         $markup = $response->getBody();
         if($this->api()->isCapturing()){ file_put_contents($file, $markup); }
         $this->assertStringContainsString('</table>', $markup, 'Task Qualities ToolTip Markup does not match');

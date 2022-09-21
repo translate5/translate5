@@ -245,7 +245,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $edit, $segToTest->id);
         $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
-            //edit source also, currently our test helper cant make this in one API call
+        //edit source also, currently our test helper cant make this in one API call
         if($isSE) {
             $edit = str_replace('house', 'house - edited', $segToTest->sourceEdit);
             $segmentData = $this->api()->prepareSegmentPut('sourceEdit', $edit, $segToTest->id);
@@ -265,7 +265,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
             'alikes' => json_encode($alikeIds)
         ];
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
-        $resp = $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
+        $this->api()->put('editor/alikesegment/'.$segToTest->id, $alikePutData);
         
         $segments = $this->api()->getSegments();
         foreach($segments as $segment) {
@@ -315,7 +315,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
             'alikes' => json_encode($alikeIds)
         ];
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
-        $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
+        $this->api()->put('editor/alikesegment/'.$segToTest->id, $alikePutData);
 
 
         $jsonFileName = 'expectedSegments.json';
@@ -362,7 +362,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
             'alikes' => json_encode($alikeIds)
         ];
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
-        $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
+        $this->api()->put('editor/alikesegment/'.$segToTest->id, $alikePutData);
         
         /*
          * segmentNrInTask 20 - add whitespace tag the other tags must remain in the alikes
@@ -384,7 +384,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         ];
         
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
-        $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
+        $this->api()->put('editor/alikesegment/'.$segToTest->id, $alikePutData);
 
         $jsonFileName = 'expectedSegmentsEditedWhitespace.json';
         $segmentsAfterChange = $this->api()->getSegments($jsonFileName);

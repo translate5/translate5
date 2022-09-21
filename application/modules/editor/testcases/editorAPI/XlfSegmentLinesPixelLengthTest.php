@@ -162,7 +162,7 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToExport, $fileToCompare) {
         $this->api()->login('testmanager');
-        $this->api()->request($exportUrl);
+        $this->api()->get($exportUrl);
 
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();

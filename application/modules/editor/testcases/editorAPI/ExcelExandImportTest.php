@@ -71,7 +71,7 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
         //start task export
         
         //get the excel
-        $response = $this->api()->request('editor/task/'.$task->id.'/excelexport');
+        $response = $this->api()->get('editor/task/'.$task->id.'/excelexport');
         self::$tempExcel = $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
         file_put_contents($tempExcel, $response->getBody());
         
@@ -102,7 +102,7 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
      */
     public function testReimport() {
         $this->api()->addFile('excelreimportUpload', self::$tempExcel, 'application/data');
-        $this->api()->request('editor/task/'.$this->api()->getTask()->id.'/excelreimport', 'POST');
+        $this->api()->post('editor/task/'.$this->api()->getTask()->id.'/excelreimport');
         $this->api()->reloadTask();
         $task = $this->api()->getTask();
         $this->assertEmpty($task->lockingUser, 'Task is locked by user '.$task->lockingUser);

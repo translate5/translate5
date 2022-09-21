@@ -200,7 +200,7 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
      * @param string $fileToCompare
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToCompare) {
-        $this->api()->request($exportUrl);
+        $this->api()->get($exportUrl);
 
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();

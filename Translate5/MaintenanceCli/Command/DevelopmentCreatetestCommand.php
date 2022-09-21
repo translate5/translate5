@@ -256,7 +256,7 @@ class '.$name.' extends editor_Test_JsonTest {
         $task = $this->api()->getTask();
         //start task export
         
-        $this->api()->request(\'editor/task/export/id/\'.$task->id);
+        $this->api()->get(\'editor/task/export/id/\'.$task->id);
         
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();

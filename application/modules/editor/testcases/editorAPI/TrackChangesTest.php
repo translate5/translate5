@@ -95,7 +95,7 @@ class TrackChangesTest extends \ZfExtended_Test_ApiTestcase {
         $task = $this->api()->getTask();
         
         //start task export with diff
-        $this->api()->request('editor/task/export/id/'.$task->id.'/');
+        $this->api()->get('editor/task/export/id/'.$task->id.'/');
         
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();

@@ -97,7 +97,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $unitType = $characterBased ? 'character' : 'word';
 
         $taskGuid = self::$api->getTask()->taskGuid;
-        $response = self::$api->request('editor/plugins_matchanalysis_matchanalysis/export', 'GET', [
+        $response = self::$api->get('editor/plugins_matchanalysis_matchanalysis/export', [
             'taskGuid' => $taskGuid,
             'type' => 'exportXml'
         ]);

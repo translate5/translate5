@@ -270,7 +270,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         $task = $this->api()->getTask();
         //start task export
         
-        $this->api()->request('editor/task/export/id/'.$task->id);
+        $this->api()->get('editor/task/export/id/'.$task->id);
         //$fileToCompare;
 
         //get the exported file content
