@@ -62,7 +62,8 @@ class Translate198Test extends editor_Test_JsonTest {
         $this->api()->setTask($task1);
         self::assertNotEmpty($response,'Unable to edit task 1.');
 
-        $segments = self::$api->getJson('editor/segment?page=1&start=0&limit=200');
+        $jsonFileName = 'segments-task1.json';
+        $segments = self::$api->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile('segments-task1.json', $segments);
 
         self::assertCount(1, $segments);
@@ -72,7 +73,8 @@ class Translate198Test extends editor_Test_JsonTest {
         $this->api()->setTask($task2);
         self::assertNotEmpty($response,'Unable to edit task 2.');
 
-        $segments = self::$api->getJson('editor/segment?page=1&start=0&limit=200');
+        $jsonFileName = 'segments-task2.json';
+        $segments = self::$api->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile('segments-task2.json', $segments);
 
         //open task for whole testcase
