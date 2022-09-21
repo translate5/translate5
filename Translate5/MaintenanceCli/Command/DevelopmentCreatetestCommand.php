@@ -206,7 +206,7 @@ class '.$name.' extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson(\'editor/task/\'.$task->id, \'PUT\', array(\'userState\' => \'edit\', \'id\' => $task->id));
+        $api->putJson(\'editor/task/\'.$task->id, array(\'userState\' => \'edit\', \'id\' => $task->id));
     }
     
     /**
@@ -217,7 +217,7 @@ class '.$name.' extends editor_Test_JsonTest {
         $jsonFileName = \'expectedSegments.json\';
 // REMINDER FOR TEST USAGE:
 // when the option -c is set on calling this test as a single test (e.g /var/www/translate5/application/modules/editor/testcases/apitest.sh -c editorAPI/MyFunnyTest.php), the files are automatically saved after fetching with the passed filename (third argument)
-        $segments = $this->api()->getJson(\'editor/segment?page=1&start=0&limit=10\', [], $jsonFileName);
+        $segments = $this->api()->getSegments($jsonFileName, 10);
         $this->assertModelsEqualsJsonFile(\'Segment\', $jsonFileName, $segments, \'Imported segments are not as expected!\');
     }
     
@@ -227,7 +227,7 @@ class '.$name.' extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list
-        $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
+        $segments = $this->api()->getSegments(null, 10);
         
         //test editing a prefilled segment
         $segToTest = $segments[0];
@@ -236,13 +236,13 @@ class '.$name.' extends editor_Test_JsonTest {
         $segToTest->targetEdit = str_replace([\'cool.\', \'is &lt; a\'], [\'cool &amp; cööler.\', \'is &gt; a\'], $segToTest->targetEdit);
         
         $segmentData = $this->api()->prepareSegmentPut(\'targetEdit\', $segToTest->targetEdit, $segToTest->id);
-        $this->api()->requestJson(\'editor/segment/\'.$segToTest->id, \'PUT\', $segmentData);
+        $this->api()->putJson(\'editor/segment/\'.$segToTest->id, $segmentData);
         
         //check direct PUT result
         $jsonFileName = \'expectedSegments-edited.json\';
 // REMINDER FOR TEST USAGE:
 // when the option -c is set on calling this test as a single test (e.g /var/www/translate5/application/modules/editor/testcases/apitest.sh -c editorAPI/MyFunnyTest.php), the files are automatically saved after fetching with the passed filename (third argument)
-        $segments = $this->api()->getJson(\'editor/segment?page=1&start=0&limit=10\', [], $jsonFileName);
+        $segments = $this->api()->getSegments($jsonFileName, 10);
         $this->assertModelsEqualsJsonFile(\'Segment\', $jsonFileName, $segments, \'Imported segments are not as expected!\');
     }
     
@@ -279,9 +279,9 @@ class '.$name.' extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login(\'testlector\');
-        self::$api->cleanup && self::$api->requestJson(\'editor/task/\'.$task->id, \'PUT\', array(\'userState\' => \'open\', \'id\' => $task->id));
+        self::$api->cleanup && self::$api->putJson(\'editor/task/\'.$task->id, array(\'userState\' => \'open\', \'id\' => $task->id));
         self::$api->login(\'testmanager\');
-        self::$api->cleanup && self::$api->requestJson(\'editor/task/\'.$task->id, \'DELETE\');
+        self::$api->cleanup && self::$api->delete(\'editor/task/\'.$task->id);
     }
 }
 ');
