@@ -32,8 +32,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use \editor_Plugins_SpellCheck_SegmentProcessor as SegmentProcessor;
 use MittagQI\Translate5\Plugins\SpellCheck\Base\Enum\SegmentState;
-
 /**
  * The Quality provider 
  * This class just provides the translations for the filter backend
@@ -57,7 +57,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     /**
      * SpellCheck segment processor instance
      *
-     * @var editor_Plugins_SpellCheck_SegmentProcessor
+     * @var SegmentProcessor
      */
     protected static $_processor = null;
 
@@ -94,11 +94,11 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     /**
      * Get SpellCheck segment processor instance
      *
-     * @return editor_Plugins_SpellCheck_SegmentProcessor
+     * @return SegmentProcessor
      */
-    public function getProcessor(?string $spellcheckLang = null): editor_Plugins_SpellCheck_SegmentProcessor
+    public function getProcessor(?string $spellcheckLang = null): SegmentProcessor
     {
-        return self::$_processor ?? self::$_processor = ZfExtended_Factory::get(editor_Plugins_SpellCheck_SegmentProcessor::class, [
+        return self::$_processor ?? self::$_processor = ZfExtended_Factory::get(SegmentProcessor::class, [
             'spellcheckLanguage' => $spellcheckLang,
         ]);
     }
