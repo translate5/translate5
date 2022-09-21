@@ -52,7 +52,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
     }
     
     public function test10_SetupCustomerAndResources() {
-        self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
+        self::$customerTest = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
         ]);
@@ -71,7 +71,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
      * @depends test10_SetupCustomerAndResources
      */
     public function test20_ExportResourcesLog() {
-        $result = self::$api->requestJson('editor/customer/exportresource','GET',[
+        $result = self::$api->getJson('editor/customer/exportresource',[
             'customerId' =>self::$customerTest->id
         ]);
         
@@ -89,11 +89,11 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testmanager');
         
         //remove task
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
         //remove the created resources
         self::$api->cleanup && self::$api->removeResources();
         //remove the temp customer
-        self::$api->cleanup && self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
     
     /***
@@ -172,7 +172,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
         $params['pretranslateTmAndTerm']= 1;
         $params['pretranslateMt']= 1;
         $params['isTaskImport']= 0;
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
+        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
         error_log("Queue pretranslation and analysis.");
     }
     
@@ -187,7 +187,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
      * Start the import process
      */
     protected function startImport(){
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
         error_log('Import workers started.');
     }
 }

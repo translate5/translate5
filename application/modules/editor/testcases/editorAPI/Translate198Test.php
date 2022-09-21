@@ -49,7 +49,7 @@ class Translate198Test extends editor_Test_JsonTest {
      * imports two tasks
      */
     public function testTasks() {
-        $testCustomer = self::$api->requestJson('editor/customer/', 'POST',[
+        $testCustomer = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
         ]);
@@ -64,7 +64,7 @@ class Translate198Test extends editor_Test_JsonTest {
 
         $jsonFileName = 'segments-task1.json';
         $segments = self::$api->getSegments($jsonFileName);
-        $this->assertSegmentsEqualsJsonFile('segments-task1.json', $segments);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments);
 
         self::assertCount(1, $segments);
 
@@ -75,7 +75,7 @@ class Translate198Test extends editor_Test_JsonTest {
 
         $jsonFileName = 'segments-task2.json';
         $segments = self::$api->getSegments($jsonFileName);
-        $this->assertSegmentsEqualsJsonFile('segments-task2.json', $segments);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments);
 
         //open task for whole testcase
         self::$api->login('testmanager');
@@ -107,7 +107,7 @@ class Translate198Test extends editor_Test_JsonTest {
         ];
         self::$api->addImportFile(self::$api->getFile($taskName.'-de-en.xlf'));
         self::$api->import($task, false, false);
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
         self::$api->checkTaskStateLoop();
         return self::$api->getTask();
     }

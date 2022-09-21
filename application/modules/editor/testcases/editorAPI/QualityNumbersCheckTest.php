@@ -85,10 +85,10 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         // error_log("\nTesting task based on file: 'testfiles/" . $taskName . ".csv'\n");
 
         // Open task for whole testcase
-        self::$api->requestJson('editor/task/' . $task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
+        self::$api->putJson('editor/task/' . $task->id, ['userState' => 'edit', 'id' => $task->id]);
 
         // Get segments and check their quantity
-        $segmentQuantity = count(self::$api->requestJson('editor/segment?page=1&start=0&limit=10'));
+        $segmentQuantity = count(self::$api->getSegments(null, 10));
         static::assertEquals($expectedSegmentQuantity, $segmentQuantity, 'Not enough segments in the imported task');
 
         // Check qualities
@@ -98,12 +98,12 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
 
         // Close task
-        self::$api->requestJson('editor/task/' . $task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
+        self::$api->putJson('editor/task/' . $task->id, ['userState' => 'open', 'id' => $task->id]);
 
         // Print the step where we are
         // error_log("\nDeleting task based on file: 'testfiles/" . $taskName . ".csv'\n");
 
         // Delete task
-        self::$api->requestJson('editor/task/' . $task->id, 'DELETE');
+        self::$api->delete('editor/task/' . $task->id);
     }
 }

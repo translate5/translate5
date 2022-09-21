@@ -73,10 +73,10 @@ class QualityBaseTest extends editor_Test_JsonTest {
         
         $task = $api->getTask();
            //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
         
         // we need some segments to play with
-        static::$segments = $api->requestJson('editor/segment?page=1&start=0&limit=10');
+        static::$segments = $api->getSegments(null, 10);
         
         static::assertEquals(count(static::$segments), 10, 'Not enough segments in the imported task');
     }
@@ -200,9 +200,9 @@ class QualityBaseTest extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
-        self::$api->requestJson('/editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('/editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
     }
 
     /**
@@ -210,7 +210,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
      * @return array
      */
     private function _fetchMqmQualities(int $segmentId) : array {
-        $qualities = $this->api()->requestJson('/editor/quality/segment?segmentId='.$segmentId);
+        $qualities = $this->api()->getJson('/editor/quality/segment?segmentId='.$segmentId);
         $mqmQualities = [];
         foreach($qualities as $quality){
             if($quality->type == 'mqm'){

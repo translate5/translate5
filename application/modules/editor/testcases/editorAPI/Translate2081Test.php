@@ -47,7 +47,7 @@ class Translate2081Test extends editor_Test_JsonTest {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
 
-        self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
+        self::$customerTest = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer', true),
         ]);
@@ -66,7 +66,7 @@ class Translate2081Test extends editor_Test_JsonTest {
         $params['userGuid'] = '{00000000-0000-0000-C100-CCDDEE000003}'; // testlector
         $params['workflowStepName'] = 'translation';
 
-        $result = self::$api->requestJson('editor/userassocdefault', 'POST',[], [
+        $result = self::$api->postJson('editor/userassocdefault',[], [
             'data' => Zend_Json::encode($params)
         ]);
         unset($result->id);
@@ -102,7 +102,7 @@ class Translate2081Test extends editor_Test_JsonTest {
 
 
         // after the task is created/imported, check if the users are auto assigned.
-        $data = $this->api()->requestJson('editor/taskuserassoc','GET',[
+        $data = $this->api()->getJson('editor/taskuserassoc',[
             'filter' => '[{"operator":"eq","value":"' . self::$api->getTask()->taskGuid . '","property":"taskGuid"}]'
         ]);
 
@@ -130,9 +130,9 @@ class Translate2081Test extends editor_Test_JsonTest {
         //open task for whole testcase
         self::$api->login('testmanager');
 
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
 
         //remove the temp customer
-        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
 }

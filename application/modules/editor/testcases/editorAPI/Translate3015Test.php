@@ -58,7 +58,7 @@ class Translate3015Test extends editor_Test_JsonTest {
 
         $fileName = 'TBX-basic-sample.tbx';
 
-        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', [
+        $termCollection = $this->api()->postJson('editor/termcollection', [
             'name' => __CLASS__,
             'customerIds' => $this->api()->getCustomer()->id
         ]);
@@ -69,14 +69,14 @@ class Translate3015Test extends editor_Test_JsonTest {
 
 
         $this->api()->addFile($fileName, $this->api()->getFile($fileName), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', [
+        $this->api()->postJson('editor/termcollection/import', [
             'collectionId' =>self::$collId,
             'customerIds' => $this->api()->getCustomer()->id,
             'mergeTerms'=>true
         ]);
 
         //export the generated file
-        $response = $this->api()->requestJson('editor/termcollection/export?format=1', 'POST', array('collectionId' =>self::$collId));
+        $response = $this->api()->postJson('editor/termcollection/export?format=1', array('collectionId' =>self::$collId));
 
         $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
@@ -91,7 +91,7 @@ class Translate3015Test extends editor_Test_JsonTest {
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.Test file name: ".$fileName);
 
-        $attributes=$this->api()->requestJson('editor/termcollection/testgetattributes', 'GET', array('collectionId' =>self::$collId));
+        $attributes = $this->api()->getJson('editor/termcollection/testgetattributes', array('collectionId' =>self::$collId));
 
         $termCount = 1;
         $termsAtributeCount = 10;
@@ -107,7 +107,7 @@ class Translate3015Test extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->requestJson('editor/termcollection/'.self::$collId,'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/termcollection/'.self::$collId);
     }
 
 }

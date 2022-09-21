@@ -75,7 +75,7 @@ class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
         self::$api->reloadTask();
         self::$api->addUser('testtranslator','waiting','translatorCheck',$assocParams);
         
-        $data = $this->api()->requestJson('editor/taskuserassoc','GET',[
+        $data = $this->api()->getJson('editor/taskuserassoc',[
             'filter' => '[{"operator":"eq","value":"' . self::$api->getTask()->taskGuid . '","property":"taskGuid"}]'
         ]);
         
@@ -98,6 +98,6 @@ class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
     }
 }

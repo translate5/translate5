@@ -51,6 +51,6 @@ class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->addImportFile($this->api()->getFile('ibm-opentm2-fail3.xlf'), 'application/xml');
         $this->assertFalse($this->api()->import($this->taskConfig, false), 'XLF with sub tags in tags without IDs did not produce a task state error!');
         $task = $this->api()->getTask();
-        $this->api()->requestJson('editor/task/'.$task->id, 'DELETE');
+        $this->api()->delete('editor/task/'.$task->id);
     }
 }

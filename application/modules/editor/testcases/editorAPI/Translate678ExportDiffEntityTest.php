@@ -65,17 +65,17 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
     public function testEditing() {
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
         
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $segToEdit = $segments[0];
         
         //swap < and >
         $editedData = 'Target with "special" \'chars\' &amp; greaters &gt; and &lt; lessers';
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-        $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
     }
 
     /**
@@ -107,7 +107,7 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
+        self::$api->delete('editor/task/'.$task->id);
     }
 }

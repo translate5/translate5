@@ -99,7 +99,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         
         $this->api()->logout();
         
-        $json = $this->api()->requestJson('editor/session/'.$this->api()->getAuthCookie());
+        $json = $this->api()->getJson('editor/session/'.$this->api()->getAuthCookie());
         $this->assertEquals('not authenticated', $json->state);
         $this->assertEmpty($json->user);
     }
@@ -126,7 +126,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
             $this->api()->setTask(null);
         }
         
-        $response = $this->api()->requestJson('editor/session', 'POST', $loginData);
+        $response = $this->api()->postJson('editor/session', $loginData);
         $sessionId = $response->sessionId;
         $sessionToken = $response->sessionToken;
         
@@ -150,7 +150,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         else {
             $this->assertFalse(strpos($response->getBody(), '"taskGuid":"'.$taskGuid.'"'), 'The editor page does contain a taskGuid, which should not be.');
         }
-        $sessionData = $this->api()->requestJson('editor/session/'.$sessionId);
+        $sessionData = $this->api()->getJson('editor/session/'.$sessionId);
         $this->assertEquals(200, $this->api()->getLastResponse()->getStatus(), 'Server did not respond HTTP 200');
         unset($sessionData->user->id);
         unset($sessionData->user->loginTimeStamp);
@@ -180,7 +180,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         
         $this->api()->login('testapiuser');
         $this->assertLogin('testapiuser');
-        $assoc = $this->api()->requestJson('editor/taskuserassoc/'.$assoc->id);
+        $assoc = $this->api()->getJson('editor/taskuserassoc/'.$assoc->id);
         $hash = $assoc->staticAuthHash;
         $this->assertMatchesRegularExpression('/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/',$hash, 'Single click auth hash is no valid guid');
         $this->api()->logout();
@@ -213,8 +213,8 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
     }
 }

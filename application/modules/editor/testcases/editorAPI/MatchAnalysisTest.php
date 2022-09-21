@@ -154,7 +154,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
 
         $unitType = $characterBased ? 'character' : 'word';
 
-        $analysis=$this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
+        $analysis=$this->api()->getJson('editor/plugins_matchanalysis_matchanalysis',[
             'taskGuid'=> $this->api()->getTask()->taskGuid,
             'unitType' => $unitType
         ]);
@@ -174,7 +174,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         
         
         //not test all results and matches
-        $analysis = $this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
+        $analysis = $this->api()->getJson('editor/plugins_matchanalysis_matchanalysis',[
             'taskGuid' => $this->api()->getTask()->taskGuid,
             'notGrouped' => $this->api()->getTask()->taskGuid
         ]);
@@ -277,7 +277,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $params['pretranslateTmAndTerm']= 1;
         $params['pretranslateMt']= 0;
         $params['isTaskImport']= 0;
-        $this->api()->requestJson('editor/task/'.$this->api()->getTask()->id.'/pretranslation/operation', 'PUT', $params, $params);
+        $this->api()->putJson('editor/task/'.$this->api()->getTask()->id.'/pretranslation/operation', $params, null, false);
         error_log("Queue pretranslation and analysis.");
     }
     
@@ -285,7 +285,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      * Start the import process
      */
     protected function startImport(){
-        $this->api()->requestJson('editor/task/'.$this->api()->getTask()->id.'/import', 'GET');
+        $this->api()->getJson('editor/task/'.$this->api()->getTask()->id.'/import');
         error_log('Import workers started.');
     }
     
@@ -313,7 +313,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         //open task for whole testcase
         self::$api->login('testmanager');
 
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
         //remove the created resources
         self::$api->cleanup && self::$api->removeResources();
     }

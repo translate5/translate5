@@ -71,7 +71,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
     }
     
     /**
@@ -79,7 +79,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
      */
     public function testBasicSegmentValuesAfterImport() {
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         
         $this->assertCount(13, $segments);
         
@@ -163,30 +163,30 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments =$this->api()->getSegments();
         
         //test editing a prefilled segment
         $segToTest = $segments[2];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'PHP Handbuch', $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //check direct PUT result
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg3.json', $segment);
         
         //check again with GET fresh from server
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
+        $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg3.json', $segment);
         
         //test editing an empty segment
         $segToTest = $segments[6];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache 2.x auf Unix-Systemen', $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //check direct PUT result
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7.json', $segment);
         
         //check again with GET fresh from server
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
+        $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7.json', $segment);
         
         // check correction of overpapped QM Tags (only when there is no contents between them) For this, proper t5qid's are required
@@ -196,36 +196,36 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         $tag2_open = '<img class="open critical qmflag ownttip qmflag-4" data-t5qid="2" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
         $tag2_close = '<img class="close critical qmflag ownttip qmflag-4" data-t5qid="2" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.$tag1_close.' auf'.$tag2_close.' Unix-Systemen', $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //check direct PUT result
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-a.json', $segment);
         
         //check again with GET fresh from server
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
+        $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-a.json', $segment);
         
         // check for overpapped QM Tags with contents between them. They must be not corrected on saving.
         $segToTest = $segments[6];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.' auf'.$tag1_close.' Unix-Systemen'.$tag2_close, $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //check direct PUT result
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-b.json', $segment);
         
         //check again with GET fresh from server
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id);
+        $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-b.json', $segment);
         
         $segToTest = $segments[7];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'edited by a test', $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         $segToTest = $segments[8];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'edited also by a test', $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         
         
         //bulk check of all autoStateId fields
@@ -289,8 +289,8 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
     }
 }

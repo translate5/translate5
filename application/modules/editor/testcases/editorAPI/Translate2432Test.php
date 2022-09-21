@@ -57,7 +57,7 @@ class Translate2432Test extends \ZfExtended_Test_ApiTestcase {
      * Test the config autoset
      */
     public function testOkapiConfigDefaults() {
-        $result = self::$api->requestJson('editor/config');
+        $result = self::$api->getJson('editor/config');
         
         $result = json_decode(json_encode($result), true);
         

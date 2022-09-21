@@ -64,15 +64,16 @@ class Translate1475Test extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
     }
     
     /**
      * Testing segment values directly after import
      */
     public function testSegmentValuesAfterImport() {
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
+        $jsonFileName = 'expectedSegments.json';
+        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
     /**
@@ -99,27 +100,27 @@ class Translate1475Test extends editor_Test_JsonTest {
         $segmentContent = str_replace(array_keys($replacements), $replacements, $segmentContent);
         
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
+        $segments = $this->api()->getSegments(null, 20);
         $this->assertNotEmpty($segments, 'No segments are found in the Task!');
         
         //the first three segments remain unedited, since content is getting to long with edited content
         $i = 0;
         foreach($segments as $idx => $segToEdit) {
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segmentContent[$i++], $segToEdit->id);
-            $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+            $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
         }
         
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegmentsEdited.json', $segments, 'Edited segments are not as expected!');
+        $jsonFileName = 'expectedSegmentsEdited.json';
+        $segments = $this->api()->getSegments($jsonFileName, 20);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
     }
 }
