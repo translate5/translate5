@@ -162,8 +162,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
             'alikes' => json_encode($alikeIds)
         ]; 
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
-        $resp = $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
-        $foo = $this->api()->decodeJsonResponse($resp);
+        $this->api()->putJson('editor/alikesegment/'.$segToTest->id, $alikePutData, null, false);
         
         //get segment list again to check if change alikes were applied correctly
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
@@ -242,9 +241,8 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
             'alikes' => json_encode($alikeIds)
         ]; 
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
-        $resp = $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
-        $foo = $this->api()->decodeJsonResponse($resp);
-        
+        $this->api()->putJson('editor/alikesegment/'.$segToTest->id, $alikePutData, null, false);
+
         //get segment list again to check if change alikes were applied correctly
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
