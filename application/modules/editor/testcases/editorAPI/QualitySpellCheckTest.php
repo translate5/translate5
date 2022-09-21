@@ -82,7 +82,7 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         self::$api->putJson('editor/task/' . $task->id, ['userState' => 'edit', 'id' => $task->id]);
 
         // Get segments and check their quantity
-        $factQty = count(self::$api->getJson(null, 10));
+        $factQty = count(self::$api->getSegments(null, 10));
         static::assertEquals($factQty, $expectedSegmentQuantity, 'Not enough segments in the imported task');
 
         // Check qualities

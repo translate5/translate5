@@ -191,7 +191,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $filteredTasks = $this->getFilteredTasks();
         $this->assertEquals(count($this->tasksForKPI), count($filteredTasks));
         
-        $result = $this->api()->postJson('editor/task/kpi', [], ['filter' => $this->renderTaskGridFilter()]);
+        $result = $this->api()->postJson('editor/task/kpi', ['filter' => $this->renderTaskGridFilter()], null, false);
         
         $statistics = $this->getExpectedKpiStatistics();
         
