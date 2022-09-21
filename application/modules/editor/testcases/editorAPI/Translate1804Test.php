@@ -66,40 +66,41 @@ class Translate1804Test extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
     }
     
     /**
      * Testing segment values directly after import
      */
     public function testSegmentValuesAfterImport() {
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-        
+
+        $jsonFileName = 'expectedSegments.json';
+        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
+
         //we need a copy of the segmentIds, since assertSegmentsEqualsJsonFile would remove them
         $ids = array_column($segments, 'id');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
         
         $testContent = '<ins class="trackchanges ownttip" data-usertrackingid="2330" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2020-05-14T12:30:33+02:00">0</ins>';
         
         //saving a plain 0
         $segment = $this->api()->prepareSegmentPut('targetEdit', "0", $ids[3]);
-        $this->api()->requestJson('editor/segment/'.$ids[3], 'PUT', $segment);
+        $this->api()->putJson('editor/segment/'.$ids[3], $segment);
         
         //saving a 0 with track changes
         $segment = $this->api()->prepareSegmentPut('targetEdit', $testContent, $ids[4]);
-        $this->api()->requestJson('editor/segment/'.$ids[4], 'PUT', $segment);
+        $this->api()->putJson('editor/segment/'.$ids[4], $segment);
         
         //saving a plain 0
         $segment = $this->api()->prepareSegmentPut('targetEdit', "0", $ids[6]);
-        $this->api()->requestJson('editor/segment/'.$ids[6], 'PUT', $segment);
+        $this->api()->putJson('editor/segment/'.$ids[6], $segment);
         //saving a 0 with track changes
         $segment = $this->api()->prepareSegmentPut('targetEdit', $testContent, $ids[7]);
-        $this->api()->requestJson('editor/segment/'.$ids[7], 'PUT', $segment);
-        
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
+        $this->api()->putJson('editor/segment/'.$ids[7], $segment);
 
-        $this->assertSegmentsEqualsJsonFile('expectedSegments-edited.json', $segments, 'Edited segments are not as expected!');
+        $jsonFileName = 'expectedSegments-edited.json';
+        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
     }
     
     /**
@@ -134,8 +135,8 @@ class Translate1804Test extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
     }
 }

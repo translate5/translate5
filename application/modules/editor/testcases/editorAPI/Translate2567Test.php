@@ -61,7 +61,7 @@ class Translate2567Test extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
     }
     
     /**
@@ -69,7 +69,7 @@ class Translate2567Test extends editor_Test_JsonTest {
      */
     public function testSegmentValuesAfterImport() {
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getJson('editor/segment?page=1&start=0&limit=10', [], $jsonFileName);
+        $segments = $this->api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
 
@@ -77,8 +77,8 @@ class Translate2567Test extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
     }
 }

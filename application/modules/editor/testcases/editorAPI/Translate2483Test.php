@@ -91,7 +91,7 @@ class Translate2483Test extends editor_Test_JsonTest {
      */
     public function testCreateAndWrite() {
         self::assertLogin('testmanager');
-        $response = self::$api->requestJson('editor/instanttranslateapi/writetm', 'POST',
+        $response = self::$api->postJson('editor/instanttranslateapi/writetm',
             [
                 'source' => self::$sourceText,
                 'target' => self::$targetText,
@@ -117,7 +117,7 @@ class Translate2483Test extends editor_Test_JsonTest {
         $params['target'] = self::$targetLang;
         $params['text'] = self::$sourceText;
 
-        $this->api()->requestJson('editor/instanttranslateapi/translate', 'GET', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
+        $this->api()->getJson('editor/instanttranslateapi/translate', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
         $responseBody = json_decode($this->api()->getLastResponse()->getBody());
         // Is anything returned for Deep at all?
         $this->assertIsObject($responseBody, 'InstantTranslate: Response for translation does not return an object, check error log.');
@@ -137,7 +137,7 @@ class Translate2483Test extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         foreach (self::$createdResources as $createdResource) {
-            self::$api->requestJson('editor/languageresourceinstance/'.$createdResource,'DELETE');
+            self::$api->delete('editor/languageresourceinstance/'.$createdResource);
         }
     }
 }

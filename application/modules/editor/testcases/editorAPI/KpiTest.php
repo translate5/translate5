@@ -180,7 +180,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $startDate = $startDate->format('Y-m-d H:i:s');
         $taskId = self::$taskIds[$taskNameSuffix];
         $assocId=self::$taskUserAssocMap[$taskId];
-        $this->api()->requestJson('editor/taskuserassoc/'.$assocId, 'PUT', [$this->taskStartDate => $startDate, $this->taskEndDate => $endDate]);
+        $this->api()->putJson('editor/taskuserassoc/'.$assocId, [$this->taskStartDate => $startDate, $this->taskEndDate => $endDate]);
     }
     
     /**
@@ -191,7 +191,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $filteredTasks = $this->getFilteredTasks();
         $this->assertEquals(count($this->tasksForKPI), count($filteredTasks));
         
-        $result = $this->api()->requestJson('editor/task/kpi', 'POST', [], ['filter' => $this->renderTaskGridFilter()]);
+        $result = $this->api()->postJson('editor/task/kpi', ['filter' => $this->renderTaskGridFilter()], null, false);
         
         $statistics = $this->getExpectedKpiStatistics();
         
@@ -208,8 +208,8 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
         foreach (self::$taskIds as $taskId) {
-            self::$api->requestJson('editor/task/'.$taskId, 'PUT', ['userState' => 'open', 'id' =>$taskId]);
-            self::$api->requestJson('editor/task/'.$taskId, 'DELETE');
+            self::$api->putJson('editor/task/'.$taskId, ['userState' => 'open', 'id' =>$taskId]);
+            self::$api->delete('editor/task/'.$taskId);
         }
     }
     
@@ -231,7 +231,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      */
     protected function getFilteredTasks() {
         // taskGrid: apply the filter for our tasks! do NOT use the limit!
-        $result = $this->api()->requestJson('editor/task?filter='.urlencode($this->renderTaskGridFilter()), 'GET');
+        $result = $this->api()->getJson('editor/task?filter='.urlencode($this->renderTaskGridFilter()));
         return $result;
     }
     

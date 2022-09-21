@@ -68,10 +68,10 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
         $task = self::$api->getTask();
 
         // Open task for whole testcase
-        $api->requestJson('editor/task/' . $task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
+        $api->putJson('editor/task/' . $task->id, ['userState' => 'edit', 'id' => $task->id]);
 
         // Get segments and check their quantity
-        static::$segments = $api->requestJson('editor/segment?page=1&start=0&limit=29');
+        static::$segments = $api->getSegments(null, 29);
         static::assertEquals(count(static::$segments), 29, 'Not enough segments in the imported task');
     }
 
@@ -93,8 +93,8 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
     }
 }

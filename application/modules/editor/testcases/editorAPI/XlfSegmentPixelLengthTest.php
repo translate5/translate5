@@ -65,7 +65,7 @@ class XlfSegmentPixelLengthTest extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
     }
     
     /**
@@ -73,11 +73,10 @@ class XlfSegmentPixelLengthTest extends editor_Test_JsonTest {
      * Other constellations of the segment length count are implicitly tested in the XlfImportTest!
      */
     public function testSegmentValuesAfterImport() {
-        
         //get segment list (just the ones of the first file for that tests)
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
+        $jsonFileName = 'expectedSegments.json';
+        $segments = $this->api()->getSegments($jsonFileName, 20);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
     /**
@@ -85,7 +84,7 @@ class XlfSegmentPixelLengthTest extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list (just the ones of the first file for that tests)
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
+        $segments = $this->api()->getSegments(null, 20);
         $this->assertNotEmpty($segments, 'No segments are found in the Task!');
         
         require_once 'Models/Segment/TagAbstract.php';
@@ -104,12 +103,12 @@ class XlfSegmentPixelLengthTest extends editor_Test_JsonTest {
             }
             $editedData = $contentToUse.' - edited'.$segToEdit->segmentNrInTask;
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-            $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+            $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
         }
         
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegmentsEdited.json', $segments, 'Edited segments are not as expected!');
+        $jsonFileName = 'expectedSegmentsEdited.json';
+        $segments = $this->api()->getSegments($jsonFileName, 20);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
         
         $task = $this->api()->getTask();
         //start task export
@@ -146,8 +145,8 @@ class XlfSegmentPixelLengthTest extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
     }
 }

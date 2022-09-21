@@ -56,7 +56,7 @@ class RelaisImportTest extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
     }
     
     /**
@@ -64,7 +64,7 @@ class RelaisImportTest extends editor_Test_JsonTest {
      */
     public function testRelaisContent() {
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $segments = array_map(function($segment){
             //TODO remove array cast with PHP7
             return (array) $segment;
@@ -120,7 +120,7 @@ class RelaisImportTest extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
     }
 }

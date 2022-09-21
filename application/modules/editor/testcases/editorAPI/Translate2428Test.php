@@ -54,7 +54,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
      * Waith for the task import to finish.
      */
     public function testSetupCustomerAndResources() {
-        self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
+        self::$customerTest = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
         ]);
@@ -64,7 +64,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         $this->addZDemoMTMt("two");
         self::$api->addTaskAssoc();
         $this->queueAnalysys();
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
         self::$api->checkTaskStateLoop();
     }
     
@@ -79,7 +79,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         
         $task = self::$api->getTask();
         //enable 100% matches for edition. This should calculate also the word count
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['edit100PercentMatch' => 1]);
+        self::$api->putJson('editor/task/'.$task->id, ['edit100PercentMatch' => 1]);
         
         self::$api->reloadTask();
         $wordCount = self::$api->getTask()->wordCount;
@@ -96,7 +96,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
      * @param string $validationFileName
      */
     protected function checkAnalysis(string $validationFileName){
-        $analysis=self::$api->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
+        $analysis=self::$api->getJson('editor/plugins_matchanalysis_matchanalysis',[
             'taskGuid'=>self::$api->getTask()->taskGuid
         ]);
         
@@ -146,7 +146,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         $params['pretranslateTmAndTerm']= 1;
         $params['pretranslateMt']= 1;
         $params['isTaskImport']= 0;
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
+        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
         error_log("Queue pretranslation and analysis.");
     }
 
@@ -180,12 +180,12 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
         
         //remove the created resources
         self::$api->removeResources();
         
         //remove the temp customer
-        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
 }

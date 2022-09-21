@@ -67,9 +67,9 @@ class Translate2417Test extends editor_Test_JsonTest {
         $this->api()->addUser('testmanager');
 
         $task = $this->api()->getTask();
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
+        $this->api()->putJson('editor/task/'.$task->id, ['userState' => 'edit', 'id' => $task->id]);
 
-        $segments = $this->api()->requestJson('editor/segment');
+        $segments = $this->api()->getJson('editor/segment');
         $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
     }
 
@@ -85,12 +85,12 @@ class Translate2417Test extends editor_Test_JsonTest {
         $tm = $this->api()->getResources()[0];
 
         // load the first segment
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=1');
+        $segments = $this->api()->getSegments(null, 1);
         // test the first segment
         $segToTest = $segments[0];
 
         // query the results from this segment and compare them against the expected initial json
-        $tmResults = $this->api()->requestJson('editor/languageresourceinstance/'.$tm->id.'/query','GET',['segmentId' => $segToTest->id]);
+        $tmResults = $this->api()->getJson('editor/languageresourceinstance/'.$tm->id.'/query', ['segmentId' => $segToTest->id]);
 
         $this->assertIsArray($tmResults, 'GET editor/languageresourceinstance/'.$tm->id.'/query does not return an array but: '.print_r($tmResults,1).' and raw result is '.print_r($this->api()->getLastResponse(),1));
 
@@ -100,10 +100,10 @@ class Translate2417Test extends editor_Test_JsonTest {
         $segToTest->targetEdit = "Aleks test tm update.";
 
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
 
         // after the segment save, check for the tm results for the same segment
-        $tmResults = $this->api()->requestJson('editor/languageresourceinstance/'.$tm->id.'/query','GET',['segmentId' => $segToTest->id]);
+        $tmResults = $this->api()->getJson('editor/languageresourceinstance/'.$tm->id.'/query', ['segmentId' => $segToTest->id]);
 
         $this->assertTmResultEqualsJsonFile('tmResultsAfterEdit.json', $tmResults, 'The received tm results after segment modification are not as expected!');
     }
@@ -152,7 +152,7 @@ class Translate2417Test extends editor_Test_JsonTest {
      * Start the import process
      */
     protected function startImport(){
-        $this->api()->requestJson('editor/task/'.$this->api()->getTask()->id.'/import', 'GET');
+        $this->api()->getJson('editor/task/'.$this->api()->getTask()->id.'/import');
         error_log('Import workers started.');
     }
 
@@ -172,9 +172,9 @@ class Translate2417Test extends editor_Test_JsonTest {
         //open task for whole testcase
         self::$api->login('testmanager');
 
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
+        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
 
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
         //remove the created resources
         self::$api->cleanup && self::$api->removeResources();
     }

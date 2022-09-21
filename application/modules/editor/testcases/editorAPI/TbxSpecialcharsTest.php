@@ -61,10 +61,10 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
 
         /*class_exists('editor_Utils');
         $last = editor_Utils::db()->query('SELECT `id` FROM `LEK_languageresources` ORDER BY `id` DESC LIMIT 1')->fetchColumn();
-        self::$api->requestJson('editor/termcollection/' . $last, 'DELETE');*/
+        self::$api->delete('editor/termcollection/' . $last);*/
 
         // [1] Create empty term collection
-        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', [
+        $termCollection = $this->api()->postJson('editor/termcollection', [
             'name' => 'Test api collection',
             'customerIds' => $this->api()->getCustomer()->id
         ]);
@@ -77,19 +77,19 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
         // [2] Import tbx with single termEntry, having '&lt;' at multiple places
         $file = 'Specialchars.tbx';
         $this->api()->addFile($file, $this->api()->getFile($file), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', [
+        $this->api()->postJson('editor/termcollection/import', [
             'collectionId' => self::$collectionId,
             'customerIds' => $this->api()->getCustomer()->id,
             'mergeTerms' => true
         ]);
 
         // [3] Get language: english
-        $english = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
+        $english = $this->api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
         $this->assertNotEmpty($english, 'Unable to load english-language');
         self::$english = $english[0];
 
         // [4] Find imported term by *-query and en-language id
-        $termsearch = $this->api()->requestJson('editor/plugins_termportal_data/search', 'GET', [
+        $termsearch = $this->api()->getJson('editor/plugins_termportal_data/search', [
             'query' => '*',
             'collectionIds' => self::$collectionId,
             'language' => self::$english->id,
@@ -100,7 +100,7 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertNotEmpty($termsearch->data, "No terms are found in the term collection for the search string '*'");
 
         // [5] Get imported term info and unset not needed props
-        $json = $this->api()->requestJson('editor/plugins_termportal_data/terminfo', 'POST', [
+        $json = $this->api()->postJson('editor/plugins_termportal_data/terminfo', [
             'termId' => $termsearch->data[0]->id
         ]);
         unset($json->siblings, $json->time);
@@ -128,6 +128,6 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
      */
     public static function tearDownAfterClass(): void {
         self::$api->login('testtermproposer');
-        self::$api->cleanup && self::$api->requestJson('editor/termcollection/'.self::$collectionId,'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/termcollection/'.self::$collectionId);
     }
 }

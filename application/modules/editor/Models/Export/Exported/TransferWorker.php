@@ -119,7 +119,7 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
             $api->addFilePlain('tmUpload', $raw, 'text/xml', $m[0]);
 
             // Make request to imitate language resource tbx import dialog submit
-            $json[$idx] = $api->requestJson($url . 'languageresourceinstance/' . $m[1] . '/import/', 'POST', $data);
+            $json[$idx] = $api->postJson($url.'languageresourceinstance/'.$m[1].'/import/', $data);
         }
     }
 }

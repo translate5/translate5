@@ -67,7 +67,7 @@ class Translate2855Test extends editor_Test_JsonTest {
      * @throws Exception
      */
     private static function createResource(){
-        self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
+        self::$customerTest = self::$api->postJson('editor/customer/',[
             'name' => 'API Testing::Pivot pre-translation',
             'number' => uniqid('API Testing::Pivot pre-translation', true),
         ]);
@@ -113,18 +113,14 @@ class Translate2855Test extends editor_Test_JsonTest {
      * Queue pivot pre-translation worker
      */
     private static function queuePretranslation(){
-        $params=[];
-        $params['taskGuid'] = self::$api->getTask()->taskGuid;
-        self::$api->requestJson('editor/languageresourcetaskpivotassoc/pretranslation/batch', 'PUT', $params, $params);
-        error_log('Queue pivot pretranslation.');
+        self::$api->putJson('editor/languageresourcetaskpivotassoc/pretranslation/batch', [ 'taskGuid' => self::$api->getTask()->taskGuid ], null, false);
     }
 
     /***
      * Start the import process
      */
     private static function startImport(){
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
-        error_log('Import workers started.');
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
     }
 
     /***
@@ -140,8 +136,8 @@ class Translate2855Test extends editor_Test_JsonTest {
      */
     public function testSegmentContent(){
         //open task for whole testcase
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id, 'PUT', ['userState' => 'edit', 'id' => self::$api->getTask()->id]);
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        self::$api->putJson('editor/task/'.self::$api->getTask()->id, ['userState' => 'edit', 'id' => self::$api->getTask()->id]);
+        $segments = $this->api()->getSegments();
 
         self::assertEquals(3,count($segments), 'The number of segments does not match.');
 
@@ -159,10 +155,10 @@ class Translate2855Test extends editor_Test_JsonTest {
 
         self::$api->removeResources();
 
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
 
         //remove the temp customer
-        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
 }

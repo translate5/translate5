@@ -54,14 +54,14 @@ class ProjectTaskTest extends editor_Test_JsonTest {
      * Run the task import and waith for importing
      */
     public function testSetupCustomerAndResources() {
-        self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
+        self::$customerTest = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
         ]);
         
         $this->addTermCollection();
         $this->createProject();
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
         self::$api->checkProjectTasksStateLoop();
     }
     
@@ -111,18 +111,15 @@ class ProjectTaskTest extends editor_Test_JsonTest {
 
         error_log('Segments check for task ['.$task->taskName.']');
         //open the task for editing. This is the only way to load the segments via the api
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
+        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'edit', 'id' => $task->id]);
 
         $fileName = str_replace(['/','::'],'_',$task->taskName.'.json');
-
-        // load all segments for the current opened task
-        $segments = self::$api->requestJson('editor/segment?page=1&start=0&limit=200');
-
+        $segments = self::$api->getSegments($fileName);
         // compare segments (this API will strip/adjust segment contents)
         $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected in '.basename($fileName).'!');
 
         //close the task for editing
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
+        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
 
         //reset internal current task to the project
         $this->api()->setTask($project);
@@ -175,15 +172,15 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         self::$api->login('testmanager');
 
         //close the task for editing
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
+        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
         
         //when removing the task, all task project will be removed
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
         
         //remove the created resources
         self::$api->removeResources();
         
         //remove the temp customer
-        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
 }

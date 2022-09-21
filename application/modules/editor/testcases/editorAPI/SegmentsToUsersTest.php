@@ -63,7 +63,7 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
         // task must be in 'simultaneous'-mode
         self::assertContains('editor_Plugins_FrontEndMessageBus_Init', $appState->pluginsLoaded, 'Plugin FrontEndMessageBus must be activated for this test case!');
         $task = $api->getTask();
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('usageMode' => 'simultaneous'));
+        $api->putJson('editor/task/'.$task->id, array('usageMode' => 'simultaneous'));
         
         // => testEditableSegmentsForUser1
         $api->reloadTask();
@@ -92,9 +92,9 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->reloadTask();
         $task = $this->api()->getTask();
         //open task
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
+        $segments = $this->api()->getSegments(null, 20);
         //check if segments are editable as expected
         $this->checkSegments($segments, self::SEGMENTS_USER1);
         $this->api()->logout();
@@ -108,9 +108,9 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->reloadTask();
         $task = $this->api()->getTask();
         //open task
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
+        $segments = $this->api()->getSegments(null, 20);
         //check if segments are editable as expected
         $this->checkSegments($segments, self::SEGMENTS_USER2);
         $this->api()->logout();
@@ -134,8 +134,8 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->delete('editor/task/'.$task->id);
     }
 }

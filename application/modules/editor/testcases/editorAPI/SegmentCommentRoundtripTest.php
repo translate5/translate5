@@ -59,7 +59,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
 
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
         
         $tests = array(
             'runtimeOptions.editor.export.exportComments' => 1,
@@ -74,13 +74,11 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
      * Testing some segment values directly after import
      */
     public function testImportedContent() {
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=100');
+        $jsonFileName = 'expectedSegments.json';
+        $segments = $this->api()->getSegments($jsonFileName, 100);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
         $segmentIds = array_column($segments, 'id');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
-
         $comments = $this->getCommentsForTest($segmentIds);
-        
         $this->assertCommentsEqualsJsonFile('expectedComments.json', $comments, 'Imported comments are not as expected!');
     }
 
@@ -92,7 +90,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
     protected function getCommentsForTest(array $segmentIds) {
         $comments = [];
         foreach($segmentIds as $id) {
-            $commentsBySegment = $this->api()->requestJson('editor/comment?segmentId='.$id);
+            $commentsBySegment = $this->api()->getJson('editor/comment?segmentId='.$id);
             $comments[] = $commentsBySegment;
         }
         return $comments;
@@ -102,7 +100,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
      * Test adding comments via translate5, and check if they are added properly
      */
     public function testAddNewComments() {
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=100');
+        $segments = $this->api()->getSegments(null, 100);
         $segmentIds = array_column($segments, 'id');
         foreach($segmentIds as $idx => $segmentId) {
             $comment = [
@@ -111,16 +109,13 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
                 'userName'      => 'A Test users name',
                 'comment'       => 'A test comment for segment '.$idx,
             ];
-            $this->api()->requestJson('editor/comment', 'POST', $comment);
+            $this->api()->postJson('editor/comment', $comment);
         }
-
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=100');
+        $jsonFileName = 'expectedSegmentsAfterAdd.json';
+        $segments = $this->api()->getSegments($jsonFileName, 100);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
         $segmentIds = array_column($segments, 'id');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegmentsAfterAdd.json', $segments, 'Imported segments are not as expected!');
-
         $comments = $this->getCommentsForTest($segmentIds);
-        
         $this->assertCommentsEqualsJsonFile('expectedCommentsAfterAdd.json', $comments, 'Imported comments are not as expected!', true);
     }
 
@@ -189,8 +184,8 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
     }
 }

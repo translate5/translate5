@@ -207,7 +207,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         $task = $api->getTask();
    
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
     }
     
     /**
@@ -215,7 +215,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
      */
     public function testAlikeCalculation() {
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $this->assertCount(count(self::$dummyData), $segments);
         
         //test source editing
@@ -224,7 +224,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         //test editing a prefilled segment
         $segToTest = $segments[0];
         //$this->assertEquals($this->dummyData[0]['sourceBeforeEdit'], $segToTest->source);
-        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        $alikes = $this->api()->getJson('editor/alikesegment/'.$segToTest->id);
         $alikes = array_map(function($item){return (array) $item;}, $alikes);
         
         $targetMatch = array_keys(array_filter(array_column($alikes, 'targetMatch', 'segmentNrInTask')));
@@ -239,21 +239,21 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
      */
     public function testEditing() {
         $isSE = static::$useSourceEditing;
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $segToTest = $segments[0];
         $edit = str_replace('Haus', 'Haus - edited', $segToTest->targetEdit);
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $edit, $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
             //edit source also, currently our test helper cant make this in one API call
         if($isSE) {
             $edit = str_replace('house', 'house - edited', $segToTest->sourceEdit);
             $segmentData = $this->api()->prepareSegmentPut('sourceEdit', $edit, $segToTest->id);
-            $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+            $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         }
         
         //fetch alikes and assert correct segments found by segmentNrInTask
-        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        $alikes = $this->api()->getJson('editor/alikesegment/'.$segToTest->id);
         
         //save alikes
         $alikeIds = array_map(function($item){
@@ -267,7 +267,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
         $resp = $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
         
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         foreach($segments as $segment) {
             $nr = $segment->segmentNrInTask;
             if(!in_array($segment->id, $alikeIds)) {
@@ -292,13 +292,13 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
      * See TRANSLATE-1442 and TRANSLATE-680 and TRANSLATE-1669
      */
     public function testTagOnlyReplacement() {
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $segToTest = $segments[12]; //segmentNrInTask 13
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit.'Test', $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //fetch alikes and assert correct segments found by segmentNrInTask
-        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        $alikes = $this->api()->getJson('editor/alikesegment/'.$segToTest->id);
         
         $alikeNrs = array_map(function($item){
             return $item->segmentNrInTask;
@@ -316,16 +316,18 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         ];
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
         $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
-            
-        $segmentsAfterChange = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segmentsAfterChange, 'Imported segments are not as expected!');
+
+
+        $jsonFileName = 'expectedSegments.json';
+        $segmentsAfterChange = $this->api()->getSegments($jsonFileName);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segmentsAfterChange, 'Imported segments are not as expected!');
         
         //seg 14 has seg 16 as alike, although the target tag count differs.
         // But thats ok since target of 16 is empty, and will be filled with one tag from the source on editing.
         // So after editing, tags are equal again.
         $segToTest = $segments[13]; //segmentNrInTask 14
         //fetch alikes and assert correct segments found by segmentNrInTask
-        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        $alikes = $this->api()->getJson('editor/alikesegment/'.$segToTest->id);
         $alikeNrs = array_map(function($item){
             return $item->segmentNrInTask;
         },$alikes);
@@ -337,7 +339,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
      * @depends testTagOnlyReplacement
      */
     public function testWhitespaceTagManipulation() {
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         
         /*
          * segmentNrInTask 18 - remove whitespace tag the other tags must remain in the alikes
@@ -346,10 +348,10 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         $newTarget = preg_replace('/Test<.*>word/', 'Test Word', $segToTest->targetEdit);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $newTarget, $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //fetch alikes and assert correct segments found by segmentNrInTask
-        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        $alikes = $this->api()->getJson('editor/alikesegment/'.$segToTest->id);
         
         $alikeNrs = array_column($alikes, 'segmentNrInTask');
         $this->assertEquals([19], $alikeNrs, 'The found repetitions are not as expected!');
@@ -367,10 +369,10 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
          */
         $segToTest = $segments[19];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segments[17]->target, $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //fetch alikes and assert correct segments found by segmentNrInTask
-        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        $alikes = $this->api()->getJson('editor/alikesegment/'.$segToTest->id);
         
         $alikeNrs = array_column($alikes, 'segmentNrInTask');
         $this->assertEquals([21], $alikeNrs, 'The found repetitions are not as expected!');
@@ -383,16 +385,17 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
         $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
-                
-        $segmentsAfterChange = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
-        $this->assertSegmentsEqualsJsonFile('expectedSegmentsEditedWhitespace.json', $segmentsAfterChange, 'Imported segments are not as expected!');
+
+        $jsonFileName = 'expectedSegmentsEditedWhitespace.json';
+        $segmentsAfterChange = $this->api()->getSegments($jsonFileName);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segmentsAfterChange, 'Imported segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
+        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
     }
 }
