@@ -155,10 +155,8 @@ class Translate2756Test extends editor_Test_JsonTest {
         //open task for whole testcase
         self::$api->login('testlector');
         self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
-        if(self::$api->cleanup) {
-            self::$api->login('testmanager');
-            self::$api->delete('editor/task/'.$task->id);
-            self::$api->removeResources();
-        }
+        self::$api->login('testmanager');
+        self::$api->delete('editor/task/'.$task->id);
+        self::$api->removeResources();
     }
 }

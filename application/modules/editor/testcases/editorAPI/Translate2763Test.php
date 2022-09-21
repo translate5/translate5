@@ -91,7 +91,7 @@ class Translate2763Test extends editor_Test_JsonTest {
 
         $this->assertFileContents('term-export-2.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', $this->api()->isCapturing());
 
-        $this->api()->cleanup && $this->api()->delete('editor/languageresourceinstance/'.self::$TC_ID.'');
+        $this->api()->delete('editor/languageresourceinstance/'.self::$TC_ID.'');
     }
 
     /**

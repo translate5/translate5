@@ -156,9 +156,9 @@ class Translate2491Test extends editor_Test_JsonTest {
     public static function tearDownAfterClass(): void {
 
         // Get task
-        self::$api->cleanup && self::$api->delete('editor/task/' . self::$api->getTask()->id);
+        self::$api->delete('editor/task/' . self::$api->getTask()->id);
 
         // Drop termCollection
-        self::$api->cleanup && self::$api->delete('editor/termcollection/' . self::$collectionId);
+        self::$api->delete('editor/termcollection/' . self::$collectionId);
     }
 }

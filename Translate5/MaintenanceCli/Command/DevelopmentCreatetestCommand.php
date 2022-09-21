@@ -279,9 +279,9 @@ class '.$name.' extends editor_Test_JsonTest {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login(\'testlector\');
-        self::$api->cleanup && self::$api->putJson(\'editor/task/\'.$task->id, array(\'userState\' => \'open\', \'id\' => $task->id));
+        self::$api->putJson(\'editor/task/\'.$task->id, array(\'userState\' => \'open\', \'id\' => $task->id));
         self::$api->login(\'testmanager\');
-        self::$api->cleanup && self::$api->delete(\'editor/task/\'.$task->id);
+        self::$api->delete(\'editor/task/\'.$task->id);
     }
 }
 ');

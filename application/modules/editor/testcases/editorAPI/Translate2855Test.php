@@ -155,8 +155,8 @@ class Translate2855Test extends editor_Test_JsonTest {
 
         self::$api->removeResources();
 
-        self::$api->cleanup && self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
-        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
+        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
+        self::$api->delete('editor/task/'.$task->id);
 
         //remove the temp customer
         self::$api->delete('editor/customer/'.self::$customerTest->id);

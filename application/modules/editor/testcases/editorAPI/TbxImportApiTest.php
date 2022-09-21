@@ -126,7 +126,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
 
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->delete('editor/termcollection/'.self::$collId);
+        self::$api->delete('editor/termcollection/'.self::$collId);
     }
 
 }

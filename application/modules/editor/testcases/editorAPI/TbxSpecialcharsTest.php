@@ -128,6 +128,6 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
      */
     public static function tearDownAfterClass(): void {
         self::$api->login('testtermproposer');
-        self::$api->cleanup && self::$api->delete('editor/termcollection/'.self::$collectionId);
+        self::$api->delete('editor/termcollection/'.self::$collectionId);
     }
 }

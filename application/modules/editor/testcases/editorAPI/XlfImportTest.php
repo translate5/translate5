@@ -248,6 +248,6 @@ class XlfImportTest extends editor_Test_JsonTest {
         self::$api->login('testlector');
         self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->delete('editor/task/'.$task->id);
+        self::$api->delete('editor/task/'.$task->id);
     }
 }

@@ -107,7 +107,7 @@ class Translate3015Test extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->delete('editor/termcollection/'.self::$collId);
+        self::$api->delete('editor/termcollection/'.self::$collId);
     }
 
 }
