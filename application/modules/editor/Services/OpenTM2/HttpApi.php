@@ -257,6 +257,51 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
+
+        if($this->isOpenTM2() && strtolower($json->targetLang) === 'en-gb'){
+            // TODO REMOVE THIS WHOLE IF AFTER ABOLISHING OPENTM2
+            //between 06.2022 v5.7.4 and 9.2022 v5.7.10 all en-GB segments were stored as en-UK into OpenTM2
+            // with v5.7.10 this was fixed, but now all en-UK results must be fetched separately
+            // and merged into the result
+            // - this is only relevant for targetLanguages = en-GB, source language is not compared on search
+            //   on export this will lead to empty xml:lang fields, which is fixed in FixLanguagesCodes
+            // - only on saving en-UK as source, the source lang is empty string on export and ?? in answer,
+            //   the export is fixed in FixLanguagesCodes, the latter one does not hurt
+
+            //en-UK request first
+            $jsonEnUk = clone $json;
+            $jsonEnUk->targetLang = 'en-UK';
+            $http->setRawData(json_encode($jsonEnUk), 'application/json; charset=utf-8');
+            $resultsUK = [];
+            $resultUK = $this->processResponse($http->request());
+            if($resultUK) {
+                $resultsUK = clone $this->result;
+                if(!empty($resultsUK->results)) {
+                    foreach ($resultsUK->results as $oneResult) {
+                        $oneResult->targetLang = 'en-GB'; //en-UK is stored as ?? and must be changed
+                    }
+                }
+            }
+
+            //en-GB request
+            $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+            $resultGB = $this->processResponse($http->request());
+
+            if($resultUK && $resultsUK->NumOfFoundProposals > 0) {
+                //if no GB results found or there was an error, we use just the UK entries
+                if(!$resultGB || $this->result->NumOfFoundProposals === 0) {
+                    $this->result = $resultsUK;
+                }
+                //merge the results
+                else {
+                    $this->result->NumOfFoundProposals += $resultsUK->NumOfFoundProposals;
+                    $this->result->results = array_merge($this->result->results, $resultsUK->results);
+                }
+            }
+
+            return $resultGB || $resultUK;
+        }
+
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
     }
