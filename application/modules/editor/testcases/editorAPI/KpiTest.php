@@ -32,24 +32,25 @@ END LICENSE AND COPYRIGHT
  */
 class KpiTest extends \ZfExtended_Test_ApiTestcase {
     
-    const KPI_REVIEWER='averageProcessingTimeReviewer';
-    const KPI_TRANSLATOR='averageProcessingTimeTranslator';
-    const KPI_TRANSLATOR_CHECK='averageProcessingTimeSecondTranslator';
+    const KPI_REVIEWER = 'averageProcessingTimeReviewer';
+    const KPI_TRANSLATOR = 'averageProcessingTimeTranslator';
+    const KPI_TRANSLATOR_CHECK = 'averageProcessingTimeSecondTranslator';
     
     /**
      * What our tasknames start with (e.g.for creating and filtering tasks).
      * @var string
      */
-    protected $taskNameBase = 'API Testing::'.__CLASS__;
+    private static $taskNameBase = 'API Testing::'.__CLASS__;
     
     /**
      * Settings for the tasks we create and check.
      * @var array
      */
-    protected $tasksForKPI = [array('taskNameSuffix' => 'nr1', 'doExport' => true,  'processingTimeInDays' => 10),
-                              array('taskNameSuffix' => 'nr2', 'doExport' => true,  'processingTimeInDays' => 20),
-                              array('taskNameSuffix' => 'nr3', 'doExport' => false, 'processingTimeInDays' => 30),
-                              array('taskNameSuffix' => 'nr4', 'doExport' => false, 'processingTimeInDays' => 40)
+    private static $tasksForKPI = [
+        array('taskNameSuffix' => 'nr1', 'doExport' => true,  'processingTimeInDays' => 10),
+        array('taskNameSuffix' => 'nr2', 'doExport' => true,  'processingTimeInDays' => 20),
+        array('taskNameSuffix' => 'nr3', 'doExport' => false, 'processingTimeInDays' => 30),
+        array('taskNameSuffix' => 'nr4', 'doExport' => false, 'processingTimeInDays' => 40)
     ];
     
     /**
@@ -57,65 +58,90 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      * taskIds[$taskNameSuffix] = id;
      * @var array 
      */
-    protected static $taskIds = [];
+    private static $taskIds = [];
     
     /***
      * Task id to taskUserAssoc id map
      * @var array
      */
-    protected static $taskUserAssocMap=[];
+    private static $taskUserAssocMap=[];
     
     /**
      * KPI average processing time: taskUserAssoc-property for startdate
      * @var string
      */
-    protected $taskStartDate = 'assignmentDate';
+    private static $taskStartDate = 'assignmentDate';
     
     /**
      * KPI average processing time: taskUserAssoc-property for enddate
      * @var string
      */
-    protected $taskEndDate = 'finishedDate';
-    
-    /**
-     * @var string contains the file name to the downloaded excel
-     */
-    protected static $tempExcel;
-    
+    private static $taskEndDate = 'finishedDate';
     
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
+
+        // If any task exists already, filtering will be wrong!
+        $filteredTasks = static::getFilteredTasks();
+        static::assertEquals('0', count($filteredTasks), 'The translate5 instance contains already a task with the name "'.static::$taskNameBase.'" remove this task before!');
+
+        // create the tasks and store their ids
+        foreach (static::$tasksForKPI as $taskData) {
+            $taskNameSuffix = $taskData['taskNameSuffix'];
+            $task = array(
+                'taskName' => static::$taskNameBase.'_'.$taskNameSuffix, //no date in file name possible here!
+                'sourceLang' => 'en',
+                'targetLang' => 'de'
+            );
+            self::$api->addImportFile(self::$api->getFile('../TestImportProjects/testcase-de-en.xlf'));
+            self::$api->import($task);
+
+            // store task-id for later deleting
+            $task = self::$api->getTask();
+            static::$taskIds[$taskNameSuffix] = $task->id;
+
+            //add user to the task
+            $tua = self::$api->addUser('testlector', params: [
+                'workflow'=>'default',
+                'workflowStepName'=>'reviewing'
+            ]);
+            static::$taskUserAssocMap[$task->id] = $tua->id;
+        }
     }
-    
+
     /**
-     * If any task exists already, filtering will be wrong!
+     * Renders the filter for filtering our tasks in the taskGrid.
+     * @return string
      */
-    public function testConditions() {
-        $filteredTasks = $this->getFilteredTasks();
-        $this->assertEquals('0', count($filteredTasks), 'The translate5 instance contains already a task with the name "'.$this->taskNameBase.'" remove this task before!');
+    private static function renderTaskGridFilter() {
+        return '[{"operator":"like","value":"' . static::$taskNameBase . '","property":"taskName"}]';
+    }
+
+    /**
+     * Filter the taskGrid for our tasks only and return the found tasks that match the filtering.
+     * @return int
+     */
+    private static function getFilteredTasks() {
+        // taskGrid: apply the filter for our tasks! do NOT use the limit!
+        return self::$api->getJson('editor/task?filter='.urlencode(static::renderTaskGridFilter()));
     }
     
     /**
-     * Create tasks, create values for KPIs, check the KPI-results .
-     * @depends testConditions
+     * create values for KPIs, check the KPI-results .
      */
     public function testKPI() {
-        // create the tasks and store their ids
-        foreach ($this->tasksForKPI as $task) {
-            $this->createTask($task['taskNameSuffix']);
-        }
-        
+
         // --- For KPI I: number of exported tasks ---
-        foreach ($this->tasksForKPI as $task) {
+        foreach (static::$tasksForKPI as $task) {
             if ($task['doExport']) {
                 $this->runExcelExportAndImport($task['taskNameSuffix']);
             }
         }
         
         // --- For KPI II: average processing time ---
-        foreach ($this->tasksForKPI as $task) {
+        foreach (static::$tasksForKPI as $task) {
             $interval_spec = 'P'.(string)$task['processingTimeInDays'].'D';
             $this->setTaskProcessingDates($task['taskNameSuffix'], $interval_spec);
         }
@@ -123,78 +149,23 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         // check the KPI-results
         $this->checkKpiResults();
     }
-    
-    /**
-     * Import a task and store the id it got in translate5.
-     * @param string $taskNameSuffix
-     */
-    protected function createTask(string $taskNameSuffix) {
-        $task = array(
-            'taskName' => $this->taskNameBase.'_'.$taskNameSuffix, //no date in file name possible here!
-            'sourceLang' => 'en',
-            'targetLang' => 'de'
-        );
-        $this->api()->addImportFile($this->api()->getFile('../TestImportProjects/testcase-de-en.xlf'));
-        $this->api()->import($task);
-        
-        // store task-id for later deleting
-        $task = $this->api()->getTask();
-        self::$taskIds[$taskNameSuffix] = $task->id;
-        
-        //add user to the task
-        $tua=$this->api()->addUser('testlector',params: [
-            'workflow'=>'default',
-            'workflowStepName'=>'reviewing'
-        ]);
-        
-        self::$taskUserAssocMap[$task->id]=$tua->id;
-    }
-    
-    /**
-     * Export a task via API.
-     * @param string $taskNameSuffix
-     */
-    protected function runExcelExportAndImport(string $taskNameSuffix) {
-        $taskId = self::$taskIds[$taskNameSuffix];
-        
-        $response = $this->api()->get('editor/task/'.$taskId.'/excelexport');
-        self::$tempExcel = $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
-        file_put_contents($tempExcel, $response->getBody());
-        
-        $this->api()->addFile('excelreimportUpload', self::$tempExcel, 'application/data');
-        $this->api()->post('editor/task/'.$taskId.'/excelreimport');
-        $this->api()->reloadTask();
-    }
-    
-    /**
-     * Set the start- and end-date of a task.
-     * @param string $taskNameSuffix
-     * @param $interval_spec
-     */
-    protected function setTaskProcessingDates(string $taskNameSuffix, $interval_spec) {
-        // We set the endDate to now and the startDate to the given days ago.
-        $now = date('Y-m-d H:i:s');
-        $endDate = $now;
-        $startDate = new DateTime($now);
-        $startDate->sub(new DateInterval($interval_spec));
-        $startDate = $startDate->format('Y-m-d H:i:s');
-        $taskId = self::$taskIds[$taskNameSuffix];
-        $assocId=self::$taskUserAssocMap[$taskId];
-        $this->api()->putJson('editor/taskuserassoc/'.$assocId, [$this->taskStartDate => $startDate, $this->taskEndDate => $endDate]);
-    }
-    
+
+    // -----------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------
+
     /**
      * Check if the KPI-result we get from the API matches what we expect.
      */
-    protected function checkKpiResults() {
+    private function checkKpiResults() {
         // Does the number of found tasks match the number of tasks we created?
-        $filteredTasks = $this->getFilteredTasks();
-        $this->assertEquals(count($this->tasksForKPI), count($filteredTasks));
-        
-        $result = $this->api()->postJson('editor/task/kpi', ['filter' => $this->renderTaskGridFilter()], null, false);
-        
+        $filteredTasks = static::getFilteredTasks();
+        $this->assertEquals(count(static::$tasksForKPI), count($filteredTasks));
+
+        $result = self::$api->postJson('editor/task/kpi', ['filter' => static::renderTaskGridFilter()], null, false);
+
         $statistics = $this->getExpectedKpiStatistics();
-        
+
         // averageProcessingTime from API comes with translated unit (e.g. "2 days", "14 Tage"),
         // but these translations are not available here (are they?)
         $search = array("days", "Tage", " ");
@@ -204,45 +175,49 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($result->{self::KPI_REVIEWER}, $statistics[self::KPI_REVIEWER]);
         $this->assertEquals($result->excelExportUsage, $statistics['excelExportUsage']);
     }
-    
-    public static function tearDownAfterClass(): void {
-        self::$api->login('testmanager');
-        foreach (self::$taskIds as $taskId) {
-            self::$api->deleteTask($taskId);
-        }
-    }
-    
-    // -----------------------------------------------------------------
-    // Helpers
-    // -----------------------------------------------------------------
-    
+
     /**
-     * Renders the filter for filtering our tasks in the taskGrid.
-     * @return string
+     * Export a task via API.
+     * @param string $taskNameSuffix
      */
-    protected function renderTaskGridFilter() {
-        return '[{"operator":"like","value":"' . $this->taskNameBase . '","property":"taskName"}]';
+    private function runExcelExportAndImport(string $taskNameSuffix) {
+        $taskId = self::$taskIds[$taskNameSuffix];
+
+        $response = self::$api->get('editor/task/'.$taskId.'/excelexport');
+        $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
+        file_put_contents($tempExcel, $response->getBody());
+
+        self::$api->addFile('excelreimportUpload', $tempExcel, 'application/data');
+        self::$api->post('editor/task/'.$taskId.'/excelreimport');
+        self::$api->reloadTask();
     }
-    
+
     /**
-     * Filter the taskGrid for our tasks only and return the found tasks that match the filtering.
-     * @return int
+     * Set the start- and end-date of a task.
+     * @param string $taskNameSuffix
+     * @param $interval_spec
      */
-    protected function getFilteredTasks() {
-        // taskGrid: apply the filter for our tasks! do NOT use the limit!
-        $result = $this->api()->getJson('editor/task?filter='.urlencode($this->renderTaskGridFilter()));
-        return $result;
+    private function setTaskProcessingDates(string $taskNameSuffix, $interval_spec) {
+        // We set the endDate to now and the startDate to the given days ago.
+        $now = date('Y-m-d H:i:s');
+        $endDate = $now;
+        $startDate = new DateTime($now);
+        $startDate->sub(new DateInterval($interval_spec));
+        $startDate = $startDate->format('Y-m-d H:i:s');
+        $taskId = self::$taskIds[$taskNameSuffix];
+        $assocId=self::$taskUserAssocMap[$taskId];
+        self::$api->putJson('editor/taskuserassoc/'.$assocId, [static::$taskStartDate => $startDate, static::$taskEndDate => $endDate]);
     }
     
     /**
      * Get the KPI-values we expect for our tasks.
      * @return array
      */
-    protected function getExpectedKpiStatistics() {
+    private function getExpectedKpiStatistics() {
         $nrExported = 0;
         $processingTimeInDays = 0;
-        $nrTasks = count($this->tasksForKPI);
-        foreach ($this->tasksForKPI as $task) {
+        $nrTasks = count(static::$tasksForKPI);
+        foreach (static::$tasksForKPI as $task) {
             if ($task['doExport']) {
                 $nrExported++;
             }
@@ -252,5 +227,12 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $statistics[self::KPI_REVIEWER] = (string)round($processingTimeInDays / $nrTasks, 0);
         $statistics['excelExportUsage'] = round((($nrExported / $nrTasks) * 100),2) . '%';
         return $statistics;
+    }
+
+    public static function tearDownAfterClass(): void {
+        self::$api->login('testmanager');
+        foreach (self::$taskIds as $taskId) {
+            self::$api->deleteTask($taskId);
+        }
     }
 }
