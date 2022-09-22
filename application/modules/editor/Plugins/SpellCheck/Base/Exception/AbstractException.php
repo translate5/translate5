@@ -26,10 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Plugins\SpellCheck\Base\Exception;
+
 /**
  * Abstract Exception Class to get more details Information on SpellCheck-Error.
  */
-abstract class editor_Plugins_SpellCheck_Exception_Abstract extends ZfExtended_ErrorCodeException {
+abstract class AbstractException extends \ZfExtended_ErrorCodeException
+{
 
     /**
      * @var string
@@ -41,14 +46,15 @@ abstract class editor_Plugins_SpellCheck_Exception_Abstract extends ZfExtended_E
      *
      * @var integer
      */
-    protected $level = ZfExtended_Logger::LEVEL_WARN;
+    protected $level = \ZfExtended_Logger::LEVEL_WARN;
 
     /**
      * Error codes for spellcheck messages
      *
      * @var array
      */
-    protected static $localErrorCodes = [
+    protected static array $localErrorCodes = [
+        // TODO how to change spell check to 24 translate
         'E1410' => 'SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary.',
         'E1411' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
         'E1412' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.',

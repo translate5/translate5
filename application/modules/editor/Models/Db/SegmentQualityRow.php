@@ -68,33 +68,38 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
     /**
      * Sets the additionalData, which can only be an stdClass Object, as encoded JSON
      * An empy or missing Object will lead to NULL as column value
-     * @param stdClass $data
+     * @param stdClass|array|null $data
      */
-    public function setAdditionalData(?stdClass $data){
-        if(is_object($data)){
+    public function setAdditionalData(stdClass|array|null $data): void
+    {
+        if(is_object($data) || is_array($data)){
             $jsonString = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             $this->additionalData = (empty($jsonString)) ? NULL : $jsonString;
         } else {
             $this->additionalData = NULL;
         }
     }
+
     /**
      * Compares our additionalData with the passed additional data if they are equal
-     * @param stdClass $data
+     * @param stdClass|array|null $data
      * @return boolean
      */
-    public function isAdditionalDataEqual(stdClass $data=NULL) : bool {
-        if($data == NULL){
-            return $this->additionalData === NULL;
+    public function isAdditionalDataEqual(stdClass|array|null $data = null) : bool {
+        if($data === null){
+            return $this->additionalData === null;
         }
+
         $ours = (array) $this->getAdditionalData();
         $theirs = (array) $data;
+
         foreach($ours as $key => $val){
             if(!array_key_exists($key, $theirs) || $theirs[$key] !== $val){
                 return false;
             }
         }
-        return (count($ours) == count($theirs));
+
+        return (count($ours) === count($theirs));
     }
     /** can be used for debugging
     public function save(){

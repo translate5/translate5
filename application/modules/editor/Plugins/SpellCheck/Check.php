@@ -27,6 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\MalfunctionException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\RequestException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\TimeOutException;
 
 /**
  *
@@ -100,26 +104,26 @@ class editor_Plugins_SpellCheck_Check {
     public static $map = [
 
         // General error types
-        'characters'            => SELF::CHARACTERS,
-        'duplication'           => SELF::DUPLICATION,
-        'inconsistency'         => SELF::INCONSISTENCY,
-        'legal'                 => SELF::LEGAL,
-        'uncategorized'         => SELF::UNCATEGORIZED,
+        'characters'            => self::CHARACTERS,
+        'duplication'           => self::DUPLICATION,
+        'inconsistency'         => self::INCONSISTENCY,
+        'legal'                 => self::LEGAL,
+        'uncategorized'         => self::UNCATEGORIZED,
 
         // Style error types
-        'register'                => SELF::REGISTER,
-        'locale-specific-content' => SELF::LOCALE_SPECIFIC_CONTENT,
-        'locale-violation'        => SELF::LOCALE_VIOLATION,
-        'style'                   => SELF::GENERAL_STYLE,
-        'pattern-problem'         => SELF::PATTERN_PROBLEM,
-        'whitespace'              => SELF::WHITESPACE,
-        'terminology'             => SELF::TERMINOLOGY,
-        'internationalization'    => SELF::INTERNATIONALIZATION,
+        'register'                => self::REGISTER,
+        'locale-specific-content' => self::LOCALE_SPECIFIC_CONTENT,
+        'locale-violation'        => self::LOCALE_VIOLATION,
+        'style'                   => self::GENERAL_STYLE,
+        'pattern-problem'         => self::PATTERN_PROBLEM,
+        'whitespace'              => self::WHITESPACE,
+        'terminology'             => self::TERMINOLOGY,
+        'internationalization'    => self::INTERNATIONALIZATION,
 
         // Remaining error types
-        'grammar'                 => SELF::GRAMMAR,
-        'misspelling'             => SELF::MISSPELLING,
-        'typographical'           => SELF::TYPOGRAPHICAL,
+        'grammar'                 => self::GRAMMAR,
+        'misspelling'             => self::MISSPELLING,
+        'typographical'           => self::TYPOGRAPHICAL,
     ];
 
     /**
@@ -136,10 +140,11 @@ class editor_Plugins_SpellCheck_Check {
      * @param $targetField
      * @param editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter $connector
      * @param $spellCheckLang
-     * @throws editor_Plugins_SpellCheck_Exception_Down
-     * @throws editor_Plugins_SpellCheck_Exception_Malfunction
-     * @throws editor_Plugins_SpellCheck_Exception_Request
-     * @throws editor_Plugins_SpellCheck_Exception_TimeOut
+     *
+     * @throws DownException
+     * @throws MalfunctionException
+     * @throws RequestException
+     * @throws TimeOutException
      */
     public function __construct(editor_Models_Segment $segment, $targetField,
                                 editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter $connector, $spellCheckLang) {
