@@ -39,13 +39,10 @@ class Translate2827Test extends editor_Test_JsonTest {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
         self::assertLogin('testmanager');
-    }
+        self::$api->addImportFiles(self::$api->getFile('import-project.de-es-ES.workfile.sdlxliff'));
+        self::$api->addImportFiles(self::$api->getFile('import-project.de-mk-MK.pivot.sdlxliff'));
 
-    /***
-     * Create the task with pivot
-     */
-    public function testImportProjectWithRelais(){
-        $task =[
+        $task = [
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => 'de',
             'targetLang' => ['es-ES'],
@@ -56,11 +53,13 @@ class Translate2827Test extends editor_Test_JsonTest {
             'importUpload_type' => ['workfiles','pivot'],
             'autoStartImport' => 1
         ];
-        self::assertLogin('testmanager');
-        self::$api->addImportFiles(self::$api->getFile('import-project.de-es-ES.workfile.sdlxliff'));
-        self::$api->addImportFiles(self::$api->getFile('import-project.de-mk-MK.pivot.sdlxliff'));
-        self::$api->import($task,false);
-        error_log('Task created. '.$this->api()->getTask()->taskName);
+        self::$api->import($task, false);
+    }
+
+    /***
+     * Create the task with pivot
+     */
+    public function testImportProjectWithRelais(){
         $projectTasks = self::$api->getProjectTasks();
         $this->assertEquals(count($projectTasks), 1, 'No tasks where created.');
     }

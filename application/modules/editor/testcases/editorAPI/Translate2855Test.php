@@ -53,27 +53,18 @@ class Translate2855Test extends editor_Test_JsonTest {
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
         self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
         self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
+        self::assertNeededUsers(); // last authed user is testmanager
+        self::assertLogin('testmanager');
 
-        self::assertNeededUsers(); //last authed user is testmanager
-
-        self::createResource();
-        self::createTask();
-        self::queuePretranslation();
-        self::startImport();
-        self::checkTaskState();
-    }
-
-    /**
-     * @throws Exception
-     */
-    private static function createResource(){
+        // add customer
         self::$customerTest = self::$api->postJson('editor/customer/',[
             'name' => 'API Testing::Pivot pre-translation',
             'number' => uniqid('API Testing::Pivot pre-translation', true),
         ]);
 
-        $params=[
-            'resourceId'=>'ZDemoMT',
+        // add needed Demo MT
+        $params = [
+            'resourceId' => 'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
@@ -84,53 +75,30 @@ class Translate2855Test extends editor_Test_JsonTest {
             'serviceName'=> 'ZDemoMT',
             'name' => 'API Testing::Pivot pre-translation_'.__CLASS__
         ];
-
         self::$api->addResource($params);
-    }
 
-    /**
-     * @return void
-     */
-    private static function createTask(): void
-    {
+        // create task without starting the import
         $task = [
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'relaisLang' => self::$targetLangRfc,
-            'customerId'=>self::$customerTest->id,
+            'customerId' => self::$customerTest->id,
             'edit100PercentMatch' => true,
-            'autoStartImport'=>0
+            'autoStartImport' => 0
         ];
-
-        self::assertLogin('testmanager');
-
         self::$api->addImportFile(self::$api->getFile('Task-de-en.html'));
         self::$api->import($task,false,false);
-    }
 
-    /***
-     * Queue pivot pre-translation worker
-     */
-    private static function queuePretranslation(){
+        // queue the pretranslation
         self::$api->putJson('editor/languageresourcetaskpivotassoc/pretranslation/batch', [ 'taskGuid' => self::$api->getTask()->taskGuid ], null, false);
-    }
 
-    /***
-     * Start the import process
-     */
-    private static function startImport(){
+        // start the import & wait for finish
         self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
-    }
-
-    /***
-     * Check the task state
-     */
-    private static function checkTaskState(){
         self::$api->checkTaskStateLoop();
     }
 
-    /***
+    /**
      * Test if the task relais segments are pre-translated using ZDemoMT
      * @return void
      */

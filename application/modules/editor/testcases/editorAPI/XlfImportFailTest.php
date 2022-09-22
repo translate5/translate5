@@ -30,13 +30,7 @@ END LICENSE AND COPYRIGHT
  * Checks if mrk segmentation errors and missing tag ids surround sub tags are stopping the import
  */
 class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
-    protected $taskConfig = [
-        'sourceLang' => 'en',
-        'targetLang' => 'de',
-        'edit100PercentMatch' => true,
-        'lockLocked' => 1,
-    ];
-    
+
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -48,9 +42,15 @@ class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     public function testImportMissingTagId() {
-        $this->api()->addImportFile($this->api()->getFile('ibm-opentm2-fail3.xlf'), 'application/xml');
-        $this->assertFalse($this->api()->import($this->taskConfig, false), 'XLF with sub tags in tags without IDs did not produce a task state error!');
-        $task = $this->api()->getTask();
-        $this->api()->deleteTask($task->id);
+        $taskConfig = [
+            'sourceLang' => 'en',
+            'targetLang' => 'de',
+            'edit100PercentMatch' => true,
+            'lockLocked' => 1,
+        ];
+        self::$api->addImportFile(self::$api->getFile('ibm-opentm2-fail3.xlf'), 'application/xml');
+        $this->assertFalse(self::$api->import($taskConfig, false), 'XLF with sub tags in tags without IDs did not produce a task state error!');
+        $task = self::$api->getTask();
+        self::$api->deleteTask($task->id);
     }
 }
