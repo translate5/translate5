@@ -48,7 +48,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
     }
-    
+
     /***
      * Create test customer, project tasks, language resources.
      * Run the task import and waith for importing
@@ -58,13 +58,40 @@ class ProjectTaskTest extends editor_Test_JsonTest {
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
         ]);
-        
-        $this->addTermCollection();
-        $this->createProject();
+
+        // add term collection
+        $params = [];
+        //create the resource 3 and import the file
+        $params['name'] = 'API Testing::TermCollection_'.__CLASS__;
+        $params['resourceId'] = 'editor_Services_TermCollection';
+        $params['serviceType'] = 'editor_Services_TermCollection';
+        $params['customerIds'] = [self::$customerTest->id];
+        $params['customerUseAsDefaultIds'] = [self::$customerTest->id];
+        $params['customerWriteAsDefaultIds'] = [];
+        $params['serviceName'] = 'TermCollection';
+        $params['mergeTerms'] = false;
+        self::$api->addResource($params, 'collection.tbx', true);
+
+        // create project
+        $task =[
+            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'customerId' => self::$customerTest->id,
+            'autoStartImport' => 0,
+            'edit100PercentMatch' => 0
+        ];
+        self::assertLogin('testmanager');
+
+        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
+        self::$api->addImportFile($zipfile);
+
+        self::$api->import($task,false,false);
+        error_log('Task created. '.self::$api->getTask()->taskName);
         self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
         self::$api->checkProjectTasksStateLoop();
     }
-    
+
     /***
      * Validate the basic project task values
      */
@@ -89,14 +116,17 @@ class ProjectTaskTest extends editor_Test_JsonTest {
             self::assertEquals($task->taskType, self::$api::INITIAL_TASKTYPE_PROJECT_TASK, 'Project tasktype does not match the expected type.');
         }
     }
+    
     /***
      * For each project task, check the segment content. Some of the segments are with terms.
      */
     public function testProjectTasksSegmentContent() {
+        $project = $this->api()->getTask();
         self::$api->reloadProjectTasks();
         foreach (self::$api->getProjectTasks() as $task){
             $this->checkProjectTaskSegments($task);
         }
+        $this->api()->setTask($project);
     }
     
     /***
@@ -104,8 +134,8 @@ class ProjectTaskTest extends editor_Test_JsonTest {
      * For this, first the task needs to be opened for editing. After the check the task will be set to open again.
      * @param stdClass $task
      */
-    protected function checkProjectTaskSegments(stdClass $task){
-        $project = $this->api()->getTask();
+    private function checkProjectTaskSegments(stdClass $task){
+
         //set internal current task for further processing
         $this->api()->setTask($task);
 
@@ -120,51 +150,8 @@ class ProjectTaskTest extends editor_Test_JsonTest {
 
         // close the task for editing
         $this->api()->setTaskToOpen($task->id);
+    }
 
-        //reset internal current task to the project
-        $this->api()->setTask($project);
-    }
-    
-
-    /***
-     * Add the term collection resource
-     */
-    protected function addTermCollection() {
-        $params=[];
-        //create the resource 3 and import the file
-        $params['name'] = 'API Testing::TermCollection_'.__CLASS__;
-        $params['resourceId'] = 'editor_Services_TermCollection';
-        $params['serviceType'] = 'editor_Services_TermCollection';
-        $params['customerIds'] = [self::$customerTest->id];
-        $params['customerUseAsDefaultIds'] = [self::$customerTest->id];
-        $params['customerWriteAsDefaultIds'] = [];
-        $params['serviceName'] ='TermCollection';
-        $params['mergeTerms'] =false;
-        
-        self::$api->addResource($params, 'collection.tbx', true);
-    }
-    
-    /***
-     * Create project tasks.
-     */
-    protected function createProject(){
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId'=>self::$customerTest->id,
-            'autoStartImport'=>0,
-            'edit100PercentMatch' => 0
-        ];
-        self::assertLogin('testmanager');
-        
-        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
-        self::$api->addImportFile($zipfile);
-        
-        self::$api->import($task,false,false);
-        error_log('Task created. '.self::$api->getTask()->taskName);
-    }
-    
     public static function tearDownAfterClass(): void {
         
         $task = self::$api->getTask();
