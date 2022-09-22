@@ -50,7 +50,7 @@ class Translate2827Test extends editor_Test_JsonTest {
             'sourceLang' => 'de',
             'targetLang' => ['es-ES'],
             'relaisLang' => 'mk-MK',
-            'customerId'=>self::api()->getCustomer()->id,
+            'customerId' => self::$api->getCustomer()->id,
             'edit100PercentMatch' => true,
             'importUpload_language' => ['es-ES','mk-MK'],
             'importUpload_type' => ['workfiles','pivot'],

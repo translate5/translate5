@@ -34,10 +34,10 @@
  */
 class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
     
-    protected static $sourceLangRfc='de';
-    protected static $targetLangRfc='en';
+    protected static $sourceLangRfc = 'de';
+    protected static $targetLangRfc = 'en';
     
-    protected static $prefix='MATEST';
+    protected static $prefix = 'MATEST';
     
     /**
      */
@@ -51,155 +51,72 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
+
+        // Import all required resources and task before running the tests
+        static::addTm('resource1.tmx', static::getLrRenderName('resource1'));
+        static::addTm('resource2.tmx', static::getLrRenderName('resource2'));
+        static::addTermCollection('collection.tbx', static::getLrRenderName('resource3'));
+        static::createTask();
+        self::$api->addTaskAssoc();
+        static::queueAnalysys();
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
+        self::$api->checkTaskStateLoop();
     }
-    
-    /***
-     * Import all required resources and task before the validation
+
+    /**
+     * Add the translation memory resource. OpenTM2 in our case
+     * @param string $fileName
+     * @param string $name
      */
-    public function testSetupData(){
-        //use the following lines to rerun the validation tests on a specific task
-        //$this->api()->reloadTask(9066);
-        //return;
-        $this->addTm('resource1.tmx',$this->getLrRenderName('resource1'));
-        $this->addTm('resource2.tmx',$this->getLrRenderName('resource2'));
-        $this->addTermCollection('collection.tbx', $this->getLrRenderName('resource3'));
-        $this->createTask();
-        $this->addTaskAssoc();
-        $this->queueAnalysys();
-        $this->startImport();
-        $this->checkTaskState();
+    private static function addTm(string $fileName, string $name){
+        $params = [
+            'resourceId' => 'editor_Services_OpenTM2_1',
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'customerIds' => [ self::$api->getCustomer()->id ],
+            'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
+            'serviceType' => 'editor_Services_OpenTM2',
+            'serviceName'=> 'OpenTM2',
+            'name' => $name
+        ];
+        //create the resource 1 and import the file
+        self::$api->addResource($params, $fileName,true);
     }
 
-    /***
-     * @depends testSetupData
-     * @return void
+    /**
+     * Add the term collection resource
+     * @param string $fileName
+     * @param string $name
      */
-    public function testExportXmlResultsWord(): void
-    {
-        $this->exportXmlResults();
+    private static function addTermCollection(string $fileName, string $name) {
+        $customer = self::$api->getCustomer();
+        $params = [
+            'name' => $name,
+            'resourceId' =>'editor_Services_TermCollection',
+            'serviceType' =>'editor_Services_TermCollection',
+            'customerIds' => [$customer->id],
+            'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
+            'serviceName' =>'TermCollection',
+            'mergeTerms' => false
+        ];
+        self::$api->addResource($params, $fileName);
     }
 
-    /***
-     * @depends testSetupData
-     * @return void
+    /**
+     * Return the languageresource render name with the prefix
+     * @param string $name
+     * @return string
      */
-    public function testExportXmlResultsCharacter(): void
-    {
-        $this->exportXmlResults(true);
+    private static function getLrRenderName(string $name){
+        return self::$prefix.$name;
     }
 
-    /***
-     * Test the xml analysis summary
-     */
-    public function exportXmlResults(bool $characterBased = false): void
-    {
-
-        $unitType = $characterBased ? 'character' : 'word';
-
-        $taskGuid = self::$api->getTask()->taskGuid;
-        $response = self::$api->get('editor/plugins_matchanalysis_matchanalysis/export', [
-            'taskGuid' => $taskGuid,
-            'type' => 'exportXml'
-        ]);
-        
-        self::assertTrue($response->getStatus() === 200, 'export XML HTTP Status is not 200');
-        $actual = self::$api->formatXml($response->getBody());
-
-        //sanitize task information
-        $actual = str_replace('number="'.$taskGuid.'"/>', 'number="UNTESTABLECONTENT"/>', $actual);
-        
-        //sanitize analysis information
-        $actual = preg_replace(
-            '/<taskInfo taskId="([^"]*)" runAt="([^"]*)" runTime="([^"]*)">/',
-            '<taskInfo taskId="UNTESTABLECONTENT" runAt="UNTESTABLECONTENT" runTime="UNTESTABLECONTENT">',
-            $actual);
-        
-        self::$api->isCapturing() && file_put_contents($this->api()->getFile('exportResults-'.$unitType.'.xml', null, false), $actual);
-        $expected = self::$api->getFileContent('exportResults-'.$unitType.'.xml');
-        
-        //check for differences between the expected and the actual content
-        self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
-    }
-
-    /***
-     *
-     * @depends testSetupData
-     * @return void
-     */
-    public function testWordBasedResults(): void
-    {
-        $this->validateResults();
-    }
-
-    /***
-     *
-     * @depends testSetupData
-     * @return void
-     */
-    public function testCharacterBasedResults(): void
-    {
-        $this->validateResults(true);
-    }
-
-    /***
-     * Validate the analysis results.
-     * 1. the first validation will validate the grouped results for the analysis
-     * 2. the second validation will validate the all existing results for the analysis
-     *
-     * @param bool $characterBased
-     * @return void
-     */
-    protected function validateResults(bool $characterBased = false): void
-    {
-
-        $unitType = $characterBased ? 'character' : 'word';
-
-        $analysis=$this->api()->getJson('editor/plugins_matchanalysis_matchanalysis',[
-            'taskGuid'=> $this->api()->getTask()->taskGuid,
-            'unitType' => $unitType
-        ]);
-        
-        $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
-        //remove the created timestamp since is not relevant for the test
-        foreach ($analysis as &$a){
-            unset($a->created);
-        }
-        
-        //this is to recreate the file from the api response
-        $this->api()->isCapturing() && file_put_contents($this->api()->getFile('analysis-'.$unitType.'.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
-        $expected=$this->api()->getFileContent('analysis-'.$unitType.'.txt');
-        $actual=json_encode($analysis, JSON_PRETTY_PRINT);
-        //check for differences between the expected and the actual content
-        $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
-        
-        
-        //not test all results and matches
-        $analysis = $this->api()->getJson('editor/plugins_matchanalysis_matchanalysis',[
-            'taskGuid' => $this->api()->getTask()->taskGuid,
-            'notGrouped' => $this->api()->getTask()->taskGuid
-        ]);
-        $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
-        //remove some of the unneeded columns
-        foreach ($analysis as &$a){
-            unset($a->id);
-            unset($a->taskGuid);
-            unset($a->analysisId);
-            unset($a->segmentId);
-            unset($a->languageResourceid);
-        }
-
-        $this->api()->isCapturing() && file_put_contents($this->api()->getFile('allanalysis-'.$unitType.'.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
-        $expected=$this->api()->getFileContent('allanalysis-'.$unitType.'.txt');
-        $actual=json_encode($analysis, JSON_PRETTY_PRINT);
-        //check for differences between the expected and the actual content
-        $this->assertEquals($expected, $actual, "The expected file(allanalysis) an the result file does not match.");
-        
-    }
-    
-    /***
+    /**
      * Create the task. The task will not be imported directly autoStartImport is 0!
      */
-    protected function createTask(){
+    private static function createTask(){
         $task =[
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
@@ -213,100 +130,142 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
         self::$api->addImportFile($zipfile);
         self::$api->import($task,false,false);
-        error_log('Task created. '.$this->api()->getTask()->taskName);
     }
-    
-    /***
-     * Add the translation memory resource. OpenTM2 in our case
-     * @param string $fileName
-     * @param string $name
-     */
-    protected function addTm(string $fileName,string $name){
-        $params=[
-            'resourceId'=>'editor_Services_OpenTM2_1',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [$this->api()->getCustomer()->id],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Services_OpenTM2',
-            'serviceName'=> 'OpenTM2',
-            'name' => $name
-        ];
-        //create the resource 1 and import the file
-        self::$api->addResource($params,$fileName,true);
-    }
-    
-    /***
-     * Add the term collection resource
-     * @param string $fileName
-     * @param string $name
-     */
-    protected function addTermCollection(string $fileName,string $name) {
-        $customer = self::api()->getCustomer();
-        
-        $params=[];
-        //create the resource 3 and import the file
-        $params['name']=$name;
-        $params['resourceId']='editor_Services_TermCollection';
-        $params['serviceType']='editor_Services_TermCollection';
-        $params['customerIds'] = [$customer->id];
-        $params['customerUseAsDefaultIds'] = [];
-        $params['customerWriteAsDefaultIds'] = [];
-        $params['serviceName']='TermCollection';
-        $params['mergeTerms']=false;
-        
-        self::$api->addResource($params,$fileName);
-    }
-    
-    /***
-     * Associate all resources to the task
-     */
-    protected function addTaskAssoc(){
-        self::$api->addTaskAssoc();
-    }
-    
-    /***
+
+    /**
      * Queue the match anlysis worker
      */
-    protected function queueAnalysys(){
-        //run the analysis
-        $params=[];
-        $params['internalFuzzy']= 1;
-        $params['pretranslateMatchrate']= 100;
-        $params['pretranslateTmAndTerm']= 1;
-        $params['pretranslateMt']= 0;
-        $params['isTaskImport']= 0;
-        $this->api()->putJson('editor/task/'.$this->api()->getTask()->id.'/pretranslation/operation', $params, null, false);
-        error_log("Queue pretranslation and analysis.");
+    private static function queueAnalysys(){
+         $params = [
+            'internalFuzzy' => 1,
+            'pretranslateMatchrate' => 100,
+            'pretranslateTmAndTerm' => 1,
+            'pretranslateMt' => 0,
+            'isTaskImport' => 0
+        ];
+        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
     }
-    
+
     /***
-     * Start the import process
+     * @return void
      */
-    protected function startImport(){
-        $this->api()->getJson('editor/task/'.$this->api()->getTask()->id.'/import');
-        error_log('Import workers started.');
+    public function testExportXmlResultsWord(): void
+    {
+        $this->exportXmlResults();
     }
-    
+
     /***
-     * Check the task state
+     * @return void
      */
-    protected function checkTaskState(){
-        self::$api->checkTaskStateLoop();
+    public function testExportXmlResultsCharacter(): void
+    {
+        $this->exportXmlResults(true);
     }
-    
+
     /***
-     * Return the languageresource render name with the prefix
-     * @param string $name
-     * @return string
+     *
+     * @return void
      */
-    protected static function getLrRenderName(string $name){
-        return self::$prefix.$name;
+    public function testWordBasedResults(): void
+    {
+        $this->validateResults();
     }
-    
+
     /***
-     * Cleand up the resources and the task
+     *
+     * @return void
+     */
+    public function testCharacterBasedResults(): void
+    {
+        $this->validateResults(true);
+    }
+
+    /***
+     * Test the xml analysis summary
+     */
+    private function exportXmlResults(bool $characterBased = false): void
+    {
+
+        $unitType = $characterBased ? 'character' : 'word';
+
+        $taskGuid = self::$api->getTask()->taskGuid;
+        $response = self::$api->get('editor/plugins_matchanalysis_matchanalysis/export', [
+            'taskGuid' => $taskGuid,
+            'type' => 'exportXml'
+        ]);
+
+        self::assertTrue($response->getStatus() === 200, 'export XML HTTP Status is not 200');
+        $actual = self::$api->formatXml($response->getBody());
+
+        //sanitize task information
+        $actual = str_replace('number="'.$taskGuid.'"/>', 'number="UNTESTABLECONTENT"/>', $actual);
+
+        //sanitize analysis information
+        $actual = preg_replace(
+            '/<taskInfo taskId="([^"]*)" runAt="([^"]*)" runTime="([^"]*)">/',
+            '<taskInfo taskId="UNTESTABLECONTENT" runAt="UNTESTABLECONTENT" runTime="UNTESTABLECONTENT">',
+            $actual);
+
+        self::$api->isCapturing() && file_put_contents(self::$api->getFile('exportResults-'.$unitType.'.xml', null, false), $actual);
+        $expected = self::$api->getFileContent('exportResults-'.$unitType.'.xml');
+
+        //check for differences between the expected and the actual content
+        self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
+    }
+
+    /***
+     * Validate the analysis results.
+     * 1. the first validation will validate the grouped results for the analysis
+     * 2. the second validation will validate the all existing results for the analysis
+     *
+     * @param bool $characterBased
+     * @return void
+     */
+    private function validateResults(bool $characterBased = false): void
+    {
+        $unitType = $characterBased ? 'character' : 'word';
+
+        $jsonFileName = 'analysis-'.$unitType.'.json';
+        // fetch task data
+        $analysis = self::$api->getJson('editor/plugins_matchanalysis_matchanalysis', [ 'taskGuid'=> self::$api->getTask()->taskGuid, 'unitType' => $unitType ], $jsonFileName);
+        $this->assertNotEmpty($analysis,'No results found for the '.$unitType.'-based task-specific matchanalysis.');
+        //check for differences between the expected and the actual content
+        $expectedAnalysis = self::$api->getFileContent($jsonFileName);
+        $this->assertEquals($this->filterTaskAnalysis($expectedAnalysis), $this->filterTaskAnalysis($analysis), 'The expected file and the data does not match for the '.$unitType.'-based task-specific matchanalysis.');
+
+        //now test all results and matches
+        $jsonFileName = 'allanalysis-'.$unitType.'.json';
+        $analysis = self::$api->getJson('editor/plugins_matchanalysis_matchanalysis', [ 'taskGuid' => self::$api->getTask()->taskGuid, 'notGrouped' => self::$api->getTask()->taskGuid ], $jsonFileName);
+        $this->assertNotEmpty($analysis,'No results found for the '.$unitType.'-based not-grouped matchanalysis.');
+        //check for differences between the expected and the actual content
+        $expectedAnalysis = self::$api->getFileContent($jsonFileName);
+        //check for differences between the expected and the actual content
+        $this->assertEquals($this->filterUngroupedAnalysis($expectedAnalysis), $this->filterUngroupedAnalysis($analysis), "The expected file and the data does not match for the '.$unitType.'-based not-grouped matchanalysis..");
+    }
+
+    private function filterTaskAnalysis(array $data) : array {
+        // remove the created timestamp since is not relevant for the test
+        foreach ($data as &$a){
+            unset($a->created);
+        }
+        usort($data, function($a, $b) { return strcmp($a->resourceName, $b->resourceName); });
+        return $data;
+    }
+
+    private function filterUngroupedAnalysis(array $data){
+        // remove some of the unneeded columns
+        foreach ($data as &$a){
+            unset($a->id);
+            unset($a->taskGuid);
+            unset($a->analysisId);
+            unset($a->segmentId);
+            unset($a->languageResourceid);
+        }
+        return $data;
+    }
+
+    /**
+     * Clean up the resources and the task
      */
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();

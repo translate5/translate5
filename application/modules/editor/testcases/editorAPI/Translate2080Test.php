@@ -51,7 +51,7 @@ class Translate2080Test extends editor_Test_JsonTest {
             'sourceLang' => 'de',
             'targetLang' => ['en','mk'],
             'relaisLang' => 'it',
-            'customerId'=>self::api()->getCustomer()->id,
+            'customerId' => self::$api->getCustomer()->id,
             'edit100PercentMatch' => true,
             'importUpload_language' => ['en','mk','it'],
             'importUpload_type' => ['workfiles','workfiles','pivot'],
