@@ -16,6 +16,19 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.11] - 2022-09-22
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-2988](https://jira.translate5.net/browse/TRANSLATE-2988): LanguageResources - Make translate5 fit for switch to t5memory** <br>
+FIXED in 5.7.11: the language mapping to en-UK was used till 5.7.10 erroneously for saving and querying segments. To fix the affected languages are queried both in OpenTM2.
+Add some fixes and data conversions when exporting a TMX from OpenTM2 so that it can be imported into t5memory.
+
+
 ## [5.7.10] - 2022-09-20
 
 ### Important Notes:
