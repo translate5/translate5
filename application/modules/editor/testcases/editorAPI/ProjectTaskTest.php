@@ -47,13 +47,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-    }
 
-    /***
-     * Create test customer, project tasks, language resources.
-     * Run the task import and waith for importing
-     */
-    public function testSetupCustomerAndResources() {
         self::$customerTest = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
@@ -116,7 +110,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
             self::assertEquals($task->taskType, self::$api::INITIAL_TASKTYPE_PROJECT_TASK, 'Project tasktype does not match the expected type.');
         }
     }
-    
+
     /***
      * For each project task, check the segment content. Some of the segments are with terms.
      */
