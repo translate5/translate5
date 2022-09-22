@@ -32,14 +32,10 @@ END LICENSE AND COPYRIGHT
  */
 class Translate2417Test extends editor_Test_JsonTest {
 
-    protected static $sourceLangRfc='de';
-    protected static $targetLangRfc='en';
+    protected static $sourceLangRfc = 'de';
+    protected static $targetLangRfc = 'en';
+    protected static $prefix = 'T2417';
 
-    protected static $prefix='MATEST';
-
-    /***
-     *
-     */
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
 
@@ -48,75 +44,12 @@ class Translate2417Test extends editor_Test_JsonTest {
 
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
-    }
-
-    /***
-     * Import all required resources and task before the validation
-     */
-    public function test10_SetupData(){
-        $this->addTm('resource1.tmx',self::$prefix.'resource1');
-        $this->createTask();
-    }
-
-    /***
-     * Test if all the segments are as expected after import.
-     * @depends test10_SetupData
-     */
-    public function test20_SegmentValuesAfterImport() {
-
-        $this->api()->addUser('testmanager');
-
-        $task = $this->api()->getTask();
-        $this->api()->setTaskToEdit($task->id);
-
-        $segments = $this->api()->getJson('editor/segment');
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
-    }
-
-    /***
-     * Test the tm->query results before and after segment editing. After the segment is edited, and because of the writable as default flag,
-     * the translated targetEdit should be offered as result from the tm when we query for the segment
-     * @depends test20_SegmentValuesAfterImport
-     */
-    public function test30_TmResultQuery() {
-
         self::assertLogin('testmanager');
 
-        $tm = $this->api()->getResources()[0];
-
-        // load the first segment
-        $segments = $this->api()->getSegments(null, 1);
-        // test the first segment
-        $segToTest = $segments[0];
-
-        // query the results from this segment and compare them against the expected initial json
-        $tmResults = $this->api()->getJson('editor/languageresourceinstance/'.$tm->id.'/query', ['segmentId' => $segToTest->id]);
-
-        $this->assertIsArray($tmResults, 'GET editor/languageresourceinstance/'.$tm->id.'/query does not return an array but: '.print_r($tmResults,1).' and raw result is '.print_r($this->api()->getLastResponse(),1));
-
-        $this->assertTmResultEqualsJsonFile('tmResultsBeforeEdit.json', $tmResults, 'The received tm results before segment modification are not as expected!');
-
-        // set dummy translation for the first segment and save it. This should upload this translation to the tm to.
-        $segToTest->targetEdit = "Aleks test tm update.";
-
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
-        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
-
-        // after the segment save, check for the tm results for the same segment
-        $tmResults = $this->api()->getJson('editor/languageresourceinstance/'.$tm->id.'/query', ['segmentId' => $segToTest->id]);
-
-        $this->assertTmResultEqualsJsonFile('tmResultsAfterEdit.json', $tmResults, 'The received tm results after segment modification are not as expected!');
-    }
-
-    /***
-     * Add the translation memory resource. OpenTM2 in our case
-     * @param string $fileName
-     * @param string $name
-     */
-    protected function addTm(string $fileName,string $name){
-        $customerId = $this->api()->getCustomer()->id;
+        // add the TM
+        $customerId = self::$api->getCustomer()->id;
         $params=[
-            'resourceId'=>'editor_Services_OpenTM2_1',
+            'resourceId' => 'editor_Services_OpenTM2_1',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [$customerId],
@@ -124,15 +57,12 @@ class Translate2417Test extends editor_Test_JsonTest {
             'customerWriteAsDefaultIds' => [$customerId],
             'serviceType' => 'editor_Services_OpenTM2',
             'serviceName'=> 'OpenTM2',
-            'name' => $name
+            'name' => self::$prefix.'resource1'
         ];
         //create the resource 1 and import the file
-        self::$api->addResource($params,$fileName,true);
-    }
-    /***
-     * Create the task. The task will not be imported directly autoStartImport is 0!
-     */
-    protected function createTask(){
+        self::$api->addResource($params, 'resource1.tmx',true);
+
+        // import the task
         $task =[
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
@@ -140,28 +70,49 @@ class Translate2417Test extends editor_Test_JsonTest {
             'customerId'=>self::$api->getCustomer()->id,
             'autoStartImport'=>1
         ];
-        self::assertLogin('testmanager');
-
         $zipfile = self::$api->zipTestFiles('testfiles/','test.zip');
         self::$api->addImportFile($zipfile);
         self::$api->import($task,false);
-        error_log('Task created. '.$this->api()->getTask()->taskName);
     }
 
-    /***
-     * Start the import process
+    /**
+     * Test if all the segments are as expected after import.
      */
-    protected function startImport(){
-        $this->api()->getJson('editor/task/'.$this->api()->getTask()->id.'/import');
-        error_log('Import workers started.');
-    }
+    public function testSegments() {
 
-    /***
-     * Check the task state
-     */
-    protected function checkTaskState(){
-        self::$api->checkTaskStateLoop();
-        sleep(3); //lets wait another 3 seconds, since this test was always failing with 403 due a not found tasl lang res assoc
+        $task = self::$api->getTask();
+        self::$api->addUser('testmanager');
+        self::$api->setTaskToEdit($task->id);
+        $jsonFileName = 'expectedSegments.json';
+        $segments = self::$api->getSegments($jsonFileName);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
+
+        // now test editing the segments
+
+        self::assertLogin('testmanager');
+
+        $tm = self::$api->getResources()[0];
+
+        // load the first segment
+        $segments = self::$api->getSegments(null, 1);
+        // test the first segment
+        $segToTest = $segments[0];
+
+        // query the results from this segment and compare them against the expected initial json
+        $jsonFileName = 'tmResultsBeforeEdit.json';
+        $tmResults = self::$api->getJson('editor/languageresourceinstance/'.$tm->id.'/query', ['segmentId' => $segToTest->id], $jsonFileName);
+        $this->assertIsArray($tmResults, 'GET editor/languageresourceinstance/'.$tm->id.'/query does not return an array but: '.print_r($tmResults,1).' and raw result is '.print_r(self::$api->getLastResponse(),1));
+        $this->assertTmResultEqualsJsonFile($jsonFileName, $tmResults, 'The received tm results before segment modification are not as expected!');
+
+        // set dummy translation for the first segment and save it. This should upload this translation to the tm to.
+        $segToTest->targetEdit = "Aleks test tm update.";
+        $segmentData = self::$api->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
+        self::$api->putJson('editor/segment/'.$segToTest->id, $segmentData);
+
+        // after the segment save, check for the tm results for the same segment
+        $jsonFileName = 'tmResultsAfterEdit.json';
+        $tmResults = self::$api->getJson('editor/languageresourceinstance/'.$tm->id.'/query', ['segmentId' => $segToTest->id], $jsonFileName);
+        $this->assertTmResultEqualsJsonFile($jsonFileName, $tmResults, 'The received tm results after segment modification are not as expected!');
     }
 
     /***

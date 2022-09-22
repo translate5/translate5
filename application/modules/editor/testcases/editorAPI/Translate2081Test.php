@@ -58,23 +58,24 @@ class Translate2081Test extends editor_Test_JsonTest {
      */
     public function testDefaultUserAssoc(){
 
-        $params = [];
-        $params['customerId']  = self::$customerTest->id;
-        $params['workflow'] = 'default';
-        $params['sourceLang'] = self::$sourceLangRfc;
-        $params['targetLang'] = self::$targetLangRfc;
-        $params['userGuid'] = '{00000000-0000-0000-C100-CCDDEE000003}'; // testlector
-        $params['workflowStepName'] = 'translation';
-
+        $params = [
+            'customerId' => self::$customerTest->id,
+            'workflow' => 'default',
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'userGuid' => '{00000000-0000-0000-C100-CCDDEE000003}', // testlector
+            'workflowStepName' => 'translation'
+        ];
         $result = self::$api->postJson('editor/userassocdefault', $params);
         unset($result->id);
         unset($result->customerId);
-
-        //file_put_contents(self::$api->getFile('assocResult.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
-        $expected=self::$api->getFileContent('assocResult.txt');
-        $actual=json_encode($result, JSON_PRETTY_PRINT);
+        if(self::$api->isCapturing()){
+            file_put_contents(self::$api->getFile('assocResult.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
+        }
+        $expected = self::$api->getFileContent('assocResult.txt');
+        $actual = json_encode($result, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
-        self::assertEquals($expected, $actual, "The expected file(assocResult) an the result file does not match.");
+        self::assertEquals($expected, $actual, "The expected file (assocResult) an the result file does not match.");
     }
 
     /***
@@ -85,13 +86,13 @@ class Translate2081Test extends editor_Test_JsonTest {
     public function testTaskAutoAssign(){
 
         // create the task and wait for the import
-        $task =[
+        $task = [
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId'=>self::$customerTest->id,
+            'customerId' => self::$customerTest->id,
             'edit100PercentMatch' => true,
-            'autoStartImport'=>1
+            'autoStartImport' => 1
         ];
         self::assertLogin('testmanager');
         self::$api->addImportFile(self::$api->getFile('TRANSLATE-2545-de-en.xlf'));
@@ -100,8 +101,9 @@ class Translate2081Test extends editor_Test_JsonTest {
 
 
         // after the task is created/imported, check if the users are auto assigned.
+        $task = self::$api->getTask();
         $data = $this->api()->getJson('editor/taskuserassoc',[
-            'filter' => '[{"operator":"eq","value":"' . self::$api->getTask()->taskGuid . '","property":"taskGuid"}]'
+            'filter' => '[{"operator":"eq","value":"' .$task->taskGuid . '","property":"taskGuid"}]'
         ]);
 
         //filter out the non static data
@@ -118,14 +120,14 @@ class Translate2081Test extends editor_Test_JsonTest {
 
         //file_put_contents($this->api()->getFile('expected.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expected.json'), $data, 'The expected users are not auto assigned to the task');
+
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 
     /***
-     * Cleand up the resources and the task
+     * Clean up the added customer
      */
     public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
         //remove the temp customer
         self::$api->delete('editor/customer/'.self::$customerTest->id);
     }

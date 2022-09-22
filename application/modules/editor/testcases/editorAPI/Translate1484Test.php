@@ -47,28 +47,83 @@ class Translate1484Test extends editor_Test_JsonTest {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
+
+        static::setupTestTask();
     }
     
-    public function test10_SetupCustomerAndResources() {
+    private static function setupTestTask() {
+
+        // add customer
         self::$customerTest = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
         ]);
-        
-        $this->createTask();
-        $this->addMt();
-        $this->addOpenTm2Tm();
-        $this->addTaskAssoc();
-        $this->queueAnalysys();
-        $this->startImport();
-        $this->checkTaskState();
+
+        // add Task
+        $task = [
+            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'customerId' => self::$customerTest->id,
+            'edit100PercentMatch' => false,
+            'autoStartImport' => 0
+        ];
+        self::assertLogin('testmanager');
+        self::$api->addImportFile(self::$api->getFile('simple-en-de.xlf'));
+        self::$api->import($task,false,false);
+
+        // Create dummy mt
+        $params = [
+            'resourceId'=>'ZDemoMT',
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'customerIds' => [self::$customerTest->id],
+            'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
+            'serviceType' => 'editor_Plugins_ZDemoMT',
+            'serviceName'=> 'ZDemoMT',
+            'name' => 'API Testing::ZDemoMT_'.__CLASS__
+        ];
+        self::$api->addResource($params);
+
+        // Create OpentTm2 resource and upload tm memory
+        $params = [
+            'resourceId' => 'editor_Services_OpenTM2_1',
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'customerIds' => [self::$customerTest->id],
+            'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
+            'serviceType' => 'editor_Services_OpenTM2',
+            'serviceName'=> 'OpenTM2',
+            'name' => 'API Testing::OpenTm2Tm_'.__CLASS__
+        ];
+        self::$api->addResource($params,'resource1.tmx',true);
+
+        // Add task to languageresource assoc
+        self::$api->addTaskAssoc();
+
+        // Queue the match anlysis worker
+        $params = [
+            'internalFuzzy' => 1,
+            'pretranslateMatchrate' => 100,
+            'pretranslateTmAndTerm' => 1,
+            'pretranslateMt' => 1,
+            'isTaskImport' => 0
+        ];
+        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
+
+        // start the import
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
+
+        // waiit for the import to be finished
+        self::$api->checkTaskStateLoop();
     }
 
     /***
      * Test the excel export.
-     * @depends test10_SetupCustomerAndResources
      */
-    public function test20_ExportResourcesLog() {
+    public function testExportResourcesLog() {
 
         $jsonFileName = 'exportResults.json';
         $actualObject = self::$api->getJson('editor/customer/exportresource', [ 'customerId' => self::$customerTest->id ], $jsonFileName);
@@ -94,100 +149,5 @@ class Translate1484Test extends editor_Test_JsonTest {
         self::$api->removeResources();
         //remove the temp customer
         self::$api->delete('editor/customer/'.self::$customerTest->id);
-    }
-    
-    /***
-     * Create the task. The task will not be imported directly autoStartImport is 0!
-     */
-    protected function createTask(){
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId' => self::$customerTest->id,
-            'edit100PercentMatch' => false,
-            'autoStartImport' => 0
-        ];
-        self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('simple-en-de.xlf'));
-        self::$api->import($task,false,false);
-        error_log('Task created. '.self::$api->getTask()->taskName);
-    }
-
-
-
-    
-    /***
-     * Create dummy mt
-     */
-    protected function addMt(){
-        $params=[
-            'resourceId'=>'ZDemoMT',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [self::$customerTest->id],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Plugins_ZDemoMT',
-            'serviceName'=> 'ZDemoMT',
-            'name' => 'API Testing::ZDemoMT_'.__CLASS__
-        ];
-        
-        self::$api->addResource($params);
-    }
-    
-    /***
-     * Create OpentTm2 resource and upload tm memory
-     */
-    protected function addOpenTm2Tm() {
-        $params=[
-            'resourceId'=>'editor_Services_OpenTM2_1',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [self::$customerTest->id],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Services_OpenTM2',
-            'serviceName'=> 'OpenTM2',
-            'name' => 'API Testing::OpenTm2Tm_'.__CLASS__
-        ];
-        self::$api->addResource($params,'resource1.tmx',true);
-    }
-    
-    /***
-     * Add task to languageresource assoc
-     */
-    protected function addTaskAssoc(){
-        self::$api->addTaskAssoc();
-    }
-    
-    /***
-     * Queue the match anlysis worker
-     */
-    protected function queueAnalysys(){
-        //run the analysis
-        $params=[];
-        $params['internalFuzzy']= 1;
-        $params['pretranslateMatchrate']= 100;
-        $params['pretranslateTmAndTerm']= 1;
-        $params['pretranslateMt']= 1;
-        $params['isTaskImport']= 0;
-        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
-        error_log("Queue pretranslation and analysis.");
-    }
-    
-    /***
-     * Check the task state
-     */
-    protected function checkTaskState(){
-        self::$api->checkTaskStateLoop();
-    }
-    
-    /***
-     * Start the import process
-     */
-    protected function startImport(){
-        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
-        error_log('Import workers started.');
     }
 }

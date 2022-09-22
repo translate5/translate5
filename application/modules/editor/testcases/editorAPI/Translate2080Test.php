@@ -62,15 +62,9 @@ class Translate2080Test extends editor_Test_JsonTest {
         self::$api->addImportFiles(self::$api->getFile('mk.xlf'));
         self::$api->addImportFiles(self::$api->getFile('mk.xlf'));
         self::$api->import($task,false);
-        error_log('Task created. '.$this->api()->getTask()->taskName);
 
-        $projectTasks = self::$api->getTask()->projectTasks;
-
-        $this->assertEquals(count($projectTasks), 2, 'No project tasks created.');
-    }
-
-    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
+        $this->assertEquals(count($task->projectTasks), 2, 'No project tasks created.');
         self::$api->deleteTask($task->id);
     }
 }
