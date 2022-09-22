@@ -127,7 +127,7 @@ class Translate2491Test extends editor_Test_JsonTest {
         }
 
         // Open task for whole testcase
-        $this->api()->putJson('editor/task/' . $task->id, ['userState' => 'edit', 'id' => $task->id]);
+        $this->api()->setTaskToEdit($task->id);
 
         // Get segments and check their quantity (1 term and 1 definition-attr for that term, so total 2)
         $segments = $this->api()->getSegments(null, 10);
@@ -138,7 +138,7 @@ class Translate2491Test extends editor_Test_JsonTest {
         $this->api()->putJson('editor/segment/'.$segments[1]->id, $this->api()->prepareSegmentPut('targetEdit', 'Term1 DE', $segments[1]->id));
 
         // Close task
-        $this->api()->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
+        $this->api()->setTaskToOpen($task->id);
 
         // Re-import into termcollection
         $this->api()->get('editor/task/export/id/'.$task->id . '?format=transfer');
@@ -154,10 +154,8 @@ class Translate2491Test extends editor_Test_JsonTest {
      * Cleanup
      */
     public static function tearDownAfterClass(): void {
-
-        // Get task
-        self::$api->delete('editor/task/' . self::$api->getTask()->id);
-
+        $task = self::$api->getTask();
+        self::$api->deleteTask($task->id);
         // Drop termCollection
         self::$api->delete('editor/termcollection/' . self::$collectionId);
     }

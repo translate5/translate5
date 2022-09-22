@@ -121,7 +121,7 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
     public function testEditingSegmentWithMqm() {
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
         //get segment list
         $segments = $this->api()->getSegments();
@@ -248,9 +248,6 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testlector'); //logout testmanager to close task
-        self::$api->login('testmanager'); //login again to delete
-        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

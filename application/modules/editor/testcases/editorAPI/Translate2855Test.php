@@ -136,10 +136,10 @@ class Translate2855Test extends editor_Test_JsonTest {
      */
     public function testSegmentContent(){
         //open task for whole testcase
-        self::$api->putJson('editor/task/'.self::$api->getTask()->id, ['userState' => 'edit', 'id' => self::$api->getTask()->id]);
+        self::$api->setTaskToEdit();
         $segments = $this->api()->getSegments();
 
-        self::assertEquals(3,count($segments), 'The number of segments does not match.');
+        self::assertEquals(3, count($segments), 'The number of segments does not match.');
 
         foreach ($segments as $segment){
             self::assertNotEmpty($segment->relais);
@@ -151,13 +151,9 @@ class Translate2855Test extends editor_Test_JsonTest {
      */
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testmanager');
-
+        // remove task & resources
+        self::$api->deleteTask($task->id, 'testmanager');
         self::$api->removeResources();
-
-        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
-        self::$api->delete('editor/task/'.$task->id);
-
         //remove the temp customer
         self::$api->delete('editor/customer/'.self::$customerTest->id);
     }

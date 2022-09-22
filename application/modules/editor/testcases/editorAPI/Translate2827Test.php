@@ -71,7 +71,7 @@ class Translate2827Test extends editor_Test_JsonTest {
     public function testRelaisContent() {
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->putJson('editor/task/'.$task->id, ['userState' => 'edit', 'id' => $task->id]);
+        $this->api()->setTaskToEdit($task->id);
         //get segment list
         $segments = $this->api()->getSegments();
         $segments = array_map(function($segment){
@@ -87,8 +87,7 @@ class Translate2827Test extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id);
     }
 
 }

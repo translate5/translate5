@@ -59,7 +59,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
 
         $task = $api->getTask();
         //open task for whole testcase
-        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
         
         $tests = array(
             'runtimeOptions.editor.export.exportComments' => 1,
@@ -182,10 +182,6 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testlector');
-        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

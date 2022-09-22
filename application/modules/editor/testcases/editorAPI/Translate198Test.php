@@ -58,7 +58,7 @@ class Translate198Test extends editor_Test_JsonTest {
         $task2 = $this->createTask('task2', $testCustomer->id);
 
         //open task for editing. This should not produce any error
-        $response = self::$api->putJson('editor/task/'.$task1->id, ['userState' => 'edit', 'id' => $task1->id]);
+        $response = self::$api->setTaskToEdit($task1->id);
         $this->api()->setTask($task1);
         self::assertNotEmpty($response,'Unable to edit task 1.');
 
@@ -69,7 +69,7 @@ class Translate198Test extends editor_Test_JsonTest {
         self::assertCount(1, $segments);
 
         //open the secound task with the same user. This should not be posible
-        $response = self::$api->putJson('editor/task/'.$task2->id, ['userState' => 'edit', 'id' => $task2->id]);
+        $response = self::$api->setTaskToEdit($task2->id);
         $this->api()->setTask($task2);
         self::assertNotEmpty($response,'Unable to edit task 2.');
 
@@ -77,15 +77,12 @@ class Translate198Test extends editor_Test_JsonTest {
         $segments = self::$api->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments);
 
-        //open task for whole testcase
+        //open tasks for whole testcase
         self::$api->login('testmanager');
 
-        //leave the first task with the testmanager
-        self::$api->putJson('editor/task/'.$task1->id, ['userState' => 'open', 'id' => $task1->id]);
-        self::$api->putJson('editor/task/'.$task2->id, ['userState' => 'open', 'id' => $task2->id]);
-        //remove the 2 tasks
-        self::$api->delete('editor/task/'.$task1->id);
-        self::$api->delete('editor/task/'.$task2->id);
+        // remove the 2 tasks
+        self::$api->deleteTask($task1->id);
+        self::$api->deleteTask($task2->id);
 
         //remove the temp customer
         self::$api->delete('editor/customer/'.$testCustomer->id);

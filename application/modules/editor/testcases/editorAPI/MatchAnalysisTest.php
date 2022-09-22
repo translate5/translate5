@@ -310,10 +310,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      */
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager');
         //remove the created resources
         self::$api->removeResources();
     }

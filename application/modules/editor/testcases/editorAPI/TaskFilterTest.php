@@ -81,7 +81,6 @@ class TaskFilterTest extends \ZfExtended_Test_ApiTestcase {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testmanager');
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

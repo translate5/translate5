@@ -79,7 +79,7 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         // error_log("\nTesting task based on file: 'testfiles/" . $taskName . ".csv'\n");
 
         // Open task for whole testcase
-        self::$api->putJson('editor/task/' . $task->id, ['userState' => 'edit', 'id' => $task->id]);
+        self::$api->setTaskToEdit($task->id);
 
         // Get segments and check their quantity
         $factQty = count(self::$api->getSegments(null, 10));
@@ -92,13 +92,7 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
 
 
-        // Close task
-        self::$api->putJson('editor/task/' . $task->id, ['userState' => 'open', 'id' => $task->id]);
-
-        // Print the step where we are
-        // error_log("\nDeleting task based on file: 'testfiles/" . $taskName . ".csv'\n");
-
-        // Delete task
-        self::$api->delete('editor/task/' . $task->id);
+        // Close && delete task
+        self::$api->deleteTask($task->id);
     }
 }

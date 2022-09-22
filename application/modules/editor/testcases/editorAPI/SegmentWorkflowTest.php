@@ -92,7 +92,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
         //get segment list
         $segments = $this->api()->getSegments();
@@ -146,7 +146,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($segmentFinishCount, $reloadProgresTask->segmentFinishCount,'The segment finish count is not the same as the calculated one for the task!');
         
         //finishing the task
-        $res = $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'finished', 'id' => $task->id));
+        $res = $this->api()->setTaskToFinished($task->id);
         $this->assertEquals('finished', $this->api()->reloadTask()->userState);
         
         //get the changes file
@@ -172,8 +172,6 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

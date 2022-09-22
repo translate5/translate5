@@ -92,7 +92,7 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->reloadTask();
         $task = $this->api()->getTask();
         //open task
-        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         //get segment list
         $segments = $this->api()->getSegments(null, 20);
         //check if segments are editable as expected
@@ -108,7 +108,7 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->reloadTask();
         $task = $this->api()->getTask();
         //open task
-        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         //get segment list
         $segments = $this->api()->getSegments(null, 20);
         //check if segments are editable as expected
@@ -133,9 +133,6 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testlector');
-        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

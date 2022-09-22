@@ -111,7 +111,7 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
         $this->assertEmpty($task->locked);
         
         //open task
-        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
         $jsonFileName = 'expectedSegments.json';
         $segments = $this->api()->getSegments($jsonFileName, 47);
@@ -120,8 +120,6 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testmanager');
-        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

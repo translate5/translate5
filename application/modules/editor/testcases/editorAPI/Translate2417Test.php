@@ -67,7 +67,7 @@ class Translate2417Test extends editor_Test_JsonTest {
         $this->api()->addUser('testmanager');
 
         $task = $this->api()->getTask();
-        $this->api()->putJson('editor/task/'.$task->id, ['userState' => 'edit', 'id' => $task->id]);
+        $this->api()->setTaskToEdit($task->id);
 
         $segments = $this->api()->getJson('editor/segment');
         $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
@@ -169,12 +169,7 @@ class Translate2417Test extends editor_Test_JsonTest {
      */
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-
-        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
-
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager');
         //remove the created resources
         self::$api->removeResources();
     }

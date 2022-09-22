@@ -61,7 +61,7 @@ class Translate682Test extends \ZfExtended_Test_ApiTestcase {
     public function testEditing() {
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
         //get segment list
         $segments = $this->api()->getSegments();
@@ -106,9 +106,6 @@ class Translate682Test extends \ZfExtended_Test_ApiTestcase {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

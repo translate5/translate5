@@ -68,7 +68,7 @@ class QualitySegmentEmptyTest extends editor_Test_JsonTest {
         $task = self::$api->getTask();
 
         // Open task for whole testcase
-        $api->putJson('editor/task/' . $task->id, ['userState' => 'edit', 'id' => $task->id]);
+        $api->setTaskToEdit($task->id);
 
         // Get segments and check their quantity
         static::$segments = $api->getSegments(null, 10);
@@ -90,9 +90,6 @@ class QualitySegmentEmptyTest extends editor_Test_JsonTest {
      */
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testlector');
-        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

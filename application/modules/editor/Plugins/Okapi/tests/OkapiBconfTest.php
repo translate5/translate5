@@ -245,16 +245,14 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $api->addImportFile($api->getFile('workfiles/BconfWithin-de-en.zip'));
         $api->import($task);
         $task = $api->getTask();
-        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
 
         $jsonFileName = 'expectedSegments.json';
-        $segments= $api->getSegments($jsonFileName, 3);
-
-        // Leave task so it becomes deleteable
-        $api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
-
+        $segments = $api->getSegments($jsonFileName, 3);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
-        $api->deleteTask();
+
+        // Cleanup
+        $api->deleteTask($task->id);
     }
 
     /***

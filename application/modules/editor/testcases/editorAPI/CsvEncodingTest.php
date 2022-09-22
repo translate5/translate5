@@ -97,7 +97,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
         
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
         //Testing Reference files. Is a little bit hidden in here, but as separate method we would have to play with logins and the task,
         // in this method we are logged in and the task is opened.
@@ -152,7 +152,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
     public function testChangesXml() {
         $task = $this->api()->getTask();
         //finishing the task to get a changes.xml
-        $res = $this->api()->putJson('editor/task/'.$task->id, array('userState' => 'finished', 'id' => $task->id));
+        $res = $this->api()->setTaskToFinished($task->id);
         $this->assertEquals('finished', $this->api()->reloadTask()->userState);
         
         //get the changes file
@@ -207,7 +207,6 @@ class CsvEncodingTest extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testmanager');
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

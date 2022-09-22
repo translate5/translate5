@@ -111,15 +111,15 @@ class ProjectTaskTest extends editor_Test_JsonTest {
 
         error_log('Segments check for task ['.$task->taskName.']');
         //open the task for editing. This is the only way to load the segments via the api
-        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'edit', 'id' => $task->id]);
+        $this->api()->setTaskToEdit($task->id);
 
         $fileName = str_replace(['/','::'],'_',$task->taskName.'.json');
         $segments = self::$api->getSegments($fileName);
         // compare segments (this API will strip/adjust segment contents)
         $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected in '.basename($fileName).'!');
 
-        //close the task for editing
-        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
+        // close the task for editing
+        $this->api()->setTaskToOpen($task->id);
 
         //reset internal current task to the project
         $this->api()->setTask($project);
@@ -168,18 +168,9 @@ class ProjectTaskTest extends editor_Test_JsonTest {
     public static function tearDownAfterClass(): void {
         
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-
-        //close the task for editing
-        self::$api->putJson('editor/task/'.$task->id, ['userState' => 'open', 'id' => $task->id]);
-        
-        //when removing the task, all task project will be removed
-        self::$api->delete('editor/task/'.$task->id);
-        
+        self::$api->deleteTask($task->id, 'testmanager');
         //remove the created resources
         self::$api->removeResources();
-        
         //remove the temp customer
         self::$api->delete('editor/customer/'.self::$customerTest->id);
     }

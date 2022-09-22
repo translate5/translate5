@@ -93,7 +93,7 @@ class Translate2756Test extends editor_Test_JsonTest {
         $api->login('testlector');
         
         //open task for whole testcase
-        $api->putJson('editor/task/'.$task->id, array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
     }
     
     /**
@@ -152,11 +152,7 @@ class Translate2756Test extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testlector');
-        self::$api->putJson('editor/task/'.$task->id, array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
         self::$api->removeResources();
     }
 }

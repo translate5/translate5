@@ -89,11 +89,7 @@ class Translate1484Test extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-        
-        //remove task
-        self::$api->delete('editor/task/'.$task->id);
+        self::$api->deleteTask($task->id, 'testmanager');
         //remove the created resources
         self::$api->removeResources();
         //remove the temp customer
