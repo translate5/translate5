@@ -232,4 +232,17 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
         // Apply spellCheck prop
         $view->rows['spellCheck'] = $segmentSpellCheckDataByIds[$view->rows['id']];
     }
+
+    /**
+     * Provides vars for frontend
+     *
+     * @return array
+     */
+    public static function getQualityVars(): array
+    {
+        return [
+            'field' => 'spellCheck',
+            'columnPostfixes' => ['EditColumn'],
+        ];
+    }
 }

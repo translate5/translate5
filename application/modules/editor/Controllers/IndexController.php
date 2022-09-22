@@ -381,6 +381,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set('editor.segments.editorSpecialCharacters', $rop->editor->segments?->editorSpecialCharacters ?? '');
 
         $this->setJsAppData();
+        $this->setQualityCheckJsVars();
     }
 
     /***
@@ -808,6 +809,21 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->view->noMatch = true;
             $this->view->enOut[] = ['text' => $enXliff($inputKey, $input, $input), 'matchrate' => 0];
         }
+    }
+
+    private function setQualityCheckJsVars(): void
+    {
+        $vars = [];
+
+        /** @var ZfExtended_Plugin_Manager $pluginManager */
+        $pluginManager = Zend_Registry::get('PluginManager');
+        foreach ($pluginManager->getActive() as $initClass) {
+            if (method_exists($initClass, 'getQualityVars')) {
+                $vars[] = $initClass::getQualityVars();
+            }
+        }
+
+        $this->view->Php2JsVars()->set('quality.types', $vars);
     }
 }
 

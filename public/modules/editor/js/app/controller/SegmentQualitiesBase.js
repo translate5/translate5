@@ -79,16 +79,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             cellNode,
             matches;
 
-        let qualityTargets = [
-            {
-                field: '24translate',
-                columnPostfixes: ['EditColumn', 'Column']
-            },
-            {
-                field: 'spellCheck',
-                columnPostfixes: ['EditColumn']
-            },
-        ];
+        let qualityTargets = Editor.data.quality.types;
 
         for (const field of qualityTargets) {
             let data = rec.get(field.field);
