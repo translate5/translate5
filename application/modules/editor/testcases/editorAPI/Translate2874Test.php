@@ -52,7 +52,7 @@ class Translate2874Test extends editor_Test_JsonTest {
             'sourceLang' => $task['sourceLang'],
             'targetLang' => $task['targetLang'],
             'customerIds' => [$task['customerId']],
-            'customerUseAsDefaultIds' => [[$task['customerId']]],
+            'customerUseAsDefaultIds' => [$task['customerId']],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',
             'serviceName'=> 'ZDemoMT',
