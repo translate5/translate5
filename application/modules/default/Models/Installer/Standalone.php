@@ -26,21 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package portal
- * @version 2.0
- *
- */
 /**
  */
 class Models_Installer_Standalone {
     const INSTALL_INI = '/application/config/installation.ini';
     const CLIENT_SPECIFIC_INSTALL = '/client-specific-installation';
     const CLIENT_SPECIFIC = '/client-specific';
-    const DB_INIT = '/dbinit/DbInit.sql';
     const ZEND_LIB = '/library/zend';
-    const MYSQL_BIN = '/usr/bin/mysql';
     const OS_UNKNOWN = 1;
     const OS_WIN = 2;
     const OS_LINUX = 3;
@@ -54,31 +46,46 @@ class Models_Installer_Standalone {
      * @var integer
      */
     const INSTALLER_VERSION = 17;
-    
+    const VENDOR_AUTOLOAD_PHP = '/vendor/autoload.php';
+
     /**
      * @var string
      */
-    protected $currentWorkingDir;
+    protected string $currentWorkingDir;
+    
+    /**
+     * @var array
+     * zend                → path to zend, deprecated
+     * help                → show help
+     * maintenance         → deprecated maintenance
+     * announceMaintenance → deprecated announceMaintenance
+     * dbOnly              → deprecated, use da:u
+     * applicationState    → deprecated status
+     * updateCheck         → deprecated status
+     * license-ignore      → ignore licenses, for automation
+     * applicationZipOverride → path to zip file
+     * db::host            → db host
+     * db::username        → db username
+     * db::password        → db password
+     * db::database        → db database
+     * hostname            → hostname to be used (SSL?)
+     */
+    protected array $options;
     
     /**
      * @var array
      */
-    protected $options;
-    
-    /**
-     * @var array
-     */
-    protected $dbCredentials = array(
+    protected array $dbCredentials = [
             'host' => 'localhost',
             'username' => 'root',
             'executable' => '',
             'password' => '',
-            'database' => 'translate5',
-    );
+            'dbname' => 'translate5',
+    ];
     
-    protected $hostname;
+    protected string $hostname;
     
-    protected $isInstallation = false;
+    protected bool $isInstallation = false;
     
     /**
      * Stores the md5 hash of this file before downloading the update.
@@ -86,30 +93,30 @@ class Models_Installer_Standalone {
      * updates in the updater itself, so that it has to be restarted!
      * @var string
      */
-    protected $installerHash;
+    protected string $installerHash;
     
     /**
      * contains the called file, the path to this file
      * @var string
      */
-    protected $installerFile;
-    
-    /**
-     * @var Models_Installer_PreconditionCheck
-     */
-    protected $preconditonChecker;
+    protected string $installerFile;
     
     /**
      * @var Symfony\Component\Console\Application
      */
-    protected $cli;
-    
+    protected \Symfony\Component\Console\Application $cli;
+
     /**
-     * Options:
-     * mysql_bin => path to mysql binary
      * @param array $options
+     * @throws Zend_Db_Exception
+     * @throws Zend_Exception
+     * @throws Zend_Mail_Exception
+     * @throws Exception
      */
-    public static function mainLinux(array $options = null) {
+    public static function mainLinux(array $options = []): void
+    {
+        //initially we have to load the locales from the environment
+        setlocale(LC_ALL, '');
         $saInstaller = new self(getcwd(), $options);
         $saInstaller->checkAndCallTools();
         $saInstaller->checkGitAndInit();
@@ -129,7 +136,7 @@ class Models_Installer_Standalone {
      * @param string $currentWorkingDir
      * @param array $options options from outside
      */
-    protected function __construct($currentWorkingDir, array $options) {
+    protected function __construct(string $currentWorkingDir, array $options) {
         $this->options = $options;
         $this->currentWorkingDir = $currentWorkingDir;
         if(empty($this->options['zend'])) {
@@ -143,29 +150,35 @@ class Models_Installer_Standalone {
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Downloader.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Dependencies.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/DbUpdater.php';
-        require_once $this->currentWorkingDir.'/application/modules/default/Models/Installer/PreconditionCheck.php';
-        $this->preconditonChecker = new Models_Installer_PreconditionCheck();
         $this->setHostname();
     }
     
-    protected function setHostname() {
+    protected function setHostname(): void
+    {
         $this->hostname = self::HOSTNAME_LINUX;
         if($this->getOS()===  self::OS_WIN){
             $this->hostname = self::HOSTNAME_WIN;
         }
     }
-    
-    protected function checkAndCallTools() {
+
+    /**
+     * @throws Zend_Exception
+     * @throws Exception
+     */
+    protected function checkAndCallTools(): void
+    {
         if(!empty($this->options['help'])) {
             $this->showHelp();
             exit;
         }
         if(!empty($this->options['maintenance'])) {
+            $this->log(PHP_EOL.'Deprecated - call ./translate5.sh maintenance');
             $this->addZendToIncludePath();
             $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['announceMaintenance'])) {
+            $this->log(PHP_EOL.'Deprecated - call ./translate5.sh maintenance');
             $this->addZendToIncludePath();
             $this->maintenanceMode();
             exit;
@@ -179,21 +192,20 @@ class Models_Installer_Standalone {
             exit;
         }
         if(!empty($this->options['applicationState'])) {
+            $this->log(PHP_EOL.'Deprecated - call ./translate5.sh status');
             $this->addZendToIncludePath();
             $this->initApplication();
             echo json_encode(ZfExtended_Debug::applicationState());
             exit;
         }
         if(!empty($this->options['updateCheck'])) {
-            $this->addZendToIncludePath();
-            $this->initApplication();
-            $this->preconditonChecker->checkUsers();
-            $this->preconditonChecker->checkWorkers();
+            $this->log(PHP_EOL.'Deprecated - call ./translate5.sh status');
             exit; //exiting here completly after checkrun
         }
     }
     
-    protected function showHelp() {
+    protected function showHelp(): void
+    {
         echo "\n";
         echo "  Usage: install-and-update.sh\n";
         echo "  or:    install-and-update.sh [OPTION]...\n";
@@ -212,8 +224,12 @@ class Models_Installer_Standalone {
         echo "  For other maintenance tasks call ./translate5.[sh|bat] list! ";
         echo "\n\n";
     }
-    
-    protected function maintenanceMode() {
+
+    /**
+     * @throws Exception
+     */
+    protected function maintenanceMode(): void
+    {
         $this->initTranslate5CliBridge();
         $this->log(PHP_EOL.'Deprecated - maintain maintenance via ./install-and-update.sh: see ./translate5.[sh|bat] list maintenance !');
         if(!empty($this->options['announceMaintenance'])) {
@@ -251,7 +267,7 @@ class Models_Installer_Standalone {
                 '--message' => $this->options['announceMessage'],
                 ]);
                 $this->cli->run($input);
-        };
+        }
     }
     
     protected function checkGitAndInit() {
@@ -262,7 +278,10 @@ class Models_Installer_Standalone {
     Please use git to update your installation and call ./translate5.sh database:update \n\n");
         }
     }
-    
+
+    /**
+     * @throws Exception
+     */
     protected function checkEnvironment() {
         $this->initTranslate5CliBridge();
         $input = new Symfony\Component\Console\Input\ArrayInput([
@@ -270,7 +289,9 @@ class Models_Installer_Standalone {
             '--pre-installation' => null,
             '--ansi' => null,
         ]);
-        $this->cli->run($input);
+        if($this->cli->run($input) !== 0){
+            die(1);
+        }
         $this->log('');
     }
 
@@ -301,12 +322,12 @@ class Models_Installer_Standalone {
         return $this->cli->get('installer:timezone')->getTimezone();
     }
     
-    protected function initTranslate5CliBridge()
+    protected function initTranslate5CliBridge(): void
     {
         if(!empty($this->cli)) {
             return;
         }
-        require_once $this->currentWorkingDir.'/vendor/autoload.php';
+        require_once $this->currentWorkingDir. self::VENDOR_AUTOLOAD_PHP;
         $this->cli = new Symfony\Component\Console\Application();
         $this->cli->setAutoExit(false);
         $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
@@ -318,19 +339,21 @@ class Models_Installer_Standalone {
         $this->cli->add(new Translate5\MaintenanceCli\Command\InstallerTimezoneCommand());
     }
     
-    protected function checkMyselfForUpdates() {
+    protected function checkMyselfForUpdates(): void
+    {
         if($this->installerHash !== md5_file($this->installerFile)) {
             die("\n\n The translate5 Updater has updated it self, please restart the install-and-update script!\n\n");
         }
     }
     
-    protected function processDependencies() {
-        $options = $this->options;
+    protected function processDependencies(): void
+    {
+        $o = $this->options;
         $this->logSection('Checking server for updates and packages:');
         $downloader = new ZfExtended_Models_Installer_Downloader($this->currentWorkingDir);
         
-        if(isset($options['applicationZipOverride']) && file_exists($options['applicationZipOverride'])) {
-            $zipOverride = $options['applicationZipOverride'];
+        if(isset($o['applicationZipOverride']) && file_exists($o['applicationZipOverride'])) {
+            $zipOverride = $o['applicationZipOverride'];
         }
         else {
             $zipOverride = null;
@@ -341,10 +364,15 @@ class Models_Installer_Standalone {
         $this->acceptLicenses($depsToAccept);
         $downloader->pullDependencies(true);
     }
-    
-    protected function installation() {
-        $options = $this->options;
-        
+
+    /**
+     * @throws Zend_Exception
+     * @throws Exception
+     */
+    protected function installation(): void
+    {
+        $o = $this->options;
+
         //assume installation success if installation.ini exists!
         if(file_exists($this->currentWorkingDir.self::INSTALL_INI)){
             return;
@@ -352,16 +380,13 @@ class Models_Installer_Standalone {
         $this->isInstallation = true;
         $this->logSection('Translate5 Installation');
         
-        if(is_array($options) && isset($options['mysql_bin']) && $options['mysql_bin'] != self::MYSQL_BIN) {
-            $this->dbCredentials['executable'] = $options['mysql_bin'];
-        }
-        if(!is_array($options) || empty($options['db::host']) || empty($options['db::username']) || empty($options['db::password']) || empty($options['db::database'])) {
-            while(! $this->promptDbCredentials());
+        if(!is_array($o) || empty($o['db::host']) || empty($o['db::username']) || empty($o['db::password']) || empty($o['db::database'])) {
+            while(! $this->promptDbCredentials()){};
         } else {
-            $this->dbCredentials['host']     = $options['db::host'];
-            $this->dbCredentials['username'] = $options['db::username'];
-            $this->dbCredentials['password'] = $options['db::password'];
-            $this->dbCredentials['database'] = $options['db::database'];
+            $this->dbCredentials['host']     = $o['db::host'];
+            $this->dbCredentials['username'] = $o['db::username'];
+            $this->dbCredentials['password'] = $o['db::password'];
+            $this->dbCredentials['dbname'] = $o['db::database'];
         }
 
         $timezone = $this->askTimzone();
@@ -382,13 +407,14 @@ class Models_Installer_Standalone {
      * so this has currently to be done manually in this method.
      * See this as a workaround and not as a final solution.
      */
-    protected function cleanUpDeletedFiles() {
+    protected function cleanUpDeletedFiles(): void
+    {
         $deleteList = dirname(__FILE__).'/filesToBeDeleted.txt';
         $toDeleteList = file($deleteList);
         foreach($toDeleteList as $toDelete) {
             $toDelete = trim($toDelete);
             //ignore comments
-            if(empty($toDelete) || strpos($toDelete, '#') === 0){
+            if(empty($toDelete) || str_starts_with($toDelete, '#')){
                 continue;
             }
             $cwd = realpath($this->currentWorkingDir);
@@ -397,7 +423,7 @@ class Models_Installer_Standalone {
                 continue;
             }
             //ensure that file/dir to be deleted is in the currentWorkingDir
-            if(strpos($toDelete, $cwd) !== 0 || $cwd == $toDelete) {
+            if(!str_starts_with($toDelete, $cwd) || $cwd == $toDelete) {
                 $this->log('Won\'t delete file '.$toDelete);
                 continue;
             }
@@ -415,7 +441,8 @@ class Models_Installer_Standalone {
     /**
      * inits on new installations the client specific directories
      */
-    protected function moveClientSpecific() {
+    protected function moveClientSpecific(): void
+    {
         $source = $this->currentWorkingDir.self::CLIENT_SPECIFIC_INSTALL;
         $target = $this->currentWorkingDir.self::CLIENT_SPECIFIC;
         $targetPub = $this->currentWorkingDir.'/public'.self::CLIENT_SPECIFIC;
@@ -427,11 +454,14 @@ class Models_Installer_Standalone {
             rename($source, $target);
         }
     }
-    
+
     /**
      * This are installation step which must be called after initApplication
+     * @throws Zend_Db_Exception
+     * @throws Zend_Exception
      */
-    protected function postInstallation() {
+    protected function postInstallation(): void
+    {
         if(!$this->isInstallation){
             return;
         }
@@ -440,22 +470,30 @@ class Models_Installer_Standalone {
             $db = Zend_Db::factory($config->resources->db);
             $db->query("update Zf_configuration set value = ? where name = 'runtimeOptions.server.name'", $this->hostname);
         }
+
+        //since passwords are encrypted, we have to do that for the demo users too
+        $asdfasdf = ZfExtended_Authentication::getInstance()->createSecurePassword('asdfasdf');
+        $config = Zend_Registry::get('config');
+        $db = Zend_Db::factory($config->resources->db);
+        $db->query("update Zf_users set passwd = ? where email = 'noreply@translate5.net' and login != 'system'", [$asdfasdf]);
     }
     
     /**
      * @deprecated moved into abstract module
      * Adds the downloaded Zend Lib to the include path
      */
-    protected function addZendToIncludePath() {
-        if(file_exists($this->currentWorkingDir.'/vendor/autoload.php')) {
-            require_once $this->currentWorkingDir.'/vendor/autoload.php';
+    protected function addZendToIncludePath(): void
+    {
+        if(file_exists($this->currentWorkingDir. self::VENDOR_AUTOLOAD_PHP)) {
+            require_once $this->currentWorkingDir. self::VENDOR_AUTOLOAD_PHP;
         }
     }
     
     /**
      * prompting the user for the DB credentials
      */
-    protected function promptDbCredentials() {
+    protected function promptDbCredentials(): bool
+    {
         $this->log('Please enter the MySQL database settings, the database must already exist.');
         $this->log('Default character set must be utf8mb4. This can be done for example with the following command: ');
         $this->log('  CREATE DATABASE IF NOT EXISTS `translate5` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'."\n");
@@ -489,7 +527,8 @@ class Models_Installer_Standalone {
      * prompts for all new licenses to be accepted
      * @param array $depsToAccept
      */
-    protected function acceptLicenses(array $depsToAccept) {
+    protected function acceptLicenses(array $depsToAccept): void
+    {
         if(is_array($this->options) && ($this->options['license-ignore'] ?? false)){
             return;
         }
@@ -524,7 +563,8 @@ class Models_Installer_Standalone {
     /**
      * @return int
      */
-    static public function getOS() {
+    static public function getOS(): int
+    {
         switch (true) {
             case stristr(PHP_OS, 'DAR'): return self::OS_OSX;
             case stristr(PHP_OS, 'WIN'): return self::OS_WIN;
@@ -533,7 +573,8 @@ class Models_Installer_Standalone {
         }
     }
     
-    protected function prompt($message = 'prompt: ', $hidden = false) {
+    protected function prompt($message = 'prompt: ', $hidden = false): bool|string
+    {
         if (PHP_SAPI !== 'cli') {
             return false;
         }
@@ -556,7 +597,8 @@ class Models_Installer_Standalone {
     /**
      * prompt the user for the hostname, since this config is needed in the DbConfig
      */
-    protected function promptHostname() {
+    protected function promptHostname(): void
+    {
         if(is_array($this->options) && !empty($this->options['hostname'])) {
             $this->hostname = $this->options['hostname'];
             return;
@@ -566,41 +608,41 @@ class Models_Installer_Standalone {
         $value = $this->prompt($prompt);
         $this->hostname = empty($value) ? $this->hostname : $value;
     }
-    
+
     /**
      * Applies the DbInit.sql
      */
-    protected function initDb() {
+    protected function initDb(): void
+    {
         $this->log("\nCreating the database base layout...");
-        $dbInit = $this->currentWorkingDir.'/'.self::DB_INIT;
-        $exec = empty($this->dbCredentials['executable']) ? self::MYSQL_BIN : $this->dbCredentials['executable'];
-        
-        $db = new stdClass();
-        $db->host = $this->dbCredentials['host'];
-        $db->username = $this->dbCredentials['username'];
-        $db->password = $this->dbCredentials['password'];
-        $db->dbname = $this->dbCredentials['database'];
-        
-        $dbupdater = new ZfExtended_Models_Installer_DbUpdater($db, $exec, $this->currentWorkingDir);
-        if(!$dbupdater->executeSqlFile($exec, $db, $dbInit, $output)) {
-            $this->log('Error on Importing '.self::DB_INIT.' file, stopping installation. Called command: '.$exec.".\n".'Result of Command: '.print_r($output,1));
+
+        $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
+        if(! $dbupdater->initDb()) {
+            $this->log('Error on creating initial DB structure, stopping installation. Result: '.print_r($dbupdater->getErrors(),1));
             exit;
         }
         $this->log('Translate5 tables created.');
+        $warnings = $dbupdater->getWarnings();
+        if(!empty($warnings)) {
+            $this->log('There were the following warnings: ');
+            $this->log(join(PHP_EOL), $warnings);
+        }
     }
-    
+
     /**
      * Creates the installation.ini
      * @param array $additionalParameters
      * @return boolean
+     * @throws Exception
      */
-    protected function createInstallationIni(array $additionalParameters) {
-        $content = array();
+    protected function createInstallationIni(array $additionalParameters): bool
+    {
+        $content = [];
         $content[] = '[application]';
         $content[] = 'resources.db.params.host = "'.$this->dbCredentials['host'].'"';
         $content[] = 'resources.db.params.username = "'.$this->dbCredentials['username'].'"';
         $content[] = 'resources.db.params.password = "'.$this->dbCredentials['password'].'"';
-        $content[] = 'resources.db.params.dbname = "'.$this->dbCredentials['database'].'"';
+        $content[] = 'resources.db.params.dbname = "'.$this->dbCredentials['dbname'].'"';
         if(!empty($this->dbCredentials['executable'])) {
             $content[] = 'resources.db.executable = "'.$this->dbCredentials['executable'].'"';
         }
@@ -634,7 +676,7 @@ class Models_Installer_Standalone {
                         'host' => $this->dbCredentials['host'],
                         'username' => $this->dbCredentials['username'],
                         'password' => $this->dbCredentials['password'],
-                        'dbname' => $this->dbCredentials['database'],
+                        'dbname' => $this->dbCredentials['dbname'],
                     ])
                 ])
             ])
@@ -642,10 +684,11 @@ class Models_Installer_Standalone {
         
         return ($bytes > 0);
     }
-    
+
     /**
      * returns true if the DB is OK
      * @return bool
+     * @throws Exception
      */
     protected function checkDb(): bool {
         $this->initTranslate5CliBridge();
@@ -657,11 +700,14 @@ class Models_Installer_Standalone {
         ]);
         return $this->cli->run($input) === 0;
     }
-    
+
     /**
      * Applies all DB alter statement files to the DB
+     * @throws Zend_Mail_Exception
+     * @throws Exception
      */
-    protected function updateDb() {
+    protected function updateDb(): void
+    {
         $changelog = ZfExtended_Factory::get('editor_Models_Changelog');
         /* @var $changelog editor_Models_Changelog */
         $beforeMaxChangeLogId = $changelog->getMaxId();
@@ -678,19 +724,21 @@ class Models_Installer_Standalone {
         $changelog->updateVersion($beforeMaxChangeLogId, $version);
         $this->sendChangeLogs($newChangeLogEntries, $version);
     }
-    
+
     /**
      * Send the given changelogs to the admin users.
      * @param array $newChangeLogEntries
+     * @param $version
+     * @throws Zend_Mail_Exception
      */
-    protected function sendChangeLogs($newChangeLogEntries, $version) {
+    protected function sendChangeLogs(array $newChangeLogEntries, $version): void
+    {
         if(empty($newChangeLogEntries)) {
             return;
         }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $admins = $user->loadAllByRole(['admin']);
-        //Zend_Registry::set('Zend_Locale', 'en');
         $mail = ZfExtended_Factory::get('ZfExtended_Mailer', ['utf8']);
         /* @var $mail ZfExtended_Mailer */
         $mail->setSubject("ChangeLog to translate5 version ".$version.' on '.$this->hostname);
@@ -736,12 +784,14 @@ class Models_Installer_Standalone {
         }
         $mail->send();
     }
-    
+
     /**
+     * @throws Zend_Exception
      * @deprecated moved into abstract modules
      * generates a Zend Application like environment with all needed registry entries filled
      */
-    protected function initApplication() {
+    protected function initApplication(): void
+    {
         $_SERVER['REQUEST_URI'] = '/database/forceimportall';
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['HTTP_HOST'] = 'localhost';
@@ -764,7 +814,8 @@ class Models_Installer_Standalone {
         $this->log('Current translate5 version '.$version);
     }
     
-    protected function done() {
+    protected function done(): void
+    {
         $version = ZfExtended_Utils::getAppVersion();
         $this->log("\nTranslate5 installation / update to version $version done.\n");
         if(!empty($this->hostname)) {
@@ -775,11 +826,13 @@ class Models_Installer_Standalone {
         $this->log('  or write an email to support@translate5.net');
     }
     
-    protected function log($msg) {
+    protected function log($msg): void
+    {
         echo $msg."\n";
     }
     
-    protected function logSection($msg, $lineChar = '=') {
+    protected function logSection($msg, $lineChar = '='): void
+    {
         echo "\n".$msg."\n";
         echo str_pad('', strlen($msg), $lineChar)."\n\n";
     }

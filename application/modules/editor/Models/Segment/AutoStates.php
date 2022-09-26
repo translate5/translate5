@@ -539,7 +539,7 @@ class editor_Models_Segment_AutoStates {
      * @param editor_Models_TaskUserAssoc $tua optional, if not given only acl is considered
      */
     protected function isEditWithoutAssoc(editor_Models_TaskUserAssoc $tua) {
-        $userSession = new Zend_Session_Namespace('user');
+        $auth = ZfExtended_Authentication::getInstance();
         $role = $tua && $tua->getRole();
         $acl = ZfExtended_Acl::getInstance();
         
@@ -547,9 +547,9 @@ class editor_Models_Segment_AutoStates {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($tua->getTaskGuid());
-        $sameUserGuid = $task->getPmGuid() === $userSession->data->userGuid;
-        $systemUser = $userSession->data->userGuid == ZfExtended_Models_User::SYSTEM_GUID;
-        $editAllTasks = $acl->isInAllowedRoles($userSession->data->roles, 'backend', 'editAllTasks');
+        $sameUserGuid = $task->getPmGuid() === $auth->getUser()->getUserGuid();
+        $systemUser = $auth->getUser()->getUserGuid() == ZfExtended_Models_User::SYSTEM_GUID;
+        $editAllTasks = $acl->isInAllowedRoles($auth->getRoles(), 'backend', 'editAllTasks');
         return empty($role) && ($editAllTasks || $sameUserGuid || $systemUser);
     }
     

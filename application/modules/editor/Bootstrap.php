@@ -109,7 +109,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     
     public function _initREST()
     {
-        $this->front->setRequest(new REST_Controller_Request_Http);
+        $this->front->setRequest(new ZfExtended_Sanitized_HttpRequest());
 
         // register the RestHandler plugin
         $this->front->registerPlugin(new ZfExtended_Controllers_Plugins_RegisterRestControllerPluginRestHandler());

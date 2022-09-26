@@ -313,7 +313,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1346"></a>E1346  | Language&nbsp;Resource Microsoft Translator | Microsoft Translator quota exceeded. A limit has been reached. | See the error log for details.
 | <a id="E1358"></a>E1358  | Language&nbsp;Resource Term Collection | Term Collection Import: Unable to open zip file from file-path: {filePath} | See the error log for details.
 | <a id="E1359"></a>E1359  | Language&nbsp;Resource Term Collection | Term Collection Import: Content from zip file could not be extracted. | See the error log for details.
-| <a id="E1403"></a>E1403  | Language&nbsp;Resource pivot pre-translation    | The taskGuid is required as parameter | The taskGuid is not provided as parametar on the request | 
+| <a id="E1403"></a>E1403  | Language&nbsp;Resource pivot pre-translation    | The taskGuid is required as parameter | The taskGuid is not provided as parameter on the request | 
 
 ### Terminology
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -578,7 +578,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 #### Plug-In ModelFront&nbsp;
 | EventCode        | Context       | EventMessage  | Description/Solution
 | :--------------- |:------------- | :------------ | :-------------------
-| <a id="E1266"></a>E1266  | ModelFront | ModelFront Plug-In: authentication parametars are not defined. | The apiUpr or apiToken zf_configuration parameters are not defined or empty.
+| <a id="E1266"></a>E1266  | ModelFront | ModelFront Plug-In: authentication parameters are not defined. | The apiUpr or apiToken zf_configuration parameters are not defined or empty.
 | <a id="E1267"></a>E1267  | ModelFront | ModelFront Plug-In: source or target languages are not defined. | The source or target languages are not set.
 | <a id="E1268"></a>E1268  | ModelFront | ModelFront Plug-In: Error on ModelFront api request. The error was: {message}. | Error happen on model front api request. For more info see the error log.
 | <a id="E1269"></a>E1269  | ModelFront | ModelFront Plug-In: Error on processing the segments. Segment list with errors: {errors}. | ModelFront api responds with error for the requested segment. For more info about the error check the error log.

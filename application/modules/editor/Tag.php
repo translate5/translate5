@@ -274,7 +274,7 @@ class editor_Tag {
     public static function unparse($html){
         if(static::USE_PHP_DOM){
             // implementation using PHP DOM
-            $dom = new editor_Utils_Dom();
+            $dom = new ZfExtended_Dom();
             $node = $dom->loadUnicodeElement($html);
             if($node != NULL){
                 return static::fromDomElement($node);

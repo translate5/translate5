@@ -188,18 +188,7 @@ class Editor_CommentController extends ZfExtended_RestController {
         $segment->load($segmentId);
         $this->entity->updateSegment($segment, $taskGuid);
     }
-    
-    /**
-     * removes HTML from comment
-     * @see ZfExtended_RestController::decodePutData()
-     * @return void
-     */
-    protected function decodePutData()
-    {
-        parent::decodePutData();
-        $this->data->comment = strip_tags($this->data->comment);
-    }
-    
+
     //getting a single comment is actually unnecessary
     public function getAction() {
         throw new ZfExtended_BadMethodCallException(__CLASS__ . '->put');

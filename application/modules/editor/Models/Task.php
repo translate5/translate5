@@ -1105,8 +1105,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     protected function rolesAllowReadAnonymizedUsers(array $rolesToCheck = null) {
         if(empty($rolesToCheck)) {
-            $userSession = new Zend_Session_Namespace('user');
-            $rolesToCheck = $userSession->data->roles;
+            $rolesToCheck = ZfExtended_Authentication::getInstance()->getRoles();
         }
         $aclInstance = ZfExtended_Acl::getInstance();
         return $aclInstance->isInAllowedRoles($rolesToCheck, "frontend", "readAnonymyzedUsers");
