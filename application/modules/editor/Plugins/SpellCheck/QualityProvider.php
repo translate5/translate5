@@ -32,6 +32,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use \editor_Plugins_SpellCheck_SegmentProcessor as SegmentProcessor;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Enum\SegmentState;
 /**
  * The Quality provider 
  * This class just provides the translations for the filter backend
@@ -55,7 +57,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     /**
      * SpellCheck segment processor instance
      *
-     * @var editor_Plugins_SpellCheck_SegmentProcessor
+     * @var SegmentProcessor
      */
     protected static $_processor = null;
 
@@ -92,10 +94,13 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     /**
      * Get SpellCheck segment processor instance
      *
-     * @return editor_Plugins_SpellCheck_SegmentProcessor|null
+     * @return SegmentProcessor
      */
-    public function getProcessor() {
-        return self::$_processor ?? self::$_processor = ZfExtended_Factory::get('editor_Plugins_SpellCheck_SegmentProcessor');
+    public function getProcessor(?string $spellcheckLang = null): SegmentProcessor
+    {
+        return self::$_processor ?? self::$_processor = ZfExtended_Factory::get(SegmentProcessor::class, [
+            'spellcheckLanguage' => $spellcheckLang,
+        ]);
     }
 
     /**
@@ -167,25 +172,27 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             return $tags;
         }
 
+        $processor = $this->getProcessor();
+
         // If current task's target lang is not supported by LanguageTool - return
-        if (!$spellCheckLang = $this->getProcessor()->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())) {
+        if (!$spellCheckLang = $processor->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())) {
             return $tags;
         }
 
+        $processor->setSpellcheckLanguage($spellCheckLang);
+
         // If processing mode is 'alike'
-        if ($processingMode == editor_Segment_Processing::ALIKE){
+        if ($processingMode === editor_Segment_Processing::ALIKE){
 
             // the only task in an alike process is cloning the qualities ...
             $tags->cloneAlikeQualitiesByType(static::$type);
 
-        // Else
-        } else if ($processingMode == editor_Segment_Processing::EDIT) {
+        } else if ($processingMode === editor_Segment_Processing::EDIT) {
 
             // Do process
-            $this->getProcessor()->process([$tags], null, false, $spellCheckLang);
+            $processor->process([$tags]);
         }
 
-        // Return
         return $tags;
     }
 
@@ -307,10 +314,10 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
 
         // Reset status to unchecked for checked segments
         $meta->db->update([
-            'spellcheckState' => editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_UNCHECKED
+            'spellcheckState' => SegmentState::SEGMENT_STATE_UNCHECKED
         ],[
             'taskGuid = ?' => $task->getTaskGuid(),
-            'spellcheckState = ?' => editor_Plugins_SpellCheck_Configuration::SEGMENT_STATE_CHECKED,
+            'spellcheckState = ?' => SegmentState::SEGMENT_STATE_CHECKED,
         ]);
     }
 }

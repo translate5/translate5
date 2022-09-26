@@ -50,17 +50,17 @@ class Translate2717Test extends editor_Test_JsonTest {
      */
     public static function testCreateCustomers(){
 
-        $customer = self::$api->requestJson('editor/customer/', 'POST',[
+        $customer = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::TRANSLATE-2717-source',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
+            'number'=>uniqid('API Testing::ResourcesLogCustomer')
         ]);
 
         self::assertIsObject($customer,'Unable to create the source customer');
         self::$sourceCustomerId = $customer->id;
 
-        $customer = self::$api->requestJson('editor/customer/', 'POST',[
+        $customer = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::TRANSLATE-2717-target',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
+            'number'=>uniqid('API Testing::ResourcesLogCustomer')
         ]);
         self::assertIsObject($customer,'Unable to create the target customer');
         self::$targetCustomerId = $customer->id;
@@ -82,12 +82,10 @@ class Translate2717Test extends editor_Test_JsonTest {
         }
 
         // copy the configs from the source to the target customer
-        self::$api->requestJson('editor/customer/'.self::$targetCustomerId.'/copy/operation', 'POST',[],[
-            'copyConfigCustomer'=>self::$sourceCustomerId
-        ]);
+        self::$api->postJson('editor/customer/'.self::$targetCustomerId.'/copy/operation', [ 'copyConfigCustomer' => self::$sourceCustomerId ], null, false);
 
         // get all target customer configs
-        $configs = self::$api->requestJson('editor/config/', 'GET',[
+        $configs = self::$api->getJson('editor/config/',[
             'customerId'=>self::$targetCustomerId,
         ]);
 
@@ -126,11 +124,9 @@ class Translate2717Test extends editor_Test_JsonTest {
         ]);
 
         // copy the default user assoc from the source to the target customer
-        self::$api->requestJson('editor/customer/'.self::$targetCustomerId.'/copy/operation', 'POST',[],[
-            'copyDefaultAssignmentsCustomer'=>self::$sourceCustomerId
-        ]);
+        self::$api->postJson('editor/customer/'.self::$targetCustomerId.'/copy/operation', [ 'copyDefaultAssignmentsCustomer' => self::$sourceCustomerId ], null, false);
 
-        $sourceValues = self::$api->requestJson('editor/userassocdefault/', 'GET',[
+        $sourceValues = self::$api->getJson('editor/userassocdefault/',[
             'filter' => '[{"value":"'.self::$sourceCustomerId.'","property":"customerId","operator":"eq"}]',
         ]);
 
@@ -139,7 +135,7 @@ class Translate2717Test extends editor_Test_JsonTest {
             unset($r->customerId);
             return $r;
         },$sourceValues);
-        $targetValues = self::$api->requestJson('editor/userassocdefault/', 'GET',[
+        $targetValues = self::$api->getJson('editor/userassocdefault/',[
             'filter' => '[{"value":"'.self::$targetCustomerId.'","property":"customerId","operator":"eq"}]',
         ]);
         array_map(function ($r){
@@ -160,12 +156,10 @@ class Translate2717Test extends editor_Test_JsonTest {
      * @return void
      */
     private static function addCustomerConfig(string $name,string $value,int $customerId){
-        self::$api->requestJson('editor/config/', 'put',[
-            'data' => json_encode([
-                'value' => $value,
-                'customerId' => $customerId,
-                'name' => $name
-            ])
+        self::$api->putJson('editor/config/',[
+            'value' => $value,
+            'customerId' => $customerId,
+            'name' => $name
         ]);
     }
 
@@ -184,12 +178,12 @@ class Translate2717Test extends editor_Test_JsonTest {
             "trackchangesShowAll"=>1,
             "trackchangesAcceptReject"=>1
         ],$data);
-         self::$api->requestJson('editor/userassocdefault/', 'POST',$newData);
+         self::$api->postJson('editor/userassocdefault/', $newData);
     }
 
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/customer/'.self::$sourceCustomerId, 'DELETE');
-        self::$api->requestJson('editor/customer/'.self::$targetCustomerId, 'DELETE');
+        self::$api->delete('editor/customer/'.self::$sourceCustomerId);
+        self::$api->delete('editor/customer/'.self::$targetCustomerId);
     }
 }

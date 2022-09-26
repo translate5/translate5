@@ -1441,10 +1441,14 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Einstellungen');?>'
     });
 
+    Ext.define("Editor.locale.de.admin.preferences.User", {
+        override: "Editor.view.admin.preferences.User",
+        title: '<?php echo $this->translate->_('Meine Einstellungen');?>'
+    });
+
     Ext.define("Editor.locale.de.admin.preferences.UserViewController", {
         override: "Editor.view.admin.preferences.UserViewController",
         strings: {
-            settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
             pwSave: '<?php echo $this->translate->_('Passwort erfolgreich gespeichert!');?>'
         }
     });

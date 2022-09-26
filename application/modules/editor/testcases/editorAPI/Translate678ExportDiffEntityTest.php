@@ -65,17 +65,17 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
     public function testEditing() {
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $segToEdit = $segments[0];
         
         //swap < and >
         $editedData = 'Target with "special" \'chars\' &amp; greaters &gt; and &lt; lessers';
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-        $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
     }
 
     /**
@@ -87,7 +87,7 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
         $task = $this->api()->getTask();
 
         //start task export with diff
-        $this->api()->request('editor/task/export/id/'.$task->id.'/diff/1');
+        $this->api()->get('editor/task/export/id/'.$task->id.'/diff/1');
 
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();
@@ -105,9 +105,6 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

@@ -90,14 +90,14 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         }
 
         $result = $db->query('
-        SELECT table_schema, table_name, column_name, character_set_name, collation_name
+        SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
         FROM information_schema.columns
         WHERE character_set_name != "utf8mb4"
         AND table_schema = database()
         ORDER BY table_schema, table_name,ordinal_position');
 
         while($row = $result->fetchObject()) {
-            $this->result->error[] = 'DB column '.$row->table_name.'.'.$row->column_name.' has charset "'.$row->character_set_name.'" instead of "utf8mb4" (collation is '.$row->collation_name.')';
+            $this->result->error[] = 'DB column '.$row->TABLE_NAME.'.'.$row->COLUMN_NAME.' has charset "'.$row->CHARACTER_SET_NAME.'" instead of "utf8mb4" (collation is '.$row->COLLATION_NAME.')';
         }
     }
     

@@ -46,26 +46,64 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-    }
-    
-    /***
-     * Create test customer, task, moses language resource.
-     * Associate the resources to task, queue and run matchanalysis and pretranslation.
-     * Waith for the task import to finish.
-     */
-    public function testSetupCustomerAndResources() {
-        self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
-            'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
+
+        self::$customerTest = self::$api->postJson('editor/customer/',[
+            'name' => 'API Testing::ResourcesLogCustomer',
+            'number' => uniqid('API Testing::ResourcesLogCustomer'),
         ]);
-        
-        $this->createTask();
-        $this->addZDemoMTMt("one");
-        $this->addZDemoMTMt("two");
+
+        self::assertLogin('testmanager');
+
+        // Create the task. The task will not be imported directly autoStartImport is 0!
+        $task = [
+            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'customerId'=>self::$customerTest->id,
+            'autoStartImport'=>0,
+            'wordCount' => 0,//just to overwrite the default value set by the ApiHelper
+            'edit100PercentMatch' => 0
+        ];
+        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
+        self::$api->addImportFile($zipfile);
+        self::$api->import($task,false,false);
+        // add Demo-MTs
+        static::addZDemoMTMt('one');
+        static::addZDemoMTMt('two');
+
+        // add resource assocs
         self::$api->addTaskAssoc();
-        $this->queueAnalysys();
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
+
+        // queue analysis
+        $params = [
+            'internalFuzzy' => 1,
+            'pretranslateMatchrate' => 100,
+            'pretranslateTmAndTerm' => 1,
+            'pretranslateMt' => 1,
+            'isTaskImport' => 0
+        ];
+        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
+
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
         self::$api->checkTaskStateLoop();
+    }
+
+    /***
+     * Create dummy mt resource.
+     */
+    private static function addZDemoMTMt(string $suffix){
+        $params = [
+            'resourceId'=>'ZDemoMT',
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'customerIds' => [self::$customerTest->id],
+            'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
+            'serviceType' => 'editor_Plugins_ZDemoMT',
+            'serviceName'=> 'ZDemoMT',
+            'name' => 'API Testing::ZDemoMT_'.__CLASS__.'_'.$suffix
+        ];
+        self::$api->addResource($params);
     }
     
     /**
@@ -79,7 +117,7 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         
         $task = self::$api->getTask();
         //enable 100% matches for edition. This should calculate also the word count
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['edit100PercentMatch' => 1]);
+        self::$api->putJson('editor/task/'.$task->id, ['edit100PercentMatch' => 1]);
         
         self::$api->reloadTask();
         $wordCount = self::$api->getTask()->wordCount;
@@ -95,8 +133,8 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
      * which will switch the expected result to compare against.
      * @param string $validationFileName
      */
-    protected function checkAnalysis(string $validationFileName){
-        $analysis=self::$api->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
+    private function checkAnalysis(string $validationFileName){
+        $analysis=self::$api->getJson('editor/plugins_matchanalysis_matchanalysis',[
             'taskGuid'=>self::$api->getTask()->taskGuid
         ]);
         
@@ -112,80 +150,13 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected analysis and the result file does not match.");
     }
-    
-    /***
-     * Create the task. The task will not be imported directly autoStartImport is 0!
-     */
-    protected function createTask(){
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId'=>self::$customerTest->id,
-            'autoStartImport'=>0,
-            'wordCount' => 0,//just to overwrite the default value set by the ApiHelper
-            'edit100PercentMatch' => 0
-        ];
-        self::assertLogin('testmanager');
-        
-        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
-        self::$api->addImportFile($zipfile);
-        
-        self::$api->import($task,false,false);
-        error_log('Task created. '.self::$api->getTask()->taskName);
-    }
-    
-    /***
-     * Queue the match anlysis worker
-     */
-    protected function queueAnalysys(){
-        //run the analysis
-        $params=[];
-        $params['internalFuzzy']= 1;
-        $params['pretranslateMatchrate']= 100;
-        $params['pretranslateTmAndTerm']= 1;
-        $params['pretranslateMt']= 1;
-        $params['isTaskImport']= 0;
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
-        error_log("Queue pretranslation and analysis.");
-    }
 
-    /***
-     * Add task to languageresource assoc
-     */
-    protected function addTaskAssoc(){
-        self::$api->addTaskAssoc();
-    }
-    
-    /***
-     * Create dummy mt resource.
-     */
-    protected function addZDemoMTMt(string $sufix){
-        $params=[
-            'resourceId'=>'ZDemoMT',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [self::$customerTest->id],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Plugins_ZDemoMT',
-            'serviceName'=> 'ZDemoMT',
-            'name' => 'API Testing::ZDemoMT_'.__CLASS__.'_'.$sufix
-        ];
-        
-        self::$api->addResource($params);
-    }
-    
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
-        
+        self::$api->deleteTask($task->id, 'testmanager');
         //remove the created resources
         self::$api->removeResources();
-        
         //remove the temp customer
-        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
 }

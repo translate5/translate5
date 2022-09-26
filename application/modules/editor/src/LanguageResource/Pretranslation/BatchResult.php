@@ -65,23 +65,27 @@ class BatchResult extends ZfExtended_Models_Entity_Abstract {
         $result=reset($result);
         return unserialize($result['result']);
     }
-    
+
     /***
-     * Delete all cached records for given language resource
-     * @param int $languageResource
-     * @return number
+     * Delete all cached records for given language resources
+     * @param array $languageResources
+     * @return int
      */
-    public function deleteForLanguageresource(int $languageResource) {
+    public function deleteForLanguageresource(array $languageResources) {
+        if(empty($languageResources)){
+            return 0;
+        }
         return $this->db->delete([
-            'languageResource = ?' => $languageResource
+            'languageResource IN(?)' => $languageResources
         ]);
     }
-    
+
     /***
      * Remove cache records older then one day
-     * @return number
+     * @return int
      */
-    public function deleteOlderRecords() {
+    public function deleteOlderRecords(): int
+    {
         return $this->db->delete([
             'timestamp < DATE_SUB(NOW(), INTERVAL 24 HOUR)'
         ]);

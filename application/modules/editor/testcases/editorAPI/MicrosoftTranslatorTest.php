@@ -74,7 +74,7 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $fileName
      */
     protected function translateText(string $text,string $fileName){
-        $result=$this->api()->requestJson('editor/instanttranslateapi/translate', 'GET',[
+        $result=$this->api()->getJson('editor/instanttranslateapi/translate',[
             'text'=>$text,
             'source'=>self::$sourceLangRfc,
             'target'=>self::$targetLangRfc
@@ -108,12 +108,12 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
             'serviceType' => 'editor_Services_Microsoft',
             'serviceName'=> 'Microsoft'
         ];
-        $resource = $this->api()->requestJson('editor/languageresourceinstance', 'POST',[],$params);
+        $resource = $this->api()->postJson('editor/languageresourceinstance', $params, null, false);
         $this->assertTrue(is_object($resource), 'Unable to create the language resource:'.$params['name']);
         $this->assertEquals($params['name'], $resource->name);
         self::$languageResourceId=$resource->id;
         error_log("Language resources created. ".$resource->name);
-        $resp = $this->api()->requestJson('editor/languageresourceinstance/'.$resource->id, 'GET',[]);
+        $resp = $this->api()->getJson('editor/languageresourceinstance/'.$resource->id,[]);
         $this->assertEquals('available',$resp->status,'Tm import stoped. Tm state is:'.$resp->status);
     }
     
@@ -151,6 +151,6 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
      */
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/languageresourceinstance/'.self::$languageResourceId,'DELETE');
+        self::$api->delete('editor/languageresourceinstance/'.self::$languageResourceId);
     }
 }

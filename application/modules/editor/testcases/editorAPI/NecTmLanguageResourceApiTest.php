@@ -150,7 +150,7 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params = $this->languageResourceParams;
         $params['resourceId']  = static::RESOURCE_ID;
         $params['serviceType'] = static::SERVICE_TYPE;
-        $languageResource = $this->api()->request('editor/languageresourceinstance', 'POST', $params);
+        $languageResource = $this->api()->post('editor/languageresourceinstance', $params);
          // TODO...
     }
 

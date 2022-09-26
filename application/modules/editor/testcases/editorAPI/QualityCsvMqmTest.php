@@ -121,10 +121,10 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
     public function testEditingSegmentWithMqm() {
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $segToEdit = $segments[0];
         
         //asserts that our content was imported properly
@@ -133,7 +133,7 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         $editedData = $this->compileMqmTags($this->testData);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-        $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
         
         //editing second segment
         $segToEdit = $segments[1];
@@ -155,7 +155,7 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         );
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $this->compileMqmTags($test2), $segToEdit->id);
-        $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
     }
     
     /**
@@ -200,7 +200,7 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
      * @param string $fileToCompare
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToCompare) {
-        $this->api()->request($exportUrl);
+        $this->api()->get($exportUrl);
 
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();
@@ -248,9 +248,6 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testlector'); //logout testmanager to close task
-        self::$api->login('testmanager'); //login again to delete
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

@@ -422,7 +422,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1317"></a>E1317  | Plug-In DeepL | DeepL authorization failed. Please supply a valid API Key. | The configured API Key is not valid.
 | <a id="E1318"></a>E1318  | Plug-In DeepL | DeepL quota exceeded. The character limit has been reached. | The usage quota of your DeepL account is exceeded.
 | <a id="E1334"></a>E1334  | Plug-In DeepL | DeepL is returning an error: {message} | See the error message what is going wrong.
-| <a id="E1385"></a>E1385  | Plug-In DeepL | DeepL Plug-In: Unable to create glossary | There was a problem on DeepL glossary creation. For more info check the error log.
+| <a id="E1385"></a>E1385  | Plug-In DeepL | Deepl Plug-In: Unable to create glossary | There was a problem on DeepL glossary creation. For more info check the error log.
 | <a id="E1386"></a>E1386  | Plug-In DeepL | DeepL Plug-In: For one or more of the clients assigned to your current TermCollection the TermCollection {0} has already been assigned as &quot;DeepL glossary source&quot;. Should the TermCollection {0} be unassigned as glossary source for all of its assigned clients? | There is already term-collection in use as glossary source for one of the matching customers when trying to assign another term-collection to be used as glossary source.
 | <a id="E1388"></a>E1388  | Plug-In DeepL | DeepL Plug-In: Unable to fetch all available language combinations for glossaries. | Api error calling the glossary-language-pairs endpoint. For more info see the error log.
 | <a id="E1389"></a>E1389  | Plug-In DeepL | DeepL Plug-In: Unable to delete glossary. | Api error calling the DELETE /v2/glossaries/\[glossary_id\] endpoint. For more info see the error log.

@@ -61,26 +61,24 @@ class Translate2315Test extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
     }
     
     /**
      * Testing segment values directly after import
      */
     public function testSegmentValuesAfterImport() {
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-        
+        $jsonFileName = 'expectedSegments.json';
+        $segments = $this->api()->getSegments($jsonFileName, 10);
         $this->checkRepetition($segments[0]->id, [$segments[1]->id]);
         $this->checkRepetition($segments[2]->id, []);
         $this->checkRepetition($segments[4]->id, []);
         $this->checkRepetition($segments[6]->id, [$segments[7]->id]);
-        
-        //file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
     protected function checkRepetition(int $idToGetFor, array $idsToBeFound) {
-        $alikes = $this->api()->requestJson('editor/alikesegment/'.$idToGetFor);
+        $alikes = $this->api()->getJson('editor/alikesegment/'.$idToGetFor);
         $idsFound = array_column($alikes, 'id');
         sort($idsFound);
         sort($idsToBeFound);
@@ -93,20 +91,20 @@ class Translate2315Test extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
+        $segments = $this->api()->getSegments(null, 10);
         
         //edit the segment and make some target repetitions
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', "target rep 1", $segments[4]->id);
-        $this->api()->requestJson('editor/segment/'.$segments[4]->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segments[4]->id, $segmentData);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', "target rep 1", $segments[5]->id);
-        $this->api()->requestJson('editor/segment/'.$segments[5]->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segments[5]->id, $segmentData);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', "target rep 2", $segments[6]->id);
-        $this->api()->requestJson('editor/segment/'.$segments[6]->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segments[6]->id, $segmentData);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', "target rep 2", $segments[7]->id);
-        $this->api()->requestJson('editor/segment/'.$segments[7]->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segments[7]->id, $segmentData);
         
         $this->checkRepetition($segments[0]->id, [$segments[1]->id]); //source rep
         $this->checkRepetition($segments[2]->id, []); //still no repetition
@@ -114,17 +112,13 @@ class Translate2315Test extends editor_Test_JsonTest {
         $this->checkRepetition($segments[6]->id, [$segments[7]->id]); // both is a rep
         
         //check direct PUT result
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-        //file_put_contents($this->api()->getFile('/expectedSegments-edited.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertSegmentsEqualsJsonFile('expectedSegments-edited.json', $segments, 'Edited segments are not as expected!');
+        $jsonFileName = 'expectedSegments-edited.json';
+        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

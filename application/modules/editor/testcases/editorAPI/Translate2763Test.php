@@ -51,7 +51,7 @@ class Translate2763Test extends editor_Test_JsonTest {
      */
     public function test10_InitialTbxImport() {
         $this->api()->addFile('tmUpload', $this->api()->getFile('testfiles/term-import-1.tbx'), 'application/xml');
-        $result = $this->api()->requestJson('editor/languageresourceinstance', 'POST', [
+        $result = $this->api()->postJson('editor/languageresourceinstance', [
             //format jsontext???
             'color' => '19737d',
             'serviceName' => 'TermCollection',
@@ -63,7 +63,7 @@ class Translate2763Test extends editor_Test_JsonTest {
 
         self::$TC_ID = $result->id ?? null;
 
-        $data = $this->api()->request('/editor/languageresourceinstance/tbxexport', 'GET', [
+        $data = $this->api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$TC_ID,
             'tbxBasicOnly' => '1',
             'exportImages' => '0',
@@ -78,12 +78,12 @@ class Translate2763Test extends editor_Test_JsonTest {
      */
     public function test20_MergeImport() {
         $this->api()->addFile('tmUpload', $this->api()->getFile('testfiles/term-import-2.tbx'), 'application/xml');
-        $this->api()->requestJson('editor/languageresourceinstance/'.self::$TC_ID.'/import/', 'POST', [
+        $this->api()->postJson('editor/languageresourceinstance/'.self::$TC_ID.'/import/', [
             'deleteTermsOlderThanCurrentImport' => 'on',
             'deleteProposalsLastTouchedOlderThan' => null,
         ]);
 
-        $data = $this->api()->request('/editor/languageresourceinstance/tbxexport', 'GET', [
+        $data = $this->api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$TC_ID,
             'tbxBasicOnly' => '1',
             'exportImages' => '0',
@@ -91,7 +91,7 @@ class Translate2763Test extends editor_Test_JsonTest {
 
         $this->assertFileContents('term-export-2.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', $this->api()->isCapturing());
 
-        $this->api()->cleanup && $this->api()->requestJson('editor/languageresourceinstance/'.self::$TC_ID.'', 'DELETE');
+        $this->api()->delete('editor/languageresourceinstance/'.self::$TC_ID.'');
     }
 
     /**

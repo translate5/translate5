@@ -26,6 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\MalfunctionException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\RequestException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\TimeOutException;
+
 /**
  * Connector to LanguageTool
  * https://languagetool.org/http-api/swagger-ui/#/default
@@ -117,16 +122,10 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
         try {
             $response = $this->getMatches('a simple test', 'en-US');
         }
-        catch (editor_Plugins_SpellCheck_Exception_TimeOut $e) {
+        catch (TimeOutException $e) {
             return true; // can not respond due it is processing data
         }
-        catch (editor_Plugins_SpellCheck_Exception_Down $e) {
-            return false;
-        }
-        catch (editor_Plugins_SpellCheck_Exception_Malfunction $e) {
-            return false;
-        }
-        catch (editor_Plugins_SpellCheck_Exception_Request $e) {
+        catch (DownException|MalfunctionException|RequestException $e) {
             return false;
         }
 
@@ -139,8 +138,9 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
 
     /**
      * Create the http object and set the url
-     * 
-     * @param string $url
+     *
+     * @param string $path
+     *
      * @return Zend_Http_Client
      */
     private function getHttpClient($path) {
@@ -169,9 +169,7 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
                               // - 201 Created (we don't create any resources)
                               // - 401 Unauthorized (we don't use authentication)
         
-        $result = json_decode(trim($response->getBody()));
-        
-        return $result;
+        return json_decode(trim($response->getBody()));
     }
     
     /**
@@ -240,7 +238,9 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
         $text = explode($line, file_get_contents($file))[0] . $line . "\r\n";
 
         // Append lines
-        foreach ($list as $item) $text .= '| ' . join(' | ', $item) . "\r\n";
+        foreach ($list as $item) {
+            $text .= '| ' . join(' | ', $item) . "\r\n";
+        }
 
         // Overwrite md file
         file_put_contents($file, $text);
@@ -291,26 +291,26 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
 
         // Catch timeout
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $httpException) {
-            throw new editor_Plugins_SpellCheck_Exception_TimeOut('E1412', $extraData, $httpException);
+            throw new TimeOutException('E1412', $extraData, $httpException);
 
         // Catch spot down
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $httpException) {
-            throw new editor_Plugins_SpellCheck_Exception_Down('E1410', $extraData, $httpException);
+            throw new DownException('E1410', $extraData, $httpException);
 
         // Catch no response
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $httpException) {
-            throw new editor_Plugins_SpellCheck_Exception_Request('E1130', $extraData, $httpException);
+            throw new RequestException('E1130', $extraData, $httpException);
 
         // Others
         } catch (Exception $httpException) {
-            throw new editor_Plugins_SpellCheck_Exception_Request('E1119', $extraData, $httpException);
+            throw new RequestException('E1119', $extraData, $httpException);
         }
 
         // If response http status is not between 200 and 300
         if (!$this->wasSuccessfull()) {
 
             // Throw malfunction exception
-            throw new editor_Plugins_SpellCheck_Exception_Malfunction('E1120', [
+            throw new MalfunctionException('E1120', [
                 'httpStatus' => $this->getLastStatus(),
                 'languageToolUrl' => $http->getUri(true),
                 'plainServerResponse' => print_r($response->getBody(), true),
@@ -379,7 +379,7 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
 
         // If self::$languages['argByLangId'] is non-null this means
         // that we've already checked whether current task's target language is
-        // supported by LanguageTool, and this, in it's turn, means that this variable
+        // supported by LanguageTool, and this, in its turn, means that this variable
         // is either `false` (if target lang is not supported), or string-code to be
         // used as 2nd arg for getMatches() call (if target lang is supported)
         if (isset(self::$languages['argByLangId'][$targetLangId])) {

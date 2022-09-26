@@ -47,24 +47,45 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-    }
-    
-    /***
-     * Create test customer, project tasks, language resources.
-     * Run the task import and waith for importing
-     */
-    public function testSetupCustomerAndResources() {
-        self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
+
+        self::$customerTest = self::$api->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
         ]);
-        
-        $this->addTermCollection();
-        $this->createProject();
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
+
+        // add term collection
+        $params = [];
+        //create the resource 3 and import the file
+        $params['name'] = 'API Testing::TermCollection_'.__CLASS__;
+        $params['resourceId'] = 'editor_Services_TermCollection';
+        $params['serviceType'] = 'editor_Services_TermCollection';
+        $params['customerIds'] = [self::$customerTest->id];
+        $params['customerUseAsDefaultIds'] = [self::$customerTest->id];
+        $params['customerWriteAsDefaultIds'] = [];
+        $params['serviceName'] = 'TermCollection';
+        $params['mergeTerms'] = false;
+        self::$api->addResource($params, 'collection.tbx', true);
+
+        // create project
+        $task =[
+            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
+            'sourceLang' => self::$sourceLangRfc,
+            'targetLang' => self::$targetLangRfc,
+            'customerId' => self::$customerTest->id,
+            'autoStartImport' => 0,
+            'edit100PercentMatch' => 0
+        ];
+        self::assertLogin('testmanager');
+
+        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
+        self::$api->addImportFile($zipfile);
+
+        self::$api->import($task,false,false);
+        error_log('Task created. '.self::$api->getTask()->taskName);
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
         self::$api->checkProjectTasksStateLoop();
     }
-    
+
     /***
      * Validate the basic project task values
      */
@@ -89,14 +110,17 @@ class ProjectTaskTest extends editor_Test_JsonTest {
             self::assertEquals($task->taskType, self::$api::INITIAL_TASKTYPE_PROJECT_TASK, 'Project tasktype does not match the expected type.');
         }
     }
+
     /***
      * For each project task, check the segment content. Some of the segments are with terms.
      */
     public function testProjectTasksSegmentContent() {
+        $project = $this->api()->getTask();
         self::$api->reloadProjectTasks();
         foreach (self::$api->getProjectTasks() as $task){
             $this->checkProjectTaskSegments($task);
         }
+        $this->api()->setTask($project);
     }
     
     /***
@@ -104,86 +128,31 @@ class ProjectTaskTest extends editor_Test_JsonTest {
      * For this, first the task needs to be opened for editing. After the check the task will be set to open again.
      * @param stdClass $task
      */
-    protected function checkProjectTaskSegments(stdClass $task){
-        $project = $this->api()->getTask();
+    private function checkProjectTaskSegments(stdClass $task){
+
         //set internal current task for further processing
         $this->api()->setTask($task);
 
         error_log('Segments check for task ['.$task->taskName.']');
         //open the task for editing. This is the only way to load the segments via the api
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
+        $this->api()->setTaskToEdit($task->id);
 
         $fileName = str_replace(['/','::'],'_',$task->taskName.'.json');
-
-        // load all segments for the current opened task
-        $segments = self::$api->requestJson('editor/segment?page=1&start=0&limit=200');
-
+        $segments = self::$api->getSegments($fileName);
         // compare segments (this API will strip/adjust segment contents)
         $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected in '.basename($fileName).'!');
 
-        //close the task for editing
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
+        // close the task for editing
+        $this->api()->setTaskToOpen($task->id);
+    }
 
-        //reset internal current task to the project
-        $this->api()->setTask($project);
-    }
-    
-
-    /***
-     * Add the term collection resource
-     */
-    protected function addTermCollection() {
-        $params=[];
-        //create the resource 3 and import the file
-        $params['name'] = 'API Testing::TermCollection_'.__CLASS__;
-        $params['resourceId'] = 'editor_Services_TermCollection';
-        $params['serviceType'] = 'editor_Services_TermCollection';
-        $params['customerIds'] = [self::$customerTest->id];
-        $params['customerUseAsDefaultIds'] = [self::$customerTest->id];
-        $params['customerWriteAsDefaultIds'] = [];
-        $params['serviceName'] ='TermCollection';
-        $params['mergeTerms'] =false;
-        
-        self::$api->addResource($params, 'collection.tbx', true);
-    }
-    
-    /***
-     * Create project tasks.
-     */
-    protected function createProject(){
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId'=>self::$customerTest->id,
-            'autoStartImport'=>0,
-            'edit100PercentMatch' => 0
-        ];
-        self::assertLogin('testmanager');
-        
-        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
-        self::$api->addImportFile($zipfile);
-        
-        self::$api->import($task,false,false);
-        error_log('Task created. '.self::$api->getTask()->taskName);
-    }
-    
     public static function tearDownAfterClass(): void {
         
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-
-        //close the task for editing
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
-        
-        //when removing the task, all task project will be removed
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
-        
+        self::$api->deleteTask($task->id, 'testmanager');
         //remove the created resources
         self::$api->removeResources();
-        
         //remove the temp customer
-        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
 }

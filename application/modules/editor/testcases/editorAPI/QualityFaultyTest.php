@@ -74,10 +74,10 @@ class QualityFaultyTest extends editor_Test_JsonTest {
         
         $task = $api->getTask();
            //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
         
         // we need some segments to play with
-        static::$segments = $api->requestJson('editor/segment?page=1&start=0&limit=10');
+        static::$segments = $api->getSegments(null, 10);
         
         static::assertEquals(10, count(static::$segments), 'Not enough segments in the imported task');
     }
@@ -134,7 +134,7 @@ class QualityFaultyTest extends editor_Test_JsonTest {
     public function testTaskTooltip(){
         
         $file = $this->api()->getFile('expectedTaskToolTipFaulty.html', null, false);
-        $response = $this->api()->request('editor/quality/tasktooltip?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
+        $response = $this->api()->get('editor/quality/tasktooltip?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
         $markup = $response->getBody();
         if($this->api()->isCapturing()){ file_put_contents($file, $markup); }
         $this->assertStringContainsString('</table>', $markup, 'Task Qualities ToolTip Markup does not match');
@@ -145,10 +145,6 @@ class QualityFaultyTest extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

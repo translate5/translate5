@@ -86,6 +86,18 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Prevents that the test data (tasks, etc) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet.');
 
+        $this->addOption(
+            'stop-on-error',
+            'e',
+            InputOption::VALUE_NONE,
+            'Leads to the testsuite stopping on the first error (not failure!).');
+
+        $this->addOption(
+            'stop-on-failure',
+            'f',
+            InputOption::VALUE_NONE,
+            'Leads to the testsuite stopping on the first failure (not error!).');
+
 //        $this->addOption(
 //            'name',
 //            'N',
@@ -131,7 +143,9 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
                 'if the performed changes are really desired and correct right now!',
                 'Sloppy checking or "just comitting the changes" may make the test useless!',
             ]);
-            $this->io->confirm('Yes, I will check the modified data files thoroughly!');
+            if(!$this->io->confirm('Yes, I will check the modified data files thoroughly!')){
+                putenv('DO_CAPTURE=0');
+            }
             if($this->input->getOption('legacy-segment')){
                 putenv('LEGACY_DATA=1');
             }
@@ -143,12 +157,24 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             putenv('DO_CAPTURE=0');
         }
 
+        $stopOnError = '';
+        $stopOnFailure = '';
+
+        if($this->input->getOption('stop-on-error')){
+            $stopOnError = '--stop-on-error';
+        }
+        if($this->input->getOption('stop-on-failure')){
+            $stopOnFailure = '--stop-on-failure';
+        }
+
         $command = new \PHPUnit\TextUI\Command();
         $command->run([
             'phpunit',
             '--colors',
             '--verbose',
-	    '--testdox-text',
+            $stopOnError,
+            $stopOnFailure,
+	        '--testdox-text',
             'last-test-result.txt',
             '--cache-result-file',
             '.phpunit.result.cache',
