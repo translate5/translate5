@@ -58,7 +58,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
      */
     startEditing: function(records, segmentId, isActive){
         this.isActive = isActive;
-        if(isActive && records && records.length > 0){
+        if(isActive && records && records.length){
             this.createCheckboxes(records);
         }
     },
