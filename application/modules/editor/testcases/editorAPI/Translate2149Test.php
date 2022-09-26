@@ -37,9 +37,19 @@ END LICENSE AND COPYRIGHT
  *    Text der von extern kommt zu ersetzen “<1>damit wir keine Probleme mit dem Urheberrecht bekommen”.</1>
  */
 class Translate2149Test extends editor_Test_JsonTest {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.xlf.preserveWhitespace' => 0,
+        'import.xlf.ignoreFramingTags' => 'all'
+    ];
+
+    public static function beforeTests(): void {
+
         $task = array(
             'sourceLang' => 'de',
             'targetLang' => 'es',
@@ -47,32 +57,26 @@ class Translate2149Test extends editor_Test_JsonTest {
             'lockLocked' => 1,
         );
         
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
+
+        static::assertConfigs();
         
-        $tests = array(
-            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-            'runtimeOptions.import.xlf.ignoreFramingTags' => 'all',
-        );
-        self::$api->testConfig($tests);
+        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip'); //TRANSLATE-2149-de-es
         
-        $zipfile = $api->zipTestFiles('testfiles/','XLF-test.zip'); //TRANSLATE-2149-de-es
+        static::api()->addImportFile($zipfile);
+        static::api()->import($task);
         
-        $api->addImportFile($zipfile);
-        $api->import($task);
+        static::api()->addUser('testlector');
         
-        $api->addUser('testlector');
+        //login in beforeTests means using this user in whole testcase!
+        static::api()->login('testlector');
         
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
-        
-        $task = $api->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
     }
     
     /**
@@ -80,12 +84,12 @@ class Translate2149Test extends editor_Test_JsonTest {
      */
     public function testSegmentValuesAfterImport() {
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

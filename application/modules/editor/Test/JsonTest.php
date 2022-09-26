@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * This solves problems with autoincrement values & other dynamic data
  * See editor_Test_Model_Abstract & descendants
  */
-abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
+abstract class editor_Test_JsonTest extends \editor_Test_ApiTest {
 
     /* Segment model specific API */
     
@@ -56,7 +56,7 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param boolean $keepComments
      */
     public function assertSegmentEqualsJsonFile(string $fileToCompare, stdClass $segment, string $message='', bool $keepComments=true){
-        $this->assertSegmentEqualsObject(self::$api->getFileContent($fileToCompare), $segment, $message, $keepComments);
+        $this->assertSegmentEqualsObject(static::api()->getFileContent($fileToCompare), $segment, $message, $keepComments);
     }
     /**
      * compares the given segment content with an expectation object
@@ -80,15 +80,15 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param boolean $keepComments
      */
     public function assertSegmentsEqualsJsonFile(string $fileToCompare, array $segments, string $message='', bool $keepComments=true){
-        if(self::$api->isCapturing()) {
+        if(static::api()->isCapturing()) {
             foreach($segments as $idx => $segment) {
                 $model = editor_Test_Model_Abstract::create($segment, 'segment');
                 $segments[$idx] = $model->getComparableData();
             }
             // on capturing we disable assert existence
-            $this->api()->captureData($fileToCompare, $segments, encode: true);
+            static::api()->captureData($fileToCompare, $segments, encode: true);
         }
-        $expectations = self::$api->getFileContent($fileToCompare);
+        $expectations = static::api()->getFileContent($fileToCompare);
         $numSegments = count($segments);
         $numExpectations = count($expectations);
         if($numSegments === $numExpectations) {
@@ -110,7 +110,7 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $message
      */
     public function assertTmResultEqualsJsonFile(string $fileToCompare, array $tmResults, string $message){
-        $expectations = self::$api->getFileContent($fileToCompare);
+        $expectations = static::api()->getFileContent($fileToCompare);
         $tmUnset = function ($in){
             unset($in->languageResourceid);
             unset($in->metaData);
@@ -131,7 +131,7 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param boolean $removeDates
      */
     public function assertCommentsEqualsJsonFile(string $fileToCompare, array $comments, string $message='', bool $removeDates=false){
-        $expectations = self::$api->getFileContent($fileToCompare);
+        $expectations = static::api()->getFileContent($fileToCompare);
         $numComments = count($comments);
         if($numComments != count($expectations)){
             $this->assertEquals($numComments, count($expectations), $message.' [Number of comments does not match the expectations]');
@@ -179,7 +179,7 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param editor_Test_Model_Filter|null $filter: If given, the expected & actual items will be filtered according to this filter
      */
     public function assertModelsEqualsJsonFile(string $modelName, string $fileToCompare, array $actualModels, string $message='', editor_Test_Model_Filter $filter=NULL){
-        $expectedModels = self::$api->getFileContent($fileToCompare);
+        $expectedModels = static::api()->getFileContent($fileToCompare);
         $this->assertModelsEqualsObjects($modelName, $expectedModels, $actualModels, $message, $filter);
     }
     /**
@@ -191,7 +191,7 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
      */
     public function assertModelEqualsJsonFile(string $modelName, string $fileToCompare, stdClass $actualModel, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
-        $this->assertModelEqualsObject($modelName, self::$api->getFileContent($fileToCompare), $actualModel, $message, $treeFilter);
+        $this->assertModelEqualsObject($modelName, static::api()->getFileContent($fileToCompare), $actualModel, $message, $treeFilter);
     }
     
     /**
@@ -202,7 +202,7 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $message
      */
     public function assertModelEqualsJsonFileRow(string $modelName, string $fileToCompare, stdClass $actual, string $message=''){
-        $expected = $this->api()->getFileContent($fileToCompare);
+        $expected = static::api()->getFileContent($fileToCompare);
         $this->assertModelEqualsObject($modelName, $expected->row, $actual->row);
     }
     /**
@@ -248,7 +248,7 @@ abstract class editor_Test_JsonTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $message
      */
     public function assertObjectEqualsJsonFile(string $fileToCompare, stdClass $actualObject, string $message=''){
-        $expectedObject = self::$api->getFileContent($fileToCompare);
+        $expectedObject = static::api()->getFileContent($fileToCompare);
         $this->assertEquals($expectedObject, $actualObject, $message);
     }
 }

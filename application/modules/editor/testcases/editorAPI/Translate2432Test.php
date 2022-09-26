@@ -34,21 +34,22 @@ END LICENSE AND COPYRIGHT
  * INFO: when new .bconf file is added there, the config should be also added 
  *
  */
-class Translate2432Test extends \ZfExtended_Test_ApiTestcase {
-    
+class Translate2432Test extends \editor_Test_ApiTest {
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_Okapi_Init'
+    ];
+
     /***
      * Currently available bconf files for okapi import/export
      * @var array
      */
     protected static $validExportFile = 'okapi_default_export.bconf';
         
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
+    public static function beforeTests(): void {
 
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
     }
@@ -57,7 +58,7 @@ class Translate2432Test extends \ZfExtended_Test_ApiTestcase {
      * Test the config autoset
      */
     public function testOkapiConfigDefaults() {
-        $result = self::$api->getJson('editor/config');
+        $result = static::api()->getJson('editor/config');
         
         $result = json_decode(json_encode($result), true);
         
@@ -68,9 +69,5 @@ class Translate2432Test extends \ZfExtended_Test_ApiTestcase {
         $default = $result[$index]['default'];
 
         $this->assertEquals(self::$validExportFile, $default, 'The defaults for config ['.$result[$index]['name'].'] are not as expected');
-    }
-
-    public static function tearDownAfterClass(): void {
-        //not needed
     }
 }

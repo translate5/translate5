@@ -32,12 +32,26 @@ END LICENSE AND COPYRIGHT
  * exported file will then be checked for correct encoded content.
  */
 class CsvEncodingTest extends editor_Test_JsonTest {
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_ManualStatusCheck_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.csv.delimiter' => ',',
+        'import.csv.enclosure' => '"',
+        'import.csv.fields.mid' => 'id',
+        'import.csv.fields.source' => 'source',
+        'editor.notification.saveXmlToFile' => 1
+    ];
+
     /**
      * Setting up the test task by fresh import, adds the lector and translator users
      */
-    public static function setUpBeforeClass():void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+    public static function beforeTests():void {
+
         $task = array(
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => 'en',
@@ -45,39 +59,23 @@ class CsvEncodingTest extends editor_Test_JsonTest {
             'edit100PercentMatch' => true,
         );
         
-        $appState = self::assertTermTagger();
-        self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck should not be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $zipfile = $api->zipTestFiles('CSV-testfiles/','CSV-test.zip');
+        $zipfile = static::api()->zipTestFiles('CSV-testfiles/','CSV-test.zip');
         
-        $api->addImportFile($zipfile);
-        $api->import($task);
+        static::api()->addImportFile($zipfile);
+        static::api()->import($task);
         
-        $api->addUser('testlector');
-        $api->reloadTask();
-        $api->addUser('testtranslator', 'waiting', 'translation');
+        static::api()->addUser('testlector');
+        static::api()->reloadTask();
+        static::api()->addUser('testtranslator', 'waiting', 'translation');
         unlink($zipfile);
+
+        static::assertConfigs();
     }
-    
-    /**
-     * tests if config is correct for using our test CSV
-     * and
-     * tests if config is correct for testing changes.xliff
-     */
-    public function testCsvSettings() {
-        $tests = array(
-            'runtimeOptions.import.csv.delimiter' => ',',
-            'runtimeOptions.import.csv.enclosure' => '"',
-            'runtimeOptions.import.csv.fields.mid' => 'id',
-            'runtimeOptions.import.csv.fields.source' => 'source',
-            'runtimeOptions.editor.notification.saveXmlToFile' => 1,
-        );
-        self::$api->testConfig($tests);
-    }
-    
     
     /**
      * tests the specialcharacters encoding after import, edits some segments as lector, finish then the task
@@ -88,30 +86,30 @@ class CsvEncodingTest extends editor_Test_JsonTest {
      */
     public function testEncodingAfterImport() {
         //check that testtranslator is waiting
-        $this->api()->login('testtranslator');
-        $this->assertEquals('waiting', $this->api()->reloadTask()->userState);
+        static::api()->login('testtranslator');
+        $this->assertEquals('waiting', static::api()->reloadTask()->userState);
         
         //check that testlector is open
-        $this->api()->login('testlector');
-        $this->assertEquals('open', $this->api()->reloadTask()->userState);
+        static::api()->login('testlector');
+        $this->assertEquals('open', static::api()->reloadTask()->userState);
         
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         
         //Testing Reference files. Is a little bit hidden in here, but as separate method we would have to play with logins and the task,
         // in this method we are logged in and the task is opened.
-        $res = $this->api()->get('editor/referencefile/Translate%205%20Referenz%20Demonstration.pdf');
+        $res = static::api()->get('editor/referencefile/Translate%205%20Referenz%20Demonstration.pdf');
         /*@var $res Zend_Http_Response */
         $this->assertEquals(200, $res->getStatus(), 'GET reference file does not return HTTP 200');
         $this->assertEquals('2a0275e5921f9127120403b0306758b5', md5($res->getBody()), 'GET reference file does not return correct body');
         
         //get segment list
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
 
         //check imported segment content against correct encoded strings from CSV in not imported colums 4 and 5
         //MQM is in this file for check correct encoding order, see TRANSLATE-654
-        $approvalFileContent = $this->api()->getFileContent('CSV-testfiles/workfiles/specialCharactersInCSV.csv');
+        $approvalFileContent = static::api()->getFileContent('CSV-testfiles/workfiles/specialCharactersInCSV.csv');
         
         
         $csvRows = explode("\n", $approvalFileContent);
@@ -140,8 +138,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
             
             $segToEdit = $segments[$idx];
             $editedData = $row[4].' - edited';
-            $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-            $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
+            static::api()->saveSegment($segToEdit->id, $editedData);
         }
     }
     
@@ -150,13 +147,13 @@ class CsvEncodingTest extends editor_Test_JsonTest {
      * @depends testEncodingAfterImport
      */
     public function testChangesXml() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //finishing the task to get a changes.xml
-        $res = $this->api()->setTaskToFinished($task->id);
-        $this->assertEquals('finished', $this->api()->reloadTask()->userState);
+        $res = static::api()->setTaskToFinished($task->id);
+        $this->assertEquals('finished', static::api()->reloadTask()->userState);
         
         //get the changes file
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $foundChangeFiles = glob($path.'changes*.xliff');
         $this->assertNotEmpty($foundChangeFiles, 'No changes*.xliff file was written for taskGuid: '.$task->taskGuid);
         $foundChangeFile = end($foundChangeFiles);
@@ -164,8 +161,8 @@ class CsvEncodingTest extends editor_Test_JsonTest {
         
         //no direct file assert equals possible here, since our diff format contains random sdl:revids
         //this revids has to be replaced before assertEqual
-        $approvalFileContent = $this->api()->getFileContent('testCsvEncoding-assert-equal.xliff');
-        $toCheck = $this->api()->replaceChangesXmlContent(file_get_contents($foundChangeFile));
+        $approvalFileContent = static::api()->getFileContent('testCsvEncoding-assert-equal.xliff');
+        $toCheck = static::api()->replaceChangesXmlContent(file_get_contents($foundChangeFile));
         $this->assertSame($approvalFileContent, $toCheck);
     }
     
@@ -174,7 +171,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
      * @depends testChangesXml
      */
     public function testExport() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'specialCharactersInCSV-export-assert-equal.csv');
         //start task export with diff
@@ -188,25 +185,25 @@ class CsvEncodingTest extends editor_Test_JsonTest {
      * @param string $fileToCompare
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToCompare) {
-        $this->api()->login('testmanager');
-        $this->api()->get($exportUrl);
+        static::api()->login('testmanager');
+        static::api()->get($exportUrl);
 
         $removeMqmIds = function($text) {
             return preg_replace('/xml:id=""[^"]+""/', 'xml:id=""removed-for-comparing""', $text);
         };
         
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFile = $removeMqmIds($this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/specialCharactersInCSV.csv'));
+        $exportedFile = $removeMqmIds(static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/specialCharactersInCSV.csv'));
         //compare it
-        $expectedResult = $removeMqmIds($this->api()->getFileContent($fileToCompare));
+        $expectedResult = $removeMqmIds(static::api()->getFileContent($fileToCompare));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
 
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

@@ -45,21 +45,21 @@ class Translate1804CsvTest extends \Translate1804Test {
      * @param string $fileToCompare
      */
     public function testExport() {
-        self::$api->login('testmanager');
-        $task = $this->api()->getTask();
+        static::api()->login('testmanager');
+        $task = static::api()->getTask();
         //start task export
         
-        $this->api()->get('editor/task/export/id/'.$task->id);
+        static::api()->get('editor/task/export/id/'.$task->id);
         //$fileToCompare;
         
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/01-csv-en-de.csv');
-        //file_put_contents($this->api()->getFile('export-01-csv-en-de-new.csv', null, false), $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-01-csv-en-de.csv');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/01-csv-en-de.csv');
+        //file_put_contents(static::api()->getFile('export-01-csv-en-de-new.csv', null, false), $exportedFile);
+        $expectedResult = static::api()->getFileContent('export-01-csv-en-de.csv');
         
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');
     }

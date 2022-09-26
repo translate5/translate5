@@ -42,10 +42,10 @@ END LICENSE AND COPYRIGHT
  * 
  * 
  */
-class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
+class Translate2375Test extends \editor_Test_ApiTest {
     protected static $fixedDate = '2020-11-21 18:01:00';
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
+        
         
         $task = array(
             'sourceLang' => 'de',
@@ -56,27 +56,27 @@ class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $zipfile = $api->zipTestFiles('testfiles/','testTask.zip');
-        
-        $api->addImportFile($zipfile);
-        $api->import($task);
-        $task = $api->getTask();
-        error_log('Task created. '.self::$api->getTask()->taskName);
+        $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
+
+        static::api()->addImportFile($zipfile);
+        static::api()->import($task);
+        $task = static::api()->getTask();
+        error_log('Task created. '.static::api()->getTask()->taskName);
     }
     
     public function testDeadlineDate(){
         self::assertLogin('testmanager');
         
-        $assocParams = ['deadlineDate'=>'default','assignmentDate'=>self::$fixedDate];
+        $assocParams = ['deadlineDate' => 'default', 'assignmentDate' => self::$fixedDate];
         
-        self::$api->addUser('testtranslator','open','reviewing',$assocParams);
-        self::$api->reloadTask();
-        self::$api->addUser('testtranslator','waiting','translation',$assocParams);
-        self::$api->reloadTask();
-        self::$api->addUser('testtranslator','waiting','translatorCheck',$assocParams);
+        static::api()->addUser('testtranslator','open','reviewing',$assocParams);
+        static::api()->reloadTask();
+        static::api()->addUser('testtranslator','waiting','translation',$assocParams);
+        static::api()->reloadTask();
+        static::api()->addUser('testtranslator','waiting','translatorCheck',$assocParams);
         
-        $data = $this->api()->getJson('editor/taskuserassoc',[
-            'filter' => '[{"operator":"eq","value":"' . self::$api->getTask()->taskGuid . '","property":"taskGuid"}]'
+        $data = static::api()->getJson('editor/taskuserassoc',[
+            'filter' => '[{"operator":"eq","value":"' . static::api()->getTask()->taskGuid . '","property":"taskGuid"}]'
         ]);
         
         //filter out the non static data
@@ -90,12 +90,12 @@ class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
             return $assoc;
         }, $data);
         
-        //file_put_contents($this->api()->getFile('/expected.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expected.json'), $data, 'The calculate default deadline is are not as expected!');
+        //file_put_contents(static::api()->getFile('/expected.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
+        $this->assertEquals(static::api()->getFileContent('expected.json'), $data, 'The calculate default deadline is are not as expected!');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

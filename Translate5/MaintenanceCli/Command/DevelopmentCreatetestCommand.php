@@ -166,9 +166,23 @@ END LICENSE AND COPYRIGHT
  * For details see the issue.
  */
 class '.$name.' extends editor_Test_JsonTest {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+
+//TODO FOR TEST USAGE: check plugin pre conditions
+    protected static array $forbiddenPlugins = [
+        \'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap\',
+        \'editor_Plugins_NoMissingTargetTerminology_Bootstrap\'
+    ];
+//TODO FOR TEST USAGE: check plugin pre conditions
+    protected static array $requiredPlugins = [
+        \'editor_Plugins_Okapi_Init\'
+    ];
+//TODO FOR TEST USAGE: check config pre conditions
+    protected static array $requiredRuntimeOptions = [
+        \'import.xlf.preserveWhitespace\' => 0,
+        \'runtimeOptions.import.xlf.ignoreFramingTags\' => \'all\'
+    ];
+    
+    public static function beforeTests(): void {
         $task = [
             \'sourceLang\' => \'de\',
             \'targetLang\' => \'en\',
@@ -176,37 +190,29 @@ class '.$name.' extends editor_Test_JsonTest {
             \'lockLocked\' => 1,
         ];
         
-        $appState = self::assertAppState();
+        static::assertAppState();
 
-//TODO FOR TEST USAGE: check plugin pre conditions
-        self::assertNotContains(\'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap\', $appState->pluginsLoaded, \'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!\');
-        self::assertNotContains(\'editor_Plugins_NoMissingTargetTerminology_Bootstrap\', $appState->pluginsLoaded, \'Plugin NoMissingTargetTerminology should not be activated for this test case!\');
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin(\'testmanager\');
+        static::assertNeededUsers(); //last authed user is testmanager
+        static::assertLogin(\'testmanager\');
         
 //TODO FOR TEST USAGE: adjust or delete the created testfiles/task-config.ini
 
 //TODO FOR TEST USAGE: check config checks
-        $tests = array(
-            \'runtimeOptions.import.xlf.preserveWhitespace\' => 0,
-            \'runtimeOptions.import.xlf.ignoreFramingTags\' => \'all\',
-        );
-        self::$api->testConfig($tests);
+        static::assertConfigs();
         
-        $zipfile = $api->zipTestFiles(\'testfiles/\',\'testTask.zip\');
+        $zipfile = static::api()->zipTestFiles(\'testfiles/\',\'testTask.zip\');
         
-        $api->addImportFile($zipfile);
-        $api->import($task);
+        static::api()->addImportFile($zipfile);
+        static::api()->import($task);
         
-        $api->addUser(\'testlector\');
+        static::api()->addUser(\'testlector\');
         
         //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login(\'testlector\');
+        static::api()->login(\'testlector\');
         
-        $task = $api->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $api->setTaskToOpen($task->id);
+        static::api()->setTaskToOpen($task->id);
     }
     
     /**
@@ -217,7 +223,7 @@ class '.$name.' extends editor_Test_JsonTest {
         $jsonFileName = \'expectedSegments.json\';
 // REMINDER FOR TEST USAGE:
 // when the option -c is set on calling this test as a single test (e.g /var/www/translate5/application/modules/editor/testcases/apitest.sh -c editorAPI/MyFunnyTest.php), the files are automatically saved after fetching with the passed filename (third argument)
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertModelsEqualsJsonFile(\'Segment\', $jsonFileName, $segments, \'Imported segments are not as expected!\');
     }
     
@@ -227,22 +233,20 @@ class '.$name.' extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list
-        $segments = $this->api()->getSegments(null, 10);
+        $segments = static::api()->getSegments(null, 10);
         
         //test editing a prefilled segment
         $segToTest = $segments[0];
         
 //TODO FOR TEST USAGE: adjust your segment editings here
         $segToTest->targetEdit = str_replace([\'cool.\', \'is &lt; a\'], [\'cool &amp; cööler.\', \'is &gt; a\'], $segToTest->targetEdit);
-        
-        $segmentData = $this->api()->prepareSegmentPut(\'targetEdit\', $segToTest->targetEdit, $segToTest->id);
-        $this->api()->putJson(\'editor/segment/\'.$segToTest->id, $segmentData);
+        static::api()->saveSegment($segToTest->id, $segToTest->targetEdit);
         
         //check direct PUT result
         $jsonFileName = \'expectedSegments-edited.json\';
 // REMINDER FOR TEST USAGE:
 // when the option -c is set on calling this test as a single test (e.g /var/www/translate5/application/modules/editor/testcases/apitest.sh -c editorAPI/MyFunnyTest.php), the files are automatically saved after fetching with the passed filename (third argument)
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertModelsEqualsJsonFile(\'Segment\', $jsonFileName, $segments, \'Imported segments are not as expected!\');
     }
     
@@ -252,32 +256,32 @@ class '.$name.' extends editor_Test_JsonTest {
      * @depends testSegmentEditing
      */
     public function testExport() {
-        self::$api->login(\'testmanager\');
-        $task = $this->api()->getTask();
+        static::api()->login(\'testmanager\');
+        $task = static::api()->getTask();
         //start task export
         
-        $this->api()->get(\'editor/task/export/id/\'.$task->id);
+        static::api()->get(\'editor/task/export/id/\'.$task->id);
         
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.\'export.zip\';
         $this->assertFileExists($pathToZip);
         
         $exportFileName = \'export-'.$issue.'-de-en.xlf\';
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.\'/'.$issue.'-de-en.xlf\');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.\'/'.$issue.'-de-en.xlf\');
 // REMINDER FOR TEST USAGE:
 // This is the manual way to save files when the command-option -c (= capture) was set
-        if($this->api()->isCapturing()){
-            file_put_contents($this->api()->getFile($exportFileName, null, false), $exportedFile);
+        if(static::api()->isCapturing()){
+            file_put_contents(static::api()->getFile($exportFileName, null, false), $exportedFile);
         }
-        $expectedResult = $this->api()->getFileContent($exportFileName);
+        $expectedResult = static::api()->getFileContent($exportFileName);
         
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), \'Exported result does not equal to export-'.$issue.'-de-en.xlf\');
     }
 
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, \'testmanager\', \'testlector\');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, \'testmanager\', \'testlector\');
     }
 }
 ');

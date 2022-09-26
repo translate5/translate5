@@ -38,10 +38,20 @@ critical qmflag ownttip close => close critical qmflag ownttip
  * edits segments and checks then the edited ones again on correct content
  */
 class BasicSegmentEditingTest extends editor_Test_JsonTest {
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.fileparser.options.protectTags' => 0
+    ];
     
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+    public static function beforeTests(): void {
+
         $task = array(
             'sourceLang' => 'en',
             'targetLang' => 'de',
@@ -49,29 +59,24 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
             'lockLocked' => 1,
         );
         
-        $appState = self::assertTermTagger();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
+
+        static::assertConfigs();
         
-        $tests = [
-            'runtimeOptions.import.fileparser.options.protectTags' => 0,
-        ];
-        self::$api->testConfig($tests);
+        static::api()->addImportFile('MainTest/simple-en-de.zip');
+        static::api()->import($task);
         
-        $api->addImportFile('MainTest/simple-en-de.zip');
-        $api->import($task);
+        static::api()->addUser('testlector');
         
-        $api->addUser('testlector');
+        //login in beforeTests means using this user in whole testcase!
+        static::api()->login('testlector');
         
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
-        
-        $task = $api->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
     }
     
     /**
@@ -79,7 +84,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
      */
     public function testBasicSegmentValuesAfterImport() {
         //get segment list
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
         
         $this->assertCount(13, $segments);
         
@@ -163,30 +168,28 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list
-        $segments =$this->api()->getSegments();
+        $segments =static::api()->getSegments();
         
         //test editing a prefilled segment
         $segToTest = $segments[2];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'PHP Handbuch', $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
-        
+        $segment = static::api()->saveSegment($segToTest->id, 'PHP Handbuch');
+
         //check direct PUT result
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg3.json', $segment);
         
         //check again with GET fresh from server
-        $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
+        $segment = static::api()->getJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg3.json', $segment);
         
         //test editing an empty segment
         $segToTest = $segments[6];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache 2.x auf Unix-Systemen', $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
-        
+        $segment = static::api()->saveSegment($segToTest->id, 'Apache 2.x auf Unix-Systemen');
+
         //check direct PUT result
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7.json', $segment);
         
         //check again with GET fresh from server
-        $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
+        $segment = static::api()->getJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7.json', $segment);
         
         // check correction of overpapped QM Tags (only when there is no contents between them) For this, proper t5qid's are required
@@ -195,37 +198,35 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         $tag1_close = '<img class="close critical qmflag ownttip qmflag-19" data-t5qid="1" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" />';
         $tag2_open = '<img class="open critical qmflag ownttip qmflag-4" data-t5qid="2" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
         $tag2_close = '<img class="close critical qmflag ownttip qmflag-4" data-t5qid="2" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.$tag1_close.' auf'.$tag2_close.' Unix-Systemen', $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
-        
+        $targetEdit = $tag1_open.'Apache 2.x'.$tag2_open.$tag1_close.' auf'.$tag2_close.' Unix-Systemen';
+        $segment = static::api()->saveSegment($segToTest->id, $targetEdit);
+
         //check direct PUT result
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-a.json', $segment);
         
         //check again with GET fresh from server
-        $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
+        $segment = static::api()->getJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-a.json', $segment);
         
         // check for overpapped QM Tags with contents between them. They must be not corrected on saving.
         $segToTest = $segments[6];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.' auf'.$tag1_close.' Unix-Systemen'.$tag2_close, $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
-        
+        $targetEdit = $tag1_open.'Apache 2.x'.$tag2_open.' auf'.$tag1_close.' Unix-Systemen'.$tag2_close;
+        $segment = static::api()->saveSegment($segToTest->id, $targetEdit);
+
         //check direct PUT result
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-b.json', $segment);
         
         //check again with GET fresh from server
-        $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
+        $segment = static::api()->getJson('editor/segment/'.$segToTest->id);
         $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-b.json', $segment);
         
         $segToTest = $segments[7];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'edited by a test', $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
-        
+        static::api()->saveSegment($segToTest->id, 'edited by a test');
+
         $segToTest = $segments[8];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'edited also by a test', $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
+        static::api()->saveSegment($segToTest->id, 'edited also by a test');
         
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
         
         
         //bulk check of all autoStateId fields
@@ -251,11 +252,11 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
      * @depends testSegmentEditing
      */
     public function testTaskStatistics() {
-        $this->api()->reloadTask();
-        $task = $this->api()->getTask();
+        static::api()->reloadTask();
+        $task = static::api()->getTask();
         $stat = $task->workflowProgressSummary;
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/BasicSegmentEditingTest/expected-task-stat-new.json", json_encode($stat,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expected-task-stat.json'), $stat, 'Imported segments are not as expected!');
+        $this->assertEquals(static::api()->getFileContent('expected-task-stat.json'), $stat, 'Imported segments are not as expected!');
     }
     
     /**
@@ -266,27 +267,27 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
      * @param string $fileToCompare
      */
     public function testExport() {
-        self::$api->login('testmanager');
-        $task = $this->api()->getTask();
+        static::api()->login('testmanager');
+        $task = static::api()->getTask();
         //start task export
         
-        $this->api()->get('editor/task/export/id/'.$task->id);
+        static::api()->get('editor/task/export/id/'.$task->id);
         //$fileToCompare;
 
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/install-unix.apache2.html.sdlxliff');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/install-unix.apache2.html.sdlxliff');
         //file_put_contents('/home/tlauria/foo.sdlxliff', $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-assert.sdlxliff');
+        $expectedResult = static::api()->getFileContent('export-assert.sdlxliff');
         
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

@@ -31,9 +31,14 @@ END LICENSE AND COPYRIGHT
  * For details see the issue.
  */
 class Translate2315Test extends editor_Test_JsonTest {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    public static function beforeTests(): void {
+
         $task = array(
             'sourceLang' => 'de',
             'targetLang' => 'en',
@@ -41,27 +46,24 @@ class Translate2315Test extends editor_Test_JsonTest {
             'lockLocked' => 1,
         );
         
-        $appState = self::assertAppState();
+        self::assertAppState();
 
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $zipfile = $api->zipTestFiles('testfiles/','testTask.zip');
+        $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
         
-        $api->addImportFile($zipfile);
-        $api->import($task);
+        static::api()->addImportFile($zipfile);
+        static::api()->import($task);
         
-        $api->addUser('testlector');
+        static::api()->addUser('testlector');
         
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
+        //login in beforeTests means using this user in whole testcase!
+        static::api()->login('testlector');
         
-        $task = $api->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
     }
     
     /**
@@ -69,7 +71,7 @@ class Translate2315Test extends editor_Test_JsonTest {
      */
     public function testSegmentValuesAfterImport() {
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->checkRepetition($segments[0]->id, [$segments[1]->id]);
         $this->checkRepetition($segments[2]->id, []);
         $this->checkRepetition($segments[4]->id, []);
@@ -78,7 +80,7 @@ class Translate2315Test extends editor_Test_JsonTest {
     }
     
     protected function checkRepetition(int $idToGetFor, array $idsToBeFound) {
-        $alikes = $this->api()->getJson('editor/alikesegment/'.$idToGetFor);
+        $alikes = static::api()->getJson('editor/alikesegment/'.$idToGetFor);
         $idsFound = array_column($alikes, 'id');
         sort($idsFound);
         sort($idsToBeFound);
@@ -91,21 +93,14 @@ class Translate2315Test extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list
-        $segments = $this->api()->getSegments(null, 10);
+        $segments = static::api()->getSegments(null, 10);
         
         //edit the segment and make some target repetitions
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', "target rep 1", $segments[4]->id);
-        $this->api()->putJson('editor/segment/'.$segments[4]->id, $segmentData);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', "target rep 1", $segments[5]->id);
-        $this->api()->putJson('editor/segment/'.$segments[5]->id, $segmentData);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', "target rep 2", $segments[6]->id);
-        $this->api()->putJson('editor/segment/'.$segments[6]->id, $segmentData);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', "target rep 2", $segments[7]->id);
-        $this->api()->putJson('editor/segment/'.$segments[7]->id, $segmentData);
-        
+        static::api()->saveSegment($segments[4]->id, 'target rep 1');
+        static::api()->saveSegment($segments[5]->id, 'target rep 1');
+        static::api()->saveSegment($segments[6]->id, 'target rep 2');
+        static::api()->saveSegment($segments[7]->id, 'target rep 2');
+
         $this->checkRepetition($segments[0]->id, [$segments[1]->id]); //source rep
         $this->checkRepetition($segments[2]->id, []); //still no repetition
         $this->checkRepetition($segments[4]->id, [$segments[5]->id]); // target rep
@@ -113,12 +108,12 @@ class Translate2315Test extends editor_Test_JsonTest {
         
         //check direct PUT result
         $jsonFileName = 'expectedSegments-edited.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

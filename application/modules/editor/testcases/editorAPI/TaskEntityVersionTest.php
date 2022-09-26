@@ -29,10 +29,10 @@ END LICENSE AND COPYRIGHT
 /**
  * TaskEntityVersionTest is currently incomplete, just created as a stub to be implemented
  */
-class TaskEntityVersionTest extends \ZfExtended_Test_ApiTestcase {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+class TaskEntityVersionTest extends \editor_Test_ApiTest {
+
+    public static function beforeTests(): void {
+
         $task = array(
             'sourceLang' => 'en',
             'targetLang' => 'de',
@@ -43,21 +43,21 @@ class TaskEntityVersionTest extends \ZfExtended_Test_ApiTestcase {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        $api->addImportFile('MainTest/simple-en-de.zip');
-        $api->import($task);
+        static::api()->addImportFile('MainTest/simple-en-de.zip');
+        static::api()->import($task);
     }
     
     public function testEntityVersionOnChangingUsers() {
         $this->markTestIncomplete("test in draft mode, has to be completed!");
         //first add one user
-        $this->api()->addUser('testlector');
+        static::api()->addUser('testlector');
         //dont reload task and add another user, this results correctly in an 409 HTTP status
         //problem for this test is now, that addUser already checks for 200, this has to be flexibilized
-        $this->api()->addUser('testtranslator');
+        static::api()->addUser('testtranslator');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id);
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id);
     }
 }

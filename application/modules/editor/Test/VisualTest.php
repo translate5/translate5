@@ -31,6 +31,9 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Test_VisualTest extends editor_Test_JsonTest
 {
+    protected static array $requiredPlugins = [
+        'editor_Plugins_VisualReview_Init'
+    ];
     /**
      * Retrieves the visual files structure as json
      * @param string $taskGuid
@@ -38,7 +41,7 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
      * @return mixed
      */
     protected function getVisualFilesJSON(string $taskGuid, string $jsonFileName){
-        return $this->api()->getJson('/editor/plugins_visualreview_visualreview/files?taskGuid='.urlencode($taskGuid), [], $jsonFileName);
+        return static::api()->getJson('/editor/plugins_visualreview_visualreview/files?taskGuid='.urlencode($taskGuid), [], $jsonFileName);
     }
     /**
      * Retrieves the visuals HTML file for the given index
@@ -47,7 +50,7 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
      * @return false|string
      */
     protected function getVisualHtmlFile(bool $isSplitFile=false, int $index=0){
-        return file_get_contents($this->api()->getTaskDataDirectory().editor_Plugins_VisualReview_Source_Files::FOLDER_REVIEW_DEPRICATED.'/'.$this->getVisualHtmlFileName($isSplitFile, $index));
+        return file_get_contents(static::api()->getTaskDataDirectory().editor_Plugins_VisualReview_Source_Files::FOLDER_REVIEW_DEPRICATED.'/'.$this->getVisualHtmlFileName($isSplitFile, $index));
     }
     /**
      * Retrieves the visuals HTML file name for the given index and if split
@@ -95,7 +98,7 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
      * @param string $message
      */
     public function assertVisualFiles(string $fileToCompare, string $message=''){
-        $filesList = $this->getVisualFilesJSON($this->api()->getTask()->taskGuid, $fileToCompare);
-        $this->assertModelsEqualsObjects('VisualSourceFile', self::$api->getFileContent($fileToCompare), $filesList, $message);
+        $filesList = $this->getVisualFilesJSON(static::api()->getTask()->taskGuid, $fileToCompare);
+        $this->assertModelsEqualsObjects('VisualSourceFile', static::api()->getFileContent($fileToCompare), $filesList, $message);
     }
 }

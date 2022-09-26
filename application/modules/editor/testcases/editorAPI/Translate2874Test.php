@@ -31,23 +31,23 @@ END LICENSE AND COPYRIGHT
  * For details see the issue.
  */
 class Translate2874Test extends editor_Test_JsonTest {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
+
+    public static function beforeTests(): void {
 
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
 
-        $api->loadCustomer();
+        static::api()->loadCustomer();
         $task = [
             'sourceLang' => 'de',
             'targetLang' => 'en',
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
-            'customerId' => $api->getCustomer()->id,
+            'customerId' => static::api()->getCustomer()->id,
             'autoStartImport' => 0,
         ];
 
-        self::$api->addResource([
+        static::api()->addResource([
             'resourceId'=>'ZDemoMT',
             'sourceLang' => $task['sourceLang'],
             'targetLang' => $task['targetLang'],
@@ -59,13 +59,13 @@ class Translate2874Test extends editor_Test_JsonTest {
             'name' => 'API Testing::ZDemoMT_'.__CLASS__
         ]);
 
-        $api->addImportFile($api->zipTestFiles('testfiles/','testTask.zip'));
-        $api->import($task, false, false);
-        $api->reloadTask();
+        static::api()->addImportFile(static::api()->zipTestFiles('testfiles/','testTask.zip'));
+        static::api()->import($task, false, false);
+        static::api()->reloadTask();
 
         //add assocs
-        $api->addUser('testlector');
-        self::$api->addTaskAssoc();
+        static::api()->addUser('testlector');
+        static::api()->addTaskAssoc();
 
         $params = [
             'internalFuzzy' => 0,
@@ -74,18 +74,18 @@ class Translate2874Test extends editor_Test_JsonTest {
             'pretranslateMt' => 1,
             'isTaskImport' => 0,
         ];
-        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
+        static::api()->putJson('editor/task/'.static::api()->getTask()->id.'/pretranslation/operation', $params, null, false);
 
-        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
+        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
 
-        self::$api->checkTaskStateLoop();
+        static::api()->checkTaskStateLoop();
 
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
+        //login in beforeTests means using this user in whole testcase!
+        static::api()->login('testlector');
         
-        $task = $api->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
     }
     
     /**
@@ -93,12 +93,12 @@ class Translate2874Test extends editor_Test_JsonTest {
     public function testPreTranslatedContent() {
         //test segment list
         $jsonFileName = 'expectedSegments-edited.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

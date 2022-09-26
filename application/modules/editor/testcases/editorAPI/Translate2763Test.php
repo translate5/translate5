@@ -39,10 +39,10 @@ class Translate2763Test extends editor_Test_JsonTest {
 
     protected static $TC_ID;
 
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
+        
 
-        self::$api->login('testmanager');
+        static::api()->login('testmanager');
         self::assertLogin('testmanager');
         self::assertCustomer();
     }
@@ -50,26 +50,26 @@ class Translate2763Test extends editor_Test_JsonTest {
     /**
      */
     public function test10_InitialTbxImport() {
-        $this->api()->addFile('tmUpload', $this->api()->getFile('testfiles/term-import-1.tbx'), 'application/xml');
-        $result = $this->api()->postJson('editor/languageresourceinstance', [
+        static::api()->addFile('tmUpload', static::api()->getFile('testfiles/term-import-1.tbx'), 'application/xml');
+        $result = static::api()->postJson('editor/languageresourceinstance', [
             //format jsontext???
             'color' => '19737d',
             'serviceName' => 'TermCollection',
             'serviceType' => 'editor_Services_TermCollection',
             'resourceId' => 'editor_Services_TermCollection',
-            'customerIds[]' => $this->api()->getCustomer()->id,
+            'customerIds[]' => static::api()->getCustomer()->id,
             'name' => 'TC test',
         ]);
 
         self::$TC_ID = $result->id ?? null;
 
-        $data = $this->api()->get('/editor/languageresourceinstance/tbxexport', [
+        $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$TC_ID,
             'tbxBasicOnly' => '1',
             'exportImages' => '0',
         ]);
 
-        $this->assertFileContents('term-export-1.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', $this->api()->isCapturing());
+        $this->assertFileContents('term-export-1.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', static::api()->isCapturing());
     }
 
     /**
@@ -77,21 +77,21 @@ class Translate2763Test extends editor_Test_JsonTest {
      * @depends test10_InitialTbxImport
      */
     public function test20_MergeImport() {
-        $this->api()->addFile('tmUpload', $this->api()->getFile('testfiles/term-import-2.tbx'), 'application/xml');
-        $this->api()->postJson('editor/languageresourceinstance/'.self::$TC_ID.'/import/', [
+        static::api()->addFile('tmUpload', static::api()->getFile('testfiles/term-import-2.tbx'), 'application/xml');
+        static::api()->postJson('editor/languageresourceinstance/'.self::$TC_ID.'/import/', [
             'deleteTermsOlderThanCurrentImport' => 'on',
             'deleteProposalsLastTouchedOlderThan' => null,
         ]);
 
-        $data = $this->api()->get('/editor/languageresourceinstance/tbxexport', [
+        $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$TC_ID,
             'tbxBasicOnly' => '1',
             'exportImages' => '0',
         ]);
 
-        $this->assertFileContents('term-export-2.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', $this->api()->isCapturing());
+        $this->assertFileContents('term-export-2.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', static::api()->isCapturing());
 
-        $this->api()->delete('editor/languageresourceinstance/'.self::$TC_ID.'');
+        static::api()->delete('editor/languageresourceinstance/'.self::$TC_ID.'');
     }
 
     /**

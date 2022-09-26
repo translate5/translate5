@@ -33,6 +33,19 @@ END LICENSE AND COPYRIGHT
 class QualityCsvMqmTest extends editor_Test_JsonTest {
     
     const CSV_TARGET = 'target is coming from test edit';
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_ManualStatusCheck_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.csv.delimiter' => ',',
+        'import.csv.enclosure' => '"',
+        'import.csv.fields.mid' => 'id',
+        'import.csv.fields.source' => 'source'
+    ];
     
     protected $testData = array(
         'M',
@@ -80,9 +93,8 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
     /**
      * Setting up the test task by fresh import, adds the lector and translator users
      */
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+    public static function beforeTests(): void {
+
         $task = array(
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => 'en',
@@ -90,50 +102,35 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
             'edit100PercentMatch' => true,
         );
         
-        $appState = self::assertTermTagger();
-        self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck should not be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $api->addImportPlain("id,source,target\n".'1,"source not needed here","'.self::CSV_TARGET.'"'."\n".'2,"zeile 2","row 2"');
-        $api->import($task);
+        static::api()->addImportPlain("id,source,target\n".'1,"source not needed here","'.self::CSV_TARGET.'"'."\n".'2,"zeile 2","row 2"');
+        static::api()->import($task);
+
+        static::assertConfigs();
     }
-    
-    /**
-     * tests if config is correct for using our test CSV
-     */
-    public function testCsvSettings() {
-        $tests = array(
-            'runtimeOptions.import.csv.delimiter' => ',',
-            'runtimeOptions.import.csv.enclosure' => '"',
-            'runtimeOptions.import.csv.fields.mid' => 'id',
-            'runtimeOptions.import.csv.fields.source' => 'source',
-        );
-        self::$api->testConfig($tests);
-    }
-    
-    
+
     /**
      * Check imported data and add MQM to the target by editing it
      * @depends testCsvSettings
      */
     public function testEditingSegmentWithMqm() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         
         //get segment list
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
         $segToEdit = $segments[0];
         
         //asserts that our content was imported properly
         $this->assertEquals(self::CSV_TARGET, $segToEdit->targetEdit);
 
         $editedData = $this->compileMqmTags($this->testData);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-        $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
+        static::api()->saveSegment($segToEdit->id, $editedData);
         
         //editing second segment
         $segToEdit = $segments[1];
@@ -153,9 +150,7 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
                 '<c-c#3#3>',
                 'order'
         );
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $this->compileMqmTags($test2), $segToEdit->id);
-        $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
+        static::api()->saveSegment($segToEdit->id, $this->compileMqmTags($test2));
     }
     
     /**
@@ -186,7 +181,7 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
      * @depends testEditingSegmentWithMqm
      */
     public function testExport() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'cascadingMqm-export-assert-equal.csv');
         //start task export with diff
@@ -200,15 +195,15 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
      * @param string $fileToCompare
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToCompare) {
-        $this->api()->get($exportUrl);
+        static::api()->get($exportUrl);
 
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFileContent = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
+        $exportedFileContent = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
         // get the expected content
-        $expectedResult = $this->api()->getFileContent($fileToCompare, $exportedFileContent);
+        $expectedResult = static::api()->getFileContent($fileToCompare, $exportedFileContent);
         $foundIds = [];
         
         //since the mqm ids are generated on each test run differently,
@@ -246,8 +241,8 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFileContent), 'Exported result does not equal to '.$fileToCompare);
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

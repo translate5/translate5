@@ -32,23 +32,25 @@
  * The valid test results are counted by hand and thay are correct.
  *
  */
-class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
+class MatchAnalysisTest extends \editor_Test_ApiTest {
     
     protected static $sourceLangRfc = 'de';
     protected static $targetLangRfc = 'en';
     
     protected static $prefix = 'MATEST';
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_Okapi_Init',
+        'editor_Plugins_MatchAnalysis_Init',
+        'editor_Plugins_InstantTranslate_Init'
+    ];
     
     /**
      */
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
-        self::assertContains('editor_Plugins_InstantTranslate_Init', $appState->pluginsLoaded, 'Plugin InstantTranslate must be activated for this test case!');
-        self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
-        
+    public static function beforeTests(): void {
+
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
 
@@ -57,10 +59,10 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         static::addTm('resource2.tmx', static::getLrRenderName('resource2'));
         static::addTermCollection('collection.tbx', static::getLrRenderName('resource3'));
         static::createTask();
-        self::$api->addTaskAssoc();
+        static::api()->addTaskAssoc();
         static::queueAnalysys();
-        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
-        self::$api->checkTaskStateLoop();
+        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
+        static::api()->checkTaskStateLoop();
     }
 
     /**
@@ -73,7 +75,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'resourceId' => 'editor_Services_OpenTM2_1',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [ self::$api->getCustomer()->id ],
+            'customerIds' => [ static::api()->getCustomer()->id ],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
@@ -81,7 +83,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'name' => $name
         ];
         //create the resource 1 and import the file
-        self::$api->addResource($params, $fileName,true);
+        static::api()->addResource($params, $fileName,true);
     }
 
     /**
@@ -90,18 +92,18 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $name
      */
     private static function addTermCollection(string $fileName, string $name) {
-        $customer = self::$api->getCustomer();
+        $customer = static::api()->getCustomer();
         $params = [
             'name' => $name,
             'resourceId' =>'editor_Services_TermCollection',
             'serviceType' =>'editor_Services_TermCollection',
-            'customerIds' => [$customer->id],
+            'customerIds' => [ $customer->id ],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
-            'serviceName' =>'TermCollection',
+            'serviceName' => 'TermCollection',
             'mergeTerms' => false
         ];
-        self::$api->addResource($params, $fileName);
+        static::api()->addResource($params, $fileName);
     }
 
     /**
@@ -121,15 +123,15 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId'=>self::$api->getCustomer()->id,
+            'customerId' => static::api()->getCustomer()->id,
             'edit100PercentMatch' => true,
             'wordCount' => 1270,
-            'autoStartImport'=>0
+            'autoStartImport' => 0
         ];
         self::assertLogin('testmanager');
-        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
-        self::$api->addImportFile($zipfile);
-        self::$api->import($task,false,false);
+        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
+        static::api()->addImportFile($zipfile);
+        static::api()->import($task, false, false);
     }
 
     /**
@@ -143,7 +145,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'pretranslateMt' => 0,
             'isTaskImport' => 0
         ];
-        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
+        static::api()->putJson('editor/task/'.static::api()->getTask()->id.'/pretranslation/operation', $params, null, false);
     }
 
     /***
@@ -151,7 +153,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testExportXmlResultsWord(): void
     {
-        $this->exportXmlResults();
+        $this->exportXmlResults(false);
     }
 
     /***
@@ -168,7 +170,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testWordBasedResults(): void
     {
-        $this->validateResults();
+        $this->validateResults(false);
     }
 
     /***
@@ -183,19 +185,19 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
     /***
      * Test the xml analysis summary
      */
-    private function exportXmlResults(bool $characterBased = false): void
+    private function exportXmlResults(bool $characterBased): void
     {
 
         $unitType = $characterBased ? 'character' : 'word';
 
-        $taskGuid = self::$api->getTask()->taskGuid;
-        $response = self::$api->get('editor/plugins_matchanalysis_matchanalysis/export', [
+        $taskGuid = static::api()->getTask()->taskGuid;
+        $response = static::api()->get('editor/plugins_matchanalysis_matchanalysis/export', [
             'taskGuid' => $taskGuid,
             'type' => 'exportXml'
         ]);
 
         self::assertTrue($response->getStatus() === 200, 'export XML HTTP Status is not 200');
-        $actual = self::$api->formatXml($response->getBody());
+        $actual = static::api()->formatXml($response->getBody());
 
         //sanitize task information
         $actual = str_replace('number="'.$taskGuid.'"/>', 'number="UNTESTABLECONTENT"/>', $actual);
@@ -206,8 +208,8 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             '<taskInfo taskId="UNTESTABLECONTENT" runAt="UNTESTABLECONTENT" runTime="UNTESTABLECONTENT">',
             $actual);
 
-        self::$api->isCapturing() && file_put_contents(self::$api->getFile('exportResults-'.$unitType.'.xml', null, false), $actual);
-        $expected = self::$api->getFileContent('exportResults-'.$unitType.'.xml');
+        static::api()->isCapturing() && file_put_contents(static::api()->getFile('exportResults-'.$unitType.'.xml', null, false), $actual);
+        $expected = static::api()->getFileContent('exportResults-'.$unitType.'.xml');
 
         //check for differences between the expected and the actual content
         self::assertEquals($expected, $actual, "The expected file(exportResults) an the result file does not match.");
@@ -221,38 +223,46 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      * @param bool $characterBased
      * @return void
      */
-    private function validateResults(bool $characterBased = false): void
+    private function validateResults(bool $characterBased): void
     {
         $unitType = $characterBased ? 'character' : 'word';
 
         $jsonFileName = 'analysis-'.$unitType.'.json';
         // fetch task data
-        $analysis = self::$api->getJson('editor/plugins_matchanalysis_matchanalysis', [ 'taskGuid'=> self::$api->getTask()->taskGuid, 'unitType' => $unitType ], $jsonFileName);
+        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [ 'taskGuid'=> static::api()->getTask()->taskGuid, 'unitType' => $unitType ], $jsonFileName);
         $this->assertNotEmpty($analysis,'No results found for the '.$unitType.'-based task-specific matchanalysis.');
         //check for differences between the expected and the actual content
-        $expectedAnalysis = self::$api->getFileContent($jsonFileName);
+        $expectedAnalysis = static::api()->getFileContent($jsonFileName);
         $this->assertEquals($this->filterTaskAnalysis($expectedAnalysis), $this->filterTaskAnalysis($analysis), 'The expected file and the data does not match for the '.$unitType.'-based task-specific matchanalysis.');
 
         //now test all results and matches
         $jsonFileName = 'allanalysis-'.$unitType.'.json';
-        $analysis = self::$api->getJson('editor/plugins_matchanalysis_matchanalysis', [ 'taskGuid' => self::$api->getTask()->taskGuid, 'notGrouped' => self::$api->getTask()->taskGuid ], $jsonFileName);
+        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [ 'taskGuid' => static::api()->getTask()->taskGuid, 'notGrouped' => static::api()->getTask()->taskGuid ], $jsonFileName);
         $this->assertNotEmpty($analysis,'No results found for the '.$unitType.'-based not-grouped matchanalysis.');
         //check for differences between the expected and the actual content
-        $expectedAnalysis = self::$api->getFileContent($jsonFileName);
+        $expectedAnalysis = static::api()->getFileContent($jsonFileName);
         //check for differences between the expected and the actual content
         $this->assertEquals($this->filterUngroupedAnalysis($expectedAnalysis), $this->filterUngroupedAnalysis($analysis), "The expected file and the data does not match for the '.$unitType.'-based not-grouped matchanalysis..");
     }
 
-    private function filterTaskAnalysis(array $data) : array {
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function filterTaskAnalysis(array &$data) : array {
         // remove the created timestamp since is not relevant for the test
         foreach ($data as &$a){
             unset($a->created);
         }
-        usort($data, function($a, $b) { return strcmp($a->resourceName, $b->resourceName); });
+        usort($data, function($a, $b){ return strcmp($a->resourceName, $b->resourceName); });
         return $data;
     }
 
-    private function filterUngroupedAnalysis(array $data){
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function filterUngroupedAnalysis(array &$data){
         // remove some of the unneeded columns
         foreach ($data as &$a){
             unset($a->id);
@@ -267,10 +277,10 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
     /**
      * Clean up the resources and the task
      */
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
         //remove the created resources
-        self::$api->removeResources();
+        static::api()->removeResources();
     }
 }

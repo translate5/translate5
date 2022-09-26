@@ -31,18 +31,17 @@ END LICENSE AND COPYRIGHT
  */
 class QualitySpellCheckTest extends editor_Test_JsonTest {
 
-    public static function setUpBeforeClass(): void {
-        // Prepare initial API instance
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    protected static array $requiredPlugins = [
+        'editor_Plugins_SpellCheck_Init'
+    ];
 
+    public static function beforeTests(): void {
         // Check app state
-        $appState = self::assertAppState();
+        self::assertAppState();
 
         // Assert users. Last authed user is testmanager
         self::assertNeededUsers();
         self::assertLogin('testmanager');
-
-        self::assertContains('editor_Plugins_SpellCheck_Init', $appState->pluginsLoaded, 'SpellCheck must be activated for this test case!');
     }
 
     public function testTask0(){
@@ -56,16 +55,16 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         preg_match('~ --- ([^ ]+) ([^ ]+)$~', $taskName, $lang);
 
         // Get absolute file path to be used as 1st arg in below addImportFile() call
-        $absolutePath = self::$api->getFile('testfiles/' . $taskName . '.csv');
+        $absolutePath = static::api()->getFile('testfiles/' . $taskName . '.csv');
 
         // Print the step where we are
         // error_log("\nCreating task based on file: 'testfiles/" . $taskName . ".csv', source lang: '{$lang[1]}', target lang: '{$lang[2]}'\n");
 
         // Add csv-file for import
-        self::$api->addImportFile($absolutePath);
+        static::api()->addImportFile($absolutePath);
 
         // Do import
-        self::$api->import([
+        static::api()->import([
             'sourceLang' => $lang[1],
             'targetLang' => $lang[2],
             'edit100PercentMatch' => true,
@@ -73,26 +72,26 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         ]);
 
         // Get task
-        $task = self::$api->getTask();
+        $task = static::api()->getTask();
 
         // Print the step where we are
         // error_log("\nTesting task based on file: 'testfiles/" . $taskName . ".csv'\n");
 
         // Open task for whole testcase
-        self::$api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
 
         // Get segments and check their quantity
-        $factQty = count(self::$api->getSegments(null, 10));
+        $factQty = count(static::api()->getSegments(null, 10));
         static::assertEquals($factQty, $expectedSegmentQuantity, 'Not enough segments in the imported task');
 
         // Check qualities
         $jsonFile = $taskName.'.json';
-        $tree = self::$api->getJsonTree('/editor/quality', [], $jsonFile);
+        $tree = static::api()->getJsonTree('/editor/quality', [], $jsonFile);
         $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'spellcheck');
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
 
 
         // Close && delete task
-        self::$api->deleteTask($task->id);
+        static::api()->deleteTask($task->id);
     }
 }

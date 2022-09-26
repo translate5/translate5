@@ -35,12 +35,18 @@ END LICENSE AND COPYRIGHT
  * See also:
  * CsvEncodingTest
  */
-class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
+class Translate678ExportDiffEntityTest extends \editor_Test_ApiTest {
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_ManualStatusCheck_Bootstrap'
+    ];
+
     protected static $expectedCsvResult;
     
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+    public static function beforeTests(): void {
+
         $task = array(
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => 'en',
@@ -48,34 +54,31 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
         );
         
-        $appState = self::assertTermTagger();
-        self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck should not be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $api->addImportFile($api->getFile('apiTest.csv'), 'application/csv');
+        static::api()->addImportFile(static::api()->getFile('apiTest.csv'), 'application/csv');
         
-        $api->import($task);
+        static::api()->import($task);
     }
     
     /**
      * edits the segment data with " and ' characters, also changing < to >
      */
     public function testEditing() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         
         //get segment list
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
         $segToEdit = $segments[0];
         
         //swap < and >
         $editedData = 'Target with "special" \'chars\' &amp; greaters &gt; and &lt; lessers';
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-        $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
+        static::api()->saveSegment($segToEdit->id, $editedData);
     }
 
     /**
@@ -84,27 +87,27 @@ class Translate678ExportDiffEntityTest extends \ZfExtended_Test_ApiTestcase {
      * @depends testEditing
      */
     public function testExport() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
 
         //start task export with diff
-        $this->api()->get('editor/task/export/id/'.$task->id.'/diff/1');
+        static::api()->get('editor/task/export/id/'.$task->id.'/diff/1');
 
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedData = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
+        $exportedData = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
         
-        $expectedData = $this->api()->getFileContent('apiTest.csv');
+        $expectedData = static::api()->getFileContent('apiTest.csv');
         //insert the swapped <> characters into the expectedData for comparsion
         $expectedData = str_replace(array('< and >'), '<ins>></ins><del><</del> and <ins><</ins><del>></del>', $expectedData);
 
         $this->assertEquals(rtrim($expectedData), rtrim($exportedData), 'Exported result does not equal to '.$expectedData);
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

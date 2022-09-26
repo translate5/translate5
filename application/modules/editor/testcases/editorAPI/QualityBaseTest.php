@@ -31,16 +31,21 @@ END LICENSE AND COPYRIGHT
  * One Problem that might occur is, that the text's (usually text-prop) of the quality models in fact are translated strings that obviously can change. One solution would be, to not compare those props
  */
 class QualityBaseTest extends editor_Test_JsonTest {
-    
+
+    protected static array $requiredRuntimeOptions = [
+        'autoQA.enableInternalTagCheck' => 1,
+        'autoQA.enableEdited100MatchCheck' => 1,
+        'autoQA.enableUneditedFuzzyMatchCheck' => 1,
+        'autoQA.enableMqmTags' => 1,
+        'autoQA.enableQm' => 1
+    ];
     /**
      * 
      * @var stdClass[]
      */
-    static $segments = [];
+    private static $segments = [];
     
-    public static function setUpBeforeClass(): void {
-       
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
 
         $task = array(
             'sourceLang' => 'en',
@@ -53,30 +58,22 @@ class QualityBaseTest extends editor_Test_JsonTest {
         self::assertNeededUsers();
         self::assertLogin('testmanager');
 
-        $tests = array(
-            'runtimeOptions.autoQA.enableInternalTagCheck' => 1,
-            'runtimeOptions.autoQA.enableEdited100MatchCheck' => 1,
-            'runtimeOptions.autoQA.enableUneditedFuzzyMatchCheck' => 1,
-            'runtimeOptions.autoQA.enableMqmTags' => 1,
-            'runtimeOptions.autoQA.enableQm' => 1
-        );
-        self::$api->testConfig($tests);
-        
+        static::assertConfigs();
          
-        $api->addImportFile('MainTest/csv-with-mqm-en-de.zip');
-        $api->import($task);
+        static::api()->addImportFile('MainTest/csv-with-mqm-en-de.zip');
+        static::api()->import($task);
         
-        $api->addUser('testlector');
+        static::api()->addUser('testlector');
         
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
+        //login in beforeTests means using this user in whole testcase!
+        static::api()->login('testlector');
         
-        $task = $api->getTask();
+        $task = static::api()->getTask();
            //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         
         // we need some segments to play with
-        static::$segments = $api->getSegments(null, 10);
+        static::$segments = static::api()->getSegments(null, 10);
         
         static::assertEquals(count(static::$segments), 10, 'Not enough segments in the imported task');
     }
@@ -86,7 +83,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
      */
     public function testFilterQualityTree(){
         $fileName = 'expectedQualityFilter.json';
-        $tree = $this->api()->getJsonTree('/editor/quality', [], $fileName);
+        $tree = static::api()->getJsonTree('/editor/quality', [], $fileName);
         $this->assertModelEqualsJsonFile('FilterQuality', $fileName, $tree);
     }
     /**
@@ -94,7 +91,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
      */
     public function testTaskQualityTree(){
         $fileName = 'expectedTaskQualities.json';
-        $tree = $this->api()->getJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid), [], $fileName);
+        $tree = static::api()->getJson('editor/quality/task?&taskGuid='.urlencode(static::api()->getTask()->taskGuid), [], $fileName);
         $this->assertModelEqualsJsonFile('TaskQuality', $fileName, $tree);
     }
     /**
@@ -102,7 +99,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
      */
     public function testTaskTooltip(){
         $fileName = 'expectedTaskToolTip.html';
-        $markup = $this->api()->getRaw('editor/quality/tasktooltip?&taskGuid='.urlencode(self::$api->getTask()->taskGuid), [], $fileName);
+        $markup = static::api()->getRaw('editor/quality/tasktooltip?&taskGuid='.urlencode(static::api()->getTask()->taskGuid), [], $fileName);
         $this->assertStringContainsString('</table>', $markup, 'Task Qualities ToolTip Markup does not match');
         $this->assertStringContainsString('<td>487</td>', $markup, 'Task Qualities ToolTip Markup does not match'); // number of all MQMs 
         $this->assertFileContents($fileName, $markup, 'Task Qualities ToolTip Markup does not match'); // this test might has to be adjusted due to the translation problematic
@@ -112,17 +109,17 @@ class QualityBaseTest extends editor_Test_JsonTest {
      */
     public function testSegmentQualities(){
         $fileName = 'expectedSegmentQualities0.json';
-        $qualities = $this->api()->getJson('/editor/quality/segment?segmentId='.static::$segments[0]->id, [], $fileName);
+        $qualities = static::api()->getJson('/editor/quality/segment?segmentId='.static::$segments[0]->id, [], $fileName);
         $qualityFilter = editor_Test_Model_Filter::createMulti('type', ['mqm', 'spellcheck']);
         $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, '', $qualityFilter);
         
         $fileName = 'expectedSegmentQualities4.json';
-        $qualities = $this->api()->getJson('/editor/quality/segment?segmentId='.static::$segments[4]->id, [], $fileName);
+        $qualities = static::api()->getJson('/editor/quality/segment?segmentId='.static::$segments[4]->id, [], $fileName);
         $qualityFilter = editor_Test_Model_Filter::createSingle('type', 'mqm');
         $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, '', $qualityFilter);
         
         $fileName = 'expectedSegmentQualities9.json';
-        $qualities = $this->api()->getJson('/editor/quality/segment?segmentId='.static::$segments[9]->id, [], $fileName);
+        $qualities = static::api()->getJson('/editor/quality/segment?segmentId='.static::$segments[9]->id, [], $fileName);
         $qualityFilter = editor_Test_Model_Filter::createMulti('type', ['mqm', 'spellcheck']);
         $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, '', $qualityFilter);
     }
@@ -132,19 +129,19 @@ class QualityBaseTest extends editor_Test_JsonTest {
     public function testSetUnsetQm(){
         
         $fileName = 'expectedSetSegmentQmAdd0.json';
-        $actual = $this->api()->getJson('/editor/quality/segmentqm?segmentId='.static::$segments[0]->id.'&categoryIndex=4&qmaction=add', [], $fileName);
+        $actual = static::api()->getJson('/editor/quality/segmentqm?segmentId='.static::$segments[0]->id.'&categoryIndex=4&qmaction=add', [], $fileName);
         $this->assertModelEqualsJsonFileRow('SegmentQuality', $fileName, $actual);
         
         $fileName = 'expectedSetSegmentQmAdd4.json';
-        $actual = $this->api()->getJson('/editor/quality/segmentqm?segmentId='.static::$segments[4]->id.'&categoryIndex=1&qmaction=add', [], $fileName);
+        $actual = static::api()->getJson('/editor/quality/segmentqm?segmentId='.static::$segments[4]->id.'&categoryIndex=1&qmaction=add', [], $fileName);
         $this->assertModelEqualsJsonFileRow('SegmentQuality', $fileName, $actual);
         
         $fileName = 'expectedSetSegmentQmAdd9.json';
-        $actual = $this->api()->getJson('/editor/quality/segmentqm?segmentId='.static::$segments[9]->id.'&categoryIndex=3&qmaction=add', [], $fileName);
+        $actual = static::api()->getJson('/editor/quality/segmentqm?segmentId='.static::$segments[9]->id.'&categoryIndex=3&qmaction=add', [], $fileName);
         $this->assertModelEqualsJsonFileRow('SegmentQuality', $fileName, $actual);
         
         $fileName = 'expectedSetSegmentQmRemove0.json';
-        $actual = $this->api()->getJson('/editor/quality/segmentqm?segmentId='.static::$segments[0]->id.'&categoryIndex=4&qmaction=remove', [], $fileName);
+        $actual = static::api()->getJson('/editor/quality/segmentqm?segmentId='.static::$segments[0]->id.'&categoryIndex=4&qmaction=remove', [], $fileName);
         $this->assertModelEqualsJsonFileRow('SegmentQuality', $fileName, $actual);
     }
     /**
@@ -158,25 +155,25 @@ class QualityBaseTest extends editor_Test_JsonTest {
         $qualities0id = $qualities[0]->id; // needed for later revert false positive test
         
         $fileName = 'expectedFalsePositive0-0.json';
-        $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities0id.'&falsePositive=1', [], $fileName);
+        $actual = static::api()->getJson('/editor/quality/falsepositive?id='.$qualities0id.'&falsePositive=1', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
 
         $fileName = 'expectedFalsePositive0-1.json';
-        $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities[1]->id.'&falsePositive=1', [], $fileName);
+        $actual = static::api()->getJson('/editor/quality/falsepositive?id='.$qualities[1]->id.'&falsePositive=1', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
         
         $fileName = 'expectedFalsePositive0-2.json';
-        $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities[2]->id.'&falsePositive=1', [], $fileName);
+        $actual = static::api()->getJson('/editor/quality/falsepositive?id='.$qualities[2]->id.'&falsePositive=1', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
         
         $qualities = $this->_fetchMqmQualities(static::$segments[9]->id);
 
         $fileName = 'expectedFalsePositive9-0.json';
-        $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities[0]->id.'&falsePositive=1', [], $fileName);
+        $actual = static::api()->getJson('/editor/quality/falsepositive?id='.$qualities[0]->id.'&falsePositive=1', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
 
         $fileName = 'expectedNotFalsePositive0-0.json';
-        $actual = $this->api()->getJson('/editor/quality/falsepositive?id='.$qualities0id.'&falsePositive=0', [], $fileName);
+        $actual = static::api()->getJson('/editor/quality/falsepositive?id='.$qualities0id.'&falsePositive=0', [], $fileName);
         $this->assertObjectEqualsJsonFile($fileName, $actual);
     }
 
@@ -188,17 +185,17 @@ class QualityBaseTest extends editor_Test_JsonTest {
     public function testFilterAndTaskAfterChanges(){
         
         $fileName = 'expectedQualityFilterChanged.json';
-        $tree = $this->api()->getJsonTree('/editor/quality', [], $fileName);
+        $tree = static::api()->getJsonTree('/editor/quality', [], $fileName);
         $this->assertModelEqualsJsonFile('FilterQuality', $fileName, $tree);
         
         $fileName = 'expectedTaskQualitiesChanged.json';
-        $tree = $this->api()->getJson('/editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid), [], $fileName);
+        $tree = static::api()->getJson('/editor/quality/task?&taskGuid='.urlencode(static::api()->getTask()->taskGuid), [], $fileName);
         $this->assertModelEqualsJsonFile('TaskQuality', $fileName, $tree);
     }
 
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 
     /**
@@ -206,7 +203,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
      * @return array
      */
     private function _fetchMqmQualities(int $segmentId) : array {
-        $qualities = $this->api()->getJson('/editor/quality/segment?segmentId='.$segmentId);
+        $qualities = static::api()->getJson('/editor/quality/segment?segmentId='.$segmentId);
         $mqmQualities = [];
         foreach($qualities as $quality){
             if($quality->type == 'mqm'){

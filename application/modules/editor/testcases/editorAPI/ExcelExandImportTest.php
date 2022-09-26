@@ -35,10 +35,18 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
      * @var string contains the file name to the downloaded excel
      */
     protected static $tempExcel;
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.xlf.preserveWhitespace' => 0
+    ];
     
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+    public static function beforeTests(): void {
+
         $task = array(
             'sourceLang' => 'en',
             'targetLang' => 'de',
@@ -47,31 +55,26 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
             
         );
         
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
+
+        static::assertConfigs();
         
-        $tests = array(
-            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-        );
-        self::$api->testConfig($tests);
-        
-        $api->addImportFile($api->getFile('testcase-en-de.xlf'));
-        $api->import($task);
+        static::api()->addImportFile(static::api()->getFile('testcase-en-de.xlf'));
+        static::api()->import($task);
     }
     
     /**
      * Test the excel export
      */
     public function testExcelExport() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //start task export
         
         //get the excel
-        $response = $this->api()->get('editor/task/'.$task->id.'/excelexport');
+        $response = static::api()->get('editor/task/'.$task->id.'/excelexport');
         self::$tempExcel = $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
         file_put_contents($tempExcel, $response->getBody());
         
@@ -89,8 +92,8 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
      * @depends testExcelExport
      */
     public function testTaskStatus() {
-        $this->api()->reloadTask();
-        $task = $this->api()->getTask();
+        static::api()->reloadTask();
+        $task = static::api()->getTask();
         $this->assertEquals('*translate5InternalLock*ExcelExported', $task->lockedInternalSessionUniqId);
         $this->assertEquals('{00000000-0000-0000-0000-000000000000}', $task->lockingUser);
         $this->assertEquals('ExcelExported', $task->state);
@@ -101,25 +104,25 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
      * @depends testExcelExport
      */
     public function testReimport() {
-        $this->api()->addFile('excelreimportUpload', self::$tempExcel, 'application/data');
-        $this->api()->post('editor/task/'.$this->api()->getTask()->id.'/excelreimport');
-        $this->api()->reloadTask();
-        $task = $this->api()->getTask();
+        static::api()->addFile('excelreimportUpload', self::$tempExcel, 'application/data');
+        static::api()->post('editor/task/'.static::api()->getTask()->id.'/excelreimport');
+        static::api()->reloadTask();
+        $task = static::api()->getTask();
         $this->assertEmpty($task->lockingUser, 'Task is locked by user '.$task->lockingUser);
         $this->assertEmpty($task->lockedInternalSessionUniqId, 'Task is locked by sessionUniqId '.$task->lockedInternalSessionUniqId);
         $this->assertEquals('open', $task->state);
         $this->assertEmpty($task->locked);
         
         //open task
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getSegments($jsonFileName, 47);
+        $segments = static::api()->getSegments($jsonFileName, 47);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

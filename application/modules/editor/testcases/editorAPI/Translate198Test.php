@@ -36,56 +36,58 @@ class Translate198Test extends editor_Test_JsonTest {
      * Currently imported task ids
      * @var array
      */
+    protected static $customerTest;
     protected static $sourceLangRfc = 'de';
     protected static $targetLangRfc = 'en';
     
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
+        
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
+
+        // add customer
+        self::$customerTest = static::api()->postJson('editor/customer/',[
+            'name' => 'API Testing::'.__CLASS__,
+            'number' => uniqid('API Testing::ResourcesLogCustomer'),
+        ]);
     }
 
     /**
      * imports two tasks
      */
     public function testTasks() {
-        $testCustomer = self::$api->postJson('editor/customer/',[
-            'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
-        ]);
 
-        $task1 = $this->createTask('task1', $testCustomer->id);
-        $task2 = $this->createTask('task2', $testCustomer->id);
+        $task1 = $this->createTask('task1', self::$customerTest->id);
+        $task2 = $this->createTask('task2', self::$customerTest->id);
 
         //open task for editing. This should not produce any error
-        $response = self::$api->setTaskToEdit($task1->id);
-        $this->api()->setTask($task1);
+        $response = static::api()->setTaskToEdit($task1->id);
+        static::api()->setTask($task1);
         self::assertNotEmpty($response,'Unable to edit task 1.');
 
         $jsonFileName = 'segments-task1.json';
-        $segments = self::$api->getSegments($jsonFileName);
+        $segments = static::api()->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments);
 
         self::assertCount(1, $segments);
 
         //open the secound task with the same user. This should not be posible
-        $response = self::$api->setTaskToEdit($task2->id);
-        $this->api()->setTask($task2);
+        $response = static::api()->setTaskToEdit($task2->id);
+        static::api()->setTask($task2);
         self::assertNotEmpty($response,'Unable to edit task 2.');
 
         $jsonFileName = 'segments-task2.json';
-        $segments = self::$api->getSegments($jsonFileName);
+        $segments = static::api()->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments);
 
         //open tasks for whole testcase
-        self::$api->login('testmanager');
+        static::api()->login('testmanager');
 
         // remove the 2 tasks
-        self::$api->deleteTask($task1->id);
-        self::$api->deleteTask($task2->id);
+        static::api()->deleteTask($task1->id);
+        static::api()->deleteTask($task2->id);
 
-        //remove the temp customer
-        self::$api->delete('editor/customer/'.$testCustomer->id);
+
     }
 
     /**
@@ -102,10 +104,15 @@ class Translate198Test extends editor_Test_JsonTest {
             'customerId' => $customerId,
             'autoStartImport' => 0
         ];
-        self::$api->addImportFile(self::$api->getFile($taskName.'-de-en.xlf'));
-        self::$api->import($task, false, false);
-        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
-        self::$api->checkTaskStateLoop();
-        return self::$api->getTask();
+        static::api()->addImportFile(static::api()->getFile($taskName.'-de-en.xlf'));
+        static::api()->import($task, false, false);
+        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
+        static::api()->checkTaskStateLoop();
+        return static::api()->getTask();
+    }
+
+    public static function afterTests(): void {
+        //remove the temp customer
+        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

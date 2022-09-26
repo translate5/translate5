@@ -31,47 +31,51 @@ END LICENSE AND COPYRIGHT
  * For details see the issue.
  */
 class Translate2756Test extends editor_Test_JsonTest {
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_ZDemoMT_Init'
+    ];
+
     /**
      * @throws Zend_Exception
      */
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
+    public static function beforeTests(): void {
 
         /// → Testfall für aktuellen Issue (target update) erstellen!
         /// Wiederholungen und match rate mit rein packen?
 
-        $appState = self::assertAppState();
-
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
+        self::assertAppState();
 
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $zipfile = $api->zipTestFiles('testfiles/','testTask.zip');
+        $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
 
         //create task
-        $api->loadCustomer();
-        $api->addImportFile($zipfile);
-        $api->import([
+        static::api()->loadCustomer();
+        static::api()->addImportFile($zipfile);
+        static::api()->import([
             'sourceLang' => 'de',
             'targetLang' => 'en',
             'edit100PercentMatch' => true,
-            'customerId' => $api->getCustomer()->id,
+            'customerId' => static::api()->getCustomer()->id,
             'autoStartImport' => 0, //don't start the import directly
             'lockLocked' => 1,
         ], true, false);
 
-        $task = $api->getTask();
+        $task = static::api()->getTask();
 
         //create dummy TM
-        $api->addDummyTm('DummyTmxData.tmx');
+        static::api()->addDummyTm('DummyTmxData.tmx');
         sleep(2);
 
         //link task and TM
-        $api->addTaskAssoc();
+        static::api()->addTaskAssoc();
 
         //prepare analysis
         $params = [
@@ -81,19 +85,19 @@ class Translate2756Test extends editor_Test_JsonTest {
             'pretranslateMt' => 1,
             'isTaskImport' => 0,
         ];
-        $api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
+        static::api()->putJson('editor/task/'.static::api()->getTask()->id.'/pretranslation/operation', $params, null, false);
 
         //start import and wait for it
-        $api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
-        $api->checkTaskStateLoop();
+        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
+        static::api()->checkTaskStateLoop();
         
-        $api->addUser('testlector');
+        static::api()->addUser('testlector');
         
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
+        //login in beforeTests means using this user in whole testcase!
+        static::api()->login('testlector');
         
         //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
     }
     
     /**
@@ -101,7 +105,7 @@ class Translate2756Test extends editor_Test_JsonTest {
      */
     public function test10_SegmentValuesAfterImport() {
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
@@ -110,30 +114,24 @@ class Translate2756Test extends editor_Test_JsonTest {
      */
     public function test20_SegmentEditing() {
         //get segment list
-        $segments = $this->api()->getSegments(null, 10);
+        $segments = static::api()->getSegments(null, 10);
         
         //prepare segment with changed TM data from GUI
         $segToTest = $segments[2];
-        $tmId = $this->api()->getResources()[0]->id ?? 0;
-        $result = [
-            'id' => $segToTest->id,
+        $tmId = static::api()->getResources()[0]->id ?? 0;
+        $additionalPutData = [
             'target' => '=&gt; contact Translate5 service',
-            'targetEdit' => 'contact Translate5 service',
             'matchRate' => 91,
-            'matchRateType' => 'matchresourceusage;languageResourceid='.$tmId,
-            'autoStateId' => 999,
-            'durations' => [],
+            'matchRateType' => 'matchresourceusage;languageResourceid='.$tmId
         ];
-
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $result['targetEdit'], $result);
-        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
+        static::api()->saveSegment($segToTest->id, 'contact Translate5 service', null, null, $additionalPutData);
 
         //change also the repetitions
-        $this->api()->putJson('editor/alikesegment/'.$segToTest->id, [  'duration' => 666, 'alikes' => json_encode([$segments[3]->id]) ], null, false);
+        static::api()->putJson('editor/alikesegment/'.$segToTest->id, [  'duration' => 666, 'alikes' => json_encode([$segments[3]->id]) ], null, false);
 
         //check direct PUT result
         $jsonFileName = 'expectedSegments-edited.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
     }
 
@@ -141,18 +139,18 @@ class Translate2756Test extends editor_Test_JsonTest {
      * @depends test20_SegmentEditing
      */
     public function test30_AnalysisResult() {
-        $this->api()->login('testmanager');
+        static::api()->login('testmanager');
         $jsonFileName = 'expectedAnalysis.json';
-        $analysis = $this->api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
-            'taskGuid' => $this->api()->getTask()->taskGuid,
+        $analysis = static::api()->getJson('editor/plugins_matchanalysis_matchanalysis', [
+            'taskGuid' => static::api()->getTask()->taskGuid,
             'notGrouped' => 1
         ], $jsonFileName);
         $this->assertModelsEqualsJsonFile('Analysis', $jsonFileName, $analysis, 'Analysis is not as expected!');
     }
 
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
-        self::$api->removeResources();
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
+        static::api()->removeResources();
     }
 }

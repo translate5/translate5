@@ -30,24 +30,26 @@ END LICENSE AND COPYRIGHT
  * Test word count of a task when edit100PercentMatch enabled/disabled.
  * This will also test the analysis results when the task edit100PercentMatch is enabled/disabled
  */
-class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
+class Translate2428Test extends \editor_Test_ApiTest {
     
     protected static $customerTest;
     protected static $sourceLangRfc = 'de';
     protected static $targetLangRfc = 'en';
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_Okapi_Init',
+        'editor_Plugins_MatchAnalysis_Init',
+        'editor_Plugins_ZDemoMT_Init'
+    ];
     
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
-        self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
-        self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
-        
+    public static function beforeTests(): void {
+
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
 
-        self::$customerTest = self::$api->postJson('editor/customer/',[
+        self::$customerTest = static::api()->postJson('editor/customer/',[
             'name' => 'API Testing::ResourcesLogCustomer',
             'number' => uniqid('API Testing::ResourcesLogCustomer'),
         ]);
@@ -64,15 +66,15 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
             'wordCount' => 0,//just to overwrite the default value set by the ApiHelper
             'edit100PercentMatch' => 0
         ];
-        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
-        self::$api->addImportFile($zipfile);
-        self::$api->import($task,false,false);
+        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
+        static::api()->addImportFile($zipfile);
+        static::api()->import($task,false,false);
         // add Demo-MTs
         static::addZDemoMTMt('one');
         static::addZDemoMTMt('two');
 
         // add resource assocs
-        self::$api->addTaskAssoc();
+        static::api()->addTaskAssoc();
 
         // queue analysis
         $params = [
@@ -82,10 +84,10 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
             'pretranslateMt' => 1,
             'isTaskImport' => 0
         ];
-        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
+        static::api()->putJson('editor/task/'.static::api()->getTask()->id.'/pretranslation/operation', $params, null, false);
 
-        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
-        self::$api->checkTaskStateLoop();
+        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
+        static::api()->checkTaskStateLoop();
     }
 
     /***
@@ -103,24 +105,24 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
             'serviceName'=> 'ZDemoMT',
             'name' => 'API Testing::ZDemoMT_'.__CLASS__.'_'.$suffix
         ];
-        self::$api->addResource($params);
+        static::api()->addResource($params);
     }
     
     /**
      * Test the word count and analysis with and without 100% match enabled/disabled
      */
     public function testTaskWorkCount() {
-        $wordCount = self::$api->getTask()->wordCount;
+        $wordCount = static::api()->getTask()->wordCount;
         $this->assertEquals(66, $wordCount, 'Task word count is not as expected!');
         
         $this->checkAnalysis('edit100PercentMatch_false.txt');
         
-        $task = self::$api->getTask();
+        $task = static::api()->getTask();
         //enable 100% matches for edition. This should calculate also the word count
-        self::$api->putJson('editor/task/'.$task->id, ['edit100PercentMatch' => 1]);
+        static::api()->putJson('editor/task/'.$task->id, ['edit100PercentMatch' => 1]);
         
-        self::$api->reloadTask();
-        $wordCount = self::$api->getTask()->wordCount;
+        static::api()->reloadTask();
+        $wordCount = static::api()->getTask()->wordCount;
         
         $this->assertEquals(72, $wordCount, 'Task word count is not as expected!');
         
@@ -134,8 +136,8 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
      * @param string $validationFileName
      */
     private function checkAnalysis(string $validationFileName){
-        $analysis=self::$api->getJson('editor/plugins_matchanalysis_matchanalysis',[
-            'taskGuid'=>self::$api->getTask()->taskGuid
+        $analysis=static::api()->getJson('editor/plugins_matchanalysis_matchanalysis',[
+            'taskGuid'=>static::api()->getTask()->taskGuid
         ]);
         
         $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
@@ -144,19 +146,19 @@ class Translate2428Test extends \ZfExtended_Test_ApiTestcase {
             unset($a->created);
         }
         //this is to recreate the file from the api response
-        //file_put_contents(self::$api->getFile($validationFileName, null, false), json_encode($analysis, JSON_PRETTY_PRINT));
-        $expected=self::$api->getFileContent($validationFileName);
+        //file_put_contents(static::api()->getFile($validationFileName, null, false), json_encode($analysis, JSON_PRETTY_PRINT));
+        $expected=static::api()->getFileContent($validationFileName);
         $actual=json_encode($analysis, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected analysis and the result file does not match.");
     }
 
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
         //remove the created resources
-        self::$api->removeResources();
+        static::api()->removeResources();
         //remove the temp customer
-        self::$api->delete('editor/customer/'.self::$customerTest->id);
+        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

@@ -33,12 +33,18 @@ END LICENSE AND COPYRIGHT
  * See therefore: 
  * TRANSLATE-678 
  */
-class Translate682Test extends \ZfExtended_Test_ApiTestcase {
+class Translate682Test extends \editor_Test_ApiTest {
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_ManualStatusCheck_Bootstrap'
+    ];
+
     protected static $expectedCsvResult;
     
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+    public static function beforeTests(): void {
+
         $task = array(
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => 'en',
@@ -46,33 +52,29 @@ class Translate682Test extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
         );
         
-        $appState = self::assertTermTagger();
-        self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck should not be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $api->addImportFile($api->getFile('testsamples.sdlxliff'), 'application/xml');
-        $api->addImportTbx($api->getFile('tbx_without_ids.tbx'));
+        static::api()->addImportFile(static::api()->getFile('testsamples.sdlxliff'), 'application/xml');
+        static::api()->addImportTbx(static::api()->getFile('tbx_without_ids.tbx'));
         
-        $api->import($task);
+        static::api()->import($task);
     }
     
     public function testEditing() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         
         //get segment list
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
         $segToEdit = $segments[0];
-        
-        
+
         //swap < and >
         $editedData = str_replace('&lt;FilesMatch', '&gt;FilesMatch', $segToEdit->targetEdit);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-        $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
+        static::api()->saveSegment($segToEdit->id, $editedData);
     }
 
     /**
@@ -80,13 +82,13 @@ class Translate682Test extends \ZfExtended_Test_ApiTestcase {
      * @depends testEditing
      */
     public function testExport() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
 
         //start task export with diff 
-        $this->api()->get('editor/task/export/id/'.$task->id.'/diff/1');
+        static::api()->get('editor/task/export/id/'.$task->id.'/diff/1');
 
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
@@ -98,14 +100,14 @@ class Translate682Test extends \ZfExtended_Test_ApiTestcase {
             return preg_replace('/(sdl:revid="|rev-def id=")[a-z0-9-]{36}"/', '\1foo-bar"', $string);
         };
         
-        $exportedData = $replaceDynamicRevId($this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/testsamples.sdlxliff'));
-        $expectedData = $replaceDynamicRevId($this->api()->getFileContent('expectedResult.sdlxliff'));
+        $exportedData = $replaceDynamicRevId(static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/testsamples.sdlxliff'));
+        $expectedData = $replaceDynamicRevId(static::api()->getFileContent('expectedResult.sdlxliff'));
         
         $this->assertEquals(rtrim($expectedData), rtrim($exportedData), 'Exported result does not equal to expected SDLXLIFF content');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

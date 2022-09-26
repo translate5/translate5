@@ -30,9 +30,22 @@ END LICENSE AND COPYRIGHT
  * SegmentCommentRoundtripTest imports a SDLXLIFF file with comments, adds new comments and export the file again
  */
 class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'editor.export.exportComments' => 1,
+        'import.sdlxliff.applyChangeMarks' => 1,
+        'import.sdlxliff.importComments' => 1,
+        'customers.anonymizeUsers' => 0,
+    ];
     
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
 
         $task = array(
             'sourceLang' => 'en',
@@ -41,33 +54,25 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
             'lockLocked' => 1,
         );
 
-        $appState = self::assertTermTagger();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
+        self::assertAppState();
 
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
 
-        $zipfile = $api->zipTestFiles('testfiles/','XLF-test.zip');
-        $api->addImportFile($zipfile);
-        $api->import($task);
+        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
+        static::api()->addImportFile($zipfile);
+        static::api()->import($task);
 
-        $api->addUser('testlector');
+        static::api()->addUser('testlector');
 
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
+        //login in beforeTests means using this user in whole testcase!
+        static::api()->login('testlector');
 
-        $task = $api->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $api->setTaskToEdit($task->id);
-        
-        $tests = array(
-            'runtimeOptions.editor.export.exportComments' => 1,
-            'runtimeOptions.import.sdlxliff.applyChangeMarks' => 1,
-            'runtimeOptions.import.sdlxliff.importComments' => 1,
-            'runtimeOptions.customers.anonymizeUsers' => 0,
-        );
-        self::$api->testConfig($tests, ['taskGuid' => $task->taskGuid]);
+        static::api()->setTaskToEdit($task->id);
+
+        static::assertConfigs($task->taskGuid);
     }
 
     /**
@@ -75,7 +80,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
      */
     public function testImportedContent() {
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getSegments($jsonFileName, 100);
+        $segments = static::api()->getSegments($jsonFileName, 100);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
         $segmentIds = array_column($segments, 'id');
         $comments = $this->getCommentsForTest($segmentIds);
@@ -90,7 +95,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
     protected function getCommentsForTest(array $segmentIds) {
         $comments = [];
         foreach($segmentIds as $id) {
-            $commentsBySegment = $this->api()->getJson('editor/comment?segmentId='.$id);
+            $commentsBySegment = static::api()->getJson('editor/comment?segmentId='.$id);
             $comments[] = $commentsBySegment;
         }
         return $comments;
@@ -100,7 +105,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
      * Test adding comments via translate5, and check if they are added properly
      */
     public function testAddNewComments() {
-        $segments = $this->api()->getSegments(null, 100);
+        $segments = static::api()->getSegments(null, 100);
         $segmentIds = array_column($segments, 'id');
         foreach($segmentIds as $idx => $segmentId) {
             $comment = [
@@ -109,10 +114,10 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
                 'userName'      => 'A Test users name',
                 'comment'       => 'A test comment for segment '.$idx,
             ];
-            $this->api()->postJson('editor/comment', $comment);
+            static::api()->postJson('editor/comment', $comment);
         }
         $jsonFileName = 'expectedSegmentsAfterAdd.json';
-        $segments = $this->api()->getSegments($jsonFileName, 100);
+        $segments = static::api()->getSegments($jsonFileName, 100);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
         $segmentIds = array_column($segments, 'id');
         $comments = $this->getCommentsForTest($segmentIds);
@@ -124,14 +129,14 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
      * @depends testAddNewComments
      */
     public function testExport() {
-        self::$api->login('testmanager');
-        $task = $this->api()->getTask();
+        static::api()->login('testmanager');
+        $task = static::api()->getTask();
         //start task export
 
-        $this->api()->get('editor/task/export/id/'.$task->id);
+        static::api()->get('editor/task/export/id/'.$task->id);
 
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
 
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
@@ -141,8 +146,8 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
     }
 
     protected function _testExportSdlXliff(string $pathToZip) {
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $this->api()->getTask()->taskGuid.'/01-sdlxliff-en-de.sdlxliff');
-        $expectedResult = $this->api()->getFileContent('export-assert.sdlxliff', $exportedFile);
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, static::api()->getTask()->taskGuid.'/01-sdlxliff-en-de.sdlxliff');
+        $expectedResult = static::api()->getFileContent('export-assert.sdlxliff', $exportedFile);
         //Since we replace only our own comments, we can leave Medium and 1.0 as fixed string, since they are currently not modifiable by translate5
         $s = [
             '/<Comment severity="Medium" user="lector test" date="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2}" version="1\.0">/',
@@ -163,8 +168,8 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
     }
 
     protected function _testExportMemoQXliff(string $pathToZip) {
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $this->api()->getTask()->taskGuid.'/02-memoq-de-en.mqxliff');
-        $expectedResult = $this->api()->getFileContent('export-assert.mqxliff', $exportedFile);
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, static::api()->getTask()->taskGuid.'/02-memoq-de-en.mqxliff');
+        $expectedResult = static::api()->getFileContent('export-assert.mqxliff', $exportedFile);
         //Since we replace only our own comments, we can leave Medium and 1.0 as fixed string, since they are currently not modifiable by translate5
         $s = [
             '/<mq:comment id="[0-9abcdef-]{36}" creatoruser="lector test" time="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"/'
@@ -180,8 +185,8 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.mqxliff');
     }
 
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

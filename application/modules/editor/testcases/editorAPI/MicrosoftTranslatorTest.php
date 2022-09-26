@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Test microsoft translator api for dictonary,normal and segmentation search
  */
-class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
+class MicrosoftTranslatorTest extends \editor_Test_ApiTest {
     
     protected static $languageResourceId;
     
@@ -37,21 +37,19 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
     protected static string $targetLangRfc = 'en';
     protected static string $serviceName = 'Microsoft';
     protected static string $languageResourceName = 'API Testing::'.__CLASS__;
-    
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_InstantTranslate_Init'
+    ];
     /**
      */
-    public static function setUpBeforeClass(): void {
+    public static function beforeTests(): void {
         //check if this test needs to be skipped.
         if (!self::isMasterTest()) {
             self::markTestSkipped('Test runs only in master test to reduce usage/costs.');
             return;
         }
-        
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_InstantTranslate_Init', $appState->pluginsLoaded, 'Plugin InstantTranslate must be activated for this test case!');
-        
+        self::assertAppState();
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
     }
@@ -74,7 +72,7 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $fileName
      */
     protected function translateText(string $text,string $fileName){
-        $result=$this->api()->getJson('editor/instanttranslateapi/translate',[
+        $result=static::api()->getJson('editor/instanttranslateapi/translate',[
             'text'=>$text,
             'source'=>self::$sourceLangRfc,
             'target'=>self::$targetLangRfc
@@ -85,9 +83,9 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
         $filtered = $this->filterResult($result);
         
         //this is to recreate the file from the api response
-        //file_put_contents($this->api()->getFile($fileName, null, false), json_encode($filtered, JSON_PRETTY_PRINT));
+        //file_put_contents(static::api()->getFile($fileName, null, false), json_encode($filtered, JSON_PRETTY_PRINT));
 
-        $expected=$this->api()->getFileContent($fileName);
+        $expected=static::api()->getFileContent($fileName);
         $actual=json_encode($filtered, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
@@ -102,18 +100,18 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
             'name'=>self::$languageResourceName,
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [$this->api()->getCustomer()->id],
+            'customerIds' => [static::api()->getCustomer()->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_Microsoft',
             'serviceName'=> 'Microsoft'
         ];
-        $resource = $this->api()->postJson('editor/languageresourceinstance', $params, null, false);
+        $resource = static::api()->postJson('editor/languageresourceinstance', $params, null, false);
         $this->assertTrue(is_object($resource), 'Unable to create the language resource:'.$params['name']);
         $this->assertEquals($params['name'], $resource->name);
         self::$languageResourceId=$resource->id;
         error_log("Language resources created. ".$resource->name);
-        $resp = $this->api()->getJson('editor/languageresourceinstance/'.$resource->id,[]);
+        $resp = static::api()->getJson('editor/languageresourceinstance/'.$resource->id,[]);
         $this->assertEquals('available',$resp->status,'Tm import stoped. Tm state is:'.$resp->status);
     }
     
@@ -149,8 +147,8 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
     /***
      * Cleand up the resources and the task
      */
-    public static function tearDownAfterClass(): void {
-        self::$api->login('testmanager');
-        self::$api->delete('editor/languageresourceinstance/'.self::$languageResourceId);
+    public static function afterTests(): void {
+        static::api()->login('testmanager');
+        static::api()->delete('editor/languageresourceinstance/'.self::$languageResourceId);
     }
 }

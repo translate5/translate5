@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * SegmentsToUsersTest imports a test task, adds users with the same workflow-role and assigns segments to them.
  * It then checks if they are allowed to edit segments accordingly.
  */
-class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
+class SegmentsToUsersTest extends \editor_Test_ApiTest {
     
     const STEP = 'translation';
     const SEGMENTRANGE_USER1 = '1-3,5';
@@ -38,12 +38,17 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
     const SEGMENTRANGE_USER2 = '6-7';
     const SEGMENTS_USER2 = [6,7];
     const NON_EDITABLE_SEGMENTS_EXPECTED = '4,8-10';
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_FrontEndMessageBus_Init'
+    ];
     /**
      * Setting up the test task by fresh import, adds the lector and translator users
      */
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+    public static function beforeTests(): void {
+
         $task = array(
             'taskName' => 'API Testing::'.__CLASS__,
             'sourceLang' => 'en',
@@ -51,34 +56,33 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true
         );
         
-        $appState = self::assertTermTagger();
+        self::assertAppState();
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         self::assertCustomer();
         
-        $api->addImportFile($api->getFile('testcase-de-en.xlf'));
-        $api->import($task);
+        static::api()->addImportFile(static::api()->getFile('testcase-de-en.xlf'));
+        static::api()->import($task);
         
         // task must be in 'simultaneous'-mode
-        self::assertContains('editor_Plugins_FrontEndMessageBus_Init', $appState->pluginsLoaded, 'Plugin FrontEndMessageBus must be activated for this test case!');
-        $task = $api->getTask();
-        $api->putJson('editor/task/'.$task->id, array('usageMode' => 'simultaneous'));
+        $task = static::api()->getTask();
+        static::api()->putJson('editor/task/'.$task->id, array('usageMode' => 'simultaneous'));
         
         // => testEditableSegmentsForUser1
-        $api->reloadTask();
-        $api->addUser('testlector', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER1]);
+        static::api()->reloadTask();
+        static::api()->addUser('testlector', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER1]);
         
         // => testEditableSegmentsForUser2
-        $api->reloadTask();
-        $api->addUser('testtranslator', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER2]);
+        static::api()->reloadTask();
+        static::api()->addUser('testtranslator', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER2]);
     }
     
     /**
      * Checks if the segments that are NOT editable are recognized as expected.
      */
     public function testNonEditableSegments() {
-        $missingsegmentranges = $this->api()->reloadTask()->missingsegmentranges[0];
+        $missingsegmentranges = static::api()->reloadTask()->missingsegmentranges[0];
         //fwrite(STDERR, print_r($missingsegmentranges,1));
         $this->assertEquals('translation', $missingsegmentranges->workflowStepName);
         $this->assertEquals(self::NON_EDITABLE_SEGMENTS_EXPECTED, $missingsegmentranges->missingSegments);
@@ -88,32 +92,32 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
      * Opens the task for User1 and checks if the segments are editable as expected.
      */
     public function testEditableSegmentsForUser1() {
-        $this->api()->login('testlector');
-        $this->api()->reloadTask();
-        $task = $this->api()->getTask();
+        static::api()->login('testlector');
+        static::api()->reloadTask();
+        $task = static::api()->getTask();
         //open task
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         //get segment list
-        $segments = $this->api()->getSegments(null, 20);
+        $segments = static::api()->getSegments(null, 20);
         //check if segments are editable as expected
         $this->checkSegments($segments, self::SEGMENTS_USER1);
-        $this->api()->logout();
+        static::api()->logout();
     }
     
     /**
      * Opens the task for User2 and checks if the segments are editable as expected.
      */
     public function testEditableSegmentsForUser2() {
-        $this->api()->login('testtranslator');
-        $this->api()->reloadTask();
-        $task = $this->api()->getTask();
+        static::api()->login('testtranslator');
+        static::api()->reloadTask();
+        $task = static::api()->getTask();
         //open task
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         //get segment list
-        $segments = $this->api()->getSegments(null, 20);
+        $segments = static::api()->getSegments(null, 20);
         //check if segments are editable as expected
         $this->checkSegments($segments, self::SEGMENTS_USER2);
-        $this->api()->logout();
+        static::api()->logout();
     }
     
     /**
@@ -131,8 +135,8 @@ class SegmentsToUsersTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($editableSegmentsExpected, $editableSegments);
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

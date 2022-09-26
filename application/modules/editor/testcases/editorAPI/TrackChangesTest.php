@@ -28,11 +28,16 @@ END LICENSE AND COPYRIGHT
 
 /**
  */
-class TrackChangesTest extends \ZfExtended_Test_ApiTestcase {
+class TrackChangesTest extends \editor_Test_ApiTest {
+
     protected static $expectedCsvResult;
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_TrackChanges_Init'
+    ];
     
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
+        
         
         $task = array(
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
@@ -41,19 +46,18 @@ class TrackChangesTest extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
         );
         
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_TrackChanges_Init', $appState->pluginsLoaded, 'Plugin TrackChanges must be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $api->addImportFile($api->getFile('testcase-de-en.xlf'));
+        static::api()->addImportFile(static::api()->getFile('testcase-de-en.xlf'));
         
-        $api->import($task);
+        static::api()->import($task);
         
-        $task = $api->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
     }
     
     /**
@@ -61,19 +65,17 @@ class TrackChangesTest extends \ZfExtended_Test_ApiTestcase {
      * Given a special construction of del tags was leading to much deleted content on the export
      */
     public function testTranslate1267() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         
         //get segment list
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
         $segToEdit = $segments[0];
                 
         //add content with ins del tags, here without attributes for better readability
         $editedData = 'This <del>was</del><ins>is</ins> the <ins>house</ins><del>castle</del> of St. Nicholas.';
         
         $editedData = $this->addTrackChangesAttributes($editedData);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-        $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
+        static::api()->saveSegment($segToEdit->id, $editedData);
     }
 
     /**
@@ -92,27 +94,27 @@ class TrackChangesTest extends \ZfExtended_Test_ApiTestcase {
      * @depends testTranslate1267
      */
     public function testExport() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         
         //start task export with diff
-        $this->api()->get('editor/task/export/id/'.$task->id.'/');
+        static::api()->get('editor/task/export/id/'.$task->id.'/');
         
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
         //get the exported file content
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/testcase-de-en.xlf');
-        $expectedResult = $this->api()->getFileContent('expected-export-testcase-de-en.xlf');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/testcase-de-en.xlf');
+        $expectedResult = static::api()->getFileContent('expected-export-testcase-de-en.xlf');
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
         //file_put_contents('/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/TrackChangesTest/new-export.xlf', rtrim($exportedFile));
         //compare it
        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to expected-export-testcase-de-en.xlf');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

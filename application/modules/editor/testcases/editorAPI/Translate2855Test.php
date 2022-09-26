@@ -42,22 +42,24 @@ class Translate2855Test extends editor_Test_JsonTest {
     protected static $sourceLangRfc = 'en';
     protected static $targetLangRfc = 'de';
 
+    protected static array $requiredPlugins = [
+        'editor_Plugins_Okapi_Init',
+        'editor_Plugins_MatchAnalysis_Init',
+        'editor_Plugins_ZDemoMT_Init'
+    ];
+
     /**
      * This method is called before the first test of this test class is run.
      * @throws Exception
      */
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
 
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
-        self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
-        self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
+        self::assertAppState();
         self::assertNeededUsers(); // last authed user is testmanager
         self::assertLogin('testmanager');
 
         // add customer
-        self::$customerTest = self::$api->postJson('editor/customer/',[
+        self::$customerTest = static::api()->postJson('editor/customer/',[
             'name' => 'API Testing::Pivot pre-translation',
             'number' => uniqid('API Testing::Pivot pre-translation', true),
         ]);
@@ -75,7 +77,7 @@ class Translate2855Test extends editor_Test_JsonTest {
             'serviceName'=> 'ZDemoMT',
             'name' => 'API Testing::Pivot pre-translation_'.__CLASS__
         ];
-        self::$api->addResource($params);
+        static::api()->addResource($params);
 
         // create task without starting the import
         $task = [
@@ -87,15 +89,15 @@ class Translate2855Test extends editor_Test_JsonTest {
             'edit100PercentMatch' => true,
             'autoStartImport' => 0
         ];
-        self::$api->addImportFile(self::$api->getFile('Task-de-en.html'));
-        self::$api->import($task,false,false);
+        static::api()->addImportFile(static::api()->getFile('Task-de-en.html'));
+        static::api()->import($task,false,false);
 
         // queue the pretranslation
-        self::$api->putJson('editor/languageresourcetaskpivotassoc/pretranslation/batch', [ 'taskGuid' => self::$api->getTask()->taskGuid ], null, false);
+        static::api()->putJson('editor/languageresourcetaskpivotassoc/pretranslation/batch', [ 'taskGuid' => static::api()->getTask()->taskGuid ], null, false);
 
         // start the import & wait for finish
-        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
-        self::$api->checkTaskStateLoop();
+        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
+        static::api()->checkTaskStateLoop();
     }
 
     /**
@@ -104,8 +106,8 @@ class Translate2855Test extends editor_Test_JsonTest {
      */
     public function testSegmentContent(){
         //open task for whole testcase
-        self::$api->setTaskToEdit();
-        $segments = $this->api()->getSegments();
+        static::api()->setTaskToEdit();
+        $segments = static::api()->getSegments();
 
         self::assertEquals(3, count($segments), 'The number of segments does not match.');
 
@@ -117,12 +119,12 @@ class Translate2855Test extends editor_Test_JsonTest {
     /**
      * This method is called after the last test of this test class is run.
      */
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
         // remove task & resources
-        self::$api->deleteTask($task->id, 'testmanager');
-        self::$api->removeResources();
+        static::api()->deleteTask($task->id, 'testmanager');
+        static::api()->removeResources();
         //remove the temp customer
-        self::$api->delete('editor/customer/'.self::$customerTest->id);
+        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

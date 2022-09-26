@@ -37,14 +37,16 @@ class Translate1484Test extends editor_Test_JsonTest {
     protected static $sourceLangRfc = 'en';
     protected static $targetLangRfc = 'de';
 
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
-        self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
-        self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
-        
+    protected static array $requiredPlugins = [
+        'editor_Plugins_Okapi_Init',
+        'editor_Plugins_MatchAnalysis_Init',
+        'editor_Plugins_ZDemoMT_Init'
+    ];
+
+    public static function beforeTests(): void {
+
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
 
@@ -54,7 +56,7 @@ class Translate1484Test extends editor_Test_JsonTest {
     private static function setupTestTask() {
 
         // add customer
-        self::$customerTest = self::$api->postJson('editor/customer/',[
+        self::$customerTest = static::api()->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer'),
         ]);
@@ -69,8 +71,8 @@ class Translate1484Test extends editor_Test_JsonTest {
             'autoStartImport' => 0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('simple-en-de.xlf'));
-        self::$api->import($task,false,false);
+        static::api()->addImportFile(static::api()->getFile('simple-en-de.xlf'));
+        static::api()->import($task,false,false);
 
         // Create dummy mt
         $params = [
@@ -84,7 +86,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'serviceName'=> 'ZDemoMT',
             'name' => 'API Testing::ZDemoMT_'.__CLASS__
         ];
-        self::$api->addResource($params);
+        static::api()->addResource($params);
 
         // Create OpentTm2 resource and upload tm memory
         $params = [
@@ -98,10 +100,10 @@ class Translate1484Test extends editor_Test_JsonTest {
             'serviceName'=> 'OpenTM2',
             'name' => 'API Testing::OpenTm2Tm_'.__CLASS__
         ];
-        self::$api->addResource($params,'resource1.tmx',true);
+        static::api()->addResource($params,'resource1.tmx',true);
 
         // Add task to languageresource assoc
-        self::$api->addTaskAssoc();
+        static::api()->addTaskAssoc();
 
         // Queue the match anlysis worker
         $params = [
@@ -111,13 +113,13 @@ class Translate1484Test extends editor_Test_JsonTest {
             'pretranslateMt' => 1,
             'isTaskImport' => 0
         ];
-        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
+        static::api()->putJson('editor/task/'.static::api()->getTask()->id.'/pretranslation/operation', $params, null, false);
 
         // start the import
-        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
+        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
 
         // waiit for the import to be finished
-        self::$api->checkTaskStateLoop();
+        static::api()->checkTaskStateLoop();
     }
 
     /***
@@ -126,8 +128,8 @@ class Translate1484Test extends editor_Test_JsonTest {
     public function testExportResourcesLog() {
 
         $jsonFileName = 'exportResults.json';
-        $actualObject = self::$api->getJson('editor/customer/exportresource', [ 'customerId' => self::$customerTest->id ], $jsonFileName);
-        $expectedObject = self::$api->getFileContent($jsonFileName);
+        $actualObject = static::api()->getJson('editor/customer/exportresource', [ 'customerId' => self::$customerTest->id ], $jsonFileName);
+        $expectedObject = static::api()->getFileContent($jsonFileName);
         // we need to order the results to avoid tests failing due to runtime-differences
         $this->sortExportResource($actualObject);
         $this->sortExportResource($expectedObject);
@@ -142,12 +144,12 @@ class Translate1484Test extends editor_Test_JsonTest {
         usort($exportResource->UsageLogByCustomer, function($a, $b) { return ($a->charactersPerCustomer === $b->charactersPerCustomer) ? 0 : ($a->charactersPerCustomer < $b->charactersPerCustomer ? -1 : 1); });
     }
 
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
         //remove the created resources
-        self::$api->removeResources();
+        static::api()->removeResources();
         //remove the temp customer
-        self::$api->delete('editor/customer/'.self::$customerTest->id);
+        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

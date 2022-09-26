@@ -27,11 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Abstraction layer for performing API tests which need to work with a mocked task
- * These are usually "classic" PHPunit tests and no API-Tests
+ * Abstraction layer for performing Unit tests which need to work with a mocked task
  */
-abstract class editor_Test_MockedTaskTest extends \ZfExtended_Test_ApiTestcase {
-
+abstract class editor_Test_MockedTaskTest extends \editor_Test_UnitTest {
     /**
      *
      * @var editor_Models_Task

@@ -29,14 +29,17 @@ END LICENSE AND COPYRIGHT
 /**
  * Checks if mrk segmentation errors and missing tag ids surround sub tags are stopping the import
  */
-class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
+class XlfImportFailTest extends \editor_Test_ApiTest {
 
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    public static function beforeTests(): void {
+
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
     }
@@ -48,9 +51,9 @@ class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         ];
-        self::$api->addImportFile(self::$api->getFile('ibm-opentm2-fail3.xlf'), 'application/xml');
-        $this->assertFalse(self::$api->import($taskConfig, false), 'XLF with sub tags in tags without IDs did not produce a task state error!');
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id);
+        static::api()->addImportFile(static::api()->getFile('ibm-opentm2-fail3.xlf'), 'application/xml');
+        $this->assertFalse(static::api()->import($taskConfig, false), 'XLF with sub tags in tags without IDs did not produce a task state error!');
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id);
     }
 }

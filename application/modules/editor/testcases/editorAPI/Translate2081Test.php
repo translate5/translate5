@@ -36,18 +36,20 @@ class Translate2081Test extends editor_Test_JsonTest {
     protected static $sourceLangRfc='de';
     protected static $targetLangRfc='en';
 
+    protected static array $requiredPlugins = [
+        'editor_Plugins_Okapi_Init'
+    ];
+
     /**
      */
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
 
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
+        self::assertAppState();
 
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
 
-        self::$customerTest = self::$api->postJson('editor/customer/',[
+        self::$customerTest = static::api()->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer', true),
         ]);
@@ -66,13 +68,13 @@ class Translate2081Test extends editor_Test_JsonTest {
             'userGuid' => '{00000000-0000-0000-C100-CCDDEE000003}', // testlector
             'workflowStepName' => 'translation'
         ];
-        $result = self::$api->postJson('editor/userassocdefault', $params);
+        $result = static::api()->postJson('editor/userassocdefault', $params);
         unset($result->id);
         unset($result->customerId);
-        if(self::$api->isCapturing()){
-            file_put_contents(self::$api->getFile('assocResult.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
+        if(static::api()->isCapturing()){
+            file_put_contents(static::api()->getFile('assocResult.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
         }
-        $expected = self::$api->getFileContent('assocResult.txt');
+        $expected = static::api()->getFileContent('assocResult.txt');
         $actual = json_encode($result, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         self::assertEquals($expected, $actual, "The expected file (assocResult) an the result file does not match.");
@@ -95,14 +97,14 @@ class Translate2081Test extends editor_Test_JsonTest {
             'autoStartImport' => 1
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('TRANSLATE-2545-de-en.xlf'));
-        self::$api->import($task,false);
-        error_log('Task created. '.$this->api()->getTask()->taskName);
+        static::api()->addImportFile(static::api()->getFile('TRANSLATE-2545-de-en.xlf'));
+        static::api()->import($task,false);
+        error_log('Task created. '.static::api()->getTask()->taskName);
 
 
         // after the task is created/imported, check if the users are auto assigned.
-        $task = self::$api->getTask();
-        $data = $this->api()->getJson('editor/taskuserassoc',[
+        $task = static::api()->getTask();
+        $data = static::api()->getJson('editor/taskuserassoc',[
             'filter' => '[{"operator":"eq","value":"' .$task->taskGuid . '","property":"taskGuid"}]'
         ]);
 
@@ -118,17 +120,17 @@ class Translate2081Test extends editor_Test_JsonTest {
             return $assoc;
         }, $data);
 
-        //file_put_contents($this->api()->getFile('expected.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expected.json'), $data, 'The expected users are not auto assigned to the task');
+        //file_put_contents(static::api()->getFile('expected.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
+        $this->assertEquals(static::api()->getFileContent('expected.json'), $data, 'The expected users are not auto assigned to the task');
 
-        self::$api->deleteTask($task->id, 'testmanager');
+        static::api()->deleteTask($task->id, 'testmanager');
     }
 
     /***
      * Clean up the added customer
      */
-    public static function tearDownAfterClass(): void {
+    public static function afterTests(): void {
         //remove the temp customer
-        self::$api->delete('editor/customer/'.self::$customerTest->id);
+        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

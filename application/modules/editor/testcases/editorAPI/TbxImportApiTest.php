@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  *       the test can not relay on tbx content test.
  *       When in the tbx export result the attributes are include this can be changed
  */
-class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
+class TbxImportApiTest extends \editor_Test_ApiTest {
 
     /***
      * The current active collection
@@ -40,8 +40,8 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     protected static int $collId;
 
-    public static function setUpBeforeClass(): void {
-        self::$api= new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
+        
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         self::assertCustomer();
@@ -55,7 +55,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testTbxImport(){
 
-        $termCollection = $this->api()->postJson('editor/termcollection', ['name' => 'Test api collection', 'customerIds' => $this->api()->getCustomer()->id]);
+        $termCollection = static::api()->postJson('editor/termcollection', ['name' => 'Test api collection', 'customerIds' => static::api()->getCustomer()->id]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection', $termCollection->name);
 
@@ -97,25 +97,25 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
      * @param int $languageAtributeCount: the count of the language level attributes after the import
      */
     private function singleTest(string $fileName,int $termCount,int $termsAtributeCount,int $termsEntryAtributeCount,int $languageAtributeCount){
-        $this->api()->addFile($fileName, $this->api()->getFile($fileName), "application/xml");
-        $this->api()->postJson('editor/termcollection/import', array('collectionId' =>self::$collId, 'customerIds' => $this->api()->getCustomer()->id,'mergeTerms'=>true));
+        static::api()->addFile($fileName, static::api()->getFile($fileName), "application/xml");
+        static::api()->postJson('editor/termcollection/import', array('collectionId' =>self::$collId, 'customerIds' => static::api()->getCustomer()->id,'mergeTerms'=>true));
 
         //export the generated file
-        $response = $this->api()->postJson('editor/termcollection/export?format=1', array('collectionId' =>self::$collId));
+        $response = static::api()->postJson('editor/termcollection/export?format=1', array('collectionId' =>self::$collId));
 
         $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
 
-        if($this->api()->isCapturing()) {
-            file_put_contents($this->api()->getFile('/E_'.$fileName, null, false), $response->filedata);
+        if(static::api()->isCapturing()) {
+            file_put_contents(static::api()->getFile('/E_'.$fileName, null, false), $response->filedata);
         }
-        $expected = $this->api()->getFileContent('E_'.$fileName);
+        $expected = static::api()->getFileContent('E_'.$fileName);
         $actual = $response->filedata;
 
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.Test file name: ".$fileName);
 
-        $attributes=$this->api()->getJson('editor/termcollection/testgetattributes', array('collectionId' =>self::$collId));
+        $attributes=static::api()->getJson('editor/termcollection/testgetattributes', array('collectionId' =>self::$collId));
 
         //check if the generated attributes are matching
         $this->assertTrue($termCount==$attributes->termsCount, $fileName.' file test.Invalid number of terms created.Terms count:'.$attributes->termsCount.', expected:'.$termCount);
@@ -124,9 +124,9 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertTrue($languageAtributeCount==$attributes->languageAtributeCount, $fileName.' file test.Invalid and number of language level attribute created.Language level attribute count:'.$attributes->languageAtributeCount.', expected:'.$languageAtributeCount);
     }
 
-    public static function tearDownAfterClass(): void {
-        self::$api->login('testmanager');
-        self::$api->delete('editor/termcollection/'.self::$collId);
+    public static function afterTests(): void {
+        static::api()->login('testmanager');
+        static::api()->delete('editor/termcollection/'.self::$collId);
     }
 
 }

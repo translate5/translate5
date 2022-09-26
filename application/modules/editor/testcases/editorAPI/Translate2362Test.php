@@ -31,9 +31,18 @@ END LICENSE AND COPYRIGHT
  * For details see the issue.
  */
 class Translate2362Test extends editor_Test_JsonTest {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.xlf.ignoreFramingTags' => 'all'
+    ];
+
+    public static function beforeTests(): void {
+
         $task = array(
             'sourceLang' => 'de',
             'targetLang' => 'en',
@@ -41,32 +50,26 @@ class Translate2362Test extends editor_Test_JsonTest {
             'lockLocked' => 1,
         );
         
-        $appState = self::assertAppState();
+        self::assertAppState();
 
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
 
-        $tests = array(
-            'runtimeOptions.import.xlf.ignoreFramingTags' => 'all',
-        );
-        self::$api->testConfig($tests);
+        static::assertConfigs();
 
-        $zipfile = $api->zipTestFiles('testfiles/','testTask.zip');
+        $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
         
-        $api->addImportFile($zipfile);
-        $api->import($task);
+        static::api()->addImportFile($zipfile);
+        static::api()->import($task);
         
-        $api->addUser('testlector');
+        static::api()->addUser('testlector');
         
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
+        //login in beforeTests means using this user in whole testcase!
+        static::api()->login('testlector');
         
-        $task = $api->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
     }
     
     /**
@@ -74,7 +77,7 @@ class Translate2362Test extends editor_Test_JsonTest {
      */
     public function testSegmentValuesAfterImport() {
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
@@ -83,25 +86,20 @@ class Translate2362Test extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list
-        $segments = $this->api()->getSegments(null, 10);
+        $segments = static::api()->getSegments(null, 10);
         
         //test editing a prefilled segment
         $segToTest = $segments[0];
-        
         $segToTest->targetEdit = str_replace(['cool.', 'is &lt; a'], ['cool &amp; cööler.', 'is &gt; a'], $segToTest->targetEdit);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
-        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
+        static::api()->saveSegment($segToTest->id, $segToTest->targetEdit);
         
         $segToTest = $segments[1];
         $segToTest->targetEdit = str_replace(['comments and CDATA'], ['CDATA and comments'], $segToTest->targetEdit);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
-        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
+        static::api()->saveSegment($segToTest->id, $segToTest->targetEdit);
         
         //check direct PUT result
         $jsonFileName = 'expectedSegments-edited.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
     }
     
@@ -110,26 +108,26 @@ class Translate2362Test extends editor_Test_JsonTest {
      * @depends testSegmentEditing
      */
     public function testExport() {
-        self::$api->login('testmanager');
-        $task = $this->api()->getTask();
+        static::api()->login('testmanager');
+        $task = static::api()->getTask();
         //start task export
         
-        $this->api()->get('editor/task/export/id/'.$task->id);
+        static::api()->get('editor/task/export/id/'.$task->id);
         
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/TRANSLATE-2362-de-en.xlf');
-        //file_put_contents($this->api()->getFile('export-TRANSLATE-2362-de-en.xlf', null, false), $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-TRANSLATE-2362-de-en.xlf');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/TRANSLATE-2362-de-en.xlf');
+        //file_put_contents(static::api()->getFile('export-TRANSLATE-2362-de-en.xlf', null, false), $exportedFile);
+        $expectedResult = static::api()->getFileContent('export-TRANSLATE-2362-de-en.xlf');
         
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-TRANSLATE-2362-de-en.xlf');
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

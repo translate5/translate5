@@ -30,13 +30,20 @@ END LICENSE AND COPYRIGHT
  * SegmentWorkflowTest imports a test task, adds workflow users, edits segments and finishes then the task.
  * The produced changes.xml and the workflow steps of the segments are checked. 
  */
-class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
+class SegmentWorkflowTest extends \editor_Test_ApiTest {
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_ManualStatusCheck_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = ['editor.notification.saveXmlToFile' => 1];
     /**
      * Setting up the test task by fresh import, adds the lector and translator users
      */
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
+    public static function beforeTests(): void {
+
         $task = array(
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => 'en',
@@ -44,37 +51,27 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
         );
         
-        $appState = self::assertTermTagger();
-        self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck should not be activated for this test case!');
-        
+        self::assertAppState();
+
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        $api->addImportFile('SegmentWorkflowTest/simple-en-de.zip');
-        $api->import($task);
+        static::api()->addImportFile('SegmentWorkflowTest/simple-en-de.zip');
+        static::api()->import($task);
         
         //FIXME improve this test by using two lector users to test after all finish with multiple users
-        $api->reloadTask();
-        $api->addUser('testlector');
-        $api->reloadTask();
-        $api->addUser('testtranslator', 'waiting', 'translatorCheck');
+        static::api()->reloadTask();
+        static::api()->addUser('testlector');
+        static::api()->reloadTask();
+        static::api()->addUser('testtranslator', 'waiting', 'translatorCheck');
+
+        static::assertConfigs();
     }
     
     public function testTranslator() {
         //Implement tests for the new role translator and workflowstep translating!
         $this->markTestIncomplete("Implement tests for the new role translator and workflowstep translating!");
     }
-    
-    /**
-     * tests if config is correct for testing changes.xliff 
-     */
-    public function testSaveXmlToFile() {
-        $config = $this->api()->getJson('editor/config', array(
-            'filter' => '[{"type":"string","value":"runtimeOptions.editor.notification.saveXmlToFile","property":"name","operator":"like"}]',
-        ));
-        $this->assertCount(1, $config);
-        $this->assertEquals(1, $config[0]->value);
-    }
-    
+
     /**
      * edits some segments as lector, finish then the task
      * - checks for correct changes.xliff
@@ -83,26 +80,25 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testWorkflowFinishAsLector() {
         //check that testtranslator is waiting
-        $this->api()->login('testtranslator');
-        $this->assertEquals('waiting', $this->api()->reloadTask()->userState);
+        static::api()->login('testtranslator');
+        $this->assertEquals('waiting', static::api()->reloadTask()->userState);
         
         //check that testlector is open
-        $this->api()->login('testlector');
-        $this->assertEquals('open', $this->api()->reloadTask()->userState);
+        static::api()->login('testlector');
+        $this->assertEquals('open', static::api()->reloadTask()->userState);
         
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         
         //get segment list
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
 
         //initial segment finish count for workflow step lektoring
         $segmentFinishCount=0;
         //edit two segments
         $segToTest = $segments[2];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'PHP Handbuch', $segToTest->id);
-        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
+        static::api()->saveSegment($segToTest->id, 'PHP Handbuch');
 
         //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
@@ -111,22 +107,20 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $nbsp = json_decode('"\u00a0"');
         //the first "\u00a0 " (incl. the trailing whitespace) will be replaced by the content sanitizer to a single whitespace
         //the second single "\u00a0" must result in a single whitespace
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache'.$nbsp.' 2.x'.$nbsp.'auf'.$nbsp.$nbsp.'Unix-Systemen', $segToTest->id);
-        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
-        
+        static::api()->saveSegment($segToTest->id, 'Apache'.$nbsp.' 2.x'.$nbsp.'auf'.$nbsp.$nbsp.'Unix-Systemen');
+
         //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
         
         //edit a segment with special characters
         $segToTest = $segments[4];
         //multiple normal spaces should also be converted to single spaces
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', "Installation auf   Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode", $segToTest->id);
-        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
+        static::api()->saveSegment($segToTest->id, "Installation auf   Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode");
         
         //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
         
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
 
         //bulk check of all workflowStepNr fields
         $workflowStepNr = array_map(function($item){
@@ -141,16 +135,16 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(array('','','reviewing','','reviewing','','reviewing'), $workflowStep);
         
         //reloat the task and test the current workflow progress
-        $reloadProgresTask= $this->api()->reloadTask();
+        $reloadProgresTask= static::api()->reloadTask();
         //check if the local segmentFinishCount is the same as the calculated one for the task
         $this->assertEquals($segmentFinishCount, $reloadProgresTask->segmentFinishCount,'The segment finish count is not the same as the calculated one for the task!');
         
         //finishing the task
-        $res = $this->api()->setTaskToFinished($task->id);
-        $this->assertEquals('finished', $this->api()->reloadTask()->userState);
+        $res = static::api()->setTaskToFinished($task->id);
+        $this->assertEquals('finished', static::api()->reloadTask()->userState);
         
         //get the changes file
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $foundChangeFiles = glob($path.'changes*.xliff');
         $this->assertNotEmpty($foundChangeFiles, 'No changes*.xliff file was written for taskGuid: '.$task->taskGuid);
         $foundChangeFile = end($foundChangeFiles);
@@ -158,20 +152,20 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         
         //no direct file assert equals possible here, since our diff format contains random sdl:revids
         //this revids has to be replaced before assertEqual
-        $approvalFileContent = $this->api()->replaceChangesXmlContent($this->api()->getFileContent('testWorkflowFinishAsLector-assert-equal.xliff'));
-        $toCheck = $this->api()->replaceChangesXmlContent(file_get_contents($foundChangeFile));
+        $approvalFileContent = static::api()->replaceChangesXmlContent(static::api()->getFileContent('testWorkflowFinishAsLector-assert-equal.xliff'));
+        $toCheck = static::api()->replaceChangesXmlContent(file_get_contents($foundChangeFile));
         $this->assertXmlStringEqualsXmlString($approvalFileContent, $toCheck);
         
         //check that task is finished for lector now
-        $this->assertEquals('finished', $this->api()->reloadTask()->userState);
+        $this->assertEquals('finished', static::api()->reloadTask()->userState);
         
         //check that task is open for translator now
-        $this->api()->login('testtranslator');
-        $this->assertEquals('open', $this->api()->reloadTask()->userState);
+        static::api()->login('testtranslator');
+        $this->assertEquals('open', static::api()->reloadTask()->userState);
     }
     
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

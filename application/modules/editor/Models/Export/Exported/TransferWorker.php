@@ -83,7 +83,7 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
         $tbxA = glob($parameters['folderToGetTbx'] . DIRECTORY_SEPARATOR . 'TermCollection*.tbx');
 
         // Create API instance
-        $api = new ZfExtended_Test_ApiHelper('ZfExtended_Test_ApiTestcase');
+        $api = new editor_Test_ApiHelper('editor_Test_ApiTest');
         $api->setAuthCookie($parameters['cookie']);
         $url = $parameters['url'];
 

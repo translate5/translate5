@@ -39,39 +39,35 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
     /**
      * @throws Zend_Exception
      */
-    public static function setUpBeforeClass(): void {
-
-        // Prepare api instance
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
+    public static function beforeTests(): void {
         // Check app state
-        $appState = self::assertAppState();
+        self::assertAppState();
 
         // Last authed user is testmanager
         self::assertNeededUsers();
         self::assertLogin('testmanager');
 
         // Import xlf-file
-        $api->addImportFile($api->getFile('testfiles/TRANSLATE-2537-en-de.xlf'));
-        $api->import([
+        static::api()->addImportFile(static::api()->getFile('testfiles/TRANSLATE-2537-en-de.xlf'));
+        static::api()->import([
             'sourceLang' => 'en',
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         ]);
 
-        // Login in setUpBeforeClass means using this user in whole testcase!
-        self::$api->addUser('testlector');
-        self::$api->login('testlector');
+        // Login in beforeTests means using this user in whole testcase!
+        static::api()->addUser('testlector');
+        static::api()->login('testlector');
 
         // Get task
-        $task = self::$api->getTask();
+        $task = static::api()->getTask();
 
         // Open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
 
         // Get segments and check their quantity
-        static::$segments = $api->getSegments(null, 29);
+        static::$segments = static::api()->getSegments(null, 29);
         static::assertEquals(count(static::$segments), 29, 'Not enough segments in the imported task');
     }
 
@@ -81,7 +77,7 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
     public function testSegmentQualities(){
         foreach ([3, 4, 5, 6, 9, 10] as $idx) {
             $fileName = 'expectedSegmentQualities-' . $idx . '.json';
-            $qualities = self::$api->getJson('/editor/quality/segment?segmentId=' . static::$segments[$idx]->id, [], $fileName);
+            $qualities = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[$idx]->id, [], $fileName);
             $qualityFilter = editor_Test_Model_Filter::createSingle('type', 'consistent');
             $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, 'File '.$fileName.', Segment target: "'.static::$segments[$idx]->target.'"', $qualityFilter);
         }
@@ -90,8 +86,8 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
     /**
      * Cleanup
      */
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+    public static function afterTests(): void {
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

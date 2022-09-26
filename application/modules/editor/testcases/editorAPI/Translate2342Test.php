@@ -31,27 +31,31 @@ END LICENSE AND COPYRIGHT
  * and the report progress after the import.
  *
  */
-class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
+class Translate2342Test extends \editor_Test_ApiTest {
     /* @var $this Translate1484Test */
     
     protected static $customerTest;
     protected static $sourceLangRfc = 'de';
     protected static $targetLangRfc = 'en';
-    
-    
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
-        self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
-        self::assertNotContains('editor_Plugins_SegmentStatistics_Bootstrap', $appState->pluginsLoaded, 'Plugin SegmentStatistics must be deactivated for this test case!');
-        self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_SegmentStatistics_Bootstrap',
+    ];
+
+    protected static array $requiredPlugins = [
+        'editor_Plugins_Okapi_Init',
+        'editor_Plugins_MatchAnalysis_Init',
+        'editor_Plugins_ZDemoMT_Init'
+    ];
+
+    public static function beforeTests(): void {
+
+        self::assertAppState();
 
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
 
-        self::$customerTest = self::$api->postJson('editor/customer/',[
+        self::$customerTest = static::api()->postJson('editor/customer/',[
             'name'=>'API Testing::ResourcesLogCustomer',
             'number'=>uniqid('API Testing::ResourcesLogCustomer', true),
         ]);
@@ -68,8 +72,8 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
             'autoStartImport' => 0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('import-test-file.html'));
-        self::$api->import($task,false,false);
+        static::api()->addImportFile(static::api()->getFile('import-test-file.html'));
+        static::api()->import($task,false,false);
 
         // Create dummy MT resource
         $params =[
@@ -83,13 +87,13 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
             'serviceName'=> 'ZDemoMT',
             'name' => 'API Testing::ZDemoMT_'.__CLASS__
         ];
-        self::$api->addResource($params);
+        static::api()->addResource($params);
 
         // Add task to languageresource assoc
-        self::$api->addTaskAssoc();
+        static::api()->addTaskAssoc();
 
         // Queue the match anlysis worker
-        $task = self::$api->getTask();
+        $task = static::api()->getTask();
         $params = [
             'internalFuzzy' => 1,
             'pretranslateMatchrate' => 100,
@@ -97,10 +101,10 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
             'pretranslateMt' => 1,
             'isTaskImport' => 0
         ];
-        self::$api->putJson('editor/task/'.$task->id.'/pretranslation/operation', $params, null, false);
+        static::api()->putJson('editor/task/'.$task->id.'/pretranslation/operation', $params, null, false);
 
         // now test the queued worker progress before and after the import.
-        $result = self::$api->getJson('editor/task/importprogress',[
+        $result = static::api()->getJson('editor/task/importprogress',[
             'taskGuid' => $task->taskGuid
         ]);
         $result = $result->progress ?? null;
@@ -108,20 +112,20 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
 
         //remove the non static properties
         unset($result->taskGuid);
-        if(self::$api->isCapturing()){
-            file_put_contents(self::$api->getFile('exportInitial.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
+        if(static::api()->isCapturing()){
+            file_put_contents(static::api()->getFile('exportInitial.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
         }
 
-        $expected = self::$api->getFileContent('exportInitial.txt');
+        $expected = static::api()->getFileContent('exportInitial.txt');
         $actual = json_encode($result, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
         
         // run the import workers and check wait for task import
-        self::$api->getJson('editor/task/'.$task->id.'/import');
-        self::$api->checkTaskStateLoop();
+        static::api()->getJson('editor/task/'.$task->id.'/import');
+        static::api()->checkTaskStateLoop();
         
-        $result = self::$api->getJson('editor/task/importprogress',[
+        $result = static::api()->getJson('editor/task/importprogress',[
             'taskGuid' => $task->taskGuid
         ]);
         $result = $result->progress ?? null;
@@ -129,22 +133,22 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
 
         //remove the non static properties
         unset($result->taskGuid);
-        if(self::$api->isCapturing()){
-            file_put_contents(self::$api->getFile('exportFinal.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
+        if(static::api()->isCapturing()){
+            file_put_contents(static::api()->getFile('exportFinal.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
         }
 
-        $expected = self::$api->getFileContent('exportFinal.txt');
+        $expected = static::api()->getFileContent('exportFinal.txt');
         $actual = json_encode($result, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
 
-        self::$api->deleteTask($task->id, 'testmanager');
-        self::$api->removeResources();
+        static::api()->deleteTask($task->id, 'testmanager');
+        static::api()->removeResources();
     }
 
 
-    public static function tearDownAfterClass(): void {
+    public static function afterTests(): void {
         //remove the temp customer
-        self::$api->delete('editor/customer/'.self::$customerTest->id);
+        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

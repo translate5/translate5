@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  */
-class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
+class TbxSpecialcharsTest extends \editor_Test_ApiTest {
     
     /***
      * The current active collection
@@ -46,10 +46,10 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
     /**
      *
      */
-    public static function setUpBeforeClass(): void {
-        self::$api=new ZfExtended_Test_ApiHelper(__CLASS__);
+    public static function beforeTests(): void {
+        
         self::assertNeededUsers(); //last authed user is testmanager
-        self::$api->login('testtermproposer');//log in as proposer
+        static::api()->login('testtermproposer');//log in as proposer
         self::assertLogin('testtermproposer');
         self::assertCustomer();
     }
@@ -61,12 +61,12 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
 
         /*class_exists('editor_Utils');
         $last = editor_Utils::db()->query('SELECT `id` FROM `LEK_languageresources` ORDER BY `id` DESC LIMIT 1')->fetchColumn();
-        self::$api->delete('editor/termcollection/' . $last);*/
+        static::api()->delete('editor/termcollection/' . $last);*/
 
         // [1] Create empty term collection
-        $termCollection = $this->api()->postJson('editor/termcollection', [
+        $termCollection = static::api()->postJson('editor/termcollection', [
             'name' => 'Test api collection',
-            'customerIds' => $this->api()->getCustomer()->id
+            'customerIds' => static::api()->getCustomer()->id
         ]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection', $termCollection->name);
@@ -76,20 +76,20 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
 
         // [2] Import tbx with single termEntry, having '&lt;' at multiple places
         $file = 'Specialchars.tbx';
-        $this->api()->addFile($file, $this->api()->getFile($file), "application/xml");
-        $this->api()->postJson('editor/termcollection/import', [
+        static::api()->addFile($file, static::api()->getFile($file), "application/xml");
+        static::api()->postJson('editor/termcollection/import', [
             'collectionId' => self::$collectionId,
-            'customerIds' => $this->api()->getCustomer()->id,
+            'customerIds' => static::api()->getCustomer()->id,
             'mergeTerms' => true
         ]);
 
         // [3] Get language: english
-        $english = $this->api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
+        $english = static::api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
         $this->assertNotEmpty($english, 'Unable to load english-language');
         self::$english = $english[0];
 
         // [4] Find imported term by *-query and en-language id
-        $termsearch = $this->api()->getJson('editor/plugins_termportal_data/search', [
+        $termsearch = static::api()->getJson('editor/plugins_termportal_data/search', [
             'query' => '*',
             'collectionIds' => self::$collectionId,
             'language' => self::$english->id,
@@ -100,13 +100,13 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertNotEmpty($termsearch->data, "No terms are found in the term collection for the search string '*'");
 
         // [5] Get imported term info and unset not needed props
-        $json = $this->api()->postJson('editor/plugins_termportal_data/terminfo', [
+        $json = static::api()->postJson('editor/plugins_termportal_data/terminfo', [
             'termId' => $termsearch->data[0]->id
         ]);
         unset($json->siblings, $json->time);
 
         // [6] Assert qties of specialchars (original vs imported)
-        $original = preg_match_all('~&lt;~', file_get_contents($this->api()->getFile($file)));
+        $original = preg_match_all('~&lt;~', file_get_contents(static::api()->getFile($file)));
         $imported = preg_match_all('~<~', print_r($json, true));
         $original_descripGrp_transacGrp = 1;
         $original_respPerson = 2;
@@ -114,7 +114,7 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($expected, $imported, 'Specialchars quantities in ' . $file .' and in /terminfo response are not equal');
 
         // [7] Assert qties of specialchars (original vs exported)
-        $exportedTbx = $this->api()->getRaw('editor/languageresourceinstance/tbxexport', [
+        $exportedTbx = static::api()->getRaw('editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$collectionId,
             'tbxBasicOnly' => 0,
             'exportImages' => 1
@@ -126,8 +126,8 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
     /**
      *
      */
-    public static function tearDownAfterClass(): void {
-        self::$api->login('testtermproposer');
-        self::$api->delete('editor/termcollection/'.self::$collectionId);
+    public static function afterTests(): void {
+        static::api()->login('testtermproposer');
+        static::api()->delete('editor/termcollection/'.self::$collectionId);
     }
 }
