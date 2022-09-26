@@ -289,6 +289,7 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
     private function initConfiguration(): void
     {
         //see method header!
+        // values were just taken over from master instance, not tested if they really must be set to that value!
         $testConfig = [
             'runtimeOptions.customers.anonymizeUsers' => 1,
             'runtimeOptions.editor.notification.userListColumns' => '["surName","firstName","email","role","state","deadlineDate"]',
