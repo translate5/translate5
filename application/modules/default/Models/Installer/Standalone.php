@@ -55,6 +55,20 @@ class Models_Installer_Standalone {
     
     /**
      * @var array
+     * zend                → path to zend, deprecated
+     * help                → show help
+     * maintenance         → deprecated maintenance
+     * announceMaintenance → deprecated announceMaintenance
+     * dbOnly              → deprecated, use da:u
+     * applicationState    → deprecated status
+     * updateCheck         → deprecated status
+     * license-ignore      → ignore licenses, for automation
+     * applicationZipOverride → path to zip file
+     * db::host            → db host
+     * db::username        → db username
+     * db::password        → db password
+     * db::database        → db database
+     * hostname            → hostname to be used (SSL?)
      */
     protected array $options;
     
@@ -93,13 +107,13 @@ class Models_Installer_Standalone {
     protected \Symfony\Component\Console\Application $cli;
 
     /**
-     * @param array|null $options
+     * @param array $options
      * @throws Zend_Db_Exception
      * @throws Zend_Exception
      * @throws Zend_Mail_Exception
      * @throws Exception
      */
-    public static function mainLinux(array $options = null): void
+    public static function mainLinux(array $options = []): void
     {
         //initially we have to load the locales from the environment
         setlocale(LC_ALL, '');
@@ -158,11 +172,13 @@ class Models_Installer_Standalone {
             exit;
         }
         if(!empty($this->options['maintenance'])) {
+            $this->log(PHP_EOL.'Deprecated - call ./translate5.sh maintenance');
             $this->addZendToIncludePath();
             $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['announceMaintenance'])) {
+            $this->log(PHP_EOL.'Deprecated - call ./translate5.sh maintenance');
             $this->addZendToIncludePath();
             $this->maintenanceMode();
             exit;
@@ -176,6 +192,7 @@ class Models_Installer_Standalone {
             exit;
         }
         if(!empty($this->options['applicationState'])) {
+            $this->log(PHP_EOL.'Deprecated - call ./translate5.sh status');
             $this->addZendToIncludePath();
             $this->initApplication();
             echo json_encode(ZfExtended_Debug::applicationState());
