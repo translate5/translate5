@@ -68,7 +68,6 @@ Ext.define('Editor.view.ui.changealike.Grid', {
     var me = this,
     segField = Editor.model.segment.Field,
     config;
-    console.log(me.rowBodyTpl.apply)
     config = {
       columns: [
         {
