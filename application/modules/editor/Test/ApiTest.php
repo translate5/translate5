@@ -37,6 +37,10 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
      * @var editor_Test_ApiHelper|null
      */
     private static editor_Test_ApiHelper $_api;
+    /**
+     * @var stdClass|null
+     */
+    private static ?stdClass $_appState = null;
 
     /**
      * @var
@@ -90,35 +94,26 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * Asserts that the application state could be loaded
-     * @return stdClass
+     * Asserts that the application state is sufficient for the current test
      */
     public static function assertAppState(){
-        static::api()->login(static::$testUserToLogin, 'asdfasdf');
-        static::assertLogin(static::$testUserToLogin);
-        $state = static::api()->getJson('editor/index/applicationstate');
-        static::assertTrue(is_object($state), 'Application state data is no object!');
-        //other system checks
-        static::assertEquals(0, $state->worker->scheduled, 'For API testing no scheduled workers are allowed in DB!');
-        static::assertEquals(0, $state->worker->waiting, 'For API testing no waiting workers are allowed in DB!');
-        static::assertEquals(0, $state->worker->running, 'For API testing no running workers are allowed in DB!');
-        if(!$state->database->isUptodate) {
-            die('Database is not up to date! '.$state->database->newCount.' new / '.$state->database->modCount.' modified.'."\n\n");
+        $state = static::getAppState();
+        if(static::api()->login(static::$testUserToLogin)){
+            static::assertLogin(static::$testUserToLogin);
         }
         // check for termtagger
         if(static::$termtaggerRequired){
             static::assertFalse(empty($state->termtagger), 'Termtagger Plugin not active!');
             static::assertTrue($state->termtagger->runningAll, 'Some configured termtaggers are not running: '.print_r($state->termtagger->running,1));
         }
-        // test the runtimeOptions whitelist
+        // test the plugins whitelist
         foreach(static::$requiredPlugins as $plugin){
             self::assertContains($plugin, $state->pluginsLoaded, 'Plugin '.$plugin.' must be activated for this test case!');
         }
-        // test the runtimeOptions blacklist
+        // test the plugins blacklist
         foreach(static::$forbiddenPlugins as $plugin){
             self::assertNotContains($plugin, $state->pluginsLoaded, 'Plugin '.$plugin.' must not be activated for this test case!');
         }
-        return $state;
     }
 
     /**
@@ -127,7 +122,7 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
      * @return stdClass the login/status JSON for further processing
      */
     public static function assertLogin($user) {
-        $json = static::api()->getJson('editor/session/'.static::api()->getAuthCookie());
+        $json = static::api()->getJson('editor/session/'.editor_Test_ApiHelper::getAuthCookie());
         static::assertTrue(is_object($json), 'User "'.$user.'" is not authenticated!');
         static::assertEquals('authenticated', $json->state, 'User "'.$user.'" is not authenticated!');
         static::assertEquals($user, $json->user->login);
@@ -135,17 +130,18 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * TODO: needs to be checked only once per test suite
      * Asserts that a default set of test users is available (provided by testdata.sql not imported by install-and-update kit!)
      */
     public static function assertNeededUsers() {
-        static::api()->login('testlector', 'asdfasdf');
+        static::api()->login('testlector');
         $json = static::assertLogin('testlector');
         static::assertContains('editor', $json->user->roles, 'Checking users roles:');
         static::assertNotContains('pm', $json->user->roles, 'Checking users roles:');
         static::assertContains('basic', $json->user->roles, 'Checking users roles:');
         static::assertContains('noRights', $json->user->roles, 'Checking users roles:');
 
-        static::api()->login('testtranslator', 'asdfasdf');
+        static::api()->login('testtranslator');
         $json = static::assertLogin('testtranslator');
         static::assertContains('editor', $json->user->roles, 'Checking users roles:');
         static::assertNotContains('pm', $json->user->roles, 'Checking users roles:');
@@ -153,7 +149,7 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
         static::assertContains('noRights', $json->user->roles, 'Checking users roles:');
 
 
-        static::api()->login('testtermproposer', 'asdfasdf');
+        static::api()->login('testtermproposer');
         $json = static::assertLogin('testtermproposer');
         static::assertContains('termProposer', $json->user->roles, 'Checking users roles:');
         static::assertContains('editor', $json->user->roles, 'Checking users roles:');
@@ -161,7 +157,7 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
         static::assertContains('basic', $json->user->roles, 'Checking users roles:');
         static::assertContains('noRights', $json->user->roles, 'Checking users roles:');
 
-        static::api()->login('testmanager', 'asdfasdf');
+        static::api()->login('testmanager');
         $json = static::assertLogin('testmanager');
         static::assertContains('editor', $json->user->roles, 'Checking users roles:');
         static::assertContains('pm', $json->user->roles, 'Checking users roles:');
@@ -214,6 +210,10 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
     final public static function setUpBeforeClass(): void {
         // each test gets an own api-object
         static::$_api = new editor_Test_ApiHelper(static::class);
+        // this runs only once with the first API-Test
+        if(static::$_appState === null){
+            self::evaluateAppState(static::$_api);
+        }
         // this can be used in extending classes as replacement for setUpBeforeClass()
         static::beforeTests();
     }
@@ -221,5 +221,44 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
     final public static function tearDownAfterClass(): void {
         // this can be used in extending classes as replacement for tearDownAfterClass()
         static::afterTests();
+    }
+
+    private static function evaluateAppState(editor_Test_ApiHelper $api){
+        // the initial login of the current Test suite
+        $api->login('testapiuser');
+        static::assertLogin('testapiuser');
+        $state = $api->getJson('editor/index/applicationstate');
+        if(!is_object($state)){
+            die('Application state could not be fetched, terminating API-tests.'."\n\n");
+        }
+        // system checks
+        $errors = [];
+        if($state->worker->scheduled < 0){
+            $errors[] = 'For API testing no scheduled workers are allowed in DB!';
+        }
+        if($state->worker->waiting < 0){
+            $errors[] = 'For API testing no waiting workers are allowed in DB!';
+        }
+        if($state->worker->running < 0){
+            $errors[] = 'For API testing no running workers are allowed in DB!';
+        }
+        if(!$state->database->isUptodate){
+            $errors[] = 'Database is not up to date! '.$state->database->newCount.' new / '.$state->database->modCount.' modified.';
+        }
+        if(!$state->database->isUptodate) {
+            die('Database is not up to date! '.$state->database->newCount.' new / '.$state->database->modCount.' modified. Terminating API-tests'."\n\n");
+        }
+        if(count($errors) > 0){
+            die(implode("\n", $errors)."\nTerminating API-tests\n\n");
+        }
+        static::$_appState = $state;
+    }
+
+    /**
+     * Retrieves the application-state object
+     * @return stdClass
+     */
+    final public static function getAppState() : stdClass {
+        return static::$_appState;
     }
 }

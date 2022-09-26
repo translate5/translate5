@@ -83,8 +83,10 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
         $tbxA = glob($parameters['folderToGetTbx'] . DIRECTORY_SEPARATOR . 'TermCollection*.tbx');
 
         // Create API instance
-        $api = new editor_Test_ApiHelper('editor_Test_ApiTest');
-        $api->setAuthCookie($parameters['cookie']);
+        // TODO TESTS FIXME: Why is that done ???
+        // Since the auth-cookie now is valid the whole test-suite: is that still neccessary ?
+        editor_Test_ApiHelper::setAuthCookie($parameters['cookie']);
+
         $url = $parameters['url'];
 
         // Api request data

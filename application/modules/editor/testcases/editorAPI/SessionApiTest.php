@@ -79,7 +79,7 @@ class SessionApiTest extends \editor_Test_ApiTest {
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
         
-        $response = static::api()->post('editor/session', ['login' => 'wrongUsername', 'passwd' => 'asdfasdf']);
+        $response = static::api()->post('editor/session', ['login' => 'wrongUsername', 'passwd' => editor_Test_ApiHelper::PASSWORD]);
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
     }
@@ -97,7 +97,7 @@ class SessionApiTest extends \editor_Test_ApiTest {
         
         static::api()->logout();
         
-        $json = static::api()->getJson('editor/session/'.static::api()->getAuthCookie());
+        $json = static::api()->getJson('editor/session/'.editor_Test_ApiHelper::getAuthCookie());
         $this->assertEquals('not authenticated', $json->state);
         $this->assertEmpty($json->user);
     }
@@ -111,7 +111,7 @@ class SessionApiTest extends \editor_Test_ApiTest {
         
         $loginData = [
             'login' => 'testmanager',
-            'passwd' => 'asdfasdf',
+            'passwd' => editor_Test_ApiHelper::PASSWORD,
         ];
         
         $task = static::api()->getTask();
@@ -127,8 +127,8 @@ class SessionApiTest extends \editor_Test_ApiTest {
         $response = static::api()->postJson('editor/session', $loginData);
         $sessionId = $response->sessionId;
         $sessionToken = $response->sessionToken;
-        
-        static::api()->setAuthCookie($sessionId);
+
+        editor_Test_ApiHelper::setAuthCookie($sessionId);
 
         $plainResponse = static::api()->getLastResponse();
         $this->assertEquals(200, $plainResponse->getStatus(), 'Server did not respond HTTP 200');
