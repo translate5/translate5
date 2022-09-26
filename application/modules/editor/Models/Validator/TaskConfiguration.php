@@ -51,7 +51,7 @@ class editor_Models_Validator_TaskConfiguration extends ZfExtended_Models_Valida
         $this->addValidator('default', 'stringLength', array('min' => 0, 'max' => 1024));
         //`defaults` varchar(1024) DEFAULT NULL COMMENT 'a comma separated list of default values, only one of this value is possible to be set by the GUI',
         $this->addValidator('defaults', 'stringLength', array('min' => 0, 'max' => 1024));
-        //`type` enum('string','integer','boolean','list','map','absolutepath') NOT NULL DEFAULT 'string',
+        //`type` enum('string','integer','float','boolean','list','map','absolutepath','markup','json','regex','regexlist') NOT NULL DEFAULT 'string',
         
         //`description` varchar(1024) NOT NULL COMMENT 'contains a human readable description for what this config is for',
         $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 1024));

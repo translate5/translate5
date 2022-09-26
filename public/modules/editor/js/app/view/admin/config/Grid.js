@@ -377,23 +377,24 @@ Ext.define('Editor.view.admin.config.Grid', {
                 };
                 break;
             case 'list':
+            case 'regexlist':
                 config = {
-                  xtype: 'tagfield',
-                  name: 'value',
-                  store: defaultsStore,
-                  value: record.get('value'),
-                  displayField: 'value',
-                  valueField: 'id',
-                  typeAhead: true,
-                  queryMode: 'local',
-                  filterPickList: false,
-                  triggerOnClick: true,
-                  createNewOnBlur: !hasDefaults,
-                  createNewOnEnter: !hasDefaults,
-                  triggerAction: 'all',
-                  growMax: 150
-              };
-            break;
+                    xtype: 'tagfield',
+                    name: 'value',
+                    store: defaultsStore,
+                    value: record.get('value'),
+                    displayField: 'value',
+                    valueField: 'id',
+                    typeAhead: true,
+                    queryMode: 'local',
+                    filterPickList: false,
+                    triggerOnClick: true,
+                    createNewOnBlur: !hasDefaults,
+                    createNewOnEnter: !hasDefaults,
+                    triggerAction: 'all',
+                    growMax: 150
+                };
+                break;
         }
 
         if(!Ext.isEmpty(record.get('typeClassGui'))) {

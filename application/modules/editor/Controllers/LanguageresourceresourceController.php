@@ -47,12 +47,10 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         /* @var $serviceManager editor_Services_Manager */
         $result = array();
         
-        $userSession = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        
-        $isAllowedFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesAddFilebased');
-        $isAllowedNonFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesAddNonFilebased');
+        $userRoles = ZfExtended_Authentication::getInstance()->getRoles();
+        $isAllowedFilebased = $acl->isInAllowedRoles($userRoles, 'frontend', 'languageResourcesAddFilebased');
+        $isAllowedNonFilebased = $acl->isInAllowedRoles($userRoles, 'frontend', 'languageResourcesAddNonFilebased');
         
         // (1) the resources of the configured services
         $resources = $serviceManager->getAllResources();

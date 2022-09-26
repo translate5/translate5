@@ -90,8 +90,8 @@ class editor_Models_Quality_RequestState {
             $this->collapsed = (count($parts) < 3 || empty($parts[2]) || $parts[2] == 'NONE') ? '' : $parts[2];
         }
         //  our user restriction, depends on if the user is a normal editor or has the right to manage qualities (and thus sees other users qualities)
-        if(!ZfExtended_Acl::getInstance()->isInAllowedRoles(editor_User::instance()->getRoles(), 'frontend', 'editorManageQualities')){
-            $this->userGuid = editor_User::instance()->getGuid();
+        if(!ZfExtended_Acl::getInstance()->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'frontend', 'editorManageQualities')){
+            $this->userGuid = ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
         }
     }
     /**

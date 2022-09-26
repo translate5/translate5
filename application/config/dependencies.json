@@ -11,12 +11,6 @@
     },
     "dependencies": [
         {
-            "name": "translate5-DB-init",
-            "label": "translate5 DB init",
-            "url": "RELEASE:translate5-DB-init.zip",
-            "target": "dbinit\/"
-        },
-        {
             "name": "third-party-dependencies",
             "label": "Third Party Dependencies pulled in by PHP composer",
             "url": "RELEASE:third-party-dependencies.zip",

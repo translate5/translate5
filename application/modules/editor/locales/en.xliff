@@ -2460,10 +2460,6 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>Seg.: {siblings}</source>
     <target>seg.: {siblings}</target>
 </trans-unit>
-<trans-unit id='RXMga29ubnRlbiBuaWNodCBhbGxlIHdpZWRlcmhvbHRlbiBTZWdtZW50ZSBnZXNwZWljaGVydCB3ZXJkZW4hIERpZXMga2FubiB1bnRlcnNjaGllZGxpY2hlIFVyc2FjaGVuIGhhYmVuLiBCaXR0ZSBzcGVpY2hlcm4gU2llIGRhcyB6dWxldHp0IGJlYXJiZWl0ZXRlIFNlZ21lbnQgZXJuZXV0IHVuZCB2ZXJ3ZW5kZW4gU2llIGRlbiBtYW51ZWxsZW4gTW9kdXMgZGVzIFdpZWRlcmhvbHVuZ3NlZGl0b3IgdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIHp1IGlkZW50aWZpemllcmVuIHVtIHNpZSBkYW5hY2ggaMOkbmRpc2NoIHp1IGJlYXJiZWl0ZW4u'>
-    <source>Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.</source>
-    <target>Not all repeated segments could be saved! There can be different reasons for that. Please save the last edited segment again and use the manual mode of the repetition editor to identify and reedit manually the non changed segments.</target>
-</trans-unit>
 <trans-unit id='RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllICdBbGxlcyBFcnNldHplbicgRnVua3Rpb25hbGl0w6R0IHVtIGRpZSBiZXRyb2ZmZW5lbiBTZWdtZW50ZSBlaW56ZWxuIHp1IGZpbmRlbiB1bmQgenUgYmVhcmJlaXRlbi4='>
     <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
     <target>The replacements could not be applied in all found segments. There can be different reasons for that. Please use search and replace without 'replace all' to identify and reedit the non changed segments.</target>
