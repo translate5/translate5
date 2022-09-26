@@ -36,7 +36,12 @@ class editor_ConfigController extends ZfExtended_RestController {
      * @var editor_Models_Config
      */
     protected $entity;
-    
+    /**
+     * prevents sanitization of the 'value' param.
+     * The param will be sanitized dynamically, see putAction
+     * @var array
+     */
+    protected array $dataSanitizationMap = ['value' => ZfExtended_Sanitizer::UNSANITIZED];
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
@@ -65,14 +70,19 @@ class editor_ConfigController extends ZfExtended_RestController {
             'E1363' => 'Configuration value invalid: {errorMsg}',
         ]);
 
-        $this->decodePutData();
+        $this->decodePutData(); // will fetch the 'value' param unsanitized
 
         if(!property_exists($this->data, 'value')) {
             throw new ZfExtended_UnprocessableEntity('E1025');
         }
-        
+
         $this->entity->loadByName($this->data->name);
 
+        // we have to add dynamic sanitization here depending on the config type
+        $this->data->value = ZfExtended_Sanitizer::sanitize(
+            $this->data->value,
+            ZfExtended_DbConfig_Type_CoreTypes::getSanitizationType($this->entity->getType())
+        );
         
         $level = null;
 

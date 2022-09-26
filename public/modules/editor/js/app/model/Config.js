@@ -38,7 +38,7 @@ Ext.define('Editor.model.Config', {
     {name: 'name', type: 'string'},
     {name: 'guiName', type: 'string'},
     {name: 'typeClassGui', type: 'string', persist: false},
-      {
+    {
       name: 'value',
       critical: true,
       convert: function(value, record) {
@@ -63,6 +63,7 @@ Ext.define('Editor.model.Config', {
             return Ext.Number.from(value,0);
           case 'map':
           case 'list':
+          case 'regexlist':
             if(Ext.isArray(value) || Ext.isObject(value)) {
               return value;
             }
