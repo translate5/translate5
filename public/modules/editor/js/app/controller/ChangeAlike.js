@@ -72,8 +72,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     alikeSingular: '#UT#Wiederholung wurde bearbeitet und gespeichert',
     alikePlural: '#UT#Wiederholungen wurden bearbeitet und gespeichert',
     alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.',
-    alikesFailure: '#UT#Die Wiederholungen konnten nicht gespeichert werden',
-    alikesNotAllSaved: '#UT#Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.'
+    alikesFailure: '#UT#Die Wiederholungen konnten nicht gespeichert werden'
   },
   alikesToProcess: null,
   fetchedAlikes: null,
@@ -467,7 +466,7 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @param {Object} options
    */
   alikesSaveFailureHandler: function(resp, options) {
-    this.cleanUpAlikeSegments(true);
+    this.cleanUpAlikeSegments();
     Editor.MessageBox.addError(this.messages.alikesFailure);
   },
   /**
@@ -482,7 +481,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     alikes = me.alikesToProcess,
     alikesSaved = (data.rows.length == 1 ? me.messages.alikeSingular : me.messages.alikePlural);
     if(!data.rows || data.rows.length == 0) {
- 	    me.cleanUpAlikeSegments(false);
+ 	    me.cleanUpAlikeSegments();
     	return;
     }
     //Auslesen und Verarbeiten der IDs der Alike Segmente die auf dem Server erfolgreich gespeichert wurden
@@ -498,7 +497,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     	}
     });
     // finish process by checking of unsaved alikes occured
-    if(me.cleanUpAlikeSegments(false)){
+    if(me.cleanUpAlikeSegments()){
         Editor.MessageBox.addSuccess(Ext.String.format(alikesSaved, data.rows.length));
     }
 
@@ -510,9 +509,9 @@ Ext.define('Editor.controller.ChangeAlike', {
    * und werden daher im Segments Store rejectet, sprich wieder die unveränderten Daten angezeigt 
    * 
    * This method should be the last called method in the changealike processing. Its responsible to jump back to the saveChain
-   * It returns, if no error saving the alikes occured (and no message-box was generated unless "silent" was passed)
+   * It returns, if no error saving the alikes occured
    */
-  cleanUpAlikeSegments: function(silent) {
+  cleanUpAlikeSegments: function() {
       var me = this,
           alikes = me.alikesToProcess;
       me.alikesToProcess = null;
@@ -528,9 +527,6 @@ Ext.define('Editor.controller.ChangeAlike', {
               delete rec._editorDataSave;
           }
       });
-      if(!silent){
-          Editor.MessageBox.addError(me.messages.alikesNotAllSaved);
-      }
       me.callbackToSaveChain();
       // TODO FIXME: This leads to ugly JS-Errors, it seems Rootcause does not catch these reliably. therefore deactivated
       // throw "not all alikes saved"; // exception here to trigger the rootcause logging
