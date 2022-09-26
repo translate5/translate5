@@ -107,7 +107,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
     }
     
     /**
@@ -115,7 +115,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
      */
     public function testSourceMatches() {
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $this->assertCount(7, $segments);
         
         //test source editing 
@@ -133,12 +133,12 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         
         //edit one segment
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'I repeat me in the source', $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //edit source also, currently our test helper cant make this in one API call
         if($isSE) {
             $segmentData = $this->api()->prepareSegmentPut('sourceEdit', 'Ich wiederhole mich in der Quelle - edited', $segToTest->id);
-            $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+            $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         }
       
         //assert source / target after editing
@@ -147,7 +147,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $this->assertFieldTextEquals($this->toCompareSource['targetEditAfterEdit'], $segment->targetEdit);
         
         //fetch alikes and assert correct segments found by segmentNrInTask
-        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        $alikes = $this->api()->getJson('editor/alikesegment/'.$segToTest->id);
         $segmentNrInTask = array_map(function($item){
             return $item->segmentNrInTask;
         },$alikes);
@@ -165,7 +165,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $this->api()->putJson('editor/alikesegment/'.$segToTest->id, $alikePutData, null, false);
         
         //get segment list again to check if change alikes were applied correctly
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         
         //check the alike were the ChangeAlikes handler only changed the autoState, the content was already correct
         $segment = $segments[0];
@@ -195,7 +195,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
      */
     public function testTargetMatches() {
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $this->assertCount(7, $segments);
         
         //test source editing 
@@ -212,12 +212,12 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
 
         //edit one segment
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'I repeat me in the targettext', $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
 
         //edit source also, currently our test helper cant make this in one API call
         if($isSE) {
             $segmentData = $this->api()->prepareSegmentPut('sourceEdit', 'Ich wiederhole mich im Zieltext - edited', $segToTest->id);
-            $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+            $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         }
          
         //assert source / target after editing
@@ -226,7 +226,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //fetch alikes and assert correct segments found by segmentNrInTask
-        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        $alikes = $this->api()->getJson('editor/alikesegment/'.$segToTest->id);
         $segmentNrInTask = array_map(function($item){
             return $item->segmentNrInTask;
         },$alikes);
@@ -244,7 +244,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $this->api()->putJson('editor/alikesegment/'.$segToTest->id, $alikePutData, null, false);
 
         //get segment list again to check if change alikes were applied correctly
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         
         //check the alike were the ChangeAlikes handler only changed the autoState, the content was already correct
         $segment = $segments[3];
@@ -287,7 +287,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
             return;
         }
         //get segment list again to check if change alikes were applied correctly
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         
         $sourceCompareString = $this->toCompareSource['sourceAfterEdit'].' - edited';
         $targetCompareString = $this->toCompareTarget['sourceAfterEdit6'].' - edited';
@@ -303,9 +303,6 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

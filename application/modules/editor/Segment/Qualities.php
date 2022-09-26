@@ -93,6 +93,7 @@ final class editor_Segment_Qualities {
         }
         // error_log('PROCESS QUALITIES FOR SEGMENT '.$this->segmentId.', MODE '.$this->processingMode.', EXISTING: '.count($this->existing));
     }
+
     /**
      * Adds a quality independently of a tag (usually do not use start & end index then)
      * NOTE that the $additopnal data only can be a flat Object !
@@ -101,9 +102,18 @@ final class editor_Segment_Qualities {
      * @param string $category
      * @param int $startIndex
      * @param int $endIndex
-     * @param stdClass $additionalData
+     * @param stdClass|array|null $additionalData
      */
-    public function add(string $field, string $type, string $category, int $startIndex, int $endIndex, stdClass $additionalData=NULL){
+    public function add(
+        string $field,
+        string $type,
+        string $category,
+        int $startIndex,
+        int $endIndex,
+        stdClass|array|null $additionalData = null,
+        bool $hidden = false
+    ): void
+    {
         // we can not compare the text indices because qualities added vie ->add() are qualities that relate to the whole segment content !
         $quality = $this->findExistingByProps($field, $type, $category, $additionalData);
         if($quality == NULL){
@@ -117,7 +127,8 @@ final class editor_Segment_Qualities {
             $quality->startIndex = $startIndex;
             $quality->endIndex = $endIndex;
             $quality->falsePositive = 0;
-            if($additionalData != NULL){
+            $quality->hidden = $hidden;
+            if($additionalData !== null){
                 $quality->setAdditionalData($additionalData);
             }
             // new qualities without tags will be saved in a batch
@@ -342,16 +353,18 @@ final class editor_Segment_Qualities {
         }
         return NULL;
     }
+
     /**
      * Finds an existing quality that was not yet found that matches all given props. This is expected to be a quality without segment tags and thus must match the whole width of the segment
      * Needed for persistance of falsePositive only
      * @param string $field
      * @param string $type
      * @param string $category
-     * @param stdClass $additionalData
+     * @param stdClass|array|null $additionalData
      * @return editor_Models_Db_SegmentQualityRow|NULL
      */
-    private function findExistingByProps(string $field, string $type, string $category, ?stdClass $additionalData) : ?editor_Models_Db_SegmentQualityRow {
+    private function findExistingByProps(string $field, string $type, string $category, stdClass|array|null $additionalData): ?editor_Models_Db_SegmentQualityRow
+    {
         foreach($this->existing as $quality){
             if($quality->processingState == 'delete' && $type === $quality->type && $field == $quality->field && $category == $quality->category && $quality->isAdditionalDataEqual($additionalData)){
                 return $quality;

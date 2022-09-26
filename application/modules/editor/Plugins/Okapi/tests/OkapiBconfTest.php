@@ -42,7 +42,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         self::$api->login('testmanager');
         self::assertLogin('testmanager');
 
-        $appState = self::$api->requestJson('editor/index/applicationstate');
+        $appState = self::$api->getJson('editor/index/applicationstate');
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case');
 
         // Test essential configs
@@ -72,9 +72,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $bconfName = 'OkapiBconfTest' . microtime() . '.bconf';
         self::$api->addFile('bconffile', $input->getPathname(), 'application/octet-stream');
         // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
-        $res = self::$api->requestJson('editor/plugins_okapi_bconf/uploadbconf', 'POST', [
-            'name' => $bconfName,
-        ]);
+        $res = self::$api->postJson('editor/plugins_okapi_bconf/uploadbconf', [ 'name' => $bconfName ], null, false);
         self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true for bconf '.$bconfName);
         self::$bconfId = $res->id;
         self::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
@@ -97,27 +95,27 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
         // Upload sourceSRX
         $api->addFile('srx', $api->getFile('srx/idSource.srx'), 'application/octet-stream');
-        $res = $api->request("editor/plugins_okapi_bconf/uploadsrx?id=$id", 'POST', [
+        $res = $api->post("editor/plugins_okapi_bconf/uploadsrx?id=$id", [
             'purpose' => 'source',
         ]);
         self::assertEquals(200, $res->getStatus());
         // Upload targetSRX
         $api->addFile('srx', $api->getFile('srx/idTarget.srx'), 'application/octet-stream');
-        $res = $api->request("editor/plugins_okapi_bconf/uploadsrx?id=$id", 'POST', [
+        $res = $api->post("editor/plugins_okapi_bconf/uploadsrx?id=$id", [
             'purpose' => 'target',
         ]);
         self::assertEquals(200, $res->getStatus());
 
-        $res = $api->request("editor/plugins_okapi_bconf/downloadbconf?id=$id");
+        $res = $api->get("editor/plugins_okapi_bconf/downloadbconf?id=$id");
         self::assertEquals(200, $res->getStatus());
         $bconfString = $res->getBody();
 
-        $res = $api->request("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=source");
+        $res = $api->get("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=source");
         self::assertEquals(200, $res->getStatus());
         $sourceSrx = $res->getBody();
         self::assertStringContainsString($sourceSrx, $bconfString, "sourceSrx update failed for bconf #$id");
 
-        $targetSrx = $api->request("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=target")->getBody();
+        $targetSrx = $api->get("editor/plugins_okapi_bconf/downloadsrx?id=$id&purpose=target")->getBody();
         self::assertStringContainsString($targetSrx, $bconfString, "targetSrx update failed for bconf #$id");
     }
 
@@ -247,13 +245,14 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $api->addImportFile($api->getFile('workfiles/BconfWithin-de-en.zip'));
         $api->import($task);
         $task = $api->getTask();
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
-        $segments= $api->requestJson('editor/segment?page=1&start=0&limit=3');
-        // Leave task so it becomes deleteable
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
 
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
-        $api->deleteTask();
+        $jsonFileName = 'expectedSegments.json';
+        $segments = $api->getSegments($jsonFileName, 3);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
+
+        // Cleanup
+        $api->deleteTask($task->id);
     }
 
     /***

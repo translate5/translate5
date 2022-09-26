@@ -244,6 +244,8 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      */
     public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, $types=NULL, bool $typesAreBlacklist=false, $categories=NULL) : Zend_Db_Table_Rowset_Abstract {
         $select = $this->select();
+        $select->where('hidden = 0');
+
         if(!empty($taskGuid)){
             $select->where('taskGuid = ?', $taskGuid);
         }
@@ -294,6 +296,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             ->from(['qualities' => $this->getName()], 'qualities.*')
             ->from(['segments' => 'LEK_segments'], 'segments.editable') // we need the editable prop for assigning structural faults of non-editable segments a virtual category
             ->where('qualities.segmentId = segments.id')
+            ->where('qualities.hidden = 0')
             // we want qualities from editable segments, only exception are structural internal tag errors
             // as usual, Zend Selects do not provide proper bracketing, so we're crating this manually here
             ->where('segments.editable = 1 OR (qualities.type = \''.editor_Segment_Tag::TYPE_INTERNAL.'\' AND qualities.category = \''.editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY.'\')');

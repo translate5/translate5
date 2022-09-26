@@ -66,16 +66,16 @@ class Translate2362Test extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
     }
     
     /**
      * Testing segment values directly after import
      */
     public function testSegmentValuesAfterImport() {
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
+        $jsonFileName = 'expectedSegments.json';
+        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
     /**
@@ -83,7 +83,7 @@ class Translate2362Test extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
+        $segments = $this->api()->getSegments(null, 10);
         
         //test editing a prefilled segment
         $segToTest = $segments[0];
@@ -91,18 +91,18 @@ class Translate2362Test extends editor_Test_JsonTest {
         $segToTest->targetEdit = str_replace(['cool.', 'is &lt; a'], ['cool &amp; cööler.', 'is &gt; a'], $segToTest->targetEdit);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         $segToTest = $segments[1];
         $segToTest->targetEdit = str_replace(['comments and CDATA'], ['CDATA and comments'], $segToTest->targetEdit);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //check direct PUT result
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegments-edited.json', $segments, 'Edited segments are not as expected!');
+        $jsonFileName = 'expectedSegments-edited.json';
+        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
     }
     
     /**
@@ -114,7 +114,7 @@ class Translate2362Test extends editor_Test_JsonTest {
         $task = $this->api()->getTask();
         //start task export
         
-        $this->api()->request('editor/task/export/id/'.$task->id);
+        $this->api()->get('editor/task/export/id/'.$task->id);
         
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();
@@ -130,10 +130,6 @@ class Translate2362Test extends editor_Test_JsonTest {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

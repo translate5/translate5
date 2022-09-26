@@ -57,7 +57,7 @@ class Markup {
     public static function isValid(string $markup) : bool {
         // if there is markup, we have to make sure it's valid
         if(strip_tags($markup) != $markup){
-            $domDocument = new \editor_Utils_Dom();
+            $domDocument = new \ZfExtended_Dom();
             $domDocument->loadUnicodeMarkup($markup);
             return $domDocument->isValid(false);
         }

@@ -39,28 +39,27 @@ class Translate2827Test extends editor_Test_JsonTest {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
         self::assertLogin('testmanager');
+        self::$api->addImportFiles(self::$api->getFile('import-project.de-es-ES.workfile.sdlxliff'));
+        self::$api->addImportFiles(self::$api->getFile('import-project.de-mk-MK.pivot.sdlxliff'));
+
+        $task = [
+            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
+            'sourceLang' => 'de',
+            'targetLang' => ['es-ES'],
+            'relaisLang' => 'mk-MK',
+            'customerId' => self::$api->getCustomer()->id,
+            'edit100PercentMatch' => true,
+            'importUpload_language' => ['es-ES','mk-MK'],
+            'importUpload_type' => ['workfiles','pivot'],
+            'autoStartImport' => 1
+        ];
+        self::$api->import($task, false);
     }
 
     /***
      * Create the task with pivot
      */
     public function testImportProjectWithRelais(){
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'de',
-            'targetLang' => ['es-ES'],
-            'relaisLang' => 'mk-MK',
-            'customerId'=>self::api()->getCustomer()->id,
-            'edit100PercentMatch' => true,
-            'importUpload_language' => ['es-ES','mk-MK'],
-            'importUpload_type' => ['workfiles','pivot'],
-            'autoStartImport' => 1
-        ];
-        self::assertLogin('testmanager');
-        self::$api->addImportFiles(self::$api->getFile('import-project.de-es-ES.workfile.sdlxliff'));
-        self::$api->addImportFiles(self::$api->getFile('import-project.de-mk-MK.pivot.sdlxliff'));
-        self::$api->import($task,false);
-        error_log('Task created. '.$this->api()->getTask()->taskName);
         $projectTasks = self::$api->getProjectTasks();
         $this->assertEquals(count($projectTasks), 1, 'No tasks where created.');
     }
@@ -71,9 +70,9 @@ class Translate2827Test extends editor_Test_JsonTest {
     public function testRelaisContent() {
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'edit', 'id' => $task->id]);
+        $this->api()->setTaskToEdit($task->id);
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
         $segments = array_map(function($segment){
             return $segment;
         }, $segments);
@@ -87,8 +86,7 @@ class Translate2827Test extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id);
     }
 
 }

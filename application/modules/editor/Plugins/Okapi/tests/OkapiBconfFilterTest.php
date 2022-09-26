@@ -41,7 +41,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
         self::$api->login('testmanager');
         self::assertLogin('testmanager');
 
-        $appState = self::$api->requestJson('editor/index/applicationstate');
+        $appState = self::$api->getJson('editor/index/applicationstate');
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case');
 
         // Needed for localized error messages in Unit Test like ZfExtended_NoAccessException
@@ -68,9 +68,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
         $bconfName = 'OkapiBconfFilterTest'.time().'.bconf';
         self::$api->addFile('bconffile', $input->getPathname(), 'application/octet-stream');
         // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
-        $res = self::$api->requestJson('editor/plugins_okapi_bconf/uploadbconf', 'POST', [
-            'name' => $bconfName,
-        ]);
+        $res = self::$api->postJson('editor/plugins_okapi_bconf/uploadbconf', [ 'name' => $bconfName ]);
         self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true for bconf '.$bconfName);
         self::$bconfId = $res->id;
         self::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
@@ -312,9 +310,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
         $input = new SplFileInfo(self::$api->getFile($invalidBconfFile));
         self::$api->addFile('bconffile', $input->getPathname(), 'application/octet-stream');
         // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
-        $result = self::$api->requestJson('editor/plugins_okapi_bconf/uploadbconf', 'POST', [
-            'name' => $tempName,
-        ]);
+        $result = self::$api->postJson('editor/plugins_okapi_bconf/uploadbconf', [ 'name' => $tempName ], null, false);
         if($result !== false){
             self::fail('Uploaded invalid BCONF "'.$invalidBconfFile.'" could be uploaded although it is invalid');
         } else {
@@ -371,7 +367,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
         $input = new SplFileInfo(self::$api->getFile($filename));
         self::$api->addFile($uploadName, $input->getPathname(), $uploadMime);
         // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
-        $result = self::$api->requestJson($endpoint, 'POST', $uploadParams);
+        $result = self::$api->postJson($endpoint, $uploadParams);
         return $this->_getFullResult($result);
     }
 

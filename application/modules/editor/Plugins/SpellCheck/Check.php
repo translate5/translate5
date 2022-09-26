@@ -27,6 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Segment_Whitespace as Whitespace;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\MalfunctionException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\RequestException;
+use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\TimeOutException;
 
 /**
  *
@@ -137,10 +141,10 @@ class editor_Plugins_SpellCheck_Check {
      * @param editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter $connector
      * @param $spellCheckLang
      * @throws Zend_Exception
-     * @throws editor_Plugins_SpellCheck_Exception_Down
-     * @throws editor_Plugins_SpellCheck_Exception_Malfunction
-     * @throws editor_Plugins_SpellCheck_Exception_Request
-     * @throws editor_Plugins_SpellCheck_Exception_TimeOut
+     * @throws DownException
+     * @throws MalfunctionException
+     * @throws RequestException
+     * @throws TimeOutException
      */
     public function __construct(editor_Models_Segment $segment, $targetField,
                                 editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter $connector, $spellCheckLang) {
@@ -153,7 +157,7 @@ class editor_Plugins_SpellCheck_Check {
         $target = Whitespace::replaceLabelledCharacters($target);
 
         // If empty target - return
-        if (!strlen($target)) {
+        if (strlen($target) !== 0) {
             return;
         }
 

@@ -58,7 +58,6 @@ class TaskEntityVersionTest extends \ZfExtended_Test_ApiTestcase {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id);
     }
 }

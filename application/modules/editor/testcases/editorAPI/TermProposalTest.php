@@ -79,10 +79,10 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         /*class_exists('editor_Utils');
         $last = editor_Utils::db()->query('SELECT `id` FROM `LEK_languageresources` ORDER BY `id` DESC LIMIT 1')->fetchColumn();
-        self::$api->requestJson('editor/termcollection/' . $last, 'DELETE');*/
+        self::$api->delete('editor/termcollection/' . $last);*/
 
         // [1] create empty term collection
-        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', [
+        $termCollection = $this->api()->postJson('editor/termcollection', [
             'name' => 'Test api collection',
             'customerIds' => $this->api()->getCustomer()->id
         ]);
@@ -94,29 +94,29 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         // [2] import tbx with single termEntry
         $this->api()->addFile('Term.tbx', $this->api()->getFile('Term.tbx'), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', [
+        $this->api()->postJson('editor/termcollection/import', [
             'collectionId' => self::$collectionId,
             'customerIds' => $this->api()->getCustomer()->id,
             'mergeTerms' => true
         ]);
 
         // [3] get languages: german
-        $german = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]']);
+        $german = $this->api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]']);
         $this->assertNotEmpty($german, 'Unable to load the german-language needed for the term search.');
         self::$german = $german[0];
 
         // english
-        $english = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
+        $english = $this->api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"en","property":"rfc5646"}]']);
         $this->assertNotEmpty($english, 'Unable to load english-language needed for use in noTermDefinedFor filter');
         self::$english = $english[0];
 
         // italian
-        $italian = $this->api()->requestJson('editor/language', 'GET', ['filter' => '[{"operator":"eq","value":"it","property":"rfc5646"}]']);
+        $italian = $this->api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"it","property":"rfc5646"}]']);
         $this->assertNotEmpty($italian, 'Unable to load italian-language needed for use in noTermDefinedFor-filter');
         self::$italian = $italian[0];
 
         // [4] find imported term by *-query and de-DE language id
-        $termsearch = $this->api()->requestJson('editor/plugins_termportal_data/search', 'GET', [
+        $termsearch = $this->api()->getJson('editor/plugins_termportal_data/search', [
             'query' => '*',
             'collectionIds' => self::$collectionId,
             'language' => self::$german->id,
@@ -130,32 +130,34 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $importedTerm = $termsearch->data[0];
 
         // [5] create proposal 'TestTermProposal' for imported term
-        $importedTermProposal = $this->api()->requestJson('editor/term', 'PUT', $data = [
+        $data = [
             'termId' => $importedTerm->id,
             'proposal' => 'TestTermProposal'
-        ]);
+        ];
+        $importedTermProposal = $this->api()->putJson('editor/term', $data);
         $this->assertTrue(is_object($importedTermProposal)
             && $importedTermProposal->proposal === $data['proposal'],
             'Unable to create proposal for the tbx-imported term');
 
         // Get imported term attributes
-        $importedTermAttrA = $this->api()->requestJson('editor/plugins_termportal_data/siblinginfo', 'POST', [
+        $importedTermAttrA = $this->api()->postJson('editor/plugins_termportal_data/siblinginfo', [
             'termId' => $importedTerm->id
         ])->term->attributes;
 
         // [6] reject that proposal, so we now have two separate terms, and last one is rejected
-        $rejected = $this->api()->requestJson('editor/attribute', 'PUT', [
+        $rejected = $this->api()->putJson('editor/attribute', [
             'attrId' => array_column($importedTermAttrA, 'id', 'type')['processStatus'],
             'value' => 'rejected'
         ]);
 
         // [7] create new term entry with term = "Term1" (de-DE) and note-attr = "Note for Term1"
-        $Term1 = $this->api()->requestJson('editor/term', 'POST', $Term1_data = [
+        $Term1_data = [
             'collectionId' => self::$collectionId,
             'language' => self::$german->rfc5646,
             'term' => 'Term1',
             'note' => 'Note for Term1'
-        ]);
+        ];
+        $Term1 = $this->api()->postJson('editor/term', $Term1_data);
 
         // Check if the term entry proposal is valid
         $this->assertTrue(is_object($Term1)
@@ -164,23 +166,24 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             'Unable to propose new term entry with new term.');
 
         // [8] create new term for same term entry with term=Term2 and 'en'-language
-        $Term2 = $this->api()->requestJson('editor/term', 'POST', $data = [
+        $data = [
             'collectionId' => self::$collectionId,
             'termEntryId' => $Term1->termEntryId,
             'language' => 'en',
             'term' => 'Term2',
-        ]);
+        ];
+        $Term2 = $this->api()->postJson('editor/term', $data);
         $this->assertTrue(is_object($Term2)
             && $Term2->query == $data['term']
             && $Term2->termEntryId == $data['termEntryId']
             && is_numeric($Term2->termId), 'Appending term under existing termEntry was unsuccessful');
 
         // [9] get the list of possible attributes (e.g. attribute datatypes)
-        $dataTypeA = $this->api()->requestJson('editor/attributedatatype');
+        $dataTypeA = $this->api()->getJson('editor/attributedatatype');
         $this->assertTrue(is_object($dataTypeA), 'Unable to get attribute datatypes');
 
         // [10] create image-attr for entry-level for created term entry
-        $figurecreate = $this->api()->requestJson('editor/attribute', 'POST', $data = [
+        $figurecreate = $this->api()->postJson('editor/attribute', [
             'termId' => $Term1->termId,
             'level' => 'entry',
             'dataType' => 'figure'
@@ -190,12 +193,12 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         // [11] update that image-attr, e.g upload the image file
         $this->api()->addFile('figure', $this->api()->getFile('Image.jpg'), "image/jpg");
-        $figureupdate = $this->api()->requestJson('editor/attribute', 'PUT', $data = [
+        $figureupdate = $this->api()->putJson('editor/attribute', [
             'attrId' => $figurecreate->inserted->id,
         ]);
 
         // [12] create ref-attr for termEntry-level for Term1
-        $refcreate = $this->api()->requestJson('editor/attribute', 'POST', $data = [
+        $refcreate = $this->api()->postJson('editor/attribute', [
             'termId' => $Term1->termId,
             'level' => 'entry',
             'dataType' => 'crossReference'
@@ -204,7 +207,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             && is_numeric($refcreate->inserted->id), 'Unable to create ref-attribute for the entry-level');
 
         // [13] update that ref-attr with the termEntryTbxId of an imported term
-        $refupdate = $this->api()->requestJson('editor/attribute', 'PUT', $data = [
+        $refupdate = $this->api()->putJson('editor/attribute', [
             'attrId' => $refcreate->inserted->id,
             'target' => $importedTerm->termEntryTbxId,
         ]);
@@ -212,7 +215,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             && $refupdate->target == $rejected->inserted->termEntryTbxId, 'Unable to update ref-attribute for the entry-level');
 
         // [14] create ref-attr for term-level for Term1
-        $refcreate = $this->api()->requestJson('editor/attribute', 'POST', $data = [
+        $refcreate = $this->api()->postJson('editor/attribute', [
             'termId' => $Term1->termId,
             'level' => 'term',
             'dataType' => 'crossReference'
@@ -221,7 +224,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             && is_numeric($refcreate->inserted->id), 'Unable to create ref-attribute for the entry-level');
 
         // [15] update that ref-attr with the termTbxId of an appended term Term2
-        $refupdate = $this->api()->requestJson('editor/attribute', 'PUT', $data = [
+        $refupdate = $this->api()->putJson('editor/attribute', [
             'attrId' => $refcreate->inserted->id,
             'target' => $Term2->termTbxId,
         ]);
@@ -229,7 +232,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             && $refupdate->value == $Term2->query, 'Unable to update ref-attribute for the term-level');
 
         // [16] create xref-attr for Term1
-        $xrefcreate = $this->api()->requestJson('editor/attribute', 'POST', $data = [
+        $xrefcreate = $this->api()->postJson('editor/attribute', [
             'termId' => $Term1->termId,
             'level' => 'term',
             'dataType' => 'externalCrossReference'
@@ -238,7 +241,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             && is_numeric($xrefcreate->inserted->id), 'Unable to create xref-attribute for the term-level');
 
         // [17] update that xref-attr value
-        $xrefupdate = $this->api()->requestJson('editor/attribute', 'PUT', [
+        $xrefupdate = $this->api()->putJson('editor/attribute', [
             'attrId' => $xrefcreate->inserted->id,
             'dataIndex' => 'value',
             'value' => 'Wikipedia website'
@@ -247,15 +250,16 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             && property_exists($xrefupdate, 'isValidUrl'), 'Unable to set value for the term-level xref-attribute');
 
         // [18] update that xref-attr target
-        $xrefupdate = $this->api()->requestJson('editor/attribute', 'PUT', $xrefdata = [
+        $xrefdata = [
             'attrId' => $xrefcreate->inserted->id,
             'dataIndex' => 'target',
             'value' => 'https://wikipedia.org'
-        ]);
+        ];
+        $xrefupdate = $this->api()->putJson('editor/attribute', $xrefdata);
         $this->assertTrue(is_object($xrefupdate) && $xrefupdate->isValidUrl, 'Unable to set target for the term-level xref-attribute');
 
         // [10] search for the term attributes
-        $terminfo = $this->api()->requestJson('editor/plugins_termportal_data/terminfo', 'POST', ['termId' => $Term1->termId]);
+        $terminfo = $this->api()->postJson('editor/plugins_termportal_data/terminfo', ['termId' => $Term1->termId]);
         $this->assertTrue(is_object($terminfo), 'No data returned by terminfo-call');
 
         // Check image-attr is there
@@ -270,7 +274,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         );
 
         // [20] get termportal setup data (dictionaries, etc)
-        self::$setup = $this->api()->requestJson('editor/plugins_termportal_data');
+        self::$setup = $this->api()->getJson('editor/plugins_termportal_data');
         $this->assertIsObject(self::$setup, 'Termportal setup data is not an array');
 
         // Check props presence
@@ -280,7 +284,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             $this->assertObjectHasAttribute($prop, self::$setup, 'Termportal setup data has no ' . $prop . '-property');
 
         // [21] call siblinginfo to get attributes for Term1
-        $siblinginfo = $this->api()->requestJson('editor/plugins_termportal_data/siblinginfo', 'POST', ['termId' => $Term1->termId]);
+        $siblinginfo = $this->api()->postJson('editor/plugins_termportal_data/siblinginfo', ['termId' => $Term1->termId]);
         $this->assertIsObject($siblinginfo, 'Siblinginfo data is not an array');
 
         // Check props presence
@@ -329,7 +333,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         ], $existingPlanQtyNote = 1, true);
 
         // [22] Get the export data and compare the values with the expected export file data
-        $exportFact = $this->api()->requestJson('editor/languageresourceinstance/testexport', 'GET', [
+        $exportFact = $this->api()->getJson('editor/languageresourceinstance/testexport', [
             'collectionId' => self::$collectionId,
         ]);
         $this->assertIsArray($exportFact, 'Unable to export the term proposals');
@@ -341,38 +345,38 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         );
 
         // [23] delete image-attr, check image full path not exists anymore
-        $figuredelete = $this->api()->requestJson('editor/attribute', 'DELETE', ['attrId' => $figurecreate->inserted->id]);
+        $figuredelete = $this->api()->delete('editor/attribute', ['attrId' => $figurecreate->inserted->id]);
         $this->assertIsObject($figuredelete, 'Unable to delete the image-attr');
         $this->assertObjectHasAttribute('updated', $figuredelete, 'Image-attr deletion response does not contain "updated" prop');
         $this->assertFalse($this->api()->getRaw($src), 'Image-attr deleted but image-file still exists at ' . $src);
 
         // [24] delete 'TestTermProposal' [isLast=false]
-        $rejecteddelete = $this->api()->requestJson('editor/term', 'DELETE', ['termId' => $rejected->inserted->id]);
+        $rejecteddelete = $this->api()->delete('editor/term', ['termId' => $rejected->inserted->id]);
         $this->assertIsObject($rejecteddelete, 'Unable to delete rejected term');
         $this->assertObjectHasAttribute('isLast', $rejecteddelete, 'Rejected term deletion response does not have isLast prop');
         $this->assertFalse($rejecteddelete->isLast, 'Deleted term should have not been the last - neither among its language nor among its termEntry');
 
         // [25] delete note-attr for Term1
         $attrId_note = array_column($siblinginfo->term->attributes, 'id', 'dataTypeId')[$dataTypeId_note];
-        $notedelete = $this->api()->requestJson('editor/attribute', 'DELETE', ['attrId' => $attrId_note]);
+        $notedelete = $this->api()->delete('editor/attribute', ['attrId' => $attrId_note]);
         $this->assertIsObject($notedelete, 'Unable to delete note-attr');
         $this->assertObjectHasAttribute('updated', $notedelete, 'Unable to delete note-attr');
 
         // [26] delete Term2 (having language=en)    [isLast=language]
-        $Term2_delete = $this->api()->requestJson('editor/term', 'DELETE', ['termId' => $Term2->termId]);
+        $Term2_delete = $this->api()->delete('editor/term', ['termId' => $Term2->termId]);
         $this->assertIsObject($Term2_delete, 'Unable to delete Term2 (having language=en) [isLast=language]');
         $this->assertObjectHasAttribute('isLast', $Term2_delete, 'Term2 deletion response does not have isLast prop');
         $this->assertEquals($Term2_delete->isLast, 'language', 'Deleted term should be the last among its language');
 
         // [27] delete Term1 (having language=de-DE) [isLast=termEntry]
-        $Term1_delete = $this->api()->requestJson('editor/term', 'DELETE', ['termId' => $Term1->termId]);
+        $Term1_delete = $this->api()->delete('editor/term', ['termId' => $Term1->termId]);
         $this->assertIsObject($Term1_delete, 'Unable to delete Term2 (having language=en) [isLast=language]');
         $this->assertObjectHasAttribute('isLast', $Term1_delete, 'Term2 deletion response does not have isLast prop');
         $this->assertEquals($Term1_delete->isLast, 'entry', 'Deleted term should be the last among its termEntry');
 
         // [28] Rename the note-attr label
         $currentLabel = $dataTypeA->$dataTypeId_note->title;
-        $labeledit = $this->api()->requestJson('editor/attributedatatype', 'PUT', [
+        $labeledit = $this->api()->putJson('editor/attributedatatype', [
             'dataTypeId' => $dataTypeId_note,
             'locale' => 'en',
             'label' => $currentLabel . '-amended'
@@ -381,7 +385,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertObjectHasAttribute('label', $labeledit, 'Note-attr editing response has no label-prop');
 
         // Restore old label back
-        $labeledit = $this->api()->requestJson('editor/attributedatatype', 'PUT', [
+        $labeledit = $this->api()->putJson('editor/attributedatatype', [
             'dataTypeId' => $dataTypeId_note,
             'locale' => 'en',
             'label' => $currentLabel
@@ -392,7 +396,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
     public static function tearDownAfterClass(): void {
         self::$api->login('testtermproposer');
-        self::$api->cleanup && self::$api->requestJson('editor/termcollection/'.self::$collectionId,'DELETE');
+        self::$api->delete('editor/termcollection/'.self::$collectionId);
     }
 
     /**
@@ -416,7 +420,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $finalParams = $commonParams + $customParams;
 
         // Get response
-        $resp = $this->api()->requestJson('editor/plugins_termportal_data/search', 'GET', $finalParams);
+        $resp = $this->api()->getJson('editor/plugins_termportal_data/search', $finalParams);
 
         // Print params and get output
         $query = var_export($finalParams, true);
@@ -504,7 +508,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
     public function assertBatchEdit($planQty, $value, $postParams, $existingPlanQty = 0, $save = false) {
 
         // Get response
-        $resp = $this->api()->requestJson('editor/attribute', 'POST', $postParams);
+        $resp = $this->api()->postJson('editor/attribute', $postParams);
 
         // Print params and get output
         $query = var_export($postParams, true);
@@ -544,7 +548,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         }
 
         // Batch update note-attr for termEntry-level
-        $resp = $this->api()->requestJson('editor/attribute', 'PUT', $putParams);
+        $resp = $this->api()->putJson('editor/attribute', $putParams);
 
         // Print params and get output
         $query = var_export($putParams, true);
@@ -567,7 +571,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
             // Pick values from inserted attrs and apply them to the existing attrs
             // Drop inserted attrs having existing attrs
             // Undraft inserted attrs having no existing attrs
-            $resp = $this->api()->requestJson('editor/attribute', 'PUT', $params = [
+            $resp = $this->api()->putJson('editor/attribute', $params = [
                 'attrId' => join(',', array_values($existingFact)),
                 'dropId' => join(',', $dropIdA = array_keys($existingFact)),
                 'draft0' => join(',', array_diff(explode(',', $insertedIds), $dropIdA))
@@ -580,7 +584,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         // Else batch delete note-attr
         } else {
-            $resp = $this->api()->requestJson('editor/attribute', 'DELETE', ['attrId' => $insertedIds]);
+            $resp = $this->api()->delete('editor/attribute', ['attrId' => $insertedIds]);
             $this->assertIsObject($resp, 'Attrs batch-deletion response is not an object');
             $this->assertObjectHasAttribute('updated', $resp, 'Note-attr deletion response does not contain "updated" prop');
         }

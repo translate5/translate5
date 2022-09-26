@@ -82,7 +82,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         'TmOverview'                    => ['languageResourcesOverview'], //controlled by ACL, enabling frontend rights given here
         'Localizer'                     => true,
         'Quality'                       => true,
-        'QualityMqm'                    => true //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
+        'QualityMqm'                    => true, //the check if this controller is active is task specific (runtimeOptions.autoQA.enableMqmTags, flag is task specific)
+        'SegmentQualitiesBase'          => true,
     ];
 
     public function init()
@@ -187,11 +188,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $downloader = ZfExtended_Factory::get('ZfExtended_Models_Installer_Downloader', array(APPLICATION_PATH . '/..'));
         /* @var $downloader ZfExtended_Models_Installer_Downloader */
 
-        $userSession = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
-        if (!$acl->isInAllowedRoles($userSession->data->roles, 'getUpdateNotification')) {
+        if (!$acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'getUpdateNotification')) {
             return;
         }
         $onlineVersion = $downloader->getAvailableVersion();
@@ -380,6 +380,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set('editor.segments.editorSpecialCharacters', $rop->editor->segments?->editorSpecialCharacters ?? '');
 
         $this->setJsAppData();
+        $this->setQualityCheckJsVars();
     }
 
     /***
@@ -426,7 +427,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $userSession = new Zend_Session_Namespace('user');
         $userSession->data->passwd = '********';
         $userSession->data->openIdSubject = '';
-        $userRoles = $userSession->data->roles;
+        $userRoles = ZfExtended_Authentication::getInstance()->getRoles();
 
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
@@ -560,8 +561,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
      */
     protected function getActiveFrontendControllers()
     {
-        $userSession = new Zend_Session_Namespace('user');
-
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
@@ -573,7 +572,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         foreach($this->frontendEndControllers as $controller => $enabled) {
             if(is_array($enabled)) {
                 foreach($enabled as $neededRightForController) {
-                    if($acl->isInAllowedRoles($userSession->data->roles, 'frontend', $neededRightForController)) {
+                    if($acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'frontend', $neededRightForController)) {
                         $enabled = true;
                         break; //at least only one right is needed out of the list
                     }
@@ -626,13 +625,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     public function applicationstateAction()
     {
         $this->_helper->layout->disableLayout();
-        $userSession = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
         $config = Zend_Registry::get('config');
         $isCronIP = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
-        $hasAppStateACL = $acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate');
+        $hasAppStateACL = $acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'backend', 'applicationstate');
         //since application state contains sensible information we show that only to the cron TP, or with more details to the API users
         if ($isCronIP || $hasAppStateACL) {
             $this->view->applicationstate = ZfExtended_Debug::applicationState($hasAppStateACL);
@@ -807,6 +805,21 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->view->noMatch = true;
             $this->view->enOut[] = ['text' => $enXliff($inputKey, $input, $input), 'matchrate' => 0];
         }
+    }
+
+    private function setQualityCheckJsVars(): void
+    {
+        $vars = [];
+
+        /** @var ZfExtended_Plugin_Manager $pluginManager */
+        $pluginManager = Zend_Registry::get('PluginManager');
+        foreach ($pluginManager->getActive() as $initClass) {
+            if (method_exists($initClass, 'getQualityVars')) {
+                $vars[] = $initClass::getQualityVars();
+            }
+        }
+
+        $this->view->Php2JsVars()->set('quality.types', $vars);
     }
 }
 

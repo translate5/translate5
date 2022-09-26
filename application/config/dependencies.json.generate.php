@@ -61,21 +61,16 @@ $dep->application = [
  */
 
 $dep->dependencies = [[
-        "name" => "translate5-DB-init",                     //used as internal name of the package / dependency
-        "label" => "translate5 DB init",                    //shown as name to the user
-        "url" => "RELEASE:translate5-DB-init.zip",          //URL of the package to be downloaded
-        "target" => "dbinit/"                               //due to a bug in the downloader a target always must be given!
+        "name" => "third-party-dependencies",               //used as internal name of the package / dependency
+        "label" => "Third Party Dependencies pulled in by PHP composer",    //shown as name to the user
+        "url" => "RELEASE:third-party-dependencies.zip",    //URL of the package to be downloaded
+        "version" => "-na-",                                // currently not used, just for the sake of completeness
+        "target" => "vendor/",                              //due to a bug in the downloader a target always must be given!
                                                             // without a target the whole application is getting deleted!
                                                             // that means we can provide only ZIP packages at the moment
                                                             // with version 2.5.10 this is fixed, but lazy updaters will still have the problem!
                                                             // so in near future target will be optional, and without a target
                                                             // nothing will be unzipped, just downloaded
-    ],[
-        "name" => "third-party-dependencies",               // see above
-        "label" => "Third Party Dependencies pulled in by PHP composer",    // see above
-        "url" => "RELEASE:third-party-dependencies.zip",       // see above
-        "version" => "-na-",                                // currently not used, just for the sake of completeness
-        "target" => "vendor/",                              // unzip target, see above
         "licenses" => [[                                    // list of licenses to be confirmed for this package
             //"uses" => "several dependent libraries",        // is parsed into license title and agreement
             "usesFile"  => "docs/third-party-licenses/third-party-dependency-license-overview.txt", //loads the content from the given filename, and places the content in the "uses" variable

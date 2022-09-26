@@ -98,12 +98,20 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
 
     /**
      * Calculates the progress based on the termtagState field in LEK_segments_meta
+     *
      * @return float
      */
-    protected function calculateProgressDone() : float {
-        /* @var $meta editor_Models_Segment_Meta */
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        return $meta->getTermtaggerSegmentProgress($this->taskGuid);
+    protected function calculateProgressDone(): float
+    {
+        $meta = ZfExtended_Factory::get(editor_Models_Segment_Meta:: class);
+        $states = [
+            editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED,
+            editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_DEFECT,
+            editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE,
+            editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_IGNORE
+        ];
+
+        return $meta->calculateSegmentProgressByStatesAndColumn($this->taskGuid, $states, 'termtagState');
     }
 
     /**

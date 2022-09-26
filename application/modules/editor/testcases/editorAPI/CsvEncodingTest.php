@@ -97,17 +97,17 @@ class CsvEncodingTest extends editor_Test_JsonTest {
         
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
         //Testing Reference files. Is a little bit hidden in here, but as separate method we would have to play with logins and the task,
         // in this method we are logged in and the task is opened.
-        $res = $this->api()->request('editor/referencefile/Translate%205%20Referenz%20Demonstration.pdf');
+        $res = $this->api()->get('editor/referencefile/Translate%205%20Referenz%20Demonstration.pdf');
         /*@var $res Zend_Http_Response */
         $this->assertEquals(200, $res->getStatus(), 'GET reference file does not return HTTP 200');
         $this->assertEquals('2a0275e5921f9127120403b0306758b5', md5($res->getBody()), 'GET reference file does not return correct body');
         
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
 
         //check imported segment content against correct encoded strings from CSV in not imported colums 4 and 5
         //MQM is in this file for check correct encoding order, see TRANSLATE-654
@@ -141,7 +141,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
             $segToEdit = $segments[$idx];
             $editedData = $row[4].' - edited';
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-            $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+            $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
         }
     }
     
@@ -152,7 +152,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
     public function testChangesXml() {
         $task = $this->api()->getTask();
         //finishing the task to get a changes.xml
-        $res = $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'finished', 'id' => $task->id));
+        $res = $this->api()->setTaskToFinished($task->id);
         $this->assertEquals('finished', $this->api()->reloadTask()->userState);
         
         //get the changes file
@@ -189,7 +189,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToCompare) {
         $this->api()->login('testmanager');
-        $this->api()->request($exportUrl);
+        $this->api()->get($exportUrl);
 
         $removeMqmIds = function($text) {
             return preg_replace('/xml:id=""[^"]+""/', 'xml:id=""removed-for-comparing""', $text);
@@ -207,7 +207,6 @@ class CsvEncodingTest extends editor_Test_JsonTest {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

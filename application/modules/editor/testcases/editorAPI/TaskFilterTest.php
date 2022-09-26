@@ -66,13 +66,13 @@ class TaskFilterTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testTaskUserAssocFilters() {
         //test the assigment date of the task
-        $return = $this->api()->requestJson('editor/task', 'GET',[
+        $return = $this->api()->getJson('editor/task',[
             'filter' => '[{"operator":"eq","value":"'.date("Y-m-d 00:00:00", strtotime("now")).'","property":"assignmentDate"},{"operator":"eq","value":'.self::$api->getTask()->id.',"property":"id"}]'
         ]);
         $this->assertCount(2, $return);
         
         //test the finish count filter
-        $return = $this->api()->requestJson('editor/task', 'GET',[
+        $return = $this->api()->getJson('editor/task',[
             'filter' => '[{"operator":"eq","value":0,"property":"segmentFinishCount"},{"operator":"eq","value":'.self::$api->getTask()->id.',"property":"id"}]',
         ]);
         $this->assertCount(1, $return);
@@ -81,7 +81,6 @@ class TaskFilterTest extends \ZfExtended_Test_ApiTestcase {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

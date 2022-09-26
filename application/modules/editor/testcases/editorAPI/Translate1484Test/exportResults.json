@@ -25,28 +25,12 @@
             "charactersPerCustomer": "259"
         },
         {
-            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
-            "langageResourceServiceName": "OpenTM2",
-            "sourceLang": "en",
-            "targetLang": "de",
-            "repetition": "0",
-            "charactersPerCustomer": "35"
-        },
-        {
             "langageResourceName": "API Testing::ZDemoMT_Translate1484Test",
             "langageResourceServiceName": "ZDemoMT",
             "sourceLang": "en",
             "targetLang": "de",
             "repetition": "0",
             "charactersPerCustomer": "10"
-        },
-        {
-            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
-            "langageResourceServiceName": "OpenTM2",
-            "sourceLang": "en",
-            "targetLang": "de",
-            "repetition": "0",
-            "charactersPerCustomer": "30"
         },
         {
             "langageResourceName": "API Testing::ZDemoMT_Translate1484Test",
@@ -95,6 +79,22 @@
             "targetLang": "de",
             "repetition": "0",
             "charactersPerCustomer": "77"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "en",
+            "targetLang": "de",
+            "repetition": "0",
+            "charactersPerCustomer": "35"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "en",
+            "targetLang": "de",
+            "repetition": "0",
+            "charactersPerCustomer": "30"
         }
     ],
     "DocumentUsage": [

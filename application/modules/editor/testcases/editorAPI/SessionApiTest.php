@@ -53,16 +53,16 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
      * Test correct behavior when all or one of the credential fields are empty
      */
     public function testEmptyCredentials() {
-        $response = $this->api()->request('editor/session', 'POST');
+        $response = $this->api()->post('editor/session');
         
         $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."},{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
-        $response = $this->api()->request('editor/session', 'POST', ['login' => 'givenLogin']);
+        $response = $this->api()->post('editor/session', ['login' => 'givenLogin']);
         $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
-        $response = $this->api()->request('editor/session', 'POST', ['passwd' => 'givenPasswd']);
+        $response = $this->api()->post('editor/session', ['passwd' => 'givenPasswd']);
         $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."}],"message":"NOT OK","success":false}', $response->getBody());
     }
@@ -71,17 +71,17 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
      * Test session API interface with wrong credentials
      */
     public function testWrongCredentials() {
-        $response = $this->api()->request('editor/session', 'POST', ['login' => 'wrongUsername', 'passwd' => 'wrongPassword']);
+        $response = $this->api()->post('editor/session', ['login' => 'wrongUsername', 'passwd' => 'wrongPassword']);
         $msg403 = '{"errorCode":null,"httpStatus":403,"errorMessage":"Keine Zugriffsberechtigung!","message":"Forbidden","success":false}';
         
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
         
-        $response = $this->api()->request('editor/session', 'POST', ['login' => 'testlector', 'passwd' => 'wrongPassword']);
+        $response = $this->api()->post('editor/session', ['login' => 'testlector', 'passwd' => 'wrongPassword']);
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
         
-        $response = $this->api()->request('editor/session', 'POST', ['login' => 'wrongUsername', 'passwd' => 'asdfasdf']);
+        $response = $this->api()->post('editor/session', ['login' => 'wrongUsername', 'passwd' => 'asdfasdf']);
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
     }
@@ -99,7 +99,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         
         $this->api()->logout();
         
-        $json = $this->api()->requestJson('editor/session/'.$this->api()->getAuthCookie());
+        $json = $this->api()->getJson('editor/session/'.$this->api()->getAuthCookie());
         $this->assertEquals('not authenticated', $json->state);
         $this->assertEmpty($json->user);
     }
@@ -126,7 +126,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
             $this->api()->setTask(null);
         }
         
-        $response = $this->api()->requestJson('editor/session', 'POST', $loginData);
+        $response = $this->api()->postJson('editor/session', $loginData);
         $sessionId = $response->sessionId;
         $sessionToken = $response->sessionToken;
         
@@ -142,7 +142,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
             $this->assertEquals('/editor/taskid/'.$this->api()->getTask()->id.'/', $response->taskUrlPath, 'Login call does return a valid task URL!');
         }
 
-        $response = $this->api()->request('editor/?sessionToken='.$sessionToken.'&APItest=true');
+        $response = $this->api()->get('editor/?sessionToken='.$sessionToken.'&APItest=true');
         $this->assertNotFalse(strpos($response->getBody(), '<div id="loading-indicator-text"></div>'), 'The editor page does not contain the expected content.');
         if($withTask) {
             $this->assertNotFalse(strpos($response->getBody(), '"taskGuid":"'.$taskGuid.'"'), 'The editor page does not contain the expected taskGuid for the opened task.');
@@ -150,7 +150,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         else {
             $this->assertFalse(strpos($response->getBody(), '"taskGuid":"'.$taskGuid.'"'), 'The editor page does contain a taskGuid, which should not be.');
         }
-        $sessionData = $this->api()->requestJson('editor/session/'.$sessionId);
+        $sessionData = $this->api()->getJson('editor/session/'.$sessionId);
         $this->assertEquals(200, $this->api()->getLastResponse()->getStatus(), 'Server did not respond HTTP 200');
         unset($sessionData->user->id);
         unset($sessionData->user->loginTimeStamp);
@@ -180,11 +180,11 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         
         $this->api()->login('testapiuser');
         $this->assertLogin('testapiuser');
-        $assoc = $this->api()->requestJson('editor/taskuserassoc/'.$assoc->id);
+        $assoc = $this->api()->getJson('editor/taskuserassoc/'.$assoc->id);
         $hash = $assoc->staticAuthHash;
         $this->assertMatchesRegularExpression('/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/',$hash, 'Single click auth hash is no valid guid');
         $this->api()->logout();
-        $response = $this->api()->request('editor/session?authhash='.$hash);
+        $response = $this->api()->get('editor/session?authhash='.$hash);
         $taskGuid = $this->api()->getTask()->taskGuid;
         $this->assertNotFalse(strpos($response->getBody(), '"taskGuid":"'.$taskGuid.'"'), 'The editor page does not contain the expected taskGuid for the opened task.');
         $this->assertLogin('testlector'); //must be testlector after single click auth
@@ -202,7 +202,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->login('testmanager');
         $this->assertLogin('testmanager');
         // This will replace the testmanager session with testlector
-        $this->api()->request('editor/session/impersonate','GET',[
+        $this->api()->get('editor/session/impersonate', [
             'login' => 'testlector'
         ]);
         $this->assertLogin('testlector');
@@ -211,10 +211,6 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

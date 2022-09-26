@@ -71,7 +71,7 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
         //start task export
         
         //get the excel
-        $response = $this->api()->request('editor/task/'.$task->id.'/excelexport');
+        $response = $this->api()->get('editor/task/'.$task->id.'/excelexport');
         self::$tempExcel = $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
         file_put_contents($tempExcel, $response->getBody());
         
@@ -102,7 +102,7 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
      */
     public function testReimport() {
         $this->api()->addFile('excelreimportUpload', self::$tempExcel, 'application/data');
-        $this->api()->request('editor/task/'.$this->api()->getTask()->id.'/excelreimport', 'POST');
+        $this->api()->post('editor/task/'.$this->api()->getTask()->id.'/excelreimport');
         $this->api()->reloadTask();
         $task = $this->api()->getTask();
         $this->assertEmpty($task->lockingUser, 'Task is locked by user '.$task->lockingUser);
@@ -111,17 +111,15 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
         $this->assertEmpty($task->locked);
         
         //open task
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=47');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
+        $jsonFileName = 'expectedSegments.json';
+        $segments = $this->api()->getSegments($jsonFileName, 47);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

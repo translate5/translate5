@@ -26,9 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Exception Class to get detailed information on SpellCheck-Error.
- */
-class editor_Plugins_SpellCheck_Exception_Malfunction extends editor_Plugins_SpellCheck_Exception_Abstract {
+declare(strict_types=1);
 
+namespace MittagQI\Translate5\Plugins\SpellCheck\Base\Exception;
+
+/**
+ * Exception Class to get detailed information on SpellCheck-Error
+ */
+class DownException extends AbstractException
+{
 }

@@ -59,7 +59,7 @@ class Translate1841Test extends \ZfExtended_Test_ApiTestcase {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
         $api->reloadTask();
     }
 
@@ -88,21 +88,20 @@ class Translate1841Test extends \ZfExtended_Test_ApiTestcase {
         $segEdit1 = '<ins class="trackchanges ownttip" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:49:28+01:00"><div class="open 6270742069643d223122207269643d223122202f internal-tag ownttip"><span title="&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;</span></div></ins>back <del class="trackchanges ownttip deleted" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:49:27+01:00"><div class="open 6270742069643d223122207269643d223122202f internal-tag ownttip"><span title="&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;</span></div></del>to the house<div class="close 6570742069643d223222207269643d223122202f internal-tag ownttip"><span title="&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;</span></div>';
         $segEdit2 = '<div class="open 6270742069643d223122207269643d223122202f internal-tag ownttip"><span title="&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;</span></div>the house<del class="trackchanges ownttip deleted" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:52:14+01:00"><div class="close 6570742069643d223222207269643d223122202f internal-tag ownttip"><span title="&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;</span></div></del>\u00a0is<ins class="trackchanges ownttip" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:52:15+01:00"><div class="close 6570742069643d223222207269643d223122202f internal-tag ownttip"><span title="&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;</span></div></ins> back';
         
-        
         //get segment list (just the ones of the first file for that tests)
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=2');
+        $segments = $this->api()->getSegments(null, 2);
         $this->assertNotEmpty($segments, 'No segments are found in the Task!');
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segEdit1, $segments[0]->id);
-        $this->api()->requestJson('editor/segment/'.$segments[0]->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segments[0]->id, $segmentData);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segEdit2, $segments[1]->id);
-        $this->api()->requestJson('editor/segment/'.$segments[1]->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segments[1]->id, $segmentData);
         
         $task = $this->api()->getTask();
         //start task export 
         $this->api()->login('testmanager');
-        $this->api()->request('editor/task/export/id/'.$task->id.'?format=xliff2');
+        $this->api()->get('editor/task/export/id/'.$task->id.'?format=xliff2');
         
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();
@@ -140,10 +139,6 @@ class Translate1841Test extends \ZfExtended_Test_ApiTestcase {
 
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

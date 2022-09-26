@@ -313,7 +313,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1346"></a>E1346  | Language&nbsp;Resource Microsoft Translator | Microsoft Translator quota exceeded. A limit has been reached. | See the error log for details.
 | <a id="E1358"></a>E1358  | Language&nbsp;Resource Term Collection | Term Collection Import: Unable to open zip file from file-path: {filePath} | See the error log for details.
 | <a id="E1359"></a>E1359  | Language&nbsp;Resource Term Collection | Term Collection Import: Content from zip file could not be extracted. | See the error log for details.
-| <a id="E1403"></a>E1403  | Language&nbsp;Resource pivot pre-translation    | The taskGuid is required as parameter | The taskGuid is not provided as parametar on the request | 
+| <a id="E1403"></a>E1403  | Language&nbsp;Resource pivot pre-translation    | The taskGuid is required as parameter | The taskGuid is not provided as parameter on the request | 
 
 ### Terminology
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -422,7 +422,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1317"></a>E1317  | Plug-In DeepL | DeepL authorization failed. Please supply a valid API Key. | The configured API Key is not valid.
 | <a id="E1318"></a>E1318  | Plug-In DeepL | DeepL quota exceeded. The character limit has been reached. | The usage quota of your DeepL account is exceeded.
 | <a id="E1334"></a>E1334  | Plug-In DeepL | DeepL is returning an error: {message} | See the error message what is going wrong.
-| <a id="E1385"></a>E1385  | Plug-In DeepL | DeepL Plug-In: Unable to create glossary | There was a problem on DeepL glossary creation. For more info check the error log.
+| <a id="E1385"></a>E1385  | Plug-In DeepL | Deepl Plug-In: Unable to create glossary | There was a problem on DeepL glossary creation. For more info check the error log.
 | <a id="E1386"></a>E1386  | Plug-In DeepL | DeepL Plug-In: For one or more of the clients assigned to your current TermCollection the TermCollection {0} has already been assigned as &quot;DeepL glossary source&quot;. Should the TermCollection {0} be unassigned as glossary source for all of its assigned clients? | There is already term-collection in use as glossary source for one of the matching customers when trying to assign another term-collection to be used as glossary source.
 | <a id="E1388"></a>E1388  | Plug-In DeepL | DeepL Plug-In: Unable to fetch all available language combinations for glossaries. | Api error calling the glossary-language-pairs endpoint. For more info see the error log.
 | <a id="E1389"></a>E1389  | Plug-In DeepL | DeepL Plug-In: Unable to delete glossary. | Api error calling the DELETE /v2/glossaries/\[glossary_id\] endpoint. For more info see the error log.
@@ -578,7 +578,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 #### Plug-In ModelFront&nbsp;
 | EventCode        | Context       | EventMessage  | Description/Solution
 | :--------------- |:------------- | :------------ | :-------------------
-| <a id="E1266"></a>E1266  | ModelFront | ModelFront Plug-In: authentication parametars are not defined. | The apiUpr or apiToken zf_configuration parameters are not defined or empty.
+| <a id="E1266"></a>E1266  | ModelFront | ModelFront Plug-In: authentication parameters are not defined. | The apiUpr or apiToken zf_configuration parameters are not defined or empty.
 | <a id="E1267"></a>E1267  | ModelFront | ModelFront Plug-In: source or target languages are not defined. | The source or target languages are not set.
 | <a id="E1268"></a>E1268  | ModelFront | ModelFront Plug-In: Error on ModelFront api request. The error was: {message}. | Error happen on model front api request. For more info see the error log.
 | <a id="E1269"></a>E1269  | ModelFront | ModelFront Plug-In: Error on processing the segments. Segment list with errors: {errors}. | ModelFront api responds with error for the requested segment. For more info about the error check the error log.

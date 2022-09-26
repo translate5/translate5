@@ -53,27 +53,18 @@ class Translate2855Test extends editor_Test_JsonTest {
         self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
         self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
         self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
+        self::assertNeededUsers(); // last authed user is testmanager
+        self::assertLogin('testmanager');
 
-        self::assertNeededUsers(); //last authed user is testmanager
-
-        self::createResource();
-        self::createTask();
-        self::queuePretranslation();
-        self::startImport();
-        self::checkTaskState();
-    }
-
-    /**
-     * @throws Exception
-     */
-    private static function createResource(){
-        self::$customerTest = self::$api->requestJson('editor/customer/', 'POST',[
+        // add customer
+        self::$customerTest = self::$api->postJson('editor/customer/',[
             'name' => 'API Testing::Pivot pre-translation',
             'number' => uniqid('API Testing::Pivot pre-translation', true),
         ]);
 
-        $params=[
-            'resourceId'=>'ZDemoMT',
+        // add needed Demo MT
+        $params = [
+            'resourceId' => 'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
@@ -84,66 +75,39 @@ class Translate2855Test extends editor_Test_JsonTest {
             'serviceName'=> 'ZDemoMT',
             'name' => 'API Testing::Pivot pre-translation_'.__CLASS__
         ];
-
         self::$api->addResource($params);
-    }
 
-    /**
-     * @return void
-     */
-    private static function createTask(): void
-    {
+        // create task without starting the import
         $task = [
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'relaisLang' => self::$targetLangRfc,
-            'customerId'=>self::$customerTest->id,
+            'customerId' => self::$customerTest->id,
             'edit100PercentMatch' => true,
-            'autoStartImport'=>0
+            'autoStartImport' => 0
         ];
-
-        self::assertLogin('testmanager');
-
         self::$api->addImportFile(self::$api->getFile('Task-de-en.html'));
         self::$api->import($task,false,false);
-    }
 
-    /***
-     * Queue pivot pre-translation worker
-     */
-    private static function queuePretranslation(){
-        $params=[];
-        $params['taskGuid'] = self::$api->getTask()->taskGuid;
-        self::$api->requestJson('editor/languageresourcetaskpivotassoc/pretranslation/batch', 'PUT', $params, $params);
-        error_log('Queue pivot pretranslation.');
-    }
+        // queue the pretranslation
+        self::$api->putJson('editor/languageresourcetaskpivotassoc/pretranslation/batch', [ 'taskGuid' => self::$api->getTask()->taskGuid ], null, false);
 
-    /***
-     * Start the import process
-     */
-    private static function startImport(){
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
-        error_log('Import workers started.');
-    }
-
-    /***
-     * Check the task state
-     */
-    private static function checkTaskState(){
+        // start the import & wait for finish
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
         self::$api->checkTaskStateLoop();
     }
 
-    /***
+    /**
      * Test if the task relais segments are pre-translated using ZDemoMT
      * @return void
      */
     public function testSegmentContent(){
         //open task for whole testcase
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id, 'PUT', ['userState' => 'edit', 'id' => self::$api->getTask()->id]);
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        self::$api->setTaskToEdit();
+        $segments = $this->api()->getSegments();
 
-        self::assertEquals(3,count($segments), 'The number of segments does not match.');
+        self::assertEquals(3, count($segments), 'The number of segments does not match.');
 
         foreach ($segments as $segment){
             self::assertNotEmpty($segment->relais);
@@ -155,14 +119,10 @@ class Translate2855Test extends editor_Test_JsonTest {
      */
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->login('testmanager');
-
+        // remove task & resources
+        self::$api->deleteTask($task->id, 'testmanager');
         self::$api->removeResources();
-
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'PUT', ['userState' => 'open', 'id' => $task->id]);
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
-
         //remove the temp customer
-        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
 }
