@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Plugin Bootstrap for Debug Plugin
  */
 class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Provides debug information in the GUI - for development';
+    protected static string $description = 'Provides debug information in the GUI - for development';
     
     public function init() {
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndexAction'));

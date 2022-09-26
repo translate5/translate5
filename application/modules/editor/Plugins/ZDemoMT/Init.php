@@ -27,7 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_ZDemoMT_Init extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Provides a demo MT engine for development purposes - is faking a machine translation by using text rotation about 13 characters in the alphabet';
+    protected static string $description = 'Provides a demo MT engine for development purposes - is faking a machine translation by using text rotation about 13 characters in the alphabet';
+    protected static bool $activateForTests = true;
     
     public function init() {
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');

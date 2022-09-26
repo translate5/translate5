@@ -112,7 +112,10 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        //errors in the space of the testsuite should boil out directly
+        //ini_set('error_log', '/dev/stderr');
         $this->initInputOutput($input, $output);
+
         $this->initTranslate5();
 
         $testGiven = $this->input->getArgument('test');
@@ -185,5 +188,152 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
 	$this->io->success('Last test result stored in TEST_ROOT/last-test-result.txt');
 
         return 0;
+    }
+
+    /**
+     * Overwritten to check if DB exists, if not create it
+     * @return void
+     * @throws \Zend_Db_Adapter_Exception
+     * @throws \Zend_Db_Exception
+     * @throws \Zend_Exception
+     */
+    protected function initTranslate5()
+    {
+
+        // SAMPLE CODE TO DROP DB IN HERE FOR TESTING PURPOSES ONLY
+        // WE EXPLICITLY DECIDED NOT TO AUTOMATE THAT, but that its the devs
+        // responsibility to provide an empty DB
+//        try {
+//            $pdox = new \PDO('mysql:host=127.0.0.1', 'root', 'XXX');
+//            $pdox->query('drop database translate5;');
+//        }
+//        catch (\PDOException $e){
+//            error_log($e);
+//        }
+
+        try {
+            parent::initTranslate5();
+
+            $test = $this->input->getArgument('test');
+            //if a single test was given, we run that on the current DB
+            if(!empty($test)) {
+                //return;
+            }
+            //if the whole testsuite is running, on an existing DB, we consider that as an error:
+            $config = \Zend_Registry::get('config');
+            $db = $config->resources->db->params->dbname;
+            $this->io->error([
+                'The configured database "'.$db.'" exists!',
+                'Since the run of the whole testsuite wants to create a clean one, drop it, call: ',
+                '  mysql -h localhost -u root -p -e "drop database '.$db.';"',
+                'or change the DB in the installation.ini to a non existing one (but must be still accessible by the user)'."\n".
+                'or run just a single test',
+            ]);
+            die(1);
+        }
+        catch (\Zend_Db_Adapter_Exception $e) {
+            if(! str_contains($e->getMessage(), 'Unknown database')) {
+                throw $e;
+            }
+        }
+        $this->initDatabase();
+    }
+
+    /**
+     * @return void
+     * @throws \Zend_Db_Exception
+     * @throws \Zend_Exception
+     */
+    private function initDatabase(): void
+    {
+//start application - without bootstrapping - is loading the needed configurations only
+        $baseIndex = \ZfExtended_BaseIndex::getInstance();
+        $config = $baseIndex->initApplication()->getOption('resources');
+        $config = $config['db']['params'];
+
+        //default character set utf8mb4 collate utf8mb4_unicode_ci
+        $sql = 'create database %s default character set utf8mb4 collate utf8mb4_unicode_ci';
+
+        // we create the database first - we have to use raw PDO since Zend_Db needs a database...
+        $pdo = new \PDO('mysql:host=' . $config['host'], $config['username'], $config['password']);
+        $pdo->query(sprintf($sql, $config['dbname']));
+
+        $updater = new \ZfExtended_Models_Installer_DbUpdater();
+        //add the test SQL path
+        $updater->setAdditonalSqlPaths([APPLICATION_PATH . '/modules/editor/testcases/database/']);
+
+        //init DB
+        if ($updater->initDb() && $updater->importAll() && !$updater->hasErrors()) {
+            \editor_Utils::initDemoAndTestUserPasswords();
+            parent::initTranslate5(); //re-init application
+            $this->initConfiguration();
+            $this->initPlugins();
+            return;
+        }
+        $updater->hasErrors() && $this->io->error($updater->getErrors());
+        $updater->hasWarnings() && $this->io->warning($updater->getWarnings());
+        die(1);
+    }
+
+    /**
+     * The here added system configuration (service URLS) should match for most setups, and can be overwritten in installation.ini
+     *
+     * Before adding an application config here:
+     *   1. try to set the value via task-config.ini specific for that test
+     *   2. If that is not possible, add it here but ensure that the test which needs it, checks if the value is set before
+     * The here added application configuration must be finally valid on all machines!
+     *
+     * @return void
+     * @throws \Zend_Exception
+     */
+    private function initConfiguration(): void
+    {
+        //see method header!
+        $testConfig = [
+            'runtimeOptions.customers.anonymizeUsers' => 1,
+            'runtimeOptions.editor.notification.userListColumns' => '["surName","firstName","email","role","state","deadlineDate"]',
+            'runtimeOptions.import.enableSourceEditing' => 1,
+            'runtimeOptions.import.sdlxliff.importComments' => 1,
+            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
+            'runtimeOptions.InstantTranslate.minMatchRateBorder' => 70,
+            'runtimeOptions.plugins.Okapi.server' => '{"okapi-longhorn":"http://localhost:8080/okapi-longhorn/","okapi-longhorn-143":"http://localhost:8080/okapi-longhorn_143/"}',
+            'runtimeOptions.plugins.Okapi.serverUsed' => 'okapi-longhorn-143',
+            'runtimeOptions.plugins.SpellCheck.languagetool.url.gui' => 'http://localhost:8081/v2',
+            'runtimeOptions.plugins.SpellCheck.liveCheckOnEditing' => 1,
+            'runtimeOptions.plugins.VisualReview.directPublicAccess' => 1,
+            'runtimeOptions.tbx.termLabelMap' => '{"legalTerm": "permitted", "admittedTerm": "permitted", "preferredTerm": "preferred", "regulatedTerm": "permitted", "deprecatedTerm": "forbidden", "supersededTerm": "forbidden", "standardizedTerm": "permitted"}',
+        ];
+
+        //the following configs must be set in installation.ini otherwise we ask to annoy the developers to set them
+        $localConfig = [
+            'runtimeOptions.plugins.VisualReview.shellCommandPdf2Html',
+            'runtimeOptions.server.name',
+            'runtimeOptions.server.protocol',
+            'runtimeOptions.plugins.DeepL.authkey',
+            'runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost',
+        ];
+
+        $config = new \editor_Models_Config();
+
+        //set predefined values
+        foreach($testConfig as $name => $value) {
+            $config->update($name, $value);
+        }
+
+        //annoy the developer to set some local values in the ini
+        foreach($localConfig as $localConf) {
+            $config->loadByName($localConf);
+            if(!$config->hasIniEntry()) {
+                $value = $this->io->ask('Please provide a local value for "'.$localConf.'" or set it in the installation.ini');
+                $config->update($localConf, $value);
+            }
+        }
+    }
+
+    private function initPlugins()
+    {
+        /** @var \ZfExtended_Plugin_Manager $pluginmanager */
+        $pluginmanager = \Zend_Registry::get('PluginManager');
+        $pluginmanager->activateTestRelevantOnly();
     }
 }

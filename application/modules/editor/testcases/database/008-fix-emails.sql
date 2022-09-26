@@ -25,10 +25,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_users` (`userGuid` , `firstName` , `surName` , `gender` , `login` , `email` , `roles` , `passwd`, `editable`, `locale`)
-VALUES
-('{00000000-0000-0000-C100-CCDDEE000001}', 'manager', 'test', 'm', 'testmanager', 'noreply@translate5.net', 'pm,editor,admin,instantTranslate', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000002}', 'lector', 'test', 'm', 'testlector', 'noreply@translate5.net', 'editor', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000003}', 'translator', 'test', 'm', 'testtranslator', 'noreply@translate5.net', 'editor', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000004}', 'api', 'test', 'm', 'testapiuser', 'noreply@translate5.net', 'pm,editor,admin,api', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000005}', 'termproposer', 'test', 'm', 'testtermproposer', 'noreply@translate5.net', 'pm,editor,api,termProposer', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en');
+-- in order that passwords are updated correctly in fresh databases the email must be noreply@translate5.net
+UPDATE `Zf_users` 
+SET `email` = 'noreply@translate5.net' where `login` in ('testmanager', 'testlector', 'testtranslator', 'testapiuser', 'testtermproposer', 'testmanager2');

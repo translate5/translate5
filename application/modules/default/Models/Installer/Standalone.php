@@ -470,12 +470,6 @@ class Models_Installer_Standalone {
             $db = Zend_Db::factory($config->resources->db);
             $db->query("update Zf_configuration set value = ? where name = 'runtimeOptions.server.name'", $this->hostname);
         }
-
-        //since passwords are encrypted, we have to do that for the demo users too
-        $asdfasdf = ZfExtended_Authentication::getInstance()->createSecurePassword('asdfasdf');
-        $config = Zend_Registry::get('config');
-        $db = Zend_Db::factory($config->resources->db);
-        $db->query("update Zf_users set passwd = ? where email = 'noreply@translate5.net' and login != 'system'", [$asdfasdf]);
     }
     
     /**
@@ -813,9 +807,18 @@ class Models_Installer_Standalone {
         $version = ZfExtended_Utils::getAppVersion();
         $this->log('Current translate5 version '.$version);
     }
-    
+
+    /**
+     * @throws Zend_Exception
+     * @throws Zend_Db_Exception
+     */
     protected function done(): void
     {
+        if($this->isInstallation){
+            //since passwords are encrypted, we have to do that for the demo users too
+            editor_Utils::initDemoAndTestUserPasswords();
+        }
+
         $version = ZfExtended_Utils::getAppVersion();
         $this->log("\nTranslate5 installation / update to version $version done.\n");
         if(!empty($this->hostname)) {

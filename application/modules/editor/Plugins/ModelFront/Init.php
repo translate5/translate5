@@ -30,7 +30,8 @@ END LICENSE AND COPYRIGHT
  * Info: the ModelFront plugin depends on the MatchAnalysis plugin (MatchAnalysis plugin must be active when ModelFront plugin is active).
  */
 class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Provides the risk prediction functionality, as offered by ModelFront.';
+    protected static string $description = 'Provides the risk prediction functionality, as offered by ModelFront.';
+    protected static bool $activateForTests = true;
 
     /***
      * @var ZfExtended_Logger

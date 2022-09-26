@@ -33,7 +33,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 
     const TASK_STATE = 'termtagging';
 
-    protected static $description = 'Provides term-tagging';
+    protected static string $description = 'Provides term-tagging';
+    protected static bool $activateForTests = true;
 
     /**
      * @var ZfExtended_Logger

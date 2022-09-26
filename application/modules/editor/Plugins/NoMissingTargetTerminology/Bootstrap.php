@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * depends on editor_Plugins_SegmentStatistics_Bootstrap
  */
 class editor_Plugins_NoMissingTargetTerminology_Bootstrap extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Sets the segment meta flag noMissingTargetTermOnImport to false if a term in source does not exist in target column';
+    protected static string $description = 'Sets the segment meta flag noMissingTargetTermOnImport to false if a term in source does not exist in target column';
     
     public function init() {
         $this->dependsOn('editor_Plugins_SegmentStatistics_Bootstrap');

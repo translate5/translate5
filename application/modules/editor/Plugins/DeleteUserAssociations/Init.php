@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Plugins_DeleteUserAssociations_Init extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Enables deletion of user associations not in the user hierarchy';
+    protected static string $description = 'Enables deletion of user associations not in the user hierarchy';
     
     /**
      * Initialize the plugn "DeleteUserAssociations"

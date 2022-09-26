@@ -40,7 +40,8 @@
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
-    protected static $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
+    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
+    protected static bool $activateForTests = true;
 
     /**
      * The current internal version index of the bconf's

@@ -275,6 +275,25 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     }
 
     /**
+     * returns true if installation.ini has a same named entry
+     * @return bool
+     * @throws Zend_Exception
+     */
+    public function hasIniEntry(): bool
+    {
+        $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
+        $name = $this->getName();
+        $name = explode('.', $name);
+        foreach($name as $key) {
+            if(! array_key_exists($key, $iniOptions)) {
+                return false;
+            }
+            $iniOptions = $iniOptions[$key];
+        }
+        return true;
+    }
+
+    /**
      * Returns the level integer value to a named level value
      * @param string $level
      * @return int
