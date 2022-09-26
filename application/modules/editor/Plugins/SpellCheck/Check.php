@@ -157,7 +157,7 @@ class editor_Plugins_SpellCheck_Check {
         $target = Whitespace::replaceLabelledCharacters($target);
 
         // If empty target - return
-        if (strlen($target) !== 0) {
+        if (strlen($target) === 0) {
             return;
         }
 
