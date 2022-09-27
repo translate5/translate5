@@ -1073,21 +1073,16 @@ class editor_AttributeController extends ZfExtended_RestController
         $current = $_['termId']->getProposal() ? 'unprocessed' : $this->entity->getValue();
 
         // Define which old values can be changed to which new values
-        $allow = false; $allowByRole = [
-            'termCustomerSearch' => false, // no change allowed
-            'termReviewer' =>  ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
-            'termFinalizer' => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
-            'termProposer' =>  [],
-            'termPM' => true, // any change allowed
-            'termPM_allClients' => true,
+        $allow = false; $allowByRight = [
+            'review'    => ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
+            'finalize'  => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
+            'propose'   => [],
+            'anyStatus' => true, // any change allowed
         ];
 
-        // Setup roles
-        $role = array_flip($this->_session->roles); array_walk($role, fn(&$a) => $a = true);
-
         // Merge allowed
-        foreach ($allowByRole as $i => $info)
-            if ($role[$i] ?? 0)
+        foreach ($allowByRight as $right => $info)
+            if ($this->isAllowed('editor_term', $right))
                 $allow = is_bool($info) || is_bool($allow)
                     ? $info
                     : $info + $allow;
