@@ -39,44 +39,29 @@ END LICENSE AND COPYRIGHT
  */
 class Translate3015Test extends editor_Test_JsonTest {
 
-    /***
-     * The current active collection
-     * @var integer
-     */
-    protected static int $collId;
-
-    public static function beforeTests(): void {
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        self::assertCustomer();
-    }
-
-    /***
-     */
     public function testTbxImport(){
 
         $fileName = 'TBX-basic-sample.tbx';
 
         $termCollection = static::api()->postJson('editor/termcollection', [
             'name' => __CLASS__,
-            'customerIds' => static::api()->getCustomer()->id
+            'customerIds' => static::getTestCustomerId()
         ]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals(__CLASS__, $termCollection->name);
 
-        self::$collId = $termCollection->id;
+        $collectionId = $termCollection->id;
 
 
         static::api()->addFile($fileName, static::api()->getFile($fileName), "application/xml");
         static::api()->postJson('editor/termcollection/import', [
-            'collectionId' =>self::$collId,
-            'customerIds' => static::api()->getCustomer()->id,
+            'collectionId' =>$collectionId,
+            'customerIds' => static::getTestCustomerId(),
             'mergeTerms'=>true
         ]);
 
         //export the generated file
-        $response = static::api()->postJson('editor/termcollection/export?format=1', array('collectionId' =>self::$collId));
+        $response = static::api()->postJson('editor/termcollection/export?format=1', array('collectionId' =>$collectionId));
 
         $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
@@ -91,7 +76,7 @@ class Translate3015Test extends editor_Test_JsonTest {
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.Test file name: ".$fileName);
 
-        $attributes = static::api()->getJson('editor/termcollection/testgetattributes', array('collectionId' =>self::$collId));
+        $attributes = static::api()->getJson('editor/termcollection/testgetattributes', array('collectionId' =>$collectionId));
 
         $termCount = 1;
         $termsAtributeCount = 10;
@@ -103,11 +88,8 @@ class Translate3015Test extends editor_Test_JsonTest {
         $this->assertTrue($termsAtributeCount ===  (int)$attributes->termsAtributeCount, $fileName.' file test.Invalid number of term attribute created.Terms attribute count:'.$attributes->termsAtributeCount.', expected:'.$termsAtributeCount);
         $this->assertTrue($termsEntryAtributeCount === (int)$attributes->termsEntryAtributeCount, $fileName.' file test.Invalid and number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:'.$termsEntryAtributeCount);
         $this->assertTrue($languageAtributeCount === (int)$attributes->languageAtributeCount, $fileName.' file test.Invalid and number of language level attribute created.Language level attribute count:'.$attributes->languageAtributeCount.', expected:'.$languageAtributeCount);
-    }
 
-    public static function afterTests(): void {
         static::api()->login('testmanager');
-        static::api()->delete('editor/termcollection/'.self::$collId);
+        static::api()->delete('editor/termcollection/'.$collectionId);
     }
-
 }

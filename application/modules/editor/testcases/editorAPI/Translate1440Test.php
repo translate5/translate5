@@ -48,18 +48,13 @@ class Translate1440Test extends editor_Test_JsonTest {
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
-        
-        self::assertAppState();
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
 
         $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
         
         static::api()->addImportFile($zipfile);
         static::api()->import($task);
 
-        static::assertConfigs();
-        
+                
         static::api()->addUser('testlector');
         
         //login in beforeTests means using this user in whole testcase!

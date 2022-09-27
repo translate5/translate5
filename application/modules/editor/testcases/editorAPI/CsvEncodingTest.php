@@ -58,12 +58,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
         $zipfile = static::api()->zipTestFiles('CSV-testfiles/','CSV-test.zip');
         
         static::api()->addImportFile($zipfile);
@@ -74,8 +69,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
         static::api()->addUser('testtranslator', 'waiting', 'translation');
         unlink($zipfile);
 
-        static::assertConfigs();
-    }
+            }
     
     /**
      * tests the specialcharacters encoding after import, edits some segments as lector, finish then the task

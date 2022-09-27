@@ -45,18 +45,12 @@ class Translate2428Test extends \editor_Test_ApiTest {
     
     public static function beforeTests(): void {
 
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        self::assertLogin('testmanager');
-
         // Create the task. The task will not be imported directly autoStartImport is 0!
         $task = [
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId'=>static::$testCustomer->id,
+            'customerId'=>static::$testOwnCustomer->id,
             'autoStartImport'=>0,
             'wordCount' => 0,//just to overwrite the default value set by the ApiHelper
             'edit100PercentMatch' => 0
@@ -93,7 +87,7 @@ class Translate2428Test extends \editor_Test_ApiTest {
             'resourceId'=>'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$testCustomer->id],
+            'customerIds' => [static::$testOwnCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',

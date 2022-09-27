@@ -45,12 +45,7 @@ class Translate1841Test extends \editor_Test_ApiTest {
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
         static::api()->addImportFile(static::api()->getFile('TRANSLATE-1841-de-en.xlf'), 'application/xml');
         
         static::api()->import($task);

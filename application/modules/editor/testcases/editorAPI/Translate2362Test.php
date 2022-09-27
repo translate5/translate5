@@ -49,13 +49,6 @@ class Translate2362Test extends editor_Test_JsonTest {
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
-        
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-
-        static::assertConfigs();
 
         $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
         

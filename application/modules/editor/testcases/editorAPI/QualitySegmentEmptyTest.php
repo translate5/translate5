@@ -40,13 +40,6 @@ class QualitySegmentEmptyTest extends editor_Test_JsonTest {
      * @throws Zend_Exception
      */
     public static function beforeTests(): void {
-        // Check app state
-        self::assertAppState();
-
-        // Last authed user is testmanager
-        self::assertNeededUsers();
-        self::assertLogin('testmanager');
-
         // Import xlf-file
         static::api()->addImportFile(static::api()->getFile('testfiles/TRANSLATE-2540-en-de.xlf'));
         static::api()->import([

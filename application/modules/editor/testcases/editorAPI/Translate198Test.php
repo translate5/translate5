@@ -41,19 +41,13 @@ class Translate198Test extends editor_Test_JsonTest {
 
     protected static bool $setupOwnCustomer = true;
     
-    public static function beforeTests(): void {
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-    }
-
     /**
      * imports two tasks
      */
     public function testTasks() {
 
-        $task1 = $this->createTask('task1', static::$testCustomer->id);
-        $task2 = $this->createTask('task2', static::$testCustomer->id);
+        $task1 = $this->createTask('task1', static::$testOwnCustomer->id);
+        $task2 = $this->createTask('task2', static::$testOwnCustomer->id);
 
         //open task for editing. This should not produce any error
         $response = static::api()->setTaskToEdit($task1->id);

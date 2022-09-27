@@ -31,18 +31,6 @@ END LICENSE AND COPYRIGHT
  */
 class QualityNumbersCheckTest extends editor_Test_JsonTest {
 
-    public static function beforeTests(): void {
-        // Prepare initial API instance
-        
-
-        // Check app state
-        self::assertAppState();
-
-        // Assert users. Last authed user is testmanager
-        self::assertNeededUsers();
-        self::assertLogin('testmanager');
-    }
-
     public function testTask0(){
         $this->performTestForTask('num1..num11 except num7 --- de-DE en-US', 10);
     }

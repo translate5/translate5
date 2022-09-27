@@ -45,12 +45,7 @@ class TrackChangesTest extends \editor_Test_ApiTest {
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
         static::api()->addImportFile(static::api()->getFile('testcase-de-en.xlf'));
         
         static::api()->import($task);

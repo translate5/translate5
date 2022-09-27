@@ -32,15 +32,6 @@ END LICENSE AND COPYRIGHT
  */
 class Translate2080Test extends editor_Test_JsonTest {
 
-    public static function beforeTests(): void {
-
-        
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();//assert the test customer
-        self::assertLogin('testmanager');
-    }
-
     /***
      * Create 2 project tasks. The second task will have "it" as relais language.
      * The relais file will be matched based on the name.
@@ -51,7 +42,7 @@ class Translate2080Test extends editor_Test_JsonTest {
             'sourceLang' => 'de',
             'targetLang' => ['en','mk'],
             'relaisLang' => 'it',
-            'customerId' => static::api()->getCustomer()->id,
+            'customerId' => static::getTestCustomerId(),
             'edit100PercentMatch' => true,
             'importUpload_language' => ['en','mk','it'],
             'importUpload_type' => ['workfiles','workfiles','pivot'],

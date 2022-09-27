@@ -53,13 +53,7 @@ class QualityBaseTest extends editor_Test_JsonTest {
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
-        
-        self::assertAppState();
-        self::assertNeededUsers();
-        self::assertLogin('testmanager');
 
-        static::assertConfigs();
-         
         static::api()->addImportFile('MainTest/csv-with-mqm-en-de.zip');
         static::api()->import($task);
         

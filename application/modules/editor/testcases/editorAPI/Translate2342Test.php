@@ -49,14 +49,6 @@ class Translate2342Test extends \editor_Test_ApiTest {
 
     protected static bool $setupOwnCustomer = true;
 
-    public static function beforeTests(): void {
-
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-    }
-    
     public function testImportAndProgress() {
 
         // create task
@@ -64,7 +56,7 @@ class Translate2342Test extends \editor_Test_ApiTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$testCustomer->id,
+            'customerId' => static::$testOwnCustomer->id,
             'autoStartImport' => 0
         ];
         self::assertLogin('testmanager');
@@ -76,7 +68,7 @@ class Translate2342Test extends \editor_Test_ApiTest {
             'resourceId' => 'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$testCustomer->id],
+            'customerIds' => [static::$testOwnCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',

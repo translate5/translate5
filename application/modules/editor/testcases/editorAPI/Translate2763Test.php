@@ -39,14 +39,6 @@ class Translate2763Test extends editor_Test_JsonTest {
 
     protected static $TC_ID;
 
-    public static function beforeTests(): void {
-        
-
-        static::api()->login('testmanager');
-        self::assertLogin('testmanager');
-        self::assertCustomer();
-    }
-
     /**
      */
     public function test10_InitialTbxImport() {
@@ -57,7 +49,7 @@ class Translate2763Test extends editor_Test_JsonTest {
             'serviceName' => 'TermCollection',
             'serviceType' => 'editor_Services_TermCollection',
             'resourceId' => 'editor_Services_TermCollection',
-            'customerIds[]' => static::api()->getCustomer()->id,
+            'customerIds[]' => static::getTestCustomerId(),
             'name' => 'TC test',
         ]);
 

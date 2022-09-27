@@ -34,16 +34,12 @@ class Translate2874Test extends editor_Test_JsonTest {
 
     public static function beforeTests(): void {
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-
-        static::api()->loadCustomer();
         $task = [
             'sourceLang' => 'de',
             'targetLang' => 'en',
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
-            'customerId' => static::api()->getCustomer()->id,
+            'customerId' => static::getTestCustomerId(),
             'autoStartImport' => 0,
         ];
 

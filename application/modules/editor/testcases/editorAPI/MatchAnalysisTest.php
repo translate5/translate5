@@ -48,12 +48,6 @@ class MatchAnalysisTest extends \editor_Test_ApiTest {
     /**
      */
     public static function beforeTests(): void {
-
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();//assert the test customer
-
         // Import all required resources and task before running the tests
         static::addTm('resource1.tmx', static::getLrRenderName('resource1'));
         static::addTm('resource2.tmx', static::getLrRenderName('resource2'));
@@ -75,7 +69,7 @@ class MatchAnalysisTest extends \editor_Test_ApiTest {
             'resourceId' => 'editor_Services_OpenTM2_1',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [ static::api()->getCustomer()->id ],
+            'customerIds' => [ static::getTestCustomerId() ],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
@@ -92,12 +86,11 @@ class MatchAnalysisTest extends \editor_Test_ApiTest {
      * @param string $name
      */
     private static function addTermCollection(string $fileName, string $name) {
-        $customer = static::api()->getCustomer();
         $params = [
             'name' => $name,
             'resourceId' =>'editor_Services_TermCollection',
             'serviceType' =>'editor_Services_TermCollection',
-            'customerIds' => [ $customer->id ],
+            'customerIds' => [ static::getTestCustomerId() ],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceName' => 'TermCollection',
@@ -123,7 +116,7 @@ class MatchAnalysisTest extends \editor_Test_ApiTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => static::api()->getCustomer()->id,
+            'customerId' => static::getTestCustomerId(),
             'edit100PercentMatch' => true,
             'wordCount' => 1270,
             'autoStartImport' => 0

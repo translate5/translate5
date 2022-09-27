@@ -196,18 +196,12 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
             'enableSourceEditing' => static::$useSourceEditing,
             'lockLocked' => 1,
         ];
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
         static::api()->addImportArray(self::$dummyData);
         static::api()->addFilePlain('taskConfig', 'runtimeOptions.import.fileparser.options.protectTags = 1', 'text/plain', 'task-config.ini');
         static::api()->import($task);
 
-        static::assertConfigs();
-
+        
         $task = static::api()->getTask();
    
         //open task for whole testcase

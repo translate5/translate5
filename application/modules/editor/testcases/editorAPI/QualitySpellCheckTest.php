@@ -35,15 +35,6 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         'editor_Plugins_SpellCheck_Init'
     ];
 
-    public static function beforeTests(): void {
-        // Check app state
-        self::assertAppState();
-
-        // Assert users. Last authed user is testmanager
-        self::assertNeededUsers();
-        self::assertLogin('testmanager');
-    }
-
     public function testTask0(){
         $this->performTestForTask('ten segments --- de-DE en-US', 10);
     }

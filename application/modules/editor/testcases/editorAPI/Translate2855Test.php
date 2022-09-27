@@ -55,19 +55,15 @@ class Translate2855Test extends editor_Test_JsonTest {
      */
     public static function beforeTests(): void {
 
-        self::assertAppState();
-        self::assertNeededUsers(); // last authed user is testmanager
-        self::assertLogin('testmanager');
-
         // add needed Demo MT
         $params = [
             'resourceId' => 'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$testCustomer->id],
+            'customerIds' => [static::$testOwnCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
-            'customerPivotAsDefaultIds' => [static::$testCustomer->id],
+            'customerPivotAsDefaultIds' => [static::$testOwnCustomer->id],
             'serviceType' => 'editor_Plugins_ZDemoMT',
             'serviceName'=> 'ZDemoMT',
             'name' => 'API Testing::Pivot pre-translation_'.__CLASS__
@@ -80,7 +76,7 @@ class Translate2855Test extends editor_Test_JsonTest {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'relaisLang' => self::$targetLangRfc,
-            'customerId' => static::$testCustomer->id,
+            'customerId' => static::$testOwnCustomer->id,
             'edit100PercentMatch' => true,
             'autoStartImport' => 0
         ];

@@ -41,15 +41,9 @@ class Translate2417Test extends editor_Test_JsonTest {
     ];
 
     public static function beforeTests(): void {
-        
-
-        self::assertAppState();
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();//assert the test customer
-        self::assertLogin('testmanager');
 
         // add the TM
-        $customerId = static::api()->getCustomer()->id;
+        $customerId = static::getTestCustomerId();
         $params = [
             'resourceId' => 'editor_Services_OpenTM2_1',
             'sourceLang' => self::$sourceLangRfc,
@@ -69,7 +63,7 @@ class Translate2417Test extends editor_Test_JsonTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId'=>static::api()->getCustomer()->id,
+            'customerId'=>static::getTestCustomerId(),
             'autoStartImport'=>1
         ];
         $zipfile = static::api()->zipTestFiles('testfiles/','test.zip');

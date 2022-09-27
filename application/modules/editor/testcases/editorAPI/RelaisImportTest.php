@@ -45,12 +45,7 @@ class RelaisImportTest extends editor_Test_JsonTest {
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
         static::api()->zipTestFiles('testfiles/','RelaisImportTest.zip');
         
         static::api()->addImportFile(static::api()->getFile('RelaisImportTest.zip'));

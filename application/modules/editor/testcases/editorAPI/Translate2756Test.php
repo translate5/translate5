@@ -49,21 +49,15 @@ class Translate2756Test extends editor_Test_JsonTest {
         /// → Testfall für aktuellen Issue (target update) erstellen!
         /// Wiederholungen und match rate mit rein packen?
 
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
         $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
 
         //create task
-        static::api()->loadCustomer();
         static::api()->addImportFile($zipfile);
         static::api()->import([
             'sourceLang' => 'de',
             'targetLang' => 'en',
             'edit100PercentMatch' => true,
-            'customerId' => static::api()->getCustomer()->id,
+            'customerId' => static::getTestCustomerId(),
             'autoStartImport' => 0, //don't start the import directly
             'lockLocked' => 1,
         ], true, false);
@@ -71,7 +65,7 @@ class Translate2756Test extends editor_Test_JsonTest {
         $task = static::api()->getTask();
 
         //create dummy TM
-        static::api()->addDummyTm('DummyTmxData.tmx');
+        static::api()->addDummyTm(static::getTestCustomerId(), 'DummyTmxData.tmx');
         sleep(2);
 
         //link task and TM

@@ -36,8 +36,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         'editor_Plugins_Okapi_Init'
     ];
 
-    protected static string $setupUserLogin = 'testmanager';
-
     private static editor_Plugins_Okapi_Bconf_Entity $bconf;
 
     private static int $bconfId = 0;
@@ -47,9 +45,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     public const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
 
     public static function beforeTests(): void {
-
-        static::assertAppState();
-
         // Test essential configs
         $okapiConf = self::$okapiConf = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
 

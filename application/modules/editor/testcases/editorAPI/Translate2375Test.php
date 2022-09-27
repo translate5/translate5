@@ -45,17 +45,13 @@ END LICENSE AND COPYRIGHT
 class Translate2375Test extends \editor_Test_ApiTest {
     protected static $fixedDate = '2020-11-21 18:01:00';
     public static function beforeTests(): void {
-        
-        
+
         $task = array(
             'sourceLang' => 'de',
             'targetLang' => 'en',
             'orderdate' => self::$fixedDate
         );
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
+
         $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
 
         static::api()->addImportFile($zipfile);

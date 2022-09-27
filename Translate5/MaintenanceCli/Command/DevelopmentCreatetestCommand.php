@@ -181,6 +181,8 @@ class '.$name.' extends editor_Test_JsonTest {
         \'import.xlf.preserveWhitespace\' => 0,
         \'runtimeOptions.import.xlf.ignoreFramingTags\' => \'all\'
     ];
+ //TODO FOR TEST USAGE: this is the user that will be logged in after the auto setup
+    protected static string $setupUserLogin = \'testmanager\';
     
     public static function beforeTests(): void {
         $task = [
@@ -190,16 +192,8 @@ class '.$name.' extends editor_Test_JsonTest {
             \'lockLocked\' => 1,
         ];
         
-        static::assertAppState();
-
-        static::assertNeededUsers(); //last authed user is testmanager
-        static::assertLogin(\'testmanager\');
-        
 //TODO FOR TEST USAGE: adjust or delete the created testfiles/task-config.ini
-
-//TODO FOR TEST USAGE: check config checks
-        static::assertConfigs();
-        
+  
         $zipfile = static::api()->zipTestFiles(\'testfiles/\',\'testTask.zip\');
         
         static::api()->addImportFile($zipfile);
@@ -207,7 +201,7 @@ class '.$name.' extends editor_Test_JsonTest {
         
         static::api()->addUser(\'testlector\');
         
-        //login in setUpBeforeClass means using this user in whole testcase!
+        //login in beforeTests means using this user in whole testcase!
         static::api()->login(\'testlector\');
         
         $task = static::api()->getTask();

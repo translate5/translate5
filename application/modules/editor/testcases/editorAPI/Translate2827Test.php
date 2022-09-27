@@ -34,11 +34,6 @@ class Translate2827Test extends editor_Test_JsonTest {
 
     public static function beforeTests(): void {
 
-        
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();//assert the test customer
-        self::assertLogin('testmanager');
         static::api()->addImportFiles(static::api()->getFile('import-project.de-es-ES.workfile.sdlxliff'));
         static::api()->addImportFiles(static::api()->getFile('import-project.de-mk-MK.pivot.sdlxliff'));
 
@@ -47,7 +42,7 @@ class Translate2827Test extends editor_Test_JsonTest {
             'sourceLang' => 'de',
             'targetLang' => ['es-ES'],
             'relaisLang' => 'mk-MK',
-            'customerId' => static::api()->getCustomer()->id,
+            'customerId' => static::getTestCustomerId(),
             'edit100PercentMatch' => true,
             'importUpload_language' => ['es-ES','mk-MK'],
             'importUpload_type' => ['workfiles','pivot'],

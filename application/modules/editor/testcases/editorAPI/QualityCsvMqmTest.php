@@ -101,16 +101,10 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
         static::api()->addImportPlain("id,source,target\n".'1,"source not needed here","'.self::CSV_TARGET.'"'."\n".'2,"zeile 2","row 2"');
         static::api()->import($task);
 
-        static::assertConfigs();
     }
 
     /**

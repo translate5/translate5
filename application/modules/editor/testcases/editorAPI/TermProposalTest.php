@@ -64,14 +64,12 @@ class TermProposalTest extends \editor_Test_ApiTest {
      */
     protected static $setup;
 
-    public static function beforeTests(): void {
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        static::api()->login('testtermproposer');//log in as proposer
-        self::assertLogin('testtermproposer');
-        self::assertCustomer();
-    }
-    
+    /**
+     * We need the termproposer to be logged in for the test
+     * @var string
+     */
+    protected static string $setupUserLogin = 'testtermproposer';
+
     /***
      * Test term and term attribute proposals.
      */
@@ -84,7 +82,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         // [1] create empty term collection
         $termCollection = static::api()->postJson('editor/termcollection', [
             'name' => 'Test api collection',
-            'customerIds' => static::api()->getCustomer()->id
+            'customerIds' => static::getTestCustomerId()
         ]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection', $termCollection->name);
@@ -96,7 +94,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         static::api()->addFile('Term.tbx', static::api()->getFile('Term.tbx'), "application/xml");
         static::api()->postJson('editor/termcollection/import', [
             'collectionId' => self::$collectionId,
-            'customerIds' => static::api()->getCustomer()->id,
+            'customerIds' => static::getTestCustomerId(),
             'mergeTerms' => true
         ]);
 

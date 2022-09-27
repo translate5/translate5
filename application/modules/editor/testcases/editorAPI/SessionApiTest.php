@@ -39,10 +39,7 @@ class SessionApiTest extends \editor_Test_ApiTest {
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
+
         static::api()->addImportFile(static::api()->getFile('justatask.xlf'));
         static::api()->import($task);
     }

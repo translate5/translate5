@@ -51,15 +51,9 @@ class Translate682Test extends \editor_Test_ApiTest {
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
         static::api()->addImportFile(static::api()->getFile('testsamples.sdlxliff'), 'application/xml');
         static::api()->addImportTbx(static::api()->getFile('tbx_without_ids.tbx'));
-        
         static::api()->import($task);
     }
     

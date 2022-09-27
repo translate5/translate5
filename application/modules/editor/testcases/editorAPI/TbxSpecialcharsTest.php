@@ -44,15 +44,10 @@ class TbxSpecialcharsTest extends \editor_Test_ApiTest {
     protected static $english;
 
     /**
-     *
+     * We need the termproposer to be logged in for the test
+     * @var string
      */
-    public static function beforeTests(): void {
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        static::api()->login('testtermproposer');//log in as proposer
-        self::assertLogin('testtermproposer');
-        self::assertCustomer();
-    }
+    protected static string $setupUserLogin = 'testtermproposer';
 
     /***
      * Test term and term attribute proposals.
@@ -66,20 +61,20 @@ class TbxSpecialcharsTest extends \editor_Test_ApiTest {
         // [1] Create empty term collection
         $termCollection = static::api()->postJson('editor/termcollection', [
             'name' => 'Test api collection',
-            'customerIds' => static::api()->getCustomer()->id
+            'customerIds' => static::getTestCustomerId()
         ]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection', $termCollection->name);
 
         // Remember collectionId
-        self::$collectionId = $termCollection->id;
+        $collectionId = $termCollection->id;
 
         // [2] Import tbx with single termEntry, having '&lt;' at multiple places
         $file = 'Specialchars.tbx';
         static::api()->addFile($file, static::api()->getFile($file), "application/xml");
         static::api()->postJson('editor/termcollection/import', [
-            'collectionId' => self::$collectionId,
-            'customerIds' => static::api()->getCustomer()->id,
+            'collectionId' => $collectionId,
+            'customerIds' => static::getTestCustomerId(),
             'mergeTerms' => true
         ]);
 
@@ -91,12 +86,12 @@ class TbxSpecialcharsTest extends \editor_Test_ApiTest {
         // [4] Find imported term by *-query and en-language id
         $termsearch = static::api()->getJson('editor/plugins_termportal_data/search', [
             'query' => '*',
-            'collectionIds' => self::$collectionId,
+            'collectionIds' => $collectionId,
             'language' => self::$english->id,
             'start' => 0,
             'limit' => 1
         ]);
-        $this->assertTrue(is_object($termsearch), 'No terms are found in the termcollection ' . self::$collectionId);
+        $this->assertTrue(is_object($termsearch), 'No terms are found in the termcollection ' . $collectionId);
         $this->assertNotEmpty($termsearch->data, "No terms are found in the term collection for the search string '*'");
 
         // [5] Get imported term info and unset not needed props
@@ -115,19 +110,14 @@ class TbxSpecialcharsTest extends \editor_Test_ApiTest {
 
         // [7] Assert qties of specialchars (original vs exported)
         $exportedTbx = static::api()->getRaw('editor/languageresourceinstance/tbxexport', [
-            'collectionId' => self::$collectionId,
+            'collectionId' => $collectionId,
             'tbxBasicOnly' => 0,
             'exportImages' => 1
         ]);
         $exported = preg_match_all('~&lt;~', $exportedTbx);
         $this->assertEquals($original, $exported, 'Specialchars quantities in original and exported files are not equal');
-    }
 
-    /**
-     *
-     */
-    public static function afterTests(): void {
         static::api()->login('testtermproposer');
-        static::api()->delete('editor/termcollection/'.self::$collectionId);
+        static::api()->delete('editor/termcollection/'.$collectionId);
     }
 }

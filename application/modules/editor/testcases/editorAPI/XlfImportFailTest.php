@@ -36,14 +36,6 @@ class XlfImportFailTest extends \editor_Test_ApiTest {
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
     ];
 
-    public static function beforeTests(): void {
-
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-    }
-    
     public function testImportMissingTagId() {
         $taskConfig = [
             'sourceLang' => 'en',

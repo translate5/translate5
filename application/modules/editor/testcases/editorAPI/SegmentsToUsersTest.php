@@ -55,13 +55,7 @@ class SegmentsToUsersTest extends \editor_Test_ApiTest {
             'targetLang' => 'de',
             'edit100PercentMatch' => true
         );
-        
-        self::assertAppState();
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        self::assertCustomer();
-        
+
         static::api()->addImportFile(static::api()->getFile('testcase-de-en.xlf'));
         static::api()->import($task);
         

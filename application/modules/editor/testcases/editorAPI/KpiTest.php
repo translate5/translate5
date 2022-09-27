@@ -79,9 +79,6 @@ class KpiTest extends \editor_Test_ApiTest {
     private static $taskEndDate = 'finishedDate';
     
     public static function beforeTests(): void {
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
 
         // If any task exists already, filtering will be wrong!
         $filteredTasks = static::getFilteredTasks();

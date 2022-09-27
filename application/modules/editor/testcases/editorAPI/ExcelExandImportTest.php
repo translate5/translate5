@@ -54,14 +54,7 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
             'lockLocked' => 1,
             
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-
-        static::assertConfigs();
-        
         static::api()->addImportFile(static::api()->getFile('testcase-en-de.xlf'));
         static::api()->import($task);
     }

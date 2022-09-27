@@ -69,10 +69,6 @@ class NecTmLanguageResourceApiTest extends \editor_Test_ApiTest {
      */
     public static function beforeTests(): void {
         self::markTestIncomplete("Still in progress!");
-        
-        self::assertNeededUsers(); // last authed user is testmanager
-        self::assertLogin('testmanager');
-        self::assertCustomer();
     }
     
     /**

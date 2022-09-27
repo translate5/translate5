@@ -53,14 +53,8 @@ class Translate678ExportDiffEntityTest extends \editor_Test_ApiTest {
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
         static::api()->addImportFile(static::api()->getFile('apiTest.csv'), 'application/csv');
-        
         static::api()->import($task);
     }
     

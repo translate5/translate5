@@ -69,22 +69,14 @@ class Translate2483Test extends editor_Test_JsonTest {
     ];
 
     public static function beforeTests(): void {
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();
 
         $json = self::assertLogin('testmanager');
         self::assertContains('instantTranslate', $json->user->roles, 'Missing role for user.');
         self::assertContains('instantTranslateWriteTm', $json->user->roles, 'Missing role for user.');
-        self::assertContains(static::api()->getCustomer()->id, array_filter(explode(',',$json->user->customers)), 'The test customer is not assigned to the testmanager');
-
-
-        self::assertAppState();
+        self::assertContains(static::getTestCustomerId(), array_filter(explode(',', $json->user->customers)), 'The test customer is not assigned to the testmanager');
 
         self::$sourceText = bin2hex(random_bytes(10));
         self::$targetText = bin2hex(random_bytes(10));
-
-        self::assertNeededUsers();
     }
 
 

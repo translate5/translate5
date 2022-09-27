@@ -46,14 +46,6 @@ class Translate2432Test extends \editor_Test_ApiTest {
      */
     protected static $validExportFile = 'okapi_default_export.bconf';
         
-    public static function beforeTests(): void {
-
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-    }
-    
     /***
      * Test the config autoset
      */

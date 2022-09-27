@@ -49,9 +49,6 @@ class MicrosoftTranslatorTest extends \editor_Test_ApiTest {
             self::markTestSkipped('Test runs only in master test to reduce usage/costs.');
             return;
         }
-        self::assertAppState();
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();//assert the test customer
     }
     
     /***
@@ -100,7 +97,7 @@ class MicrosoftTranslatorTest extends \editor_Test_ApiTest {
             'name'=>self::$languageResourceName,
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::api()->getCustomer()->id],
+            'customerIds' => [ static::getTestCustomerId() ],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_Microsoft',

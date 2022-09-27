@@ -36,15 +36,10 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
         'editor_Plugins_Okapi_Init'
     ];
 
-    protected static string $setupUserLogin = 'testmanager';
-
     private static editor_Plugins_Okapi_Bconf_Entity $bconf;
     private static int $bconfId = 0;
 
     public static function beforeTests(): void {
-
-        static::assertAppState();
-
         // Needed for localized error messages in Unit Test like ZfExtended_NoAccessException
         if(!Zend_Registry::isRegistered('Zend_Locale')){
             Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));

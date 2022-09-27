@@ -41,23 +41,13 @@ class Translate2081Test extends editor_Test_JsonTest {
 
     protected static bool $setupOwnCustomer = true;
 
-    /**
-     */
-    public static function beforeTests(): void {
-
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();//assert the test customer
-    }
-
     /***
      * Add default user assoc and validate the results
      */
     public function testDefaultUserAssoc(){
 
         $params = [
-            'customerId' => static::$testCustomer->id,
+            'customerId' => static::$testOwnCustomer->id,
             'workflow' => 'default',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
@@ -88,7 +78,7 @@ class Translate2081Test extends editor_Test_JsonTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$testCustomer->id,
+            'customerId' => static::$testOwnCustomer->id,
             'edit100PercentMatch' => true,
             'autoStartImport' => 1
         ];

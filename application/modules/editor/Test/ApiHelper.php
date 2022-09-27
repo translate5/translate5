@@ -56,6 +56,11 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
     const INITIAL_TASKTYPE_PROJECT_TASK = 'projectTask';
 
     /**
+     * Customer-number of the test-customer
+     */
+    const TEST_CUSTOMER_NUMBER = '123456789';
+
+    /**
      *
      */
     const SEGMENT_DUPL_SAVE_CHECK = '<img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="duplicatesavecheck" data-segmentid="%s" data-fieldname="%s">';
@@ -488,27 +493,19 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
     //region Customer API
     /******************************************************* CUSTOMER API *******************************************************/
 
-    /***
-     * return the test customer
-     * @return stdClass
+    /**
+     * Retrieves a ustomer by it's number
+     * @param string $customerNumber
+     * @return stdClass|null
      */
-    public function getCustomer(){
-        return $this->customer;
-    }
-
-    /***
-     * Load the default customer
-     */
-    public function loadCustomer(){
-        $test = $this->testClass;
-        $filter = '[{"operator":"eq","value":"123456789","property":"number"}]';
-        $filter = urlencode($filter);
-        $url='editor/customer?page=1&start=0&limit=20&filter='.$filter;
+    public function getCustomerByNumber(string $customerNumber) : ?stdClass {
+        $filter = '[{"operator":"eq","value":"'.$customerNumber.'","property":"number"}]';
+        $url = 'editor/customer?page=1&start=0&limit=20&filter='.urlencode($filter);
         $customerData = $this->getJson($url);
-        $test::assertNotEmpty($customerData,"Unable to load test customer.No test customer was found for number:123456789");
-        $this->customer = $customerData[0];
-        $resp = $this->getLastResponse();
-        $test::assertEquals(200, $resp->getStatus(), 'Load test customer Request does not respond HTTP 200! Body was: '.$resp->getBody());
+        if($customerData && is_array($customerData) && count($customerData) > 0){
+            return $customerData[0];
+        }
+        return null;
     }
 
     /**
@@ -641,15 +638,19 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
 
     /**
      * Add the translation memory resource (type DummyTM)
+     * @param int $customerId
      * @param string $fileName
-     * @param string $name
+     * @param string|null $name
+     * @param string|null $sourceLang
+     * @param string|null $targetLang
+     * @throws Exception
      */
-    public function addDummyTm(string $fileName, ?string $name = null, ?string $sourceLang = null, ?string $targetLang = null){
+    public function addDummyTm(int $customerId, string $fileName, ?string $name = null, ?string $sourceLang = null, ?string $targetLang = null){
         $params = [
             'resourceId'    =>  'editor_Services_DummyFileTm',
             'sourceLang'    => $sourceLang ?? $this->task->originalSourceLang,
             'targetLang'    => $targetLang ?? $this->task->originalTargetLang,
-            'customerIds' => [$this->getCustomer()->id],
+            'customerIds' => [ $customerId ],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_DummyFileTm',
@@ -657,7 +658,7 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
             'name' => $name ?? $this->testClass,
         ];
         //create the resource 1 and import the file
-        $this->addResource($params,$fileName,true);
+        $this->addResource($params, $fileName, true);
     }
 
     /***

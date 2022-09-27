@@ -50,11 +50,7 @@ class SegmentWorkflowTest extends \editor_Test_ApiTest {
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
         static::api()->addImportFile('SegmentWorkflowTest/simple-en-de.zip');
         static::api()->import($task);
         
@@ -64,8 +60,7 @@ class SegmentWorkflowTest extends \editor_Test_ApiTest {
         static::api()->reloadTask();
         static::api()->addUser('testtranslator', 'waiting', 'translatorCheck');
 
-        static::assertConfigs();
-    }
+            }
     
     public function testTranslator() {
         //Implement tests for the new role translator and workflowstep translating!

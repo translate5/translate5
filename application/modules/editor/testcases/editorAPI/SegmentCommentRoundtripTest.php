@@ -38,13 +38,6 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
     ];
 
-    protected static array $requiredRuntimeOptions = [
-        'editor.export.exportComments' => 1,
-        'import.sdlxliff.applyChangeMarks' => 1,
-        'import.sdlxliff.importComments' => 1,
-        'customers.anonymizeUsers' => 0,
-    ];
-    
     public static function beforeTests(): void {
 
         $task = array(
@@ -53,11 +46,6 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
-
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
 
         $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
         static::api()->addImportFile($zipfile);
@@ -72,7 +60,13 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         //open task for whole testcase
         static::api()->setTaskToEdit($task->id);
 
-        static::assertConfigs($task->taskGuid);
+        $requiredTaskConfigs = [
+            'editor.export.exportComments' => 1,
+            'import.sdlxliff.applyChangeMarks' => 1,
+            'import.sdlxliff.importComments' => 1,
+            'customers.anonymizeUsers' => 0,
+        ];
+        static::assertTaskConfigs($task->taskGuid, $requiredTaskConfigs);
     }
 
     /**

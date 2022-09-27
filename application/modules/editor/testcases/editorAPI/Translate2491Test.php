@@ -31,48 +31,24 @@ END LICENSE AND COPYRIGHT
  */
 class Translate2491Test extends editor_Test_JsonTest {
 
-    /***
-     * The current active collection
-     * @var integer
-     */
-    protected static $collectionId;
-
-    /**
-     * @throws Zend_Exception
-     */
-    public static function beforeTests(): void {
-
-        // Prepare api instance
-        
-
-        // Last authed user is testmanager
-        self::assertNeededUsers();
-
-        // Load customer
-        self::assertCustomer();
-    }
-
-    /**
-     * Test the qualities fetched for a segment
-     */
     public function testTermsTransfer(){
 
         // [1] create empty term collection
         $termCollection = static::api()->postJson('editor/termcollection', [
             'name' => 'Test api collection 2',
-            'customerIds' => static::api()->getCustomer()->id
+            'customerIds' => static::getTestCustomerId()
         ]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection 2', $termCollection->name);
 
         // Remember collectionId
-        self::$collectionId = $termCollection->id;
+        $collectionId = $termCollection->id;
 
         // [2] import test tbx
         static::api()->addFile('Term.tbx', static::api()->getFile('Term.tbx'), "application/xml");
         static::api()->postJson('editor/termcollection/import', [
-            'collectionId' => self::$collectionId,
-            'customerIds' => static::api()->getCustomer()->id,
+            'collectionId' => $collectionId,
+            'customerIds' => static::getTestCustomerId(),
             'mergeTerms' => true
         ]);
 
@@ -93,13 +69,13 @@ class Translate2491Test extends editor_Test_JsonTest {
         // [4] find imported term by *-query and en-EN language id
         $termsearch = static::api()->getJson('editor/plugins_termportal_data/search', [
             'query' => '*',
-            'collectionIds' => self::$collectionId,
+            'collectionIds' => $collectionId,
             'language' => $english->id,
             'start' => 0,
             'limit' => 10
         ]);
 
-        $this->assertTrue(is_object($termsearch), 'No terms are found in the termcollection ' . self::$collectionId);
+        $this->assertTrue(is_object($termsearch), 'No terms are found in the termcollection ' . $collectionId);
         $this->assertNotEmpty($termsearch->data, "No terms are found in the term collection for the search string '*'");
 
         // Transfer terms to main Translate5 app
@@ -108,7 +84,7 @@ class Translate2491Test extends editor_Test_JsonTest {
             'targetLang' =>  $german->id,
             'translated' =>  0,
             'definition' =>  1,
-            'clientId' =>  static::api()->getCustomer()->id,
+            'clientId' =>  static::getTestCustomerId(),
             'sourceLang' =>  $english->id,
             'terms' => 'all',
             'except' => array_reverse(array_column($termsearch->data, 'id'))[0],
@@ -119,10 +95,9 @@ class Translate2491Test extends editor_Test_JsonTest {
         $task->originalSourceLang = $taskCfg['sourceLang'];
         $task->originalTargetLang = $taskCfg['targetLang'];
 
-        if($task->taskType == ZfExtended_Test_ApiHelper::INITIAL_TASKTYPE_PROJECT) {
+        if($task->taskType == editor_Test_ApiHelper::INITIAL_TASKTYPE_PROJECT) {
             static::api()->checkProjectTasksStateLoop();
-        }
-        else {
+        } else {
             static::api()->checkTaskStateLoop();
         }
 
@@ -148,15 +123,10 @@ class Translate2491Test extends editor_Test_JsonTest {
         $this->assertTrue(is_object($terminfo), 'No data returned by terminfo-call');
         $this->assertTrue(isset($terminfo->siblings->data[1]->term), 'Path "siblings->data[1]->term" not exists in terminfo response');
         $this->assertEquals($terminfo->siblings->data[1]->term, 'Term1 DE', 'German translation for term "Term1 EN" was not imported');
-    }
 
-    /**
-     * Cleanup
-     */
-    public static function afterTests(): void {
         $task = static::api()->getTask();
         static::api()->deleteTask($task->id);
         // Drop termCollection
-        static::api()->delete('editor/termcollection/' . self::$collectionId);
+        static::api()->delete('editor/termcollection/' . $collectionId);
     }
 }

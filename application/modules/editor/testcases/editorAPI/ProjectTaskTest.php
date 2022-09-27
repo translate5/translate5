@@ -47,19 +47,13 @@ class ProjectTaskTest extends editor_Test_JsonTest {
     protected static bool $setupOwnCustomer = true;
 
     public static function beforeTests(): void {
-
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-
         // add term collection
         $params = [
             'name' => 'API Testing::TermCollection_'.__CLASS__,
             'resourceId' => 'editor_Services_TermCollection',
             'serviceType' => 'editor_Services_TermCollection',
-            'customerIds' => [ static::$testCustomer->id ],
-            'customerUseAsDefaultIds' => [ static::$testCustomer->id ],
+            'customerIds' => [ static::$testOwnCustomer->id ],
+            'customerUseAsDefaultIds' => [ static::$testOwnCustomer->id ],
             'customerWriteAsDefaultIds' => [],
             'serviceName' => 'TermCollection',
             'mergeTerms' => false
@@ -71,7 +65,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$testCustomer->id,
+            'customerId' => static::$testOwnCustomer->id,
             'autoStartImport' => 0,
             'edit100PercentMatch' => 0
         ];

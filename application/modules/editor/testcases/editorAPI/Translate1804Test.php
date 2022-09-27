@@ -41,20 +41,14 @@ class Translate1804Test extends editor_Test_JsonTest {
     ];
 
     public static function beforeTests(): void {
+
         $task = array(
             'sourceLang' => 'en',
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
-        
-        self::assertAppState();
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-
-        static::assertConfigs();
-        
         $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
 
         static::api()->addImportFile($zipfile);

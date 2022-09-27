@@ -99,13 +99,6 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
             'enableSourceEditing' => static::$useSourceEditing,
             'lockLocked' => 1,
         );
-        
-        self::assertAppState();
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-
-        static::assertConfigs();
 
         static::api()->addImportFile('TRANSLATE-683/TRANSLATE-683-de-en.csv');
         static::api()->addImportTbx('TRANSLATE-683/TRANSLATE-683-de-en.tbx');
