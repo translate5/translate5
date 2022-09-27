@@ -26,16 +26,15 @@
 -- */
 
 UPDATE Zf_configuration
-    SET value = default
+    SET value = Zf_configuration.`default`
     WHERE name = 'runtimeOptions.plugins.SpellCheck.languagetool.url.default'
         AND value = '["http://yourlanguagetooldomain:8081/v2"]';
 
 UPDATE Zf_configuration
-    SET value = default
+    SET value = Zf_configuration.`default`
     WHERE name = 'runtimeOptions.plugins.SpellCheck.languagetool.url.import'
         AND value = '["http://yourlanguagetooldomain:8081/v2"]';
 
 UPDATE Zf_configuration
-    SET value = default
-    WHERE name = 'runtimeOptions.plugins.SpellCheck.languagetool.url.gui'
-      AND `default` = 'http://localhost:8081/v2';
+    SET `default` = 'http://localhost:8081/v2'
+    WHERE name = 'runtimeOptions.plugins.SpellCheck.languagetool.url.gui';
