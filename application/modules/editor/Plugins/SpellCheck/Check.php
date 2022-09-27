@@ -140,7 +140,7 @@ class editor_Plugins_SpellCheck_Check {
      * @param $targetField
      * @param editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter $connector
      * @param $spellCheckLang
-     *
+     * @throws Zend_Exception
      * @throws DownException
      * @throws MalfunctionException
      * @throws RequestException
@@ -155,6 +155,11 @@ class editor_Plugins_SpellCheck_Check {
 
         // Replace whitespace-placeholders with the actual characters they represent
         $target = Whitespace::replaceLabelledCharacters($target);
+
+        // If empty target - return
+        if (strlen($target) === 0) {
+            return;
+        }
 
         // Get LanguageTool response
         $data = $connector->getMatches($target, $spellCheckLang);
