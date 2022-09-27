@@ -1069,6 +1069,20 @@ class editor_Utils {
         return $val;
     }
 
+    /**
+     * initializes the test and demo user passwords
+     * @return void
+     * @throws Zend_Db_Exception
+     * @throws Zend_Exception
+     */
+    public static function initDemoAndTestUserPasswords(): void
+    {
+        $asdfasdf = ZfExtended_Authentication::getInstance()->createSecurePassword('asdfasdf');
+        $config = Zend_Registry::get('config');
+        $db = Zend_Db::factory($config->resources->db);
+        $db->query("update Zf_users set passwd = ? where email = 'noreply@translate5.net' and login != 'system'", [$asdfasdf]);
+    }
+
 }
 
 class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {

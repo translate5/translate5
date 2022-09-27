@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abstract {
     
-    protected static $description = 'Provides the Globalese pre-translation';
+    protected static string $description = 'Provides the Globalese pre-translation';
     
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH

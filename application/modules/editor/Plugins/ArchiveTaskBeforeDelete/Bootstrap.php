@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * Plugin Bootstrap for Segment Statistics Plugin
  */
 class editor_Plugins_ArchiveTaskBeforeDelete_Bootstrap extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Creates a Task archive on ending a task';
+    protected static string $description = 'Creates a Task archive on ending a task';
     
     public function init() {
         $this->eventManager->attach('editor_TaskController', 'beforeDeleteAction', array($this, 'handleBeforeDeleteAction'));

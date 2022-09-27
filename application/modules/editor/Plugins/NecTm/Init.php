@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Provides the Nec-TM connector. ATTENTION: A NEC-TM Server URL is needed!';
+    protected static string $description = 'Provides the Nec-TM connector. ATTENTION: A NEC-TM Server URL is needed!';
     
     /**
      * @var editor_Plugins_NecTm_HttpApi

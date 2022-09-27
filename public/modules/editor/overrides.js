@@ -129,10 +129,21 @@ Ext.override(Ext.menu.Item, {
  */
 Ext.override(Ext.grid.column.Column, {
     initConfig: function(config) {
-        if(config.tooltip === undefined) {
-            config.tooltip = Ext.String.htmlEncode(config.text||this.text);
+        if (config.tooltip === undefined) {
+            if (Ext.String.trim(config.text || this.text)) {
+                config.tooltip = Ext.String.htmlEncode(config.text || this.text);
+            }
         }
         return this.callParent([config]);
+    },
+
+    /**
+     * This method is added for ability to make column's tooltip-config bindable
+     *
+     * @param tooltip
+     */
+    setTooltip: function(tooltip) {
+        this.titleEl.dom.setAttribute('data-qtip', this.tooltip = tooltip);
     }
 });
 
@@ -1482,3 +1493,19 @@ Ext.define('Translate5.override.Ext.Array.from', {
     }
 });
 
+Ext.define('Translate5.override.Ext.grid.feature.RowBody', {
+    override: 'Ext.grid.feature.RowBody',
+    init: function() {
+        var me = this;
+
+        // If me.extraRowTpl is an array (e.g. is not an XTemplate so far)
+        if (Ext.isArray(me.extraRowTpl)) {
+
+            // Force using own instance of feature rather than the one stored in values.view.rowBodyFeature
+            me.extraRowTpl[6] = me.extraRowTpl[6].replace('values.view.rowBodyFeature', 'this.rowBody');
+        }
+
+        // Call parent
+        me.callParent(arguments);
+    }
+});

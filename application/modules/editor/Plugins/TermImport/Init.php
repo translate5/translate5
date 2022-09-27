@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
     
-    protected static $description = 'Provides a term import on file level';
+    protected static string $description = 'Provides a term import on file level';
     
     /**
      * @var array
