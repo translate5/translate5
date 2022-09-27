@@ -45,15 +45,6 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.ui.changealike.Grid', {
   extend: 'Ext.grid.Panel',
-
-  item_segmentNrInTaskColumn: 'Nr.', 
-  item_sourceColumn: 'Quelle', 
-  item_targetColumn: 'Ziel', 
-  item_filterColumn: 'In aktueller Filterung enthalten', 
-  item_sourceMatchColumn: 'Quell-Treffer', 
-  item_targetMatchColumn: 'Ziel-Treffer',
-  item_sameContextColumn: 'Kontext-Treffer',
-
   requires: [
       'Editor.view.segments.column.Matchrate',
       'Editor.view.segments.column.AutoState'
@@ -75,7 +66,9 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           filter: {
               type: 'numeric'
           },
-          text: me.item_segmentNrInTaskColumn,
+          bind: {
+            text: '{l10n.alikeGrid.segmentNrInTaskColumn}'
+          },
           width: 50
         },
         {
@@ -99,7 +92,9 @@ Ext.define('Editor.view.ui.changealike.Grid', {
             }
             return value;
           },
-          text: me.item_sourceColumn
+          bind: {
+            text: '{l10n.alikeGrid.sourceColumn}'
+          }
         },
         {
           xtype: 'booleancolumn',
@@ -109,7 +104,9 @@ Ext.define('Editor.view.ui.changealike.Grid', {
             type: 'boolean'
           },
           width: 49,
-          tooltip: me.item_sourceMatchColumn
+          bind: {
+            tooltip: '{l10n.alikeGrid.sourceMatchColumn}'
+          },
         },
         {
           xtype: 'gridcolumn',
@@ -127,7 +124,9 @@ Ext.define('Editor.view.ui.changealike.Grid', {
             }
             return value;
           },
-          text: me.item_targetColumn
+          bind: {
+            text: '{l10n.alikeGrid.targetColumn}'
+          }
         },
         {
           xtype: 'booleancolumn',
@@ -137,7 +136,9 @@ Ext.define('Editor.view.ui.changealike.Grid', {
             type: 'boolean'
           },
           width: 49,
-          tooltip: me.item_targetMatchColumn
+          bind: {
+            tooltip: '{l10n.alikeGrid.targetMatchColumn}'
+          }
         },
         {
           xtype: 'booleancolumn',
@@ -146,7 +147,9 @@ Ext.define('Editor.view.ui.changealike.Grid', {
               type: 'boolean'
           },
           width: 41,
-          tooltip: me.item_filterColumn,
+          bind: {
+            tooltip: '{l10n.alikeGrid.filterColumn}'
+          },
           text: '<span class="fa fa-filter"></span>'
         },
         {
@@ -156,7 +159,9 @@ Ext.define('Editor.view.ui.changealike.Grid', {
               type: 'boolean'
           },
           width: 41,
-          tooltip: me.item_sameContextColumn,
+          bind: {
+            tooltip: '{l10n.alikeGrid.sameContextColumn}'
+          },
           text: '<span class="fa fa-table-list"></span>',
         }, {
         	xtype:'matchrateColumn',
