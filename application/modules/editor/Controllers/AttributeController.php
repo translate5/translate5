@@ -100,7 +100,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // If current user has 'termPM_allClients' role, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
-            in_array('termPM_allClients', $this->_session->roles)
+            $this->isAllowed('editor_term', 'anyCollection')
                 ?: $termCollection->getAccessibleCollectionIds(editor_User::instance()->getModel());
     }
 
@@ -328,11 +328,19 @@ class editor_AttributeController extends ZfExtended_RestController
         // but has other roles allowed to delete attributes only in certain curcumstances
         if (!$this->isAllowed('editor_attribute', 'putAny')) {
 
+            // Collect rights
+            $rights = [];
+            foreach (['propose', 'review', 'finalize'] as $right) {
+                if ($this->isAllowed('editor_term', $right)) {
+                    $rights []= $right;
+                }
+            }
+
             // Get [attrId => readonly] pairs
             $readonlyA = $this->entity->getReadonlyByIds(
                 $attrIdA,
                 $this->_session->id, // here we're inside putAction, so we do have access
-                $this->_session->roles
+                $rights
             );
 
             // Prepare error msg
@@ -514,11 +522,19 @@ class editor_AttributeController extends ZfExtended_RestController
             // Get attribute ids
             $attrIds = array_keys($entityA);
 
+            // Collect rights
+            $rights = [];
+            foreach (['propose', 'review', 'finalize'] as $right) {
+                if ($this->isAllowed('editor_term', $right)) {
+                    $rights []= $right;
+                }
+            }
+
             // Get [attrId => readonly] pairs
             $readonlyA = $this->entity->getReadonlyByIds(
                 $attrIds,
                 $this->_session->id, // here we're inside deleteAction, so we do have access
-                $this->_session->roles
+                $rights
             );
 
             // If at least one is readonly - flush failure

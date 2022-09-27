@@ -72,7 +72,7 @@ class editor_TermController extends ZfExtended_RestController
         // If current user has 'termPM_allClients' role, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
-            in_array('termPM_allClients', $this->_session->roles)
+            $this->isAllowed('editor_term', 'anyCollection')
                 ?: $termCollection->getAccessibleCollectionIds(editor_User::instance()->getModel());
     }
 
@@ -346,15 +346,15 @@ class editor_TermController extends ZfExtended_RestController
         $isProvisionallyProcessed = !$this->entity->getProposal() && $this->entity->getProcessStatus() == 'provisionallyProcessed';
 
         // Roles shortcuts
-        $termProposer  = in_array('termProposer' , $this->_session->roles);
-        $termReviewer  = in_array('termReviewer' , $this->_session->roles);
-        $termFinalizer = in_array('termFinalizer', $this->_session->roles);
+        $canPropose  = $this->isAllowed('editor_term', 'propose');
+        $canReview   = $this->isAllowed('editor_term', 'review');
+        $canFinalize = $this->isAllowed('editor_term', 'finalize');
 
         // Setup a flag indicating whether current user can edit current term
         $editable = $canChangeAny
-            || ($termProposer  && $this->entity->getCreatedBy() == $this->_session->id)
-            || ($termReviewer  && $isUnprocessed)
-            || ($termFinalizer && $isProvisionallyProcessed);
+            || ($canPropose  && $this->entity->getCreatedBy() == $this->_session->id)
+            || ($canReview   && $isUnprocessed)
+            || ($canFinalize && $isProvisionallyProcessed);
 
         // If not allowed - flush failure
         if (!$editable) $this->jflush(false, 'This term is not editable');
