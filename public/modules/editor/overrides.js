@@ -129,10 +129,21 @@ Ext.override(Ext.menu.Item, {
  */
 Ext.override(Ext.grid.column.Column, {
     initConfig: function(config) {
-        if(config.tooltip === undefined) {
-            config.tooltip = Ext.String.htmlEncode(config.text||this.text);
+        if (config.tooltip === undefined) {
+            if (Ext.String.trim(config.text || this.text)) {
+                config.tooltip = Ext.String.htmlEncode(config.text || this.text);
+            }
         }
         return this.callParent([config]);
+    },
+
+    /**
+     * This method is added for ability to make column's tooltip-config bindable
+     *
+     * @param tooltip
+     */
+    setTooltip: function(tooltip) {
+        this.titleEl.dom.setAttribute('data-qtip', this.tooltip = tooltip);
     }
 });
 
