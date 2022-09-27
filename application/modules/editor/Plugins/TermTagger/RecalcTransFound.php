@@ -341,7 +341,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
                 $entryId = $this->exists[$srcId]['termEntryTbxId'];
 
                 // If there are no source term translations
-                if (!$transTextA = array_values($this->trans[$entryId]) ?? 0) {
+                if (!$transTextA = array_values($this->trans[$entryId] ?? [])) {
 
                     // Setup 'transNotDefined'-class
                     $value = 'transNotDefined';
