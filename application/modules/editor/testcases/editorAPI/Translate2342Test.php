@@ -34,7 +34,6 @@ END LICENSE AND COPYRIGHT
 class Translate2342Test extends \editor_Test_ApiTest {
     /* @var $this Translate1484Test */
     
-    protected static $customerTest;
     protected static $sourceLangRfc = 'de';
     protected static $targetLangRfc = 'en';
 
@@ -48,17 +47,14 @@ class Translate2342Test extends \editor_Test_ApiTest {
         'editor_Plugins_ZDemoMT_Init'
     ];
 
+    protected static bool $setupOwnCustomer = true;
+
     public static function beforeTests(): void {
 
         self::assertAppState();
 
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-
-        self::$customerTest = static::api()->postJson('editor/customer/',[
-            'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer', true),
-        ]);
     }
     
     public function testImportAndProgress() {
@@ -68,7 +64,7 @@ class Translate2342Test extends \editor_Test_ApiTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => self::$customerTest->id,
+            'customerId' => static::$testCustomer->id,
             'autoStartImport' => 0
         ];
         self::assertLogin('testmanager');
@@ -80,7 +76,7 @@ class Translate2342Test extends \editor_Test_ApiTest {
             'resourceId' => 'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [self::$customerTest->id],
+            'customerIds' => [static::$testCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',
@@ -144,11 +140,5 @@ class Translate2342Test extends \editor_Test_ApiTest {
 
         static::api()->deleteTask($task->id, 'testmanager');
         static::api()->removeResources();
-    }
-
-
-    public static function afterTests(): void {
-        //remove the temp customer
-        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

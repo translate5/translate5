@@ -32,13 +32,14 @@ END LICENSE AND COPYRIGHT
  */
 class Translate2081Test extends editor_Test_JsonTest {
 
-    protected static $customerTest;
     protected static $sourceLangRfc='de';
     protected static $targetLangRfc='en';
 
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init'
     ];
+
+    protected static bool $setupOwnCustomer = true;
 
     /**
      */
@@ -48,11 +49,6 @@ class Translate2081Test extends editor_Test_JsonTest {
 
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
-
-        self::$customerTest = static::api()->postJson('editor/customer/',[
-            'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer', true),
-        ]);
     }
 
     /***
@@ -61,7 +57,7 @@ class Translate2081Test extends editor_Test_JsonTest {
     public function testDefaultUserAssoc(){
 
         $params = [
-            'customerId' => self::$customerTest->id,
+            'customerId' => static::$testCustomer->id,
             'workflow' => 'default',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
@@ -92,7 +88,7 @@ class Translate2081Test extends editor_Test_JsonTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => self::$customerTest->id,
+            'customerId' => static::$testCustomer->id,
             'edit100PercentMatch' => true,
             'autoStartImport' => 1
         ];
@@ -124,13 +120,5 @@ class Translate2081Test extends editor_Test_JsonTest {
         $this->assertEquals(static::api()->getFileContent('expected.json'), $data, 'The expected users are not auto assigned to the task');
 
         static::api()->deleteTask($task->id, 'testmanager');
-    }
-
-    /***
-     * Clean up the added customer
-     */
-    public static function afterTests(): void {
-        //remove the temp customer
-        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

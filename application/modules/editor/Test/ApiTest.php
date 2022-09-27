@@ -70,8 +70,19 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
      * The user that will be logged in in the base setup
      * @var string
      */
-    protected static string $testUserToLogin = 'testapiuser';
+    protected static string $setupUserLogin = 'testapiuser';
 
+    /**
+     * If set, a test-specific customer will be created on test-setup and removed on teardown. The customer will be accessible via ::$testCustomer
+     * @var bool
+     */
+    protected static bool $setupOwnCustomer = false;
+
+    /**
+     * Holds the test customer if setup for creation
+     * @var stdClass
+     */
+    protected static stdClass $testCustomer;
     /**
      * Retrieves the test API
      * @return editor_Test_ApiHelper
@@ -98,8 +109,8 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
      */
     public static function assertAppState(){
         $state = static::getAppState();
-        if(static::api()->login(static::$testUserToLogin)){
-            static::assertLogin(static::$testUserToLogin);
+        if(static::api()->login(static::$setupUserLogin)){
+            static::assertLogin(static::$setupUserLogin);
         }
         // check for termtagger
         if(static::$termtaggerRequired){
@@ -214,11 +225,17 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
         if(static::$_appState === null){
             self::evaluateAppState(static::$_api);
         }
+        if(static::$setupOwnCustomer){
+            static::$testCustomer = static::$_api->addCustomer('API-Testing::'.static::class);
+        }
         // this can be used in extending classes as replacement for setUpBeforeClass()
         static::beforeTests();
     }
 
     final public static function tearDownAfterClass(): void {
+        if(static::$setupOwnCustomer){
+            static::$_api->deleteCustomer(static::$testCustomer->id);
+        }
         // this can be used in extending classes as replacement for tearDownAfterClass()
         static::afterTests();
     }
@@ -244,9 +261,6 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase {
         }
         if(!$state->database->isUptodate){
             $errors[] = 'Database is not up to date! '.$state->database->newCount.' new / '.$state->database->modCount.' modified.';
-        }
-        if(!$state->database->isUptodate) {
-            die('Database is not up to date! '.$state->database->newCount.' new / '.$state->database->modCount.' modified. Terminating API-tests'."\n\n");
         }
         if(count($errors) > 0){
             die(implode("\n", $errors)."\nTerminating API-tests\n\n");

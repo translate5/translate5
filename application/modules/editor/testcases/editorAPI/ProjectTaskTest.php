@@ -35,7 +35,6 @@ END LICENSE AND COPYRIGHT
  */
 class ProjectTaskTest extends editor_Test_JsonTest {
     
-    protected static $customerTest;
     protected static $sourceLangRfc = 'en';
     protected static $targetLangRfc = ['de','it','fr','mk'];
 
@@ -45,6 +44,8 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         'editor_Plugins_TermTagger_Bootstrap'
     ];
 
+    protected static bool $setupOwnCustomer = true;
+
     public static function beforeTests(): void {
 
         self::assertAppState();
@@ -52,18 +53,13 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
 
-        self::$customerTest = static::api()->postJson('editor/customer/',[
-            'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
-        ]);
-
         // add term collection
         $params = [
             'name' => 'API Testing::TermCollection_'.__CLASS__,
             'resourceId' => 'editor_Services_TermCollection',
             'serviceType' => 'editor_Services_TermCollection',
-            'customerIds' => [ self::$customerTest->id ],
-            'customerUseAsDefaultIds' => [ self::$customerTest->id ],
+            'customerIds' => [ static::$testCustomer->id ],
+            'customerUseAsDefaultIds' => [ static::$testCustomer->id ],
             'customerWriteAsDefaultIds' => [],
             'serviceName' => 'TermCollection',
             'mergeTerms' => false
@@ -75,7 +71,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => self::$customerTest->id,
+            'customerId' => static::$testCustomer->id,
             'autoStartImport' => 0,
             'edit100PercentMatch' => 0
         ];
@@ -156,7 +152,5 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         static::api()->deleteTask($task->id, 'testmanager');
         //remove the created resources
         static::api()->removeResources();
-        //remove the temp customer
-        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

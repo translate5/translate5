@@ -528,7 +528,7 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
         ]);
     }
 
-    public function removeCustomer(int $customerId){
+    public function deleteCustomer(int $customerId){
         $this->delete('editor/customer/'.$customerId);
     }
 

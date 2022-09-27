@@ -36,20 +36,15 @@ class Translate198Test extends editor_Test_JsonTest {
      * Currently imported task ids
      * @var array
      */
-    protected static $customerTest;
     protected static $sourceLangRfc = 'de';
     protected static $targetLangRfc = 'en';
+
+    protected static bool $setupOwnCustomer = true;
     
     public static function beforeTests(): void {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-
-        // add customer
-        self::$customerTest = static::api()->postJson('editor/customer/',[
-            'name' => 'API Testing::'.__CLASS__,
-            'number' => uniqid('API Testing::ResourcesLogCustomer'),
-        ]);
     }
 
     /**
@@ -57,8 +52,8 @@ class Translate198Test extends editor_Test_JsonTest {
      */
     public function testTasks() {
 
-        $task1 = $this->createTask('task1', self::$customerTest->id);
-        $task2 = $this->createTask('task2', self::$customerTest->id);
+        $task1 = $this->createTask('task1', static::$testCustomer->id);
+        $task2 = $this->createTask('task2', static::$testCustomer->id);
 
         //open task for editing. This should not produce any error
         $response = static::api()->setTaskToEdit($task1->id);
@@ -109,10 +104,5 @@ class Translate198Test extends editor_Test_JsonTest {
         static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
         static::api()->checkTaskStateLoop();
         return static::api()->getTask();
-    }
-
-    public static function afterTests(): void {
-        //remove the temp customer
-        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

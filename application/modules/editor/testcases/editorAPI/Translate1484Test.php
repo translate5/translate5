@@ -33,7 +33,6 @@ END LICENSE AND COPYRIGHT
 class Translate1484Test extends editor_Test_JsonTest {
     /* @var $this Translate1484Test */
     
-    protected static $customerTest;
     protected static $sourceLangRfc = 'en';
     protected static $targetLangRfc = 'de';
 
@@ -42,6 +41,8 @@ class Translate1484Test extends editor_Test_JsonTest {
         'editor_Plugins_MatchAnalysis_Init',
         'editor_Plugins_ZDemoMT_Init'
     ];
+
+    protected static bool $setupOwnCustomer = true;
 
     public static function beforeTests(): void {
 
@@ -55,18 +56,12 @@ class Translate1484Test extends editor_Test_JsonTest {
     
     private static function setupTestTask() {
 
-        // add customer
-        self::$customerTest = static::api()->postJson('editor/customer/',[
-            'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
-        ]);
-
         // add Task
         $task = [
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => self::$customerTest->id,
+            'customerId' => static::$testCustomer->id,
             'edit100PercentMatch' => false,
             'autoStartImport' => 0
         ];
@@ -79,7 +74,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'resourceId'=>'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [self::$customerTest->id],
+            'customerIds' => [static::$testCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',
@@ -93,7 +88,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'resourceId' => 'editor_Services_OpenTM2_1',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [self::$customerTest->id],
+            'customerIds' => [static::$testCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
@@ -128,7 +123,7 @@ class Translate1484Test extends editor_Test_JsonTest {
     public function testExportResourcesLog() {
 
         $jsonFileName = 'exportResults.json';
-        $actualObject = static::api()->getJson('editor/customer/exportresource', [ 'customerId' => self::$customerTest->id ], $jsonFileName);
+        $actualObject = static::api()->getJson('editor/customer/exportresource', [ 'customerId' => static::$testCustomer->id ], $jsonFileName);
         $expectedObject = static::api()->getFileContent($jsonFileName);
         // we need to order the results to avoid tests failing due to runtime-differences
         $this->sortExportResource($actualObject);
@@ -149,7 +144,5 @@ class Translate1484Test extends editor_Test_JsonTest {
         static::api()->deleteTask($task->id, 'testmanager');
         //remove the created resources
         static::api()->removeResources();
-        //remove the temp customer
-        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

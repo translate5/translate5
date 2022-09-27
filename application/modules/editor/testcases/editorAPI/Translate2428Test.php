@@ -32,7 +32,6 @@ END LICENSE AND COPYRIGHT
  */
 class Translate2428Test extends \editor_Test_ApiTest {
     
-    protected static $customerTest;
     protected static $sourceLangRfc = 'de';
     protected static $targetLangRfc = 'en';
 
@@ -41,6 +40,8 @@ class Translate2428Test extends \editor_Test_ApiTest {
         'editor_Plugins_MatchAnalysis_Init',
         'editor_Plugins_ZDemoMT_Init'
     ];
+
+    protected static bool $setupOwnCustomer = true;
     
     public static function beforeTests(): void {
 
@@ -48,12 +49,6 @@ class Translate2428Test extends \editor_Test_ApiTest {
 
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-
-        self::$customerTest = static::api()->postJson('editor/customer/',[
-            'name' => 'API Testing::ResourcesLogCustomer',
-            'number' => uniqid('API Testing::ResourcesLogCustomer'),
-        ]);
-
         self::assertLogin('testmanager');
 
         // Create the task. The task will not be imported directly autoStartImport is 0!
@@ -61,7 +56,7 @@ class Translate2428Test extends \editor_Test_ApiTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId'=>self::$customerTest->id,
+            'customerId'=>static::$testCustomer->id,
             'autoStartImport'=>0,
             'wordCount' => 0,//just to overwrite the default value set by the ApiHelper
             'edit100PercentMatch' => 0
@@ -98,7 +93,7 @@ class Translate2428Test extends \editor_Test_ApiTest {
             'resourceId'=>'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [self::$customerTest->id],
+            'customerIds' => [static::$testCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',
@@ -158,7 +153,5 @@ class Translate2428Test extends \editor_Test_ApiTest {
         static::api()->deleteTask($task->id, 'testmanager');
         //remove the created resources
         static::api()->removeResources();
-        //remove the temp customer
-        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

@@ -38,8 +38,7 @@ END LICENSE AND COPYRIGHT
  */
 class Translate2855Test extends editor_Test_JsonTest {
 
-    protected static $customerTest;
-    protected static $sourceLangRfc = 'en';
+     protected static $sourceLangRfc = 'en';
     protected static $targetLangRfc = 'de';
 
     protected static array $requiredPlugins = [
@@ -47,6 +46,8 @@ class Translate2855Test extends editor_Test_JsonTest {
         'editor_Plugins_MatchAnalysis_Init',
         'editor_Plugins_ZDemoMT_Init'
     ];
+
+    protected static bool $setupOwnCustomer = true;
 
     /**
      * This method is called before the first test of this test class is run.
@@ -58,21 +59,15 @@ class Translate2855Test extends editor_Test_JsonTest {
         self::assertNeededUsers(); // last authed user is testmanager
         self::assertLogin('testmanager');
 
-        // add customer
-        self::$customerTest = static::api()->postJson('editor/customer/',[
-            'name' => 'API Testing::Pivot pre-translation',
-            'number' => uniqid('API Testing::Pivot pre-translation', true),
-        ]);
-
         // add needed Demo MT
         $params = [
             'resourceId' => 'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [self::$customerTest->id],
+            'customerIds' => [static::$testCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
-            'customerPivotAsDefaultIds' => [self::$customerTest->id],
+            'customerPivotAsDefaultIds' => [static::$testCustomer->id],
             'serviceType' => 'editor_Plugins_ZDemoMT',
             'serviceName'=> 'ZDemoMT',
             'name' => 'API Testing::Pivot pre-translation_'.__CLASS__
@@ -85,7 +80,7 @@ class Translate2855Test extends editor_Test_JsonTest {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'relaisLang' => self::$targetLangRfc,
-            'customerId' => self::$customerTest->id,
+            'customerId' => static::$testCustomer->id,
             'edit100PercentMatch' => true,
             'autoStartImport' => 0
         ];
@@ -124,7 +119,5 @@ class Translate2855Test extends editor_Test_JsonTest {
         // remove task & resources
         static::api()->deleteTask($task->id, 'testmanager');
         static::api()->removeResources();
-        //remove the temp customer
-        static::api()->delete('editor/customer/'.self::$customerTest->id);
     }
 }

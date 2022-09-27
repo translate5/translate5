@@ -36,7 +36,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
         'editor_Plugins_Okapi_Init'
     ];
 
-    protected static string $testUserToLogin = 'testmanager';
+    protected static string $setupUserLogin = 'testmanager';
 
     private static editor_Plugins_Okapi_Bconf_Entity $bconf;
     private static int $bconfId = 0;
