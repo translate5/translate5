@@ -32,4 +32,7 @@ INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
 ('editor','termFinalizer',    'editor_term','finalize'),
 
 ('editor','termPM_allClients','editor_term','anyStatus'),
-('editor','termPM',           'editor_term','anyStatus');
+('editor','termPM',           'editor_term','anyStatus'),
+
+('editor','termPM_allClients','editor_term','transfer'),
+('editor','termPM',           'editor_term','transfer');

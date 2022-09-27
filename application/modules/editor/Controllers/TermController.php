@@ -472,4 +472,161 @@ class editor_TermController extends ZfExtended_RestController
         // Flush response data
         $this->view->assign($data);
     }
+
+    /**
+     * Transfer terms for translation as task of type 'termtranslation'
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Mismatch
+     */
+    public function transferAction() {
+
+        // Make sure execution won't on request aborted
+        ignore_user_abort(1);
+
+        // Measure time spent to get here
+        mt('we\'re in transferAction');
+
+        // Check params
+        $_ = $this->jcheck([
+            'clientId' => [
+                'req' => true,
+                'rex' => 'int11',
+                'key' => 'LEK_customer'
+            ],
+            'projectName' => [
+                'req' => true,
+                'rex' => '~[^ ]+~',
+            ],
+            'sourceLang' => [
+                'req' => true,
+                'rex' => 'int11',
+                'key' => 'LEK_languages'
+            ],
+            'targetLang' => [
+                'req' => true,
+                'rex' => 'int11list',
+                'key' => 'LEK_languages*'
+            ],
+            'terms' => [
+                'req' => true,
+                'fis' => 'all,none'
+            ],
+            'except' => [
+                'req' => $this->getParam('terms') == 'none',
+                'rex' => 'int11list'
+            ],
+            'translated,definition' => [
+                'req' => true,
+                'rex' => 'bool'
+            ]
+        ]);
+
+        // Make sure sourceLang is not among targetLangs
+        if (in_array($_['sourceLang']['id'], array_column($_['targetLang'], 'id'))) {
+            $this->jflush(false, 'Source language should NOT be in the list of target languages');
+        }
+
+        // If we're in ordinary selection mode,
+        // e.g. we have the ids of all terms we need to transfer given by request's except-param
+        if ($this->getParam('terms') == 'none') {
+
+            // Load terms data by ids list, given in except-param
+            $_ += $this->jcheck(['except' => ['key' => 'terms_term*']]);
+
+            // Get distinct language-values and trim sublanguage-values from them
+            foreach(array_unique(array_column($_['except'], 'language')) as $language) {
+                $languageA[explode('-', $language)[0]] = true;
+            }
+
+            // Make sure all terms belong to 1 distinct language, that is equal to sourceLang-param
+            $this->jcheck([
+                'distinctQty' => ['eql' => 1],
+                'language'    => ['eql' => $_['sourceLang']['rfc5646']]
+            ], [
+                'distinctQty' => count($languageA),
+                'language'    => array_keys($languageA)[0]
+            ]);
+
+            // Get distinct collectonId-values
+            $collectionIdA = array_unique(array_column($_['except'], 'collectionId'));
+
+            // Make sure all terms belongs to accessible collections
+            if (is_array($this->collectionIds))
+                if (array_diff($collectionIdA, $this->collectionIds))
+                    $this->jflush(false, 'Some of selected terms belongs to inaccessible TermCollections');
+
+            // Get shared customers
+            $sharedCustomerIdA = ZfExtended_Factory
+                ::get('editor_Models_LanguageResources_CustomerAssoc')
+                ->getSharedCustomers($collectionIdA);
+
+            // If no shared customers found
+            if (!$sharedCustomerIdA) {
+                $this->jflush(false, 'Selected terms should belong to at least 1 shared customer');
+            }
+
+            // Make sure value of given clientId-param is in the list of shared customers
+            $this->jcheck([
+                'clientId' => [
+                    'fis' => join(',', $sharedCustomerIdA) ?: 'inaccessible'
+                ]
+            ]);
+        }
+
+        // Measure time spent
+        mt('request params validation');
+
+        // If terms-param is 'none'
+        if ($this->getParam('terms') == 'none') {
+
+            // Get termIds from except-param
+            $termIds = explode(',', $this->getParam('except'));
+
+            // Else if it is 'all'
+        } else {
+
+            // 2nd arg required to be passed by reference (see below)
+            $total = false;
+
+            // Fetch ids of ALL terms matching last search, excluding ids given by 'except'-param
+            $termIds = ZfExtended_Factory
+                ::get('editor_Models_Terminology_Models_TermModel')
+                ->searchTermByParams(
+                    $_SESSION['lastParams'] + ['except' => $this->getParam('except')],
+                    $total
+                );
+        }
+
+        // Instantiate terms transfer util class
+        /** @var editor_Plugins_TermPortal_Util_Transfer $transfer */
+        $transfer = ZfExtended_Factory::get('editor_Plugins_TermPortal_Util_Transfer');
+
+        // Prepare data for transfer
+        $nothingToTranslate = !$transfer->prepare(
+            customerId: $this->getParam('clientId'),
+            projectName: $this->getParam('projectName'),
+            sourceLang: $_['sourceLang']['id'],
+            targetLangs: array_column($_['targetLang'], 'id'),
+            termIds: $termIds,
+            skipTranslated: !$this->getParam('translated'),
+            skipDefinition: !$this->getParam('definition'),
+        );
+
+        // Measure time spent
+        mt('exporting selected terms as raw tbx-files');
+
+        // If all selected terms do already have translations for all selected target languages
+        if ($nothingToTranslate) {
+            $this->jflush(false, 'All selected terms do already have translations for all selected target languages');
+        }
+
+        // Make sequence of API calls to walk through task creation steps
+        if (!$steps = $transfer->doSteps(true)) {
+            $this->jflush(false, 'Something went wrong');
+        }
+
+        // Flush responses
+        $this->view->assign($steps);  // i(mt(true), 'a');
+    }
 }
