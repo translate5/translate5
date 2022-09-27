@@ -27,6 +27,6 @@
 
 INSERT INTO `Zf_users` (`userGuid` , `firstName` , `surName` , `gender` , `login` , `email` , `roles` , `passwd`, `editable`, `locale`)
 VALUES
-('{00000000-0000-0000-C100-CCDDEE000006}', 'without', 'API', 'm', 'testmanager2', 'support@translate5.net', 'pm,editor,admin,instantTranslate', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en');
+('{00000000-0000-0000-C100-CCDDEE000006}', 'without', 'API', 'm', 'testmanager2', 'noreply@translate5.net', 'pm,editor,admin,instantTranslate', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en');
 
     

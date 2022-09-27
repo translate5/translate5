@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Plugin Bootstrap for Segment Statistics Plugin
  */
 class editor_Plugins_SegmentStatistics_Bootstrap extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Creates term specific segment statistics.';
+    protected static string $description = 'Creates term specific segment statistics.';
     
     /**
      * Just for better readability

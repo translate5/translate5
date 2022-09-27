@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * depends on editor_Plugins_SegmentStatistics_Bootstrap
  */
 class editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Provides a configurable segment locker';
+    protected static string $description = 'Provides a configurable segment locker';
     
     public function init() {
         //priority -9000 in order to always allow other plugins to modify meta-data before locking runs

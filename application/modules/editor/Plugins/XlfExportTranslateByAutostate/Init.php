@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
  * Modified means with a reviewed autostate, and real changed content or new comments.
  */
 class editor_Plugins_XlfExportTranslateByAutostate_Init extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'This Plugin is for Across connection where we have to abuse trans-units translate="yes/no" for filtering changed segments coming from translate5';
+    protected static string $description = 'This Plugin is for Across connection where we have to abuse trans-units translate="yes/no" for filtering changed segments coming from translate5';
     /**
      * Regarding the autostates all review states where content was really modified are making translate yes,
      * so all other makes translate no then.
