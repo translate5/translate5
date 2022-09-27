@@ -36,7 +36,12 @@ class editor_ConfigController extends ZfExtended_RestController {
      * @var editor_Models_Config
      */
     protected $entity;
-    
+    /**
+     * prevents sanitization of the 'value' param.
+     * The param will be sanitized dynamically, see putAction
+     * @var array
+     */
+    protected array $dataSanitizationMap = ['value' => ZfExtended_Sanitizer::UNSANITIZED];
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
@@ -65,14 +70,19 @@ class editor_ConfigController extends ZfExtended_RestController {
             'E1363' => 'Configuration value invalid: {errorMsg}',
         ]);
 
-        $this->decodePutData();
+        $this->decodePutData(); // will fetch the 'value' param unsanitized
 
         if(!property_exists($this->data, 'value')) {
             throw new ZfExtended_UnprocessableEntity('E1025');
         }
-        
+
         $this->entity->loadByName($this->data->name);
 
+        // we have to add dynamic sanitization here depending on the config type
+        $this->data->value = ZfExtended_Sanitizer::sanitize(
+            $this->data->value,
+            ZfExtended_DbConfig_Type_CoreTypes::getSanitizationType($this->entity->getType())
+        );
         
         $level = null;
 
@@ -237,19 +247,15 @@ class editor_ConfigController extends ZfExtended_RestController {
             throw new editor_Models_ConfigException('E1299');
         }
     }
-    
+
     /**
      * Check if the current user is allowed to update config with $level
      * @param int $level
+     * @throws Zend_Acl_Exception
      * @throws editor_Models_ConfigException
      */
     protected function checkConfigUpdateAllowed(int $level) {
-        $userSession = new Zend_Session_Namespace('user');
-        
-        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->load($userSession->data->id);
-        
+        $user = ZfExtended_Authentication::getInstance()->getUser();
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         if(!$acl->isInAllowedRoles($user->getRoles(),$user::APPLICATION_CONFIG_LEVEL,$this->entity->getConfigLevelLabel($level))){

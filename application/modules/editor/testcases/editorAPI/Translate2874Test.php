@@ -52,7 +52,7 @@ class Translate2874Test extends editor_Test_JsonTest {
             'sourceLang' => $task['sourceLang'],
             'targetLang' => $task['targetLang'],
             'customerIds' => [$task['customerId']],
-            'customerUseAsDefaultIds' => [[$task['customerId']]],
+            'customerUseAsDefaultIds' => [$task['customerId']],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',
             'serviceName'=> 'ZDemoMT',
@@ -74,9 +74,9 @@ class Translate2874Test extends editor_Test_JsonTest {
             'pretranslateMt' => 1,
             'isTaskImport' => 0,
         ];
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
+        self::$api->putJson('editor/task/'.self::$api->getTask()->id.'/pretranslation/operation', $params, null, false);
 
-        self::$api->requestJson('editor/task/'.self::$api->getTask()->id.'/import', 'GET');
+        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
 
         self::$api->checkTaskStateLoop();
 
@@ -85,7 +85,7 @@ class Translate2874Test extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
     }
     
     /**
@@ -93,16 +93,12 @@ class Translate2874Test extends editor_Test_JsonTest {
     public function testPreTranslatedContent() {
         //test segment list
         $jsonFileName = 'expectedSegments-edited.json';
-        $segments = $this->api()->getJson('editor/segment?page=1&start=0&limit=10', [], $jsonFileName);
+        $segments = $this->api()->getSegments($jsonFileName, 10);
         $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testlector');
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

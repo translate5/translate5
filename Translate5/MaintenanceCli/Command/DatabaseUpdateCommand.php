@@ -157,6 +157,10 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             if(!empty($errors)) {
                 $this->io->error($errors);
             }
+            $warnings = $dbupdater->getWarnings();
+            if(!empty($warnings)) {
+                $this->io->warning($warnings);
+            }
             if($importedCount > 0) {
                 if(empty($errors)) {
                     $this->io->success('Imported '.$importedCount.' files!');

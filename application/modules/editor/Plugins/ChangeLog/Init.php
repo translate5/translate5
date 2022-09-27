@@ -27,8 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Provides change-log information in the GUI';
-    
+    protected static string $description = 'Provides change-log information in the GUI';
+
+    protected static bool $activateForTests = true;
+
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
      * @var array

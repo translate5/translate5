@@ -27,8 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Provides connector to PangeaMT (offered by Pangeanic)';
-    
+    protected static string $description = 'Provides connector to PangeaMT (offered by Pangeanic)';
+
     /**
      * @var editor_Plugins_PangeaMt_Service
      */

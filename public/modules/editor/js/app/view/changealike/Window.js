@@ -52,6 +52,7 @@ Ext.define('Editor.view.changealike.Window', {
         type: 'vbox'
     },
     closeAction: 'hide',
+    maximizable: true,
     modal: true,
 
     strings: {

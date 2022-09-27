@@ -35,7 +35,7 @@ use MittagQI\Translate5\Segment\TagRepair\Tags;
  */
 class editor_Plugins_DummyPretranslator_Init extends ZfExtended_Plugin_Abstract {
 
-    protected static $description = 'Provides a dummy pretranslator - for testing';
+    protected static string $description = 'Provides a dummy pretranslator - for testing';
 
     public function init() {
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));

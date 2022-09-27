@@ -29,7 +29,8 @@
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
-    protected static $description = 'Provides the match-analysis and pre-translation against language-resources.';
+    protected static string $description = 'Provides the match-analysis and pre-translation against language-resources.';
+    protected static bool $activateForTests = true;
     
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
@@ -53,23 +54,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $batchAssocs = [];
     
-    public function getFrontendControllers() {
-        $result = array();
-        $userSession = new Zend_Session_Namespace('user');
-        if(empty($userSession) || empty($userSession->data)) {
-            return $result;
-        }
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        if(!$acl->has('frontend')) {
-            return $result;
-        }
-        foreach($this->frontendControllers as $right => $controller) {
-            if($acl->isInAllowedRoles($userSession->data->roles, 'frontend', $right)) {
-                $result[] = $controller;
-            }
-        }
-        return $result;
+    public function getFrontendControllers(): array
+    {
+        return $this->getFrontendControllersFromAcl();
     }
     
     /**

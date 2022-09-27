@@ -36,7 +36,12 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Interface {
     use editor_Plugins_ArchiveTaskBeforeDelete_TLogger;
-    
+
+    /**
+     * default executable of the mysql command, can be overwritten by config
+     * @var string
+     */
+    const MYSQL_BIN = '/usr/bin/mysql';
     const DIR_SQL_DATA = 'db_data';
     const DIR_SQL_STRUCTURE = 'db_structure';
     
@@ -180,7 +185,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor
         else {
             $exec = $config->resources->db->executable;
             if(!isset($exec)) {
-                $exec = ZfExtended_Models_Installer_DbUpdater::MYSQL_BIN;
+                $exec = self::MYSQL_BIN;
             }
             $exec = dirname($exec).'/mysqldump';
         }

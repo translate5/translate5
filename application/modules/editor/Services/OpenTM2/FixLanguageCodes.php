@@ -162,6 +162,11 @@ class editor_Services_OpenTM2_FixLanguageCodes {
         //it may happen that source lang is empty, so we set that (its the first tuv after a prop)
         $tmxData = preg_replace('#</prop>(\s+<tuv[^>]+)xml:lang=""#', '</prop>\1xml:lang="'.$sourceLang.'"', $tmxData);
 
+        //and if targetLang is en-GB, then remaining empty xml:langs were en-UK and must be changed to en-GB
+        if(strtolower($targetLang) === 'en-gb') {
+            $tmxData = preg_replace('#(<tuv[^>]+)xml:lang=""#', '\1xml:lang="en-GB"', $tmxData);
+        }
+
         //Since the prop type tmgr:language is openTM2 proprietary, we just remove it:
         $tmxData = preg_replace('#<prop type="tmgr:language">[^<]+</prop>(\s)*#', '', $tmxData);
 

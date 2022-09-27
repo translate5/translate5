@@ -45,24 +45,20 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.ui.changealike.Grid', {
   extend: 'Ext.grid.Panel',
-
-  item_segmentNrInTaskColumn: 'Nr.', 
-  item_sourceColumn: 'Quelle', 
-  item_targetColumn: 'Ziel', 
-  item_filterColumn: 'In aktueller Filterung enthalten', 
-  item_sourceMatchColumn: 'Quell-Treffer', 
-  item_targetMatchColumn: 'Ziel-Treffer', 
-  
   requires: [
       'Editor.view.segments.column.Matchrate',
       'Editor.view.segments.column.AutoState'
   ],
-  
+  rowBodyTpl: new Ext.XTemplate([
+      '<span class="x-grid-cell-inner">{type}</span>',
+      '<span class="x-grid-cell-inner">{source}</span>',
+      '<span class="x-grid-cell-inner"></span>',
+      '<span class="x-grid-cell-inner">{target}</span>'
+  ]),
   initConfig: function(instanceConfig) {
     var me = this,
     segField = Editor.model.segment.Field,
     config;
-
     config = {
       columns: [
         {
@@ -70,12 +66,21 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           filter: {
               type: 'numeric'
           },
-          text: me.item_segmentNrInTaskColumn,
+          bind: {
+            text: '{l10n.alikeGrid.segmentNrInTaskColumn}'
+          },
           width: 50
+        },
+        {
+          xtype: 'autoStateColumn',
+          userCls: 't5auto-state',
+          width: 36,
+          text: ''
         },
         {
           xtype: 'gridcolumn',
           dataIndex: 'source',
+          flex: 1,
           filter: {
               type: 'string'
           },
@@ -87,11 +92,27 @@ Ext.define('Editor.view.ui.changealike.Grid', {
             }
             return value;
           },
-          text: me.item_sourceColumn
+          bind: {
+            text: '{l10n.alikeGrid.sourceColumn}'
+          }
+        },
+        {
+          xtype: 'booleancolumn',
+          dataIndex: 'sourceMatch',
+          userCls: 't5source-match',
+          filter: {
+            type: 'boolean'
+          },
+          width: 49,
+          bind: {
+            tooltip: '{l10n.alikeGrid.sourceMatchColumn}'
+          },
         },
         {
           xtype: 'gridcolumn',
           dataIndex: 'target',
+          isAlikeTarget: true,
+          flex: 1,
           filter: {
               type: 'string'
           },
@@ -103,7 +124,21 @@ Ext.define('Editor.view.ui.changealike.Grid', {
             }
             return value;
           },
-          text: me.item_targetColumn
+          bind: {
+            text: '{l10n.alikeGrid.targetColumn}'
+          }
+        },
+        {
+          xtype: 'booleancolumn',
+          dataIndex: 'targetMatch',
+          userCls: 't5target-match',
+          filter: {
+            type: 'boolean'
+          },
+          width: 49,
+          bind: {
+            tooltip: '{l10n.alikeGrid.targetMatchColumn}'
+          }
         },
         {
           xtype: 'booleancolumn',
@@ -111,38 +146,60 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           filter: {
               type: 'boolean'
           },
-          width: 180,
-          text: me.item_filterColumn
+          width: 41,
+          bind: {
+            tooltip: '{l10n.alikeGrid.filterColumn}'
+          },
+          text: '<span class="fa fa-filter"></span>'
         },
         {
           xtype: 'booleancolumn',
-          dataIndex: 'sourceMatch',
+          dataIndex: 'contextMatch',
           filter: {
               type: 'boolean'
           },
-          width: 90, 
-          text: me.item_sourceMatchColumn
-        },
-        {
-          xtype: 'booleancolumn',
-          dataIndex: 'targetMatch',
-          filter: {
-              type: 'boolean'
+          width: 41,
+          bind: {
+            tooltip: '{l10n.alikeGrid.sameContextColumn}'
           },
-          width: 80, 
-          text: me.item_targetMatchColumn
-        },{
-        	xtype:'matchrateColumn'
-        },{
-        	xtype:'autoStateColumn'
+          text: '<span class="fa fa-table-list"></span>',
+        }, {
+        	xtype:'matchrateColumn',
+            width: 43,
+            text: '<span class="fa fa-percent"></span>',
+            tooltip: 'Matchrate'
         }
       ],
-      viewConfig: {
-        //loadMask: false
-      },
+      userCls: 't5alikeGrid',
       selModel: Ext.create('Ext.selection.CheckboxModel', {
-        injectCheckbox: 3
-      })
+        injectCheckbox: 0
+      }),
+      features: [{
+        ftype: 'rowbody',
+        bodyBefore: true,
+        getAdditionalData: (data, idx, record) => {
+          return {
+            rowBody: me.rowBodyTpl.apply({
+              type: record.get('context').data[0].type,
+              source: record.get('context').data[0].source,
+              target: record.get('context').data[0].target
+            }),
+            rowBodyCls: 'segment-tag-column'
+          }
+        }
+      }, {
+        ftype: 'rowbody',
+        getAdditionalData: (data, idx, record) => {
+          return {
+            rowBody: me.rowBodyTpl.apply({
+              type: record.get('context').data[1].type,
+              source: record.get('context').data[1].source,
+              target: record.get('context').data[1].target
+            }),
+            rowBodyCls: 'segment-tag-column'
+          }
+        }
+      }]
     };
 
     if (instanceConfig) {

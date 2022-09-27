@@ -54,6 +54,9 @@ Ext.define('Editor.controller.Preferences', {
   }],
   listen: {
       component: {
+          '#preferencesWindow [name=alikeBehaviour]': {
+              change: 'onAlikeBehaviourChange'
+          },
           '#preferencesWindow #saveBtn': {
               click: 'handleSave'
           },
@@ -76,13 +79,18 @@ Ext.define('Editor.controller.Preferences', {
       // Editor.data.preferences a preferences store is used.
       me.getForm().getForm().setValues({
           alikeBehaviour: Editor.app.getUserConfig('alike.defaultBehaviour'),
-          showOnEmptyTarget: Editor.app.getUserConfig('alike.showOnEmptyTarget')
+          showOnEmptyTarget: Editor.app.getUserConfig('alike.showOnEmptyTarget'),
+          repetitionType: Editor.app.getUserConfig('alike.repetitionType'),
+          sameContextOnly: Editor.app.getUserConfig('alike.sameContextOnly')
       });
       //disable change alike settings if a segment is currently opened. 
       // If not a user would be able to change the change alike behaviour, 
       // while alikes are already loaded or not loaded. This would lead to bugs.
       me.getForm().down('radiogroup').setDisabled(me.getSegmentGrid().editingPlugin.editing);
       me.window.show();
+
+      // Refresh form items disability
+      me.onAlikeBehaviourChange();
   },
   /**
    * Speichert die Einstellungen und schließt das Fenster
@@ -91,23 +99,56 @@ Ext.define('Editor.controller.Preferences', {
    * Idea: make a store which contains all configs updateable by the user. From that store we can then fill the preferences here
    */
   handleSave: function() {
-    var me = this,
-        values = this.getForm().getForm().getValues(),
+    var me = this, value,
+        store = Ext.state.Manager.getProvider().store,
         alike = Editor.app.getUserConfig('alike.defaultBehaviour',true),
-        emptyTarget = Editor.app.getUserConfig('alike.showOnEmptyTarget',true);
+        emptyTarget = Editor.app.getUserConfig('alike.showOnEmptyTarget',true),
+        repetitionType = Editor.app.getUserConfig('alike.repetitionType',true),
+        sameContextOnly = Editor.app.getUserConfig('alike.sameContextOnly',true);
+
+    // Temporarily enable form items that are currently disabled
+    // to make sure their values to be picked by below getValues() call
+    me.getForm().query('[disabled=true]').forEach((item) => {item.enable()});
+
+    // Get values
+    values = me.getForm().getForm().getValues();
+
+    // Disable back if need
+    me.onAlikeBehaviourChange();
+
     alike.set('value', values.alikeBehaviour);
     emptyTarget.set('value', values.showOnEmptyTarget);
-    emptyTarget.save({
-        success: function() {
-            alike.save({
-                success: function() {
-                    me.window.close();
-                } 
-            });
-        } 
-    });
+    repetitionType.set('value', values.repetitionType);
+    sameContextOnly.set('value', values.sameContextOnly);
+
+    // If there are some configs changed
+    if (store.getModifiedRecords().length) {
+
+        // Sync each changed config with server-side, sequentually
+        store.sync({
+            success: function() {
+
+                // Commit changes within local store
+                store.commitChanges();
+
+                // Close preferences window
+                me.window.close();
+            }
+        });
+
+    // Else just close the window
+    } else {
+        me.window.close();
+    }
   },
   handleCancel: function() {
     this.window.close();
-  }
+  },
+
+    onAlikeBehaviourChange: function() {
+        var me = this, disabled = !me.window.down('[name=alikeBehaviour][inputValue=always]').checked;
+        me.window.query('[name/="repetitionType|sameContextOnly"]').forEach(function(item){
+            item.setDisabled(disabled);
+        });
+    }
 });

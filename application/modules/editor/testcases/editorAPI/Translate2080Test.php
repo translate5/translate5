@@ -51,7 +51,7 @@ class Translate2080Test extends editor_Test_JsonTest {
             'sourceLang' => 'de',
             'targetLang' => ['en','mk'],
             'relaisLang' => 'it',
-            'customerId'=>self::api()->getCustomer()->id,
+            'customerId' => self::$api->getCustomer()->id,
             'edit100PercentMatch' => true,
             'importUpload_language' => ['en','mk','it'],
             'importUpload_type' => ['workfiles','workfiles','pivot'],
@@ -62,15 +62,9 @@ class Translate2080Test extends editor_Test_JsonTest {
         self::$api->addImportFiles(self::$api->getFile('mk.xlf'));
         self::$api->addImportFiles(self::$api->getFile('mk.xlf'));
         self::$api->import($task,false);
-        error_log('Task created. '.$this->api()->getTask()->taskName);
 
-        $projectTasks = self::$api->getTask()->projectTasks;
-
-        $this->assertEquals(count($projectTasks), 2, 'No project tasks created.');
-    }
-
-    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        $this->assertEquals(count($task->projectTasks), 2, 'No project tasks created.');
+        self::$api->deleteTask($task->id);
     }
 }

@@ -134,9 +134,16 @@
 <trans-unit id='S2VpbiBTdWJzZWdtZW50IGF1c2dld8OkaGx0Lg=='><source>Kein Subsegment ausgewählt.</source><target>Kein Subsegment ausgewählt.</target></trans-unit>
 <trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgaW0gRWRpdG9yIGVpbiBTdWJzZWdtZW50IGF1cyE='><source>Bitte wählen Sie im Editor ein Subsegment aus!</source><target>Bitte wählen Sie im Editor ein Subsegment aus!</target></trans-unit>
 <trans-unit id='VmVyaGFsdGVuIGRlcyBXaWVkZXJob2x1bmdzZWRpdG9y'><source>Verhalten des Wiederholungseditor</source><target>Verhalten des Wiederholungseditor</target></trans-unit>
-<trans-unit id='SW1tZXIgYXV0b21hdGlzY2ggZXJzZXR6ZW4gdW5kIFN0YXR1cyBzZXR6ZW4='><source>Immer automatisch ersetzen und Status setzen</source><target>Immer automatisch ersetzen und Status setzen</target></trans-unit>
+<trans-unit id='SW1tZXIgYXV0b21hdGlzY2ggZXJzZXR6ZW4gdW5kIFN0YXR1cyBzZXR6ZW4sIHdlbm4='><source>Immer automatisch ersetzen und Status setzen, wenn</source><target>Immer automatisch ersetzen und Status setzen, wenn</target></trans-unit>
 <trans-unit id='QmVpIGplZGVyIFdpZWRlcmhvbHVuZyBlaW56ZWxuIGVudHNjaGVpZGVu'><source>Bei jeder Wiederholung einzeln entscheiden</source><target>Bei jeder Wiederholung einzeln entscheiden</target></trans-unit>
 <trans-unit id='TmllIGF1dG9tYXRpc2NoIGVyc2V0emVuIHVuZCBTdGF0dXMgc2V0emVu'><source>Nie automatisch ersetzen und Status setzen</source><target>Nie automatisch ersetzen und Status setzen</target></trans-unit>
+
+<trans-unit id='UXVlbGxlIHdpZWRlcmhvbHQgd2lyZA=='><source>Quelle wiederholt wird</source><target>Quelle wiederholt wird</target></trans-unit>
+<trans-unit id='WmllbCB3aWVkZXJob2x0IHdpcmQ='><source>Ziel wiederholt wird</source><target>Ziel wiederholt wird</target></trans-unit>
+<trans-unit id='UXVlbGxlIFVORCBaaWVsIHdpZWRlcmhvbHQgd2VyZGVu'><source>Quelle UND Ziel wiederholt werden</source><target>Quelle UND Ziel wiederholt werden</target></trans-unit>
+<trans-unit id='UXVlbGxlIE9ERVIgWmllbCB3aWVkZXJob2x0IHdlcmRlbg=='><source>Quelle ODER Ziel wiederholt werden</source><target>Quelle ODER Ziel wiederholt werden</target></trans-unit>
+<trans-unit id='TnVyIGdsZWljaGVyIEtvbnRleHQ='><source>Nur gleicher Kontext</source><target>Nur gleicher Kontext</target></trans-unit>
+
 <trans-unit id='QWJicmVjaGVu'><source>Abbrechen</source><target>Abbrechen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJu'><source>Speichern</source><target>Speichern</target></trans-unit>
 <trans-unit id='U2VnbWVudC1NZXRhZGF0ZW4='><source>Segment-Metadaten</source><target>Segment-Metadaten</target></trans-unit>
@@ -160,6 +167,7 @@
 <trans-unit id='SW4gYWt0dWVsbGVyIEZpbHRlcnVuZyBlbnRoYWx0ZW4='><source>In aktueller Filterung enthalten</source><target>In aktueller Filterung enthalten</target></trans-unit>
 <trans-unit id='UXVlbGwtVHJlZmZlcg=='><source>Quell-Treffer</source><target>Quell-Treffer</target></trans-unit>
 <trans-unit id='WmllbC1UcmVmZmVy'><source>Ziel-Treffer</source><target>Ziel-Treffer</target></trans-unit>
+<trans-unit id="S29udGV4dC1UcmVmZmVy"><source>Kontext-Treffer</source><target>Kontext-Treffer</target></trans-unit>
 <trans-unit id='UmVsYWlzLVRyZWZmZXI='><source>Relais-Treffer</source><target>Relais-Treffer</target></trans-unit>
 <trans-unit id='ezB9IFdpZWRlcmhvbHVuZyB3dXJkZSBiZWFyYmVpdGV0IHVuZCBnZXNwZWljaGVydA=='><source>{0} Wiederholung wurde bearbeitet und gespeichert</source><target>{0} Wiederholung wurde bearbeitet und gespeichert</target></trans-unit>
 <trans-unit id='ezB9IFdpZWRlcmhvbHVuZ2VuIHd1cmRlbiBiZWFyYmVpdGV0IHVuZCBnZXNwZWljaGVydA=='><source>{0} Wiederholungen wurden bearbeitet und gespeichert</source><target>{0} Wiederholungen wurden bearbeitet und gespeichert</target></trans-unit>
@@ -1258,7 +1266,6 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='bWF4'><source>max</source><target>max</target></trans-unit>
 <trans-unit id='WmVpbGU='><source>Zeile</source><target>Zeile</target></trans-unit>
 <trans-unit id='U2VnLjoge3NpYmxpbmdzfQ=='><source>Seg.: {siblings}</source><target>Seg.: {siblings}</target></trans-unit>
-<trans-unit id='RXMga29ubnRlbiBuaWNodCBhbGxlIHdpZWRlcmhvbHRlbiBTZWdtZW50ZSBnZXNwZWljaGVydCB3ZXJkZW4hIERpZXMga2FubiB1bnRlcnNjaGllZGxpY2hlIFVyc2FjaGVuIGhhYmVuLiBCaXR0ZSBzcGVpY2hlcm4gU2llIGRhcyB6dWxldHp0IGJlYXJiZWl0ZXRlIFNlZ21lbnQgZXJuZXV0IHVuZCB2ZXJ3ZW5kZW4gU2llIGRlbiBtYW51ZWxsZW4gTW9kdXMgZGVzIFdpZWRlcmhvbHVuZ3NlZGl0b3IgdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIHp1IGlkZW50aWZpemllcmVuIHVtIHNpZSBkYW5hY2ggaMOkbmRpc2NoIHp1IGJlYXJiZWl0ZW4u'><source>Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.</source><target>Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.</target></trans-unit>
 <trans-unit id='RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllICdBbGxlcyBFcnNldHplbicgRnVua3Rpb25hbGl0w6R0IHVtIGRpZSBiZXRyb2ZmZW5lbiBTZWdtZW50ZSBlaW56ZWxuIHp1IGZpbmRlbiB1bmQgenUgYmVhcmJlaXRlbi4='><source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source><target>Es konnten nicht in allen gefundenen Segmente der Inhalt automatisch ersetzt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</target></trans-unit>
 <trans-unit id='T3JpZ2luYWxmb3JtYXQsIHswfQ=='><source>Originalformat, {0}</source><target>Originalformat, {0}</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6dGUgVGVybWUgaW4gVGVybUNvbGxlY3Rpb24ocykgw7xiZXJ0cmFnZW4='><source>Übersetzte Terme in TermCollection(s) übertragen</source><target>Übersetzte Terme in TermCollection(s) übertragen</target></trans-unit>
@@ -2123,7 +2130,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QXJiZWl0c2RhdGVp'><source>Arbeitsdatei</source><target>Arbeitsdatei</target></trans-unit>
 <trans-unit id='UGl2b3QtRGF0ZWk='><source>Pivot-Datei</source><target>Pivot-Datei</target></trans-unit>
 <trans-unit id='RGF0ZWkoZW4pIGhpbnp1ZsO8Z2Vu'><source>Datei(en) hinzufügen</source><target>Datei(en) hinzufügen</target></trans-unit>
-<trans-unit id='SW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0'><source>InstantTranslateWriteTm</source><target>Instant-Translate TM schreiben</target></trans-unit>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZVdyaXRlVG0'><source>InstantTranslateWriteTm</source><target>Instant-Translate TM schreiben(nur API)</target></trans-unit>
 <trans-unit id='UmVmZXJlbnotRGF0ZWkoZW4p'><source>Referenz-Datei(en)</source><target>Referenz-Datei(en)</target></trans-unit>
 <trans-unit id='UmVmZXJlbnotRGF0ZWk='><source>Referenz-Datei</source><target>Referenz-Datei</target></trans-unit>
 <trans-unit id='S3VuZGVuZWluc3RlbGx1bmdlbiBpbiBkZW4gYWt0dWVsbGVuIEt1bmRlbiDDvGJlcm5laG1lbg=='><source>Kundeneinstellungen in den aktuellen Kunden übernehmen</source><target>Kundeneinstellungen in den aktuellen Kunden übernehmen</target></trans-unit>

@@ -65,7 +65,7 @@ class XlfImportTest extends editor_Test_JsonTest {
         
         $task = $api->getTask();
         //open task for whole testcase
-        $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $api->setTaskToEdit($task->id);
     }
     
     /**
@@ -78,9 +78,9 @@ class XlfImportTest extends editor_Test_JsonTest {
         
         //FIXME get task and test wordcount!!!
         //get segment list (just the ones of the first file for that tests)
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=47');
-
-        $this->assertSegmentsEqualsJsonFile('expectedSegments.json', $segments, 'Imported segments are not as expected!');
+        $jsonFileName = 'expectedSegments.json';
+        $segments = $this->api()->getSegments($jsonFileName, 47);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
     /**
@@ -88,8 +88,8 @@ class XlfImportTest extends editor_Test_JsonTest {
      * Needs $this->config->runtimeOptions->import->xlf->preserveWhitespace to be false!
      */
     public function testPreserveWhitespace() {
-        $segments = $this->api()->requestJson('editor/segment?start=47&limit=200');
-        
+        $jsonFileName = 'expectedSegmentsPreserveWhitespace.json';
+        $segments = $this->api()->getSegments($jsonFileName, 200, 47);
         $this->assertSegmentsEqualsJsonFile('expectedSegmentsPreserveWhitespace.json', $segments, 'Imported segments are not as expected!');
     }
     
@@ -99,7 +99,7 @@ class XlfImportTest extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list (just the ones of the first file for that tests)
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=41');
+        $segments = $this->api()->getSegments(null, 41);
         $this->assertNotEmpty($segments, 'No segments are found in the Task!');
         
         require_once 'Models/Segment/TagAbstract.php';
@@ -134,28 +134,29 @@ class XlfImportTest extends editor_Test_JsonTest {
                 $editedData = $contentToUse.' - edited'.$segToEdit->segmentNrInTask;
             }
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-            $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+            $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
         }
         
         //test editing of segments with preserved whitespace and segment length count
         $segments = array_merge(
-            $this->api()->requestJson('editor/segment?page=1&start=80&limit=6'),
-            $this->api()->requestJson('editor/segment?page=1&start=106&limit=1'),
-            $this->api()->requestJson('editor/segment?page=1&start=116&limit=18'),
+            $this->api()->getSegments(null, 6, 80),
+            $this->api()->getSegments(null, 1, 106),
+            $this->api()->getSegments(null, 18, 116),
         );
         foreach($segments as $idx => $segToEdit) {
             $content = strlen($segToEdit->target) > 0 ? $segToEdit->target : $segToEdit->source;
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $content.' - edited', $segToEdit->id);
-            $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
+            $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
         }
         
         /**
          * Tests if whitespace is preserved correctly, according to the XLIFF specification.
          * Needs $this->config->runtimeOptions->import->xlf->preserveWhitespace to be false!
          */
-        $segments = $this->api()->requestJson('editor/segment?start=47&limit=200');
-        
-        $this->assertSegmentsEqualsJsonFile('expectedSegmentsPreserveWhitespaceAfterEdit.json', $segments, 'Edited segments are not as expected!');
+
+        $jsonFileName = 'expectedSegmentsPreserveWhitespaceAfterEdit.json';
+        $segments = $this->api()->getSegments($jsonFileName, 200, 47);
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
         
         $task = $this->api()->getTask();
         //start task export
@@ -216,7 +217,7 @@ class XlfImportTest extends editor_Test_JsonTest {
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToExport, $fileToCompare) {
         $this->api()->login('testmanager');
-        $this->api()->request($exportUrl);
+        $this->api()->get($exportUrl);
 
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();
@@ -243,10 +244,6 @@ class XlfImportTest extends editor_Test_JsonTest {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testlector');
-        self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
-        self::$api->login('testmanager');
-        self::$api->cleanup && self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

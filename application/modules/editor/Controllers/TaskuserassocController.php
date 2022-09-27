@@ -83,9 +83,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     }
 
     public function postDispatch() {
-        $user = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
-        if($acl->isInAllowedRoles($user->data->roles, 'readAuthHash')) {
+        if($acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'readAuthHash')) {
             parent::postDispatch();
             return;
         }

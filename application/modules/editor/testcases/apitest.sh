@@ -13,15 +13,30 @@ INCLUDES="${APPLICATION_ROOT}application:${APPLICATION_ROOT}library:${APPLICATIO
 
 # check if the capture-option is set (only available for single tests)
 DO_CAPTURE=0
-while getopts :c opt
+STOP_ON_ERROR=
+STOP_ON_FAILURE=
+while getopts :cef opt
 do
    case $opt in
        c)
-       		shift $((OPTIND-1))
-       		DO_CAPTURE=1 
+       		DO_CAPTURE=1
        		;;
    esac
+
+   case $opt in
+      e)
+       		STOP_ON_ERROR="--stop-on-error"
+          ;;
+   esac
+
+   case $opt in
+      f)
+       		STOP_ON_FAILURE="--stop-on-failure"
+          ;;
+   esac
 done
+
+shift $((OPTIND-1))
 
 # evaluate if single test or whole suite
 if [ -n "$1" ]; then
@@ -38,9 +53,9 @@ export DO_CAPTURE=$DO_CAPTURE
 # starting test suite:
 
 if phpunit --atleast-version 8.0.0; then
-    phpunit --colors --verbose --cache-result-file ${APPLICATION_ROOT}application/modules/editor/testcases/.phpunit.result.cache  --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
+    phpunit --colors --verbose $STOP_ON_ERROR $STOP_ON_FAILURE --cache-result-file ${APPLICATION_ROOT}application/modules/editor/testcases/.phpunit.result.cache  --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
     exit $?
 else
-    phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
+    phpunit --verbose $STOP_ON_ERROR $STOP_ON_FAILURE --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
     exit $?
 fi

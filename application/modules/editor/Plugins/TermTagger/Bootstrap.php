@@ -33,7 +33,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 
     const TASK_STATE = 'termtagging';
 
-    protected static $description = 'Provides term-tagging';
+    protected static string $description = 'Provides term-tagging';
+    protected static bool $activateForTests = true;
 
     /**
      * @var ZfExtended_Logger
@@ -312,9 +313,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         //lazy instanciation of markTransFound
         if(empty($this->markTransFound)) {
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($masterSegment->getTaskGuid());
+            $task = editor_ModelInstances::taskByGuid($masterSegment->getTaskGuid());
             $this->markTransFound = ZfExtended_Factory::get('editor_Plugins_TermTagger_RecalcTransFound', array($task));
         }
         $sourceOrig = $alikeSegment->getSource();

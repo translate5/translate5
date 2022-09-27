@@ -68,7 +68,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
      * tests if config is correct for testing changes.xliff 
      */
     public function testSaveXmlToFile() {
-        $config = $this->api()->requestJson('editor/config', 'GET', array(
+        $config = $this->api()->getJson('editor/config', array(
             'filter' => '[{"type":"string","value":"runtimeOptions.editor.notification.saveXmlToFile","property":"name","operator":"like"}]',
         ));
         $this->assertCount(1, $config);
@@ -92,17 +92,17 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         
         $task = $this->api()->getTask();
         //open task for whole testcase
-        $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        $this->api()->setTaskToEdit($task->id);
         
         //get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
 
         //initial segment finish count for workflow step lektoring
         $segmentFinishCount=0;
         //edit two segments
         $segToTest = $segments[2];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'PHP Handbuch', $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
 
         //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
@@ -112,7 +112,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         //the first "\u00a0 " (incl. the trailing whitespace) will be replaced by the content sanitizer to a single whitespace
         //the second single "\u00a0" must result in a single whitespace
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache'.$nbsp.' 2.x'.$nbsp.'auf'.$nbsp.$nbsp.'Unix-Systemen', $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
@@ -121,12 +121,12 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $segToTest = $segments[4];
         //multiple normal spaces should also be converted to single spaces
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', "Installation auf   Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode", $segToTest->id);
-        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
         
         //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
         
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segments = $this->api()->getSegments();
 
         //bulk check of all workflowStepNr fields
         $workflowStepNr = array_map(function($item){
@@ -146,7 +146,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($segmentFinishCount, $reloadProgresTask->segmentFinishCount,'The segment finish count is not the same as the calculated one for the task!');
         
         //finishing the task
-        $res = $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'finished', 'id' => $task->id));
+        $res = $this->api()->setTaskToFinished($task->id);
         $this->assertEquals('finished', $this->api()->reloadTask()->userState);
         
         //get the changes file
@@ -172,8 +172,6 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
     
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
-        //open task for whole testcase
-        self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->deleteTask($task->id, 'testmanager');
     }
 }
