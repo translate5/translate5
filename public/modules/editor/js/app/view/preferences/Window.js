@@ -40,22 +40,13 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.preferences.Window', {
     extend: 'Ext.window.Window',
 
-    height: 274,
+    height: 440,
     itemId: 'preferencesWindow',
     width: 460,
     resizable: false, //needed for boxLabel width
     title: '#UT#Einstellungen',
     modal: true,
-    
-    //Item Strings:
-    item_radiogroup_fieldLabel: 'Verhalten des Wiederholungseditor',
-    item_alikeBehaviour_always_boxLabel: 'Immer automatisch ersetzen und Status setzen',
-    item_alikeBehaviour_individual_boxLabel: 'Bei jeder Wiederholung einzeln entscheiden',
-    item_alikeBehaviour_never_boxLabel: 'Nie automatisch ersetzen und Status setzen',
-    item_cancelBtn: 'Abbrechen',
-    item_saveBtn: 'Speichern',
-    item_show_on_empty_target:'Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist',
-    
+
     initConfig: function(instanceConfig) {
       var me = this,
       config = {
@@ -69,7 +60,9 @@ Ext.define('Editor.view.preferences.Window', {
             items: [
               {
                 xtype: 'radiogroup',
-                fieldLabel: this.item_radiogroup_fieldLabel,
+                bind: {
+                  fieldLabel: '{l10n.preferences.window.radiogroup}',
+                },
                 labelAlign: 'top',
                 columns: 1,
                 anchor: '100%',
@@ -78,26 +71,81 @@ Ext.define('Editor.view.preferences.Window', {
                     xtype: 'radiofield',
                     name: 'alikeBehaviour',
                     width: 426, //needed for long labels to wrap
-                    boxLabel: this.item_alikeBehaviour_always_boxLabel,
+                    bind: {
+                      boxLabel: '{l10n.preferences.window.alikeBehaviourAlways}',
+                    },
                     inputValue: 'always'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'repetitionType',
+                    width: 426,
+                    margin: '0 0 0 30',
+                    bind: {
+                      boxLabel: '{l10n.preferences.window.repetitionTypeSource}',
+                    },
+                    inputValue: 'source'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'repetitionType',
+                    width: 426,
+                    margin: '0 0 0 30',
+                    bind: {
+                      boxLabel: '{l10n.preferences.window.repetitionTypeTarget}',
+                    },
+                    inputValue: 'target'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'repetitionType',
+                    width: 426,
+                    margin: '0 0 0 30',
+                    bind: {
+                      boxLabel: '{l10n.preferences.window.repetitionTypeBothAnd}',
+                    },
+                    inputValue: 'bothAnd'
+                  },
+                  {
+                    xtype: 'radiofield',
+                    name: 'repetitionType',
+                    width: 426,
+                    margin: '0 0 0 30',
+                    bind: {
+                      boxLabel: '{l10n.preferences.window.repetitionTypeBothOr}',
+                    },
+                    inputValue: 'bothOr'
+                  }, {
+                    xtype: 'checkbox',
+                    name: 'sameContextOnly',
+                    margin: '0 0 0 30',
+                    bind: {
+                      boxLabel: '{l10n.preferences.window.sameContextOnly}',
+                    },
                   },
                   {
                     xtype: 'radiofield',
                     name: 'alikeBehaviour',
                     width: 426, //needed for long labels to wrap
-                    boxLabel: this.item_alikeBehaviour_individual_boxLabel,
+                    bind: {
+                      boxLabel: '{l10n.preferences.window.alikeBehaviourIndividual}',
+                    },
                     inputValue: 'individual'
                   },
                   {
                     xtype: 'radiofield',
                     name: 'alikeBehaviour',
                     width: 426, //needed for long labels to wrap
-                    boxLabel: this.item_alikeBehaviour_never_boxLabel,
+                    bind: {
+                      boxLabel: '{l10n.preferences.window.alikeBehaviourNever}',
+                    },
                     inputValue: 'never'
                   },{
             	    xtype:'checkbox',
             	    name:'showOnEmptyTarget',
-            	    boxLabel:this.item_show_on_empty_target,
+                    bind: {
+                      boxLabel: '{l10n.preferences.window.showOnEmptyTarget}',
+                    },
             	    width: 426 //needed for long labels to wrap
                   }
                 ]
@@ -119,13 +167,17 @@ Ext.define('Editor.view.preferences.Window', {
                 xtype: 'button',
                 glyph: 'f00c@FontAwesome5FreeSolid',
                 itemId: 'saveBtn',
-                text: this.item_saveBtn
+                bind: {
+                  text: '{l10n.preferences.window.saveBtn}',
+                }
               },
               {
                 xtype: 'button',
                 glyph: 'f00d@FontAwesome5FreeSolid',
-                itemId: 'cancelBtn',
-                text: this.item_cancelBtn
+                bind: {
+                  text: '{l10n.preferences.window.cancelBtn}',
+                },
+                itemId: 'cancelBtn'
               }
             ]
           }

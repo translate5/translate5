@@ -324,10 +324,6 @@
                 <source>Verhalten des Wiederholungseditor</source>
                 <target>Repetition editor setting</target>
             </trans-unit>
-            <trans-unit id="SW1tZXIgYXV0b21hdGlzY2ggZXJzZXR6ZW4gdW5kIFN0YXR1cyBzZXR6ZW4=">
-                <source>Immer automatisch ersetzen und Status setzen</source>
-                <target>Always replace automatically and set status</target>
-            </trans-unit>
             <trans-unit id="QmVpIGplZGVyIFdpZWRlcmhvbHVuZyBlaW56ZWxuIGVudHNjaGVpZGVu">
                 <source>Bei jeder Wiederholung einzeln entscheiden</source>
                 <target>Decide individually for each repetition</target>

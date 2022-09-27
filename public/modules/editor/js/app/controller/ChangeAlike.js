@@ -422,21 +422,43 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @return {Number[]}
    */
   getAlikesToProcess: function() {
-      var me = this, 
-          allIds = me.getAllAlikeIds();
-      if(me.isAutoProcessing()){
-          return allIds;
+      var me = this, byRepetitionType, bySameContextOnly,
+          repetitionType = Editor.app.getUserConfig('alike.repetitionType'),
+          sameContextOnly = Editor.app.getUserConfig('alike.sameContextOnly');
+
+      // If alike-segments should be automatically processed
+      if (me.isAutoProcessing()) {
+
+          // Return all found alike-segments ids, filtered according to repetitionType and sameContextOnly configs
+          return me.getAllAlikeIds(function(rec) {
+
+              // Check whether current alike-segment conforms repetitionType-clause
+              switch (repetitionType) {
+                  case 'bothOr' : byRepetitionType = true;                                             break;
+                  case 'bothAnd': byRepetitionType = rec.get('sourceMatch') && rec.get('targetMatch'); break;
+                  case 'source' : byRepetitionType = rec.get('sourceMatch');                           break;
+                  case 'target' : byRepetitionType = rec.get('targetMatch');                           break;
+              }
+
+              // Check whether current alike-segment conforms sameContextOnly-clause
+              bySameContextOnly = sameContextOnly ? rec.get('contextMatch') : true;
+
+              // Return true of both conditions are ok
+              return byRepetitionType && bySameContextOnly;
+          });
       }
-      return me.getSelectedAlikeIds(allIds);
+
+      // Else return all alike-segments, currently selected in repetitions-dialog
+      return me.getSelectedAlikeIds(me.getAllAlikeIds());
   },
   /**
    * returns an array with all alike ids
    * @returns {Array}
    */
-  getAllAlikeIds: function() {
+  getAllAlikeIds: function(filterFn) {
     var result = [];
     Ext.Array.each(this.fetchedAlikes, function(rec){
-        result.push(rec.get('id'));
+        if (typeof filterFn != 'function' || filterFn(rec)) result.push(rec.get('id'));
     });
     return result;
   },

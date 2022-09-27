@@ -334,14 +334,6 @@ Ext.define('Editor.controller.Localizer', {
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
 
-  	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
-    Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
-    Editor.view.preferences.Window.prototype.item_alikeBehaviour_individual_boxLabel = '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>';
-    Editor.view.preferences.Window.prototype.item_alikeBehaviour_never_boxLabel = '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>';
-    Editor.view.preferences.Window.prototype.item_show_on_empty_target = '<?php echo $this->translate->_('Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist');?>';
-    Editor.view.preferences.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
-    Editor.view.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
-
     Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
@@ -469,6 +461,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.ui.changealike.Grid.prototype.item_filterColumn = '<?php echo $this->translate->_('In aktueller Filterung enthalten');?>';
   	Editor.view.ui.changealike.Grid.prototype.item_sourceMatchColumn = '<?php echo $this->translate->_('Quell-Treffer');?>';
   	Editor.view.ui.changealike.Grid.prototype.item_targetMatchColumn = '<?php echo $this->translate->_('Ziel-Treffer');?>';
+  	Editor.view.ui.changealike.Grid.prototype.item_sameContextColumn = '<?php echo $this->translate->_('Kontext-Treffer');?>';
 
     Editor.controller.ChangeAlike.prototype.messages = {
         alikeSingular: '<?php echo $this->translate->_('{0} Wiederholung wurde bearbeitet und gespeichert');?>',
@@ -2077,6 +2070,20 @@ Editor.data.l10n = {
             uiThemeComboLabelText: '<?php echo $this->translate->_('Layout');?>',
             changeUiLangaugeLabelText: '<?php echo $this->translate->_('Sprache ändern');?>',
             passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>'
+        },
+        window: {
+            radiogroup: '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>',
+            alikeBehaviourAlways: '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen, wenn');?>',
+            alikeBehaviourIndividual: '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>',
+            alikeBehaviourNever: '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>',
+            repetitionTypeSource: '<?php echo $this->translate->_('Quelle wiederholt wird');?>',
+            repetitionTypeTarget: '<?php echo $this->translate->_('Ziel wiederholt wird');?>',
+            repetitionTypeBothAnd: '<?php echo $this->translate->_('Quelle UND Ziel wiederholt werden');?>',
+            repetitionTypeBothOr: '<?php echo $this->translate->_('Quelle ODER Ziel wiederholt werden');?>',
+            sameContextOnly: '<?php echo $this->translate->_('Nur gleicher Kontext');?>',
+            showOnEmptyTarget: '<?php echo $this->translate->_('Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            saveBtn: '<?php echo $this->translate->_('Speichern');?>'
         }
     }
 
