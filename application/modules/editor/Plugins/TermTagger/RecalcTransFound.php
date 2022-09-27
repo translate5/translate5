@@ -31,226 +31,261 @@ END LICENSE AND COPYRIGHT
  * Makes a recalculation of the transFound transNotFound and transNotDefined Information out of and in the given segment content
  */
 class editor_Plugins_TermTagger_RecalcTransFound {
+
     /**
-     *
      * @var editor_Models_Task
      */
-    protected $task;
+    protected editor_Models_Task $task;
 
     /**
      * @var editor_Models_Terminology_Models_TermModel
      */
-    protected $termModel;
+    protected editor_Models_Terminology_Models_TermModel $termModel;
 
     /**
      * @var array
      */
-    protected $sourceFuzzyLanguages;
+    protected array $sourceFuzzyLanguages;
 
     /**
      * @var array
      */
-    protected $targetFuzzyLanguages;
+    protected array $targetFuzzyLanguages;
 
     /**
-     * @var array
+     * @var array|null
      */
-    protected $groupCounter = array();
+    protected ?array $collectionIds = null;
+
+    protected array $exists;
+    protected array $trans;
+    protected array $termsByEntry;
+    protected array $homonym;
+    protected array $trgIdA;
+    protected array $trgTextA;
 
     /**
-     * must be reset if task changes. Since task can only be given on construction, no need to reset.
-     * @var array
+     * Constructor
+     *
+     * editor_Plugins_TermTagger_RecalcTransFound constructor.
+     * @param editor_Models_Task $task
+     * @throws Zend_Cache_Exception
      */
-    protected $notPresentInTbxTarget = array();
-
     public function __construct(editor_Models_Task $task) {
         $this->task = $task;
         $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
+
         /* @var $lang editor_Models_Languages */
+        $lang = ZfExtended_Factory::get('editor_Models_Languages');
         $this->targetFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getTargetLang(),'id',true);
         $this->sourceFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getSourceLang(),'id',true);
+
+        // Lazy load collectionIds defined for current task
+        $this->collectionIds = $this->collectionIds ?? ZfExtended_Factory
+            ::get('editor_Models_TermCollection_TermCollection')
+            ->getCollectionsForTask($this->task->getTaskGuid());
     }
 
     /**
-     * recalculates a list of segment contents
+     * Recalculates a list of segment contents
      * consumes a list of stdObjects, each stdObject contain a ->source and a ->target field which are processed
+     *
      * @param array $segments
      * @return array
+     * @throws Zend_Exception
      */
-    public function recalcList(array $segments) {
-        //TODO: this config and return can be removed after finishing the initial big transit project
+    public function recalcList(array $segments) : array {
+        //TODO: this config and return can be removed after finishing the initial big transit project. Remove?
         $config = Zend_Registry::get('config');
-        if(!empty($config->runtimeOptions->termTagger->markTransFoundLegacy)) {
+        if (!empty($config->runtimeOptions->termTagger->markTransFoundLegacy)) {
             return $segments;
         }
-        foreach ($segments as &$seg) {
-            $seg->source = $this->recalc($seg->source, $seg->target);
+        foreach ($segments as &$segment) {
+            $segment->source = $this->recalc($segment->source, $segment->target);
         }
         return $segments;
     }
 
     /**
-     * @var null
+     * Get translation status mark for source term having tbxId given by $srcId arg,
+     * or for source term's homonym, identified by termEntryTbxId still given by $srcId but with `true` as value of 2nd arg
+     *
+     * @param string $srcId
+     * @param bool $isHomonym
+     * @return string
      */
-    public $collectionIds = null;
+    protected function getMarkByTbxId(string $srcId, $isHomonym = false) : string {
+
+        // If $isHomonym arg is true, it means that $srcId arg contains termEntryTbxId of a homonym term for some source term
+        // so that we set up $src variable for it to be an array containing termEntryTbxId-key for it to be possible to use for
+        // finding translations. We do that to avoid excessive SQL-query as the only thing we need for homonym term is it's
+        // termEntryTbxId, which we did preload but not in $this->exists array
+        $src = $isHomonym
+            ? ['termEntryTbxId' => $srcId]
+            : ($this->exists[$srcId] ?? 0);
+
+        // If given source term is NOT found in db
+        if (!$src) {
+
+            // Setup 'transNotDefined'-class
+            return 'transNotDefined';
+
+        // Else if found, but it has NO translations in db for the target fuzzy languages
+        } else if (!$transIdA = array_keys($this->trans[$src['termEntryTbxId']] ?? [])) {
+
+            // Setup 'transNotDefined'-class
+            return 'transNotDefined';
+
+        // Else if at least one of target terms is a translation for the current source term
+        } else if ($transTermId = array_intersect($transIdA, $this->trgIdA)[0] ?? 0) {
+
+            // Remove first found tbxId from $trgIdA
+            unset($this->trgIdA[array_search($transTermId, $this->trgIdA)]);
+
+            // Setup 'transFound'-class
+            return 'transFound';
+
+        // Else setup default css class to be used if kept unmodified by below
+        } else {
+
+            // Default css class for other cases
+            return 'transNotFound';
+        }
+    }
 
     /**
-     * recalculates one single segment content
-     * @param string $source
-     * @param string $target is given as reference, if the modified target is needed too
-     * @return string the modified source field
+     * Preload data, sufficient for being further used to detect correct source terms translation status marks
+     *
+     * @param array $srcIdA
+     * @throws Zend_Db_Statement_Exception
      */
-    public function recalc(string $source, string &$target): string
-    {
-        //TODO: this config and return can be removed after finishing the initial big transit project
-        $config = Zend_Registry::get('config');
-        if (!empty($config->runtimeOptions->termTagger->markTransFoundLegacy)) {
-            return $source;
-        }
-        $taskGuid = $this->task->getTaskGuid();
+    protected function preload(array $srcIdA) {
+        $db = Zend_Db_Table_Abstract::getDefaultAdapter();
 
-        // Lazy load collectionIds defined for current task
-        if ($this->collectionIds === null) {
-            /* @var $assoc editor_Models_TermCollection_TermCollection */
-            $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            $this->collectionIds = $assoc->getCollectionsForTask($taskGuid);
-        }
+        // Reset data arrays
+        $this->homonym = $this->trans = $this->trgTextA = [];
 
-        if (empty($this->collectionIds)) {
-            return $source;
-        }
-        $source = $this->removeExistingFlags($source);
-        $target = $this->removeExistingFlags($target);
-        $sourceTermIds = $this->termModel->getTermMidsFromSegment($source);
-        $targetTermIds = $this->termModel->getTermMidsFromSegment($target);
-        $targetTermIds_initial = $targetTermIds; $targetTermIds_unset = [];
-        $toMarkMemory = [];
-        $this->groupCounter = [];
+        // Get merged list of term tbx ids detected in source and target
+        $tbxIdA = array_unique(array_merge($srcIdA, $this->trgIdA));
 
-        foreach ($sourceTermIds as $sourceTermId) {
+        // Get merged list of source and target fuzzy languages
+        $fuzzy = array_merge($this->sourceFuzzyLanguages, $this->targetFuzzyLanguages);
 
-            // Goto label to be used in case when $sourceTermId initially detected by TermTagger contains termTbxId of a term
-            // located under NOT the same termEntry as term(s) detected in segment target text, so that such a term in
-            // segment source text will be red-inderlined to inidicate that it's translation(s) was not found in segment
-            // target text, despite there actually are correct translations but just in another termEntries. So, this
-            // label will be used as a pointer for goto operator executed in case if such situation was detected and
-            // alternative termTbxId was found to solve that problem so we'll have to run same iteration from the
-            // beginning but with using spoofed value of $sourceTermId variable
-            correct_sourceTermId:
+        // Get `termEntryTbxId` and `term` for each term tbx id detected in source and/or target
+        $this->exists = $db->query("
+            SELECT `termTbxId`, `termEntryTbxId`, `term` 
+            FROM `terms_term` 
+            WHERE 1
+             AND `termTbxId` IN ('". join("','", $tbxIdA) . "')
+             AND `collectionId` IN (" . join(',', $this->collectionIds) . ")
+             AND `processStatus` = 'finalized'
+            LIMIT " . count($tbxIdA) . "             
+        ")->fetchAll(PDO::FETCH_UNIQUE);
 
-            // Check whether source term having given termTbxId ($sourceTermId) exists within task's termcollections
-            try {
-                $this->termModel->loadByMid($sourceTermId, $this->collectionIds);
-            }
-            catch (ZfExtended_Models_Entity_NotFoundException $e) {
+        // Get all terms (from source and target), grouped by their termEntryTbxId
+        $this->termsByEntry = $db->query("
+            SELECT `termEntryTbxId`, `termEntryTbxId`, `term`, `termTbxId`, `languageId`
+            FROM `terms_term`
+            WHERE 1
+              AND `termEntryTbxId` IN ('" . join("','", array_column($this->exists, 'termEntryTbxId')) . "')
+              AND `collectionId`   IN (" . join(',', $this->collectionIds) . ")
+              AND `languageId`     IN (" . join(',', $fuzzy) . ")
+              AND `processStatus` = 'finalized'
+        ")->fetchAll(PDO::FETCH_GROUP);
 
-                // So the source terms are marked as notfound in the repetitions
-                $toMarkMemory[$sourceTermId] = null;
+        // Foreach source term
+        foreach ($srcIdA as $srcId) {
+
+            // If NOT exists in db - skip
+            if (!$src = $this->exists[$srcId] ?? 0) {
                 continue;
             }
 
-            // Get termEntryId of the given source term
-            $termEntryTbxId = $this->termModel->getTermEntryTbxId();
-
-            // Find translations of the given source term for target fuzzy languages
-            $groupedTerms = $this->termModel->getAllTermsOfGroup($this->collectionIds, $termEntryTbxId, $this->targetFuzzyLanguages);
-
-            // If no translations found
-            if (empty($groupedTerms)) {
-
-                // Setup a flag indicating that there are no translations for the current source term for the languages we need
-                $this->notPresentInTbxTarget[$termEntryTbxId] = true;
-            }
-
-            // Counter for those of translations which are found in segment target text
-            $transFound = $this->groupCounter[$termEntryTbxId] ?? 0;
-
-            // Foreach translation existing for the given source term under the same termEntry
-            foreach ($groupedTerms as $groupedTerm) {
-
-                // Check whether translation does exist in segment target text
-                $targetTermIdKey = array_search($groupedTerm['termTbxId'], $targetTermIds);
-
-                // If so
-                if ($targetTermIdKey !== false) {
-
-                    // Increment translation-which-is-found-in-segment-target counter
-                    $transFound ++;
-
-                    // Collect target terms tbx ids, that were unset from $targetTermIds
-                    $targetTermIds_unset []= $groupedTerm['termTbxId'];
-
-                    // Unset it from $targetTermIds-array, so that the only tbx ids of terms will be kept
-                    // there which are not translations to any of terms detected in segment source text
-                    unset($targetTermIds[$targetTermIdKey]);
+            // Pick translations for target fuzzy languages
+            foreach ($this->termsByEntry[$src['termEntryTbxId']] as $term) {
+                if (in_array($term['languageId'], $this->targetFuzzyLanguages)) {
+                    $this->trans[ $src['termEntryTbxId'] ][ $term['termTbxId'] ] = $term['term'];
                 }
             }
 
-            // If there are terms detected in segment target text but none of them is a translation for source text's current term
-            if ($targetTermIds && !$transFound) {
-
-                // Shortcut to db adapter instance
-                $db = Zend_Db_Table_Abstract::getDefaultAdapter();
-
-                // Lazy load distinct termEntryTbx ids of target terms
-                $termEntryTbxIdA = $termEntryTbxIdA
-                    ?? $this->termModel->loadTermEntryTbxIdsByTermTbxIds($targetTermIds_initial);
-
-                // Unset values from $termEntryTbxIdA if need
-                foreach ($targetTermIds_unset as $targetTermId_unset) {
-                    unset($termEntryTbxIdA[$targetTermId_unset]);
-                }
-
-                // Try to find current source term's homonym under the target terms' termEntries
-                $sourceTermId_homonym = $this->termModel->findHomonym(
-                    $this->termModel->getTerm(), $termEntryTbxIdA, $this->sourceFuzzyLanguages,
-                );
-
-                // If found
-                if ($sourceTermId_homonym) {
-
-                    // Spoof value of $sourceTermId with found homonym's termTbxId
-                    $sourceTermId = $sourceTermId_homonym;
-
-                    // Re-run current iteration
-                    goto correct_sourceTermId;
-
-                // Else
-                } else {
-
-                    // Fetch target terms texts for all target terms tbx ids
-                    $targetTermTexts = $targetTermTexts ?? $this->termModel->loadDistinctByTbxIds($targetTermIds);
-
-                    // Foreach translation existing for the current source term under it's termEntry
-                    foreach ($groupedTerms as $groupedTerm) {
-
-                        // Check whether translation does exist in segment target
-                        $targetTermTextKey = array_search($groupedTerm['term'], $targetTermTexts);
-
-                        // If exists
-                        if ($targetTermTextKey !== false) {
-
-                            // Increment translation-which-is-found-in-segment-target counter
-                            $transFound ++;
-
-                            // Unset it from $targetTermIds-array, so that the only tbx ids of terms to be kept where
-                            unset($targetTermTexts[$targetTermTextKey]);
+            // Pick target terms' termEntries having homonyms for current source term
+            foreach ($this->trgIdA as $trgTbxId) {
+                if ($trg = $this->exists[$trgTbxId] ?? 0) {
+                    foreach ($this->termsByEntry[$trg['termEntryTbxId']] as $term) {
+                        if (in_array($term['languageId'], $this->sourceFuzzyLanguages)
+                            && $term['term'] == $src['term']
+                            && $term['termTbxId'] != $srcId) {
+                            $this->homonym[$srcId] []= $term['termEntryTbxId'];
                         }
                     }
                 }
             }
-
-            //
-            $toMarkMemory[$sourceTermId] = $termEntryTbxId;
-
-            // Apply into class vaiable to be accessed from othe methods
-            $this->groupCounter[$termEntryTbxId] = $transFound;
         }
 
-        // Reapply css class names where need
-        foreach ($toMarkMemory as $sourceTermId => $termEntryTbxId) {
-            $source = $this->insertTransFoundInSegmentClass($source, $sourceTermId, $termEntryTbxId);
+        // Add translations for source-terms-homonyms to be able to find those among target terms
+        // in case if we won't find translations for source-terms-themselves among target terms
+        foreach ($this->homonym as $srcId => $termEntryIdA) {
+            foreach ($termEntryIdA as $termEntryId) {
+                if (!isset($this->trans[$termEntryId])) {
+                    foreach ($this->termsByEntry[$termEntryId] as $term) {
+                        if (in_array($term['languageId'], $this->targetFuzzyLanguages)) {
+                            $this->trans[ $termEntryId ] [ $term['termTbxId'] ] = $term['term'];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Collect target terms texts
+        foreach ($this->trgIdA as $trgId) {
+            if ($text = $this->exists[$trgId]['term'] ?? 0) {
+                $this->trgTextA []= $text;
+            }
+        }
+    }
+
+    /**
+     * Recalculates translation status marks for all terms found by TermTagger within single segment source text
+     *
+     * @param string $source
+     * @param string $target is given as reference, if the modified target is needed too
+     * @return string the modified source field
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     */
+    public function recalc(string $source, string &$target): string
+    {
+        // If termTagger's markTransFoundLegacy-config is set to 1 - return source as is
+        if (!empty(Zend_Registry::get('config')->runtimeOptions->termTagger->markTransFoundLegacy)) {
+            return $source;
+        }
+
+        // If no term collections - return source as is
+        if (empty($this->collectionIds)) {
+            return $source;
+        }
+
+        // Get source and target
+        $source = $this->removeExistingFlags($source);
+        $target = $this->removeExistingFlags($target);
+
+        // If no source terms detected - return source as is
+        if (!count($srcIdA = $this->termModel->getTermMidsFromSegment($source))) {
+            return $source;
+        }
+
+        // Get target tbx ids
+        $this->trgIdA = $this->termModel->getTermMidsFromSegment($target);
+
+        // Preload data
+        $this->preload($srcIdA);
+
+        // Get [termTbxId => [mark1, mark2, ...]] pairs for all terms detected in segment source text
+        $markA = $this->getMarkBySrcIdA($srcIdA);
+
+        // Recalc transNotFound/transNotDefined/transFound marks
+        foreach ($markA as $srcId => $values) {
+            $source = $this->insertMark($source, $srcId, $values);
         }
 
         // Return source text
@@ -258,51 +293,128 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     }
 
     /**
-     * remove potentially incorrect transFound, transNotFound and transNotDefined inserted by termtagger
+     * Get marks to be later injected as css class for term tags in segment source text
+     *
+     * @param array $srcIdA
+     * @return array
+     */
+    protected function getMarkBySrcIdA(array $srcIdA) : array {
+
+        // Marks array
+        $mark = [];
+
+        // Foreach source term tbx id
+        foreach ($srcIdA as $srcId) {
+
+            // Get css class
+            $value = $this->getMarkByTbxId($srcId);
+
+            // If translation was found or such source term does not exists in db at all
+            if ($value == 'transFound' || !isset($this->exists[$srcId])) {
+
+                // Append mark for current occurrence of term tag
+                $mark[$srcId] []= $value;
+
+                // Keep the mark we have for current source term and goto next source term
+                continue;
+            }
+
+            // If source term has homonyms among target terms' termEntries
+            if ($this->homonym[$srcId] ?? 0) {
+
+                // Foreach homonym
+                foreach ($this->homonym[$srcId] as $termEntryId) {
+
+                    // Get mark for homonym
+                    $value = $this->getMarkByTbxId($termEntryId, true);
+
+                    // If it's 'transFound' - stop homonym walkthrough
+                    if ($value == 'transFound') {
+                        break;
+                    }
+                }
+
+            // Else
+            } else {
+
+                // Get source term's termEntryTbxId
+                $entryId = $this->exists[$srcId]['termEntryTbxId'];
+
+                // If there are no source term translations
+                if (!$transTextA = array_values($this->trans[$entryId]) ?? 0) {
+
+                    // Setup 'transNotDefined'-class
+                    $value = 'transNotDefined';
+
+                // Else if at least one of target terms is a translation for the current source term
+                } else if ($transText = array_intersect($transTextA, $this->trgTextA)[0] ?? 0) {
+
+                    // Remove first found term text from $transTextA
+                    unset($this->trgTextA[array_search($transText, $this->trgTextA)]);
+
+                    // Setup 'transFound'-class
+                    $value = 'transFound';
+                }
+            }
+
+            // Append mark for current occurrence of term tag
+            $mark[$srcId] []= $value;
+        }
+
+        // Return marks for all terms within current segment source text
+        return $mark;
+    }
+
+    /**
+     * Remove potentially incorrect transFound, transNotFound and transNotDefined inserted by TermTagger
+     *
      * @param string $content
      * @return string
      */
-    protected function removeExistingFlags($content) {
-        $classesToRemove = array('transFound', 'transNotFound', 'transNotDefined');
+    protected function removeExistingFlags($content) : string {
 
-        return preg_replace_callback('/(<div[^>]*class=")([^"]*term[^"]*)("[^>]*>)/', function($matches) use ($classesToRemove){
+        // List of TermTagger-assigned statuses to be stripped prior recalculation
+        $strip = ['transFound', 'transNotFound', 'transNotDefined'];
+
+        // Strip statuses
+        return preg_replace_callback('/(<div[^>]*class=")([^"]*term[^"]*)("[^>]*>)/', function($matches) use ($strip) {
+
+            // Get array of found classes
             $classesFound = explode(' ', $matches[2]);
-            //remove the unwanted css classes by array_diff:
-            return $matches[1].join(' ', array_diff($classesFound, $classesToRemove)).$matches[3];
+
+            // Remove the unwanted css classes by array_diff:
+            return $matches[1] . join(' ', array_diff($classesFound, $strip)) . $matches[3];
         }, $content);
     }
 
     /**
-     * insert the css-class transFound or transNotFound into css-class of the term-div tag with the corresponding mid
-     * @param string $seg
-     * @param $mid
-     * @param $groupId
+     * Insert the css-class transFound/transNotFound/transNotDefined into css-classes list of the term-div tag with the corresponding $tbxId
+     *
+     * @param string $source
+     * @param string $srcId
+     * @param array $values
      * @return string
      */
-    protected function insertTransFoundInSegmentClass(string $seg, $mid, $groupId) {
-        settype($this->groupCounter[$groupId], 'integer');
-        $transFound =& $this->groupCounter[$groupId];
-        $presentInTbxTarget = empty($this->notPresentInTbxTarget[$groupId]);
-        $rCallback = function($matches) use (&$seg, &$transFound, $presentInTbxTarget){
-            foreach ($matches as $match) {
-                if($presentInTbxTarget) {
-                    $cssClassToInsert = ($transFound>0)?'transFound':'transNotFound';
-                }
-                else {
-                    $cssClassToInsert = 'transNotDefined';
-                }
+    protected function insertMark(string $source, string $srcId, array $values) : string {
 
-                $transFound--;
-                $modifiedMatch = $match;
-                if(strpos($modifiedMatch, ' class=')===false){
-                    $modifiedMatch = str_replace('<div', '<div class=""', $modifiedMatch);
-                }
-                $modifiedMatch = preg_replace('/( class="[^"]*)"/', '\\1 '.$cssClassToInsert.'"', $modifiedMatch);
-                $seg = preg_replace('/'.$match.'/', $modifiedMatch, $seg, 1);
+        // Tag regular expression and replacements counter
+        $rex = '~<div[^>]*data-tbxid="' . $srcId .'"[^>]*>~'; $idx = 0;
+
+        // For each occurrence inject the value according occurrence index
+        return preg_replace_callback($rex, function($matches) use ($srcId, &$idx, $values) {
+
+            // Replacement
+            $replace = $matches[0];
+
+            // If there is no class-attribute at all
+            if (strpos($replace, ' class=') === false) {
+
+                // Append it, empty for now
+                $replace = str_replace('<div', '<div class=""', $replace);
             }
-        };
 
-        preg_replace_callback('/<div[^>]*data-tbxid="'.$mid.'"[^>]*>/', $rCallback, $seg);
-        return $seg;
+            // Append $mark to class list
+            return preg_replace('~( class="[^"]*)"~', '$1 ' . $values[$idx++] . '"', $replace);
+        }, $source);
     }
 }
