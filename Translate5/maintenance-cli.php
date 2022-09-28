@@ -66,7 +66,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     TestRunAllCommand,
     TestRunCommand,
     TestRunSuiteCommand,
-    TestCreateIniSectionCommand,
+    TestAddIniSectionCommand,
     UserCreateCommand,
     UserInfoCommand,
     WorkerCleanCommand,
@@ -115,7 +115,7 @@ if(file_exists('.git')) {
     $commands[] = new TestRunAllCommand();
     $commands[] = new TestRunCommand();
     $commands[] = new TestRunSuiteCommand();
-    $commands[] = new TestCreateIniSectionCommand();
+    $commands[] = new TestAddIniSectionCommand();
     $commands[] = new ReleaseNotesCommand();
     $commands[] = new DevelopmentNewModelCommand();
     $commands[] = new DevelopmentEcodeCommand();

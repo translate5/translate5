@@ -30,7 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\Test\Suites;
+use Translate5\MaintenanceCli\Test\Config;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class TestRunSuiteCommand extends Translate5AbstractTestCommand
@@ -46,7 +46,7 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Runs one of the following test-suites: "'.implode('", "', Suites::ALL).'"');
+            ->setHelp('Runs one of the following test-suites: "'.implode('", "', Config::SUITES).'"');
 
         $this->addArgument('suite',
             InputArgument::OPTIONAL,
@@ -68,9 +68,9 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
 
         $suite = ($this->input->hasArgument('suite')) ? $this->input->getArgument('suite') : null;
 
-        if($suite === null || !in_array($suite, Suites::ALL)) {
+        if($suite === null || !in_array($suite, Config::SUITES)) {
             $uestion = ($suite === null) ? 'Please choose a Suite' : 'Suite "'.$suite.'" doesn\'t exist, choose one of the following';
-            $askSuites = new ChoiceQuestion($uestion, Suites::ALL, null);
+            $askSuites = new ChoiceQuestion($uestion, Config::SUITES, null);
             $suite = $this->io->askQuestion($askSuites);
         }
 

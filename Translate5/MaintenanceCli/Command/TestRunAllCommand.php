@@ -58,6 +58,7 @@ class TestRunAllCommand extends Translate5AbstractTestCommand
         $this->initInputOutput($input, $output);
 
         $this->reInitDatabase();
+        $this->reInitDataDirectory();
         $this->initTranslate5();
 
         return $this->startApiTest();

@@ -29,14 +29,13 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputOption;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
+use Translate5\MaintenanceCli\Test\Config;
 
 abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 {
     const RELATIVE_TEST_ROOT = 'application/modules/editor/testcases/';
 
     const RELATIVE_TEST_DIR = self::RELATIVE_TEST_ROOT.'editorAPI/';
-
-    const TEST_DATABASE = 'translate5_apitests';
 
     /**
      * General Options of all test-commands
@@ -180,8 +179,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         $config = $config['db']['params'];
 
         // check, if configured test-db meets our expectaions
-        if($config['dbname'] !== self::TEST_DATABASE){
-            die('The configured test database in installation.ini [test:application] must be \''.self::TEST_DATABASE.'\'!');
+        if($config['dbname'] !== Config::DATABASE_NAME){
+            die('The configured test database in installation.ini [test:application] must be \''.Config::DATABASE_NAME.'\'!');
         }
 
         // drop an existing DB
@@ -222,62 +221,48 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     }
 
     /**
-     * The here added system configuration (service URLS) should match for most setups, and can be overwritten in installation.ini
-     *
-     * Before adding an application config here:
-     *   1. try to set the value via task-config.ini specific for that test
-     *   2. If that is not possible, add it here but ensure that the test which needs it, checks if the value is set before
-     * The here added application configuration must be finally valid on all machines!
-     *
-     * @return void
+     * Removes the testdata-directory contents
+     */
+    protected function reInitDataDirectory(): void
+    {
+        $dir = APPLICATION_ROOT.'/'.Config::DATA_DIRECTORY;
+        if(is_dir($dir)){
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+            foreach ($files as $file) {
+                if ($file->isDir()){
+                    rmdir($file->getRealPath());
+                } else {
+                    unlink($file->getRealPath());
+                }
+            }
+        } else {
+            mkdir($dir, 0777, true);
+        }
+    }
+
+    /**
+     * The here added system configuration is neccessary for the tests to be constant
      * @throws \Zend_Exception
      */
-    protected function initConfiguration(): void
+    private function initConfiguration(): void
     {
-        //see method header!
-        // values were just taken over from master instance, not tested if they really must be set to that value!
-        $testConfig = [
-            'runtimeOptions.customers.anonymizeUsers' => 1,
-            'runtimeOptions.editor.notification.userListColumns' => '["surName","firstName","email","role","state","deadlineDate"]',
-            'runtimeOptions.import.enableSourceEditing' => 1,
-            'runtimeOptions.import.sdlxliff.importComments' => 1,
-            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-            'runtimeOptions.InstantTranslate.minMatchRateBorder' => 70,
-            'runtimeOptions.plugins.Okapi.server' => '{"okapi-longhorn":"http://localhost:8080/okapi-longhorn/","okapi-longhorn-143":"http://localhost:8080/okapi-longhorn_143/"}',
-            'runtimeOptions.plugins.Okapi.serverUsed' => 'okapi-longhorn-143',
-            'runtimeOptions.plugins.SpellCheck.languagetool.url.gui' => 'http://localhost:8081/v2',
-            'runtimeOptions.plugins.SpellCheck.liveCheckOnEditing' => 1,
-            'runtimeOptions.plugins.VisualReview.directPublicAccess' => 1,
-            'runtimeOptions.tbx.termLabelMap' => '{"legalTerm": "permitted", "admittedTerm": "permitted", "preferredTerm": "preferred", "regulatedTerm": "permitted", "deprecatedTerm": "forbidden", "supersededTerm": "forbidden", "standardizedTerm": "permitted"}',
-        ];
-
-        //the following configs must be set in installation.ini otherwise we ask to annoy the developers to set them
-        $localConfig = [
-            'runtimeOptions.plugins.VisualReview.shellCommandPdf2Html',
-            'runtimeOptions.server.name',
-            'runtimeOptions.server.protocol',
-            'runtimeOptions.plugins.DeepL.authkey',
-            'runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost',
-        ];
-
         $config = new \editor_Models_Config();
-
-        //set predefined values
-        foreach($testConfig as $name => $value) {
-            $config->update($name, $value);
-        }
-
-        //annoy the developer to set some local values in the ini
-        foreach($localConfig as $localConf) {
-            $config->loadByName($localConf);
-            if(!$config->hasIniEntry()) {
-                $value = $this->io->ask('Please provide a local value for "'.$localConf.'" or set it in the installation.ini');
-                $config->update($localConf, $value);
+        // set the predefined, fixed values ("dynamic" values will be copied to the installation.ini
+        foreach(Config::CONFIGS as $name => $value) {
+            if($value !== null){ // value is statically defined
+                $config->update($name, $value);
             }
         }
     }
 
-    protected function initPlugins()
+    /**
+     * Writes the Plugins marked as test-relevant to the database
+     * @throws \Zend_Exception
+     */
+    private function initPlugins(): void
     {
         /** @var \ZfExtended_Plugin_Manager $pluginmanager */
         $pluginmanager = \Zend_Registry::get('PluginManager');
