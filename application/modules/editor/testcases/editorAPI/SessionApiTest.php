@@ -30,8 +30,13 @@ END LICENSE AND COPYRIGHT
  * Tests the User Auth API
  */
 class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
-    
-    
+
+    /**
+     * Internal reference to the created task
+     * @var stdClass
+     */
+    protected static stdClass $task;
+
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
@@ -47,6 +52,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         
         $api->addImportFile($api->getFile('justatask.xlf'));
         $api->import($task);
+        self::$task = $api->getTask();
     }
     
     /**
@@ -65,6 +71,8 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $response = $this->api()->post('editor/session', ['passwd' => 'givenPasswd']);
         $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."}],"message":"NOT OK","success":false}', $response->getBody());
+
+        //$this->pr
     }
     
     /**
@@ -169,7 +177,13 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->logout();
         $this->api()->setTask($task);
     }
-    
+
+    /**
+     * @depends testSessionToken
+     * @depends testSessionTokenWithTask
+     * @return void
+     * @throws Zend_Http_Client_Exception
+     */
     public function testSingleClickAuthentication() {
         $this->api()->logout();
         $this->api()->login('testmanager2');
@@ -210,7 +224,6 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
+        self::$api->deleteTask(self::$task->id, 'testmanager', 'testlector');
     }
 }
