@@ -27,53 +27,22 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Translate5\MaintenanceCli\WebAppBridge\Application;
 
-class DevelopmentRuntestCommand extends Translate5AbstractCommand
+abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 {
     const RELATIVE_TEST_ROOT = 'application/modules/editor/testcases/';
+
     const RELATIVE_TEST_DIR = self::RELATIVE_TEST_ROOT.'editorAPI/';
 
-    // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'dev:runtest';
-    
+    const TEST_DATABASE = 'translate5_apitests';
+
+    /**
+     * General Options of all test-commands
+     */
     protected function configure()
     {
-        $this
-        // the short description shown while running "php bin/console list"
-        ->setDescription('Development: Runs all or a given test a new API test.')
-        
-        // the full command description shown when running the command with
-        // the "--help" option
-        ->setHelp('Runs all or a given test a new API test.');
-
-        $this->addArgument('test',
-            InputArgument::OPTIONAL,
-            'Filename of the Test to be called (optionally with relative path so that tab completion can be used to find the test)'
-        );
-
-        $this->addOption(
-            'capture',
-            'c',
-            InputOption::VALUE_NONE,
-            'Use this option to re-capture the test data of a test. Probably not all tests are adopted yet to support this switch.');
-
-        $this->addOption(
-            'legacy-segment',
-            'l',
-            InputOption::VALUE_NONE,
-            'Use this option when re-capturing segment test data to use the old order of the segment data. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c');
-
-        $this->addOption(
-            'legacy-json',
-            'j',
-            InputOption::VALUE_NONE,
-            'Use this option when re-capturing test data to use the old json style. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c');
-
         $this->addOption(
             'xdebug',
             'x',
@@ -97,38 +66,24 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             'f',
             InputOption::VALUE_NONE,
             'Leads to the testsuite stopping on the first failure (not error!).');
-
-//        $this->addOption(
-//            'name',
-//            'N',
-//            InputOption::VALUE_REQUIRED,
-//            'Force a name (must end with Test!) instead of getting it from the branch.');
     }
 
     /**
-     * Execute the command
-     * {@inheritDoc}
-     * @see \Symfony\Component\Console\Command\Command::execute()
+     * Starts the unit test for a single test, the suite or all tests
+     * @param string|null $testPath
+     * @param string|null $testSuite
+     * @return int
+     * @throws \PHPUnit\TextUI\Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function startApiTest(string $testPath = null, string $testSuite = null) : int
     {
-        //errors in the space of the testsuite should boil out directly
-        //ini_set('error_log', '/dev/stderr');
-        $this->initInputOutput($input, $output);
+        $stopOnError = '';
+        $stopOnFailure = '';
+        $suiteOption = '';
+        $testPathOrSuite = '';
 
-        $this->initTranslate5();
+        // environment stuff needed for all tests (using environment variables here keeps compatibility with plain apiTest.sh call)
 
-        $testGiven = $this->input->getArgument('test');
-        if(!empty($testGiven)) {
-            if($testGiven  === basename($testGiven)) {
-                $testGiven = self::RELATIVE_TEST_DIR.$testGiven;
-            }
-            if(!file_exists($testGiven)) {
-                throw new \RuntimeException('Given Test does not exist: ' . $testGiven);
-            }
-        }
-
-        //using environment variables here keeps compatibility with plain apiTest.sh call
         putenv('APPLICATION_ROOT='.__DIR__);
 
         if($this->input->getOption('xdebug')){
@@ -139,30 +94,7 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             putenv('KEEP_DATA=1');
         }
 
-        if($this->input->getOption('capture')){
-            putenv('DO_CAPTURE=1');
-            $this->io->warning([
-                'Check the modified test data files thoroughly and conscientiously with git diff,',
-                'if the performed changes are really desired and correct right now!',
-                'Sloppy checking or "just comitting the changes" may make the test useless!',
-            ]);
-            if(!$this->io->confirm('Yes, I will check the modified data files thoroughly!')){
-                putenv('DO_CAPTURE=0');
-            }
-            if($this->input->getOption('legacy-segment')){
-                putenv('LEGACY_DATA=1');
-            }
-            if($this->input->getOption('legacy-json')){
-                putenv('LEGACY_JSON=1');
-            }
-        }
-        else {
-            putenv('DO_CAPTURE=0');
-        }
-
-        $stopOnError = '';
-        $stopOnFailure = '';
-
+        // command options usable for all tests
         if($this->input->getOption('stop-on-error')){
             $stopOnError = '--stop-on-error';
         }
@@ -170,28 +102,45 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             $stopOnFailure = '--stop-on-failure';
         }
 
-        $command = new \PHPUnit\TextUI\Command();
-        $command->run([
+        // test / suite / all specific stuff. Note that DO_CAPTURE is defined in the concrete command for a single test
+        if($testPath !== null){
+            $testPathOrSuite = $testPath;
+        } else if($testSuite !== null){
+            $suiteOption = '--testsuite';
+            $testPathOrSuite = $testSuite;
+            putenv('DO_CAPTURE=0');
+        } else {
+            putenv('DO_CAPTURE=0');
+            $testPathOrSuite = 'application';
+        }
+
+        $assembly = [
             'phpunit',
             '--colors',
             '--verbose',
             $stopOnError,
             $stopOnFailure,
-	        '--testdox-text',
+            '--testdox-text',
             'last-test-result.txt',
             '--cache-result-file',
             '.phpunit.result.cache',
             '--bootstrap',
             self::RELATIVE_TEST_ROOT.'bootstrap.php',
-            $testGiven ?? 'application' // PHP Unit searches recursivly for files named *Test.php
-        ]);
-	$this->io->success('Last test result stored in TEST_ROOT/last-test-result.txt');
+            $suiteOption,
+            $testPathOrSuite
+        ];
+        die(implode(' ', $assembly)); // TODO REMOVE
+
+        // start PHPUnit with neccessary options
+        $command = new \PHPUnit\TextUI\Command();
+        $command->run($assembly);
+        $this->io->success('Last test result stored in TEST_ROOT/last-test-result.txt');
 
         return 0;
     }
 
     /**
-     * Overwritten to check if DB exists, if not create it
+     * Overwritten to initialize T5 with the [test] section in the ini files
      * @return void
      * @throws \Zend_Db_Adapter_Exception
      * @throws \Zend_Db_Exception
@@ -199,58 +148,54 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
      */
     protected function initTranslate5()
     {
-
-        // SAMPLE CODE TO DROP DB IN HERE FOR TESTING PURPOSES ONLY
-        // WE EXPLICITLY DECIDED NOT TO AUTOMATE THAT, but that its the devs
-        // responsibility to provide an empty DB
-//        try {
-//            $pdox = new \PDO('mysql:host=127.0.0.1', 'root', 'XXX');
-//            $pdox->query('drop database translate5;');
-//        }
-//        catch (\PDOException $e){
-//            error_log($e);
-//        }
-
-        try {
-            parent::initTranslate5();
-
-            $test = $this->input->getArgument('test');
-            //if a single test was given, we run that on the current DB
-            if(!empty($test)) {
-                //return;
-            }
-            //if the whole testsuite is running, on an existing DB, we consider that as an error:
-            $config = \Zend_Registry::get('config');
-            $db = $config->resources->db->params->dbname;
-            $this->io->error([
-                'The configured database "'.$db.'" exists!',
-                'Since the run of the whole testsuite wants to create a clean one, drop it, call: ',
-                '  mysql -h localhost -u root -p -e "drop database '.$db.';"',
-                'or change the DB in the installation.ini to a non existing one (but must be still accessible by the user)'."\n".
-                'or run just a single test',
-            ]);
-            die(1);
-        }
-        catch (\Zend_Db_Adapter_Exception $e) {
-            if(! str_contains($e->getMessage(), 'Unknown database')) {
-                throw $e;
-            }
-        }
-        $this->initDatabase();
+        $this->translate5 = new Application();
+        $this->translate5->init('test'); // crucial: use test-environment to start the test
     }
 
     /**
+     * Erases the current test-DB and creates it from scratch
      * @return void
      * @throws \Zend_Db_Exception
      * @throws \Zend_Exception
      */
-    private function initDatabase(): void
+    protected function reInitDatabase(): void
     {
-//start application - without bootstrapping - is loading the needed configurations only
+        $testDbExists = true;
+
+        // Somehow dirty but we must initialize the app anyway ...
+        try {
+            $translate5 = new Application();
+            $translate5->init('test'); // crucial: use test-environment to get the test-configurations
+        } catch (\Throwable $e){
+            if(str_contains($e->getMessage(), 'Unknown database')) {
+                $testDbExists = false;
+            } else {
+                // other Problem, cancel
+                die($e->getMessage()."\n\n".$e->getTraceAsString());
+            }
+        }
+        // evaluate database params
         $baseIndex = \ZfExtended_BaseIndex::getInstance();
         $config = $baseIndex->initApplication()->getOption('resources');
         $config = $config['db']['params'];
 
+        // check, if configured test-db meets our expectaions
+        if($config['dbname'] !== self::TEST_DATABASE){
+            die('The configured test database in installation.ini [test:application] must be \''.self::TEST_DATABASE.'\'!');
+        }
+
+        // drop an existing DB
+        if($testDbExists){
+            try {
+                $pdo = new \PDO('mysql:host=127.0.0.1', $config['username'], $config['password']);
+                $pdo->query('DROP DATABASE '.$config['dbname'].';');
+                $this->io->info('Dropped database '.$config['dbname']);
+            }
+            catch (\PDOException $e){
+                die($e->getMessage()."\n\n".$e->getTraceAsString());
+            }
+        }
+        // now create DB from scratch
         //default character set utf8mb4 collate utf8mb4_unicode_ci
         $sql = 'create database %s default character set utf8mb4 collate utf8mb4_unicode_ci';
 
@@ -265,7 +210,8 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
         //init DB
         if ($updater->initDb() && $updater->importAll() && !$updater->hasErrors()) {
             \editor_Utils::initDemoAndTestUserPasswords();
-            parent::initTranslate5(); //re-init application
+            $this->translate5 = new Application();
+            $this->translate5->init('test'); // crucial: use test-environment to get the (hopefully) configured test-db
             $this->initConfiguration();
             $this->initPlugins();
             return;
@@ -286,7 +232,7 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
      * @return void
      * @throws \Zend_Exception
      */
-    private function initConfiguration(): void
+    protected function initConfiguration(): void
     {
         //see method header!
         // values were just taken over from master instance, not tested if they really must be set to that value!
@@ -331,7 +277,7 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
         }
     }
 
-    private function initPlugins()
+    protected function initPlugins()
     {
         /** @var \ZfExtended_Plugin_Manager $pluginmanager */
         $pluginmanager = \Zend_Registry::get('PluginManager');

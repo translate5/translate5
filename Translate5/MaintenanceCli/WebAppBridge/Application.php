@@ -60,15 +60,19 @@ class Application {
             $this->zendIncludeDir[] = $additionalZendDir;
         }
     }
-    
-    public function init() {
+
+    /**
+     * @param string $applicationEnvironment: defines the section in the ini-files to use
+     * @throws \Zend_Exception
+     */
+    public function init(string $applicationEnvironment = 'application') {
         $cwd = getcwd();
         
         $_SERVER['REQUEST_URI'] = '/database/forceimportall';
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['HTTP_HOST'] = 'localhost';
         defined('APPLICATION_PATH') || define('APPLICATION_PATH', $cwd.DIRECTORY_SEPARATOR.'application');
-        defined('APPLICATION_ENV') || define('APPLICATION_ENV', 'application');
+        defined('APPLICATION_ENV') || define('APPLICATION_ENV', $applicationEnvironment);
 
         require_once 'Zend/Session.php';
         \Zend_Session::$_unitTestEnabled = ! self::$startSession;

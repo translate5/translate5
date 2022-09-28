@@ -48,7 +48,7 @@ $_SERVER['SERVER_NAME'] = 'localhost';
 $_SERVER['HTTP_HOST'] = 'localhost';
 defined('APPLICATION_ROOT') || define('APPLICATION_ROOT', $APPLICATION_ROOT);
 defined('APPLICATION_PATH') || define('APPLICATION_PATH', $APPLICATION_ROOT.DIRECTORY_SEPARATOR.'application');
-defined('APPLICATION_ENV') || define('APPLICATION_ENV', 'application');
+defined('APPLICATION_ENV') || define('APPLICATION_ENV', 'test');
 // define a general marker for unit tests
 // be aware, that this marker affects the TESTING installation and the tests running in it, not the via API tested installation
 define('T5_IS_UNIT_TEST', true);
