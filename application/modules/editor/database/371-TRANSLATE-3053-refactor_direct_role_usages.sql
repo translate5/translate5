@@ -36,3 +36,8 @@ INSERT IGNORE INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
 
 ('editor','termPM_allClients','editor_term','transfer'),
 ('editor','termPM',           'editor_term','transfer');
+
+DELETE FROM `Zf_acl_rules` WHERE 1
+  AND `role` IN ('termCustomerSearch', 'termProposer')
+  AND `resource` = 'editor_apps'
+  AND `right` = 'all';
