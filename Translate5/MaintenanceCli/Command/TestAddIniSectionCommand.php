@@ -61,7 +61,8 @@ class TestAddIniSectionCommand extends Translate5AbstractCommand
         $installationIniPath = APPLICATION_ROOT.'/application/config/installation.ini';
         $installationIni = file_get_contents($installationIniPath);
         if(!$installationIni){
-            die('No installation.ini found!');
+            $this->io->error('No installation.ini found!');
+            return 0;
         }
         // normalizing seperator, just to be sure
         preg_replace('/[ *test *: *application *]/i', $section, $installationIni);
@@ -72,12 +73,12 @@ class TestAddIniSectionCommand extends Translate5AbstractCommand
                 $parts = explode($section, $installationIni);
                 $installationIni = rtrim($parts[0], "\n");
             } else {
-                die(0);
+                return 0;
             }
         }
         // add seperator and base configurations
         $installationIni .= "\n\n\n".$section."\n";
-        $installationIni .= 'resources.db.params.dbname = "translate5_apitests"'."\n"; // fixed DB-name
+        $installationIni .= 'resources.db.params.dbname = "'.Config::DATABASE_NAME.'"'."\n"; // fixed DB-name
         $written = 0;
         $missing = 0;
 

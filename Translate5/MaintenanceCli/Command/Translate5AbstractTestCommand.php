@@ -128,8 +128,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $suiteOption,
             $testPathOrSuite
         ];
-        die(implode(' ', $assembly)); // TODO REMOVE
-
+        // die(implode(' ', $assembly));
         // start PHPUnit with neccessary options
         $command = new \PHPUnit\TextUI\Command();
         $command->run($assembly);
@@ -157,7 +156,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      * @throws \Zend_Db_Exception
      * @throws \Zend_Exception
      */
-    protected function reInitDatabase(): void
+    protected function reInitDatabase(): bool
     {
         $testDbExists = true;
 
@@ -180,7 +179,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
         // check, if configured test-db meets our expectaions
         if($config['dbname'] !== Config::DATABASE_NAME){
-            die('The configured test database in installation.ini [test:application] must be \''.Config::DATABASE_NAME.'\'!');
+            $this->io->error('The configured test database in installation.ini [test:application] must be \''.Config::DATABASE_NAME.'\'!');
+            return false;
         }
 
         // drop an existing DB
@@ -191,7 +191,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
                 $this->io->info('Dropped database '.$config['dbname']);
             }
             catch (\PDOException $e){
-                die($e->getMessage()."\n\n".$e->getTraceAsString());
+                $this->io->error($e->getMessage()."\n\n".$e->getTraceAsString());
+                return false;
             }
         }
         // now create DB from scratch
@@ -213,11 +214,11 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $this->translate5->init('test'); // crucial: use test-environment to get the (hopefully) configured test-db
             $this->initConfiguration();
             $this->initPlugins();
-            return;
+            return true;
         }
         $updater->hasErrors() && $this->io->error($updater->getErrors());
         $updater->hasWarnings() && $this->io->warning($updater->getWarnings());
-        die(1);
+        return false;
     }
 
     /**

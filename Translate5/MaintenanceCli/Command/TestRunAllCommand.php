@@ -57,7 +57,9 @@ class TestRunAllCommand extends Translate5AbstractTestCommand
     {
         $this->initInputOutput($input, $output);
 
-        $this->reInitDatabase();
+        if(!$this->reInitDatabase()){
+            return 0;
+        }
         $this->reInitDataDirectory();
         $this->initTranslate5();
 
