@@ -1,0 +1,28 @@
+<phpunit>
+  <testsuites>
+    <testsuite name="segment-tags">
+      <file>editorAPI/SegmentTagsTest.php</file>
+      <file>editorAPI/SegmentTagsCloneTest.php</file>
+      <file>editorAPI/SegmentTagsComparisionTest.php</file>
+      <file>editorAPI/SegmentTagsOverlapTest.php</file>
+      <file>editorAPI/SegmentTagsRepairTest.php</file>
+      <file>editorAPI/TagsRepairTest.php</file>
+    </testsuite>
+    <testsuite name="quality">
+      <file>editorAPI/QualityBaseTest.php</file>
+      <file>editorAPI/QualityConsistencyTest.php</file>
+      <file>editorAPI/QualityCsvMqmTest.php</file>
+      <file>editorAPI/QualityFaultyTest.php</file>
+      <file>editorAPI/QualityNumbersCheckTest.php</file>
+      <file>editorAPI/QualitySegmentEmptyTest.php</file>
+      <file>editorAPI/QualitySpellCheckTest.php</file>
+    </testsuite>
+    <testsuite name="okapi">
+      <file>../Plugins/Okapi/tests/OkapiBconfTest.php</file>
+      <file>../Plugins/Okapi/tests/OkapiBconfFilterTest.php</file>
+    </testsuite>
+    <testsuite name="visual">
+      <file>../Plugins/VisualReview/tests/VisualImageTest.php</file>
+    </testsuite>
+  </testsuites>
+</phpunit>

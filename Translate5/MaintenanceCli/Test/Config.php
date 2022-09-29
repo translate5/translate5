@@ -43,16 +43,9 @@ class Config {
     const DATABASE_NAME = 'translate5_test';
 
     /**
-     * The available test-suites
-     */
-    const SUITES = [
-        'suite1',
-        'suite2'
-    ];
-
-    /**
      * The configs that either need a fixed value or will be fetched from the application database
-     * If the value is null, the value will be fetched from the application-database and written to [test:application] in the installation.ini, all other values will be saved to the test database
+     * If the value is null, the value will be fetched from the application-database
+     * all values will be saved to the translate5_test database
      */
     const CONFIGS = [
 

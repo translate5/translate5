@@ -37,7 +37,7 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'test:runsuite';
-    
+
     protected function configure()
     {
         $this
@@ -46,9 +46,10 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Runs one of the following test-suites: "'.implode('", "', Config::SUITES).'"');
+            ->setHelp('Runs one of the following test-suites: "'.implode('", "', $this->getAllSuiteNames()).'"');
 
-        $this->addArgument('suite',
+        $this->addArgument(
+            'suite',
             InputArgument::OPTIONAL,
             'Name of the Suite to be executed'
         );
@@ -65,12 +66,13 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
     {
 
         $this->initInputOutput($input, $output);
+        $suiteNames = $this->getAllSuiteNames();
 
         $suite = ($this->input->hasArgument('suite')) ? $this->input->getArgument('suite') : null;
 
-        if($suite === null || !in_array($suite, Config::SUITES)) {
+        if($suite === null || !in_array($suite, $suiteNames)) {
             $uestion = ($suite === null) ? 'Please choose a Suite' : 'Suite "'.$suite.'" doesn\'t exist, choose one of the following';
-            $askSuites = new ChoiceQuestion($uestion, Config::SUITES, null);
+            $askSuites = new ChoiceQuestion($uestion, $suiteNames, null);
             $suite = $this->io->askQuestion($askSuites);
         }
 

@@ -28,7 +28,9 @@
 namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Translate5\MaintenanceCli\Test\Config;
 
 class TestRunAllCommand extends Translate5AbstractTestCommand
 {
@@ -45,6 +47,12 @@ class TestRunAllCommand extends Translate5AbstractTestCommand
             // the "--help" option
             ->setHelp('Runs all API-tests.');
 
+        $this->addOption(
+            'skip-database-reset',
+            's',
+            InputOption::VALUE_NONE,
+            'Will skip the database-reset before running the tests.');
+
         parent::configure();
     }
 
@@ -57,10 +65,19 @@ class TestRunAllCommand extends Translate5AbstractTestCommand
     {
         $this->initInputOutput($input, $output);
 
-        if(!$this->reInitDatabase()){
-            return 0;
+        if($this->input->getOption('skip-database-reset')){
+
+            // skip database reinit (we will not check, if the DB exists ...)
+            $this->io->info('Will work on current DB \''.Config::DATABASE_NAME.'\'');
+
+        } else {
+
+            // reinitialize the database & data directory
+            if(!$this->reInitDatabase()){
+                return 0;
+            }
+            $this->reInitDataDirectory();
         }
-        $this->reInitDataDirectory();
         $this->initTranslate5();
 
         return $this->startApiTest();

@@ -76,10 +76,17 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     protected function startApiTest(string $testPath = null, string $testSuite = null) : int
     {
+        $verbose = '--verbose'; // '--debug'
         $stopOnError = '';
         $stopOnFailure = '';
+        $testPathOrDir = '';
+        $configurationOption = '--no-configuration';
+        $configurationFile = '';
+        $bootstrapOption = '--bootstrap';
+        $bootstrapFile = self::RELATIVE_TEST_ROOT.'bootstrap.php';
         $suiteOption = '';
-        $testPathOrSuite = '';
+        $suiteFile = '';
+
 
         // environment stuff needed for all tests (using environment variables here keeps compatibility with plain apiTest.sh call)
 
@@ -103,37 +110,89 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
         // test / suite / all specific stuff. Note that DO_CAPTURE is defined in the concrete command for a single test
         if($testPath !== null){
-            $testPathOrSuite = $testPath;
+            $testPathOrDir = $testPath;
         } else if($testSuite !== null){
+            // defining the configuration-file-option to read the suites from
+            $configurationOption = '--configuration';
+            // QUIRK: why do we have to set an absolute path here to get the tests running ? With relative pathes, PHPUnit finds the configuration but can not find the linked files ...
+            $configurationFile = APPLICATION_ROOT.'/'.self::RELATIVE_TEST_ROOT.'phpunit.xml';
+            // defining the suite to use
             $suiteOption = '--testsuite';
-            $testPathOrSuite = $testSuite;
+            $suiteFile = $testSuite;
+            // must not be set when using a suite, otherwise the suite will never be triggered ...
+            $testPathOrDir = '';
             putenv('DO_CAPTURE=0');
         } else {
             putenv('DO_CAPTURE=0');
-            $testPathOrSuite = 'application';
+            $testPathOrDir = 'application';
         }
 
         $assembly = [
             'phpunit',
             '--colors',
-            '--verbose',
+            $verbose,
             $stopOnError,
             $stopOnFailure,
             '--testdox-text',
             'last-test-result.txt',
             '--cache-result-file',
             '.phpunit.result.cache',
-            '--bootstrap',
-            self::RELATIVE_TEST_ROOT.'bootstrap.php',
+            $configurationOption,
+            $configurationFile,
+            $bootstrapOption,
+            $bootstrapFile,
             $suiteOption,
-            $testPathOrSuite
+            $suiteFile,
+            $testPathOrDir
         ];
+
+        // die(implode(' ', $assembly)."\n"); return 0;
+
         // start PHPUnit with neccessary options
         $command = new \PHPUnit\TextUI\Command();
         $command->run($assembly);
         $this->io->success('Last test result stored in TEST_ROOT/last-test-result.txt');
 
         return 0;
+    }
+
+    /**
+     * Retrieves all suites by parsing the phpunit.xml
+     * If this file is corrupt or not available, returns a single item hinting at the problem
+     * @return array
+     */
+    protected function getAllSuiteNames(): array {
+        try {
+            // misusing PHPUnit private loader here, but it's the easiest way to have the correct options etc.
+            $document = (new \PHPUnit\Util\Xml\Loader)->loadFile(self::RELATIVE_TEST_ROOT.'phpunit.xml', false, true, true);
+            $xpath = new \DOMXPath($document);
+            /* @var \DOMElement[] $elements */
+            $elements = [];
+            $nodes = $xpath->query('testsuites/testsuite');
+            if ($nodes->length === 0) {
+                $nodes = $xpath->query('testsuite');
+            }
+            if ($nodes->length === 1) {
+                $elements[] = $nodes->item(0);
+            } else {
+                foreach ($nodes as $testSuiteNode) {
+                    $elements[] = $testSuiteNode;
+                }
+            }
+            $suiteNames = [];
+            foreach ($elements as $element) {
+                $name = (string) $element->getAttribute('name');
+                if(!empty($name)){
+                    $suiteNames[] = $name;
+                }
+            }
+            if(count($suiteNames) === 0){
+                die('No suites defined in "'.self::RELATIVE_TEST_ROOT.'phpunit.xml"'."\n"); // since this is called on command-creation we simply die...
+            }
+            return $suiteNames;
+        } catch (\Throwable) {
+            die('File "'.self::RELATIVE_TEST_ROOT.'phpunit.xml" is missing.'."\n"); // since this is called on command-creation we simply die...
+        }
     }
 
     /**
@@ -175,13 +234,17 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         $config = $baseIndex->initApplication()->getOption('resources');
         $applicationDbName = $config['db']['applicationDbName']; // we need the application db-name from a seperate value (created with the test:addinisection Command) as the db-params are overridden
         $config = $config['db']['params'];
-        $pdo = new \PDO('mysql:host='.$config['host'], $config['username'], $config['password']);
-
         // check, if configured test-db meets our expectaions
         if($config['dbname'] !== Config::DATABASE_NAME){
             $this->io->error('The configured test database in installation.ini [test:application] must be \''.Config::DATABASE_NAME.'\'!');
             return false;
         }
+        // check, if configured test-db meets our expectaions
+        if($applicationDbName === Config::DATABASE_NAME){
+            $this->io->error('The configured application database in installation.ini must not be \''.Config::DATABASE_NAME.'\'!');
+            return false;
+        }
+        $pdo = new \PDO('mysql:host='.$config['host'], $config['username'], $config['password']);
 
         // drop an existing DB
         if($testDbExists){
@@ -227,7 +290,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     protected function reInitDataDirectory(): void
     {
-        $dir = APPLICATION_ROOT.'/'.Config::DATA_DIRECTORY;
+        $dir = Config::DATA_DIRECTORY;
         if(is_dir($dir)){
             $files = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
