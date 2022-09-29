@@ -79,6 +79,22 @@ class TestAddIniSectionCommand extends Translate5AbstractCommand
         // add seperator and base configurations
         $installationIni .= "\n\n\n".$section."\n";
         $installationIni .= 'resources.db.params.dbname = "'.Config::DATABASE_NAME.'"'."\n"; // fixed DB-name
+
+        // add original db-name as different param, it must still be accessible when overridden
+        $baseIndex = \ZfExtended_BaseIndex::getInstance();
+        $config = $baseIndex->initApplication()->getOption('resources');
+        $installationIni .= 'resources.db.applicationDbName = "'.$config['db']['params']['dbname'].'"'."\n";
+
+        // save installation ini back
+        file_put_contents($installationIniPath, $installationIni);
+
+        $this->io->info('The '.$section.'-section has been appended to installation.ini.');
+        return 0;
+
+        /*
+         * This code writes the configs from the DB to the ini-file.
+         * This works only for simple types
+
         $written = 0;
         $missing = 0;
 
@@ -107,5 +123,7 @@ class TestAddIniSectionCommand extends Translate5AbstractCommand
             $this->io->warning($missing.' configs have not been found in the application DB. Please set them manually!');
         }
         return 0;
+
+        */
     }
 }

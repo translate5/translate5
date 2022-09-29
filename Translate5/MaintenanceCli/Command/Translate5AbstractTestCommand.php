@@ -128,7 +128,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $suiteOption,
             $testPathOrSuite
         ];
-        // die(implode(' ', $assembly));
+        die(implode(' ', $assembly)); // TODO REMOVE
         // start PHPUnit with neccessary options
         $command = new \PHPUnit\TextUI\Command();
         $command->run($assembly);
@@ -159,7 +159,6 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     protected function reInitDatabase(): bool
     {
         $testDbExists = true;
-
         // Somehow dirty but we must initialize the app anyway ...
         try {
             $translate5 = new Application();
@@ -175,7 +174,9 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         // evaluate database params
         $baseIndex = \ZfExtended_BaseIndex::getInstance();
         $config = $baseIndex->initApplication()->getOption('resources');
+        $applicationDbName = $config['db']['applicationDbName']; // we need the application db-name from a seperate value (created with the test:addinisection Command) as the db-params are overridden
         $config = $config['db']['params'];
+        $pdo = new \PDO('mysql:host='.$config['host'], $config['username'], $config['password']);
 
         // check, if configured test-db meets our expectaions
         if($config['dbname'] !== Config::DATABASE_NAME){
@@ -186,7 +187,6 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         // drop an existing DB
         if($testDbExists){
             try {
-                $pdo = new \PDO('mysql:host=127.0.0.1', $config['username'], $config['password']);
                 $pdo->query('DROP DATABASE '.$config['dbname'].';');
                 $this->io->info('Dropped database '.$config['dbname']);
             }
@@ -200,7 +200,6 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         $sql = 'create database %s default character set utf8mb4 collate utf8mb4_unicode_ci';
 
         // we create the database first - we have to use raw PDO since Zend_Db needs a database...
-        $pdo = new \PDO('mysql:host=' . $config['host'], $config['username'], $config['password']);
         $pdo->query(sprintf($sql, $config['dbname']));
 
         $updater = new \ZfExtended_Models_Installer_DbUpdater();
@@ -209,11 +208,14 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
         //init DB
         if ($updater->initDb() && $updater->importAll() && !$updater->hasErrors()) {
+            // encrypt test-user passworts
             \editor_Utils::initDemoAndTestUserPasswords();
-            $this->translate5 = new Application();
-            $this->translate5->init('test'); // crucial: use test-environment to get the (hopefully) configured test-db
-            $this->initConfiguration();
+            // add needed plugins
             $this->initPlugins();
+            // add the needed configs
+            $configs = $this->getApplicationConfiguration($applicationDbName, $config['host'], $config['username'], $config['password']);
+            $this->initConfiguration($configs);
+
             return true;
         }
         $updater->hasErrors() && $this->io->error($updater->getErrors());
@@ -228,9 +230,9 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     {
         $dir = APPLICATION_ROOT.'/'.Config::DATA_DIRECTORY;
         if(is_dir($dir)){
-            $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
-                RecursiveIteratorIterator::CHILD_FIRST
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
             );
             foreach ($files as $file) {
                 if ($file->isDir()){
@@ -248,15 +250,42 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      * The here added system configuration is neccessary for the tests to be constant
      * @throws \Zend_Exception
      */
-    private function initConfiguration(): void
+    private function initConfiguration(array $neededConfigs): void
     {
         $config = new \editor_Models_Config();
-        // set the predefined, fixed values ("dynamic" values will be copied to the installation.ini
-        foreach(Config::CONFIGS as $name => $value) {
-            if($value !== null){ // value is statically defined
+        // set the predefined or dynamically evaluated values
+        foreach($neededConfigs as $name => $value) {
+            if($value !== null){
                 $config->update($name, $value);
             }
         }
+    }
+
+    /**
+     * Retrieves the "dynamic" config values that need to be copied from the application DB as they hardly can be set statically to suit all installations
+     * @param string $applicationDbName
+     * @param string $host
+     * @param string $username
+     * @param string $password
+     * @return array
+     */
+    private function getApplicationConfiguration(string $applicationDbName, string $host, string $username, string $password): array
+    {
+        $this->io->info('Copying config-values from database \''.$applicationDbName.'\'');
+        $pdo = new \PDO('mysql:host='.$host.';dbname='.$applicationDbName, $username, $password);
+        $neededConfigs = Config::CONFIGS;
+        foreach($neededConfigs as $name => $value){
+            if($value === null){ // value should be taken from application DB
+                $query = 'SELECT `value` FROM `Zf_configuration` WHERE `name` = ?';
+                $stmt = $pdo->prepare($query);
+                $stmt->execute([$name]);
+                $appVal = $stmt->fetchColumn();
+                if($appVal !== false){
+                    $neededConfigs[$name] = $appVal;
+                }
+            }
+        }
+        return $neededConfigs;
     }
 
     /**
