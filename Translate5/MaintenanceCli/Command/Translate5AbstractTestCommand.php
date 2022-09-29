@@ -203,7 +203,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
         $updater = new \ZfExtended_Models_Installer_DbUpdater();
         //add the test SQL path
-        $updater->setAdditonalSqlPaths([APPLICATION_PATH . '/modules/editor/testcases/database/']);
+        $updater->addAdditonalSqlPath(APPLICATION_PATH.'/modules/editor/testcases/database/');
 
         //init DB
         if ($updater->initDb() && $updater->importAll() && !$updater->hasErrors()) {
