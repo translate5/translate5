@@ -157,11 +157,8 @@ class Dispatcher {
             // get all initial_page acl records for all available user roles
             $aclModules = $acl->getInitialPageModulesForRoles(Auth::getInstance()->getRoles());
 
-            $config = Zend_Registry::get('config');
-            $modulesOrder = explode(',',$config->runtimeOptions->modulesOrder);
-
             // find the module redirect based on the modulesOrder config
-            foreach ($modulesOrder as $module){
+            foreach (APPLICATION_MODULES as $module){
                 if(in_array($module,$aclModules)){
                     $applett = $module;
                     break;

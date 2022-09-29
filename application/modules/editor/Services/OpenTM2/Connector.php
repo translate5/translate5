@@ -90,11 +90,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         //to ensure that we get unique TMs Names although of the above stripped content,
         // we add the LanguageResource ID and a prefix which can be configured per each translate5 instance
-        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
-        if(!empty($prefix)) {
-            $prefix .= '-';
-        }
-        $name = $prefix.'ID'.$this->languageResource->getId().'-'.$this->filterName($this->languageResource->getName());
+        $name = 'ID'.$this->languageResource->getId().'-'.$this->filterName($this->languageResource->getName());
         
         $this->languageResource->addSpecificData('fileName',$name);
         $this->languageResource->save();
