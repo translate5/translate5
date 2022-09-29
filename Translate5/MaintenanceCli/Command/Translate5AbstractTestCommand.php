@@ -230,7 +230,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         $dir = APPLICATION_ROOT.'/'.Config::DATA_DIRECTORY;
         if(is_dir($dir)){
             $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::CHILD_FIRST
             );
             foreach ($files as $file) {
@@ -247,7 +247,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
     /**
      * The here added system configuration is neccessary for the tests to be constant
-     * @throws \Zend_Exception
+     * @param array $neededConfigs
      */
     private function initConfiguration(array $neededConfigs): void
     {
