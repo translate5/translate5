@@ -128,7 +128,6 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $suiteOption,
             $testPathOrSuite
         ];
-        die(implode(' ', $assembly)); // TODO REMOVE
         // start PHPUnit with neccessary options
         $command = new \PHPUnit\TextUI\Command();
         $command->run($assembly);
