@@ -29,29 +29,34 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
-class TestRunSuiteCommand extends Translate5AbstractTestCommand
+class TestApplicationRunCommand extends Translate5AbstractTestCommand
 {
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'test:runsuite';
-
+    protected static $defaultName = 'test:apprun';
+    
     protected function configure()
     {
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('API-Tests: Runs a test suite.')
-
+            ->setDescription('API-Tests: Runs all tests for the application environment.')
+        
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Runs one of the following test-suites: "'.implode('", "', $this->getAllSuiteNames()).'"');
+            ->setHelp('Runs all API-tests for the aplication environment and NOT the test-environment.');
 
-        $this->addArgument(
-            'suite',
+        $this->addArgument('testorsuite',
             InputArgument::OPTIONAL,
-            'Name of the Suite to be executed'
+            'Filename of the Test to be called (don\'t forget *.php) or name of a suite'
         );
+
+        $this->addOption(
+            'recreate-database',
+            'r',
+            InputOption::VALUE_NONE,
+            'Use this option to recreate the application database. This will also clean the /data directory contents.');
 
         parent::configure();
     }
@@ -63,18 +68,21 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $this->initInputOutput($input, $output);
-        $suiteNames = $this->getAllSuiteNames();
 
-        $suite = ($this->input->hasArgument('suite')) ? $this->input->getArgument('suite') : null;
+        $testOrSuite = $this->input->getArgument('testorsuite');
+        $extension = empty($testOrSuite) ? '' : strtolower(pathinfo($testOrSuite, PATHINFO_EXTENSION));
+        $testPath = ($extension === 'php') ? $testOrSuite : null;
+        $testSuite = ($extension === '' && !empty($testOrSuite)) ? $testOrSuite : null;
 
-        if($suite === null || !in_array($suite, $suiteNames)) {
-            $uestion = ($suite === null) ? 'Please choose a Suite' : 'Suite "'.$suite.'" doesn\'t exist, choose one of the following';
-            $askSuites = new ChoiceQuestion($uestion, $suiteNames, null);
-            $suite = $this->io->askQuestion($askSuites);
+        // reinitialize the database & data directory if we should
+        if($this->input->getOption('recreate-database')) {
+            if (!$this->reInitApplicationDatabase()){
+                return 0;
+            }
+            // cleanup he "normal" data dirs
+            $this->reInitDataDirectory('data');
         }
-
-        return $this->startApiTest(null, $suite);
+        return $this->startApiTest($testPath, $testSuite, 'application');
     }
 }

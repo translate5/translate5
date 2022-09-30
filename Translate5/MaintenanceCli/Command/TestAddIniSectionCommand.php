@@ -31,7 +31,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\Test\Config;
 
-class TestAddIniSectionCommand extends Translate5AbstractCommand
+class TestAddIniSectionCommand extends Translate5AbstractTestCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'test:addinisection';
@@ -54,76 +54,74 @@ class TestAddIniSectionCommand extends Translate5AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->initInputOutput($input, $output);
-        $this->initTranslate5();
+        try {
+            $this->initInputOutput($input, $output);
+            $this->initTranslate5(); // this needs to run in the normal application environment !
 
-        $section = '[test:application]';
-        $installationIniPath = APPLICATION_ROOT.'/application/config/installation.ini';
-        $installationIni = file_get_contents($installationIniPath);
-        if(!$installationIni){
-            $this->io->error('No installation.ini found!');
-            return 0;
-        }
-        // normalizing seperator, just to be sure
-        preg_replace('/[ *test *: *application *]/i', $section, $installationIni);
-
-        // if the installation.ini already contains a test section we ask if we should override it and if yes dismiss it
-        if(str_contains($installationIni, $section)){
-            if($this->io->confirm('The installation.ini already has a '.$section.' section, should it be overwritten?')){
-                $parts = explode($section, $installationIni);
-                $installationIni = rtrim($parts[0], "\n");
-            } else {
+            $section = '[test:application]';
+            $installationIniPath = APPLICATION_ROOT.'/application/config/installation.ini';
+            $installationIni = file_get_contents($installationIniPath);
+            if(!$installationIni){
+                $this->io->error('No installation.ini found!');
                 return 0;
             }
-        }
-        // add seperator and base configurations
-        $installationIni .= "\n\n\n".$section."\n";
-        $installationIni .= 'resources.db.params.dbname = "'.Config::DATABASE_NAME.'"'."\n"; // fixed DB-name
+            // normalizing section seperator, just to be sure
+            $installationIni = str_replace("\r", '', $installationIni);
+            $installationIni = preg_replace('/ *\[ *test *: *application *\] */i', $section, $installationIni);
 
-        // add original db-name as different param, it must still be accessible when overridden
-        $baseIndex = \ZfExtended_BaseIndex::getInstance();
-        $config = $baseIndex->initApplication()->getOption('resources');
-        $installationIni .= 'resources.db.applicationDbName = "'.$config['db']['params']['dbname'].'"'."\n";
-
-        // save installation ini back
-        file_put_contents($installationIniPath, $installationIni);
-
-        $this->io->info('The '.$section.'-section has been appended to installation.ini.');
-        return 0;
-
-        /*
-         * This code writes the configs from the DB to the ini-file.
-         * This works only for simple types
-
-        $written = 0;
-        $missing = 0;
-
-        // now write the values from the DB to the installation.ini
-        $config = new \editor_Models_Config();
-        foreach(Config::CONFIGS as $name => $value){
-            if($value === null){ // value should be taken from existing config
-                $dbValue = $config->getCurrentValue($name);
-                if($dbValue === null || $dbValue === ''){
-                    $installationIni .= '; '.$name.' = ? TODO: not found in application DB, set manually'."\n"; // value not found: user needs to take action
-                    $missing++;
+            // if the installation.ini already contains a test section we ask if we should override it and if yes dismiss it
+            if(str_contains($installationIni, $section)){
+                if($this->io->confirm('The installation.ini already has a '.$section.' section, should it be overwritten?')){
+                    // dismiss the current test section
+                    $parts = explode($section, $installationIni);
+                    $installationIni = rtrim($parts[0], "\n");
                 } else {
-                    if($dbValue !== 'true' && $dbValue !== 'false' && !ctype_digit($dbValue)){
-                        $dbValue = str_contains($dbValue, '"') ? '\''.str_replace('\'', '\\\'', $dbValue).'\'' : '"'.$dbValue.'"';
-                    }
-                    $installationIni .= $name.' = '.$dbValue."\n";
-                    $written++;
+                    return 0;
                 }
             }
-        }
-        // save installation ini back
-        file_put_contents($installationIniPath, $installationIni);
 
-        $this->io->info('The '.$section.'-section has been appended to installation.ini, '.$written.' configs have been added.');
-        if($missing > 0){
-            $this->io->warning($missing.' configs have not been found in the application DB. Please set them manually!');
+            // set testSettings (if not already there) to [application]
+            if(!str_contains($installationIni, 'testSettings')){
+                $installationIni .= implode("\n", [
+                    "\n",
+                    ';test settings, this enables api-tests via command for the instance',
+                    'testSettings.testsAllowed = 1',
+                    'testSettings.isApiTest = 0'
+                ]);
+            } else {
+                // if there, we make sure they're correct them
+                $installationIni = preg_replace('/ *testSettings.testsAllowed *= *[0,1]*/i', 'testSettings.testsAllowed = 1', $installationIni);
+                $installationIni = preg_replace('/ *testSettings.isApiTest *= *[0,1]*/i', 'testSettings.isApiTest = 0', $installationIni);
+                // ... and complement if neccessary
+                if(!str_contains($installationIni, 'testSettings.testsAllowed = 1')){
+                    $installationIni .= "\n".'testSettings.testsAllowed = 1';
+                }
+                if(!str_contains($installationIni, 'testSettings.isApiTest = 0')){
+                    $installationIni .= "\n".'testSettings.isApiTest = 0';
+                }
+            }
+
+
+            // add test-section [test:application]
+            // retrieve application db-name
+            $baseIndex = \ZfExtended_BaseIndex::getInstance();
+            $config = $baseIndex->initApplication()->getOption('resources');
+            // add seperator and base configurations
+            $installationIni .= "\n\n\n".$section."\n";
+            // create test-db-name with a fixed scheme
+            $installationIni .= 'resources.db.params.dbname = "'.Config::createTestDatabaseName($config['db']['params']['dbname']).'"'."\n";
+            // add application db-name as different param, it must still be accessible when overridden
+            $installationIni .= 'testSettings.applicationDbName = "'.$config['db']['params']['dbname'].'"'."\n";
+            // a configuration-option that retrieves if we are API-testing
+            $installationIni .= 'testSettings.isApiTest = 1'."\n";
+
+            // save installation ini back
+            file_put_contents($installationIniPath, $installationIni);
+
+            $this->io->info('The '.$section.'-section has been appended to installation.ini.');
+        } catch(\Throwable $e) {
+            $this->io->error($e->getMessage()."\n\n".$e->getTraceAsString());
         }
         return 0;
-
-        */
     }
 }

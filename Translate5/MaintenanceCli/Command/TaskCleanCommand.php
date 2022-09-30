@@ -252,11 +252,7 @@ class TaskCleanCommand extends Translate5AbstractCommand
                 if(strpos($absDir, $absRoot) !== 0) {
                     throw new RuntimeException('The to be deleted directory "'.$absDir.'" is not under application root "'.$absRoot.'"!');
                 }
-                /* @var $recursivedircleaner \ZfExtended_Controller_Helper_Recursivedircleaner */
-                $recursivedircleaner = \ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                    'Recursivedircleaner'
-                    );
-                $recursivedircleaner->delete($absDir);
+                \ZfExtended_Utils::recursiveDelete($absDir);
             }
         }
         $this->io->section('Data Directories without a task:');
@@ -303,7 +299,11 @@ class TaskCleanCommand extends Translate5AbstractCommand
     protected function getDirectorySize(string $dir): int {
         $bytes = 0;
         foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)) as $it){
-            $bytes += $it->getSize();
+            try {
+                $bytes += $it->getSize();
+            } catch(\Throwable){
+
+            }
         }
         return $bytes;
     }

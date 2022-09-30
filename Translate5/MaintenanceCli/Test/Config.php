@@ -38,9 +38,18 @@ class Config {
     const DATA_DIRECTORY = 'testdata';
 
     /**
-     * Fixed database-name of the test-database
+     * The configs that define USERDATA pathes
      */
-    const DATABASE_NAME = 'translate5_test';
+    const DATA_CONFIGS = [
+
+        /* Configs that reference pathes in the USERDATA dir */
+
+        'runtimeOptions.dir.tmp' => '../testdata/tmp',
+        'runtimeOptions.dir.logs' => '../testdata/cache',
+        'runtimeOptions.dir.taskData' => '../testdata/editorImportedTasks',
+        'runtimeOptions.plugins.Okapi.dataDir' => '../testdata/editorOkapiBconf',
+        'runtimeOptions.plugins.VisualReview.fontsDataDir' => '../testdata/editorVisualReviewFonts'
+    ];
 
     /**
      * The configs that either need a fixed value or will be fetched from the application database
@@ -51,12 +60,6 @@ class Config {
 
         /* Configs that need to be of fixed value */
 
-        'runtimeOptions.plugins.Okapi.dataDir' => '../testdata/editorOkapiBconf',
-        'runtimeOptions.plugins.VisualReview.fontsDataDir' => '../testdata/editorVisualReviewFonts',
-        'runtimeOptions.dir.tmp' => '../testdata/tmp',
-        'runtimeOptions.dir.taskData' => '../testdata/editorImportedTasks',
-        'runtimeOptions.dir.logs' => '../testdata/cache',
-        'runtimeOptions.dir.locales' => '../data/locales', // TODO: do we need to change this ?
         'runtimeOptions.customers.anonymizeUsers' => 1,
         'runtimeOptions.editor.notification.userListColumns' => '["surName","firstName","email","role","state","deadlineDate"]',
         'runtimeOptions.import.enableSourceEditing' => 1,
@@ -102,4 +105,56 @@ class Config {
         'runtimeOptions.plugins.VisualReview.shellCommandPdfOptimizer' => null,
         'runtimeOptions.plugins.VisualReview.shellCommandWget' => null
     ];
+
+    /**
+     * The name of the test-db will follow a fixed scheme
+     * @param string $applicationDatabaseName
+     * @return string
+     * @throws \ZfExtended_Exception
+     */
+    public static function createTestDatabaseName(string $applicationDatabaseName) : string{
+        // we have to be really picky here ...
+        if(empty($applicationDatabaseName)){
+            throw new \ZfExtended_Exception('Empty applicationDatabaseName provided!');
+        }
+        // trying to respect camel-case vs underscore naming-schemes here, of course just an attempt
+        if(strtolower($applicationDatabaseName) === $applicationDatabaseName){
+            return $applicationDatabaseName.'_test';
+        }
+        return $applicationDatabaseName.'Test';
+    }
+
+    /**
+     * Retrieves the configs for a test-database
+     * @return array
+     */
+    public static function getTestConfigs() : array {
+        return array_merge(self::DATA_CONFIGS, self::CONFIGS);
+    }
+
+    /**
+     * Retrieves the configs for a productive/application database
+     * @param string $dataFolder
+     * @return array
+     */
+    public static function getApplicationConfigs(string $dataFolder='data') : array {
+        $configs = [];
+        foreach(self::DATA_CONFIGS as $name => $value){
+            $configs[$name] = str_replace('/'.self::DATA_DIRECTORY.'/', '/'.$dataFolder.'/', $value);
+        }
+        return array_merge($configs, self::CONFIGS);
+    }
+
+    /**
+     * Retrieves the folders inside the USERDATA directory that needs to be cleaned when the database is recrteated
+     * @return string[]
+     */
+    public static function getUserDataFolders() : array {
+        $folders = [];
+        foreach(self::DATA_CONFIGS as $name => $path){
+            $parts = explode('/', $path);
+            $folders[] = array_pop($parts);
+        }
+        return $folders;
+    }
 }

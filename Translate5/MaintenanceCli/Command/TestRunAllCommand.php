@@ -68,17 +68,16 @@ class TestRunAllCommand extends Translate5AbstractTestCommand
         if($this->input->getOption('skip-database-reset')){
 
             // skip database reinit (we will not check, if the DB exists ...)
-            $this->io->info('Will work on current DB \''.Config::DATABASE_NAME.'\'');
+            $this->io->info('Skip database-reset ...');
 
         } else {
 
             // reinitialize the database & data directory
-            if(!$this->reInitDatabase()){
+            if(!$this->reInitTestDatabase()){
                 return 0;
             }
-            $this->reInitDataDirectory();
+            $this->reInitDataDirectory(Config::DATA_DIRECTORY);
         }
-        $this->initTranslate5();
 
         return $this->startApiTest();
     }

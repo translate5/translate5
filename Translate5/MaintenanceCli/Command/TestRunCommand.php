@@ -112,8 +112,6 @@ class TestRunCommand extends Translate5AbstractTestCommand
             putenv('DO_CAPTURE=0');
         }
 
-        $this->initTranslate5();
-
         return $this->startApiTest($test);
     }
 }
