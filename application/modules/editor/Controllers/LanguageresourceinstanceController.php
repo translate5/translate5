@@ -1437,8 +1437,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 continue;
             }
             $toAdd = [
-                "type" => $translate->_($key.'_'.$serviceName),
-                "value" => $value
+                'type' => $key.'_'.$serviceName,
+                'text' => $translate->_($key.'_'.$serviceName),
+                'value' => $value
             ];
             // fileName should always appear as first element
             if($key === 'fileName'){
@@ -1447,6 +1448,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                 array_push($return, $toAdd);
             }
         }
-        return Zend_Json::encode($return);
+
+        return empty($return) ? '' : Zend_Json::encode($return);
     }
 }
