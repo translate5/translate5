@@ -234,14 +234,14 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
             }
             if($taskResult->state == 'error') {
                 if($failOnError) {
-                    $test::fail('Task Import stopped. Task has state error.');
+                    $test::fail('Task Import stopped. Task has state error and last errors: '."\n  ".join("\n  ", array_column($taskResult->lastErrors ?? [], 'message')));
                 }
                 return false;
             }
             //break after RELOAD_TASK_LIMIT reloads
             if($counter==static::RELOAD_TASK_LIMIT){
                 if($failOnError) {
-                    $test::fail('Task Import stopped. Task doees not have state open after '.static::RELOAD_TASK_LIMIT.' task checks.');
+                    $test::fail('Task Import stopped. Task is not open after '.self::RELOAD_TASK_LIMIT.' task checks, but has state: '.$taskResult->state);
                 }
                 return false;
             }

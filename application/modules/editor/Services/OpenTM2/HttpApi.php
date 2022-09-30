@@ -136,6 +136,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             // so we ensure that there is a path, although this would lead to an 404
             $fileName = 'i/do/not/exist';
         }
+
+        //CRUCIAL: the prefix (if any) must be added on usage, and may not be stored in the specificName
+        // that is relevant for security on a multi hosting environment
+        $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
+        if(!empty($prefix)) {
+            $fileName = $prefix.'-'.$fileName;
+        }
         $url = urlencode($fileName).'/'.ltrim($urlSuffix, '/');
         return $this->getHttp($method, $url);
     }

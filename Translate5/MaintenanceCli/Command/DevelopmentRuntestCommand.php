@@ -217,7 +217,7 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             $test = $this->input->getArgument('test');
             //if a single test was given, we run that on the current DB
             if(!empty($test)) {
-                //return;
+                return;
             }
             //if the whole testsuite is running, on an existing DB, we consider that as an error:
             $config = \Zend_Registry::get('config');
@@ -260,7 +260,7 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
 
         $updater = new \ZfExtended_Models_Installer_DbUpdater();
         //add the test SQL path
-        $updater->setAdditonalSqlPaths([APPLICATION_PATH . '/modules/editor/testcases/database/']);
+        $updater->addAdditonalSqlPath(APPLICATION_PATH . '/modules/editor/testcases/database/');
 
         //init DB
         if ($updater->initDb() && $updater->importAll() && !$updater->hasErrors()) {

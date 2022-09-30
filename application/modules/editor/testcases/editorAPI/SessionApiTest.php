@@ -31,6 +31,12 @@ END LICENSE AND COPYRIGHT
  */
 class SessionApiTest extends \editor_Test_ApiTest {
 
+    /**
+     * Internal reference to the created task
+     * @var stdClass
+     */
+    protected static stdClass $task;
+
     public static function beforeTests(): void {
 
         $task = array(
@@ -42,6 +48,7 @@ class SessionApiTest extends \editor_Test_ApiTest {
 
         static::api()->addImportFile(static::api()->getFile('justatask.xlf'));
         static::api()->import($task);
+        self::$task = $api->getTask();
     }
     
     /**
@@ -164,7 +171,13 @@ class SessionApiTest extends \editor_Test_ApiTest {
         static::api()->logout();
         static::api()->setTask($task);
     }
-    
+
+    /**
+     * @depends testSessionToken
+     * @depends testSessionTokenWithTask
+     * @return void
+     * @throws Zend_Http_Client_Exception
+     */
     public function testSingleClickAuthentication() {
         static::api()->logout();
         static::api()->login('testmanager2');
@@ -205,7 +218,6 @@ class SessionApiTest extends \editor_Test_ApiTest {
     }
     
     public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
+        static::api()->deleteTask(self::$task->id, 'testmanager', 'testlector');
     }
 }
