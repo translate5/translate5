@@ -460,7 +460,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                         SELECT
                             ROW_NUMBER() OVER (
                                 PARTITION BY termEntryId 
-                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC
+                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC,id DESC
                             ) AS virtual_id,
                             term,
                             id,
@@ -481,7 +481,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                         SELECT
                             ROW_NUMBER() OVER (
                                 PARTITION BY termEntryId 
-                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC
+                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC,id DESC
                             ) AS virtual_id,
                             term,
                             id,
@@ -499,6 +499,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                     AND sourceTable.id != targetTable.id
                     GROUP BY sourceTable.term;';
 
+        error_log($sql);
         return $this->db->getAdapter()->query($sql)->fetchAll();
     }
 
