@@ -93,10 +93,11 @@ class QualityBaseTest extends editor_Test_JsonTest {
      */
     public function testTaskTooltip(){
         $fileName = 'expectedTaskToolTip.html';
-        $markup = static::api()->getRaw('editor/quality/tasktooltip?&taskGuid='.urlencode(static::api()->getTask()->taskGuid), [], $fileName);
-        $this->assertStringContainsString('</table>', $markup, 'Task Qualities ToolTip Markup does not match');
-        $this->assertStringContainsString('<td>487</td>', $markup, 'Task Qualities ToolTip Markup does not match'); // number of all MQMs 
-        $this->assertFileContents($fileName, $markup, 'Task Qualities ToolTip Markup does not match'); // this test might has to be adjusted due to the translation problematic
+        $result = static::api()->getRaw('editor/quality/tasktooltip?&taskGuid='.urlencode(self::$api->getTask()->taskGuid), [], $fileName);
+        $this->assertTrue($result->success, 'Task Qualities ToolTip Markup could not be requested');
+        $this->assertStringContainsString('</table>', $result->data, 'Task Qualities ToolTip Markup does not match');
+        $this->assertStringContainsString('<td>487</td>', $result->data, 'Task Qualities ToolTip Markup does not match'); // number of all MQMs
+        $this->assertFileContents($fileName, $result->data, 'Task Qualities ToolTip Markup does not match'); // this test might has to be adjusted due to the translation problematic
     }
     /**
      * Tests the qualities fetched for a segment

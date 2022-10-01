@@ -109,12 +109,13 @@ class TbxSpecialcharsTest extends \editor_Test_ApiTest {
         $this->assertEquals($expected, $imported, 'Specialchars quantities in ' . $file .' and in /terminfo response are not equal');
 
         // [7] Assert qties of specialchars (original vs exported)
-        $exportedTbx = static::api()->getRaw('editor/languageresourceinstance/tbxexport', [
+        $result = static::api()->getRaw('editor/languageresourceinstance/tbxexport', [
             'collectionId' => $collectionId,
             'tbxBasicOnly' => 0,
             'exportImages' => 1
         ]);
-        $exported = preg_match_all('~&lt;~', $exportedTbx);
+        $this->assertTrue($result->success, 'TBX export could not be requested');
+        $exported = preg_match_all('~&lt;~', $result->data);
         $this->assertEquals($original, $exported, 'Specialchars quantities in original and exported files are not equal');
 
         static::api()->login('testtermproposer');

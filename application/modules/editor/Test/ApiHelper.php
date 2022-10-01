@@ -129,8 +129,7 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
         }
         $this->task->originalSourceLang = $task['sourceLang'];
         $this->task->originalTargetLang = $task['targetLang'];
-        $resp = $this->getLastResponse();
-        $test::assertEquals(200, $resp->getStatus(), 'Import Request does not respond HTTP 200! Body was: '.$resp->getBody());
+        $this->assertResponseStatus($this->getLastResponse(), 'Import');
 
         if(!$waitForImport){
             return true;
@@ -176,7 +175,7 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
             'taskGuid'=> $taskGuid
         ]);
         $resp = $this->getLastResponse();
-        $this->testClass::assertEquals(200, $resp->getStatus(), 'Import Request does not respond HTTP 200! Body was: '.$resp->getBody());
+        $this->assertResponseStatus($resp, 'Config');
         return $this->decodeJsonResponse($resp);
     }
 
@@ -361,38 +360,43 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
     /**
      * Sets the passed or current task to open
      * @param int $taskId: if given, this task is taken, otherwise the current task
+     * @return array|stdClass
      */
     public function setTaskToOpen(int $taskId = -1) {
-        $this->setTaskState($taskId, 'open');
+        return $this->setTaskState($taskId, 'open');
     }
 
     /**
      * Sets the passed or current task to edit
      * @param int $taskId: if given, this task is taken, otherwise the current task
+     * @return array|stdClass
      */
     public function setTaskToEdit(int $taskId = -1) {
-        $this->setTaskState($taskId, 'edit');
+        return $this->setTaskState($taskId, 'edit');
     }
 
     /**
      * Sets the passed or current task to finished
      * @param int $taskId: if given, this task is taken, otherwise the current task
+     * @return array|stdClass
      */
     public function setTaskToFinished(int $taskId = -1) {
-        $this->setTaskState($taskId, 'finished');
+        return $this->setTaskState($taskId, 'finished');
     }
 
     /**
      * @param int $taskId: if given, this task is taken, otherwise the current task
      * @param string $userState
+     * @return array|stdClass
      */
-    private function setTaskState(int $taskId, string $userState){
+    private function setTaskState(int $taskId, string $userState) {
         if($taskId < 1 && $this->task){
             $taskId = $this->task->id;
         }
         if($taskId > 0){
-            $this->putJson('editor/task/'.$taskId, array('userState' => $userState, 'id' => $taskId));
+            return $this->putJson('editor/task/'.$taskId, array('userState' => $userState, 'id' => $taskId));
         }
+        return $this->createResponseResult(null, 'No Task to set state for');
     }
 
     /***
@@ -484,8 +488,7 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
         );
         $p = array_merge($p, $params);
         $json = $this->postJson('editor/taskuserassoc', $p);
-        $resp = $this->getLastResponse();
-        $test::assertEquals(200, $resp->getStatus(), 'User "'.$username.'" could not be added to test task '.$this->task->taskGuid.'! Body was: '.$resp->getBody());
+        $this->assertResponseStatus($this->getLastResponse(), 'User');
         return $json;
     }
 
@@ -539,7 +542,7 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * @param int $limit
      * @param int $start
      * @param int $page
-     * @return bool|mixed|stdClass|null
+     * @return stdClass|array
      */
     public function getSegments(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1){
         $url = 'editor/segment?page='.$page.'&start='.$start.'&limit='.$limit;
@@ -598,42 +601,42 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
         if($fileName){
             $this->addFile('tmUpload', $this->getFile($fileName,$testDir), "application/xml");
             $resource = $this->postJson('editor/languageresourceinstance', $params);
-        }else{
+        } else {
             //request because the requestJson will encode the params with "data" as parent
-            $response = $this->request('editor/languageresourceinstance', 'POST',$params);
+            $response = $this->request('editor/languageresourceinstance', 'POST', $params);
+            $this->assertResponseStatus($response, 'Language resource');
             $resource = $this->decodeJsonResponse($response);
         }
-        $test::assertTrue(is_object($resource), 'Unable to create the language resource:'.$params['name']);
         $test::assertEquals($params['name'], $resource->name);
 
         //collect the created resource
-        static::$resources[]=$resource;
+        static::$resources[] = $resource;
 
         error_log("Language resources created. ".$resource->name);
 
-        $resp = $this->getJson('editor/languageresourceinstance/'.$resource->id);
+        $result = $this->getJson('editor/languageresourceinstance/'.$resource->id);
 
         if(!$waitForImport){
-            return $resp;
+            return $result;
         }
-        error_log('Languageresources status check:'.$resp->status);
+        error_log('Languageresources status check:'.$result->status);
         $counter=0;
-        while ($resp->status!='available'){
-            if($resp->status=='error'){
+        while ($result->status != 'available'){
+            if($result->status == 'error'){
                 break;
             }
             //break after RELOAD_RESOURCE_LIMIT trys
-            if($counter==static::RELOAD_RESOURCE_LIMIT){
+            if($counter == static::RELOAD_RESOURCE_LIMIT){
                 break;
             }
             sleep(2);
-            $resp = $this->getJson('editor/languageresourceinstance/'.$resp->id);
-            error_log('Languageresources status check '.$counter.'/'.static::RELOAD_RESOURCE_LIMIT.' state: '.$resp->status);
+            $result = $this->getJson('editor/languageresourceinstance/'.$result->id);
+            error_log('Languageresources status check '.$counter.'/'.static::RELOAD_RESOURCE_LIMIT.' state: '.$result->status);
             $counter++;
         }
 
-        $test::assertEquals('available',$resp->status,'Resource import stoped. Resource state is:'.$resp->status);
-        return $resp;
+        $test::assertEquals('available', $result->status, 'Resource import stoped. Resource state is:'.$result->status);
+        return $result;
     }
 
     /**
@@ -732,7 +735,7 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      */
     public function getLanguages() {
         $resp = $this->get('editor/language');
-        $this->testClass::assertEquals(200, $resp->getStatus(), 'Import Request does not respond HTTP 200! Body was: '.$resp->getBody());
+        $this->assertResponseStatus($resp, 'Languages');
         return $this->decodeJsonResponse($resp);
     }
 
