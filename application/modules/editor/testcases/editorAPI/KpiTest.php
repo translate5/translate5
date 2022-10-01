@@ -86,28 +86,29 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         // If any task exists already, filtering will be wrong!
         $filteredTasks = static::getFilteredTasks();
         static::assertEquals('0', count($filteredTasks), 'The translate5 instance contains already a task with the name "'.static::$taskNameBase.'" remove this task before!');
+        if(count($filteredTasks) === 0){
+            // create the tasks and store their ids
+            foreach (static::$tasksForKPI as $taskData) {
+                $taskNameSuffix = $taskData['taskNameSuffix'];
+                $task = array(
+                    'taskName' => static::$taskNameBase.'_'.$taskNameSuffix, //no date in file name possible here!
+                    'sourceLang' => 'en',
+                    'targetLang' => 'de'
+                );
+                self::$api->addImportFile(self::$api->getFile('../TestImportProjects/testcase-de-en.xlf'));
+                self::$api->import($task);
 
-        // create the tasks and store their ids
-        foreach (static::$tasksForKPI as $taskData) {
-            $taskNameSuffix = $taskData['taskNameSuffix'];
-            $task = array(
-                'taskName' => static::$taskNameBase.'_'.$taskNameSuffix, //no date in file name possible here!
-                'sourceLang' => 'en',
-                'targetLang' => 'de'
-            );
-            self::$api->addImportFile(self::$api->getFile('../TestImportProjects/testcase-de-en.xlf'));
-            self::$api->import($task);
+                // store task-id for later deleting
+                $task = self::$api->getTask();
+                static::$taskIds[$taskNameSuffix] = $task->id;
 
-            // store task-id for later deleting
-            $task = self::$api->getTask();
-            static::$taskIds[$taskNameSuffix] = $task->id;
-
-            //add user to the task
-            $tua = self::$api->addUser('testlector', params: [
-                'workflow'=>'default',
-                'workflowStepName'=>'reviewing'
-            ]);
-            static::$taskUserAssocMap[$task->id] = $tua->id;
+                //add user to the task
+                $tua = self::$api->addUser('testlector', params: [
+                    'workflow'=>'default',
+                    'workflowStepName'=>'reviewing'
+                ]);
+                static::$taskUserAssocMap[$task->id] = $tua->id;
+            }
         }
     }
 
