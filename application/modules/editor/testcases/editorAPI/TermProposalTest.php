@@ -266,7 +266,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
 
         // Check it's the same file that we uploaded
         $result = static::api()->getRaw($src);
-        $this->assertTrue($result->success, 'Image-file could not be requested');
+        $this->assertFalse(static::api()->isJsonResultError($result), 'Image-file could not be requested');
         $this->assertEquals(
             $result->data,
             file_get_contents(static::api()->getFile('Image.jpg')),
@@ -349,7 +349,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $this->assertIsObject($figuredelete, 'Unable to delete the image-attr');
         $this->assertObjectHasAttribute('updated', $figuredelete, 'Image-attr deletion response does not contain "updated" prop');
         $result = static::api()->getRaw($src);
-        $this->assertFalse($result->success, 'Image-attr deleted but image-file still exists at ' . $src);
+        $this->assertTrue(static::api()->isJsonResultError($result), 'Image-attr deleted but image-file still exists at ' . $src);
 
         // [24] delete 'TestTermProposal' [isLast=false]
         $rejecteddelete = static::api()->delete('editor/term', ['termId' => $rejected->inserted->id]);
