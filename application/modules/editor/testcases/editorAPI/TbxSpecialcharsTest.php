@@ -119,7 +119,7 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
             'tbxBasicOnly' => 0,
             'exportImages' => 1
         ]);
-        $this->assertTrue($result->success, 'TBX export could not be requested');
+        $this->assertFalse($this->api()->isJsonResultError($result), 'TBX export could not be requested');
         $exported = preg_match_all('~&lt;~', $result->data);
         $this->assertEquals($original, $exported, 'Specialchars quantities in original and exported files are not equal');
     }
