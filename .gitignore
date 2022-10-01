@@ -33,10 +33,5 @@
 
 # Tests
 /test-requests/*.env.json
-/testdata/editorImportedTasks*
-/testdata/editorOkapiBconf*
-/testdata/editorVisualReviewFonts*
-/testdata/purchaseOrderPdfs*
-/testdata/tbx-import*
-/testdata/dummyTm_*
+/testdata/*
 

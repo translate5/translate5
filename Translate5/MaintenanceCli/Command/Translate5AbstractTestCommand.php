@@ -82,7 +82,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             if($environment === 'test'){
                 $this->initTranslate5($environment);
                 if($this->checkApiTestsAlowed()){
-                    // Crucial: this triggrs the test-sections in the ini-files to be used
+                    // Crucial: this triggrs the test-sections in the ini-files to be used in the test-bootstrap
                     putenv('APPLICATION_ENV=test');
                 } else {
                     return 0;

@@ -46,6 +46,7 @@ class Config {
 
         'runtimeOptions.dir.tmp' => '../testdata/tmp',
         'runtimeOptions.dir.logs' => '../testdata/cache',
+        /* 'runtimeOptions.dir.locales' => '../testdata/locales', Will not be relocated as it containes git-controlled files */
         'runtimeOptions.dir.taskData' => '../testdata/editorImportedTasks',
         'runtimeOptions.plugins.Okapi.dataDir' => '../testdata/editorOkapiBconf',
         'runtimeOptions.plugins.VisualReview.fontsDataDir' => '../testdata/editorVisualReviewFonts'
