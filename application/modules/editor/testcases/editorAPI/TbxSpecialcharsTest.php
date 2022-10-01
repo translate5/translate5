@@ -114,12 +114,13 @@ class TbxSpecialcharsTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($expected, $imported, 'Specialchars quantities in ' . $file .' and in /terminfo response are not equal');
 
         // [7] Assert qties of specialchars (original vs exported)
-        $exportedTbx = $this->api()->getRaw('editor/languageresourceinstance/tbxexport', [
+        $result = $this->api()->getRaw('editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$collectionId,
             'tbxBasicOnly' => 0,
             'exportImages' => 1
         ]);
-        $exported = preg_match_all('~&lt;~', $exportedTbx);
+        $this->assertTrue($result->success, 'TBX export could not be requested');
+        $exported = preg_match_all('~&lt;~', $result->data);
         $this->assertEquals($original, $exported, 'Specialchars quantities in original and exported files are not equal');
     }
 

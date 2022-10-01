@@ -71,8 +71,6 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $response = $this->api()->post('editor/session', ['passwd' => 'givenPasswd']);
         $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."}],"message":"NOT OK","success":false}', $response->getBody());
-
-        //$this->pr
     }
     
     /**
