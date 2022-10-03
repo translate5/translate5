@@ -58,9 +58,9 @@ class Translate198Test extends editor_Test_JsonTest {
         $task2 = $this->createTask('task2', $testCustomer->id);
 
         //open task for editing. This should not produce any error
-        $response = self::$api->setTaskToEdit($task1->id);
+        $result = self::$api->setTaskToEdit($task1->id);
+        self::assertObjectNotHasAttribute('error',$result, (property_exists($result, 'error') ? $result->error : ''));
         $this->api()->setTask($task1);
-        self::assertNotEmpty($response,'Unable to edit task 1.');
 
         $jsonFileName = 'segments-task1.json';
         $segments = self::$api->getSegments($jsonFileName);
@@ -69,9 +69,10 @@ class Translate198Test extends editor_Test_JsonTest {
         self::assertCount(1, $segments);
 
         //open the secound task with the same user. This should not be posible
-        $response = self::$api->setTaskToEdit($task2->id);
+        $result = self::$api->setTaskToEdit($task2->id);
+        self::assertObjectNotHasAttribute('error',$result, (property_exists($result, 'error') ? $result->error : ''));
         $this->api()->setTask($task2);
-        self::assertNotEmpty($response,'Unable to edit task 2.');
+
 
         $jsonFileName = 'segments-task2.json';
         $segments = self::$api->getSegments($jsonFileName);

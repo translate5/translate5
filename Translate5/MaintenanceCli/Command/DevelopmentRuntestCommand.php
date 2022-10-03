@@ -98,6 +98,12 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
             InputOption::VALUE_NONE,
             'Leads to the testsuite stopping on the first failure (not error!).');
 
+        $this->addOption(
+            'skip-database-recreation',
+            's',
+            InputOption::VALUE_NONE,
+            'Skips the recreation of the application database.');
+
 //        $this->addOption(
 //            'name',
 //            'N',
@@ -210,13 +216,13 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
 //        catch (\PDOException $e){
 //            error_log($e);
 //        }
-
+        $recreateDatabase = !$this->input->getOption('skip-database-recreation');
         try {
             parent::initTranslate5();
 
             $test = $this->input->getArgument('test');
             //if a single test was given, we run that on the current DB
-            if(!empty($test)) {
+            if(!$recreateDatabase || !empty($test)) {
                 return;
             }
             //if the whole testsuite is running, on an existing DB, we consider that as an error:
@@ -260,7 +266,7 @@ class DevelopmentRuntestCommand extends Translate5AbstractCommand
 
         $updater = new \ZfExtended_Models_Installer_DbUpdater();
         //add the test SQL path
-        $updater->setAdditonalSqlPaths([APPLICATION_PATH . '/modules/editor/testcases/database/']);
+        $updater->addAdditonalSqlPath(APPLICATION_PATH . '/modules/editor/testcases/database/');
 
         //init DB
         if ($updater->initDb() && $updater->importAll() && !$updater->hasErrors()) {
