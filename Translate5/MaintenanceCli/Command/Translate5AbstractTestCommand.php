@@ -352,9 +352,11 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $config = $baseIndex->initApplication()->getOption('resources');
             $config = $config['db']['params'];
 
-            if(!$this->io->confirm('Shall the current database "'.$config['dbname'].'" really be erased and recreated from scratch?')) {
+            if($this->io->ask('To really recreate the database "'.$config['dbname'].'" type it\'s name to confirm') !== $config['dbname']){
+                $this->io->error('The name was wrong...');
                 return false;
             }
+            $this->io->note('Recreate database \''.$config['dbname'].'\'');
 
             // get current configs first
             $configs = $this->getCurrentConfiguration();
