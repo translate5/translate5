@@ -70,6 +70,12 @@ class TestRunCommand extends Translate5AbstractTestCommand
             InputOption::VALUE_NONE,
             'Use this option when re-capturing test data to use the old json style. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c');
 
+        $this->addOption(
+            'recreate-database',
+            'r',
+            InputOption::VALUE_NONE,
+            'Use this option to recreate the test database before running the test.');
+
         parent::configure();
     }
 
@@ -82,9 +88,12 @@ class TestRunCommand extends Translate5AbstractTestCommand
     {
         $this->initInputOutput($input, $output);
 
-        $test = $this->input->getArgument('test');
+        $test = trim($this->input->getArgument('test'), '.');
         if(!empty($test)) {
-            if($test  === basename($test)) {
+            if(empty(pathinfo($test, PATHINFO_EXTENSION))) {
+                $test = $test.'.php';
+            }
+            if($test === basename($test)) {
                 $test = self::RELATIVE_TEST_DIR.$test;
             }
             if(!file_exists($test)) {
@@ -112,6 +121,9 @@ class TestRunCommand extends Translate5AbstractTestCommand
             putenv('DO_CAPTURE=0');
         }
 
-        return $this->startApiTest($test);
+        if($this->initTestEnvironment('test', true, $this->input->getOption('recreate-database'))){
+            $this->startApiTest($test);
+        }
+        return 0;
     }
 }

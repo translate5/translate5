@@ -100,16 +100,15 @@ class TestAddIniSectionCommand extends Translate5AbstractTestCommand
                     $installationIni .= "\n".'testSettings.isApiTest = 0';
                 }
             }
-
-
             // add test-section [test:application]
             // retrieve application db-name
             $baseIndex = \ZfExtended_BaseIndex::getInstance();
             $config = $baseIndex->initApplication()->getOption('resources');
+            $testDbname = Config::createTestDatabaseName($config['db']['params']['dbname']);
             // add seperator and base configurations
             $installationIni .= "\n\n\n".$section."\n";
             // create test-db-name with a fixed scheme
-            $installationIni .= 'resources.db.params.dbname = "'.Config::createTestDatabaseName($config['db']['params']['dbname']).'"'."\n";
+            $installationIni .= 'resources.db.params.dbname = "'.$testDbname.'"'."\n";
             // add application db-name as different param, it must still be accessible when overridden
             $installationIni .= 'testSettings.applicationDbName = "'.$config['db']['params']['dbname'].'"'."\n";
             // a configuration-option that retrieves if we are API-testing
@@ -118,7 +117,9 @@ class TestAddIniSectionCommand extends Translate5AbstractTestCommand
             // save installation ini back
             file_put_contents($installationIniPath, $installationIni);
 
-            $this->io->info('The '.$section.'-section has been appended to installation.ini.');
+            // feedback
+            $this->io->success('The '.$section.'-section has been appended to installation.ini with the test-db "'.$testDbname.'".');
+
         } catch(\Throwable $e) {
             $this->io->error($e->getMessage()."\n\n".$e->getTraceAsString());
         }

@@ -65,20 +65,15 @@ class TestRunAllCommand extends Translate5AbstractTestCommand
     {
         $this->initInputOutput($input, $output);
 
+        // this command will work other than the other two test:run: the db-recreation is the default
+        $forceRecreation = true;
         if($this->input->getOption('skip-database-reset')){
-
-            // skip database reinit (we will not check, if the DB exists ...)
-            $this->io->info('Skip database-reset ...');
-
-        } else {
-
-            // reinitialize the database & data directory
-            if(!$this->reInitTestDatabase()){
-                return 0;
-            }
-            $this->reInitDataDirectory(Config::DATA_DIRECTORY);
+            // skip database reinit if option is set.
+            $forceRecreation = false;
         }
-
-        return $this->startApiTest();
+        if($this->initTestEnvironment('test', true, $forceRecreation)){
+            $this->startApiTest();
+        }
+        return 0;
     }
 }

@@ -29,6 +29,7 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
@@ -53,6 +54,12 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
             'Name of the Suite to be executed'
         );
 
+        $this->addOption(
+            'recreate-database',
+            'r',
+            InputOption::VALUE_NONE,
+            'Use this option to recreate the test database before running the test.');
+
         parent::configure();
     }
 
@@ -63,7 +70,6 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $this->initInputOutput($input, $output);
         $suiteNames = $this->getAllSuiteNames();
 
@@ -75,6 +81,9 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
             $suite = $this->io->askQuestion($askSuites);
         }
 
-        return $this->startApiTest(null, $suite);
+        if($this->initTestEnvironment('test', true, $this->input->getOption('recreate-database'))){
+            $this->startApiTest(null, $suite);
+        }
+        return 0;
     }
 }

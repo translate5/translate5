@@ -80,9 +80,11 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
             if (!$this->reInitApplicationDatabase()){
                 return 0;
             }
-            // cleanup he "normal" data dirs
-            $this->reInitDataDirectory('data');
         }
-        return $this->startApiTest($testPath, $testSuite, 'application');
+        // crucial: this initializes the "normal" application environment
+        if($this->initTestEnvironment('application', false)){
+            $this->startApiTest($testPath, $testSuite);
+        }
+        return 0;
     }
 }

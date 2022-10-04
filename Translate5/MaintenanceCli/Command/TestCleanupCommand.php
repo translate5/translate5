@@ -27,11 +27,9 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class TestCleanupCommand extends Translate5AbstractTestCommand
 {
@@ -71,10 +69,9 @@ class TestCleanupCommand extends Translate5AbstractTestCommand
             if($this->io->confirm('Are you sure you want to erase all workers, unlock all tasks and erase incomplete bconf\'s on your application/production system ?')){
                 $this->initTranslate5();
                 $this->databaseCleanup();
-                return 0;
-            } else {
-                return 0;
+
             }
+            return 0;
         }
         $this->initTranslate5('test');
         $this->databaseCleanup();
