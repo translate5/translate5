@@ -167,27 +167,27 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         
         //test editing a prefilled segment
         $segToTest = $segments[2];
+        $jsonFileName = 'testSegmentEditing-assert-seg3.json';
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'PHP Handbuch', $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
-        
-        //check direct PUT result
-        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg3.json', $segment);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData, $jsonFileName);
+        $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //check again with GET fresh from server
         $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
-        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg3.json', $segment);
+        $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //test editing an empty segment
         $segToTest = $segments[6];
+        $jsonFileName = 'testSegmentEditing-assert-seg7.json';
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache 2.x auf Unix-Systemen', $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData, $jsonFileName);
         
         //check direct PUT result
-        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7.json', $segment);
+        $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //check again with GET fresh from server
         $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
-        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7.json', $segment);
+        $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         // check correction of overpapped QM Tags (only when there is no contents between them) For this, proper t5qid's are required
         $segToTest = $segments[6];
@@ -195,27 +195,29 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         $tag1_close = '<img class="close critical qmflag ownttip qmflag-19" data-t5qid="1" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" />';
         $tag2_open = '<img class="open critical qmflag ownttip qmflag-4" data-t5qid="2" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
         $tag2_close = '<img class="close critical qmflag ownttip qmflag-4" data-t5qid="2" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
+        $jsonFileName = 'testSegmentEditing-assert-seg7-a.json';
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.$tag1_close.' auf'.$tag2_close.' Unix-Systemen', $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData, $jsonFileName);
         
         //check direct PUT result
-        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-a.json', $segment);
+        $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //check again with GET fresh from server
         $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
-        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-a.json', $segment);
+        $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         // check for overpapped QM Tags with contents between them. They must be not corrected on saving.
         $segToTest = $segments[6];
+        $jsonFileName = 'testSegmentEditing-assert-seg7-b.json';
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.' auf'.$tag1_close.' Unix-Systemen'.$tag2_close, $segToTest->id);
-        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData);
+        $segment = $this->api()->putJson('editor/segment/'.$segToTest->id, $segmentData, $jsonFileName);
         
         //check direct PUT result
-        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-b.json', $segment);
+        $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         //check again with GET fresh from server
         $segment = $this->api()->getJson('editor/segment/'.$segToTest->id);
-        $this->assertSegmentEqualsJsonFile('testSegmentEditing-assert-seg7-b.json', $segment);
+        $this->assertSegmentEqualsJsonFile($jsonFileName, $segment);
         
         $segToTest = $segments[7];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'edited by a test', $segToTest->id);

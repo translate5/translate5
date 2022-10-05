@@ -1703,8 +1703,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
         // Get context
         $self = $this->contextData[$nr];
-        $prev = $this->contextData[$nr - 1];
-        $next = $this->contextData[$nr + 1];
+        $prev = array_key_exists($nr - 1, $this->contextData) ? $this->contextData[$nr - 1] : null;
+        $next = array_key_exists($nr + 1, $this->contextData) ? $this->contextData[$nr + 1] : null;
 
         // Get hashes
         $prevMd5 = $prev && $prev['fileId'] == $self['fileId'] ? $prev['sourceMd5'] : '';

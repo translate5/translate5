@@ -1,0 +1,7 @@
+<database>
+	<name>testcases</name>
+	<file>
+		<name>007-new-instant-translate-user-role.sql</name>
+		<dependency>application/modules/editor/PrivatePlugins/InstantTranslate/database/013-TRANSLATE-2483-save-instanttranslate-translation.sql</dependency>
+	</file>
+</database>
