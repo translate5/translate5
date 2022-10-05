@@ -50,26 +50,30 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function __construct() {
         $this->fixLanguages = ZfExtended_Factory::get('editor_Services_OpenTM2_FixLanguageCodes');
     }
-    
+
     /**
      * This method creates a new memory.
+     * @throws Zend_Exception
      */
-    public function createEmptyMemory($memory, $sourceLanguage) {
+    public function createEmptyMemory($memory, $sourceLanguage): bool
+    {
         $data = new stdClass();
-        $data->name = $memory;
+        $data->name = $this->addTmPrefix($memory);
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
-        
+
         $http = $this->getHttp('POST');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
     }
-    
+
     /**
      * This method creates a new memory with TM file
+     * @throws Zend_Exception
      */
-    public function createMemory($memory, $sourceLanguage, $tmData) {
+    public function createMemory($memory, $sourceLanguage, $tmData): bool
+    {
         $data = new stdClass();
-        $data->name = $memory;
+        $data->name = $this->addTmPrefix($memory);
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
         $data->data = base64_encode($tmData);
         
@@ -137,14 +141,39 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $fileName = 'i/do/not/exist';
         }
 
+        $url = urlencode($this->addTmPrefix($fileName)).'/'.ltrim($urlSuffix, '/');
+        return $this->getHttp($method, $url);
+    }
+
+    /**
+     * adds the internal TM prefix to the given TM name
+     * @param string $tmName
+     * @return string
+     * @throws Zend_Exception
+     */
+    protected function addTmPrefix(string $tmName): string {
         //CRUCIAL: the prefix (if any) must be added on usage, and may not be stored in the specificName
         // that is relevant for security on a multi hosting environment
         $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
         if(!empty($prefix)) {
-            $fileName = $prefix.'-'.$fileName;
+            $tmName = $prefix.'-'.$tmName;
         }
-        $url = urlencode($fileName).'/'.ltrim($urlSuffix, '/');
-        return $this->getHttp($method, $url);
+        return $tmName;
+    }
+
+    /**
+     * Updates the filename of the language resource instance with the filename coming from the TM system
+     * @throws Zend_Exception
+     */
+    public function updateFilenameFromResult(): void {
+        $createdName = $this->getResult()->name;
+        $prefix = Zend_Registry::get('config')->runtimeOptions->LanguageResources->opentm2->tmprefix;
+        if(!empty($prefix)) {
+            //remove the prefix from being stored into the TM
+            $createdName = str_replace('^'.$prefix.'-', '', '^'.$createdName);
+        }
+        $this->languageResource->addSpecificData('fileName', $createdName);
+        $this->languageResource->save(); //saving it here makes the TM available even when the TMX import was crashed
     }
     
     /**
