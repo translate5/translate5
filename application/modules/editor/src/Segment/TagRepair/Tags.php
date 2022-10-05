@@ -86,11 +86,11 @@ class Tags extends \editor_TagSequence {
      * Creates a new tag-repair for the given markup
      * The given markup must be syntactically valid markup !
      * @param string $markup
-     * @param bool $preserveComents: if set, HTML comments are preserved and will survive untouched
+     * @param bool $preserveComments: if set, HTML comments are preserved and will survive untouched
      * @throws \ZfExtended_Exception
      */
-    public function __construct(string $markup, bool $preserveComents=false) {
-        if($preserveComents){
+    public function __construct(string $markup, bool $preserveComments=false) {
+        if($preserveComments){
             $markup = Tag::replaceComments($markup);
         } else {
             $markup = Tag::stripComments($markup);
@@ -99,6 +99,9 @@ class Tags extends \editor_TagSequence {
         // quirk: when no markup is contained, unparse will not be called and thus requestHtml remains empty
         if(count($this->tags) == 0){
             $this->requestHtml = $this->text;
+        }
+        if(self::DO_DEBUG){
+            error_log('CONSTRUCT RepairTags for text ['.strip_tags($markup).']'."\n".'    Markup is: ['.$markup.']'."\n".'    Request markup is: ['.$this->requestHtml.']');
         }
     }
     /**
@@ -139,6 +142,10 @@ class Tags extends \editor_TagSequence {
             }
             $this->capturedErrors = [];
             $this->captureErrors = false;
+
+            if(self::DO_DEBUG){
+                error_log('RECREATE RepairTags successful recreation: ['.$rendered.']'."\n");
+            }
             return $rendered;
 
         } catch (Exception $e) {
@@ -154,8 +161,12 @@ class Tags extends \editor_TagSequence {
             // fallback: recreate original structure from scratch (without any sent tags)
             $this->invalidate();
             $this->reEvaluate(strip_tags($html));
+            $rendered = $this->render();
+            if(self::DO_DEBUG){
+                error_log('RECREATE RepairTags recreation failed, created fallback: ['.$rendered.']'."\n");
+            }
             // if this still produces errors we may create tag-errors which will be reported or even lead to an exception
-            return $this->render();
+            return $rendered;
         }
     }
 

@@ -33,4 +33,5 @@
 
 # Tests
 /test-requests/*.env.json
+/testdata/*
 

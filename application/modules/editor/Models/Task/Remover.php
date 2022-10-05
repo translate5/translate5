@@ -156,11 +156,7 @@ class editor_Models_Task_Remover {
         //also delete files on default delete
         $taskPath = (string)$this->task->getAbsoluteTaskDataPath();
         if(is_dir($taskPath)){
-            /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
-            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Recursivedircleaner'
-            );
-            $recursivedircleaner->delete($taskPath);
+            ZfExtended_Utils::recursiveDelete($taskPath);
         }
     }
 

@@ -162,7 +162,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                         //if there was no repetition result found at all or it was no MT, then we reset it
                         $rep = $this->repetitionByHash[$segment->getSourceMd5()] ?? null;
                         if(empty($rep) || !($rep->isMT ?? false)) {
+                            // if tags could not be applied, then getMtResult should be called again
                             $this->repetitionByHash[$segment->getSourceMd5()] = $bestMatchRateResult;
+                        }
+                        $master = $this->repetitionMasterSegments[$segment->getSourceMd5()] ?? null;
+                        //if we are processing a repetition, we have to fix the tags:
+                        if($rep && $master && $master->getId() !== $segment->getId()) {
+                            $bestMatchRateResult = $this->updateTargetOfRepetition($segment, $rep) ?? $this->getMtResult($segment);
                         }
                     }
                 }
@@ -276,17 +282,38 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $masterResult = $this->repetitionByHash[$segmentHash];
         $masterHasFullMatch = $masterResult->matchrate >= 100;
-        if ($masterHasFullMatch && $this->repetitionUpdater->updateTargetOfRepetition($this->repetitionMasterSegments[$segmentHash], $segment)) {
+
+        if ($masterHasFullMatch) {
+            //bestResult is fallback if tags could not be applied
+            return $this->updateTargetOfRepetition($segment, $masterResult) ?? $bestResult;
+        }
+        //if the master was a fuzzy or the full match repetition could not be set (above updateTargetOfRepetition) properly, we keep the found matchrate and translation
+        return $bestResult;
+    }
+
+    /**
+     * When taking over a repetition, the content (tags) must be prepared properly before usage
+     * returns null if the tags could not be applied
+     * @param editor_Models_Segment $segment
+     * @param stdClass|null $masterResult
+     * @param int|null $repetitionRate
+     * @return stdClass|null
+     */
+    protected function updateTargetOfRepetition(editor_Models_Segment $segment, ?stdClass $masterResult, ?int $repetitionRate = null): ?stdClass
+    {
+        $segmentHash = $segment->getSourceMd5();
+        if(!is_null($masterResult) && $this->repetitionUpdater->updateTargetOfRepetition($this->repetitionMasterSegments[$segmentHash], $segment)) {
             //the returning result must be the one from the first of the repetition group.
             // to get the correct content for the repetition we get the value from $segment, which was updated by the repetition updater
             // we may not update the repetitionHash, this would interfer with the other repetitions
             $bestRepeatedResult = clone $masterResult;
             $bestRepeatedResult->target = $segment->getTargetEdit();
-            $bestRepeatedResult->matchrate = $repetitionRate; //in the case of masterHasFullMatch we use also that matchrate for the segment
+            if(!is_null($repetitionRate)) {
+                $bestRepeatedResult->matchrate = $repetitionRate; //in the case of masterHasFullMatch we use also that matchrate for the segment
+            }
             return $bestRepeatedResult;
         }
-        //if the master was a fuzzy or the full match repetition could not be set (above updateTargetOfRepetition) properly, we keep the found matchrate and translation
-        return $bestResult;
+        return null;
     }
 
     /**

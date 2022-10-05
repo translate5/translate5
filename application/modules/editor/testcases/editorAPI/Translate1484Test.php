@@ -60,8 +60,6 @@ class Translate1484Test extends editor_Test_JsonTest {
             'edit100PercentMatch' => false,
             'autoStartImport' => 0
         ];
-        static::api()->addImportFile(static::api()->getFile('simple-en-de.xlf'));
-        static::api()->import($task,false,false);
 
         // Create dummy mt
         $params = [
@@ -90,6 +88,9 @@ class Translate1484Test extends editor_Test_JsonTest {
             'name' => 'API Testing::OpenTm2Tm_'.__CLASS__
         ];
         static::api()->addResource($params,'resource1.tmx',true);
+
+        static::api()->addImportFile(self::$api->getFile('simple-en-de.xlf'));
+        static::api()->import($task, false, false);
 
         // Add task to languageresource assoc
         static::api()->addTaskAssoc();

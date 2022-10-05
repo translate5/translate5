@@ -80,9 +80,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->tagHandler = ZfExtended_Factory::get('editor_Services_Connector_TagHandler_Xliff', [['gTagPairing' => false]]);
         }
     }
-    
+
     /**
      * {@inheritDoc}
+     * @throws Zend_Exception
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(array $fileinfo = null,array $params=null) {
@@ -104,8 +105,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $tmxUpload = !$noFile && in_array($fileinfo['type'], $validFileTypes['TMX']) && preg_match('/\.tmx$/', $fileinfo['name']);
         if($noFile || $tmxUpload) {
             if($this->api->createEmptyMemory($name, $sourceLang)){
-                $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
-                $this->languageResource->save(); //saving it here makes the TM available even when the TMX import was crashed
+                $this->api->updateFilenameFromResult();
                 //if initial upload is a TMX file, we have to import it.
                 if($tmxUpload) {
                     return $this->addAdditionalTm($fileinfo);
@@ -121,7 +121,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         //initial upload is a TM file
         if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
-            $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
+            $this->api->updateFilenameFromResult();
             return true;
         }
         $this->logger->error('E1304', 'OpenTM2: could not create prefilled TM', [
