@@ -69,8 +69,6 @@ class Translate1484Test extends editor_Test_JsonTest {
             'autoStartImport' => 0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('simple-en-de.xlf'));
-        self::$api->import($task,false,false);
 
         // Create dummy mt
         $params = [
@@ -99,6 +97,9 @@ class Translate1484Test extends editor_Test_JsonTest {
             'name' => 'API Testing::OpenTm2Tm_'.__CLASS__
         ];
         self::$api->addResource($params,'resource1.tmx',true);
+
+        self::$api->addImportFile(self::$api->getFile('simple-en-de.xlf'));
+        self::$api->import($task,false,false);
 
         // Add task to languageresource assoc
         self::$api->addTaskAssoc();

@@ -38,3 +38,8 @@ UPDATE Zf_configuration
 UPDATE Zf_configuration
     SET `default` = 'http://localhost:8081/v2'
     WHERE name = 'runtimeOptions.plugins.SpellCheck.languagetool.url.gui';
+
+UPDATE Zf_configuration
+SET value = Zf_configuration.`default`
+WHERE name = 'runtimeOptions.plugins.SpellCheck.languagetool.url.gui'
+  AND value = 'http://yourlanguagetooldomain:8081/v2';
