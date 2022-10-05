@@ -5641,7 +5641,7 @@ CREATE TABLE `Zf_users` (
 
 INSERT INTO `Zf_users` VALUES
 (1,'{00000000-0000-0000-0000-000000000000}','system','user','m','system','noreply@translate5.net','','asdfasdfsdfsf',0,NULL,NULL,'',NULL,NULL),
-(2,'{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}','Project','Manager','m','manager','noreply@translate5.net','systemadmin,pm,editor','6a204bd89f3c8348afd5c77c717a097a',0,'de',NULL,'',NULL,NULL),
+(2,'{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}','Project','Manager','m','manager','noreply@translate5.net','systemadmin,admin,pm,editor','6a204bd89f3c8348afd5c77c717a097a',0,'de',NULL,'',NULL,NULL),
 (3,'{f68616ee-9182-4fb7-9dec-1bc125e19cef}','Proof','Reader One','m','proofreader1','noreply@translate5.net','editor','6a204bd89f3c8348afd5c77c717a097a',1,'en',NULL,'',NULL,NULL),
 (4,'{294da45d-63c2-45b1-9c6e-73329129d7f0}','Proof','Reader Two','f','proofreader2','noreply@translate5.net','editor','6a204bd89f3c8348afd5c77c717a097a',1,NULL,NULL,'',NULL,NULL),
 (5,'{c99ae747-0afb-446a-827a-6b3b32cfb819}','Trans','Lator One','f','translator1','noreply@translate5.net','editor','6a204bd89f3c8348afd5c77c717a097a',1,'en',NULL,'',NULL,NULL),
