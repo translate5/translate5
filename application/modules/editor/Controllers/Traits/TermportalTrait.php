@@ -32,7 +32,7 @@ trait editor_Controllers_Traits_TermportalTrait {
      * Alias for editor_Utils::jcheck(), except that if $data arg is not given - request params will be used by default
      *
      * @param $ruleA
-     * @param null $data
+     * @param array|null|ZfExtended_Models_Entity_Abstract $data
      * @return array
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
