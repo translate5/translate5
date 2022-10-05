@@ -288,9 +288,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         } finally {
             // Make sure to delete directory
             if($testDir !== NULL){
-                /** @var ZfExtended_Controller_Helper_Recursivedircleaner $cleaner */
-                $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
-                $cleaner->delete($testDir);
+                ZfExtended_Utils::recursiveDelete($testDir);
             }
             if(!empty($outerEx)){
                 throw $outerEx;
