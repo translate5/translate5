@@ -126,6 +126,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      * Starts the unit test for a single test, a suite or all tests
      * @param string|null $testPath
      * @param string|null $testSuite
+     * @throws \PHPUnit\TextUI\Exception
      */
     protected function startApiTest(string $testPath = null, string $testSuite = null)
     {
@@ -377,17 +378,47 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function reInitDataDirectory(string $dataDirectory): void
     {
+        $info = $this->fetchOwnerAndGroup('data'); // we take the owner and group of the /data dir as a reference
         if(!is_dir($dataDirectory)){
             mkdir($dataDirectory, 0777, true);
+            if(PHP_OS_FAMILY != 'Windows'){ // TODO FIXME: on windows this may lead to an unusable installation if called with elevated rights
+                chown($dataDirectory, $info->owner);
+                chgrp($dataDirectory, $info->group);
+            }
         }
         foreach(Config::getUserDataFolders() as $folder){
             $userDir = $dataDirectory.'/'.$folder;
             if(is_dir($userDir)){
-                \ZfExtended_Utils::recursiveDelete($userDir);
+                \ZfExtended_Utils::recursiveDelete($userDir, null, false);
+            } else {
+                mkdir($userDir, 0777);
+                if(PHP_OS_FAMILY != 'Windows'){ // TODO FIXME: on windows this may lead to an unusable installation if called with elevated rights
+                    chown($userDir, $info->owner);
+                    chgrp($userDir, $info->group);
+                }
             }
-            mkdir($userDir, 0777);
         }
         $this->io->note('Successfully cleaned user-data directory \'/'.$dataDirectory.'\'');
+    }
+
+    /**
+     * Helper to retrieve owner & group of an directory. defaults to www-data for both, if no dir given or evaluation not successful
+     * @param string|null $directory
+     * @return \stdClass with "props" owner and "group"
+     */
+    private function fetchOwnerAndGroup(string $directory=null) : \stdClass{
+        $info = new \stdClass;
+        $info->owner = 'www-data';
+        $info->group = 'www-data';
+        if($directory && is_dir($directory)){
+            $oinfo = @posix_getpwuid(@fileowner($directory));
+            $ginfo = @posix_getgrgid(@filegroup($directory));
+            if($oinfo !== false && $ginfo !== false){
+                $info->owner = $oinfo['name'];
+                $info->group = $ginfo['name'];
+            }
+        }
+        return $info;
     }
 
     /**
