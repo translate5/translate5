@@ -481,7 +481,7 @@ class editor_TermController extends ZfExtended_RestController
      */
     public function transferAction() {
 
-        // Make sure execution won't on request aborted
+        // Make sure execution won't stop on request aborted
         ignore_user_abort(1);
 
         // Measure time spent to get here
@@ -583,7 +583,7 @@ class editor_TermController extends ZfExtended_RestController
             // Get termIds from except-param
             $termIds = explode(',', $this->getParam('except'));
 
-            // Else if it is 'all'
+        // Else if it is 'all'
         } else {
 
             // 2nd arg required to be passed by reference (see below)

@@ -281,7 +281,7 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
 
         // Check props presence
         foreach ([
-             'locale', 'role', 'permission', 'activeItem', 'l10n', 'filterWindow', 'filterPanel', 'lang',
+             'locale', 'right', 'permission', 'activeItem', 'l10n', 'filterWindow', 'filterPanel', 'lang',
              'langInclSubs', 'flag', 'langAll', 'language', 'cfg', 'itranslateQuery', 'time'] as $prop)
             $this->assertObjectHasAttribute($prop, self::$setup, 'Termportal setup data has no ' . $prop . '-property');
 
