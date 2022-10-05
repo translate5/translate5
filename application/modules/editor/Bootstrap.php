@@ -609,6 +609,14 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                     'controller' => 'quality',
                     'action' => 'segmentqm'
                 )));
+
+        $this->front->getRouter()->addRoute(
+            'termTransfer', new ZfExtended_Controller_RestLikeRoute(
+            'editor/term/transfer/*', [
+                'module' => 'editor',
+                'controller' => 'term',
+                'action' => 'transfer'
+            ]));
     }
     
     

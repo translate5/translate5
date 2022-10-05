@@ -35,10 +35,10 @@ class Translate2491Test extends editor_Test_JsonTest {
      * The current active collection
      * @var integer
      */
-    protected static $collectionId;
+    protected static int $collectionId;
 
     /**
-     * @throws Zend_Exception
+     * @throws ReflectionException
      */
     public static function setUpBeforeClass(): void {
 
@@ -103,7 +103,7 @@ class Translate2491Test extends editor_Test_JsonTest {
         $this->assertNotEmpty($termsearch->data, "No terms are found in the term collection for the search string '*'");
 
         // Transfer terms to main Translate5 app
-        $transfer = $this->api()->postJson('editor/plugins_termportal_data/transfer', $taskCfg = [
+        $transfer = $this->api()->postJson('editor/term/transfer', $taskCfg = [
             'projectName' => '2 terms selected',
             'targetLang' =>  $german->id,
             'translated' =>  0,
