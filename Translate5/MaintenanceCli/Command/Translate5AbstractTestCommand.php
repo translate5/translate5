@@ -335,10 +335,11 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
     /**
      * Erases the current application-DB and creates it from scratch
-     * This must be confirmed by the user
+     * This must be confirmed by the user or the correct database-name must be passed
+     * @param string|null $databaseName
      * @return bool
      */
-    protected function reInitApplicationDatabase(): bool
+    protected function reInitApplicationDatabase(string $databaseName = null): bool
     {
         try {
             // evaluate database params
@@ -347,10 +348,11 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $baseIndex = \ZfExtended_BaseIndex::getInstance();
             $config = $baseIndex->initApplication()->getOption('resources');
             $config = $config['db']['params'];
-
-            if($this->io->ask('To really recreate the database "'.$config['dbname'].'" type it\'s name to confirm') !== $config['dbname']){
-                $this->io->error('The name was wrong...');
-                return false;
+            if($config['dbname'] !== $databaseName){
+                if($this->io->ask('To really recreate the database "'.$config['dbname'].'" type it\'s name to confirm') !== $config['dbname']){
+                    $this->io->error('The name was wrong...');
+                    return false;
+                }
             }
             $this->io->note('Recreate database \''.$config['dbname'].'\'');
 
