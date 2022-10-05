@@ -27,13 +27,17 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\LockableTrait;
 
 class TestApplicationRunCommand extends Translate5AbstractTestCommand
 {
+    use LockableTrait;
+
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'test:apprun';
     
@@ -47,6 +51,7 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
             // the "--help" option
             ->setHelp('Runs all API-tests for the aplication environment and NOT the test-environment.');
 
+        // on the master-system it can happen several dev's run the tests and we should avoid that
         $this->addArgument('testorsuite',
             InputArgument::OPTIONAL,
             'Filename of the Test to be called (don\'t forget *.php) or name of a suite'
@@ -70,6 +75,11 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
     {
         $this->initInputOutput($input, $output);
 
+        if (!$this->lock()) {
+            $this->io->warning('The '.$this->getName().' command is already executed by another user.');
+            return Command::FAILURE;
+        }
+
         $testOrSuite = $this->input->getArgument('testorsuite');
         $extension = empty($testOrSuite) ? '' : strtolower(pathinfo($testOrSuite, PATHINFO_EXTENSION));
         $testPath = ($extension === 'php') ? $testOrSuite : null;
@@ -78,13 +88,13 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
         // reinitialize the database & data directory if we should
         if($this->input->getOption('recreate-database')) {
             if (!$this->reInitApplicationDatabase()){
-                return 0;
+                return Command::FAILURE;
             }
         }
         // crucial: this initializes the "normal" application environment
         if($this->initTestEnvironment('application', false)){
             $this->startApiTest($testPath, $testSuite);
         }
-        return 0;
+        return Command::SUCCESS;
     }
 }

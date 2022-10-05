@@ -129,89 +129,84 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     protected function startApiTest(string $testPath = null, string $testSuite = null)
     {
-        try {
-            $verbose = '--verbose'; // '--debug'
-            $stopOnError = '';
-            $stopOnFailure = '';
-            $testPathOrDir = '';
-            $configurationOption = '--no-configuration';
-            $configurationFile = '';
-            $bootstrapOption = '--bootstrap';
-            $bootstrapFile = self::RELATIVE_TEST_ROOT.'bootstrap.php';
-            $suiteOption = '';
-            $suiteFile = '';
+        $verbose = '--verbose'; // '--debug'
+        $stopOnError = '';
+        $stopOnFailure = '';
+        $testPathOrDir = '';
+        $configurationOption = '--no-configuration';
+        $configurationFile = '';
+        $bootstrapOption = '--bootstrap';
+        $bootstrapFile = self::RELATIVE_TEST_ROOT.'bootstrap.php';
+        $suiteOption = '';
+        $suiteFile = '';
 
-            // environment stuff needed for all tests (using environment variables here keeps compatibility with plain apiTest.sh call)
-            putenv('APPLICATION_ROOT='.__DIR__);
+        // environment stuff needed for all tests (using environment variables here keeps compatibility with plain apiTest.sh call)
+        putenv('APPLICATION_ROOT='.__DIR__);
 
-            if($this->input->getOption('xdebug')){
-                putenv('XDEBUG_ENABLE=1');
-            }
-
-            if($this->input->getOption('keep-data')){
-                putenv('KEEP_DATA=1');
-            }
-
-            // command options usable for all tests
-            if($this->input->getOption('stop-on-error')){
-                $stopOnError = '--stop-on-error';
-            }
-            if($this->input->getOption('stop-on-failure')){
-                $stopOnFailure = '--stop-on-failure';
-            }
-
-            // test / suite / all specific stuff. Note that DO_CAPTURE is defined in the concrete command for a single test
-            if($testPath !== null){
-                $testPathOrDir = $testPath;
-                $this->io->note('Running test \''.basename($testPath).'\'');
-
-            } else if($testSuite !== null){
-
-                $this->io->note('Running suite \''.$testSuite.'\'');
-                // defining the configuration-file-option to read the suites from
-                $configurationOption = '--configuration';
-                // QUIRK: why do we have to set an absolute path here to get the tests running ? With relative pathes, PHPUnit finds the configuration but can not find the linked files ...
-                $configurationFile = APPLICATION_ROOT.'/'.self::RELATIVE_TEST_ROOT.'phpunit.xml';
-                // defining the suite to use
-                $suiteOption = '--testsuite';
-                $suiteFile = $testSuite;
-                // must not be set when using a suite, otherwise the suite will never be triggered ...
-                $testPathOrDir = '';
-                putenv('DO_CAPTURE=0');
-            } else {
-                putenv('DO_CAPTURE=0');
-                $testPathOrDir = 'application';
-            }
-
-            $assembly = [
-                'phpunit',
-                '--colors',
-                $verbose,
-                $stopOnError,
-                $stopOnFailure,
-                '--testdox-text',
-                'last-test-result.txt',
-                '--cache-result-file',
-                '.phpunit.result.cache',
-                $configurationOption,
-                $configurationFile,
-                $bootstrapOption,
-                $bootstrapFile,
-                $suiteOption,
-                $suiteFile,
-                $testPathOrDir
-            ];
-
-            // die(implode(' ', $assembly)."\n");
-
-            // start PHPUnit with neccessary options
-            $command = new \PHPUnit\TextUI\Command();
-            $command->run($assembly);
-            $this->io->success('Last test result stored in TEST_ROOT/last-test-result.txt');
-
-        }  catch(\Throwable $e) {
-            $this->io->error($e->getMessage()."\n\n".$e->getTraceAsString());
+        if($this->input->getOption('xdebug')){
+            putenv('XDEBUG_ENABLE=1');
         }
+
+        if($this->input->getOption('keep-data')){
+            putenv('KEEP_DATA=1');
+        }
+
+        // command options usable for all tests
+        if($this->input->getOption('stop-on-error')){
+            $stopOnError = '--stop-on-error';
+        }
+        if($this->input->getOption('stop-on-failure')){
+            $stopOnFailure = '--stop-on-failure';
+        }
+
+        // test / suite / all specific stuff. Note that DO_CAPTURE is defined in the concrete command for a single test
+        if($testPath !== null){
+            $testPathOrDir = $testPath;
+            $this->io->note('Running test \''.basename($testPath).'\'');
+
+        } else if($testSuite !== null){
+
+            $this->io->note('Running suite \''.$testSuite.'\'');
+            // defining the configuration-file-option to read the suites from
+            $configurationOption = '--configuration';
+            // QUIRK: why do we have to set an absolute path here to get the tests running ? With relative pathes, PHPUnit finds the configuration but can not find the linked files ...
+            $configurationFile = APPLICATION_ROOT.'/'.self::RELATIVE_TEST_ROOT.'phpunit.xml';
+            // defining the suite to use
+            $suiteOption = '--testsuite';
+            $suiteFile = $testSuite;
+            // must not be set when using a suite, otherwise the suite will never be triggered ...
+            $testPathOrDir = '';
+            putenv('DO_CAPTURE=0');
+        } else {
+            putenv('DO_CAPTURE=0');
+            $testPathOrDir = 'application';
+        }
+
+        $assembly = [
+            'phpunit',
+            '--colors',
+            $verbose,
+            $stopOnError,
+            $stopOnFailure,
+            '--testdox-text',
+            'last-test-result.txt',
+            '--cache-result-file',
+            '.phpunit.result.cache',
+            $configurationOption,
+            $configurationFile,
+            $bootstrapOption,
+            $bootstrapFile,
+            $suiteOption,
+            $suiteFile,
+            $testPathOrDir
+        ];
+
+        // die(implode(' ', $assembly)."\n");
+
+        // start PHPUnit with neccessary options
+        $command = new \PHPUnit\TextUI\Command();
+        $command->run($assembly);
+        $this->io->success('Last test result stored in '.self::RELATIVE_TEST_ROOT.'last-test-result.txt');
     }
 
     /**
