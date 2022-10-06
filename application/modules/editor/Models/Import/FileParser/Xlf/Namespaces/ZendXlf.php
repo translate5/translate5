@@ -26,22 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/** #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- */
-
-
 /**
- * XLF Fileparser Add On to parse Zend XLF specific dialect
+ * XLF File-parser Add On to parse Zend XLF specific dialect
  */
 class editor_Models_Import_FileParser_Xlf_Namespaces_ZendXlf extends editor_Models_Import_FileParser_Xlf_Namespaces_Abstract{
+
+    protected static function isApplicable(string $xliff): bool
+    {
+        return false; // this namespace is added explicitly on usage with addNamespace
+    }
+
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
-    public function useTagContentOnly() {
+    public function useTagContentOnly(): ?bool
+    {
         return true;
     }
 }

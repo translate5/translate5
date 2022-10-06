@@ -39,11 +39,17 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Import_FileParser_Xlf_Namespaces_Tmgr extends editor_Models_Import_FileParser_Xlf_Namespaces_Abstract{
     const IBM_XLIFF_NAMESPACE = 'xmlns:tmgr="http://www.ibm.com"';
 
+    protected static function isApplicable(string $xliff): bool
+    {
+        return str_contains($xliff, self::IBM_XLIFF_NAMESPACE);
+    }
+
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::transunitAttributes()
      */
-    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
+    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes): void
+    {
         //FIXME add match rate infos into our matchRateType field!
         settype($attributes['tmgr:matchratio'], 'integer');
         $segmentAttributes->matchRate = $attributes['tmgr:matchratio'];
@@ -53,7 +59,8 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Tmgr extends editor_Models_
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
-    public function useTagContentOnly() {
+    public function useTagContentOnly(): ?bool
+    {
         return null; //For OpenTM2 we can calculate this value depending on the tag
     }
 }
