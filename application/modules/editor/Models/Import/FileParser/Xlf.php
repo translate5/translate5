@@ -640,12 +640,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //trigger namespace handlers for specific handling of custom attributes in trans-unit
         // and in the source and target MRKs
         $this->namespaces->transunitAttributes($attributes, $segmentAttributes);
+
         if(is_array($currentSource)) {
             $this->namespaces->currentSource($currentSource, $segmentAttributes);
         }
         if(is_array($currentTarget)) {
             $this->namespaces->currentTarget($currentTarget, $segmentAttributes);
         }
+
         $this->setMid($id);
         
         if(!empty($this->currentPlainTarget) && $state = $this->xmlparser->getAttribute($this->currentPlainTarget['openerMeta']['attributes'], 'state')) {
