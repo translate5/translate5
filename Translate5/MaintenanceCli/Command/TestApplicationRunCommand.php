@@ -61,7 +61,13 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
             'recreate-database',
             'r',
             InputOption::VALUE_NONE,
-            'Use this option to recreate the application database. This will also clean the /data directory contents.');
+            'Use this option to recreate the application database with it\'s name being prompted. This will also clean the /data directory contents.');
+
+        $this->addOption(
+            'database-recreation',
+            'd',
+            InputOption::VALUE_REQUIRED,
+            'Use this option to recreate the application database with it\'s name as option. This will also clean the /data directory contents.');
 
         parent::configure();
     }
@@ -86,8 +92,9 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
         $testSuite = ($extension === '' && !empty($testOrSuite)) ? $testOrSuite : null;
 
         // reinitialize the database & data directory if we should
-        if($this->input->getOption('recreate-database')) {
-            if (!$this->reInitApplicationDatabase()){
+        $databaseForRecreation = $this->input->getOption('database-recreation');
+        if($databaseForRecreation || $this->input->getOption('recreate-database')){
+            if (!$this->reInitApplicationDatabase($databaseForRecreation)){
                 return Command::FAILURE;
             }
         }

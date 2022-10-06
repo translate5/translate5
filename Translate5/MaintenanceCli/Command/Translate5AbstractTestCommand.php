@@ -126,6 +126,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      * Starts the unit test for a single test, a suite or all tests
      * @param string|null $testPath
      * @param string|null $testSuite
+     * @throws \PHPUnit\TextUI\Exception
      */
     protected function startApiTest(string $testPath = null, string $testSuite = null)
     {
@@ -334,10 +335,11 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
     /**
      * Erases the current application-DB and creates it from scratch
-     * This must be confirmed by the user
+     * This must be confirmed by the user or the correct database-name must be passed
+     * @param string|null $databaseName
      * @return bool
      */
-    protected function reInitApplicationDatabase(): bool
+    protected function reInitApplicationDatabase(string $databaseName = null): bool
     {
         try {
             // evaluate database params
@@ -346,9 +348,12 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $baseIndex = \ZfExtended_BaseIndex::getInstance();
             $config = $baseIndex->initApplication()->getOption('resources');
             $config = $config['db']['params'];
-
-            if($this->io->ask('To really recreate the database "'.$config['dbname'].'" type it\'s name to confirm') !== $config['dbname']){
-                $this->io->error('The name was wrong...');
+            // check given db-name or prompt for one
+            if($databaseName !== null && $config['dbname'] !== $databaseName){
+                $this->io->error('The passed database-name "'.$databaseName.'" does not match te application database "'.$config['dbname'].'".');
+                return false;
+            } else if($databaseName === null && $this->io->ask('To really recreate the database "'.$config['dbname'].'" type it\'s name to confirm') !== $config['dbname']){
+                $this->io->error('The given name does not match "'.$config['dbname'].'"...');
                 return false;
             }
             $this->io->note('Recreate database \''.$config['dbname'].'\'');
@@ -377,17 +382,47 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function reInitDataDirectory(string $dataDirectory): void
     {
+        $info = $this->fetchOwnerAndGroup('data'); // we take the owner and group of the /data dir as a reference
         if(!is_dir($dataDirectory)){
             mkdir($dataDirectory, 0777, true);
+            if(PHP_OS_FAMILY != 'Windows'){ // TODO FIXME: on windows this may lead to an unusable installation if called with elevated rights
+                chown($dataDirectory, $info->owner);
+                chgrp($dataDirectory, $info->group);
+            }
         }
         foreach(Config::getUserDataFolders() as $folder){
             $userDir = $dataDirectory.'/'.$folder;
             if(is_dir($userDir)){
-                \ZfExtended_Utils::recursiveDelete($userDir);
+                \ZfExtended_Utils::recursiveDelete($userDir, null, false);
+            } else {
+                mkdir($userDir, 0777);
+                if(PHP_OS_FAMILY != 'Windows'){ // TODO FIXME: on windows this may lead to an unusable installation if called with elevated rights
+                    chown($userDir, $info->owner);
+                    chgrp($userDir, $info->group);
+                }
             }
-            mkdir($userDir, 0777);
         }
         $this->io->note('Successfully cleaned user-data directory \'/'.$dataDirectory.'\'');
+    }
+
+    /**
+     * Helper to retrieve owner & group of an directory. defaults to www-data for both, if no dir given or evaluation not successful
+     * @param string|null $directory
+     * @return \stdClass with "props" owner and "group"
+     */
+    private function fetchOwnerAndGroup(string $directory=null) : \stdClass{
+        $info = new \stdClass;
+        $info->owner = 'www-data';
+        $info->group = 'www-data';
+        if($directory && is_dir($directory)){
+            $oinfo = @posix_getpwuid(@fileowner($directory));
+            $ginfo = @posix_getgrgid(@filegroup($directory));
+            if($oinfo !== false && $ginfo !== false){
+                $info->owner = $oinfo['name'];
+                $info->group = $ginfo['name'];
+            }
+        }
+        return $info;
     }
 
     /**
