@@ -348,11 +348,13 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $baseIndex = \ZfExtended_BaseIndex::getInstance();
             $config = $baseIndex->initApplication()->getOption('resources');
             $config = $config['db']['params'];
-            if($config['dbname'] !== $databaseName){
-                if($this->io->ask('To really recreate the database "'.$config['dbname'].'" type it\'s name to confirm') !== $config['dbname']){
-                    $this->io->error('The name was wrong...');
-                    return false;
-                }
+            // check given db-name or prompt for one
+            if($databaseName !== null && $config['dbname'] !== $databaseName){
+                $this->io->error('The passed database-name "'.$databaseName.'" does not match te application database "'.$config['dbname'].'".');
+                return false;
+            } else if($databaseName === null && $this->io->ask('To really recreate the database "'.$config['dbname'].'" type it\'s name to confirm') !== $config['dbname']){
+                $this->io->error('The given name does not match "'.$config['dbname'].'"...');
+                return false;
             }
             $this->io->note('Recreate database \''.$config['dbname'].'\'');
 
