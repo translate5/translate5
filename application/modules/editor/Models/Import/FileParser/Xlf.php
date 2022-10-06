@@ -614,14 +614,18 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         $this->groupTranslate[] = (strtolower($attributes['translate']) == 'yes');
     }
-    
+
     /**
      * parses the TransUnit attributes
      * @param array $attributes transUnit attributes
      * @param int $mid MRK tag mid or 0 if no mrk mtype seg used
+     * @param array|string $currentSource
+     * @param array|string $currentTarget
      * @return editor_Models_Import_FileParser_SegmentAttributes
+     * @throws editor_Models_Import_FileParser_Exception
+     * @throws editor_Models_Import_MetaData_Exception
      */
-    protected function parseSegmentAttributes($attributes, $mid): editor_Models_Import_FileParser_SegmentAttributes {
+    protected function parseSegmentAttributes($attributes, $mid, array|string $currentSource, array|string $currentTarget): editor_Models_Import_FileParser_SegmentAttributes {
         //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
         // and one trans-unit (where the id comes from) can contain multiple mrk type seg tags, which are all converted into single segments.
         // instead of using mid from the mrk type seg element, the segmentCount as additional ID part is fine.
@@ -633,8 +637,17 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         $this->calculateMatchRate($segmentAttributes);
 
-        //process nonxliff attributes
+        //trigger namespace handlers for specific handling of custom attributes in trans-unit
+        // and in the source and target MRKs
         $this->namespaces->transunitAttributes($attributes, $segmentAttributes);
+
+        if(is_array($currentSource)) {
+            $this->namespaces->currentSource($currentSource, $segmentAttributes);
+        }
+        if(is_array($currentTarget)) {
+            $this->namespaces->currentTarget($currentTarget, $segmentAttributes);
+        }
+
         $this->setMid($id);
         
         if(!empty($this->currentPlainTarget) && $state = $this->xmlparser->getAttribute($this->currentPlainTarget['openerMeta']['attributes'], 'state')) {
@@ -828,7 +841,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             ];
             
             //parse attributes for each found segment not only for the whole trans-unit
-            $attributes = $this->parseSegmentAttributes($transUnit, $mid);
+            $attributes = $this->parseSegmentAttributes($transUnit, $mid, $currentSource, $currentTarget);
             if($currentTarget == self::MISSING_MRK) {
                 $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_TARGET_MRK;
             } elseif($currentSource == self::MISSING_MRK) {
