@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 
 $APPLICATION_ROOT = rtrim(getenv('APPLICATION_ROOT'), '/');
+$ENVIRONMENT = (getenv('APPLICATION_ENV') ?: 'application');
 
 $zendLib = $APPLICATION_ROOT.'/vendor/shardj/zf1-future/library/';
 
@@ -48,12 +49,12 @@ $_SERVER['SERVER_NAME'] = 'localhost';
 $_SERVER['HTTP_HOST'] = 'localhost';
 defined('APPLICATION_ROOT') || define('APPLICATION_ROOT', $APPLICATION_ROOT);
 defined('APPLICATION_PATH') || define('APPLICATION_PATH', $APPLICATION_ROOT.DIRECTORY_SEPARATOR.'application');
-defined('APPLICATION_ENV') || define('APPLICATION_ENV', 'application');
+defined('APPLICATION_ENV') || define('APPLICATION_ENV', $ENVIRONMENT);
 // define a general marker for unit tests
 // be aware, that this marker affects the TESTING installation and the tests running in it, not the via API tested installation
-define('T5_IS_UNIT_TEST', true);
+define('T5_IS_UNIT_TEST', true); // TODO REPLACE WITH CONFIG
 
-  
+
 require_once 'Zend/Session.php';
 Zend_Session::$_unitTestEnabled = true;
 require_once 'library/ZfExtended/BaseIndex.php';
@@ -73,6 +74,7 @@ ZfExtended_Test_ApiHelper::setup([
     'KEEP_DATA' => (getenv('KEEP_DATA') === "1"),
     'LEGACY_DATA' => (getenv('LEGACY_DATA') === "1"),
     'LEGACY_JSON' => (getenv('LEGACY_JSON') === "1"),
+    'ENVIRONMENT' => $ENVIRONMENT
 ]);
 
 //forcing cwd to testcases dir

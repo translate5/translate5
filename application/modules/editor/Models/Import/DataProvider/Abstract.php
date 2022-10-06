@@ -98,12 +98,8 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * deletes the temporary import folder
      */
     protected function removeTempFolder() {
-        /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
-        $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                    'Recursivedircleaner'
-        );
         if(isset($this->importFolder) && is_dir($this->importFolder)) {
-            $recursivedircleaner->delete($this->importFolder);
+            ZfExtended_Utils::recursiveDelete($this->importFolder);
         }
     }
 

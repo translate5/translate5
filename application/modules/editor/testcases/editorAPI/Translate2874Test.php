@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for TRANSLATE-2874 Mixing XLF id and rid values led to wrong tag numbering
  * For details see the issue.
+ * includes a test for TRANSLATE-3068 - pre-translation with MT matches only and repetitions did use wrong tags
  */
 class Translate2874Test extends editor_Test_JsonTest {
     public static function setUpBeforeClass(): void {
@@ -65,7 +66,6 @@ class Translate2874Test extends editor_Test_JsonTest {
 
         //add assocs
         $api->addUser('testlector');
-        self::$api->addTaskAssoc();
 
         $params = [
             'internalFuzzy' => 0,
