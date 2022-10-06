@@ -78,6 +78,7 @@ class Config {
         'runtimeOptions.errorCodesUrl' => null,
 
         'runtimeOptions.LanguageResources.opentm2.server' => null,
+        'runtimeOptions.LanguageResources.opentm2.tmprefix' => null,
         'runtimeOptions.LanguageResources.moses.server' => null,
         'runtimeOptions.LanguageResources.sdllanguagecloud.server' => null,
 
