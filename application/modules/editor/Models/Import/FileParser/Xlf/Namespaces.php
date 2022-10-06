@@ -37,24 +37,49 @@ END LICENSE AND COPYRIGHT
  * XLF Namespace Handler
  */
 class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Import_FileParser_Xlf_Namespaces_Abstract {
-    protected $namespaces = [];
-    
+
+    /**
+     * List of available specific XLF namespace classes
+     * @var array|string[]
+     */
+    protected static array $registeredNamespaces = [
+        'ibm' => editor_Models_Import_FileParser_Xlf_Namespaces_Tmgr::class,
+        'translate5' => editor_Models_Import_FileParser_Xlf_Namespaces_Translate5::class,
+        'across' => editor_Models_Import_FileParser_Xlf_Namespaces_Across::class,
+        'memoq' => editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ::class,
+    ];
+
+    /**
+     * Namespace instances to be used on XLF parsing (checked by isApplicable or force added manually)
+     * @var array
+     */
+    protected array $activeNamespaces = [];
+
+    /**
+     * @param string $xliff
+     * @return bool
+     */
+    protected static function isApplicable(string $xliff): bool
+    {
+        throw new LogicException('It makes no sense to call that method on the general namespace class');
+    }
+
+    /**
+     * registers a new XLF namespace to be checked on applicability on each XLF import
+     * @param string $key
+     * @param string $namespace
+     * @return void
+     */
+    public static function registerNamespace(string $key, string $namespace): void
+    {
+        self::$registeredNamespaces[$key] = $namespace;
+    }
+
     public function __construct($xliff) {
-        //TODO this code could be improved by moving the following checks into each namespace class and loop through the existing classes
-        // instead of hardcoding the checks here
-        // Additionaly this simple String check fails if the strings are somewhere in the content
-        // for a better implementation see Export Namespaces
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_Tmgr::IBM_XLIFF_NAMESPACE) !== false) {
-            $this->namespaces['ibm'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_Namespaces_Tmgr');
-        }
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_Translate5::TRANSLATE5_XLIFF_NAMESPACE) !== false) {
-            $this->namespaces['translate5'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_Namespaces_Translate5');
-        }
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_Across::ACROSS_XLIFF_NAMESPACE) !== false) {
-            $this->namespaces['across'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_Namespaces_Across');
-        }
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ::MEMOQ_XLIFF_NAMESPACE) !== false) {
-            $this->namespaces['memoq'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ');
+        foreach(self::$registeredNamespaces as $name => $namespaceCls) {
+            if($namespaceCls::isApplicable($xliff)) {
+                $this->addNamespace($name, ZfExtended_Factory::get($namespaceCls));
+            }
         }
     }
     
@@ -63,16 +88,33 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * @param string $key
      * @param editor_Models_Import_FileParser_Xlf_Namespaces_Abstract $namespace
      */
-    public function addNamespace($key, editor_Models_Import_FileParser_Xlf_Namespaces_Abstract $namespace) {
-        $this->namespaces[$key] = $namespace;
+    public function addNamespace(string $key, editor_Models_Import_FileParser_Xlf_Namespaces_Abstract $namespace) {
+        $this->activeNamespaces[$key] = $namespace;
     }
     
     /**
-     *
      * @param array $attributes
      * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
      */
-    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
+    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes): void {
+        $this->call(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * @param array $currentSourceTag
+     * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
+     */
+    public function currentSource(array $currentSourceTag, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes): void
+    {
+        $this->call(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * @param array $currentTargetTag
+     * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
+     */
+    public function currentTarget(array $currentTargetTag, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes): void
+    {
         $this->call(__FUNCTION__, func_get_args());
     }
     
@@ -80,7 +122,8 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
+    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser): void
+    {
         $this->call(__FUNCTION__, func_get_args());
     }
     
@@ -88,24 +131,25 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getPairedTag()
      */
-    public function getPairedTag($xlfBeginTag, $xlfEndTag){
-        return $this->call(__FUNCTION__, func_get_args());
+    public function getPairedTag(string $xlfBeginTag, ?string $xlfEndTag): array
+    {
+        return $this->call(__FUNCTION__, func_get_args(), []);
     }
     
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getSingleTag()
      */
-    public function getSingleTag($xlfTag){
-        return $this->call(__FUNCTION__, func_get_args());
+    public function getSingleTag(string $xlfTag): array{
+        return $this->call(__FUNCTION__, func_get_args(), []);
     }
     
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
-    public function useTagContentOnly(){
-        //using null as default value should trigger further investigation if the tag content should be used or not (if the namespace did not provide information about it)
+    public function useTagContentOnly(): ?bool{
+        //using null as explicit default value should trigger further investigation if the tag content should be used or not (if the namespace did not provide information about it)
         return $this->call(__FUNCTION__, func_get_args(), null);
     }
     
@@ -113,26 +157,29 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getComments()
      */
-    public function getComments() {
-        return $this->call(__FUNCTION__, func_get_args());
+    public function getComments(): array {
+        return $this->call(__FUNCTION__, func_get_args(), []);
     }
     
     /**
      * calls the function in each namespace object, passes the arguments
      * @param string $function
      * @param array $arguments
-     * @param boolean $result optional, the default result if no namespace was found
+     * @param mixed $default optional, the default result if no namespace was found
      * @return string|mixed
      */
-    protected function call(string $function, array $arguments, $result = false) {
-        foreach ($this->namespaces as $namespace){
+    protected function call(string $function, array $arguments, array|bool|null $default = null): array|bool|null {
+        //it is slightly unusual that a XLF file has multiple activeNamespaces, but still it can happen
+        // we handle it, that if a empty result is produced, we proceed with the next namespace
+        foreach ($this->activeNamespaces as $namespace){
             $result = call_user_func_array([$namespace, $function], $arguments);
-            //if one of the callen namespace handlers produces a result, we return this and end the loop
-            if(!is_null($result)) {
-                return $result;
+            if(is_array($result) && !empty($result) || is_null($result)) {
+                //empty array or null means, check next namespace
+                continue;
             }
+            return $result;
         }
-        //if no namespace was defined, we return the default result, by default false
-        return $result;
+        //if no namespace was defined, or nothing was returned by them, we return the default result
+        return $default;
     }
 }
