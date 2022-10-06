@@ -499,7 +499,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                     AND sourceTable.id != targetTable.id
                     GROUP BY sourceTable.term;';
 
-        error_log($sql);
         return $this->db->getAdapter()->query($sql)->fetchAll();
     }
 
