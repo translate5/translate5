@@ -149,7 +149,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
     public function useTagContentOnly(): ?bool{
-        //using null as default value should trigger further investigation if the tag content should be used or not (if the namespace did not provide information about it)
+        //using null as explicit default value should trigger further investigation if the tag content should be used or not (if the namespace did not provide information about it)
         return $this->call(__FUNCTION__, func_get_args(), null);
     }
     
@@ -168,7 +168,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * @param mixed $default optional, the default result if no namespace was found
      * @return string|mixed
      */
-    protected function call(string $function, array $arguments, array|bool|null $default): array|bool|null {
+    protected function call(string $function, array $arguments, array|bool|null $default = null): array|bool|null {
         //it is slightly unusual that a XLF file has multiple activeNamespaces, but still it can happen
         // we handle it, that if a empty result is produced, we proceed with the next namespace
         foreach ($this->activeNamespaces as $namespace){
