@@ -133,7 +133,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      */
     public function getPairedTag(string $xlfBeginTag, ?string $xlfEndTag): array
     {
-        return $this->call(__FUNCTION__, func_get_args());
+        return $this->call(__FUNCTION__, func_get_args(), []);
     }
     
     /**
@@ -141,7 +141,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getSingleTag()
      */
     public function getSingleTag(string $xlfTag): array{
-        return $this->call(__FUNCTION__, func_get_args());
+        return $this->call(__FUNCTION__, func_get_args(), []);
     }
     
     /**
@@ -158,25 +158,28 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getComments()
      */
     public function getComments(): array {
-        return $this->call(__FUNCTION__, func_get_args());
+        return $this->call(__FUNCTION__, func_get_args(), []);
     }
     
     /**
      * calls the function in each namespace object, passes the arguments
      * @param string $function
      * @param array $arguments
-     * @param boolean $result optional, the default result if no namespace was found
+     * @param mixed $default optional, the default result if no namespace was found
      * @return string|mixed
      */
-    protected function call(string $function, array $arguments, mixed $result = false): mixed {
+    protected function call(string $function, array $arguments, array|bool|null $default): array|bool|null {
+        //it is slightly unusual that a XLF file has multiple activeNamespaces, but still it can happen
+        // we handle it, that if a empty result is produced, we proceed with the next namespace
         foreach ($this->activeNamespaces as $namespace){
             $result = call_user_func_array([$namespace, $function], $arguments);
-            //if one of the callen namespace handlers produces a result, we return this and end the loop
-            if(!is_null($result)) {
-                return $result;
+            if(is_array($result) && !empty($result) || is_null($result)) {
+                //empty array or null means, check next namespace
+                continue;
             }
+            return $result;
         }
-        //if no namespace was defined, we return the default result, by default false
-        return $result;
+        //if no namespace was defined, or nothing was returned by them, we return the default result
+        return $default;
     }
 }
