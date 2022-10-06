@@ -449,7 +449,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
         // get the configured term processing statuses which can be used
         $config = Zend_Registry::get('config');
-        $processStatus = $config->runtimeOptions->terminology->usedTermProcessStatus->toArray() ?? [editor_Models_Terminology_Models_TermModel::PROCESS_STATUS_FINALIZED];
+        $processStatus = $config->runtimeOptions->terminology->usedTermProcessStatus->toArray();
+        if( empty($processStatus)){
+            $processStatus =  [editor_Models_Terminology_Models_TermModel::PROCESS_STATUS_FINALIZED];
+        }
         $processStatus = implode('","',$processStatus);
         
         // This query will select translated terms from source to target langauge from each term entry
