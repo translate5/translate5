@@ -95,6 +95,16 @@ class TestRunCommand extends Translate5AbstractTestCommand
             }
             if($test === basename($test)) {
                 $test = self::RELATIVE_TEST_DIR.$test;
+            } else {
+                // cleanup various ways to reference tests in the Plugins or PrivatePlugins folder
+                $cleanedPath = ltrim($test, './');
+                if(str_starts_with($cleanedPath, 'PrivatePlugins')){
+                    $cleanedPath = substr($cleanedPath, 7); // remove "Private"
+                }
+                // we set the path relative to application-root to get tests pointing to plugin's test-folders running
+                if(str_starts_with($cleanedPath, 'Plugins')) {
+                    $test = 'application/modules/editor/'.$cleanedPath;
+                }
             }
             if(!file_exists($test)) {
                 throw new \RuntimeException('The given Test does not exist: '.$test);

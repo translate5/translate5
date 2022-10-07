@@ -131,6 +131,27 @@ class Models_Installer_Standalone {
         $saInstaller->checkDb();
         $saInstaller->done();
     }
+
+    /**
+     * @param array $options
+     * @throws Zend_Db_Exception
+     * @throws Zend_Exception
+     * @throws Zend_Mail_Exception
+     * @throws Exception
+     */
+    public static function developerInstall(array $options = []): void
+    {
+        //initially we have to load the locales from the environment
+        setlocale(LC_ALL, '');
+        $saInstaller = new self(getcwd(), $options);
+        $saInstaller->checkEnvironment();
+        $saInstaller->installation();//checks internally if steps are already done
+        $saInstaller->initApplication();
+        $saInstaller->postInstallation();
+        $saInstaller->updateDb(); //this does also cache cleaning!
+        $saInstaller->checkDb();
+        $saInstaller->done();
+    }
     
     /**
      * @param string $currentWorkingDir
