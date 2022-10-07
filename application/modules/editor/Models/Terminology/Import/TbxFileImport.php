@@ -530,7 +530,7 @@ $memLog('Loaded terms:        ');
         $newTerm->languageId = $parsedLangSet->languageId;
         $newTerm->termEntryGuid = $newTerm->parentEntry->entryGuid;
         $newTerm->termEntryTbxId = $newTerm->parentEntry->termEntryTbxId;
-        $newTerm->term = $term;
+        $newTerm->term = trim($term);
         $newTerm->termTbxId = $this->getIdOrGenerate($tig->term);
         $newTerm->langSetGuid = $parsedLangSet->langSetGuid;
 

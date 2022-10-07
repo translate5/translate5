@@ -84,17 +84,15 @@ class editor_Plugins_Okapi_Bconf_Filters {
 
     /**
      * Used for testing/validating bconfs
-     * English / en-GB
-     * @var int
+     * @var string
      */
-    const SOURCE_LANGUAGE = 5;
+    const SOURCE_LANGUAGE = 'en';
 
     /**
-     * sed for testing/validating bconfs
-     * German / de-DE
-     * @var int
+     * Used for testing/validating bconfs
+     * @var string
      */
-    const TARGET_LANGUAGE = 4;
+    const TARGET_LANGUAGE = 'de';
 
     /**
      * @var editor_Plugins_Okapi_Bconf_Filters|null

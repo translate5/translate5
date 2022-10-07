@@ -3,7 +3,7 @@
         url = ../ZfExtended.git
 [submodule "application/modules/editor/PrivatePlugins"]
 	path = application/modules/editor/PrivatePlugins
-	url = git@bitbucket.org:mittagqi/privateplugins.git
+	url = ../privateplugins.git
 [submodule "app-tm-erp"]
 	path = app-tm-erp
-	url = git@bitbucket.org:mittagqi/app-tm-erp.git
+	url = ../app-tm-erp.git

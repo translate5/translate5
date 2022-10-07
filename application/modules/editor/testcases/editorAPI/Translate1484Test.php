@@ -67,7 +67,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [static::$ownCustomer->id],
-            'customerUseAsDefaultIds' => [],
+            'customerUseAsDefaultIds' => [static::$ownCustomer->id],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',
             'serviceName'=> 'ZDemoMT',
@@ -81,7 +81,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [static::$ownCustomer->id],
-            'customerUseAsDefaultIds' => [],
+            'customerUseAsDefaultIds' => [static::$ownCustomer->id],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
             'serviceName'=> 'OpenTM2',
@@ -91,9 +91,6 @@ class Translate1484Test extends editor_Test_JsonTest {
 
         static::api()->addImportFile(static::api()->getFile('simple-en-de.xlf'));
         static::api()->import($task, false, false);
-
-        // Add task to languageresource assoc
-        static::api()->addTaskAssoc();
 
         // Queue the match anlysis worker
         $params = [
@@ -130,8 +127,12 @@ class Translate1484Test extends editor_Test_JsonTest {
      * @param stdClass $exportResource
      */
     private function sortExportResource(stdClass $exportResource){
-        usort($exportResource->MonthlySummaryByResource, function($a, $b) { return ($a->totalCharacters === $b->totalCharacters) ? 0 : ($a->totalCharacters < $b->totalCharacters ? -1 : 1); });
-        usort($exportResource->UsageLogByCustomer, function($a, $b) { return ($a->charactersPerCustomer === $b->charactersPerCustomer) ? 0 : ($a->charactersPerCustomer < $b->charactersPerCustomer ? -1 : 1); });
+        usort($exportResource->MonthlySummaryByResource, function($a, $b) {
+            return $a->totalCharacters - $b->totalCharacters;
+        });
+        usort($exportResource->UsageLogByCustomer, function($a, $b) {
+            return $a->charactersPerCustomer - $b->charactersPerCustomer;
+        });
     }
 
     public static function afterTests(): void {

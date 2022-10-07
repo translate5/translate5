@@ -90,16 +90,6 @@ $dep->dependencies = [[
             // title       optional, overwrites default title (defined in ZfExtended_Models_Installer_License)
         ]]
     ],[
-        "name" => "Open_Sans",
-        "label" => "Open Sans Fonts",
-        "url" => "RELEASE:Open_Sans.zip",
-        "target" => "application/modules/editor/ThirdParty/Open_Sans/",
-        "licenses" => [[
-            "uses" => "the Open Sans font",
-            "license" => "Apache License 2.0",
-            "relpath" => "docs/third-party-licenses/Open_Sans-license.txt"
-        ]]
-    ],[
         "name" => "termtagger",
         "label" => "openTMS TermTagger",
         "url" => "RELEASE:openTMStermTagger.zip",
