@@ -26,10 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Import;
+
 /**
- * Base Class for all Unit Tests
+ * Represents the api-request configuration for a termcollection-resource
  */
-abstract class editor_Test_UnitTest extends \PHPUnit\Framework\TestCase
+final class TermCollectionResource extends LanguageResource
 {
-    const TYPE = 'unit';
+    public bool $mergeTerms = false;
+    public bool $useAsGlossarySource = false;
+    protected string $serviceName = 'TermCollection';
+    protected string $serviceType = 'editor_Services_TermCollection';
+    protected string $_deleteRoute = 'editor/termcollection/';
 }

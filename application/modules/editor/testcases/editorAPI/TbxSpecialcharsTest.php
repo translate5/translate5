@@ -114,7 +114,7 @@ class TbxSpecialcharsTest extends \editor_Test_ApiTest {
             'tbxBasicOnly' => 0,
             'exportImages' => 1
         ]);
-        $this->assertFalse($this->api()->isJsonResultError($result), 'TBX export could not be requested');
+        $this->assertFalse(static::api()->isJsonResultError($result), 'TBX export could not be requested');
         $exported = preg_match_all('~&lt;~', $result->data);
         $this->assertEquals($original, $exported, 'Specialchars quantities in original and exported files are not equal');
 

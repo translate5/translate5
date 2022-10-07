@@ -52,8 +52,8 @@ class ProjectTaskTest extends editor_Test_JsonTest {
             'name' => 'API Testing::TermCollection_'.__CLASS__,
             'resourceId' => 'editor_Services_TermCollection',
             'serviceType' => 'editor_Services_TermCollection',
-            'customerIds' => [ static::$testOwnCustomer->id ],
-            'customerUseAsDefaultIds' => [ static::$testOwnCustomer->id ],
+            'customerIds' => [ static::$ownCustomer->id ],
+            'customerUseAsDefaultIds' => [ static::$ownCustomer->id ],
             'customerWriteAsDefaultIds' => [],
             'serviceName' => 'TermCollection',
             'mergeTerms' => false
@@ -65,7 +65,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$testOwnCustomer->id,
+            'customerId' => static::$ownCustomer->id,
             'autoStartImport' => 0,
             'edit100PercentMatch' => 0
         ];

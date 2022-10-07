@@ -26,10 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Import;
+
 /**
- * Base Class for all Unit Tests
+ * Represents the api-request configuration for a DeepL-resource
  */
-abstract class editor_Test_UnitTest extends \PHPUnit\Framework\TestCase
+final class DummyTm extends LanguageResource
 {
-    const TYPE = 'unit';
+    public string $sourceLang = 'en';
+    public string $targetLang = 'de';
+    protected string $serviceName = 'DummyFile TM';
+    protected string $serviceType = 'editor_Services_DummyFileTm';
 }

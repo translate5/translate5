@@ -157,7 +157,7 @@ class MatchAnalysisTest extends \editor_Test_ApiTest {
         $this->exportXmlResults(true);
     }
 
-    /***
+    /**
      *
      * @return void
      */
@@ -166,7 +166,7 @@ class MatchAnalysisTest extends \editor_Test_ApiTest {
         $this->validateResults(false);
     }
 
-    /***
+    /**
      *
      * @return void
      */

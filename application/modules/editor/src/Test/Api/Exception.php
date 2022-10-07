@@ -26,10 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Api;
 /**
- * Base Class for all Unit Tests
+ * Base Class for all API Tests Api Exceptions
  */
-abstract class editor_Test_UnitTest extends \PHPUnit\Framework\TestCase
+final class Exception extends \Exception
 {
-    const TYPE = 'unit';
+    public function __construct($message = "", $code = 0, \Throwable $previous = null)
+    {
+        parent::__construct('API-test API: ' . $message, $code, $previous);
+    }
 }

@@ -47,7 +47,7 @@ class Translate2081Test extends editor_Test_JsonTest {
     public function testDefaultUserAssoc(){
 
         $params = [
-            'customerId' => static::$testOwnCustomer->id,
+            'customerId' => static::$ownCustomer->id,
             'workflow' => 'default',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
@@ -78,7 +78,7 @@ class Translate2081Test extends editor_Test_JsonTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$testOwnCustomer->id,
+            'customerId' => static::$ownCustomer->id,
             'edit100PercentMatch' => true,
             'autoStartImport' => 1
         ];

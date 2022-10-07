@@ -26,30 +26,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Api;
+
 /**
  * API Helper the provides general functions to test the translate5 API
  */
-final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
-
-    /***
+final class Helper extends \ZfExtended_Test_ApiHelper
+{
+    /**
      * How many time the task status will be check while the task is importing.
      * @var integer
      */
     const RELOAD_TASK_LIMIT = 100;
 
-    /***
+    /**
      * How many times the language reosurces status will be checked while the resource is importing
      * @var integer
      */
     const RELOAD_RESOURCE_LIMIT = 40;
 
-    /***
+    /**
      * Project taskType
      * @var string
      */
     const INITIAL_TASKTYPE_PROJECT = 'project';
 
-    /***
+    /**
      * Project task type
      * @var string
      */
@@ -67,7 +69,7 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
 
     /**
      * stdObject with the values of the last imported task
-     * @var stdClass
+     * @var \stdClass
      */
     protected $task;
 
@@ -79,9 +81,9 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
 
     /**
      * stdObject with the values of the test customer
-     * @var stdClass
+     * @var \stdClass
      */
-    protected stdClass $customer;
+    protected \stdClass $customer;
 
     /**
      * Collection of language resources created from addResources method
@@ -102,77 +104,116 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
 
     /**
      * Imports the task described in array $task, parameters are the API parameters, at least:
+     * @Deprecated
      *
-    $task = array(
-    'sourceLang' => 'en', // mandatory, source language in rfc5646
-    'targetLang' => 'de', // mandatory, target language in rfc5646
-    'relaisLang' => 'de', // optional, must be given on using relais column
-    'taskName' => 'simple-en-de', //optional, defaults to __CLASS__::__TEST__
-    'orderdate' => date('Y-m-d H:i:s'), //optional, defaults to now
-    'wordCount' => 666, //optional, defaults to heavy metal
-    );
+     * $task = array(
+     * 'sourceLang' => 'en', // mandatory, source language in rfc5646
+     * 'targetLang' => 'de', // mandatory, target language in rfc5646
+     * 'relaisLang' => 'de', // optional, must be given on using relais column
+     * 'taskName' => 'simple-en-de', //optional, defaults to __CLASS__::__TEST__
+     * 'orderdate' => date('Y-m-d H:i:s'), //optional, defaults to now
+     * 'wordCount' => 666, //optional, defaults to heavy metal
+     * );
      *
      * @param array $task
      * @param bool $failOnError default true
-     * @param bool $waithForImport default true : if this is set to false, the function will not check the task import state
+     * @param bool $waitForImport default true : if this is set to false, the function will not check the task import state
      * @return boolean;
      */
-    public function import(array $task, $failOnError = true, $waitForImport = true): bool {
+    public function import(array $task, bool $failOnError = true, bool $waitForImport = true): bool
+    {
         $this->initTaskPostData($task);
 
         $test = $this->testClass;
         $test::assertLogin('testmanager');
 
         $this->task = $this->postJson('editor/task', $task);
-        if(isset($this->task->projectTasks)){
+        if (isset($this->task->projectTasks)) {
             $this->projectTasks = is_array($this->task->projectTasks) ? $this->task->projectTasks : [$this->task->projectTasks];
         }
         $this->task->originalSourceLang = $task['sourceLang'];
         $this->task->originalTargetLang = $task['targetLang'];
         $this->assertResponseStatus($this->getLastResponse(), 'Import');
 
-        if(!$waitForImport){
+        if (!$waitForImport) {
             return true;
         }
-        if($this->task->taskType == static::INITIAL_TASKTYPE_PROJECT){
+        if ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
             return $this->checkProjectTasksStateLoop($failOnError);
         }
         return $this->checkTaskStateLoop($failOnError);
     }
 
-    public function addImportFile($path, $mime = 'application/zip') {
+    /**
+     * Imports a task and returns the requested data on success
+     * @param array $task
+     * @param bool $failOnError
+     * @param bool $waitForImport
+     * @return array|\stdClass
+     * @throws Exception
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function importTask(array $task, bool $failOnError = true, bool $waitForImport = true)
+    {
+        $this->initTaskPostData($task);
+        $this->testClass::assertLogin('testmanager'); // make sure testmanager is logged in
+        $task = $this->postJson('editor/task', $task);
+        $this->assertResponseStatus($this->getLastResponse(), 'Import');
+        if (!$waitForImport) {
+            return $task;
+        }
+        if ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
+            $this->checkProjectTasksStateLoop($failOnError);
+        } else {
+            $this->checkTaskStateLoop($failOnError);
+        }
+        return $task;
+    }
+
+
+    /**
+     * Adds a single file for upload
+     * @param string $path
+     * @param string $mime
+     */
+    public function addImportFile(string $path, string $mime = 'application/zip')
+    {
         $this->addFile('importUpload', $path, $mime);
     }
 
     /***
      * Add multiple work-files for upload.
-     * @param $path
-     * @param $mime
+     * @param string $path
+     * @param string $mime
      * @return void
      */
-    public function addImportFiles($path, $mime = 'application/zip') {
+    public function addImportFiles(string $path, string $mime = 'application/zip')
+    {
         $this->addFile('importUpload[]', $path, $mime);
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @param string $mime
      */
-    public function addImportTbx(string $path, string $mime = 'application/xml') {
+    public function addImportTbx(string $path, string $mime = 'application/xml')
+    {
         $this->addFile('importTbx', $path, $mime);
     }
 
     /***
      * Add task specific config. The config must be added after the task is created and before the import is triggered.
+     * @param string $taskGuid
      * @param string $configName
      * @param string $configValue
      * @return mixed|boolean
      */
-    public function addTaskImportConfig(string $taskGuid, string $configName, string $configValue){
+    public function addTaskImportConfig(string $taskGuid, string $configName, string $configValue)
+    {
         $this->putJson('editor/config', [
             'name' => $configName,
             'value' => $configValue,
-            'taskGuid'=> $taskGuid
+            'taskGuid' => $taskGuid
         ]);
         $resp = $this->getLastResponse();
         $this->assertResponseStatus($resp, 'Config');
@@ -185,8 +226,10 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      *
      * @param string $data
      * @param string $mime
+     * @param string $filename
      */
-    public function addImportPlain($data, $mime = 'application/csv', $filename = 'apiTest.csv') {
+    public function addImportPlain(string $data, string $mime = 'application/csv', string $filename = 'apiTest.csv')
+    {
         $this->addFilePlain('importUpload', $data, $mime, $filename);
     }
 
@@ -198,15 +241,16 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      *
      * @param array $data
      */
-    public function addImportArray(array $data) {
+    public function addImportArray(array $data)
+    {
         $i = 1;
-        $data = array_map(function($row) use (&$i){
-            $row = array_map(function($cell){
+        $data = array_map(function ($row) use (&$i) {
+            $row = array_map(function ($cell) {
                 //escape " chars
                 return str_replace('"', '""', $cell);
-            },$row);
+            }, $row);
             array_unshift($row, $i++); //add mid
-            return '"'.join('","', $row).'"';
+            return '"' . join('","', $row) . '"';
         }, $data);
         array_unshift($data, '"id", "source", "target"');
         $this->addImportPlain(join("\n", $data));
@@ -217,30 +261,30 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * @param bool $failOnError
      * @return boolean
      */
-    public function checkTaskStateLoop(bool $failOnError = true): bool {
-        $test = $this->testClass;
-        $counter=0;
-        while(true){
-            error_log('Task state check '.$counter.'/'.static::RELOAD_TASK_LIMIT.' state: '.$this->task->state.' ['.$test.']');
-            $taskResult = $this->getJson('editor/task/'.$this->task->id);
-            if($taskResult->state == 'open') {
+    public function checkTaskStateLoop(bool $failOnError = true): bool
+    {
+        $counter = 0;
+        while (true) {
+            error_log('Task state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ' state: ' . $this->task->state . ' [' . $test . ']');
+            $taskResult = $this->getJson('editor/task/' . $this->task->id);
+            if ($taskResult->state == 'open') {
                 $this->task = $taskResult;
                 return true;
             }
-            if($taskResult->state == 'unconfirmed') {
+            if ($taskResult->state == 'unconfirmed') {
                 //with task templates we could implement separate tests for that feature:
-                $test::fail('runtimeOptions.import.initialTaskState = unconfirmed is not supported at the moment!');
+                $this->testClass::fail('runtimeOptions.import.initialTaskState = unconfirmed is not supported at the moment!');
             }
-            if($taskResult->state == 'error') {
-                if($failOnError) {
-                    $test::fail('Task Import stopped. Task has state error and last errors: '."\n  ".join("\n  ", array_column($taskResult->lastErrors ?? [], 'message')));
+            if ($taskResult->state == 'error') {
+                if ($failOnError) {
+                    $this->testClass::fail('Task Import stopped. Task has state error and last errors: ' . "\n  " . join("\n  ", array_column($taskResult->lastErrors ?? [], 'message')));
                 }
                 return false;
             }
             //break after RELOAD_TASK_LIMIT reloads
-            if($counter==static::RELOAD_TASK_LIMIT){
-                if($failOnError) {
-                    $test::fail('Task Import stopped. Task is not open after '.self::RELOAD_TASK_LIMIT.' task checks, but has state: '.$taskResult->state);
+            if ($counter == self::RELOAD_TASK_LIMIT) {
+                if ($failOnError) {
+                    $this->testClass::fail('Task Import stopped. Task is not open after ' . self::RELOAD_TASK_LIMIT . ' task checks, but has state: ' . $taskResult->state);
                 }
                 return false;
             }
@@ -252,13 +296,14 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
     /***
      * Check the state of all project tasks. The test will fail when $failOnError = true and if one of the project task is in state error or after RELOAD_TASK_LIMIT task state checks
      * @param bool $failOnError
-     * @throws Exception
      * @return bool
+     * @throws Exception
      */
-    public function checkProjectTasksStateLoop(bool $failOnError = true): bool {
+    public function checkProjectTasksStateLoop(bool $failOnError = true): bool
+    {
         $test = $this->testClass;
-        $counter=0;
-        while(true){
+        $counter = 0;
+        while (true) {
 
             //reload the project
             $this->reloadProjectTasks();
@@ -267,33 +312,33 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
             //foreach project task check the state
             foreach ($this->projectTasks as $task) {
 
-                error_log('Project tasks state check '.$counter.'/'.static::RELOAD_TASK_LIMIT.', [ name:'.$task->taskName.'], [state: '.$task->state.'] ['.$test.']');
+                error_log('Project tasks state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ', [ name:' . $task->taskName . '], [state: ' . $task->state . '] [' . $test . ']');
 
-                if($task->state == 'open') {
+                if ($task->state == 'open') {
                     $toCheck--;
                     continue;
                 }
-                if($task->state == 'unconfirmed') {
+                if ($task->state == 'unconfirmed') {
                     //with task templates we could implement separate tests for that feature:
                     throw new Exception("runtimeOptions.import.initialTaskState = unconfirmed is not supported at the moment!");
                 }
 
-                if($task->state == 'error') {
-                    if($failOnError) {
+                if ($task->state == 'error') {
+                    if ($failOnError) {
                         $test::fail('Task Import stopped. Task has state error.');
                     }
                     return false;
                 }
             }
 
-            if($toCheck == 0){
+            if ($toCheck == 0) {
                 return true;
             }
 
             //break after RELOAD_TASK_LIMIT reloads
-            if($counter==static::RELOAD_TASK_LIMIT){
-                if($failOnError) {
-                    $test::fail('Project task import stopped. After '.static::RELOAD_TASK_LIMIT.' task state checks, all of the project task are not in state open.');
+            if ($counter == self::RELOAD_TASK_LIMIT) {
+                if ($failOnError) {
+                    $test::fail('Project task import stopped. After ' . self::RELOAD_TASK_LIMIT . ' task state checks, all of the project task are not in state open.');
                 }
                 return false;
             }
@@ -304,13 +349,14 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
     //endregion
     //region Task API
     /******************************************************* TASK API *******************************************************/
-    
-    
+
+
     /**
      * returns the current active task to test
-     * @return stdClass
+     * @return \stdClass
      */
-    public function getTask() {
+    public function getTask()
+    {
         return $this->task;
     }
 
@@ -318,25 +364,28 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * returns the absolute data path to the task
      * @return string
      */
-    public function getTaskDataDirectory() {
-        return static::$CONFIG['DATA_DIR'].trim($this->task->taskGuid, '{}').'/';
+    public function getTaskDataDirectory()
+    {
+        return self::$CONFIG['DATA_DIR'] . trim($this->task->taskGuid, '{}') . '/';
     }
 
     /**
      * reloads the internal stored task
-     * @return stdClass
+     * @return \stdClass
      */
-    public function reloadTask(int $id = null) {
-        return $this->task = $this->getJson('editor/task/'.($id ?? $this->task->id));
+    public function reloadTask(int $id = null)
+    {
+        return $this->task = $this->getJson('editor/task/' . ($id ?? $this->task->id));
     }
 
     /***
      * Reload the tasks of the current project
      * @return mixed|boolean
      */
-    public function reloadProjectTasks() {
+    public function reloadProjectTasks()
+    {
         return $this->projectTasks = $this->getJson('editor/task/', [
-            'filter' => '[{"operator":"eq","value":"'.$this->task->projectId.'","property":"projectId"}]',
+            'filter' => '[{"operator":"eq","value":"' . $this->task->projectId . '","property":"projectId"}]',
         ]);
     }
 
@@ -344,7 +393,8 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      *
      * @return array|mixed|boolean
      */
-    public function getProjectTasks() {
+    public function getProjectTasks()
+    {
         return $this->projectTasks;
     }
 
@@ -353,48 +403,53 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      *
      * @param $task
      */
-    public function setTask($task) {
+    public function setTask($task)
+    {
         $this->task = $task;
     }
 
     /**
      * Sets the passed or current task to open
-     * @param int $taskId: if given, this task is taken, otherwise the current task
-     * @return array|stdClass
+     * @param int $taskId : if given, this task is taken, otherwise the current task
+     * @return array|\stdClass
      */
-    public function setTaskToOpen(int $taskId = -1) {
+    public function setTaskToOpen(int $taskId = -1)
+    {
         return $this->setTaskState($taskId, 'open');
     }
 
     /**
      * Sets the passed or current task to edit
-     * @param int $taskId: if given, this task is taken, otherwise the current task
-     * @return array|stdClass
+     * @param int $taskId : if given, this task is taken, otherwise the current task
+     * @return array|\stdClass
      */
-    public function setTaskToEdit(int $taskId = -1) {
+    public function setTaskToEdit(int $taskId = -1)
+    {
         return $this->setTaskState($taskId, 'edit');
     }
 
     /**
      * Sets the passed or current task to finished
-     * @param int $taskId: if given, this task is taken, otherwise the current task
-     * @return array|stdClass
+     * @param int $taskId : if given, this task is taken, otherwise the current task
+     * @return array|\stdClass
      */
-    public function setTaskToFinished(int $taskId = -1) {
+    public function setTaskToFinished(int $taskId = -1)
+    {
         return $this->setTaskState($taskId, 'finished');
     }
 
     /**
-     * @param int $taskId: if given, this task is taken, otherwise the current task
+     * @param int $taskId : if given, this task is taken, otherwise the current task
      * @param string $userState
-     * @return array|stdClass
+     * @return array|\stdClass
      */
-    private function setTaskState(int $taskId, string $userState) {
-        if($taskId < 1 && $this->task){
+    private function setTaskState(int $taskId, string $userState)
+    {
+        if ($taskId < 1 && $this->task) {
             $taskId = $this->task->id;
         }
-        if($taskId > 0){
-            return $this->putJson('editor/task/'.$taskId, array('userState' => $userState, 'id' => $taskId));
+        if ($taskId > 0) {
+            return $this->putJson('editor/task/' . $taskId, array('userState' => $userState, 'id' => $taskId));
         }
         return $this->createResponseResult(null, 'No Task to set state for');
     }
@@ -402,38 +457,57 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
     /***
      * Associate all $resources to the current task
      */
-    public function addTaskAssoc(){
+    public function addTaskAssoc()
+    {
         $taskGuid = $this->getTask()->taskGuid;
         $test = $this->testClass;
-        $test::assertNotEmpty($taskGuid,'Unable to associate resources to task. taskGuid empty');
+        $test::assertNotEmpty($taskGuid, 'Unable to associate resources to task. taskGuid empty');
 
-        foreach ($this->getResources() as $resource){
+        foreach ($this->getResources() as $resource) {
             // associate languageresource to task
             $this->postJson('editor/languageresourcetaskassoc', [
                 'languageResourceId' => $resource->id,
                 'taskGuid' => $taskGuid,
                 'segmentsUpdateable' => 0
             ]);
-            error_log('Languageresources assoc to task. '.$resource->name.' -> '.$taskGuid);
+            error_log('Languageresources assoc to task. ' . $resource->name . ' -> ' . $taskGuid);
         }
     }
+
+    /**
+     * @param int $resourceId
+     * @param string $taskGuid
+     * @return array|\stdClass
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function addResourceTaskAssoc(int $resourceId, string $taskGuid){
+        return $this->postJson(
+            'editor/languageresourcetaskassoc',
+            [
+                'languageResourceId' => $resourceId,
+                'taskGuid' => $taskGuid,
+                'segmentsUpdateable' => 0
+            ]);
+    }
+
     /**
      * @param array $task
      */
-    protected function initTaskPostData(array &$task) {
+    protected function initTaskPostData(array &$task)
+    {
         $now = date('Y-m-d H:i:s');
         $test = $this->testClass;
-        if(empty($task['taskName'])) {
-            $task['taskName'] = 'API Testing::'.$test.' '.$now;
+        if (empty($task['taskName'])) {
+            $task['taskName'] = 'API Testing::' . $test . ' ' . $now;
         }
-        if(empty($task['orderdate'])) {
+        if (empty($task['orderdate'])) {
             $task['orderdate'] = $now;
         }
-        if(!isset($task['wordCount'])) {
+        if (!isset($task['wordCount'])) {
             $task['wordCount'] = 666;
         }
         //currently all test tasks are started automatically, no test of the /editor/task/ID/import URL is implemented!
-        if(!isset($task['autoStartImport'])) {
+        if (!isset($task['autoStartImport'])) {
             $task['autoStartImport'] = 1;
         }
         $task['orderer'] = 'unittest';
@@ -441,25 +515,26 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
 
     /**
      * Removes the passed or current Task
-     * @param int $taskId: if given, this task is taken, otherwise the current task
-     * @param string|null $loginName: if given, a login with this user is done before opening/deleting the task
-     * @param string|null $loginName: only in conjunction with $loginName. If given, a login with this user is done before to open the task, deletion is done with the latter
+     * @param int $taskId : if given, this task is taken, otherwise the current task
+     * @param string|null $loginName : if given, a login with this user is done before opening/deleting the task
+     * @param string|null $loginNameToOpen : only in conjunction with $loginName. If given, a login with this user is done before to open the task, deletion is done with the latter
      */
-    public function deleteTask(int $taskId = -1, string $loginName = null, string $loginNameToOpen = null) {
-        if($taskId < 1 && $this->task){
+    public function deleteTask(int $taskId = -1, string $loginName = null, string $loginNameToOpen = null)
+    {
+        if ($taskId < 1 && $this->task) {
             $taskId = $this->task->id;
         }
-        if($taskId > 0){
-            if(!empty($loginName) && !empty($loginNameToOpen)){
+        if ($taskId > 0) {
+            if (!empty($loginName) && !empty($loginNameToOpen)) {
                 $this->login($loginNameToOpen);
-            } else if(!empty($loginName)){
+            } else if (!empty($loginName)) {
                 $this->login($loginName);
             }
             $this->setTaskToOpen($taskId);
-            if(!empty($loginName) && !empty($loginNameToOpen)){
+            if (!empty($loginName) && !empty($loginNameToOpen)) {
                 $this->login($loginName);
             }
-            $this->delete('editor/task/'.$taskId);
+            $this->delete('editor/task/' . $taskId);
         }
     }
     //endregion
@@ -473,15 +548,34 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * @param string $step reviewing or translation, as available by the workflow
      * @param array $params add additional taskuserassoc params to the add user call
      *
-     * @return stdClass taskuserassoc result
+     * @return \stdClass taskuserassoc result
      */
-    public function addUser($username, string $state = 'open', string $step = 'reviewing', array $params = []) {
+    public function addUser(string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
+    {
+        return $this->addUserToTask($this->task->taskGuid, $this->task->entityVersion, $username, $state, $step, $params);
+    }
+
+    /**
+     * adds the given user to the given task
+     * UGLY: these are lots of params, better working with config-objects
+     * @param string $taskGuid
+     * @param int $entityVersion
+     * @param string $username
+     * @param string $state
+     * @param string $step
+     * @param array $params
+     *
+     * @return array|\stdClass
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function addUserToTask(string $taskGuid, int $entityVersion, string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
+    {
         $test = $this->testClass;
-        $test::assertFalse(empty($this->testusers[$username]), 'Given testuser "'.$username.'" does not exist!');
+        $test::assertFalse(empty($this->testusers[$username]), 'Given testuser "' . $username . '" does not exist!');
         $p = array(
             "id" => 0,
-            "entityVersion" => $this->task->entityVersion,
-            "taskGuid" => $this->task->taskGuid,
+            "entityVersion" => $entityVersion,
+            "taskGuid" => $taskGuid,
             "userGuid" => $this->testusers[$username],
             "state" => $state,
             "workflowStepName" => $step,
@@ -499,13 +593,14 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
     /**
      * Retrieves a ustomer by it's number
      * @param string $customerNumber
-     * @return stdClass|null
+     * @return \stdClass|null
      */
-    public function getCustomerByNumber(string $customerNumber) : ?stdClass {
-        $filter = '[{"operator":"eq","value":"'.$customerNumber.'","property":"number"}]';
-        $url = 'editor/customer?page=1&start=0&limit=20&filter='.urlencode($filter);
+    public function getCustomerByNumber(string $customerNumber): ?\stdClass
+    {
+        $filter = '[{"operator":"eq","value":"' . $customerNumber . '","property":"number"}]';
+        $url = 'editor/customer?page=1&start=0&limit=20&filter=' . urlencode($filter);
         $customerData = $this->getJson($url);
-        if($customerData && is_array($customerData) && count($customerData) > 0){
+        if ($customerData && is_array($customerData) && count($customerData) > 0) {
             return $customerData[0];
         }
         return null;
@@ -515,11 +610,12 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * Adds a test customer
      * @param string $customerName
      * @param string|null $customerNumber
-     * @return bool|mixed|stdClass|null
+     * @return bool|mixed|\stdClass|null
      */
-    public function addCustomer(string $customerName, string $customerNumber = null){
+    public function addCustomer(string $customerName, string $customerNumber = null)
+    {
         // add customer
-        if($customerNumber === null){
+        if ($customerNumber === null) {
             $customerNumber = uniqid($customerName);
         }
         return $this->postJson('editor/customer/', [
@@ -528,8 +624,9 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
         ]);
     }
 
-    public function deleteCustomer(int $customerId){
-        $this->delete('editor/customer/'.$customerId);
+    public function deleteCustomer(int $customerId)
+    {
+        $this->delete('editor/customer/' . $customerId);
     }
 
     //endregion
@@ -542,10 +639,11 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * @param int $limit
      * @param int $start
      * @param int $page
-     * @return stdClass|array
+     * @return \stdClass|array
      */
-    public function getSegments(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1){
-        $url = 'editor/segment?page='.$page.'&start='.$start.'&limit='.$limit;
+    public function getSegments(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1)
+    {
+        $url = 'editor/segment?page=' . $page . '&start=' . $start . '&limit=' . $limit;
         return $this->fetchJson($url, 'GET', [], $jsonFileName, false);
     }
 
@@ -555,28 +653,29 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * @param string $editedTarget
      * @param string|null $editedSource
      * @param string|null $jsonFileName
-     * @param array $additionalPutData: may be used to send additional data. will overwrite programmatical values
+     * @param array $additionalPutData : may be used to send additional data. will overwrite programmatical values
      * @param int $duration
-     * @return bool|stdClass
+     * @return bool|\stdClass
      */
-    public function saveSegment(int $segmentId, string $editedTarget = null, string $editedSource = null, string $jsonFileName = null, array $additionalPutData=[], int $duration=666){
+    public function saveSegment(int $segmentId, string $editedTarget = null, string $editedSource = null, string $jsonFileName = null, array $additionalPutData = [], int $duration = 666)
+    {
         $data = [
             'id' => $segmentId,
             'autoStateId' => 999,
             'durations' => []
         ];
-        if($editedSource !== null){
-            $data['sourceEdit'] = $editedSource.sprintf(static::SEGMENT_DUPL_SAVE_CHECK, $segmentId, 'sourceEdit');
+        if ($editedSource !== null) {
+            $data['sourceEdit'] = $editedSource . sprintf(self::SEGMENT_DUPL_SAVE_CHECK, $segmentId, 'sourceEdit');
             $data['durations']['sourceEdit'] = $duration;
         }
-        if($editedTarget !== null){
-            $data['targetEdit'] = $editedTarget.sprintf(static::SEGMENT_DUPL_SAVE_CHECK, $segmentId, 'targetEdit');
+        if ($editedTarget !== null) {
+            $data['targetEdit'] = $editedTarget . sprintf(self::SEGMENT_DUPL_SAVE_CHECK, $segmentId, 'targetEdit');
             $data['durations']['targetEdit'] = $duration;
         }
-        foreach($additionalPutData as $key => $value){
+        foreach ($additionalPutData as $key => $value) {
             $data[$key] = $value;
         }
-        return $this->putJson('editor/segment/'.$segmentId, $data, $jsonFileName);
+        return $this->putJson('editor/segment/' . $segmentId, $data, $jsonFileName);
     }
 
     //endregion
@@ -585,21 +684,23 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
 
     /***
      * Create new language resource
-     *
-     * @param array $params: api params
-     * @param string $fileName: the resource upload file name
-     * @param bool $waitForImport: wait until the resource is imported
-     * @return mixed|boolean
+     * @param array $params
+     * @param string|null $fileName
+     * @param bool $waitForImport
+     * @param string $testDir
+     * @return array|\stdClass
+     * @throws \Zend_Http_Client_Exception
      */
-    public function addResource(array $params, string $fileName = null, bool $waitForImport=false, string $testDir = ''){
+    public function addResource(array $params, string $fileName = null, bool $waitForImport = false, string $testDir = '')
+    {
 
-        if(!empty($this->filesToAdd)) {
+        if (!empty($this->filesToAdd)) {
             throw new Exception('There are already some files added as pending request and not sent yet! Send them first to the server before calling addResource!');
         }
         $test = $this->testClass;
         //if filename is provided, set the file upload field
-        if($fileName){
-            $this->addFile('tmUpload', $this->getFile($fileName,$testDir), "application/xml");
+        if ($fileName) {
+            $this->addFile('tmUpload', $this->getFile($fileName, $testDir), "application/xml");
             $resource = $this->postJson('editor/languageresourceinstance', $params);
         } else {
             //request because the requestJson will encode the params with "data" as parent
@@ -610,32 +711,32 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
         $test::assertEquals($params['name'], $resource->name);
 
         //collect the created resource
-        static::$resources[] = $resource;
+        self::$resources[] = $resource;
 
-        error_log("Language resources created. ".$resource->name);
+        error_log("Language resources created. " . $resource->name);
 
-        $result = $this->getJson('editor/languageresourceinstance/'.$resource->id);
+        $result = $this->getJson('editor/languageresourceinstance/' . $resource->id);
 
-        if(!$waitForImport){
+        if (!$waitForImport) {
             return $result;
         }
-        error_log('Languageresources status check:'.$result->status);
-        $counter=0;
-        while ($result->status != 'available'){
-            if($result->status == 'error'){
+        error_log('Languageresources status check:' . $result->status);
+        $counter = 0;
+        while ($result->status != 'available') {
+            if ($result->status == 'error') {
                 break;
             }
             //break after RELOAD_RESOURCE_LIMIT trys
-            if($counter == static::RELOAD_RESOURCE_LIMIT){
+            if ($counter == self::RELOAD_RESOURCE_LIMIT) {
                 break;
             }
             sleep(2);
-            $result = $this->getJson('editor/languageresourceinstance/'.$result->id);
-            error_log('Languageresources status check '.$counter.'/'.static::RELOAD_RESOURCE_LIMIT.' state: '.$result->status);
+            $result = $this->getJson('editor/languageresourceinstance/' . $result->id);
+            error_log('Languageresources status check ' . $counter . '/' . self::RELOAD_RESOURCE_LIMIT . ' state: ' . $result->status);
             $counter++;
         }
 
-        $test::assertEquals('available', $result->status, 'Resource import stoped. Resource state is:'.$result->status);
+        $test::assertEquals('available', $result->status, 'Resource import stoped. Resource state is:' . $result->status);
         return $result;
     }
 
@@ -648,52 +749,56 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * @param string|null $targetLang
      * @throws Exception
      */
-    public function addDummyTm(int $customerId, string $fileName, ?string $name = null, ?string $sourceLang = null, ?string $targetLang = null){
+    public function addDummyTm(int $customerId, string $fileName, ?string $name = null, ?string $sourceLang = null, ?string $targetLang = null)
+    {
         $params = [
-            'resourceId'    =>  'editor_Services_DummyFileTm',
-            'sourceLang'    => $sourceLang ?? $this->task->originalSourceLang,
-            'targetLang'    => $targetLang ?? $this->task->originalTargetLang,
-            'customerIds' => [ $customerId ],
+            'resourceId' => 'editor_Services_DummyFileTm',
+            'sourceLang' => $sourceLang ?? $this->task->originalSourceLang,
+            'targetLang' => $targetLang ?? $this->task->originalTargetLang,
+            'customerIds' => [$customerId],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_DummyFileTm',
-            'serviceName'=> 'DummyFile TM',
+            'serviceName' => 'DummyFile TM',
             'name' => $name ?? $this->testClass,
         ];
         //create the resource 1 and import the file
         $this->addResource($params, $fileName, true);
     }
 
-    /***
-     *
+    /**
      * @param array $params
-     * @param string $filename
+     * @param string|null $filename
+     * @throws \Zend_Http_Client_Exception
      */
-    public function addTermCollection(array $params,string $filename=null) {
+    public function addTermCollection(array $params, string $filename = null)
+    {
         //create the language resource
-        $collection = $this->addResource($params,$filename);
+        $collection = $this->addResource($params, $filename);
         //validate the results
-        $response = $this->postJson('editor/termcollection/export', [ 'collectionId' => $collection->id ]);
+        $response = $this->postJson('editor/termcollection/export', ['collectionId' => $collection->id]);
         $this->assertTrue(is_object($response), "Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata, "The exported tbx file by collection is empty");
-        error_log("Termcollection created. ".$collection->name);
     }
 
     /***
      * Get the created language resources
+     * @return array
      */
-    public function getResources() {
-        return static::$resources;
+    public function getResources()
+    {
+        return self::$resources;
     }
 
     /**
      * Remove all resources from the database
      */
-    public function removeResources() {
-        foreach ($this->getResources() as $resource){
-            $route = 'editor/languageresourceinstance/'.$resource->id;
-            if($resource->serviceName == 'TermCollection'){
-                $route = 'editor/termcollection/'.$resource->id;
+    public function removeResources()
+    {
+        foreach ($this->getResources() as $resource) {
+            $route = 'editor/languageresourceinstance/' . $resource->id;
+            if ($resource->serviceName == 'TermCollection') {
+                $route = 'editor/termcollection/' . $resource->id;
             }
             $this->delete($route);
         }
@@ -709,21 +814,22 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * @param array $configsToTest
      * @param array $filter provide an array with several filtering guids. Key taskGuid or userGuid or customerId, value the according value
      */
-    public function testConfig(array $configsToTest, array $plainFilter = []) {
+    public function testConfig(array $configsToTest, array $plainFilter = [])
+    {
         $test = $this->testClass;
-        foreach($configsToTest as $name => $value) {
-            if(substr($name, 0, 15) !== 'runtimeOptions.'){
-                $name = 'runtimeOptions.'.$name;
+        foreach ($configsToTest as $name => $value) {
+            if (!str_starts_with($name, 'runtimeOptions.')) {
+                $name = 'runtimeOptions.' . $name;
             }
             $filter = array_merge([
-                'filter' => '[{"type":"string","value":"'.$name.'","property":"name","operator":"like"}]',
+                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"like"}]',
             ], $plainFilter);
             $config = $this->getJson('editor/config', $filter);
-            $test::assertCount(1, $config, 'No Config entry for config "'.$name.'" found in instance config!');
-            if(is_null($value)) {
-                $test::assertNotEmpty($config[0]->value, 'Config '.$name.' in instance is empty but should be set with a value!');
+            $test::assertCount(1, $config, 'No Config entry for config "' . $name . '" found in instance config!');
+            if (is_null($value)) {
+                $test::assertNotEmpty($config[0]->value, 'Config ' . $name . ' in instance is empty but should be set with a value!');
             } else {
-                $test::assertEquals($value, $config[0]->value, 'Config '.$name.' in instance config is not as expected: ');
+                $test::assertEquals($value, $config[0]->value, 'Config ' . $name . ' in instance config is not as expected: ');
             }
         }
     }
@@ -731,9 +837,11 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
     //endregion
 
     /**
-     * Get all available langues from lek_languages table
+     * @return mixed|\stdClass
+     * @throws \Zend_Http_Client_Exception
      */
-    public function getLanguages() {
+    public function getLanguages()
+    {
         $resp = $this->get('editor/language');
         $this->assertResponseStatus($resp, 'Languages');
         return $this->decodeJsonResponse($resp);
@@ -744,9 +852,10 @@ final class editor_Test_ApiHelper extends \ZfExtended_Test_ApiHelper {
      * @param string $changesXml
      * @return string
      */
-    public function replaceChangesXmlContent($changesXml) {
+    public function replaceChangesXmlContent(string $changesXml): string
+    {
         $guid = htmlspecialchars($this->task->taskGuid);
-        $changesXml = str_replace(' translate5:taskguid="'.$guid.'"', ' translate5:taskguid="TASKGUID"', $changesXml);
+        $changesXml = str_replace(' translate5:taskguid="' . $guid . '"', ' translate5:taskguid="TASKGUID"', $changesXml);
         return preg_replace('/sdl:revid="[^"]{36}"/', 'sdl:revid="replaced-for-testing"', $changesXml);
     }
 }

@@ -26,10 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Import;
+
 /**
- * Base Class for all Unit Tests
+ * Represents the api-request configuration for a OpenTM2-resource
  */
-abstract class editor_Test_UnitTest extends \PHPUnit\Framework\TestCase
+final class OpenTm2 extends LanguageResource
 {
-    const TYPE = 'unit';
+    public string $sourceLang = 'en';
+    public string $targetLang = 'de';
+    protected string $serviceName = 'OpenTM2';
+    protected string $serviceType = 'editor_Services_OpenTM2';
 }

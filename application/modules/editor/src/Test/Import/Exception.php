@@ -26,10 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Import;
+
 /**
- * Base Class for all Unit Tests
+ * Base Class for all API Tests Import Exceptions
  */
-abstract class editor_Test_UnitTest extends \PHPUnit\Framework\TestCase
-{
-    const TYPE = 'unit';
+final class Exception extends \Exception {
+
+    public function __construct($message = "", $code = 0, \Throwable $previous = null)
+    {
+        parent::__construct('API-test IMPORT: '.$message, $code, $previous);
+    }
 }

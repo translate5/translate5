@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Api\Helper;
 /**
  * Testcase for TRANSLATE-2540
  */
@@ -95,7 +96,7 @@ class Translate2491Test extends editor_Test_JsonTest {
         $task->originalSourceLang = $taskCfg['sourceLang'];
         $task->originalTargetLang = $taskCfg['targetLang'];
 
-        if($task->taskType == editor_Test_ApiHelper::INITIAL_TASKTYPE_PROJECT) {
+        if($task->taskType == Helper::INITIAL_TASKTYPE_PROJECT) {
             static::api()->checkProjectTasksStateLoop();
         } else {
             static::api()->checkTaskStateLoop();

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Api\Helper;
+
 /**
  * Tests the User Auth API
  */
@@ -83,7 +85,7 @@ class SessionApiTest extends \editor_Test_ApiTest {
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
         
-        $response = static::api()->post('editor/session', ['login' => 'wrongUsername', 'passwd' => editor_Test_ApiHelper::PASSWORD]);
+        $response = static::api()->post('editor/session', ['login' => 'wrongUsername', 'passwd' => Helper::PASSWORD]);
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
     }
@@ -101,7 +103,7 @@ class SessionApiTest extends \editor_Test_ApiTest {
         
         static::api()->logout();
         
-        $json = static::api()->getJson('editor/session/'.editor_Test_ApiHelper::getAuthCookie());
+        $json = static::api()->getJson('editor/session/'.Helper::getAuthCookie());
         $this->assertEquals('not authenticated', $json->state);
         $this->assertEmpty($json->user);
     }
@@ -115,7 +117,7 @@ class SessionApiTest extends \editor_Test_ApiTest {
         
         $loginData = [
             'login' => 'testmanager',
-            'passwd' => editor_Test_ApiHelper::PASSWORD,
+            'passwd' => Helper::PASSWORD,
         ];
         
         $task = static::api()->getTask();
@@ -132,7 +134,7 @@ class SessionApiTest extends \editor_Test_ApiTest {
         $sessionId = $response->sessionId;
         $sessionToken = $response->sessionToken;
 
-        editor_Test_ApiHelper::setAuthCookie($sessionId);
+        Helper::setAuthCookie($sessionId);
 
         $plainResponse = static::api()->getLastResponse();
         $this->assertEquals(200, $plainResponse->getStatus(), 'Server did not respond HTTP 200');

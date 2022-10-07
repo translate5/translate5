@@ -56,7 +56,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$testOwnCustomer->id,
+            'customerId' => static::$ownCustomer->id,
             'edit100PercentMatch' => false,
             'autoStartImport' => 0
         ];
@@ -66,7 +66,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'resourceId'=>'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$testOwnCustomer->id],
+            'customerIds' => [static::$ownCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',
@@ -80,7 +80,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'resourceId' => 'editor_Services_OpenTM2_1',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$testOwnCustomer->id],
+            'customerIds' => [static::$ownCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
@@ -89,7 +89,7 @@ class Translate1484Test extends editor_Test_JsonTest {
         ];
         static::api()->addResource($params,'resource1.tmx',true);
 
-        static::api()->addImportFile(self::$api->getFile('simple-en-de.xlf'));
+        static::api()->addImportFile(static::api()->getFile('simple-en-de.xlf'));
         static::api()->import($task, false, false);
 
         // Add task to languageresource assoc
@@ -118,7 +118,7 @@ class Translate1484Test extends editor_Test_JsonTest {
     public function testExportResourcesLog() {
 
         $jsonFileName = 'exportResults.json';
-        $actualObject = static::api()->getJson('editor/customer/exportresource', [ 'customerId' => static::$testOwnCustomer->id ], $jsonFileName);
+        $actualObject = static::api()->getJson('editor/customer/exportresource', [ 'customerId' => static::$ownCustomer->id ], $jsonFileName);
         $expectedObject = static::api()->getFileContent($jsonFileName);
         // we need to order the results to avoid tests failing due to runtime-differences
         $this->sortExportResource($actualObject);

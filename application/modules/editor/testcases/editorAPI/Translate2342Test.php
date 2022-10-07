@@ -56,7 +56,7 @@ class Translate2342Test extends \editor_Test_ApiTest {
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$testOwnCustomer->id,
+            'customerId' => static::$ownCustomer->id,
             'autoStartImport' => 0
         ];
         self::assertLogin('testmanager');
@@ -68,7 +68,7 @@ class Translate2342Test extends \editor_Test_ApiTest {
             'resourceId' => 'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$testOwnCustomer->id],
+            'customerIds' => [static::$ownCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',

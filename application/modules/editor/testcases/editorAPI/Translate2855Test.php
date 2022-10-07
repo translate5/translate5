@@ -60,10 +60,10 @@ class Translate2855Test extends editor_Test_JsonTest {
             'resourceId' => 'ZDemoMT',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$testOwnCustomer->id],
+            'customerIds' => [static::$ownCustomer->id],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
-            'customerPivotAsDefaultIds' => [static::$testOwnCustomer->id],
+            'customerPivotAsDefaultIds' => [static::$ownCustomer->id],
             'serviceType' => 'editor_Plugins_ZDemoMT',
             'serviceName'=> 'ZDemoMT',
             'name' => 'API Testing::Pivot pre-translation_'.__CLASS__
@@ -76,7 +76,7 @@ class Translate2855Test extends editor_Test_JsonTest {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'relaisLang' => self::$targetLangRfc,
-            'customerId' => static::$testOwnCustomer->id,
+            'customerId' => static::$ownCustomer->id,
             'edit100PercentMatch' => true,
             'autoStartImport' => 0
         ];

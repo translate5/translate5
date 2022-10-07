@@ -46,8 +46,8 @@ class Translate198Test extends editor_Test_JsonTest {
      */
     public function testTasks() {
 
-        $task1 = $this->createTask('task1', static::$testOwnCustomer->id);
-        $task2 = $this->createTask('task2', static::$testOwnCustomer->id);
+        $task1 = $this->createTask('task1', static::$ownCustomer->id);
+        $task2 = $this->createTask('task2', static::$ownCustomer->id);
 
         //open task for editing. This should not produce any error
         $result = static::api()->setTaskToEdit($task1->id);

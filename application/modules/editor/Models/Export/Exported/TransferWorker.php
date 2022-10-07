@@ -85,7 +85,7 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
         // Create API instance
         // TODO FIXME: There should be an own API class in ZfExtended and we must not misuse the Test-Helper here
         $api = new ZfExtended_Test_ApiHelper('ZfExtended_Test_ApiTestcase');
-        editor_Test_ApiHelper::setAuthCookie($parameters['cookie']);
+        ZfExtended_Test_ApiHelper::setAuthCookie($parameters['cookie']);
 
         $url = $parameters['url'];
 

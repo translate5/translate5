@@ -26,10 +26,35 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Import;
+
+use MittagQI\Translate5\Test\Api\Helper;
+
 /**
- * Base Class for all Unit Tests
+ * Represents the api-request configuration for a pretranslation operation
  */
-abstract class editor_Test_UnitTest extends \PHPUnit\Framework\TestCase
+final class Pretranslation extends Resource
 {
-    const TYPE = 'unit';
+    public int $internalFuzzy = 1;
+    public int $pretranslateMatchrate = 100;
+    public int $pretranslateTmAndTerm = 1;
+    public int $pretranslateMt = 0;
+    public int $isTaskImport = 0;
+
+    /**
+     * Queues the analysis
+     * @param Helper $api
+     * @param int $taskId
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function request(Helper $api, int $taskId)
+    {
+        $api->putJson(
+            'editor/task/' . $taskId . '/pretranslation/operation',
+            $this->getRequestParams(),
+            null,
+            false
+        );
+        $this->_requested = true;
+    }
 }

@@ -69,7 +69,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
         static::api()->addUser('testtranslator', 'waiting', 'translation');
         unlink($zipfile);
 
-            }
+    }
     
     /**
      * tests the specialcharacters encoding after import, edits some segments as lector, finish then the task
