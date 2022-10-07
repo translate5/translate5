@@ -45,6 +45,7 @@ abstract class LanguageResource extends Resource
     protected ?string $_uploadFile = null;
     protected string $_uploadDir = '';
     protected string $_deleteRoute = 'editor/languageresourceinstance/';
+    protected bool $_associateToTasks = true;
 
     /**
      * @param string $testClass
@@ -83,6 +84,37 @@ abstract class LanguageResource extends Resource
         $this->_uploadFile = $resourceFileName;
         $this->_uploadDir = $folderInTestDir;
         return $this;
+    }
+
+    /**
+     * @param int $customerId
+     * @param bool $resourceIsTaskAssociated
+     * @return $this
+     */
+    public function addDefaultCustomerId(int $customerId, bool $resourceIsTaskAssociated = true): LanguageResource
+    {
+        if (!in_array($customerId, $this->customerUseAsDefaultIds)) {
+            $this->customerUseAsDefaultIds[] = $customerId;
+        }
+        $this->_associateToTasks = $resourceIsTaskAssociated;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setIsNotTaskAssociated(): LanguageResource
+    {
+        $this->_associateToTasks = false;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTaskAssociated(): bool
+    {
+        return $this->_associateToTasks;
     }
 
     /**

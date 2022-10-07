@@ -147,7 +147,9 @@ final class Task extends Resource
             // associate resources
             if ($config->hasLanguageResources()) {
                 foreach ($config->getLanguageResources() as $resource) {
-                    $api->addResourceTaskAssoc($resource->getId(), $this->getTaskGuid());
+                    if($resource->isTaskAssociated()){
+                        $api->addResourceTaskAssoc($resource->getId(), $this->getTaskGuid());
+                    }
                 }
             }
             // queue pretranslation
