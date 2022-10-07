@@ -509,11 +509,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     protected function removeDirectoryRecursive(string $path){
         if (is_dir($path)) {
-            /* @var $recursiveDirCleaner ZfExtended_Controller_Helper_Recursivedircleaner */
-            $recursiveDirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Recursivedircleaner'
-            );
-            $recursiveDirCleaner->delete($path);
+            ZfExtended_Utils::recursiveDelete($path);
         }
     }
 

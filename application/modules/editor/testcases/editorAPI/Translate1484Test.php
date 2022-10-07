@@ -69,8 +69,6 @@ class Translate1484Test extends editor_Test_JsonTest {
             'autoStartImport' => 0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('simple-en-de.xlf'));
-        self::$api->import($task,false,false);
 
         // Create dummy mt
         $params = [
@@ -78,7 +76,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
-            'customerUseAsDefaultIds' => [],
+            'customerUseAsDefaultIds' => [self::$customerTest->id],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Plugins_ZDemoMT',
             'serviceName'=> 'ZDemoMT',
@@ -92,7 +90,7 @@ class Translate1484Test extends editor_Test_JsonTest {
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
-            'customerUseAsDefaultIds' => [],
+            'customerUseAsDefaultIds' => [self::$customerTest->id],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
             'serviceName'=> 'OpenTM2',
@@ -100,8 +98,8 @@ class Translate1484Test extends editor_Test_JsonTest {
         ];
         self::$api->addResource($params,'resource1.tmx',true);
 
-        // Add task to languageresource assoc
-        self::$api->addTaskAssoc();
+        self::$api->addImportFile(self::$api->getFile('simple-en-de.xlf'));
+        self::$api->import($task,false,false);
 
         // Queue the match anlysis worker
         $params = [
@@ -138,8 +136,12 @@ class Translate1484Test extends editor_Test_JsonTest {
      * @param stdClass $exportResource
      */
     private function sortExportResource(stdClass $exportResource){
-        usort($exportResource->MonthlySummaryByResource, function($a, $b) { return ($a->totalCharacters === $b->totalCharacters) ? 0 : ($a->totalCharacters < $b->totalCharacters ? -1 : 1); });
-        usort($exportResource->UsageLogByCustomer, function($a, $b) { return ($a->charactersPerCustomer === $b->charactersPerCustomer) ? 0 : ($a->charactersPerCustomer < $b->charactersPerCustomer ? -1 : 1); });
+        usort($exportResource->MonthlySummaryByResource, function($a, $b) {
+            return $a->totalCharacters - $b->totalCharacters;
+        });
+        usort($exportResource->UsageLogByCustomer, function($a, $b) {
+            return $a->charactersPerCustomer - $b->charactersPerCustomer;
+        });
     }
 
     public static function tearDownAfterClass(): void {

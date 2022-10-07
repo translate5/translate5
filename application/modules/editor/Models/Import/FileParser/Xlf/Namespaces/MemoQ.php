@@ -26,13 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/** #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- */
-
-
 /**
  * XLF Fileparser Add On to parse MemoQ XLF specific stuff
  */
@@ -40,17 +33,22 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ extends editor_Models
     const MEMOQ_XLIFF_NAMESPACE = 'xmlns:mq="MQXliff"';
     const USERGUID = 'memoq-imported';
 
-    /***
-     * 
+    protected static function isApplicable(string $xliff): bool
+    {
+        return str_contains($xliff, self::MEMOQ_XLIFF_NAMESPACE);
+    }
+
+    /**
      * @var array
      */
-    protected $comments=[];
+    protected array $comments = [];
     
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
+    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser): void
+    {
         $memoqMqmTag = 'trans-unit > target > mrk[mtype=x-mq-range], ';
         $memoqMqmTag .= 'trans-unit > source > mrk[mtype=x-mq-range], ';
         $memoqMqmTag .= 'trans-unit > seg-source > mrk[mtype=x-mq-range]';
@@ -92,7 +90,8 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ extends editor_Models
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
-    public function useTagContentOnly() {
+    public function useTagContentOnly(): ?bool
+    {
         return false;
     }
 
@@ -101,9 +100,10 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ extends editor_Models
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getComments()
      */
-    public function getComments() {
-        $comments = $this->comments;
+    public function getComments(): array
+    {
+        $commentsToGet = $this->comments;
         $this->comments = [];
-        return $comments;
+        return $commentsToGet;
     }
 }

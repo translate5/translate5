@@ -691,9 +691,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     private function removeFiles(int $id){
         $dir = self::getUserDataDir().'/'.strval($id);
         if(is_dir($dir)){ // just to be safe
-            /** @var ZfExtended_Controller_Helper_Recursivedircleaner $cleaner */
-            $cleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
-            $cleaner->delete($dir);
+            ZfExtended_Utils::recursiveDelete($dir);
         }
     }
 

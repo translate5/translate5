@@ -70,10 +70,11 @@ abstract class Translate5AbstractCommand extends Command
     
     /**
      * Initializes the translate5 application bridge (setup the translate5 Zend Application so that Models and the DB can be used)
+     * @throws \Zend_Exception
      */
-    protected function initTranslate5() {
+    protected function initTranslate5(string $applicationEnvironment = 'application') {
         $this->translate5 = new Application();
-        $this->translate5->init();
+        $this->translate5->init($applicationEnvironment);
     }
 
     protected function getLogo() {

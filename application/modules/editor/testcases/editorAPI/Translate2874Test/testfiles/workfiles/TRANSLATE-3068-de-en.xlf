@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="word/document.xml" source-language="de" target-language="en" datatype="x-undefined">
+<body>
+<trans-unit id="NFDBB2FA9-tu615" xml:space="preserve">
+    <source xml:lang="de"><bpt id="1">&lt;run1></bpt>01<ph id="2">&lt;tags2/></ph>02<ph id="3">&lt;tags3/></ph>03<ph id="4">&lt;tags4/></ph>04<ept id="1">&lt;/run1></ept></source>
+    <seg-source><mrk mid="0" mtype="seg"><bpt id="1">&lt;run1></bpt>01<ph id="2">&lt;tags2/></ph>02<ph id="3">&lt;tags3/></ph>03<ph id="4">&lt;tags4/></ph>04<ept id="1">&lt;/run1></ept></mrk></seg-source>
+</trans-unit>
+<trans-unit id="NFDBB2FA9-tu3418" xml:space="preserve">
+    <source xml:lang="de"><ph id="1">&lt;tags1/></ph><bpt id="2">&lt;run2></bpt>01<ph id="3">&lt;tags3/></ph>02<ph id="4">&lt;tags4/></ph>03<ph id="5">&lt;tags5/></ph>04<ept id="2">&lt;/run2></ept></source>
+    <seg-source><mrk mid="0" mtype="seg"><ph id="1">&lt;tags1/></ph><bpt id="2">&lt;run2></bpt>01<ph id="3">&lt;tags3/></ph>02<ph id="4">&lt;tags4/></ph>03<ph id="5">&lt;tags5/></ph>04<ept id="2">&lt;/run2></ept></mrk></seg-source>
+</trans-unit>
+</body>
+</file>
+</xliff>

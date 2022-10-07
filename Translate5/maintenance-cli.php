@@ -39,7 +39,6 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     DevelopmentGithookCommand,
     DevelopmentNewModelCommand,
     DevelopmentNewdbchangeCommand,
-    DevelopmentRuntestCommand,
     DevelopmentTriggerworkflowCommand,
     DevelopmentOkapiBconfNextVersionCommand,
     L10nAddCommand,
@@ -64,6 +63,12 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     TaskSkeletonfileCommand,
     TermportalReindexCommand,
     TermportalDatatypecheckCommand,
+    TestRunAllCommand,
+    TestRunCommand,
+    TestRunSuiteCommand,
+    TestApplicationRunCommand,
+    TestAddIniSectionCommand,
+    TestCleanupCommand,
     UserCreateCommand,
     UserInfoCommand,
     WorkerCleanCommand,
@@ -109,7 +114,12 @@ if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
-    $commands[] = new DevelopmentRuntestCommand();
+    $commands[] = new TestRunAllCommand();
+    $commands[] = new TestRunCommand();
+    $commands[] = new TestRunSuiteCommand();
+    $commands[] = new TestApplicationRunCommand();
+    $commands[] = new TestAddIniSectionCommand();
+    $commands[] = new TestCleanupCommand();
     $commands[] = new ReleaseNotesCommand();
     $commands[] = new DevelopmentNewModelCommand();
     $commands[] = new DevelopmentEcodeCommand();
