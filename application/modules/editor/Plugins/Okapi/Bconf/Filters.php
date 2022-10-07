@@ -83,18 +83,6 @@ class editor_Plugins_Okapi_Bconf_Filters {
     const TESTFILE_FOLDER = 'testfiles';
 
     /**
-     * Used for testing/validating bconfs
-     * @var string
-     */
-    const SOURCE_LANGUAGE = 'en';
-
-    /**
-     * Used for testing/validating bconfs
-     * @var string
-     */
-    const TARGET_LANGUAGE = 'de';
-
-    /**
      * @var editor_Plugins_Okapi_Bconf_Filters|null
      */
     private static ?editor_Plugins_Okapi_Bconf_Filters $_instance = NULL;
