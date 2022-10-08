@@ -262,7 +262,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @return boolean
      */
     public function checkTaskStateLoop(bool $failOnError = true): bool
-
     {
         $counter = 0;
         while (true) {
