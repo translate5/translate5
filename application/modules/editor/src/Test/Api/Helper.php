@@ -262,10 +262,11 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @return boolean
      */
     public function checkTaskStateLoop(bool $failOnError = true): bool
+
     {
         $counter = 0;
         while (true) {
-            error_log('Task state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ' state: ' . $this->task->state . ' [' . $test . ']');
+            error_log('Task state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ' state: ' . $this->task->state . ' [' . $this->testClass . ']');
             $taskResult = $this->getJson('editor/task/' . $this->task->id);
             if ($taskResult->state == 'open') {
                 $this->task = $taskResult;
