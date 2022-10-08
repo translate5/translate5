@@ -89,28 +89,14 @@ class TestRunCommand extends Translate5AbstractTestCommand
         $this->initInputOutput($input, $output);
 
         $test = trim($this->input->getArgument('test'), '.');
+        $testPath = null;
         if(!empty($test)) {
-            if(empty(pathinfo($test, PATHINFO_EXTENSION))) {
-                $test = $test.'.php';
-            }
-            if($test === basename($test)) {
-                $test = self::RELATIVE_TEST_DIR.$test;
-            } else {
-                // cleanup various ways to reference tests in the Plugins or PrivatePlugins folder
-                $cleanedPath = ltrim($test, './');
-                if(str_starts_with($cleanedPath, 'PrivatePlugins')){
-                    $cleanedPath = substr($cleanedPath, 7); // remove "Private"
-                }
-                // we set the path relative to application-root to get tests pointing to plugin's test-folders running
-                if(str_starts_with($cleanedPath, 'Plugins')) {
-                    $test = 'application/modules/editor/'.$cleanedPath;
-                }
-            }
-            if(!file_exists($test)) {
-                throw new \RuntimeException('The given Test does not exist: '.$test);
+            $testPath = empty(pathinfo($test, PATHINFO_EXTENSION)) ? $test.'.php' : $test;
+            $testPath = $this->normalizeSingleTestPath($testPath);
+            if(!file_exists($testPath)) {
+                throw new \RuntimeException('The given Test does not exist: '.$test.' / '.$testPath);
             }
         }
-
         if($this->input->getOption('capture')){
             putenv('DO_CAPTURE=1');
             $this->io->warning([
@@ -132,7 +118,7 @@ class TestRunCommand extends Translate5AbstractTestCommand
         }
 
         if($this->initTestEnvironment('test', true, $this->input->getOption('recreate-database'))){
-            $this->startApiTest($test);
+            $this->startApiTest($testPath);
         }
         return 0;
     }

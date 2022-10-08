@@ -88,8 +88,12 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
 
         $testOrSuite = $this->input->getArgument('testorsuite');
         $extension = empty($testOrSuite) ? '' : strtolower(pathinfo($testOrSuite, PATHINFO_EXTENSION));
-        $testPath = ($extension === 'php') ? $testOrSuite : null;
+        $testPath = ($extension === 'php') ? $this->normalizeSingleTestPath($testOrSuite) : null;
         $testSuite = ($extension === '' && !empty($testOrSuite)) ? $testOrSuite : null;
+
+        if($testPath !== null && !file_exists($testPath)){
+            throw new \RuntimeException('The given Test does not exist: '.$testOrSuite);
+        }
 
         // reinitialize the database & data directory if we should
         $databaseForRecreation = $this->input->getOption('database-recreation');

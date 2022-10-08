@@ -1,4 +1,7 @@
-<phpunit>
+<phpunit bootstrap="bootstrap.php" cacheResult="true" cacheResultFile=".phpunit.result.cache" colors="true">
+  <logging>
+    <testdoxText outputFile="last-test-result.txt"/>
+  </logging>
   <testsuites>
     <testsuite name="segment-tags">
       <file>editorAPI/SegmentTagsTest.php</file>
