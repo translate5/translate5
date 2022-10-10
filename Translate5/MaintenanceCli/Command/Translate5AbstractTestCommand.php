@@ -395,7 +395,9 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function reInitDataDirectory(string $dataDirectory): void
     {
-        $info = $this->fetchOwnerAndGroup('data'); // we take the owner and group of the /data dir as a reference
+        if(PHP_OS_FAMILY != 'Windows'){
+            $info = $this->fetchOwnerAndGroup('data'); // we take the owner and group of the /data dir as a reference, default is www-data for cases, where that dir is missing
+        }
         if (!is_dir($dataDirectory)) {
             mkdir($dataDirectory, 0777, true);
             if (PHP_OS_FAMILY != 'Windows') { // TODO FIXME: on windows this may lead to an unusable installation if called with elevated rights
