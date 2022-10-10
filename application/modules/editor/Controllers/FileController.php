@@ -27,17 +27,20 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\Import\FileParser\FileParserHelper;
+use MittagQI\Translate5\Task\Import\SegmentProcessor\Reimport;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
-class Editor_FileController extends ZfExtended_RestController {
-  use TaskContextTrait;
+class Editor_FileController extends ZfExtended_RestController
+{
+    use TaskContextTrait;
 
-  protected $entityClass = 'editor_Models_Foldertree';
-  
-  /**
-   * @var editor_Models_Foldertree
-   */
-  protected $entity;
+    protected $entityClass = 'editor_Models_Foldertree';
+
+    /**
+     * @var editor_Models_Foldertree
+     */
+    protected $entity;
 
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
@@ -82,24 +85,57 @@ class Editor_FileController extends ZfExtended_RestController {
         $this->syncSegmentFileOrder($taskGuid);
         $this->view->data = $mover->getById((int)$data->id);
     }
-  
-  /**
-   * syncronize the Segment FileOrder Values to the corresponding Values in LEK_Files
-   * @param string $taskGuid
-   */
-  protected function syncSegmentFileOrder($taskGuid) {
-    /* @var $segment editor_Models_Segment */
-    $segment = ZfExtended_Factory::get('editor_Models_Segment');
-    $segment->syncFileOrderFromFiles($taskGuid);
-  }
-  
-  public function deleteAction()
-  {
-    throw new ZfExtended_BadMethodCallException(__CLASS__.'->delete');
-  }
-  
-  public function postAction()
-  {
-    throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
-  }
+
+    public function reimportAction()
+    {
+
+        $path = '';
+
+
+        /** @var Reimport $processor */
+        $processor = ZfExtended_Factory::get(Reimport::class);
+
+        /** @var editor_Models_SegmentFieldManager $segmentFieldManager */
+        $segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $segmentFieldManager->initFields($this->getCurrentTask()->getTaskGuid());
+
+        /** @var FileParserHelper $parserHelper */
+        $parserHelper = ZfExtended_Factory::get(FileParserHelper::class,[
+            $this->getCurrentTask(),
+            $segmentFieldManager
+        ]);
+
+
+        $file = new SplFileInfo($this->importConfig->importFolder . '/' . $path);
+        // get the parser dynamically even of only xliff is supported
+        $parser = $parserHelper->getFileParser($fileId, $file);
+
+        /* @var $parser editor_Models_Import_FileParser */
+        $processor->setSegmentFile($fileId, $file->getBasename());
+        $parser->addSegmentProcessor($processor);
+        $parser->parseFile();
+
+    }
+
+
+    /**
+     * syncronize the Segment FileOrder Values to the corresponding Values in LEK_Files
+     * @param string $taskGuid
+     */
+    protected function syncSegmentFileOrder($taskGuid)
+    {
+        /* @var $segment editor_Models_Segment */
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        $segment->syncFileOrderFromFiles($taskGuid);
+    }
+
+    public function deleteAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__ . '->delete');
+    }
+
+    public function postAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__ . '->post');
+    }
 }
