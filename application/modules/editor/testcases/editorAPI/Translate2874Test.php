@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for TRANSLATE-2874 Mixing XLF id and rid values led to wrong tag numbering
  * For details see the issue.
@@ -33,57 +35,28 @@ END LICENSE AND COPYRIGHT
  */
 class Translate2874Test extends editor_Test_JsonTest {
 
-    public static function beforeTests(): void {
+    protected static string $setupUserLogin = 'testlector';
 
-        $task = [
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-            'customerId' => static::getTestCustomerId(),
-            'autoStartImport' => 0,
-        ];
-
-        static::api()->addResource([
-            'resourceId'=>'ZDemoMT',
-            'sourceLang' => $task['sourceLang'],
-            'targetLang' => $task['targetLang'],
-            'customerIds' => [$task['customerId']],
-            'customerUseAsDefaultIds' => [$task['customerId']],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Plugins_ZDemoMT',
-            'serviceName'=> 'ZDemoMT',
-            'name' => 'API Testing::ZDemoMT_'.__CLASS__
-        ]);
-
-        static::api()->addImportFile(static::api()->zipTestFiles('testfiles/','testTask.zip'));
-        static::api()->import($task, false, false);
-        static::api()->reloadTask();
-
-        //add assocs
-        static::api()->addUser('testlector');
-
-        $params = [
-            'internalFuzzy' => 0,
-            'pretranslateMatchrate' => 100,
-            'pretranslateTmAndTerm' => 0,
-            'pretranslateMt' => 1,
-            'isTaskImport' => 0,
-        ];
-        static::api()->putJson('editor/task/'.static::api()->getTask()->id.'/pretranslation/operation', $params, null, false);
-
-        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
-
-        static::api()->checkTaskStateLoop();
-
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $sourceLangRfc = 'de';
+        $targetLangRfc = 'en';
+        $customerId = static::getTestCustomerId();
+        $config
+            ->addLanguageResource('zdemomt', null, $customerId, $sourceLangRfc, $targetLangRfc)
+            ->addDefaultCustomerId($customerId)
+            ->setProperty('name', 'API Testing::ZDemoMT_Translate2874Test'); // TODO FIXME: we better generate data independent from resource-names ...
+        $config
+            ->addPretranslation()
+            ->setProperty('pretranslateTmAndTerm', 0)
+            ->setProperty('pretranslateMt', 1);
+        $config
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
+            ->addUploadFolder('testfiles', 'testTask.zip')
+            ->setProperty('edit100PercentMatch', false)
+            ->setToEditAfterImport();
     }
-    
+
     /**
      */
     public function testPreTranslatedContent() {
@@ -91,10 +64,5 @@ class Translate2874Test extends editor_Test_JsonTest {
         $jsonFileName = 'expectedSegments-edited.json';
         $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertModelsEqualsJsonFile('Segment', $jsonFileName, $segments, 'Imported segments are not as expected!');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

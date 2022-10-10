@@ -55,7 +55,8 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
         $config
             ->addLanguageResource('termcollection', 'collection.tbx', static::getTestCustomerId())
             ->setProperty('name', 'MATESTresource3'); // TODO FIXME: we better generate data independent from resource-names ...
-        $config->addPretranslation();
+        $config
+            ->addPretranslation();
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, static::getTestCustomerId())
             ->addUploadFolder('testfiles', 'XLF-test.zip')

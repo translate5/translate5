@@ -261,6 +261,7 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
      */
     protected static function testSpecificSetup()
     {
+        // add a test-customer if setup-option set
         if (static::$setupOwnCustomer) {
             static::$ownCustomer = static::api()->addCustomer('API Testing::' . static::class);
         }
@@ -276,6 +277,7 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
      */
     protected static function testSpecificTeardown()
     {
+        // remove the test-coustomer if setup-option set
         if (static::$setupOwnCustomer) {
             static::api()->deleteCustomer(static::$ownCustomer->id);
         }

@@ -204,11 +204,10 @@ final class Task extends Resource
             // wait for the import to finish. TODO FIXME: is the manual evaluation of multilang-tasks neccessary ?
             if ($this->isProjectTask() || $isMultiLanguage) {
 
-                error_log("\n\nTASK PROJEKT TASK STATE LOOP\n\n"); // TODO REMOVE
                 $api->checkProjectTasksStateLoop();
 
             } else {
-                error_log("\n\nTASK TASK STATE LOOP\n\n"); // TODO REMOVE
+
                 $api->checkTaskStateLoop();
             }
         }
