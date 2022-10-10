@@ -512,26 +512,32 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * Removes the passed or current Task
-     * @param int $taskId : if given, this task is taken, otherwise the current task
-     * @param string|null $loginName : if given, a login with this user is done before opening/deleting the task
-     * @param string|null $loginNameToOpen : only in conjunction with $loginName. If given, a login with this user is done before to open the task, deletion is done with the latter
+     * @param int $taskId: if given, this task is taken, otherwise the current task
+     * @param string|null $loginName: if given, a login with this user is done before opening/deleting the task
+     * @param string|null $loginName: only in conjunction with $loginName. If given, a login with this user is done before to open the task, deletion is done with the latter
+     * @param bool $isProjectTask
      */
-    public function deleteTask(int $taskId = -1, string $loginName = null, string $loginNameToOpen = null)
+    public function deleteTask(int $taskId = -1, string $loginName = null, string $loginNameToOpen = null, bool $isProjectTask = false)
     {
-        if ($taskId < 1 && $this->task) {
+        if($taskId < 1 && $this->task){
             $taskId = $this->task->id;
+            $isProjectTask = ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT);
         }
-        if ($taskId > 0) {
-            if (!empty($loginName) && !empty($loginNameToOpen)) {
-                $this->login($loginNameToOpen);
-            } else if (!empty($loginName)) {
+        if($taskId > 0){
+            if($isProjectTask){
                 $this->login($loginName);
+            } else {
+                if(!empty($loginName) && !empty($loginNameToOpen)){
+                    $this->login($loginNameToOpen);
+                } else if(!empty($loginName)){
+                    $this->login($loginName);
+                }
+                $this->setTaskToOpen($taskId);
+                if(!empty($loginName) && !empty($loginNameToOpen)){
+                    $this->login($loginName);
+                }
             }
-            $this->setTaskToOpen($taskId);
-            if (!empty($loginName) && !empty($loginNameToOpen)) {
-                $this->login($loginName);
-            }
-            $this->delete('editor/task/' . $taskId);
+            $this->delete('editor/task/'.$taskId);
         }
     }
     //endregion

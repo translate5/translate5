@@ -147,6 +147,16 @@ final class Task extends Resource
     }
 
     /**
+     * Retrieves, if a task is a project. This can only be called, after the task was imported
+     * @return bool
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    public function isProjectTask(): bool
+    {
+        return $this->getProperty('taskType') == Helper::INITIAL_TASKTYPE_PROJECT;
+    }
+
+    /**
      * @param Helper $api
      * @param Config $config
      * @throws Exception
@@ -194,7 +204,7 @@ final class Task extends Resource
             $api->getJson('editor/task/'.$this->getId().'/import');
 
             // wait for the import to finish. TODO FIXME: is the waiting for project with multi-targetlang tasks actually correct ?
-            if ($this->getProperty('taskType') == Helper::INITIAL_TASKTYPE_PROJECT || (is_array($this->_originalTargetLang) && count($this->_originalTargetLang) > 1)) {
+            if ($this->isProjectTask() || (is_array($this->_originalTargetLang) && count($this->_originalTargetLang) > 1)) {
 
                 error_log("\n\nTASK PROJEKT TASK STATE LOOP\n\n"); // TODO REMOVE
                 $api->checkProjectTasksStateLoop();
@@ -225,13 +235,17 @@ final class Task extends Resource
         // remove on server
         if ($this->_requested) {
             $taskId = $this->getId();
-            if ($config->hasTestlectorLogin()) {
-                $api->login('testlector');
-                $api->setTaskToOpen($taskId);
+            if($this->isProjectTask()){
                 $api->login('testmanager');
             } else {
-                $api->login('testmanager');
-                $api->setTaskToOpen($taskId);
+                if ($config->hasTestlectorLogin()) {
+                    $api->login('testlector');
+                    $api->setTaskToOpen($taskId);
+                    $api->login('testmanager');
+                } else {
+                    $api->login('testmanager');
+                    $api->setTaskToOpen($taskId);
+                }
             }
             $api->delete('editor/task/' . $taskId);
         }
