@@ -53,7 +53,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         $ownCustomerId = static::$ownCustomer->id;
         $config
             ->addLanguageResource('termcollection', 'collection.tbx', $ownCustomerId)
-            ->addDefaultCustomerId($ownCustomerId, false);
+            ->addDefaultCustomerId($ownCustomerId);
         $config->addTask(static::$sourceLangRfc, static::$targetLangRfc, $ownCustomerId)
             ->addUploadFolder('testfiles', 'XLF-test.zip')
             ->setProperty('edit100PercentMatch', 0)

@@ -37,11 +37,13 @@ abstract class LanguageResource extends Resource
 {
     const OPEN_TM2 = 'opentm2';
 
-    const DUMMY_TM = 'dummytm';
-
     const DEEPL = 'deepl';
 
     const TERM_COLLECTION = 'termcollection';
+
+    const DUMMY_TM = 'dummytm';
+
+    const ZDemo_MT = 'zdemomt';
 
     public string $name;
     public array $customerIds = [];
@@ -109,7 +111,7 @@ abstract class LanguageResource extends Resource
      * @param bool $resourceIsTaskAssociated
      * @return $this
      */
-    public function addDefaultCustomerId(int $customerId, bool $resourceIsTaskAssociated = true, bool $useForWriteAccess = false): LanguageResource
+    public function addDefaultCustomerId(int $customerId, bool $useForWriteAccess = false, bool $resourceIsTaskAssociated = false): LanguageResource
     {
         if (!in_array($customerId, $this->customerUseAsDefaultIds)) {
             $this->customerUseAsDefaultIds[] = $customerId;

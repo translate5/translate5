@@ -304,11 +304,14 @@ final class Config
             case LanguageResource::OPEN_TM2:
                 return new OpenTm2($this->testClass, $nextIndex);
 
+            case LanguageResource::DEEPL:
+                return new DeepL($this->testClass, $nextIndex);
+
             case LanguageResource::DUMMY_TM:
                 return new DummyTm($this->testClass, $nextIndex);
 
-            case LanguageResource::DEEPL:
-                return new DeepL($this->testClass, $nextIndex);
+            case LanguageResource::ZDemo_MT:
+                return new ZDemoMT($this->testClass, $nextIndex);
 
             case LanguageResource::TERM_COLLECTION:
             case 'termcollectionresource':

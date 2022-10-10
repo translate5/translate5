@@ -26,49 +26,37 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Import\Task;
+use MittagQI\Translate5\Test\Import\LanguageResource;
+
 /***
  * This test will test the customerWriteAsDefaultIds flag in the languageresources-customer assoc.
  * The used tm memory is OpenTm2.
  */
 class Translate2417Test extends editor_Test_JsonTest {
 
-    protected static $sourceLangRfc = 'de';
-    protected static $targetLangRfc = 'en';
-    protected static $prefix = 'T2417';
-
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init'
     ];
 
-    public static function beforeTests(): void {
+    private static LanguageResource $translationMemory;
 
-        // add the TM
+    private static Task $task;
+
+    protected static function setupImport(Config $config): void
+    {
+        $sourceLangRfc = 'de';
+        $targetLangRfc = 'en';
         $customerId = static::getTestCustomerId();
-        $params = [
-            'resourceId' => 'editor_Services_OpenTM2_1',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [$customerId],
-            'customerUseAsDefaultIds' => [$customerId],
-            'customerWriteAsDefaultIds' => [$customerId],
-            'serviceType' => 'editor_Services_OpenTM2',
-            'serviceName'=> 'OpenTM2',
-            'name' => self::$prefix.'resource1'
-        ];
-        //create the resource 1 and import the file
-        static::api()->addResource($params, 'resource1.tmx',true);
-
-        // import the task
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId'=>static::getTestCustomerId(),
-            'autoStartImport'=>1
-        ];
-        $zipfile = static::api()->zipTestFiles('testfiles/','test.zip');
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task,false);
+        static::$translationMemory = $config
+            ->addLanguageResource('opentm2', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
+            ->addDefaultCustomerId($customerId, true)
+            ->setProperty('name', 'T2417resource1'); // TODO FIXME: we better generate data independent from resource-names ...
+        static::$task = $config
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
+            ->addUploadFolder('testfiles', 'test.zip')
+            ->setProperty('taskName', 'API Testing::Translate2417Test'); // TODO FIXME: we better generate data independent from resource-names ...
     }
 
     /**
@@ -76,19 +64,15 @@ class Translate2417Test extends editor_Test_JsonTest {
      */
     public function testSegments() {
 
-        $task = static::api()->getTask();
+        $tmId = static::$translationMemory->getId();
         static::api()->addUser('testmanager');
-        static::api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit(static::$task->getId());
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
 
         // now test editing the segments
-
         self::assertLogin('testmanager');
-
-        $tm = static::api()->getResources()[0];
-
         // load the first segment
         $segments = static::api()->getSegments(null, 1);
         // test the first segment
@@ -96,8 +80,8 @@ class Translate2417Test extends editor_Test_JsonTest {
 
         // query the results from this segment and compare them against the expected initial json
         $jsonFileName = 'tmResultsBeforeEdit.json';
-        $tmResults = static::api()->getJson('editor/languageresourceinstance/'.$tm->id.'/query', ['segmentId' => $segToTest->id], $jsonFileName);
-        $this->assertIsArray($tmResults, 'GET editor/languageresourceinstance/'.$tm->id.'/query does not return an array but: '.print_r($tmResults,1).' and raw result is '.print_r(static::api()->getLastResponse(),1));
+        $tmResults = static::api()->getJson('editor/languageresourceinstance/'.$tmId.'/query', ['segmentId' => $segToTest->id], $jsonFileName);
+        $this->assertIsArray($tmResults, 'GET editor/languageresourceinstance/'.$tmId.'/query does not return an array but: '.print_r($tmResults,1).' and raw result is '.print_r(static::api()->getLastResponse(),1));
         $this->assertTmResultEqualsJsonFile($jsonFileName, $tmResults, 'The received tm results before segment modification are not as expected!');
 
         // set dummy translation for the first segment and save it. This should upload this translation to the tm to.
@@ -106,17 +90,7 @@ class Translate2417Test extends editor_Test_JsonTest {
 
         // after the segment save, check for the tm results for the same segment
         $jsonFileName = 'tmResultsAfterEdit.json';
-        $tmResults = static::api()->getJson('editor/languageresourceinstance/'.$tm->id.'/query', ['segmentId' => $segToTest->id], $jsonFileName);
+        $tmResults = static::api()->getJson('editor/languageresourceinstance/'.$tmId.'/query', ['segmentId' => $segToTest->id], $jsonFileName);
         $this->assertTmResultEqualsJsonFile($jsonFileName, $tmResults, 'The received tm results after segment modification are not as expected!');
-    }
-
-    /***
-     * Cleand up the resources and the task
-     */
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
-        //remove the created resources
-        static::api()->removeResources();
     }
 }

@@ -26,15 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * This test class will create test task and pretranslate it with ZDemoMT and OpenTm2 TM
  * Then the export result from the logg will be compared against the expected result.
  */
 class Translate1484Test extends editor_Test_JsonTest {
     /* @var $this Translate1484Test */
-    
-    protected static $sourceLangRfc = 'en';
-    protected static $targetLangRfc = 'de';
 
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
@@ -44,69 +43,27 @@ class Translate1484Test extends editor_Test_JsonTest {
 
     protected static bool $setupOwnCustomer = true;
 
-    public static function beforeTests(): void {
-
-        static::setupTestTask();
-    }
-    
-    private static function setupTestTask() {
-
-        // add Task
-        $task = [
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$ownCustomer->id,
-            'edit100PercentMatch' => false,
-            'autoStartImport' => 0
-        ];
-
-        // Create dummy mt
-        $params = [
-            'resourceId'=>'ZDemoMT',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$ownCustomer->id],
-            'customerUseAsDefaultIds' => [static::$ownCustomer->id],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Plugins_ZDemoMT',
-            'serviceName'=> 'ZDemoMT',
-            'name' => 'API Testing::ZDemoMT_'.__CLASS__
-        ];
-        static::api()->addResource($params);
-
-        // Create OpentTm2 resource and upload tm memory
-        $params = [
-            'resourceId' => 'editor_Services_OpenTM2_1',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$ownCustomer->id],
-            'customerUseAsDefaultIds' => [static::$ownCustomer->id],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Services_OpenTM2',
-            'serviceName'=> 'OpenTM2',
-            'name' => 'API Testing::OpenTm2Tm_'.__CLASS__
-        ];
-        static::api()->addResource($params,'resource1.tmx',true);
-
-        static::api()->addImportFile(static::api()->getFile('simple-en-de.xlf'));
-        static::api()->import($task, false, false);
-
-        // Queue the match anlysis worker
-        $params = [
-            'internalFuzzy' => 1,
-            'pretranslateMatchrate' => 100,
-            'pretranslateTmAndTerm' => 1,
-            'pretranslateMt' => 1,
-            'isTaskImport' => 0
-        ];
-        static::api()->putJson('editor/task/'.static::api()->getTask()->id.'/pretranslation/operation', $params, null, false);
-
-        // start the import
-        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
-
-        // waiit for the import to be finished
-        static::api()->checkTaskStateLoop();
+    protected static function setupImport(Config $config): void
+    {
+        $sourceLangRfc = 'en';
+        $targetLangRfc = 'de';
+        $customerId = static::$ownCustomer->id;
+        $config
+            ->addLanguageResource('zdemomt', null, $customerId, $sourceLangRfc, $targetLangRfc)
+            ->addDefaultCustomerId($customerId)
+            ->setProperty('name', 'API Testing::ZDemoMT_Translate1484Test'); // TODO FIXME: we better generate data independent from resource-names ...
+        $config
+            ->addLanguageResource('opentm2', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
+            ->addDefaultCustomerId($customerId)
+            ->setProperty('name', 'API Testing::OpenTm2Tm_Translate1484Test'); // TODO FIXME: we better generate data independent from resource-names ...
+        $config
+            ->addPretranslation()
+            ->setProperty('pretranslateMt', 1);
+        $config
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
+            ->addUploadFile('simple-en-de.xlf')
+            ->setProperty('edit100PercentMatch', false)
+            ->setProperty('taskName', 'API Testing::Translate1484Test'); // TODO FIXME: we better generate data independent from resource-names ...
     }
 
     /***
@@ -133,12 +90,5 @@ class Translate1484Test extends editor_Test_JsonTest {
         usort($exportResource->UsageLogByCustomer, function($a, $b) {
             return $a->charactersPerCustomer - $b->charactersPerCustomer;
         });
-    }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
-        //remove the created resources
-        static::api()->removeResources();
     }
 }

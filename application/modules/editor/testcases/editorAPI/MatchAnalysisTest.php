@@ -56,7 +56,8 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
             ->addLanguageResource('termcollection', 'collection.tbx', static::getTestCustomerId())
             ->setProperty('name', 'MATESTresource3'); // TODO FIXME: we better generate data independent from resource-names ...
         $config->addPretranslation();
-        $config->addTask($sourceLangRfc, $targetLangRfc, static::getTestCustomerId())
+        $config
+            ->addTask($sourceLangRfc, $targetLangRfc, static::getTestCustomerId())
             ->addUploadFolder('testfiles', 'XLF-test.zip')
             ->setProperty('wordCount', 1270)
             ->setProperty('taskName', 'API Testing::MatchAnalysisTest'); // TODO FIXME: we better generate data independent from resource-names ...

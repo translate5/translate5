@@ -164,10 +164,13 @@ final class Task extends Resource
         // tasks will be uploaded as testmanager
         $api->login('testmanager');
 
+        // has to be evaluated before the data is re-set by request
+        $isMultiLanguage = (is_array($this->targetLang) && count($this->targetLang) > 1);
+
         // prepare our resources
         $this->upload($api);
 
-        if (!$config->hasLanguageResources() && !$config->hasPretranslation() && is_string($this->targetLang)) {
+        if (!$config->hasLanguageResources() && !$config->hasPretranslation() && !$isMultiLanguage) {
 
             // the simple case: task without resources & pretranslation
             if (!$this->doImport($api, true, true)) {
@@ -198,8 +201,8 @@ final class Task extends Resource
             // start the import
             $api->getJson('editor/task/'.$this->getId().'/import');
 
-            // wait for the import to finish. TODO FIXME: is the waiting for project with multi-targetlang tasks actually correct ?
-            if ($this->isProjectTask() || (is_array($this->_originalTargetLang) && count($this->_originalTargetLang) > 1)) {
+            // wait for the import to finish. TODO FIXME: is the manual evaluation of multilang-tasks neccessary ?
+            if ($this->isProjectTask() || $isMultiLanguage) {
 
                 error_log("\n\nTASK PROJEKT TASK STATE LOOP\n\n"); // TODO REMOVE
                 $api->checkProjectTasksStateLoop();
