@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "98901",
+                    "qid": "2233",
                     "qtype": "consistent",
                     "qcount": 3,
                     "qcomplete": true,
@@ -66,7 +66,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "98891",
+                    "qid": "2218",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -90,7 +90,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "98900",
+                    "qid": "2230",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -149,7 +149,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "98867",
+                    "qid": "2194",
                     "qtype": "spellcheck",
                     "qcount": 14,
                     "qcomplete": true,
@@ -167,7 +167,7 @@
                     "qcomplete": true,
                     "qcategory": "typographical",
                     "text": "Typographical",
-                    "qtooltip": "The text has typographical errors such as omitted\/incorrect punctuation, incorrect capitalization, etc.",
+                    "qtooltip": "The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.",
                     "leaf": true,
                     "checked": false
                 },
@@ -222,7 +222,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "98882",
+                            "qid": "2209",
                             "qtype": "spellcheck",
                             "qcount": 1,
                             "qcomplete": true,
@@ -759,13 +759,13 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "98890",
+                    "qid": "2217",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
                     "qcategory": "num1",
                     "qcatidx": "-1",
-                    "text": "Numbers source \u2260 target",
+                    "text": "Numbers source ≠ target",
                     "qtooltip": "",
                     "leaf": true,
                     "checked": false
@@ -787,7 +787,7 @@
                     "qcount": 0,
                     "qcomplete": true,
                     "qcategory": "num11",
-                    "text": "Different character\/formatting for number interval",
+                    "text": "Different character/formatting for number interval",
                     "qtooltip": "",
                     "leaf": true,
                     "checked": false
@@ -928,7 +928,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "98860",
+                    "qid": "2187",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -940,7 +940,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "98856",
+                    "qid": "2183",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -952,7 +952,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "98862",
+                    "qid": "2189",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -1126,7 +1126,7 @@
             ],
             "qcategory": null,
             "qtooltip": "",
-            "text": "White space at the beginning\/end",
+            "text": "White space at the beginning/end",
             "qtotal": 0,
             "expanded": false,
             "checked": false

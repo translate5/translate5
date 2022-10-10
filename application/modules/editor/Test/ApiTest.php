@@ -27,18 +27,17 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Api\Helper;
+use PHPUnit\Framework\SkippedTestSuiteError;
 
 /**
  * Base Class for all API Tests
  * For tests importing tasks, use TaskImportTest
- * TODO: BeforeFirstTestHook, AfterLastTestHook, executeAfterLastTest, executeBeforeFirstTest
  */
 abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     *
-     */
     const TYPE = 'api';
+
+    const NAME_PREFIX = 'API Testing::';
 
     /**
      * @var Helper
@@ -217,8 +216,8 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
 
     final public static function setUpBeforeClass(): void
     {
-        // each test gets an own api-object
-        static::$_api = new Helper(static::class);
+        // each test gets an own api-object, the instance of the current test is for code-completion adnd does not hurt, since the constructor does nothing
+        static::$_api = new Helper(static::class, new static);
         // this runs only once with the first API-Test
         if (static::$_appState === null) {
             self::testRunSetup(static::$_api);
@@ -233,10 +232,12 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
 
     final public static function tearDownAfterClass(): void
     {
-        // internal method to create the configured setups
-        static::testSpecificTeardown();
         // this can be used in concrete tests as replacement for tearDownAfterClass()
         static::afterTests();
+        // internal method to clan up stuff
+        static::testSpecificTeardown();
+        // as a final step., we check if the test left workers in the DB
+        static::assertWorkerCleanup();
     }
 
     /**
@@ -261,7 +262,7 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
     protected static function testSpecificSetup()
     {
         if (static::$setupOwnCustomer) {
-            static::$ownCustomer = static::api()->addCustomer('API-Test::' . static::class);
+            static::$ownCustomer = static::api()->addCustomer('API Testing::' . static::class);
         }
         // log the user in that is setup as the needed test-user
         if (static::api()->login(static::$setupUserLogin)) {
@@ -284,6 +285,10 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
      * Fetches the app-state for the current test-run and checks basic requirements
      * @param Helper $api
      */
+    /**
+     * @param Helper $api
+     * @throws Zend_Http_Client_Exception
+     */
     private static function evaluateAppState(Helper $api)
     {
         // the initial login of the current Test suite
@@ -291,25 +296,28 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
         static::assertLogin('testapiuser');
         $state = $api->getJson('editor/index/applicationstate');
         if (!is_object($state)) {
+            // UGLY: no Exception can terminate the suite with a single "Explanation", so to avoid all tests failing we simply die ...
             die('Application state could not be fetched, terminating API-tests.' . "\n\n");
         }
         // system checks
         $errors = [];
-        if ($state->worker->scheduled < 0) {
-            $errors[] = 'For API testing no scheduled workers are allowed in DB!';
+        if ($state->worker->scheduled > 0) {
+            $errors[] = 'For API testing no scheduled workers are allowed in the DB!';
         }
-        if ($state->worker->waiting < 0) {
-            $errors[] = 'For API testing no waiting workers are allowed in DB!';
+        if ($state->worker->waiting > 0) {
+            $errors[] = 'For API testing no waiting workers are allowed in the DB!';
         }
-        if ($state->worker->running < 0) {
-            $errors[] = 'For API testing no running workers are allowed in DB!';
+        if ($state->worker->running > 0) {
+            $errors[] = 'For API testing no running workers are allowed in the DB!';
         }
         if (!$state->database->isUptodate) {
             $errors[] = 'Database is not up to date! ' . $state->database->newCount . ' new / ' . $state->database->modCount . ' modified.';
         }
         if (count($errors) > 0) {
+            // UGLY: no Exception can terminate the suite with a single "Explanation", so to avoid all tests failing we simply die ...
             die(implode("\n", $errors) . "\nTerminating API-tests\n\n");
         }
+        unset($state->worker); // worker state is not persistent ...
         static::$_appState = $state;
     }
 
@@ -386,5 +394,21 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
         $response = static::api()->getLastResponse();
         static::assertEquals(200, $response->getStatus(), 'Load test customer Request does not respond HTTP 200! Body was: ' . $response->getBody());
         static::$_testCustomerId = $customer->id;
+    }
+
+    /**
+     * Asserts that no running, waiting, scheduled or crashed workers are left in the test after teardown
+     * @throws Zend_Http_Client_Exception
+     */
+    private static function assertWorkerCleanup()
+    {
+        static::api()->login('testapiuser');
+        $state = static::api()->getJson('editor/index/workercleanupstate');
+        if (!is_object($state)) {
+            throw new SkippedTestSuiteError('Worker cleanup state could not be fetched, terminating API-tests.' . "\n\n");
+        }
+        if($state->cleanupNeccessary){
+            static::fail('The test left running, waiting, scheduled or crashed worker\'s in the DB');
+        }
     }
 }

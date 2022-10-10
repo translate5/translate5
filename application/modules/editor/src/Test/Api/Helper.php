@@ -123,9 +123,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     public function import(array $task, bool $failOnError = true, bool $waitForImport = true): bool
     {
         $this->initTaskPostData($task);
-
-        $test = $this->testClass;
-        $test::assertLogin('testmanager');
+        $this->test::assertLogin('testmanager');
 
         $this->task = $this->postJson('editor/task', $task);
         if (isset($this->task->projectTasks)) {
@@ -156,18 +154,18 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     public function importTask(array $task, bool $failOnError = true, bool $waitForImport = true)
     {
         $this->initTaskPostData($task);
-        $this->testClass::assertLogin('testmanager'); // make sure testmanager is logged in
-        $task = $this->postJson('editor/task', $task);
+        $this->test::assertLogin('testmanager'); // make sure testmanager is logged in
+        $this->task = $this->postJson('editor/task', $task);
         $this->assertResponseStatus($this->getLastResponse(), 'Import');
         if (!$waitForImport) {
-            return $task;
+            return $this->task;
         }
         if ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
             $this->checkProjectTasksStateLoop($failOnError);
         } else {
             $this->checkTaskStateLoop($failOnError);
         }
-        return $task;
+        return $this->task;
     }
 
 
@@ -273,18 +271,18 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             }
             if ($taskResult->state == 'unconfirmed') {
                 //with task templates we could implement separate tests for that feature:
-                $this->testClass::fail('runtimeOptions.import.initialTaskState = unconfirmed is not supported at the moment!');
+                $this->test::fail('runtimeOptions.import.initialTaskState = unconfirmed is not supported at the moment!');
             }
             if ($taskResult->state == 'error') {
                 if ($failOnError) {
-                    $this->testClass::fail('Task Import stopped. Task has state error and last errors: ' . "\n  " . join("\n  ", array_column($taskResult->lastErrors ?? [], 'message')));
+                    $this->test::fail('Task Import stopped. Task has state error and last errors: ' . "\n  " . join("\n  ", array_column($taskResult->lastErrors ?? [], 'message')));
                 }
                 return false;
             }
             //break after RELOAD_TASK_LIMIT reloads
             if ($counter == self::RELOAD_TASK_LIMIT) {
                 if ($failOnError) {
-                    $this->testClass::fail('Task Import stopped. Task is not open after ' . self::RELOAD_TASK_LIMIT . ' task checks, but has state: ' . $taskResult->state);
+                    $this->test::fail('Task Import stopped. Task is not open after ' . self::RELOAD_TASK_LIMIT . ' task checks, but has state: ' . $taskResult->state);
                 }
                 return false;
             }
@@ -301,7 +299,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     public function checkProjectTasksStateLoop(bool $failOnError = true): bool
     {
-        $test = $this->testClass;
         $counter = 0;
         while (true) {
 
@@ -312,7 +309,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             //foreach project task check the state
             foreach ($this->projectTasks as $task) {
 
-                error_log('Project tasks state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ', [ name:' . $task->taskName . '], [state: ' . $task->state . '] [' . $test . ']');
+                error_log('Project tasks state check ' . $counter . '/' . self::RELOAD_TASK_LIMIT . ', [ name:' . $task->taskName . '], [state: ' . $task->state . '] [' . $this->testClass . ']');
 
                 if ($task->state == 'open') {
                     $toCheck--;
@@ -325,7 +322,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
                 if ($task->state == 'error') {
                     if ($failOnError) {
-                        $test::fail('Task Import stopped. Task has state error.');
+                        $this->test::fail('Task Import stopped. Task has state error.');
                     }
                     return false;
                 }
@@ -338,7 +335,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             //break after RELOAD_TASK_LIMIT reloads
             if ($counter == self::RELOAD_TASK_LIMIT) {
                 if ($failOnError) {
-                    $test::fail('Project task import stopped. After ' . self::RELOAD_TASK_LIMIT . ' task state checks, all of the project task are not in state open.');
+                    $this->test::fail('Project task import stopped. After ' . self::RELOAD_TASK_LIMIT . ' task state checks, all of the project task are not in state open.');
                 }
                 return false;
             }
@@ -460,8 +457,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     public function addTaskAssoc()
     {
         $taskGuid = $this->getTask()->taskGuid;
-        $test = $this->testClass;
-        $test::assertNotEmpty($taskGuid, 'Unable to associate resources to task. taskGuid empty');
+        $this->test::assertNotEmpty($taskGuid, 'Unable to associate resources to task. taskGuid empty');
 
         foreach ($this->getResources() as $resource) {
             // associate languageresource to task
@@ -480,7 +476,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @return array|\stdClass
      * @throws \Zend_Http_Client_Exception
      */
-    public function addResourceTaskAssoc(int $resourceId, string $taskGuid){
+    public function addResourceTaskAssoc(int $resourceId, string $resourceName, string $taskGuid){
+        error_log('Languageresources assoc to task. ' . $resourceName . ' -> ' . $taskGuid);
         return $this->postJson(
             'editor/languageresourcetaskassoc',
             [
@@ -488,6 +485,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                 'taskGuid' => $taskGuid,
                 'segmentsUpdateable' => 0
             ]);
+
     }
 
     /**
@@ -496,9 +494,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     protected function initTaskPostData(array &$task)
     {
         $now = date('Y-m-d H:i:s');
-        $test = $this->testClass;
         if (empty($task['taskName'])) {
-            $task['taskName'] = 'API Testing::' . $test . ' ' . $now;
+            $task['taskName'] = 'API Testing::' . $this->testClass . ' ' . $now;
         }
         if (empty($task['orderdate'])) {
             $task['orderdate'] = $now;
@@ -510,7 +507,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         if (!isset($task['autoStartImport'])) {
             $task['autoStartImport'] = 1;
         }
-        $task['orderer'] = 'unittest';
+        $task['orderer'] = 'unittest'; // TODO FIXME: this should be solved with the available configs or defined props
     }
 
     /**
@@ -570,8 +567,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     public function addUserToTask(string $taskGuid, int $entityVersion, string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
     {
-        $test = $this->testClass;
-        $test::assertFalse(empty($this->testusers[$username]), 'Given testuser "' . $username . '" does not exist!');
+        $this->test::assertFalse(empty($this->testusers[$username]), 'Given testuser "' . $username . '" does not exist!');
         $p = array(
             "id" => 0,
             "entityVersion" => $entityVersion,
@@ -693,11 +689,9 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     public function addResource(array $params, string $fileName = null, bool $waitForImport = false, string $testDir = '')
     {
-
         if (!empty($this->filesToAdd)) {
             throw new Exception('There are already some files added as pending request and not sent yet! Send them first to the server before calling addResource!');
         }
-        $test = $this->testClass;
         //if filename is provided, set the file upload field
         if ($fileName) {
             $this->addFile('tmUpload', $this->getFile($fileName, $testDir), "application/xml");
@@ -708,7 +702,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             $this->assertResponseStatus($response, 'Language resource');
             $resource = $this->decodeJsonResponse($response);
         }
-        $test::assertEquals($params['name'], $resource->name);
+        $this->test::assertEquals($params['name'], $resource->name);
 
         //collect the created resource
         self::$resources[] = $resource;
@@ -736,7 +730,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             $counter++;
         }
 
-        $test::assertEquals('available', $result->status, 'Resource import stoped. Resource state is:' . $result->status);
+        $this->test::assertEquals('available', $result->status, 'Resource import stoped. Resource state is:' . $result->status);
         return $result;
     }
 
@@ -816,7 +810,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     public function testConfig(array $configsToTest, array $plainFilter = [])
     {
-        $test = $this->testClass;
         foreach ($configsToTest as $name => $value) {
             if (!str_starts_with($name, 'runtimeOptions.')) {
                 $name = 'runtimeOptions.' . $name;
@@ -825,11 +818,11 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                 'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"like"}]',
             ], $plainFilter);
             $config = $this->getJson('editor/config', $filter);
-            $test::assertCount(1, $config, 'No Config entry for config "' . $name . '" found in instance config!');
+            $this->test::assertCount(1, $config, 'No Config entry for config "' . $name . '" found in instance config!');
             if (is_null($value)) {
-                $test::assertNotEmpty($config[0]->value, 'Config ' . $name . ' in instance is empty but should be set with a value!');
+                $this->test::assertNotEmpty($config[0]->value, 'Config ' . $name . ' in instance is empty but should be set with a value!');
             } else {
-                $test::assertEquals($value, $config[0]->value, 'Config ' . $name . ' in instance config is not as expected: ');
+                $this->test::assertEquals($value, $config[0]->value, 'Config ' . $name . ' in instance config is not as expected: ');
             }
         }
     }

@@ -46,7 +46,7 @@ abstract class Resource
     public function __construct(string $testClass, int $index)
     {
         // fixed recognizable naming scheme for a resource name
-        $this->_name = 'API-Test::' . $this->purifyClassname($testClass) . '-' . $this->purifyClassname(static::class) . '-' . $index;
+        $this->_name = $this->createName($testClass, $index);
         $this->_index = $index;
         // for lazyness: define the name for those resources, that have names
         if (property_exists($this, 'name')) {
@@ -54,9 +54,25 @@ abstract class Resource
         }
     }
 
-    private function purifyClassname(string $className): string
+    /**
+     * Creates the name of a resource
+     * @param string $testClass
+     * @param int $resourceIndex
+     * @return string
+     */
+    protected function createName(string $testClass, int $resourceIndex): string
     {
-        if(str_contains($className, '\\')) {
+        return $this->purifyClassname(static::class) . '-' . $this->purifyClassname($testClass) . '-' . $resourceIndex;
+    }
+
+    /**
+     * prequesite that we have tests from namespaces at some point
+     * @param string $className
+     * @return string
+     */
+    protected function purifyClassname(string $className): string
+    {
+        if (str_contains($className, '\\')) {
             $parts = explode('\\', $className);
             return array_pop($parts);
         }
@@ -91,7 +107,6 @@ abstract class Resource
                 $this->$name = $val;
             }
         }
-        error_log('APPLIED RESULT FOR ' . get_class($this) . ': ' . print_r($result, 1)); // TODO: REMOVE
         $this->_requested = true;
     }
 
@@ -108,8 +123,7 @@ abstract class Resource
             if (property_exists($result, 'error')) {
                 $error .= ' [ ' . $result->error . ' ]';
             }
-            $test = $api->getTestClass();
-            $test::fail($error);
+            $api->getTest()::fail($error);
             return false;
         }
         $this->applyResult($result);
@@ -117,11 +131,13 @@ abstract class Resource
     }
 
     /**
+     * Sets a property of the recource
      * @param string $name
-     * @param mixed $val
+     * @param $val
+     * @return $this
      * @throws Exception
      */
-    public function setProperty(string $name, $val)
+    public function setProperty(string $name, $val): Resource
     {
         if (str_starts_with($name, '_')) {
             throw new Exception('Resource::setProperty: you can not set internal vars');
@@ -130,6 +146,36 @@ abstract class Resource
             throw new Exception('Resource::setProperty: property "' . $name . '" does not exist');
         }
         $this->$name = $val;
+        return $this;
+    }
+
+    /**
+     * Adds a property of the recource that will be added to the request params
+     * @param string $name
+     * @param $val
+     * @return $this
+     * @throws Exception
+     */
+    public function addProperty(string $name, $val): Resource
+    {
+        if (str_starts_with($name, '_')) {
+            throw new Exception('Resource::addProperty: you can not add internal vars');
+        }
+        $this->$name = $val;
+        return $this;
+    }
+
+    /**
+     * Checks if there is a resource
+     * @param string $name
+     * @return bool
+     */
+    public function hasProperty(string $name): bool
+    {
+        if (str_starts_with($name, '_')) {
+            return false;
+        }
+        return property_exists($this, $name);
     }
 
     /**
@@ -179,4 +225,20 @@ abstract class Resource
     {
         return $this->_name;
     }
+
+    /**
+     * Imports the resource in the setup-phase of the test
+     * @param Helper $api
+     * @param Config $config
+     * @return mixed
+     */
+    abstract public function import(Helper $api, Config $config): void;
+
+    /**
+     * Removes the imported resources in the teardown-phase of the test
+     * @param Helper $api
+     * @param Config $config
+     * @return mixed
+     */
+    abstract public function cleanup(Helper $api, Config $config): void;
 }

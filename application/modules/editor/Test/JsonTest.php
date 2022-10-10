@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * This solves problems with autoincrement values & other dynamic data
  * See editor_Test_Model_Abstract & descendants
  */
-abstract class editor_Test_JsonTest extends \editor_Test_ApiTest {
+abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
 
     /* Segment model specific API */
     

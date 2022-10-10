@@ -35,6 +35,14 @@ use MittagQI\Translate5\Test\Api\Helper;
  */
 abstract class LanguageResource extends Resource
 {
+    const OPEN_TM2 = 'opentm2';
+
+    const DUMMY_TM = 'dummytm';
+
+    const DEEPL = 'deepl';
+
+    const TERM_COLLECTION = 'termcollection';
+
     public string $name;
     public array $customerIds = [];
     public array $customerUseAsDefaultIds = [];
@@ -54,7 +62,17 @@ abstract class LanguageResource extends Resource
     public function __construct(string $testClass, int $index)
     {
         parent::__construct($testClass, $index);
-        $this->resourceId = $this->serviceType . '_' . ($index + 1);
+        $this->resourceId = $this->createResourceId($index);
+    }
+
+    /**
+     * Creates the resource-id
+     * @param int $resourceIndex
+     * @return string
+     */
+    protected function createResourceId(int $resourceIndex): string
+    {
+        return $this->serviceType;
     }
 
     /**
@@ -121,7 +139,7 @@ abstract class LanguageResource extends Resource
      * @param Helper $api
      * @throws \Zend_Http_Client_Exception
      */
-    public function request(Helper $api)
+    public function import(Helper $api, Config $config): void
     {
         $result = $api->addResource($this->getRequestParams(), $this->_uploadFile, true, $this->_uploadDir);
         $this->validateResult($result, $api);
@@ -130,7 +148,7 @@ abstract class LanguageResource extends Resource
     /**
      * Removes the languageresource from the system
      */
-    public function cleanup(Helper $api)
+    public function cleanup(Helper $api, Config $config): void
     {
         if ($this->_requested) {
             $api->delete($this->_deleteRoute . $this->getId());

@@ -45,6 +45,12 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     public const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
 
     public static function beforeTests(): void {
+
+        // Needed for localized error messages in Unit Test like ZfExtended_NoAccessException
+        if(!Zend_Registry::isRegistered('Zend_Locale')){
+            Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
+        }
+
         // Test essential configs
         $okapiConf = self::$okapiConf = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
 
@@ -57,11 +63,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists($t5defaultImportBconf,
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
-
-        // Needed for localized error messages in Unit Test like ZfExtended_NoAccessException
-        if(!Zend_Registry::isRegistered('Zend_Locale')){
-            Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
-        }
     }
 
     /***
@@ -187,9 +188,8 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         }
     }
 
-    /***
+    /**
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
-     * @depends test30_AutoImportAndVersionUpdate AutoImport must work for initializing LEK_okapi_bconf after installation
      */
     public function test40_OkapiTaskImport() {
         try {
@@ -202,14 +202,13 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         } catch(Exception $e){
             self::fail($msg . "\n" . $e->getMessage());
         }
-        $task = [
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            //'bconfId' omitted to test fallback to Okapi_Models_Bconf::getDefaultBconfId
-        ];
-        static::api()->addImportFile(static::api()->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
-        static::api()->import($task);
-        static::api()->deleteTask();
+
+        $config = static::getConfig();
+        $config->import(
+            $config
+                ->addTask('de', 'en')
+                ->addUploadFile('workfiles/TRANSLATE-2266-de-en.txt')
+        );
     }
 
     /***
@@ -217,39 +216,39 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * @depends test40_OkapiTaskImport
      */
     public function test50_OkapiTaskImportWithBconfIdAndMultipleFiles() {
-        $task = [
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'bconfId'    => self::$bconf->getDefaultBconfId(),
-        ];
-        static::api()->addImportFile(static::api()->getFile('workfiles/TRANSLATE-2266-de-en.txt'));
-        static::api()->addImportFile(static::api()->getFile('workfiles/TRANSLATE-2266-de-en-2.txt'));
-        static::api()->import($task);
-        static::api()->deleteTask();
+        // cleanup will be atomatically done on teardown
+        $config = static::getConfig();
+        $config->import(
+            $config
+                ->addTask('de', 'en')
+                ->addUploadFiles([
+                    'workfiles/TRANSLATE-2266-de-en.txt',
+                    'workfiles/TRANSLATE-2266-de-en-2.txt'
+                ])
+                ->addProperty(
+                    'bconfId',
+                    self::$bconf->getDefaultBconfId()
+                )
+        );
     }
 
-    /***
+    /**
      * Verify ImportArchives with bconfs are supported
      * @depends test50_OkapiTaskImportWithBconfIdAndMultipleFiles
      */
     public function test55_BconfInImportArchive() {
-        $task = [
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-        ];
-        static::api()->addImportFile(static::api()->getFile('workfiles/BconfWithin-de-en.zip'));
-        static::api()->import($task);
-        $task = static::api()->getTask();
-        static::api()->setTaskToEdit($task->id);
-
+        $config = static::getConfig();
+        $config->import(
+            $config
+                ->addTask('de', 'en', -1,'workfiles/BconfWithin-de-en.zip')
+                ->setToEditAfterImport()
+        );
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName, 3);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
-        // Cleanup
-        static::api()->deleteTask($task->id);
     }
 
-    /***
+    /**
      * Provoke Exceptions via invalid inputs
      * @depends test10_BconfImportExport
      */

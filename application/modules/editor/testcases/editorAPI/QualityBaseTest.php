@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for all endpoints of the AutoQA feature
  * One Problem that might occur is, that the text's (usually text-prop) of the quality models in fact are translated strings that obviously can change. One solution would be, to not compare those props
@@ -39,36 +41,24 @@ class QualityBaseTest extends editor_Test_JsonTest {
         'autoQA.enableMqmTags' => 1,
         'autoQA.enableQm' => 1
     ];
+
+    protected static string $setupUserLogin = 'testlector';
+
     /**
      * 
      * @var stdClass[]
      */
     private static $segments = [];
-    
+
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de', -1, 'csv-with-mqm-en-de.zip')
+            ->setToEditAfterImport();
+    }
+
     public static function beforeTests(): void {
-
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        static::api()->addImportFile('MainTest/csv-with-mqm-en-de.zip');
-        static::api()->import($task);
-        
-        static::api()->addUser('testlector');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        $task = static::api()->getTask();
-           //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
-        
         // we need some segments to play with
         static::$segments = static::api()->getSegments(null, 10);
-        
         static::assertEquals(count(static::$segments), 10, 'Not enough segments in the imported task');
     }
    
@@ -186,11 +176,6 @@ class QualityBaseTest extends editor_Test_JsonTest {
         $fileName = 'expectedTaskQualitiesChanged.json';
         $tree = static::api()->getJson('/editor/quality/task?&taskGuid='.urlencode(static::api()->getTask()->taskGuid), [], $fileName);
         $this->assertModelEqualsJsonFile('TaskQuality', $fileName, $tree);
-    }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 
     /**

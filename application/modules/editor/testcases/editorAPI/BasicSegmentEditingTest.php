@@ -59,7 +59,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
             'lockLocked' => 1,
         );
                 
-        static::api()->addImportFile('MainTest/simple-en-de.zip');
+        static::api()->addImportFile(static::api()->getFile('simple-en-de.zip'));
         static::api()->import($task);
         
         static::api()->addUser('testlector');

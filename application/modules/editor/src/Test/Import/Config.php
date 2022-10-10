@@ -77,24 +77,33 @@ final class Config
         $this->login = $login;
     }
 
+    /**
+     * @throws Exception
+     * @throws \MittagQI\Translate5\Test\Api\Exception
+     * @throws \Zend_Exception
+     * @throws \Zend_Http_Client_Exception
+     */
     public function setup(): void
     {
         // first import the language resources
         foreach ($this->langResources as $resource) {
-            $resource->request($this->api);
+            $resource->import($this->api, $this);
         }
         // then termcollections
         foreach ($this->termCollections as $termCollection) {
-            $termCollection->request($this->api);
+            $termCollection->import($this->api, $this);
         }
         // then the tasks
         foreach ($this->tasks as $task) {
-            $task->request($this->api, $this);
+            $task->import($this->api, $this);
         }
         // last step is to log the setup user in
         $this->api->login($this->login);
     }
 
+    /**
+     * cleans all resources up
+     */
     public function teardown(): void
     {
         // reversed order, first the tasks
@@ -103,22 +112,23 @@ final class Config
         }
         // then termcollections
         foreach ($this->termCollections as $termCollection) {
-            $termCollection->cleanup($this->api);
+            $termCollection->cleanup($this->api, $this);
         }
         // then language resources
         foreach ($this->langResources as $resource) {
-            $resource->cleanup($this->api);
+            $resource->cleanup($this->api, $this);
         }
     }
 
     /**
-     * @param int $customerId
+     * Adds a single Task with the given props. return can be used to chain further specs
      * @param string|null $sourceLanguage
      * @param string|array|null $targetLanguage
-     * @param string|null $zipFileName
+     * @param int $customerId
+     * @param string|null $filePathInTestFolder: if set, the file is added as upload
      * @return Task
      */
-    public function addTask(int $customerId = -1, string $sourceLanguage = null, $targetLanguage = null, string $zipFileName = null): Task
+    public function addTask(string $sourceLanguage = null, $targetLanguage = null, int $customerId = -1, string $filePathInTestFolder = null): Task
     {
         $next = count($this->tasks);
         $task = new Task($this->testClass, $next);
@@ -131,63 +141,41 @@ final class Config
         if ($targetLanguage != null) {
             $task->targetLang = $targetLanguage;
         }
-        if ($zipFileName != null) {
-            $task->addUploadZip($zipFileName);
+        if ($filePathInTestFolder != null) {
+            $task->addUploadFile($filePathInTestFolder);
         }
         $this->tasks[] = $task;
         return $task;
     }
 
     /**
-     * @param string $type
+     * @param string $type: see LanguageResource::XXX
+     * @param string|null $resourceFileName
+     * @param array|null $customerIds
      * @param string|null $sourceLanguage
      * @param string|null $targetLanguage
-     * @param string|null $resourceFileName
      * @return LanguageResource
      * @throws Exception
      */
-    public function addLanguageResource(string $type, string $sourceLanguage = null, string $targetLanguage = null, string $resourceFileName = null): LanguageResource
+    public function addLanguageResource(string $type, string $resourceFileName = null, array $customerIds = null, string $sourceLanguage = null, string $targetLanguage = null): LanguageResource
     {
         $next = count($this->langResources);
         $resource = $this->createLanguageResource($type, $next);
-        if ($sourceLanguage != null) {
+
+        if ($resourceFileName !== null) {
+            $resource->addUploadFile($resourceFileName);
+        }
+        if ($customerIds !== null) {
+            $resource->setProperty('customerIds', $customerIds);
+        }
+        if ($sourceLanguage !== null && $resource->hasProperty('sourceLang')) {
             $resource->setProperty('sourceLang', $sourceLanguage);
         }
-        if ($targetLanguage != null) {
+        if ($targetLanguage !== null && $resource->hasProperty('targetLang')) {
             $resource->setProperty('targetLang', $targetLanguage);
-        }
-        if ($resourceFileName != null) {
-            $resource->addUploadFile($resourceFileName);
         }
         $this->langResources[] = $resource;
         return $resource;
-    }
-
-    /**
-     * @param string $type
-     * @param int $nextIndex
-     * @return LanguageResource
-     * @throws Exception
-     */
-    private function createLanguageResource(string $type, int $nextIndex): LanguageResource
-    {
-        switch (strtolower($type)) {
-            case 'opentm2':
-                return new OpenTm2($this->testClass, $nextIndex);
-
-            case 'dummytm':
-                return new DummyTm($this->testClass, $nextIndex);
-
-            case 'deepl':
-                return new DeepL($this->testClass, $nextIndex);
-
-            case 'termcollection':
-            case 'termcollectionresource':
-                return new TermCollectionResource($this->testClass, $nextIndex);
-
-            default:
-                throw new Exception('Unknown resource-type "' . $type . '"');
-        }
     }
 
     /**
@@ -213,7 +201,7 @@ final class Config
      */
     public function addPretranslation(): Pretranslation
     {
-        $this->pretranslation = new Pretranslation('pretranslation0', $this->testClass, 0);
+        $this->pretranslation = new Pretranslation($this->testClass, 0);
         return $this->pretranslation;
     }
 
@@ -287,10 +275,47 @@ final class Config
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getTestClass(): string
+    public function hasTestlectorLogin(): bool
     {
-        return $this->testClass;
+        return $this->login === 'testlector';
+    }
+
+    /**
+     * Can be used to add resources after the setup-phase of an test
+     * Resources imported this way will be cleaned up automatically nevertheless
+     * @param Resource $resource
+     */
+    public function import(Resource $resource)
+    {
+        $resource->import($this->api, $this);
+    }
+
+    /**
+     * @param string $type
+     * @param int $nextIndex
+     * @return LanguageResource
+     * @throws Exception
+     */
+    private function createLanguageResource(string $type, int $nextIndex): LanguageResource
+    {
+        switch (strtolower($type)) {
+            case LanguageResource::OPEN_TM2:
+                return new OpenTm2($this->testClass, $nextIndex);
+
+            case LanguageResource::DUMMY_TM:
+                return new DummyTm($this->testClass, $nextIndex);
+
+            case LanguageResource::DEEPL:
+                return new DeepL($this->testClass, $nextIndex);
+
+            case LanguageResource::TERM_COLLECTION:
+            case 'termcollectionresource':
+                return new TermCollectionResource($this->testClass, $nextIndex);
+
+            default:
+                throw new Exception('Unknown resource-type "' . $type . '"');
+        }
     }
 }

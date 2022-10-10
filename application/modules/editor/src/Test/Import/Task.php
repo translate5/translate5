@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Test\Import;
 
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\Api\Exception;
 
 /**
  * Represents the api-request configuration for a task
@@ -42,14 +43,15 @@ final class Task extends Resource
      */
     public $targetLang = 'de';
     public int $customerId;
-    public int $wordCount = 0;
-    public int $autoStartImport = 1;
     public bool $edit100PercentMatch = true;
     public bool $enableSourceEditing = false;
     public int $lockLocked = 1;
-    private ?array $_uploadZip = null;
+    public int $wordCount = 666;
+    public int $autoStartImport = 1;
+    public string $orderdate;
     private ?array $_uploadFolder = null;
     private ?array $_uploadFiles = null;
+    private ?array $_uploadData = null;
     private ?string $_cleanupZip = null;
     private bool $_setToEditAfterImport = false;
 
@@ -60,19 +62,15 @@ final class Task extends Resource
     public function __construct(string $testClass, int $index)
     {
         parent::__construct($testClass, $index);
-        $this->taskName = $this->_name;
+        $now = date('Y-m-d H:i:s');
+        $this->orderdate = $now;
+        // TODO FIXME: is the date-addition really neccessary ?
+        $this->taskName = $this->_name . ' ' . $now;
     }
 
-    /**
-     * Adds a single zip that is expected to be in the test's dir. otherwise use second param to define the relative path in the test base-dir
-     * @param string $zipFileName
-     * @param string|null $folderInTestsBase
-     * @return $this
-     */
-    public function addUploadZip(string $zipFileName, string $folderInTestsBase = null): Task
+    protected function createName(string $testClass, int $resourceIndex): string
     {
-        $this->_uploadZip = ['zip' => $zipFileName, 'folder' => trim($folderInTestsBase, '/')];
-        return $this;
+        return \editor_Test_ApiTest::NAME_PREFIX . parent::createName($testClass, $resourceIndex);
     }
 
     /**
@@ -88,13 +86,40 @@ final class Task extends Resource
     }
 
     /**
+     * Adds a direct path to be uploaded which is expected to reside in the test-dir
+     * @param string $filePath
+     * @return $this
+     */
+    public function addUploadFile(string $filePath): Task
+    {
+        if ($this->_uploadFiles === null) {
+            $this->_uploadFiles = [];
+        }
+        $this->_uploadFiles[] = $filePath;
+        return $this;
+    }
+
+    /**
      * Adds direct pathes to be uploaded which are expected to reside in the test-dir
      * @param string[] $filePathes
      * @return $this
      */
     public function addUploadFiles(array $filePathes): Task
     {
-        $this->_uploadFiles = $filePathes;
+        $this->_uploadFiles = ($this->_uploadFiles === null) ? $filePathes : array_merge($this->_uploadFiles, $filePathes);
+        return $this;
+    }
+
+    /**
+     * Adds raw data to be uploaded as file
+     * @param string $data
+     * @param string $mime
+     * @param string $filename
+     * @return $this
+     */
+    public function addUploadData(string $data, string $mime = 'application/csv', string $filename = 'apiTest.csv'): Task
+    {
+        $this->_uploadData = ['data' => $data, 'mime' => $mime, 'filename' => $filename];
         return $this;
     }
 
@@ -120,11 +145,11 @@ final class Task extends Resource
      * @param Helper $api
      * @param Config $config
      * @throws Exception
-     * @throws \MittagQI\Translate5\Test\Api\Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
      * @throws \Zend_Exception
      * @throws \Zend_Http_Client_Exception
      */
-    public function request(Helper $api, Config $config)
+    public function import(Helper $api, Config $config): void
     {
         // tasks will be uploaded as testmanager
         $api->login('testmanager');
@@ -135,37 +160,49 @@ final class Task extends Resource
         if (!$config->hasLanguageResources() && !$config->hasPretranslation() && is_string($this->targetLang)) {
 
             // the simple case: task without resources & pretranslation
-            if (!$this->import($api, true, true)) {
+            if (!$this->doImport($api, true, true)) {
                 return;
             }
 
         } else {
 
-            if (!$this->import($api, false, false)) {
+            if (!$this->doImport($api, false, false)) {
                 return;
             }
             // associate resources
             if ($config->hasLanguageResources()) {
                 foreach ($config->getLanguageResources() as $resource) {
-                    if($resource->isTaskAssociated()){
-                        $api->addResourceTaskAssoc($resource->getId(), $this->getTaskGuid());
+                    if ($resource->isTaskAssociated()) {
+                        $api->addResourceTaskAssoc($resource->getId(), $resource->getName(), $this->getTaskGuid());
                     }
                 }
             }
             // queue pretranslation
             if ($config->hasPretranslation()) {
-                $config->getPretranslation()->request($api, $this->getId());
+                $config
+                    ->getPretranslation()
+                    ->setTaskId($this->getId())
+                    ->import($api, $config);
             }
+
+            // start the import
+            $api->getJson('editor/task/'.$this->getId().'/import');
+
             // wait for the import to finish. TODO FIXME: is the waiting for project with multi-targetlang tasks actually correct ?
             if ($this->getProperty('taskType') == Helper::INITIAL_TASKTYPE_PROJECT || (is_array($this->originalTargetLang) && count($this->originalTargetLang) > 1)) {
+
+                // error_log("\n\nTASK PROJEKT TASK STATE LOOP\n\n");
                 $api->checkProjectTasksStateLoop();
+
             } else {
+                // error_log("\n\nTASK TASK STATE LOOP\n\n";)>;
                 $api->checkTaskStateLoop();
             }
         }
         // if testlector shall be loged in after setup, we add him to the task automatically
         if ($config->getLogin() === 'testlector') {
             $api->addUserToTask($this->getTaskGuid(), $this->getProperty('entityVersion'), 'testlector');
+            $api->login('testlector');
         }
         // last step: open task for edit if configured
         if ($this->_setToEditAfterImport) {
@@ -173,15 +210,30 @@ final class Task extends Resource
         }
     }
 
-    public function cleanup(Helper $api, Config $config)
+    /**
+     * @param Helper $api
+     * @param Config $config
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    public function cleanup(Helper $api, Config $config): void
     {
+        // remove on server
+        if ($this->_requested) {
+            $taskId = $this->getId();
+            if ($config->hasTestlectorLogin()) {
+                $api->login('testlector');
+                $api->setTaskToOpen($taskId);
+                $api->login('testmanager');
+            } else {
+                $api->login('testmanager');
+                $api->setTaskToOpen($taskId);
+            }
+            $api->delete('editor/task/' . $taskId);
+        }
+        // remnove zipped file when imported by folder
         if ($this->_cleanupZip !== null) {
             @unlink($this->_cleanupZip);
             $this->_cleanupZip = null;
-        }
-        if ($this->_requested) {
-            $testlector = ($config->getLogin() === 'testlector') ? 'testlector' : null;
-            $api->deleteTask($this->getId(), 'testmanager', $testlector);
         }
     }
 
@@ -194,10 +246,11 @@ final class Task extends Resource
      * @throws \MittagQI\Translate5\Test\Api\Exception
      * @throws \Zend_Http_Client_Exception
      */
-    private function import(Helper $api, bool $failOnError, bool $waitTorImport): bool
+    private function doImport(Helper $api, bool $failOnError, bool $waitTorImport): bool
     {
         $this->originalSourceLang = $this->sourceLang;
         $this->originalTargetLang = $this->targetLang;
+        $this->autoStartImport = $waitTorImport ? 1 : 0;
         $result = $api->importTask($this->getRequestParams(), $failOnError, $waitTorImport);
         if ($this->validateResult($result, $api)) {
             // normalize projectTasks
@@ -210,22 +263,27 @@ final class Task extends Resource
     }
 
     /**
-     * Adds all our files to the
+     * Adds all our files before importing
      * @param Helper $api
      * @throws \Zend_Exception
      */
     private function upload(Helper $api)
     {
-        if ($this->_uploadZip !== null) {
-            $folder = ($this->_uploadZip['folder'] === null) ? $api->getTestClass() : $this->_uploadZip['folder'];
-            $api->addImportFile($folder . '/' . $this->_uploadZip['zip']);
-        } else if ($this->_uploadFolder !== null) {
+        if ($this->_uploadFolder !== null) {
             $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder['folder'] . '/', $this->_uploadFolder['zip']); // TODO FIXME: is the slash after the folder neccesary?
             $api->addImportFile($this->_cleanupZip);
         } else if ($this->_uploadFiles !== null) {
-            foreach ($this->_uploadFiles as $relPath) {
-                $api->addImportFiles($api->getFile($relPath));
+            if (count($this->_uploadFiles) == 1) {
+                $api->addImportFile($api->getFile($this->_uploadFiles[0]));
+            } else {
+                foreach ($this->_uploadFiles as $relPath) {
+                    $api->addImportFiles($api->getFile($relPath));
+                }
             }
+        } else if($this->_uploadData !== null) {
+            $api->addImportPlain($this->_uploadData['data'], $this->_uploadData['mime'], $this->_uploadData['filename']);
+        } else {
+            throw new Exception('The task to import has no files assigned');
         }
     }
 }

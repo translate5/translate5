@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * CsvMqmTest tests the correct export MQM Tags.
  *   Especially the cases of overlapping and misordered MQM tags
@@ -89,27 +91,15 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         '<n-c#19#1988>',
         '<n-c#8#1993>',
     );
-    
-    /**
-     * Setting up the test task by fresh import, adds the lector and translator users
-     */
-    public static function beforeTests(): void {
 
-        $task = array(
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-        );
-
-        static::api()->addImportPlain("id,source,target\n".'1,"source not needed here","'.self::CSV_TARGET.'"'."\n".'2,"zeile 2","row 2"');
-        static::api()->import($task);
-
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de')
+            ->addUploadData("id,source,target\n".'1,"source not needed here","'.self::CSV_TARGET.'"'."\n".'2,"zeile 2","row 2"');
     }
 
     /**
      * Check imported data and add MQM to the target by editing it
-     * @depends testCsvSettings
      */
     public function testEditingSegmentWithMqm() {
         $task = static::api()->getTask();
@@ -233,10 +223,5 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         $foundIds = [];
         $exportedFileContent = preg_replace_callback($regex, $idReplacer, $exportedFileContent);
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFileContent), 'Exported result does not equal to '.$fileToCompare);
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for 'TRANSLATE-2537: AutoQA: Check inconsistent translations'
  */
@@ -34,33 +36,19 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
     /**
      * @var array
      */
-    public static $segments = [];
+    private static $segments = [];
 
-    /**
-     * @throws Zend_Exception
-     */
+    protected static string $setupUserLogin = 'testlector';
+
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de')
+            ->addUploadFile('testfiles/TRANSLATE-2537-en-de.xlf')
+            ->setToEditAfterImport();
+    }
+
     public static function beforeTests(): void {
-
-        // Import xlf-file
-        static::api()->addImportFile(static::api()->getFile('testfiles/TRANSLATE-2537-en-de.xlf'));
-        static::api()->import([
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        ]);
-
-        // Login in beforeTests means using this user in whole testcase!
-        static::api()->addUser('testlector');
-        static::api()->login('testlector');
-
-        // Get task
-        $task = static::api()->getTask();
-
-        // Open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
-
-        // Get segments and check their quantity
+        // Get segments needed for the test and check their quantity
         static::$segments = static::api()->getSegments(null, 29);
         static::assertEquals(count(static::$segments), 29, 'Not enough segments in the imported task');
     }
@@ -75,13 +63,5 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
             $qualityFilter = editor_Test_Model_Filter::createSingle('type', 'consistent');
             $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, 'File '.$fileName.', Segment target: "'.static::$segments[$idx]->target.'"', $qualityFilter);
         }
-    }
-
-    /**
-     * Cleanup
-     */
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

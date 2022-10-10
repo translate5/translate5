@@ -264,11 +264,12 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
                     'type' => $fprm->getType()
                 ];
                 $content = file_get_contents(static::api()->getFile($filename));
-                $result = static::api()->postRaw('editor/plugins_okapi_bconffilter/savefprm', $content, $params);
+                $result = static::api()->postRawData('editor/plugins_okapi_bconffilter/savefprm', $content, $params);
+                // result is to have two props: success & error. Error only, if success === false
                 if($validExtended){
-                    self::assertEquals(true, $result->success, 'Failed to save FPRM "'.$filename.'"');
+                    self::assertTrue((property_exists($result, 'success') && $result->success === true), 'Failed to save FPRM "'.$filename.'"');
                 } else {
-                    self::assertEquals(false, $result->success, 'Failed to save FPRM "'.$filename.'"');
+                    self::assertTrue((property_exists($result, 'success') && $result->success === false), 'Could save faulty FPRM "'.$filename.'"');
                     $error = strtolower($result->error);
                     foreach($extendedValidationErrors as $errorPart){
                         self::assertEquals(true, str_contains($error, strtolower($errorPart)));
@@ -340,8 +341,8 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
                 'type' => $fprmType
             ];
             $content = file_get_contents(static::api()->getFile($filename));
-            $result = static::api()->postRaw('editor/plugins_okapi_bconffilter/savefprm', $content, $params);
-            self::assertEquals(true, $result->success, 'Failed to save changed FPRM "'.$filename.'"');
+            $result = static::api()->postRawData('editor/plugins_okapi_bconffilter/savefprm', $content, $params);
+            self::assertFalse(static::api()->isJsonResultError($result), 'Failed to save changed FPRM "'.$filename.'"');
             try {
                 $fprm = new editor_Plugins_Okapi_Bconf_Filter_Fprm(self::$bconf->createPath($filterEntity->getFile()));
                 self::assertEquals(true, str_contains($fprm->getContent(), $searchedString), 'The updated SRX "'.$filterEntity->getFile().'" did not contain the expected contents');

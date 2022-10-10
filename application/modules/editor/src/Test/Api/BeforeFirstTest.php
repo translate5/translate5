@@ -26,26 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Test\Import;
+namespace MittagQI\Translate5\Test\Api;
+
+use PHPUnit\Runner\BeforeFirstTestHook;
+use PHPUnit\Framework\SkippedTestSuiteError;
 
 /**
- * Represents the api-request configuration for a OpenTM2-resource
+ * Is called only once before the first test, no matter if run as "runall", "runsuite" or "run"
  */
-final class OpenTm2 extends LanguageResource
+final class BeforeFirstTest implements BeforeFirstTestHook
 {
-    /**
-     * @var string|array
-     */
-    public $sourceLang = 'en';
-    /**
-     * @var string|array
-     */
-    public $targetLang = 'de';
-    protected string $serviceName = 'OpenTM2';
-    protected string $serviceType = 'editor_Services_OpenTM2';
-
-    protected function createResourceId(int $resourceIndex): string
+    public function executeBeforeFirstTest(): void
     {
-        return $this->serviceType . '_1';
+        // error_log('BEFORE FIRST TEST!');
+        // throw new SkippedTestSuiteError('TESTCASE HAS TO END!');
     }
 }

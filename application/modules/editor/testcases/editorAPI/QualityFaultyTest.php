@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for the AutoQA feature
  * Tests the special case, an internal tag has a faulty HTML structure (opening/closing tags in wrong order, internal tags interleaving)
@@ -45,32 +47,18 @@ class QualityFaultyTest extends editor_Test_JsonTest {
      * @var stdClass[]
      */
     private static $segments = [];
+
+    protected static string $setupUserLogin = 'testlector';
+
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de', -1, 'qm-terminology-en-de.zip')
+            ->setToEditAfterImport();
+    }
     
     public static function beforeTests(): void {
-
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        static::api()->addImportFile('MainTest/qm-terminology-en-de.zip');
-        static::api()->import($task);
-        static::api()->reloadTask();
-        
-        static::api()->addUser('testlector');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        $task = static::api()->getTask();
-           //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
-        
         // we need some segments to play with
         static::$segments = static::api()->getSegments(null, 10);
-        
         static::assertEquals(10, count(static::$segments), 'Not enough segments in the imported task');
     }
     /**
@@ -130,11 +118,5 @@ class QualityFaultyTest extends editor_Test_JsonTest {
         $this->assertStringContainsString('</table>', $markup, 'Task Qualities ToolTip Markup does not match');
         $this->assertStringContainsString('<span class="x-grid-symbol t5-quality-faulty">', $markup, 'Task Qualities ToolTip Markup does not match'); // number of all MQMs
         $this->assertEquals(file_get_contents($file), $markup, 'Task Qualities ToolTip Markup does not match'); // this test mignt has to be adjusted due to the translation problematic
-    }
-
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

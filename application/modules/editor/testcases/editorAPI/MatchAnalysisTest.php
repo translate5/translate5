@@ -26,119 +26,40 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Match analysis tests.
  * The test will check if the current codebase provides a valid matchanalysis test results.
- * The valid test results are counted by hand and thay are correct.
+ * The valid test results are counted by hand and they are correct.
  *
  */
-class MatchAnalysisTest extends \editor_Test_ApiTest {
+class MatchAnalysisTest extends editor_Test_ImportTest {
     
-    protected static $sourceLangRfc = 'de';
-    protected static $targetLangRfc = 'en';
-    
-    protected static $prefix = 'MATEST';
-
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
         'editor_Plugins_MatchAnalysis_Init',
         'editor_Plugins_InstantTranslate_Init'
     ];
-    
-    /**
-     */
-    public static function beforeTests(): void {
-        // Import all required resources and task before running the tests
-        static::addTm('resource1.tmx', static::getLrRenderName('resource1'));
-        static::addTm('resource2.tmx', static::getLrRenderName('resource2'));
-        static::addTermCollection('collection.tbx', static::getLrRenderName('resource3'));
-        static::createTask();
-        static::api()->addTaskAssoc();
-        static::queueAnalysys();
-        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
-        static::api()->checkTaskStateLoop();
-    }
 
-    /**
-     * Add the translation memory resource. OpenTM2 in our case
-     * @param string $fileName
-     * @param string $name
-     */
-    private static function addTm(string $fileName, string $name){
-        $params = [
-            'resourceId' => 'editor_Services_OpenTM2_1',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [ static::getTestCustomerId() ],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Services_OpenTM2',
-            'serviceName'=> 'OpenTM2',
-            'name' => $name
-        ];
-        //create the resource 1 and import the file
-        static::api()->addResource($params, $fileName,true);
-    }
-
-    /**
-     * Add the term collection resource
-     * @param string $fileName
-     * @param string $name
-     */
-    private static function addTermCollection(string $fileName, string $name) {
-        $params = [
-            'name' => $name,
-            'resourceId' =>'editor_Services_TermCollection',
-            'serviceType' =>'editor_Services_TermCollection',
-            'customerIds' => [ static::getTestCustomerId() ],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceName' => 'TermCollection',
-            'mergeTerms' => false
-        ];
-        static::api()->addResource($params, $fileName);
-    }
-
-    /**
-     * Return the languageresource render name with the prefix
-     * @param string $name
-     * @return string
-     */
-    private static function getLrRenderName(string $name){
-        return self::$prefix.$name;
-    }
-
-    /**
-     * Create the task. The task will not be imported directly autoStartImport is 0!
-     */
-    private static function createTask(){
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId' => static::getTestCustomerId(),
-            'edit100PercentMatch' => true,
-            'wordCount' => 1270,
-            'autoStartImport' => 0
-        ];
-        self::assertLogin('testmanager');
-        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task, false, false);
-    }
-
-    /**
-     * Queue the match anlysis worker
-     */
-    private static function queueAnalysys(){
-         $params = [
-            'internalFuzzy' => 1,
-            'pretranslateMatchrate' => 100,
-            'pretranslateTmAndTerm' => 1,
-            'pretranslateMt' => 0,
-            'isTaskImport' => 0
-        ];
-        static::api()->putJson('editor/task/'.static::api()->getTask()->id.'/pretranslation/operation', $params, null, false);
+    protected static function setupImport(Config $config): void
+    {
+        $sourceLangRfc = 'de';
+        $targetLangRfc = 'de';
+        $config
+            ->addLanguageResource('opentm2', 'resource1.tmx', [ static::getTestCustomerId() ], $sourceLangRfc, $targetLangRfc)
+            ->setProperty('name', 'MATESTresource1'); // TODO FIXME: we better generate data independent from resource-names ...
+        $config
+            ->addLanguageResource('opentm2', 'resource2.tmx', [ static::getTestCustomerId() ], $sourceLangRfc, $targetLangRfc)
+            ->setProperty('name', 'MATESTresource2'); // TODO FIXME: we better generate data independent from resource-names ...
+        $config
+            ->addLanguageResource('termcollection', 'collection.tbx', [ static::getTestCustomerId() ])
+            ->setProperty('name', 'MATESTresource3'); // TODO FIXME: we better generate data independent from resource-names ...
+        $config->addPretranslation();
+        $config->addTask($sourceLangRfc, $targetLangRfc, static::getTestCustomerId())
+            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->setProperty('wordCount', 1270)
+            ->setProperty('taskName', 'API Testing::MatchAnalysisTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
 
     /***
@@ -265,15 +186,5 @@ class MatchAnalysisTest extends \editor_Test_ApiTest {
             unset($a->languageResourceid);
         }
         return $data;
-    }
-
-    /**
-     * Clean up the resources and the task
-     */
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
-        //remove the created resources
-        static::api()->removeResources();
     }
 }

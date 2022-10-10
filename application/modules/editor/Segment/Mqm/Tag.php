@@ -321,7 +321,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     
     public function onConsolidationRemoval() {
         // we don't want exceptions on empty mqm tags (which do not make sense but also are no real error and will be removed silently) or on unit tests
-        if($this->startIndex == $this->endIndex || defined('T5_IS_UNIT_TEST')){
+        if($this->startIndex == $this->endIndex || defined('APPLICATION_UNITTEST')){
             return;
         }
         // tags spanning no text will be removed silently

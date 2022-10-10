@@ -39,7 +39,8 @@ class TaskEntityVersionTest extends \editor_Test_ApiTest {
             'edit100PercentMatch' => true,
         );
 
-        static::api()->addImportFile('MainTest/simple-en-de.zip');
+
+        static::api()->addImportFile(static::api()->getFile('simple-en-de.zip'));
         static::api()->import($task);
     }
     

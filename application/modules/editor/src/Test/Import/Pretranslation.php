@@ -40,21 +40,38 @@ final class Pretranslation extends Resource
     public int $pretranslateTmAndTerm = 1;
     public int $pretranslateMt = 0;
     public int $isTaskImport = 0;
+    private int $_taskId;
 
+    /**
+     * @param int $taskId
+     * @return $this
+     */
+    public function setTaskId(int $taskId){
+        $this->_taskId = $taskId;
+        return $this;
+    }
     /**
      * Queues the analysis
      * @param Helper $api
      * @param int $taskId
      * @throws \Zend_Http_Client_Exception
      */
-    public function request(Helper $api, int $taskId)
+    public function import(Helper $api, Config $config): void
     {
+        if(empty($this->_taskId)){
+            throw new Exception('Pretranslation has no taskId assigned');
+        }
         $api->putJson(
-            'editor/task/' . $taskId . '/pretranslation/operation',
+            'editor/task/' . $this->_taskId . '/pretranslation/operation',
             $this->getRequestParams(),
             null,
             false
         );
         $this->_requested = true;
+    }
+
+    public function cleanup(Helper $api, Config $config): void
+    {
+        // only to fullfill abstract implementation, not needed here
     }
 }

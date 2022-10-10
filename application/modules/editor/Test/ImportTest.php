@@ -89,5 +89,4 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
         parent::testSpecificTeardown();
         static::$_config->teardown();
     }
-
 }

@@ -63,7 +63,7 @@ final class TermCollection extends Resource
      * @param Helper $api
      * @throws \Zend_Http_Client_Exception
      */
-    public function request(Helper $api)
+    public function import(Helper $api, Config $config): void
     {
         $api->login($this->_login);
         // [1] Create empty term collection
@@ -71,9 +71,8 @@ final class TermCollection extends Resource
             'name' => $this->name,
             'customerIds' => $this->customerIds
         ]);
-        $test = $api->getTestClass();
-        $test::assertTrue(is_object($termCollection), 'Unable to create a test collection');
-        $test::assertEquals($this->name, $termCollection->name);
+        $api->getTest()::assertTrue(is_object($termCollection), 'Unable to create a test collection');
+        $api->getTest()::assertEquals($this->name, $termCollection->name);
         // Remember collectionId
         $this->collectionId = $termCollection->id;
         // Upload the given TBX
@@ -91,7 +90,7 @@ final class TermCollection extends Resource
     /**
      * @param Helper $api
      */
-    public function cleanup(Helper $api)
+    public function cleanup(Helper $api, Config $config): void
     {
         if($this->_requested){
             $api->login($this->_login);

@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Abstraction layer for performing Unit tests which need to work with a mocked task
  */
-abstract class editor_Test_MockedTaskTest extends \editor_Test_UnitTest {
+abstract class editor_Test_MockedTaskTest extends editor_Test_UnitTest {
     /**
      *
      * @var editor_Models_Task
@@ -55,6 +55,7 @@ abstract class editor_Test_MockedTaskTest extends \editor_Test_UnitTest {
             $task->setQmSubsegmentFlags('{"qmSubsegmentFlags":[{"text":"Accuracy","id":1,"children":[{"text":"Terminology","id":2},{"text":"Mistranslation","id":3},{"text":"Omission","id":4},{"text":"Untranslated","id":5},{"text":"Addition","id":6}]},{"text":"Fluency","id":7,"children":[{"text":"Content","id":8,"children":[{"text":"Register","id":9},{"text":"Style","id":10},{"text":"Inconsistency","id":11}]},{"text":"Mechanical","id":12,"children":[{"text":"Spelling","id":13},{"text":"Typography","id":14},{"text":"Grammar","id":15},{"text":"Locale violation","id":16}]},{"text":"Unintelligible","id":17}]},{"text":"Verity","id":18,"children":[{"text":"Completeness","id":19},{"text":"Legal requirements","id":20},{"text":"Locale applicability","id":21}]}],"severities":{"critical":"Critical","major":"Major","minor":"Minor"}}');
             $task->setTaskType('default');
             $task->setProjectId(1233);
+            // TODO FIXME: set row-object to readonly
             static::$testTask = $task;
         }
         return static::$testTask;

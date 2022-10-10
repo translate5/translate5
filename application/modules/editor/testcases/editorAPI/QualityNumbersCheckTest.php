@@ -49,31 +49,14 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         $lang = [];
         preg_match('~ --- ([^ ]+) ([^ ]+)$~', $taskName, $lang);
 
-        // Get absolute file path to be used as 1st arg in below addImportFile() call
-        $absolutePath = static::api()->getFile('testfiles/' . $taskName . '.csv');
-
-        // Print the step where we are
-        // error_log("\nCreating task based on file: 'testfiles/" . $taskName . ".csv', source lang: '{$lang[1]}', target lang: '{$lang[2]}'\n");
-
-        // Add csv-file for import
-        static::api()->addImportFile($absolutePath);
-
-        // Do import
-        static::api()->import([
-            'sourceLang' => $lang[1],
-            'targetLang' => $lang[2],
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        ]);
-
-        // Get task
-        $task = static::api()->getTask();
-
-        // Print the step where we are
-        // error_log("\nTesting task based on file: 'testfiles/" . $taskName . ".csv'\n");
-
-        // Open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+        // import task
+        $config = static::getConfig();
+        $config->import(
+            $config
+                ->addTask($lang[1], $lang[2])
+                ->addUploadFile('testfiles/' . $taskName . '.csv')
+                ->setToEditAfterImport()
+        );
 
         // Get segments and check their quantity
         $segmentQuantity = count(static::api()->getSegments(null, 10));
@@ -84,8 +67,5 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         $tree = static::api()->getJsonTree('/editor/quality', [], $jsonFile);
         $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'numbers');
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
-
-        // Close & delete task
-        static::api()->deleteTask($task->id);
     }
 }
