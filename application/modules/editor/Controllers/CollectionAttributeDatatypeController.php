@@ -47,7 +47,15 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
     protected $entity;
 
     /**
+     * Collections, allowed for current user
+     *
+     * @var
+     */
+    protected $collectionIds = false;
+
+    /**
      * @throws Zend_Session_Exception
+     * @throws ZfExtended_Mismatch
      */
     public function init() {
 
@@ -59,6 +67,15 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
 
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
+
+        // If current user has 'termPM_allClients' role, it means all collections are accessible
+        // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
+        $this->collectionIds =
+            in_array('termPM_allClients', $this->_session->roles)
+            //$this->isAllowed('editor_term', 'anyCollection') // use this instead of upper line when
+                ?: ZfExtended_Factory
+                    ::get(editor_Models_TermCollection_TermCollection::class)
+                    ->getAccessibleCollectionIds(editor_User::instance()->getModel());
     }
 
     /**
@@ -73,6 +90,13 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
                 'rex' => 'int11',                                                   // regular expression preset key or raw expression
                 'key' => 'LEK_languageresources',                                   // points to existing record in a given db table
             ]
+        ]);
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
         ]);
 
         // Get [id => dataTypeId] pairs for each record, representing availability
@@ -97,7 +121,11 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
 
     /**
      * Create attribute
+     *
+     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     public function postAction() {
 
@@ -113,6 +141,13 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
                 'rex' => 'int11',
                 'key' => 'terms_attributes_datatype'
             ]
+        ]);
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
         ]);
 
         // Init new record
@@ -150,6 +185,13 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
                 'key' => $this->entity,
             ],
         ]);
+
+        // If no or only certain collections are accessible - validate collection accessibility
+        if ($this->collectionIds !== true) $this->jcheck([
+            'collectionId' => [
+                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
+            ],
+        ], $this->entity);
 
         // Delete mapping
         $this->entity->delete();
