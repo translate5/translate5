@@ -109,10 +109,13 @@ abstract class LanguageResource extends Resource
      * @param bool $resourceIsTaskAssociated
      * @return $this
      */
-    public function addDefaultCustomerId(int $customerId, bool $resourceIsTaskAssociated = true): LanguageResource
+    public function addDefaultCustomerId(int $customerId, bool $resourceIsTaskAssociated = true, bool $useForWriteAccess = false): LanguageResource
     {
         if (!in_array($customerId, $this->customerUseAsDefaultIds)) {
             $this->customerUseAsDefaultIds[] = $customerId;
+        }
+        if ($useForWriteAccess && !in_array($customerId, $this->customerWriteAsDefaultIds)) {
+            $this->customerWriteAsDefaultIds[] = $customerId;
         }
         $this->_associateToTasks = $resourceIsTaskAssociated;
         return $this;

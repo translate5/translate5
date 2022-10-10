@@ -93,8 +93,8 @@ class Translate2491Test extends editor_Test_JsonTest {
 
         // Wait for import
         static::api()->setTask($task = $transfer->step1->rows->projectTasks[0]);
-        $task->originalSourceLang = $taskCfg['sourceLang'];
-        $task->originalTargetLang = $taskCfg['targetLang'];
+        $task->_originalSourceLang = $taskCfg['sourceLang'];
+        $task->_originalTargetLang = $taskCfg['targetLang'];
 
         if($task->taskType == Helper::INITIAL_TASKTYPE_PROJECT) {
             static::api()->checkProjectTasksStateLoop();

@@ -53,6 +53,11 @@ final class Task extends Resource
     private ?array $_uploadFiles = null;
     private ?array $_uploadData = null;
     private ?string $_cleanupZip = null;
+    private string $_originalSourceLang;
+    /**
+     * @var string|array
+     */
+    private $_originalTargetLang;
     private bool $_setToEditAfterImport = false;
 
     /**
@@ -189,19 +194,19 @@ final class Task extends Resource
             $api->getJson('editor/task/'.$this->getId().'/import');
 
             // wait for the import to finish. TODO FIXME: is the waiting for project with multi-targetlang tasks actually correct ?
-            if ($this->getProperty('taskType') == Helper::INITIAL_TASKTYPE_PROJECT || (is_array($this->originalTargetLang) && count($this->originalTargetLang) > 1)) {
+            if ($this->getProperty('taskType') == Helper::INITIAL_TASKTYPE_PROJECT || (is_array($this->_originalTargetLang) && count($this->_originalTargetLang) > 1)) {
 
-                // error_log("\n\nTASK PROJEKT TASK STATE LOOP\n\n");
+                error_log("\n\nTASK PROJEKT TASK STATE LOOP\n\n"); // TODO REMOVE
                 $api->checkProjectTasksStateLoop();
 
             } else {
-                // error_log("\n\nTASK TASK STATE LOOP\n\n";)>;
+                error_log("\n\nTASK TASK STATE LOOP\n\n"); // TODO REMOVE
                 $api->checkTaskStateLoop();
             }
         }
         // if testlector shall be loged in after setup, we add him to the task automatically
         if ($config->getLogin() === 'testlector') {
-            $api->addUserToTask($this->getTaskGuid(), $this->getProperty('entityVersion'), 'testlector');
+            $api->addUserToTask($this->getTaskGuid(), 'testlector');
             $api->login('testlector');
         }
         // last step: open task for edit if configured
@@ -248,8 +253,8 @@ final class Task extends Resource
      */
     private function doImport(Helper $api, bool $failOnError, bool $waitTorImport): bool
     {
-        $this->originalSourceLang = $this->sourceLang;
-        $this->originalTargetLang = $this->targetLang;
+        $this->_originalSourceLang = $this->sourceLang;
+        $this->_originalTargetLang = $this->targetLang;
         $this->autoStartImport = $waitTorImport ? 1 : 0;
         $result = $api->importTask($this->getRequestParams(), $failOnError, $waitTorImport);
         if ($this->validateResult($result, $api)) {

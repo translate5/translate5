@@ -157,7 +157,7 @@ final class Config
      * @return LanguageResource
      * @throws Exception
      */
-    public function addLanguageResource(string $type, string $resourceFileName = null, array $customerIds = null, string $sourceLanguage = null, string $targetLanguage = null): LanguageResource
+    public function addLanguageResource(string $type, string $resourceFileName = null, int $customerId = -1, string $sourceLanguage = null, string $targetLanguage = null): LanguageResource
     {
         $next = count($this->langResources);
         $resource = $this->createLanguageResource($type, $next);
@@ -165,8 +165,8 @@ final class Config
         if ($resourceFileName !== null) {
             $resource->addUploadFile($resourceFileName);
         }
-        if ($customerIds !== null) {
-            $resource->setProperty('customerIds', $customerIds);
+        if ($customerId > 0) {
+            $resource->setProperty('customerIds', [ $customerId ]);
         }
         if ($sourceLanguage !== null && $resource->hasProperty('sourceLang')) {
             $resource->setProperty('sourceLang', $sourceLanguage);

@@ -45,15 +45,15 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
     protected static function setupImport(Config $config): void
     {
         $sourceLangRfc = 'de';
-        $targetLangRfc = 'de';
+        $targetLangRfc = 'en';
         $config
-            ->addLanguageResource('opentm2', 'resource1.tmx', [ static::getTestCustomerId() ], $sourceLangRfc, $targetLangRfc)
+            ->addLanguageResource('opentm2', 'resource1.tmx', static::getTestCustomerId(), $sourceLangRfc, $targetLangRfc)
             ->setProperty('name', 'MATESTresource1'); // TODO FIXME: we better generate data independent from resource-names ...
         $config
-            ->addLanguageResource('opentm2', 'resource2.tmx', [ static::getTestCustomerId() ], $sourceLangRfc, $targetLangRfc)
+            ->addLanguageResource('opentm2', 'resource2.tmx', static::getTestCustomerId(), $sourceLangRfc, $targetLangRfc)
             ->setProperty('name', 'MATESTresource2'); // TODO FIXME: we better generate data independent from resource-names ...
         $config
-            ->addLanguageResource('termcollection', 'collection.tbx', [ static::getTestCustomerId() ])
+            ->addLanguageResource('termcollection', 'collection.tbx', static::getTestCustomerId())
             ->setProperty('name', 'MATESTresource3'); // TODO FIXME: we better generate data independent from resource-names ...
         $config->addPretranslation();
         $config->addTask($sourceLangRfc, $targetLangRfc, static::getTestCustomerId())

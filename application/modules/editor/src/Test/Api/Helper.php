@@ -129,8 +129,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         if (isset($this->task->projectTasks)) {
             $this->projectTasks = is_array($this->task->projectTasks) ? $this->task->projectTasks : [$this->task->projectTasks];
         }
-        $this->task->originalSourceLang = $task['sourceLang'];
-        $this->task->originalTargetLang = $task['targetLang'];
+        $this->task->_originalSourceLang = $task['sourceLang'];
+        $this->task->_originalTargetLang = $task['targetLang'];
         $this->assertResponseStatus($this->getLastResponse(), 'Import');
 
         if (!$waitForImport) {
@@ -549,14 +549,13 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     public function addUser(string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
     {
-        return $this->addUserToTask($this->task->taskGuid, $this->task->entityVersion, $username, $state, $step, $params);
+        return $this->addUserToTask($this->task->taskGuid, $username, $state, $step, $params);
     }
 
     /**
      * adds the given user to the given task
      * UGLY: these are lots of params, better working with config-objects
      * @param string $taskGuid
-     * @param int $entityVersion
      * @param string $username
      * @param string $state
      * @param string $step
@@ -565,12 +564,11 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @return array|\stdClass
      * @throws \Zend_Http_Client_Exception
      */
-    public function addUserToTask(string $taskGuid, int $entityVersion, string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
+    public function addUserToTask(string $taskGuid, string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
     {
         $this->test::assertFalse(empty($this->testusers[$username]), 'Given testuser "' . $username . '" does not exist!');
         $p = array(
             "id" => 0,
-            "entityVersion" => $entityVersion,
             "taskGuid" => $taskGuid,
             "userGuid" => $this->testusers[$username],
             "state" => $state,
@@ -747,8 +745,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     {
         $params = [
             'resourceId' => 'editor_Services_DummyFileTm',
-            'sourceLang' => $sourceLang ?? $this->task->originalSourceLang,
-            'targetLang' => $targetLang ?? $this->task->originalTargetLang,
+            'sourceLang' => $sourceLang ?? $this->task->_originalSourceLang,
+            'targetLang' => $targetLang ?? $this->task->_originalTargetLang,
             'customerIds' => [$customerId],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],

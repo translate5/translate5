@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /***
  * 1. Create project with 4 project tasks.
  * 2. Create term collection which will be assigned as default for all of the tasks.
@@ -46,38 +48,16 @@ class ProjectTaskTest extends editor_Test_JsonTest {
 
     protected static bool $setupOwnCustomer = true;
 
-    public static function beforeTests(): void {
-        // add term collection
-        $params = [
-            'name' => 'API Testing::TermCollection_'.__CLASS__,
-            'resourceId' => 'editor_Services_TermCollection',
-            'serviceType' => 'editor_Services_TermCollection',
-            'customerIds' => [ static::$ownCustomer->id ],
-            'customerUseAsDefaultIds' => [ static::$ownCustomer->id ],
-            'customerWriteAsDefaultIds' => [],
-            'serviceName' => 'TermCollection',
-            'mergeTerms' => false
-        ];
-        static::api()->addResource($params, 'collection.tbx', true);
-
-        // create project
-        $task = [
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$ownCustomer->id,
-            'autoStartImport' => 0,
-            'edit100PercentMatch' => 0
-        ];
-        self::assertLogin('testmanager');
-
-        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
-        static::api()->addImportFile($zipfile);
-
-        static::api()->import($task,false,false);
-        error_log('Task created. '.static::api()->getTask()->taskName);
-        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
-        static::api()->checkProjectTasksStateLoop();
+    protected static function setupImport(Config $config): void
+    {
+        $ownCustomerId = static::$ownCustomer->id;
+        $config
+            ->addLanguageResource('termcollection', 'collection.tbx', $ownCustomerId)
+            ->addDefaultCustomerId($ownCustomerId, false);
+        $config->addTask(static::$sourceLangRfc, static::$targetLangRfc, $ownCustomerId)
+            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->setProperty('edit100PercentMatch', 0)
+            ->setProperty('taskName', static::NAME_PREFIX.static::class); // TODO FIXME: we better generate data independent from resource-names ...
     }
 
     /***
@@ -138,13 +118,5 @@ class ProjectTaskTest extends editor_Test_JsonTest {
 
         // close the task for editing
         static::api()->setTaskToOpen($task->id);
-    }
-
-    public static function afterTests(): void {
-        
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
-        //remove the created resources
-        static::api()->removeResources();
     }
 }

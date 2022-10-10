@@ -86,7 +86,8 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
      */
     protected static function testSpecificTeardown()
     {
-        parent::testSpecificTeardown();
+        // always reversed order in teardown !
         static::$_config->teardown();
+        parent::testSpecificTeardown();
     }
 }
