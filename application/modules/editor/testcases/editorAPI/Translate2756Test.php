@@ -65,7 +65,7 @@ class Translate2756Test extends editor_Test_JsonTest {
         $task = static::api()->getTask();
 
         //create dummy TM
-        static::api()->addDummyTm(static::getTestCustomerId(), 'DummyTmxData.tmx');
+        static::api()->addDummyTm(static::getTestCustomerId(), 'DummyTmxData.tmx', 'de', 'en');
         sleep(2);
 
         //link task and TM

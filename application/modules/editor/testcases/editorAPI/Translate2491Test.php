@@ -91,16 +91,9 @@ class Translate2491Test extends editor_Test_JsonTest {
             'except' => array_reverse(array_column($termsearch->data, 'id'))[0],
         ]);
 
-        // Wait for import
-        static::api()->setTask($task = $transfer->step1->rows->projectTasks[0]);
-        $task->_originalSourceLang = $taskCfg['sourceLang'];
-        $task->_originalTargetLang = $taskCfg['targetLang'];
-
-        if($task->taskType == Helper::INITIAL_TASKTYPE_PROJECT) {
-            static::api()->checkProjectTasksStateLoop();
-        } else {
-            static::api()->checkTaskStateLoop();
-        }
+        // Mimic a task-import
+        $task = $transfer->step1->rows->projectTasks[0];
+        static::api()->waitForTaskImport($task);
 
         // Open task for whole testcase
         static::api()->setTaskToEdit($task->id);

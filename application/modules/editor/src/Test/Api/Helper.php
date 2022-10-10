@@ -129,8 +129,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         if (isset($this->task->projectTasks)) {
             $this->projectTasks = is_array($this->task->projectTasks) ? $this->task->projectTasks : [$this->task->projectTasks];
         }
-        $this->task->_originalSourceLang = $task['sourceLang'];
-        $this->task->_originalTargetLang = $task['targetLang'];
         $this->assertResponseStatus($this->getLastResponse(), 'Import');
 
         if (!$waitForImport) {
@@ -141,33 +139,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         }
         return $this->checkTaskStateLoop($failOnError);
     }
-
-    /**
-     * Imports a task and returns the requested data on success
-     * @param array $task
-     * @param bool $failOnError
-     * @param bool $waitForImport
-     * @return array|\stdClass
-     * @throws Exception
-     * @throws \Zend_Http_Client_Exception
-     */
-    public function importTask(array $task, bool $failOnError = true, bool $waitForImport = true)
-    {
-        $this->initTaskPostData($task);
-        $this->test::assertLogin('testmanager'); // make sure testmanager is logged in
-        $this->task = $this->postJson('editor/task', $task);
-        $this->assertResponseStatus($this->getLastResponse(), 'Import');
-        if (!$waitForImport) {
-            return $this->task;
-        }
-        if ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
-            $this->checkProjectTasksStateLoop($failOnError);
-        } else {
-            $this->checkTaskStateLoop($failOnError);
-        }
-        return $this->task;
-    }
-
 
     /**
      * Adds a single file for upload
@@ -197,25 +168,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     public function addImportTbx(string $path, string $mime = 'application/xml')
     {
         $this->addFile('importTbx', $path, $mime);
-    }
-
-    /***
-     * Add task specific config. The config must be added after the task is created and before the import is triggered.
-     * @param string $taskGuid
-     * @param string $configName
-     * @param string $configValue
-     * @return mixed|boolean
-     */
-    public function addTaskImportConfig(string $taskGuid, string $configName, string $configValue)
-    {
-        $this->putJson('editor/config', [
-            'name' => $configName,
-            'value' => $configValue,
-            'taskGuid' => $taskGuid
-        ]);
-        $resp = $this->getLastResponse();
-        $this->assertResponseStatus($resp, 'Config');
-        return $this->decodeJsonResponse($resp);
     }
 
     /**
@@ -343,10 +295,71 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             sleep(10);
         }
     }
+
     //endregion
     //region Task API
     /******************************************************* TASK API *******************************************************/
 
+
+    /**
+     * Imports a task and returns the requested data on success
+     * @param array $task
+     * @param bool $failOnError
+     * @param bool $waitForImport
+     * @return array|\stdClass
+     * @throws Exception
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function importTask(array $task, bool $failOnError = true, bool $waitForImport = true)
+    {
+        $this->initTaskPostData($task);
+        $this->test::assertLogin('testmanager'); // make sure testmanager is logged in
+        $this->task = $this->postJson('editor/task', $task);
+        $this->assertResponseStatus($this->getLastResponse(), 'Import');
+        if (!$waitForImport) {
+            return $this->task;
+        }
+        if ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
+            $this->checkProjectTasksStateLoop($failOnError);
+        } else {
+            $this->checkTaskStateLoop($failOnError);
+        }
+        return $this->task;
+    }
+
+    /**
+     * Can be used to wait for an task import, that was initiated without autoStartImport
+     * @param stdClass $task
+     * @throws Exception
+     */
+    public function waitForTaskImport(stdClass $task)
+    {
+        $this->task = $task;
+        if($task->taskType == self::INITIAL_TASKTYPE_PROJECT){
+            $this->checkProjectTasksStateLoop();
+        } else {
+            $this->checkTaskStateLoop();
+        }
+    }
+
+    /***
+     * Add task specific config. The config must be added after the task is created and before the import is triggered.
+     * @param string $taskGuid
+     * @param string $configName
+     * @param string $configValue
+     * @return mixed|boolean
+     */
+    public function addTaskImportConfig(string $taskGuid, string $configName, string $configValue)
+    {
+        $this->putJson('editor/config', [
+            'name' => $configName,
+            'value' => $configValue,
+            'taskGuid' => $taskGuid
+        ]);
+        $resp = $this->getLastResponse();
+        $this->assertResponseStatus($resp, 'Config');
+        return $this->decodeJsonResponse($resp);
+    }
 
     /**
      * returns the current active task to test
@@ -742,18 +755,18 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * Add the translation memory resource (type DummyTM)
      * @param int $customerId
      * @param string $fileName
+     * @param string $sourceLang
+     * @param string $targetLang
      * @param string|null $name
-     * @param string|null $sourceLang
-     * @param string|null $targetLang
-     * @throws Exception
+     * @throws \Zend_Http_Client_Exception
      */
-    public function addDummyTm(int $customerId, string $fileName, ?string $name = null, ?string $sourceLang = null, ?string $targetLang = null)
+    public function addDummyTm(int $customerId, string $fileName, string $sourceLang, string $targetLang, ?string $name = null)
     {
         $params = [
             'resourceId' => 'editor_Services_DummyFileTm',
-            'sourceLang' => $sourceLang ?? $this->task->_originalSourceLang,
-            'targetLang' => $targetLang ?? $this->task->_originalTargetLang,
-            'customerIds' => [$customerId],
+            'sourceLang' => $sourceLang,
+            'targetLang' => $targetLang,
+            'customerIds' => [ $customerId ],
             'customerUseAsDefaultIds' => [],
             'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_DummyFileTm',

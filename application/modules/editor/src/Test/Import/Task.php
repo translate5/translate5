@@ -53,11 +53,6 @@ final class Task extends Resource
     private ?array $_uploadFiles = null;
     private ?array $_uploadData = null;
     private ?string $_cleanupZip = null;
-    private string $_originalSourceLang;
-    /**
-     * @var string|array
-     */
-    private $_originalTargetLang;
     private bool $_setToEditAfterImport = false;
 
     /**
@@ -267,8 +262,6 @@ final class Task extends Resource
      */
     private function doImport(Helper $api, bool $failOnError, bool $waitTorImport): bool
     {
-        $this->_originalSourceLang = $this->sourceLang;
-        $this->_originalTargetLang = $this->targetLang;
         $this->autoStartImport = $waitTorImport ? 1 : 0;
         $result = $api->importTask($this->getRequestParams(), $failOnError, $waitTorImport);
         if ($this->validateResult($result, $api)) {
