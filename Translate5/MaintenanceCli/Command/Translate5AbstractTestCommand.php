@@ -217,7 +217,6 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         // start PHPUnit with neccessary options
         $command = new \PHPUnit\TextUI\Command();
         $command->run($assembly);
-        $this->io->success('Last test result stored in ' . self::RELATIVE_TEST_ROOT . 'last-test-result.txt');
     }
 
     /**
