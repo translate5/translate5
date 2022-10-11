@@ -56,7 +56,8 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param boolean $keepComments
      */
     public function assertSegmentEqualsJsonFile(string $fileToCompare, stdClass $segment, string $message='', bool $keepComments=true){
-        $this->assertSegmentEqualsObject(static::api()->getFileContent($fileToCompare), $segment, $message, $keepComments);
+        $expectedSegment = static::api()->getFileContent($fileToCompare, $segment, true);
+        $this->assertSegmentEqualsObject($expectedSegment, $segment, $message, $keepComments);
     }
     /**
      * compares the given segment content with an expectation object
@@ -86,7 +87,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
                 $segments[$idx] = $model->getComparableData();
             }
             // on capturing we disable assert existence
-            static::api()->captureData($fileToCompare, $segments, encode: true);
+            static::api()->captureData($fileToCompare, $segments, true);
         }
         $expectations = static::api()->getFileContent($fileToCompare);
         $numSegments = count($segments);
@@ -110,7 +111,8 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param string $message
      */
     public function assertTmResultEqualsJsonFile(string $fileToCompare, array $tmResults, string $message){
-        $expectations = static::api()->getFileContent($fileToCompare);
+        $expectations = static::api()->getFileContent($fileToCompare, $tmResults, true);
+        // TODO FIXME: write a model for this !
         $tmUnset = function ($in){
             unset($in->languageResourceid);
             unset($in->metaData);
@@ -118,7 +120,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
         foreach ($tmResults as &$res){
             $tmUnset($res);
         }
-        $this->assertEquals($tmResults,$expectations ,$message);
+        $this->assertEquals($tmResults, $expectations, $message);
     }
     
     /* Comment model specific API */
@@ -131,7 +133,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param boolean $removeDates
      */
     public function assertCommentsEqualsJsonFile(string $fileToCompare, array $comments, string $message='', bool $removeDates=false){
-        $expectations = static::api()->getFileContent($fileToCompare);
+        $expectations = static::api()->getFileContent($fileToCompare, $comments, true);
         $numComments = count($comments);
         if($numComments != count($expectations)){
             $this->assertEquals($numComments, count($expectations), $message.' [Number of comments does not match the expectations]');
@@ -179,7 +181,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param editor_Test_Model_Filter|null $filter: If given, the expected & actual items will be filtered according to this filter
      */
     public function assertModelsEqualsJsonFile(string $modelName, string $fileToCompare, array $actualModels, string $message='', editor_Test_Model_Filter $filter=NULL){
-        $expectedModels = static::api()->getFileContent($fileToCompare);
+        $expectedModels = static::api()->getFileContent($fileToCompare, $actualModels, true);
         $this->assertModelsEqualsObjects($modelName, $expectedModels, $actualModels, $message, $filter);
     }
     /**
@@ -191,7 +193,8 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
      */
     public function assertModelEqualsJsonFile(string $modelName, string $fileToCompare, stdClass $actualModel, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
-        $this->assertModelEqualsObject($modelName, static::api()->getFileContent($fileToCompare), $actualModel, $message, $treeFilter);
+        $expectedModel = static::api()->getFileContent($fileToCompare, $actualModel, true);
+        $this->assertModelEqualsObject($modelName, $expectedModel, $actualModel, $message, $treeFilter);
     }
     
     /**
@@ -202,7 +205,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param string $message
      */
     public function assertModelEqualsJsonFileRow(string $modelName, string $fileToCompare, stdClass $actual, string $message=''){
-        $expected = static::api()->getFileContent($fileToCompare);
+        $expected = static::api()->getFileContent($fileToCompare, $actual, true);
         $this->assertModelEqualsObject($modelName, $expected->row, $actual->row);
     }
     /**
@@ -248,7 +251,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param string $message
      */
     public function assertObjectEqualsJsonFile(string $fileToCompare, stdClass $actualObject, string $message=''){
-        $expectedObject = static::api()->getFileContent($fileToCompare);
+        $expectedObject = static::api()->getFileContent($fileToCompare, $actualObject, true);
         $this->assertEquals($expectedObject, $actualObject, $message);
     }
 }
