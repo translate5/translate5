@@ -116,15 +116,12 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
 
             try {
 
-                error_log('CREATE T5 API CLIENT: COOKIE-zfExtended: '.$parameters['cookie'].' / URL: '.$parameters['url'].'languageresourceinstance/'.$m[1].'/import/');
-
                 $client = new ZfExtended_ApiClient($parameters['url'].'languageresourceinstance/'.$m[1].'/import/', null, $parameters['cookie']);
                 $client->setHeaders('Accept', 'application/json');
                 $client->setFileUpload($m[0], 'tmUpload', $raw, 'text/xml');
                 foreach($data as $name => $val){
                     $client->setParameterPost($name, $val);
                 }
-                // $parameters = array('data' => json_encode($parameters));
                 $response = $client->request('POST');
                 $result = json_decode($response->getBody());
                 if(property_exists($result, 'rows')){
