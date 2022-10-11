@@ -25,7 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE `translate5`.`Zf_configuration` SET 
+UPDATE `Zf_configuration` SET
 `name` = 'runtimeOptions.terminology.usedTermProcessStatus', 
 `category` = 'system', 
 `description` = 'Only terms with this process status are used for purposes in translate5\'s editor and InstantTranslate', 
