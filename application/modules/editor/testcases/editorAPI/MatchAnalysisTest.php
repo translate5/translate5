@@ -46,19 +46,20 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
     {
         $sourceLangRfc = 'de';
         $targetLangRfc = 'en';
+        $customerId = static::getTestCustomerId();
         $config
-            ->addLanguageResource('opentm2', 'resource1.tmx', static::getTestCustomerId(), $sourceLangRfc, $targetLangRfc)
+            ->addLanguageResource('opentm2', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
             ->setProperty('name', 'MATESTresource1'); // TODO FIXME: we better generate data independent from resource-names ...
         $config
-            ->addLanguageResource('opentm2', 'resource2.tmx', static::getTestCustomerId(), $sourceLangRfc, $targetLangRfc)
+            ->addLanguageResource('opentm2', 'resource2.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
             ->setProperty('name', 'MATESTresource2'); // TODO FIXME: we better generate data independent from resource-names ...
         $config
-            ->addLanguageResource('termcollection', 'collection.tbx', static::getTestCustomerId())
+            ->addLanguageResource('termcollection', 'collection.tbx', $customerId)
             ->setProperty('name', 'MATESTresource3'); // TODO FIXME: we better generate data independent from resource-names ...
         $config
             ->addPretranslation();
         $config
-            ->addTask($sourceLangRfc, $targetLangRfc, static::getTestCustomerId())
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
             ->addUploadFolder('testfiles', 'XLF-test.zip')
             ->setProperty('wordCount', 1270)
             ->setProperty('taskName', 'API Testing::MatchAnalysisTest'); // TODO FIXME: we better generate data independent from resource-names ...

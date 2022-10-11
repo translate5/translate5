@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for TRANSLATE-2756 - basically a match analysis and pretranslation test regarding repetitions and internal fuzzies
  * For details see the issue.
@@ -41,59 +43,25 @@ class Translate2756Test extends editor_Test_JsonTest {
         'editor_Plugins_ZDemoMT_Init'
     ];
 
-    /**
-     * @throws Zend_Exception
-     */
-    public static function beforeTests(): void {
+    protected static string $setupUserLogin = 'testlector';
 
-        /// → Testfall für aktuellen Issue (target update) erstellen!
-        /// Wiederholungen und match rate mit rein packen?
-
-        $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
-
-        //create task
-        static::api()->addImportFile($zipfile);
-        static::api()->import([
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'edit100PercentMatch' => true,
-            'customerId' => static::getTestCustomerId(),
-            'autoStartImport' => 0, //don't start the import directly
-            'lockLocked' => 1,
-        ], true, false);
-
-        $task = static::api()->getTask();
-
-        //create dummy TM
-        static::api()->addDummyTm(static::getTestCustomerId(), 'DummyTmxData.tmx', 'de', 'en');
-        sleep(2);
-
-        //link task and TM
-        static::api()->addTaskAssoc();
-
-        //prepare analysis
-        $params = [
-            'internalFuzzy' => 1,
-            'pretranslateMatchrate' => 100,
-            'pretranslateTmAndTerm' => 1,
-            'pretranslateMt' => 1,
-            'isTaskImport' => 0,
-        ];
-        static::api()->putJson('editor/task/'.static::api()->getTask()->id.'/pretranslation/operation', $params, null, false);
-
-        //start import and wait for it
-        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
-        static::api()->checkTaskStateLoop();
-        
-        static::api()->addUser('testlector');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $sourceLangRfc = 'de';
+        $targetLangRfc = 'en';
+        $customerId = static::getTestCustomerId();
+        $config
+            ->addLanguageResource('dummytm', 'DummyTmxData.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
+            ->setProperty('name', 'Translate2756Test');  // TODO FIXME: we better generate data independent from resource-names ...
+        $config
+            ->addPretranslation()
+            ->setProperty('pretranslateMt', 1);
+        $config
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
+            ->addUploadFolder('testfiles', 'testTask.zip')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      */
@@ -140,11 +108,5 @@ class Translate2756Test extends editor_Test_JsonTest {
             'notGrouped' => 1
         ], $jsonFileName);
         $this->assertModelsEqualsJsonFile('Analysis', $jsonFileName, $analysis, 'Analysis is not as expected!');
-    }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
-        static::api()->removeResources();
     }
 }

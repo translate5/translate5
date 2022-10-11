@@ -229,7 +229,9 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             }
             if ($taskResult->state == 'error') {
                 if ($failOnError) {
-                    $this->test::fail('Task Import stopped. Task has state error and last errors: ' . "\n  " . join("\n  ", array_column($taskResult->lastErrors ?? [], 'message')));
+                    $lastErrors = (property_exists($taskResult, 'lastErrors') && !empty($taskResult->lastErrors)) ? $taskResult->lastErrors : [];
+                    $addon = (count($lastErrors) > 0) ? ' and last errors:' . "\n ".join("\n ", array_column($lastErrors, 'message')) : '.';
+                    $this->test::fail('Task Import stopped. Task has state error'.$addon);
                 }
                 return false;
             }
@@ -753,49 +755,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             $counter++;
         }
 
-        $this->test::assertEquals('available', $result->status, 'Resource import stoped. Resource state is:' . $result->status);
+        $this->test::assertEquals('available', $result->status, 'Resource import of '.$resource->name.' stopped. Resource state is:' . $result->status);
         return $result;
-    }
-
-    /**
-     * Add the translation memory resource (type DummyTM)
-     * @param int $customerId
-     * @param string $fileName
-     * @param string $sourceLang
-     * @param string $targetLang
-     * @param string|null $name
-     * @throws \Zend_Http_Client_Exception
-     */
-    public function addDummyTm(int $customerId, string $fileName, string $sourceLang, string $targetLang, ?string $name = null)
-    {
-        $params = [
-            'resourceId' => 'editor_Services_DummyFileTm',
-            'sourceLang' => $sourceLang,
-            'targetLang' => $targetLang,
-            'customerIds' => [ $customerId ],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Services_DummyFileTm',
-            'serviceName' => 'DummyFile TM',
-            'name' => $name ?? $this->testClass,
-        ];
-        //create the resource 1 and import the file
-        $this->addResource($params, $fileName, true);
-    }
-
-    /**
-     * @param array $params
-     * @param string|null $filename
-     * @throws \Zend_Http_Client_Exception
-     */
-    public function addTermCollection(array $params, string $filename = null)
-    {
-        //create the language resource
-        $collection = $this->addResource($params, $filename);
-        //validate the results
-        $response = $this->postJson('editor/termcollection/export', ['collectionId' => $collection->id]);
-        $this->assertTrue(is_object($response), "Unable to export the terms by term collection");
-        $this->assertNotEmpty($response->filedata, "The exported tbx file by collection is empty");
     }
 
     /***
