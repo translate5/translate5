@@ -471,25 +471,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         return $this->createResponseResult(null, 'No Task to set state for');
     }
 
-    /***
-     * Associate all $resources to the current task
-     */
-    public function addTaskAssoc()
-    {
-        $taskGuid = $this->getTask()->taskGuid;
-        $this->test::assertNotEmpty($taskGuid, 'Unable to associate resources to task. taskGuid empty');
-
-        foreach ($this->getResources() as $resource) {
-            // associate languageresource to task
-            $this->postJson('editor/languageresourcetaskassoc', [
-                'languageResourceId' => $resource->id,
-                'taskGuid' => $taskGuid,
-                'segmentsUpdateable' => 0
-            ]);
-            error_log('Languageresources assoc to task. ' . $resource->name . ' -> ' . $taskGuid);
-        }
-    }
-
     /**
      * @param int $resourceId
      * @param string $taskGuid
@@ -757,29 +738,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
         $this->test::assertEquals('available', $result->status, 'Resource import of '.$resource->name.' stopped. Resource state is:' . $result->status);
         return $result;
-    }
-
-    /***
-     * Get the created language resources
-     * @return array
-     */
-    public function getResources()
-    {
-        return self::$resources;
-    }
-
-    /**
-     * Remove all resources from the database
-     */
-    public function removeResources()
-    {
-        foreach ($this->getResources() as $resource) {
-            $route = 'editor/languageresourceinstance/' . $resource->id;
-            if ($resource->serviceName == 'TermCollection') {
-                $route = 'editor/termcollection/' . $resource->id;
-            }
-            $this->delete($route);
-        }
     }
 
     //endregion

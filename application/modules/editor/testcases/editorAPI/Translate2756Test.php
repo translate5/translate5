@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Import\LanguageResource;
 
 /**
  * Testcase for TRANSLATE-2756 - basically a match analysis and pretranslation test regarding repetitions and internal fuzzies
@@ -45,12 +46,14 @@ class Translate2756Test extends editor_Test_JsonTest {
 
     protected static string $setupUserLogin = 'testlector';
 
+    private static LanguageResource $dummyTm;
+
     protected static function setupImport(Config $config): void
     {
         $sourceLangRfc = 'de';
         $targetLangRfc = 'en';
         $customerId = static::getTestCustomerId();
-        $config
+        static::$dummyTm = $config
             ->addLanguageResource('dummytm', 'DummyTmxData.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
             ->setProperty('name', 'Translate2756Test');  // TODO FIXME: we better generate data independent from resource-names ...
         $config
@@ -80,7 +83,7 @@ class Translate2756Test extends editor_Test_JsonTest {
         
         //prepare segment with changed TM data from GUI
         $segToTest = $segments[2];
-        $tmId = static::api()->getResources()[0]->id ?? 0;
+        $tmId = static::$dummyTm->getId() ?? 0;
         $additionalPutData = [
             'target' => '=&gt; contact Translate5 service',
             'matchRate' => 91,
