@@ -410,7 +410,7 @@ Ext.define('Editor.controller.TmOverview', {
                     me.handleDeleteTm(view,cell,col,newRecord);
                     break;
                 case 'export':
-                    me.showTermCollectionActionMenu(newRecord,ev);
+                    me.showExportActionMenu(newRecord,ev);
                     break;
                 case 'log':
                     me.handleLogTm(view,cell,col,newRecord);
@@ -605,9 +605,13 @@ Ext.define('Editor.controller.TmOverview', {
      * @param newRecord
      * @param event
      */
-    showTermCollectionActionMenu: function (newRecord,event) {
+    showExportActionMenu: function (newRecord,event) {
         var me = this,
             menu = me.exportTcMenuCache.termCollectionExportActionMenu;
+
+        if(me.fireEvent('beforeShowExportActionMenu',newRecord) === false){
+            return;
+        }
 
         if (!menu) {
             //create fresh menu instance
