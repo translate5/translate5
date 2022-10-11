@@ -38,8 +38,17 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
 {
     use LockableTrait;
 
-    // the name of the command (the part after "bin/console")
+    /**
+     * the name of the command (the part after "bin/console")
+     * @var string
+     */
     protected static $defaultName = 'test:apprun';
+
+    /**
+     * A master
+     * @var bool
+     */
+    protected static bool $canMimicMasterTest = false;
     
     protected function configure()
     {

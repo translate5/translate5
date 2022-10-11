@@ -39,6 +39,12 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     const RELATIVE_TEST_DIR = self::RELATIVE_TEST_ROOT . 'editorAPI/';
 
     /**
+     * @var bool
+     * Enables the -m option to let the current tests to be run a s master-tests
+     */
+    protected static bool $canMimicMasterTest = true;
+
+    /**
      * General Options of all test-commands
      */
     protected function configure()
@@ -66,6 +72,14 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             'f',
             InputOption::VALUE_NONE,
             'Leads to the testsuite stopping on the first failure (not error!).');
+
+        if(static::$canMimicMasterTest){
+            $this->addOption(
+                'master-test',
+                'm',
+                InputOption::VALUE_NONE,
+                'Leads to the testsuite running in master mode. Be aware that this might create costs for using paid external APIs.');
+        }
     }
 
     /**
@@ -150,6 +164,10 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
         if ($this->input->getOption('keep-data')) {
             putenv('KEEP_DATA=1');
+        }
+
+        if (static::$canMimicMasterTest && $this->input->getOption('master-test')) {
+            putenv('MASTER_TEST=1');
         }
 
         // command options usable for all tests
