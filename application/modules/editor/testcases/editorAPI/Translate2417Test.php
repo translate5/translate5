@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
-use MittagQI\Translate5\Test\Import\Task;
 use MittagQI\Translate5\Test\Import\LanguageResource;
 
 /***
@@ -42,8 +41,6 @@ class Translate2417Test extends editor_Test_JsonTest {
 
     private static LanguageResource $translationMemory;
 
-    private static Task $task;
-
     protected static function setupImport(Config $config): void
     {
         $sourceLangRfc = 'de';
@@ -51,12 +48,10 @@ class Translate2417Test extends editor_Test_JsonTest {
         $customerId = static::getTestCustomerId();
         static::$translationMemory = $config
             ->addLanguageResource('opentm2', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
-            ->addDefaultCustomerId($customerId, true)
-            ->setProperty('name', 'T2417resource1'); // TODO FIXME: we better generate data independent from resource-names ...
-        static::$task = $config
+            ->addDefaultCustomerId($customerId, true);
+        $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
-            ->addUploadFolder('testfiles', 'test.zip')
-            ->setProperty('taskName', 'API Testing::Translate2417Test'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->addUploadFolder('testfiles', 'test.zip');
     }
 
     /**
@@ -66,7 +61,7 @@ class Translate2417Test extends editor_Test_JsonTest {
 
         $tmId = static::$translationMemory->getId();
         static::api()->addUser('testmanager');
-        static::api()->setTaskToEdit(static::$task->getId());
+        static::api()->setTaskToEdit(static::getTask()->getId());
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');

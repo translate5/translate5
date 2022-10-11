@@ -103,6 +103,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
 
     /**
+     * @deprecated
      * Imports the task described in array $task, parameters are the API parameters, at least:
      * @Deprecated
      *
@@ -184,6 +185,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     }
 
     /**
+     * TODO FIXME: implement in the concrete test
      * Receives a two dimensional array and add it as a CSV file to the task
      * MID col and CSV head line is added automatically
      *
@@ -207,6 +209,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     }
 
     /**
+     * DO NOT USE IN CONCRETE API TESTS
      * Check the task state. The test will fail when $failOnError = true and if the task is in state error or after RELOAD_TASK_LIMIT task state checks
      * @param bool $failOnError
      * @return boolean
@@ -243,7 +246,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         }
     }
 
-    /***
+    /**
+     * DO NOT USE IN CONCRETE API TESTS
      * Check the state of all project tasks. The test will fail when $failOnError = true and if one of the project task is in state error or after RELOAD_TASK_LIMIT task state checks
      * @param bool $failOnError
      * @return bool
@@ -332,7 +336,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @param stdClass $task
      * @throws Exception
      */
-    public function waitForTaskImport(stdClass $task)
+    public function waitForTaskImported(stdClass $task)
     {
         $this->task = $task;
         if($task->taskType == self::INITIAL_TASKTYPE_PROJECT){
@@ -380,12 +384,14 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     }
 
     /**
-     * reloads the internal stored task
-     * @return \stdClass
+     * reloads the given or internally stored task
+     * @param int|null $taskId
+     * @return array|\stdClass
+     * @throws \Zend_Http_Client_Exception
      */
-    public function reloadTask(int $id = null)
+    public function reloadTask(int $taskId = null)
     {
-        return $this->task = $this->getJson('editor/task/' . ($id ?? $this->task->id));
+        return $this->task = $this->getJson('editor/task/' . ($taskId ?? $this->task->id));
     }
 
     /***
@@ -558,6 +564,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     /******************************************************* USER API *******************************************************/
 
     /**
+     * @deprecated
      * adds the given user to the actual task
      * @param string $username one of the predefined users (testmanager, testlector, testtranslator)
      * @param string $state open, waiting, finished, as available by the workflow

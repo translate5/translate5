@@ -53,7 +53,6 @@ abstract class LanguageResource extends Resource
     protected string $serviceType;
     protected string $serviceName;
     protected ?string $_uploadFile = null;
-    protected string $_uploadDir = '';
     protected string $_deleteRoute = 'editor/languageresourceinstance/';
     protected bool $_associateToTasks = true;
 
@@ -96,13 +95,11 @@ abstract class LanguageResource extends Resource
     /**
      * Adds the upload for the language resource
      * @param string $resourceFileName
-     * @param string $folderInTestDir
      * @return $this
      */
-    public function addUploadFile(string $resourceFileName, string $folderInTestDir = ''): LanguageResource
+    public function addUploadFile(string $resourceFileName): LanguageResource
     {
         $this->_uploadFile = $resourceFileName;
-        $this->_uploadDir = $folderInTestDir;
         return $this;
     }
 
@@ -146,7 +143,10 @@ abstract class LanguageResource extends Resource
      */
     public function import(Helper $api, Config $config): void
     {
-        $result = $api->addResource($this->getRequestParams(), $this->_uploadFile, true, $this->_uploadDir);
+        if($this->_requested){
+            throw new Exception('You cannot import a '.get_class($this).' twice.');
+        }
+        $result = $api->addResource($this->getRequestParams(), $this->_uploadFile, true);
         $this->validateResult($result, $api);
     }
 

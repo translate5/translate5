@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /***
  * This is a test for the pivot pre-translation feature.
  *
@@ -38,9 +40,6 @@ END LICENSE AND COPYRIGHT
  */
 class Translate2855Test extends editor_Test_JsonTest {
 
-     protected static $sourceLangRfc = 'en';
-    protected static $targetLangRfc = 'de';
-
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',
         'editor_Plugins_MatchAnalysis_Init',
@@ -49,46 +48,21 @@ class Translate2855Test extends editor_Test_JsonTest {
 
     protected static bool $setupOwnCustomer = true;
 
-    /**
-     * This method is called before the first test of this test class is run.
-     * @throws Exception
-     */
-    public static function beforeTests(): void {
-
-        // add needed Demo MT
-        $params = [
-            'resourceId' => 'ZDemoMT',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$ownCustomer->id],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'customerPivotAsDefaultIds' => [static::$ownCustomer->id],
-            'serviceType' => 'editor_Plugins_ZDemoMT',
-            'serviceName'=> 'ZDemoMT',
-            'name' => 'API Testing::Pivot pre-translation_'.__CLASS__
-        ];
-        static::api()->addResource($params);
-
-        // create task without starting the import
-        $task = [
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'relaisLang' => self::$targetLangRfc,
-            'customerId' => static::$ownCustomer->id,
-            'edit100PercentMatch' => true,
-            'autoStartImport' => 0
-        ];
-        static::api()->addImportFile(static::api()->getFile('Task-de-en.html'));
-        static::api()->import($task,false,false);
-
-        // queue the pretranslation
-        static::api()->putJson('editor/languageresourcetaskpivotassoc/pretranslation/batch', [ 'taskGuid' => static::api()->getTask()->taskGuid ], null, false);
-
-        // start the import & wait for finish
-        static::api()->getJson('editor/task/'.static::api()->getTask()->id.'/import');
-        static::api()->checkTaskStateLoop();
+    protected static function setupImport(Config $config): void
+    {
+        $sourceLangRfc = 'en';
+        $targetLangRfc = 'de';
+        $customerId = static::$ownCustomer->id;
+        $config
+            ->addLanguageResource('zdemomt', null, $customerId, $sourceLangRfc, $targetLangRfc)
+            ->addProperty('customerPivotAsDefaultIds', [ $customerId ]);
+        $config
+            ->addPivotBatchPretranslation();
+        $config
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
+            ->addUploadFile('Task-de-en.html')
+            ->addProperty('relaisLang', $targetLangRfc)
+            ->setToEditAfterImport();
     }
 
     /**
@@ -96,24 +70,10 @@ class Translate2855Test extends editor_Test_JsonTest {
      * @return void
      */
     public function testSegmentContent(){
-        //open task for whole testcase
-        static::api()->setTaskToEdit();
         $segments = static::api()->getSegments();
-
         self::assertEquals(3, count($segments), 'The number of segments does not match.');
-
         foreach ($segments as $segment){
             self::assertNotEmpty($segment->relais);
         }
-    }
-
-    /**
-     * This method is called after the last test of this test class is run.
-     */
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        // remove task & resources
-        static::api()->deleteTask($task->id, 'testmanager');
-        static::api()->removeResources();
     }
 }

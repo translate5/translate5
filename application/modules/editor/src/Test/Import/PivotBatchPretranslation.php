@@ -28,19 +28,20 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Import;
 
+use MittagQI\Translate5\Test\Api\Helper;
+
 /**
- * Represents the api-request configuration for a DeepL-resource
+ * Represents the api-request configuration for a pivot batch-pretranslation operation
  */
-final class DummyTm extends LanguageResource
+final class PivotBatchPretranslation extends Operation
 {
-    /**
-     * @var string|array
-     */
-    public $sourceLang = 'en';
-    /**
-     * @var string|array
-     */
-    public $targetLang = 'de';
-    protected string $serviceName = 'DummyFile TM';
-    protected string $serviceType = 'editor_Services_DummyFileTm';
+    public function request(Helper $api): void
+    {
+        $api->putJson(
+            'editor/languageresourcetaskpivotassoc/pretranslation/batch',
+            [ 'taskGuid' => $this->_taskGuid ],
+            null,
+            false
+        );
+    }
 }

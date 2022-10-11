@@ -33,45 +33,21 @@ use MittagQI\Translate5\Test\Api\Helper;
 /**
  * Represents the api-request configuration for a pretranslation operation
  */
-final class Pretranslation extends Resource
+final class Pretranslation extends Operation
 {
     public int $internalFuzzy = 1;
     public int $pretranslateMatchrate = 100;
     public int $pretranslateTmAndTerm = 1;
     public int $pretranslateMt = 0;
     public int $isTaskImport = 0;
-    private int $_taskId;
 
-    /**
-     * @param int $taskId
-     * @return $this
-     */
-    public function setTaskId(int $taskId){
-        $this->_taskId = $taskId;
-        return $this;
-    }
-    /**
-     * Queues the analysis
-     * @param Helper $api
-     * @param int $taskId
-     * @throws \Zend_Http_Client_Exception
-     */
-    public function import(Helper $api, Config $config): void
+    public function request(Helper $api): void
     {
-        if(empty($this->_taskId)){
-            throw new Exception('Pretranslation has no taskId assigned');
-        }
         $api->putJson(
             'editor/task/' . $this->_taskId . '/pretranslation/operation',
             $this->getRequestParams(),
             null,
             false
         );
-        $this->_requested = true;
-    }
-
-    public function cleanup(Helper $api, Config $config): void
-    {
-        // only to fullfill abstract implementation, not needed here
     }
 }

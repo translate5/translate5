@@ -93,7 +93,7 @@ class Translate2491Test extends editor_Test_JsonTest {
 
         // Mimic a task-import
         $task = $transfer->step1->rows->projectTasks[0];
-        static::api()->waitForTaskImport($task);
+        static::api()->waitForTaskImported($task);
 
         // Open task for whole testcase
         static::api()->setTaskToEdit($task->id);

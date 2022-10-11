@@ -65,6 +65,9 @@ final class TermCollection extends Resource
      */
     public function import(Helper $api, Config $config): void
     {
+        if($this->_requested){
+            throw new Exception('You cannot import a TermCollection twice.');
+        }
         $api->login($this->_login);
         // [1] Create empty term collection
         $termCollection = $api->postJson('editor/termcollection', [

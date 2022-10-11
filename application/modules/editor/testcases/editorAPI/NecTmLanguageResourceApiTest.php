@@ -149,11 +149,4 @@ class NecTmLanguageResourceApiTest extends \editor_Test_ApiTest {
         $languageResource = static::api()->post('editor/languageresourceinstance', $params);
          // TODO...
     }
-
-    /**
-     *
-     */
-    public static function afterTests(): void {
-        static::api()->login('testmanager');
-    }
 }

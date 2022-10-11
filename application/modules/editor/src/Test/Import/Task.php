@@ -54,6 +54,7 @@ final class Task extends Resource
     private ?array $_uploadData = null;
     private ?string $_cleanupZip = null;
     private bool $_setToEditAfterImport = false;
+    private bool $_waitForImported = true;
 
     /**
      * @param string $testClass
@@ -133,6 +134,17 @@ final class Task extends Resource
     }
 
     /**
+     * Special API to not wait for a task to import
+     * Note that this is more of a Hack and prevents users to be assigned to the task automatically if setup or the login to the setup user-login
+     * @return $this
+     */
+    public function setNotToWaitForImported(): Task
+    {
+        $this->_waitForImported = false;
+        return $this;
+    }
+
+    /**
      * @return string
      * @throws Exception
      */
@@ -161,6 +173,9 @@ final class Task extends Resource
      */
     public function import(Helper $api, Config $config): void
     {
+        if($this->_requested){
+            throw new Exception('You cannot import a Task twice.');
+        }
         // tasks will be uploaded as testmanager
         $api->login('testmanager');
 
@@ -170,10 +185,14 @@ final class Task extends Resource
         // prepare our resources
         $this->upload($api);
 
-        if (!$config->hasLanguageResources() && !$config->hasPretranslation() && !$isMultiLanguage) {
+        if (!$config->hasLanguageResources() && !$config->hasTaskOperation() && !$isMultiLanguage) {
 
             // the simple case: task without resources & pretranslation
-            if (!$this->doImport($api, true, true)) {
+            if (!$this->doImport($api, true, $this->_waitForImported)) {
+                return;
+            }
+            // if we shall not wait, we have to skip user-assignments & task-state-setting
+            if(!$this->_waitForImported){
                 return;
             }
 
@@ -190,14 +209,17 @@ final class Task extends Resource
                     }
                 }
             }
-            // queue pretranslation
-            if ($config->hasPretranslation()) {
+            // queue pretranslation / PivotBatchPetranslation / Analysis
+            if ($config->hasTaskOperation()) {
                 $config
-                    ->getPretranslation()
-                    ->setTaskId($this->getId())
+                    ->getTaskOperation()
+                    ->setTask($this)
                     ->import($api, $config);
             }
-
+            // some tests want to hook in after the task-adding but before import starts
+            if(!$this->_waitForImported){
+                return;
+            }
             // start the import
             $api->getJson('editor/task/'.$this->getId().'/import');
 
@@ -211,6 +233,9 @@ final class Task extends Resource
                 $api->checkTaskStateLoop();
             }
         }
+        // after the wait-loop the task may has some changed props
+        // TODO: we should rework the API not to cache the task-data but to return them
+        $this->applyResult($api->getTask());
         // if testlector shall be loged in after setup, we add him to the task automatically
         if ($config->getLogin() === 'testlector') {
             $api->addUserToTask($this->getTaskGuid(), 'testlector');
@@ -220,6 +245,17 @@ final class Task extends Resource
         if ($this->_setToEditAfterImport) {
             $api->setTaskToEdit($this->getId());
         }
+    }
+
+    /**
+     * Reloads a task and fetches fresh props
+     * @param Helper $api
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function reload(Helper $api){
+        $result = $api->getJson('editor/task/' . $this->getId());
+        $this->applyResult($result);
     }
 
     /**

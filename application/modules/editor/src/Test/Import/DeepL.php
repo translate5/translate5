@@ -33,8 +33,19 @@ namespace MittagQI\Translate5\Test\Import;
  */
 final class DeepL extends LanguageResource
 {
-    public string $sourceLang = 'en';
-    public string $targetLang = 'de';
+    /**
+     * @var string|array
+     */
+    public $sourceLang = 'en';
+    /**
+     * @var string|array
+     */
+    public $targetLang = 'de';
     protected string $serviceName = 'DeepL';
     protected string $serviceType = 'editor_Plugins_DeepL';
+
+    protected function createResourceId(int $resourceIndex): string
+    {
+        return $this->serviceType . '_1';
+    }
 }

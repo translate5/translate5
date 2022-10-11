@@ -33,7 +33,6 @@ use MittagQI\Translate5\Test\Import\Config;
  * Then the export result from the logg will be compared against the expected result.
  */
 class Translate1484Test extends editor_Test_JsonTest {
-    /* @var $this Translate1484Test */
 
     protected static array $requiredPlugins = [
         'editor_Plugins_Okapi_Init',

@@ -66,9 +66,9 @@ final class Config
     private array $termCollections = [];
 
     /**
-     * @var Pretranslation|null
+     * @var Operation|null
      */
-    private ?Pretranslation $pretranslation = null;
+    private ?Operation $taskOperation = null;
 
     public function __construct(Helper $api, string $testClass, string $login)
     {
@@ -197,20 +197,34 @@ final class Config
     }
 
     /**
+     * Queues a Pretranslation for the task
+     * Note, that by default pretranslateTmAndTerm is active, the other options not
+     * Will overwrite any already queued Operation
      * @return Pretranslation
      */
     public function addPretranslation(): Pretranslation
     {
-        $this->pretranslation = new Pretranslation($this->testClass, 0);
-        return $this->pretranslation;
+        $this->taskOperation = new Pretranslation($this->testClass, 0);
+        return $this->taskOperation;
+    }
+
+    /**
+     * Queues a Pivot batch-Pretranslation for the task
+     * Will overwrite any already queued Operation
+     * @return PivotBatchPretranslation
+     */
+    public function addPivotBatchPretranslation(): PivotBatchPretranslation
+    {
+        $this->taskOperation = new PivotBatchPretranslation($this->testClass, 0);
+        return $this->taskOperation;
     }
 
     /**
      * @return Pretranslation
      */
-    public function getPretranslation(): Pretranslation
+    public function getTaskOperation(): Operation
     {
-        return $this->pretranslation;
+        return $this->taskOperation;
     }
 
     /**
@@ -232,9 +246,9 @@ final class Config
     /**
      * @return bool
      */
-    public function hasPretranslation(): bool
+    public function hasTaskOperation(): bool
     {
-        return ($this->pretranslation !== null);
+        return ($this->taskOperation !== null);
     }
 
     /**
@@ -318,7 +332,7 @@ final class Config
                 return new TermCollectionResource($this->testClass, $nextIndex);
 
             default:
-                throw new Exception('Unknown resource-type "' . $type . '"');
+                throw new Exception('Unknown language-resource type "' . $type . '"');
         }
     }
 }

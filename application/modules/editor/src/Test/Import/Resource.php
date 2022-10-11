@@ -102,6 +102,7 @@ abstract class Resource
      */
     public function applyResult(\stdClass $result)
     {
+        // error_log("APPLY RESULTS:\n".json_encode($result, JSON_PRETTY_PRINT));
         foreach (get_object_vars($result) as $name => $val) {
             if (!str_starts_with($name, '_')) {
                 $this->$name = $val;

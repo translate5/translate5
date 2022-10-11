@@ -26,16 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /***
  * Test the import progress feature. This will only test the progress report before the import is triggered
  * and the report progress after the import.
- *
  */
-class Translate2342Test extends \editor_Test_ApiTest {
-    /* @var $this Translate1484Test */
-    
-    protected static $sourceLangRfc = 'de';
-    protected static $targetLangRfc = 'en';
+class Translate2342Test extends editor_Test_ImportTest {
 
     protected static array $forbiddenPlugins = [
         'editor_Plugins_SegmentStatistics_Bootstrap',
@@ -49,51 +46,29 @@ class Translate2342Test extends \editor_Test_ApiTest {
 
     protected static bool $setupOwnCustomer = true;
 
+    protected static function setupImport(Config $config): void
+    {
+        $sourceLangRfc = 'de';
+        $targetLangRfc = 'en';
+        $customerId = static::$ownCustomer->id;
+        $config
+            ->addLanguageResource('zdemomt', null, $customerId, $sourceLangRfc, $targetLangRfc);
+        $config
+            ->addPretranslation()
+            ->setProperty('pretranslateMt', 1);
+        $config
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
+            ->addUploadFile('import-test-file.html')
+            ->setNotToWaitForImported(); // this triggers the task-import to immediately start
+    }
+
     public function testImportAndProgress() {
 
-        // create task
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId' => static::$ownCustomer->id,
-            'autoStartImport' => 0
-        ];
-        self::assertLogin('testmanager');
-        static::api()->addImportFile(static::api()->getFile('import-test-file.html'));
-        static::api()->import($task,false,false);
-
-        // Create dummy MT resource
-        $params =[
-            'resourceId' => 'ZDemoMT',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [static::$ownCustomer->id],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Plugins_ZDemoMT',
-            'serviceName'=> 'ZDemoMT',
-            'name' => 'API Testing::ZDemoMT_'.__CLASS__
-        ];
-        static::api()->addResource($params);
-
-        // Add task to languageresource assoc
-        static::api()->addTaskAssoc();
-
-        // Queue the match anlysis worker
-        $task = static::api()->getTask();
-        $params = [
-            'internalFuzzy' => 1,
-            'pretranslateMatchrate' => 100,
-            'pretranslateTmAndTerm' => 1,
-            'pretranslateMt' => 1,
-            'isTaskImport' => 0
-        ];
-        static::api()->putJson('editor/task/'.$task->id.'/pretranslation/operation', $params, null, false);
-
+        $taskId = static::getTask()->getId();
+        $taskGuid = static::getTask()->getTaskGuid();
         // now test the queued worker progress before and after the import.
         $result = static::api()->getJson('editor/task/importprogress',[
-            'taskGuid' => $task->taskGuid
+            'taskGuid' => $taskGuid
         ]);
         $result = $result->progress ?? null;
         $this->assertNotEmpty($result->progress ?? null,'No results found for the import progress.');
@@ -110,11 +85,11 @@ class Translate2342Test extends \editor_Test_ApiTest {
         self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
         
         // run the import workers and check wait for task import
-        static::api()->getJson('editor/task/'.$task->id.'/import');
+        static::api()->getJson('editor/task/'.$taskId.'/import');
         static::api()->checkTaskStateLoop();
         
         $result = static::api()->getJson('editor/task/importprogress',[
-            'taskGuid' => $task->taskGuid
+            'taskGuid' => $taskGuid
         ]);
         $result = $result->progress ?? null;
         $this->assertNotEmpty($result->progress ?? null,'No results found for the import progress.');
@@ -129,8 +104,5 @@ class Translate2342Test extends \editor_Test_ApiTest {
         $actual = json_encode($result, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
-
-        static::api()->deleteTask($task->id, 'testmanager');
-        static::api()->removeResources();
     }
 }

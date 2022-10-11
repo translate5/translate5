@@ -28,19 +28,52 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Import;
 
+use MittagQI\Translate5\Test\Api\Helper;
+
 /**
- * Represents the api-request configuration for a DeepL-resource
+ * Abstract base for task-operations
  */
-final class DummyTm extends LanguageResource
+abstract class Operation extends Resource
 {
+    protected int $_taskId;
+    protected string $_taskGuid;
+
     /**
-     * @var string|array
+     * @param int $taskId
+     * @return $this
      */
-    public $sourceLang = 'en';
+    public function setTask(Task $task){
+        $this->_taskId = $task->getId();
+        $this->_taskGuid = $task->getTaskGuid();
+        return $this;
+    }
     /**
-     * @var string|array
+     * Queues the analysis
+     * @param Helper $api
+     * @param int $taskId
+     * @throws \Zend_Http_Client_Exception
      */
-    public $targetLang = 'de';
-    protected string $serviceName = 'DummyFile TM';
-    protected string $serviceType = 'editor_Services_DummyFileTm';
+    public function import(Helper $api, Config $config): void
+    {
+        if($this->_requested){
+            throw new Exception('You cannot import a '.get_class($this).' twice.');
+        }
+        if(empty($this->_taskId)){
+            throw new Exception('Pretranslation has no taskId assigned');
+        }
+        $this->request($api);
+        $this->_requested = true;
+    }
+
+    /**
+     * Implements the actual request
+     * @param Helper $api
+     * @param Config $config
+     */
+    abstract protected function request(Helper $api): void;
+
+    public function cleanup(Helper $api, Config $config): void
+    {
+        // only to fullfill abstract implementation, not needed here
+    }
 }
