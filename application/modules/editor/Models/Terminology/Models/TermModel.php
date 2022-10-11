@@ -1324,7 +1324,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
         $langs = array_unique(array_merge(... $langs));
 
-        $statuses = $task->getConfig()->runtimeOptions->terminology->usedTermProcessStatus->toArray();
+        $statuses = $task->getConfig()->runtimeOptions->termTagger->usedTermProcessStatus->toArray();
         if( empty($statuses)){
             $statuses =  [];
         }
@@ -1481,7 +1481,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $allIds = array_merge($sourceIds, $targetIds);
 
         // show only the terms with the config staus values
-        $statuses = $task->getConfig()->runtimeOptions->terminology->usedTermProcessStatus->toArray();
+        $statuses = $task->getConfig()->runtimeOptions->termTagger->usedTermProcessStatus->toArray();
         if( empty($statuses)){
             $statuses =  [];
         }
