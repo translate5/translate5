@@ -27,30 +27,16 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Api\Helper;
+use MittagQI\Translate5\Test\Import\Config;
 
 /**
  * Tests the User Auth API
  */
-class SessionApiTest extends \editor_Test_ApiTest {
+class SessionApiTest extends editor_Test_ImportTest {
 
-    /**
-     * Internal reference to the created task
-     * @var stdClass
-     */
-    protected static stdClass $task;
-
-    public static function beforeTests(): void {
-
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        static::api()->addImportFile(static::api()->getFile('justatask.xlf'));
-        static::api()->import($task);
-        self::$task = $api->getTask();
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de', -1, 'justatask.xlf');
     }
     
     /**
@@ -119,7 +105,8 @@ class SessionApiTest extends \editor_Test_ApiTest {
             'login' => 'testmanager',
             'passwd' => Helper::PASSWORD,
         ];
-        
+
+
         $task = static::api()->getTask();
         $taskGuid = $task->taskGuid;
         if($withTask) {
@@ -217,9 +204,5 @@ class SessionApiTest extends \editor_Test_ApiTest {
         ]);
         $this->assertLogin('testlector');
         static::api()->logout();
-    }
-    
-    public static function afterTests(): void {
-        static::api()->deleteTask(self::$task->id, 'testmanager', 'testlector');
     }
 }
