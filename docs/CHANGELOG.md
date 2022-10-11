@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Change Log
 
 All notable changes to translate5 will be documented here.

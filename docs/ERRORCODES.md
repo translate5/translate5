@@ -423,9 +423,13 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1318"></a>E1318  | Plug-In DeepL | DeepL quota exceeded. The character limit has been reached. | The usage quota of your DeepL account is exceeded.
 | <a id="E1334"></a>E1334  | Plug-In DeepL | DeepL is returning an error: {message} | See the error message what is going wrong.
 | <a id="E1385"></a>E1385  | Plug-In DeepL | Deepl Plug-In: Unable to create glossary | There was a problem on DeepL glossary creation. For more info check the error log.
-| <a id="E1386"></a>E1386  | Plug-In DeepL | DeepL Plug-In: For one or more of the clients assigned to your current TermCollection the TermCollection {0} has already been assigned as &quot;DeepL glossary source&quot;. Should the TermCollection {0} be unassigned as glossary source for all of its assigned clients? | There is already term-collection in use as glossary source for one of the matching customers when trying to assign another term-collection to be used as glossary source.
+| <a id="E1386"></a>E1386  | Plug-In DeepL | DeepL Plug-In: For one or more of the clients assigned to your current TermCollection the TermCollection {0} has already been assigned as "DeepL glossary source". Should the TermCollection {0} be unassigned as glossary source for all of its assigned clients? | There is already term-collection in use as glossary source for one of the matching customers when trying to assign another term-collection to be used as glossary source.
 | <a id="E1388"></a>E1388  | Plug-In DeepL | DeepL Plug-In: Unable to fetch all available language combinations for glossaries. | Api error calling the glossary-language-pairs endpoint. For more info see the error log.
 | <a id="E1389"></a>E1389  | Plug-In DeepL | DeepL Plug-In: Unable to delete glossary. | Api error calling the DELETE /v2/glossaries/\[glossary_id\] endpoint. For more info see the error log.
+| <a id="E1422"></a>E1422  | Plug-In DeepL | Glossary export: The languageResourceId parametar is required.
+| <a id="E1423"></a>E1423  | Plug-In DeepL | Glossary export: No glossaryId was found for the exported resource.
+| <a id="E1424"></a>E1424  | Plug-In DeepL | Glossary export: The exported glossary is empty
+| <a id="E1425"></a>E1425  | Plug-In DeepL | Glossary export: Unable to export the glossary
 
 #### Plug-In Groupshare
 | EventCode        | Context       | EventMessage  | Description/Solution
