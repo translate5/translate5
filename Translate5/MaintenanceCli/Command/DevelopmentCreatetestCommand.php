@@ -161,8 +161,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
- * Testcase for '.$issue.' Mixing XLF id and rid values led to wrong tag numbering
+ * Testcase for '.$issue.' //TODO FOR TEST USAGE: add a description
  * For details see the issue.
  */
 class '.$name.' extends editor_Test_JsonTest {
@@ -181,39 +183,39 @@ class '.$name.' extends editor_Test_JsonTest {
         \'import.xlf.preserveWhitespace\' => 0,
         \'runtimeOptions.import.xlf.ignoreFramingTags\' => \'all\'
     ];
- //TODO FOR TEST USAGE: this is the user that will be logged in after the auto setup
+ 
+//TODO FOR TEST USAGE: If set to true, an own customer is created for the test. If not needed, remove
+    protected static bool $setupOwnCustomer = false;
+    
+//TODO FOR TEST USAGE: This is the user that will be logged in after the auto setup. Also all imported tasks will be associated with this user
     protected static string $setupUserLogin = \'testmanager\';
     
-    public static function beforeTests(): void {
-        $task = [
-            \'sourceLang\' => \'de\',
-            \'targetLang\' => \'en\',
-            \'edit100PercentMatch\' => true,
-            \'lockLocked\' => 1,
-        ];
-        
-//TODO FOR TEST USAGE: adjust or delete the created testfiles/task-config.ini
-  
-        $zipfile = static::api()->zipTestFiles(\'testfiles/\',\'testTask.zip\');
-        
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task);
-        
-        static::api()->addUser(\'testlector\');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login(\'testlector\');
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToOpen($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $sourceLangRfc = \'de\';
+        $targetLangRfc = \'en\';
+        $customerId = static::getTestCustomerId();
+//TODO FOR TEST USAGE: Adding a Language-Resource, that will be automatically imported in the setup-phase
+        $config
+            ->addLanguageResource(\'opentm2\', \'my-translation-memory.tmx\', $customerId, $sourceLangRfc, $targetLangRfc);
+//TODO FOR TEST USAGE: Adding a Language-Resource, that will be automatically imported in the setup-phase
+        $config
+            ->addLanguageResource(\'termcollection\', \'my-term-collection.tbx\', $customerId);
+//TODO FOR TEST USAGE: Adding a Pretranslation Operation to the task
+        $config
+            ->addPretranslation();
+//TODO FOR TEST USAGE: Adding a Task. During import, the added LanguageResources are automatically assigned and an added Operation will be queued
+        $config
+            ->addTask($sourceLangRfc, $targetLangRfc, static::getTestCustomerId(), \'my-test-data-de-en.zip\')
+            ->setProperty(\'wordCount\', 1270);
     }
     
     /**
 //TODO FOR TEST USAGE: adjust your tests, here is a simple example of testing values after import
      * Testing segment values directly after import
      */
-    public function testSegmentValuesAfterImport() {
+    public function testSegmentValuesAfterImport()
+    {
         $jsonFileName = \'expectedSegments.json\';
 // REMINDER FOR TEST USAGE:
 // when the option -c is set on calling this test as a single test (e.g /var/www/translate5/application/modules/editor/testcases/apitest.sh -c editorAPI/MyFunnyTest.php), the files are automatically saved after fetching with the passed filename (third argument)
@@ -225,7 +227,8 @@ class '.$name.' extends editor_Test_JsonTest {
 //TODO FOR TEST USAGE: adjust your tests, here is a simple example of editing a segment value
      * @depends testSegmentValuesAfterImport
      */
-    public function testSegmentEditing() {
+    public function testSegmentEditing()
+    {
         //get segment list
         $segments = static::api()->getSegments(null, 10);
         
@@ -249,20 +252,21 @@ class '.$name.' extends editor_Test_JsonTest {
      * tests the export results
      * @depends testSegmentEditing
      */
-    public function testExport() {
+    public function testExport()
+    {
         static::api()->login(\'testmanager\');
-        $task = static::api()->getTask();
-        //start task export
+        $task = static::getTask();
         
-        static::api()->get(\'editor/task/export/id/\'.$task->id);
+        //start task export        
+        static::api()->get(\'editor/task/export/id/\'.$task->getId());
         
         //get the exported file content
-        $path = static::api()->getTaskDataDirectory();
+        $path = $task->getDataDirectory();
         $pathToZip = $path.\'export.zip\';
         $this->assertFileExists($pathToZip);
         
         $exportFileName = \'export-'.$issue.'-de-en.xlf\';
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.\'/'.$issue.'-de-en.xlf\');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->getTaskGuid().\'/'.$issue.'-de-en.xlf\');
 // REMINDER FOR TEST USAGE:
 // This is the manual way to save files when the command-option -c (= capture) was set
         if(static::api()->isCapturing()){
@@ -271,11 +275,6 @@ class '.$name.' extends editor_Test_JsonTest {
         $expectedResult = static::api()->getFileContent($exportFileName);
         
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), \'Exported result does not equal to export-'.$issue.'-de-en.xlf\');
-    }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, \'testmanager\', \'testlector\');
     }
 }
 ');
