@@ -97,7 +97,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         'testtranslator' => '{00000000-0000-0000-C100-CCDDEE000003}',
     );
 
-
     //region Import API
     /******************************************************* IMPORT API *******************************************************/
 
@@ -333,10 +332,10 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * Can be used to wait for an task import, that was initiated without autoStartImport
-     * @param stdClass $task
+     * @param \stdClass $task
      * @throws Exception
      */
-    public function waitForTaskImported(stdClass $task)
+    public function waitForTaskImported(\stdClass $task)
     {
         $this->task = $task;
         if($task->taskType == self::INITIAL_TASKTYPE_PROJECT){

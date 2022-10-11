@@ -154,6 +154,16 @@ final class Task extends Resource
     }
 
     /**
+     * Retrieves the task's data-directory
+     * @return string
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    public function getDataDirectory(): string
+    {
+        return Helper::getTaskDataBaseDirectory() . trim($this->getTaskGuid(), '{}') . '/';
+    }
+
+    /**
      * Retrieves, if a task is a project. This can only be called, after the task was imported
      * @return bool
      * @throws \MittagQI\Translate5\Test\Import\Exception
