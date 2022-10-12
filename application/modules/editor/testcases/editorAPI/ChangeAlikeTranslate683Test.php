@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * ChangeAlikeTranslate683Test imports a simple task, checks and checks the ChangeAlike Behaviour in combination 
  * with Source Editing and trans[Not]Found mark up.
@@ -61,7 +63,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
     ];
 
     protected static $useSourceEditing = false;
-    
+
     /**
      * the strings to be compared on testing change alike source matching 
      * @var array
@@ -89,26 +91,16 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
             
         'targetAfterEdit' => 'I repeat <div title="" class="term preferredTerm exact">me</div> in the <div title="" class="term preferredTerm exact">targettext</div>',
     );
-    
-    public static function beforeTests():void {
 
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'edit100PercentMatch' => true,
-            'enableSourceEditing' => static::$useSourceEditing,
-            'lockLocked' => 1,
-        );
-
-        static::api()->addImportFile('TRANSLATE-683/TRANSLATE-683-de-en.csv');
-        static::api()->addImportTbx('TRANSLATE-683/TRANSLATE-683-de-en.tbx');
-        static::api()->import($task);
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'en', -1, 'TRANSLATE-683-de-en.csv')
+            ->addAdditionalUploadFile('importTbx', 'TRANSLATE-683-de-en.tbx', 'application/xml')
+            ->setProperty('enableSourceEditing', static::$useSourceEditing)
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Test using changealikes by source match
      */
@@ -218,7 +210,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $segmentNrInTask = array_map(function($item){
             return $item->segmentNrInTask;
         },$alikes);
-        $this->assertEquals(array(4,6,7), $segmentNrInTask);
+        $this->assertEquals([4, 6, 7], $segmentNrInTask);
         $alikeIds = array_map(function($item){
             return $item->id;
         },$alikes);
@@ -287,10 +279,5 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $this->assertFieldTextEquals($targetCompareString, $segments[4]->sourceEdit);
         $this->assertFieldTextEquals($targetCompareString, $segments[5]->sourceEdit);
         $this->assertFieldTextEquals($targetCompareString, $segments[6]->sourceEdit);
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

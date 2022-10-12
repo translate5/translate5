@@ -52,6 +52,7 @@ final class Task extends Resource
     private ?array $_uploadFolder = null;
     private ?array $_uploadFiles = null;
     private ?array $_uploadData = null;
+    private ?array $_additionalUploadFiles = null;
     private ?string $_taskConfigIni = null;
     private ?string $_cleanupZip = null;
     private bool $_setToEditAfterImport = false;
@@ -111,7 +112,9 @@ final class Task extends Resource
      */
     public function addUploadFiles(array $filePathes): Task
     {
-        $this->_uploadFiles = ($this->_uploadFiles === null) ? $filePathes : array_merge($this->_uploadFiles, $filePathes);
+        foreach($filePathes as $path){
+            $this->addUploadFile($path);
+        }
         return $this;
     }
 
@@ -119,13 +122,28 @@ final class Task extends Resource
      * Adds raw data to be uploaded as file
      * The Upload can either be defined by file(s), by folder or by data
      * @param string $data
-     * @param string $mime
-     * @param string $filename
+     * @param string $mimeType
+     * @param string $fileName
      * @return $this
      */
-    public function addUploadData(string $data, string $mime = 'application/csv', string $filename = 'apiTest.csv'): Task
+    public function addUploadData(string $data, string $mimeType = 'application/csv', string $fileName = 'apiTest.csv'): Task
     {
-        $this->_uploadData = ['data' => $data, 'mime' => $mime, 'filename' => $filename];
+        $this->_uploadData = ['data' => $data, 'mime' => $mimeType, 'filename' => $fileName];
+        return $this;
+    }
+
+    /**
+     * Adds an additional file to the task-import that has a differen param name (for name 'importUpload' use ->addUploadFile)
+     * @param string $uploadName
+     * @param string $filePath
+     * @return $this
+     */
+    public function addAdditionalUploadFile(string $uploadName, string $filePath, string $mimeType = 'application/zip'): Task
+    {
+        if ($this->_additionalUploadFiles === null) {
+            $this->_additionalUploadFiles = [];
+        }
+        $this->_additionalUploadFiles[] = ['name' => $uploadName, 'path' => $filePath, 'mime' => $mimeType];
         return $this;
     }
 
@@ -349,7 +367,7 @@ final class Task extends Resource
             $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder['folder'] . '/', $this->_uploadFolder['zip']); // TODO FIXME: is the slash after the folder neccesary?
             $api->addImportFile($this->_cleanupZip);
         } else if ($this->_uploadFiles !== null) {
-            if (count($this->_uploadFiles) == 1) {
+            if (count($this->_uploadFiles) === 1) {
                 $api->addImportFile($api->getFile($this->_uploadFiles[0]));
             } else {
                 foreach ($this->_uploadFiles as $relPath) {
@@ -361,7 +379,13 @@ final class Task extends Resource
         } else {
             throw new Exception('The task to import has no files assigned');
         }
-        // add optional task-config.ini
+        // add additional uploads if set
+        if($this->_additionalUploadFiles != null){
+            foreach ($this->_additionalUploadFiles as $data) {
+                $api->addFile($data['name'], $api->getFile($data['path']), $data['mime']);
+            }
+        }
+        // add optional task-config.ini if set
         if($this->_taskConfigIni != null){
             $api->addFilePlain('taskConfig', $this->_taskConfigIni, 'text/plain', 'task-config.ini');
         }

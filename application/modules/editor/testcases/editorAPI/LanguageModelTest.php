@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Unit Tests for Language Class
  * Should be extended as needed
  */
-class LanguageModelTest extends \editor_Test_UnitTest {
+class LanguageModelTest extends editor_Test_UnitTest {
     /**
      * Testcase for "TRANSLATE-2939: Fix language matching on term tagging" to test language fuzzy logic.
      */
