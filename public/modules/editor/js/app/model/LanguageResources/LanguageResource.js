@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -37,71 +36,91 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Model
  */
 Ext.define('Editor.model.LanguageResources.LanguageResource', {
-  extend: 'Ext.data.Model',
-  STATUS_LOADING: 'loading',
-  STATUS_NOTCHECKED: 'notchecked',
-  STATUS_ERROR: 'error',
-  STATUS_AVAILABLE: 'available',
-  STATUS_UNKNOWN: 'unknown',
-  STATUS_NOCONNECTION: 'noconnection',
-  STATUS_IMPORT: 'import',
-  STATUS_NOTLOADED: 'notloaded',
-  STATUS_NOVALIDLICENSE: 'novalidlicense',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'entityVersion', type: 'integer', critical: true},
-    {name: 'name', type: 'string'},
-    {name: 'color', type: 'string'},
-    {name: 'resourceId', type: 'string'},
-    {name: 'customerUseAsDefaultIds'},
-    {name: 'customerWriteAsDefaultIds'},
-    {name: 'customerPivotAsDefaultIds'},
-    {name: 'customerIds'},
-    {name: 'status', type: 'string', persist: false},
-    {name: 'statusInfo', type: 'string', persist: false},
-    {name: 'serviceName', type: 'string'},
-    {name: 'serviceType', type: 'string'},
-    {name: 'searchable', type: 'boolean'},
-    {name: 'writeSource', type: 'boolean'},
-    {name: 'useAsGlossarySource',critical: true}
-  ],
+    extend: 'Ext.data.Model',
+    STATUS_LOADING: 'loading',
+    STATUS_NOTCHECKED: 'notchecked',
+    STATUS_ERROR: 'error',
+    STATUS_AVAILABLE: 'available',
+    STATUS_UNKNOWN: 'unknown',
+    STATUS_NOCONNECTION: 'noconnection',
+    STATUS_IMPORT: 'import',
+    STATUS_NOTLOADED: 'notloaded',
+    STATUS_NOVALIDLICENSE: 'novalidlicense',
+    fields: [
+        {name: 'id', type: 'int'},
+        {name: 'entityVersion', type: 'integer', critical: true},
+        {name: 'name', type: 'string'},
+        {name: 'color', type: 'string'},
+        {name: 'resourceId', type: 'string'},
+        {name: 'customerUseAsDefaultIds'},
+        {name: 'customerWriteAsDefaultIds'},
+        {name: 'customerPivotAsDefaultIds'},
+        {name: 'customerIds'},
+        {name: 'status', type: 'string', persist: false},
+        {name: 'statusInfo', type: 'string', persist: false},
+        {name: 'serviceName', type: 'string'},
+        {name: 'serviceType', type: 'string'},
+        {name: 'searchable', type: 'boolean'},
+        {name: 'writeSource', type: 'boolean'},
+        {name: 'useAsGlossarySource', critical: true}
+    ],
 
-  /***
-   * Is the current record Tm
-   * @returns {boolean}
-   */
-  isTm:function (){
-    return this.get('resourceType') === Editor.util.LanguageResources.resourceType.TM;
-  },
-
-  /***
-   * Is the current record Mt
-   * @returns {boolean}
-   */
-  isMt:function (){
-    return this.get('resourceType') === Editor.util.LanguageResources.resourceType.MT;
-  },
-
-  /***
-   * Is the current record Term collection
-   * @returns {boolean}
-   */
-  isTc:function (){
-    return this.get('resourceType') === Editor.util.LanguageResources.resourceType.TERM_COLLECTION;
-  },
-
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'languageresourceinstance', //same as PHP controller name
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+    /***
+     * Is the current record Tm
+     * @returns {boolean}
+     */
+    isTm: function () {
+        return this.get('resourceType') === Editor.util.LanguageResources.resourceType.TM;
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+
+    /***
+     * Is the current record Mt
+     * @returns {boolean}
+     */
+    isMt: function () {
+        return this.get('resourceType') === Editor.util.LanguageResources.resourceType.MT;
+    },
+
+    /***
+     * Is the current record Term collection
+     * @returns {boolean}
+     */
+    isTc: function () {
+        return this.get('resourceType') === Editor.util.LanguageResources.resourceType.TERM_COLLECTION;
+    },
+
+    /***
+     *
+     */
+    getSpecificDataByType: function (type) {
+        var data = Ext.JSON.decode(this.get('specificData'), true),
+            glossaryId = null;
+
+        if (!data) {
+            return glossaryId;
+        }
+
+        Ext.each(data, function (ob) {
+            if(ob.type === type){
+                return glossaryId = ob.value;
+            }
+        });
+
+        return glossaryId;
+    },
+
+    idProperty: 'id',
+    proxy: {
+        type: 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity
+        url: Editor.data.restpath + 'languageresourceinstance', //same as PHP controller name
+        reader: {
+            rootProperty: 'rows',
+            type: 'json'
+        },
+        writer: {
+            encode: true,
+            rootProperty: 'data',
+            writeAllFields: false
+        }
     }
-  }
 });

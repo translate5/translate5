@@ -149,7 +149,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
     public static function tearDownAfterClass(): void {
         
         $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+        self::$api->deleteTask($task->id, 'testmanager', null, true);
         //remove the created resources
         self::$api->removeResources();
         //remove the temp customer

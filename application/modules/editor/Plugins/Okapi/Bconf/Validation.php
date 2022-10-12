@@ -34,6 +34,18 @@
 class editor_Plugins_Okapi_Bconf_Validation {
 
     /**
+     * Used for testing/validating bconfs
+     * @var string
+     */
+    const SOURCE_LANGUAGE = 'en';
+
+    /**
+     * Used for testing/validating bconfs
+     * @var string
+     */
+    const TARGET_LANGUAGE = 'de';
+
+    /**
      * @var string
      */
     protected editor_Plugins_Okapi_Bconf_Entity $bconf;
@@ -141,7 +153,7 @@ class editor_Plugins_Okapi_Bconf_Validation {
             $api->createProject();
             $api->uploadOkapiConfig($this->bconf->getPath());
             $api->uploadInputFile($testfile, new SplFileInfo($testfilePath));
-            $api->executeTask(editor_Plugins_Okapi_Bconf_Filters::SOURCE_LANGUAGE, editor_Plugins_Okapi_Bconf_Filters::TARGET_LANGUAGE);
+            $api->executeTask(self::SOURCE_LANGUAGE, self::TARGET_LANGUAGE);
             $convertedFile = $api->downloadFile($testfile, $manifestFile, new SplFileInfo($testDir));
             // cleanup downloaded files
             unlink($convertedFile);
