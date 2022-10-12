@@ -181,4 +181,23 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             $model->save();
         }
     }
+
+    /***
+     * Disable the pivot autostart in case the import is done via the translate5 UI. For all api imports, the config
+     * runtimeOptions.import.autoStartPivotTranslations will decide if the the pivot pre-translation is auto-queued
+     * @param editor_Models_Task $task
+     * @return void
+     */
+    public function handlePivotAutostart(editor_Models_Task $task): void
+    {
+
+        $importWizardUsed = $this->getRequest()->getParam('importWizardUsed',false);
+        if( $importWizardUsed === false){
+            return;
+        }
+        
+        /** @var editor_Models_TaskConfig $config */
+        $config = ZfExtended_Factory::get('editor_Models_TaskConfig');
+        $config->updateInsertConfig($task->getTaskGuid(),'runtimeOptions.import.autoStartPivotTranslations',false);
+    }
 }

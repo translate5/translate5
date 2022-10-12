@@ -209,7 +209,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             /* @var $batchWorker editor_Plugins_MatchAnalysis_BatchWorker */
 
             $workerParameters['languageResourceId'] = $languageRessource->getId();
-            $workerParameters['userGuid'] = editor_User::instance()->getGuid();
+
+            $user = ZfExtended_Authentication::getInstance()->getUser();
+            $workerParameters['userGuid'] = $user?->getUserGuid() ?? ZfExtended_Models_User::SYSTEM_GUID;
 
             $workerParameters['contentField'] = editor_Models_SegmentField::TYPE_RELAIS;
 

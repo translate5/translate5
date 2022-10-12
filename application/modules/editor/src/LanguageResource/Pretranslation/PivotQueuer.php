@@ -9,8 +9,10 @@ use editor_User;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Authentication;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
+use ZfExtended_Models_User;
 use ZfExtended_Models_Worker;
 
 /**
@@ -60,8 +62,11 @@ class PivotQueuer
             $parentWorkerId = editor_Task_Operation::create(editor_Task_Operation::PIVOT_PRE_TRANSLATION, $task);
         }
 
-        $workerParameters['userGuid'] = editor_User::instance()->getGuid();
-        $workerParameters['userName'] = editor_User::instance()->getUserName();
+        $user = ZfExtended_Authentication::getInstance()->getUser();
+
+        $workerParameters['userGuid'] = $user?->getUserGuid() ?? ZfExtended_Models_User::SYSTEM_GUID;
+        $workerParameters['userName'] = $user?->getUserName() ?? ZfExtended_Models_User::SYSTEM_LOGIN;
+
 
         //enable batch query via config
         $workerParameters['batchQuery'] = (boolean) Zend_Registry::get('config')->runtimeOptions->LanguageResources->Pretranslation->enableBatchQuery;
