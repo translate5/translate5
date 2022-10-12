@@ -210,7 +210,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $segmentNrInTask = array_map(function($item){
             return $item->segmentNrInTask;
         },$alikes);
-        $this->assertEquals([4, 6, 7], $segmentNrInTask);
+        $this->assertEquals([6], $segmentNrInTask);
         $alikeIds = array_map(function($item){
             return $item->id;
         },$alikes);
