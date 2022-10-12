@@ -29,7 +29,6 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Test\Import;
 
 use MittagQI\Translate5\Test\Api\Helper;
-use MittagQI\Translate5\Test\Api\Exception;
 
 /**
  * Represents the api-request configuration for a task
@@ -53,6 +52,7 @@ final class Task extends Resource
     private ?array $_uploadFiles = null;
     private ?array $_uploadData = null;
     private ?array $_additionalUploadFiles = null;
+    private ?array $_additionalUsers = null;
     private ?string $_taskConfigIni = null;
     private ?string $_cleanupZip = null;
     private bool $_setToEditAfterImport = false;
@@ -112,7 +112,7 @@ final class Task extends Resource
      */
     public function addUploadFiles(array $filePathes): Task
     {
-        foreach($filePathes as $path){
+        foreach ($filePathes as $path) {
             $this->addUploadFile($path);
         }
         return $this;
@@ -144,6 +144,24 @@ final class Task extends Resource
             $this->_additionalUploadFiles = [];
         }
         $this->_additionalUploadFiles[] = ['name' => $uploadName, 'path' => $filePath, 'mime' => $mimeType];
+        return $this;
+    }
+
+    /**
+     * Adds the given user to the actual task
+     * To just add the testlector, use the $setupUserLogin option !!
+     * @param string $userName : One of the predefined users (testmanager, testlector, testtranslator)
+     * @param string $userState : open, waiting, finished, as available by the workflow
+     * @param string $workflowStep : reviewing or translation, as available by the workflow
+     * @param array $params : add additional taskuserassoc params to the add user call
+     * @return $this
+     */
+    public function addAdditionalUser(string $userName, string $userState = 'open', string $workflowStep = 'reviewing', array $params = []): Task
+    {
+        if ($this->_additionalUsers === null) {
+            $this->_additionalUsers = [];
+        }
+        $this->_additionalUsers[] = ['name' => $userName, 'state' => $userState, 'step' => $workflowStep, 'params' => $params];
         return $this;
     }
 
@@ -217,7 +235,7 @@ final class Task extends Resource
      */
     public function import(Helper $api, Config $config): void
     {
-        if($this->_requested){
+        if ($this->_requested) {
             throw new Exception('You cannot import a Task twice.');
         }
         // tasks will be uploaded as testmanager
@@ -236,7 +254,7 @@ final class Task extends Resource
                 return;
             }
             // if we shall not wait, we have to skip user-assignments & task-state-setting
-            if(!$this->_waitForImported){
+            if (!$this->_waitForImported) {
                 return;
             }
 
@@ -261,11 +279,11 @@ final class Task extends Resource
                     ->import($api, $config);
             }
             // some tests want to hook in after the task-adding but before import starts
-            if(!$this->_waitForImported){
+            if (!$this->_waitForImported) {
                 return;
             }
             // start the import
-            $api->getJson('editor/task/'.$this->getId().'/import');
+            $api->getJson('editor/task/' . $this->getId() . '/import');
 
             // wait for the import to finish. TODO FIXME: is the manual evaluation of multilang-tasks neccessary ?
             if ($this->isProjectTask() || $isMultiLanguage) {
@@ -285,6 +303,16 @@ final class Task extends Resource
             $api->addUserToTask($this->getTaskGuid(), 'testlector');
             $api->login('testlector');
         }
+        // add additional defined users
+        if ($this->_additionalUsers !== null) {
+            foreach ($this->_additionalUsers as $data) {
+                if ($data['name'] === 'testlector' && $config->getLogin() === 'testlector') {
+                    throw new Exception('You cannot setup the \'testlector\' login and assign it as seperate user to the task at the same time.');
+                }
+                // $this->reload($api); // some tests added this always between user-adds but it seems to be unneccessary
+                $api->addUserToTask($this->getTaskGuid(), $data['name'], $data['state'], $data['step'], $data['params']);
+            }
+        }
         // last step: open task for edit if configured
         if ($this->_setToEditAfterImport) {
             $api->setTaskToEdit($this->getId());
@@ -294,10 +322,12 @@ final class Task extends Resource
     /**
      * Reloads a task and fetches fresh props
      * @param Helper $api
-     * @throws \MittagQI\Translate5\Test\Import\Exception
+     * @throws Exception
      * @throws \Zend_Http_Client_Exception
      */
-    public function reload(Helper $api){
+    public function reload(Helper $api)
+    {
+        $this->checkImported(' therefore the task cannot be reloaded.');
         $result = $api->getJson('editor/task/' . $this->getId());
         $this->applyResult($result);
     }
@@ -312,7 +342,7 @@ final class Task extends Resource
         // remove on server
         if ($this->_requested) {
             $taskId = $this->getId();
-            if($this->isProjectTask()){
+            if ($this->isProjectTask()) {
                 $api->login('testmanager');
             } else {
                 if ($config->hasTestlectorLogin()) {
@@ -331,6 +361,49 @@ final class Task extends Resource
             @unlink($this->_cleanupZip);
             $this->_cleanupZip = null;
         }
+    }
+
+    /**
+     * Retrieves a certain user from the task's "users" prop
+     * This can only be called successfully after loading a task & assugning the user ...
+     * @param string $login
+     * @return \stdClass|null
+     */
+    public function getUser(string $login): ?\stdClass
+    {
+        $this->checkImported(' therefore users can not be retrieved.');
+        if (property_exists($this, 'users')) {
+            foreach ($this->users as $user) {
+                if (property_exists($user, 'login') && $user->login === $login) {
+                    return $user;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the task to "finished" after import
+     * @param Helper $api
+     * @return stdClass
+     * @throws Exception
+     */
+    public function setTaskToFinished(Helper $api): mixed
+    {
+        $this->checkImported(' therefore the task cannot be finished.');
+        return $api->setTaskToFinished($this->getId());
+    }
+
+    /**
+     * Sets the task to "edit" after import
+     * @param Helper $api
+     * @return stdClass
+     * @throws Exception
+     */
+    public function setTaskToEdit(Helper $api): mixed
+    {
+        $this->checkImported(' therefore the task cannot be edited.');
+        return $api->setTaskToEdit($this->getId());
     }
 
     /**
@@ -374,19 +447,19 @@ final class Task extends Resource
                     $api->addImportFiles($api->getFile($relPath));
                 }
             }
-        } else if($this->_uploadData !== null) {
+        } else if ($this->_uploadData !== null) {
             $api->addImportPlain($this->_uploadData['data'], $this->_uploadData['mime'], $this->_uploadData['filename']);
         } else {
             throw new Exception('The task to import has no files assigned');
         }
         // add additional uploads if set
-        if($this->_additionalUploadFiles != null){
+        if ($this->_additionalUploadFiles != null) {
             foreach ($this->_additionalUploadFiles as $data) {
                 $api->addFile($data['name'], $api->getFile($data['path']), $data['mime']);
             }
         }
         // add optional task-config.ini if set
-        if($this->_taskConfigIni != null){
+        if ($this->_taskConfigIni != null) {
             $api->addFilePlain('taskConfig', $this->_taskConfigIni, 'text/plain', 'task-config.ini');
         }
     }

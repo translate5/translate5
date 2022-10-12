@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * CsvEncodingTest imports a CSV with several special characters
  * The test task will be edited and exported. The generated changes.xml and
@@ -47,49 +49,35 @@ class CsvEncodingTest extends editor_Test_JsonTest {
         'editor.notification.saveXmlToFile' => 1
     ];
 
-    /**
-     * Setting up the test task by fresh import, adds the lector and translator users
-     */
-    public static function beforeTests():void {
-
-        $task = array(
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-        );
-
-        $zipfile = static::api()->zipTestFiles('CSV-testfiles/','CSV-test.zip');
-        
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task);
-        
-        static::api()->addUser('testlector');
-        static::api()->reloadTask();
-        static::api()->addUser('testtranslator', 'waiting', 'translation');
-        unlink($zipfile);
-
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de')
+            ->addUploadFolder('CSV-testfiles', 'CSV-test.zip')
+            ->addAdditionalUser('testlector')
+            ->addAdditionalUser('testtranslator', 'waiting', 'translation')
+            ->setProperty('taskName', static::NAME_PREFIX . 'CsvEncodingTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
-    
+
     /**
      * tests the specialcharacters encoding after import, edits some segments as lector, finish then the task
      * - checks for correct changes.xliff
      * - checks if task is open for translator and finished for lector
      * - modifies also segments with special characters to test encoding in changes.xml
-     * @depends testCsvSettings
      */
     public function testEncodingAfterImport() {
         //check that testtranslator is waiting
         static::api()->login('testtranslator');
-        $this->assertEquals('waiting', static::api()->reloadTask()->userState);
+        static::getTask()->reload(static::api());
+        $this->assertEquals('waiting', static::getTask()->getProperty('userState'));
         
         //check that testlector is open
         static::api()->login('testlector');
-        $this->assertEquals('open', static::api()->reloadTask()->userState);
-        
-        $task = static::api()->getTask();
+        static::getTask()->reload(static::api());
+        $this->assertEquals('open', static::getTask()->getProperty('userState'));
+
         //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+        static::getTask()->setTaskToEdit(static::api());
         
         //Testing Reference files. Is a little bit hidden in here, but as separate method we would have to play with logins and the task,
         // in this method we are logged in and the task is opened.
@@ -143,9 +131,10 @@ class CsvEncodingTest extends editor_Test_JsonTest {
     public function testChangesXml() {
         $task = static::api()->getTask();
         //finishing the task to get a changes.xml
-        $res = static::api()->setTaskToFinished($task->id);
-        $this->assertEquals('finished', static::api()->reloadTask()->userState);
-        
+        static::getTask()->setTaskToFinished(static::api());
+        static::getTask()->reload(static::api());
+        $this->assertEquals('finished', static::getTask()->getProperty('userState'));
+
         //get the changes file
         $path = static::api()->getTaskDataDirectory();
         $foundChangeFiles = glob($path.'changes*.xliff');
@@ -194,10 +183,5 @@ class CsvEncodingTest extends editor_Test_JsonTest {
         //compare it
         $expectedResult = $removeMqmIds(static::api()->getFileContent($fileToCompare));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
-    }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

@@ -228,6 +228,17 @@ abstract class Resource
     }
 
     /**
+     * Certain functions of resources can only be called after import
+     * @param string $additionalMessage
+     * @throws Exception
+     */
+    protected function checkImported(string $additionalMessage=''){
+        if(!$this->_requested){
+            throw new Exception(trim('The '.get_class($this).' was not yet imported '.$additionalMessage));
+        }
+    }
+
+    /**
      * Imports the resource in the setup-phase of the test
      * @param Helper $api
      * @param Config $config
