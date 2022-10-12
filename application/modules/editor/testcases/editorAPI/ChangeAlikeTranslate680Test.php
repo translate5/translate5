@@ -296,7 +296,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
      */
     public function testTagOnlyReplacement() {
         $segments = static::api()->getSegments();
-        $segToTest = $segments[12]; //segmentNrInTask 13
+        $segToTest = $segments[12]; //segmentNrInTask 13  // TODO FIXME: here a selection by segmentNrInTask is required to create a maintainable test !!
         static::api()->saveSegment($segToTest->id, $segToTest->targetEdit.'Test');
         
         //fetch alikes and assert correct segments found by segmentNrInTask
@@ -327,7 +327,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         //seg 14 has seg 16 as alike, although the target tag count differs.
         // But thats ok since target of 16 is empty, and will be filled with one tag from the source on editing.
         // So after editing, tags are equal again.
-        $segToTest = $segments[13]; //segmentNrInTask 14
+        $segToTest = $segments[13]; //segmentNrInTask 14  // TODO FIXME: here a selection by segmentNrInTask is required to create a maintainable test !!
         //fetch alikes and assert correct segments found by segmentNrInTask
         $alikes = static::api()->getJson('editor/alikesegment/'.$segToTest->id);
         $alikeNrs = array_map(function($item){
@@ -346,7 +346,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         /*
          * segmentNrInTask 18 - remove whitespace tag the other tags must remain in the alikes
          */
-        $segToTest = $segments[17];
+        $segToTest = $segments[17]; // TODO FIXME: here a selection by segmentNrInTask is required to create a maintainable test !!
         $newTarget = preg_replace('/Test<.*>word/', 'Test Word', $segToTest->targetEdit);
         static::api()->saveSegment($segToTest->id, $newTarget);
         
@@ -367,14 +367,14 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         /*
          * segmentNrInTask 20 - add whitespace tag the other tags must remain in the alikes
          */
-        $segToTest = $segments[19];
+        $segToTest = $segments[19]; // TODO FIXME: here a selection by segmentNrInTask is required to create a maintainable test !!
         static::api()->saveSegment($segToTest->id, $segments[17]->target);
         
         //fetch alikes and assert correct segments found by segmentNrInTask
         $alikes = static::api()->getJson('editor/alikesegment/'.$segToTest->id);
         
         $alikeNrs = array_column($alikes, 'segmentNrInTask');
-        $this->assertEquals([19, 21], $alikeNrs, 'The found repetitions are not as expected!');
+        $this->assertEquals([21], $alikeNrs, 'The found repetitions are not as expected!');
         $alikeIds = array_column($alikes, 'id');
         
         $alikePutData = [

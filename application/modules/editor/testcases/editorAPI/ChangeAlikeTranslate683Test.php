@@ -210,7 +210,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $segmentNrInTask = array_map(function($item){
             return $item->segmentNrInTask;
         },$alikes);
-        $this->assertEquals([6], $segmentNrInTask);
+        $this->assertEquals([4, 6, 7], $segmentNrInTask);
         $alikeIds = array_map(function($item){
             return $item->id;
         },$alikes);
@@ -227,28 +227,28 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $segments = static::api()->getSegments();
         
         //check the alike were the ChangeAlikes handler only changed the autoState, the content was already correct
-        $segment = $segments[3];
+        $segment = $segments[3]; // TODO FIXME: here a selection by segmentNrInTask is required to create a maintainable test !!
         $this->assertEquals(11, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit4'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
         $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //retest the master segment, if the edited content remains and the autostate is correct
-        $segment = $segments[4];
+        $segment = $segments[4]; // TODO FIXME: here a selection by segmentNrInTask is required to create a maintainable test !!
         $this->assertEquals(10, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit5'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
         $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //test the alike were changed content and autostate
-        $segment = $segments[5];
+        $segment = $segments[5]; // TODO FIXME: here a selection by segmentNrInTask is required to create a maintainable test !!
         $this->assertEquals($isSE ? 11 : 13, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit6'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit6'], $segment->target);
         $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //test the alike were changed content and autostate
-        $segment = $segments[6];
+        $segment = $segments[6]; // TODO FIXME: here a selection by segmentNrInTask is required to create a maintainable test !!
         $this->assertEquals(11, $segment->autoStateId);
         $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit7'], $segment->source);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target);
