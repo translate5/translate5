@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * SegmentCommentRoundtripTest imports a SDLXLIFF file with comments, adds new comments and export the file again
  */
@@ -38,35 +40,25 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
     ];
 
-    public static function beforeTests(): void {
+    protected static string $setupUserLogin = 'testlector';
 
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de')
+            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->setToEditAfterImport();
+    }
 
-        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task);
-
-        static::api()->addUser('testlector');
-
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
-
+    public static function beforeTests(): void
+    {
         $requiredTaskConfigs = [
             'editor.export.exportComments' => 1,
             'import.sdlxliff.applyChangeMarks' => 1,
             'import.sdlxliff.importComments' => 1,
             'customers.anonymizeUsers' => 0,
         ];
-        static::assertTaskConfigs($task->taskGuid, $requiredTaskConfigs);
+        static::assertTaskConfigs(static::getTask()->getTaskGuid(), $requiredTaskConfigs);
     }
 
     /**
@@ -177,10 +169,5 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
         //file_put_contents('/home/tlauria/foo-export.mqxliff', $exportedFile);
         //file_put_contents('/home/tlauria/foo-expect.mqxliff', $expectedResult);
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.mqxliff');
-    }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }
