@@ -37,7 +37,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "Kommentar f\u00fcr Segment 2 (Severy level: For your information)",
+            "comment": "Kommentar für Segment 2 (Severy level: For your information)",
             "created": "2019-08-21 11:59:06",
             "modified": "2019-08-21 11:59:06",
             "isEditable": false
@@ -47,7 +47,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar für HIER in Segment 3 (Severy level: Warning)",
             "created": "2019-08-21 11:59:31",
             "modified": "2019-08-21 11:59:31",
             "isEditable": false
@@ -73,7 +73,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar für Benutzer 1 HIER in Segment 4 (Severy level: Error)",
             "created": "2019-08-21 12:00:24",
             "modified": "2019-08-21 12:00:24",
             "isEditable": false
@@ -83,7 +83,7 @@
         {
             "userGuid": "memoq-imported",
             "userName": "JF",
-            "comment": "&quot;Hallo&quot; \u201eMarc\u201c!",
+            "comment": "&quot;Hallo&quot; „Marc“!",
             "created": "2020-03-10 12:06:20",
             "modified": "2020-03-10 12:06:20",
             "isEditable": false
@@ -91,7 +91,7 @@
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "und &lt;b&gt;nochmal&lt;\/b&gt; einer.",
+            "comment": "und &lt;b&gt;nochmal&lt;/b&gt; einer.",
             "created": "2020-01-28 10:22:33",
             "modified": "2020-01-28 10:22:33",
             "isEditable": false
