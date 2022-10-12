@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * ExcelExandImportTest.php imports a simple task, checks export of excel and reimport then
  */
@@ -44,21 +46,12 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
     protected static array $requiredRuntimeOptions = [
         'import.xlf.preserveWhitespace' => 0
     ];
-    
-    public static function beforeTests(): void {
 
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-            
-        );
-
-        static::api()->addImportFile(static::api()->getFile('testcase-en-de.xlf'));
-        static::api()->import($task);
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de', -1, 'testcase-en-de.xlf');
     }
-    
+
     /**
      * Test the excel export
      */
@@ -112,10 +105,5 @@ class ExcelExandImportTest extends editor_Test_JsonTest {
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName, 47);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }
