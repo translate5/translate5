@@ -26,41 +26,44 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Import\LanguageResource;
+
 /**
  * Test microsoft translator api for dictonary,normal and segmentation search
  */
-class MicrosoftTranslatorTest extends \editor_Test_ApiTest {
-    
-    protected static $languageResourceId;
-    
+class MicrosoftTranslatorTest extends editor_Test_ImportTest {
+
+    protected static LanguageResource $microsoftTranslator;
+
     protected static string $sourceLangRfc = 'de';
+
     protected static string $targetLangRfc = 'en';
-    protected static string $serviceName = 'Microsoft';
-    protected static string $languageResourceName = 'API Testing::'.__CLASS__;
 
     protected static array $requiredPlugins = [
         'editor_Plugins_InstantTranslate_Init'
     ];
-    /**
-     */
-    public static function beforeTests(): void {
-        //check if this test needs to be skipped.
+
+    protected static function setupImport(Config $config): void
+    {
         if (!self::isMasterTest()) {
             self::markTestSkipped('Test runs only in master test to reduce usage/costs.');
-            return;
+        } else {
+            static::$microsoftTranslator = $config
+                ->addLanguageResource('microsofttranslator', null, static::getTestCustomerId(), static::$sourceLangRfc, static::$targetLangRfc)
+                ->setProperty('name', static::NAME_PREFIX . static::class);
         }
     }
-    
-    /***
-     */
-    public function testSetupData(){
-        $this->createLanguageResource();
+
+    public function testResource(){
+        $response = static::api()->getJson('editor/languageresourceinstance/'.static::$microsoftTranslator->getId());
+        static::assertEquals('available', $response->status, 'Tm import stoped. Tm state is:'.$response->status);
     }
     
     public function testSearch(){
-        $this->translateText("wagen","dictonary.txt");
-        $this->translateText("testwagen","regular.txt");
-        $this->translateText("Vor dem Hintergrund des Konzepts freier Software. Leitet MittagQI die Entwicklung. Von translate5 als community-basiertem Open Source Übersetzungssystem.","segmentation.txt");
+        $this->translateText('wagen','dictonary.txt');
+        $this->translateText('testwagen','regular.txt');
+        $this->translateText('Vor dem Hintergrund des Konzepts freier Software. Leitet MittagQI die Entwicklung. Von translate5 als community-basiertem Open Source Übersetzungssystem.','segmentation.txt');
     }
     
     /***
@@ -68,11 +71,11 @@ class MicrosoftTranslatorTest extends \editor_Test_ApiTest {
      * @param string $text
      * @param string $fileName
      */
-    protected function translateText(string $text,string $fileName){
-        $result=static::api()->getJson('editor/instanttranslateapi/translate',[
-            'text'=>$text,
-            'source'=>self::$sourceLangRfc,
-            'target'=>self::$targetLangRfc
+    private function translateText(string $text, string $fileName){
+        $result = static::api()->getJson('editor/instanttranslateapi/translate',[
+            'text' => $text,
+            'source' => self::$sourceLangRfc,
+            'target' => self::$targetLangRfc
         ]);
         $this->assertNotEmpty($result,'No results found for the search request. Search was:'.$text);
         
@@ -80,55 +83,34 @@ class MicrosoftTranslatorTest extends \editor_Test_ApiTest {
         $filtered = $this->filterResult($result);
         
         //this is to recreate the file from the api response
-        //file_put_contents(static::api()->getFile($fileName, null, false), json_encode($filtered, JSON_PRETTY_PRINT));
-
-        $expected=static::api()->getFileContent($fileName);
-        $actual=json_encode($filtered, JSON_PRETTY_PRINT);
+        if(static::api()->isCapturing()){
+            file_put_contents(static::api()->getFile($fileName, null, false), json_encode($filtered, JSON_PRETTY_PRINT));
+        }
+        $expected = static::api()->getFileContent($fileName);
+        $actual = json_encode($filtered, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
     }
-    
-    /***
-     * Create the language resource
-     */
-    protected function createLanguageResource(){
-        $params=[
-            'resourceId'=>'editor_Services_Microsoft',
-            'name'=>self::$languageResourceName,
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [ static::getTestCustomerId() ],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Services_Microsoft',
-            'serviceName'=> 'Microsoft'
-        ];
-        $resource = static::api()->postJson('editor/languageresourceinstance', $params, null, false);
-        $this->assertTrue(is_object($resource), 'Unable to create the language resource:'.$params['name']);
-        $this->assertEquals($params['name'], $resource->name);
-        self::$languageResourceId=$resource->id;
-        error_log("Language resources created. ".$resource->name);
-        $resp = static::api()->getJson('editor/languageresourceinstance/'.$resource->id,[]);
-        $this->assertEquals('available',$resp->status,'Tm import stoped. Tm state is:'.$resp->status);
-    }
-    
+
     /***
      * Filter only the required fields for the test
      * @param mixed $result
      * @return array
      */
-    protected function filterResult($result){
+    private function filterResult($result){
         //filter only microsoft service results
-        if(isset($result->{self::$serviceName})){
-            $result = $result->{self::$serviceName};
+        $serviceName = static::$microsoftTranslator->getServiceName();
+        $resourceName = static::$microsoftTranslator->getName();
+        if(isset($result->{$serviceName})){
+            $result = $result->{$serviceName};
         }
         //for segmentation request only the best matches will be returned
         if(isset($result->translationForSegmentedText)){
             return $result;
         }
         //filter out by language resource name
-        if(isset($result->{self::$languageResourceName})){
-            $result = $result->{self::$languageResourceName};
+        if(isset($result->{$resourceName})){
+            $result = $result->{$resourceName};
         }
         $filtered = [];
         //remove the result parametars which should not be tested
@@ -139,13 +121,5 @@ class MicrosoftTranslatorTest extends \editor_Test_ApiTest {
             $filtered = $r;
         }
         return $filtered;
-    }
-    
-    /***
-     * Cleand up the resources and the task
-     */
-    public static function afterTests(): void {
-        static::api()->login('testmanager');
-        static::api()->delete('editor/languageresourceinstance/'.self::$languageResourceId);
     }
 }

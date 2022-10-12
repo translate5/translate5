@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Tests if Relais Files are imported correctly, inclusive our alignment checks 
  */
@@ -36,26 +38,15 @@ class RelaisImportTest extends editor_Test_JsonTest {
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
     ];
 
-    public static function beforeTests(): void {
-
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'relaisLang' => 'it',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        static::api()->zipTestFiles('testfiles/','RelaisImportTest.zip');
-        
-        static::api()->addImportFile(static::api()->getFile('RelaisImportTest.zip'));
-        static::api()->import($task);
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'en')
+            ->addUploadFolder('testfiles', 'RelaisImportTest.zip')
+            ->addProperty('relaisLang', 'it')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Test if relais columns are containing the expected content
      */
@@ -111,10 +102,5 @@ class RelaisImportTest extends editor_Test_JsonTest {
         $this->assertFieldTextEquals($targetEdit, $segments[0]['targetEdit'], 'Imported Target is not as expected!');
         $targetEdit = '<div title="" class="term preferredTerm exact" data-tbxid="term_11_1_en_1_00019">Apache</div> 1.3.x auf Unix-Systemen';
         $this->assertFieldTextEquals($targetEdit, $segments[24]['targetEdit'], 'Imported Target is not as expected!');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

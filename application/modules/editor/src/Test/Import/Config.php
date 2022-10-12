@@ -331,6 +331,10 @@ final class Config
             case 'termcollectionresource':
                 return new TermCollectionResource($this->testClass, $nextIndex);
 
+            case LanguageResource::MICROSOFT_TRANSLATOR:
+            case 'mstranslator':
+                return new MicrosoftTranslator($this->testClass, $nextIndex);
+
             default:
                 throw new Exception('Unknown language-resource type "' . $type . '"');
         }

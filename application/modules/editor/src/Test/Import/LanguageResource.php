@@ -45,6 +45,9 @@ abstract class LanguageResource extends Resource
 
     const ZDemo_MT = 'zdemomt';
 
+    const MICROSOFT_TRANSLATOR = 'microsofttranslator';
+
+
     public string $name;
     public array $customerIds = [];
     public array $customerUseAsDefaultIds = [];
