@@ -52,6 +52,7 @@ final class Task extends Resource
     private ?array $_uploadFolder = null;
     private ?array $_uploadFiles = null;
     private ?array $_uploadData = null;
+    private ?string $_taskConfigIni = null;
     private ?string $_cleanupZip = null;
     private bool $_setToEditAfterImport = false;
     private bool $_waitForImported = true;
@@ -76,6 +77,7 @@ final class Task extends Resource
 
     /**
      * Adds a folder in the test-dir that will be zipped for upload
+     * The Upload can either be defined by file(s), by folder or by data
      * @param string $folderInTestDir
      * @param string $zipFileName
      * @return $this
@@ -88,6 +90,7 @@ final class Task extends Resource
 
     /**
      * Adds a direct path to be uploaded which is expected to reside in the test-dir
+     * The Upload can either be defined by file(s), by folder or by data
      * @param string $filePath
      * @return $this
      */
@@ -102,6 +105,7 @@ final class Task extends Resource
 
     /**
      * Adds direct pathes to be uploaded which are expected to reside in the test-dir
+     * The Upload can either be defined by file(s), by folder or by data
      * @param string[] $filePathes
      * @return $this
      */
@@ -113,6 +117,7 @@ final class Task extends Resource
 
     /**
      * Adds raw data to be uploaded as file
+     * The Upload can either be defined by file(s), by folder or by data
      * @param string $data
      * @param string $mime
      * @param string $filename
@@ -121,6 +126,17 @@ final class Task extends Resource
     public function addUploadData(string $data, string $mime = 'application/csv', string $filename = 'apiTest.csv'): Task
     {
         $this->_uploadData = ['data' => $data, 'mime' => $mime, 'filename' => $filename];
+        return $this;
+    }
+
+    /**
+     * Adds the task-config.ini from raw file content
+     * @param string $fileContent
+     * @return $this
+     */
+    public function addTaskConfigIniFile(string $fileContent): Task
+    {
+        $this->_taskConfigIni = $fileContent;
         return $this;
     }
 
@@ -344,6 +360,10 @@ final class Task extends Resource
             $api->addImportPlain($this->_uploadData['data'], $this->_uploadData['mime'], $this->_uploadData['filename']);
         } else {
             throw new Exception('The task to import has no files assigned');
+        }
+        // add optional task-config.ini
+        if($this->_taskConfigIni != null){
+            $api->addFilePlain('taskConfig', $this->_taskConfigIni, 'text/plain', 'task-config.ini');
         }
     }
 }
