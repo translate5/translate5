@@ -184,30 +184,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     }
 
     /**
-     * TODO FIXME: implement in the concrete test
-     * Receives a two dimensional array and add it as a CSV file to the task
-     * MID col and CSV head line is added automatically
-     *
-     * multiple targets currently not supported!
-     *
-     * @param array $data
-     */
-    public function addImportArray(array $data)
-    {
-        $i = 1;
-        $data = array_map(function ($row) use (&$i) {
-            $row = array_map(function ($cell) {
-                //escape " chars
-                return str_replace('"', '""', $cell);
-            }, $row);
-            array_unshift($row, $i++); //add mid
-            return '"' . join('","', $row) . '"';
-        }, $data);
-        array_unshift($data, '"id", "source", "target"');
-        $this->addImportPlain(join("\n", $data));
-    }
-
-    /**
      * DO NOT USE IN CONCRETE API TESTS
      * Check the task state. The test will fail when $failOnError = true and if the task is in state error or after RELOAD_TASK_LIMIT task state checks
      * @param bool $failOnError

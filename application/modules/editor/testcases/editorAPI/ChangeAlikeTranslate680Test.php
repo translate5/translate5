@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * This test covers if the repetition editor can deal with tags inside of segments.
  * Details are described in TRANSLATE-680: Automatic substituations of tags for repetitions
@@ -185,29 +187,39 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
             Antwort: Position spielt explizit eine Rolle,
 
      */
-    
-    
-    public static function beforeTests():void {
 
-        $task =[
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'enableSourceEditing' => static::$useSourceEditing,
-            'lockLocked' => 1,
-        ];
-
-        static::api()->addImportArray(self::$dummyData);
-        static::api()->addFilePlain('taskConfig', 'runtimeOptions.import.fileparser.options.protectTags = 1', 'text/plain', 'task-config.ini');
-        static::api()->import($task);
-
-        
-        $task = static::api()->getTask();
-   
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de')
+            ->setProperty('enableSourceEditing', static::$useSourceEditing)
+            ->addUploadData(static::createImportArray(static::$dummyData))
+            ->addTaskConfigIniFile('runtimeOptions.import.fileparser.options.protectTags = 1')
+            ->setToEditAfterImport();
     }
-    
+
+    /**
+     * Receives a two dimensional array and add it as a CSV file to the task
+     * MID col and CSV head line is added automatically
+     * multiple targets currently not supported!
+     * @param array $data
+     * @return string
+     */
+    private static function createImportArray(array $data): string
+    {
+        $i = 1;
+        $data = array_map(function ($row) use (&$i) {
+            $row = array_map(function ($cell) {
+                //escape " chars
+                return str_replace('"', '""', $cell);
+            }, $row);
+            array_unshift($row, $i++); //add mid
+            return '"' . join('","', $row) . '"';
+        }, $data);
+        array_unshift($data, '"id", "source", "target"');
+        return join("\n", $data);
+    }
+
     /**
      * Test using changealikes by source match
      */
@@ -362,7 +374,7 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         $alikes = static::api()->getJson('editor/alikesegment/'.$segToTest->id);
         
         $alikeNrs = array_column($alikes, 'segmentNrInTask');
-        $this->assertEquals([21], $alikeNrs, 'The found repetitions are not as expected!');
+        $this->assertEquals([19, 21], $alikeNrs, 'The found repetitions are not as expected!');
         $alikeIds = array_column($alikes, 'id');
         
         $alikePutData = [
@@ -376,10 +388,5 @@ class ChangeAlikeTranslate680Test extends editor_Test_JsonTest {
         $jsonFileName = 'expectedSegmentsEditedWhitespace.json';
         $segmentsAfterChange = static::api()->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segmentsAfterChange, 'Imported segments are not as expected!');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }
