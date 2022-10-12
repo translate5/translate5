@@ -69,6 +69,17 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
     }
 
     /**
+     * Convenience-API to get the task with the given index
+     * @param int $index
+     * @return Task
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    protected static function getTaskAt(int $index): Task
+    {
+        return static::$_config->getTaskAt($index);
+    }
+
+    /**
      * internal setup for the base-classes
      * Do not override in concrete test-classes, use beforeTests there
      */

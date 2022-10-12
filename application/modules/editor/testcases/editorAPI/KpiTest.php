@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * KpiTest imports three simple tasks, sets some KPI-relevant dates, exports some of the tasks,
  * and then checks if the KPIs (Key Performance Indicators) get calculated as expected.
  */
-class KpiTest extends \editor_Test_ApiTest {
+class KpiTest extends editor_Test_ImportTest {
     
     const KPI_REVIEWER = 'averageProcessingTimeReviewer';
     const KPI_TRANSLATOR = 'averageProcessingTimeTranslator';
@@ -77,36 +79,37 @@ class KpiTest extends \editor_Test_ApiTest {
      * @var string
      */
     private static $taskEndDate = 'finishedDate';
-    
-    public static function beforeTests(): void {
 
+    protected static function setupImport(Config $config): void
+    {
         // If any task exists already, filtering will be wrong!
         $filteredTasks = static::getFilteredTasks();
         static::assertEquals('0', count($filteredTasks), 'The translate5 instance contains already a task with the name "'.static::$taskNameBase.'" remove this task before!');
 
         if(count($filteredTasks) === 0){
-	        // create the tasks and store their ids
-	        foreach (static::$tasksForKPI as $taskData) {
-	            $taskNameSuffix = $taskData['taskNameSuffix'];
-	            $task = array(
-	                'taskName' => static::$taskNameBase.'_'.$taskNameSuffix, //no date in file name possible here!
-	                'sourceLang' => 'en',
-	                'targetLang' => 'de'
-	            );
-	            static::api()->addImportFile(static::api()->getFile('../TestImportProjects/testcase-de-en.xlf'));
-	            static::api()->import($task);
+            // create the tasks and store their ids
+            foreach (static::$tasksForKPI as $taskData) {
 
-	            // store task-id for later deleting
-	            $task = static::api()->getTask();
-	            static::$taskIds[$taskNameSuffix] = $task->id;
+                $taskNameSuffix = $taskData['taskNameSuffix'];
+                $config
+                    ->addTask('en', 'de', -1, 'testcase-de-en.xlf')
+                    ->setProperty('taskName', static::$taskNameBase.'_'.$taskNameSuffix)
+                    ->addAdditionalUser('testlector', params: [
+                        'workflow'=>'default',
+                        'workflowStepName'=>'reviewing'
+                    ]);
+            }
+        }
+    }
 
-	            //add user to the task
-	            $tua = static::api()->addUser('testlector', params: [
-	                'workflow'=>'default',
-	                'workflowStepName'=>'reviewing'
-	            ]);
-	            static::$taskUserAssocMap[$task->id] = $tua->id;
-	        }
+    /**
+     * generate some maps to work with
+     */
+    public static function beforeTests(): void {
+        for($i = 0; $i < count(static::$tasksForKPI); $i++){
+            $task = static::getTaskAt($i);
+            static::$taskIds[static::$tasksForKPI[$i]['taskNameSuffix']] = $task->getId();
+            static::$taskUserAssocMap[$task->getId()] = $task->getUserAssoc('testlector')->id;
         }
     }
 
@@ -226,12 +229,5 @@ class KpiTest extends \editor_Test_ApiTest {
         $statistics[self::KPI_REVIEWER] = (string)round($processingTimeInDays / $nrTasks, 0);
         $statistics['excelExportUsage'] = round((($nrExported / $nrTasks) * 100),2) . '%';
         return $statistics;
-    }
-
-    public static function afterTests(): void {
-        static::api()->login('testmanager');
-        foreach (self::$taskIds as $taskId) {
-            static::api()->deleteTask($taskId);
-        }
     }
 }

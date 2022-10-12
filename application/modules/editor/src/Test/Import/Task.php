@@ -53,6 +53,7 @@ final class Task extends Resource
     private ?array $_uploadData = null;
     private ?array $_additionalUploadFiles = null;
     private ?array $_additionalUsers = null;
+    private array $_userAssocs = [];
     private ?string $_taskConfigIni = null;
     private ?string $_cleanupZip = null;
     private bool $_setToEditAfterImport = false;
@@ -300,7 +301,7 @@ final class Task extends Resource
         $this->applyResult($api->getTask());
         // if testlector shall be loged in after setup, we add him to the task automatically
         if ($config->getLogin() === 'testlector') {
-            $api->addUserToTask($this->getTaskGuid(), 'testlector');
+            $this->_userAssocs['testlector'] = $api->addUserToTask($this->getTaskGuid(), 'testlector');
             $api->login('testlector');
         }
         // add additional defined users
@@ -310,7 +311,7 @@ final class Task extends Resource
                     throw new Exception('You cannot setup the \'testlector\' login and assign it as seperate user to the task at the same time.');
                 }
                 // $this->reload($api); // some tests added this always between user-adds but it seems to be unneccessary
-                $api->addUserToTask($this->getTaskGuid(), $data['name'], $data['state'], $data['step'], $data['params']);
+                $this->_userAssocs[$data['name']] = $api->addUserToTask($this->getTaskGuid(), $data['name'], $data['state'], $data['step'], $data['params']);
             }
         }
         // last step: open task for edit if configured
@@ -364,20 +365,17 @@ final class Task extends Resource
     }
 
     /**
-     * Retrieves a certain user from the task's "users" prop
-     * This can only be called successfully after loading a task & assugning the user ...
+     * Retrieves a user-assoc created on import
+     * This can only be called successfully after loading a task & assigning the user ...
      * @param string $login
      * @return \stdClass|null
+     * @throws Exception
      */
-    public function getUser(string $login): ?\stdClass
+    public function getUserAssoc(string $login): ?\stdClass
     {
-        $this->checkImported(' therefore users can not be retrieved.');
-        if (property_exists($this, 'users')) {
-            foreach ($this->users as $user) {
-                if (property_exists($user, 'login') && $user->login === $login) {
-                    return $user;
-                }
-            }
+        $this->checkImported(' therefore user-assocs can not be retrieved.');
+        if (array_key_exists($login, $this->_userAssocs)) {
+            return $this->_userAssocs[$login];
         }
         return null;
     }
