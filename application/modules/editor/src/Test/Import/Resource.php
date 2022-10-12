@@ -96,6 +96,22 @@ abstract class Resource
     }
 
     /**
+     * Retrieves the currently stored data as object. This mimics what is cached in the Helper API
+     * @return \stdClass
+     */
+    public function getAsObject(): \stdClass
+    {
+        $obj = new \stdClass();
+        foreach (get_object_vars($this) as $name => $val) {
+            // exclude internal props
+            if (!str_starts_with($name, '_')) {
+                $obj->$name = $val;
+            }
+        }
+        return $obj;
+    }
+
+    /**
      * Applies the requested data back to this class after request
      * This dynamically adds more props
      * @param \stdClass $result

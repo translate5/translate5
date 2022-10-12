@@ -52,7 +52,8 @@ final class Task extends Resource
     private ?array $_uploadFiles = null;
     private ?array $_uploadData = null;
     private ?array $_additionalUploadFiles = null;
-    private ?array $_additionalUsers = null;
+    private ?array $_importUsers = null;
+    private ?string $_usageMode = null;
     private array $_userAssocs = [];
     private ?string $_taskConfigIni = null;
     private ?string $_cleanupZip = null;
@@ -139,12 +140,12 @@ final class Task extends Resource
      * @param string $filePath
      * @return $this
      */
-    public function addAdditionalUploadFile(string $uploadName, string $filePath, string $mimeType = 'application/zip'): Task
+    public function addAdditionalUploadFile(string $uploadName, string $filePath): Task
     {
         if ($this->_additionalUploadFiles === null) {
             $this->_additionalUploadFiles = [];
         }
-        $this->_additionalUploadFiles[] = ['name' => $uploadName, 'path' => $filePath, 'mime' => $mimeType];
+        $this->_additionalUploadFiles[] = ['name' => $uploadName, 'path' => $filePath];
         return $this;
     }
 
@@ -157,12 +158,23 @@ final class Task extends Resource
      * @param array $params : add additional taskuserassoc params to the add user call
      * @return $this
      */
-    public function addAdditionalUser(string $userName, string $userState = 'open', string $workflowStep = 'reviewing', array $params = []): Task
+    public function addUser(string $userName, string $userState = 'open', string $workflowStep = 'reviewing', array $params = []): Task
     {
-        if ($this->_additionalUsers === null) {
-            $this->_additionalUsers = [];
+        if ($this->_importUsers === null) {
+            $this->_importUsers = [];
         }
-        $this->_additionalUsers[] = ['name' => $userName, 'state' => $userState, 'step' => $workflowStep, 'params' => $params];
+        $this->_importUsers[] = ['name' => $userName, 'state' => $userState, 'step' => $workflowStep, 'params' => $params];
+        return $this;
+    }
+
+    /**
+     * Sets the task-usage mode during import
+     * @param string $usageMode
+     * @return $this
+     */
+    public function setUsageMode(string $usageMode): Task
+    {
+        $this->_usageMode = $usageMode;
         return $this;
     }
 
@@ -299,14 +311,19 @@ final class Task extends Resource
         // after the wait-loop the task may has some changed props
         // TODO: we should rework the API not to cache the task-data but to return them
         $this->applyResult($api->getTask());
+
+        // set usage-mode if setup
+        if($this->_usageMode !== null){
+            $api->putJson('editor/task/'.$this->getId(), array('usageMode' => $this->_usageMode));
+        }
         // if testlector shall be loged in after setup, we add him to the task automatically
         if ($config->getLogin() === 'testlector') {
             $this->_userAssocs['testlector'] = $api->addUserToTask($this->getTaskGuid(), 'testlector');
             $api->login('testlector');
         }
         // add additional defined users
-        if ($this->_additionalUsers !== null) {
-            foreach ($this->_additionalUsers as $data) {
+        if ($this->_importUsers !== null) {
+            foreach ($this->_importUsers as $data) {
                 if ($data['name'] === 'testlector' && $config->getLogin() === 'testlector') {
                     throw new Exception('You cannot setup the \'testlector\' login and assign it as seperate user to the task at the same time.');
                 }
@@ -323,6 +340,7 @@ final class Task extends Resource
     /**
      * Reloads a task and fetches fresh props
      * @param Helper $api
+     * @return $this
      * @throws Exception
      * @throws \Zend_Http_Client_Exception
      */
@@ -331,6 +349,7 @@ final class Task extends Resource
         $this->checkImported(' therefore the task cannot be reloaded.');
         $result = $api->getJson('editor/task/' . $this->getId());
         $this->applyResult($result);
+        return $this;
     }
 
     /**
@@ -439,10 +458,10 @@ final class Task extends Resource
             $api->addImportFile($this->_cleanupZip);
         } else if ($this->_uploadFiles !== null) {
             if (count($this->_uploadFiles) === 1) {
-                $api->addImportFile($api->getFile($this->_uploadFiles[0]));
+                $api->addImportFile($api->getFile($this->_uploadFiles[0]), $this->evaluateMime($this->_uploadFiles[0]));
             } else {
                 foreach ($this->_uploadFiles as $relPath) {
-                    $api->addImportFiles($api->getFile($relPath));
+                    $api->addImportFiles($api->getFile($relPath), $this->evaluateMime($relPath));
                 }
             }
         } else if ($this->_uploadData !== null) {
@@ -453,12 +472,33 @@ final class Task extends Resource
         // add additional uploads if set
         if ($this->_additionalUploadFiles != null) {
             foreach ($this->_additionalUploadFiles as $data) {
-                $api->addFile($data['name'], $api->getFile($data['path']), $data['mime']);
+                $api->addFile($data['name'], $api->getFile($data['path']), $this->evaluateMime($data['path']));
             }
         }
         // add optional task-config.ini if set
         if ($this->_taskConfigIni != null) {
             $api->addFilePlain('taskConfig', $this->_taskConfigIni, 'text/plain', 'task-config.ini');
+        }
+    }
+
+    /**
+     * mime detection for import files
+     * @param string $file
+     * @return string
+     */
+    private function evaluateMime(string $file): string {
+        switch(pathinfo($file, PATHINFO_EXTENSION)){
+            case 'zip':
+                return 'application/zip';
+            case 'csv':
+                return 'application/csv';
+            case 'tbx':
+            case 'xliff':
+            case 'xlf':
+            case 'xml':
+                 return 'application/xml';
+            default:
+                return 'text/plain';
         }
     }
 }
