@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * SegmentWorkflowTest imports a test task, adds workflow users, edits segments and finishes then the task.
  * The produced changes.xml and the workflow steps of the segments are checked. 
  */
-class SegmentWorkflowTest extends \editor_Test_ApiTest {
+class SegmentWorkflowTest extends editor_Test_ImportTest {
 
     protected static bool $termtaggerRequired = true;
 
@@ -39,29 +41,16 @@ class SegmentWorkflowTest extends \editor_Test_ApiTest {
     ];
 
     protected static array $requiredRuntimeOptions = ['editor.notification.saveXmlToFile' => 1];
-    /**
-     * Setting up the test task by fresh import, adds the lector and translator users
-     */
-    public static function beforeTests(): void {
 
-        $task = array(
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-        );
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de', -1, 'simple-en-de.zip')
+            ->addUser('testlector')
+            ->addUser('testtranslator', 'waiting', 'translatorCheck')
+            ->setProperty('taskName', static::NAME_PREFIX . 'SegmentWorkflowTest'); // TODO FIXME: we better generate data independent from resource-names ...
+    }
 
-        static::api()->addImportFile('SegmentWorkflowTest/simple-en-de.zip');
-        static::api()->import($task);
-        
-        //FIXME improve this test by using two lector users to test after all finish with multiple users
-        static::api()->reloadTask();
-        static::api()->addUser('testlector');
-        static::api()->reloadTask();
-        static::api()->addUser('testtranslator', 'waiting', 'translatorCheck');
-
-            }
-    
     public function testTranslator() {
         //Implement tests for the new role translator and workflowstep translating!
         $this->markTestIncomplete("Implement tests for the new role translator and workflowstep translating!");
@@ -157,10 +146,5 @@ class SegmentWorkflowTest extends \editor_Test_ApiTest {
         //check that task is open for translator now
         static::api()->login('testtranslator');
         $this->assertEquals('open', static::api()->reloadTask()->userState);
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

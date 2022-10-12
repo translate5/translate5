@@ -26,38 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Test the task joined filters
  */
-class TaskFilterTest extends \editor_Test_ApiTest {
+class TaskFilterTest extends editor_Test_ImportTest {
 
     protected static bool $termtaggerRequired = true;
-    /**
-     * Setting up the test task by fresh import, adds the lector and translator users
-     */
-    public static function beforeTests():void {
 
-        $task = array(
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-        );
-
-        static::api()->addImportFile('SegmentWorkflowTest/simple-en-de.zip');
-        static::api()->import($task);
-        
-        static::api()->addUser('testlector','open','reviewing',[
-            'deadlineDate'=>date("Y-m-d 00:00:00", strtotime("+1 day"))
-        
-        ]);
-        static::api()->reloadTask();
-        static::api()->addUser('testtranslator', 'waiting', 'translation',[
-            'deadlineDate'=>date("Y-m-d 00:00:00", strtotime("+2 day"))
-            
-        ]);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de', -1, 'simple-en-de.zip')
+            ->setUsageMode('simultaneous')
+            ->addUser('testlector', 'open', 'reviewing', ['deadlineDate' => date("Y-m-d 00:00:00", strtotime("+1 day"))])
+            ->addUser('testtranslator', 'waiting', 'translation', ['deadlineDate' => date("Y-m-d 00:00:00", strtotime("+2 day"))])
+            ->setProperty('taskName', static::NAME_PREFIX . 'TaskFilterTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
-    
+
     /**
      * Test if the task user assoc filters are workign
      */
@@ -74,10 +61,5 @@ class TaskFilterTest extends \editor_Test_ApiTest {
         ]);
         $this->assertCount(1, $return);
         $this->assertEquals(0, $return[0]->segmentFinishCount);
-    }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

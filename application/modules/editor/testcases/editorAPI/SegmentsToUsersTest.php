@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * SegmentsToUsersTest imports a test task, adds users with the same workflow-role and assigns segments to them.
  * It then checks if they are allowed to edit segments accordingly.
  */
-class SegmentsToUsersTest extends \editor_Test_ApiTest {
+class SegmentsToUsersTest extends editor_Test_ImportTest {
     
     const STEP = 'translation';
     const SEGMENTRANGE_USER1 = '1-3,5';
@@ -44,40 +46,21 @@ class SegmentsToUsersTest extends \editor_Test_ApiTest {
     protected static array $requiredPlugins = [
         'editor_Plugins_FrontEndMessageBus_Init'
     ];
-    /**
-     * Setting up the test task by fresh import, adds the lector and translator users
-     */
-    public static function beforeTests(): void {
 
-        $task = array(
-            'taskName' => 'API Testing::'.__CLASS__,
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true
-        );
-
-        static::api()->addImportFile(static::api()->getFile('testcase-de-en.xlf'));
-        static::api()->import($task);
-        
-        // task must be in 'simultaneous'-mode
-        $task = static::api()->getTask();
-        static::api()->putJson('editor/task/'.$task->id, array('usageMode' => 'simultaneous'));
-        
-        // => testEditableSegmentsForUser1
-        static::api()->reloadTask();
-        static::api()->addUser('testlector', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER1]);
-        
-        // => testEditableSegmentsForUser2
-        static::api()->reloadTask();
-        static::api()->addUser('testtranslator', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER2]);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de', -1, 'testcase-de-en.xlf')
+            ->setUsageMode('simultaneous')
+            ->addUser('testlector', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER1])
+            ->addUser('testtranslator', 'open', self::STEP, ['segmentrange' => self::SEGMENTRANGE_USER2]);
     }
-    
+
     /**
      * Checks if the segments that are NOT editable are recognized as expected.
      */
     public function testNonEditableSegments() {
-        $missingsegmentranges = static::api()->reloadTask()->missingsegmentranges[0];
-        //fwrite(STDERR, print_r($missingsegmentranges,1));
+        $missingsegmentranges = static::getTask()->reload(static::api())->getProperty('missingsegmentranges')[0];
         $this->assertEquals('translation', $missingsegmentranges->workflowStepName);
         $this->assertEquals(self::NON_EDITABLE_SEGMENTS_EXPECTED, $missingsegmentranges->missingSegments);
     }
@@ -87,10 +70,9 @@ class SegmentsToUsersTest extends \editor_Test_ApiTest {
      */
     public function testEditableSegmentsForUser1() {
         static::api()->login('testlector');
-        static::api()->reloadTask();
-        $task = static::api()->getTask();
+        $taskId = static::getTask()->reload(static::api())->getId();
         //open task
-        static::api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($taskId);
         //get segment list
         $segments = static::api()->getSegments(null, 20);
         //check if segments are editable as expected
@@ -103,10 +85,9 @@ class SegmentsToUsersTest extends \editor_Test_ApiTest {
      */
     public function testEditableSegmentsForUser2() {
         static::api()->login('testtranslator');
-        static::api()->reloadTask();
-        $task = static::api()->getTask();
+        $taskId = static::getTask()->reload(static::api())->getId();
         //open task
-        static::api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($taskId);
         //get segment list
         $segments = static::api()->getSegments(null, 20);
         //check if segments are editable as expected
@@ -127,10 +108,5 @@ class SegmentsToUsersTest extends \editor_Test_ApiTest {
             }
         }
         $this->assertEquals($editableSegmentsExpected, $editableSegments);
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

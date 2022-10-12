@@ -26,35 +26,24 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- */
-class TrackChangesTest extends \editor_Test_ApiTest {
+use MittagQI\Translate5\Test\Import\Config;
+
+class TrackChangesTest extends editor_Test_ImportTest {
 
     protected static $expectedCsvResult;
 
     protected static array $requiredPlugins = [
         'editor_Plugins_TrackChanges_Init'
     ];
-    
-    public static function beforeTests(): void {
-        
-        
-        $task = array(
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-        );
 
-        static::api()->addImportFile(static::api()->getFile('testcase-de-en.xlf'));
-        
-        static::api()->import($task);
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de', -1, 'testcase-de-en.xlf')
+            ->setToEditAfterImport()
+            ->setProperty('taskName', static::NAME_PREFIX . 'TrackChangesTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
-    
+
     /**
      * test for issue TRANSLATE-1267: content between two track changes del tags is getting deleted on some circumstances
      * Given a special construction of del tags was leading to much deleted content on the export
@@ -106,10 +95,5 @@ class TrackChangesTest extends \editor_Test_ApiTest {
         //file_put_contents('/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/TrackChangesTest/new-export.xlf', rtrim($exportedFile));
         //compare it
        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to expected-export-testcase-de-en.xlf');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

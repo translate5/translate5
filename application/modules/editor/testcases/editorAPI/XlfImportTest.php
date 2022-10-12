@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * BasicSegmentEditingTest imports a simple task, checks imported values,
  * edits segments and checks then the edited ones again on correct content
@@ -41,30 +43,16 @@ class XlfImportTest extends editor_Test_JsonTest {
         'import.xlf.preserveWhitespace' => 0
     ];
 
-    public static function beforeTests(): void {
+    protected static string $setupUserLogin = 'testlector';
 
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
-        
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task);
-        
-        static::api()->addUser('testlector');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de')
+            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      */
@@ -234,10 +222,5 @@ class XlfImportTest extends editor_Test_JsonTest {
      */
     public function testPreserveAllWhitespace() {
         $this->markTestIncomplete('Could not be tested due missing task template functionality to set the preserve config to true.');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

@@ -94,7 +94,7 @@ class KpiTest extends editor_Test_ImportTest {
                 $config
                     ->addTask('en', 'de', -1, 'testcase-de-en.xlf')
                     ->setProperty('taskName', static::$taskNameBase.'_'.$taskNameSuffix)
-                    ->addAdditionalUser('testlector', params: [
+                    ->addUser('testlector', params: [
                         'workflow'=>'default',
                         'workflowStepName'=>'reviewing'
                     ]);

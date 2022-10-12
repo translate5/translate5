@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * XlfSegmentLengthTest imports a simple task and checks imported values about the segment lengths
  * edits segments and checks then the edited ones again on correct content
@@ -41,30 +43,16 @@ class XlfSegmentLengthTest extends editor_Test_JsonTest {
         'import.xlf.preserveWhitespace' => 0
     ];
 
-    public static function beforeTests(): void {
+    protected static string $setupUserLogin = 'testlector';
 
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
-        
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task);
-        
-        static::api()->addUser('testlector');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de')
+            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      * Other constellations of the segment length count are implicitly tested in the XlfImportTest!
@@ -83,11 +71,8 @@ class XlfSegmentLengthTest extends editor_Test_JsonTest {
         //get segment list (just the ones of the first file for that tests)
         $segments = static::api()->getSegments(null, 20);
         $this->assertNotEmpty($segments, 'No segments are found in the Task!');
-        
-        require_once 'Models/Segment/TagAbstract.php';
-        require_once 'Models/Segment/InternalTag.php';
 
-        //the first three segments remain unedited, since content is getting to long with edited content
+        //the first three segments remain unedited, since content is getting too long with edited content
         foreach($segments as $idx => $segToEdit) {
             if(empty($segToEdit->editable)) {
                 continue;
@@ -99,6 +84,7 @@ class XlfSegmentLengthTest extends editor_Test_JsonTest {
                 $contentToUse = $segToEdit->targetEdit;
             }
             $editedData = $contentToUse.' - edited'.$segToEdit->segmentNrInTask;
+            echo 'EDIT: '.strlen(strip_tags($editedData)).': '.$editedData;
             static::api()->saveSegment($segToEdit->id, $editedData);
         }
         
@@ -133,10 +119,5 @@ class XlfSegmentLengthTest extends editor_Test_JsonTest {
         //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
         //file_put_contents('/home/tlauria/foo-'.$fileToCompare, rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

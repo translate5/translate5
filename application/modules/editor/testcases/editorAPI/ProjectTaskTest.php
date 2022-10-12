@@ -57,7 +57,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         $config->addTask(static::$sourceLangRfc, static::$targetLangRfc, $ownCustomerId)
             ->addUploadFolder('testfiles', 'XLF-test.zip')
             ->setProperty('edit100PercentMatch', 0)
-            ->setProperty('taskName', static::NAME_PREFIX.static::class); // TODO FIXME: we better generate data independent from resource-names ...
+            ->setProperty('taskName', static::NAME_PREFIX . 'ProjectTaskTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
 
     /***

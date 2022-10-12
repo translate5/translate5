@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Translate682Test imports a simple task, where the segments contain htmlentities
  * this were changed and afterwards a diff export is done. The entities may not be destroyed by the diff, but completly encapsulated.
@@ -33,7 +35,7 @@ END LICENSE AND COPYRIGHT
  * See therefore: 
  * TRANSLATE-678 
  */
-class Translate682Test extends \editor_Test_ApiTest {
+class Translate682Test extends editor_Test_ImportTest {
 
     protected static bool $termtaggerRequired = true;
 
@@ -42,26 +44,18 @@ class Translate682Test extends \editor_Test_ApiTest {
     ];
 
     protected static $expectedCsvResult;
-    
-    public static function beforeTests(): void {
 
-        $task = array(
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-        );
-
-        static::api()->addImportFile(static::api()->getFile('testsamples.sdlxliff'), 'application/xml');
-        static::api()->addImportTbx(static::api()->getFile('tbx_without_ids.tbx'));
-        static::api()->import($task);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de', -1, 'testsamples.sdlxliff')
+            ->addAdditionalUploadFile('importTbx', 'tbx_without_ids.tbx')
+            ->setToEditAfterImport()
+            ->setProperty('taskName', static::NAME_PREFIX . 'Translate682Test'); // TODO FIXME: we better generate data independent from resource-names ...
     }
-    
+
     public function testEditing() {
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
-        
+
         //get segment list
         $segments = static::api()->getSegments();
         $segToEdit = $segments[0];
@@ -98,10 +92,5 @@ class Translate682Test extends \editor_Test_ApiTest {
         $expectedData = $replaceDynamicRevId(static::api()->getFileContent('expectedResult.sdlxliff'));
         
         $this->assertEquals(rtrim($expectedData), rtrim($exportedData), 'Exported result does not equal to expected SDLXLIFF content');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }

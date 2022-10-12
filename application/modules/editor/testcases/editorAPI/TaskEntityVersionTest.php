@@ -26,35 +26,24 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * TaskEntityVersionTest is currently incomplete, just created as a stub to be implemented
  */
-class TaskEntityVersionTest extends \editor_Test_ApiTest {
+class TaskEntityVersionTest extends editor_Test_ImportTest {
 
-    public static function beforeTests(): void {
-
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-        );
-
-
-        static::api()->addImportFile(static::api()->getFile('simple-en-de.zip'));
-        static::api()->import($task);
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de', -1, 'simple-en-de.zip');
     }
-    
+
     public function testEntityVersionOnChangingUsers() {
         $this->markTestIncomplete("test in draft mode, has to be completed!");
         //first add one user
-        static::api()->addUser('testlector');
+        // static::api()->addUser('testlector');
         //dont reload task and add another user, this results correctly in an 409 HTTP status
         //problem for this test is now, that addUser already checks for 200, this has to be flexibilized
-        static::api()->addUser('testtranslator');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id);
+        // static::api()->addUser('testtranslator');
     }
 }
