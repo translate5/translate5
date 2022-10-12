@@ -63,12 +63,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists($t5defaultImportBconf,
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
-    }
 
-    /***
-     * Unpack, Pack a Bconf to verify the Bconf Parser and Packer
-     */
-    public function test10_BconfImportExport() {
         $input = new SplFileInfo(static::api()->getFile('minimal/batchConfiguration.t5.bconf'));
         $bconfName = 'OkapiBconfTest' . microtime() . '.bconf';
         static::api()->addFile('bconffile', $input->getPathname(), 'application/octet-stream');
@@ -85,9 +80,8 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         self::assertFileEquals($input, $output, $failureMsg);
     }
 
-    /***
+    /**
      * Test if new srx files are packed into bconf.
-     * @depends test10_BconfImportExport
      */
     public function test20_SrxUpload() {
         $bconf = self::$bconf;
@@ -119,9 +113,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         self::assertStringContainsString($targetSrx, $bconfString, "targetSrx update failed for bconf #$id");
     }
 
-    /**
-     * @depends test10_BconfImportExport
-     */
     public function test30_AutoImportAndVersionUpdate() {
         if(!self::isMasterTest()){
             self::assertTrue(true);
@@ -250,7 +241,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
     /**
      * Provoke Exceptions via invalid inputs
-     * @depends test10_BconfImportExport
      */
     public function test60_InvalidFiles() {
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
@@ -290,9 +280,9 @@ class OkapiBconfTest extends editor_Test_JsonTest {
     }
 
     /**
-     * @depends test10_BconfImportExport
+     * Cleanup, also tested
      */
-    public function test70_DeleteBconf() {
+    public static function afterTests(): void {
         $bconf = self::$bconf;
         $bconf->load(self::$bconfId);
         $bconfDir = $bconf->getDataDirectory();
