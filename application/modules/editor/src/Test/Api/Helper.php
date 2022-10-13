@@ -91,10 +91,12 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     protected static array $resources = []; //TODO: remove from memory ?
 
-    protected array $testusers = array(
+    protected static array $testusers = array(
         'testmanager' => '{00000000-0000-0000-C100-CCDDEE000001}',
         'testlector' => '{00000000-0000-0000-C100-CCDDEE000002}',
         'testtranslator' => '{00000000-0000-0000-C100-CCDDEE000003}',
+        'testapiuser' => '{00000000-0000-0000-C100-CCDDEE000004}',
+        'testtermproposer' => '{00000000-0000-0000-C100-CCDDEE000005}'
     );
 
     //region Import API
@@ -102,6 +104,10 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
 
     /**
+     * @param array $task
+     * @param bool $failOnError default true
+     * @param bool $waitForImport default true : if this is set to false, the function will not check the task import state
+     * @return boolean;
      * @deprecated
      * Imports the task described in array $task, parameters are the API parameters, at least:
      * @Deprecated
@@ -115,10 +121,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * 'wordCount' => 666, //optional, defaults to heavy metal
      * );
      *
-     * @param array $task
-     * @param bool $failOnError default true
-     * @param bool $waitForImport default true : if this is set to false, the function will not check the task import state
-     * @return boolean;
      */
     public function import(array $task, bool $failOnError = true, bool $waitForImport = true): bool
     {
@@ -206,8 +208,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             if ($taskResult->state == 'error') {
                 if ($failOnError) {
                     $lastErrors = (property_exists($taskResult, 'lastErrors') && !empty($taskResult->lastErrors)) ? $taskResult->lastErrors : [];
-                    $addon = (count($lastErrors) > 0) ? ' and last errors:' . "\n ".join("\n ", array_column($lastErrors, 'message')) : '.';
-                    $this->test::fail('Task Import stopped. Task has state error'.$addon);
+                    $addon = (count($lastErrors) > 0) ? ' and last errors:' . "\n " . join("\n ", array_column($lastErrors, 'message')) : '.';
+                    $this->test::fail('Task Import stopped. Task has state error' . $addon);
                 }
                 return false;
             }
@@ -316,7 +318,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     public function waitForTaskImported(\stdClass $task)
     {
         $this->task = $task;
-        if($task->taskType == self::INITIAL_TASKTYPE_PROJECT){
+        if ($task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
             $this->checkProjectTasksStateLoop();
         } else {
             $this->checkTaskStateLoop();
@@ -453,7 +455,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * @return array|\stdClass
      * @throws \Zend_Http_Client_Exception
      */
-    public function addResourceTaskAssoc(int $resourceId, string $resourceName, string $taskGuid){
+    public function addResourceTaskAssoc(int $resourceId, string $resourceName, string $taskGuid)
+    {
         error_log('Languageresources assoc to task. ' . $resourceName . ' -> ' . $taskGuid);
         return $this->postJson(
             'editor/languageresourcetaskassoc',
@@ -489,32 +492,32 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     /**
      * Removes the passed or current Task
-     * @param int $taskId: if given, this task is taken, otherwise the current task
-     * @param string|null $loginName: if given, a login with this user is done before opening/deleting the task
-     * @param string|null $loginName: only in conjunction with $loginName. If given, a login with this user is done before to open the task, deletion is done with the latter
+     * @param int $taskId : if given, this task is taken, otherwise the current task
+     * @param string|null $loginName : if given, a login with this user is done before opening/deleting the task
+     * @param string|null $loginName : only in conjunction with $loginName. If given, a login with this user is done before to open the task, deletion is done with the latter
      * @param bool $isProjectTask
      */
     public function deleteTask(int $taskId = -1, string $loginName = null, string $loginNameToOpen = null, bool $isProjectTask = false)
     {
-        if($taskId < 1 && $this->task){
+        if ($taskId < 1 && $this->task) {
             $taskId = $this->task->id;
             $isProjectTask = ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT);
         }
-        if($taskId > 0){
-            if($isProjectTask){
+        if ($taskId > 0) {
+            if ($isProjectTask) {
                 $this->login($loginName);
             } else {
-                if(!empty($loginName) && !empty($loginNameToOpen)){
+                if (!empty($loginName) && !empty($loginNameToOpen)) {
                     $this->login($loginNameToOpen);
-                } else if(!empty($loginName)){
+                } else if (!empty($loginName)) {
                     $this->login($loginName);
                 }
                 $this->setTaskToOpen($taskId);
-                if(!empty($loginName) && !empty($loginNameToOpen)){
+                if (!empty($loginName) && !empty($loginNameToOpen)) {
                     $this->login($loginName);
                 }
             }
-            $this->delete('editor/task/'.$taskId);
+            $this->delete('editor/task/' . $taskId);
         }
     }
     //endregion
@@ -522,14 +525,14 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     /******************************************************* USER API *******************************************************/
 
     /**
-     * @deprecated
-     * adds the given user to the actual task
      * @param string $username one of the predefined users (testmanager, testlector, testtranslator)
      * @param string $state open, waiting, finished, as available by the workflow
      * @param string $step reviewing or translation, as available by the workflow
      * @param array $params add additional taskuserassoc params to the add user call
      *
      * @return \stdClass taskuserassoc result
+     * @deprecated
+     * adds the given user to the actual task
      */
     public function addUser(string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
     {
@@ -562,6 +565,20 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         $json = $this->postJson('editor/taskuserassoc', $p);
         $this->assertResponseStatus($this->getLastResponse(), 'User');
         return $json;
+    }
+
+    /**
+     * Retrieves a userGuid from the setup test-users
+     * @param string $login
+     * @return string
+     * @throws Exception
+     */
+    public function getUserGuid(string $login): string
+    {
+        if (array_key_exists($login, static::$testusers)) {
+            return static::$testusers[$login];
+        }
+        throw new Exception('User \''.$login.'\' is no valid test user.');
     }
 
     //endregion
@@ -712,7 +729,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             $counter++;
         }
 
-        $this->test::assertEquals('available', $result->status, 'Resource import of '.$resource->name.' stopped. Resource state is:' . $result->status);
+        $this->test::assertEquals('available', $result->status, 'Resource import of ' . $resource->name . ' stopped. Resource state is:' . $result->status);
         return $result;
     }
 

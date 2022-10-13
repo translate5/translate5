@@ -32,6 +32,8 @@ use MittagQI\Translate5\Test\Api\Helper;
 
 /**
  * Represents the api-request configuration for a task
+ * There are many quirks in the implementation of the underlying helper API that lead to the state here not neccesarily reflect the state of the task on the server,
+ * e.g. when setting ::setNotToFailOnError in the helper Loop the data is not cached. why ?
  */
 final class Task extends Resource
 {
@@ -230,6 +232,15 @@ final class Task extends Resource
     }
 
     /**
+     * @return string
+     * @throws Exception
+     */
+    public function getTaskState(): string
+    {
+        return strval($this->getProperty('state'));
+    }
+
+    /**
      * Retrieves the task's data-directory
      * @return string
      * @throws \MittagQI\Translate5\Test\Import\Exception
@@ -284,6 +295,7 @@ final class Task extends Resource
 
         } else {
 
+            // TODO FIXME: check, if $this->_failOnError can not be used here, seems to be just a miscoding overtaken over the years ...
             if (!$this->doImport($api, false, false)) {
                 return;
             }
@@ -319,7 +331,7 @@ final class Task extends Resource
                 $api->checkTaskStateLoop();
             }
         }
-        // after the wait-loop the task may has some changed props
+
         // TODO: we should rework the API not to cache the task-data but to return them
         $this->applyResult($api->getTask());
 
@@ -364,27 +376,43 @@ final class Task extends Resource
     }
 
     /**
+     * If the import was configured not to be waiting with ::setNotToWaitForImported this api can be used to wait afterwards ...
+     * @param Helper $api
+     * @throws Exception
+     */
+    public function waitForImport(Helper $api)
+    {
+        if ($this->isProjectTask()) {
+            $this->checkProjectTasksStateLoop();
+        } else {
+            $this->checkTaskStateLoop();
+        }
+        // TODO: we should rework the API not to cache the task-data but to return them
+        $this->applyResult($api->getTask());
+    }
+
+    /**
      * @param Helper $api
      * @param Config $config
      * @throws \MittagQI\Translate5\Test\Import\Exception
      */
     public function cleanup(Helper $api, Config $config): void
     {
+        // TODO FIXME: this is just neccessary because of quirks in the helper API ... see class comment
+        if($this->_failOnError){
+            $this->reload($api);
+        }
         // remove on server
         if ($this->_requested) {
+            $taskState = $this->getTaskState();
             $taskId = $this->getId();
-            if ($this->isProjectTask()) {
-                $api->login('testmanager');
-            } else {
-                if ($config->hasTestlectorLogin()) {
-                    $api->login('testlector');
-                    $api->setTaskToOpen($taskId);
-                    $api->login('testmanager');
-                } else {
-                    $api->login('testmanager');
-                    $api->setTaskToOpen($taskId);
-                }
+            // project tasks or tasks in error/import state can not be opened
+            if (!$this->isProjectTask() && $taskState !== 'open' && $taskState !== 'error' && $taskState !== 'import') {
+                $login = ($config->hasTestlectorLogin()) ? 'testlector' : 'testmanager';
+                $api->login($login);
+                $api->setTaskToOpen($taskId);
             }
+            $api->login('testmanager');
             $api->delete('editor/task/' . $taskId);
         }
         // remnove zipped file when imported by folder
