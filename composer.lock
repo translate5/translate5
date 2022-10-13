@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cbf60205b23a5c407ad26cee6830b37d",
+    "content-hash": "aa80a4b469a0b28cff65c60239458418",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -8362,6 +8362,19 @@
             "description": "package introducing roboto font from google for instanttranslation"
         },
         {
+            "name": "translate5/rangy-lib",
+            "version": "1.3.1-dev",
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.translate5.net/rangy.zip"
+            },
+            "type": "library",
+            "license": [
+                "MIT"
+            ],
+            "description": "A cross-browser JavaScript range and selection library, originating from https://github.com/timdown/rangy"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.4.1",
             "source": {
@@ -8776,7 +8789,8 @@
     "stability-flags": {
         "shardj/zf1-future": 20,
         "querypath/querypath": 20,
-        "dream-group/horde-text-diff": 20
+        "dream-group/horde-text-diff": 20,
+        "translate5/rangy-lib": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
