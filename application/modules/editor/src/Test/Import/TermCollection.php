@@ -37,10 +37,7 @@ final class TermCollection extends Resource
 {
     public string $name;
     public int $collectionId;
-    /**
-     * @var array|int
-     */
-    public $customerIds;
+    public string|array $customerIds;
     public bool $mergeTerms = true;
     protected string $_tbxFile;
     protected string $_login;

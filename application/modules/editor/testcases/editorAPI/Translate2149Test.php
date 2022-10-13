@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for TRANSLATE-2149 Xliff import deletes part of segment and a tag
  * The problem was the algorithm in editor_Models_Import_FileParser_Xlf_SurroundingTags was modifying internally the
@@ -48,30 +50,16 @@ class Translate2149Test extends editor_Test_JsonTest {
         'import.xlf.ignoreFramingTags' => 'all'
     ];
 
-    public static function beforeTests(): void {
+    // protected static string $setupUserLogin = 'testlector';
 
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'es',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip'); //TRANSLATE-2149-de-es
-        
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task);
-        
-        static::api()->addUser('testlector');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'es')
+            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      */
@@ -79,10 +67,5 @@ class Translate2149Test extends editor_Test_JsonTest {
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

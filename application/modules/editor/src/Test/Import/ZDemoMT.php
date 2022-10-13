@@ -33,14 +33,8 @@ namespace MittagQI\Translate5\Test\Import;
  */
 final class ZDemoMT extends LanguageResource
 {
-    /**
-     * @var string|array
-     */
-    public $sourceLang = 'en';
-    /**
-     * @var string|array
-     */
-    public $targetLang = 'de';
+    public string|array $sourceLang = 'en';
+    public string|array $targetLang = 'de';
     protected string $serviceName = 'ZDemoMT';
     protected string $serviceType = 'editor_Plugins_ZDemoMT';
 
