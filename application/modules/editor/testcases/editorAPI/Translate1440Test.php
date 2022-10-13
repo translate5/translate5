@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for TRANSLATE-1440 xlf tag numbering mismatch between source and target
  */
@@ -39,32 +41,15 @@ class Translate1440Test extends editor_Test_JsonTest {
     protected static array $requiredRuntimeOptions = [
         'import.xlf.preserveWhitespace' => 0
     ];
-    
-    public static function beforeTests(): void {
 
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'fr',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        $zipfile = static::api()->zipTestFiles('testfiles/','XLF-test.zip');
-        
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task);
-
-                
-        static::api()->addUser('testlector');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'fr')
+            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      */
@@ -72,10 +57,5 @@ class Translate1440Test extends editor_Test_JsonTest {
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

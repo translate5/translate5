@@ -26,36 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /***
  * This test will create one task with pivot file where the workflow/pivot file-name matching is done until the first "."
  * ex: the pivot file with a name "test-aleks.de.xliff" will match the workflow file with a name "test-aleks.en.test.xliff"
  */
 class Translate2827Test extends editor_Test_JsonTest {
 
-    public static function beforeTests(): void {
-
-        static::api()->addImportFiles(static::api()->getFile('import-project.de-es-ES.workfile.sdlxliff'));
-        static::api()->addImportFiles(static::api()->getFile('import-project.de-mk-MK.pivot.sdlxliff'));
-
-        $task = [
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'de',
-            'targetLang' => ['es-ES'],
-            'relaisLang' => 'mk-MK',
-            'customerId' => static::getTestCustomerId(),
-            'edit100PercentMatch' => true,
-            'importUpload_language' => ['es-ES','mk-MK'],
-            'importUpload_type' => ['workfiles','pivot'],
-            'autoStartImport' => 1
-        ];
-        static::api()->import($task, false);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'es-ES', static::getTestCustomerId())
+            ->addUploadFiles([
+                'import-project.de-es-ES.workfile.sdlxliff',
+                'import-project.de-mk-MK.pivot.sdlxliff'
+            ])
+            ->addProperty('relaisLang', 'mk-MK')
+            ->addProperty('importUpload_language', ['es-ES', 'mk-MK'])
+            ->addProperty('importUpload_type', ['workfiles', 'pivot']);
     }
 
-    /***
+    /**
      * Create the task with pivot
      */
     public function testImportProjectWithRelais(){
-        $projectTasks = static::api()->getProjectTasks();
+        $projectTasks = static::getTask()->getProperty('projectTasks');
+        // $projectTasks = static::api()->getProjectTasks();
         $this->assertEquals(count($projectTasks), 1, 'No tasks where created.');
     }
 
@@ -78,10 +75,4 @@ class Translate2827Test extends editor_Test_JsonTest {
         ];
         $this->assertEquals($expected, $relais, 'Relais columns not filled as expected!');
     }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id);
-    }
-
 }

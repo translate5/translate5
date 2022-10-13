@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for TRANSLATE-2567 TagProtection can not deal with line breaks in HTML attributes
  * For details see the issue.
@@ -37,30 +39,14 @@ class Translate2567Test extends editor_Test_JsonTest {
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
     ];
 
-    public static function beforeTests(): void {
-
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
-        
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task);
-        
-        static::api()->addUser('testlector');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'en', -1, 'simple-en-de.zip')
+            ->addUploadFolder('testfiles','testTask.zip')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      */
@@ -68,10 +54,5 @@ class Translate2567Test extends editor_Test_JsonTest {
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
-    }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

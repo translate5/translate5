@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Test the default deadline date. For each workflow role (this tests only the default workflow),
  * an default deadline date task overwrite config is set.
@@ -42,29 +44,22 @@ END LICENSE AND COPYRIGHT
  * 
  * 
  */
-class Translate2375Test extends \editor_Test_ApiTest {
+class Translate2375Test extends editor_Test_ImportTest {
+
     protected static $fixedDate = '2020-11-21 18:01:00';
-    public static function beforeTests(): void {
 
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'orderdate' => self::$fixedDate
-        );
-
-        $zipfile = static::api()->zipTestFiles('testfiles/','testTask.zip');
-
-        static::api()->addImportFile($zipfile);
-        static::api()->import($task);
-        $task = static::api()->getTask();
-        error_log('Task created. '.static::api()->getTask()->taskName);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'en')
+            ->addProperty('orderdate', self::$fixedDate)
+            ->addUploadFolder('testfiles', 'testTask.zip');
     }
-    
+
     public function testDeadlineDate(){
+
         self::assertLogin('testmanager');
-        
         $assocParams = ['deadlineDate' => 'default', 'assignmentDate' => self::$fixedDate];
-        
         static::api()->addUser('testtranslator','open','reviewing',$assocParams);
         static::api()->reloadTask();
         static::api()->addUser('testtranslator','waiting','translation',$assocParams);
@@ -88,10 +83,5 @@ class Translate2375Test extends \editor_Test_ApiTest {
         
         //file_put_contents(static::api()->getFile('/expected.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
         $this->assertEquals(static::api()->getFileContent('expected.json'), $data, 'The calculate default deadline is are not as expected!');
-    }
-    
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager');
     }
 }
