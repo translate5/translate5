@@ -378,9 +378,9 @@ final class Task extends Resource
     public function waitForImport(Helper $api)
     {
         if ($this->isProjectTask()) {
-            $this->checkProjectTasksStateLoop();
+            $api->checkProjectTasksStateLoop();
         } else {
-            $this->checkTaskStateLoop();
+            $api->checkTaskStateLoop();
         }
         // TODO: we should rework the API not to cache the task-data but to return them
         $this->applyResult($api->getTask());
@@ -437,7 +437,7 @@ final class Task extends Resource
     /**
      * Sets the task to "finished" after import
      * @param Helper $api
-     * @return stdClass
+     * @return \stdClass
      * @throws Exception
      */
     public function setTaskToFinished(Helper $api): mixed
@@ -449,7 +449,7 @@ final class Task extends Resource
     /**
      * Sets the task to "edit" after import
      * @param Helper $api
-     * @return stdClass
+     * @return \stdClass
      * @throws Exception
      */
     public function setTaskToEdit(Helper $api): mixed

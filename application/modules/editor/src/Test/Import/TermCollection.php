@@ -58,6 +58,8 @@ final class TermCollection extends Resource
     /**
      * Adds a term-collection
      * @param Helper $api
+     * @param Config $config
+     * @throws Exception
      * @throws \Zend_Http_Client_Exception
      */
     public function import(Helper $api, Config $config): void
@@ -89,6 +91,7 @@ final class TermCollection extends Resource
 
     /**
      * @param Helper $api
+     * @param Config $config
      */
     public function cleanup(Helper $api, Config $config): void
     {

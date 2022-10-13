@@ -42,11 +42,13 @@ abstract class Operation extends Resource
      * @param int $taskId
      * @return $this
      */
-    public function setTask(Task $task){
+    public function setTask(Task $task): Operation
+    {
         $this->_taskId = $task->getId();
         $this->_taskGuid = $task->getTaskGuid();
         return $this;
     }
+
     /**
      * Queues the analysis
      * @param Helper $api
@@ -55,10 +57,10 @@ abstract class Operation extends Resource
      */
     public function import(Helper $api, Config $config): void
     {
-        if($this->_requested){
-            throw new Exception('You cannot import a '.get_class($this).' twice.');
+        if ($this->_requested) {
+            throw new Exception('You cannot import a ' . get_class($this) . ' twice.');
         }
-        if(empty($this->_taskId)){
+        if (empty($this->_taskId)) {
             throw new Exception('Pretranslation has no taskId assigned');
         }
         $this->request($api);
