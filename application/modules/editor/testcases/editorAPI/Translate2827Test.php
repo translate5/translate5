@@ -52,7 +52,6 @@ class Translate2827Test extends editor_Test_JsonTest {
      */
     public function testImportProjectWithRelais(){
         $projectTasks = static::getTask()->getProperty('projectTasks');
-        // $projectTasks = static::api()->getProjectTasks();
         $this->assertEquals(count($projectTasks), 1, 'No tasks where created.');
     }
 

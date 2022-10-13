@@ -26,39 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * BasicSegmentEditingTest imports a simple task, checks imported values,
  * edits segments and checks then the edited ones again on correct content
  */
-class Translate1841Test extends \editor_Test_ApiTest {
+class Translate1841Test extends editor_Test_ImportTest {
 
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
     ];
 
-    public static function beforeTests(): void {
+    protected static string $setupUserLogin = 'testlector';
 
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-
-        static::api()->addImportFile(static::api()->getFile('TRANSLATE-1841-de-en.xlf'), 'application/xml');
-        
-        static::api()->import($task);
-        
-        static::api()->addUser('testlector');
-        
-        //login in beforeTests means using this user in whole testcase!
-        static::api()->login('testlector');
-        
-        $task = static::api()->getTask();
-        //open task for whole testcase
-        static::api()->setTaskToEdit($task->id);
-        static::api()->reloadTask();
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'en', -1, 'TRANSLATE-1841-de-en.xlf')
+            ->setProperty('taskName', static::NAME_PREFIX . 'Translate1841Test')  // TODO FIXME: we better generate data independent from resource-names ...
+            ->setToEditAfterImport();
     }
 
     /**
@@ -78,10 +66,10 @@ class Translate1841Test extends \editor_Test_ApiTest {
      * Test the issues fixed behaviour
      */
     public function testIssue() {
-        $task = static::api()->getTask();
-        $this->assertIsArray($task->userTracking, 'UserTracking in task is no array!');
-        $this->assertNotEmpty($task->userTracking, 'UserTracking of task is empty!');
-        $user = reset($task->userTracking);
+        $userTracking = static::getTask()->reload(static::api())->getProperty('userTracking');
+        $this->assertIsArray($userTracking, 'UserTracking in task is no array!');
+        $this->assertNotEmpty($userTracking, 'UserTracking of task is empty!');
+        $user = reset($userTracking);
         
         $segEdit1 = '<ins class="trackchanges ownttip" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:49:28+01:00"><div class="open 6270742069643d223122207269643d223122202f internal-tag ownttip"><span title="&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;</span></div></ins>back <del class="trackchanges ownttip deleted" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:49:27+01:00"><div class="open 6270742069643d223122207269643d223122202f internal-tag ownttip"><span title="&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;</span></div></del>to the house<div class="close 6570742069643d223222207269643d223122202f internal-tag ownttip"><span title="&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;</span></div>';
         $segEdit2 = '<div class="open 6270742069643d223122207269643d223122202f internal-tag ownttip"><span title="&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;</span></div>the house<del class="trackchanges ownttip deleted" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:52:14+01:00"><div class="close 6570742069643d223222207269643d223122202f internal-tag ownttip"><span title="&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;</span></div></del>\u00a0is<ins class="trackchanges ownttip" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:52:15+01:00"><div class="close 6570742069643d223222207269643d223122202f internal-tag ownttip"><span title="&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;</span></div></ins> back';
@@ -119,21 +107,5 @@ class Translate1841Test extends \editor_Test_ApiTest {
         //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
         //file_put_contents('/home/tlauria/foo-'.$fileToCompare, rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to exportCompare.xlf');
-    }
-    
-    /**
-     * tests the export results
-     * @param stdClass $task
-     * @param string $exportUrl
-     * @param string $fileToExport
-     * @param string $fileToCompare
-     */
-    protected function checkExport(stdClass $task, $exportUrl, $fileToExport, $fileToCompare) {
-
-    }
-
-    public static function afterTests(): void {
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }
