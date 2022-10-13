@@ -322,11 +322,8 @@ final class Task extends Resource
 
             // wait for the import to finish. TODO FIXME: is the manual evaluation of multilang-tasks neccessary ?
             if ($this->isProjectTask() || $isMultiLanguage) {
-
                 $api->checkProjectTasksStateLoop();
-
             } else {
-
                 $api->checkTaskStateLoop();
             }
         }
@@ -476,10 +473,6 @@ final class Task extends Resource
         $this->autoStartImport = $waitTorImport ? 1 : 0;
         $result = $api->importTask($this->getRequestParams(), $failOnError, $waitTorImport);
         if ($this->validateResult($result, $api)) {
-            // normalize projectTasks
-            if (property_exists($result, 'projectTasks')) {
-                $this->projectTasks = is_array($result->projectTasks) ? $result->projectTasks : [$result->projectTasks];
-            }
             return true;
         }
         return false;

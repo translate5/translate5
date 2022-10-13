@@ -298,6 +298,8 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         $this->initTaskPostData($task);
         $this->test::assertLogin('testmanager'); // make sure testmanager is logged in
         $this->task = $this->postJson('editor/task', $task);
+        // the project tasks will only be part of the first request
+        $projectTasks = (property_exists($this->task, 'projectTasks')) ? $this->task->projectTasks : null;
         $this->assertResponseStatus($this->getLastResponse(), 'Import');
         if (!$waitForImport) {
             return $this->task;
@@ -306,6 +308,9 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             $this->checkProjectTasksStateLoop($failOnError);
         } else {
             $this->checkTaskStateLoop($failOnError);
+        }
+        if($projectTasks !== null){
+            $this->task->projectTasks = is_array($projectTasks) ? $projectTasks : [ $projectTasks ];
         }
         return $this->task;
     }
