@@ -553,11 +553,11 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     public function addUserToTask(string $taskGuid, string $username, string $state = 'open', string $step = 'reviewing', array $params = [])
     {
-        $this->test::assertFalse(empty($this->testusers[$username]), 'Given testuser "' . $username . '" does not exist!');
+        $this->test::assertFalse(empty(static::$testusers[$username]), 'Given testuser "' . $username . '" does not exist!');
         $p = array(
             "id" => 0,
             "taskGuid" => $taskGuid,
-            "userGuid" => $this->testusers[$username],
+            "userGuid" => static::$testusers[$username],
             "state" => $state,
             "workflowStepName" => $step,
         );
