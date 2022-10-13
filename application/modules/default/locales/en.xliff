@@ -8,9 +8,7 @@
             </trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0CiAgICBmw7xyIGRlbiBCcm93c2Vy'><source>translate5 - Open-Source-Lektorat
     für den Browser</source><target>translate5 - open source reviewing environment for the browser</target></trans-unit>
-
 <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can review SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
-
 <trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'><source>Unterstützung der Entwicklung von translate5</source><target>Support of translate5 development</target></trans-unit>
 <trans-unit id='VW5zZXIgZ3Jvw59lciBEYW5rIGdlaHQgYW4gZGllIGZvbGdlbmRlbiBVbnRlcm5laG1lbiB1bmQgT3JnYW5pc2F0aW9uZW4uIFNpZSBmaW5hbnppZXJlbiBkaWUgRmVhdHVyZXMsIGRpZSBzaWUgdm9uIHRyYW5zbGF0ZTUgZXJ3YXJ0ZW4u'><source>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</source><target>All of our gratitudes go to the following companies and organizations. They finance the features they expect from translate5.</target></trans-unit>
 <trans-unit id='U2llIGVybcO2Z2xpY2hlbiBzbyBkaWVzZXMgUHJvamVrdCE='><source>Sie ermöglichen so dieses Projekt!</source><target>This way they make this project possible!</target></trans-unit>
@@ -59,7 +57,6 @@
     <source>Eine Wartung steht unmittelbar bevor, Sie können sich daher nicht anmelden. Bitte versuchen Sie es in Kürze erneut.</source>
     <target>Maintenance will start in a few minutes, login is disabled therefore. Please try again shortly.</target>
 </trans-unit>
-
 <trans-unit id='TmV1ZXMgUGFzc3dvcnQ='>
     <source>Neues Passwort</source>
     <target>New password</target>
@@ -191,7 +188,6 @@ If your key is no longer valid, you can request a new one at any time.
 If you did not send the request yourself, please inform us of this.
 
 {footer}</target></trans-unit>
-
 <trans-unit id='VHJ5IG9ubGluZQ=='>
     <source>Try online</source>
     <target>Try online</target>
@@ -317,6 +313,7 @@ If you did not send the request yourself, please inform us of this.
   <source>Redirect to login...</source>
   <target>Redirect to login...</target>
 </trans-unit>
+<trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='><source>{LinkConsortium}</source><target>https://www.translate5.net/en/consortium</target></trans-unit>
 </body>
 </file>
 </xliff>
