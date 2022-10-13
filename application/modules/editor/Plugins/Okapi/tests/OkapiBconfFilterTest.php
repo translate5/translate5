@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Testcase for the Custom file filter configuration with GUI / BCONF Management
  * This Test currently has uncommented parts due to the phenomenon, the target-srx is not respected on some systems and OKAPI always uses the source-SRX for segmentation
+ * TODE FIXME: seperate the unit-test part and make a pure unit-test out of it ...
  */
 class OkapiBconfFilterTest extends editor_Test_JsonTest {
 
