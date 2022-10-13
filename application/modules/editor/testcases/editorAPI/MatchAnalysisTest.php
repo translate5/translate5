@@ -60,7 +60,7 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
             ->addPretranslation();
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
-            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->addUploadFolder('testfiles')
             ->setProperty('wordCount', 1270)
             ->setProperty('taskName', 'API Testing::MatchAnalysisTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }

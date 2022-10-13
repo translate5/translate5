@@ -49,7 +49,7 @@ final class Task extends Resource
     public int $wordCount = 666;
     public int $autoStartImport = 1;
     public string $orderdate;
-    private ?array $_uploadFolder = null;
+    private ?string $_uploadFolder = null;
     private ?array $_uploadFiles = null;
     private ?array $_uploadData = null;
     private ?array $_additionalUploadFiles = null;
@@ -84,12 +84,11 @@ final class Task extends Resource
      * Adds a folder in the test-dir that will be zipped for upload
      * The Upload can either be defined by file(s), by folder or by data
      * @param string $folderInTestDir
-     * @param string $zipFileName
      * @return $this
      */
-    public function addUploadFolder(string $folderInTestDir, string $zipFileName = 'testTask.zip'): Task
+    public function addUploadFolder(string $folderInTestDir): Task
     {
-        $this->_uploadFolder = ['zip' => $zipFileName, 'folder' => trim($folderInTestDir, '/')];
+        $this->_uploadFolder = trim($folderInTestDir, '/');
         return $this;
     }
 
@@ -486,7 +485,7 @@ final class Task extends Resource
     private function upload(Helper $api)
     {
         if ($this->_uploadFolder !== null) {
-            $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder['folder'] . '/', $this->_uploadFolder['zip']); // TODO FIXME: is the slash after the folder neccesary?
+            $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder . '/', 'testTask.zip'); // TODO FIXME: is the slash after the folder neccesary?
             $api->addImportFile($this->_cleanupZip);
         } else if ($this->_uploadFiles !== null) {
             if (count($this->_uploadFiles) === 1) {

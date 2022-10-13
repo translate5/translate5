@@ -51,7 +51,7 @@ class Translate2417Test extends editor_Test_JsonTest {
             ->addDefaultCustomerId($customerId, true);
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
-            ->addUploadFolder('testfiles', 'test.zip');
+            ->addUploadFolder('testfiles');
     }
 
     /**

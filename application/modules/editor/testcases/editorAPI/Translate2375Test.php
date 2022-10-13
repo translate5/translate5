@@ -53,7 +53,7 @@ class Translate2375Test extends editor_Test_ImportTest {
         $config
             ->addTask('de', 'en')
             ->addProperty('orderdate', self::$fixedDate)
-            ->addUploadFolder('testfiles', 'testTask.zip');
+            ->addUploadFolder('testfiles');
     }
 
     public function testDeadlineDate(){

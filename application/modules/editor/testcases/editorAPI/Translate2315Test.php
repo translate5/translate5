@@ -45,7 +45,7 @@ class Translate2315Test extends editor_Test_JsonTest {
     {
         $config
             ->addTask('de', 'en')
-            ->addUploadFolder('testfiles', 'testTask.zip')
+            ->addUploadFolder('testfiles')
             ->setToEditAfterImport();
     }
 

@@ -49,7 +49,7 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
     {
         $config
             ->addTask('en', 'de')
-            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->addUploadFolder('testfiles')
             ->setToEditAfterImport();
     }
 

@@ -58,7 +58,7 @@ class Translate2428Test extends editor_Test_ImportTest {
             ->setProperty('pretranslateMt', 1);
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
-            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->addUploadFolder('testfiles')
             ->setProperty('wordCount', 0)
             ->setProperty('edit100PercentMatch', false)
             ->setProperty('taskName', 'API Testing::Translate2428Test'); // TODO FIXME: we better generate data independent from resource-names ...

@@ -42,7 +42,7 @@ class RelaisImportTest extends editor_Test_JsonTest {
     {
         $config
             ->addTask('de', 'en')
-            ->addUploadFolder('testfiles', 'RelaisImportTest.zip')
+            ->addUploadFolder('testfiles')
             ->addProperty('relaisLang', 'it')
             ->setToEditAfterImport();
     }

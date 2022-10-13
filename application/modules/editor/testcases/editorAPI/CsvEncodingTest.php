@@ -53,7 +53,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
     {
         $config
             ->addTask('en', 'de')
-            ->addUploadFolder('CSV-testfiles', 'CSV-test.zip')
+            ->addUploadFolder('CSV-testfiles')
             ->addUser('testlector')
             ->addUser('testtranslator', 'waiting', 'translation')
             ->setProperty('taskName', static::NAME_PREFIX . 'CsvEncodingTest'); // TODO FIXME: we better generate data independent from resource-names ...

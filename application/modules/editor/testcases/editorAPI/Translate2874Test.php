@@ -52,7 +52,7 @@ class Translate2874Test extends editor_Test_JsonTest {
             ->setProperty('pretranslateMt', 1);
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
-            ->addUploadFolder('testfiles', 'testTask.zip')
+            ->addUploadFolder('testfiles')
             ->setProperty('edit100PercentMatch', false)
             ->setToEditAfterImport();
     }

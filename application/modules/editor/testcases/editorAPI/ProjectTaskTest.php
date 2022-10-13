@@ -55,7 +55,7 @@ class ProjectTaskTest extends editor_Test_JsonTest {
             ->addLanguageResource('termcollection', 'collection.tbx', $ownCustomerId)
             ->addDefaultCustomerId($ownCustomerId);
         $config->addTask(static::$sourceLangRfc, static::$targetLangRfc, $ownCustomerId)
-            ->addUploadFolder('testfiles', 'XLF-test.zip')
+            ->addUploadFolder('testfiles')
             ->setProperty('edit100PercentMatch', 0)
             ->setProperty('taskName', static::NAME_PREFIX . 'ProjectTaskTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }

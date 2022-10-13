@@ -102,46 +102,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     //region Import API
     /******************************************************* IMPORT API *******************************************************/
 
-
-    /**
-     * @param array $task
-     * @param bool $failOnError default true
-     * @param bool $waitForImport default true : if this is set to false, the function will not check the task import state
-     * @return boolean;
-     * @deprecated
-     * Imports the task described in array $task, parameters are the API parameters, at least:
-     * @Deprecated
-     *
-     * $task = array(
-     * 'sourceLang' => 'en', // mandatory, source language in rfc5646
-     * 'targetLang' => 'de', // mandatory, target language in rfc5646
-     * 'relaisLang' => 'de', // optional, must be given on using relais column
-     * 'taskName' => 'simple-en-de', //optional, defaults to __CLASS__::__TEST__
-     * 'orderdate' => date('Y-m-d H:i:s'), //optional, defaults to now
-     * 'wordCount' => 666, //optional, defaults to heavy metal
-     * );
-     *
-     */
-    public function import(array $task, bool $failOnError = true, bool $waitForImport = true): bool
-    {
-        $this->initTaskPostData($task);
-        $this->test::assertLogin('testmanager');
-
-        $this->task = $this->postJson('editor/task', $task);
-        if (isset($this->task->projectTasks)) {
-            $this->projectTasks = is_array($this->task->projectTasks) ? $this->task->projectTasks : [$this->task->projectTasks];
-        }
-        $this->assertResponseStatus($this->getLastResponse(), 'Import');
-
-        if (!$waitForImport) {
-            return true;
-        }
-        if ($this->task->taskType == self::INITIAL_TASKTYPE_PROJECT) {
-            return $this->checkProjectTasksStateLoop($failOnError);
-        }
-        return $this->checkTaskStateLoop($failOnError);
-    }
-
     /**
      * Adds a single file for upload
      * @param string $path
@@ -161,15 +121,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     public function addImportFiles(string $path, string $mime = 'application/zip')
     {
         $this->addFile('importUpload[]', $path, $mime);
-    }
-
-    /**
-     * @param string $path
-     * @param string $mime
-     */
-    public function addImportTbx(string $path, string $mime = 'application/xml')
-    {
-        $this->addFile('importTbx', $path, $mime);
     }
 
     /**
@@ -328,25 +279,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         } else {
             $this->checkTaskStateLoop();
         }
-    }
-
-    /***
-     * Add task specific config. The config must be added after the task is created and before the import is triggered.
-     * @param string $taskGuid
-     * @param string $configName
-     * @param string $configValue
-     * @return mixed|boolean
-     */
-    public function addTaskImportConfig(string $taskGuid, string $configName, string $configValue)
-    {
-        $this->putJson('editor/config', [
-            'name' => $configName,
-            'value' => $configValue,
-            'taskGuid' => $taskGuid
-        ]);
-        $resp = $this->getLastResponse();
-        $this->assertResponseStatus($resp, 'Config');
-        return $this->decodeJsonResponse($resp);
     }
 
     /**
