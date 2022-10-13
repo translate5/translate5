@@ -43,8 +43,7 @@ class Translate2080Test extends editor_Test_JsonTest {
             ->addProperty('relaisLang', 'it')
             ->addProperty('importUpload_language', ['en','mk','it'])
             ->addProperty('importUpload_type', ['workfiles','workfiles','pivot'])
-            ->setNotToFailOnError()
-            ->setProperty('taskName', static::NAME_PREFIX . 'Translate2080Test'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->setNotToFailOnError();
     }
 
     /***
