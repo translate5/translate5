@@ -48,6 +48,8 @@ class Translate2342Test extends editor_Test_ImportTest {
 
     protected static function setupImport(Config $config): void
     {
+        // we remove all "done" workers as well for this test
+        static::api()->getJson('editor/index/workercleanupstate', ['force' => 1]);
         $sourceLangRfc = 'de';
         $targetLangRfc = 'en';
         $customerId = static::$ownCustomer->id;
