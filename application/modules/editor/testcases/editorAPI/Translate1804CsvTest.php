@@ -34,7 +34,7 @@ require_once 'Translate1804Test.php';
  * Reason why we can not mix CSV and others: This would lead to multiple source and target columns, since a source and target are added by default for the other file types,
  * and for CSV is added then another source and target columns, since the column labels do not match. For multiple CSV files the column labels are used to align the columns.
  */
-class Translate1804CsvTest extends \Translate1804Test {
+class Translate1804CsvTest extends Translate1804Test {
     // just extend the base class, the api helper determines the file paths along the class name
     
     /**
