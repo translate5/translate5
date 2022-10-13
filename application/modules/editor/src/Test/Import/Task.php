@@ -59,6 +59,7 @@ final class Task extends Resource
     private ?string $_cleanupZip = null;
     private bool $_setToEditAfterImport = false;
     private bool $_waitForImported = true;
+    private bool $_failOnError = true;
 
     /**
      * @param string $testClass
@@ -199,6 +200,16 @@ final class Task extends Resource
     }
 
     /**
+     * Special API to not fail on error during import. Can be used e.g. to test expected failures
+     * @return $this
+     */
+    public function setNotToFailOnError(): Task
+    {
+        $this->_failOnError = false;
+        return $this;
+    }
+
+    /**
      * Special API to not wait for a task to import
      * Note that this is more of a Hack and prevents users to be assigned to the task automatically if setup or the login to the setup user-login
      * @return $this
@@ -263,7 +274,7 @@ final class Task extends Resource
         if (!$config->hasLanguageResources() && !$config->hasTaskOperation() && !$isMultiLanguage) {
 
             // the simple case: task without resources & pretranslation
-            if (!$this->doImport($api, true, $this->_waitForImported)) {
+            if (!$this->doImport($api, $this->_failOnError, $this->_waitForImported)) {
                 return;
             }
             // if we shall not wait, we have to skip user-assignments & task-state-setting
