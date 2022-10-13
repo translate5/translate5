@@ -62,7 +62,9 @@ class FlysystemFactory {
      *  host (required)
      *  username (required)
      *  password (optional, default: null) set to null if privateKey is used
-     *  privateKey (optional, default: null) can be used instead of password, set to null if password is set, must be a path: '/path/to/my/private_key'
+     *  privateKey (optional, default: null) can be used instead of password, set to null if password is set,
+     *                                       must be a path: '/path/to/my/private_key'
+     *                                       if a relative path is given, APPLICATION_ROOT is prepended
      *  passphrase (optional, default: null), set to null if privateKey is not used or has no passphrase
      *  port (optional, default: 22)
      *  useAgent (optional, default: false)
@@ -75,6 +77,9 @@ class FlysystemFactory {
      * @return Filesystem
      */
     public static function createSftp(object $options): Filesystem {
+        if(isset($options->privateKey) && ! str_starts_with($options->privateKey, '/')) {
+            $options->privateKey = APPLICATION_ROOT . '/'. $options->privateKey;
+        }
         return new Filesystem(new SftpAdapter(
             SftpConnectionProvider::fromArray((array) $options),
             $options->rootpath ?? '/'
