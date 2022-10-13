@@ -26,26 +26,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Checks if mrk segmentation errors and missing tag ids surround sub tags are stopping the import
  */
-class XlfImportFailTest extends \editor_Test_ApiTest {
+class XlfImportFailTest extends editor_Test_ImportTest {
 
     protected static array $forbiddenPlugins = [
         'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
         'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
     ];
 
-    public function testImportMissingTagId() {
-        $taskConfig = [
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        ];
-        static::api()->addImportFile(static::api()->getFile('ibm-opentm2-fail3.xlf'), 'application/xml');
-        $this->assertFalse(static::api()->import($taskConfig, false), 'XLF with sub tags in tags without IDs did not produce a task state error!');
-        $task = static::api()->getTask();
-        static::api()->deleteTask($task->id);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de', -1, 'ibm-opentm2-fail3.xlf')
+            ->setNotToFailOnError();
+    }
+
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    public function testImportMissingTagId()
+    {
+        $taskState =  static::getTask()->reload(static::api())->getTaskState();
+        static::assertEquals('error', $taskState);
     }
 }
