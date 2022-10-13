@@ -24,7 +24,7 @@
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":1}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": "3"
     },
     {
         "segmentNrInTask": "2",
@@ -51,7 +51,7 @@
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":1}},\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": "3"
     },
     {
         "segmentNrInTask": "3",
@@ -78,7 +78,7 @@
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": "3"
     },
     {
         "segmentNrInTask": "4",
@@ -99,13 +99,13 @@
         "sourceMd5": "cfcd208495d565ef66e7dff9f98764da",
         "sourceToSort": "0",
         "target": "",
-        "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
+        "targetMd5": "cfcd208495d565ef66e7dff9f98764da",
         "targetToSort": "",
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": "3"
     },
     {
         "segmentNrInTask": "5",
@@ -126,13 +126,13 @@
         "sourceMd5": "cfcd208495d565ef66e7dff9f98764da",
         "sourceToSort": "0",
         "target": "",
-        "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
+        "targetMd5": "cfcd208495d565ef66e7dff9f98764da",
         "targetToSort": "",
         "targetEdit": "<ins class=\"trackchanges ownttip\" data-usercssnr=\"usernr1\" data-workflowstep=\"no workflow1\" >0<\/ins>",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": "3"
     },
     {
         "segmentNrInTask": "6",
@@ -159,7 +159,7 @@
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false,
-        "isRepeated": 3,
+        "isRepeated": "3",
         "isFirstofFile": true
     },
     {
@@ -181,13 +181,13 @@
         "sourceMd5": "cfcd208495d565ef66e7dff9f98764da",
         "sourceToSort": "0",
         "target": "",
-        "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
+        "targetMd5": "cfcd208495d565ef66e7dff9f98764da",
         "targetToSort": "",
         "targetEdit": "0",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": "3"
     },
     {
         "segmentNrInTask": "8",
@@ -208,12 +208,12 @@
         "sourceMd5": "cfcd208495d565ef66e7dff9f98764da",
         "sourceToSort": "0",
         "target": "",
-        "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
+        "targetMd5": "cfcd208495d565ef66e7dff9f98764da",
         "targetToSort": "",
         "targetEdit": "<ins class=\"trackchanges ownttip\" data-usercssnr=\"usernr1\" data-workflowstep=\"no workflow1\" >0<\/ins>",
         "targetEditToSort": "0",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false,
-        "isRepeated": 3
+        "isRepeated": "3"
     }
 ]
