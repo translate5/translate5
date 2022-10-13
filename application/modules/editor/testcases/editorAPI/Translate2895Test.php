@@ -36,11 +36,6 @@ class Translate2895Test extends \editor_Test_UnitTest {
 
     public static function setUpBeforeClass(): void
     {
-        require_once 'editor/Models/Import/FileParser/Tag.php';
-        require_once 'editor/Models/Import/FileParser/XmlParser.php';
-        require_once 'editor/Models/Import/FileParser/Xlf/SurroundingTagRemover/None.php';
-        require_once 'editor/Models/Import/FileParser/Xlf/SurroundingTagRemover/Paired.php';
-        require_once 'editor/Models/Import/FileParser/Xlf/SurroundingTagRemover/All.php';
         self::$xmlParser = new editor_Models_Import_FileParser_XmlParser();
     }
 

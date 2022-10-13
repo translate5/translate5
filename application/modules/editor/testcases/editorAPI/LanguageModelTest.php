@@ -53,19 +53,19 @@ class LanguageModelTest extends editor_Test_UnitTest {
         }
 
         //this is just to test the loading, the values may be adopted if they changes (but still represent german!)
-        $this->assertEquals('Deutsch', $languageDE->getLangName(), 'Language Name not as expected after loading');
-        $this->assertEquals('de', $languageDE->getRfc5646(), 'RFC5646 not as expected after loading');
-        $this->assertEquals('ger', $languageDE->getIso6393(), 'ISO6393 not as expected after loading');
-        $this->assertEquals('Deutsch (Deutschland)', $languageDESUB->getLangName(), 'Language Name not as expected after loading');
-        $this->assertEquals('de-DE', $languageDESUB->getRfc5646(), 'RFC5646 not as expected after loading');
-        $this->assertEquals('1031', $languageDESUB->getLcid(), 'LCID not as expected after loading');
+        static::assertEquals('Deutsch', $languageDE->getLangName(), 'Language Name not as expected after loading');
+        static::assertEquals('de', $languageDE->getRfc5646(), 'RFC5646 not as expected after loading');
+        static::assertEquals('ger', $languageDE->getIso6393(), 'ISO6393 not as expected after loading');
+        static::assertEquals('Deutsch (Deutschland)', $languageDESUB->getLangName(), 'Language Name not as expected after loading');
+        static::assertEquals('de-DE', $languageDESUB->getRfc5646(), 'RFC5646 not as expected after loading');
+        static::assertEquals('1031', $languageDESUB->getLcid(), 'LCID not as expected after loading');
 
         //load the rfc fuzzy values for the loaded german
-        $this->assertEquals($allGermanRFCs, $languageDE->getFuzzyLanguages($languageDE->getId(), 'rfc5646', true), 'Should return all german languages!');
-        $this->assertEquals($allGermanRFCs, $languageDE->getFuzzyLanguages($languageDE->getId(), 'rfc5646', false), 'Should return all german languages!');
+        static::assertEquals($allGermanRFCs, $languageDE->getFuzzyLanguages($languageDE->getId(), 'rfc5646', true), 'Should return all german languages!');
+        static::assertEquals($allGermanRFCs, $languageDE->getFuzzyLanguages($languageDE->getId(), 'rfc5646', false), 'Should return all german languages!');
 
-        $this->assertEquals(['de-DE', 'de'], $languageDESUB->getFuzzyLanguages($languageDESUB->getId(), 'rfc5646', true), 'Fuzzies for de-DE (including major) should be de and de-DE only');
+        static::assertEquals(['de-DE', 'de'], $languageDESUB->getFuzzyLanguages($languageDESUB->getId(), 'rfc5646', true), 'Fuzzies for de-DE (including major) should be de and de-DE only');
         //ta
-        $this->assertEquals(['de-DE'], $languageDESUB->getFuzzyLanguages($languageDESUB->getId(), 'rfc5646', false), 'Fuzzies for de-DE (excluding major) should be de-DE only');
+        static::assertEquals(['de-DE'], $languageDESUB->getFuzzyLanguages($languageDESUB->getId(), 'rfc5646', false), 'Fuzzies for de-DE (excluding major) should be de-DE only');
     }
 }
