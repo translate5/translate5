@@ -647,7 +647,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $config = Zend_Registry::get('config');
         // this action may removes workers and is only allowed to be called by tests
         if(defined('APPLICATION_APITEST') && $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR']){
-            $this->view->workercleanupstate = ZfExtended_Debug::workerCleanupState($this->getParam('force', '0') == '1');
+            $this->view->workercleanupstate = ZfExtended_Debug::workerCleanupState($this->getParam('force') == '1');
         }
     }
 
