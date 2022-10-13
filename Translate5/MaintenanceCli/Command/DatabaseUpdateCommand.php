@@ -89,8 +89,7 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         
         $this->writeTitle('database management');
         
-        $dbupdater = \ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
-        /* @var $dbupdater \ZfExtended_Models_Installer_DbUpdater */
+        $dbupdater = \ZfExtended_Factory::get(\ZfExtended_Models_Installer_DbUpdater::class, [true]);
 
         //print on develop machines the configured sqlPaths and in the Browser GUI
         $usedPaths = $dbupdater->calculateChanges();
