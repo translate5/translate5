@@ -1,5 +1,12 @@
-# User data dirs
-/data/*
+# User data dirs (not locales - otherwise these rules could be condensed)
+/data/editorImportedTasks*
+/data/editorOkapiBconf*
+/data/editorVisualReviewFonts*
+/data/purchaseOrderPdfs*
+/data/tbx-import*
+/data/dummyTm_*
+/data/cache*
+/data/tmp*
 
 # Dirs
 /.idea/

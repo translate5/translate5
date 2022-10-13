@@ -137,11 +137,13 @@
 <trans-unit id='SW1tZXIgYXV0b21hdGlzY2ggZXJzZXR6ZW4gdW5kIFN0YXR1cyBzZXR6ZW4sIHdlbm4='><source>Immer automatisch ersetzen und Status setzen, wenn</source><target>Immer automatisch ersetzen und Status setzen, wenn</target></trans-unit>
 <trans-unit id='QmVpIGplZGVyIFdpZWRlcmhvbHVuZyBlaW56ZWxuIGVudHNjaGVpZGVu'><source>Bei jeder Wiederholung einzeln entscheiden</source><target>Bei jeder Wiederholung einzeln entscheiden</target></trans-unit>
 <trans-unit id='TmllIGF1dG9tYXRpc2NoIGVyc2V0emVuIHVuZCBTdGF0dXMgc2V0emVu'><source>Nie automatisch ersetzen und Status setzen</source><target>Nie automatisch ersetzen und Status setzen</target></trans-unit>
+
 <trans-unit id='UXVlbGxlIHdpZWRlcmhvbHQgd2lyZA=='><source>Quelle wiederholt wird</source><target>Quelle wiederholt wird</target></trans-unit>
 <trans-unit id='WmllbCB3aWVkZXJob2x0IHdpcmQ='><source>Ziel wiederholt wird</source><target>Ziel wiederholt wird</target></trans-unit>
 <trans-unit id='UXVlbGxlIFVORCBaaWVsIHdpZWRlcmhvbHQgd2VyZGVu'><source>Quelle UND Ziel wiederholt werden</source><target>Quelle UND Ziel wiederholt werden</target></trans-unit>
 <trans-unit id='UXVlbGxlIE9ERVIgWmllbCB3aWVkZXJob2x0IHdlcmRlbg=='><source>Quelle ODER Ziel wiederholt werden</source><target>Quelle ODER Ziel wiederholt werden</target></trans-unit>
 <trans-unit id='TnVyIGdsZWljaGVyIEtvbnRleHQ='><source>Nur gleicher Kontext</source><target>Nur gleicher Kontext</target></trans-unit>
+
 <trans-unit id='QWJicmVjaGVu'><source>Abbrechen</source><target>Abbrechen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJu'><source>Speichern</source><target>Speichern</target></trans-unit>
 <trans-unit id='U2VnbWVudC1NZXRhZGF0ZW4='><source>Segment-Metadaten</source><target>Segment-Metadaten</target></trans-unit>
@@ -875,6 +877,7 @@
 <trans-unit id='V29ya2Zsb3cgYWJnZXNjaGxvc3Nlbg=='><source>Workflow abgeschlossen</source><target>Workflow abgeschlossen</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5n'><source>Übersetzung</source><target>Übersetzung</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6dCwgYXV0bw=='><source>Übersetzt, auto</source><target>Übersetzt, auto</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRvckNoZWNr'><source>translatorCheck</source><target>translatorCheck</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIHdhcyBub3QgZm91bmQgaW4gdGhlIGhheXN0YWNr'><source>'%value%' was not found in the haystack</source><target>'%value%' was not found in the haystack</target></trans-unit>
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</target></trans-unit>
 <trans-unit id='QmVpbSBJbXBvcnQgdm9uIEF1ZmdhYmVuIHdlcmRlbiAiRWRpdG9yIiBCZW51dHplciBtaXQgZGVuIHBhc3NlbmRlbiBTcHJhY2hlbiA8YSBocmVmPSJodHRwOi8vY29uZmx1ZW5jZS50cmFuc2xhdGU1Lm5ldC9wYWdlcy92aWV3cGFnZS5hY3Rpb24/cGFnZUlkPTU1NzE2NCIgdGFyZ2V0PSJfYmxhbmsiIHRpdGxlPSJtZWhyIEluZm8iPmF1dG9tYXRpc2NoIGRlciBBdWZnYWJlIHp1Z2V3aWVzZW48L2E+Lg=='><source>Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.</source><target>Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.</target></trans-unit>
@@ -2099,6 +2102,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3RhbmRhcmQgV29ya2Zsb3c='><source>Standard Workflow</source><target>Standard Workflow</target></trans-unit>
 <trans-unit id='Q29tcGxleCBXb3JrZmxvdw=='><source>Complex Workflow</source><target>Complex Workflow</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQgV29ya2Zsb3cgKMOcYmVyc2V0enVuZywgTGVrdG9yYXQsIFp3ZWl0ZXMgTGVrdG9yYXQp'><source>Standard Workflow (Übersetzung, Lektorat, Zweites Lektorat)</source><target>Standard Workflow</target></trans-unit>
+<trans-unit id='SW1wb3J0IGFiYnJlY2hlbg=='><source>Import abbrechen</source><target>Import abbrechen</target></trans-unit>
 <trans-unit id='QWxsZSBwYXNzZW5kZW4gendlaXNwcmFjaGlnZW4gRGF0ZWllbiBmw7xyIGRpZXNlIFNwcmFjaGUgd2VyZGVuIGF1cyBkZXIgTGlzdGUgaG9jaGdlbGFkZW5lciBEYXRlaWVuIGVudGZlcm50Lg=='><source>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</source><target>Alle passenden zweisprachigen Dateien für diese Sprache werden aus der Liste hochgeladener Dateien entfernt.</target></trans-unit>
 <trans-unit id='QXJiZWl0c2RhdGVpKGVuKQ=='><source>Arbeitsdatei(en)</source><target>Arbeitsdatei(en)</target></trans-unit>
 <trans-unit id='UGl2b3QtRGF0ZWkoZW4p'><source>Pivot-Datei(en)</source><target>Pivot-Datei(en)</target></trans-unit>
@@ -2148,6 +2152,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIGhvY2hnZWxhZGVuZW4gQXJiZWl0c2RhdGVpZW4gZ2VmdW5kZW4gb2RlciBkaWUgaG9jaGdlbGFkZW5lbiBEYXRlaWVuIMO8YmVyc2NocmVpdGVuIGRpZSBtYXhpbWFsIHp1bMOkc3NpZ2UgR3LDtsOfZS4='><source>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</source><target>Es wurden keine hochgeladenen Arbeitsdateien gefunden oder die hochgeladenen Dateien überschreiten die maximal zulässige Größe.</target></trans-unit>
 <trans-unit id='U2luZ2xlIFNpZ24tb24='><source>Single Sign-on</source><target>Single Sign-on</target></trans-unit>
 <trans-unit id='RGllc2VzIEZlbGQgZGFyZiBuaWNodCBsZWVyIHNlaW4='><source>Dieses Feld darf nicht leer sein</source><target>Dieses Feld darf nicht leer sein</target></trans-unit>
+
 <trans-unit id='WmFobGVu'><source>Zahlen</source><target>Zahlen</target></trans-unit>
 <trans-unit id='WmFobGVuIFF1ZWxsZSDiiaAgWmllbA=='><source>Zahlen Quelle ≠ Ziel</source><target>Zahlen Quelle ≠ Ziel</target></trans-unit>
 <trans-unit id='QWxwaGFudW1lcmlzY2hlIFplaWNoZW5mb2xnZW46IFVudGVyc2NoaWVkZQ=='><source>Alphanumerische Zeichenfolgen: Unterschiede</source><target>Alphanumerische Zeichenfolgen: Unterschiede</target></trans-unit>
@@ -2166,6 +2171,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
   <source>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</source>
   <target>Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.</target>
 </trans-unit>
+
 <trans-unit id='dGFza1R5cGU6OnRlcm10cmFuc2xhdGlvbg=='><source>taskType::termtranslation</source><target>Terminologieübersetzungsprojekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OnByb2plY3Q='><source>taskType::project</source><target>Projekt</target></trans-unit>
 <trans-unit id='dGFza1R5cGU6OmRlZmF1bHQ='><source>taskType::default</source><target>Projekt</target></trans-unit>
@@ -2178,6 +2184,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='Tm91bnM='><source>Substantiv</source><target>Substantiv</target></trans-unit>
 <trans-unit id='UHLDpHBvc2l0aW9u'><source>Präposition</source><target>Präposition</target></trans-unit>
 <trans-unit id='UHJvbm9tZW4='><source>Pronomen</source><target>Pronomen</target></trans-unit>
+<trans-unit id='U29uc3RpZ2Vz'><source>Sonstiges</source><target>Sonstiges</target></trans-unit>
 <trans-unit id='V2FocnNjaGVpbmxpY2hrZWl0'><source>Wahrscheinlichkeit</source><target>Wahrscheinlichkeit</target></trans-unit>
 <trans-unit id='QWx0ZXJuYXRpdmVu'><source>Alternativen</source><target>Alternativen</target></trans-unit>
 <trans-unit id='UGl2b3QtU3ByYWNocmVzc291cmNlbg=='><source>Pivot-Sprachressourcen</source><target>Pivot-Sprachressourcen</target></trans-unit>
@@ -2194,11 +2201,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QXR0cmlidXRlIGF1ZiBTcHJhY2hlYmVuZQ=='><source>Attribute auf Sprachebene</source><target>Attribute auf Sprachebene</target></trans-unit>
 <trans-unit id='QXR0cmlidXRlIGF1ZiBCZW5lbm51bmdzZWJlbmU='><source>Attribute auf Benennungsebene</source><target>Attribute auf Benennungsebene</target></trans-unit>
 <trans-unit id='QWx0ZXMgUGFzc3dvcnQ='><source>Altes Passwort</source><target>Altes Passwort</target></trans-unit>
-<trans-unit id="R2VuZXJhbE1ldGF0YWdUaXRsZVN1ZmZpeA=="><source>GeneralMetatagTitleSuffix</source><target state="needs-review-adaptation">translate5 - Open Source translation system</target></trans-unit>
-<trans-unit id='T2JlcmZsw6RjaGU='><source>Oberfläche</source><target>Oberfläche</target></trans-unit>
-<trans-unit id='U2VnbWVudC1Lb21tZW50YXI='><source>Segment-Kommentar</source><target></target>Segment-Kommentar</trans-unit>
-<trans-unit id='RnJlaWUgQW5tZXJrdW5n'><source>Freie Anmerkung</source><target>Freie Anmerkung</target></trans-unit>
-<trans-unit id='VmlkZW8tQW5tZXJrdW5n'><source>Video-Anmerkung</source><target>Video-Anmerkung</target></trans-unit>
   </body>
  </file>
 </xliff>

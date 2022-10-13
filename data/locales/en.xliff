@@ -1,0 +1,1478 @@
+<?xml version="1.0"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+    <file original="php-sourcecode" source-language="de" datatype="php" target-language="en">
+        <body>
+            <trans-unit id="UU0gU3Vic2VnbWVudGU=">
+                <source>QM Subsegmente</source>
+                <target>QM Subsegments</target>
+            </trans-unit>
+            <trans-unit id="QWxsZSBLYXRlZ29yaWVu">
+                <source>Alle Kategorien</source>
+                <target>All categories</target>
+            </trans-unit>
+            <trans-unit id="dHJhbnNsYXRlNSBEZW1vdmVyc2lvbg==">
+                <source>translate5 Demoversion</source>
+                <target>translate5 Demo Version</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgYmVhY2h0ZW4gU2llOiBEaWVzZSB0cmFuc2xhdGU1IERlbW92ZXJzaW9uIGlzdCDDtmZmZW50bGljaCwgYWxsZSBob2NoZ2VsYWRlbmVuIFByb2pla3RlIGvDtm5uZW4gdm9uIGplZGVtIGVpbmdlc2VoZW4gd2VyZGVuLiBFaW4gRXhwb3J0IHNwaWVsdCBhbGxlIGFrdHVlbGwgZWluZ2VjaGVja3RlbiBEYXRlaWVuIGVpbmVzIFByb2pla3RlcyBhdXMu">
+                <source>Bitte beachten Sie: Diese translate5 Demoversion ist &#xF6;ffentlich, alle hochgeladenen Projekte k&#xF6;nnen von jedem eingesehen werden. Ein Export spielt alle aktuell eingecheckten Dateien eines Projektes aus.</source>
+                <target>Please note: This translate5 demo version is public, all uploaded tasks can be viewed by everybody. An export generates all files in a task that are currently checked in.</target>
+            </trans-unit>
+            <trans-unit id="RGVtb3ZlcnNpb24gc3RhcnRlbg==">
+                <source>Demoversion starten</source>
+                <target>Starting the demo version</target>
+            </trans-unit>
+            <trans-unit id="RGllc2UgRGVtb3ZlcnNpb24gZW50c3ByaWNodCBudXIgaGluc2ljaHRsaWNoIGRlcyBlaWdlbnRsaWNoZW4gw5xiZXJzZXR6dW5nc2VkaXRvcnMgdW5zZXJlbiBWb3JzdGVsbHVuZ2VuIHZvbiBhbnNwcmVjaGVuZGVyIE9wdGlrIHVuZCBVc2FiaWxpdHkuIERpZXNlIGRlbSBFZGl0b3Igdm9yZ2VzY2hhbHRldGVuIFNlaXRlbiBkaWVuZW4genVuw6RjaHN0IG51ciBkZW0gWndlY2ssIGRlbiBFZGl0b3Igc2VsYnN0IHp1IGRlbW9uc3RyaWVyZW4uIFNpZSBzb2xsIGVpbmUgZWluZmFjaGUgbGF1ZmbDpGhpZ2UgU2VydmVydmVyc2lvbiBiZXJlaXRzdGVsbGVuLCBkaWUgdW5hYmjDpG5naWcgdm9uIHVuc2VyZW4gSW50ZWdyYXRpb25lbiBpbiBkaWUgYmVvc3BoZXJlIGRlciBGaXJtYSAiYmVvIEdlc2VsbHNjaGFmdCBmw7xyIFNwcmFjaGVuIHVuZCBUZWNobm9sb2dpZSBtYkgiIG9kZXIgaW4gW2ldLWdhdGUgZGVyIEZpcm1hICJpdGwgSW5zdGl0dXQgZsO8ciB0ZWNobmlzY2hlIExpdGVyYXR1ciBBRyIgZnVua3Rpb25pZXJ0Lg==">
+                <source>Diese Demoversion entspricht nur hinsichtlich des eigentlichen Übersetzungseditors unseren Vorstellungen von ansprechender Optik und Usability. Diese dem Editor vorgeschalteten Seiten dienen zunächst nur dem Zweck, den Editor selbst zu demonstrieren. Sie soll eine einfache lauffähige Serverversion bereitstellen, die unabhängig von unseren Integrationen in die beosphere der Firma "beo Gesellschaft für Sprachen und Technologie mbH" oder in [i]-gate der Firma "itl Institut für technische Literatur AG" funktioniert.</source>
+                <target>This demo version corresponds to our idea of attractive design and good usability only as far as our own translation editor is concerned. These pages prior to the editor initially serve only to demonstrate the editor itself. It is intended to provide a simple, workable server version that works independently from our integration in the beosphere of "beo Gesellschaft f&#xFC;r Sprachen und Technologie mbH" or in [i]-gate of "itl Institut f&#xFC;r technische Literatur AG".</target>
+            </trans-unit>
+            <trans-unit id="R2VybmUgaW50ZWdyaWVyZW4gd2lyIGF1Y2ggZsO8ciBTaWUgdHJhbnNsYXRlNSBpbiBJaHJlIFN5c3RlbXVtZ2VidW5nIQ==">
+                <source>Gerne integrieren wir auch f&#xFC;r Sie translate5 in Ihre Systemumgebung!</source>
+                <target>We would be happy to also integrate translate5 for you in your system environment!</target>
+            </trans-unit>
+            <trans-unit id="R2VybmUgaW50ZWdyaWVyZW4gd2lyIGF1Y2ggZsO8ciBTaWUgdHJhbnNsYXRlNSBpbiBJaHJlIFN5c3RlbXVtZ2VidW5nIHVuZC9vZGVyIGVudHdpY2tlbG4gZGllIG7DtnRpZ2VuIE1vZHVsZSBmw7xyIFByb2pla3R2ZXJ3YWx0dW5nIHVuZCBCZW51dHplcm1hbmFnZW1lbnQgYWxzIEJlc3RhbmR0ZWlsIHZvbiB0cmFuc2xhdGU1IQ==">
+                <source>Gerne integrieren wir auch für Sie translate5 in Ihre Systemumgebung und/oder entwickeln die nötigen Module für Projektverwaltung und Benutzermanagement als Bestandteil von translate5!</source>
+                <target>We would be happy to also integrate translate5 for you in your system environment and/or to develop the necessary modules for project and user management as part of translate5!</target>
+            </trans-unit>
+            <trans-unit id="V2VpdGVyZSBJbmZvcm1hdGlvbmVuIMO8YmVyIFRyYW5zbGF0ZTUgenUgZm9sZ2VuZGVuIFRoZW1lbjo=">
+                <source>Weitere Informationen &#xFC;ber Translate5 zu folgenden Themen:</source>
+                <target>Further information about translate5 on the following topics:</target>
+            </trans-unit>
+            <trans-unit id="RmVhdHVyZXM=">
+                <source>Features</source>
+                <target>Features</target>
+            </trans-unit>
+            <trans-unit id="RW50d2lja2x1bmc=">
+                <source>Entwicklung</source>
+                <target>Development</target>
+            </trans-unit>
+            <trans-unit id="Q29uc3VsdGluZyB1bmQgSW5zdGFsbGF0aW9uZW4=">
+                <source>Consulting und Installationen</source>
+                <target>Consulting and installations</target>
+            </trans-unit>
+            <trans-unit id="QmVpIHRyYW5zbGF0ZTUgaGFuZGVsdCBlcyBzaWNoIGFrdHVlbGwgdW0gZWluZSBCZXRhIFZlcnNpb24u">
+                <source>Bei translate5 handelt es sich aktuell um eine Beta Version.</source>
+                <target>translate5 is currently a beta version.</target>
+            </trans-unit>
+            <trans-unit id="QmVpIEZlaGxlcm4gb2RlciBQcm9ibGVtZW4gbWl0IGRlciBTb2Z0d2FyZSB3ZW5kZW4gU2llIHNpY2ggYml0dGUgYW4=">
+                <source>Bei Fehlern oder Problemen mit der Software wenden Sie sich bitte an</source>
+                <target>In the event of errors or problems with the software, please contact</target>
+            </trans-unit>
+            <trans-unit id="QmVpIEZlaGxlcm4gb2RlciBQcm9ibGVtZW4gbWl0IHRyYW5zbGF0ZTUgd2VuZGVuIFNpZSBzaWNoIGJpdHRlIGFu">
+                <source>Bei Fehlern oder Problemen mit translate5 wenden Sie sich bitte an</source>
+                <target>In the event of errors or problems with translate5, please contact</target>
+            </trans-unit>
+            <trans-unit id="R2VuZXJhbE1ldGF0YWdUaXRsZVN1ZmZpeA==">
+                <source>GeneralMetatagTitleSuffix</source>
+                <target>translate5 - Open Source translation system</target>
+            </trans-unit>
+            <trans-unit id="dHJhbnNsYXRlNQ==">
+                <source>translate5</source>
+                <target>translate5</target>
+            </trans-unit>
+            <trans-unit id="dHJhbnNsYXRlNSBEZW1vdmVyc2lvbg==">
+                <source>translate5 Demoversion</source>
+                <target>translate5 demo version</target>
+            </trans-unit>
+            <trans-unit id="SW4gZGVyIERlbW92ZXJzaW9uIHNpbmQgYWt0dWVsbCBkaWUgZm9sZ2VuZGVuIFByb2pla3RlIHZvcmhhbmRlbi4=">
+                <source>In der Demoversion sind aktuell die folgenden Projekte vorhanden.</source>
+                <target>The following tasks are included in the demo version.</target>
+            </trans-unit>
+            <trans-unit id="V8OkaGxlbiBTaWUgZGFzIFByb2pla3Qgd2VsY2hlcyBTaWUgbGVrdG9yaWVyZW4gb2RlciBleHBvcnRpZXJlbiB3b2xsZW4u">
+                <source>W&#xE4;hlen Sie das Projekt welches Sie lektorieren oder exportieren wollen.</source>
+                <target>Please select the task that you would like to edit or export.</target>
+            </trans-unit>
+            <trans-unit id="RGVyIEV4cG9ydCBrYW5uIGplIG5hY2ggR3LDtsOfZSBkZXMgUHJvamVrdGVzIGVpbmlnZSBTZWt1bmRlbiBkYXVlcm4u">
+                <source>Der Export kann je nach Gr&#xF6;&#xDF;e des Projektes einige Sekunden dauern.</source>
+                <target>The export may take several seconds, depending on the size of the task.</target>
+            </trans-unit>
+            <trans-unit id="UHJvamVrdA==">
+                <source>Projekt</source>
+                <target>Task</target>
+            </trans-unit>
+            <trans-unit id="QWN0aW9ucw==">
+                <source>Actions</source>
+                <target>Actions</target>
+            </trans-unit>
+            <trans-unit id="bGVrdG9yaWVyZW4=">
+                <source>lektorieren</source>
+                <target>Edit</target>
+            </trans-unit>
+            <trans-unit id="ZXhwb3J0aWVyZW4=">
+                <source>exportieren</source>
+                <target>Export</target>
+            </trans-unit>
+            <trans-unit id="ZXhwLiBtaXQgw4RuZGVydW5nc2hpc3Rvcmll">
+                <source>exp. mit &#xC4;nderungshistorie</source>
+                <target>Exp. with tracked changes</target>
+            </trans-unit>
+            <trans-unit id="TmV1ZXMgUHJvamVrdCBhbmxlZ2Vu">
+                <source>Neues Projekt anlegen</source>
+                <target>Create new task</target>
+            </trans-unit>
+            <trans-unit id="TmV1ZSBQcm9qZWt0ZGF0ZW4gaW1wb3J0aWVyZW4=">
+                <source>Neue Projektdaten importieren</source>
+                <target>Import new task data</target>
+            </trans-unit>
+            <trans-unit id="VGVzdGRhdGVu">
+                <source>Testdaten</source>
+                <target>Test files</target>
+            </trans-unit>
+            <trans-unit id="RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgPGEgaHJlZj0iL2luZGV4L3Rlc3RkYXRhLyI+aGllciBUZXN0ZGF0ZW4gZG93bmxvYWRlbjwvYT4gdW5kIGFscyBuZXVlcyBQcm9qZWt0IGltcG9ydGllcmVuLg==">
+                <source>Falls Sie keine Testdaten zur Hand haben, k&#xF6;nnen Sie 
+                    <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.
+                </source>
+                <target>If you do not have any test files available, you can 
+                    <a href="/index/testdata/">download test files here</a> and import as a new task.
+                </target>
+            </trans-unit>
+            <trans-unit id="dHJhbnNsYXRlNSBQcm9qZWt0IGxla3RvcmllcmVu">
+                <source>translate5 Projekt lektorieren</source>
+                <target>Editing a translate5 task</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgZ2ViZW4gU2llIGRlbiBCZW51dHplcm5hbWVuIGVpbiwgZGVyIGFscyBCZW51dHplciBiZWkgbGVrdG9yaWVydGVuIFNlZ21lbnRlbiBlaW5nZXRyYWdlbiB3ZXJkZW4gc29sbDo=">
+                <source>Bitte geben Sie den Benutzernamen ein, der als Benutzer bei lektorierten Segmenten eingetragen werden soll:</source>
+                <target>Please enter the user name to be entered as a user for edited segments:</target>
+            </trans-unit>
+            <trans-unit id="TmFtZSBkZXMgTGVrdG9ycyAoSWhyIE5hbWUp">
+                <source>Name des Lektors (Ihr Name)</source>
+                <target>Name of editor (your name)</target>
+            </trans-unit>
+            <trans-unit id="TGVrdG9yYXQgU3RhcnRlbg==">
+                <source>Lektorat Starten</source>
+                <target>Start editing</target>
+            </trans-unit>
+            <trans-unit id="U3RhcnRzZWl0ZQ==">
+                <source>Startseite</source>
+                <target>Homepage</target>
+            </trans-unit>
+            <trans-unit id="RGVtb3ZlcnNpb24=">
+                <source>Demoversion</source>
+                <target>Demo version</target>
+            </trans-unit>
+            <trans-unit id="QmVkaWVudW5n">
+                <source>Bedienung</source>
+                <target>Notes for use</target>
+            </trans-unit>
+            <trans-unit id="U3RhbmRhbG9uZSBWZXJzaW9u">
+                <source>Standalone Version</source>
+                <target>Stand alone version</target>
+            </trans-unit>
+            <trans-unit id="RWlud2FuZGZyZWk=">
+                <source>Einwandfrei</source>
+                <target>OK</target>
+            </trans-unit>
+            <trans-unit id="TGVpY2h0ZSBNw6RuZ2Vs">
+                <source>Leichte M&#xE4;ngel</source>
+                <target>Minor errors</target>
+            </trans-unit>
+            <trans-unit id="TXVzcyDDvGJlcmFyYmVpdGV0IHdlcmRlbg==">
+                <source>Muss &#xFC;berarbeitet werden</source>
+                <target>Must be reworked</target>
+            </trans-unit>
+            <trans-unit id="U3RhdHVzIDE=">
+                <source>Status 1</source>
+                <target>Status 1</target>
+            </trans-unit>
+            <trans-unit id="U3RhdHVzIDI=">
+                <source>Status 2</source>
+                <target>Status 2</target>
+            </trans-unit>
+            <trans-unit id="U3RhdHVzIDM=">
+                <source>Status 3</source>
+                <target>Status 3</target>
+            </trans-unit>
+            <trans-unit id="RWRpdG9yIFRpdGxl">
+                <source>Editor Title</source>
+                <target>translate5 reviewing editor</target>
+            </trans-unit>
+            <trans-unit id="SmE=">
+                <source>Ja</source>
+                <target>Yes</target>
+            </trans-unit>
+            <trans-unit id="TmVpbg==">
+                <source>Nein</source>
+                <target>No</target>
+            </trans-unit>
+            <trans-unit id="w5xiZXJ0cmFnZSBEYXRlbi4uLg==">
+                <source>&#xDC;bertrage Daten...</source>
+                <target>Conveying data...</target>
+            </trans-unit>
+            <trans-unit id="RWluc3RlbGx1bmdlbiBmw7xyIGRpZXNlIFNpdHp1bmcgZ2VzcGVpY2hlcnQh">
+                <source>Einstellungen f&#xFC;r diese Sitzung gespeichert!</source>
+                <target>Setting for this session saved!</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFNlZ21lbnQgd3VyZGUgZ2VzcGVpY2hlcnQh">
+                <source>Das Segment wurde gespeichert!</source>
+                <target>The segment has been saved!</target>
+            </trans-unit>
+            <trans-unit id="RGllIGdld8OkaGx0ZSBTb3J0aWVydW5nIGRlciBTZWdtZW50ZSB3dXJkZSB6dXLDvGNrZ2VzZXR6dCE=">
+                <source>Die gew&#xE4;hlte Sortierung der Segmente wurde zur&#xFC;ckgesetzt!</source>
+                <target>The selected sorting of the segments has been reset!</target>
+            </trans-unit>
+            <trans-unit id="S2VpbiBTZWdtZW50IGRpZXNlciBEYXRlaSBlbnRzcHJpY2h0IGRlbiBGaWx0ZXJrcml0ZXJpZW4=">
+                <source>Kein Segment dieser Datei entspricht den Filterkriterien</source>
+                <target>No segment in this file fulfils the filter criteria</target>
+            </trans-unit>
+            <trans-unit id="RmVobGVy">
+                <source>Fehler</source>
+                <target>Error</target>
+            </trans-unit>
+            <trans-unit id="RmVobGVyIGJlaW0gU3BlaWNoZXJuIG9kZXIgYmVpbSBBdXNsZXNlbiB2b24gRGF0ZW4uIEJpdHRlIHdlbmRlbiBTaWUgc2ljaCBhbiB1bnNlcmVuIFN1cHBvcnQh">
+                <source>Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!</source>
+                <target>Error whilst saving or reading data. Please contact our support team!</target>
+            </trans-unit>
+            <trans-unit id="RGllIERhdGVpIHp1bSBWb3JhdXNsYWRlbiBkZXIgVGFnZ3JhZmlrZW4gd3VyZGUgbmljaHQgZ2VmdW5kZW4uIERhaGVyIGvDtm5uZW4gZGllIFRhZ2dyYWZpa2VuIGVyc3QgYmVpbSDDlmZmbmVuIGRlcyBqZXdlaWxpZ2VuIFNlZ21lbnRzIGdlbGFkZW4gd2VyZGVuLg==">
+                <source>Die Datei zum Vorausladen der Taggrafiken wurde nicht gefunden. Daher k&#xF6;nnen die Taggrafiken erst beim &#xD6;ffnen des jeweiligen Segments geladen werden.</source>
+                <target>The file for pre-loading the tag graphics was not found. Therefore the tag graphics can only be loaded when the respective segment is opened.</target>
+            </trans-unit>
+            <trans-unit id="b2s=">
+                <source>ok</source>
+                <target>ok</target>
+            </trans-unit>
+            <trans-unit id="ZXJyb3I=">
+                <source>error</source>
+                <target>error</target>
+            </trans-unit>
+            <trans-unit id="bm90aWNl">
+                <source>notice</source>
+                <target>notice</target>
+            </trans-unit>
+            <trans-unit id="RGFzIGxldHp0ZSBiZWFyYmVpdGV0ZSBTZWdtZW50IGlzdCBkYXMgU2VnbWVudCBtaXQgZGVtIEluaGFsdCAiezB9Ii4g">
+                <source>Das letzte bearbeitete Segment ist das Segment mit dem Inhalt "{0}". </source>
+                <target>The segment last processed is the segment with the content "{0}". </target>
+            </trans-unit>
+            <trans-unit id="V29sbGVuIFNpZSBkYXMgTGVrdG9yYXQgd2lya2xpY2ggc2NobGllw59lbj8=">
+                <source>Wollen Sie das Lektorat wirklich schlie&#xDF;en?</source>
+                <target>Are you sure you want to close the editor?</target>
+            </trans-unit>
+            <trans-unit id="RGF0ZWllbg==">
+                <source>Dateien</source>
+                <target>Files</target>
+            </trans-unit>
+            <trans-unit id="U2VnbWVudGxpc3RlIHVuZCBFZGl0b3I=">
+                <source>Segmentliste und Editor</source>
+                <target>Segment list and editor</target>
+            </trans-unit>
+            <trans-unit id="QmVhcmJlaXR1bmdzbW9kdXM=">
+                <source>Bearbeitungsmodus</source>
+                <target>Processing mode</target>
+            </trans-unit>            
+            <trans-unit id="UU0=">
+                <source>QM</source>
+                <target>QA</target>
+            </trans-unit>
+            <trans-unit id="TWF0Y2hyYXRl">
+                <source>Matchrate</source>
+                <target>Match rate</target>
+            </trans-unit>
+            <trans-unit id="WmllbHRleHQgw7xiZXJhcmJlaXRldA==">
+                <source>Zieltext &#xFC;berarbeitet</source>
+                <target>Target text reworked</target>
+            </trans-unit>
+            <trans-unit id="QmVhcmJlaXR1bmdzc3RhdHVz">
+                <source>Bearbeitungsstatus</source>
+                <target>Processing status</target>
+            </trans-unit>
+            <trans-unit id="QXVzZ2FuZ3N0ZXh0">
+                <source>Ausgangstext</source>
+                <target>Source text</target>
+            </trans-unit>
+            <trans-unit id="QXVzZ2FuZ3N0ZXh0IMO8YmVyYXJiZWl0ZXQ=">
+                <source>Ausgangstext &#xFC;berarbeitet</source>
+                <target>Source text reworked</target>
+            </trans-unit>
+            <trans-unit id="QWNodHVuZzogRGVyIEF1c2dhbmdzdGV4dCB3aXJkIMO8YmVyc2NocmllYmVuIQ==">
+                <source>Achtung: Der Ausgangstext wird überschrieben!</source>
+                <target>Warning: The Source text will be overwritten!</target>
+            </trans-unit>
+            <trans-unit id="U3RhdHVz">
+                <source>Status</source>
+                <target>Status</target>
+            </trans-unit>
+            <trans-unit id="UmVsYWlz">
+                <source>Relais</source>
+                <target>Relay</target>
+            </trans-unit>
+            <trans-unit id="WmllbHRleHQ=">
+                <source>Zieltext</source>
+                <target>Target text</target>
+            </trans-unit>
+
+            <trans-unit id="SW4gWmllbHRleHQ=">
+                <source>In Zieltext</source>
+                <target>In target text</target>
+            </trans-unit>
+            <trans-unit id="SW4gQXVzZ2FuZ3N0ZXh0">
+                <source>In Ausgangstext</source>
+                <target>In source text</target>
+            </trans-unit>
+
+            <trans-unit id="bGV0enRlciBCZWFyYmVpdGVy">
+                <source>letzter Bearbeiter</source>
+                <target>Last editor</target>
+            </trans-unit>
+            <trans-unit id="QXJiZWl0cy1EYXRlaWVu">
+                <source>Arbeits-Dateien</source>
+                <target>Work files</target>
+            </trans-unit>
+            <trans-unit id="UmVmZXJlbnotRGF0ZWllbg==">
+                <source>Referenz-Dateien</source>
+                <target>Reference files</target>
+            </trans-unit>
+            <trans-unit id="VmVyaGFsdGVuIGRlcyBXaWVkZXJob2x1bmdzZWRpdG9y">
+                <source>Verhalten des Wiederholungseditor</source>
+                <target>Repetition editor setting</target>
+            </trans-unit>
+            <trans-unit id="QmVpIGplZGVyIFdpZWRlcmhvbHVuZyBlaW56ZWxuIGVudHNjaGVpZGVu">
+                <source>Bei jeder Wiederholung einzeln entscheiden</source>
+                <target>Decide individually for each repetition</target>
+            </trans-unit>
+            <trans-unit id="TmllIGF1dG9tYXRpc2NoIGVyc2V0emVuIHVuZCBTdGF0dXMgc2V0emVu">
+                <source>Nie automatisch ersetzen und Status setzen</source>
+                <target>Never replace automatically and set status</target>
+            </trans-unit>
+            <trans-unit id="QWJicmVjaGVu">
+                <source>Abbrechen</source>
+                <target>Cancel</target>
+            </trans-unit>
+            <trans-unit id="U3BlaWNoZXJu">
+                <source>Speichern</source>
+                <target>Save</target>
+            </trans-unit>
+            <trans-unit id="U2VnbWVudC1NZXRhZGF0ZW4=">
+                <source>Segment-Metadaten</source>
+                <target>Segment meta data</target>
+            </trans-unit>
+            <trans-unit id="VGVybWlub2xvZ2ll">
+                <source>Terminologie</source>
+                <target>Terminology</target>
+            </trans-unit>
+            <trans-unit id="QWt0dWVsbGVzIFNlZ21lbnQgZsO8ciBkaWUgZm9sZ2VuZGVuIFNlZ21lbnRlIMO8YmVybmVobWVuPw==">
+                <source>Aktuelles Segment f&#xFC;r die folgenden Segmente &#xFC;bernehmen?</source>
+                <target>Adopt current segment for the following segments?</target>
+            </trans-unit>
+            <trans-unit id="SGlsZmU6">
+                <source>Hilfe:</source>
+                <target>Help:</target>
+            </trans-unit>
+            <trans-unit id="SGlsZmU=">
+                <source>Hilfe</source>
+                <target>Help</target>
+            </trans-unit>
+            <trans-unit id="SW0gV2llZGVyaG9sdW5nc2VkaXRvciB3ZXJkZW4gYWxsZSBzaWNoIGltIFZlcmdsZWljaCB6dW0gYWt0dWVsbGVuIFNlZ21lbnQgd2llZGVyaG9sZW5kZW4gU2VnbWVudGUgYW5nZXplaWd0LiBEaWVzIGvDtm5uZW4gU2VnbWVudGUgc2VpbiwgZGVyZW4gcXVlbGxzcHJhY2hsaWNoZXIgSW5oYWx0IGRlciBxdWVsbHNwcmFjaGxpY2hlbiBTcGFsdGUgZGVzIGFrdHVlbGxlbiBTZWdtZW50cyBlbnRzcHJpY2h0IChrbGFzc2lzY2hlIFdpZWRlcmhvbHVuZykuIERpZXMga8O2bm5lbiBhYmVyIGF1Y2ggU2VnbWVudGUgc2VpbiwgZGVyZW4gWklFTHNwcmFjaGxpY2hlciBJbmhhbHQgZGVyIFpJRUxzcHJhY2hsaWNoZW4gU3BhbHRlIGRlcyBha3R1ZWxsZW4gU2VnbWVudHMgZW50c3ByaWNodC4=">
+                <source>Im Wiederholungseditor werden alle sich im Vergleich zum aktuellen Segment wiederholenden Segmente angezeigt. Dies k&#xF6;nnen Segmente sein, deren quellsprachlicher Inhalt der quellsprachlichen Spalte des aktuellen Segments entspricht (klassische Wiederholung). Dies k&#xF6;nnen aber auch Segmente sein, deren ZIELsprachlicher Inhalt der ZIELsprachlichen Spalte des aktuellen Segments entspricht.</source>
+                <target>The Repetition editor shows all equal segments, compared to the actual segment. This could be segments, whose source content equals the source content of the actual segment (typical repetition). But also equality in the target content is found.</target>
+            </trans-unit>
+            <trans-unit id="RGllIFNwYWx0ZW4gUXVlbGwtIGJ6dy4gWmllbC1UcmVmZmVyIHplaWdlbiBhbiwgd2VsY2hlIFNwYWx0ZSBkZXIgV2llZGVyaG9sdW5nIG1pdCBkZW0gYWt0dWVsbGVuIFNlZ21lbnQgw7xiZXJlaW5zdGltbXQu">
+                <source>Die Spalten Quell- bzw. Ziel-Treffer zeigen an, welche Spalte der Wiederholung mit dem aktuellen Segment &#xFC;bereinstimmt.</source>
+                <target>The columns Source-Hit and Target-Hit identify the column in which the equality occurs.</target>
+            </trans-unit>
+            <trans-unit id="RGllIFNwYWx0ZSAiSW4gYWt0dWVsbGVyIEZpbHRlcnVuZyBlbnRoYWx0ZW4iIHplaWd0IGFuLCBvYiBkYXMgYW5nZXplaWd0ZSBTZWdtZW50IGdlbcOkw58gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcgaW4gZGVyIFNlZ21lbnTDvGJlcnNpY2h0IGFrdHVlbGwgYW5nZXplaWd0IHdpcmQgKEphKSwgb2RlciBkdXJjaCBkaWUgZ2VzZXR6dGVuIEZpbHRlciBhdXNnZWJsZW5kZXQgaXN0IChOZWluKS4=">
+                <source>Die Spalte "In aktueller Filterung enthalten" zeigt an, ob das angezeigte Segment gem&#xE4;&#xDF; der aktuellen Filterung in der Segment&#xFC;bersicht aktuell angezeigt wird (Ja), oder durch die gesetzten Filter ausgeblendet ist (Nein).</source>
+                <target>The column "Included in current filter" indicates whether the displayed segment is included (Yes) or excluded (No) by the filter in the segment overview.</target>
+            </trans-unit>
+            <trans-unit id="IktlaW5lIMOEbmRlcnVuZyBkdXJjaGbDvGhyZW4iIGJyaWNodCBkZW4gV2llZGVyaG9sdW5nc2VkaXRvciBvaG5lIMOEbmRlcnVuZyBhbiBkZW4gd2VpdGVyZW4gU2VnbWVudGVuIGFiLiAiw4RuZGVydW5nIMO8YmVybmVobWVuIiBzcGVpY2hlcnQgZGllIMOEbmRlcnVuZ2VuIGRlciBhdXNnZXfDpGhsdGVuIFNlZ21lbnRlIChIYWtlbiBpbiBkZXIgWmVpbGUgZGVzIFNlZ21lbnRzIGltIFdpZWRlcmhvbHVuZ3NlZGl0b3IgaXN0IGdlc2V0enQpLg==">
+                <source>"Keine &#xC4;nderung durchf&#xFC;hren" bricht den Wiederholungseditor ohne &#xC4;nderung an den weiteren Segmenten ab. "&#xC4;nderung &#xFC;bernehmen" speichert die &#xC4;nderungen der ausgew&#xE4;hlten Segmente (Haken in der Zeile des Segments im Wiederholungseditor ist gesetzt).</source>
+                <target>"Do not conduct changes" cancels the repetition editor, without a change to any segment. "Accept changes" saves the changes to the selected segments (checkbox has to be set).</target>
+            </trans-unit>
+            <trans-unit id="w5xiZXIgZGFzIEjDpGtjaGVuIGluIGRlciBTcGFsdGVuw7xiZXJzY2hyaWZ0IGxhc3NlbiBzaWNoIGFsbGUgU2VnbWVudGUgc2VsZWt0aWVyZW4gb2RlciBkZXNlbGVrdGllcmVuLg==">
+                <source>&#xDC;ber das H&#xE4;kchen in der Spalten&#xFC;berschrift lassen sich alle Segmente selektieren oder deselektieren.</source>
+                <target>The checkbox in the column header selects or deselects all segments.</target>
+            </trans-unit>
+            <trans-unit id="UXVlbGxl">
+                <source>Quelle</source>
+                <target>Source</target>
+            </trans-unit>
+            <trans-unit id="WmllbA==">
+                <source>Ziel</source>
+                <target>Target</target>
+            </trans-unit>
+            <trans-unit id="SW4gYWt0dWVsbGVyIEZpbHRlcnVuZyBlbnRoYWx0ZW4=">
+                <source>In aktueller Filterung enthalten</source>
+                <target>Included in current filter</target>
+            </trans-unit>
+            <trans-unit id="UXVlbGwtVHJlZmZlcg==">
+                <source>Quell-Treffer</source>
+                <target>Source hits</target>
+            </trans-unit>
+            <trans-unit id="WmllbC1UcmVmZmVy">
+                <source>Ziel-Treffer</source>
+                <target>Target hits</target>
+            </trans-unit>
+            <trans-unit id="UmVsYWlzLVRyZWZmZXI=">
+                <source>Relais-Treffer</source>
+                <target>Relay hits</target>
+            </trans-unit>
+            <trans-unit id="ezB9IFdpZWRlcmhvbHVuZyB3dXJkZSBiZWFyYmVpdGV0IHVuZCBnZXNwZWljaGVydA==">
+                <source>{0} Wiederholung wurde bearbeitet und gespeichert</source>
+                <target>{0} Repetition processed and saved</target>
+            </trans-unit>
+            <trans-unit id="ezB9IFdpZWRlcmhvbHVuZ2VuIHd1cmRlbiBiZWFyYmVpdGV0IHVuZCBnZXNwZWljaGVydA==">
+                <source>{0} Wiederholungen wurden bearbeitet und gespeichert</source>
+                <target>{0} repetitions processed and saved</target>
+            </trans-unit>
+            <trans-unit id="TnVtbWVyIGVpbmdlYmVuLi4u">
+                <source>Nummer eingeben...</source>
+                <target>Enter number...</target>
+            </trans-unit>
+            <trans-unit id="Z3LDtsOfZXIgYWxz">
+                <source>gr&#xF6;&#xDF;er als</source>
+                <target>larger than</target>
+            </trans-unit>
+            <trans-unit id="a2xlaW5lciBhbHM=">
+                <source>kleiner als</source>
+                <target>smaller than</target>
+            </trans-unit>
+            <trans-unit id="aXN0IGdsZWljaA==">
+                <source>ist gleich</source>
+                <target>equal to</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVy">
+                <source>Filter</source>
+                <target>Filter</target>
+            </trans-unit>
+            <trans-unit id="UmVmZXJlbnogRGF0ZWllbg==">
+                <source>Referenz Dateien</source>
+                <target>Reference files</target>
+            </trans-unit>
+            <trans-unit id="SGlud2Vpc2UgenUgZGVuIFByb2pla3QgSW1wb3J0IEVpbnN0ZWxsdW5nZW4=">
+                <source>Hinweise zu den Projekt Import Einstellungen</source>
+                <target>Notes on the task import settings</target>
+            </trans-unit>
+            <trans-unit id="RGllc2UgdHJhbnNsYXRlNSBEZW1vdmVyc2lvbiBpc3Qgw7ZmZmVudGxpY2gsIGFsbGUgaG9jaGdlbGFkZW5lbiBQcm9qZWt0ZSBrw7ZubmVuIHZvbiBqZWRlbSBlaW5nZXNlaGVuIHVuZCBleHBvcnRpZXJ0IHdlcmRlbiE=">
+                <source>Diese translate5 Demoversion ist &#xF6;ffentlich, alle hochgeladenen Projekte k&#xF6;nnen von jedem eingesehen und exportiert werden!</source>
+                <target>This translate5 demo version is public, all uploaded tasks can be viewed and exported by everybody!</target>
+            </trans-unit>
+            <trans-unit id="WmlwLURhdGVpIG1pdCBJbXBvcnQgRGF0ZW4=">
+                <source>Zip-Datei mit Import Daten</source>
+                <target>Zip folder with import files</target>
+            </trans-unit>
+            <trans-unit id='cmV2aWV3OiBWZXJ6ZWljaG5pcyBtaXQgenUgbGVrdG9yaWVyZW5kZW4gRGF0ZWllbg=='>
+                <source>review: Verzeichnis mit zu lektorierenden Dateien</source>
+                <target>review: Directory with files to review</target>
+            </trans-unit>
+            <trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicmV2aWV3IiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiB1bmQgLyBvZGVyIENTVi1EYXRlaWVuIGluIGVpbmVyIGJlbGllYmlnZW4gVmVyemVpY2huaXNzdHJ1a3R1ciBiZWluaGFsdGVuIGthbm4uIENTVi0gdW5kIFNETFhMSUZGLURhdGVpZW4ga8O2bm5lbiBiZWxpZWJpZyBnZW1pc2NodCB3ZXJkZW4uIERpZSBTdHJ1a3R1ciB3aXJkIGltIExla3RvcmF0IGFiZ2ViaWxkZXQu'>
+                <source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
+                <target>The zip folder must include a directory called "review", which can contain multiple SDLXLIFF and / or openTM2-XLIFF and / or CSV files in any directory structure. CSV, openTM2-XLIFF and SDLXLIFF files can be mixed up. The structure is depicted in editing.</target>
+            </trans-unit>
+            <trans-unit id='U3RydWt0dXIgdm9uIENTVi1EYXRlaWVuIChmYWxscyBhbHMgTGVrdG9yYXRzcXVlbGxlIHZlcndlbmRldCk='>
+                <source>Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)</source>
+                <target>CSV file structure (if used)</target>
+            </trans-unit>
+            <trans-unit id='Q1NWLURhdGVpZW4gbcO8c3NlbiBkcmVpIFNwYWx0ZW4gZW50aGFsdGVuLCBkZXJlbiBTcGFsdGVua8O2cGZlIG1pdCBkZW4gQmV6ZWljaG51bmdlbiAibWlkIiwgInF1ZWxsZSIsICJ6aWVsIiBnZWtlbm56ZWljaG5ldCBzaW5kLiBEaWVzZSBTcGFsdGVuIGvDtm5uZW4gaW4gYmVsaWViaWdlciBSZWloZW5mb2xnZSBpbiBkZXIgQ1NWLURhdGVpIGVudGhhbHRlbiBzZWluLiBXZWl0ZXJlIFNwYWx0ZW4gZGVyIENTVi1EYXRlaSB3ZXJkZW4gYmVpbSBJbXBvcnQgaWdub3JpZXJ0LiBTcGFsdGVudHJlbm5lciBkZXIgQ1NWIGlzdCBlaW4gS29tbWEgIiwiLCBUZXh0ZXJrZW5udW5nc3plaWNoZW4gZWluIGRvcHBlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gIiZhcG9zOyIuIFplaWxlbnRyZW5uZXIgZGVyIENTViBpc3QgZWluIExpbnV4LSwgTWFjLSBvZGVyIFdpbmRvd3N6ZWlsZW51bWJydWNoLiBDb2RpZXJ1bmcgZGVyIENTVi1EYXRlaSBrYW5uIHV0Zi04LCBpc28tODg1OS0xIG9kZXIgd2luZG93cy0xMjUxIHNlaW4uIERpZSBDU1YtRGF0ZWkgd2lyZCBpbiBkZXIgc2VsYmVuIENvZGllcnVuZyBleHBvcnRpZXJ0LCBpbiBkZXIgc2llIGJlaW0gSW1wb3J0IHZvcmxhZyAoQWNodHVuZzogQmVpIGVpbmVyIMOcYmVyc2V0enVuZyBpbiBOaWNodC1XZXN0ZXVyb3DDpGlzY2hlIFNwcmFjaGVuIHNvbGx0ZSBkYWhlciB1dGYtOCBiZXJlaXRzIGFscyBJbXBvcnRjb2RpZXJ1bmcgZ2V3w6RobHQgd2VyZGVuKS4='>
+                <source>CSV-Dateien müssen drei Spalten enthalten, deren Spaltenköpfe mit den Bezeichnungen "mid", "quelle", "ziel" gekennzeichnet sind. Diese Spalten können in beliebiger Reihenfolge in der CSV-Datei enthalten sein. Weitere Spalten der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma ",", Texterkennungszeichen ein doppeltes Anführungszeichen "&apos;". Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</source>
+                <target>CSV files must contain three columns, the column-heads have to be labelled as "mid", "quelle" (source) and "ziel" (target). The order of the columns doesn't matter. Other columns will be ignored on import. The delimiter between the columns must be a comma ",", text has to be enclosed in double quotes "&apos;". As line end can be used Linux-, Mac- or Windows line endings. The encoding of each CSV file can be utf-8, iso-8859-1 or windows-1251. On export the same encoding of the file will be used. (Warning: Translating in a language other than a Western European one, utf-8 should be used as encoding on the import.).</target>
+            </trans-unit>
+            <trans-unit id='VmVyemVpY2huaXNzdHJ1a3R1ciBiZWltIEV4cG9ydA=='>
+                <source>Verzeichnisstruktur beim Export</source>
+                <target>Directory structure after export</target>
+            </trans-unit>
+            <trans-unit id="QmVpbSBFeHBvcnQgd2lyZCBkaWUgZ2xlaWNoZSBEYXRlaSB1bmQgVmVyemVpY2huaXNzdHJ1a3R1ciBpbiBGb3JtIGVpbmVyIFppcC1EYXRlaSB3aWVkZXIgYXVzZ2VzcGllbHQ=">
+                <source>Beim Export wird die gleiche Datei und Verzeichnisstruktur in Form einer Zip-Datei wieder ausgespielt</source>
+                <target>When exporting, the same file and directory structure is generated in the form of a zip folder</target>
+            </trans-unit>
+            <trans-unit id='VEJYLURhdGVpIHp1ciBBdXN6ZWljaG51bmcgdm9uIFRlcm1pbm9sb2dpZQ=='>
+                <source>TBX-Datei zur Auszeichnung von Terminologie</source>
+                <target>TBX file for terminology mark up</target>
+            </trans-unit>
+            <trans-unit id="RGllIFRCWCBEYXRlaSBtaXQgZGVyIFRlcm1pbm9sb2dpZSBkYXJmIHNpY2ggaW4ga2VpbmVtIFVudGVydmVyemVpY2huaXMgYmVmaW5kZW4sIHNvbnN0IHdpcmQgU2llIG5pY2h0IGltcG9ydGllcnQuIEJlZmluZGVuIHNpY2ggbWVocmVyZSBUQlggRGF0ZWllbiBpbiBkZXIgWmlwLURhdGVpLCBzbyB3aXJkIG5hY2ggYWxwaGFiZXRpc2NoZXIgU29ydGllcnVuZyBkaWUgZXJzdGUgVEJYIERhdGVpIHZlcndlbmRldC4=">
+                <source>Die TBX Datei mit der Terminologie darf sich in keinem Unterverzeichnis befinden, sonst wird Sie nicht importiert. Befinden sich mehrere TBX Dateien in der Zip-Datei, so wird nach alphabetischer Sortierung die erste TBX Datei verwendet.</source>
+                <target>The TBX file with the terminology must not be in any subdirectory, or it will not be imported. If there are multiple TBX files in the zip folder, the first TBX file ordered alphabetically will be used.</target>
+            </trans-unit>
+            <trans-unit id='RGllIFRCWC1EYXRlaSBrYW5uIGJlbGllYmlnIHZpZWxlIFNwcmFjaGVuIGVudGhhbHRlbi4gU2llIG11c3MgbWluZGVzdGVucyBkaWUgendlaSBTcHJhY2hlbiBlbnRoYWx0ZW4sIGRpZSBiZWltIEF1ZmdhYmVuaW1wb3J0IGFscyBRdWVsbC0gdW5kIFppZWxzcHJhY2hlbiBhdXNnZXfDpGhsdCB3ZXJkZW4uIERpZSBUQlggRGF0ZWkgZGFyZiBzaWNoIGluIGtlaW5lbSBVbnRlcnZlcnplaWNobmlzIGJlZmluZGVuLCBzb25zdCB3aXJkIFNpZSBuaWNodCBpbXBvcnRpZXJ0LiBCZWZpbmRlbiBzaWNoIG1laHJlcmUgVEJYIERhdGVpZW4gaW4gZGVyIFppcC1EYXRlaSwgc28gd2lyZCBuYWNoIGFscGhhYmV0aXNjaGVyIFNvcnRpZXJ1bmcgZGllIGVyc3RlIFRCWCBEYXRlaSB2ZXJ3ZW5kZXQu'>
+                <source>Die TBX-Datei kann beliebig viele Sprachen enthalten. Sie muss mindestens die zwei Sprachen enthalten, die beim Aufgabenimport als Quell- und Zielsprachen ausgewählt werden. Die TBX Datei darf sich in keinem Unterverzeichnis befinden, sonst wird Sie nicht importiert. Befinden sich mehrere TBX Dateien in der Zip-Datei, so wird nach alphabetischer Sortierung die erste TBX Datei verwendet.</source>
+                <target>The TBX file can contain several languages. It must contain at least the two languages, used as source and target language on import. The TBX file with the terminology must not be in any subdirectory, or it will not be imported. If there are multiple TBX files in the zip folder, the first TBX file ordered alphabetically will be used.</target>
+            </trans-unit>
+            <trans-unit id='UmVsYWlzc3ByYWNoZSB6dXIgVmVyZsO8Z3VuZyBzdGVsbGVu'>
+                <source>Relaissprache zur Verfügung stellen</source>
+                <target>Provide a relay (pivot) language</target>
+            </trans-unit>
+            <trans-unit id='VmVyc3RlaHQgZGVyIExla3RvciBkaWUgQXVzZ2FuZ3NzcHJhY2hlIG5pY2h0IGthbm4gaWhtIGVpbmUgUmVsYWlzc3ByYWNoZSB6dXIgVmVyZsO8Z3VuZyBnZXN0ZWxsdCB3ZXJkZW4sIGRpZSBlciB2ZXJzdGVodCAoei4gQi4gRW5nbGlzY2gpLiBEYXp1IG11c3MgZGFzIHp1IGxla3RvcmllcmVuZGUgRG9rdW1lbnQgc3RydWt0dXJnbGVpY2ggYWxzIEVuZ2xpc2Now7xiZXJzZXR6dW5nIHZvcmxpZWdlbi4gRGllc2VzIG9kZXIgZGllc2Ugc3RydWt0dXJnbGVpY2hlbiBEb2t1bWVudGUgd2VyZGVuIGltIG9wdGlvbmFsZW4gVmVyemVpY2huaXMgInJlbGFpcyIgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQuIERhYmVpIG11c3MgZGllIERhdGVpc3RydWt0dXIgaWRlbnRpc2NoIHp1IGRlbiBJbmhhbHRlbiBpbSAicmV2aWV3IiBWZXJ6ZWljaG5pcyBzZWluLg=='>
+                <source>Versteht der Lektor die Ausgangssprache nicht kann ihm eine Relaissprache zur Verfügung gestellt werden, die er versteht (z. B. Englisch). Dazu muss das zu lektorierende Dokument strukturgleich als Englischübersetzung vorliegen. Dieses oder diese strukturgleichen Dokumente werden im optionalen Verzeichnis "relais" zur Verfügung gestellt. Dabei muss die Dateistruktur identisch zu den Inhalten im "review" Verzeichnis sein.</source>
+                <target>A relay or pivot language (for example English) can be provided, if the editor doesn't understand the source language. Therefore the English translation must have the same structure as the reviewing document. The relay files have to be placed in the optional directory "relais". The file structure here must be identical to the contents in the "review" directory.</target>
+            </trans-unit>
+            <trans-unit id='UmVmZXJlbnpkYXRlaWVuIHp1ciBWZXJmw7xndW5nIHN0ZWxsZW4='>
+                <source>Referenzdateien zur Verfügung stellen</source>
+                <target>Provide reference files</target>
+            </trans-unit>
+            <trans-unit id="RGFzIG9wdGlvbmFsZSBWZXJ6ZWljaG5pcyAicmVmZXJlbmNlRmlsZXMiIGthbm4gZWluZSBiZWxpZWJpZ2UgRGF0ZWlzdHJ1a3R1ciBlbnRoYWx0ZW4sIHdlbGNoZSBhbHMgUmVmZXJlbnpkYXRlaWVuIGltcG9ydGllcnQgd2VyZGVuLg==">
+                <source>Das optionale Verzeichnis "referenceFiles" kann eine beliebige Dateistruktur enthalten, welche als Referenzdateien importiert werden.</source>
+                <target>The optional directory "referenceFiles" can contain any file structure imported as reference files.</target>
+            </trans-unit>
+            <trans-unit id="RGllc2VzIFZlcnplaWNobmlzIGlzdCB6d2luZ2VuZCBuw7Z0aWcsIHVuZCBiZWluaGFsdGV0IGRpZSB6dSBsZWt0b3JpZXJlbmRlbiBEYXRlaWVuLg==">
+                <source>Dieses Verzeichnis ist zwingend n&#xF6;tig, und beinhaltet die zu lektorierenden Dateien.</source>
+                <target>This directory is mandatory and includes the files to be edited.</target>
+            </trans-unit>
+            <trans-unit id="RGllc2VzIFZlcnplaWNobmlzIGlzdCBvcHRpb25hbCwgbXVzcyB3ZW5uIHZvcmhhbmRlbiBkaWUgZ2xlaWNoZSBEYXRlaXN0cnVrdHVyIHdpZSAicmV2aWV3IiBhdWZ3ZWlzZW4=">
+                <source>Dieses Verzeichnis ist optional, muss wenn vorhanden die gleiche Dateistruktur wie "review" aufweisen</source>
+                <target>This directory is optional, but if present must have the same file structure as "review"</target>
+            </trans-unit>
+            <trans-unit id="b3B0aW9uYWxlIFRCWCBEYXRlaSBtaXQgVGVybWVuLCBkaWUgZXJzdGUgZ2VmdW5kZW4gVEJYIERhdGVpIHdpcmQgdmVyd2VuZGV0">
+                <source>optionale TBX Datei mit Termen, die erste gefunden TBX Datei wird verwendet</source>
+                <target>Optional TBX file with terms, the first TBX file found is used</target>
+            </trans-unit>
+            <trans-unit id="b3B0aW9uYWxlcyBWZXJ6ZWljaG5pcyBtaXQgUmVmZXJlbnpkYXRlaWVu">
+                <source>optionales Verzeichnis mit Referenzdateien</source>
+                <target>Optional directory with reference files</target>
+            </trans-unit>
+            <trans-unit id="UHJvamVrdG5hbWU=">
+                <source>Projektname</source>
+                <target>Task name</target>
+            </trans-unit>
+            <trans-unit id="RGVyIFByb2pla3RuYW1lIGlzdCBmcmVpIHfDpGhsYmFyIHVuZCBtdXNzIGdlc2V0enQgc2Vpbi4gRXIgZGllbnQgenVyIElkZW50aWZpemllcnVuZyBkZXMgUHJvamVrdGVzIGluIGRlciBQcm9qZWt0w7xiZXJzaWNodA==">
+                <source>Der Projektname ist frei w&#xE4;hlbar und muss gesetzt sein. Er dient zur Identifizierung des Projektes in der Projekt&#xFC;bersicht</source>
+                <target>The task name can be freely selected and must be set. It helps to identify the task in the task overview</target>
+            </trans-unit>
+            <trans-unit id="TmFtZSBkZXMgw5xiZXJzZXR6ZXJz">
+                <source>Name des &#xDC;bersetzers</source>
+                <target>Name of translator</target>
+            </trans-unit>
+            <trans-unit id="RGVyIE5hbWUgZGVzIMOcYmVyc2V0emVycyBpc3QgZnJlaSB3w6RobGJhciB1bmQgbXVzcyBnZXNldHp0IHNlaW4uIERlciBlaW5nZWdlYmVuZSBOYW1lIHdpcmQgaW0gTGVrdG9yYXQgYWxzIGxldHp0ZXIgQmVhcmJlaXRlciBhbmdlemVpZ3Qu">
+                <source>Der Name des &#xDC;bersetzers ist frei w&#xE4;hlbar und muss gesetzt sein. Der eingegebene Name wird im Lektorat als letzter Bearbeiter angezeigt.</source>
+                <target>The name of the translator can be freely selected and must be set. The name entered is displayed in editing as the last editor.</target>
+            </trans-unit>
+            <trans-unit id="UXVlbGxzcHJhY2hlIHVuZCBaaWVsc3ByYWNoZQ==">
+                <source>Quellsprache und Zielsprache</source>
+                <target>Source and target language</target>
+            </trans-unit>
+            <trans-unit id="RGFtaXQgZGllIFRlcm1pbm9sb2dpZSBkZXIgaW1wb3J0aWVydGVuIERhdGVuIGtvcnJla3QgYXVzZ2V6ZWljaG5ldCB3ZXJkZW4ga2FubiwgbcO8c3NlbiBkaWUgUXVlbGwgdW5kIGRpZSBaaWVsc3ByYWNoZSBhbmdlZ2ViZW4gd2VyZGVuLg==">
+                <source>Damit die Terminologie der importierten Daten korrekt ausgezeichnet werden kann, m&#xFC;ssen die Quell und die Zielsprache angegeben werden.</source>
+                <target>In order for the terminology in the imported files to be displayed correctly, the source and target languages must be given.</target>
+            </trans-unit>
+            <trans-unit id="PGk+QWNodHVuZzo8L2k+IE1vbWVudGFuIG3DvHNzZW4gZGllIFNwcmFjaGVuIGluIGRlciBUQlggRGF0ZWkgaWRlbnRpc2NoIHp1IGRlbiBpbSBJbXBvcnR2b3JnYW5nIGF1c2dld8OkaGx0ZW4gU3ByYWNoZW4gc2Vpbi4=">
+                <source>Momentan m&#xFC;ssen die Sprachen in der TBX Datei identisch zu den im Importvorgang ausgew&#xE4;hlten Sprachen sein.</source>
+                <target>At present, the languages in the TBX file must be identical to the languages selected in the import process.</target>
+            </trans-unit>
+            <trans-unit id="V8OkaGxlbiBTaWUgei5CLiBiZWltIFByb2pla3RpbXBvcnQgZGllIFNwcmFjaGUgIkVuZ2xpc2NoIChlbikiLCBkYW5uIHdpcmQgYXVzIGRlciBUQlggRGF0ZWkgbGVkaWdsaWNoIGRpZSBUZXJtaW5vbG9naWUgaW4gZGVyIFNwcmFjaGUgImVuIiBpbXBvcnRpZXJ0Lg==">
+                <source>W&#xE4;hlen Sie z.B. beim Projektimport die Sprache "Englisch (en)", dann wird aus der TBX Datei lediglich die Terminologie in der Sprache "en" importiert.</source>
+                <target>When importing a task for example, please select the language "English (en)", only the terminology in the language "en" is imported from the TBX file.</target>
+            </trans-unit>
+            <trans-unit id="TmljaHQgYWJlciBkaWUgU3ByYWNoZW4gImVuLVVTIiBvZGVyICJlbi1HQiIu">
+                <source>Nicht aber die Sprachen "en-US" oder "en-GB".</source>
+                <target>But not the languages "en-US" or "en-GB".</target>
+            </trans-unit>
+            <trans-unit id="SGlud2Vpc2UgenVtIExla3RvcmF0">
+                <source>Hinweise zum Lektorat</source>
+                <target>Notes on editing</target>
+            </trans-unit>
+            <trans-unit id="U2NyZWVuc2hvdCBMZWt0b3JhdA==">
+                <source>Screenshot Lektorat</source>
+                <target>Editing screen shot</target>
+            </trans-unit>
+            <trans-unit id="RGF0ZWnDvGJlcnNpY2h0">
+                <source>Datei&#xFC;bersicht</source>
+                <target>File overview</target>
+            </trans-unit>
+            <trans-unit id="QmVsaWViaWcgdmVya2xlaW5lci0gdW5kIHZlcmdyw7bDn2VyYmFy">
+                <source>Beliebig verkleiner- und vergr&#xF6;&#xDF;erbar</source>
+                <target>Can always be reduced and expanded</target>
+            </trans-unit>
+            <trans-unit id="RGF0ZWlyZWloZW5mb2xnZSBzb3J0aWVyYmFy">
+                <source>Dateireihenfolge sortierbar</source>
+                <target>File sequence sortable</target>
+            </trans-unit>
+            <trans-unit id="S2xpY2sgYXVmIERhdGVpIHNwcmluZ3QgenVtIGVyc3RlbiBTZWdtZW50">
+                <source>Klick auf Datei springt zum ersten Segment</source>
+                <target>Clicking on the file springs to the first segment</target>
+            </trans-unit>
+            <trans-unit id="QWxsZSBTcGFsdGVuIGZpbHRlci0gdW5kIHNvcnRpZXJiYXI=">
+                <source>Alle Spalten filter- und sortierbar</source>
+                <target>All columns can be filtered and sorted</target>
+            </trans-unit>
+            <trans-unit id="RmlsdGVyIG1laHJlcmVyIFNwYWx0ZW4ga29tYmluaWVyYmFy">
+                <source>Filter mehrerer Spalten kombinierbar</source>
+                <target>Filters from multiple columns can be combined</target>
+            </trans-unit>
+            <trans-unit id="RXJtw7ZnbGljaHQgZmxleGlibGVzIFJldmlldw==">
+                <source>Erm&#xF6;glicht flexibles Review</source>
+                <target>Enables flexible review</target>
+            </trans-unit>
+            <trans-unit id="VGVybWlub2xvZ2llIGltIFNlZ21lbnQ=">
+                <source>Terminologie im Segment</source>
+                <target>Terminology in the segment</target>
+            </trans-unit>
+            <trans-unit id="QmxhdSB1bnRlcnN0cmljaGVuOiBUZXJtIHVuZCDDnGJlcnNldHp1bmcgdm9yaGFuZGVu">
+                <source>Blau unterstrichen: Term und &#xDC;bersetzung vorhanden</source>
+                <target>Blue underlined: term and translation present</target>
+            </trans-unit>
+            <trans-unit id="Um90IHVudGVyc3RyaWNoZW46IFRlcm0gZmVobHQgaW4gw5xiZXJzZXR6dW5n">
+                <source>Rot unterstrichen: Term fehlt in &#xDC;bersetzung</source>
+                <target>Red underlined: term missing in translation</target>
+            </trans-unit>
+            <trans-unit id="VmlvbGV0dCBoaW50ZXJsZWd0OiBWZXJ3ZW5kZXRlciBUZXJtIGlzdCB2ZXJib3RlbmUgQmVuZW5udW5n">
+                <source>Violett hinterlegt: Verwendeter Term ist verbotene Benennung</source>
+                <target>Purple background: term used is a forbidden designation</target>
+            </trans-unit>
+            <trans-unit id="V2lyZCBiZWkgU3BlaWNoZXJuIGRlcyBTZWdtZW50cyBhdXRvbWF0aXNjaCBnZXNldHp0">
+                <source>Wird bei Speichern des Segments automatisch gesetzt</source>
+                <target>Set automatically when segment is saved</target>
+            </trans-unit>
+            <trans-unit id="SMOka2NoZW46IFd1cmRlIGxla3RvcmllcnQ=">
+                <source>H&#xE4;kchen: Wurde lektoriert</source>
+                <target>Tick: edited</target>
+            </trans-unit>
+            <trans-unit id="WmFobnJhZDogQXV0b21hdGlzY2ggYW5nZXBhc3N0ZSBXaWVkZXJob2x1bmc=">
+                <source>Zahnrad: Automatisch angepasste Wiederholung</source>
+                <target>Gear wheel: automatically adjusted repetition</target>
+            </trans-unit>
+            <trans-unit id="WmVpZ2VuIGRpZSBXZXJ0ZSBkZXMgYWt0dWVsbGVuIFNlZ21lbnRz">
+                <source>Zeigen die Werte des aktuellen Segments</source>
+                <target>Displaying the values of the current segment</target>
+            </trans-unit>
+            <trans-unit id="VGVybWlub2xvZ2llIGVudGjDpGx0IGF1Y2ggbmljaHQgaW0gU2VnbWVudCB2ZXJ3ZW5kZXRlIFRlcm1lIGVpbmVzIHZlcndlbmRldGVuIEJlZ3JpZmZz">
+                <source>Terminologie enth&#xE4;lt auch nicht im Segment verwendete Terme eines verwendeten Begriffs</source>
+                <target>Terminology also contains translations not used in the segment for a used term</target>
+            </trans-unit>
+            <trans-unit id="V8OkaGxiYXJlIFdlcnRlIGbDvHIgIlFNIiB1bmQgIlN0YXR1cyIgc2luZCBwcm8gSW5zdGFsbGF0aW9uIGZyZWkga29uZmlndXJpZXJiYXI=">
+                <source>W&#xE4;hlbare Werte f&#xFC;r "QM" und "Status" sind pro Installation frei konfigurierbar</source>
+                <target>Selectable values for "QM" and "Status" can be freely chosen per installation</target>
+            </trans-unit>
+            <trans-unit id="dHJhbnNsYXRlNSBTdGFuZCBBbG9uZSBWZXJzaW9u">
+                <source>translate5 Stand Alone Version</source>
+                <target>translate5 Stand Alone Version</target>
+            </trans-unit>
+            <trans-unit id="U2Nob24gamV0enQgaXN0IHRyYW5zbGF0ZTUgYWxzIE9wZW4gU291cmNlIGluIEZvcm0gZWluZXIgU3RhbmQgQWxvbmUgVmVyc2lvbiBmw7xyIGRlbiBCZXRyaWViIHVudGVyIFdpbmRvd3MgdmVyZsO8Z2Jhci4=">
+                <source>Schon jetzt ist translate5 als Open Source in Form einer Stand Alone Version f&#xFC;r den Betrieb unter Windows verf&#xFC;gbar.</source>
+                <target>translate5 is already available now as open source in the form of a stand alone version for use with Windows.</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgYmVhY2h0ZW4gU2llOiBEaWVzZSB0cmFuc2xhdGU1IFN0YW5kIEFsb25lIFZlcnNpb24gdW50ZXJzdMO8dHp0IGVpbiBQcm9qZWt0IHBybyBJbnN0YWxsYXRpb24uIERhcyBiZWRldXRldDogQWxsZSBpbXBvcnRpZXJ0ZW4gRGF0ZWllbiB3ZXJkZW4gZ2VtZWluc2FtIGluIGVpbmVtIERhdGVpYmF1bSBsZWt0b3JpZXJ0LiBTaW5kIGJlcmVpdHMgRGF0ZWllbiBlaW5nZWNoZWNrdCwga2FubiBlaW4gd2VpdGVyZXIgQ2hlY2tpbiBlcnN0IGR1cmNoZ2Vmw7xocnQgd2VyZGVuLCB3ZW5uIGRpZXNlIERhdGVpZW4gd2llZGVyIGF1cyB0cmFuc2xhdGU1IGdlbMO2c2NodCBzaW5kLg==">
+                <source>Bitte beachten Sie: Diese translate5 Stand Alone Version unterst&#xFC;tzt ein Projekt pro Installation. Das bedeutet: Alle importierten Dateien werden gemeinsam in einem Dateibaum lektoriert. Sind bereits Dateien eingecheckt, kann ein weiterer Checkin erst durchgef&#xFC;hrt werden, wenn diese Dateien wieder aus translate5 gel&#xF6;scht sind.</source>
+                <target>Please note: this translate5 stand alone version supports one task per installation. This means that all files imported are edited together in one file tree. If files are already checked in, a further check-in can only be conducted when these files are deleted again from translate5.</target>
+            </trans-unit>
+            <trans-unit id="RGllIFN0YW5kIEFsb25lIFZlcnNpb24gc3RlaHQgaW4gRm9ybSBlaW5lcyBrb21wbGV0dGVuIFhBTVBQIFBha2V0ZXMgenVyIFZlcmbDvGd1bmcuIEJpdHRlIGJlYWNodGVuIFNpZSBkaWUgSW5mb3JtYXRpb25lbiBpbiBkZXIgZWJlbmZhbGxzIHZlcmbDvGdiYXJlbiBQREYgRGF0ZWku">
+                <source>Die Stand Alone Version steht in Form eines kompletten XAMPP Paketes zur Verf&#xFC;gung. Bitte beachten Sie die Informationen in der ebenfalls verf&#xFC;gbaren PDF Datei.</source>
+                <target>The stand alone version is available as a complete XAMPP package. Please observe the information in the PDF document also available.</target>
+            </trans-unit>
+            <trans-unit id="VHJhbnNsYXRlNSBTdGFuZCBBbG9uZSBhbHMgZ2V6aXBwdGVzIFhBTVBQIFBha2V0">
+                <source>Translate5 Stand Alone als gezipptes XAMPP Paket</source>
+                <target>translate5 Stand Alone as a zipped XAMPP package</target>
+            </trans-unit>
+            <trans-unit id="QmVkaWVudW5nc2hpbndlaXNlIFRyYW5zbGF0ZTUgU3RhbmQgQWxvbmUgKFBERik=">
+                <source>Bedienungshinweise Translate5 Stand Alone (PDF)</source>
+                <target>translate5 Stand Alone instructions (PDF)</target>
+            </trans-unit>
+            <trans-unit id="WnVtIFRlc3RlbiBrw7ZubmVuIGViZW5mYWxscyB1bnNlcmUgPGEgaHJlZj0iL2luZGV4L3Rlc3RkYXRhLyI+VGVzdGRhdGVuPC9hPiB2ZXJ3ZW5kZXQgd2VyZGVuLiBEaWVzZSBtw7xzc2VuIFNpZSBkYW5uIGFsbGVyZGluZ3MgZW50emlwcGVuLg==">
+                <source>Zum Testen k&#xF6;nnen ebenfalls unsere  verwendet werden. Diese m&#xFC;ssen Sie dann allerdings entzippen.</source>
+                <target>For testing purposes, our  can also be used. This must however first be unzipped.</target>
+            </trans-unit>
+            <trans-unit id="SW1wcmVzc3Vt">
+                <source>Impressum</source>
+                <target>Legal information</target>
+            </trans-unit>
+            <trans-unit id="RGllc2UgU2l0ZSBpc3QgZGVtIE9wZW4gU291cmNlIFByb2pla3QgInRyYW5zbGF0ZTUiIGdld2lkbWV0LiBTaWUgd2lyZCBnZXNwb25zZXJ0IHZvbjo=">
+                <source>Diese Site ist dem Open Source Projekt "translate5" gewidmet. Sie wird gesponsert von:</source>
+                <target>This site is dedicated to the open source project "translate5". It is sponsored by:</target>
+            </trans-unit>
+            <trans-unit id="RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgZGllIGZvbGdlbmRlbiBaaXAgRGF0ZWllbiBkb3dubG9hZGVuIHVuZCBhbHMgbmV1ZSBQcm9qZWt0ZSBpbXBvcnRpZXJlbjo=">
+                <source>Falls Sie keine Testdaten zur Hand haben, k&#xF6;nnen Sie die folgenden Zip Dateien downloaden und als neue Projekte importieren:</source>
+                <target>Should you not have any test files present, you can download the following zip folder and import as a new task:</target>
+            </trans-unit>
+            <trans-unit id="KGVpbmZhY2hlIFRlc3RkYXRlbik=">
+                <source>(einfache Testdaten)</source>
+                <target>(Basic test files)</target>
+            </trans-unit>
+            <trans-unit id="KFRlc3RkYXRlbiBtaXQgUmVsYWlzc3ByYWNoZSk=">
+                <source>(Testdaten mit Relaissprache)</source>
+                <target>(Test files with relay language)</target>
+            </trans-unit>
+            <trans-unit id="KFRlc3RkYXRlbiBtaXQgVGVybWlub2xvZ2llKQ==">
+                <source>(Testdaten mit Terminologie)</source>
+                <target>(Test files with terminology)</target>
+            </trans-unit>
+            <trans-unit id="KFRlc3RkYXRlbiBtaXQgVGVybWlub2xvZ2llLCBSZWxhaXNzcHJhY2hlbiB1bmQgUmVmZXJlbnpkYXRlaWVuKQ==">
+                <source>(Testdaten mit Terminologie, Relaissprachen und Referenzdateien)</source>
+                <target>(Test files with terminology, relay language and reference files)</target>
+            </trans-unit>
+            <trans-unit id="RsO8ciBlaW5lIGtvcnJla3RlIEF1c3plaWNobnVuZyBkZXIgVGVybWlub2xvZ2llIGJpdHRlIGRpZSBRdWVsbHNwcmFjaGUgYXVmIEVuZ2xpc2NoIHVuZCBkaWUgWmllbHNwcmFjaGUgYXVmIERldXRzY2ggc3RlbGxlbi4=">
+                <source>F&#xFC;r eine korrekte Auszeichnung der Terminologie bitte die Quellsprache auf Englisch und die Zielsprache auf Deutsch stellen.</source>
+                <target>In order to display the terminology correctly, please set the source language to English and the target language to German.</target>
+            </trans-unit>
+            <trans-unit id="JnJhcXVvOyBadW0gSW1wb3J0">
+                <source>&amp;raquo; Zum Import</source>
+                <target>&amp;raquo; to import</target>
+            </trans-unit>
+            <trans-unit id="JnJhcXVvOyBCZWRpZW51bmdzaGlud2Vpc2UgZsO8ciBkaWUgRXJzdGVsbHVuZyBlaWdlbmVyIFRlc3RkYXRlbg==">
+                <source>&amp;raquo; Bedienungshinweise f&#xFC;r die Erstellung eigener Testdaten</source>
+                <target>&amp;raquo; Instructions for creating own test files</target>
+            </trans-unit>
+            <trans-unit id="RGV1dHNjaCAoZGUp">
+                <source>Deutsch (de)</source>
+                <target>German (de)</target>
+            </trans-unit>
+            <trans-unit id="RW5nbGlzY2ggKGVuKQ==">
+                <source>Englisch (en)</source>
+                <target>English (en)</target>
+            </trans-unit>
+            <trans-unit id="U3BhbmlzY2ggKGVzKQ==">
+                <source>Spanisch (es)</source>
+                <target>Spanish (es)</target>
+            </trans-unit>
+            <trans-unit id="dHJhbnNsYXRlNSAtIG5ldWVzIFByb2pla3QgaW1wb3J0aWVyZW4=">
+                <source>translate5 - neues Projekt importieren</source>
+                <target>translate5 - import new task</target>
+            </trans-unit>
+            <trans-unit id="V2ljaHRpZ2VyIEhpbndlaXM6">
+                <source>Wichtiger Hinweis:</source>
+                <target>Important information:</target>
+            </trans-unit>
+            <trans-unit id="TW9tZW50YW4ga8O2bm5lbiBEYXRlaWVuIGltIFNETFhMSUZGIEZvcm1hdCB1bmQgVGVybWlub2xvZ2llIGltIFRCWCBGb3JtYXQgaW1wb3J0aWVydCB3ZXJkZW4u">
+                <source>Momentan k&#xF6;nnen Dateien im SDLXLIFF Format und Terminologie im TBX Format importiert werden.</source>
+                <target>At present, files in SDLXLIFF format and terminology in TBX format can be imported.</target>
+            </trans-unit>
+            <trans-unit id="RGFtaXQgZGllIFRlcm1pbm9sb2dpZSBhbmhhbmQgZGVyIFRCWCBEYXRlbiBhdXNnZXplaWNobmV0IHdlcmRlbiBrYW5uLCBtw7xzc2VuIGRpZSBRdWVsbC0gdW5kIFppZWxzcHJhY2hlIGVudHNwcmVjaGVuZCBnZXNldHp0IHdlcmRlbi4=">
+                <source>Damit die Terminologie anhand der TBX Daten ausgezeichnet werden kann, m&#xFC;ssen die Quell- und Zielsprache entsprechend gesetzt werden.</source>
+                <target>In order to display the terminology with the TBX files, the source and target languages must be set accordingly.</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgYmVhY2h0ZW4gU2llIGRpZSA8YSBocmVmPSIvaW5kZXgvdXNhZ2UvI2ltcG9ydCI+QmVkaWVudW5nc2hpbndlaXNlIHp1IGRlbiBJbXBvcnQgRWluc3RlbGx1bmdlbjwvYT4u">
+                <source>Bitte beachten Sie die 
+                    <a href="/index/usage/#import">Bedienungshinweise zu den Import Einstellungen</a>.
+                </source>
+                <target>Please observe the 
+                    <a href="/index/usage/#import">Instructions to the import settings</a>.
+                </target>
+            </trans-unit>
+            <trans-unit id="WmlwIERhdGVpIG1pdCBJbXBvcnQgRGF0ZW4=">
+                <source>Zip Datei mit Import Daten</source>
+                <target>Zip folder with import data</target>
+            </trans-unit>
+            <trans-unit id="UHJvamVrdG5hbWUgKGZyZWkgd8OkaGxiYXIp">
+                <source>Projektname (frei w&#xE4;hlbar)</source>
+                <target>Task name (freely selectable)</target>
+            </trans-unit>
+            <trans-unit id="TmFtZSBkZXMgw5xiZXJzZXR6ZXJzIChmcmVpIHfDpGhsYmFyLCB6dXIgQW56ZWlnZSBpbSBMZWt0b3JhdCk=">
+                <source>Name des &#xDC;bersetzers (frei w&#xE4;hlbar, zur Anzeige im Lektorat)</source>
+                <target>Name of translator (freely selectable, displayed in editing)</target>
+            </trans-unit>
+            <trans-unit id="UXVlbGxzcHJhY2hlIChadXIgWnVvcmRudW5nIGRlciBUZXJtaW5vbG9naWUp">
+                <source>Quellsprache (Zur Zuordnung der Terminologie)</source>
+                <target>Source language (to allocate terminology)</target>
+            </trans-unit>
+            <trans-unit id="WmllbHNwcmFjaGUgKFp1ciBadW9yZG51bmcgZGVyIFRlcm1pbm9sb2dpZSk=">
+                <source>Zielsprache (Zur Zuordnung der Terminologie)</source>
+                <target>Target language (to allocate terminology)</target>
+            </trans-unit>
+            <trans-unit id="SW1wb3J0IFN0YXJ0ZW4=">
+                <source>Import Starten</source>
+                <target>Start import</target>
+            </trans-unit>
+            <trans-unit id="SmUgbmFjaCBHcsO2w59lIHVuZCBVbWZhbmcgSWhyZXIgRGF0ZW4ga2FubiBkZXIgSW1wb3J0IGVpbmlnZSBNaW51dGVuIGRhdWVybi4=">
+                <source>Je nach Gr&#xF6;&#xDF;e und Umfang Ihrer Daten kann der Import einige Minuten dauern.</source>
+                <target>The import may take a few minutes, depending on the size and scope of your data.</target>
+            </trans-unit>
+            <trans-unit id="SGlud2Vpc2UgenVyIEJlZGllbnVuZw==">
+                <source>Hinweise zur Bedienung</source>
+                <target>Notes for use</target>
+            </trans-unit>
+            <trans-unit id="UHJvamVrdCBJbXBvcnQ=">
+                <source>Projekt Import</source>
+                <target>Task import</target>
+            </trans-unit>
+            <trans-unit id="TGVrdG9yYXQ=">
+                <source>Lektorat</source>
+                <target>Review</target>
+            </trans-unit>
+            <trans-unit id="enVyw7xjayB6dXIgw5xiZXJzaWNodA==">
+                <source>zur&#xFC;ck zur &#xDC;bersicht</source>
+                <target>Back to overview</target>
+            </trans-unit>
+            <trans-unit id="SW4gUXVlbGxlOg==">
+                <source>In Quelle:</source>
+                <target>In source:</target>
+            </trans-unit>
+            <trans-unit id="SW4gWmllbDo=">
+                <source>In Ziel:</source>
+                <target>In target:</target>
+            </trans-unit>
+            <trans-unit id="Vm9yenVnc2JlbmVubnVuZw==">
+                <source>Vorzugsbenennung</source>
+                <target>Preferred designation</target>
+            </trans-unit>
+            <trans-unit id="ZXJsYXVidGUgQmVuZW5udW5n">
+                <source>erlaubte Benennung</source>
+                <target>Permitted designation</target>
+            </trans-unit>
+            <trans-unit id="dmVyYm90ZW5lIEJlbmVubnVuZw==">
+                <source>verbotene Benennung</source>
+                <target>Forbidden designation</target>
+            </trans-unit>
+            <trans-unit id="RmlsZSAnJXZhbHVlJScgd2FzIG5vdCB1cGxvYWRlZA==">
+                <source>File '%value%' was not uploaded</source>
+                <target>File '%value%' was not uploaded</target>
+            </trans-unit>
+            <trans-unit id="VmFsdWUgaXMgcmVxdWlyZWQgYW5kIGNhbid0IGJlIGVtcHR5">
+                <source>Value is required and can't be empty</source>
+                <target>Value is required and can't be empty</target>
+            </trans-unit>
+            <trans-unit id="QWNodHVuZzogUU0tU3Vic2VnbWVudC1NYXJraWVydW5nZW4gd2VyZGVuIGltIEV4cG9ydCBha3R1ZWxsIG5vY2ggbmljaHQgYWJnZWJpbGRldCE=">
+                <source>Achtung: QM-Subsegment-Markierungen werden im Export aktuell noch nicht abgebildet!</source>
+                <target>Caution: QM-Subsegment-marks are actually ignored on export!</target>
+            </trans-unit>
+            <trans-unit id="RXhwb3J0IFFNLVN0YXRpc3Rpaw==">
+                <source>Export QM-Statistik</source>
+                <target>Export QM-Statistics</target>
+            </trans-unit>
+            <trans-unit id="RXhwb3J0IFppZWx0ZXh0IFFNLVN0YXRpc3RpayAoWE1MKQ==">
+                <source>Export Zieltext QM-Statistik (XML)</source>
+                <target>Export Target text QM-Statistics (XML)</target>
+            </trans-unit>
+            <trans-unit id="RXhwb3J0IEF1c2dhbmdzdGV4dCBRTS1TdGF0aXN0aWsgKFhNTCk=">
+                <source>Export Ausgangstext QM-Statistik (XML)</source>
+                <target>Export Source text QM-Statistics (XML)</target>
+            </trans-unit>
+            <trans-unit id="RW5nbGlzaA==">
+                <source>English</source>
+                <target>English</target>
+            </trans-unit>
+            <trans-unit id="TmFtZSBvZiBlZGl0b3IgKHlvdXIgbmFtZSk=">
+                <source>Name of editor (your name)</source>
+                <target>Name of editor (your name)</target>
+            </trans-unit>
+            <trans-unit id="U3RhcnQgZWRpdGluZw==">
+                <source>Start editing</source>
+                <target>Start editing</target>
+            </trans-unit>
+            <trans-unit id="PGJyIC8+TWVsZHVuZyB2b20gU2VydmVyOiA8aT57MH0gezF9PC9pPg==">
+                <source>
+                    <br/>Meldung vom Server: 
+                    <i>{0} {1}</i>
+                </source>
+                <target>
+                    <br/>Server Message: 
+                    <i>{0} {1}</i>
+                </target>
+            </trans-unit>
+            <trans-unit id="UU0gU3Vic2VnbWVudCBTdGF0aXN0aWs=">
+                <source>QM Subsegment Statistik</source>
+                <target>QM Subsegment Statistics</target>
+            </trans-unit>
+            <trans-unit id="RmVobGVydHlw">
+                <source>Fehlertyp</source>
+                <target>Errortype</target>
+            </trans-unit>
+            <trans-unit id="R2VzYW10">
+                <source>Gesamt</source>
+                <target>Total</target>
+            </trans-unit>
+            <trans-unit id="U3VtbWU=">
+                <source>Summe</source>
+                <target>Sum</target>
+            </trans-unit>
+            <trans-unit id="R2V3aWNodHVuZw==">
+                <source>Gewichtung</source>
+                <target>Severity</target>
+            </trans-unit>
+            <trans-unit id="S29tbWVudGFy">
+                <source>Kommentar</source>
+                <target>Comment</target>
+            </trans-unit>
+            <trans-unit id="UU0gU3Vic2VnbWVudCBoaW56dWbDvGdlbg==">
+                <source>QM Subsegment hinzuf&#xFC;gen</source>
+                <target>add QM Subsegment</target>
+            </trans-unit>
+            <trans-unit id="S2VpbiBTdWJzZWdtZW50IGF1c2dld8OkaGx0Lg==">
+                <source>Kein Subsegment ausgew&#xE4;hlt.</source>
+                <target>No Subsegment selected.</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgd8OkaGxlbiBTaWUgaW0gRWRpdG9yIGVpbiBTdWJzZWdtZW50IGF1cyE=">
+                <source>Bitte w&#xE4;hlen Sie im Editor ein Subsegment aus!</source>
+                <target>Please select a subsegment in the editor!</target>
+            </trans-unit>
+            <trans-unit id="RGllIFdpZWRlcmhvbHVuZ2VuIGtvbm50ZW4gbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu">
+                <source>Die Wiederholungen konnten nicht gespeichert werden</source>
+                <target>Die Wiederholungen konnten nicht gespeichert werden</target>
+            </trans-unit>
+            <trans-unit id="WmlwIGZvbGRlciB3aXRoIGltcG9ydCBkYXRh">
+                <source>Zip folder with import data</source>
+                <target>Zip folder with import data</target>
+            </trans-unit>
+            <trans-unit id="UHJvamVjdCBuYW1lIChmcmVlbHkgc2VsZWN0YWJsZSk=">
+                <source>Project name (freely selectable)</source>
+                <target>Task name (freely selectable)</target>
+            </trans-unit>
+            <trans-unit id="TmFtZSBvZiB0cmFuc2xhdG9yIChmcmVlbHkgc2VsZWN0YWJsZSwgZGlzcGxheWVkIGluIGVkaXRpbmcp">
+                <source>Name of translator (freely selectable, displayed in editing)</source>
+                <target>Name of translator (freely selectable, displayed in editing)</target>
+            </trans-unit>
+            <trans-unit id="U291cmNlIGxhbmd1YWdlICh0byBhbGxvY2F0ZSB0ZXJtaW5vbG9neSk=">
+                <source>Source language (to allocate terminology)</source>
+                <target>Source language (to allocate terminology)</target>
+            </trans-unit>
+            <trans-unit id="VGFyZ2V0IGxhbmd1YWdlICh0byBhbGxvY2F0ZSB0ZXJtaW5vbG9neSk=">
+                <source>Target language (to allocate terminology)</source>
+                <target>Target language (to allocate terminology)</target>
+            </trans-unit>
+            <trans-unit id="MTAwJSBtYXRjaGVzIGNhbiBiZSBlZGl0ZWQ=">
+                <source>100% matches can be edited</source>
+                <target>100% matches can be edited</target>
+            </trans-unit>
+            <trans-unit id="U3RhcnQgaW1wb3J0">
+                <source>Start import</source>
+                <target>Start import</target>
+            </trans-unit>
+            <trans-unit id="SW1wb3J0IGVyZm9sZ3JlaWNo">
+                <source>Import erfolgreich</source>
+                <target>Import successful</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFByb2pla3Qgd3VyZGUgZXJmb2xncmVpY2ggaW1wb3J0aWVydCwgaWhyZSBPcHRpb25lbjo=">
+                <source>Das Projekt wurde erfolgreich importiert, ihre Optionen:</source>
+                <target>The task was successfully imported. Your options:</target>
+            </trans-unit>
+            <trans-unit id="d2VpdGVyIHp1bSBMZWt0b3JhdCBkZXMgUHJvamVrdGVzICZyYXF1bzs=">
+                <source>weiter zum Lektorat des Projektes &amp;raquo;</source>
+                <target>forward to the editor &amp;raquo;</target>
+            </trans-unit>
+            <trans-unit id="b2Rlcg==">
+                <source>oder</source>
+                <target>or</target>
+            </trans-unit>
+            <trans-unit id="JmxhcXVvOyB6dXLDvGNrIHp1ciBQcm9qZWt0w7xiZXJzaWNodA==">
+                <source>&amp;laquo; zur&#xFC;ck zur Projekt&#xFC;bersicht</source>
+                <target>&amp;laquo; back to the task overview</target>
+            </trans-unit>
+            <trans-unit id="PGI+QmVpc3BpZWxoYWZ0ZXIgSW5oYWx0IGVpbmVyIFppcCBEYXRlaTogPC9iPg==">
+                <source>
+                    <b>Beispielhafter Inhalt einer Zip Datei: </b>
+                </source>
+                <target>
+                    <b>Example content of a zip file: </b>
+                </target>
+            </trans-unit>
+            <trans-unit id="PGk+QWNodHVuZzo8L2k+IE1vbWVudGFuIG3DvHNzZW4gZGllIFNwcmFjaGVuIGluIGRlciBUQlggRGF0ZWkgaWRlbnRpc2NoIHp1IGRlbiBpbSBJbXBvcnR2b3JnYW5nIGF1c2dld8OkaGx0ZW4gU3ByYWNoZW4gc2Vpbi4=">
+                <source>
+                    <i>Achtung:</i> Momentan m&#xFC;ssen die Sprachen in der TBX Datei identisch zu den im Importvorgang ausgew&#xE4;hlten Sprachen sein.
+                </source>
+                <target>
+                    <i>Achtung:</i> Momentan m&#xFC;ssen die Sprachen in der TBX Datei identisch zu den im Importvorgang ausgew&#xE4;hlten Sprachen sein.
+                </target>
+            </trans-unit>
+            <trans-unit id="QnJvd2VyLVN1cHBvcnQ6IERpZSBha3R1ZWxsZSBWZXJzaW9uIHVudGVyc3TDvHR6dCBvZmZpemllbGwgbmV1ZXJlIFZlcnNpb25lbiB2b24gRmlyZWZveCB1bmQgU2FmYXJpLCBzb3dpZSBJbnRlcm5ldCBFeHBsb3JlciA3LCA4LCA5IHVuZCAxMC4=">
+                <source>Brower-Support: Die aktuelle Version unterst&#xFC;tzt offiziell neuere Versionen von Firefox und Safari, sowie Internet Explorer 7, 8, 9 und 10.</source>
+                <target>Brower-Support: The latest version supports officially recent versions of Firefox and Safari, as well as Internet Explorer 7, 8, 9 and 10.</target>
+            </trans-unit>
+            <trans-unit id="R2VybWFu">
+                <source>German</source>
+                <target>German</target>
+            </trans-unit>
+            <trans-unit id='WE1MLURhdGVpIHp1ciBLb25maWd1cmF0aW9uIGRlciBRTS1TdWJzZWdtZW50LUtyaXRlcmllbg=='>
+                <source>XML-Datei zur Konfiguration der QM-Subsegment-Kriterien</source>
+                <target>XML file to configure the QM subsegment criteria</target>
+            </trans-unit>
+            <trans-unit id='RGllIG9wdGlvbmFsZSBYTUwtRGF0ZWkgenVyIEtvbmZpZ3VyYXRpb24gZGVyIFFNLVN1YnNlZ21lbnQtS3JpdGVyaWVuIGJlc3RpbW10LCB3ZWxjaGUgUU0tU3Vic2VnbWVudCBGZWhsZXJrYXRlZ29yaWVuIHfDpGhyZW5kIGRlcyBMZWt0b3JhdHMgenVyIFZlcmbDvGd1bmcgc3RlaGVuLiBFaW5lIMO8YmVyZ2ViZW5lIERhdGVpIG11c3MgaW0gRm9ybWF0IGRlciBTdGFuZGFyZGRhdGVpIGVudHNwcmVjaGVuLCB3ZWxjaGUgJXNoaWVyIGFscyBCZXNwaWVsIGhlcnVudGVyZ2VsYWRlbiB3ZXJkZW4ga2FubiVzLiBXaXJkIGtlaW5lIERhdGVpIMO8YmVyZ2ViZW4sIHdpcmQgZGllIFN0YW5kYXJkLURhdGVpIHZlcndlbmRldC4g'>
+                <source>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche %shier als Bespiel heruntergeladen werden kann%s. Wird keine Datei übergeben, wird die Standard-Datei verwendet. </source>
+                <target>The optional XML file to configure the QM subsegment criteria determines which QM subsegment error categories are available during the reviewing. A given file must be in the same format as the default file, which %scan be downloaded here as an example%s. If no file is given, the default file is used.</target>
+            </trans-unit>  
+            <trans-unit id="T3B0aW9uYWxlIFhNTC1EYXRlaSB6dXIgS29uZmlndXJhdGlvbiBkZXIgUU0tU3Vic2VnbWVudCBLcml0ZXJpZW4gKEJlaXNwaWVsIDxhIGhyZWY9IiVzIiB0YXJnZXQ9Il9ibGFuayI+c2llaGUgaGllcjwvYT4pLg==">
+                <source>Optionale XML-Datei zur Konfiguration der QM-Subsegment Kriterien (Beispiel 
+                    <a href="%s" target="_blank">siehe hier</a>).
+                </source>
+                <target>Optional XML file to configure the QM subsegment criteria (An example you'll 
+                    <a href="%s" target="_blank">find here</a>).
+                </target>
+            </trans-unit> 
+            <trans-unit id="Q3JpdGljYWw=">
+                <source>Critical</source>
+                <target>Critical</target>
+            </trans-unit>
+            <trans-unit id="TWFqb3I=">
+                <source>Major</source>
+                <target>Major</target>
+            </trans-unit>
+            <trans-unit id="TWlub3I=">
+                <source>Minor</source>
+                <target>Minor</target>
+            </trans-unit>
+            <trans-unit id="RmVobGVyIGJlaSBkZXIgU2VnbWVudCBWYWxpZGllcnVuZyE=">
+                <source>Fehler bei der Segment Validierung!</source>
+                <target>Error while validating a segment!</target>
+            </trans-unit>
+            <trans-unit id="RWluaWdlIGRlciBpbSBTZWdtZW50IHZlcndlbmRldGVuIFRhZ3Mgc2luZCBpbiBkZXIgZmFsc2NoZW4gUmVpaGVuZm9sZ2VuIChzY2hsaWXDn2VuZGVyIHZvciDDtmZmbmVuZGVtIFRhZyku">
+                <source>Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).</source>
+                <target>Some of the tags used in the segment are in the wrong order (closing tag before opening tag).</target>
+            </trans-unit>
+            <trans-unit id="RXMgd3VyZGVuIFRhZ3MgbWl0IGZlaGxlbmRlbSBQYXJ0bmVyIGVudGZlcm50IQ==">
+                <source>Es wurden Tags mit fehlendem Partner entfernt!</source>
+                <target>Tags with missing opening or closing tag have been removed!</target>
+            </trans-unit>
+            <trans-unit id="T2sh">
+                <source>Ok!</source>
+                <target>Ok!</target>
+            </trans-unit>
+            <trans-unit id="RmVobGVyIQ==">
+                <source>Fehler!</source>
+                <target>Error!</target>
+            </trans-unit>
+            <trans-unit id="SGlud2VpcyE=">
+                <source>Hinweis!</source>
+                <target>Note!</target>
+            </trans-unit>
+            <trans-unit id="UXVlbGxjb2Rl">
+                <source>Quellcode</source>
+                <target>Source code</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgZnJhZ2VuIFNpZSB1bnMgYW4h">
+                <source>Bitte fragen Sie uns an!</source>
+                <target>Please contact us!</target>
+            </trans-unit>
+            <trans-unit id="TWl0dGFnUUkgLSBRdWFsaXR5IEluZm9ybWF0aWNzPGJyIC8+PGJyIC8+S29ucmFkLUxvcmVuei1XZWcgMTA8YnIgLz43MjExNiBNw7Zzc2luZ2VuPGJyIC8+VGVsLiAwNzQ3My8yMjAyMDI8YnIgLz5GYXggMDc0NzMvMjIwMjExPGJyIC8+RS1NYWlsOiBzZXJ2aWNlQE1pdHRhZ1FJLmNvbQ==">
+                <source>MittagQI - Quality Informatics<br /><br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</source>
+                <target>
+                    <pre style="font-family: tahoma,verdana,helvetica,sans-serif">MittagQI - Quality Informatics
+Konrad-Lorenz-Weg 10
+72116 Mössingen
+Tel. 07473/220202
+Fax 07473/220211
+E-Mail: service@MittagQI.com</pre>
+                </target>
+            </trans-unit>
+            <trans-unit id="U2llIGVybcO2Z2xpY2hlbiBkaWVzZXMgUHJvamVrdCE=">
+                <source>Sie ermöglichen dieses Projekt!</source>
+                <target>You make this project possible!</target>
+            </trans-unit>
+      
+      
+            <trans-unit id="U3BvbnNlcmluZyB2b24gdHJhbnNsYXRlNSBhbHMgQXBwbGlrYXRpb24=">
+                <source>Sponsering von translate5 als Applikation</source>
+                <target>Sponsorship of translate5 as application</target>
+            </trans-unit>
+            <trans-unit id="VW5zZXIgRGFuayBnZWh0IGFuOg==">
+                <source>Unser Dank geht an:</source>
+                <target>Our gratitude goes to:</target>
+            </trans-unit>
+            <trans-unit id="RW5kZSBkZXIgU2VnbWVudGUgZXJyZWljaHQh">
+                <source>Ende der Segmente erreicht!</source>
+                <target>End of the segments reached!</target>
+            </trans-unit>
+            <trans-unit id="QmVnaW5uIGRlciBTZWdtZW50ZSBlcnJlaWNodCE=">
+                <source>Beginn der Segmente erreicht!</source>
+                <target>Start of the segments reached!</target>
+            </trans-unit>
+            <trans-unit id="U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbg==">
+                <source>Speichern und nächstes öffnen</source>
+                <target>Save and open next</target>
+            </trans-unit>
+            <trans-unit id="U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIMO2ZmZuZW4=">
+                <source>Speichern und vorheriges öffnen</source>
+                <target>Save and open previous</target>
+            </trans-unit>
+
+            <trans-unit id="YmVhcmJlaXRldA==">
+                <source>bearbeitet</source>
+                <target>edited</target>
+            </trans-unit>
+            <trans-unit id="QmVhcmJlaXRlbg==">
+                <source>Bearbeiten</source>
+                <target>edit</target>
+            </trans-unit>
+
+            <trans-unit id="TMO2c2NoZW4=">
+                <source>Löschen</source>
+                <target>delete</target>
+            </trans-unit>
+            <trans-unit id="S29tbWVudGFyZSB6dW0gU2VnbWVudCBOci4gezB9">
+                <source>Kommentare zum Segment Nr. {0}</source>
+                <target>Comments to segment no. {0}</target>
+            </trans-unit>
+            <trans-unit id="U2NobGllw59lbg==">
+                <source>Schließen</source>
+                <target>Close</target>
+            </trans-unit>
+            <trans-unit id="S29tbWVudGFyIG5ldSAvIGJlYXJiZWl0ZW46">
+                <source>Kommentar neu / bearbeiten:</source>
+                <target>new / edit comment:</target>
+            </trans-unit>
+            <trans-unit id="TmV1ZXIgS29tbWVudGFy">
+                <source>Neuer Kommentar</source>
+                <target>New comment</target>
+            </trans-unit>
+            <trans-unit id="S29tbWVudGFyZQ==">
+                <source>Kommentare</source>
+                <target>Comments</target>
+            </trans-unit>
+            <trans-unit id="KHswfSB3ZWl0ZXJlIEtvbW1lbnRhcmUp">
+                <source>({0} weitere Kommentare)</source>
+                <target>({0} more comments)</target>
+            </trans-unit>
+            <trans-unit id="KHswfSB3ZWl0ZXJlciBLb21tZW50YXIp">
+                <source>({0} weiterer Kommentar)</source>
+                <target>({0} more comment)</target>
+            </trans-unit>
+            <trans-unit id="TMO2c2NoZW4gZGVzIEtvbW1lbnRhcnMgYmVzdMOkdGlnZW4=">
+                <source>Löschen des Kommentars bestätigen</source>
+                <target>Confirm comment deletion</target>
+            </trans-unit>
+            <trans-unit id="U29sbCBkZXIgS29tbWVudGFyIHdpcmtsaWNoIGdlbMO2c2NodCB3ZXJkZW4/">
+                <source>Soll der Kommentar wirklich gelöscht werden?</source>
+                <target>Do you really want to delete the comment?</target>
+            </trans-unit>
+
+            <trans-unit id="TnIu">
+                <source>Nr.</source>
+                <target>No.</target>
+            </trans-unit>
+
+            <trans-unit id="RGFzIHp1bGV0enQgZ2XDtmZmbmV0ZSBTZWdtZW50IChOci4gezB9KSBrb25udGUgbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVuIQ==">
+                <source>Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!</source>
+                <target>The last opened segment (no. {0}) could not be saved!</target>
+            </trans-unit>
+            <trans-unit id="RGVyIFNlcnZlciBtZWxkZXRlIGRlbiBmb2xnZW5kZW4gRmVobGVyOg==">
+                <source>Der Server meldete den folgenden Fehler:</source>
+                <target>The server has reported the following error:</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gQml0dGUgc2NobGllw59lbiBTaWUgZGFzIFNlZ21lbnQgZ2dmLiBkdXJjaCBLbGljayBhdWYgIkFiYnJlY2hlbiIgdW5kIMO2ZmZuZW4sIGJlYXJiZWl0ZW4gdW5kIHNwZWljaGVybiBTaWUgZXMgZXJuZXV0LiBWaWVsZW4gRGFuayEgPGJyPjxicj5HZXJhZGUgYmVhcmJlaXRldGVyIFRleHQgd2FyOjxicj48YnI+">
+                <source>Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!<br/><br/>Gerade bearbeiteter Text war:<br/><br/></source>
+                <target>The segment could not be saved. Please close the segment by pressing "cancel", then open, edit and save it again. Thank You!<br/><br/>Last edited Text was:<br/><br/></target>
+            </trans-unit>
+
+            <trans-unit id="RGFzIFNlZ21lbnQga29ubnRlIG5pY2h0IHp1bSBCZWFyYmVpdGVuIGdlw7ZmZm5ldCB3ZXJkZW4sIGRhIGRhcyB2b3JoZXJpZ2UgU2VnbWVudCBub2NoIG5pY2h0IGtvcnJla3Qgc2VpbmUgU3BlaWNoZXJ1bmcgYmVlbmRldCBoYXR0ZS4gQml0dGUgdmVyc3VjaGVuIFNpZSBlcyBub2NoIGVpbm1hbC4gU29sbHRlIGVzIGRhbm4gbm9jaCBuaWNodCBmdW5rdGlvbmllcmVuLCBkcsO8Y2tlbiBTaWUgYml0dGUgRjUuIFZpZWxlbiBEYW5rIQ==">
+                <source>Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt seine Speicherung beendet hatte. Bitte versuchen Sie es noch einmal. Sollte es dann noch nicht funktionieren, drücken Sie bitte F5. Vielen Dank!</source>
+                <target>The segment could not be opened for editing, because the last segment was not correctly saved. Please try it again. Should the error persist, please press F5 to reload the application. Thank You!</target>
+            </trans-unit>
+            <trans-unit id='QWNodHVuZywgU2llIGVkaXRpZXJlbiBlaW5lbiAxMDAlIE1hdGNoIQ=='>
+              <source>Achtung, Sie editieren einen 100% Match!</source>
+              <target>Warning, You are editing a 100% match!</target>
+            </trans-unit>
+            <trans-unit id="SW5mb3JtYXRpb25lbiB6dXIgQmVkaWVudW5n">
+                <source>Informationen zur Bedienung</source>
+                <target>Operational information</target>
+            </trans-unit>
+            <trans-unit id="RGllIG9wdGlvbmFsZSBYTUwtRGF0ZWkgenVyIEtvbmZpZ3VyYXRpb24gZGVyIFFNLVN1YnNlZ21lbnQtS3JpdGVyaWVuIGJlc3RpbW10LCB3ZWxjaGUgUU0tU3Vic2VnbWVudCBGZWhsZXJrYXRlZ29yaWVuIHfDpGhyZW5kIGRlcyBMZWt0b3JhdHMgenVyIFZlcmbDvGd1bmcgc3RlaGVuLiBFaW5lIMO8YmVyZ2ViZW5lIERhdGVpIG11c3MgaW0gRm9ybWF0IGRlciBTdGFuZGFyZGRhdGVpIGVudHNwcmVjaGVuLCB3ZWxjaGUgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5oaWVyIGFscyBCZXNwaWVsIGhlcnVudGVyZ2VsYWRlbiB3ZXJkZW4ga2FubjwvYT4uIFdpcmQga2VpbmUgRGF0ZWkgw7xiZXJnZWJlbiwgd2lyZCBkaWUgU3RhbmRhcmQtRGF0ZWkgdmVyd2VuZGV0LiA=">
+                <source>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche <a href="%s" target="_blank">hier als Bespiel heruntergeladen werden kann</a>. Wird keine Datei übergeben, wird die Standard-Datei verwendet.</source>
+                <target>The optional XML file for the configuration of the QM subsegment criteria determines which QM subsegment error categories are  available during the reviewing. A given file must be in the same format as the default file, which <a href="%s" target="_blank"> can be downloaded here as an example </a>. If no file is given, the default file is used.</target>
+            </trans-unit>
+            <trans-unit id="QmVpIEZyYWdlbiB6dSB0cmFuc2xhdGU1Og==">
+                <source>Bei Fragen zu translate5:</source>
+                <target>For questions about translate5:</target>
+            </trans-unit>
+            <trans-unit id="UXVhbGl0w6R0c2dlc2ljaGVydGUgVmVyc2lvbiAtIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL3dpbGxrb21tZW4vaW1wcmVzc3VtIiB0YXJnZXQ9Il9ibGFuayI+Yml0dGUgZnJhZ2VuIFNpZSB1bnMgYW4hPC9hPg==">
+                <source>Qualitätsgesicherte Version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a>
+                </source>
+                <target>Quality-assured version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">please ask us!</a>
+                </target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldC5vcmc='>
+                <source>translate5 Quellcode auf bitbucket.org</source>
+                <target>translate5 source code on bitbucket.org</target>
+            </trans-unit>
+            <trans-unit id='RGVyIGxldHp0ZSBTdGFuZCBkZXIgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUgaXN0IGpld2VpbHMgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5hdWYgYml0YnVja2V0Lm9yZyB2ZXLDtmZmZW50bGljaHQ8L2E+Lg=='>
+                <source>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</source>
+                <target>The latest state of development of translate5 <a href="%s" target="_blank">is always published on bitbucket.org</a>.</target>
+            </trans-unit>
+            <trans-unit id='Qml0YnVja2V0IGRpZW50IGRlciBFbnR3aWNrbHVuZyBhbHMgUmVwb3NpdG9yeSB1bmQgZW50aMOkbHQgZGVuIGxldHp0ZW4gU3RhbmQgZGVyIEVudHdpY2tsdW5nLiBEaWVzZXIgaXN0IG51ciBiZWRpbmd0IGbDvHIgZGVuIFByb2R1a3RpdmVpbnNhdHogZ2VlaWduZXQgdW5kIGthbm4gRmVobGVyIGVudGhhbHRlbiE8YnIvPiBFaW4gcXVhbGl0w6R0c2dlc2ljaGVydGVzIFJlbGVhc2UsIHdlbGNoZXMgYmVyZWl0cyBhbGxlIEFiaMOkbmdpZ2tlaXRlbiBrb3JyZWt0IGVudGjDpGx0IGVyaGFsdGVuIFNpZSA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS93aWxsa29tbWVuL2ltcHJlc3N1bSIgdGFyZ2V0PSJfYmxhbmsiPmdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZTwvYT4uIERpZSBWZXLDtmZmZW50bGljaHVuZyBhdWYgYml0YnVja2V0Lm9yZyBpc3QgZsO8ciBFbnR3aWNrbGVyIGdlZGFjaHQu'><source>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.</source>
+                <target>Bitbucket serves as the development repository and contains the latest state of development. It is suitable for development use only and may contain errors!
+                    <br/> A quality-assured release, which already contains all the dependencies correctly, is receivable 
+                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank"> from us on request </a>. The source code on bitbucket.org is intended for developers.   
+                </target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBFbnR3aWNrbGVyLVJlcG9zaXRvcnkgYXVmIGJpdGJ1Y2tldC5vcmc='>
+                <source>translate5 Entwickler-Repository auf bitbucket.org</source>
+                <target>translate5 developer repository on bitbucket.org</target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBpc3QgYXVmIGF1ZiBtZWhyZXJlIGJpdGJ1Y2tldC1SZXBvc2l0b3JpZXMgdmVydGVpbHQgdW5kIGJlbsO2dGlndCBkYXLDvGJlciBoaW5hdXMgZWluZSBSZWloZSBleHRlcm5lciBCaWJsaW90aGVrZW4uIERhcyBoaWVyYXJjaGlzY2ggb2JlcnN0ZSBSZXBvc2l0b3J5IGlzdCAidHJhbnNsYXRlNSIsIHdlbGNoZXMgZGllIEFiaMOkbmdpZ2tlaXRlbiBhbHMgZ2l0LXN1Ym1vZHVsZSBvZGVyIFZlcndlaXNlIGVudGjDpGx0Lg=='>
+                <source>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source>
+                <target>translate5 is spread over multiple Bitbucket repositories and also requires a number of external libraries. The top repository is "translate5", which contains the dependencies as submodules or references.</target>
+            </trans-unit>
+            <trans-unit id="PGI+Qml0dGUgYmVhY2h0ZW4gU2llOjwvYj4gRGllc2UgdHJhbnNsYXRlNSBEZW1vdmVyc2lvbiBpc3Qgw7ZmZmVudGxpY2gsIGFsbGUgaG9jaGdlbGFkZW5lbiBQcm9qZWt0ZSBrw7ZubmVuIHZvbiBqZWRlbSBlaW5nZXNlaGVuIHdlcmRlbi4gRWluIEV4cG9ydCBzcGllbHQgYWxsZSBha3R1ZWxsIGVpbmdlY2hlY2t0ZW4gRGF0ZWllbiBlaW5lcyBQcm9qZWt0ZXMgYXVzLg==">
+                <source>
+                    <b>Bitte beachten Sie:</b> Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen werden. Ein Export spielt alle aktuell eingecheckten Dateien eines Projektes aus.
+                </source>
+                <target>
+                    <b> Please note: </b> This translate5 demo version is public, all uploaded tasks can be seen by anyone. An export exports all currently checked-in files of a task.
+                </target>
+            </trans-unit>
+            <trans-unit id="PGI+QnJvd2VyLVN1cHBvcnQ6PC9iPiBEaWUgYWt0dWVsbGUgVmVyc2lvbiB1bnRlcnN0w7x0enQgb2ZmaXppZWxsIG5ldWVyZSBWZXJzaW9uZW4gdm9uIEZpcmVmb3gsIENocm9tZSB1bmQgU2FmYXJpLCBzb3dpZSBJbnRlcm5ldCBFeHBsb3JlciA3LCA4LCA5IHVuZCAxMC4=">
+                <source>
+                    <b>Brower-Support:</b> Die aktuelle Version unterstützt offiziell neuere Versionen von Firefox, Chrome und Safari, sowie Internet Explorer 7, 8, 9 und 10.
+                </source>
+                <target>
+                    <b> Brower support: </b> The current version officially supports newer versions of Firefox, Chrome and Safari, as well as Internet Explorer 7, 8, 9 and 10.
+                </target>
+            </trans-unit>
+            <trans-unit id="PGI+UU0tU3Vic2VnbWVudC1NYXJraWVydW5nZW48L2I+IHdlcmRlbiBpbSBFeHBvcnQgYWt0dWVsbCBudXIgYmVpbSBGb3JtYXQgQ1NWIGFiZ2ViaWxkZXQu">
+                <source>
+                    <b>QM-Subsegment-Markierungen</b> werden im Export aktuell nur beim Format CSV abgebildet.
+                </source>
+                <target>
+                    <b> QM sub-segment markers </b> are currently only exported for the file-type CSV.
+                </target>
+            </trans-unit>
+            <trans-unit id="dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0IGbDvHIgZGVuIEJyb3dzZXI=">
+                <source>translate5 - Open-Source-Lektorat für den Browser</source>
+                <target>translate5 - open source reviewing environment for the browser</target>
+            </trans-unit>
+            <trans-unit id="U3BvbnNlcmluZyB2b24gdHJhbnNsYXRlNQ==">
+                <source>Sponsering von translate5</source>
+                <target>Sponsering of translate5</target>
+            </trans-unit>
+            <trans-unit id="SW5mb3MgenUgdHJhbnNsYXRlNTo=">
+                <source>Infos zu translate5:</source>
+                <target>More about translate5:</target>
+            </trans-unit>
+            <trans-unit id="SG9zdGluZw==">
+                <source>Hosting</source>
+                <target>Hosting</target>
+            </trans-unit>
+            <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='>
+                <source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source>
+                <target>With translate5 you can review SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis.</target>
+            </trans-unit>
+
+            <trans-unit id="dHJhbnNsYXRlNSBiaWV0ZXQgbW9kZXJuc3RlcyBkZXNrdG9wYXJ0aWdlcyBBcmJlaXRlbiBpbSBCcm93c2VyIG1pdCB2aWVsZW4gaW50ZXJlc3NhbnRlbiwgdGVpbHdlaXNlIGVpbnppZ2FydGlnZW4gRmVhdHVyZXMu">
+                <source>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</source>
+                <target>translate5 offers a desktop-like, cutting-edge way of reviewing in the browser with lots of interesting, sometimes unique features.</target>
+            </trans-unit>
+            <trans-unit id="dHJhbnNsYXRlNSBpc3QgT3BlbiBTb3VyY2UgdW5kIGRhbWl0IGtvc3Rlbmxvc2UgU29mdHdhcmUu">
+                <source>translate5 ist Open Source und damit kostenlose Software.</source>
+                <target>translate5 is open source and thus free software.</target>
+            </trans-unit>
+            <trans-unit id="PHN0cm9uZz48YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS90cmFuc2xhdGU1L2ZlYXR1cmVzLyIgdGFyZ2V0PSJfYmxhbmsiPkVpbmUgdW1mYXNzZW5kZSBGZWF0dXJlbGlzdGU8L2E+PC9zdHJvbmc+IHVuZCB3ZWl0ZXJlIEluZm9ybWF0aW9uZW4genUgdHJhbnNsYXRlNSBmaW5kZW4gU2llIGF1ZiA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS90cmFuc2xhdGU1LyIgdGFyZ2V0PSJfYmxhbmsiPnd3dy5taXR0YWdxaS5jb208L2E+Lg==">
+                <source>
+                    <strong>
+                        <a href="http://www.mittagqi.com/translate5/features/" target="_blank">Eine umfassende Featureliste</a>
+                    </strong> und weitere Informationen zu translate5 finden Sie auf 
+                    <a href="http://www.mittagqi.com/translate5/" target="_blank">www.mittagqi.com</a>.
+                </source>
+                <target>
+                    <strong>
+                        <a href="http://www.mittagqi.com/translate5/features/" target="_blank">For a comprehensive list of features</a></strong> and more information about translate5 please visit <a href="http://www.mittagqi.com/translate5/" target="_blank">www.mittagqi.com</a>.
+                </target>
+            </trans-unit>
+            <trans-unit id="RGVyIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL25ld3NsZXR0ZXIiIHRhcmdldD0iX2JsYW5rIj50cmFuc2xhdGU1LU5ld3NsZXR0ZXIgdm9uIE1pdHRhZ1FJPC9hPiBpbmZvcm1pZXJ0IHJlZ2VsbcOkw59pZyB6dSBuZXVlbiBGZWF0dXJlcyB1bmQgYW5kZXJlbiBOZXVpZ2tlaXRlbi4=">
+                <source>Der 
+                    <a href="http://www.mittagqi.com/newsletter" target="_blank">translate5-Newsletter von MittagQI</a> informiert regelmäßig zu neuen Features und anderen Neuigkeiten.
+                </source>
+                <target><a href="http://www.mittagqi.com/newsletter" target="_blank">translate5 newsletter of MittagQI</a> informs about new features and other news on a regularly base. 
+                </target>
+            </trans-unit>
+<trans-unit id="SW5mb3MgenUgdHJhbnNsYXRlNSBhdWYgTWl0dGFnUUkuY29t">
+    <source>Infos zu translate5 auf MittagQI.com</source>
+    <target>More about translate5 on MittagQI.com</target>
+</trans-unit>
+<trans-unit id="TmV3c2xldHRlcg==">
+    <source>Newsletter</source>
+    <target>Newsletter</target>
+</trans-unit>
+<trans-unit id="dHJhbnNsYXRlNSBOZXdzbGV0dGVy">
+    <source>translate5 Newsletter</source>
+    <target>translate5 Newsletter</target>
+</trans-unit>
+
+<trans-unit id="RGVyIFNlcnZlciBtZWxkZXRlIGRlbiBmb2xnZW5kZW4gRmVobGVyOg=="><source>Der Server meldete den folgenden Fehler:</source><target>The server reported the following error:</target></trans-unit>
+
+<trans-unit id="QnVsZ2FyaXNjaCAoYmcp"><source>Bulgarisch (bg)</source><target>Bulgarian (bg)</target></trans-unit>
+<trans-unit id="VHNjaGVjaGlzY2ggKGN6KQ=="><source>Tschechisch (cz)</source><target>Czech (cz)</target></trans-unit>
+<trans-unit id="RMOkbmlzY2ggKGRrKQ=="><source>Dänisch (dk)</source><target>Danish (dk)</target></trans-unit>
+<trans-unit id="RmlubmlzY2ggKGZpKQ=="><source>Finnisch (fi)</source><target>Finnish (fi)</target></trans-unit>
+<trans-unit id="RnJhbnrDtnNpc2NoIChmcik="><source>Französisch (fr)</source><target>French (fr)</target></trans-unit>
+<trans-unit id="SmFwYW5pc2NoIChqcCk="><source>Japanisch (jp)</source><target>Japanese (jp)</target></trans-unit>
+<trans-unit id="TmllZGVybMOkbmRpc2NoIChubCk="><source>Niederländisch (nl)</source><target>Dutch (nl)</target></trans-unit>
+<trans-unit id="Tm9yd2VnaXNjaCAoQm9rbWFsKSAobm8p"><source>Norwegisch (Bokmal) (no)</source><target>Norwegian (Bokmal) (no)</target></trans-unit>
+<trans-unit id="UnVtw6RuaXNjaCAocm8p"><source>Rumänisch (ro)</source><target>Romanian (ro)</target></trans-unit>
+<trans-unit id="UnVzc2lzY2ggKHJ1KQ=="><source>Russisch (ru)</source><target>Russian (ru)</target></trans-unit>
+<trans-unit id="UG9sbmlzY2ggKHBsKQ=="><source>Polnisch (pl)</source><target>Polish (pl)</target></trans-unit>
+<trans-unit id="UG9ydHVnaWVzaXNjaCAocHQp"><source>Portugiesisch (pt)</source><target>Portuguese (pt)</target></trans-unit>
+<trans-unit id="Q2hpbmVzaXNjaCAoemgp"><source>Chinesisch (zh)</source><target>Chinese (zh)</target></trans-unit>
+<trans-unit id="VW5nYXJpc2NoIChodSk="><source>Ungarisch (hu)</source><target>Hungarian (hu)</target></trans-unit>
+<trans-unit id="SXRhbGllbmlzY2ggKGl0KQ=="><source>Italienisch (it)</source><target>Italien (it)</target></trans-unit>
+<trans-unit id="QXVzZ2FuZ3N0ZXh0IGlzdCBlZGl0aWVyYmFy"><source>Ausgangstext ist editierbar</source><target>Source text is editable</target></trans-unit>
+<trans-unit id="V2hpdGVzcGFjZQ=="><source>Whitespace</source><target>Whitespace</target></trans-unit>
+<trans-unit id="U2VpdGUgbmljaHQgZ2VmdW5kZW46IA=="><source>Seite nicht gefunden: </source><target>Page not found: </target></trans-unit>
+<trans-unit id="LyBBdWZydWYgZGVyZm9sZ3RlIGR1cmNoIElQOiA="><source>/ Aufruf erfolgte durch IP: </source><target>/ Call was made by IP: </target></trans-unit>
+<trans-unit id="TW9ub2xpbmd1YWwgdGVybWlub2xvZ3ksIGluY29uc2lzdGVudA=="><source>Monolingual terminology, inconsistent</source><target>Monolingual terminology, inconsistent</target></trans-unit>
+<trans-unit id="QW53ZW5kdW5nc2ZlaGxlcg=="><source>Anwendungsfehler</source><target>application error</target></trans-unit>
+<trans-unit id="V2lyIGJpdHRlbiB1bSBFbnRzY2h1bGRpZ3VuZyBmw7xyIGRpZSBhdWZnZXRyZXRlbmUgU3TDtnJ1bmch"><source>Wir bitten um Entschuldigung für die aufgetretene Störung!</source><target>We apologize for the problem encountered!</target></trans-unit>
+<trans-unit id="VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gw7xiZXIgZGVuIEZlaGxlciBhdXRvbWF0aXNjaCBiZW5hY2hyaWNodGlndC4gRmFsbHMgd2VpdGVyZSBGcmFnZW4gb2RlciBVbmtsYXJoZWl0ZW4gYmVzdGVoZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gU3VwcG9ydC4="><source>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</source><target>Our administrators are automatically notified of the error. If there are any questions or doubts, please contact our support.</target></trans-unit>
+<trans-unit id="U3VwcG9ydCBFLU1haWw6"><source>Support E-Mail:</source><target>Support e-Mail:</target></trans-unit>
+
+<trans-unit id="V2hpdGVzcGFjZSc+PDx0cmFucy11bml0IGlkPSdXaGl0ZXNwYWNl"><source>Whitespace</source><target>Whitespace</target></trans-unit>
+<trans-unit id="TW9ub2xpbmd1YWwgdDx0cmFucy11bml0IGlkPSdNb25vbGluZ3VhbCB0ZXJtaW5vbG9neSwgaW5jb25zaXN0ZW50"><source>Monolingual terminology, inconsistent</source><target>Monolingual terminology, inconsistent</target></trans-unit>
+
+<trans-unit id="TWl0dGFnUUkgLSBRdWFsaXR5IEluZm9ybWF0aWNzPGJyIC8+S29ucmFkLUxvcmVuei1XZWcgMTA8YnIgLz43MjExNiBNw7Zzc2luZ2VuPGJyIC8+VGVsLiAwNzQ3My8yMjAyMDI8YnIgLz5GYXggMDc0NzMvMjIwMjExPGJyIC8+RS1NYWlsOiBzZXJ2aWNlQE1pdHRhZ1FJLmNvbQ=="><source>
+<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</source><target>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</target></trans-unit>
+   
+<trans-unit id="QW53ZW5kdW5nc2ZlaGxlcg=="><source>Anwendungsfehler</source><target>Anwendungsfehler</target></trans-unit>
+<trans-unit id="TW9ub2xpbmd1YWwgdGVybWlub2xvZ3ksIGluY29uc2lzdGVudA=="><source>Monolingual terminology, inconsistent</source><target>Monolingual terminology, inconsistent</target></trans-unit>
+<trans-unit id="TWl0dGFnUUkgLSBRdWFsaXR5IEluZm9ybWF0aWNzPGJyIC8+S29ucmFkLUxvcmVuei1XZWcgMTA8YnIgLz43MjExNiBNw7Zzc2luZ2VuPGJyIC8+VGVsLiAwNzQ3My8yMjAyMDI8YnIgLz5GYXggMDc0NzMvMjIwMjExPGJyIC8+RS1NYWlsOiBzZXJ2aWNlQE1pdHRhZ1FJLmNvbQ=="><source>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</source><target>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</target></trans-unit>
+<trans-unit id="U2VpdGUgbmljaHQgZ2VmdW5kZW46IA=="><source>Seite nicht gefunden: </source><target>Seite nicht gefunden: </target></trans-unit>
+<trans-unit id="QnVsZ2FyaXNjaCAoYmcp"><source>Bulgarisch (bg)</source><target>Bulgarisch (bg)</target></trans-unit>
+
+
+
+
+<trans-unit id="dHJhbnNsYXRlNSBMb2dpbg=="><source>translate5 Login</source><target>translate5 Login</target></trans-unit>
+
+<trans-unit id='U3RhbmRhcmRiZW51dHplciBmw7xyIHRyYW5zbGF0ZTU='><source>Standardbenutzer für translate5</source><target>Demo user for translate5</target></trans-unit>
+<trans-unit id='QWNodHVuZzogSW4gZGVyIHRyYW5zbGF0ZTUtRGVtb2luc3RhbGxhdGlvbiBzaW5kIGRpZXNlIFN0YW5kYXJkYmVudXR6ZXIgbmljaHQgZWRpdGllcmJhciAtIGFuZGVyZSBCZW51dHplciBoaW5nZWdlbiBzY2hvbi4='><source>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</source><target>Attention: These demo users are not editable in the translate5 demo - other users however are editable.</target></trans-unit>
+
+<trans-unit id="QmVudXR6ZXJuYW1l"><source>Benutzername</source><target>User</target></trans-unit>
+<trans-unit id="UGFzc3dvcnQ="><source>Passwort</source><target>Password</target></trans-unit>
+<trans-unit id="RWlubG9nZ2Vu"><source>Einloggen</source><target>Login</target></trans-unit>
+<trans-unit id="UGFzc3dvcnQgbmV1IHNldHplbg=="><source>Passwort neu setzen</source><target>Reset password</target></trans-unit>
+
+<trans-unit id="TGVrdG9y"><source>Lektor</source><target>Reviewer</target></trans-unit>
+<trans-unit id="w5xiZXJzZXR6ZXI="><source>Übersetzer</source><target>Translator</target></trans-unit>
+<trans-unit id="b2ZmZW4="><source>offen</source><target>open</target></trans-unit>
+<trans-unit id="d2FydGVuZA=="><source>wartend</source><target>waiting</target></trans-unit>
+<trans-unit id="YWJnZXNjaGxvc3Nlbg=="><source>abgeschlossen</source><target>finished</target></trans-unit>
+<trans-unit id="w4RuZGVydW5nZW4gZ2VzcGVpY2hlcnQh"><source>Änderungen gespeichert!</source><target>Changes saved!</target></trans-unit>
+<trans-unit id="RmVobGVyIGJlaW0gU3BlaWNoZXJuIGRlciDDhG5kZXJ1bmdlbiE="><source>Fehler beim Speichern der Änderungen!</source><target>Error on saving changes!</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBhYnNjaGxpZcOfZW4/"><source>Aufgabe abschließen?</source><target>Complete task?</target></trans-unit>
+<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBhYnNjaGxpZcOfZW4/"><source>Wollen Sie die Aufgabe wirklich abschließen?</source><target>Do you really want to complete the task?</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbj8="><source>Aufgabe wieder öffnen?</source><target>Open task again?</target></trans-unit>
+<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCB3aWVkZXIgw7ZmZm5lbj8="><source>Wollen Sie die Aufgabe wirklich wieder öffnen?</source><target>Do you really want to open the task again?</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBmw7xyIGFsbGUgTnV0emVyIGFic2NobGllw59lbj8="><source>Aufgabe für alle Nutzer abschließen?</source><target>Finish task for all users?</target></trans-unit>
+<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBmw7xyIGFsbGUgQmVudXR6ZXIgYWJzY2hsaWXDn2VuPw=="><source>Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?</source><target>Do you really want to complete the task for all users?</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBmw7xyIGFsbGUgTnV0emVyIHdpZWRlciDDtmZmbmVuPw=="><source>Aufgabe für alle Nutzer wieder öffnen?</source><target>Open task for all users again?</target></trans-unit>
+<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBmw7xyIGFsbGUgQmVudXR6ZXIgd2llZGVyIMO2ZmZuZW4/"><source>Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?</source><target>Do you really want to open for all users again the task?</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBlbmRnw7xsdGlnIGJlZW5kZW4/"><source>Aufgabe endgültig beenden?</source><target>Finally end job?</target></trans-unit>
+<trans-unit id="V29sbGVuIFNpZSBkaWUgQXVmZ2FiZSB3aXJrbGljaCBmw7xyIGFsbGUgQmVudXR6ZXIgZW5kZ8O8bHRpZyBiZWVuZGVuPw=="><source>Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?</source><target>Do you really want to finally end the job for all users?</target></trans-unit>
+<trans-unit id="QmVlbmRldGUgQXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbj8="><source>Beendete Aufgabe wieder öffnen?</source><target>Open Finished task again?</target></trans-unit>
+<trans-unit id="V29sbGVuIFNpZSBkaWUgYmVlbmRldGUgQXVmZ2FiZSB3aXJrbGljaCB3aWVkZXIgw7ZmZm5lbj8="><source>Wollen Sie die beendete Aufgabe wirklich wieder öffnen?</source><target>Do you really want to open the finished job again?</target></trans-unit>
+<trans-unit id="QXVmZ2FiZW4gw5xiZXJzaWNodA=="><source>Aufgaben Übersicht</source><target>tasks Overview</target></trans-unit>
+<trans-unit id="aW4gQXJiZWl0"><source>in Arbeit</source><target>work in progress</target></trans-unit>
+<trans-unit id="UE0="><source>PM</source><target>pm</target></trans-unit>
+<trans-unit id="YmVlbmRldA=="><source>beendet</source><target>ended</target></trans-unit>
+<trans-unit id="QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggezB9"><source>Bearbeitet und Gesperrt durch {0}</source><target>Edited and locked by {0}</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBoaW56dWbDvGdlbg=="><source>Aufgabe hinzufügen</source><target>Add task</target></trans-unit>
+<trans-unit id="RWluZSBuZXVlIEF1ZmdhYmUgaGluenVmw7xnZW4u"><source>Eine neue Aufgabe hinzufügen.</source><target>Add a new task.</target></trans-unit>
+<trans-unit id="QWt0dWFsaXNpZXJlbg=="><source>Aktualisieren</source><target>Refresh</target></trans-unit>
+<trans-unit id="QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u"><source>Aufgabenliste vom Server aktualisieren.</source><target>Refresh task list from the server.</target></trans-unit>
+<trans-unit id="QXVmdHJhZ3Nuci4="><source>Auftragsnr.</source><target>Order no.</target></trans-unit>
+<trans-unit id="QXVmZ2FiZW5uYW1l"><source>Aufgabenname</source><target>Task Name</target></trans-unit>
+<trans-unit id="QWt0aW9uZW4="><source>Aktionen</source><target>Actions</target></trans-unit>
+<trans-unit id="RHVyY2hsYXVm"><source>Durchlauf</source><target>Run</target></trans-unit>
+<trans-unit id="UHJvamVrdG1hbmFnZXI="><source>Projektmanager</source><target>Project manager</target></trans-unit>
+<trans-unit id="QmVudXR6ZXI="><source>Benutzer</source><target>User</target></trans-unit>
+<trans-unit id="V8O2cnRlcg=="><source>Wörter</source><target>Words</target></trans-unit>
+<trans-unit id="QW56YWhsIFfDtnJ0ZXI="><source>Anzahl Wörter</source><target>Number of words</target></trans-unit>
+<trans-unit id="TGllZmVyZGF0dW0gKHNvbGwp"><source>Lieferdatum (soll)</source><target>Delivery date (expected)</target></trans-unit>
+<trans-unit id="TGllZmVyZGF0dW0gKGlzdCk="><source>Lieferdatum (ist)</source><target>Delivery date (real)</target></trans-unit>
+<trans-unit id="UmVmZXJlbnpkYXRlaWVu"><source>Referenzdateien</source><target>Reference files</target></trans-unit>
+<trans-unit id="YmVzdGVsbHQ="><source>bestellt</source><target>Ordered</target></trans-unit>
+<trans-unit id="U291cmNlZWRpdGluZw=="><source>Sourceediting</source><target>Sourceediting</target></trans-unit>
+<trans-unit id="V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTVjsgQW5nYWJlIG5vdHdlbmRpZyk="><source>Wählen Sie die zu importierenden Daten (ZIP, CSV; Angabe notwendig)</source><target>Select the data to be imported (ZIP, CSV, specifying required)</target></trans-unit>
+<trans-unit id="SW1wb3J0IERhdGVpwrk="><source>Import Datei¹</source><target>Import file¹</target></trans-unit>
+<trans-unit id="QXVmdHJhZ3NudW1tZXI="><source>Auftragsnummer</source><target>Order number</target></trans-unit>
+<trans-unit id="UHJvamVrdG5hbWUgKGZyZWkgd8OkaGxiYXIsIEFuZ2FiZSBub3R3ZW5kaWcp"><source>Projektname (frei wählbar, Angabe notwendig)</source><target>Task name (user-selectable, required)</target></trans-unit>
+<trans-unit id="UHJvamVrdG5hbWXCuQ=="><source>Projektname¹</source><target>Project name¹</target></trans-unit>
+<trans-unit id="UXVlbGxzcHJhY2hlIGRlcyBQcm9qZWt0ZXMgKEFuZ2FiZSBub3R3ZW5kaWcp"><source>Quellsprache des Projektes (Angabe notwendig)</source><target>Source language of the task (required)</target></trans-unit>
+<trans-unit id="UXVlbGxzcHJhY2hlwrk="><source>Quellsprache¹</source><target>Source language¹</target></trans-unit>
+<trans-unit id="WmllbHNwcmFjaGUgZGVzIFByb2pla3RlcyAoQW5nYWJlIG5vdHdlbmRpZyk="><source>Zielsprache des Projektes (Angabe notwendig)</source><target>Target language of the task (required)</target></trans-unit>
+<trans-unit id="WmllbHNwcmFjaGXCuQ=="><source>Zielsprache¹</source><target>Target language¹</target></trans-unit>
+<trans-unit id="UmVsYWlzc3ByYWNoZSAoQW5nYWJlIG5vdHdlbmRpZyBzb2Zlcm4gUmVsYWlzZGF0ZW4gdm9yaGFuZGVuKQ=="><source>Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)</source><target>Pivot language (required if pivot data is available)</target></trans-unit>
+<trans-unit id="UmVsYWlzc3ByYWNoZQ=="><source>Relaissprache</source><target>Pivot language</target></trans-unit>
+<trans-unit id="TGllZmVyZGF0dW0="><source>Lieferdatum</source><target>Delivery date</target></trans-unit>
+<trans-unit id="wrkgRGllc2UgQW5nYWJlbiAvIERhdGVuIHdlcmRlbiBmw7xyIGRlbiBJbXBvcnQgendpbmdlbmQgYmVuw7Z0aWd0Lg=="><source>¹ Diese Angaben / Daten werden für den Import zwingend benötigt.</source><target>¹ This information / data is mandatory for the import needs.</target></trans-unit>
+<trans-unit id="RmVobGVyIGJlaW0gSW1wb3J0IQ=="><source>Fehler beim Import!</source><target>Import Error!</target></trans-unit>
+<trans-unit id="RmVobGVyIGJlaW0gSW1wb3J0OiBCaXR0ZSB3ZW5kZW4gU2llIHNpY2ggYW4gZGVuIFN1cHBvcnQh"><source>Fehler beim Import: Bitte wenden Sie sich an den Support!</source><target>Import Error: Please contact the support!</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSDDtmZmbmVuIChzY2hyZWliZ2VzY2jDvHR6dCk='><source>Aufgabe öffnen (schreibgeschützt)</source><target>Open task (read-only)</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBiZWFyYmVpdGVu"><source>Aufgabe bearbeiten</source><target>Edit task</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBhYnNjaGxpZcOfZW4="><source>Aufgabe abschließen</source><target>Finish task</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbg=="><source>Aufgabe wieder öffnen</source><target>Reopen task</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBmw7xyIGFsbGUgQmVudXR6ZXIgYWJzY2hsaWXDn2Vu"><source>Aufgabe für alle Benutzer abschließen</source><target>Finish task for all users</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBmw7xyIGFsbGUgQmVudXR6ZXIgd2llZGVyIMO2ZmZuZW4="><source>Aufgabe für alle Benutzer wieder öffnen</source><target>Reopen task for all users</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBrb21wbGV0dCBCZWVuZGVu"><source>Aufgabe komplett Beenden</source><target>End task</target></trans-unit>
+<trans-unit id="QmVudXR6ZXIgZGVyIEF1ZmdhYmUgenV3ZWlzZW4="><source>Benutzer der Aufgabe zuweisen</source><target>Assign user to task</target></trans-unit>
+<trans-unit id="YmVlbmRldGUgQXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbg=="><source>beendete Aufgabe wieder öffnen</source><target>Reopen ended task</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBleHBvcnRpZXJlbg=="><source>Aufgabe exportieren</source><target>Export task</target></trans-unit>
+<trans-unit id="Um9sbGU="><source>Rolle</source><target>Role</target></trans-unit>
+<trans-unit id="QmVudXR6ZXIgaGluenVmw7xnZW4="><source>Benutzer hinzufügen</source><target>Add user</target></trans-unit>
+<trans-unit id="RWluZW4gQmVudXR6ZXIgZGllc2VyIEF1ZmdhYmUgenVvcmRuZW4u"><source>Einen Benutzer dieser Aufgabe zuordnen.</source><target>Add user to this task.</target></trans-unit>
+<trans-unit id="QmVudXR6ZXIgZW50ZmVybmVu"><source>Benutzer entfernen</source><target>Remove user</target></trans-unit>
+<trans-unit id="RGVuIGdld8OkaGx0ZW4gQmVudXR6ZXIgYXVzIGRpZXNlciBBdWZnYWJlIGVudGZlcm5lbi4="><source>Den gewählten Benutzer aus dieser Aufgabe entfernen.</source><target>Remove the selected user from this task.</target></trans-unit>
+<trans-unit id="QmVudXR6ZXIgenVvcmRuZW4="><source>Benutzer zuordnen</source><target>Assign user</target></trans-unit>
+<trans-unit id="w4RuZGVydW5nZW4gc3BlaWNoZXJu"><source>Änderungen speichern</source><target>Save changes</target></trans-unit>
+<trans-unit id="RWluZW4gb2RlciBtZWhyZXJlIEJlbnV0emVyIGF1c3fDpGhsZW4="><source>Einen oder mehrere Benutzer auswählen</source><target>Select one or more users</target></trans-unit>
+<trans-unit id="TG9naW4="><source>Login</source><target>Login</target></trans-unit>
+<trans-unit id="TmFtZQ=="><source>Name</source><target>Name</target></trans-unit>
+<trans-unit id="RS1NYWls"><source>E-Mail</source><target>E-mail</target></trans-unit>
+<trans-unit id="QXVmZ2FiZQ=="><source>Aufgabe</source><target>Task</target></trans-unit>
+<trans-unit id="QWJtZWxkZW4="><source>Abmelden</source><target>Logout</target></trans-unit>
+<trans-unit id="QmVudXR6ZXIgRWluc3RlbGx1bmdlbg=="><source>Benutzer Einstellungen</source><target>User preferences</target></trans-unit>
+<trans-unit id="RWluZ2Vsb2dndCBhbHM="><source>Eingeloggt als</source><target>Logged in as</target></trans-unit>
+<trans-unit id="enVyw7xjayB6dXIgQXVmZ2FiZW5saXN0ZQ=="><source>zurück zur Aufgabenliste</source><target>Return to task list</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBiZWVuZGVu"><source>Aufgabe beenden</source><target>End task</target></trans-unit>
+<trans-unit id="dHJhbnNsYXRlNSBMb2dpbg=="><source>translate5 Login</source><target>translate5 Login</target></trans-unit>
+<trans-unit id="R2VuYXVpZ2tlaXQ="><source>Genauigkeit</source><target>Accuracy</target></trans-unit>
+<trans-unit id="Tm9ybWF0aXZlIFRlcm1pbm9sb2dpZQ=="><source>Normative Terminologie</source><target>Normative terminology</target></trans-unit>
+<trans-unit id="RmVobMO8YmVyc2V0enVuZw=="><source>Fehlübersetzung</source><target>Mistranslation</target></trans-unit>
+<trans-unit id="WnUgd8O2cnRsaWNo"><source>Zu wörtlich</source><target>Overly literal</target></trans-unit>
+<trans-unit id="RmFsc2NoZXIgRnJldW5k"><source>Falscher Freund</source><target>False friend</target></trans-unit>
+<trans-unit id="TmljaHQgenUgw7xiZXJzZXR6ZW4="><source>Nicht zu übersetzen</source><target>Should not have been translated</target></trans-unit>
+<trans-unit id="RGF0dW0vVWhyemVpdA=="><source>Datum/Uhrzeit</source><target>Date/time</target></trans-unit>
+<trans-unit id="VW1yZWNobnVuZyB2b24gRWluaGVpdGVu"><source>Umrechnung von Einheiten</source><target>Unit conversion</target></trans-unit>
+<trans-unit id="WmFobA=="><source>Zahl</source><target>Number</target></trans-unit>
+<trans-unit id="T2JqZWt0ICh6LiBCLiBOYW1lIG9kZXIgT3J0KQ=="><source>Objekt (z. B. Name oder Ort)</source><target>Entity (such as name or place)</target></trans-unit>
+<trans-unit id="QXVzbGFzc3VuZw=="><source>Auslassung</source><target>Omission</target></trans-unit>
+<trans-unit id="RXJnw6RuenVuZw=="><source>Ergänzung</source><target>Addition</target></trans-unit>
+<trans-unit id="VW7DvGJlcnNldHp0"><source>Unübersetzt</source><target>Untranslated</target></trans-unit>
+<trans-unit id="R3JhZmlr"><source>Grafik</source><target>Graphic</target></trans-unit>
+<trans-unit id="U3ByYWNoa29tcGV0ZW56"><source>Sprachkompetenz</source><target>Fluency</target></trans-unit>
+<trans-unit id="KEluaGFsdCk="><source>(Inhalt)</source><target>Content</target></trans-unit>
+<trans-unit id="VmFyaWFudGVuL1NsYW5n"><source>Varianten/Slang</source><target>Variants/slang</target></trans-unit>
+<trans-unit id="U3RpbA=="><source>Stil</source><target>Style</target></trans-unit>
+<trans-unit id="VW50ZXJuZWhtZW5zc3RpbA=="><source>Unternehmensstil</source><target>Company style</target></trans-unit>
+<trans-unit id="U3R5bGVndWlkZQ=="><source>Styleguide</source><target>Style guide</target></trans-unit>
+<trans-unit id="RWluc3ByYWNoaWdlIFRlcm1pbm9sb2dpZQ=="><source>Einsprachige Terminologie</source><target>Monolingual terminology</target></trans-unit>
+<trans-unit id="Tm9ybWF0aXZlIGVpbnNwcmFjaGlnZSBUZXJtaW5vbG9naWU="><source>Normative einsprachige Terminologie</source><target>Normative monolingual terminology</target></trans-unit>
+<trans-unit id="SW5rb25zaXN0ZW56"><source>Inkonsistenz</source><target>Inconsistency</target></trans-unit>
+<trans-unit id="QWJrw7xyenVuZ2Vu"><source>Abkürzungen</source><target>Abbreviations</target></trans-unit>
+<trans-unit id="QmlsZCB1bmQgVGV4dA=="><source>Bild und Text</source><target>Image vs. text</target></trans-unit>
+<trans-unit id="RGlza3Vycw=="><source>Diskurs</source><target>Discourse</target></trans-unit>
+<trans-unit id="RHVwbGl6aWVydW5n"><source>Duplizierung</source><target>Duplication</target></trans-unit>
+<trans-unit id="TWVocmRldXRpZ2tlaXQ="><source>Mehrdeutigkeit</source><target>Ambiguity</target></trans-unit>
+<trans-unit id="VW5rbGFyZSBWZXJ3ZWlzZQ=="><source>Unklare Verweise</source><target>Unclear reference</target></trans-unit>
+<trans-unit id="KE1lY2hhbmlzY2gp"><source>(Mechanisch)</source><target>Mechanical</target></trans-unit>
+<trans-unit id="UmVjaHRzY2hyZWlidW5n"><source>Rechtschreibung</source><target>Spelling</target></trans-unit>
+<trans-unit id="R3Jvw58tL0tsZWluc2NocmVpYnVuZw=="><source>Groß-/Kleinschreibung</source><target>Capitalization</target></trans-unit>
+<trans-unit id="RGlha3JpdGlzY2hlIFplaWNoZW4="><source>Diakritische Zeichen</source><target>Diacritics</target></trans-unit>
+<trans-unit id="VHlwb2dyYXBoaWU="><source>Typographie</source><target>Typography</target></trans-unit>
+<trans-unit id="SW50ZXJwdW5rdGlvbg=="><source>Interpunktion</source><target>Punctuation</target></trans-unit>
+<trans-unit id="QWxsZWluIHN0ZWhlbmRlIEFuZsO8aHJ1bmdzemVpY2hlbiBvZGVyIEtsYW1tZXJu"><source>Allein stehende Anführungszeichen oder Klammern</source><target>Unpaired quote marks or brackets</target></trans-unit>
+<trans-unit id="R3JhbW1hdGlr"><source>Grammatik</source><target>Grammar</target></trans-unit>
+<trans-unit id="TW9ycGhvbG9naWUgKFdvcnRmb3JtKQ=="><source>Morphologie (Wortform)</source><target>Morphology (word form)</target></trans-unit>
+<trans-unit id="V29ydGFydA=="><source>Wortart</source><target>Part of speech</target></trans-unit>
+<trans-unit id="w5xiZXJlaW5zdGltbXVuZw=="><source>Übereinstimmung</source><target>Agreement</target></trans-unit>
+<trans-unit id="U2F0emJhdQ=="><source>Satzbau</source><target>Word order</target></trans-unit>
+<trans-unit id="RnVua3Rpb25zd8O2cnRlcg=="><source>Funktionswörter</source><target>Function words</target></trans-unit>
+<trans-unit id="U3Bhbm51bmcvU2ljaHR3ZWlzZS9TdGltbXVuZw=="><source>Spannung/Sichtweise/Stimmung</source><target>Tense/Aspect/Mood</target></trans-unit>
+<trans-unit id="TmljaHRlaW5oYWx0dW5nIHZvbiBHZWJpZXRzc2NoZW1hdGFz"><source>Nichteinhaltung von Gebietsschematas</source><target>Locale violation</target></trans-unit>
+<trans-unit id="RGF0dW1zZm9ybWF0"><source>Datumsformat</source><target>Date format</target></trans-unit>
+<trans-unit id="WmVpdGZvcm1hdA=="><source>Zeitformat</source><target>Time format</target></trans-unit>
+<trans-unit id="Rm9ybWF0IHZvbiBNYcOfZWluaGVpdGVu"><source>Format von Maßeinheiten</source><target>Measurement format</target></trans-unit>
+<trans-unit id="WmFobGVuZm9ybWF0"><source>Zahlenformat</source><target>Number format</target></trans-unit>
+<trans-unit id="QXJ0IGRlciBBbmbDvGhydW5nc3plaWNoZW4="><source>Art der Anführungszeichen</source><target>Quote mark type</target></trans-unit>
+<trans-unit id="TmF0aW9uYWxlciBTcHJhY2hzdGFuZGFyZA=="><source>Nationaler Sprachstandard</source><target>National language standard</target></trans-unit>
+<trans-unit id="WmVpY2hlbmNvZGllcnVuZw=="><source>Zeichencodierung</source><target>Character encoding</target></trans-unit>
+<trans-unit id="VW56dWzDpHNzaWdlIFplaWNoZW4="><source>Unzulässige Zeichen</source><target>Nonallowed characters</target></trans-unit>
+<trans-unit id="U3RydWt0dXJwcm9ibGVt"><source>Strukturproblem</source><target>Pattern problem</target></trans-unit>
+<trans-unit id="U29ydGllcnVuZw=="><source>Sortierung</source><target>Sorting</target></trans-unit>
+<trans-unit id="w5xiZXJlaW5zdGltbXVuZyBUZXh0a29ycHVz"><source>Übereinstimmung Textkorpus</source><target>Corpus conformance</target></trans-unit>
+<trans-unit id="TGluay9RdWVydmVyd2Vpcw=="><source>Link/Querverweis</source><target>Link/cross-reference</target></trans-unit>
+<trans-unit id="RG9rdW1lbnRlbmludGVybg=="><source>Dokumentenintern</source><target>Document-internal</target></trans-unit>
+<trans-unit id="RG9rdW1lbnRlbmV4dGVybg=="><source>Dokumentenextern</source><target>Document-external</target></trans-unit>
+<trans-unit id="SW5kZXgvSW5oYWx0c3ZlcnplaWNobmlz"><source>Index/Inhaltsverzeichnis</source><target>Index/TOC</target></trans-unit>
+<trans-unit id="U2VpdGVudmVyd2Vpc2U="><source>Seitenverweise</source><target>Page references</target></trans-unit>
+<trans-unit id="Rm9ybWF0IGRlcyBJbmRleGVzL0luaGFsdHN2ZXJ6ZWljaG5pc3Nlcw=="><source>Format des Indexes/Inhaltsverzeichnisses</source><target>Index/TOC format</target></trans-unit>
+<trans-unit id="RmVobGVuZGVyL2ZhbHNjaGVyIEVpbnRyYWc="><source>Fehlender/falscher Eintrag</source><target>Missing /incorrect item</target></trans-unit>
+<trans-unit id="VW52ZXJzdMOkbmRsaWNo"><source>Unverständlich</source><target>Unintelligible</target></trans-unit>
+<trans-unit id="UmljaHRpZ2tlaXQ="><source>Richtigkeit</source><target>Verity</target></trans-unit>
+<trans-unit id="Vm9sbHN0w6RuZGlna2VpdA=="><source>Vollständigkeit</source><target>Completeness</target></trans-unit>
+<trans-unit id="TGlzdGVu"><source>Listen</source><target>Lists</target></trans-unit>
+<trans-unit id="VmVyZmFocmVu"><source>Verfahren</source><target>Procedures</target></trans-unit>
+<trans-unit id="R2VzZXR6bGljaGUgVm9yZ2FiZW4="><source>Gesetzliche Vorgaben</source><target>Legal requirements</target></trans-unit>
+<trans-unit id="QW53ZW5kYmFya2VpdCB2b24gR2ViaWV0c3NjaGVtYXRhcw=="><source>Anwendbarkeit von Gebietsschematas</source><target>Locale applicability</target></trans-unit>
+<trans-unit id="SW50ZXJuYXRpb25hbGlzaWVydW5n"><source>Internationalisierung</source><target>Internationalization</target></trans-unit>
+<trans-unit id="U29uc3RpZ2Vz"><source>Sonstiges</source><target>Other</target></trans-unit>
+<trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermSearch</source><target>Term search</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRrdW5kZQ=='><source>Standardkunde</source><target>Default customer</target></trans-unit>
+<trans-unit id='RXJlaWduaXNzZSB6dSBTcHJhY2hyZXNvdXJjZSAiezB9Ig=='><source>Ereignisse zu Sprachresource "{0}"</source><target>Results for Language-Resource "{0}"</target></trans-unit>
+<trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
+<trans-unit id='T2JlcmZsw6RjaGU='><source>Oberfläche</source><target>interface</target></trans-unit>
+<trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='><source>{LinkConsortium}</source><target>https://www.translate5.net/en/consortium</target></trans-unit>
+<trans-unit id='U2VnbWVudC1Lb21tZW50YXI='><source>Segment-Kommentar</source><target>Segment comment</target></trans-unit>
+<trans-unit id='RnJlaWUgQW5tZXJrdW5n'><source>Freie Anmerkung</source><target>Free annotation</target></trans-unit>
+<trans-unit id='VmlkZW8tQW5tZXJrdW5n'><source>Video-Anmerkung</source><target>Video annotation</target></trans-unit>
+        </body>
+    </file>
+<!-- ids are base64-encoded --></xliff>
