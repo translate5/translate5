@@ -1,5 +1,5 @@
 {
-    "text": "{7deb0282-a2ec-4fef-a392-0c5399055a5d}",
+    "text": "{c907d9e6-de97-4293-8c1a-b8b63924c10d}",
     "children": [
         {
             "qid": -1,
@@ -8,7 +8,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "6197",
+                    "qid": "6856",
                     "qtype": "consistent",
                     "qcount": 2,
                     "qcomplete": true,
@@ -54,11 +54,11 @@
         {
             "qid": -1,
             "qtype": "spellcheck",
-            "qcount": 298,
+            "qcount": 252,
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "5489",
+                    "qid": "6189",
                     "qtype": "spellcheck",
                     "qcount": 1,
                     "qcomplete": true,
@@ -70,9 +70,9 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5633",
+                    "qid": "6110",
                     "qtype": "spellcheck",
-                    "qcount": 219,
+                    "qcount": 209,
                     "qcomplete": true,
                     "qcategory": "misspelling",
                     "qcatidx": "-1",
@@ -82,7 +82,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5680",
+                    "qid": "6206",
                     "qtype": "spellcheck",
                     "qcount": 3,
                     "qcomplete": true,
@@ -94,9 +94,9 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5442",
+                    "qid": "6147",
                     "qtype": "spellcheck",
-                    "qcount": 15,
+                    "qcount": 14,
                     "qcomplete": true,
                     "qcategory": "typographical",
                     "qcatidx": "-1",
@@ -106,9 +106,9 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5632",
+                    "qid": "6154",
                     "qtype": "spellcheck",
-                    "qcount": 55,
+                    "qcount": 20,
                     "qcomplete": true,
                     "qcategory": "uncategorized",
                     "qcatidx": "-1",
@@ -118,7 +118,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5650",
+                    "qid": "6298",
                     "qtype": "spellcheck",
                     "qcount": 5,
                     "qcomplete": true,
@@ -134,7 +134,7 @@
             "qtooltip": "",
             "qcountfp": 0,
             "text": "LanguageTool",
-            "qtotal": 298,
+            "qtotal": 252,
             "expanded": false
         },
         {
@@ -156,7 +156,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "6200",
+                    "qid": "6859",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
@@ -168,7 +168,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6201",
+                    "qid": "6860",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
@@ -194,7 +194,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "6144",
+                    "qid": "6374",
                     "qtype": "mqm",
                     "qcount": 171,
                     "qcomplete": true,
@@ -205,7 +205,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5888",
+                    "qid": "6369",
                     "qtype": "mqm",
                     "qcount": 105,
                     "qcomplete": true,
@@ -216,7 +216,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6160",
+                    "qid": "6500",
                     "qtype": "mqm",
                     "qcount": 12,
                     "qcomplete": true,
@@ -227,7 +227,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5899",
+                    "qid": "6373",
                     "qtype": "mqm",
                     "qcount": 3,
                     "qcomplete": true,
@@ -238,7 +238,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6145",
+                    "qid": "6363",
                     "qtype": "mqm",
                     "qcount": 13,
                     "qcomplete": true,
@@ -249,7 +249,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6162",
+                    "qid": "6366",
                     "qtype": "mqm",
                     "qcount": 21,
                     "qcomplete": true,
@@ -260,7 +260,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5935",
+                    "qid": "6503",
                     "qtype": "mqm",
                     "qcount": 6,
                     "qcomplete": true,
@@ -271,7 +271,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6171",
+                    "qid": "6362",
                     "qtype": "mqm",
                     "qcount": 12,
                     "qcomplete": true,
@@ -282,7 +282,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5738",
+                    "qid": "6397",
                     "qtype": "mqm",
                     "qcount": 2,
                     "qcomplete": true,
@@ -293,7 +293,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5909",
+                    "qid": "6410",
                     "qtype": "mqm",
                     "qcount": 4,
                     "qcomplete": true,
@@ -304,7 +304,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5892",
+                    "qid": "6391",
                     "qtype": "mqm",
                     "qcount": 10,
                     "qcomplete": true,
@@ -315,7 +315,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6146",
+                    "qid": "6364",
                     "qtype": "mqm",
                     "qcount": 32,
                     "qcomplete": true,
@@ -326,7 +326,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6158",
+                    "qid": "6381",
                     "qtype": "mqm",
                     "qcount": 28,
                     "qcomplete": true,
@@ -337,7 +337,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5889",
+                    "qid": "6372",
                     "qtype": "mqm",
                     "qcount": 51,
                     "qcomplete": true,
@@ -348,7 +348,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "5898",
+                    "qid": "6524",
                     "qtype": "mqm",
                     "qcount": 17,
                     "qcomplete": true,
@@ -373,7 +373,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "6193",
+                    "qid": "6852",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -385,7 +385,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6190",
+                    "qid": "6849",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -397,7 +397,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6194",
+                    "qid": "6853",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -409,7 +409,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6191",
+                    "qid": "6850",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -421,7 +421,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "6192",
+                    "qid": "6851",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -478,7 +478,7 @@
         }
     ],
     "metaData": {
-        "numSegments": 796,
+        "numSegments": 750,
         "hasFaultyInternalTags": false
     }
 }
