@@ -163,6 +163,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
     /**
      * Create attribute
+     *
+     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
     public function postAction() {

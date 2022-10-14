@@ -26,6 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * Class editor_Models_Terminology_Models_CollectionAttributeDataType
+ *
+ * @method integer getCollectionId() getCollectionId()
+ * @method integer setCollectionId() setCollectionId(int $collectionId)
+ * @method integer getDataTypeId() getDataTypeId()
+ * @method integer setDataTypeId() setDataTypeId(int $dataTypeId)
+ */
 class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_CollectionAttributeDataType';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Term_CollectionAttributeDataType';
@@ -39,5 +47,31 @@ class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExt
     public function updateCollectionAttributeAssoc(int $collectionId){
         $db = Zend_Db_Table::getDefaultAdapter();
         $db->query("INSERT INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId) (SELECT collectionId,dataTypeId FROM `terms_attributes` WHERE collectionId = ? GROUP BY collectionId,dataTypeId) ON DUPLICATE KEY UPDATE id = id",[$collectionId]);
+    }
+
+    /**
+     * Delete record having given $collectionId and $dataTypeId
+     *
+     * @param int $collectionId
+     * @param int $dataTypeId
+     */
+    public function deleteBy(int $collectionId, int $dataTypeId) {
+        $this->db->getAdapter()->query('
+            DELETE FROM `terms_collection_attribute_datatype` WHERE `collectionId` = ? AND `dataTypeId` = ? LIMIT 1
+        ', [$collectionId, $dataTypeId]);
+    }
+
+    /**
+     * Check whether record exists having given $collectionId and $dataTypeId
+     *
+     * @param int $collectionId
+     * @param int $dataTypeId
+     * @return bool
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function existsBy(int $collectionId, int $dataTypeId) : bool {
+        return !!$this->db->getAdapter()->query('
+            SELECT `id` FROM `terms_collection_attribute_datatype` WHERE `collectionId` = ? AND `dataTypeId` = ? LIMIT 1
+        ', [$collectionId, $dataTypeId])->fetchColumn();
     }
 }
