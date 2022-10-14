@@ -393,6 +393,7 @@ final class Task extends Resource
      */
     public function cleanup(Helper $api, Config $config): void
     {
+        $api->login('testmanager');
         // TODO FIXME: this is just neccessary because of quirks in the helper API ... see class comment
         if($this->_failOnError){
             $this->reload($api);

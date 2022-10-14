@@ -206,11 +206,4 @@ class SessionApiTest extends editor_Test_ImportTest {
         $this->assertLogin('testlector');
         static::api()->logout();
     }
-
-    public static function afterTests(): void
-    {
-        // it seems the tests leave a incorrect state in the Helper API
-        static::api()->logout();
-        static::api()->login('testmanager');
-    }
 }
