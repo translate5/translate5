@@ -61,6 +61,7 @@ class Translate2342Test extends editor_Test_ImportTest {
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
             ->addUploadFile('import-test-file.html')
+            ->addTaskConfigIniFile('runtimeOptions.autoQA.enableSegmentSpellCheck = 0') // crucial: otherwise the self-queueing spellcheck-worker leads to unpredictable results
             ->setNotToWaitForImported(); // this triggers the task-import to immediately start
     }
 
