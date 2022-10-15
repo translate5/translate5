@@ -173,7 +173,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
         // we handle it, that if a empty result is produced, we proceed with the next namespace
         foreach ($this->activeNamespaces as $namespace){
             $result = call_user_func_array([$namespace, $function], $arguments);
-            if(is_array($result) && !empty($result) || is_null($result)) {
+            if((is_array($result) && empty($result)) || is_null($result)) {
                 //empty array or null means, check next namespace
                 continue;
             }
