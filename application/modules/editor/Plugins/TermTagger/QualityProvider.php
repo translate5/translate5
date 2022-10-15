@@ -65,7 +65,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return ($taskConfig->runtimeOptions->termTagger->enableAutoQA == 1);
     }
     
-    public function hasOperationWorker(string $processingMode) : bool {
+    public function hasOperationWorker(string $processingMode, Zend_Config $taskConfig) : bool {
         // we will run with any processing mode
         return true;
     }

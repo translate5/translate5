@@ -104,13 +104,13 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     }
 
     /**
-     * We will run with any processing mode
-     *
+     * We will run with any processing mode if configured
      * @param string $processingMode
+     * @param Zend_Config $taskConfig
      * @return bool
      */
-    public function hasOperationWorker(string $processingMode) : bool {
-        return Zend_Registry::get('config')->runtimeOptions->autoQA->enableSegmentSpellCheck;
+    public function hasOperationWorker(string $processingMode, Zend_Config $taskConfig) : bool {
+        return $taskConfig->enableSegmentSpellCheck;
     }
 
     /**
