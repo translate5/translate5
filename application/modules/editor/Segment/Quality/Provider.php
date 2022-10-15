@@ -71,9 +71,10 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /**
      * Retrieves if the provider has an own worker for the given processing type
      * @param string $processingMode
-     * @return boolean
+     * @param Zend_Config $taskConfig
+     * @return bool
      */
-    public function hasOperationWorker(string $processingMode) : bool {
+    public function hasOperationWorker(string $processingMode, Zend_Config $taskConfig) : bool {
         return false;
     }
     /**
