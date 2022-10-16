@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Filter;
 
 /**
  * Testcase for TRANSLATE-2540
@@ -59,7 +60,7 @@ class QualitySegmentEmptyTest extends editor_Test_JsonTest {
     public function testSegmentQualities(){
         $fileName = 'expectedSegmentQualities.json';
         $qualities = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[0]->id, [], $fileName);
-        $filter = editor_Test_Model_Filter::createSingle('type', 'empty');
+        $filter = Filter::createSingle('type', 'empty');
         $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, '', $filter);
     }
 }

@@ -26,13 +26,30 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * defines the compared & sanitized data for a segment's comment
- */
-class editor_Test_Model_Comment extends editor_Test_Model_Abstract {
+namespace MittagQI\Translate5\Test\Model;
 
-    //FIXME make a black list instead a whitelist here!!!
-    protected $compared = [ 'userName', 'comment', 'created', 'modified', 'isEditable' ];
-    
-    protected $messageField = 'segmentId';
+class TaskQuality extends AbstractModel
+{
+    //FIXME make a black list instead of a whitelist here!!!
+    protected array $compared = [
+        'text',
+        'qtype',
+        'qcount',
+        'qcountfp',
+        'qcomplete',
+        'qfaulty'
+    ];
+
+    protected bool $isTree = true;
+
+    protected array $treeRootSanitized = [
+        'text' => 'testtext'
+    ];
+
+    protected array $treeRootFilteredSanitized = [
+        'qcount' => 'onecounter',
+        'qtotal' => 'onecounter'
+    ];
+
+    protected string $messageField = 'text';
 }

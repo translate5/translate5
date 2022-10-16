@@ -26,45 +26,24 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Model;
+
 /**
- * defines the compared & sanitized data for a segment
+ * defines the compared & sanitized data for a visual source file entity
  */
-class editor_Test_Model_Segment extends editor_Test_Model_Abstract {
-
-    //FIXME make a black list instead a whitelist here!!!
-    protected $compared = [
-        'segmentNrInTask',
-        'mid',
-        'userGuid',
-        'userName',
-        'editable',
-        'pretrans',
-        'matchRate',
-        'stateId',
-        'autoStateId',
+class VisualSourceFile extends AbstractModel
+{
+    protected array $compared = [
+        'import',
+        'fileName',
+        'splitFileName',
         'fileOrder',
-        'workflowStepNr',
-        'workflowStep',
-        'isRepeated',
-        'sourceMd5',
-        'sourceToSort',
-        'targetMd5',
-        'targetToSort',
-        'targetEditToSort',
-        'isWatched',
-        'segmentUserAssocId',
-        'matchRateType',
-        'isFirstofFile',
+        'source',
+        'sourceType',
+        'sourceAligned',
+        'generator',
+        'scroller'
     ];
 
-    protected $sanitized = [
-        'source' => 'fieldtext',
-        'sourceEdit' => 'fieldtext',
-        'target' => 'fieldtext',
-        'targetEdit' => 'fieldtext',
-        'comments' => 'comment',
-        'metaCache' => 'metacache'
-    ];
-
-    protected $messageField = 'segmentNrInTask';
+    protected string $messageField = 'source';
 }

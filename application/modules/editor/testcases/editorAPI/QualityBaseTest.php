@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Filter;
 
 /**
  * Testcase for all endpoints of the AutoQA feature
@@ -95,17 +96,17 @@ class QualityBaseTest extends editor_Test_JsonTest {
     public function testSegmentQualities(){
         $fileName = 'expectedSegmentQualities0.json';
         $qualities = static::api()->getJson('/editor/quality/segment?segmentId='.static::$segments[0]->id, [], $fileName);
-        $qualityFilter = editor_Test_Model_Filter::createMulti('type', ['mqm', 'spellcheck']);
+        $qualityFilter = Filter::createMulti('type', ['mqm', 'spellcheck']);
         $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, '', $qualityFilter);
         
         $fileName = 'expectedSegmentQualities4.json';
         $qualities = static::api()->getJson('/editor/quality/segment?segmentId='.static::$segments[4]->id, [], $fileName);
-        $qualityFilter = editor_Test_Model_Filter::createSingle('type', 'mqm');
+        $qualityFilter = Filter::createSingle('type', 'mqm');
         $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, '', $qualityFilter);
         
         $fileName = 'expectedSegmentQualities9.json';
         $qualities = static::api()->getJson('/editor/quality/segment?segmentId='.static::$segments[9]->id, [], $fileName);
-        $qualityFilter = editor_Test_Model_Filter::createMulti('type', ['mqm', 'spellcheck']);
+        $qualityFilter = Filter::createMulti('type', ['mqm', 'spellcheck']);
         $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, '', $qualityFilter);
     }
     /**

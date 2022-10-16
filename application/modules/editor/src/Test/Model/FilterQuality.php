@@ -26,16 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Test_Model_TaskQuality extends editor_Test_Model_Abstract {
+namespace MittagQI\Translate5\Test\Model;
 
-    //FIXME make a black list instead of a whitelist here!!!
-    protected $compared = [ 'text', 'qtype', 'qcount', 'qcountfp', 'qcomplete', 'qfaulty' ];
-    
-    protected $isTree = true;
-    
-    protected $treeRootSanitized = [ 'text' => 'testtext' ];
+class FilterQuality extends AbstractModel
+{
+    //FIXME make a black list instead a whitelist here!!!
+    protected array $compared = [
+        'text',
+        'qtype',
+        'qcount',
+        'qtotal',
+        'qcategory',
+        'qcatidx',
+        'qcomplete',
+        'qfaulty',
+        'changed'
+    ];
 
-    protected $treeRootFilteredSanitized = [ 'qcount' => 'onecounter', 'qtotal' => 'onecounter' ];
+    protected bool $isTree = true;
 
-    protected $messageField = 'text';
+    protected array $treeRootSanitized = [
+        'text' => 'testtext'
+    ];
+
+    protected array $treeRootFilteredSanitized = [
+        'qcount' => 'onecounter',
+        'qtotal' => 'onecounter'
+    ];
+
+    protected string $messageField = 'text';
 }

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Filter;
+
 /**
  * Testcase for TRANSLATE-2538
  */
@@ -61,7 +63,7 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         // Check qualities
         $jsonFile = $taskName.'.json';
         $tree = static::api()->getJsonTree('/editor/quality', [], $jsonFile);
-        $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'spellcheck');
+        $treeFilter = Filter::createSingle('qtype', 'spellcheck');
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
     }
 }

@@ -26,11 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Filter;
+use MittagQI\Translate5\Test\Sanitizer;
+use MittagQI\Translate5\Test\Model\AbstractModel;
+
 /**
  * Abstraction layer for API tests comparing REST-Data with stored JSON files
  * To achieve this, a Model-based architecture is used that filters & sanitizes both, the REST data & the JSON data before comparing them.
  * This solves problems with autoincrement values & other dynamic data
- * See editor_Test_Model_Abstract & descendants
+ * See AbstractModel & descendants
  */
 abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
 
@@ -44,8 +48,8 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      */
     public function assertFieldTextEquals(string $expected, string $actual, string $message=''){
         return $this->assertEquals(
-            editor_Test_Sanitizer::fieldtext($expected),
-            editor_Test_Sanitizer::fieldtext($actual),
+            Sanitizer::fieldtext($expected),
+            Sanitizer::fieldtext($actual),
             $message);
     }
     /**
@@ -67,7 +71,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param boolean $keepComments
      */
     public function assertSegmentEqualsObject(stdClass $expectedObj, stdClass $segment, string $message='', bool $keepComments=true){
-        $model = editor_Test_Model_Abstract::create($segment, 'segment');
+        $model = AbstractModel::create($segment, 'segment');
         if(!$keepComments){
             $model->removeComparedField('comments');
         }
@@ -83,7 +87,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
     public function assertSegmentsEqualsJsonFile(string $fileToCompare, array $segments, string $message='', bool $keepComments=true){
         if(static::api()->isCapturing()) {
             foreach($segments as $idx => $segment) {
-                $model = editor_Test_Model_Abstract::create($segment, 'segment');
+                $model = AbstractModel::create($segment, 'segment');
                 $segments[$idx] = $model->getComparableData();
             }
             // on capturing we disable assert existence
@@ -163,7 +167,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param boolean $keepComments
      */
     public function assertCommentEqualsObject(stdClass $expectedObj, stdClass $comment, string $message='', bool $removeDates=false){
-        $model = editor_Test_Model_Abstract::create($comment, 'comment');
+        $model = AbstractModel::create($comment, 'comment');
         if($removeDates){
             $model->removeComparedField('created')->removeComparedField('modified');
         }
@@ -178,9 +182,9 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param string $fileToCompare
      * @param array $actualModels
      * @param string $message
-     * @param editor_Test_Model_Filter|null $filter: If given, the expected & actual items will be filtered according to this filter
+     * @param Filter|null $filter: If given, the expected & actual items will be filtered according to this filter
      */
-    public function assertModelsEqualsJsonFile(string $modelName, string $fileToCompare, array $actualModels, string $message='', editor_Test_Model_Filter $filter=NULL){
+    public function assertModelsEqualsJsonFile(string $modelName, string $fileToCompare, array $actualModels, string $message='', Filter $filter=NULL){
         $expectedModels = static::api()->getFileContent($fileToCompare, $actualModels, true);
         $this->assertModelsEqualsObjects($modelName, $expectedModels, $actualModels, $message, $filter);
     }
@@ -190,9 +194,9 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param string $fileToCompare
      * @param stdClass $actualModel
      * @param string $message
-     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
+     * @param Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
      */
-    public function assertModelEqualsJsonFile(string $modelName, string $fileToCompare, stdClass $actualModel, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
+    public function assertModelEqualsJsonFile(string $modelName, string $fileToCompare, stdClass $actualModel, string $message='', Filter $treeFilter=NULL){
         $expectedModel = static::api()->getFileContent($fileToCompare, $actualModel, true);
         $this->assertModelEqualsObject($modelName, $expectedModel, $actualModel, $message, $treeFilter);
     }
@@ -214,10 +218,10 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param stdClass $expectedModel
      * @param stdClass $actualModel
      * @param string $message
-     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
+     * @param Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
      */
-    public function assertModelEqualsObject(string $modelName, stdClass $expectedModel, stdClass $actualModel, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
-        $model = editor_Test_Model_Abstract::create($actualModel, $modelName);
+    public function assertModelEqualsObject(string $modelName, stdClass $expectedModel, stdClass $actualModel, string $message='', Filter $treeFilter=NULL){
+        $model = AbstractModel::create($actualModel, $modelName);
         $model->compare($this, $expectedModel, $message, $treeFilter);
     }
     /**
@@ -226,9 +230,9 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param array $expectedModels
      * @param array $actualModels
      * @param string $message
-     * @param editor_Test_Model_Filter|null $filter: If given, the expected & actual items will be filtered according to this filter
+     * @param Filter|null $filter: If given, the expected & actual items will be filtered according to this filter
      */
-    public function assertModelsEqualsObjects(string $modelName, array $expectedModels, array $actualModels, string $message='', editor_Test_Model_Filter $filter=NULL){
+    public function assertModelsEqualsObjects(string $modelName, array $expectedModels, array $actualModels, string $message='', Filter $filter=NULL){
         // if a filter was passed, we need to reduce the lists
         if($filter != NULL){
             $actualModels = $filter->apply($actualModels);

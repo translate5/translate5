@@ -26,18 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Model;
+
 /**
- * defines the compared & sanitized data for a match analysis
+ * defines the compared & sanitized data for a segment's comment
  */
-class editor_Test_Model_Analysis extends editor_Test_Model_Abstract {
+class Comment extends AbstractModel
+{
     //FIXME make a black list instead a whitelist here!!!
-    protected $compared = [
-        'segmentNrInTask',
-        'internalFuzzy',
-        'matchRate',
-        'wordCount',
-        'type',
+    protected array $compared = [
+        'userName',
+        'comment',
+        'created',
+        'modified',
+        'isEditable'
     ];
 
-    protected $messageField = 'segmentNrInTask';
+    protected string $messageField = 'segmentId';
 }

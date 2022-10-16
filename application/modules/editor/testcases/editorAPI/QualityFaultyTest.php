@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Filter;
 
 /**
  * Testcase for the AutoQA feature
@@ -92,7 +93,7 @@ class QualityFaultyTest extends editor_Test_JsonTest {
     public function testFilterQualityTree(){
         $jsonFile = 'expectedQualityFilterFaulty.json';
         $tree = static::api()->getJsonTree('/editor/quality', [], $jsonFile);
-        $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'internal');
+        $treeFilter = Filter::createSingle('qtype', 'internal');
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
     }
     /**
@@ -102,7 +103,7 @@ class QualityFaultyTest extends editor_Test_JsonTest {
     public function testTaskQualityTree(){
         $jsonFile = 'expectedTaskQualitiesFaulty.json';
         $tree = static::api()->getJson('editor/quality/task?&taskGuid='.urlencode(static::api()->getTask()->taskGuid), [], $jsonFile);
-        $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'internal');
+        $treeFilter = Filter::createSingle('qtype', 'internal');
         $this->assertModelEqualsJsonFile('TaskQuality', $jsonFile, $tree, '', $treeFilter);
     }
     /**

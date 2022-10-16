@@ -26,22 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * defines the compared & sanitized data for a visual source file entity
- */
-class editor_Test_Model_VisualSourceFile extends editor_Test_Model_Abstract {
+namespace MittagQI\Translate5\Test\Model;
 
-    protected $compared = [
-        'import',
-        'fileName',
-        'splitFileName',
-        'fileOrder',
-        'source',
-        'sourceType',
-        'sourceAligned',
-        'generator',
-        'scroller'
+/**
+ * defines the compared & sanitized data for a match analysis
+ */
+class Analysis extends AbstractModel
+{
+    //FIXME make a black list instead a whitelist here!!!
+    protected array $compared = [
+        'segmentNrInTask',
+        'internalFuzzy',
+        'matchRate',
+        'wordCount',
+        'type',
     ];
 
-    protected $messageField = 'source';
+    protected string $messageField = 'segmentNrInTask';
 }

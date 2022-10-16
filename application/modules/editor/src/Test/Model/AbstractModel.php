@@ -26,145 +26,161 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test\Model;
+
+use MittagQI\Translate5\Test\Filter;
+use MittagQI\Translate5\Test\Sanitizer;
+
 /**
  * The master class for all Test Models
  * A test model usually defines how an entity of the REST API will be compared with captured data
  * All fields to compare must be defined in ::$compared and for those fields that need to be sanitized a sanitation can be provided
- * The sanitization in ::$sanitized is a assoc array where the key is the field-name and the value is a method name in editor_Test_Sanitizer
+ * The sanitization in ::$sanitized is a assoc array where the key is the field-name and the value is a method name in Sanitizer
  * The ::$messageField defines a field to use for identifying the entity with auto-generated message texts
  */
-abstract class editor_Test_Model_Abstract {
-    
+abstract class AbstractModel
+{
     /**
      * generates an instance of the given type
-     * This expects, that a model class for the passed type exists, e.g. if you pass 'segment' a editor_Test_Model_Segment will be created
-     * @param stdClass $data
+     * This expects, that a model class for the passed type exists, e.g. if you pass 'segment' a MittagQI\Translate5\Test\Model\Segment will be created
+     * @param \stdClass $data
      * @param string $type
-     * @return editor_Test_Model_Abstract
+     * @return AbstractModel
      */
-    public static function create(stdClass $data, string $type){
-        $className = 'editor_Test_Model_'.ucfirst($type);
+    public static function create(\stdClass $data, string $type): AbstractModel
+    {
+        $className = 'MittagQI\Translate5\Test\Model\\'.ucfirst($type);
         return new $className($data);
     }
+
     /**
      * FIXME make a black list instead a whitelist here!!!
      * Defines the fields that are compared, all others are ignored
      * If the field does not exist in the passed data, it will be generated with NULL as value
      * @var string[]
      */
-    protected $compared = [];
+    protected array $compared = [];
     /**
-     * Defines the fields that are sanitized and the type of saintation applied (which will point to a method of editor_Test_Sanitizer)
+     * Defines the fields that are sanitized and the type of saintation applied (which will point to a method of Sanitizer)
      * Fields defined here must not appear in compared
      * entries are like 'field' => 'sanitizationtype'
      * If the field does not exist in the passed data, it will be generated with NULL as value
      * @var string[]
      */
-    protected $sanitized = [];
+    protected array $sanitized = [];
     /**
      * This Field defines if this is a tree (as ExtJs uses them)
      * If set, the tree will be created recursively and the tree can be compared by comparing the root element or any branch can be compared as well
      * This field MUST NOT appear in $compared, otherwise the original data may be manipulated
      * @var boolean
      */
-    protected $isTree = false;
+    protected bool $isTree = false;
     /**
      * Defines the fields of the root-node of a tree being sanitized.
      * ONLY the root node fields will be sanitized, this is to come around issues with root-nodes usually containing the task-ID in the text
      * @var array
      */
-    protected $treeRootSanitized = [];
+    protected array $treeRootSanitized = [];
     /**
      * Defines the fields of the root-node of a tree being sanitized if the tree has a filter applied
      * ONLY the root node fields will be sanitized, this is to come around issues with root-nodes usually containing the count of children which is incorrect if we filter the children
      * @var array
      */
-    protected $treeRootFilteredSanitized = [];
+    protected array $treeRootFilteredSanitized = [];
     /**
      * This defines a field that will be added to the default message to identify the model
      * This can be a field not added to the equation
      * @var string
      */
-    protected $messageField = 'id';
+    protected string $messageField = 'id';
     /**
-     * 
-     * @var stdClass
-     */    
+     *
+     * @var \stdClass
+     */
     private $_data;
     /**
-     * 
+     *
      * @var string
      */
     private $_identification = null;
 
     /**
-     * 
-     * @param stdClass $data
+     *
+     * @param \stdClass $data
      */
-    public function __construct(stdClass $data){
+    public function __construct(\stdClass $data)
+    {
         $this->_data = $data;
-        if(!empty($this->messageField) && property_exists($data, $this->messageField)){
+        if (!empty($this->messageField) && property_exists($data, $this->messageField)) {
             $field = $this->messageField;
             $this->_identification = $data->$field;
         }
     }
+
     /**
      * dynamically adds a field that will be compared
      * @param string $field
-     * @return editor_Test_Model_Abstract
+     * @return AbstractModel
      */
-    public function addComparedField(string $field) : editor_Test_Model_Abstract {
-        if(!in_array($field, $this->compared)){
+    public function addComparedField(string $field): AbstractModel
+    {
+        if (!in_array($field, $this->compared)) {
             $this->compared[] = $field;
         }
         return $this;
     }
+
     /**
      * dynamically adds a sanitized field that will be compared
-     * Keep in mind the passed sanitization must exist in editor_Test_Sanitizer
+     * Keep in mind the passed sanitization must exist in Sanitizer
      * @param string $field
      * @param string $sanitizationName
-     * @return editor_Test_Model_Abstract
+     * @return AbstractModel
      */
-    public function addSanitizedField(string $field, string $sanitizationName) : editor_Test_Model_Abstract {
+    public function addSanitizedField(string $field, string $sanitizationName): AbstractModel
+    {
         $this->sanitized[$field] = $sanitizationName;
         return $this;
     }
+
     /**
      * Removes the field, either if a normal compared or a sanitized field
      * @param string $field
-     * @return editor_Test_Model_Abstract
+     * @return AbstractModel
      */
-    public function removeComparedField(string $field) : editor_Test_Model_Abstract {
-        if(($idx = array_search($field, $this->compared)) !== false) {
+    public function removeComparedField(string $field): AbstractModel
+    {
+        if (($idx = array_search($field, $this->compared)) !== false) {
             unset($this->compared[$idx]);
         }
-        if(array_key_exists($field, $this->sanitized)){
+        if (array_key_exists($field, $this->sanitized)) {
             unset($this->sanitized[$field]);
         }
         return $this;
     }
+
     /**
      * Copies & sanitizes our data
-     * @param stdClass $data
-     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
-     * @param bool $isRoot: internal prop to hint if an item is the root of a tree
-     * @return stdClass
+     * @param \stdClass $data
+     * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
+     * @param bool $isRoot : internal prop to hint if an item is the root of a tree
+     * @return \stdClass
      */
-    protected function copy(stdClass $data, editor_Test_Model_Filter $treeFilter=NULL, bool $isRoot=true) : stdClass {
-        $result = new stdClass();
+    protected function copy(\stdClass $data, Filter $treeFilter = NULL, bool $isRoot = true): \stdClass
+    {
+        $result = new \stdClass();
         // copy sanitized fields
-        foreach($this->sanitized as $field => $functionName){
-            if(property_exists($data, $field)){
-                $result->$field = editor_Test_Sanitizer::$functionName($data->$field);
+        foreach ($this->sanitized as $field => $functionName) {
+            if (property_exists($data, $field)) {
+                $result->$field = Sanitizer::$functionName($data->$field);
             } else {
                 $result->$field = NULL;
             }
         }
         // copy unsanitized fields (if not already defined in $sanitized)
-        foreach($this->compared as $field){
-            if(!property_exists($result, $field)){
-                if(property_exists($data, $field)){
+        foreach ($this->compared as $field) {
+            if (!property_exists($result, $field)) {
+                if (property_exists($data, $field)) {
                     $result->$field = $data->$field;
                 } else {
                     $result->$field = NULL;
@@ -172,37 +188,37 @@ abstract class editor_Test_Model_Abstract {
             }
         }
         // additional sanitization of the Root field of a tree
-        if($this->isTree && $isRoot && count($this->treeRootSanitized) > 0){
-            foreach($this->treeRootSanitized as $field => $functionName){
-                if(property_exists($data, $field)){
-                    $result->$field = editor_Test_Sanitizer::$functionName($data->$field);
+        if ($this->isTree && $isRoot && count($this->treeRootSanitized) > 0) {
+            foreach ($this->treeRootSanitized as $field => $functionName) {
+                if (property_exists($data, $field)) {
+                    $result->$field = Sanitizer::$functionName($data->$field);
                 } else {
                     $result->$field = NULL;
                 }
             }
         }
         // additional sanitization of the Root field of a tree that is filtered
-        if($this->isTree && $isRoot && $treeFilter !== NULL && count($this->treeRootFilteredSanitized) > 0){
-            foreach($this->treeRootFilteredSanitized as $field => $functionName){
-                if(property_exists($data, $field)){
-                    $result->$field = editor_Test_Sanitizer::$functionName($data->$field);
+        if ($this->isTree && $isRoot && $treeFilter !== NULL && count($this->treeRootFilteredSanitized) > 0) {
+            foreach ($this->treeRootFilteredSanitized as $field => $functionName) {
+                if (property_exists($data, $field)) {
+                    $result->$field = Sanitizer::$functionName($data->$field);
                 } else {
                     $result->$field = NULL;
                 }
             }
         }
         // recursive tree processing
-        if($this->isTree && property_exists($data, 'children')){
+        if ($this->isTree && property_exists($data, 'children')) {
             $result->children = [];
-            foreach($data->children as $child){
-                if($treeFilter === NULL || $treeFilter->matches($child)){
+            foreach ($data->children as $child) {
+                if ($treeFilter === NULL || $treeFilter->matches($child)) {
                     $result->children[] = $this->copy($child, $treeFilter, false);
                 }
             }
         }
 
         //reorder the wanted data, so that it matches to the old order for easier comparsion with diff
-        if(ZfExtended_Test_ApiHelper::isLegacyData() && $this instanceof editor_Test_Model_Segment) {
+        if (\ZfExtended_Test_ApiHelper::isLegacyData() && $this instanceof Segment) {
             $foo = [
                 'segmentNrInTask' => null,
                 'mid' => null,
@@ -231,60 +247,70 @@ abstract class editor_Test_Model_Abstract {
                 'isRepeated' => null,
             ];
             //fix the order of the associated array vs object then.
-            $result = (array) $result;
-            $result = (object) array_replace(array_intersect_key($foo, $result), $result);
+            $result = (array)$result;
+            $result = (object)array_replace(array_intersect_key($foo, $result), $result);
         }
         return $result;
     }
+
     /**
      * Generates a default message
      * @param string $message
      * @return string
      */
-    protected function getDefaultMessage(string $message) : string {
-        if(!empty($message)){
+    protected function getDefaultMessage(string $message): string
+    {
+        if (!empty($message)) {
             return $message;
         }
         $parts = explode('_', __CLASS__);
-        $message = 'Comparing '.array_pop($parts);
-        $message .= ($this->_identification == NULL) ? ' failed!' : ' "'.$this->_identification.'" failed!';
+        $message = 'Comparing ' . array_pop($parts);
+        $message .= ($this->_identification == NULL) ? ' failed!' : ' "' . $this->_identification . '" failed!';
         return $message;
     }
+
     /**
      * Compares the Model with test data for the passed testcase
-     * @param editor_Test_JsonTest $testCase
-     * @param stdClass $expected
+     * @param \editor_Test_JsonTest $testCase
+     * @param \stdClass $expected
      * @param string $message
-     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
+     * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compare(editor_Test_JsonTest $testCase, stdClass $expected, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
+    public function compare(\editor_Test_JsonTest $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = NULL)
+    {
         $this->compareExpectation($testCase, $expected, $message, $treeFilter);
     }
+
     /**
      * Since test-models can act as expectation or actual data we provide both directions of comparision (a test-model is expected to represent real API data though)
-     * @param editor_Test_JsonTest $testCase
-     * @param stdClass $expected
+     * @param \editor_Test_JsonTest $testCase
+     * @param \stdClass $expected
      * @param string $message
-     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
+     * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compareExpectation(editor_Test_JsonTest $testCase, stdClass $expected, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
+    public function compareExpectation(\editor_Test_JsonTest $testCase, \stdClass $expected, string $message = '', Filter $treeFilter = NULL)
+    {
         $testCase->assertEquals($this->copy($expected, $treeFilter), $this->copy($this->_data, $treeFilter), $message);
     }
+
     /**
      * Since test-models can act as expectation or actual data we provide both directions of comparision (a test-model is expected to represent real API data though)
-     * @param editor_Test_JsonTest $testCase
-     * @param stdClass $actual
+     * @param \editor_Test_JsonTest $testCase
+     * @param \stdClass $actual
      * @param string $message
-     * @param editor_Test_Model_Filter|null $treeFilter: If given, a passed tree data will be filtered according to the passed filter
+     * @param Filter|null $treeFilter : If given, a passed tree data will be filtered according to the passed filter
      */
-    public function compareActual(editor_Test_JsonTest $testCase, stdClass $actual, string $message='', editor_Test_Model_Filter $treeFilter=NULL){
+    public function compareActual(\editor_Test_JsonTest $testCase, \stdClass $actual, string $message = '', Filter $treeFilter = NULL)
+    {
         $testCase->assertEquals($this->copy($this->_data, $treeFilter), $this->copy($actual, $treeFilter), $message);
     }
+
     /**
      * Retrieves the transformed data for comparision
-     * @return stdClass
+     * @return \stdClass
      */
-    public function getComparableData(){
+    public function getComparableData()
+    {
         return $this->copy($this->_data);
     }
 }

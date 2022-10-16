@@ -26,16 +26,47 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Test_Model_FilterQuality extends editor_Test_Model_Abstract {
+namespace MittagQI\Translate5\Test\Model;
 
+/**
+ * defines the compared & sanitized data for a segment
+ */
+class Segment extends AbstractModel
+{
     //FIXME make a black list instead a whitelist here!!!
-    protected $compared = [ 'text', 'qtype', 'qcount', 'qtotal', 'qcategory', 'qcatidx', 'qcomplete', 'qfaulty', 'changed' ];
+    protected array $compared = [
+        'segmentNrInTask',
+        'mid',
+        'userGuid',
+        'userName',
+        'editable',
+        'pretrans',
+        'matchRate',
+        'stateId',
+        'autoStateId',
+        'fileOrder',
+        'workflowStepNr',
+        'workflowStep',
+        'isRepeated',
+        'sourceMd5',
+        'sourceToSort',
+        'targetMd5',
+        'targetToSort',
+        'targetEditToSort',
+        'isWatched',
+        'segmentUserAssocId',
+        'matchRateType',
+        'isFirstofFile',
+    ];
 
-    protected $isTree = true;
-    
-    protected $treeRootSanitized = [ 'text' => 'testtext' ];
+    protected array $sanitized = [
+        'source' => 'fieldtext',
+        'sourceEdit' => 'fieldtext',
+        'target' => 'fieldtext',
+        'targetEdit' => 'fieldtext',
+        'comments' => 'comment',
+        'metaCache' => 'metacache'
+    ];
 
-    protected $treeRootFilteredSanitized = [ 'qcount' => 'onecounter', 'qtotal' => 'onecounter' ];
-
-    protected $messageField = 'text';
+    protected string $messageField = 'segmentNrInTask';
 }

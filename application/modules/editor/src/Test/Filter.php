@@ -26,39 +26,43 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Test;
+
 /**
  * Just a general data structure for creating a filter to filter arrays of model-arrays or trees of models
  * This is a whitelist-filter that will filter for objects with a certain property to have one or multiple values
  */
-class editor_Test_Model_Filter
+class Filter
 {
     /**
      * Creates a filter to filter items to have a identical property
      * @param string $propertyName
      * @param string|int|float|bool $value: make sure the value is of the right type!
-     * @return editor_Test_Model_Filter
+     * @return Filter
      */
-    public static function createSingle(string $propertyName, $value){
-        return new editor_Test_Model_Filter($propertyName, $value, NULL);
+    public static function createSingle(string $propertyName, mixed $value): Filter {
+        return new Filter($propertyName, $value, NULL);
     }
 
     /**
      * @param string $propertyName
      * @param array $values
-     * @return editor_Test_Model_Filter
+     * @return Filter
      */
-    public static function createMulti(string $propertyName, array $values){
-        return new editor_Test_Model_Filter($propertyName, NULL, $values);
+    public static function createMulti(string $propertyName, array $values): Filter {
+        return new Filter($propertyName, NULL, $values);
     }
 
     /**
      * @var string
      */
     private string $prop;
+
     /**
      * @var mixed|null
      */
-    private $val;
+    private mixed $val;
+
     /**
      * @var array|null
      */
@@ -106,7 +110,7 @@ class editor_Test_Model_Filter
      * Just for debugging
      * @return string
      */
-    public function __toString(){
-        return 'editor_Test_Model_Filter: property: '.$this->prop.', '.(($this->val === NULL) ? 'values: ['.implode(',', $this->vals).']' : ', value: '.$this->val);
+    public function __toString(): string {
+        return 'Filter: property: '.$this->prop.', '.(($this->val === NULL) ? 'values: ['.implode(',', $this->vals).']' : ', value: '.$this->val);
     }
 }
