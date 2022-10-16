@@ -34,7 +34,7 @@ namespace MittagQI\Translate5\Test\Model;
 class Segment extends AbstractModel
 {
     //FIXME make a black list instead a whitelist here!!!
-    protected array $compared = [
+    protected array $whitelist = [
         'segmentNrInTask',
         'mid',
         'userGuid',
@@ -56,7 +56,7 @@ class Segment extends AbstractModel
         'isWatched',
         'segmentUserAssocId',
         'matchRateType',
-        'isFirstofFile',
+        'isFirstofFile'
     ];
 
     protected array $sanitized = [

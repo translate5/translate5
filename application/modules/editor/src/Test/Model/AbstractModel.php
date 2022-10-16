@@ -34,7 +34,7 @@ use MittagQI\Translate5\Test\Sanitizer;
 /**
  * The master class for all Test Models
  * A test model usually defines how an entity of the REST API will be compared with captured data
- * All fields to compare must be defined in ::$compared and for those fields that need to be sanitized a sanitation can be provided
+ * All fields to compare must be either defined via ::$blacklist OR ::$whitelist ($blacklist has higher precedence) and for those fields that need to be sanitized a sanitation can be provided
  * The sanitization in ::$sanitized is a assoc array where the key is the field-name and the value is a method name in Sanitizer
  * The ::$messageField defines a field to use for identifying the entity with auto-generated message texts
  */
@@ -49,25 +49,33 @@ abstract class AbstractModel
      */
     public static function create(\stdClass $data, string $type): AbstractModel
     {
-        $className = 'MittagQI\Translate5\Test\Model\\'.ucfirst($type);
+        $className = 'MittagQI\Translate5\Test\Model\\' . ucfirst($type);
         return new $className($data);
     }
 
+
     /**
-     * FIXME make a black list instead a whitelist here!!!
-     * Defines the fields that are compared, all others are ignored
-     * If the field does not exist in the passed data, it will be generated with NULL as value
-     * @var string[]
-     */
-    protected array $compared = [];
-    /**
-     * Defines the fields that are sanitized and the type of saintation applied (which will point to a method of Sanitizer)
-     * Fields defined here must not appear in compared
+     * Defines the fields that are sanitized and the type of sanitization applied (which will point to a method of Sanitizer)
+     * Fields defined here must not appear in blacklist nor whitelist, this has highest precedence
      * entries are like 'field' => 'sanitizationtype'
      * If the field does not exist in the passed data, it will be generated with NULL as value
      * @var string[]
      */
     protected array $sanitized = [];
+    /**
+     * Defines the fields that are NOT compared, all others are taken for comparision
+     * EITHER ::$blacklist OR ::$whitelist can be configured with $blacklist having higher precedence
+     * If the field does not exist in the passed data, it will be generated with NULL as value
+     * @var string[]
+     */
+    protected array $blacklist = [];
+    /**
+     * Defines the fields that are compared, all others are ignored
+     * EITHER ::$blacklist OR ::$whitelist can be configured with $blacklist having higher precedence
+     * If the field does not exist in the passed data, it will be generated with NULL as value
+     * @var string[]
+     */
+    protected array $whitelist = [];
     /**
      * This Field defines if this is a tree (as ExtJs uses them)
      * If set, the tree will be created recursively and the tree can be compared by comparing the root element or any branch can be compared as well
@@ -124,8 +132,10 @@ abstract class AbstractModel
      */
     public function addComparedField(string $field): AbstractModel
     {
-        if (!in_array($field, $this->compared)) {
-            $this->compared[] = $field;
+        if($this->useBlacklist()){
+            $this->removeField($this->blacklist, $field);
+        } else if(!in_array($field, $this->whitelist)) {
+            $this->whitelist[] = $field;
         }
         return $this;
     }
@@ -140,6 +150,9 @@ abstract class AbstractModel
     public function addSanitizedField(string $field, string $sanitizationName): AbstractModel
     {
         $this->sanitized[$field] = $sanitizationName;
+        if($this->useBlacklist()){
+            $this->removeField($this->blacklist, $field);
+        }
         return $this;
     }
 
@@ -150,8 +163,12 @@ abstract class AbstractModel
      */
     public function removeComparedField(string $field): AbstractModel
     {
-        if (($idx = array_search($field, $this->compared)) !== false) {
-            unset($this->compared[$idx]);
+        if($this->useBlacklist()){
+            if(!in_array($field, $this->blacklist)){
+                $this->blacklist[] = $field;
+            }
+        } else {
+            $this->removeField($this->whitelist, $field);
         }
         if (array_key_exists($field, $this->sanitized)) {
             unset($this->sanitized[$field]);
@@ -178,12 +195,23 @@ abstract class AbstractModel
             }
         }
         // copy unsanitized fields (if not already defined in $sanitized)
-        foreach ($this->compared as $field) {
-            if (!property_exists($result, $field)) {
-                if (property_exists($data, $field)) {
+        if($this->useBlacklist()){
+            // via blacklist
+            foreach(get_object_vars($data) as $field){
+                if(!property_exists($result, $field) && !in_array($field, $this->blacklist)){
                     $result->$field = $data->$field;
-                } else {
-                    $result->$field = NULL;
+                }
+            }
+
+        } else {
+            // or via whitelist
+            foreach ($this->whitelist as $field) {
+                if (!property_exists($result, $field)) {
+                    if (property_exists($data, $field)) {
+                        $result->$field = $data->$field;
+                    } else {
+                        $result->$field = NULL;
+                    }
                 }
             }
         }
@@ -312,5 +340,27 @@ abstract class AbstractModel
     public function getComparableData()
     {
         return $this->copy($this->_data);
+    }
+
+    /**
+     * Decides if blacklist or whitelist has to be used
+     * @return bool
+     */
+    protected function useBlacklist(): bool
+    {
+        return count($this->blacklist) > 0;
+    }
+
+    /**
+     * Removes an element of the whitelist or blacklist
+     * @param array $array
+     * @param string $value
+     */
+    private function removeField(array &$array, string $field){
+        if (($idx = array_search($field, $array)) !== false) {
+            // this creates index-holes in the whitelist-array (what is acceptable as long we just use foreach)
+            unset($array[$idx]);
+            $array = array_values($array);
+        }
     }
 }

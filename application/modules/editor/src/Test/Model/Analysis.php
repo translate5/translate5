@@ -34,12 +34,12 @@ namespace MittagQI\Translate5\Test\Model;
 class Analysis extends AbstractModel
 {
     //FIXME make a black list instead a whitelist here!!!
-    protected array $compared = [
+    protected array $whitelist = [
         'segmentNrInTask',
         'internalFuzzy',
         'matchRate',
         'wordCount',
-        'type',
+        'type'
     ];
 
     protected string $messageField = 'segmentNrInTask';

@@ -31,7 +31,7 @@ namespace MittagQI\Translate5\Test\Model;
 class FilterQuality extends AbstractModel
 {
     //FIXME make a black list instead a whitelist here!!!
-    protected array $compared = [
+    protected array $whitelist = [
         'text',
         'qtype',
         'qcount',

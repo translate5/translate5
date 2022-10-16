@@ -33,7 +33,7 @@ namespace MittagQI\Translate5\Test\Model;
  */
 class VisualSourceFile extends AbstractModel
 {
-    protected array $compared = [
+    protected array $whitelist = [
         'import',
         'fileName',
         'splitFileName',

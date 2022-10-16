@@ -34,7 +34,7 @@ namespace MittagQI\Translate5\Test\Model;
 class Comment extends AbstractModel
 {
     //FIXME make a black list instead a whitelist here!!!
-    protected array $compared = [
+    protected array $whitelist = [
         'userName',
         'comment',
         'created',
