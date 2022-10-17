@@ -35,7 +35,7 @@ use MittagQI\Translate5\Test\Api\Helper;
  * There are many quirks in the implementation of the underlying helper API that lead to the state here not neccesarily reflect the state of the task on the server,
  * e.g. when setting ::setNotToFailOnError in the helper Loop the data is not cached. why ?
  * Another problem is, that api-calls may manipulate the task without the changes reflected in this object.
- * To avoid this, simly use this class exclusively for task-api-calls ...
+ * To avoid this, simply use this class exclusively for task-api-calls ...
  */
 final class Task extends Resource
 {
