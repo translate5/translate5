@@ -270,6 +270,8 @@ class editor_Models_Export_Terminology_Tbx {
      *    'language' => ['en-us', 'en-gb'],
      *    'termIds' => [456, 567]
      * ]
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function exportCollectionById(int $collectionId, string $userName, $tbxBasicOnly = false, $exportImages = true,
                                          $byTermEntryQty = 1000, $byImageQty = 50, $selected = null) {

@@ -201,7 +201,13 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
         if ($capture) {
             file_put_contents($filePath, $actual);
         }
-        static::assertEquals(file_get_contents($filePath), $actual, $message);
+
+        $expected = file_get_contents($filePath);
+
+        // If we're on Windows - replace CRLF with LF
+        if (preg_match('~^WIN~i', PHP_OS)) $expected = str_replace("\r\n", "\n", $expected);
+
+        static::assertEquals($expected, $actual, $message);
     }
 
     /***

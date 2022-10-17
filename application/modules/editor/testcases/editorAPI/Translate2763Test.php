@@ -55,6 +55,9 @@ class Translate2763Test extends editor_Test_JsonTest {
 
         self::$TC_ID = $result->id ?? null;
 
+        // Assume 5 seconds is enough for tbx import to be really completed
+        sleep(5);
+
         $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$TC_ID,
             'tbxBasicOnly' => '1',
@@ -74,6 +77,9 @@ class Translate2763Test extends editor_Test_JsonTest {
             'deleteTermsOlderThanCurrentImport' => 'on',
             'deleteProposalsLastTouchedOlderThan' => null,
         ]);
+
+        // Assume 5 seconds is enough for tbx import to be really completed
+        sleep(5);
 
         $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => self::$TC_ID,
