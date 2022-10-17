@@ -113,7 +113,7 @@ abstract class editor_Services_ServiceAbstract {
     
     /**
      * returns a list with connector instances, one per resource
-     * @return [editor_Models_LanguageResources_Resource]
+     * @return editor_Models_LanguageResources_Resource[]
      */
     public function getResources(){
         return $this->resources;
