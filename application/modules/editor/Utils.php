@@ -388,6 +388,28 @@ class editor_Utils {
     }
 
     /**
+     * Ensures the definedfields are arrays in the given assoc data
+     * This will convert a string to an array, an empty string to an empty array, a missing param to an empty array (set force to false to avoid this)
+     * Note, that types other than array/string will also result in an empty array
+     * @param array $data
+     * @param array $fields
+     * @param bool $force
+     */
+    public static function ensureFieldsAreArrays(array &$data, array $fields, bool $force=true){
+        foreach($fields as $field){
+            if(array_key_exists($field, $data)){
+                if(is_string($data[$field])){
+                    $data[$field] = ($data[$field] === '') ? [] : [$data[$field]];
+                } else if(!is_array($data[$field])){
+                    $data[$field] = [];
+                }
+            } else if($force){
+                $data[$field] = [];
+            }
+        }
+    }
+
+    /**
      * Check props, stored in $data arg to match rules, given in $ruleA arg
      * Example usage:
      * $_ = editor_Utils::jcheck([

@@ -26,45 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Tests if Relais Files are imported correctly, inclusive our alignment checks 
  */
 class RelaisImportTest extends editor_Test_JsonTest {
-    
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'relaisLang' => 'it',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-        
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
-        $api->zipTestFiles('testfiles/','RelaisImportTest.zip');
-        
-        $api->addImportFile($api->getFile('RelaisImportTest.zip'));
-        $api->import($task);
-        
-        $task = $api->getTask();
-        //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'en')
+            ->addUploadFolder('testfiles')
+            ->addProperty('relaisLang', 'it')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Test if relais columns are containing the expected content
      */
     public function testRelaisContent() {
         //get segment list
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
         $segments = array_map(function($segment){
             //TODO remove array cast with PHP7
             return (array) $segment;
@@ -114,10 +102,5 @@ class RelaisImportTest extends editor_Test_JsonTest {
         $this->assertFieldTextEquals($targetEdit, $segments[0]['targetEdit'], 'Imported Target is not as expected!');
         $targetEdit = '<div title="" class="term preferredTerm exact" data-tbxid="term_11_1_en_1_00019">Apache</div> 1.3.x auf Unix-Systemen';
         $this->assertFieldTextEquals($targetEdit, $segments[24]['targetEdit'], 'Imported Target is not as expected!');
-    }
-    
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

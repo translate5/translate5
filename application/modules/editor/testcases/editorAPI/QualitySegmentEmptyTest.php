@@ -26,52 +26,31 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Filter;
+
 /**
  * Testcase for TRANSLATE-2540
  */
 class QualitySegmentEmptyTest extends editor_Test_JsonTest {
 
+    protected static string $setupUserLogin = 'testlector';
+
     /**
      * @var array
      */
-    public static $segments = [];
+    private static $segments = [];
 
-    /**
-     * @throws Zend_Exception
-     */
-    public static function setUpBeforeClass(): void {
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de')
+            ->addUploadFile('testfiles/TRANSLATE-2540-en-de.xlf')
+            ->setToEditAfterImport();
+    }
 
-        // Prepare api instance
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
-        // Check app state
-        $appState = self::assertAppState();
-
-        // Last authed user is testmanager
-        self::assertNeededUsers();
-        self::assertLogin('testmanager');
-
-        // Import xlf-file
-        $api->addImportFile($api->getFile('testfiles/TRANSLATE-2540-en-de.xlf'));
-        $api->import([
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        ]);
-
-        // Login in setUpBeforeClass means using this user in whole testcase!
-        self::$api->addUser('testlector');
-        self::$api->login('testlector');
-
-        // Get task
-        $task = self::$api->getTask();
-
-        // Open task for whole testcase
-        $api->setTaskToEdit($task->id);
-
-        // Get segments and check their quantity
-        static::$segments = $api->getSegments(null, 10);
+    public static function beforeTests(): void {
+        // Get segments needed for the test and check their quantity
+        static::$segments = static::api()->getSegments(null, 10);
         static::assertEquals(count(static::$segments), 2, 'Not enough segments in the imported task');
     }
 
@@ -80,16 +59,8 @@ class QualitySegmentEmptyTest extends editor_Test_JsonTest {
      */
     public function testSegmentQualities(){
         $fileName = 'expectedSegmentQualities.json';
-        $qualities = self::$api->getJson('/editor/quality/segment?segmentId=' . static::$segments[0]->id, [], $fileName);
-        $filter = editor_Test_Model_Filter::createSingle('type', 'empty');
+        $qualities = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[0]->id, [], $fileName);
+        $filter = Filter::createSingle('type', 'empty');
         $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, '', $filter);
-    }
-
-    /**
-     * Cleanup
-     */
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

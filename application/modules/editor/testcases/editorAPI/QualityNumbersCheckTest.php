@@ -26,22 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Filter;
+
 /**
  * Testcase for TRANSLATE-2540
  */
 class QualityNumbersCheckTest extends editor_Test_JsonTest {
-
-    public static function setUpBeforeClass(): void {
-        // Prepare initial API instance
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
-        // Check app state
-        $appState = self::assertAppState();
-
-        // Assert users. Last authed user is testmanager
-        self::assertNeededUsers();
-        self::assertLogin('testmanager');
-    }
 
     public function testTask0(){
         $this->performTestForTask('num1..num11 except num7 --- de-DE en-US', 10);
@@ -61,43 +51,23 @@ class QualityNumbersCheckTest extends editor_Test_JsonTest {
         $lang = [];
         preg_match('~ --- ([^ ]+) ([^ ]+)$~', $taskName, $lang);
 
-        // Get absolute file path to be used as 1st arg in below addImportFile() call
-        $absolutePath = self::$api->getFile('testfiles/' . $taskName . '.csv');
-
-        // Print the step where we are
-        // error_log("\nCreating task based on file: 'testfiles/" . $taskName . ".csv', source lang: '{$lang[1]}', target lang: '{$lang[2]}'\n");
-
-        // Add csv-file for import
-        self::$api->addImportFile($absolutePath);
-
-        // Do import
-        self::$api->import([
-            'sourceLang' => $lang[1],
-            'targetLang' => $lang[2],
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        ]);
-
-        // Get task
-        $task = self::$api->getTask();
-
-        // Print the step where we are
-        // error_log("\nTesting task based on file: 'testfiles/" . $taskName . ".csv'\n");
-
-        // Open task for whole testcase
-        self::$api->setTaskToEdit($task->id);
+        // import task
+        $config = static::getConfig();
+        $config->import(
+            $config
+                ->addTask($lang[1], $lang[2])
+                ->addUploadFile('testfiles/' . $taskName . '.csv')
+                ->setToEditAfterImport()
+        );
 
         // Get segments and check their quantity
-        $segmentQuantity = count(self::$api->getSegments(null, 10));
+        $segmentQuantity = count(static::api()->getSegments(null, 10));
         static::assertEquals($expectedSegmentQuantity, $segmentQuantity, 'Not enough segments in the imported task');
 
         // Check qualities
         $jsonFile = $taskName.'.json';
-        $tree = self::$api->getJsonTree('/editor/quality', [], $jsonFile);
-        $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'numbers');
+        $tree = static::api()->getJsonTree('/editor/quality', [], $jsonFile);
+        $treeFilter = Filter::createSingle('qtype', 'numbers');
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
-
-        // Close & delete task
-        self::$api->deleteTask($task->id);
     }
 }

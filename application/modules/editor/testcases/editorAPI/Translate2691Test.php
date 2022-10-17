@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Testcase for TRANSLATE-2691 SDLXLIFF diff export fails with old version of diff library and the here used content in an endless loop
  * For details see the issue.
  */
-class Translate2691Test extends ZfExtended_Test_ApiTestcase {
+class Translate2691Test extends \editor_Test_ApiTest {
     /**
      * Testing segment values directly after import
      */

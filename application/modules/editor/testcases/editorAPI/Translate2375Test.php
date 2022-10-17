@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Test the default deadline date. For each workflow role (this tests only the default workflow),
  * an default deadline date task overwrite config is set.
@@ -42,41 +44,30 @@ END LICENSE AND COPYRIGHT
  * 
  * 
  */
-class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
+class Translate2375Test extends editor_Test_ImportTest {
+
     protected static $fixedDate = '2020-11-21 18:01:00';
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'orderdate' => self::$fixedDate
-        );
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
-        $zipfile = $api->zipTestFiles('testfiles/','testTask.zip');
-        
-        $api->addImportFile($zipfile);
-        $api->import($task);
-        $task = $api->getTask();
-        error_log('Task created. '.self::$api->getTask()->taskName);
+
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'en')
+            ->addProperty('orderdate', self::$fixedDate)
+            ->addUploadFolder('testfiles');
     }
-    
+
     public function testDeadlineDate(){
+
         self::assertLogin('testmanager');
+        $assocParams = ['deadlineDate' => 'default', 'assignmentDate' => self::$fixedDate];
+        static::api()->addUser('testtranslator','open','reviewing',$assocParams);
+        static::api()->reloadTask();
+        static::api()->addUser('testtranslator','waiting','translation',$assocParams);
+        static::api()->reloadTask();
+        static::api()->addUser('testtranslator','waiting','translatorCheck',$assocParams);
         
-        $assocParams = ['deadlineDate'=>'default','assignmentDate'=>self::$fixedDate];
-        
-        self::$api->addUser('testtranslator','open','reviewing',$assocParams);
-        self::$api->reloadTask();
-        self::$api->addUser('testtranslator','waiting','translation',$assocParams);
-        self::$api->reloadTask();
-        self::$api->addUser('testtranslator','waiting','translatorCheck',$assocParams);
-        
-        $data = $this->api()->getJson('editor/taskuserassoc',[
-            'filter' => '[{"operator":"eq","value":"' . self::$api->getTask()->taskGuid . '","property":"taskGuid"}]'
+        $data = static::api()->getJson('editor/taskuserassoc',[
+            'filter' => '[{"operator":"eq","value":"' . static::api()->getTask()->taskGuid . '","property":"taskGuid"}]'
         ]);
         
         //filter out the non static data
@@ -90,12 +81,7 @@ class Translate2375Test extends \ZfExtended_Test_ApiTestcase {
             return $assoc;
         }, $data);
         
-        //file_put_contents($this->api()->getFile('/expected.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
-        $this->assertEquals(self::$api->getFileContent('expected.json'), $data, 'The calculate default deadline is are not as expected!');
-    }
-    
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
+        //file_put_contents(static::api()->getFile('/expected.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
+        $this->assertEquals(static::api()->getFileContent('expected.json'), $data, 'The calculate default deadline is are not as expected!');
     }
 }

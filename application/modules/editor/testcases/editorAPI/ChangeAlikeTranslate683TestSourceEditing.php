@@ -33,5 +33,6 @@ require_once 'ChangeAlikeTranslate683Test.php';
  * Same as ChangeAlikeTranslate683Test expect that the tests are run with a task with sourceEditing = true 
  */
 class ChangeAlikeTranslate683TestSourceEditing extends \ChangeAlikeTranslate683Test {
+
     protected static $useSourceEditing = true;
 }

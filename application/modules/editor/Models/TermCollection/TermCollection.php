@@ -446,6 +446,15 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $sourceLanguages = $fuzzyModel->getFuzzyLanguages($source,includeMajor: true);
         $targetLanguages = $fuzzyModel->getFuzzyLanguages($target,includeMajor: true);
 
+
+        // get the configured term processing statuses which can be used
+        $config = Zend_Registry::get('config');
+        $processStatus = $config->runtimeOptions->terminology->usedTermProcessStatus->toArray();
+        if( empty($processStatus)){
+            $processStatus =  [editor_Models_Terminology_Models_TermModel::PROCESS_STATUS_FINALIZED];
+        }
+        $processStatus = implode('","',$processStatus);
+        
         // This query will select translated terms from source to target langauge from each term entry
         // excluding the deprecated terms. The terms with preferredTerm status will have always priority against the
         // other terms. In case the term is not in preferredTerm status, the next most valuable status is admittedTerm.
@@ -460,7 +469,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                         SELECT
                             ROW_NUMBER() OVER (
                                 PARTITION BY termEntryId 
-                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC
+                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC,id DESC
                             ) AS virtual_id,
                             term,
                             id,
@@ -471,6 +480,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                         FROM terms_term
                         WHERE languageId IN('.implode(',',$sourceLanguages).')
                         AND status != "'.editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED.'"
+                        AND processStatus IN("'.$processStatus.'")
                     ) AS sorted_temp_table
                     GROUP BY sorted_temp_table.termEntryId) AS sourceTable
                     INNER JOIN (
@@ -481,7 +491,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                         SELECT
                             ROW_NUMBER() OVER (
                                 PARTITION BY termEntryId 
-                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC
+                                ORDER BY status = "'.editor_Models_Terminology_Models_TermModel::STAT_PREFERRED.'" DESC,status ="'.editor_Models_Terminology_Models_TermModel::STAT_ADMITTED.'" DESC,termEntryId ASC,id DESC
                             ) AS virtual_id,
                             term,
                             id,
@@ -492,6 +502,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
                         FROM terms_term
                         WHERE languageId IN('.implode(',',$targetLanguages).')
                         AND status != "'.editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED.'"
+                        AND processStatus IN("'.$processStatus.'")
                     ) AS sorted_temp_table
                     GROUP BY sorted_temp_table.termEntryId
                     ) as targetTable ON sourceTable.termEntryId = targetTable.termEntryId

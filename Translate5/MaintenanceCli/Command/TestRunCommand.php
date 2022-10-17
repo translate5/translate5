@@ -89,18 +89,14 @@ class TestRunCommand extends Translate5AbstractTestCommand
         $this->initInputOutput($input, $output);
 
         $test = trim($this->input->getArgument('test'), '.');
+        $testPath = null;
         if(!empty($test)) {
-            if(empty(pathinfo($test, PATHINFO_EXTENSION))) {
-                $test = $test.'.php';
-            }
-            if($test === basename($test)) {
-                $test = self::RELATIVE_TEST_DIR.$test;
-            }
-            if(!file_exists($test)) {
+            $testPath = empty(pathinfo($test, PATHINFO_EXTENSION)) ? $test.'.php' : $test;
+            $testPath = $this->normalizeSingleTestPath($testPath);
+            if(!file_exists($testPath)) {
                 throw new \RuntimeException('The given Test does not exist: '.$test);
             }
         }
-
         if($this->input->getOption('capture')){
             putenv('DO_CAPTURE=1');
             $this->io->warning([
@@ -122,7 +118,7 @@ class TestRunCommand extends Translate5AbstractTestCommand
         }
 
         if($this->initTestEnvironment('test', true, $this->input->getOption('recreate-database'))){
-            $this->startApiTest($test);
+            $this->startApiTest($testPath);
         }
         return 0;
     }

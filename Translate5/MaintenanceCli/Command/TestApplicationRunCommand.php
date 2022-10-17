@@ -38,8 +38,17 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
 {
     use LockableTrait;
 
-    // the name of the command (the part after "bin/console")
+    /**
+     * the name of the command (the part after "bin/console")
+     * @var string
+     */
     protected static $defaultName = 'test:apprun';
+
+    /**
+     * A master
+     * @var bool
+     */
+    protected static bool $canMimicMasterTest = false;
     
     protected function configure()
     {
@@ -61,7 +70,13 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
             'recreate-database',
             'r',
             InputOption::VALUE_NONE,
-            'Use this option to recreate the application database. This will also clean the /data directory contents.');
+            'Use this option to recreate the application database with it\'s name being prompted. This will also clean the /data directory contents.');
+
+        $this->addOption(
+            'database-recreation',
+            'd',
+            InputOption::VALUE_REQUIRED,
+            'Use this option to recreate the application database with it\'s name as option. This will also clean the /data directory contents.');
 
         parent::configure();
     }
@@ -82,12 +97,17 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
 
         $testOrSuite = $this->input->getArgument('testorsuite');
         $extension = empty($testOrSuite) ? '' : strtolower(pathinfo($testOrSuite, PATHINFO_EXTENSION));
-        $testPath = ($extension === 'php') ? $testOrSuite : null;
+        $testPath = ($extension === 'php') ? $this->normalizeSingleTestPath($testOrSuite) : null;
         $testSuite = ($extension === '' && !empty($testOrSuite)) ? $testOrSuite : null;
 
+        if($testPath !== null && !file_exists($testPath)){
+            throw new \RuntimeException('The given Test does not exist: '.$testOrSuite);
+        }
+
         // reinitialize the database & data directory if we should
-        if($this->input->getOption('recreate-database')) {
-            if (!$this->reInitApplicationDatabase()){
+        $databaseForRecreation = $this->input->getOption('database-recreation');
+        if($databaseForRecreation || $this->input->getOption('recreate-database')){
+            if (!$this->reInitApplicationDatabase($databaseForRecreation)){
                 return Command::FAILURE;
             }
         }

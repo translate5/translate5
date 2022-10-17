@@ -105,6 +105,7 @@ Ext.define('Editor.view.help.HelpWindow', {
         if(helpsection.loaderUrl !== undefined && helpsection.loaderUrl !== ""){
             items.push({
                 xtype:'helpVideo',
+                autoScroll: true,
                 title:'Video'
             });
         }

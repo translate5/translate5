@@ -26,137 +26,101 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Api\Helper;
 /**
  * Testcase for TRANSLATE-2540
  */
 class Translate2491Test extends editor_Test_JsonTest {
 
-    /***
-     * The current active collection
-     * @var integer
-     */
-    protected static int $collectionId;
-
-    /**
-     * @throws ReflectionException
-     */
-    public static function setUpBeforeClass(): void {
-
-        // Prepare api instance
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
-        // Last authed user is testmanager
-        self::assertNeededUsers();
-
-        // Load customer
-        self::assertCustomer();
-    }
-
-    /**
-     * Test the qualities fetched for a segment
-     */
     public function testTermsTransfer(){
 
         // [1] create empty term collection
-        $termCollection = $this->api()->postJson('editor/termcollection', [
+        $termCollection = static::api()->postJson('editor/termcollection', [
             'name' => 'Test api collection 2',
-            'customerIds' => $this->api()->getCustomer()->id
+            'customerIds' => static::getTestCustomerId()
         ]);
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection 2', $termCollection->name);
 
         // Remember collectionId
-        self::$collectionId = $termCollection->id;
+        $collectionId = $termCollection->id;
 
         // [2] import test tbx
-        $this->api()->addFile('Term.tbx', $this->api()->getFile('Term.tbx'), "application/xml");
-        $this->api()->postJson('editor/termcollection/import', [
-            'collectionId' => self::$collectionId,
-            'customerIds' => $this->api()->getCustomer()->id,
+        static::api()->addFile('Term.tbx', static::api()->getFile('Term.tbx'), "application/xml");
+        static::api()->postJson('editor/termcollection/import', [
+            'collectionId' => $collectionId,
+            'customerIds' => static::getTestCustomerId(),
             'mergeTerms' => true
         ]);
 
         // [3] get languages: german
-        $german = $this->api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]']);
+        $german = static::api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"de-DE","property":"rfc5646"}]']);
         $this->assertNotEmpty($german, 'Unable to load the german-language needed for the term search.');
         $german = $german[0];
 
         // english
-        $english = $this->api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"en-GB","property":"rfc5646"}]']);
+        $english = static::api()->getJson('editor/language', ['filter' => '[{"operator":"eq","value":"en-GB","property":"rfc5646"}]']);
         $this->assertNotEmpty($english, 'Unable to load english-language needed for use ');
         $english = $english[0];
 
         // Log in as proposer
-        self::$api->login('testtermproposer');
+        static::api()->login('testtermproposer');
         self::assertLogin('testtermproposer');
 
         // [4] find imported term by *-query and en-EN language id
-        $termsearch = $this->api()->getJson('editor/plugins_termportal_data/search', [
+        $termsearch = static::api()->getJson('editor/plugins_termportal_data/search', [
             'query' => '*',
-            'collectionIds' => self::$collectionId,
+            'collectionIds' => $collectionId,
             'language' => $english->id,
             'start' => 0,
             'limit' => 10
         ]);
 
-        $this->assertTrue(is_object($termsearch), 'No terms are found in the termcollection ' . self::$collectionId);
+        $this->assertTrue(is_object($termsearch), 'No terms are found in the termcollection ' . $collectionId);
         $this->assertNotEmpty($termsearch->data, "No terms are found in the term collection for the search string '*'");
 
         // Transfer terms to main Translate5 app
-        $transfer = $this->api()->postJson('editor/term/transfer', $taskCfg = [
+        $transfer = static::api()->postJson('editor/term/transfer', [
             'projectName' => '2 terms selected',
             'targetLang' =>  $german->id,
             'translated' =>  0,
             'definition' =>  1,
-            'clientId' =>  $this->api()->getCustomer()->id,
+            'clientId' =>  static::getTestCustomerId(),
             'sourceLang' =>  $english->id,
             'terms' => 'all',
             'except' => array_reverse(array_column($termsearch->data, 'id'))[0],
         ]);
 
-        // Wait for import
-        $this->api()->setTask($task = $transfer->step1->rows->projectTasks[0]);
-        $task->originalSourceLang = $taskCfg['sourceLang'];
-        $task->originalTargetLang = $taskCfg['targetLang'];
-
-        if($task->taskType == ZfExtended_Test_ApiHelper::INITIAL_TASKTYPE_PROJECT) {
-            $this->api()->checkProjectTasksStateLoop();
-        }
-        else {
-            $this->api()->checkTaskStateLoop();
-        }
+        // Mimic a task-import
+        $task = $transfer->step1->rows->projectTasks[0];
+        static::api()->waitForTaskImported($task);
 
         // Open task for whole testcase
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
 
         // Get segments and check their quantity (1 term and 1 definition-attr for that term, so total 2)
-        $segments = $this->api()->getSegments(null, 10);
+        $segments = static::api()->getSegments(null, 10);
         static::assertEquals(count($segments), 2, 'Not enough segments in the imported task');
 
         // Set 'Term1 DE' as value for targetEdit-field for segment 1
         // Attr-segment goes before term-segment, so that index 1 is used here
-        $this->api()->putJson('editor/segment/'.$segments[1]->id, $this->api()->prepareSegmentPut('targetEdit', 'Term1 DE', $segments[1]->id));
+        static::api()->saveSegment($segments[1]->id, 'Term1 DE');
 
         // Close task
-        $this->api()->setTaskToOpen($task->id);
+        static::api()->setTaskToOpen($task->id);
 
         // Re-import into termcollection
-        $this->api()->get('editor/task/export/id/'.$task->id . '?format=transfer');
+        static::api()->get('editor/task/export/id/'.$task->id . '?format=transfer');
 
         // [10] search for the term attributes
-        $terminfo = $this->api()->postJson('editor/plugins_termportal_data/terminfo', ['termId' => $termsearch->data[0]->id]);
+        $terminfo = static::api()->postJson('editor/plugins_termportal_data/terminfo', ['termId' => $termsearch->data[0]->id]);
         $this->assertTrue(is_object($terminfo), 'No data returned by terminfo-call');
         $this->assertTrue(isset($terminfo->siblings->data[1]->term), 'Path "siblings->data[1]->term" not exists in terminfo response');
         $this->assertEquals($terminfo->siblings->data[1]->term, 'Term1 DE', 'German translation for term "Term1 EN" was not imported');
-    }
 
-    /**
-     * Cleanup
-     */
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id);
+        $task = static::api()->getTask();
+        static::api()->deleteTask($task->id);
         // Drop termCollection
-        self::$api->delete('editor/termcollection/' . self::$collectionId);
+        static::api()->delete('editor/termcollection/' . $collectionId);
     }
 }

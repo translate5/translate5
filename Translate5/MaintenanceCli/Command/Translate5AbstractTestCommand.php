@@ -25,6 +25,7 @@
  
  END LICENSE AND COPYRIGHT
  */
+
 namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputOption;
@@ -35,7 +36,13 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 {
     const RELATIVE_TEST_ROOT = 'application/modules/editor/testcases/';
 
-    const RELATIVE_TEST_DIR = self::RELATIVE_TEST_ROOT.'editorAPI/';
+    const RELATIVE_TEST_DIR = self::RELATIVE_TEST_ROOT . 'editorAPI/';
+
+    /**
+     * @var bool
+     * Enables the -m option to let the current tests to be run a s master-tests
+     */
+    protected static bool $canMimicMasterTest = true;
 
     /**
      * General Options of all test-commands
@@ -65,6 +72,14 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             'f',
             InputOption::VALUE_NONE,
             'Leads to the testsuite stopping on the first failure (not error!).');
+
+        if(static::$canMimicMasterTest){
+            $this->addOption(
+                'master-test',
+                'm',
+                InputOption::VALUE_NONE,
+                'Leads to the testsuite running in master mode. Be aware that this might create costs for using paid external APIs.');
+        }
     }
 
     /**
@@ -75,11 +90,12 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      * @return bool
      * @throws \Zend_Exception
      */
-    protected function initTestEnvironment(string $environment, bool $reinitMissingDb, bool $forceRecreation = false) : bool {
+    protected function initTestEnvironment(string $environment, bool $reinitMissingDb, bool $forceRecreation = false): bool
+    {
         // we reinit the test-db if it does not exist or a recreation is forced
         // this also checks if the instance is set up for tests / API-test are allowed
-        if($environment === 'test' && $reinitMissingDb){
-            if($this->reInitTestDatabase($forceRecreation)){
+        if ($environment === 'test' && $reinitMissingDb) {
+            if ($this->reInitTestDatabase($forceRecreation)) {
                 // Crucial: this triggrs the test-sections in the ini-files to be used in the test-bootstrap
                 putenv('APPLICATION_ENV=test');
                 return true;
@@ -88,9 +104,9 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         }
         // init T5 for the test environment in which the tests have to be run - if wanted
         // this also checks, if the test-environment seems configured in installation.ini
-        if($environment === 'test'){
+        if ($environment === 'test') {
             $this->initTranslate5($environment);
-            if($this->checkApiTestsAllowed()){
+            if ($this->checkApiTestsAllowed()) {
                 // Crucial: this triggrs the test-sections in the ini-files to be used in the test-bootstrap
                 putenv('APPLICATION_ENV=test');
             } else {
@@ -107,16 +123,16 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      * Checks, if the environment is set up to allow API tests
      * @return bool
      */
-    protected function checkApiTestsAllowed() : bool
+    protected function checkApiTestsAllowed(): bool
     {
         try {
             $config = \Zend_Registry::get('config');
-            if($config?->testSettings?->testsAllowed !== 1){
+            if ($config?->testSettings?->testsAllowed !== 1) {
                 $this->io->error('This installation seems not to be set up for API tests.');
                 return false;
             }
             return true;
-        } catch(\Throwable){
+        } catch (\Throwable) {
             $this->io->error('Test-config could not be loaded.');
             return false;
         }
@@ -126,76 +142,71 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      * Starts the unit test for a single test, a suite or all tests
      * @param string|null $testPath
      * @param string|null $testSuite
+     * @throws \PHPUnit\TextUI\Exception
      */
     protected function startApiTest(string $testPath = null, string $testSuite = null)
     {
+        // the PHPunit configuration used for all tests and defining the bootstrapper
+        $configurationFilePath = APPLICATION_ROOT . '/' . self::RELATIVE_TEST_ROOT . 'phpunit.xml';
         $verbose = '--verbose'; // '--debug'
         $stopOnError = '';
         $stopOnFailure = '';
         $testPathOrDir = '';
-        $configurationOption = '--no-configuration';
-        $configurationFile = '';
-        $bootstrapOption = '--bootstrap';
-        $bootstrapFile = self::RELATIVE_TEST_ROOT.'bootstrap.php';
         $suiteOption = '';
         $suiteFile = '';
 
         // environment stuff needed for all tests (using environment variables here keeps compatibility with plain apiTest.sh call)
-        putenv('APPLICATION_ROOT='.__DIR__);
+        putenv('APPLICATION_ROOT=' . __DIR__);
 
-        if($this->input->getOption('xdebug')){
+        if ($this->input->getOption('xdebug')) {
             putenv('XDEBUG_ENABLE=1');
         }
 
-        if($this->input->getOption('keep-data')){
+        if ($this->input->getOption('keep-data')) {
             putenv('KEEP_DATA=1');
         }
 
+        if (static::$canMimicMasterTest && $this->input->getOption('master-test')) {
+            putenv('MASTER_TEST=1');
+        }
+
         // command options usable for all tests
-        if($this->input->getOption('stop-on-error')){
+        if ($this->input->getOption('stop-on-error')) {
             $stopOnError = '--stop-on-error';
         }
-        if($this->input->getOption('stop-on-failure')){
+        if ($this->input->getOption('stop-on-failure')) {
             $stopOnFailure = '--stop-on-failure';
         }
 
         // test / suite / all specific stuff. Note that DO_CAPTURE is defined in the concrete command for a single test
-        if($testPath !== null){
+        if ($testPath !== null) {
+
             $testPathOrDir = $testPath;
-            $this->io->note('Running test \''.basename($testPath).'\'');
+            $this->io->note('Running test \'' . basename($testPath) . '\'');
 
-        } else if($testSuite !== null){
+        } else if ($testSuite !== null) {
 
-            $this->io->note('Running suite \''.$testSuite.'\'');
-            // defining the configuration-file-option to read the suites from
-            $configurationOption = '--configuration';
-            // QUIRK: why do we have to set an absolute path here to get the tests running ? With relative pathes, PHPUnit finds the configuration but can not find the linked files ...
-            $configurationFile = APPLICATION_ROOT.'/'.self::RELATIVE_TEST_ROOT.'phpunit.xml';
+            $this->io->note('Running suite \'' . $testSuite . '\'');
             // defining the suite to use
             $suiteOption = '--testsuite';
             $suiteFile = $testSuite;
             // must not be set when using a suite, otherwise the suite will never be triggered ...
             $testPathOrDir = '';
             putenv('DO_CAPTURE=0');
+
         } else {
+
             putenv('DO_CAPTURE=0');
             $testPathOrDir = 'application';
         }
 
         $assembly = [
             'phpunit',
-            '--colors',
             $verbose,
             $stopOnError,
             $stopOnFailure,
-            '--testdox-text',
-            'last-test-result.txt',
-            '--cache-result-file',
-            '.phpunit.result.cache',
-            $configurationOption,
-            $configurationFile,
-            $bootstrapOption,
-            $bootstrapFile,
+            '--configuration',
+            $configurationFilePath,
             $suiteOption,
             $suiteFile,
             $testPathOrDir
@@ -206,7 +217,27 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         // start PHPUnit with neccessary options
         $command = new \PHPUnit\TextUI\Command();
         $command->run($assembly);
-        $this->io->success('Last test result stored in '.self::RELATIVE_TEST_ROOT.'last-test-result.txt');
+    }
+
+    /**
+     * Convenience-function to make pathes pinting to plugin-folders easier usable
+     * @param string $testPath
+     * @return string
+     */
+    protected function normalizeSingleTestPath(string $testPath): string
+    {
+        // just filename
+        if($testPath === basename($testPath)) {
+            return self::RELATIVE_TEST_DIR.$testPath;
+        }
+        // path in plugins
+        $tmpPath = str_replace('/PrivatePlugins/', '/Plugins/', '/'.ltrim($testPath, './'));
+        if(str_contains($tmpPath, '/Plugins/')){
+            $parts = explode('/Plugins/', $tmpPath);
+            return 'application/modules/editor/Plugins/'.array_pop($parts);
+        }
+        // otherwise
+        return $testPath;
     }
 
     /**
@@ -218,7 +249,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     {
         try {
             // misusing PHPUnit private loader here, but it's the easiest way to have the correct options etc.
-            $document = (new \PHPUnit\Util\Xml\Loader)->loadFile(self::RELATIVE_TEST_ROOT.'phpunit.xml', false, true, true);
+            $document = (new \PHPUnit\Util\Xml\Loader)->loadFile(self::RELATIVE_TEST_ROOT . 'phpunit.xml', false, true, true);
             $xpath = new \DOMXPath($document);
             /* @var \DOMElement[] $elements */
             $elements = [];
@@ -235,23 +266,23 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             }
             $suiteNames = [];
             foreach ($elements as $element) {
-                $name = (string) $element->getAttribute('name');
-                if(!empty($name)){
+                $name = (string)$element->getAttribute('name');
+                if (!empty($name)) {
                     $suiteNames[] = $name;
                 }
             }
-            if(count($suiteNames) === 0){
-                die('No suites defined in "'.self::RELATIVE_TEST_ROOT.'phpunit.xml"'."\n"); // since this is called on command-creation we simply die...
+            if (count($suiteNames) === 0) {
+                die('No suites defined in "' . self::RELATIVE_TEST_ROOT . 'phpunit.xml"' . "\n"); // since this is called on command-creation we simply die...
             }
             return $suiteNames;
         } catch (\Throwable) {
-            die('File "'.self::RELATIVE_TEST_ROOT.'phpunit.xml" is missing.'."\n"); // since this is called on command-creation we simply die...
+            die('File "' . self::RELATIVE_TEST_ROOT . 'phpunit.xml" is missing.' . "\n"); // since this is called on command-creation we simply die...
         }
     }
 
     /**
      * Erases the current test-DB and creates it from scratch. Returns the success of the action
-     * @param bool $forceRecreation: if not set the DB will only be recreated if it does not exist
+     * @param bool $forceRecreation : if not set the DB will only be recreated if it does not exist
      * @return bool
      * @throws \Zend_Exception
      */
@@ -262,28 +293,28 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         try {
             $translate5 = new Application();
             $translate5->init('test'); // crucial: use test-environment to get the test-configurations
-        } catch (\Throwable $e){
-            if(str_contains($e->getMessage(), 'Unknown database')) {
+        } catch (\Throwable $e) {
+            if (str_contains($e->getMessage(), 'Unknown database')) {
                 $testDbExists = false;
                 // we must make sure here es well, that this instance is set up as a test-system
                 $config = \Zend_Registry::get('config');
-                if($config?->testSettings?->testsAllowed !== 1){
+                if ($config?->testSettings?->testsAllowed !== 1) {
                     $this->io->error('This installation seems not to be set up for API tests.');
                     return false;
                 }
             } else {
                 // other Problem, cancel
-                $this->io->error($e->getMessage()."\n\n".$e->getTraceAsString());
+                $this->io->error($e->getMessage() . "\n\n" . $e->getTraceAsString());
                 return false;
             }
         }
         // in some cases it's only wanted to create the DB if it does not exist
         $config = \Zend_Registry::get('config');
-        if($testDbExists && !$forceRecreation){
-            $this->io->note('Database \''.$config->resources->db->params->dbname.'\' already exists');
+        if ($testDbExists && !$forceRecreation) {
+            $this->io->note('Database \'' . $config->resources->db->params->dbname . '\' already exists');
             return true;
         }
-        $this->io->note('Recreate database \''.$config->resources->db->params->dbname.'\'');
+        $this->io->note('Recreate database \'' . $config->resources->db->params->dbname . '\'');
 
         try {
             // evaluate database params
@@ -292,24 +323,24 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $config = $application->getOption('resources');
             $config = $config['db']['params'];
             $testSettings = $application->getOption('testSettings');
-            if(empty($testSettings) || $testSettings['testsAllowed'] !== 1){
+            if (empty($testSettings) || $testSettings['testsAllowed'] !== 1) {
                 $this->io->error('This installation seems not to be set up for API tests.');
                 return false;
             }
 
             $applicationDbName = $testSettings['applicationDbName']; // we need the application db-name from a seperate value (created with the test:addinisection Command) as the db-params are overridden
             // check, if configured test-db meets our expectaions
-            if(empty($applicationDbName)){
+            if (empty($applicationDbName)) {
                 $this->io->error('The configured application database is missing or wrongly set in installation.ini!');
                 return false;
             }
-            if($applicationDbName === $config['dbname']){
+            if ($applicationDbName === $config['dbname']) {
                 $this->io->error('The configured test database in installation.ini must not be the application database!');
                 return false;
             }
             $testDbName = Config::createTestDatabaseName($applicationDbName);
-            if($config['dbname'] !== $testDbName){
-                $this->io->error('The configured test database in installation.ini [test:application] must be \''.$testDbName.'\'!');
+            if ($config['dbname'] !== $testDbName) {
+                $this->io->error('The configured test database in installation.ini [test:application] must be \'' . $testDbName . '\'!');
                 return false;
             }
 
@@ -317,27 +348,28 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $configs = $this->getApplicationConfiguration($applicationDbName, $config['host'], $config['username'], $config['password']);
 
             // delete (if needed) and recreate DB. recreate tables
-            if(
+            if (
                 $this->recreateDatabase($config['host'], $config['username'], $config['password'], $config['dbname'], $testDbExists)
                 && $this->recreateTables($configs, 'test')
-            ){
-                $this->io->note('Successfully recreated database \''.$config['dbname'].'\'');
+            ) {
+                $this->io->note('Successfully recreated database \'' . $config['dbname'] . '\'');
                 // cleanup/reinitialize the test data dirs
                 $this->reInitDataDirectory(Config::DATA_DIRECTORY);
                 return true;
             }
-        } catch(\Throwable $e) {
-            $this->io->error($e->getMessage()."\n\n".$e->getTraceAsString());
+        } catch (\Throwable $e) {
+            $this->io->error($e->getMessage() . "\n\n" . $e->getTraceAsString());
         }
         return false;
     }
 
     /**
      * Erases the current application-DB and creates it from scratch
-     * This must be confirmed by the user
+     * This must be confirmed by the user or the correct database-name must be passed
+     * @param string|null $databaseName
      * @return bool
      */
-    protected function reInitApplicationDatabase(): bool
+    protected function reInitApplicationDatabase(string $databaseName = null): bool
     {
         try {
             // evaluate database params
@@ -346,28 +378,31 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $baseIndex = \ZfExtended_BaseIndex::getInstance();
             $config = $baseIndex->initApplication()->getOption('resources');
             $config = $config['db']['params'];
-
-            if($this->io->ask('To really recreate the database "'.$config['dbname'].'" type it\'s name to confirm') !== $config['dbname']){
-                $this->io->error('The name was wrong...');
+            // check given db-name or prompt for one
+            if ($databaseName !== null && $config['dbname'] !== $databaseName) {
+                $this->io->error('The passed database-name "' . $databaseName . '" does not match te application database "' . $config['dbname'] . '".');
+                return false;
+            } else if ($databaseName === null && $this->io->ask('To really recreate the database "' . $config['dbname'] . '" type it\'s name to confirm') !== $config['dbname']) {
+                $this->io->error('The given name does not match "' . $config['dbname'] . '"...');
                 return false;
             }
-            $this->io->note('Recreate database \''.$config['dbname'].'\'');
+            $this->io->note('Recreate database \'' . $config['dbname'] . '\'');
 
             // get current configs first
             $configs = $this->getCurrentConfiguration();
 
             // delete and recreate DB. recreate tables
-            if(
+            if (
                 $this->recreateDatabase($config['host'], $config['username'], $config['password'], $config['dbname'], true)
                 && $this->recreateTables($configs, 'application')
-            ){
-                $this->io->note('Successfully recreated database \''.$config['dbname'].'\'');
+            ) {
+                $this->io->note('Successfully recreated database \'' . $config['dbname'] . '\'');
                 // cleanup/reinitialize the "normal" data dirs
                 $this->reInitDataDirectory('data');
                 return true;
             }
-        } catch(\Throwable $e) {
-            $this->io->error($e->getMessage()."\n\n".$e->getTraceAsString());
+        } catch (\Throwable $e) {
+            $this->io->error($e->getMessage() . "\n\n" . $e->getTraceAsString());
         }
         return false;
     }
@@ -377,17 +412,50 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function reInitDataDirectory(string $dataDirectory): void
     {
-        if(!is_dir($dataDirectory)){
+        if(PHP_OS_FAMILY != 'Windows'){
+            $info = $this->fetchOwnerAndGroup('data'); // we take the owner and group of the /data dir as a reference, default is www-data for cases, where that dir is missing
+        }
+        if (!is_dir($dataDirectory)) {
             mkdir($dataDirectory, 0777, true);
-        }
-        foreach(Config::getUserDataFolders() as $folder){
-            $userDir = $dataDirectory.'/'.$folder;
-            if(is_dir($userDir)){
-                \ZfExtended_Utils::recursiveDelete($userDir);
+            if (PHP_OS_FAMILY != 'Windows') { // TODO FIXME: on windows this may lead to an unusable installation if called with elevated rights
+                chown($dataDirectory, $info->owner);
+                chgrp($dataDirectory, $info->group);
             }
-            mkdir($userDir, 0777);
         }
-        $this->io->note('Successfully cleaned user-data directory \'/'.$dataDirectory.'\'');
+        foreach (Config::getUserDataFolders() as $folder) {
+            $userDir = $dataDirectory . '/' . $folder;
+            if (is_dir($userDir)) {
+                \ZfExtended_Utils::recursiveDelete($userDir, null, false);
+            } else {
+                mkdir($userDir, 0777);
+                if (PHP_OS_FAMILY != 'Windows') { // TODO FIXME: on windows this may lead to an unusable installation if called with elevated rights
+                    chown($userDir, $info->owner);
+                    chgrp($userDir, $info->group);
+                }
+            }
+        }
+        $this->io->note('Successfully cleaned user-data directory \'/' . $dataDirectory . '\'');
+    }
+
+    /**
+     * Helper to retrieve owner & group of an directory. defaults to www-data for both, if no dir given or evaluation not successful
+     * @param string|null $directory
+     * @return \stdClass with "props" owner and "group"
+     */
+    private function fetchOwnerAndGroup(string $directory = null): \stdClass
+    {
+        $info = new \stdClass;
+        $info->owner = 'www-data';
+        $info->group = 'www-data';
+        if ($directory && is_dir($directory)) {
+            $oinfo = @posix_getpwuid(@fileowner($directory));
+            $ginfo = @posix_getgrgid(@filegroup($directory));
+            if ($oinfo !== false && $ginfo !== false) {
+                $info->owner = $oinfo['name'];
+                $info->group = $ginfo['name'];
+            }
+        }
+        return $info;
     }
 
     /**
@@ -399,21 +467,21 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      * @param bool $exists
      * @return bool
      */
-    private function recreateDatabase(string $host, string $username, string $password, string $dbname, bool $exists=false): bool
+    private function recreateDatabase(string $host, string $username, string $password, string $dbname, bool $exists = false): bool
     {
         // we need to use PDO, Zend works only with databases
-        $pdo = new \PDO('mysql:host='.$host, $username, $password);
-        if($exists){
+        $pdo = new \PDO('mysql:host=' . $host, $username, $password);
+        if ($exists) {
             try {
-                $pdo->query('DROP DATABASE '.$dbname.';');
-                $this->io->note('Dropped database '.$dbname);
-            } catch (\PDOException $e){
-                $this->io->error($e->getMessage()."\n\n".$e->getTraceAsString());
+                $pdo->query('DROP DATABASE ' . $dbname . ';');
+                $this->io->note('Dropped database ' . $dbname);
+            } catch (\PDOException $e) {
+                $this->io->error($e->getMessage() . "\n\n" . $e->getTraceAsString());
                 return false;
             }
         }
         // now create DB from scratch
-        $pdo->query('CREATE DATABASE '.$dbname.' DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $pdo->query('CREATE DATABASE ' . $dbname . ' DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
         return true;
     }
 
@@ -430,7 +498,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         // Create the tables from scratch
         $updater = new \ZfExtended_Models_Installer_DbUpdater();
         //add the test SQL path
-        $updater->addAdditonalSqlPath(APPLICATION_PATH.'/modules/editor/testcases/database/');
+        $updater->addAdditonalSqlPath(APPLICATION_PATH . '/modules/editor/testcases/database/');
         // init DB
         if ($updater->initDb() && $updater->importAll() && !$updater->hasErrors()) {
             // re-init app to get fresh config && other stuff
@@ -443,10 +511,10 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $this->initConfiguration($configs);
             return true;
         }
-        if($updater->hasErrors()){
+        if ($updater->hasErrors()) {
             $this->io->error($updater->getErrors());
         }
-        if($updater->hasWarnings()){
+        if ($updater->hasWarnings()) {
             $this->io->error($updater->getWarnings());
         }
         return false;
@@ -460,8 +528,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     {
         $config = new \editor_Models_Config();
         // set the predefined or dynamically evaluated values
-        foreach($neededConfigs as $name => $value) {
-            if($value !== null){
+        foreach ($neededConfigs as $name => $value) {
+            if ($value !== null) {
                 $config->update($name, $value);
             }
         }
@@ -477,16 +545,16 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function getApplicationConfiguration(string $applicationDbName, string $host, string $username, string $password): array
     {
-        $this->io->note('Copying config-values from database \''.$applicationDbName.'\'');
-        $pdo = new \PDO('mysql:host='.$host.';dbname='.$applicationDbName, $username, $password);
+        $this->io->note('Copying config-values from database \'' . $applicationDbName . '\'');
+        $pdo = new \PDO('mysql:host=' . $host . ';dbname=' . $applicationDbName, $username, $password);
         $neededConfigs = Config::getTestConfigs();
-        foreach($neededConfigs as $name => $value){
-            if($value === null){ // value should be taken from application DB
+        foreach ($neededConfigs as $name => $value) {
+            if ($value === null) { // value should be taken from application DB
                 $query = 'SELECT `value` FROM `Zf_configuration` WHERE `name` = ?';
                 $stmt = $pdo->prepare($query);
                 $stmt->execute([$name]);
                 $appVal = $stmt->fetchColumn();
-                if($appVal !== false){
+                if ($appVal !== false) {
                     $neededConfigs[$name] = $appVal;
                 }
             }
@@ -504,8 +572,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         $this->io->note('Copying config-values from current database');
         $configModel = new \editor_Models_Config();
         $neededConfigs = Config::getApplicationConfigs();
-        foreach($neededConfigs as $name => $value){
-            if($value === null){ // value should be taken from current application DB
+        foreach ($neededConfigs as $name => $value) {
+            if ($value === null) { // value should be taken from current application DB
                 $neededConfigs[$name] = $configModel->getCurrentValue($name);
             }
         }
@@ -535,24 +603,24 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         $missing = 0;
         // now write the values from the DB to the installation.ini
         $config = new \editor_Models_Config();
-        foreach(Config::CONFIGS as $name => $value){
-            if($value === null){ // value should be taken from existing config
+        foreach (Config::CONFIGS as $name => $value) {
+            if ($value === null) { // value should be taken from existing config
                 $dbValue = $config->getCurrentValue($name);
-                if($dbValue === null || $dbValue === ''){
-                    $iniFilecontent .= '; '.$name.' = ? TODO: not found in application DB, set manually'."\n"; // value not found: user needs to take action
+                if ($dbValue === null || $dbValue === '') {
+                    $iniFilecontent .= '; ' . $name . ' = ? TODO: not found in application DB, set manually' . "\n"; // value not found: user needs to take action
                     $missing++;
                 } else {
-                    if($dbValue !== 'true' && $dbValue !== 'false' && !ctype_digit($dbValue)){
-                        $dbValue = str_contains($dbValue, '"') ? '\''.str_replace('\'', '\\\'', $dbValue).'\'' : '"'.$dbValue.'"';
+                    if ($dbValue !== 'true' && $dbValue !== 'false' && !ctype_digit($dbValue)) {
+                        $dbValue = str_contains($dbValue, '"') ? '\'' . str_replace('\'', '\\\'', $dbValue) . '\'' : '"' . $dbValue . '"';
                     }
-                    $iniFilecontent .= $name.' = '.$dbValue."\n";
+                    $iniFilecontent .= $name . ' = ' . $dbValue . "\n";
                     $written++;
                 }
             }
         }
-        $this->io->note($written.' configs have been added from the configuration.');
-        if($missing > 0){
-            $this->io->warning($missing.' configs have not been found in the application DB. Please set them manually!');
+        $this->io->note($written . ' configs have been added from the configuration.');
+        if ($missing > 0) {
+            $this->io->warning($missing . ' configs have not been found in the application DB. Please set them manually!');
         }
     }
 }

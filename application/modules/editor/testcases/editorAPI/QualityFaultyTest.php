@@ -26,59 +26,40 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Filter;
+
 /**
  * Testcase for the AutoQA feature
  * Tests the special case, an internal tag has a faulty HTML structure (opening/closing tags in wrong order, internal tags interleaving)
  */
 class QualityFaultyTest extends editor_Test_JsonTest {
-    
+
+    protected static array $requiredRuntimeOptions = [
+        'autoQA.enableInternalTagCheck' => 1,
+        'autoQA.enableEdited100MatchCheck' => 1,
+        'autoQA.enableUneditedFuzzyMatchCheck' => 1,
+        'autoQA.enableMqmTags' => 1,
+        'autoQA.enableQm' => 1
+    ];
+
     /**
      *
      * @var stdClass[]
      */
-    static $segments = [];
+    private static $segments = [];
+
+    protected static string $setupUserLogin = 'testlector';
+
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de', -1, 'qm-terminology-en-de.zip')
+            ->setToEditAfterImport();
+    }
     
-    public static function setUpBeforeClass(): void {
-       
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-        
-        self::assertAppState();
-        self::assertNeededUsers();
-        self::assertLogin('testmanager');
-
-        $tests = array(
-            'runtimeOptions.autoQA.enableInternalTagCheck' => 1,
-            'runtimeOptions.autoQA.enableEdited100MatchCheck' => 1,
-            'runtimeOptions.autoQA.enableUneditedFuzzyMatchCheck' => 1,
-            'runtimeOptions.autoQA.enableMqmTags' => 1,
-            'runtimeOptions.autoQA.enableQm' => 1
-        );
-        self::$api->testConfig($tests);
-        
-         
-        $api->addImportFile('MainTest/qm-terminology-en-de.zip');
-        $api->import($task);
-        $api->reloadTask();
-        
-        $api->addUser('testlector');
-        
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
-        
-        $task = $api->getTask();
-           //open task for whole testcase
-        $api->setTaskToEdit($task->id);
-        
+    public static function beforeTests(): void {
         // we need some segments to play with
-        static::$segments = $api->getSegments(null, 10);
-        
+        static::$segments = static::api()->getSegments(null, 10);
         static::assertEquals(10, count(static::$segments), 'Not enough segments in the imported task');
     }
     /**
@@ -96,16 +77,14 @@ class QualityFaultyTest extends editor_Test_JsonTest {
         
         // edit segment 1 and make their internal tags overlap
         $segment1 = static::$segments[1];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segment1Edit, $segment1->id);
         $jsonFile = 'testSegment1EditTarget.json';
-        $segment1 = $this->api()->putJson('editor/segment/'.$segment1->id, $segmentData, $jsonFile);
+        $segment1 = static::api()->saveSegment($segment1->id, $segment1Edit, null, $jsonFile);
         $this->assertSegmentEqualsJsonFile($jsonFile, $segment1);
 
         // edit segment 3, swap open/close tag
         $segment3 = static::$segments[1];
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segment3Edit, $segment3->id);
         $jsonFile = 'testSegment3EditTarget.json';
-        $segment3 = $this->api()->putJson('editor/segment/'.$segment3->id, $segmentData, $jsonFile);
+        $segment3 = static::api()->saveSegment($segment3->id, $segment3Edit, null, $jsonFile);
         $this->assertSegmentEqualsJsonFile($jsonFile, $segment3);
     }
     /**
@@ -113,8 +92,8 @@ class QualityFaultyTest extends editor_Test_JsonTest {
      */
     public function testFilterQualityTree(){
         $jsonFile = 'expectedQualityFilterFaulty.json';
-        $tree = $this->api()->getJsonTree('/editor/quality', [], $jsonFile);
-        $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'internal');
+        $tree = static::api()->getJsonTree('/editor/quality', [], $jsonFile);
+        $treeFilter = Filter::createSingle('qtype', 'internal');
         $this->assertModelEqualsJsonFile('FilterQuality', $jsonFile, $tree, '', $treeFilter);
     }
     /**
@@ -123,8 +102,8 @@ class QualityFaultyTest extends editor_Test_JsonTest {
      */
     public function testTaskQualityTree(){
         $jsonFile = 'expectedTaskQualitiesFaulty.json';
-        $tree = $this->api()->getJson('editor/quality/task?&taskGuid='.urlencode(self::$api->getTask()->taskGuid), [], $jsonFile);
-        $treeFilter = editor_Test_Model_Filter::createSingle('qtype', 'internal');
+        $tree = static::api()->getJson('editor/quality/task?&taskGuid='.urlencode(static::api()->getTask()->taskGuid), [], $jsonFile);
+        $treeFilter = Filter::createSingle('qtype', 'internal');
         $this->assertModelEqualsJsonFile('TaskQuality', $jsonFile, $tree, '', $treeFilter);
     }
     /**
@@ -133,18 +112,12 @@ class QualityFaultyTest extends editor_Test_JsonTest {
      */
     public function testTaskTooltip(){
         
-        $file = $this->api()->getFile('expectedTaskToolTipFaulty.html', null, false);
-        $response = $this->api()->get('editor/quality/tasktooltip?&taskGuid='.urlencode(self::$api->getTask()->taskGuid));
+        $file = static::api()->getFile('expectedTaskToolTipFaulty.html', null, false);
+        $response = static::api()->get('editor/quality/tasktooltip?&taskGuid='.urlencode(static::api()->getTask()->taskGuid));
         $markup = $response->getBody();
-        if($this->api()->isCapturing()){ file_put_contents($file, $markup); }
+        if(static::api()->isCapturing()){ file_put_contents($file, $markup); }
         $this->assertStringContainsString('</table>', $markup, 'Task Qualities ToolTip Markup does not match');
         $this->assertStringContainsString('<span class="x-grid-symbol t5-quality-faulty">', $markup, 'Task Qualities ToolTip Markup does not match'); // number of all MQMs
         $this->assertEquals(file_get_contents($file), $markup, 'Task Qualities ToolTip Markup does not match'); // this test mignt has to be adjusted due to the translation problematic
-    }
-
-
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

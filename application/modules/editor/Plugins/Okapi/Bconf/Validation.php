@@ -34,6 +34,18 @@
 class editor_Plugins_Okapi_Bconf_Validation {
 
     /**
+     * Used for testing/validating bconfs
+     * @var string
+     */
+    const SOURCE_LANGUAGE = 'en';
+
+    /**
+     * Used for testing/validating bconfs
+     * @var string
+     */
+    const TARGET_LANGUAGE = 'de';
+
+    /**
      * @var string
      */
     protected editor_Plugins_Okapi_Bconf_Entity $bconf;
@@ -137,13 +149,11 @@ class editor_Plugins_Okapi_Bconf_Validation {
         /* @var $api editor_Plugins_Okapi_Connector */
         $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
         /* @var $language editor_Models_Languages */
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages */
         try {
             $api->createProject();
             $api->uploadOkapiConfig($this->bconf->getPath());
             $api->uploadInputFile($testfile, new SplFileInfo($testfilePath));
-            $api->executeTask($language->loadLangRfc5646(editor_Plugins_Okapi_Bconf_Filters::SOURCE_LANGUAGE), $language->loadLangRfc5646(editor_Plugins_Okapi_Bconf_Filters::TARGET_LANGUAGE));
+            $api->executeTask(self::SOURCE_LANGUAGE, self::TARGET_LANGUAGE);
             $convertedFile = $api->downloadFile($testfile, $manifestFile, new SplFileInfo($testDir));
             // cleanup downloaded files
             unlink($convertedFile);

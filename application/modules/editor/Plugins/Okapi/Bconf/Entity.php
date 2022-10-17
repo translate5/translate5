@@ -123,13 +123,8 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
             } else {
                 return "The directory is missing!";
             }
-        } else {
-            $permissions = fileperms($dir);
-            $rwx = 7;
-            $user = 6; // number of bytes to shift
-            if($permissions >> $user !== $rwx && !chmod($dir, $permissions | $rwx << $user)){
-                return "The directory has wrong permissions";
-            }
+        } else if(!is_writable($dir)) {
+            return "The directory is not writable!";
         }
         return '';
     }
@@ -205,7 +200,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $this->init($bconfData, false);
         $this->save(); // Generates id needed for directory
         $dir = $this->getDataDirectory();
-        if(self::checkDirectory($dir) && !mkdir($dir, 0755, true)){
+        if(self::checkDirectory($dir) != '' && !mkdir($dir, 0777, true)){
             $this->delete();
             $errorMsg = "Could not create directory for bconf (in runtimeOptions.plugins.Okapi.dataDir)";
             throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);

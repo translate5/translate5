@@ -90,16 +90,6 @@ $dep->dependencies = [[
             // title       optional, overwrites default title (defined in ZfExtended_Models_Installer_License)
         ]]
     ],[
-        "name" => "Open_Sans",
-        "label" => "Open Sans Fonts",
-        "url" => "RELEASE:Open_Sans.zip",
-        "target" => "application/modules/editor/ThirdParty/Open_Sans/",
-        "licenses" => [[
-            "uses" => "the Open Sans font",
-            "license" => "Apache License 2.0",
-            "relpath" => "docs/third-party-licenses/Open_Sans-license.txt"
-        ]]
-    ],[
         "name" => "termtagger",
         "label" => "openTMS TermTagger",
         "url" => "RELEASE:openTMStermTagger.zip",
@@ -203,6 +193,7 @@ $dep->post_install_copy = [
     "vendor/fortawesome/font-awesome/webfonts" => "public/modules/editor/fontawesome/webfonts",
     "vendor/fortawesome/font-awesome/LICENSE.txt" => "public/modules/editor/fontawesome/LICENSE.txt",
     "vendor/jquery/jquery-ui" => "public/js/jquery-ui",
+    "vendor/translate5/rangy-lib" => "public/js/rangy",
     "vendor/translate5/instanttranslate-roboto-font/" => "public/modules/editor/instanttranslate/fonts/roboto",
     "vendor/google/material-design-icons" => "public/modules/editor/material-design-icons/material-design-icons",
     "vendor/google/material-design-icons/LICENSE" => "public/modules/editor/material-design-icons/LICENSE",

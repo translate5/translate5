@@ -1324,8 +1324,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         }
         $langs = array_unique(array_merge(... $langs));
 
-        $statuses = $task->getConfig()->runtimeOptions->termTagger->usedTermProcessStatus->toArray() ?? [];
-
+        $statuses = $task->getConfig()->runtimeOptions->terminology->usedTermProcessStatus->toArray();
+        if( empty($statuses)){
+            $statuses =  [];
+        }
         $data = $this->loadSortedForExport($collectionIds, $langs, $statuses);
         if (!$data) {
             //The associated collections don't contain terms in the languages of the task.
@@ -1479,8 +1481,10 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $allIds = array_merge($sourceIds, $targetIds);
 
         // show only the terms with the config staus values
-        $statuses = $task->getConfig()->runtimeOptions->termTagger->usedTermProcessStatus->toArray() ?? [];
-
+        $statuses = $task->getConfig()->runtimeOptions->terminology->usedTermProcessStatus->toArray();
+        if( empty($statuses)){
+            $statuses =  [];
+        }
 
         $sql = $this->db->getAdapter()->select()
             ->from(['t1' =>'terms_term'], ['t2.*'])

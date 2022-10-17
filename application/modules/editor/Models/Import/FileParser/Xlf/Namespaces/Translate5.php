@@ -38,18 +38,24 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_FileParser_Xlf_Namespaces_Translate5 extends editor_Models_Import_FileParser_Xlf_Namespaces_Abstract{
     const TRANSLATE5_XLIFF_NAMESPACE = 'xmlns:translate5="http://www.translate5.net/"';
-    
+
+    protected static function isApplicable(string $xliff): bool
+    {
+        return str_contains($xliff, self::TRANSLATE5_XLIFF_NAMESPACE);
+    }
+
     /**
      * Internal tagmap
      * @var array
      */
-    protected $tagMap = [];
+    protected array $tagMap = [];
     
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::transunitAttributes()
      */
-    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
+    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes): void
+    {
         //TODO parse:
         //trans-unit id="7" translate5:autostateId="4" translate5:autostateText="not_translated">
         settype($attributes['translate5:maxNumberOfLines'], 'integer');
@@ -60,7 +66,8 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Translate5 extends editor_M
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
+    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser): void
+    {
         $this->tagMap = [];
         $xmlparser->registerElement('translate5:tagmap', null, function($tag, $key, $opener) use ($xmlparser){
             //get the content between the tagmap tags:
@@ -88,7 +95,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Translate5 extends editor_M
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getPairedTag()
      */
-    public function getPairedTag($xlfBeginTag, $xlfEndTag){
+    public function getPairedTag(string $xlfBeginTag, ?string $xlfEndTag): array{
         //in the translate5 internal tag map everything is mapped by the opener only:
         return $this->getSingleTag($xlfBeginTag);
     }
@@ -97,7 +104,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Translate5 extends editor_M
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getSingleTag()
      */
-    public function getSingleTag($xlfTag){
+    public function getSingleTag(string $xlfTag): array{
         //some foreign tools add spaces between the last attribute and the closing />
         $xlfTag = preg_replace('#"[\s]+/>$#', '"/>', $xlfTag);
         if(!empty($this->tagMap[$xlfTag])) {
@@ -109,7 +116,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Translate5 extends editor_M
         if(!empty($this->tagMap[$xlfTag])) {
             return $this->tagMap[$xlfTag];
         }
-        return null;
+        return [];
     }
     
     /**
@@ -117,7 +124,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Translate5 extends editor_M
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
-    public function useTagContentOnly() {
+    public function useTagContentOnly(): ?bool {
         return false;
     }
 }

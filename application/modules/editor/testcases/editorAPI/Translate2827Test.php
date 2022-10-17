@@ -26,41 +26,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /***
  * This test will create one task with pivot file where the workflow/pivot file-name matching is done until the first "."
  * ex: the pivot file with a name "test-aleks.de.xliff" will match the workflow file with a name "test-aleks.en.test.xliff"
  */
 class Translate2827Test extends editor_Test_JsonTest {
 
-    public static function setUpBeforeClass(): void {
-
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();//assert the test customer
-        self::assertLogin('testmanager');
-        self::$api->addImportFiles(self::$api->getFile('import-project.de-es-ES.workfile.sdlxliff'));
-        self::$api->addImportFiles(self::$api->getFile('import-project.de-mk-MK.pivot.sdlxliff'));
-
-        $task = [
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'de',
-            'targetLang' => ['es-ES'],
-            'relaisLang' => 'mk-MK',
-            'customerId' => self::$api->getCustomer()->id,
-            'edit100PercentMatch' => true,
-            'importUpload_language' => ['es-ES','mk-MK'],
-            'importUpload_type' => ['workfiles','pivot'],
-            'autoStartImport' => 1
-        ];
-        self::$api->import($task, false);
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'es-ES', static::getTestCustomerId())
+            ->addUploadFiles([
+                'import-project.de-es-ES.workfile.sdlxliff',
+                'import-project.de-mk-MK.pivot.sdlxliff'
+            ])
+            ->addProperty('relaisLang', 'mk-MK')
+            ->addProperty('importUpload_language', ['es-ES', 'mk-MK'])
+            ->addProperty('importUpload_type', ['workfiles', 'pivot']);
     }
 
-    /***
+    /**
      * Create the task with pivot
      */
     public function testImportProjectWithRelais(){
-        $projectTasks = self::$api->getProjectTasks();
+        $projectTasks = static::getTask()->getProperty('projectTasks');
         $this->assertEquals(count($projectTasks), 1, 'No tasks where created.');
     }
 
@@ -68,11 +59,11 @@ class Translate2827Test extends editor_Test_JsonTest {
      * Check if the pivot content is as expected
      */
     public function testRelaisContent() {
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //open task for whole testcase
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
         //get segment list
-        $segments = $this->api()->getSegments();
+        $segments = static::api()->getSegments();
         $segments = array_map(function($segment){
             return $segment;
         }, $segments);
@@ -83,10 +74,4 @@ class Translate2827Test extends editor_Test_JsonTest {
         ];
         $this->assertEquals($expected, $relais, 'Relais columns not filled as expected!');
     }
-
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id);
-    }
-
 }

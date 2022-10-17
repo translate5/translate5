@@ -42,16 +42,21 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Across extends editor_Model
     const ACROSS_XLIFF_NAMESPACE = 'xmlns:ax="AcrossXliff"';
     const USERGUID = 'across-imported';
 
+    protected static function isApplicable(string $xliff): bool
+    {
+        return str_contains($xliff, self::ACROSS_XLIFF_NAMESPACE);
+    }
+
     /**
      * @var array
      */
-    protected $comments = [];
+    protected array $comments = [];
 
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
-    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
+    public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser): void {
         $currentComment = null;
 
         $xmlparser->registerElement('trans-unit ax:named-property', function($tag, $attributes) use (&$currentComment){
@@ -65,7 +70,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Across extends editor_Model
             }
             $title = '';
             if(!empty($currentComment->across_title)) {
-                $title .= 'Title: '.$currentComment->across_title.'';
+                $title .= 'Title: '.$currentComment->across_title;
             }
             if(!empty($title)) {
                 $title .= "\n";
@@ -100,6 +105,9 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Across extends editor_Model
                 case 'title':
                     $currentComment->across_title = $value;
                     break;
+                default:
+                    //set nothing here
+                    break;
             }
         });
     }
@@ -109,7 +117,8 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Across extends editor_Model
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
-    public function useTagContentOnly() {
+    public function useTagContentOnly(): ?bool
+    {
         return false;
     }
 
@@ -118,9 +127,10 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Across extends editor_Model
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getComments()
      */
-    public function getComments() {
-        $comments = $this->comments;
+    public function getComments(): array
+    {
+        $commentsToReturn = $this->comments;
         $this->comments = [];
-        return $comments;
+        return $commentsToReturn;
     }
 }

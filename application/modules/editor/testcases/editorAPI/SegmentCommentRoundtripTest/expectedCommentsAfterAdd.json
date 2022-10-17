@@ -41,7 +41,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "Kommentar f\u00fcr Segment 2 (Severy level: For your information)",
+            "comment": "Kommentar für Segment 2 (Severy level: For your information)",
             "isEditable": false
         }
     ],
@@ -55,7 +55,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar für HIER in Segment 3 (Severy level: Warning)",
             "isEditable": false
         }
     ],
@@ -81,7 +81,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar für Benutzer 1 HIER in Segment 4 (Severy level: Error)",
             "isEditable": false
         }
     ],
@@ -95,13 +95,13 @@
         {
             "userGuid": "memoq-imported",
             "userName": "JF",
-            "comment": "&quot;Hallo&quot; \u201eMarc\u201c!",
+            "comment": "&quot;Hallo&quot; „Marc“!",
             "isEditable": false
         },
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "und &lt;b&gt;nochmal&lt;\/b&gt; einer.",
+            "comment": "und &lt;b&gt;nochmal&lt;/b&gt; einer.",
             "isEditable": false
         },
         {

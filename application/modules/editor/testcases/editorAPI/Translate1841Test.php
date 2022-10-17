@@ -26,41 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * BasicSegmentEditingTest imports a simple task, checks imported values,
  * edits segments and checks then the edited ones again on correct content
  */
-class Translate1841Test extends \ZfExtended_Test_ApiTestcase {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-        
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
-        $api->addImportFile($api->getFile('TRANSLATE-1841-de-en.xlf'), 'application/xml');
-        
-        $api->import($task);
-        
-        $api->addUser('testlector');
-        
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
-        
-        $task = $api->getTask();
-        //open task for whole testcase
-        $api->setTaskToEdit($task->id);
-        $api->reloadTask();
+class Translate1841Test extends editor_Test_ImportTest {
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static string $setupUserLogin = 'testlector';
+
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'en', -1, 'TRANSLATE-1841-de-en.xlf')
+            ->setProperty('taskName', static::NAME_PREFIX . 'Translate1841Test')  // TODO FIXME: we better generate data independent from resource-names ...
+            ->setToEditAfterImport();
     }
 
     /**
@@ -80,34 +66,31 @@ class Translate1841Test extends \ZfExtended_Test_ApiTestcase {
      * Test the issues fixed behaviour
      */
     public function testIssue() {
-        $task = $this->api()->getTask();
-        $this->assertIsArray($task->userTracking, 'UserTracking in task is no array!');
-        $this->assertNotEmpty($task->userTracking, 'UserTracking of task is empty!');
-        $user = reset($task->userTracking);
+        $userTracking = static::getTask()->reload(static::api())->getProperty('userTracking');
+        $this->assertIsArray($userTracking, 'UserTracking in task is no array!');
+        $this->assertNotEmpty($userTracking, 'UserTracking of task is empty!');
+        $user = reset($userTracking);
         
         $segEdit1 = '<ins class="trackchanges ownttip" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:49:28+01:00"><div class="open 6270742069643d223122207269643d223122202f internal-tag ownttip"><span title="&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;</span></div></ins>back <del class="trackchanges ownttip deleted" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:49:27+01:00"><div class="open 6270742069643d223122207269643d223122202f internal-tag ownttip"><span title="&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;</span></div></del>to the house<div class="close 6570742069643d223222207269643d223122202f internal-tag ownttip"><span title="&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;</span></div>';
         $segEdit2 = '<div class="open 6270742069643d223122207269643d223122202f internal-tag ownttip"><span title="&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; /&gt;</span></div>the house<del class="trackchanges ownttip deleted" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:52:14+01:00"><div class="close 6570742069643d223222207269643d223122202f internal-tag ownttip"><span title="&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;</span></div></del>\u00a0is<ins class="trackchanges ownttip" data-usertrackingid="'.$user->id.'" data-usercssnr="usernr2" data-workflowstep="reviewing1" data-timestamp="2020-02-26T10:52:15+01:00"><div class="close 6570742069643d223222207269643d223122202f internal-tag ownttip"><span title="&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;" class="short">&lt;/1&gt;</span><span data-originalid="1" data-length="-1" class="full">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; /&gt;</span></div></ins> back';
         
         //get segment list (just the ones of the first file for that tests)
-        $segments = $this->api()->getSegments(null, 2);
+        $segments = static::api()->getSegments(null, 2);
         $this->assertNotEmpty($segments, 'No segments are found in the Task!');
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segEdit1, $segments[0]->id);
-        $this->api()->putJson('editor/segment/'.$segments[0]->id, $segmentData);
-        
-        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segEdit2, $segments[1]->id);
-        $this->api()->putJson('editor/segment/'.$segments[1]->id, $segmentData);
-        
-        $task = $this->api()->getTask();
+
+        static::api()->saveSegment($segments[0]->id, $segEdit1);
+        static::api()->saveSegment($segments[1]->id, $segEdit2);
+
+        $task = static::api()->getTask();
         //start task export 
-        $this->api()->login('testmanager');
-        $this->api()->get('editor/task/export/id/'.$task->id.'?format=xliff2');
+        static::api()->login('testmanager');
+        static::api()->get('editor/task/export/id/'.$task->id.'?format=xliff2');
         
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, 'export-*.xliff');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, 'export-*.xliff');
         $exportedFile = preg_replace([
             '#translate5:taskguid="[^"]+"#',
             '#translate5:taskname="API Testing::Translate1841Test [^"]+"#',
@@ -118,27 +101,11 @@ class Translate1841Test extends \ZfExtended_Test_ApiTestcase {
             '<file id="XXXX" translate5:filename="TRANSLATE-1841-de-en.xlf">',
         ], $exportedFile);
         //compare it
-        $expectedResult = $this->api()->getFileContent('exportCompare.xlf');
+        $expectedResult = static::api()->getFileContent('exportCompare.xlf');
         
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
         //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
         //file_put_contents('/home/tlauria/foo-'.$fileToCompare, rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to exportCompare.xlf');
-    }
-    
-    /**
-     * tests the export results
-     * @param stdClass $task
-     * @param string $exportUrl
-     * @param string $fileToExport
-     * @param string $fileToCompare
-     */
-    protected function checkExport(stdClass $task, $exportUrl, $fileToExport, $fileToCompare) {
-
-    }
-
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

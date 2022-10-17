@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Empty dummy test to test the surrounding test framework
  */
-class DummyTest extends \ZfExtended_Test_ApiTestcase {
+class DummyTest extends editor_Test_ApiTest {
    
     public function testEntityVersionOnChangingUsers() {
         $this->assertTrue(true);
