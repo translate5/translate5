@@ -84,8 +84,7 @@ class XlfSegmentLengthTest extends editor_Test_JsonTest {
                 $contentToUse = $segToEdit->targetEdit;
             }
             $editedData = $contentToUse.' - edited'.$segToEdit->segmentNrInTask;
-            echo 'EDIT: '.strlen(strip_tags($editedData)).': '.$editedData;
-            if(in_array($segToEdit->segmentNrInTask, [1])) {
+            if(in_array($segToEdit->segmentNrInTask, [1,2,3,13,14])) {
                 static::api()->allowHttpStatusOnce(422);
                 $result = (array) static::api()->saveSegment($segToEdit->id, $editedData);
                 $this->assertEquals(422, $result['httpStatus'], 'Segment ['.$segToEdit->segmentNrInTask.'] is returning wrong HTTP Status.');
