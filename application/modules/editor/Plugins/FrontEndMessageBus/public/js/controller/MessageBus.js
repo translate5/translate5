@@ -74,7 +74,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         switch(data.message) {
             // We have to ask the user what to do:
             case 'taskClosedInOtherWindow':          
-                if(!Editor.data.task || !Editor.data.task.isModel || Editor.data.task.get('id') !== data.taskId) {
+                if(!Editor.data.task || !Editor.data.task.isModel || Editor.data.task.get('taskGuid') !== data.taskGuid) {
                     //notify the user only if the currently opened task was closed
                     return;
                 }
