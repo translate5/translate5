@@ -713,6 +713,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $defaults->addDefaultLanguageResources($task);
         $defaults->addDefaultPivotResources($task);
         $defaults->addDefaultUserAssoc($task);
+        $defaults->handlePivotAutostart($task);
     }
 
     /**

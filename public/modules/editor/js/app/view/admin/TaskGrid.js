@@ -61,7 +61,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         wordCountTT: '#UT#Anzahl Wörter',
         fileCount: '#UT#Dateien',
         sourceLang: '#UT#Quellsprache',
-        relaisLang: '#UT#Relaissprache',
+        relaisLang: '#UT#Pivotsprache',
         targetLang: '#UT#Zielsprache',
         referenceFiles: '#UT#Referenzdateien',
         terminologie: '#UT#Terminologie',
