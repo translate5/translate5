@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for TRANSLATE-2149 Xliff import deletes part of segment and a tag
  * The problem was the algorithm in editor_Models_Import_FileParser_Xlf_SurroundingTags was modifying internally the
@@ -37,55 +39,33 @@ END LICENSE AND COPYRIGHT
  *    Text der von extern kommt zu ersetzen “<1>damit wir keine Probleme mit dem Urheberrecht bekommen”.</1>
  */
 class Translate2149Test extends editor_Test_JsonTest {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'es',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-        
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
-        $tests = array(
-            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-            'runtimeOptions.import.xlf.ignoreFramingTags' => 'all',
-        );
-        self::$api->testConfig($tests);
-        
-        $zipfile = $api->zipTestFiles('testfiles/','XLF-test.zip'); //TRANSLATE-2149-de-es
-        
-        $api->addImportFile($zipfile);
-        $api->import($task);
-        
-        $api->addUser('testlector');
-        
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
-        
-        $task = $api->getTask();
-        //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.xlf.preserveWhitespace' => 0,
+        'import.xlf.ignoreFramingTags' => 'all'
+    ];
+
+    // protected static string $setupUserLogin = 'testlector';
+
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'es')
+            ->addUploadFolder('testfiles')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      */
     public function testSegmentValuesAfterImport() {
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
-    }
-    
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

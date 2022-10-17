@@ -26,56 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for TRANSLATE-1804 Segments containing only 0 are not imported
  */
 class Translate1804Test extends editor_Test_JsonTest {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(get_called_class());
-        
-        //$api->xdebug = true;
-        
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-        
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
-        $tests = array(
-            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-        );
-        self::$api->testConfig($tests);
-        
-        $zipfile = $api->zipTestFiles('testfiles/','XLF-test.zip');
-        
-        $api->addImportFile($zipfile);
-        $api->import($task);
-        
-        $api->addUser('testlector');
-        
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
-        
-        $task = $api->getTask();
-        //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.xlf.preserveWhitespace' => 0
+    ];
+
+    protected static string $setupUserLogin = 'testlector';
+
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de')
+            ->addUploadFolder('testfiles')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      */
     public function testSegmentValuesAfterImport() {
 
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
 
         //we need a copy of the segmentIds, since assertSegmentsEqualsJsonFile would remove them
@@ -84,22 +67,19 @@ class Translate1804Test extends editor_Test_JsonTest {
         $testContent = '<ins class="trackchanges ownttip" data-usertrackingid="2330" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2020-05-14T12:30:33+02:00">0</ins>';
         
         //saving a plain 0
-        $segment = $this->api()->prepareSegmentPut('targetEdit', "0", $ids[3]);
-        $this->api()->putJson('editor/segment/'.$ids[3], $segment);
+        static::api()->saveSegment($ids[3], '0');
         
         //saving a 0 with track changes
-        $segment = $this->api()->prepareSegmentPut('targetEdit', $testContent, $ids[4]);
-        $this->api()->putJson('editor/segment/'.$ids[4], $segment);
-        
+        static::api()->saveSegment($ids[4], $testContent);
+
         //saving a plain 0
-        $segment = $this->api()->prepareSegmentPut('targetEdit', "0", $ids[6]);
-        $this->api()->putJson('editor/segment/'.$ids[6], $segment);
+        static::api()->saveSegment($ids[6], '0');
+
         //saving a 0 with track changes
-        $segment = $this->api()->prepareSegmentPut('targetEdit', $testContent, $ids[7]);
-        $this->api()->putJson('editor/segment/'.$ids[7], $segment);
+        static::api()->saveSegment($ids[7], $testContent);
 
         $jsonFileName = 'expectedSegments-edited.json';
-        $segments = $this->api()->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
     }
     
@@ -108,31 +88,26 @@ class Translate1804Test extends editor_Test_JsonTest {
      * @depends testSegmentValuesAfterImport
      */
     public function testExport() {
-        self::$api->login('testmanager');
-        $task = $this->api()->getTask();
+        static::api()->login('testmanager');
+        $task = static::api()->getTask();
         //start task export
         
-        $this->api()->get('editor/task/export/id/'.$task->id);
+        static::api()->get('editor/task/export/id/'.$task->id);
         //$fileToCompare;
         
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/02-sdlxliff-en-de.sdlxliff');
-        //file_put_contents($this->api()->getFile('export-02-sdlxliff-en-de-new.sdlxliff', null, false), $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-02-sdlxliff-en-de.sdlxliff');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/02-sdlxliff-en-de.sdlxliff');
+        //file_put_contents(static::api()->getFile('export-02-sdlxliff-en-de-new.sdlxliff', null, false), $exportedFile);
+        $expectedResult = static::api()->getFileContent('export-02-sdlxliff-en-de.sdlxliff');
         
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/03-xlf-en-de.xlf');
-        //file_put_contents($this->api()->getFile('export-03-xlf-en-de-new.xlf', null, false), $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-03-xlf-en-de.xlf');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/03-xlf-en-de.xlf');
+        //file_put_contents(static::api()->getFile('export-03-xlf-en-de-new.xlf', null, false), $exportedFile);
+        $expectedResult = static::api()->getFileContent('export-03-xlf-en-de.xlf');
         
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');
-    }
-    
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

@@ -38,19 +38,12 @@ class Translate2717Test extends editor_Test_JsonTest {
     public static $sourceCustomerId;
     public static $targetCustomerId;
 
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-    }
-
     /***
-     * Creat the source and target customers
-     * @return void
+     * Create the source and target customers
      */
-    public static function testCreateCustomers(){
+    public static function beforeTests(): void{
 
-        $customer = self::$api->postJson('editor/customer/',[
+        $customer = static::api()->postJson('editor/customer/',[
             'name'=>'API Testing::TRANSLATE-2717-source',
             'number'=>uniqid('API Testing::ResourcesLogCustomer')
         ]);
@@ -58,7 +51,7 @@ class Translate2717Test extends editor_Test_JsonTest {
         self::assertIsObject($customer,'Unable to create the source customer');
         self::$sourceCustomerId = $customer->id;
 
-        $customer = self::$api->postJson('editor/customer/',[
+        $customer = static::api()->postJson('editor/customer/',[
             'name'=>'API Testing::TRANSLATE-2717-target',
             'number'=>uniqid('API Testing::ResourcesLogCustomer')
         ]);
@@ -70,7 +63,7 @@ class Translate2717Test extends editor_Test_JsonTest {
      * Add customer specific configs to the source customer and copy the configs from the source to the target customer
      * @return void
      */
-    public static function testCopyCustomerConfig(){
+    public function testCopyCustomerConfig(){
         $setConfigs = [];
         $setConfigs['runtimeOptions.editor.showConfirmFinishTaskPopup'] = '1';
         $setConfigs['runtimeOptions.lengthRestriction.sizeUnit'] = 'pixel';
@@ -78,14 +71,14 @@ class Translate2717Test extends editor_Test_JsonTest {
 
         foreach ($setConfigs as $name => $value){
             // add config to the source customer
-            self::addCustomerConfig($name,$value,self::$sourceCustomerId);
+            $this->addCustomerConfig($name,$value,self::$sourceCustomerId);
         }
 
         // copy the configs from the source to the target customer
-        self::$api->postJson('editor/customer/'.self::$targetCustomerId.'/copy/operation', [ 'copyConfigCustomer' => self::$sourceCustomerId ], null, false);
+        static::api()->postJson('editor/customer/'.self::$targetCustomerId.'/copy/operation', [ 'copyConfigCustomer' => self::$sourceCustomerId ], null, false);
 
         // get all target customer configs
-        $configs = self::$api->getJson('editor/config/',[
+        $configs = static::api()->getJson('editor/config/',[
             'customerId'=>self::$targetCustomerId,
         ]);
 
@@ -95,7 +88,7 @@ class Translate2717Test extends editor_Test_JsonTest {
                 $matches++;
             }
         }
-        self::assertEquals($matches,count($setConfigs),'Not all of the configs are copied to the target customer');
+        self::assertEquals($matches, count($setConfigs),'Not all of the configs are copied to the target customer');
     }
 
     /***
@@ -103,20 +96,20 @@ class Translate2717Test extends editor_Test_JsonTest {
      * the user defaults between them after copy
      * @return void
      */
-    public static function testCopyUserDefaults(){
-        self::addUserDefaults([
+    public function testCopyUserDefaults(){
+        $this->addUserDefaults([
             "deadlineDate"=>1,
             "sourceLang"=>'en',
             "targetLang"=>'mk',
             "workflowStepName"=>"translation",
         ]);
-        self::addUserDefaults([
+        $this->addUserDefaults([
             "deadlineDate"=>2,
             "sourceLang"=>'en',
             "targetLang"=>'de',
             "workflowStepName"=>"reviewing",
         ]);
-        self::addUserDefaults([
+        $this->addUserDefaults([
             "deadlineDate"=>3,
             "sourceLang"=>'en',
             "targetLang"=>'it',
@@ -124,9 +117,9 @@ class Translate2717Test extends editor_Test_JsonTest {
         ]);
 
         // copy the default user assoc from the source to the target customer
-        self::$api->postJson('editor/customer/'.self::$targetCustomerId.'/copy/operation', [ 'copyDefaultAssignmentsCustomer' => self::$sourceCustomerId ], null, false);
+        static::api()->postJson('editor/customer/'.self::$targetCustomerId.'/copy/operation', [ 'copyDefaultAssignmentsCustomer' => self::$sourceCustomerId ], null, false);
 
-        $sourceValues = self::$api->getJson('editor/userassocdefault/',[
+        $sourceValues = static::api()->getJson('editor/userassocdefault/',[
             'filter' => '[{"value":"'.self::$sourceCustomerId.'","property":"customerId","operator":"eq"}]',
         ]);
 
@@ -135,7 +128,7 @@ class Translate2717Test extends editor_Test_JsonTest {
             unset($r->customerId);
             return $r;
         },$sourceValues);
-        $targetValues = self::$api->getJson('editor/userassocdefault/',[
+        $targetValues = static::api()->getJson('editor/userassocdefault/',[
             'filter' => '[{"value":"'.self::$targetCustomerId.'","property":"customerId","operator":"eq"}]',
         ]);
         array_map(function ($r){
@@ -155,15 +148,15 @@ class Translate2717Test extends editor_Test_JsonTest {
      * @param int $customerId
      * @return void
      */
-    private static function addCustomerConfig(string $name,string $value,int $customerId){
-        self::$api->putJson('editor/config/',[
+    private function addCustomerConfig(string $name,string $value,int $customerId){
+        static::api()->putJson('editor/config/',[
             'value' => $value,
             'customerId' => $customerId,
             'name' => $name
         ]);
     }
 
-    private static function addUserDefaults(array $data){
+    private function addUserDefaults(array $data){
         $user = self::assertLogin('testmanager');
         $newData = array_merge([
             "customerId"=>self::$sourceCustomerId,
@@ -178,12 +171,14 @@ class Translate2717Test extends editor_Test_JsonTest {
             "trackchangesShowAll"=>1,
             "trackchangesAcceptReject"=>1
         ],$data);
-         self::$api->postJson('editor/userassocdefault/', $newData);
+         static::api()->postJson('editor/userassocdefault/', $newData);
     }
-
-    public static function tearDownAfterClass(): void {
-        self::$api->login('testmanager');
-        self::$api->delete('editor/customer/'.self::$sourceCustomerId);
-        self::$api->delete('editor/customer/'.self::$targetCustomerId);
+    /***
+     * Delete the source and target customers
+     */
+    public static function afterTests(): void {
+        static::api()->login('testmanager');
+        static::api()->delete('editor/customer/'.self::$sourceCustomerId);
+        static::api()->delete('editor/customer/'.self::$targetCustomerId);
     }
 }
