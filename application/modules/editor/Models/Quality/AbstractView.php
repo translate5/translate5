@@ -484,6 +484,7 @@ abstract class editor_Models_Quality_AbstractView {
         if($this->isTree){
             $row->children = [];
             $row->qcategory = $category;
+            // $row->qcatidx = -1;
         }
         if($this->hasNumFalsePositives){
             $row->qcountfp = 0;

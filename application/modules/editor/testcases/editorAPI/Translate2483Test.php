@@ -64,24 +64,24 @@ class Translate2483Test extends editor_Test_JsonTest {
      */
     private static array $createdResources = [];
 
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();
+    protected static array $requiredPlugins = [
+        'editor_Plugins_InstantTranslate_Init'
+    ];
+
+    public static function beforeTests(): void {
 
         $json = self::assertLogin('testmanager');
         self::assertContains('instantTranslate', $json->user->roles, 'Missing role for user.');
         self::assertContains('instantTranslateWriteTm', $json->user->roles, 'Missing role for user.');
-        self::assertContains(self::$api->getCustomer()->id, array_filter(explode(',',$json->user->customers)), 'The test customer is not assigned to the testmanager');
-
-
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_InstantTranslate_Init', $appState->pluginsLoaded, 'Plugin InstantTranslate must be activated for this test case!');
-
+        $userIds = [];
+        foreach(explode(',', $json->user->customers) as $userId){
+            if(!empty($userId)){
+                $userIds[] = intval($userId);
+            }
+        }
+        self::assertContains(static::getTestCustomerId(), $userIds, 'The test customer is not assigned to the testmanager');
         self::$sourceText = bin2hex(random_bytes(10));
         self::$targetText = bin2hex(random_bytes(10));
-
-        self::assertNeededUsers();
     }
 
 
@@ -91,7 +91,7 @@ class Translate2483Test extends editor_Test_JsonTest {
      */
     public function testCreateAndWrite() {
         self::assertLogin('testmanager');
-        $response = self::$api->postJson('editor/instanttranslateapi/writetm',
+        $response = static::api()->postJson('editor/instanttranslateapi/writetm',
             [
                 'source' => self::$sourceText,
                 'target' => self::$targetText,
@@ -117,8 +117,8 @@ class Translate2483Test extends editor_Test_JsonTest {
         $params['target'] = self::$targetLang;
         $params['text'] = self::$sourceText;
 
-        $this->api()->getJson('editor/instanttranslateapi/translate', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
-        $responseBody = json_decode($this->api()->getLastResponse()->getBody());
+        static::api()->getJson('editor/instanttranslateapi/translate', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
+        $responseBody = json_decode(static::api()->getLastResponse()->getBody());
         // Is anything returned for Deep at all?
         $this->assertIsObject($responseBody, 'InstantTranslate: Response for translation does not return an object, check error log.');
         $this->assertIsObject($responseBody->rows, 'InstantTranslate: Response for translation does not return any rows.');
@@ -135,9 +135,9 @@ class Translate2483Test extends editor_Test_JsonTest {
         }
     }
 
-    public static function tearDownAfterClass(): void {
+    public static function afterTests(): void {
         foreach (self::$createdResources as $createdResource) {
-            self::$api->delete('editor/languageresourceinstance/'.$createdResource);
+            static::api()->delete('editor/languageresourceinstance/'.$createdResource);
         }
     }
 }

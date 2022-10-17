@@ -1,12 +1,12 @@
 {
-    "id": "1141337",
+    "id": "776",
     "segmentNrInTask": "2",
-    "fileId": "5114",
+    "fileId": "23",
     "mid": "1",
     "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
     "userName": "lector test",
-    "taskGuid": "{92800d72-6714-4bae-a300-6157e41431bf}",
-    "timestamp": "2022-08-03 11:24:34",
+    "taskGuid": "{4262696b-51f6-41fd-84f4-c9c00bf311c6}",
+    "timestamp": "2022-10-09 22:33:10",
     "editable": "1",
     "pretrans": "0",
     "matchRate": "0",
@@ -18,17 +18,17 @@
     "workflowStepNr": "1",
     "workflowStep": "reviewing",
     "isRepeated": "0",
-    "source": "<div class=\"term preferredTerm exact transNotDefined\" title=\"\" data-tbxid=\"f8ae4a4b-5f93-4a14-af12-9d2335bf9477\" data-t5qid=\"98857\">Apache<\/div> may be built multithreaded by selecting the <div class=\"open 672069643d2233323822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;<\/span><\/div>worker<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/var&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;\/var&gt;<\/span><\/div> MPM, rather than the standard <div class=\"open 672069643d2233323922 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;2&gt;<\/span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;<\/span><\/div>prefork<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/var&gt;\">&lt;\/2&gt;<\/span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;\/var&gt;<\/span><\/div> MPM, when <div class=\"term preferredTerm exact transNotDefined\" title=\"\" data-tbxid=\"f8ae4a4b-5f93-4a14-af12-9d2335bf9477\" data-t5qid=\"98858\">Apache<\/div> is built.",
+    "source": "<div class=\"term preferredTerm exact transNotDefined\" title=\"\" data-tbxid=\"3c26a72d-cb1c-4a3f-b8cd-b207ffe3aba6\" data-t5qid=\"2227\">Apache</div> may be built multithreaded by selecting the <div class=\"open 672069643d2233323822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;</span></div>worker<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/var&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;/var&gt;</span></div> MPM, rather than the standard <div class=\"open 672069643d2233323922 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;2&gt;</span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;</span></div>prefork<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/var&gt;\">&lt;/2&gt;</span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;/var&gt;</span></div> MPM, when <div class=\"term preferredTerm exact transNotDefined\" title=\"\" data-tbxid=\"3c26a72d-cb1c-4a3f-b8cd-b207ffe3aba6\" data-t5qid=\"2228\">Apache</div> is built.",
     "sourceMd5": "d5988faf8c9ac82f066c0053a25b51c3",
     "sourceToSort": "Apache may be built multithreaded by selecting the worker MPM, rather than the standard prefork MPM, when Apache is built.",
-    "target": "Apache wird vielleicht multithreaded gebaut indem <div class=\"open 672069643d2233323822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;<\/span><\/div>worker<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/var&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;\/var&gt;<\/span><\/div> selektiert wird. MPM, statt dem standard modul <div class=\"open 672069643d2233323922 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;2&gt;<\/span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;<\/span><\/div><div class=\"term supersededTerm exact\" title=\"\" data-tbxid=\"9fc9bec0-904f-4db2-9e4c-cf3c4bc9c51f\" data-t5qid=\"98859\">prefork<\/div><div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/var&gt;\">&lt;\/2&gt;<\/span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;\/var&gt;<\/span><\/div> MPM, wenn Apache gebaut wird.",
-    "targetMd5": "2d17dab801e7299b2d4c08610654ad11",
+    "target": "Apache wird vielleicht multithreaded gebaut indem <div class=\"open 672069643d2233323822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;</span></div>worker<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/var&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;/var&gt;</span></div> selektiert wird. MPM, statt dem standard modul <div class=\"open 672069643d2233323922 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;2&gt;</span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;</span></div><div class=\"term supersededTerm exact\" title=\"\" data-tbxid=\"c574db02-dcfe-4b1e-ac4d-d42ef5a15146\" data-t5qid=\"2186\">prefork</div><div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/var&gt;\">&lt;/2&gt;</span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;/var&gt;</span></div> MPM, wenn Apache gebaut wird.",
+    "targetMd5": "efa81ceb77d0c3a5178f509a08ba54ed",
     "targetToSort": "Apache wird vielleicht multithreaded gebaut indem worker selektiert wird. MPM, statt dem standard modul prefork MPM, wenn Apache gebaut wird.",
-    "targetEdit": "Apache wird vielleicht multithreaded gebaut indem <div class=\"open 672069643d2233323822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;<\/span><\/div>worker selektiert wird.<div class=\"open 672069643d2233323922 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;2&gt;<\/span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;<\/span><\/div> MPM,<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/var&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;\/var&gt;<\/span><\/div> statt dem standard modul <div class=\"term supersededTerm exact\" title=\"\" data-tbxid=\"9fc9bec0-904f-4db2-9e4c-cf3c4bc9c51f\" data-t5qid=\"98859\">prefork<\/div><div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/var&gt;\">&lt;\/2&gt;<\/span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;\/var&gt;<\/span><\/div> MPM, wenn Apache gebaut wird.",
+    "targetEdit": "Apache wird vielleicht multithreaded gebaut indem <div class=\"open 672069643d2233323822 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;</span></div>worker selektiert wird.<div class=\"open 672069643d2233323922 internal-tag ownttip\"><span class=\"short\" title=\"&lt;var class=&quot;filename&quot;&gt;\">&lt;2&gt;</span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;var class=&quot;filename&quot;&gt;</span></div> MPM,<div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/var&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"328\" data-length=\"-1\">&lt;/var&gt;</span></div> statt dem standard modul <div class=\"term supersededTerm exact\" title=\"\" data-tbxid=\"c574db02-dcfe-4b1e-ac4d-d42ef5a15146\" data-t5qid=\"2229\">prefork</div><div class=\"close 2f67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/var&gt;\">&lt;/2&gt;</span><span class=\"full\" data-originalid=\"329\" data-length=\"-1\">&lt;/var&gt;</span></div> MPM, wenn Apache gebaut wird.",
     "targetEditToSort": "Apache wird vielleicht multithreaded gebaut indem worker selektiert wird. MPM, statt dem standard modul prefork MPM, wenn Apache gebaut wird.",
     "isWatched": null,
     "segmentUserAssocId": null,
-    "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"1141337\": {\"nr\":\"2\",\"length\":{\"targetEdit\":141}},\"1141338\": {\"nr\":\"3\",\"length\":{\"targetEdit\":150}}}}",
+    "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"776\": {\"nr\":\"2\",\"length\":{\"targetEdit\":141}},\"777\": {\"nr\":\"3\",\"length\":{\"targetEdit\":150}}}}",
     "spellCheck": {
         "target": [
             {
@@ -37,7 +37,7 @@
                     "start": 23,
                     "end": 36
                 },
-                "message": "M\u00f6glicher Rechtschreibfehler gefunden",
+                "message": "Möglicher Rechtschreibfehler gefunden",
                 "replacements": [],
                 "infoURLs": [],
                 "cssClassErrorType": "t5misspelling"
@@ -48,7 +48,7 @@
                     "start": 37,
                     "end": 49
                 },
-                "message": "Hier sollte ein Komma eingef\u00fcgt werden, wenn es sich um einen Haupt- und Nebensatz oder zwei Haupts\u00e4tze handelt.",
+                "message": "Hier sollte ein Komma eingefügt werden, wenn es sich um einen Haupt- und Nebensatz oder zwei Hauptsätze handelt.",
                 "replacements": [
                     "gebaut, indem"
                 ],
@@ -61,28 +61,28 @@
                     "start": 50,
                     "end": 56
                 },
-                "message": "M\u00f6glicher Rechtschreibfehler gefunden",
+                "message": "Möglicher Rechtschreibfehler gefunden",
                 "replacements": [
                     "vorher",
                     "Yorker",
                     "worden",
                     "vorbei",
-                    "B\u00fcrger",
-                    "K\u00f6rper",
+                    "Bürger",
+                    "Körper",
                     "sorgen",
                     "voller",
                     "vorne",
                     "wirken",
-                    "D\u00f6rfer",
-                    "V\u00f6lker",
+                    "Dörfer",
+                    "Völker",
                     "vordere",
                     "Berger",
-                    "M\u00f6rder",
+                    "Mörder",
                     "Volker",
-                    "W\u00f6rter",
+                    "Wörter",
                     "locker",
                     "Holger",
-                    "H\u00f6rer"
+                    "Hörer"
                 ],
                 "infoURLs": [],
                 "cssClassErrorType": "t5misspelling"
@@ -93,7 +93,7 @@
                     "start": 74,
                     "end": 77
                 },
-                "message": "M\u00f6glicher Rechtschreibfehler gefunden",
+                "message": "Möglicher Rechtschreibfehler gefunden",
                 "replacements": [
                     "MP",
                     "BPM",
@@ -105,10 +105,10 @@
                     "SPD",
                     "PS",
                     "KPD",
-                    "SP\u00d6",
+                    "SPÖ",
                     "WM",
                     "EM",
-                    "FP\u00d6",
+                    "FPÖ",
                     "IBM",
                     "MHz",
                     "MTV",
@@ -125,7 +125,7 @@
                     "start": 89,
                     "end": 97
                 },
-                "message": "M\u00f6glicher Rechtschreibfehler gefunden",
+                "message": "Möglicher Rechtschreibfehler gefunden",
                 "replacements": [
                     "Standard",
                     "standard-",
@@ -136,8 +136,8 @@
                     "Startart",
                     "standest",
                     "standort-",
-                    "st\u00e4ndest",
-                    "st\u00e4nkert"
+                    "ständest",
+                    "stänkert"
                 ],
                 "infoURLs": [],
                 "cssClassErrorType": "t5misspelling"
@@ -148,7 +148,7 @@
                     "start": 98,
                     "end": 103
                 },
-                "message": "M\u00f6glicher Rechtschreibfehler gefunden",
+                "message": "Möglicher Rechtschreibfehler gefunden",
                 "replacements": [
                     "Modul",
                     "modulo",
@@ -159,12 +159,12 @@
                     "mobil",
                     "mol",
                     "modular",
-                    "F\u00f6tus",
+                    "Fötus",
                     "Moduls",
                     "Motel",
                     "modale",
-                    "G\u00f6del",
-                    "Bet\u00fcl",
+                    "Gödel",
+                    "Betül",
                     "Foul",
                     "Lotus",
                     "Model",
@@ -180,7 +180,7 @@
                     "start": 104,
                     "end": 111
                 },
-                "message": "M\u00f6glicher Rechtschreibfehler gefunden",
+                "message": "Möglicher Rechtschreibfehler gefunden",
                 "replacements": [],
                 "infoURLs": [],
                 "cssClassErrorType": "t5misspelling"
@@ -191,7 +191,7 @@
                     "start": 112,
                     "end": 115
                 },
-                "message": "M\u00f6glicher Rechtschreibfehler gefunden",
+                "message": "Möglicher Rechtschreibfehler gefunden",
                 "replacements": [
                     "MP",
                     "BPM",
@@ -203,10 +203,10 @@
                     "SPD",
                     "PS",
                     "KPD",
-                    "SP\u00d6",
+                    "SPÖ",
                     "WM",
                     "EM",
-                    "FP\u00d6",
+                    "FPÖ",
                     "IBM",
                     "MHz",
                     "MTV",

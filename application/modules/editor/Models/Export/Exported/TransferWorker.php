@@ -82,9 +82,6 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
         // Get all exported tbx files
         $tbxA = glob($parameters['folderToGetTbx'] . DIRECTORY_SEPARATOR . 'TermCollection*.tbx');
 
-        // Create API instance
-        $api = new ZfExtended_Test_ApiHelper('ZfExtended_Test_ApiTestcase');
-        $api->setAuthCookie($parameters['cookie']);
         $url = $parameters['url'];
 
         // Api request data
@@ -115,11 +112,26 @@ class editor_Models_Export_Exported_TransferWorker extends editor_Models_Export_
             // Spoof rfc5646-code of source language with target language one
             $raw = preg_replace('~(<langSet.+?xml:lang=")([^"]+)(".*?>)~', '$1' . $targetLangRfc . '$3', $raw);
 
-            // Add file upload
-            $api->addFilePlain('tmUpload', $raw, 'text/xml', $m[0]);
+            // TODO FIXME: this Code should be abstarcted to an ZfExtended API class, see also editor_Plugins_InstantTranslate_Filetranslationhelper
 
-            // Make request to imitate language resource tbx import dialog submit
-            $json[$idx] = $api->postJson($url.'languageresourceinstance/'.$m[1].'/import/', $data);
+            try {
+
+                $client = new ZfExtended_ApiClient($parameters['url'].'languageresourceinstance/'.$m[1].'/import/', null, $parameters['cookie']);
+                $client->setHeaders('Accept', 'application/json');
+                $client->setFileUpload($m[0], 'tmUpload', $raw, 'text/xml');
+                foreach($data as $name => $val){
+                    $client->setParameterPost($name, $val);
+                }
+                $response = $client->request('POST');
+                $result = json_decode($response->getBody());
+                if(property_exists($result, 'rows')){
+                    $result = $result->rows;
+                }
+                $json[$idx] = $result;
+
+            } catch(Throwable $e) {
+                throw new ZfExtended_Exception('Could not request the translate5 API within translate5, error was: '.$e->getMessage());
+            }
         }
     }
 }

@@ -192,10 +192,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     },{
                         action: 'export',
                         getClass:function(v,meta,r) {
-                        	return service(r).getExportIconClass();
+                        	return service(r).getExportIconClass(r);
                         },
 	                    getTip:function(view,metadata,r){
-	                    	return service(r).getExportTooltip();
+	                    	return service(r).getExportTooltip(r);
 	                    }
                     },{
                         tooltip: me.strings.log,
@@ -370,7 +370,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         me.statisticTpl = new Ext.XTemplate(
             '<table>',
             '<tpl for=".">',
-            '<tr><td>{type}: </td><td>{value}</td></tr>',
+            '<tr><td>{text}: </td><td>{value}</td></tr>',
             '</tpl>',
             '</table>');
         me.callParent(arguments);

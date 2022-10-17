@@ -48,7 +48,7 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
         checked: '#UT#Ressource in Aufgabe verwenden',
         name: '#UT#Name',
         source: '#UT#Quellsprache',
-        relaisLang: '#UT#Relaissprache',
+        relaisLang: '#UT#Pivotsprache',
         serviceName: '#UT#Ressource',
         taskGuid:'#UT#Aufgabename',
         workerQueued:'#UT#Pivot-Vorübersetzung läuft',

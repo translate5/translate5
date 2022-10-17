@@ -2925,7 +2925,7 @@ CREATE TABLE `LEK_taskUserAssoc` (
 /*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50003 TRIGGER `LEK_taskUserAssoc_versioning_ins` BEFORE INSERT ON `LEK_taskUserAssoc`
- FOR EACH ROW IF not @`entityVersion` is null THEN
+ FOR EACH ROW IF not @`entityVersion` is null AND @`entityVersion` > 0 THEN
           UPDATE LEK_task SET entityVersion = @`entityVersion` WHERE taskGuid = NEW.taskGuid;
           SET @`entityVersion` := null;
         END IF */;;
@@ -2944,7 +2944,7 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50003 TRIGGER `LEK_taskUserAssoc_versioning_up` BEFORE UPDATE ON `LEK_taskUserAssoc`
- FOR EACH ROW IF not @`entityVersion` is null THEN
+ FOR EACH ROW IF not @`entityVersion` is null AND @`entityVersion` > 0 THEN
           UPDATE LEK_task SET entityVersion = @`entityVersion` WHERE taskGuid = NEW.taskGuid;
           SET @`entityVersion` := null;
         END IF */;;
@@ -2963,7 +2963,7 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50003 TRIGGER `LEK_taskUserAssoc_versioning_del` BEFORE DELETE ON `LEK_taskUserAssoc`
- FOR EACH ROW IF not @`entityVersion` is null THEN
+ FOR EACH ROW IF not @`entityVersion` is null AND @`entityVersion` > 0 THEN
           UPDATE LEK_task SET entityVersion = @`entityVersion` WHERE taskGuid = OLD.taskGuid;
           SET @`entityVersion` := null;
         END IF */;;
@@ -3731,7 +3731,7 @@ CREATE TABLE `LEK_workflow_userpref` (
 /*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50003 TRIGGER `LEK_workflow_userpref_versioning_ins` BEFORE INSERT ON `LEK_workflow_userpref`
- FOR EACH ROW IF not @`entityVersion` is null THEN
+ FOR EACH ROW IF not @`entityVersion` is null AND @`entityVersion` > 0 THEN
           UPDATE LEK_task SET entityVersion = @`entityVersion` WHERE taskGuid = NEW.taskGuid;
           SET @`entityVersion` := null;
         END IF */;;
@@ -3750,7 +3750,7 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50003 TRIGGER `LEK_workflow_userpref_versioning_up` BEFORE UPDATE ON `LEK_workflow_userpref`
- FOR EACH ROW IF not @`entityVersion` is null THEN
+ FOR EACH ROW IF not @`entityVersion` is null AND @`entityVersion` > 0 THEN
           UPDATE LEK_task SET entityVersion = @`entityVersion` WHERE taskGuid = NEW.taskGuid;
           SET @`entityVersion` := null;
         END IF */;;
@@ -3769,7 +3769,7 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50003 TRIGGER `LEK_workflow_userpref_versioning_del` BEFORE DELETE ON `LEK_workflow_userpref`
- FOR EACH ROW IF not @`entityVersion` is null THEN
+ FOR EACH ROW IF not @`entityVersion` is null AND @`entityVersion` > 0 THEN
           UPDATE LEK_task SET entityVersion = @`entityVersion` WHERE taskGuid = OLD.taskGuid;
           SET @`entityVersion` := null;
         END IF */;;

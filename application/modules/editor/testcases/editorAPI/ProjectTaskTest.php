@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /***
  * 1. Create project with 4 project tasks.
  * 2. Create term collection which will be assigned as default for all of the tasks.
@@ -35,64 +37,36 @@ END LICENSE AND COPYRIGHT
  */
 class ProjectTaskTest extends editor_Test_JsonTest {
     
-    protected static $customerTest;
     protected static $sourceLangRfc = 'en';
     protected static $targetLangRfc = ['de','it','fr','mk'];
-    
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_TermTagger_Bootstrap', $appState->pluginsLoaded, 'TermTagger must be activated for this test case!');
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
 
-        self::$customerTest = self::$api->postJson('editor/customer/',[
-            'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
-        ]);
+    protected static bool $termtaggerRequired = true;
 
-        // add term collection
-        $params = [];
-        //create the resource 3 and import the file
-        $params['name'] = 'API Testing::TermCollection_'.__CLASS__;
-        $params['resourceId'] = 'editor_Services_TermCollection';
-        $params['serviceType'] = 'editor_Services_TermCollection';
-        $params['customerIds'] = [self::$customerTest->id];
-        $params['customerUseAsDefaultIds'] = [self::$customerTest->id];
-        $params['customerWriteAsDefaultIds'] = [];
-        $params['serviceName'] = 'TermCollection';
-        $params['mergeTerms'] = false;
-        self::$api->addResource($params, 'collection.tbx', true);
+    protected static array $requiredPlugins = [
+        'editor_Plugins_TermTagger_Bootstrap'
+    ];
 
-        // create project
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId' => self::$customerTest->id,
-            'autoStartImport' => 0,
-            'edit100PercentMatch' => 0
-        ];
-        self::assertLogin('testmanager');
+    protected static bool $setupOwnCustomer = true;
 
-        $zipfile = self::$api->zipTestFiles('testfiles/','XLF-test.zip');
-        self::$api->addImportFile($zipfile);
-
-        self::$api->import($task,false,false);
-        error_log('Task created. '.self::$api->getTask()->taskName);
-        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
-        self::$api->checkProjectTasksStateLoop();
+    protected static function setupImport(Config $config): void
+    {
+        $ownCustomerId = static::$ownCustomer->id;
+        $config
+            ->addLanguageResource('termcollection', 'collection.tbx', $ownCustomerId)
+            ->addDefaultCustomerId($ownCustomerId);
+        $config->addTask(static::$sourceLangRfc, static::$targetLangRfc, $ownCustomerId)
+            ->addUploadFolder('testfiles')
+            ->setProperty('edit100PercentMatch', 0)
+            ->setProperty('taskName', static::NAME_PREFIX . 'ProjectTaskTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
 
     /***
      * Validate the basic project task values
      */
     public function testProjectTaskCreation() {
-        self::$api->reloadProjectTasks();
-        self::assertEquals(count(self::$api->getProjectTasks()), 4, 'The number of the project task is not as expected');
-        $languages = self::$api->getLanguages();
+        static::api()->reloadProjectTasks();
+        self::assertEquals(count(static::api()->getProjectTasks()), 4, 'The number of the project task is not as expected');
+        $languages = static::api()->getLanguages();
         
         $getRfc = function($id) use ($languages){
             foreach ($languages as $lang){
@@ -104,10 +78,10 @@ class ProjectTaskTest extends editor_Test_JsonTest {
         };
         
         //validate the task target language
-        foreach (self::$api->getProjectTasks() as $task){
+        foreach (static::api()->getProjectTasks() as $task){
             self::assertEquals($getRfc($task->sourceLang),self::$sourceLangRfc,'The project task does not match the expected source language');
             self::assertContains($getRfc($task->targetLang), self::$targetLangRfc, 'The task target language ('.$task->targetLang.') can not be found in the expected values.');
-            self::assertEquals($task->taskType, self::$api::INITIAL_TASKTYPE_PROJECT_TASK, 'Project tasktype does not match the expected type.');
+            self::assertEquals($task->taskType, static::api()::INITIAL_TASKTYPE_PROJECT_TASK, 'Project tasktype does not match the expected type.');
         }
     }
 
@@ -115,12 +89,12 @@ class ProjectTaskTest extends editor_Test_JsonTest {
      * For each project task, check the segment content. Some of the segments are with terms.
      */
     public function testProjectTasksSegmentContent() {
-        $project = $this->api()->getTask();
-        self::$api->reloadProjectTasks();
-        foreach (self::$api->getProjectTasks() as $task){
+        $project = static::api()->getTask();
+        static::api()->reloadProjectTasks();
+        foreach (static::api()->getProjectTasks() as $task){
             $this->checkProjectTaskSegments($task);
         }
-        $this->api()->setTask($project);
+        static::api()->setTask($project);
     }
     
     /***
@@ -131,28 +105,18 @@ class ProjectTaskTest extends editor_Test_JsonTest {
     private function checkProjectTaskSegments(stdClass $task){
 
         //set internal current task for further processing
-        $this->api()->setTask($task);
+        static::api()->setTask($task);
 
         error_log('Segments check for task ['.$task->taskName.']');
         //open the task for editing. This is the only way to load the segments via the api
-        $this->api()->setTaskToEdit($task->id);
+        static::api()->setTaskToEdit($task->id);
 
         $fileName = str_replace(['/','::'],'_',$task->taskName.'.json');
-        $segments = self::$api->getSegments($fileName);
+        $segments = static::api()->getSegments($fileName);
         // compare segments (this API will strip/adjust segment contents)
         $this->assertSegmentsEqualsJsonFile($fileName, $segments, 'Imported segments are not as expected in '.basename($fileName).'!');
 
         // close the task for editing
-        $this->api()->setTaskToOpen($task->id);
-    }
-
-    public static function tearDownAfterClass(): void {
-        
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
-        //remove the created resources
-        self::$api->removeResources();
-        //remove the temp customer
-        self::$api->delete('editor/customer/'.self::$customerTest->id);
+        static::api()->setTaskToOpen($task->id);
     }
 }

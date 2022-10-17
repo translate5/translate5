@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Task\Import\FileParser\FileParserHelper;
 
@@ -251,6 +252,12 @@ class editor_Models_Import_Worker_Import {
             // add the relais field when there are no files but only resources for pre-translation
             $this->segmentFieldManager->addField($this->segmentFieldManager::LABEL_RELAIS, editor_Models_SegmentField::TYPE_RELAIS, false);
 
+            // If the auto-queue config is set, queue the pivot worker
+            if($this->task->getConfig()->runtimeOptions->import->autoStartPivotTranslations){
+                /** @var PivotQueuer $worker */
+                $worker = ZfExtended_Factory::get(PivotQueuer::class);
+                $worker->queuePivotWorker($this->task->getTaskGuid());
+            }
         }else{
             // log the missing relais files if no pivot associations are found
             $this->filelist->getRelaisFolderTree()->logMissingFile();

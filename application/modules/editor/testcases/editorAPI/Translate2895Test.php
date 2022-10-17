@@ -30,17 +30,12 @@ END LICENSE AND COPYRIGHT
  * Testcase for TRANSLATE-2895 tests the boundary / framing tag removing in the XLF import
  * For details see the issue.
  */
-class Translate2895Test extends ZfExtended_Test_Testcase {
+class Translate2895Test extends \editor_Test_UnitTest {
 
     private static editor_Models_Import_FileParser_XmlParser $xmlParser;
 
     public static function setUpBeforeClass(): void
     {
-        require_once 'editor/Models/Import/FileParser/Tag.php';
-        require_once 'editor/Models/Import/FileParser/XmlParser.php';
-        require_once 'editor/Models/Import/FileParser/Xlf/SurroundingTagRemover/None.php';
-        require_once 'editor/Models/Import/FileParser/Xlf/SurroundingTagRemover/Paired.php';
-        require_once 'editor/Models/Import/FileParser/Xlf/SurroundingTagRemover/All.php';
         self::$xmlParser = new editor_Models_Import_FileParser_XmlParser();
     }
 
@@ -136,7 +131,7 @@ class Translate2895Test extends ZfExtended_Test_Testcase {
      * @param string $end
      * @param string|null $middleTarget defaults to middleSource but can be given to test different tags between source and target
      */
-    protected function _testContent(
+    private function _testContent(
         editor_Models_Import_FileParser_Xlf_SurroundingTagRemover_Abstract $remover,
         string $start,
         string $middleSource,
@@ -158,7 +153,7 @@ class Translate2895Test extends ZfExtended_Test_Testcase {
         }, $remover->sliceTags($sourceChunks))), 'trimmed content is not as expected: '.$source);
     }
 
-    protected function prepareContent(string $text): array {
+    private function prepareContent(string $text): array {
         $chunks = preg_split('#(</?[^>]+>)#i', $text, flags: PREG_SPLIT_DELIM_CAPTURE);
         $partner = [];
         //loop over all chunks and convert tags to tag objects as needed in the Removers

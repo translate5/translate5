@@ -1,3 +1,4 @@
 # exclude private plugin symlinks from beeing comitted (obfuscated here by wildcard)
 /S?????o
 /MittagQI
+/PrivateTests

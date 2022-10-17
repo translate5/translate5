@@ -26,31 +26,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Checks if mrk segmentation errors and missing tag ids surround sub tags are stopping the import
  */
-class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
+class XlfImportFailTest extends editor_Test_ImportTest {
 
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de', -1, 'ibm-opentm2-fail3.xlf')
+            ->setNotToFailOnError();
     }
-    
-    public function testImportMissingTagId() {
-        $taskConfig = [
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        ];
-        self::$api->addImportFile(self::$api->getFile('ibm-opentm2-fail3.xlf'), 'application/xml');
-        $this->assertFalse(self::$api->import($taskConfig, false), 'XLF with sub tags in tags without IDs did not produce a task state error!');
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id);
+
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    public function testImportMissingTagId()
+    {
+        $taskState =  static::getTask()->reload(static::api())->getTaskState();
+        static::assertEquals('error', $taskState);
     }
 }

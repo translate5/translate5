@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Change Log
 
 All notable changes to translate5 will be documented here.
@@ -15,6 +14,47 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+## [5.7.12] - 2022-10-11
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3067](https://jira.translate5.net/browse/TRANSLATE-3067): LanguageResources - Export glossary** <br>
+Export of a DeepL glossary in language resources overview.
+
+**[TRANSLATE-3016](https://jira.translate5.net/browse/TRANSLATE-3016): Configuration, Editor general, TermTagger integration - Show and use only terms of a certain process level in the editor** <br>
+UPDATE: the defined term process status list will also be applied when creating new deepl glossary
+Only the terms with a defined process status are used for term tagging and listed in the editor term-portlet. The configuration is runtimeOptions.termTagger.usedTermProcessStatus. 
+
+**[TRANSLATE-2561](https://jira.translate5.net/browse/TRANSLATE-2561): Repetition editor - Enhancement of repetition editor** <br>
+Added two new configs for automatic repetitions processing: "Repetition type" -radio buttons (source, target, source and target, source or target) and "Same content only"-checkbox
+
+
+### Changed
+**[TRANSLATE-3071](https://jira.translate5.net/browse/TRANSLATE-3071): Import/Export - Enable XLF namespace registration from plug-ins** <br>
+Plug-ins can now register custom XLIFF namespace handlers to enable import of proprietary XLIFF dialects.
+
+**[TRANSLATE-3066](https://jira.translate5.net/browse/TRANSLATE-3066): TBX-Import - Trim leading/trailing whitespaces from terms on import** <br>
+leading/trailing whitespaces are now trimmed from terms on import
+
+
+### Bugfixes
+**[TRANSLATE-3068](https://jira.translate5.net/browse/TRANSLATE-3068): MatchAnalysis & Pretranslation - Fix repetition behaviour in pre-translation with MT only** <br>
+On pre-translations with MTs only, repeated segments may get the wrong tags and produce therefore tag errors, especially a problem for instant translating files.
+
+**[TRANSLATE-3049](https://jira.translate5.net/browse/TRANSLATE-3049): SpellCheck (LanguageTool integration) - Empty segments are send to SpellCheck on import** <br>
+Empty segments are not sent for spellchecking to LanguageTool anymore
+
+**[TRANSLATE-3044](https://jira.translate5.net/browse/TRANSLATE-3044): TermTagger integration - Cache terminology data on RecalcTransFound** <br>
+Translation status assignment rewritten for terms tagged by TermTagger
+
+**[TRANSLATE-283](https://jira.translate5.net/browse/TRANSLATE-283): Editor general - XSS Protection in translate5** <br>
+ENHANCEMENT: Added general protection against CrossSiteScripting/XSS attacks
 
 
 ## [5.7.11] - 2022-09-22

@@ -39,6 +39,12 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     const RELATIVE_TEST_DIR = self::RELATIVE_TEST_ROOT . 'editorAPI/';
 
     /**
+     * @var bool
+     * Enables the -m option to let the current tests to be run a s master-tests
+     */
+    protected static bool $canMimicMasterTest = true;
+
+    /**
      * General Options of all test-commands
      */
     protected function configure()
@@ -66,6 +72,14 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             'f',
             InputOption::VALUE_NONE,
             'Leads to the testsuite stopping on the first failure (not error!).');
+
+        if(static::$canMimicMasterTest){
+            $this->addOption(
+                'master-test',
+                'm',
+                InputOption::VALUE_NONE,
+                'Leads to the testsuite running in master mode. Be aware that this might create costs for using paid external APIs.');
+        }
     }
 
     /**
@@ -152,6 +166,10 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             putenv('KEEP_DATA=1');
         }
 
+        if (static::$canMimicMasterTest && $this->input->getOption('master-test')) {
+            putenv('MASTER_TEST=1');
+        }
+
         // command options usable for all tests
         if ($this->input->getOption('stop-on-error')) {
             $stopOnError = '--stop-on-error';
@@ -199,7 +217,6 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         // start PHPUnit with neccessary options
         $command = new \PHPUnit\TextUI\Command();
         $command->run($assembly);
-        $this->io->success('Last test result stored in ' . self::RELATIVE_TEST_ROOT . 'last-test-result.txt');
     }
 
     /**
@@ -395,7 +412,9 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function reInitDataDirectory(string $dataDirectory): void
     {
-        $info = $this->fetchOwnerAndGroup('data'); // we take the owner and group of the /data dir as a reference
+        if(PHP_OS_FAMILY != 'Windows'){
+            $info = $this->fetchOwnerAndGroup('data'); // we take the owner and group of the /data dir as a reference, default is www-data for cases, where that dir is missing
+        }
         if (!is_dir($dataDirectory)) {
             mkdir($dataDirectory, 0777, true);
             if (PHP_OS_FAMILY != 'Windows') { // TODO FIXME: on windows this may lead to an unusable installation if called with elevated rights

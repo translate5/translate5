@@ -26,59 +26,36 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Testcase for TRANSLATE-1440 xlf tag numbering mismatch between source and target
  */
 class Translate1440Test extends editor_Test_JsonTest {
-    
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $task = array(
-            'sourceLang' => 'de',
-            'targetLang' => 'fr',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-        
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
-        $tests = array(
-            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-        );
-        self::$api->testConfig($tests);
-        
-        $zipfile = $api->zipTestFiles('testfiles/','XLF-test.zip');
-        
-        $api->addImportFile($zipfile);
-        $api->import($task);
-        
-        $api->addUser('testlector');
-        
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
-        
-        $task = $api->getTask();
-        //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.xlf.preserveWhitespace' => 0
+    ];
+
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('de', 'fr')
+            ->addUploadFolder('testfiles')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      */
     public function testSegmentValuesAfterImport() {
         $jsonFileName = 'expectedSegments.json';
-        $segments = self::$api->getSegments($jsonFileName, 10);
+        $segments = static::api()->getSegments($jsonFileName, 10);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
-    }
-    
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }
