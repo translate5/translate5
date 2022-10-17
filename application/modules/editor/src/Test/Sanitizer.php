@@ -41,8 +41,8 @@ final class Sanitizer
 
     /**
      * Sanitizes a segment's field text, especially the internal tags need to be sanitized
-     * @param string $text
-     * @return string
+     * @param string|null $text
+     * @return string|null
      */
     public static function fieldtext(?string $text): ?string
     {
@@ -50,10 +50,26 @@ final class Sanitizer
             return $text;
         }
         // return attributes from segment-tags that must not be compared as they contain e.g. DB-ids
-        $text = preg_replace_callback('~<([a-z]+[0-9]*)[^>]*>~', 'MittagQI\Translate5\Test\Sanitizer::_sanitizeFieldTags', $text);
-        // replace IDs of OKAPI that represent tag-agglomorations, they are represented with e.g. [#$dp65]
+        return preg_replace_callback('~<([a-z]+[0-9]*)[^>]*>~', 'MittagQI\Translate5\Test\Sanitizer::_sanitizeFieldtext', $text);
+    }
+
+    /**
+     * Special sanitization for cases, where OKAPI replaces sequences of tags with a special "agglomeration" tag like <bpt id="1">[#$dp9]</bpt>
+     * This is only needed for HTML-Imports
+     * @param string|null $text
+     * @return string|null
+     */
+    public static function okapifieldtext(?string $text): ?string
+    {
+        if (empty($text)) {
+            return $text;
+        }
+        // return attributes from segment-tags that must not be compared as they contain e.g. DB-ids
+        $text = preg_replace_callback('~<([a-z]+[0-9]*)[^>]*>~', 'MittagQI\Translate5\Test\Sanitizer::_sanitizeOkapiFieldtext', $text);
+        // replace IDs of OKAPI that represent tag-agglomerations, they are represented with e.g. [#$dp65]
         return preg_replace('~\[#\$dp[0-9]+\]~', '[#$dpXX]', $text);
     }
+
 
     /**
      * Sanitizes a segment's comment
@@ -112,11 +128,31 @@ final class Sanitizer
     }
 
     /**
+     * Callback handler for normal field text
+     * @param $matches
+     * @return string
+     */
+    protected static function _sanitizeFieldtext($matches): string
+    {
+        return static::_sanitizeFieldTags($matches, false);
+    }
+
+    /**
+     * Callback handler for special okapi field text
+     * @param $matches
+     * @return string
+     */
+    protected static function _sanitizeOkapiFieldtext($matches): string
+    {
+        return static::_sanitizeFieldTags($matches, true);
+    }
+
+    /**
      * Removes id's and other attributes from segment-tags that cannot be compared
      * @param array $matches
      * @return string
      */
-    protected static function _sanitizeFieldTags($matches): string
+    private static function _sanitizeFieldTags($matches, bool $removeCssPayload): string
     {
         if (count($matches) > 1) {
             $isSingle = (substr(trim(rtrim($matches[0], '>')), -1) == '/');
@@ -129,7 +165,7 @@ final class Sanitizer
             }
             // remove the crazy "content encoded as css-class" as these contents may contain OKAPI-specific ids
             //open 6270742069643d2231223e5b2324647031305d3c2f627074 internal-tag ownttip (the first tag can be open|close|single
-            if ($tag->hasClass('internal-tag')) {
+            if ($removeCssPayload && $tag->hasClass('internal-tag')) {
                 $classes = explode(' ', $tag->getClasses()); // the order is kept in the tag-parser
                 if (count($classes) > 3 && $classes[2] === 'internal-tag' && $classes[3] === 'ownttip' && ($classes[0] === 'open' || $classes[0] === 'close' || $classes[0] === 'single')) {
                     $tag->setClasses($classes[0] . ' internal-tag ownttip');
