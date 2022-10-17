@@ -215,9 +215,10 @@ final class editor_Segment_Quality_Manager {
      */
     public function prepareOperation(string $processingMode, editor_Models_Task $task, int $parentWorkerId, array $workerParams=[]){
         if(self::ACTIVE) {
+            $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
             foreach ($this->registry as $type => $provider) {
                 /* @var $provider editor_Segment_Quality_Provider */
-                if ($provider->hasOperationWorker($processingMode)) {
+                if ($provider->hasOperationWorker($processingMode, $qualityConfig)) {
                     $provider->addWorker($task, $parentWorkerId, $processingMode, $workerParams);
                 }
             }
@@ -249,7 +250,7 @@ final class editor_Segment_Quality_Manager {
                 // process all quality providers that do not have an import worker
                 foreach ($this->registry as $type => $provider) {
                     /* @var $provider editor_Segment_Quality_Provider */
-                    if (!$provider->hasOperationWorker($processingMode)) {
+                    if (!$provider->hasOperationWorker($processingMode, $qualityConfig)) {
                         $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
                     }
                 }
@@ -264,7 +265,7 @@ final class editor_Segment_Quality_Manager {
             // post actions: poet-processing (needed for quality-workers that need to centextualize all segments) or finalization for qualities with operation workers
             foreach ($this->registry as $type => $provider) {
                 /* @var $provider editor_Segment_Quality_Provider */
-                if ($provider->hasOperationWorker($processingMode)) {
+                if ($provider->hasOperationWorker($processingMode, $qualityConfig)) {
                     $provider->finalizeOperation($task, $processingMode);
                 } else {
                     // Append qualities, that can be detected only after all segments are created

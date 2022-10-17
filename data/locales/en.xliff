@@ -1360,7 +1360,7 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="WmllbHNwcmFjaGUgZGVzIFByb2pla3RlcyAoQW5nYWJlIG5vdHdlbmRpZyk="><source>Zielsprache des Projektes (Angabe notwendig)</source><target>Target language of the task (required)</target></trans-unit>
 <trans-unit id="WmllbHNwcmFjaGXCuQ=="><source>Zielsprache¹</source><target>Target language¹</target></trans-unit>
 <trans-unit id="UmVsYWlzc3ByYWNoZSAoQW5nYWJlIG5vdHdlbmRpZyBzb2Zlcm4gUmVsYWlzZGF0ZW4gdm9yaGFuZGVuKQ=="><source>Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)</source><target>Pivot language (required if pivot data is available)</target></trans-unit>
-<trans-unit id="UmVsYWlzc3ByYWNoZQ=="><source>Relaissprache</source><target>Pivot language</target></trans-unit>
+<trans-unit id='UGl2b3RzcHJhY2hl'><source>Pivotsprache</source><target>Pivot language</target></trans-unit>
 <trans-unit id="TGllZmVyZGF0dW0="><source>Lieferdatum</source><target>Delivery date</target></trans-unit>
 <trans-unit id="wrkgRGllc2UgQW5nYWJlbiAvIERhdGVuIHdlcmRlbiBmw7xyIGRlbiBJbXBvcnQgendpbmdlbmQgYmVuw7Z0aWd0Lg=="><source>¹ Diese Angaben / Daten werden für den Import zwingend benötigt.</source><target>¹ This information / data is mandatory for the import needs.</target></trans-unit>
 <trans-unit id="RmVobGVyIGJlaW0gSW1wb3J0IQ=="><source>Fehler beim Import!</source><target>Import Error!</target></trans-unit>

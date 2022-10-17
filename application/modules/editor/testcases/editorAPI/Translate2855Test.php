@@ -56,6 +56,13 @@ class Translate2855Test extends editor_Test_JsonTest {
         self::assertNeededUsers(); // last authed user is testmanager
         self::assertLogin('testmanager');
 
+
+        // pivot worker auto-start feature must be disabled for this test
+        $tests = [
+            'runtimeOptions.import.autoStartPivotTranslations' => 0,
+        ];
+        self::$api->testConfig($tests);
+
         // add customer
         self::$customerTest = self::$api->postJson('editor/customer/',[
             'name' => 'API Testing::Pivot pre-translation',
