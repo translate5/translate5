@@ -46,15 +46,15 @@ class SessionApiTest extends editor_Test_ImportTest {
         $response = static::api()->post('editor/session');
         
         $this->assertEquals(422, $response->getStatus());
-        $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."},{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
+        $this->assertStringContainsString('"errors":[{"id":"login","msg":"No login given."},{"id":"passwd","msg":"No password given."}]', $response->getBody());
         
         $response = static::api()->post('editor/session', ['login' => 'givenLogin']);
         $this->assertEquals(422, $response->getStatus());
-        $this->assertEquals('{"errors":[{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
+        $this->assertStringContainsString('"errors":[{"id":"passwd","msg":"No password given."}]', $response->getBody());
         
         $response = static::api()->post('editor/session', ['passwd' => 'givenPasswd']);
         $this->assertEquals(422, $response->getStatus());
-        $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."}],"message":"NOT OK","success":false}', $response->getBody());
+        $this->assertStringContainsString('"errors":[{"id":"login","msg":"No login given."}]', $response->getBody());
     }
     
     /**
