@@ -26,66 +26,36 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /***
  * This will create a task, resource and customer and assign the resource by default as pivot resource.
  * Based on runtimeOptions.import.autoStartPivotTranslations , the pivot pre-translation will be auto queue
  */
 class Translate3077Test extends editor_Test_JsonTest
 {
-    protected static stdClass $customerTest;
+    protected static array $requiredPlugins = [
+        'editor_Plugins_DeepL_Init'
+    ];
+    
+    protected static bool $setupOwnCustomer = true;
 
-    public static function setUpBeforeClass(): void
+    protected static string $setupUserLogin = 'testlector';
+
+    protected static function setupImport(Config $config): void
     {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
-        $appState = self::assertAppState();
-        if(!in_array('editor_Plugins_DeepL_Init', $appState->pluginsLoaded)) {
-            self::markTestSkipped('DeepL-Plugin must be activated for this test case, which is not the case!');
-            return;
-        }
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-
-        self::$customerTest = self::$api->postJson('editor/customer/',[
-            'name'=>'API Testing::Pivot pre-translation auto queue',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer', true),
-        ]);
-
-        $task = [
-            'sourceLang' => 'de',
-            'targetLang' => 'en',
-            'relaisLang' => 'it',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-            'customerId' => self::$customerTest->id,
-            'autoStartImport' => 1
-        ];
-
-        self::$api->addResource([
-            'name' => __CLASS__ .'::Pivot pre-translation auto queue',
-            'sourceLang' => $task['sourceLang'],
-            'targetLang' => 'it',
-            'customerIds' => [$task['customerId']],
-            'resourceId'=>'editor_Plugins_DeepL_1',
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'customerPivotAsDefaultIds' => [$task['customerId']],
-            'serviceType' => 'editor_Plugins_DeepL',
-            'serviceName'=> 'DeepL'
-        ]);
-
-        $api->addImportFile($api->zipTestFiles('testfiles/','testTask.zip'));
-        $api->import($task, false, true);
-
-        $api->addUser('testlector');
-
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
-
-        $task = $api->getTask();
-        //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+        $sourceLangRfc = 'de';
+        $targetLangRfc = 'en';
+        $relaisLangRfc = 'it';
+        $customerId = static::getTestCustomerId();
+        $config
+            ->addLanguageResource('deepl', null, $customerId, $sourceLangRfc, $relaisLangRfc)
+            ->addProperty('customerPivotAsDefaultIds', [ $customerId ]);
+        $config
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
+            ->addUploadFolder('testfiles')
+            ->addProperty('relaisLang', $relaisLangRfc)
+            ->setToEditAfterImport();
     }
 
     /***
@@ -101,14 +71,5 @@ class Translate3077Test extends editor_Test_JsonTest
             static::assertNotEmpty($segment->relais,'The pivot field for the segment is empty');
         }
 
-    }
-
-    public static function tearDownAfterClass(): void
-    {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id,'testmanager');
-        self::$api->removeResources();
-        //remove the temp customer
-        self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
 }
