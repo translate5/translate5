@@ -65,7 +65,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         targetLangTip: '#UT#Zielsprache des Projektes (Angabe notwendig)',
         targetLangLabel: '#UT#Zielsprache¹',
         relaisLangTip: '#UT#Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)',
-        relaisLangLabel: '#UT#Relaissprache',
+        relaisLangLabel: '#UT#Pivotsprache',
         numberFieldLabel: '#UT#Anzahl Wörter',
         orderdate: '#UT#Bestelldatum',
         fullMatchLabel: '#UT#Unveränderte 100% TM Matches sind editierbar',
@@ -264,6 +264,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     xtype: 'hiddenfield',
                                     name:'autoStartImport',
                                     value: 0
+                                },{
+                                    xtype: 'hiddenfield',
+                                    name: 'importWizardUsed',
+                                    value: 1
                                 }]
                             }]
                         

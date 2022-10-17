@@ -517,6 +517,26 @@ If you did not send the request yourself, please inform us of this.
                 <source>{LinkConsortium}</source>
                 <target>https://www.translate5.net/en/consortium</target>
             </trans-unit>
+            <trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
+                <source>{ResourcesYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/GBH65tZXXvg</target>
+            </trans-unit>
+            <trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
+                <source>{ResourcesYoutubeVideoGuideDescriptionContent}</source>
+                <target><br/>
+                <figure>
+                    <figcaption><b>Overview:</b></figcaption>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/GBH65tZXXvg?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/GBH65tZXXvg?start=18&amp;autoplay=1" dir="auto">0:18</a> Language resource management<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/GBH65tZXXvg?start=41&amp;autoplay=1" dir="auto">0:41</a> Add language resource<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/GBH65tZXXvg?start=134&amp;autoplay=1" dir="auto">2:14</a> Assigned tasks<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/GBH65tZXXvg?start=153&amp;autoplay=1" dir="auto">2:33</a> Reimport tasks<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/GBH65tZXXvg?start=208&amp;autoplay=1" dir="auto">2:48</a> Release workflow<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/GBH65tZXXvg?start=223&amp;autoplay=1" dir="auto">3:43</a> Language resource in the project window<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/GBH65tZXXvg?start=237&amp;autoplay=1" dir="auto">3:57</a> Contact information<br/>
+                </figure>
+                </target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

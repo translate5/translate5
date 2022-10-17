@@ -1082,6 +1082,26 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
                 <source>{LinkConsortium}</source>
                 <target>https://www.translate5.net/das-konsortium</target>
             </trans-unit>
+            <trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
+                <source>{ResourcesYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/fgSm2Ygw0uk</target>
+            </trans-unit>
+            <trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
+                <source>{ResourcesYoutubeVideoGuideDescriptionContent}</source>
+                <target><br/>
+                <figure>
+                    <figcaption><b>Übersicht:</b></figcaption>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=15&amp;autoplay=1" dir="auto">0:15</a> Sprachressourcenverwaltung<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=37&amp;autoplay=1" dir="auto">0:37</a> Sprachressource hinzufügen<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=127&amp;autoplay=1" dir="auto">2:07</a> Zugewiesene Aufgaben<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=146&amp;autoplay=1" dir="auto">2:26</a> Aufgaben reimportieren<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=200&amp;autoplay=1" dir="auto">2:40</a> Freigabeworkflow<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=212&amp;autoplay=1" dir="auto">3:32</a> Sprachressourcen im Projektfenster<br/>
+                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
+                </figure>
+                </target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

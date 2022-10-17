@@ -45,6 +45,11 @@ class Translate2855Test extends editor_Test_JsonTest {
         'editor_Plugins_MatchAnalysis_Init',
         'editor_Plugins_ZDemoMT_Init'
     ];
+    
+    protected static array $requiredRuntimeOptions = [
+        // pivot worker auto-start feature must be disabled for this test
+        'import.autoStartPivotTranslations' => 0,
+    ];
 
     protected static bool $setupOwnCustomer = true;
 
