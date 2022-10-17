@@ -26,87 +26,48 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * This will import 2 tasks, and it will test the functionality if the user is able to open 2 different task at the same time.
  */
 class Translate198Test extends editor_Test_JsonTest {
-    /* @var $this Translate198Test */
-    
-    /***
-     * Currently imported task ids
-     * @var array
-     */
-    protected static $sourceLangRfc = 'de';
-    protected static $targetLangRfc = 'en';
-    
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
+
+    protected static bool $setupOwnCustomer = true;
+
+    protected static function setupImport(Config $config): void
+    {
+        $customerId = static::$ownCustomer->id;
+        $config->addTask('de', 'en', $customerId, 'task1-de-en.xlf');
+        $config->addTask('de', 'en', $customerId, 'task2-de-en.xlf');
     }
 
     /**
      * imports two tasks
      */
     public function testTasks() {
-        $testCustomer = self::$api->postJson('editor/customer/',[
-            'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer'),
-        ]);
 
-        $task1 = $this->createTask('task1', $testCustomer->id);
-        $task2 = $this->createTask('task2', $testCustomer->id);
+        $task1 = static::getTaskAt(0)->getAsObject();
+        $task2 = static::getTaskAt(1)->getAsObject();
 
         //open task for editing. This should not produce any error
-        $result = self::$api->setTaskToEdit($task1->id);
-        self::assertObjectNotHasAttribute('error',$result, (property_exists($result, 'error') ? $result->error : ''));
-        $this->api()->setTask($task1);
+        $result = static::api()->setTaskToEdit($task1->id);
+        self::assertObjectNotHasAttribute('error', $result, (property_exists($result, 'error') ? $result->error : ''));
+        static::api()->setTask($task1);
 
         $jsonFileName = 'segments-task1.json';
-        $segments = self::$api->getSegments($jsonFileName);
+        $segments = static::api()->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments);
 
         self::assertCount(1, $segments);
 
         //open the secound task with the same user. This should not be posible
-        $result = self::$api->setTaskToEdit($task2->id);
-        self::assertObjectNotHasAttribute('error',$result, (property_exists($result, 'error') ? $result->error : ''));
-        $this->api()->setTask($task2);
-
+        $result = static::api()->setTaskToEdit($task2->id);
+        self::assertObjectNotHasAttribute('error', $result, (property_exists($result, 'error') ? $result->error : ''));
+        static::api()->setTask($task2);
 
         $jsonFileName = 'segments-task2.json';
-        $segments = self::$api->getSegments($jsonFileName);
+        $segments = static::api()->getSegments($jsonFileName);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments);
-
-        //open tasks for whole testcase
-        self::$api->login('testmanager');
-
-        // remove the 2 tasks
-        self::$api->deleteTask($task1->id);
-        self::$api->deleteTask($task2->id);
-
-        //remove the temp customer
-        self::$api->delete('editor/customer/'.$testCustomer->id);
-    }
-
-    /**
-     * Create the task. The task will not be imported directly autoStartImport is 0
-     * TODO FIXME: why don't we use the API-functions completely ?
-     * @param string $taskName
-     * @return stdClass
-     */
-    private function createTask(string $taskName, int $customerId){
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__.'_'.$taskName, 
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId' => $customerId,
-            'autoStartImport' => 0
-        ];
-        self::$api->addImportFile(self::$api->getFile($taskName.'-de-en.xlf'));
-        self::$api->import($task, false, false);
-        self::$api->getJson('editor/task/'.self::$api->getTask()->id.'/import');
-        self::$api->checkTaskStateLoop();
-        return self::$api->getTask();
     }
 }

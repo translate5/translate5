@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Filter;
+
 /**
  * Testcase for 'TRANSLATE-2537: AutoQA: Check inconsistent translations'
  */
@@ -34,44 +37,20 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
     /**
      * @var array
      */
-    public static $segments = [];
+    private static $segments = [];
 
-    /**
-     * @throws Zend_Exception
-     */
-    public static function setUpBeforeClass(): void {
+    protected static string $setupUserLogin = 'testlector';
 
-        // Prepare api instance
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
+    protected static function setupImport(Config $config): void
+    {
+        $config->addTask('en', 'de')
+            ->addUploadFile('testfiles/TRANSLATE-2537-en-de.xlf')
+            ->setToEditAfterImport();
+    }
 
-        // Check app state
-        $appState = self::assertAppState();
-
-        // Last authed user is testmanager
-        self::assertNeededUsers();
-        self::assertLogin('testmanager');
-
-        // Import xlf-file
-        $api->addImportFile($api->getFile('testfiles/TRANSLATE-2537-en-de.xlf'));
-        $api->import([
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        ]);
-
-        // Login in setUpBeforeClass means using this user in whole testcase!
-        self::$api->addUser('testlector');
-        self::$api->login('testlector');
-
-        // Get task
-        $task = self::$api->getTask();
-
-        // Open task for whole testcase
-        $api->setTaskToEdit($task->id);
-
-        // Get segments and check their quantity
-        static::$segments = $api->getSegments(null, 29);
+    public static function beforeTests(): void {
+        // Get segments needed for the test and check their quantity
+        static::$segments = static::api()->getSegments(null, 29);
         static::assertEquals(count(static::$segments), 29, 'Not enough segments in the imported task');
     }
 
@@ -81,17 +60,9 @@ class QualityConsistencyTest extends editor_Test_JsonTest {
     public function testSegmentQualities(){
         foreach ([3, 4, 5, 6, 9, 10] as $idx) {
             $fileName = 'expectedSegmentQualities-' . $idx . '.json';
-            $qualities = self::$api->getJson('/editor/quality/segment?segmentId=' . static::$segments[$idx]->id, [], $fileName);
-            $qualityFilter = editor_Test_Model_Filter::createSingle('type', 'consistent');
+            $qualities = static::api()->getJson('/editor/quality/segment?segmentId=' . static::$segments[$idx]->id, [], $fileName);
+            $qualityFilter = Filter::createSingle('type', 'consistent');
             $this->assertModelsEqualsJsonFile('SegmentQuality', $fileName, $qualities, 'File '.$fileName.', Segment target: "'.static::$segments[$idx]->target.'"', $qualityFilter);
         }
-    }
-
-    /**
-     * Cleanup
-     */
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

@@ -1,184 +1,775 @@
 <?xml version="1.0" ?>
 <xliff version='1.1' xmlns='urn:oasis:names:tc:xliff:document:1.1'>
-<!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
-<!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
- <file original='php-sourcecode' source-language='ha' target-language='de' datatype='php' xml:space='preserve'>
-  <body><trans-unit id='RGV1dHNjaA=='><source>Deutsch</source><target>Deutsch</target></trans-unit>
-<trans-unit id='RW5nbGlzY2g='><source>Englisch</source><target>Englisch</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0CiAgICBmw7xyIGRlbiBCcm93c2Vy'><source>translate5 - Open-Source-Lektorat für den Browser</source><target>translate5 - Open-Source-Lektorat für den Browser</target></trans-unit>
-<trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>Mit translate5 können Sie SDLXLIFF-, openTM2-XLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBiaWV0ZXQgbW9kZXJuc3RlcyBkZXNrdG9wYXJ0aWdlcyBBcmJlaXRlbiBpbSBCcm93c2VyIG1pdCB2aWVsZW4gaW50ZXJlc3NhbnRlbiwgdGVpbHdlaXNlIGVpbnppZ2FydGlnZW4gRmVhdHVyZXMu'><source>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</source><target>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBpc3QgT3BlbiBTb3VyY2UgdW5kIGRhbWl0IGtvc3Rlbmxvc2UgU29mdHdhcmUu'><source>translate5 ist Open Source und damit kostenlose Software.</source><target>translate5 ist Open Source und damit kostenlose Software.</target></trans-unit>
-<trans-unit id='PHN0cm9uZz48YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS90cmFuc2xhdGU1L2ZlYXR1cmVzLyIgdGFyZ2V0PSJfYmxhbmsiPkVpbmUgdW1mYXNzZW5kZSBGZWF0dXJlbGlzdGU8L2E+PC9zdHJvbmc+IHVuZCB3ZWl0ZXJlIEluZm9ybWF0aW9uZW4genUgdHJhbnNsYXRlNSBmaW5kZW4gU2llIGF1ZiA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS90cmFuc2xhdGU1LyIgdGFyZ2V0PSJfYmxhbmsiPnd3dy5taXR0YWdxaS5jb208L2E+Lg=='><source><strong><a href="http://www.mittagqi.com/translate5/features/" target="_blank">Eine umfassende Featureliste</a></strong> und weitere Informationen zu translate5 finden Sie auf <a href="http://www.mittagqi.com/translate5/" target="_blank">www.mittagqi.com</a>.</source><target><strong><a href="http://www.mittagqi.com/translate5/features/" target="_blank">Eine umfassende Featureliste</a></strong> und weitere Informationen zu translate5 finden Sie auf <a href="http://www.mittagqi.com/translate5/" target="_blank">www.mittagqi.com</a>.</target></trans-unit>
-<trans-unit id='RGVtb3ZlcnNpb24gc3RhcnRlbg=='><source>Demoversion starten</source><target>Demoversion starten</target></trans-unit>
-<trans-unit id='U3BvbnNlcmluZyB2b24gdHJhbnNsYXRlNQ=='><source>Sponsering von translate5</source><target>Sponsering von translate5</target></trans-unit>
-<trans-unit id='VW5zZXIgRGFuayBnZWh0IGFuOg=='><source>Unser Dank geht an:</source><target>Unser Dank geht an:</target></trans-unit>
-<trans-unit id='U2llIGVybcO2Z2xpY2hlbiBkaWVzZXMgUHJvamVrdCE='><source>Sie ermöglichen dieses Projekt!</source><target>Sie ermöglichen dieses Projekt!</target></trans-unit>
-<trans-unit id='SW5mb3MgenUgdHJhbnNsYXRlNSBhdWYgTWl0dGFnUUkuY29t'><source>Infos zu translate5 auf MittagQI.com</source><target>Infos zu translate5 auf MittagQI.com</target></trans-unit>
-<trans-unit id='RmVhdHVyZXM='><source>Features</source><target>Features</target></trans-unit>
-<trans-unit id='RW50d2lja2x1bmc='><source>Entwicklung</source><target>Entwicklung</target></trans-unit>
-<trans-unit id='Q29uc3VsdGluZyB1bmQgSW5zdGFsbGF0aW9uZW4='><source>Consulting und Installationen</source><target>Consulting und Installationen</target></trans-unit>
-<trans-unit id='SG9zdGluZw=='><source>Hosting</source><target>Hosting</target></trans-unit>
-<trans-unit id='VGVzdGRhdGVu'><source>Testdaten</source><target>Testdaten</target></trans-unit>
-<trans-unit id='RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgPGEgaHJlZj0iL2luZGV4L3Rlc3RkYXRhLyI+aGllciBUZXN0ZGF0ZW4gZG93bmxvYWRlbjwvYT4gdW5kIGFscyBuZXVlcyBQcm9qZWt0IGltcG9ydGllcmVuLg=='><source>Falls Sie keine Testdaten zur Hand haben, können Sie <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.</source><target>Falls Sie keine Testdaten zur Hand haben, können Sie <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBMb2dpbg=='><source>translate5 Login</source><target>translate5 Login</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRiZW51dHplciBmw7xyIHRyYW5zbGF0ZTU='><source>Standardbenutzer für translate5</source><target>Standardbenutzer für translate5</target></trans-unit>
-<trans-unit id='QWNodHVuZzogSW4gZGVyIHRyYW5zbGF0ZTUtRGVtb2luc3RhbGxhdGlvbiBzaW5kIGRpZXNlIFN0YW5kYXJkYmVudXR6ZXIgbmljaHQgZWRpdGllcmJhciAtIGFuZGVyZSBCZW51dHplciBoaW5nZWdlbiBzY2hvbi4='><source>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</source><target>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</target></trans-unit>
-<trans-unit id='QmVudXR6ZXJuYW1l'><source>Benutzername</source><target>Benutzername</target></trans-unit>
-<trans-unit id='UGFzc3dvcnQ='><source>Passwort</source><target>Passwort</target></trans-unit>
-<trans-unit id='TG9naW4='><source>Login</source><target>Login</target></trans-unit>
-<trans-unit id='RWlubG9nZ2Vu'><source>Einloggen</source><target>Einloggen</target></trans-unit>
-<trans-unit id='UGFzc3dvcnQgbmV1IHNldHplbg=='><source>Passwort neu setzen</source><target>Passwort neu setzen</target></trans-unit>
-<trans-unit id='VW5nw7xsdGlnZSBMb2dpbmRhdGVuITxici8+SGFiZW4gU2llIElociBQYXNzd29ydCB2ZXJnZXNzZW4gb2RlciBiaXNsYW5nIG5vY2gga2VpbiBQYXNzd29ydCBmw7xyIElocmVuIExvZ2luIGdlc2V0enQ/ICBTaWUga8O2bm5lbiBqZWRlcnplaXQgZWluZW4gbmV1ZW4gTGluayAlc2hpZXIlcyBhbmZvcmRlcm4u'><source>Ungültige Logindaten!<br/>Haben Sie Ihr Passwort vergessen oder bislang noch kein Passwort für Ihren Login gesetzt?  Sie können jederzeit einen neuen Link %shier%s anfordern.</source><target>Ungültige Logindaten!<br/>Haben Sie Ihr Passwort vergessen oder bislang noch kein Passwort für Ihren Login gesetzt?  Sie können jederzeit einen neuen Link %shier%s anfordern.</target></trans-unit>
-<trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'><source>Unterstützung der Entwicklung von translate5</source><target>Unterstützung der Entwicklung von translate5</target></trans-unit>
-<trans-unit id='VW5zZXIgZ3Jvw59lciBEYW5rIGdlaHQgYW4gZGllIGZvbGdlbmRlbiBVbnRlcm5laG1lbiB1bmQgT3JnYW5pc2F0aW9uZW4uIFNpZSBmaW5hbnppZXJlbiBkaWUgRmVhdHVyZXMsIGRpZSBzaWUgdm9uIHRyYW5zbGF0ZTUgZXJ3YXJ0ZW4u'><source>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</source><target>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</target></trans-unit>
-<trans-unit id='U2llIGVybcO2Z2xpY2hlbiBzbyBkaWVzZXMgUHJvamVrdCE='><source>Sie ermöglichen so dieses Projekt!</source><target>Sie ermöglichen so dieses Projekt!</target></trans-unit>
-<trans-unit id='VmllbGVuIERhbmsgZGFmw7xyIQ=='><source>Vielen Dank dafür!</source><target>Vielen Dank dafür!</target></trans-unit>
-<trans-unit id='SGF1cHR1bnRlcnN0w7x0emVyIHZvbiB0cmFuc2xhdGU1'><source>Hauptunterstützer von translate5</source><target>Hauptunterstützer von translate5</target></trans-unit>
-<trans-unit id='VW50ZXJzdMO8dHplciBhdXNnZXfDpGhsdGVyIEZlYXR1cmVz'><source>Unterstützer ausgewählter Features</source><target>Unterstützer ausgewählter Features</target></trans-unit>
-<trans-unit id='SW5mb3JtYXRpb25lbiB6dXIgQmVkaWVudW5n'><source>Informationen zur Bedienung</source><target>Informationen zur Bedienung</target></trans-unit>
-<trans-unit id='RGllc2UgdHJhbnNsYXRlNSBEZW1vdmVyc2lvbiBpc3Qgw7ZmZmVudGxpY2gsIGFsbGUgaG9jaGdlbGFkZW5lbiBQcm9qZWt0ZSBrw7ZubmVuIHZvbiBqZWRlbSBlaW5nZXNlaGVuIHVuZCBleHBvcnRpZXJ0IHdlcmRlbiE='><source>Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen und exportiert werden!</source><target>Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen und exportiert werden!</target></trans-unit>
-<trans-unit id='WmlwLURhdGVpIG1pdCBJbXBvcnQgRGF0ZW4='><source>Zip-Datei mit Import Daten</source><target>Zip-Datei mit Import Daten</target></trans-unit>
-<trans-unit id='cmV2aWV3OiBWZXJ6ZWljaG5pcyBtaXQgenUgbGVrdG9yaWVyZW5kZW4gRGF0ZWllbg=='><source>review: Verzeichnis mit zu lektorierenden Dateien</source><target>review: Verzeichnis mit zu lektorierenden Dateien</target></trans-unit>
-<trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicmV2aWV3IiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiB1bmQgLyBvZGVyIG9wZW5UTTItWExJRkYgdW5kIC8gb2RlciBDU1YtRGF0ZWllbiBpbiBlaW5lciBiZWxpZWJpZ2VuIFZlcnplaWNobmlzc3RydWt0dXIgYmVpbmhhbHRlbiBrYW5uLiBDU1YtLCBvcGVuVE0yLVhMSUZGLSB1bmQgU0RMWExJRkYtRGF0ZWllbiBrw7ZubmVuIGJlbGllYmlnIGdlbWlzY2h0IHdlcmRlbi4gRGllIFN0cnVrdHVyIHdpcmQgaW0gTGVrdG9yYXQgYWJnZWJpbGRldC4='><source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source><target>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</target></trans-unit>
-<trans-unit id='U3RydWt0dXIgdm9uIENTVi1EYXRlaWVuIChmYWxscyBhbHMgTGVrdG9yYXRzcXVlbGxlIHZlcndlbmRldCk='><source>Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)</source><target>Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)</target></trans-unit>
-<trans-unit id='Q1NWLURhdGVpZW4gbcO8c3NlbiBkcmVpIFNwYWx0ZW4gZW50aGFsdGVuLCBkZXJlbiBTcGFsdGVua8O2cGZlIG1pdCBkZW4gQmV6ZWljaG51bmdlbiAibWlkIiwgInF1ZWxsZSIsICJ6aWVsIiBnZWtlbm56ZWljaG5ldCBzaW5kLiBEaWVzZSBTcGFsdGVuIGvDtm5uZW4gaW4gYmVsaWViaWdlciBSZWloZW5mb2xnZSBpbiBkZXIgQ1NWLURhdGVpIGVudGhhbHRlbiBzZWluLiBXZWl0ZXJlIFNwYWx0ZW4gZGVyIENTVi1EYXRlaSB3ZXJkZW4gYmVpbSBJbXBvcnQgaWdub3JpZXJ0LiBTcGFsdGVudHJlbm5lciBkZXIgQ1NWIGlzdCBlaW4gS29tbWEgIiwiLCBUZXh0ZXJrZW5udW5nc3plaWNoZW4gZWluIGRvcHBlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gIiZhcG9zOyIuIFplaWxlbnRyZW5uZXIgZGVyIENTViBpc3QgZWluIExpbnV4LSwgTWFjLSBvZGVyIFdpbmRvd3N6ZWlsZW51bWJydWNoLiBDb2RpZXJ1bmcgZGVyIENTVi1EYXRlaSBrYW5uIHV0Zi04LCBpc28tODg1OS0xIG9kZXIgd2luZG93cy0xMjUxIHNlaW4uIERpZSBDU1YtRGF0ZWkgd2lyZCBpbiBkZXIgc2VsYmVuIENvZGllcnVuZyBleHBvcnRpZXJ0LCBpbiBkZXIgc2llIGJlaW0gSW1wb3J0IHZvcmxhZyAoQWNodHVuZzogQmVpIGVpbmVyIMOcYmVyc2V0enVuZyBpbiBOaWNodC1XZXN0ZXVyb3DDpGlzY2hlIFNwcmFjaGVuIHNvbGx0ZSBkYWhlciB1dGYtOCBiZXJlaXRzIGFscyBJbXBvcnRjb2RpZXJ1bmcgZ2V3w6RobHQgd2VyZGVuKS4='><source>CSV-Dateien müssen drei Spalten enthalten, deren Spaltenköpfe mit den Bezeichnungen "mid", "quelle", "ziel" gekennzeichnet sind. Diese Spalten können in beliebiger Reihenfolge in der CSV-Datei enthalten sein. Weitere Spalten der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma ",", Texterkennungszeichen ein doppeltes Anführungszeichen "&apos;". Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</source><target>CSV-Dateien müssen drei Spalten enthalten, deren Spaltenköpfe mit den Bezeichnungen "mid", "quelle", "ziel" gekennzeichnet sind. Diese Spalten können in beliebiger Reihenfolge in der CSV-Datei enthalten sein. Weitere Spalten der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma ",", Texterkennungszeichen ein doppeltes Anführungszeichen "&apos;". Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</target></trans-unit>
-<trans-unit id='VmVyemVpY2huaXNzdHJ1a3R1ciBiZWltIEV4cG9ydA=='><source>Verzeichnisstruktur beim Export</source><target>Verzeichnisstruktur beim Export</target></trans-unit>
-<trans-unit id='QmVpbSBFeHBvcnQgd2lyZCBkaWUgZ2xlaWNoZSBEYXRlaSB1bmQgVmVyemVpY2huaXNzdHJ1a3R1ciBpbiBGb3JtIGVpbmVyIFppcC1EYXRlaSB3aWVkZXIgYXVzZ2VzcGllbHQ='><source>Beim Export wird die gleiche Datei und Verzeichnisstruktur in Form einer Zip-Datei wieder ausgespielt</source><target>Beim Export wird die gleiche Datei und Verzeichnisstruktur in Form einer Zip-Datei wieder ausgespielt</target></trans-unit>
-<trans-unit id='VEJYLURhdGVpIHp1ciBBdXN6ZWljaG51bmcgdm9uIFRlcm1pbm9sb2dpZQ=='><source>TBX-Datei zur Auszeichnung von Terminologie</source><target>TBX-Datei zur Auszeichnung von Terminologie</target></trans-unit>
-<trans-unit id='RGllIFRCWC1EYXRlaSBrYW5uIGJlbGllYmlnIHZpZWxlIFNwcmFjaGVuIGVudGhhbHRlbi4gU2llIG11c3MgbWluZGVzdGVucyBkaWUgendlaSBTcHJhY2hlbiBlbnRoYWx0ZW4sIGRpZSBiZWltIEF1ZmdhYmVuaW1wb3J0IGFscyBRdWVsbC0gdW5kIFppZWxzcHJhY2hlbiBhdXNnZXfDpGhsdCB3ZXJkZW4uIERpZSBUQlggRGF0ZWkgZGFyZiBzaWNoIGluIGtlaW5lbSBVbnRlcnZlcnplaWNobmlzIGJlZmluZGVuLCBzb25zdCB3aXJkIFNpZSBuaWNodCBpbXBvcnRpZXJ0LiBCZWZpbmRlbiBzaWNoIG1laHJlcmUgVEJYIERhdGVpZW4gaW4gZGVyIFppcC1EYXRlaSwgc28gd2lyZCBuYWNoIGFscGhhYmV0aXNjaGVyIFNvcnRpZXJ1bmcgZGllIGVyc3RlIFRCWCBEYXRlaSB2ZXJ3ZW5kZXQu'><source>Die TBX-Datei kann beliebig viele Sprachen enthalten. Sie muss mindestens die zwei Sprachen enthalten, die beim Aufgabenimport als Quell- und Zielsprachen ausgewählt werden. Die TBX Datei darf sich in keinem Unterverzeichnis befinden, sonst wird Sie nicht importiert. Befinden sich mehrere TBX Dateien in der Zip-Datei, so wird nach alphabetischer Sortierung die erste TBX Datei verwendet.</source><target>Die TBX-Datei kann beliebig viele Sprachen enthalten. Sie muss mindestens die zwei Sprachen enthalten, die beim Aufgabenimport als Quell- und Zielsprachen ausgewählt werden. Die TBX Datei darf sich in keinem Unterverzeichnis befinden, sonst wird Sie nicht importiert. Befinden sich mehrere TBX Dateien in der Zip-Datei, so wird nach alphabetischer Sortierung die erste TBX Datei verwendet.</target></trans-unit>
-<trans-unit id='UmVsYWlzc3ByYWNoZSB6dXIgVmVyZsO8Z3VuZyBzdGVsbGVu'><source>Relaissprache zur Verfügung stellen</source><target>Relaissprache zur Verfügung stellen</target></trans-unit>
-<trans-unit id='VmVyc3RlaHQgZGVyIExla3RvciBkaWUgQXVzZ2FuZ3NzcHJhY2hlIG5pY2h0IGthbm4gaWhtIGVpbmUgUmVsYWlzc3ByYWNoZSB6dXIgVmVyZsO8Z3VuZyBnZXN0ZWxsdCB3ZXJkZW4sIGRpZSBlciB2ZXJzdGVodCAoei4gQi4gRW5nbGlzY2gpLiBEYXp1IG11c3MgZGFzIHp1IGxla3RvcmllcmVuZGUgRG9rdW1lbnQgc3RydWt0dXJnbGVpY2ggYWxzIEVuZ2xpc2Now7xiZXJzZXR6dW5nIHZvcmxpZWdlbi4gRGllc2VzIG9kZXIgZGllc2Ugc3RydWt0dXJnbGVpY2hlbiBEb2t1bWVudGUgd2VyZGVuIGltIG9wdGlvbmFsZW4gVmVyemVpY2huaXMgInJlbGFpcyIgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQuIERhYmVpIG11c3MgZGllIERhdGVpc3RydWt0dXIgaWRlbnRpc2NoIHp1IGRlbiBJbmhhbHRlbiBpbSAicmV2aWV3IiBWZXJ6ZWljaG5pcyBzZWluLg=='><source>Versteht der Lektor die Ausgangssprache nicht kann ihm eine Relaissprache zur Verfügung gestellt werden, die er versteht (z. B. Englisch). Dazu muss das zu lektorierende Dokument strukturgleich als Englischübersetzung vorliegen. Dieses oder diese strukturgleichen Dokumente werden im optionalen Verzeichnis "relais" zur Verfügung gestellt. Dabei muss die Dateistruktur identisch zu den Inhalten im "review" Verzeichnis sein.</source><target>Versteht der Lektor die Ausgangssprache nicht kann ihm eine Relaissprache zur Verfügung gestellt werden, die er versteht (z. B. Englisch). Dazu muss das zu lektorierende Dokument strukturgleich als Englischübersetzung vorliegen. Dieses oder diese strukturgleichen Dokumente werden im optionalen Verzeichnis "relais" zur Verfügung gestellt. Dabei muss die Dateistruktur identisch zu den Inhalten im "review" Verzeichnis sein.</target></trans-unit>
-<trans-unit id='UmVmZXJlbnpkYXRlaWVuIHp1ciBWZXJmw7xndW5nIHN0ZWxsZW4='><source>Referenzdateien zur Verfügung stellen</source><target>Referenzdateien zur Verfügung stellen</target></trans-unit>
-<trans-unit id='RGFzIG9wdGlvbmFsZSBWZXJ6ZWljaG5pcyAicmVmZXJlbmNlRmlsZXMiIGthbm4gZWluZSBiZWxpZWJpZ2UgRGF0ZWlzdHJ1a3R1ciBlbnRoYWx0ZW4sIHdlbGNoZSBhbHMgUmVmZXJlbnpkYXRlaWVuIGltcG9ydGllcnQgd2VyZGVuLg=='><source>Das optionale Verzeichnis "referenceFiles" kann eine beliebige Dateistruktur enthalten, welche als Referenzdateien importiert werden.</source><target>Das optionale Verzeichnis "referenceFiles" kann eine beliebige Dateistruktur enthalten, welche als Referenzdateien importiert werden.</target></trans-unit>
-<trans-unit id='WE1MLURhdGVpIHp1ciBLb25maWd1cmF0aW9uIGRlciBRTS1TdWJzZWdtZW50LUtyaXRlcmllbg=='><source>XML-Datei zur Konfiguration der QM-Subsegment-Kriterien</source><target>XML-Datei zur Konfiguration der QM-Subsegment-Kriterien</target></trans-unit>
-<trans-unit id='RGllIG9wdGlvbmFsZSBYTUwtRGF0ZWkgenVyIEtvbmZpZ3VyYXRpb24gZGVyIFFNLVN1YnNlZ21lbnQtS3JpdGVyaWVuIGJlc3RpbW10LCB3ZWxjaGUgUU0tU3Vic2VnbWVudCBGZWhsZXJrYXRlZ29yaWVuIHfDpGhyZW5kIGRlcyBMZWt0b3JhdHMgenVyIFZlcmbDvGd1bmcgc3RlaGVuLiBFaW5lIMO8YmVyZ2ViZW5lIERhdGVpIG11c3MgaW0gRm9ybWF0IGRlciBTdGFuZGFyZGRhdGVpIGVudHNwcmVjaGVuLCB3ZWxjaGUgJXNoaWVyIGFscyBCZXNwaWVsIGhlcnVudGVyZ2VsYWRlbiB3ZXJkZW4ga2FubiVzLiBXaXJkIGtlaW5lIERhdGVpIMO8YmVyZ2ViZW4sIHdpcmQgZGllIFN0YW5kYXJkLURhdGVpIHZlcndlbmRldC4g'><source>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche %shier als Bespiel heruntergeladen werden kann%s. Wird keine Datei übergeben, wird die Standard-Datei verwendet. </source><target>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche %shier als Bespiel heruntergeladen werden kann%s. Wird keine Datei übergeben, wird die Standard-Datei verwendet. </target></trans-unit>
-<trans-unit id='PGI+QmVpc3BpZWxoYWZ0ZXIgSW5oYWx0IGVpbmVyIFppcCBEYXRlaTogPC9iPg=='><source><b>Beispielhafter Inhalt einer Zip Datei: </b></source><target><b>Beispielhafter Inhalt einer Zip Datei: </b></target></trans-unit>
-<trans-unit id='T3B0aW9uYWxlIFhNTC1EYXRlaSB6dXIgS29uZmlndXJhdGlvbiBkZXIgUU0tU3Vic2VnbWVudCBLcml0ZXJpZW4gKEJlaXNwaWVsIDxhIGhyZWY9IiVzIiB0YXJnZXQ9Il9ibGFuayI+c2llaGUgaGllcjwvYT4pLg=='><source>Optionale XML-Datei zur Konfiguration der QM-Subsegment Kriterien (Beispiel <a href="%s" target="_blank">siehe hier</a>).</source><target>Optionale XML-Datei zur Konfiguration der QM-Subsegment Kriterien (Beispiel <a href="%s" target="_blank">siehe hier</a>).</target></trans-unit>
-<trans-unit id='RGllc2VzIFZlcnplaWNobmlzIGlzdCB6d2luZ2VuZCBuw7Z0aWcsIHVuZCBiZWluaGFsdGV0IGRpZSB6dSBsZWt0b3JpZXJlbmRlbiBEYXRlaWVuLg=='><source>Dieses Verzeichnis ist zwingend nötig, und beinhaltet die zu lektorierenden Dateien.</source><target>Dieses Verzeichnis ist zwingend nötig, und beinhaltet die zu lektorierenden Dateien.</target></trans-unit>
-<trans-unit id='RGllc2VzIFZlcnplaWNobmlzIGlzdCBvcHRpb25hbCwgbXVzcyB3ZW5uIHZvcmhhbmRlbiBkaWUgZ2xlaWNoZSBEYXRlaXN0cnVrdHVyIHdpZSAicmV2aWV3IiBhdWZ3ZWlzZW4='><source>Dieses Verzeichnis ist optional, muss wenn vorhanden die gleiche Dateistruktur wie "review" aufweisen</source><target>Dieses Verzeichnis ist optional, muss wenn vorhanden die gleiche Dateistruktur wie "review" aufweisen</target></trans-unit>
-<trans-unit id='b3B0aW9uYWxlIFRCWCBEYXRlaSBtaXQgVGVybWVuLCBkaWUgZXJzdGUgZ2VmdW5kZW4gVEJYIERhdGVpIHdpcmQgdmVyd2VuZGV0'><source>optionale TBX Datei mit Termen, die erste gefunden TBX Datei wird verwendet</source><target>optionale TBX Datei mit Termen, die erste gefunden TBX Datei wird verwendet</target></trans-unit>
-<trans-unit id='b3B0aW9uYWxlcyBWZXJ6ZWljaG5pcyBtaXQgUmVmZXJlbnpkYXRlaWVu'><source>optionales Verzeichnis mit Referenzdateien</source><target>optionales Verzeichnis mit Referenzdateien</target></trans-unit>
-<trans-unit id='SGlud2Vpc2UgenVtIExla3RvcmF0'><source>Hinweise zum Lektorat</source><target>Hinweise zum Lektorat</target></trans-unit>
-<trans-unit id='U2NyZWVuc2hvdCBMZWt0b3JhdA=='><source>Screenshot Lektorat</source><target>Screenshot Lektorat</target></trans-unit>
-<trans-unit id='RGF0ZWnDvGJlcnNpY2h0'><source>Dateiübersicht</source><target>Dateiübersicht</target></trans-unit>
-<trans-unit id='QmVsaWViaWcgdmVya2xlaW5lci0gdW5kIHZlcmdyw7bDn2VyYmFy'><source>Beliebig verkleiner- und vergrößerbar</source><target>Beliebig verkleiner- und vergrößerbar</target></trans-unit>
-<trans-unit id='RGF0ZWlyZWloZW5mb2xnZSBzb3J0aWVyYmFy'><source>Dateireihenfolge sortierbar</source><target>Dateireihenfolge sortierbar</target></trans-unit>
-<trans-unit id='S2xpY2sgYXVmIERhdGVpIHNwcmluZ3QgenVtIGVyc3RlbiBTZWdtZW50'><source>Klick auf Datei springt zum ersten Segment</source><target>Klick auf Datei springt zum ersten Segment</target></trans-unit>
-<trans-unit id='RmlsdGVy'><source>Filter</source><target>Filter</target></trans-unit>
-<trans-unit id='QWxsZSBTcGFsdGVuIGZpbHRlci0gdW5kIHNvcnRpZXJiYXI='><source>Alle Spalten filter- und sortierbar</source><target>Alle Spalten filter- und sortierbar</target></trans-unit>
-<trans-unit id='RmlsdGVyIG1laHJlcmVyIFNwYWx0ZW4ga29tYmluaWVyYmFy'><source>Filter mehrerer Spalten kombinierbar</source><target>Filter mehrerer Spalten kombinierbar</target></trans-unit>
-<trans-unit id='RXJtw7ZnbGljaHQgZmxleGlibGVzIFJldmlldw=='><source>Ermöglicht flexibles Review</source><target>Ermöglicht flexibles Review</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llIGltIFNlZ21lbnQ='><source>Terminologie im Segment</source><target>Terminologie im Segment</target></trans-unit>
-<trans-unit id='QmxhdSB1bnRlcnN0cmljaGVuOiBUZXJtIHVuZCDDnGJlcnNldHp1bmcgdm9yaGFuZGVu'><source>Blau unterstrichen: Term und Übersetzung vorhanden</source><target>Blau unterstrichen: Term und Übersetzung vorhanden</target></trans-unit>
-<trans-unit id='Um90IHVudGVyc3RyaWNoZW46IFRlcm0gZmVobHQgaW4gw5xiZXJzZXR6dW5n'><source>Rot unterstrichen: Term fehlt in Übersetzung</source><target>Rot unterstrichen: Term fehlt in Übersetzung</target></trans-unit>
-<trans-unit id='VmlvbGV0dCBoaW50ZXJsZWd0OiBWZXJ3ZW5kZXRlciBUZXJtIGlzdCB2ZXJib3RlbmUgQmVuZW5udW5n'><source>Violett hinterlegt: Verwendeter Term ist verbotene Benennung</source><target>Violett hinterlegt: Verwendeter Term ist verbotene Benennung</target></trans-unit>
-<trans-unit id='QmVhcmJlaXR1bmdzc3RhdHVz'><source>Bearbeitungsstatus</source><target>Bearbeitungsstatus</target></trans-unit>
-<trans-unit id='V2lyZCBiZWkgU3BlaWNoZXJuIGRlcyBTZWdtZW50cyBhdXRvbWF0aXNjaCBnZXNldHp0'><source>Wird bei Speichern des Segments automatisch gesetzt</source><target>Wird bei Speichern des Segments automatisch gesetzt</target></trans-unit>
-<trans-unit id='SMOka2NoZW46IFd1cmRlIGxla3RvcmllcnQ='><source>Häkchen: Wurde lektoriert</source><target>Häkchen: Wurde lektoriert</target></trans-unit>
-<trans-unit id='WmFobnJhZDogQXV0b21hdGlzY2ggYW5nZXBhc3N0ZSBXaWVkZXJob2x1bmc='><source>Zahnrad: Automatisch angepasste Wiederholung</source><target>Zahnrad: Automatisch angepasste Wiederholung</target></trans-unit>
-<trans-unit id='U2VnbWVudC1NZXRhZGF0ZW4='><source>Segment-Metadaten</source><target>Segment-Metadaten</target></trans-unit>
-<trans-unit id='WmVpZ2VuIGRpZSBXZXJ0ZSBkZXMgYWt0dWVsbGVuIFNlZ21lbnRz'><source>Zeigen die Werte des aktuellen Segments</source><target>Zeigen die Werte des aktuellen Segments</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llIGVudGjDpGx0IGF1Y2ggbmljaHQgaW0gU2VnbWVudCB2ZXJ3ZW5kZXRlIFRlcm1lIGVpbmVzIHZlcndlbmRldGVuIEJlZ3JpZmZz'><source>Terminologie enthält auch nicht im Segment verwendete Terme eines verwendeten Begriffs</source><target>Terminologie enthält auch nicht im Segment verwendete Terme eines verwendeten Begriffs</target></trans-unit>
-<trans-unit id='V8OkaGxiYXJlIFdlcnRlIGbDvHIgIlFNIiB1bmQgIlN0YXR1cyIgc2luZCBwcm8gSW5zdGFsbGF0aW9uIGZyZWkga29uZmlndXJpZXJiYXI='><source>Wählbare Werte für "QM" und "Status" sind pro Installation frei konfigurierbar</source><target>Wählbare Werte für "QM" und "Status" sind pro Installation frei konfigurierbar</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldC5vcmc='><source>translate5 Quellcode auf bitbucket.org</source><target>translate5 Quellcode auf bitbucket.org</target></trans-unit>
-<trans-unit id='UXVhbGl0w6R0c2dlc2ljaGVydGUgVmVyc2lvbiAtIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL3dpbGxrb21tZW4vaW1wcmVzc3VtIiB0YXJnZXQ9Il9ibGFuayI+Yml0dGUgZnJhZ2VuIFNpZSB1bnMgYW4hPC9hPg=='><source>Qualitätsgesicherte Version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a></source><target>Qualitätsgesicherte Version - <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a></target></trans-unit>
-<trans-unit id='Qml0YnVja2V0IGRpZW50IGRlciBFbnR3aWNrbHVuZyBhbHMgUmVwb3NpdG9yeSB1bmQgZW50aMOkbHQgZGVuIGxldHp0ZW4gU3RhbmQgZGVyIEVudHdpY2tsdW5nLiBEaWVzZXIgaXN0IG51ciBiZWRpbmd0IGbDvHIgZGVuIFByb2R1a3RpdmVpbnNhdHogZ2VlaWduZXQgdW5kIGthbm4gRmVobGVyIGVudGhhbHRlbiE8YnIvPiBFaW4gcXVhbGl0w6R0c2dlc2ljaGVydGVzIFJlbGVhc2UsIHdlbGNoZXMgYmVyZWl0cyBhbGxlIEFiaMOkbmdpZ2tlaXRlbiBrb3JyZWt0IGVudGjDpGx0IGVyaGFsdGVuIFNpZSA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS93aWxsa29tbWVuL2ltcHJlc3N1bSIgdGFyZ2V0PSJfYmxhbmsiPmdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZTwvYT4uIERpZSBWZXLDtmZmZW50bGljaHVuZyBhdWYgYml0YnVja2V0Lm9yZyBpc3QgZsO8ciBFbnR3aWNrbGVyIGdlZGFjaHQu'><source>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.</source><target>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!<br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBFbnR3aWNrbGVyLVJlcG9zaXRvcnkgYXVmIGJpdGJ1Y2tldC5vcmc='><source>translate5 Entwickler-Repository auf bitbucket.org</source><target>translate5 Entwickler-Repository auf bitbucket.org</target></trans-unit>
-<trans-unit id='RGVyIGxldHp0ZSBTdGFuZCBkZXIgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUgaXN0IGpld2VpbHMgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5hdWYgYml0YnVja2V0Lm9yZyB2ZXLDtmZmZW50bGljaHQ8L2E+Lg=='><source>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</source><target>Der letzte Stand der Entwicklung von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBpc3QgYXVmIGF1ZiBtZWhyZXJlIGJpdGJ1Y2tldC1SZXBvc2l0b3JpZXMgdmVydGVpbHQgdW5kIGJlbsO2dGlndCBkYXLDvGJlciBoaW5hdXMgZWluZSBSZWloZSBleHRlcm5lciBCaWJsaW90aGVrZW4uIERhcyBoaWVyYXJjaGlzY2ggb2JlcnN0ZSBSZXBvc2l0b3J5IGlzdCAidHJhbnNsYXRlNSIsIHdlbGNoZXMgZGllIEFiaMOkbmdpZ2tlaXRlbiBhbHMgZ2l0LXN1Ym1vZHVsZSBvZGVyIFZlcndlaXNlIGVudGjDpGx0Lg=='><source>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source><target>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</target></trans-unit>
-<trans-unit id='TWl0dGFnUUkgLSBRdWFsaXR5IEluZm9ybWF0aWNzPGJyIC8+S29ucmFkLUxvcmVuei1XZWcgMTA8YnIgLz43MjExNiBNw7Zzc2luZ2VuPGJyIC8+VGVsLiAwNzQ3My8yMjAyMDI8YnIgLz5GYXggMDc0NzMvMjIwMjExPGJyIC8+RS1NYWlsOiBzZXJ2aWNlQE1pdHRhZ1FJLmNvbQ=='><source>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</source><target>MittagQI - Quality Informatics<br />Konrad-Lorenz-Weg 10<br />72116 Mössingen<br />Tel. 07473/220202<br />Fax 07473/220211<br />E-Mail: service@MittagQI.com</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBOZXdzbGV0dGVy'><source>translate5 Newsletter</source><target>translate5 Newsletter</target></trans-unit>
-<trans-unit id='RGVyIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL25ld3NsZXR0ZXIiIHRhcmdldD0iX2JsYW5rIj50cmFuc2xhdGU1LU5ld3NsZXR0ZXIgdm9uIE1pdHRhZ1FJPC9hPiBpbmZvcm1pZXJ0IHJlZ2VsbcOkw59pZyB6dSBuZXVlbiBGZWF0dXJlcyB1bmQgYW5kZXJlbiBOZXVpZ2tlaXRlbi4='><source>Der <a href="http://www.mittagqi.com/newsletter" target="_blank">translate5-Newsletter von MittagQI</a> informiert regelmäßig zu neuen Features und anderen Neuigkeiten.</source><target>Der <a href="http://www.mittagqi.com/newsletter" target="_blank">translate5-Newsletter von MittagQI</a> informiert regelmäßig zu neuen Features und anderen Neuigkeiten.</target></trans-unit>
-<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBudXIgQVNDSUktWmVpY2hlbiBpbiBEYXRlaS0gb2RlciBWZXJ6ZWljaG5pc25hbWVuIHVuZCBrZWluZSBTb25kZXJ6ZWljaGVuIG9kZXIgVW1sYXV0ZS4gRGFzIFppcC1Gb3JtYXQgw7xiZXJtaXR0ZWx0IGtlaW5lIEluZm9ybWF0aW9uZW4sIGluIHdlbGNoZXIgQ29kaWVydW5nIElociBCZXRyaWVic3N5c3RlbSBEYXRlaS0gb2RlciBWZXJ6ZWljaG5pc25hbWVuIGdlc3BlaWNoZXJ0IGhhdC4gQXVmZ3J1bmQgZGllc2VzIE1hbmdlbHMgZGVzIFpJUC1TdGFuZGFyZHMga2FubiB0cmFuc2xhdGU1IE5pY2h0LUFTQ0lJLVplaWNoZW4gbmljaHQgZmVobGVyZnJlaSBhdXNsZXNlbi4gRWluemlnZSBBdXNuYWhtZTogSWhyIERhdGVpc3lzdGVtIHNwZWljaGVydCBEYXRlaW5hbWVuIGluIGRlciBVVEYtOC1Lb2RpZXJ1bmcsIHdpZSBMaW51eC1TeXN0ZW1lIGRpZXMgdHVuLg=='><source>Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen. Einzige Ausnahme: Ihr Dateisystem speichert Dateinamen in der UTF-8-Kodierung, wie Linux-Systeme dies tun.</source><target>Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen. Einzige Ausnahme: Ihr Dateisystem speichert Dateinamen in der UTF-8-Kodierung, wie Linux-Systeme dies tun.</target></trans-unit>
-<trans-unit id='SW1wb3J0IHZvbiBlaW56ZWxuZW4gU0RMWExJRkYgb2RlciBDU1YgRGF0ZWllbg=='><source>Import von einzelnen SDLXLIFF oder CSV Dateien</source><target>Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien</target></trans-unit>
-<trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1Ygb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='><source>Soll nur eine einzelne CSV oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source><target>Soll nur eine einzelne CSV, openTM2-XLIFF  oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</target></trans-unit>
-<trans-unit id='SGFuZGVsdCBlcyBzaWNoIHVtIGVpbmUgU0RMWExJRkYgRGF0ZWksIHNvIGthbm4genVzw6R0emxpY2ggZWluZSBUQlggRGF0ZWkgbWl0IFRlcm1pbm9sb2dpZSBhdXNnZXfDpGhsdCB3ZXJkZW4u'><source>Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.</source><target>Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.</target></trans-unit>
-<trans-unit id='TmV1ZXMgUGFzc3dvcnQ='><source>Neues Passwort</source><target>Neues Passwort</target></trans-unit>
-<trans-unit id='RS1NYWlsIGFuZm9yZGVybg=='><source>E-Mail anfordern</source><target>E-Mail anfordern</target></trans-unit>
-<trans-unit id='WnVyw7xjayB6dXIgU3RhcnRzZWl0ZQ=='><source>Zurück zur Startseite</source><target>Zurück zur Startseite</target></trans-unit>
-<trans-unit id='U2VociBnZWVocnRlciBIZXJy'><source>Sehr geehrter Herr</source><target>Sehr geehrter Herr</target></trans-unit>
-<trans-unit id='UGVyIEUtTWFpbCB3dXJkZSBJaG5lbiBlaW4gTGluayB6dWdlc2FuZHQsIG1pdCB3ZWxjaGVtIFNpZSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiBrw7ZubmVuLiBEaWVzZXIgTGluayBpc3QgMzAgbWluIGfDvGx0aWcgdW5kIGZ1bmt0aW9uaWVydCBudXIsIHNvIGxhbmdlIFNpZSBJaHJlbiBCcm93c2VyIG5pY2h0IHp3aXNjaGVuemVpdGxpY2ggZ2VzY2hsb3NzZW4gaGFiZW4uIFNpZSBrw7ZubmVuIGplZGVyemVpdCBlaW5lbiBuZXVlbiBMaW5rIMO8YmVyIGRpZXNlcyBGb3JtdWxhciBhbmZvcmRlcm4u'><source>Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link über dieses Formular anfordern.</source><target>Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link über dieses Formular anfordern.</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldA=='><source>translate5 Quellcode auf bitbucket</source><target>translate5 Quellcode auf bitbucket</target></trans-unit>
-<trans-unit id='RGFzIGxldHp0ZSBNYWpvci1SZWxlYXNlIHZvbiB0cmFuc2xhdGU1IGlzdCBqZXdlaWxzIDxhIGhyZWY9IiVzIiB0YXJnZXQ9Il9ibGFuayI+YXVmIGJpdGJ1Y2tldCB2ZXLDtmZmZW50bGljaHQ8L2E+LiBFaW4gbmV1ZXMgTWFqb3ItUmVsZWFzZSB3aXJkIG1pbmRlc3RlbnMgamVkZXMgaGFsYmUgSmFociB2ZXLDtmZmZW50bGljaHQu'><source>Das letzte Major-Release von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket veröffentlicht</a>. Ein neues Major-Release wird mindestens jedes halbe Jahr veröffentlicht.</source><target>Das letzte Major-Release von translate5 ist jeweils <a href="%s" target="_blank">auf bitbucket veröffentlicht</a>. Ein neues Major-Release wird mindestens jedes halbe Jahr veröffentlicht.</target></trans-unit>
-<trans-unit id='VW5zZXJlIHJlZ2VsbcOkw59pZ2VuIE1pbm9yLVJlbGVhc2VzIGVudGhhbHRlbmVuIGJlcmVpdHMgZnLDvGhlciBuZXVlIEZlYXR1cmVzIHVuZCBub3R3ZW5kaWdlIEJ1Zy1GaXhlcy4gTWlub3ItUmVsZWFzZXMgc3RlaGVuIGFsbGVuIEt1bmRlbiB2b24gTWl0dGFnUUkgaW0gUmFobWVuIGVpbmVzIDxhIGhyZWY9IiVzIiB0YXJnZXQ9Il9ibGFuayI+IlZlcnRyYWcgenUgVW50ZXJzdMO8dHp1bmcgdW5kIFVwZGF0ZXMgZsO8ciB0cmFuc2xhdGU1IjwvYT4genVyIFZlcmbDvGd1bmcu'><source>Unsere regelmäßigen Minor-Releases enthaltenen bereits früher neue Features und notwendige Bug-Fixes. Minor-Releases stehen allen Kunden von MittagQI im Rahmen eines <a href="%s" target="_blank">"Vertrag zu Unterstützung und Updates für translate5"</a> zur Verfügung.</source><target>Unsere regelmäßigen Minor-Releases enthaltenen bereits früher neue Features und notwendige Bug-Fixes. Minor-Releases stehen allen Kunden von MittagQI im Rahmen eines <a href="%s" target="_blank">"Vertrag zu Unterstützung und Updates für translate5"</a> zur Verfügung.</target></trans-unit>
-<trans-unit id='RGllc2VyIEJlbnV0emVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQuIDxici8+Qml0dGUgd2FydGVuIFNpZSBiaXMgZGVyIEJlbnV0emVyIHdpZWRlciB2ZXJmw7xnYmFyIGlzdCwgb2RlciBiZW51dHplbiBTaWUgZWluZW4gYW5kZXJlbiE='><source>Dieser Benutzer wird bereits verwendet. <br/>Bitte warten Sie bis der Benutzer wieder verfügbar ist, oder benutzen Sie einen anderen!</source><target>Dieser Benutzer wird bereits verwendet. <br/>Bitte warten Sie bis der Benutzer wieder verfügbar ist, oder benutzen Sie einen anderen!</target></trans-unit>
-<trans-unit id='d2lyZCBtb21lbnRhbiB2ZXJ3ZW5kZXQ='><source>wird momentan verwendet</source><target>wird momentan verwendet</target></trans-unit>
-<trans-unit id='RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgZGllIGZvbGdlbmRlbiBaaXAgRGF0ZWllbiBkb3dubG9hZGVuIHVuZCBhbHMgbmV1ZSBQcm9qZWt0ZSBpbXBvcnRpZXJlbjo='><source>Falls Sie keine Testdaten zur Hand haben, können Sie die folgenden Zip Dateien downloaden und als neue Projekte importieren:</source><target>Falls Sie keine Testdaten zur Hand haben, können Sie die folgenden Zip Dateien downloaden und als neue Projekte importieren:</target></trans-unit>
-<trans-unit id='KGVpbmZhY2hlIFRlc3RkYXRlbik='><source>(einfache Testdaten)</source><target>(einfache Testdaten)</target></trans-unit>
-<trans-unit id='KFRlc3RkYXRlbiBtaXQgUmVsYWlzc3ByYWNoZSk='><source>(Testdaten mit Relaissprache)</source><target>(Testdaten mit Relaissprache)</target></trans-unit>
-<trans-unit id='KFRlc3RkYXRlbiBtaXQgVGVybWlub2xvZ2llKQ=='><source>(Testdaten mit Terminologie)</source><target>(Testdaten mit Terminologie)</target></trans-unit>
-<trans-unit id='KFRlc3RkYXRlbiBtaXQgVGVybWlub2xvZ2llLCBSZWxhaXNzcHJhY2hlbiB1bmQgUmVmZXJlbnpkYXRlaWVuKQ=='><source>(Testdaten mit Terminologie, Relaissprachen und Referenzdateien)</source><target>(Testdaten mit Terminologie, Relaissprachen und Referenzdateien)</target></trans-unit>
-<trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgTVFNLUF1c3plaWNobnVuZ2VuKQ=='><source>(CSV-Dateiformat mit MQM-Auszeichnungen)</source><target>(CSV-Dateiformat mit MQM-Auszeichnungen)</target></trans-unit>
-<trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgbWVocmVyZW4gemllbHNwcmFjaGxpY2hlbiBBbHRlcm5hdGl2c3BhbHRlbik='><source>(CSV-Dateiformat mit mehreren zielsprachlichen Alternativspalten)</source><target>(CSV-Dateiformat mit mehreren zielsprachlichen Alternativspalten)</target></trans-unit>
-<trans-unit id='RsO8ciBlaW5lIGtvcnJla3RlIEF1c3plaWNobnVuZyBkZXIgVGVybWlub2xvZ2llIGJpdHRlIGRpZSBRdWVsbHNwcmFjaGUgYXVmIEVuZ2xpc2NoIHVuZCBkaWUgWmllbHNwcmFjaGUgYXVmIERldXRzY2ggc3RlbGxlbi4='><source>Für eine korrekte Auszeichnung der Terminologie bitte die Quellsprache auf Englisch und die Zielsprache auf Deutsch stellen.</source><target>Für eine korrekte Auszeichnung der Terminologie bitte die Quellsprache auf Englisch und die Zielsprache auf Deutsch stellen.</target></trans-unit>
-<trans-unit id='JiMxODc7IFp1ciBEZW1vdmVyc2lvbg=='><source>&#187; Zur Demoversion</source><target>&#187; Zur Demoversion</target></trans-unit>
-<trans-unit id='JiMxODc7IEJlZGllbnVuZ3NoaW53ZWlzZSBmw7xyIGRpZSBFcnN0ZWxsdW5nIGVpZ2VuZXIgVGVzdGRhdGVu'><source>&#187; Bedienungshinweise für die Erstellung eigener Testdaten</source><target>&#187; Bedienungshinweise für die Erstellung eigener Testdaten</target></trans-unit>
-<trans-unit id='SW5zdGFsbGF0aW9uZW4gJmFtcDsgSG9zdGluZw=='><source>Installationen &amp; Hosting</source><target>Installationen &amp; Hosting</target></trans-unit>
-<trans-unit id='U3VwcG9ydCAmYW1wOyBVcGRhdGVz'><source>Support &amp; Updates</source><target>Support &amp; Updates</target></trans-unit>
-<trans-unit id='T25saW5lLVJldmlldw=='><source>Online-Review</source><target>Online-Review</target></trans-unit>
-<trans-unit id='WnVnYW5nc2RhdGVuIGFuZm9yZGVybg=='><source>Zugangsdaten anfordern</source><target>Zugangsdaten anfordern</target></trans-unit>
-<trans-unit id='U2llIGJlZmluZGVuIHNpY2ggYXVmIGRlciBMb2dpbi1TZWl0ZSBkZXIgb25ld29yZCBSZXZpZXctUGxhdHRmb3JtLCBtaXQgZGVyIFNpZSBJaHJlIMOcYmVyc2V0enVuZ2VuIGltIEJyb3dzZXIgbGVzZW4sIHByw7xmZW4gdW5kIGtvcnJpZ2llcmVuIGvDtm5uZW4u'><source>Sie befinden sich auf der Login-Seite der oneword Review-Plattform, mit der Sie Ihre Übersetzungen im Browser lesen, prüfen und korrigieren können.</source><target>Sie befinden sich auf der Login-Seite der oneword Review-Plattform, mit der Sie Ihre Übersetzungen im Browser lesen, prüfen und korrigieren können.</target></trans-unit>
-<trans-unit id='PGEgaHJlZj0iaHR0cDovL3d3dy5vbmV3b3JkLmRlL3VlYmVyc2V0enVuZy9vbmxpbmUtcmV2aWV3Lmh0bWwiIHRhcmdldD0iX2JsYW5rIj5XZWl0ZXJlIEluZm9ybWF0aW9uZW48L2E+'><source><a href="http://www.oneword.de/uebersetzung/online-review.html" target="_blank">Weitere Informationen</a></source><target><a href="http://www.oneword.de/uebersetzung/online-review.html" target="_blank">Weitere Informationen</a></target></trans-unit>
-<trans-unit id='PGEgaHJlZj0iaHR0cDovL3d3dy5vbmV3b3JkLmRlIiB0YXJnZXQ9Il9ibGFuayI+U3RhcnRzZWl0ZSBvbmV3b3JkPC9hPg=='><source><a href="http://www.oneword.de" target="_blank">Startseite oneword</a></source><target><a href="http://www.oneword.de" target="_blank">Startseite oneword</a></target></trans-unit>
-<trans-unit id='b25ld29yZA=='><source>oneword</source><target>oneword</target></trans-unit>
-<trans-unit id='RGllc2UgUmV2aWV3LVBsYXR0Zm9ybSBpc3QgZWluZSBJbnN0YW56IHZvbiB0cmFuc2xhdGU1Lg=='><source>Diese Review-Plattform ist eine Instanz von translate5.</source><target>Diese Review-Plattform ist eine Instanz von translate5.</target></trans-unit>
-<trans-unit id='Qml0dGUgbWluZGVzdGVucyA4IFplaWNoZW4gdmVyd2VuZGVu'><source>Bitte mindestens 8 Zeichen verwenden</source><target>Bitte mindestens 8 Zeichen verwenden</target></trans-unit>
-<trans-unit id='UGFzc3dvcnQgd2llZGVyaG9sZW4='><source>Passwort wiederholen</source><target>Passwort wiederholen</target></trans-unit>
-<trans-unit id='TmV1IHNldHplbg=='><source>Neu setzen</source><target>Neu setzen</target></trans-unit>
-<trans-unit id='SWhyIFBhc3N3b3J0IHd1cmRlIG5ldSBnZXNldHp0LiBTaWUga8O2bm5lbiBzaWNoIG51biBlaW5sb2dnZW4u'><source>Ihr Passwort wurde neu gesetzt. Sie können sich nun einloggen.</source><target>Ihr Passwort wurde neu gesetzt. Sie können sich nun einloggen.</target></trans-unit>
-<trans-unit id='Qml0dGUgc2VuZGVuIFNpZSBtaXIgWnVnYW5nc2RhdGVuIHp1ciBvbmV3b3JkIFJldmlldy1QbGF0dGZvcm0genU='><source>Bitte senden Sie mir Zugangsdaten zur oneword Review-Plattform zu</source><target>Bitte senden Sie mir Zugangsdaten zur oneword Review-Plattform zu</target></trans-unit>
-<trans-unit id='U2VpdGUgbmljaHQgZ2VmdW5kZW4h'><source>Seite nicht gefunden!</source><target>Seite nicht gefunden!</target></trans-unit>
-<trans-unit id='U2VpdGUgbmljaHQgZ2VmdW5kZW46IA=='><source>Seite nicht gefunden: </source><target>Seite nicht gefunden: </target></trans-unit>
-<trans-unit id='LyBBdWZydWYgZXJmb2xndGUgZHVyY2ggSVA6IA=='><source>/ Aufruf erfolgte durch IP: </source><target>/ Aufruf erfolgte durch IP: </target></trans-unit>
-<trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicmV2aWV3IiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiwgb3BlblRNMi1YTElGRiB1bmQgLyBvZGVyIENTVi1EYXRlaWVuIGluIGVpbmVyIGJlbGllYmlnZW4gVmVyemVpY2huaXNzdHJ1a3R1ciBiZWluaGFsdGVuIGthbm4uIENTVi0sIG9wZW5UTTItWExJRkYtIHVuZCBTRExYTElGRi1EYXRlaWVuIGvDtm5uZW4gYmVsaWViaWcgZ2VtaXNjaHQgd2VyZGVuLiBEaWUgU3RydWt0dXIgd2lyZCBpbSBMZWt0b3JhdCBhYmdlYmlsZGV0Lg=='><source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF, openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source><target>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF, openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</target></trans-unit>
-<trans-unit id='Q1NWLURhdGVpZW4gbcO8c3NlbiBtaW5kZXN0ZW5zIGRyZWkgU3BhbHRlbiBlbnRoYWx0ZW4uIEVpbmUgU3BhbHRlIG11c3MgZGVuIFNwYWx0ZW5rb3BmICJtaWQiIGVudGhhbHRlbiB1bmQgZWluZSBlaW5kZXV0aWdlIElEIGplIENTVi1aZWlsZSBlbnRoYWx0ZW4uIEVpbmUgd2VpdGVyZSBTcGFsdGUgbXVzcyBkZW4gU3BhbHRlbmtvcGYgInF1ZWxsZSIgZW50aGFsdGVuIHVuZCBkaWUgUXVlbGxzcHJhY2hlIGVudGhhbHRlbi4gQWxsZSB3ZWl0ZXJlbiBTcGFsdGVuIG1pdCBTcGFsdGVua8O2cGZlbiB3ZXJkZW4gYWxzIFppZWxzcHJhY2hlbnNwYWx0ZW4gYmVoYW5kZWx0IHVuZCBpbXBvcnRpZXJ0LiBEYWJlaSBpc3QgZGVyIFNwYWx0ZW5rb3BmbmFtZSBmcmVpIHfDpGhsYmFyLiBTcGFsdGVuIG9obmUgYmVmw7xsbHRlbiBTcGFsdGVua29wZiBpbiBkZXIgQ1NWLURhdGVpIHdlcmRlbiBiZWltIEltcG9ydCBpZ25vcmllcnQuIFNwYWx0ZW50cmVubmVyIGRlciBDU1YgaXN0IGVpbiBLb21tYSAmcXVvdDssJnF1b3Q7LCBUZXh0ZXJrZW5udW5nc3plaWNoZW4gZWluIGRvcHBlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gJnF1b3Q7JmFwb3M7JnF1b3Q7LiBEaWUgU3BhbHRlbmtvcGZuYW1lbiBkZXIgSUQtU3BhbHRlIChwZXIgZGVmYXVsdCBtaWQpIHVuZCBkZXIgUXVlbGxzcHJhY2hlbi1TcGFsdGUgKHBlciBkZWZhdWx0IHF1ZWxsZSkgc293aWUgZGVyIFNwYWx0ZW50cmVubmVyIHVuZCBkYXMgVGV4dGVya2VubnVuZ3N6ZWljaGVuIGvDtm5uZW4gaW4gZGVyIFN5c3RlbWtvbmZpZ3VyYXRpb24gdm9uIHRyYW5zbGF0ZTUgaW5zdGFsbGF0aW9uc3NwZXppZmlzY2ggw7xiZXJzY2hyaWViZW4gd2VyZGVuLiBaZWlsZW50cmVubmVyIGRlciBDU1YgaXN0IGVpbiBMaW51eC0sIE1hYy0gb2RlciBXaW5kb3dzemVpbGVudW1icnVjaC4gQ29kaWVydW5nIGRlciBDU1YtRGF0ZWkga2FubiB1dGYtOCwgaXNvLTg4NTktMSBvZGVyIHdpbmRvd3MtMTI1MSBzZWluLiBEaWUgQ1NWLURhdGVpIHdpcmQgaW4gZGVyIHNlbGJlbiBDb2RpZXJ1bmcgZXhwb3J0aWVydCwgaW4gZGVyIHNpZSBiZWltIEltcG9ydCB2b3JsYWcgKEFjaHR1bmc6IEJlaSBlaW5lciDDnGJlcnNldHp1bmcgaW4gTmljaHQtV2VzdGV1cm9ww6Rpc2NoZSBTcHJhY2hlbiBzb2xsdGUgZGFoZXIgdXRmLTggYmVyZWl0cyBhbHMgSW1wb3J0Y29kaWVydW5nIGdld8OkaGx0IHdlcmRlbiku'><source>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen &quot;&apos;&quot;. Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</source><target>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen &quot;&apos;&quot;. Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</target></trans-unit>
-<trans-unit id='SW1wb3J0IHZvbiBlaW56ZWxuZW4gU0RMWExJRkYsIG9wZW5UTTItWExJRkYgb2RlciBDU1YgRGF0ZWllbg=='><source>Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien</source><target>Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien</target></trans-unit>
-<trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1YsIG9wZW5UTTItWExJRkYgb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='><source>Soll nur eine einzelne CSV, openTM2-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source><target>Soll nur eine einzelne CSV, openTM2-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</target></trans-unit>
-<trans-unit id='Q1NWLURhdGVpZW4gbcO8c3NlbiBtaW5kZXN0ZW5zIGRyZWkgU3BhbHRlbiBlbnRoYWx0ZW4uIEVpbmUgU3BhbHRlIG11c3MgZGVuIFNwYWx0ZW5rb3BmICJtaWQiIGVudGhhbHRlbiB1bmQgZWluZSBlaW5kZXV0aWdlIElEIGplIENTVi1aZWlsZSBlbnRoYWx0ZW4uIEVpbmUgd2VpdGVyZSBTcGFsdGUgbXVzcyBkZW4gU3BhbHRlbmtvcGYgInF1ZWxsZSIgZW50aGFsdGVuIHVuZCBkaWUgUXVlbGxzcHJhY2hlIGVudGhhbHRlbi4gQWxsZSB3ZWl0ZXJlbiBTcGFsdGVuIG1pdCBTcGFsdGVua8O2cGZlbiB3ZXJkZW4gYWxzIFppZWxzcHJhY2hlbnNwYWx0ZW4gYmVoYW5kZWx0IHVuZCBpbXBvcnRpZXJ0LiBEYWJlaSBpc3QgZGVyIFNwYWx0ZW5rb3BmbmFtZSBmcmVpIHfDpGhsYmFyLiBTcGFsdGVuIG9obmUgYmVmw7xsbHRlbiBTcGFsdGVua29wZiBpbiBkZXIgQ1NWLURhdGVpIHdlcmRlbiBiZWltIEltcG9ydCBpZ25vcmllcnQuIFNwYWx0ZW50cmVubmVyIGRlciBDU1YgaXN0IGVpbiBLb21tYSAmcXVvdDssJnF1b3Q7LCBUZXh0ZXJrZW5udW5nc3plaWNoZW4gZWluIGRvcHBlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gKCZxdW90OykuIERpZSBTcGFsdGVua29wZm5hbWVuIGRlciBJRC1TcGFsdGUgKHBlciBkZWZhdWx0IG1pZCkgdW5kIGRlciBRdWVsbHNwcmFjaGVuLVNwYWx0ZSAocGVyIGRlZmF1bHQgcXVlbGxlKSBzb3dpZSBkZXIgU3BhbHRlbnRyZW5uZXIgdW5kIGRhcyBUZXh0ZXJrZW5udW5nc3plaWNoZW4ga8O2bm5lbiBpbiBkZXIgU3lzdGVta29uZmlndXJhdGlvbiB2b24gdHJhbnNsYXRlNSBpbnN0YWxsYXRpb25zc3BlemlmaXNjaCDDvGJlcnNjaHJpZWJlbiB3ZXJkZW4uIFplaWxlbnRyZW5uZXIgZGVyIENTViBpc3QgZWluIExpbnV4LSwgTWFjLSBvZGVyIFdpbmRvd3N6ZWlsZW51bWJydWNoLiBDb2RpZXJ1bmcgZGVyIENTVi1EYXRlaSBrYW5uIHV0Zi04LCBpc28tODg1OS0xIG9kZXIgd2luZG93cy0xMjUyIHNlaW4uIERpZSBDU1YtRGF0ZWkgd2lyZCBpbiBkZXIgc2VsYmVuIENvZGllcnVuZyBleHBvcnRpZXJ0LCBpbiBkZXIgc2llIGJlaW0gSW1wb3J0IHZvcmxhZyAoQWNodHVuZzogQmVpIGVpbmVyIMOcYmVyc2V0enVuZyBpbiBOaWNodC1XZXN0ZXVyb3DDpGlzY2hlIFNwcmFjaGVuIHNvbGx0ZSBkYWhlciB1dGYtOCBiZXJlaXRzIGFscyBJbXBvcnRjb2RpZXJ1bmcgZ2V3w6RobHQgd2VyZGVuKS4='><source>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen (&quot;). Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1252 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</source><target>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen (&quot;). Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1252 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</target></trans-unit>
-<trans-unit id='VW50ZXJzdMO8dHp1bmcgdm9uIE9wZW4gU291cmNl'><source>Unterstützung von Open Source</source><target>Unterstützung von Open Source</target></trans-unit>
-<trans-unit id='RWluIHNwZXppZWxsZXIgRGFuayBnZWh0IGFuIDxhIGhyZWY9Imh0dHA6Ly93d3cubG9ncnVzLnJ1LyIgdGFyZ2V0PSJfYmxhbmsiPkxvZ3J1cyBJbnRlcm5hdGlvbmFsPC9hPiBmw7xyIGRpZSBmb3J0d8OkaHJlbmRlIEbDtnJkZXJ1bmcgdm9uIE9wZW4gU291cmNlIFNvZnR3YXJlIGluIGRlciDDnGJlcnNldHp1bmdzYnJhbmNoZS4='><source>Ein spezieller Dank geht an <a href="http://www.logrus.ru/" target="_blank">Logrus International</a> für die fortwährende Förderung von Open Source Software in der Übersetzungsbranche.</source><target>Ein spezieller Dank geht an <a href="http://www.logrus.ru/" target="_blank">Logrus International</a> für die fortwährende Förderung von Open Source Software in der Übersetzungsbranche.</target></trans-unit>
-<trans-unit id='QW53ZW5kdW5nc2ZlaGxlcg=='><source>Anwendungsfehler</source><target>Anwendungsfehler</target></trans-unit>
-<trans-unit id='V2lyIGJpdHRlbiB1bSBFbnRzY2h1bGRpZ3VuZyBmw7xyIGRpZSBhdWZnZXRyZXRlbmUgU3TDtnJ1bmch'><source>Wir bitten um Entschuldigung für die aufgetretene Störung!</source><target>Wir bitten um Entschuldigung für die aufgetretene Störung!</target></trans-unit>
-<trans-unit id='VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gw7xiZXIgZGVuIEZlaGxlciBhdXRvbWF0aXNjaCBiZW5hY2hyaWNodGlndC4gRmFsbHMgd2VpdGVyZSBGcmFnZW4gb2RlciBVbmtsYXJoZWl0ZW4gYmVzdGVoZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gU3VwcG9ydC4='><source>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</source><target>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</target></trans-unit>
-<trans-unit id='U3VwcG9ydCBFLU1haWw6'><source>Support E-Mail:</source><target>Support E-Mail:</target></trans-unit>
-<trans-unit id='VGVzdGltb25pYWxz'><source>Testimonials</source><target>Testimonials</target></trans-unit>
-<trans-unit id='RGV2ZWxvcGVycw=='><source>Developers</source><target>Developers</target></trans-unit>
-<trans-unit id='VXNlciBpbmZvcw=='><source>User infos</source><target>User infos</target></trans-unit>
-<trans-unit id='V2VsY29tZQ=='><source>Welcome</source><target>Welcome</target></trans-unit>
-<trans-unit id='TWlzc2lvbg=='><source>Mission</source><target>Mission</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBEZW1v'><source>translate5 Demo</source><target>translate5 Demo</target></trans-unit>
-<trans-unit id='VXNhZ2UgJmFtcDsgZG9jdW1lbnRhdGlvbg=='><source>Usage &amp; documentation</source><target>Usage &amp; documentation</target></trans-unit>
-<trans-unit id='SW5zdGFsbGF0aW9u'><source>Installation</source><target>Installation</target></trans-unit>
-<trans-unit id='VW5nw7xsdGlnZSBMb2dpbmRhdGVuIC0gWnVnYW5nIGdlc3BlcnJ0ITxici8+U2llIGhhYmVuIElociBQYXNzd29ydCBpbiBkZW4gbGV0enRlbiAyNCBTdHVuZGVuIG1laHJtYWxzIGZhbHNjaCBlaW5nZWdlYmVuLCBpaHIgTG9naW4gd3VyZGUgZ2VzcGVycnQuPGJyIC8+UGVyIEUtTWFpbCB3dXJkZSBJaG5lbiBlaW4gTGluayB6dWdlc2FuZHQsIG1pdCB3ZWxjaGVtIFNpZSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiBrw7ZubmVuLiBEaWVzZXIgTGluayBpc3QgMzAgbWluIGfDvGx0aWcgdW5kIGZ1bmt0aW9uaWVydCBudXIsIHNvIGxhbmdlIFNpZSBJaHJlbiBCcm93c2VyIG5pY2h0IHp3aXNjaGVuemVpdGxpY2ggZ2VzY2hsb3NzZW4gaGFiZW4uIFNpZSBrw7ZubmVuIGplZGVyemVpdCBlaW5lbiBuZXVlbiBMaW5rICVzaGllciVzIGFuZm9yZGVybi4='><source>Ungültige Logindaten - Zugang gesperrt!<br/>Sie haben Ihr Passwort in den letzten 24 Stunden mehrmals falsch eingegeben, ihr Login wurde gesperrt.<br />Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link %shier%s anfordern.</source><target>Ungültige Logindaten - Zugang gesperrt!<br/>Sie haben Ihr Passwort in den letzten 24 Stunden mehrmals falsch eingegeben, ihr Login wurde gesperrt.<br />Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link %shier%s anfordern.</target></trans-unit>
-<trans-unit id='Qml0dGUgZ2ViZW4gU2llIGVpbiBQYXNzd29ydCBhbiE='><source>Bitte geben Sie ein Passwort an!</source><target>Bitte geben Sie ein Passwort an!</target></trans-unit>
-<trans-unit id='RGFzIFBhc3N3b3J0IGlzdCB6dSBrdXJ6IQ=='><source>Das Passwort ist zu kurz!</source><target>Das Passwort ist zu kurz!</target></trans-unit>
-<trans-unit id='RWluZSBXYXJ0dW5nIHN0ZWh0IHVubWl0dGVsYmFyIGJldm9yLCBTaWUga8O2bm5lbiBzaWNoIGRhaGVyIG5pY2h0IGFubWVsZGVuLiBCaXR0ZSB2ZXJzdWNoZW4gU2llIGVzIGluIEvDvHJ6ZSBlcm5ldXQu'><source>Eine Wartung steht unmittelbar bevor, Sie können sich daher nicht anmelden. Bitte versuchen Sie es in Kürze erneut.</source><target>Eine Wartung steht unmittelbar bevor, Sie können sich daher nicht anmelden. Bitte versuchen Sie es in Kürze erneut.</target></trans-unit>
-<trans-unit id='Tm8gdG9rZW4gd2FzIHByb3ZpZGVkIHRvIG1hdGNoIGFnYWluc3Q='><source>No token was provided to match against</source><target>No token was provided to match against</target></trans-unit>
-<trans-unit id='Qml0dGUgbGFkZW4gU2llIGRpZSBMb2dpbi1TZWl0ZSBuZXUsIGdlYmVuIFNpZSBpaHIgUGFzc3dvcnQgZXJuZXV0IGVpbiB1bmQgc2VuZGVuIFNpZSBkYXMgRm9ybXVsYXIgZXJuZXV0IGFiIC0gSWhyIEhhc2gtV2VydCB6dXIgw5xiZXJwcsO8ZnVuZyB2b24gQ3Jvc3MtU2l0ZS1Ta3JpcHRpbmctQXR0YWNrZW4gd2FyIG5pY2h0IGtvcnJla3Qu'><source>Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.</source><target>Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.</target></trans-unit>
-<trans-unit id='SW4gS8O8cnplIHdpcmQgZWluZSBTeXN0ZW13YXJ0dW5nIGR1cmNoZ2Vmw7xocnQgd2VyZGVuLiBEaWUgQW53ZW5kdW5nIGlzdCBkYW5uIGbDvHIgZWluaWdlIFplaXQgZ2VzcGVycnQuIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBTdGFydHMgZGVyIFN5c3RlbXdhcnR1bmc6ICVz'><source>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</source><target>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</target></trans-unit>
-<trans-unit id='VXNhZ2U='><source>Usage</source><target>Usage</target></trans-unit>
-<trans-unit id='VHJ5IGl0IQ=='><source>Try it!</source><target>Try it!</target></trans-unit>
-<trans-unit id='RGV2ZWxvcGVy'><source>Developer</source><target>Developer</target></trans-unit>
-<trans-unit id='VHJ5IGl0IG9ubGluZSE='><source>Try it online!</source><target>Try it online!</target></trans-unit>
-<trans-unit id='Sm9pbiB0aGUgY29tbXVuaXR5'><source>Join the community</source><target>Join the community</target></trans-unit>
-<trans-unit id='U291cmNlIGNvZGU='><source>Source code</source><target>Source code</target></trans-unit>
-<trans-unit id='U291cmNl'><source>Source</source><target>Source</target></trans-unit>
-<trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='><source>{salutation} {surName},<br/>
-<br/></source><target>{salutation} {surName},<br/>
-<br/></target></trans-unit>
-<trans-unit id='PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='><source><br/>
-<br/>Vielen Dank und viele Grüße,
-<br/>Ihr Projektmanagement Team
-<br/>{companyName}
-<br/>
-<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target><br/>
-<br/>Vielen Dank und viele Grüße,
-<br/>Ihr Projektmanagement Team
-<br/>{companyName}
-<br/>
-<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</target></trans-unit>
-<trans-unit id='e2hlYWRlcn0KU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIHdpciBlaW5lIEFuZnJhZ2UgenVyIMOEbmRlcnVuZyBkZXMgUGFzc3dvcnRlcyBmw7xyIElociBLb250byBhdWYge3BvcnRhbFVybH0gZXJoYWx0ZW4gaGFiZW4uIAoKV2VubiBTaWUgSWhyIFBhc3N3b3J0IMOkbmRlcm4gbcO2Y2h0ZW4sIGRhbm4gYmVmb2xnZW4gU2llIGJpdHRlIGZvbGdlbmRlIEFud2Vpc3VuZ2VuOgoKRGVyIGZvbGdlbmRlIExpbmsgZW50aMOkbHQgZWluZW4gZsO8ciAzMCBNaW51dGVuIGfDvGx0aWdlbiBTY2hsw7xzc2VsLCBtaXQgd2VsY2hlbSBTaWUgSWhyIFBhc3N3b3J0IG5ldSBzZXR6ZW4ga8O2bm5lbi4gQXVzIFNpY2hlcmhlaXRzZ3LDvG5kZW4gZnVua3Rpb25pZXJ0IGRpZXMgbnVyLCB3ZW5uIFNpZSBkZW4gZm9sZ2VuZGVuIExpbmsgaW0gc2VsYmVuIEJyb3dzZXIgaW4gZGVtIFNpZSBkaWUgw4RuZGVydW5nIElocmVzIFBhc3N3b3J0IGFuZ2Vmb3JkZXJ0IGhhYmVuIMO2ZmZuZW4gdW5kIHp1ZGVtIG5hY2ggWnVyw7xja3NldHplbiBkZXMgUGFzc3dvcnRzIElocmVuIEJyb3dzZXIgbmljaHQgbmV1IGdlc3RhcnRldCBoYWJlbi4KCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpMaW5rIHVtIFBhc3N3b3J0IG5ldSB6dSBzZXR6ZW4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCntwb3J0YWxVcmx9e2hhc2h1cmx9Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KClNvbGx0ZSBJaHIgU2NobMO8c3NlbCBuaWNodCBtZWhyIGfDvGx0aWcgc2Vpbiwga8O2bm5lbiBTaWUgdW50ZXIgamVkZXJ6ZWl0IGVpbmVuIG5ldWVuIFNjaGzDvHNzZWwgYW5mb3JkZXJuLgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0Ke3BvcnRhbFVybH17cmVzZXR1cmx9Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKU29sbHRlbiBTaWUgZGllIEFuZnJhZ2UgbmljaHQgc2VsYnN0IGF1c2dlbMO2c3QgaGFiZW4sIGJpdHRlbiB3aXIgU2llIHVucyBkYXLDvGJlciB6dSBpbmZvcm1pZXJlbi4KCntmb290ZXJ9'><source>{header}
+    <!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
+    <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
+    <file original='php-sourcecode' source-language='ha' target-language='de' datatype='php' xml:space='preserve'>
+        <body>
+            <trans-unit id='RGV1dHNjaA=='>
+                <source>Deutsch</source>
+                <target>Deutsch</target>
+            </trans-unit>
+            <trans-unit id='RW5nbGlzY2g='>
+                <source>Englisch</source>
+                <target>Englisch</target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0CiAgICBmw7xyIGRlbiBCcm93c2Vy'>
+                <source>translate5 - Open-Source-Lektorat für den Browser</source>
+                <target>translate5 - Open-Source-Lektorat für den Browser</target>
+            </trans-unit>
+            <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='>
+                <source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source>
+                <target>Mit translate5 können Sie SDLXLIFF-, openTM2-XLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBiaWV0ZXQgbW9kZXJuc3RlcyBkZXNrdG9wYXJ0aWdlcyBBcmJlaXRlbiBpbSBCcm93c2VyIG1pdCB2aWVsZW4gaW50ZXJlc3NhbnRlbiwgdGVpbHdlaXNlIGVpbnppZ2FydGlnZW4gRmVhdHVyZXMu'>
+                <source>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</source>
+                <target>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBpc3QgT3BlbiBTb3VyY2UgdW5kIGRhbWl0IGtvc3Rlbmxvc2UgU29mdHdhcmUu'>
+                <source>translate5 ist Open Source und damit kostenlose Software.</source>
+                <target>translate5 ist Open Source und damit kostenlose Software.</target>
+            </trans-unit>
+            <trans-unit id='PHN0cm9uZz48YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS90cmFuc2xhdGU1L2ZlYXR1cmVzLyIgdGFyZ2V0PSJfYmxhbmsiPkVpbmUgdW1mYXNzZW5kZSBGZWF0dXJlbGlzdGU8L2E+PC9zdHJvbmc+IHVuZCB3ZWl0ZXJlIEluZm9ybWF0aW9uZW4genUgdHJhbnNsYXRlNSBmaW5kZW4gU2llIGF1ZiA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS90cmFuc2xhdGU1LyIgdGFyZ2V0PSJfYmxhbmsiPnd3dy5taXR0YWdxaS5jb208L2E+Lg=='>
+                <source>
+                    <strong>
+                        <a href="http://www.mittagqi.com/translate5/features/" target="_blank">Eine umfassende Featureliste</a>
+                    </strong> und weitere Informationen zu translate5 finden Sie auf 
+                    <a href="http://www.mittagqi.com/translate5/" target="_blank">www.mittagqi.com</a>.
+                </source>
+                <target>
+                    <strong>
+                        <a href="http://www.mittagqi.com/translate5/features/" target="_blank">Eine umfassende Featureliste</a>
+                    </strong> und weitere Informationen zu translate5 finden Sie auf 
+                    <a href="http://www.mittagqi.com/translate5/" target="_blank">www.mittagqi.com</a>.
+                </target>
+            </trans-unit>
+            <trans-unit id='RGVtb3ZlcnNpb24gc3RhcnRlbg=='>
+                <source>Demoversion starten</source>
+                <target>Demoversion starten</target>
+            </trans-unit>
+            <trans-unit id='U3BvbnNlcmluZyB2b24gdHJhbnNsYXRlNQ=='>
+                <source>Sponsering von translate5</source>
+                <target>Sponsering von translate5</target>
+            </trans-unit>
+            <trans-unit id='VW5zZXIgRGFuayBnZWh0IGFuOg=='>
+                <source>Unser Dank geht an:</source>
+                <target>Unser Dank geht an:</target>
+            </trans-unit>
+            <trans-unit id='U2llIGVybcO2Z2xpY2hlbiBkaWVzZXMgUHJvamVrdCE='>
+                <source>Sie ermöglichen dieses Projekt!</source>
+                <target>Sie ermöglichen dieses Projekt!</target>
+            </trans-unit>
+            <trans-unit id='SW5mb3MgenUgdHJhbnNsYXRlNSBhdWYgTWl0dGFnUUkuY29t'>
+                <source>Infos zu translate5 auf MittagQI.com</source>
+                <target>Infos zu translate5 auf MittagQI.com</target>
+            </trans-unit>
+            <trans-unit id='RmVhdHVyZXM='>
+                <source>Features</source>
+                <target>Features</target>
+            </trans-unit>
+            <trans-unit id='RW50d2lja2x1bmc='>
+                <source>Entwicklung</source>
+                <target>Entwicklung</target>
+            </trans-unit>
+            <trans-unit id='Q29uc3VsdGluZyB1bmQgSW5zdGFsbGF0aW9uZW4='>
+                <source>Consulting und Installationen</source>
+                <target>Consulting und Installationen</target>
+            </trans-unit>
+            <trans-unit id='SG9zdGluZw=='>
+                <source>Hosting</source>
+                <target>Hosting</target>
+            </trans-unit>
+            <trans-unit id='VGVzdGRhdGVu'>
+                <source>Testdaten</source>
+                <target>Testdaten</target>
+            </trans-unit>
+            <trans-unit id='RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgPGEgaHJlZj0iL2luZGV4L3Rlc3RkYXRhLyI+aGllciBUZXN0ZGF0ZW4gZG93bmxvYWRlbjwvYT4gdW5kIGFscyBuZXVlcyBQcm9qZWt0IGltcG9ydGllcmVuLg=='>
+                <source>Falls Sie keine Testdaten zur Hand haben, können Sie 
+                    <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.
+                </source>
+                <target>Falls Sie keine Testdaten zur Hand haben, können Sie 
+                    <a href="/index/testdata/">hier Testdaten downloaden</a> und als neues Projekt importieren.
+                </target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBMb2dpbg=='>
+                <source>translate5 Login</source>
+                <target>translate5 Login</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmRiZW51dHplciBmw7xyIHRyYW5zbGF0ZTU='>
+                <source>Standardbenutzer für translate5</source>
+                <target>Standardbenutzer für translate5</target>
+            </trans-unit>
+            <trans-unit id='QWNodHVuZzogSW4gZGVyIHRyYW5zbGF0ZTUtRGVtb2luc3RhbGxhdGlvbiBzaW5kIGRpZXNlIFN0YW5kYXJkYmVudXR6ZXIgbmljaHQgZWRpdGllcmJhciAtIGFuZGVyZSBCZW51dHplciBoaW5nZWdlbiBzY2hvbi4='>
+                <source>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</source>
+                <target>Achtung: In der translate5-Demoinstallation sind diese Standardbenutzer nicht editierbar - andere Benutzer hingegen schon.</target>
+            </trans-unit>
+            <trans-unit id='QmVudXR6ZXJuYW1l'>
+                <source>Benutzername</source>
+                <target>Benutzername</target>
+            </trans-unit>
+            <trans-unit id='UGFzc3dvcnQ='>
+                <source>Passwort</source>
+                <target>Passwort</target>
+            </trans-unit>
+            <trans-unit id='TG9naW4='>
+                <source>Login</source>
+                <target>Login</target>
+            </trans-unit>
+            <trans-unit id='RWlubG9nZ2Vu'>
+                <source>Einloggen</source>
+                <target>Einloggen</target>
+            </trans-unit>
+            <trans-unit id='UGFzc3dvcnQgbmV1IHNldHplbg=='>
+                <source>Passwort neu setzen</source>
+                <target>Passwort neu setzen</target>
+            </trans-unit>
+            <trans-unit id='VW5nw7xsdGlnZSBMb2dpbmRhdGVuITxici8+SGFiZW4gU2llIElociBQYXNzd29ydCB2ZXJnZXNzZW4gb2RlciBiaXNsYW5nIG5vY2gga2VpbiBQYXNzd29ydCBmw7xyIElocmVuIExvZ2luIGdlc2V0enQ/ICBTaWUga8O2bm5lbiBqZWRlcnplaXQgZWluZW4gbmV1ZW4gTGluayAlc2hpZXIlcyBhbmZvcmRlcm4u'>
+                <source>Ungültige Logindaten!
+                    <br/>Haben Sie Ihr Passwort vergessen oder bislang noch kein Passwort für Ihren Login gesetzt?  Sie können jederzeit einen neuen Link %shier%s anfordern.
+                </source>
+                <target>Ungültige Logindaten!
+                    <br/>Haben Sie Ihr Passwort vergessen oder bislang noch kein Passwort für Ihren Login gesetzt?  Sie können jederzeit einen neuen Link %shier%s anfordern.
+                </target>
+            </trans-unit>
+            <trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'>
+                <source>Unterstützung der Entwicklung von translate5</source>
+                <target>Unterstützung der Entwicklung von translate5</target>
+            </trans-unit>
+            <trans-unit id='VW5zZXIgZ3Jvw59lciBEYW5rIGdlaHQgYW4gZGllIGZvbGdlbmRlbiBVbnRlcm5laG1lbiB1bmQgT3JnYW5pc2F0aW9uZW4uIFNpZSBmaW5hbnppZXJlbiBkaWUgRmVhdHVyZXMsIGRpZSBzaWUgdm9uIHRyYW5zbGF0ZTUgZXJ3YXJ0ZW4u'>
+                <source>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</source>
+                <target>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</target>
+            </trans-unit>
+            <trans-unit id='U2llIGVybcO2Z2xpY2hlbiBzbyBkaWVzZXMgUHJvamVrdCE='>
+                <source>Sie ermöglichen so dieses Projekt!</source>
+                <target>Sie ermöglichen so dieses Projekt!</target>
+            </trans-unit>
+            <trans-unit id='VmllbGVuIERhbmsgZGFmw7xyIQ=='>
+                <source>Vielen Dank dafür!</source>
+                <target>Vielen Dank dafür!</target>
+            </trans-unit>
+            <trans-unit id='SGF1cHR1bnRlcnN0w7x0emVyIHZvbiB0cmFuc2xhdGU1'>
+                <source>Hauptunterstützer von translate5</source>
+                <target>Hauptunterstützer von translate5</target>
+            </trans-unit>
+            <trans-unit id='VW50ZXJzdMO8dHplciBhdXNnZXfDpGhsdGVyIEZlYXR1cmVz'>
+                <source>Unterstützer ausgewählter Features</source>
+                <target>Unterstützer ausgewählter Features</target>
+            </trans-unit>
+            <trans-unit id='SW5mb3JtYXRpb25lbiB6dXIgQmVkaWVudW5n'>
+                <source>Informationen zur Bedienung</source>
+                <target>Informationen zur Bedienung</target>
+            </trans-unit>
+            <trans-unit id='RGllc2UgdHJhbnNsYXRlNSBEZW1vdmVyc2lvbiBpc3Qgw7ZmZmVudGxpY2gsIGFsbGUgaG9jaGdlbGFkZW5lbiBQcm9qZWt0ZSBrw7ZubmVuIHZvbiBqZWRlbSBlaW5nZXNlaGVuIHVuZCBleHBvcnRpZXJ0IHdlcmRlbiE='>
+                <source>Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen und exportiert werden!</source>
+                <target>Diese translate5 Demoversion ist öffentlich, alle hochgeladenen Projekte können von jedem eingesehen und exportiert werden!</target>
+            </trans-unit>
+            <trans-unit id='WmlwLURhdGVpIG1pdCBJbXBvcnQgRGF0ZW4='>
+                <source>Zip-Datei mit Import Daten</source>
+                <target>Zip-Datei mit Import Daten</target>
+            </trans-unit>
+            <trans-unit id='cmV2aWV3OiBWZXJ6ZWljaG5pcyBtaXQgenUgbGVrdG9yaWVyZW5kZW4gRGF0ZWllbg=='>
+                <source>review: Verzeichnis mit zu lektorierenden Dateien</source>
+                <target>review: Verzeichnis mit zu lektorierenden Dateien</target>
+            </trans-unit>
+            <trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicmV2aWV3IiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiB1bmQgLyBvZGVyIG9wZW5UTTItWExJRkYgdW5kIC8gb2RlciBDU1YtRGF0ZWllbiBpbiBlaW5lciBiZWxpZWJpZ2VuIFZlcnplaWNobmlzc3RydWt0dXIgYmVpbmhhbHRlbiBrYW5uLiBDU1YtLCBvcGVuVE0yLVhMSUZGLSB1bmQgU0RMWExJRkYtRGF0ZWllbiBrw7ZubmVuIGJlbGllYmlnIGdlbWlzY2h0IHdlcmRlbi4gRGllIFN0cnVrdHVyIHdpcmQgaW0gTGVrdG9yYXQgYWJnZWJpbGRldC4='>
+                <source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
+                <target>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</target>
+            </trans-unit>
+            <trans-unit id='U3RydWt0dXIgdm9uIENTVi1EYXRlaWVuIChmYWxscyBhbHMgTGVrdG9yYXRzcXVlbGxlIHZlcndlbmRldCk='>
+                <source>Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)</source>
+                <target>Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)</target>
+            </trans-unit>
+            <trans-unit id='Q1NWLURhdGVpZW4gbcO8c3NlbiBkcmVpIFNwYWx0ZW4gZW50aGFsdGVuLCBkZXJlbiBTcGFsdGVua8O2cGZlIG1pdCBkZW4gQmV6ZWljaG51bmdlbiAibWlkIiwgInF1ZWxsZSIsICJ6aWVsIiBnZWtlbm56ZWljaG5ldCBzaW5kLiBEaWVzZSBTcGFsdGVuIGvDtm5uZW4gaW4gYmVsaWViaWdlciBSZWloZW5mb2xnZSBpbiBkZXIgQ1NWLURhdGVpIGVudGhhbHRlbiBzZWluLiBXZWl0ZXJlIFNwYWx0ZW4gZGVyIENTVi1EYXRlaSB3ZXJkZW4gYmVpbSBJbXBvcnQgaWdub3JpZXJ0LiBTcGFsdGVudHJlbm5lciBkZXIgQ1NWIGlzdCBlaW4gS29tbWEgIiwiLCBUZXh0ZXJrZW5udW5nc3plaWNoZW4gZWluIGRvcHBlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gIiZhcG9zOyIuIFplaWxlbnRyZW5uZXIgZGVyIENTViBpc3QgZWluIExpbnV4LSwgTWFjLSBvZGVyIFdpbmRvd3N6ZWlsZW51bWJydWNoLiBDb2RpZXJ1bmcgZGVyIENTVi1EYXRlaSBrYW5uIHV0Zi04LCBpc28tODg1OS0xIG9kZXIgd2luZG93cy0xMjUxIHNlaW4uIERpZSBDU1YtRGF0ZWkgd2lyZCBpbiBkZXIgc2VsYmVuIENvZGllcnVuZyBleHBvcnRpZXJ0LCBpbiBkZXIgc2llIGJlaW0gSW1wb3J0IHZvcmxhZyAoQWNodHVuZzogQmVpIGVpbmVyIMOcYmVyc2V0enVuZyBpbiBOaWNodC1XZXN0ZXVyb3DDpGlzY2hlIFNwcmFjaGVuIHNvbGx0ZSBkYWhlciB1dGYtOCBiZXJlaXRzIGFscyBJbXBvcnRjb2RpZXJ1bmcgZ2V3w6RobHQgd2VyZGVuKS4='>
+                <source>CSV-Dateien müssen drei Spalten enthalten, deren Spaltenköpfe mit den Bezeichnungen "mid", "quelle", "ziel" gekennzeichnet sind. Diese Spalten können in beliebiger Reihenfolge in der CSV-Datei enthalten sein. Weitere Spalten der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma ",", Texterkennungszeichen ein doppeltes Anführungszeichen "&apos;". Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</source>
+                <target>CSV-Dateien müssen drei Spalten enthalten, deren Spaltenköpfe mit den Bezeichnungen "mid", "quelle", "ziel" gekennzeichnet sind. Diese Spalten können in beliebiger Reihenfolge in der CSV-Datei enthalten sein. Weitere Spalten der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma ",", Texterkennungszeichen ein doppeltes Anführungszeichen "&apos;". Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</target>
+            </trans-unit>
+            <trans-unit id='VmVyemVpY2huaXNzdHJ1a3R1ciBiZWltIEV4cG9ydA=='>
+                <source>Verzeichnisstruktur beim Export</source>
+                <target>Verzeichnisstruktur beim Export</target>
+            </trans-unit>
+            <trans-unit id='QmVpbSBFeHBvcnQgd2lyZCBkaWUgZ2xlaWNoZSBEYXRlaSB1bmQgVmVyemVpY2huaXNzdHJ1a3R1ciBpbiBGb3JtIGVpbmVyIFppcC1EYXRlaSB3aWVkZXIgYXVzZ2VzcGllbHQ='>
+                <source>Beim Export wird die gleiche Datei und Verzeichnisstruktur in Form einer Zip-Datei wieder ausgespielt</source>
+                <target>Beim Export wird die gleiche Datei und Verzeichnisstruktur in Form einer Zip-Datei wieder ausgespielt</target>
+            </trans-unit>
+            <trans-unit id='VEJYLURhdGVpIHp1ciBBdXN6ZWljaG51bmcgdm9uIFRlcm1pbm9sb2dpZQ=='>
+                <source>TBX-Datei zur Auszeichnung von Terminologie</source>
+                <target>TBX-Datei zur Auszeichnung von Terminologie</target>
+            </trans-unit>
+            <trans-unit id='RGllIFRCWC1EYXRlaSBrYW5uIGJlbGllYmlnIHZpZWxlIFNwcmFjaGVuIGVudGhhbHRlbi4gU2llIG11c3MgbWluZGVzdGVucyBkaWUgendlaSBTcHJhY2hlbiBlbnRoYWx0ZW4sIGRpZSBiZWltIEF1ZmdhYmVuaW1wb3J0IGFscyBRdWVsbC0gdW5kIFppZWxzcHJhY2hlbiBhdXNnZXfDpGhsdCB3ZXJkZW4uIERpZSBUQlggRGF0ZWkgZGFyZiBzaWNoIGluIGtlaW5lbSBVbnRlcnZlcnplaWNobmlzIGJlZmluZGVuLCBzb25zdCB3aXJkIFNpZSBuaWNodCBpbXBvcnRpZXJ0LiBCZWZpbmRlbiBzaWNoIG1laHJlcmUgVEJYIERhdGVpZW4gaW4gZGVyIFppcC1EYXRlaSwgc28gd2lyZCBuYWNoIGFscGhhYmV0aXNjaGVyIFNvcnRpZXJ1bmcgZGllIGVyc3RlIFRCWCBEYXRlaSB2ZXJ3ZW5kZXQu'>
+                <source>Die TBX-Datei kann beliebig viele Sprachen enthalten. Sie muss mindestens die zwei Sprachen enthalten, die beim Aufgabenimport als Quell- und Zielsprachen ausgewählt werden. Die TBX Datei darf sich in keinem Unterverzeichnis befinden, sonst wird Sie nicht importiert. Befinden sich mehrere TBX Dateien in der Zip-Datei, so wird nach alphabetischer Sortierung die erste TBX Datei verwendet.</source>
+                <target>Die TBX-Datei kann beliebig viele Sprachen enthalten. Sie muss mindestens die zwei Sprachen enthalten, die beim Aufgabenimport als Quell- und Zielsprachen ausgewählt werden. Die TBX Datei darf sich in keinem Unterverzeichnis befinden, sonst wird Sie nicht importiert. Befinden sich mehrere TBX Dateien in der Zip-Datei, so wird nach alphabetischer Sortierung die erste TBX Datei verwendet.</target>
+            </trans-unit>
+            <trans-unit id='UmVsYWlzc3ByYWNoZSB6dXIgVmVyZsO8Z3VuZyBzdGVsbGVu'>
+                <source>Relaissprache zur Verfügung stellen</source>
+                <target>Relaissprache zur Verfügung stellen</target>
+            </trans-unit>
+            <trans-unit id='VmVyc3RlaHQgZGVyIExla3RvciBkaWUgQXVzZ2FuZ3NzcHJhY2hlIG5pY2h0IGthbm4gaWhtIGVpbmUgUmVsYWlzc3ByYWNoZSB6dXIgVmVyZsO8Z3VuZyBnZXN0ZWxsdCB3ZXJkZW4sIGRpZSBlciB2ZXJzdGVodCAoei4gQi4gRW5nbGlzY2gpLiBEYXp1IG11c3MgZGFzIHp1IGxla3RvcmllcmVuZGUgRG9rdW1lbnQgc3RydWt0dXJnbGVpY2ggYWxzIEVuZ2xpc2Now7xiZXJzZXR6dW5nIHZvcmxpZWdlbi4gRGllc2VzIG9kZXIgZGllc2Ugc3RydWt0dXJnbGVpY2hlbiBEb2t1bWVudGUgd2VyZGVuIGltIG9wdGlvbmFsZW4gVmVyemVpY2huaXMgInJlbGFpcyIgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQuIERhYmVpIG11c3MgZGllIERhdGVpc3RydWt0dXIgaWRlbnRpc2NoIHp1IGRlbiBJbmhhbHRlbiBpbSAicmV2aWV3IiBWZXJ6ZWljaG5pcyBzZWluLg=='>
+                <source>Versteht der Lektor die Ausgangssprache nicht kann ihm eine Relaissprache zur Verfügung gestellt werden, die er versteht (z. B. Englisch). Dazu muss das zu lektorierende Dokument strukturgleich als Englischübersetzung vorliegen. Dieses oder diese strukturgleichen Dokumente werden im optionalen Verzeichnis "relais" zur Verfügung gestellt. Dabei muss die Dateistruktur identisch zu den Inhalten im "review" Verzeichnis sein.</source>
+                <target>Versteht der Lektor die Ausgangssprache nicht kann ihm eine Relaissprache zur Verfügung gestellt werden, die er versteht (z. B. Englisch). Dazu muss das zu lektorierende Dokument strukturgleich als Englischübersetzung vorliegen. Dieses oder diese strukturgleichen Dokumente werden im optionalen Verzeichnis "relais" zur Verfügung gestellt. Dabei muss die Dateistruktur identisch zu den Inhalten im "review" Verzeichnis sein.</target>
+            </trans-unit>
+            <trans-unit id='UmVmZXJlbnpkYXRlaWVuIHp1ciBWZXJmw7xndW5nIHN0ZWxsZW4='>
+                <source>Referenzdateien zur Verfügung stellen</source>
+                <target>Referenzdateien zur Verfügung stellen</target>
+            </trans-unit>
+            <trans-unit id='RGFzIG9wdGlvbmFsZSBWZXJ6ZWljaG5pcyAicmVmZXJlbmNlRmlsZXMiIGthbm4gZWluZSBiZWxpZWJpZ2UgRGF0ZWlzdHJ1a3R1ciBlbnRoYWx0ZW4sIHdlbGNoZSBhbHMgUmVmZXJlbnpkYXRlaWVuIGltcG9ydGllcnQgd2VyZGVuLg=='>
+                <source>Das optionale Verzeichnis "referenceFiles" kann eine beliebige Dateistruktur enthalten, welche als Referenzdateien importiert werden.</source>
+                <target>Das optionale Verzeichnis "referenceFiles" kann eine beliebige Dateistruktur enthalten, welche als Referenzdateien importiert werden.</target>
+            </trans-unit>
+            <trans-unit id='WE1MLURhdGVpIHp1ciBLb25maWd1cmF0aW9uIGRlciBRTS1TdWJzZWdtZW50LUtyaXRlcmllbg=='>
+                <source>XML-Datei zur Konfiguration der QM-Subsegment-Kriterien</source>
+                <target>XML-Datei zur Konfiguration der QM-Subsegment-Kriterien</target>
+            </trans-unit>
+            <trans-unit id='RGllIG9wdGlvbmFsZSBYTUwtRGF0ZWkgenVyIEtvbmZpZ3VyYXRpb24gZGVyIFFNLVN1YnNlZ21lbnQtS3JpdGVyaWVuIGJlc3RpbW10LCB3ZWxjaGUgUU0tU3Vic2VnbWVudCBGZWhsZXJrYXRlZ29yaWVuIHfDpGhyZW5kIGRlcyBMZWt0b3JhdHMgenVyIFZlcmbDvGd1bmcgc3RlaGVuLiBFaW5lIMO8YmVyZ2ViZW5lIERhdGVpIG11c3MgaW0gRm9ybWF0IGRlciBTdGFuZGFyZGRhdGVpIGVudHNwcmVjaGVuLCB3ZWxjaGUgJXNoaWVyIGFscyBCZXNwaWVsIGhlcnVudGVyZ2VsYWRlbiB3ZXJkZW4ga2FubiVzLiBXaXJkIGtlaW5lIERhdGVpIMO8YmVyZ2ViZW4sIHdpcmQgZGllIFN0YW5kYXJkLURhdGVpIHZlcndlbmRldC4g'>
+                <source>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche %shier als Bespiel heruntergeladen werden kann%s. Wird keine Datei übergeben, wird die Standard-Datei verwendet. </source>
+                <target>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche %shier als Bespiel heruntergeladen werden kann%s. Wird keine Datei übergeben, wird die Standard-Datei verwendet. </target>
+            </trans-unit>
+            <trans-unit id='PGI+QmVpc3BpZWxoYWZ0ZXIgSW5oYWx0IGVpbmVyIFppcCBEYXRlaTogPC9iPg=='>
+                <source>
+                    <b>Beispielhafter Inhalt einer Zip Datei: </b>
+                </source>
+                <target>
+                    <b>Beispielhafter Inhalt einer Zip Datei: </b>
+                </target>
+            </trans-unit>
+            <trans-unit id='T3B0aW9uYWxlIFhNTC1EYXRlaSB6dXIgS29uZmlndXJhdGlvbiBkZXIgUU0tU3Vic2VnbWVudCBLcml0ZXJpZW4gKEJlaXNwaWVsIDxhIGhyZWY9IiVzIiB0YXJnZXQ9Il9ibGFuayI+c2llaGUgaGllcjwvYT4pLg=='>
+                <source>Optionale XML-Datei zur Konfiguration der QM-Subsegment Kriterien (Beispiel 
+                    <a href="%s" target="_blank">siehe hier</a>).
+                </source>
+                <target>Optionale XML-Datei zur Konfiguration der QM-Subsegment Kriterien (Beispiel 
+                    <a href="%s" target="_blank">siehe hier</a>).
+                </target>
+            </trans-unit>
+            <trans-unit id='RGllc2VzIFZlcnplaWNobmlzIGlzdCB6d2luZ2VuZCBuw7Z0aWcsIHVuZCBiZWluaGFsdGV0IGRpZSB6dSBsZWt0b3JpZXJlbmRlbiBEYXRlaWVuLg=='>
+                <source>Dieses Verzeichnis ist zwingend nötig, und beinhaltet die zu lektorierenden Dateien.</source>
+                <target>Dieses Verzeichnis ist zwingend nötig, und beinhaltet die zu lektorierenden Dateien.</target>
+            </trans-unit>
+            <trans-unit id='RGllc2VzIFZlcnplaWNobmlzIGlzdCBvcHRpb25hbCwgbXVzcyB3ZW5uIHZvcmhhbmRlbiBkaWUgZ2xlaWNoZSBEYXRlaXN0cnVrdHVyIHdpZSAicmV2aWV3IiBhdWZ3ZWlzZW4='>
+                <source>Dieses Verzeichnis ist optional, muss wenn vorhanden die gleiche Dateistruktur wie "review" aufweisen</source>
+                <target>Dieses Verzeichnis ist optional, muss wenn vorhanden die gleiche Dateistruktur wie "review" aufweisen</target>
+            </trans-unit>
+            <trans-unit id='b3B0aW9uYWxlIFRCWCBEYXRlaSBtaXQgVGVybWVuLCBkaWUgZXJzdGUgZ2VmdW5kZW4gVEJYIERhdGVpIHdpcmQgdmVyd2VuZGV0'>
+                <source>optionale TBX Datei mit Termen, die erste gefunden TBX Datei wird verwendet</source>
+                <target>optionale TBX Datei mit Termen, die erste gefunden TBX Datei wird verwendet</target>
+            </trans-unit>
+            <trans-unit id='b3B0aW9uYWxlcyBWZXJ6ZWljaG5pcyBtaXQgUmVmZXJlbnpkYXRlaWVu'>
+                <source>optionales Verzeichnis mit Referenzdateien</source>
+                <target>optionales Verzeichnis mit Referenzdateien</target>
+            </trans-unit>
+            <trans-unit id='SGlud2Vpc2UgenVtIExla3RvcmF0'>
+                <source>Hinweise zum Lektorat</source>
+                <target>Hinweise zum Lektorat</target>
+            </trans-unit>
+            <trans-unit id='U2NyZWVuc2hvdCBMZWt0b3JhdA=='>
+                <source>Screenshot Lektorat</source>
+                <target>Screenshot Lektorat</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWnDvGJlcnNpY2h0'>
+                <source>Dateiübersicht</source>
+                <target>Dateiübersicht</target>
+            </trans-unit>
+            <trans-unit id='QmVsaWViaWcgdmVya2xlaW5lci0gdW5kIHZlcmdyw7bDn2VyYmFy'>
+                <source>Beliebig verkleiner- und vergrößerbar</source>
+                <target>Beliebig verkleiner- und vergrößerbar</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWlyZWloZW5mb2xnZSBzb3J0aWVyYmFy'>
+                <source>Dateireihenfolge sortierbar</source>
+                <target>Dateireihenfolge sortierbar</target>
+            </trans-unit>
+            <trans-unit id='S2xpY2sgYXVmIERhdGVpIHNwcmluZ3QgenVtIGVyc3RlbiBTZWdtZW50'>
+                <source>Klick auf Datei springt zum ersten Segment</source>
+                <target>Klick auf Datei springt zum ersten Segment</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVy'>
+                <source>Filter</source>
+                <target>Filter</target>
+            </trans-unit>
+            <trans-unit id='QWxsZSBTcGFsdGVuIGZpbHRlci0gdW5kIHNvcnRpZXJiYXI='>
+                <source>Alle Spalten filter- und sortierbar</source>
+                <target>Alle Spalten filter- und sortierbar</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyIG1laHJlcmVyIFNwYWx0ZW4ga29tYmluaWVyYmFy'>
+                <source>Filter mehrerer Spalten kombinierbar</source>
+                <target>Filter mehrerer Spalten kombinierbar</target>
+            </trans-unit>
+            <trans-unit id='RXJtw7ZnbGljaHQgZmxleGlibGVzIFJldmlldw=='>
+                <source>Ermöglicht flexibles Review</source>
+                <target>Ermöglicht flexibles Review</target>
+            </trans-unit>
+            <trans-unit id='VGVybWlub2xvZ2llIGltIFNlZ21lbnQ='>
+                <source>Terminologie im Segment</source>
+                <target>Terminologie im Segment</target>
+            </trans-unit>
+            <trans-unit id='QmxhdSB1bnRlcnN0cmljaGVuOiBUZXJtIHVuZCDDnGJlcnNldHp1bmcgdm9yaGFuZGVu'>
+                <source>Blau unterstrichen: Term und Übersetzung vorhanden</source>
+                <target>Blau unterstrichen: Term und Übersetzung vorhanden</target>
+            </trans-unit>
+            <trans-unit id='Um90IHVudGVyc3RyaWNoZW46IFRlcm0gZmVobHQgaW4gw5xiZXJzZXR6dW5n'>
+                <source>Rot unterstrichen: Term fehlt in Übersetzung</source>
+                <target>Rot unterstrichen: Term fehlt in Übersetzung</target>
+            </trans-unit>
+            <trans-unit id='VmlvbGV0dCBoaW50ZXJsZWd0OiBWZXJ3ZW5kZXRlciBUZXJtIGlzdCB2ZXJib3RlbmUgQmVuZW5udW5n'>
+                <source>Violett hinterlegt: Verwendeter Term ist verbotene Benennung</source>
+                <target>Violett hinterlegt: Verwendeter Term ist verbotene Benennung</target>
+            </trans-unit>
+            <trans-unit id='QmVhcmJlaXR1bmdzc3RhdHVz'>
+                <source>Bearbeitungsstatus</source>
+                <target>Bearbeitungsstatus</target>
+            </trans-unit>
+            <trans-unit id='V2lyZCBiZWkgU3BlaWNoZXJuIGRlcyBTZWdtZW50cyBhdXRvbWF0aXNjaCBnZXNldHp0'>
+                <source>Wird bei Speichern des Segments automatisch gesetzt</source>
+                <target>Wird bei Speichern des Segments automatisch gesetzt</target>
+            </trans-unit>
+            <trans-unit id='SMOka2NoZW46IFd1cmRlIGxla3RvcmllcnQ='>
+                <source>Häkchen: Wurde lektoriert</source>
+                <target>Häkchen: Wurde lektoriert</target>
+            </trans-unit>
+            <trans-unit id='WmFobnJhZDogQXV0b21hdGlzY2ggYW5nZXBhc3N0ZSBXaWVkZXJob2x1bmc='>
+                <source>Zahnrad: Automatisch angepasste Wiederholung</source>
+                <target>Zahnrad: Automatisch angepasste Wiederholung</target>
+            </trans-unit>
+            <trans-unit id='U2VnbWVudC1NZXRhZGF0ZW4='>
+                <source>Segment-Metadaten</source>
+                <target>Segment-Metadaten</target>
+            </trans-unit>
+            <trans-unit id='WmVpZ2VuIGRpZSBXZXJ0ZSBkZXMgYWt0dWVsbGVuIFNlZ21lbnRz'>
+                <source>Zeigen die Werte des aktuellen Segments</source>
+                <target>Zeigen die Werte des aktuellen Segments</target>
+            </trans-unit>
+            <trans-unit id='VGVybWlub2xvZ2llIGVudGjDpGx0IGF1Y2ggbmljaHQgaW0gU2VnbWVudCB2ZXJ3ZW5kZXRlIFRlcm1lIGVpbmVzIHZlcndlbmRldGVuIEJlZ3JpZmZz'>
+                <source>Terminologie enthält auch nicht im Segment verwendete Terme eines verwendeten Begriffs</source>
+                <target>Terminologie enthält auch nicht im Segment verwendete Terme eines verwendeten Begriffs</target>
+            </trans-unit>
+            <trans-unit id='V8OkaGxiYXJlIFdlcnRlIGbDvHIgIlFNIiB1bmQgIlN0YXR1cyIgc2luZCBwcm8gSW5zdGFsbGF0aW9uIGZyZWkga29uZmlndXJpZXJiYXI='>
+                <source>Wählbare Werte für "QM" und "Status" sind pro Installation frei konfigurierbar</source>
+                <target>Wählbare Werte für "QM" und "Status" sind pro Installation frei konfigurierbar</target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldC5vcmc='>
+                <source>translate5 Quellcode auf bitbucket.org</source>
+                <target>translate5 Quellcode auf bitbucket.org</target>
+            </trans-unit>
+            <trans-unit id='UXVhbGl0w6R0c2dlc2ljaGVydGUgVmVyc2lvbiAtIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL3dpbGxrb21tZW4vaW1wcmVzc3VtIiB0YXJnZXQ9Il9ibGFuayI+Yml0dGUgZnJhZ2VuIFNpZSB1bnMgYW4hPC9hPg=='>
+                <source>Qualitätsgesicherte Version - 
+                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a>
+                </source>
+                <target>Qualitätsgesicherte Version - 
+                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">bitte fragen Sie uns an!</a>
+                </target>
+            </trans-unit>
+            <trans-unit id='Qml0YnVja2V0IGRpZW50IGRlciBFbnR3aWNrbHVuZyBhbHMgUmVwb3NpdG9yeSB1bmQgZW50aMOkbHQgZGVuIGxldHp0ZW4gU3RhbmQgZGVyIEVudHdpY2tsdW5nLiBEaWVzZXIgaXN0IG51ciBiZWRpbmd0IGbDvHIgZGVuIFByb2R1a3RpdmVpbnNhdHogZ2VlaWduZXQgdW5kIGthbm4gRmVobGVyIGVudGhhbHRlbiE8YnIvPiBFaW4gcXVhbGl0w6R0c2dlc2ljaGVydGVzIFJlbGVhc2UsIHdlbGNoZXMgYmVyZWl0cyBhbGxlIEFiaMOkbmdpZ2tlaXRlbiBrb3JyZWt0IGVudGjDpGx0IGVyaGFsdGVuIFNpZSA8YSBocmVmPSJodHRwOi8vd3d3Lm1pdHRhZ3FpLmNvbS93aWxsa29tbWVuL2ltcHJlc3N1bSIgdGFyZ2V0PSJfYmxhbmsiPmdlcm4gdm9uIHVucyBhdWYgQW5mcmFnZTwvYT4uIERpZSBWZXLDtmZmZW50bGljaHVuZyBhdWYgYml0YnVja2V0Lm9yZyBpc3QgZsO8ciBFbnR3aWNrbGVyIGdlZGFjaHQu'>
+                <source>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!
+                    <br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie 
+                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.
+                </source>
+                <target>Bitbucket dient der Entwicklung als Repository und enthält den letzten Stand der Entwicklung. Dieser ist nur bedingt für den Produktiveinsatz geeignet und kann Fehler enthalten!
+                    <br/> Ein qualitätsgesichertes Release, welches bereits alle Abhängigkeiten korrekt enthält erhalten Sie 
+                    <a href="http://www.mittagqi.com/willkommen/impressum" target="_blank">gern von uns auf Anfrage</a>. Die Veröffentlichung auf bitbucket.org ist für Entwickler gedacht.
+                </target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBFbnR3aWNrbGVyLVJlcG9zaXRvcnkgYXVmIGJpdGJ1Y2tldC5vcmc='>
+                <source>translate5 Entwickler-Repository auf bitbucket.org</source>
+                <target>translate5 Entwickler-Repository auf bitbucket.org</target>
+            </trans-unit>
+            <trans-unit id='RGVyIGxldHp0ZSBTdGFuZCBkZXIgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUgaXN0IGpld2VpbHMgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5hdWYgYml0YnVja2V0Lm9yZyB2ZXLDtmZmZW50bGljaHQ8L2E+Lg=='>
+                <source>Der letzte Stand der Entwicklung von translate5 ist jeweils 
+                    <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.
+                </source>
+                <target>Der letzte Stand der Entwicklung von translate5 ist jeweils 
+                    <a href="%s" target="_blank">auf bitbucket.org veröffentlicht</a>.
+                </target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBpc3QgYXVmIGF1ZiBtZWhyZXJlIGJpdGJ1Y2tldC1SZXBvc2l0b3JpZXMgdmVydGVpbHQgdW5kIGJlbsO2dGlndCBkYXLDvGJlciBoaW5hdXMgZWluZSBSZWloZSBleHRlcm5lciBCaWJsaW90aGVrZW4uIERhcyBoaWVyYXJjaGlzY2ggb2JlcnN0ZSBSZXBvc2l0b3J5IGlzdCAidHJhbnNsYXRlNSIsIHdlbGNoZXMgZGllIEFiaMOkbmdpZ2tlaXRlbiBhbHMgZ2l0LXN1Ym1vZHVsZSBvZGVyIFZlcndlaXNlIGVudGjDpGx0Lg=='>
+                <source>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</source>
+                <target>translate5 ist auf auf mehrere bitbucket-Repositories verteilt und benötigt darüber hinaus eine Reihe externer Bibliotheken. Das hierarchisch oberste Repository ist "translate5", welches die Abhängigkeiten als git-submodule oder Verweise enthält.</target>
+            </trans-unit>
+            <trans-unit id='TWl0dGFnUUkgLSBRdWFsaXR5IEluZm9ybWF0aWNzPGJyIC8+S29ucmFkLUxvcmVuei1XZWcgMTA8YnIgLz43MjExNiBNw7Zzc2luZ2VuPGJyIC8+VGVsLiAwNzQ3My8yMjAyMDI8YnIgLz5GYXggMDc0NzMvMjIwMjExPGJyIC8+RS1NYWlsOiBzZXJ2aWNlQE1pdHRhZ1FJLmNvbQ=='>
+                <source>MittagQI - Quality Informatics
+                    <br />Konrad-Lorenz-Weg 10
+                    <br />72116 Mössingen
+                    <br />Tel. 07473/220202
+                    <br />Fax 07473/220211
+                    <br />E-Mail: service@MittagQI.com
+                </source>
+                <target>MittagQI - Quality Informatics
+                    <br />Konrad-Lorenz-Weg 10
+                    <br />72116 Mössingen
+                    <br />Tel. 07473/220202
+                    <br />Fax 07473/220211
+                    <br />E-Mail: service@MittagQI.com
+                </target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBOZXdzbGV0dGVy'>
+                <source>translate5 Newsletter</source>
+                <target>translate5 Newsletter</target>
+            </trans-unit>
+            <trans-unit id='RGVyIDxhIGhyZWY9Imh0dHA6Ly93d3cubWl0dGFncWkuY29tL25ld3NsZXR0ZXIiIHRhcmdldD0iX2JsYW5rIj50cmFuc2xhdGU1LU5ld3NsZXR0ZXIgdm9uIE1pdHRhZ1FJPC9hPiBpbmZvcm1pZXJ0IHJlZ2VsbcOkw59pZyB6dSBuZXVlbiBGZWF0dXJlcyB1bmQgYW5kZXJlbiBOZXVpZ2tlaXRlbi4='>
+                <source>Der 
+                    <a href="http://www.mittagqi.com/newsletter" target="_blank">translate5-Newsletter von MittagQI</a> informiert regelmäßig zu neuen Features und anderen Neuigkeiten.
+                </source>
+                <target>Der 
+                    <a href="http://www.mittagqi.com/newsletter" target="_blank">translate5-Newsletter von MittagQI</a> informiert regelmäßig zu neuen Features und anderen Neuigkeiten.
+                </target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBudXIgQVNDSUktWmVpY2hlbiBpbiBEYXRlaS0gb2RlciBWZXJ6ZWljaG5pc25hbWVuIHVuZCBrZWluZSBTb25kZXJ6ZWljaGVuIG9kZXIgVW1sYXV0ZS4gRGFzIFppcC1Gb3JtYXQgw7xiZXJtaXR0ZWx0IGtlaW5lIEluZm9ybWF0aW9uZW4sIGluIHdlbGNoZXIgQ29kaWVydW5nIElociBCZXRyaWVic3N5c3RlbSBEYXRlaS0gb2RlciBWZXJ6ZWljaG5pc25hbWVuIGdlc3BlaWNoZXJ0IGhhdC4gQXVmZ3J1bmQgZGllc2VzIE1hbmdlbHMgZGVzIFpJUC1TdGFuZGFyZHMga2FubiB0cmFuc2xhdGU1IE5pY2h0LUFTQ0lJLVplaWNoZW4gbmljaHQgZmVobGVyZnJlaSBhdXNsZXNlbi4gRWluemlnZSBBdXNuYWhtZTogSWhyIERhdGVpc3lzdGVtIHNwZWljaGVydCBEYXRlaW5hbWVuIGluIGRlciBVVEYtOC1Lb2RpZXJ1bmcsIHdpZSBMaW51eC1TeXN0ZW1lIGRpZXMgdHVuLg=='>
+                <source>Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen. Einzige Ausnahme: Ihr Dateisystem speichert Dateinamen in der UTF-8-Kodierung, wie Linux-Systeme dies tun.</source>
+                <target>Bitte verwenden Sie nur ASCII-Zeichen in Datei- oder Verzeichnisnamen und keine Sonderzeichen oder Umlaute. Das Zip-Format übermittelt keine Informationen, in welcher Codierung Ihr Betriebssystem Datei- oder Verzeichnisnamen gespeichert hat. Aufgrund dieses Mangels des ZIP-Standards kann translate5 Nicht-ASCII-Zeichen nicht fehlerfrei auslesen. Einzige Ausnahme: Ihr Dateisystem speichert Dateinamen in der UTF-8-Kodierung, wie Linux-Systeme dies tun.</target>
+            </trans-unit>
+            <trans-unit id='SW1wb3J0IHZvbiBlaW56ZWxuZW4gU0RMWExJRkYgb2RlciBDU1YgRGF0ZWllbg=='>
+                <source>Import von einzelnen SDLXLIFF oder CSV Dateien</source>
+                <target>Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien</target>
+            </trans-unit>
+            <trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1Ygb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='>
+                <source>Soll nur eine einzelne CSV oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source>
+                <target>Soll nur eine einzelne CSV, openTM2-XLIFF  oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</target>
+            </trans-unit>
+            <trans-unit id='SGFuZGVsdCBlcyBzaWNoIHVtIGVpbmUgU0RMWExJRkYgRGF0ZWksIHNvIGthbm4genVzw6R0emxpY2ggZWluZSBUQlggRGF0ZWkgbWl0IFRlcm1pbm9sb2dpZSBhdXNnZXfDpGhsdCB3ZXJkZW4u'>
+                <source>Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.</source>
+                <target>Handelt es sich um eine SDLXLIFF Datei, so kann zusätzlich eine TBX Datei mit Terminologie ausgewählt werden.</target>
+            </trans-unit>
+            <trans-unit id='TmV1ZXMgUGFzc3dvcnQ='>
+                <source>Neues Passwort</source>
+                <target>Neues Passwort</target>
+            </trans-unit>
+            <trans-unit id='RS1NYWlsIGFuZm9yZGVybg=='>
+                <source>E-Mail anfordern</source>
+                <target>E-Mail anfordern</target>
+            </trans-unit>
+            <trans-unit id='WnVyw7xjayB6dXIgU3RhcnRzZWl0ZQ=='>
+                <source>Zurück zur Startseite</source>
+                <target>Zurück zur Startseite</target>
+            </trans-unit>
+            <trans-unit id='U2VociBnZWVocnRlciBIZXJy'>
+                <source>Sehr geehrter Herr</source>
+                <target>Sehr geehrter Herr</target>
+            </trans-unit>
+            <trans-unit id='UGVyIEUtTWFpbCB3dXJkZSBJaG5lbiBlaW4gTGluayB6dWdlc2FuZHQsIG1pdCB3ZWxjaGVtIFNpZSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiBrw7ZubmVuLiBEaWVzZXIgTGluayBpc3QgMzAgbWluIGfDvGx0aWcgdW5kIGZ1bmt0aW9uaWVydCBudXIsIHNvIGxhbmdlIFNpZSBJaHJlbiBCcm93c2VyIG5pY2h0IHp3aXNjaGVuemVpdGxpY2ggZ2VzY2hsb3NzZW4gaGFiZW4uIFNpZSBrw7ZubmVuIGplZGVyemVpdCBlaW5lbiBuZXVlbiBMaW5rIMO8YmVyIGRpZXNlcyBGb3JtdWxhciBhbmZvcmRlcm4u'>
+                <source>Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link über dieses Formular anfordern.</source>
+                <target>Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link über dieses Formular anfordern.</target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBRdWVsbGNvZGUgYXVmIGJpdGJ1Y2tldA=='>
+                <source>translate5 Quellcode auf bitbucket</source>
+                <target>translate5 Quellcode auf bitbucket</target>
+            </trans-unit>
+            <trans-unit id='RGFzIGxldHp0ZSBNYWpvci1SZWxlYXNlIHZvbiB0cmFuc2xhdGU1IGlzdCBqZXdlaWxzIDxhIGhyZWY9IiVzIiB0YXJnZXQ9Il9ibGFuayI+YXVmIGJpdGJ1Y2tldCB2ZXLDtmZmZW50bGljaHQ8L2E+LiBFaW4gbmV1ZXMgTWFqb3ItUmVsZWFzZSB3aXJkIG1pbmRlc3RlbnMgamVkZXMgaGFsYmUgSmFociB2ZXLDtmZmZW50bGljaHQu'>
+                <source>Das letzte Major-Release von translate5 ist jeweils 
+                    <a href="%s" target="_blank">auf bitbucket veröffentlicht</a>. Ein neues Major-Release wird mindestens jedes halbe Jahr veröffentlicht.
+                </source>
+                <target>Das letzte Major-Release von translate5 ist jeweils 
+                    <a href="%s" target="_blank">auf bitbucket veröffentlicht</a>. Ein neues Major-Release wird mindestens jedes halbe Jahr veröffentlicht.
+                </target>
+            </trans-unit>
+            <trans-unit id='VW5zZXJlIHJlZ2VsbcOkw59pZ2VuIE1pbm9yLVJlbGVhc2VzIGVudGhhbHRlbmVuIGJlcmVpdHMgZnLDvGhlciBuZXVlIEZlYXR1cmVzIHVuZCBub3R3ZW5kaWdlIEJ1Zy1GaXhlcy4gTWlub3ItUmVsZWFzZXMgc3RlaGVuIGFsbGVuIEt1bmRlbiB2b24gTWl0dGFnUUkgaW0gUmFobWVuIGVpbmVzIDxhIGhyZWY9IiVzIiB0YXJnZXQ9Il9ibGFuayI+IlZlcnRyYWcgenUgVW50ZXJzdMO8dHp1bmcgdW5kIFVwZGF0ZXMgZsO8ciB0cmFuc2xhdGU1IjwvYT4genVyIFZlcmbDvGd1bmcu'>
+                <source>Unsere regelmäßigen Minor-Releases enthaltenen bereits früher neue Features und notwendige Bug-Fixes. Minor-Releases stehen allen Kunden von MittagQI im Rahmen eines 
+                    <a href="%s" target="_blank">"Vertrag zu Unterstützung und Updates für translate5"</a> zur Verfügung.
+                </source>
+                <target>Unsere regelmäßigen Minor-Releases enthaltenen bereits früher neue Features und notwendige Bug-Fixes. Minor-Releases stehen allen Kunden von MittagQI im Rahmen eines 
+                    <a href="%s" target="_blank">"Vertrag zu Unterstützung und Updates für translate5"</a> zur Verfügung.
+                </target>
+            </trans-unit>
+            <trans-unit id='RGllc2VyIEJlbnV0emVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQuIDxici8+Qml0dGUgd2FydGVuIFNpZSBiaXMgZGVyIEJlbnV0emVyIHdpZWRlciB2ZXJmw7xnYmFyIGlzdCwgb2RlciBiZW51dHplbiBTaWUgZWluZW4gYW5kZXJlbiE='>
+                <source>Dieser Benutzer wird bereits verwendet. 
+                    <br/>Bitte warten Sie bis der Benutzer wieder verfügbar ist, oder benutzen Sie einen anderen!
+                </source>
+                <target>Dieser Benutzer wird bereits verwendet. 
+                    <br/>Bitte warten Sie bis der Benutzer wieder verfügbar ist, oder benutzen Sie einen anderen!
+                </target>
+            </trans-unit>
+            <trans-unit id='d2lyZCBtb21lbnRhbiB2ZXJ3ZW5kZXQ='>
+                <source>wird momentan verwendet</source>
+                <target>wird momentan verwendet</target>
+            </trans-unit>
+            <trans-unit id='RmFsbHMgU2llIGtlaW5lIFRlc3RkYXRlbiB6dXIgSGFuZCBoYWJlbiwga8O2bm5lbiBTaWUgZGllIGZvbGdlbmRlbiBaaXAgRGF0ZWllbiBkb3dubG9hZGVuIHVuZCBhbHMgbmV1ZSBQcm9qZWt0ZSBpbXBvcnRpZXJlbjo='>
+                <source>Falls Sie keine Testdaten zur Hand haben, können Sie die folgenden Zip Dateien downloaden und als neue Projekte importieren:</source>
+                <target>Falls Sie keine Testdaten zur Hand haben, können Sie die folgenden Zip Dateien downloaden und als neue Projekte importieren:</target>
+            </trans-unit>
+            <trans-unit id='KGVpbmZhY2hlIFRlc3RkYXRlbik='>
+                <source>(einfache Testdaten)</source>
+                <target>(einfache Testdaten)</target>
+            </trans-unit>
+            <trans-unit id='KFRlc3RkYXRlbiBtaXQgUmVsYWlzc3ByYWNoZSk='>
+                <source>(Testdaten mit Relaissprache)</source>
+                <target>(Testdaten mit Relaissprache)</target>
+            </trans-unit>
+            <trans-unit id='KFRlc3RkYXRlbiBtaXQgVGVybWlub2xvZ2llKQ=='>
+                <source>(Testdaten mit Terminologie)</source>
+                <target>(Testdaten mit Terminologie)</target>
+            </trans-unit>
+            <trans-unit id='KFRlc3RkYXRlbiBtaXQgVGVybWlub2xvZ2llLCBSZWxhaXNzcHJhY2hlbiB1bmQgUmVmZXJlbnpkYXRlaWVuKQ=='>
+                <source>(Testdaten mit Terminologie, Relaissprachen und Referenzdateien)</source>
+                <target>(Testdaten mit Terminologie, Relaissprachen und Referenzdateien)</target>
+            </trans-unit>
+            <trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgTVFNLUF1c3plaWNobnVuZ2VuKQ=='>
+                <source>(CSV-Dateiformat mit MQM-Auszeichnungen)</source>
+                <target>(CSV-Dateiformat mit MQM-Auszeichnungen)</target>
+            </trans-unit>
+            <trans-unit id='KENTVi1EYXRlaWZvcm1hdCBtaXQgbWVocmVyZW4gemllbHNwcmFjaGxpY2hlbiBBbHRlcm5hdGl2c3BhbHRlbik='>
+                <source>(CSV-Dateiformat mit mehreren zielsprachlichen Alternativspalten)</source>
+                <target>(CSV-Dateiformat mit mehreren zielsprachlichen Alternativspalten)</target>
+            </trans-unit>
+            <trans-unit id='RsO8ciBlaW5lIGtvcnJla3RlIEF1c3plaWNobnVuZyBkZXIgVGVybWlub2xvZ2llIGJpdHRlIGRpZSBRdWVsbHNwcmFjaGUgYXVmIEVuZ2xpc2NoIHVuZCBkaWUgWmllbHNwcmFjaGUgYXVmIERldXRzY2ggc3RlbGxlbi4='>
+                <source>Für eine korrekte Auszeichnung der Terminologie bitte die Quellsprache auf Englisch und die Zielsprache auf Deutsch stellen.</source>
+                <target>Für eine korrekte Auszeichnung der Terminologie bitte die Quellsprache auf Englisch und die Zielsprache auf Deutsch stellen.</target>
+            </trans-unit>
+            <trans-unit id='JiMxODc7IFp1ciBEZW1vdmVyc2lvbg=='>
+                <source>&#187; Zur Demoversion</source>
+                <target>&#187; Zur Demoversion</target>
+            </trans-unit>
+            <trans-unit id='JiMxODc7IEJlZGllbnVuZ3NoaW53ZWlzZSBmw7xyIGRpZSBFcnN0ZWxsdW5nIGVpZ2VuZXIgVGVzdGRhdGVu'>
+                <source>&#187; Bedienungshinweise für die Erstellung eigener Testdaten</source>
+                <target>&#187; Bedienungshinweise für die Erstellung eigener Testdaten</target>
+            </trans-unit>
+            <trans-unit id='SW5zdGFsbGF0aW9uZW4gJmFtcDsgSG9zdGluZw=='>
+                <source>Installationen &amp; Hosting</source>
+                <target>Installationen &amp; Hosting</target>
+            </trans-unit>
+            <trans-unit id='U3VwcG9ydCAmYW1wOyBVcGRhdGVz'>
+                <source>Support &amp; Updates</source>
+                <target>Support &amp; Updates</target>
+            </trans-unit>
+            <trans-unit id='T25saW5lLVJldmlldw=='>
+                <source>Online-Review</source>
+                <target>Online-Review</target>
+            </trans-unit>
+            <trans-unit id='WnVnYW5nc2RhdGVuIGFuZm9yZGVybg=='>
+                <source>Zugangsdaten anfordern</source>
+                <target>Zugangsdaten anfordern</target>
+            </trans-unit>
+            <trans-unit id='U2llIGJlZmluZGVuIHNpY2ggYXVmIGRlciBMb2dpbi1TZWl0ZSBkZXIgb25ld29yZCBSZXZpZXctUGxhdHRmb3JtLCBtaXQgZGVyIFNpZSBJaHJlIMOcYmVyc2V0enVuZ2VuIGltIEJyb3dzZXIgbGVzZW4sIHByw7xmZW4gdW5kIGtvcnJpZ2llcmVuIGvDtm5uZW4u'>
+                <source>Sie befinden sich auf der Login-Seite der oneword Review-Plattform, mit der Sie Ihre Übersetzungen im Browser lesen, prüfen und korrigieren können.</source>
+                <target>Sie befinden sich auf der Login-Seite der oneword Review-Plattform, mit der Sie Ihre Übersetzungen im Browser lesen, prüfen und korrigieren können.</target>
+            </trans-unit>
+            <trans-unit id='PGEgaHJlZj0iaHR0cDovL3d3dy5vbmV3b3JkLmRlL3VlYmVyc2V0enVuZy9vbmxpbmUtcmV2aWV3Lmh0bWwiIHRhcmdldD0iX2JsYW5rIj5XZWl0ZXJlIEluZm9ybWF0aW9uZW48L2E+'>
+                <source>
+                    <a href="http://www.oneword.de/uebersetzung/online-review.html" target="_blank">Weitere Informationen</a>
+                </source>
+                <target>
+                    <a href="http://www.oneword.de/uebersetzung/online-review.html" target="_blank">Weitere Informationen</a>
+                </target>
+            </trans-unit>
+            <trans-unit id='PGEgaHJlZj0iaHR0cDovL3d3dy5vbmV3b3JkLmRlIiB0YXJnZXQ9Il9ibGFuayI+U3RhcnRzZWl0ZSBvbmV3b3JkPC9hPg=='>
+                <source>
+                    <a href="http://www.oneword.de" target="_blank">Startseite oneword</a>
+                </source>
+                <target>
+                    <a href="http://www.oneword.de" target="_blank">Startseite oneword</a>
+                </target>
+            </trans-unit>
+            <trans-unit id='b25ld29yZA=='>
+                <source>oneword</source>
+                <target>oneword</target>
+            </trans-unit>
+            <trans-unit id='RGllc2UgUmV2aWV3LVBsYXR0Zm9ybSBpc3QgZWluZSBJbnN0YW56IHZvbiB0cmFuc2xhdGU1Lg=='>
+                <source>Diese Review-Plattform ist eine Instanz von translate5.</source>
+                <target>Diese Review-Plattform ist eine Instanz von translate5.</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgbWluZGVzdGVucyA4IFplaWNoZW4gdmVyd2VuZGVu'>
+                <source>Bitte mindestens 8 Zeichen verwenden</source>
+                <target>Bitte mindestens 8 Zeichen verwenden</target>
+            </trans-unit>
+            <trans-unit id='UGFzc3dvcnQgd2llZGVyaG9sZW4='>
+                <source>Passwort wiederholen</source>
+                <target>Passwort wiederholen</target>
+            </trans-unit>
+            <trans-unit id='TmV1IHNldHplbg=='>
+                <source>Neu setzen</source>
+                <target>Neu setzen</target>
+            </trans-unit>
+            <trans-unit id='SWhyIFBhc3N3b3J0IHd1cmRlIG5ldSBnZXNldHp0LiBTaWUga8O2bm5lbiBzaWNoIG51biBlaW5sb2dnZW4u'>
+                <source>Ihr Passwort wurde neu gesetzt. Sie können sich nun einloggen.</source>
+                <target>Ihr Passwort wurde neu gesetzt. Sie können sich nun einloggen.</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgc2VuZGVuIFNpZSBtaXIgWnVnYW5nc2RhdGVuIHp1ciBvbmV3b3JkIFJldmlldy1QbGF0dGZvcm0genU='>
+                <source>Bitte senden Sie mir Zugangsdaten zur oneword Review-Plattform zu</source>
+                <target>Bitte senden Sie mir Zugangsdaten zur oneword Review-Plattform zu</target>
+            </trans-unit>
+            <trans-unit id='U2VpdGUgbmljaHQgZ2VmdW5kZW4h'>
+                <source>Seite nicht gefunden!</source>
+                <target>Seite nicht gefunden!</target>
+            </trans-unit>
+            <trans-unit id='U2VpdGUgbmljaHQgZ2VmdW5kZW46IA=='>
+                <source>Seite nicht gefunden: </source>
+                <target>Seite nicht gefunden: </target>
+            </trans-unit>
+            <trans-unit id='LyBBdWZydWYgZXJmb2xndGUgZHVyY2ggSVA6IA=='>
+                <source>/ Aufruf erfolgte durch IP: </source>
+                <target>/ Aufruf erfolgte durch IP: </target>
+            </trans-unit>
+            <trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicmV2aWV3IiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiwgb3BlblRNMi1YTElGRiB1bmQgLyBvZGVyIENTVi1EYXRlaWVuIGluIGVpbmVyIGJlbGllYmlnZW4gVmVyemVpY2huaXNzdHJ1a3R1ciBiZWluaGFsdGVuIGthbm4uIENTVi0sIG9wZW5UTTItWExJRkYtIHVuZCBTRExYTElGRi1EYXRlaWVuIGvDtm5uZW4gYmVsaWViaWcgZ2VtaXNjaHQgd2VyZGVuLiBEaWUgU3RydWt0dXIgd2lyZCBpbSBMZWt0b3JhdCBhYmdlYmlsZGV0Lg=='>
+                <source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF, openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
+                <target>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF, openTM2-XLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV-, openTM2-XLIFF- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</target>
+            </trans-unit>
+            <trans-unit id='Q1NWLURhdGVpZW4gbcO8c3NlbiBtaW5kZXN0ZW5zIGRyZWkgU3BhbHRlbiBlbnRoYWx0ZW4uIEVpbmUgU3BhbHRlIG11c3MgZGVuIFNwYWx0ZW5rb3BmICJtaWQiIGVudGhhbHRlbiB1bmQgZWluZSBlaW5kZXV0aWdlIElEIGplIENTVi1aZWlsZSBlbnRoYWx0ZW4uIEVpbmUgd2VpdGVyZSBTcGFsdGUgbXVzcyBkZW4gU3BhbHRlbmtvcGYgInF1ZWxsZSIgZW50aGFsdGVuIHVuZCBkaWUgUXVlbGxzcHJhY2hlIGVudGhhbHRlbi4gQWxsZSB3ZWl0ZXJlbiBTcGFsdGVuIG1pdCBTcGFsdGVua8O2cGZlbiB3ZXJkZW4gYWxzIFppZWxzcHJhY2hlbnNwYWx0ZW4gYmVoYW5kZWx0IHVuZCBpbXBvcnRpZXJ0LiBEYWJlaSBpc3QgZGVyIFNwYWx0ZW5rb3BmbmFtZSBmcmVpIHfDpGhsYmFyLiBTcGFsdGVuIG9obmUgYmVmw7xsbHRlbiBTcGFsdGVua29wZiBpbiBkZXIgQ1NWLURhdGVpIHdlcmRlbiBiZWltIEltcG9ydCBpZ25vcmllcnQuIFNwYWx0ZW50cmVubmVyIGRlciBDU1YgaXN0IGVpbiBLb21tYSAmcXVvdDssJnF1b3Q7LCBUZXh0ZXJrZW5udW5nc3plaWNoZW4gZWluIGRvcHBlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gJnF1b3Q7JmFwb3M7JnF1b3Q7LiBEaWUgU3BhbHRlbmtvcGZuYW1lbiBkZXIgSUQtU3BhbHRlIChwZXIgZGVmYXVsdCBtaWQpIHVuZCBkZXIgUXVlbGxzcHJhY2hlbi1TcGFsdGUgKHBlciBkZWZhdWx0IHF1ZWxsZSkgc293aWUgZGVyIFNwYWx0ZW50cmVubmVyIHVuZCBkYXMgVGV4dGVya2VubnVuZ3N6ZWljaGVuIGvDtm5uZW4gaW4gZGVyIFN5c3RlbWtvbmZpZ3VyYXRpb24gdm9uIHRyYW5zbGF0ZTUgaW5zdGFsbGF0aW9uc3NwZXppZmlzY2ggw7xiZXJzY2hyaWViZW4gd2VyZGVuLiBaZWlsZW50cmVubmVyIGRlciBDU1YgaXN0IGVpbiBMaW51eC0sIE1hYy0gb2RlciBXaW5kb3dzemVpbGVudW1icnVjaC4gQ29kaWVydW5nIGRlciBDU1YtRGF0ZWkga2FubiB1dGYtOCwgaXNvLTg4NTktMSBvZGVyIHdpbmRvd3MtMTI1MSBzZWluLiBEaWUgQ1NWLURhdGVpIHdpcmQgaW4gZGVyIHNlbGJlbiBDb2RpZXJ1bmcgZXhwb3J0aWVydCwgaW4gZGVyIHNpZSBiZWltIEltcG9ydCB2b3JsYWcgKEFjaHR1bmc6IEJlaSBlaW5lciDDnGJlcnNldHp1bmcgaW4gTmljaHQtV2VzdGV1cm9ww6Rpc2NoZSBTcHJhY2hlbiBzb2xsdGUgZGFoZXIgdXRmLTggYmVyZWl0cyBhbHMgSW1wb3J0Y29kaWVydW5nIGdld8OkaGx0IHdlcmRlbiku'>
+                <source>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen &quot;&apos;&quot;. Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</source>
+                <target>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen &quot;&apos;&quot;. Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1251 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</target>
+            </trans-unit>
+            <trans-unit id='SW1wb3J0IHZvbiBlaW56ZWxuZW4gU0RMWExJRkYsIG9wZW5UTTItWExJRkYgb2RlciBDU1YgRGF0ZWllbg=='>
+                <source>Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien</source>
+                <target>Import von einzelnen SDLXLIFF, openTM2-XLIFF oder CSV Dateien</target>
+            </trans-unit>
+            <trans-unit id='U29sbCBudXIgZWluZSBlaW56ZWxuZSBDU1YsIG9wZW5UTTItWExJRkYgb2RlciBTRExYTElGRiBEYXRlaSBpbnMgUHJvamVrdCBpbXBvcnRpZXJ0IHdlcmRlbiwgc28ga2FubiBkaWVzZSBhdWNoIGRpcmVrdCBob2NoZ2VsYWRlbiB3ZXJkZW4uIERpZSBFcnN0ZWxsdW5nIGVpbmVyIFpJUCBEYXRlaSBpc3Qgc28gbmljaHQgbsO2dGlnLg=='>
+                <source>Soll nur eine einzelne CSV, openTM2-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</source>
+                <target>Soll nur eine einzelne CSV, openTM2-XLIFF oder SDLXLIFF Datei ins Projekt importiert werden, so kann diese auch direkt hochgeladen werden. Die Erstellung einer ZIP Datei ist so nicht nötig.</target>
+            </trans-unit>
+            <trans-unit id='Q1NWLURhdGVpZW4gbcO8c3NlbiBtaW5kZXN0ZW5zIGRyZWkgU3BhbHRlbiBlbnRoYWx0ZW4uIEVpbmUgU3BhbHRlIG11c3MgZGVuIFNwYWx0ZW5rb3BmICJtaWQiIGVudGhhbHRlbiB1bmQgZWluZSBlaW5kZXV0aWdlIElEIGplIENTVi1aZWlsZSBlbnRoYWx0ZW4uIEVpbmUgd2VpdGVyZSBTcGFsdGUgbXVzcyBkZW4gU3BhbHRlbmtvcGYgInF1ZWxsZSIgZW50aGFsdGVuIHVuZCBkaWUgUXVlbGxzcHJhY2hlIGVudGhhbHRlbi4gQWxsZSB3ZWl0ZXJlbiBTcGFsdGVuIG1pdCBTcGFsdGVua8O2cGZlbiB3ZXJkZW4gYWxzIFppZWxzcHJhY2hlbnNwYWx0ZW4gYmVoYW5kZWx0IHVuZCBpbXBvcnRpZXJ0LiBEYWJlaSBpc3QgZGVyIFNwYWx0ZW5rb3BmbmFtZSBmcmVpIHfDpGhsYmFyLiBTcGFsdGVuIG9obmUgYmVmw7xsbHRlbiBTcGFsdGVua29wZiBpbiBkZXIgQ1NWLURhdGVpIHdlcmRlbiBiZWltIEltcG9ydCBpZ25vcmllcnQuIFNwYWx0ZW50cmVubmVyIGRlciBDU1YgaXN0IGVpbiBLb21tYSAmcXVvdDssJnF1b3Q7LCBUZXh0ZXJrZW5udW5nc3plaWNoZW4gZWluIGRvcHBlbHRlcyBBbmbDvGhydW5nc3plaWNoZW4gKCZxdW90OykuIERpZSBTcGFsdGVua29wZm5hbWVuIGRlciBJRC1TcGFsdGUgKHBlciBkZWZhdWx0IG1pZCkgdW5kIGRlciBRdWVsbHNwcmFjaGVuLVNwYWx0ZSAocGVyIGRlZmF1bHQgcXVlbGxlKSBzb3dpZSBkZXIgU3BhbHRlbnRyZW5uZXIgdW5kIGRhcyBUZXh0ZXJrZW5udW5nc3plaWNoZW4ga8O2bm5lbiBpbiBkZXIgU3lzdGVta29uZmlndXJhdGlvbiB2b24gdHJhbnNsYXRlNSBpbnN0YWxsYXRpb25zc3BlemlmaXNjaCDDvGJlcnNjaHJpZWJlbiB3ZXJkZW4uIFplaWxlbnRyZW5uZXIgZGVyIENTViBpc3QgZWluIExpbnV4LSwgTWFjLSBvZGVyIFdpbmRvd3N6ZWlsZW51bWJydWNoLiBDb2RpZXJ1bmcgZGVyIENTVi1EYXRlaSBrYW5uIHV0Zi04LCBpc28tODg1OS0xIG9kZXIgd2luZG93cy0xMjUyIHNlaW4uIERpZSBDU1YtRGF0ZWkgd2lyZCBpbiBkZXIgc2VsYmVuIENvZGllcnVuZyBleHBvcnRpZXJ0LCBpbiBkZXIgc2llIGJlaW0gSW1wb3J0IHZvcmxhZyAoQWNodHVuZzogQmVpIGVpbmVyIMOcYmVyc2V0enVuZyBpbiBOaWNodC1XZXN0ZXVyb3DDpGlzY2hlIFNwcmFjaGVuIHNvbGx0ZSBkYWhlciB1dGYtOCBiZXJlaXRzIGFscyBJbXBvcnRjb2RpZXJ1bmcgZ2V3w6RobHQgd2VyZGVuKS4='>
+                <source>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen (&quot;). Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1252 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</source>
+                <target>CSV-Dateien müssen mindestens drei Spalten enthalten. Eine Spalte muss den Spaltenkopf "mid" enthalten und eine eindeutige ID je CSV-Zeile enthalten. Eine weitere Spalte muss den Spaltenkopf "quelle" enthalten und die Quellsprache enthalten. Alle weiteren Spalten mit Spaltenköpfen werden als Zielsprachenspalten behandelt und importiert. Dabei ist der Spaltenkopfname frei wählbar. Spalten ohne befüllten Spaltenkopf in der CSV-Datei werden beim Import ignoriert. Spaltentrenner der CSV ist ein Komma &quot;,&quot;, Texterkennungszeichen ein doppeltes Anführungszeichen (&quot;). Die Spaltenkopfnamen der ID-Spalte (per default mid) und der Quellsprachen-Spalte (per default quelle) sowie der Spaltentrenner und das Texterkennungszeichen können in der Systemkonfiguration von translate5 installationsspezifisch überschrieben werden. Zeilentrenner der CSV ist ein Linux-, Mac- oder Windowszeilenumbruch. Codierung der CSV-Datei kann utf-8, iso-8859-1 oder windows-1252 sein. Die CSV-Datei wird in der selben Codierung exportiert, in der sie beim Import vorlag (Achtung: Bei einer Übersetzung in Nicht-Westeuropäische Sprachen sollte daher utf-8 bereits als Importcodierung gewählt werden).</target>
+            </trans-unit>
+            <trans-unit id='VW50ZXJzdMO8dHp1bmcgdm9uIE9wZW4gU291cmNl'>
+                <source>Unterstützung von Open Source</source>
+                <target>Unterstützung von Open Source</target>
+            </trans-unit>
+            <trans-unit id='RWluIHNwZXppZWxsZXIgRGFuayBnZWh0IGFuIDxhIGhyZWY9Imh0dHA6Ly93d3cubG9ncnVzLnJ1LyIgdGFyZ2V0PSJfYmxhbmsiPkxvZ3J1cyBJbnRlcm5hdGlvbmFsPC9hPiBmw7xyIGRpZSBmb3J0d8OkaHJlbmRlIEbDtnJkZXJ1bmcgdm9uIE9wZW4gU291cmNlIFNvZnR3YXJlIGluIGRlciDDnGJlcnNldHp1bmdzYnJhbmNoZS4='>
+                <source>Ein spezieller Dank geht an 
+                    <a href="http://www.logrus.ru/" target="_blank">Logrus International</a> für die fortwährende Förderung von Open Source Software in der Übersetzungsbranche.
+                </source>
+                <target>Ein spezieller Dank geht an 
+                    <a href="http://www.logrus.ru/" target="_blank">Logrus International</a> für die fortwährende Förderung von Open Source Software in der Übersetzungsbranche.
+                </target>
+            </trans-unit>
+            <trans-unit id='QW53ZW5kdW5nc2ZlaGxlcg=='>
+                <source>Anwendungsfehler</source>
+                <target>Anwendungsfehler</target>
+            </trans-unit>
+            <trans-unit id='V2lyIGJpdHRlbiB1bSBFbnRzY2h1bGRpZ3VuZyBmw7xyIGRpZSBhdWZnZXRyZXRlbmUgU3TDtnJ1bmch'>
+                <source>Wir bitten um Entschuldigung für die aufgetretene Störung!</source>
+                <target>Wir bitten um Entschuldigung für die aufgetretene Störung!</target>
+            </trans-unit>
+            <trans-unit id='VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gw7xiZXIgZGVuIEZlaGxlciBhdXRvbWF0aXNjaCBiZW5hY2hyaWNodGlndC4gRmFsbHMgd2VpdGVyZSBGcmFnZW4gb2RlciBVbmtsYXJoZWl0ZW4gYmVzdGVoZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gU3VwcG9ydC4='>
+                <source>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</source>
+                <target>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</target>
+            </trans-unit>
+            <trans-unit id='U3VwcG9ydCBFLU1haWw6'>
+                <source>Support E-Mail:</source>
+                <target>Support E-Mail:</target>
+            </trans-unit>
+            <trans-unit id='VGVzdGltb25pYWxz'>
+                <source>Testimonials</source>
+                <target>Testimonials</target>
+            </trans-unit>
+            <trans-unit id='RGV2ZWxvcGVycw=='>
+                <source>Developers</source>
+                <target>Developers</target>
+            </trans-unit>
+            <trans-unit id='VXNlciBpbmZvcw=='>
+                <source>User infos</source>
+                <target>User infos</target>
+            </trans-unit>
+            <trans-unit id='V2VsY29tZQ=='>
+                <source>Welcome</source>
+                <target>Welcome</target>
+            </trans-unit>
+            <trans-unit id='TWlzc2lvbg=='>
+                <source>Mission</source>
+                <target>Mission</target>
+            </trans-unit>
+            <trans-unit id='dHJhbnNsYXRlNSBEZW1v'>
+                <source>translate5 Demo</source>
+                <target>translate5 Demo</target>
+            </trans-unit>
+            <trans-unit id='VXNhZ2UgJmFtcDsgZG9jdW1lbnRhdGlvbg=='>
+                <source>Usage &amp; documentation</source>
+                <target>Usage &amp; documentation</target>
+            </trans-unit>
+            <trans-unit id='SW5zdGFsbGF0aW9u'>
+                <source>Installation</source>
+                <target>Installation</target>
+            </trans-unit>
+            <trans-unit id='VW5nw7xsdGlnZSBMb2dpbmRhdGVuIC0gWnVnYW5nIGdlc3BlcnJ0ITxici8+U2llIGhhYmVuIElociBQYXNzd29ydCBpbiBkZW4gbGV0enRlbiAyNCBTdHVuZGVuIG1laHJtYWxzIGZhbHNjaCBlaW5nZWdlYmVuLCBpaHIgTG9naW4gd3VyZGUgZ2VzcGVycnQuPGJyIC8+UGVyIEUtTWFpbCB3dXJkZSBJaG5lbiBlaW4gTGluayB6dWdlc2FuZHQsIG1pdCB3ZWxjaGVtIFNpZSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiBrw7ZubmVuLiBEaWVzZXIgTGluayBpc3QgMzAgbWluIGfDvGx0aWcgdW5kIGZ1bmt0aW9uaWVydCBudXIsIHNvIGxhbmdlIFNpZSBJaHJlbiBCcm93c2VyIG5pY2h0IHp3aXNjaGVuemVpdGxpY2ggZ2VzY2hsb3NzZW4gaGFiZW4uIFNpZSBrw7ZubmVuIGplZGVyemVpdCBlaW5lbiBuZXVlbiBMaW5rICVzaGllciVzIGFuZm9yZGVybi4='>
+                <source>Ungültige Logindaten - Zugang gesperrt!
+                    <br/>Sie haben Ihr Passwort in den letzten 24 Stunden mehrmals falsch eingegeben, ihr Login wurde gesperrt.
+                    <br />Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link %shier%s anfordern.
+                </source>
+                <target>Ungültige Logindaten - Zugang gesperrt!
+                    <br/>Sie haben Ihr Passwort in den letzten 24 Stunden mehrmals falsch eingegeben, ihr Login wurde gesperrt.
+                    <br />Per E-Mail wurde Ihnen ein Link zugesandt, mit welchem Sie Ihr Passwort neu setzen können. Dieser Link ist 30 min gültig und funktioniert nur, so lange Sie Ihren Browser nicht zwischenzeitlich geschlossen haben. Sie können jederzeit einen neuen Link %shier%s anfordern.
+                </target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgZ2ViZW4gU2llIGVpbiBQYXNzd29ydCBhbiE='>
+                <source>Bitte geben Sie ein Passwort an!</source>
+                <target>Bitte geben Sie ein Passwort an!</target>
+            </trans-unit>
+            <trans-unit id='RGFzIFBhc3N3b3J0IGlzdCB6dSBrdXJ6IQ=='>
+                <source>Das Passwort ist zu kurz!</source>
+                <target>Das Passwort ist zu kurz!</target>
+            </trans-unit>
+            <trans-unit id='RWluZSBXYXJ0dW5nIHN0ZWh0IHVubWl0dGVsYmFyIGJldm9yLCBTaWUga8O2bm5lbiBzaWNoIGRhaGVyIG5pY2h0IGFubWVsZGVuLiBCaXR0ZSB2ZXJzdWNoZW4gU2llIGVzIGluIEvDvHJ6ZSBlcm5ldXQu'>
+                <source>Eine Wartung steht unmittelbar bevor, Sie können sich daher nicht anmelden. Bitte versuchen Sie es in Kürze erneut.</source>
+                <target>Eine Wartung steht unmittelbar bevor, Sie können sich daher nicht anmelden. Bitte versuchen Sie es in Kürze erneut.</target>
+            </trans-unit>
+            <trans-unit id='Tm8gdG9rZW4gd2FzIHByb3ZpZGVkIHRvIG1hdGNoIGFnYWluc3Q='>
+                <source>No token was provided to match against</source>
+                <target>No token was provided to match against</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgbGFkZW4gU2llIGRpZSBMb2dpbi1TZWl0ZSBuZXUsIGdlYmVuIFNpZSBpaHIgUGFzc3dvcnQgZXJuZXV0IGVpbiB1bmQgc2VuZGVuIFNpZSBkYXMgRm9ybXVsYXIgZXJuZXV0IGFiIC0gSWhyIEhhc2gtV2VydCB6dXIgw5xiZXJwcsO8ZnVuZyB2b24gQ3Jvc3MtU2l0ZS1Ta3JpcHRpbmctQXR0YWNrZW4gd2FyIG5pY2h0IGtvcnJla3Qu'>
+                <source>Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.</source>
+                <target>Bitte laden Sie die Login-Seite neu, geben Sie ihr Passwort erneut ein und senden Sie das Formular erneut ab - Ihr Hash-Wert zur Überprüfung von Cross-Site-Skripting-Attacken war nicht korrekt.</target>
+            </trans-unit>
+            <trans-unit id='SW4gS8O8cnplIHdpcmQgZWluZSBTeXN0ZW13YXJ0dW5nIGR1cmNoZ2Vmw7xocnQgd2VyZGVuLiBEaWUgQW53ZW5kdW5nIGlzdCBkYW5uIGbDvHIgZWluaWdlIFplaXQgZ2VzcGVycnQuIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBTdGFydHMgZGVyIFN5c3RlbXdhcnR1bmc6ICVz'>
+                <source>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</source>
+                <target>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</target>
+            </trans-unit>
+            <trans-unit id='VXNhZ2U='>
+                <source>Usage</source>
+                <target>Usage</target>
+            </trans-unit>
+            <trans-unit id='VHJ5IGl0IQ=='>
+                <source>Try it!</source>
+                <target>Try it!</target>
+            </trans-unit>
+            <trans-unit id='RGV2ZWxvcGVy'>
+                <source>Developer</source>
+                <target>Developer</target>
+            </trans-unit>
+            <trans-unit id='VHJ5IGl0IG9ubGluZSE='>
+                <source>Try it online!</source>
+                <target>Try it online!</target>
+            </trans-unit>
+            <trans-unit id='Sm9pbiB0aGUgY29tbXVuaXR5'>
+                <source>Join the community</source>
+                <target>Join the community</target>
+            </trans-unit>
+            <trans-unit id='U291cmNlIGNvZGU='>
+                <source>Source code</source>
+                <target>Source code</target>
+            </trans-unit>
+            <trans-unit id='U291cmNl'>
+                <source>Source</source>
+                <target>Source</target>
+            </trans-unit>
+            <trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='>
+                <source>{salutation} {surName},
+                    <br/>
+                    <br/>
+                </source>
+                <target>{salutation} {surName},
+                    <br/>
+                    <br/>
+                </target>
+            </trans-unit>
+            <trans-unit id='PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='>
+                <source>
+                    <br/>
+                    <br/>Vielen Dank und viele Grüße,
+
+                    <br/>Ihr Projektmanagement Team
+
+                    <br/>{companyName}
+
+                    <br/>
+                    <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
+                </source>
+                <target>
+                    <br/>
+                    <br/>Vielen Dank und viele Grüße,
+
+                    <br/>Ihr Projektmanagement Team
+
+                    <br/>{companyName}
+
+                    <br/>
+                    <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!
+                </target>
+            </trans-unit>
+            <trans-unit id='e2hlYWRlcn0KU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIHdpciBlaW5lIEFuZnJhZ2UgenVyIMOEbmRlcnVuZyBkZXMgUGFzc3dvcnRlcyBmw7xyIElociBLb250byBhdWYge3BvcnRhbFVybH0gZXJoYWx0ZW4gaGFiZW4uIAoKV2VubiBTaWUgSWhyIFBhc3N3b3J0IMOkbmRlcm4gbcO2Y2h0ZW4sIGRhbm4gYmVmb2xnZW4gU2llIGJpdHRlIGZvbGdlbmRlIEFud2Vpc3VuZ2VuOgoKRGVyIGZvbGdlbmRlIExpbmsgZW50aMOkbHQgZWluZW4gZsO8ciAzMCBNaW51dGVuIGfDvGx0aWdlbiBTY2hsw7xzc2VsLCBtaXQgd2VsY2hlbSBTaWUgSWhyIFBhc3N3b3J0IG5ldSBzZXR6ZW4ga8O2bm5lbi4gQXVzIFNpY2hlcmhlaXRzZ3LDvG5kZW4gZnVua3Rpb25pZXJ0IGRpZXMgbnVyLCB3ZW5uIFNpZSBkZW4gZm9sZ2VuZGVuIExpbmsgaW0gc2VsYmVuIEJyb3dzZXIgaW4gZGVtIFNpZSBkaWUgw4RuZGVydW5nIElocmVzIFBhc3N3b3J0IGFuZ2Vmb3JkZXJ0IGhhYmVuIMO2ZmZuZW4gdW5kIHp1ZGVtIG5hY2ggWnVyw7xja3NldHplbiBkZXMgUGFzc3dvcnRzIElocmVuIEJyb3dzZXIgbmljaHQgbmV1IGdlc3RhcnRldCBoYWJlbi4KCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpMaW5rIHVtIFBhc3N3b3J0IG5ldSB6dSBzZXR6ZW4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCntwb3J0YWxVcmx9e2hhc2h1cmx9Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KClNvbGx0ZSBJaHIgU2NobMO8c3NlbCBuaWNodCBtZWhyIGfDvGx0aWcgc2Vpbiwga8O2bm5lbiBTaWUgdW50ZXIgamVkZXJ6ZWl0IGVpbmVuIG5ldWVuIFNjaGzDvHNzZWwgYW5mb3JkZXJuLgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0Ke3BvcnRhbFVybH17cmVzZXR1cmx9Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKU29sbHRlbiBTaWUgZGllIEFuZnJhZ2UgbmljaHQgc2VsYnN0IGF1c2dlbMO2c3QgaGFiZW4sIGJpdHRlbiB3aXIgU2llIHVucyBkYXLDvGJlciB6dSBpbmZvcm1pZXJlbi4KCntmb290ZXJ9'>
+                <source>{header}
 Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr Konto auf {portalUrl} erhalten haben. 
 
 Wenn Sie Ihr Passwort ändern möchten, dann befolgen Sie bitte folgende Anweisungen:
@@ -199,7 +790,8 @@ Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie unter jederzeit einen
 
 Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
 
-{footer}</source><target>{header}
+{footer}</source>
+                <target>{header}
 Sie erhalten diese Email, weil wir eine Anfrage zur Änderung des Passwortes für Ihr Konto auf {portalUrl} erhalten haben. 
 
 Wenn Sie Ihr Passwort ändern möchten, dann befolgen Sie bitte folgende Anweisungen:
@@ -220,120 +812,283 @@ Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie unter jederzeit einen
 
 Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
 
-{footer}</target></trans-unit>
-<trans-unit id='VHJ5IG9ubGluZQ=='><source>Try online</source><target>Try online</target></trans-unit>
-<trans-unit id='Q3Jvd2Qgb2YgY29tcGFuaWVz'><source>Crowd of companies</source><target>Crowd of companies</target></trans-unit>
-<trans-unit id='VXNl'><source>Use</source><target>Use</target></trans-unit>
-<trans-unit id='SW50ZWdyYXRl'><source>Integrate</source><target>Integrate</target></trans-unit>
-<trans-unit id='RXh0ZW5k'><source>Extend</source><target>Extend</target></trans-unit>
-<trans-unit id='LSBEaWUgRGF0ZW4gc2luZCBudXIgaW4gZGVyIEhUTUwtQW5zaWNodCBkZXIgRS1NYWlsIHZlcmbDvGdiYXIhIC0='><source>- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -</source><target>- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -</target></trans-unit>
-<trans-unit id='RGVyIFJlc2V0SGFzaCBvZGVyIGRpZSBCcm93c2Vyc2l0enVuZyBpc3QgbmljaHQgKG1laHIpIGfDvGx0aWcuIEJpdHRlIGZvcmRlcm4gU2llIMO8YmVyIGRhcyBuZWJlbnN0ZWhlbmRlIEZvcm11bGFyIGVpbmUgRS1NYWlsIG1pdCBlaW5lbSBuZXVlbiBMaW5rIGFuLg=='><source>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</source><target>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</target></trans-unit>
-<trans-unit id='U3VwcG9ydCB0aGUgcHJvamVjdA=='><source>Support the project</source><target>Support the project</target></trans-unit>
-<trans-unit id='T3V0c3RhbmRpbmcgZmVhdHVyZXM='><source>Outstanding features</source><target>Outstanding features</target></trans-unit>
-<trans-unit id='JyV2YWx1ZSUnIGlzdCBrZWluZSBHVUlE'><source>'%value%' ist keine GUID</source><target>'%value%' ist keine GUID</target></trans-unit>
-<trans-unit id='SWhyIFdlYmJyb3dzZXIgd2lyZCBuaWNodCBtZWhyIHVudGVyc3TDvHR6dA=='><source>Ihr Webbrowser wird nicht mehr unterstützt</source><target>Ihr Webbrowser wird nicht mehr unterstützt</target></trans-unit>
-<trans-unit id='TGVpZGVyIHdpcmQgZGVyIE1pY3Jvc29mdCBJbnRlcm5ldCBFeHBsb3JlciB2b24gdHJhbnNsYXRlNSBuaWNodCBtZWhyIHVudGVyc3TDvHR6dC4gQml0dGUgYmVudXR6ZW4gU2llIGVpbmVuIGFuZGVyZW4gV2ViYnJvd3NlciB3aWUgei5CLiBHb29nbGUgQ2hyb21lLCBNb3ppbGxhIEZpcmVGb3gsIEFwcGxlIFNhZmFyaSBvZGVyIE1pY3Jvc29mdCBFZGdlLg=='><source>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</source><target>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</target></trans-unit>
-<trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{ProjectOverviewYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/1TkBCfo9ovw</target></trans-unit>
-<trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{ProjectOverviewYoutubeVideoGuideDescriptionContent}</source><target><br/>
-<figure>
-    <figcaption><b>Übersicht:</b></figcaption>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=18&amp;autoplay=1" dir="auto">0:18</a> Hauptbereiche<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=32&amp;autoplay=1" dir="auto">0:32</a> Projekte<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=57&amp;autoplay=1" dir="auto">0:57</a> Aufgaben<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=103&amp;autoplay=1" dir="auto">1:43</a> Sprachressourcen<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=144&amp;autoplay=1" dir="auto">2:24</a> TermPortal<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=157&amp;autoplay=1" dir="auto">2:37</a> InstantTranslate<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=176&amp;autoplay=1" dir="auto">2:56</a> Editor<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
-</figure>
-</target></trans-unit>
-<trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{EditorYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/fERwuq1yXUM</target></trans-unit>
-<trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{EditorYoutubeVideoGuideDescriptionContent}</source><target><br/>
-<figure>
-    <figcaption><b>Übersicht:</b></figcaption>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=9&amp;autoplay=1" dir="auto">0:09</a> Interface<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=66&amp;autoplay=1" dir="auto">1:06</a> Ansicht ändern<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=85&amp;autoplay=1" dir="auto">1:25</a> Bearbeitung<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=108&amp;autoplay=1" dir="auto">1:48</a> Konkordanzsuche<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=121&amp;autoplay=1" dir="auto">2:01</a> Schaltflächen für die Segmentbearbeitung<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=138&amp;autoplay=1" dir="auto">2:18</a> Lesezeichen<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=154&amp;autoplay=1" dir="auto">2:34</a> Tastenkürzel<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=175&amp;autoplay=1" dir="auto">2:55</a> Segmentscrollen und TrackChanges-Funktion<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=210&amp;autoplay=1" dir="auto">3:30</a> Wiederholungseditor<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=224&amp;autoplay=1" dir="auto">3:44</a> Farbliche Markierung von Wörtern<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=267&amp;autoplay=1" dir="auto">4:27</a> Tags<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=289&amp;autoplay=1" dir="auto">4:49</a> Bearbeitungsstatus<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=308&amp;autoplay=1" dir="auto">5:08</a> Suchen und Ersetzen<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=323&amp;autoplay=1" dir="auto">5:23</a> Segment-Metadaten<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=341&amp;autoplay=1" dir="auto">5:41</a> Dateinbaum<br/>
-    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=369&amp;autoplay=1" dir="auto">6:09</a> Kontaktinformationen<br/>
-</figure>
-</target></trans-unit>
-<trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'><source>'%value%' does not match the expected structure for a DNS hostname</source><target>'%value%' does not match the expected structure for a DNS hostname</target></trans-unit>
-<trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVVcmx9'><source>{PreferencesYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/O2Z8wlzC-oo</target></trans-unit>
-<trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'><source>{PreferencesYoutubeVideoGuideDescriptionContent}</source><target><br/>
-<figure>
-    <figcaption><b>Übersicht:</b></figcaption>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=11&amp;autoplay=1" dir="auto">0:11</a> Systemkonfigurationen<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=83&amp;autoplay=1" dir="auto">1:23</a> Konfigurationen - Kunde<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=105&amp;autoplay=1" dir="auto">1:45</a> Konfigurationen - Aufgabe<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=127&amp;autoplay=1" dir="auto">2:07</a> Konfigurationen - Import<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=141&amp;autoplay=1" dir="auto">2:21</a> In-Context Schriften<br/>
-      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=218&amp;autoplay=1" dir="auto">3:38</a> Kontaktinformationen<br/>
-</figure>
-</target></trans-unit>
-<trans-unit id='VGhlIHR3byBnaXZlbiB0b2tlbnMgZG8gbm90IG1hdGNo'><source>The two given tokens do not match</source><target>The two given tokens do not match</target></trans-unit>
-<trans-unit id='UG1saWdodA=='><source>Pmlight</source><target>PM Light</target></trans-unit>
-<trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{CliYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/oUhUakQFmVw</target></trans-unit>
-<trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{CliYoutubeVideoGuideDescriptionContent}</source>
-<target><br/>
-<figure>
-    <figcaption><b>Übersicht:</b></figcaption>
-      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
-      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=28&amp;autoplay=1" dir="auto">0:28</a> Befehlsübersicht<br/>
-      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=34&amp;autoplay=1" dir="auto">0:34</a> Hilfe zu einem Befehl<br/>
-      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=41&amp;autoplay=1" dir="auto">0:41</a> Einstellungsmöglichkeiten<br/>
-      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=82&amp;autoplay=1" dir="auto">1:22</a> Pluginübersicht<br/>
-      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=106&amp;autoplay=1" dir="auto">1:46</a> System log<br/>
-      <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=141&amp;autoplay=1" dir="auto">2:21</a> Kontaktinformation<br/>
-</figure>
-</target>
-</trans-unit>
-<trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{TaskOverviewYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/iZHRx6vpjCU</target></trans-unit>
-<trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{TaskOverviewYoutubeVideoGuideDescriptionContent}</source>
-<target><br/>
-        <figure>
-            <figcaption><b>Übersicht:</b></figcaption>
-              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
-              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=10&amp;autoplay=1" dir="auto">0:10</a> Aufgabenübersicht<br/>
-              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=22&amp;autoplay=1" dir="auto">0:22</a> Status-Kopfzeile<br/>
-              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=34&amp;autoplay=1" dir="auto">0:34</a> Aktueller Workflow-Kopfzeile<br/>
-              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=57&amp;autoplay=1" dir="auto">0:57</a> Erweiterte Filter<br/>
-              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=81&amp;autoplay=1" dir="auto">1:21</a> Auswertungen anzeigen (KPIs)<br/>
-              <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=94&amp;autoplay=1" dir="auto">1:34</a> Kontaktinformationen<br/>
-        </figure>
-</target></trans-unit>
-<trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVVcmx9'><source>{CustomerYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/Z-RPoxq64cI</target></trans-unit>
-<trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'><source>{CustomerYoutubeVideoGuideDescriptionContent}</source>
-<target><br/>
-                <figure>
-                    <figcaption><b>Übersicht:</b></figcaption>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=19&amp;autoplay=1" dir="auto">0:19</a> Standard-Benutzerzuweisung<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=188&amp;autoplay=1" dir="auto">3:08</a> Benutzerverwaltung<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=206&amp;autoplay=1" dir="auto">3:26</a> Automatisierte Benutzerzuweisung<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=335&amp;autoplay=1" dir="auto">5:35</a> Sprachressourcenzuweisung<br/>
-                      <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=413&amp;autoplay=1" dir="auto">6:53</a> Kontaktinformationen<br/>
-                </figure>
-</target>
-</trans-unit>
-<trans-unit id='UmVkaXJlY3QgdG8gbG9naW4uLi4='><source>Redirect to login...</source><target>Redirect to login...</target></trans-unit>
-<trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{ResourcesYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/fgSm2Ygw0uk</target></trans-unit>
-<trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{ResourcesYoutubeVideoGuideDescriptionContent}</source>
-<target><br/>
+{footer}</target>
+            </trans-unit>
+            <trans-unit id='VHJ5IG9ubGluZQ=='>
+                <source>Try online</source>
+                <target>Try online</target>
+            </trans-unit>
+            <trans-unit id='Q3Jvd2Qgb2YgY29tcGFuaWVz'>
+                <source>Crowd of companies</source>
+                <target>Crowd of companies</target>
+            </trans-unit>
+            <trans-unit id='VXNl'>
+                <source>Use</source>
+                <target>Use</target>
+            </trans-unit>
+            <trans-unit id='SW50ZWdyYXRl'>
+                <source>Integrate</source>
+                <target>Integrate</target>
+            </trans-unit>
+            <trans-unit id='RXh0ZW5k'>
+                <source>Extend</source>
+                <target>Extend</target>
+            </trans-unit>
+            <trans-unit id='LSBEaWUgRGF0ZW4gc2luZCBudXIgaW4gZGVyIEhUTUwtQW5zaWNodCBkZXIgRS1NYWlsIHZlcmbDvGdiYXIhIC0='>
+                <source>- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -</source>
+                <target>- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -</target>
+            </trans-unit>
+            <trans-unit id='RGVyIFJlc2V0SGFzaCBvZGVyIGRpZSBCcm93c2Vyc2l0enVuZyBpc3QgbmljaHQgKG1laHIpIGfDvGx0aWcuIEJpdHRlIGZvcmRlcm4gU2llIMO8YmVyIGRhcyBuZWJlbnN0ZWhlbmRlIEZvcm11bGFyIGVpbmUgRS1NYWlsIG1pdCBlaW5lbSBuZXVlbiBMaW5rIGFuLg=='>
+                <source>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</source>
+                <target>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</target>
+            </trans-unit>
+            <trans-unit id='U3VwcG9ydCB0aGUgcHJvamVjdA=='>
+                <source>Support the project</source>
+                <target>Support the project</target>
+            </trans-unit>
+            <trans-unit id='T3V0c3RhbmRpbmcgZmVhdHVyZXM='>
+                <source>Outstanding features</source>
+                <target>Outstanding features</target>
+            </trans-unit>
+            <trans-unit id='JyV2YWx1ZSUnIGlzdCBrZWluZSBHVUlE'>
+                <source>'%value%' ist keine GUID</source>
+                <target>'%value%' ist keine GUID</target>
+            </trans-unit>
+            <trans-unit id='SWhyIFdlYmJyb3dzZXIgd2lyZCBuaWNodCBtZWhyIHVudGVyc3TDvHR6dA=='>
+                <source>Ihr Webbrowser wird nicht mehr unterstützt</source>
+                <target>Ihr Webbrowser wird nicht mehr unterstützt</target>
+            </trans-unit>
+            <trans-unit id='TGVpZGVyIHdpcmQgZGVyIE1pY3Jvc29mdCBJbnRlcm5ldCBFeHBsb3JlciB2b24gdHJhbnNsYXRlNSBuaWNodCBtZWhyIHVudGVyc3TDvHR6dC4gQml0dGUgYmVudXR6ZW4gU2llIGVpbmVuIGFuZGVyZW4gV2ViYnJvd3NlciB3aWUgei5CLiBHb29nbGUgQ2hyb21lLCBNb3ppbGxhIEZpcmVGb3gsIEFwcGxlIFNhZmFyaSBvZGVyIE1pY3Jvc29mdCBFZGdlLg=='>
+                <source>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</source>
+                <target>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</target>
+            </trans-unit>
+            <trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
+                <source>{ProjectOverviewYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/1TkBCfo9ovw</target>
+            </trans-unit>
+            <trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
+                <source>{ProjectOverviewYoutubeVideoGuideDescriptionContent}</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=18&amp;autoplay=1" dir="auto">0:18</a> Hauptbereiche
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=32&amp;autoplay=1" dir="auto">0:32</a> Projekte
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=57&amp;autoplay=1" dir="auto">0:57</a> Aufgaben
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=103&amp;autoplay=1" dir="auto">1:43</a> Sprachressourcen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=144&amp;autoplay=1" dir="auto">2:24</a> TermPortal
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=157&amp;autoplay=1" dir="auto">2:37</a> InstantTranslate
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=176&amp;autoplay=1" dir="auto">2:56</a> Editor
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
+                <source>{EditorYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/fERwuq1yXUM</target>
+            </trans-unit>
+            <trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
+                <source>{EditorYoutubeVideoGuideDescriptionContent}</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=9&amp;autoplay=1" dir="auto">0:09</a> Interface
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=66&amp;autoplay=1" dir="auto">1:06</a> Ansicht ändern
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=85&amp;autoplay=1" dir="auto">1:25</a> Bearbeitung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=108&amp;autoplay=1" dir="auto">1:48</a> Konkordanzsuche
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=121&amp;autoplay=1" dir="auto">2:01</a> Schaltflächen für die Segmentbearbeitung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=138&amp;autoplay=1" dir="auto">2:18</a> Lesezeichen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=154&amp;autoplay=1" dir="auto">2:34</a> Tastenkürzel
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=175&amp;autoplay=1" dir="auto">2:55</a> Segmentscrollen und TrackChanges-Funktion
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=210&amp;autoplay=1" dir="auto">3:30</a> Wiederholungseditor
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=224&amp;autoplay=1" dir="auto">3:44</a> Farbliche Markierung von Wörtern
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=267&amp;autoplay=1" dir="auto">4:27</a> Tags
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=289&amp;autoplay=1" dir="auto">4:49</a> Bearbeitungsstatus
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=308&amp;autoplay=1" dir="auto">5:08</a> Suchen und Ersetzen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=323&amp;autoplay=1" dir="auto">5:23</a> Segment-Metadaten
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=341&amp;autoplay=1" dir="auto">5:41</a> Dateinbaum
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=369&amp;autoplay=1" dir="auto">6:09</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'>
+                <source>'%value%' does not match the expected structure for a DNS hostname</source>
+                <target>'%value%' does not match the expected structure for a DNS hostname</target>
+            </trans-unit>
+            <trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVVcmx9'>
+                <source>{PreferencesYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/O2Z8wlzC-oo</target>
+            </trans-unit>
+            <trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'>
+                <source>{PreferencesYoutubeVideoGuideDescriptionContent}</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=11&amp;autoplay=1" dir="auto">0:11</a> Systemkonfigurationen
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=83&amp;autoplay=1" dir="auto">1:23</a> Konfigurationen - Kunde
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=105&amp;autoplay=1" dir="auto">1:45</a> Konfigurationen - Aufgabe
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=127&amp;autoplay=1" dir="auto">2:07</a> Konfigurationen - Import
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=141&amp;autoplay=1" dir="auto">2:21</a> In-Context Schriften
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=218&amp;autoplay=1" dir="auto">3:38</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id='VGhlIHR3byBnaXZlbiB0b2tlbnMgZG8gbm90IG1hdGNo'>
+                <source>The two given tokens do not match</source>
+                <target>The two given tokens do not match</target>
+            </trans-unit>
+            <trans-unit id='UG1saWdodA=='>
+                <source>Pmlight</source>
+                <target>PM Light</target>
+            </trans-unit>
+            <trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
+                <source>{CliYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/oUhUakQFmVw</target>
+            </trans-unit>
+            <trans-unit id='e0NsaVlvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
+                <source>{CliYoutubeVideoGuideDescriptionContent}</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=28&amp;autoplay=1" dir="auto">0:28</a> Befehlsübersicht
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=34&amp;autoplay=1" dir="auto">0:34</a> Hilfe zu einem Befehl
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=41&amp;autoplay=1" dir="auto">0:41</a> Einstellungsmöglichkeiten
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=82&amp;autoplay=1" dir="auto">1:22</a> Pluginübersicht
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=106&amp;autoplay=1" dir="auto">1:46</a> System log
+                        <br/>
+                        <a target="youtubevideoframeCli" href="https://www.youtube.com/embed/oUhUakQFmVw?start=141&amp;autoplay=1" dir="auto">2:21</a> Kontaktinformation
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
+                <source>{TaskOverviewYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/iZHRx6vpjCU</target>
+            </trans-unit>
+            <trans-unit id='e1Rhc2tPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
+                <source>{TaskOverviewYoutubeVideoGuideDescriptionContent}</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=10&amp;autoplay=1" dir="auto">0:10</a> Aufgabenübersicht
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=22&amp;autoplay=1" dir="auto">0:22</a> Status-Kopfzeile
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=34&amp;autoplay=1" dir="auto">0:34</a> Aktueller Workflow-Kopfzeile
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=57&amp;autoplay=1" dir="auto">0:57</a> Erweiterte Filter
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=81&amp;autoplay=1" dir="auto">1:21</a> Auswertungen anzeigen (KPIs)
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/iZHRx6vpjCU?start=94&amp;autoplay=1" dir="auto">1:34</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVVcmx9'>
+                <source>{CustomerYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/Z-RPoxq64cI</target>
+            </trans-unit>
+            <trans-unit id='e0N1c3RvbWVyWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'>
+                <source>{CustomerYoutubeVideoGuideDescriptionContent}</source>
+                <target>
+                    <br/>
+                    <figure>
+                        <figcaption>
+                            <b>Übersicht:</b>
+                        </figcaption>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=19&amp;autoplay=1" dir="auto">0:19</a> Standard-Benutzerzuweisung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=188&amp;autoplay=1" dir="auto">3:08</a> Benutzerverwaltung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=206&amp;autoplay=1" dir="auto">3:26</a> Automatisierte Benutzerzuweisung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=335&amp;autoplay=1" dir="auto">5:35</a> Sprachressourcenzuweisung
+                        <br/>
+                        <a target="youtubevideoframe" href="https://www.youtube.com/embed/Z-RPoxq64cI?start=413&amp;autoplay=1" dir="auto">6:53</a> Kontaktinformationen
+                        <br/>
+                    </figure>
+                </target>
+            </trans-unit>
+            <trans-unit id='UmVkaXJlY3QgdG8gbG9naW4uLi4='>
+                <source>Redirect to login...</source>
+                <target>Redirect to login...</target>
+            </trans-unit>
+            <trans-unit id='U2VociBnZWVocnRlKHIp'>
+                <source>Sehr geehrte(r)</source>
+                <target>Sehr geehrte(r)</target>
+            </trans-unit>
+            <trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='>
+                <source>{LinkConsortium}</source>
+                <target>https://www.translate5.net/das-konsortium</target>
+            </trans-unit>
+            <trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='>
+                <source>{ResourcesYoutubeVideoGuideUrl}</source>
+                <target>https://www.youtube.com/embed/fgSm2Ygw0uk</target>
+            </trans-unit>
+            <trans-unit id='e1Jlc291cmNlc1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='>
+                <source>{ResourcesYoutubeVideoGuideDescriptionContent}</source>
+                <target><br/>
                 <figure>
                     <figcaption><b>Übersicht:</b></figcaption>
                       <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
@@ -345,8 +1100,8 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
                       <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=212&amp;autoplay=1" dir="auto">3:32</a> Sprachressourcen im Projektfenster<br/>
                       <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
                 </figure>
-</target>
-</trans-unit>
-  </body>
- </file>
+                </target>
+            </trans-unit>
+        </body>
+    </file>
 </xliff>

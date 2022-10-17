@@ -32,7 +32,8 @@ require_once 'ChangeAlikeTranslate680Test.php';
  * @see ChangeAlikeTranslate680Test
  * Same Tests as there expect with source editing
  */
-class ChangeAlikeTranslate680TestSourceEditing extends \ChangeAlikeTranslate680Test {
+class ChangeAlikeTranslate680TestSourceEditing extends ChangeAlikeTranslate680Test {
+
     protected static $useSourceEditing = true;
     
     /**
