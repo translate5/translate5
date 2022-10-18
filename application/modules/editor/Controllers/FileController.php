@@ -89,7 +89,11 @@ class Editor_FileController extends ZfExtended_RestController
     public function reimportAction()
     {
 
-        $path = '';
+        $fileId = $this->getParam('oldFileId');
+
+        $filePath=$this->getUploadedXlfFilePaths();
+
+        $path = $filePath[0];
 
 
         /** @var Reimport $processor */
@@ -115,6 +119,61 @@ class Editor_FileController extends ZfExtended_RestController
         $parser->addSegmentProcessor($processor);
         $parser->parseFile();
 
+    }
+
+    /***
+     * Return the uploaded tbx files paths
+     *
+     * @throws ZfExtended_FileUploadException
+     * @return array
+     */
+    private function getUploadedXlfFilePaths(): array
+    {
+        $upload = new Zend_File_Transfer();
+        $upload->addValidator('Extension', false, 'xlf');
+        // Returns all known internal file information
+        $files = $upload->getFileInfo();
+        $filePath=[];
+        foreach ($files as $file => $info) {
+            // file uploaded ?
+            if (!$upload->isUploaded($file)) {
+                $this->uploadErrors[]="The file is not uploaded";
+                continue;
+            }
+
+            // validators are ok ?
+            if (!$upload->isValid($file)) {
+                $this->uploadErrors[]="The file:".$file." is with invalid file extension";
+                continue;
+            }
+
+            $filePath[] = $info['tmp_name'];
+        }
+
+        return $filePath;
+    }
+
+    /**
+     * @return boolean if there are upload errors false, true otherwise
+     */
+    protected function validateUpload(): bool
+    {
+        if (empty($this->uploadErrors)) {
+            return true;
+        }
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */
+        $errors = [
+            'fileReimport' => []
+        ];
+
+        foreach ($this->uploadErrors as $error) {
+            $errors['fileReimport'][] = $translate->_($error);
+        }
+
+        //TODO: log exception with errors
+
+        return false;
     }
 
 
