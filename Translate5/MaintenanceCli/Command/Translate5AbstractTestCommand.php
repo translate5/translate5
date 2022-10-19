@@ -348,8 +348,9 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $configs = $this->getApplicationConfiguration($applicationDbName, $config['host'], $config['username'], $config['password']);
 
             // delete (if needed) and recreate DB. recreate tables
+            $config['exists'] = $testDbExists;
             if (
-                $this->recreateDatabase(... $config, exists: $testDbExists)
+                $this->recreateDatabase(... $config)
                 && $this->recreateTables($configs, 'test')
             ) {
                 $this->io->note('Successfully recreated database \'' . $config['dbname'] . '\'');
@@ -392,8 +393,9 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $configs = $this->getCurrentConfiguration();
 
             // delete and recreate DB. recreate tables
+            $config['exists'] = true;
             if (
-                $this->recreateDatabase(... $config, exists: true)
+                $this->recreateDatabase(... $config)
                 && $this->recreateTables($configs, 'application')
             ) {
                 $this->io->note('Successfully recreated database \'' . $config['dbname'] . '\'');
