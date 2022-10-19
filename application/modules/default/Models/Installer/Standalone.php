@@ -145,6 +145,11 @@ class Models_Installer_Standalone {
         $saInstaller = new self(getcwd(), $options);
         $saInstaller->checkEnvironment();
 
+        //FIXME HERE for dev installations we need extjs 6.2 and extjs 7.0.0
+        // so needing a DEV flag in dependencies config
+        // and a method which initially downloads the dev flagged deps once
+        // $saInstaller->processDevDependencies(); or so
+
         //for developer/docker installations we re-create the DB to ensure collation etc
         $saInstaller->recreateDb = true;
 
@@ -577,7 +582,9 @@ class Models_Installer_Standalone {
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
         if($this->recreateDb) {
             $config = Zend_Registry::get('config');
-            $dbupdater->createDatabase(... $config->resources->db->params->toArray(), dropIfExists: true);
+            $dbConf = $config->resources->db->params->toArray();
+            $dbConf['dropIfExists'] = true;
+            $dbupdater->createDatabase(... $dbConf);
         }
         if(! $dbupdater->initDb()) {
             $this->log('Error on creating initial DB structure, stopping installation. Result: '.print_r($dbupdater->getErrors(),1));
