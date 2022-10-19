@@ -30,20 +30,32 @@ declare(strict_types=1);
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Config;
+use Exception;
 use GuzzleHttp\Psr7\Uri;
+use JsonException;
+use RuntimeException;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use editor_Services_OpenTM2_Connector as Connector;
 use editor_Services_OpenTM2_Service as Service;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use Zend_Config;
+use Throwable;
+use Zend_Db_Statement_Exception;
+use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
+use ZfExtended_Models_Entity_NotFoundException;
+use ZfExtended_Resource_DbConfig as DbConfig;
 
 class OpenTm2MigrationCommand extends Translate5AbstractCommand
 {
     private const ARGUMENT_ENDPOINT = 'endpoint';
+    private const DATA_RELATIVE_PATH = '/../data/';
+    private const EXPORT_FILE_EXTENSION = '.tmx';
 
     protected static $defaultName = 'otm2:migrate';
 
@@ -57,95 +69,120 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
             ->addArgument(self::ARGUMENT_ENDPOINT, InputArgument::REQUIRED, 't5memory endpoint data to be imported to');
     }
 
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $url = $this->getUrl($input);
+        $service = new Service();
 
-        $otmResourceId = $this->getOrmResourceId($url);
+        $url = $this->getUrl($input, $service);
+        $otmResourceId = $this->getOtmResourceId($service);
 
         $this->updateConfig($url);
 
         $t5MemoryResourceId = $this->getT5MemoryResourceId($url);
 
+        $processingErrors = [];
+        $connector = new Connector();
         $languageResourcesData = ZfExtended_Factory::get(LanguageResource::class)->getByResourceId($otmResourceId);
 
-        $connector = new Connector();
+        $progressBar = new ProgressBar($output, count($languageResourcesData));
 
         foreach ($languageResourcesData as $languageResourceData) {
+            $progressBar->advance();
+
             $languageResource = ZfExtended_Factory::get(LanguageResource::class);
             $languageResource->load($languageResourceData['id']);
 
-            $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
-
-            $filename = APPLICATION_PATH . '/../data/' . $languageResource->getSpecificData('fileName') . '.tmx';
-
             $type = $connector->getValidExportTypes()['TMX'];
+            $filenameWithPath = $this->getFilePath() . $this->generateFilename($languageResource);
 
-            file_put_contents($filename, $connector->getTm($type));
+            try {
+                $this->export($connector, $languageResource, $filenameWithPath, $type);
+            } catch (Throwable $e) {
+                $processingErrors[] = [
+                    'language resource id' => $languageResourceData['id'],
+                    'message' => $e->getMessage()
+                ];
+
+                continue;
+            }
 
             $languageResource->setResourceId($t5MemoryResourceId);
 
-            $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
+            try {
+                $this->import($connector, $languageResource, $filenameWithPath, $type);
+            } catch (Throwable $e) {
+                $processingErrors[] = [
+                    'language resource id' => $languageResourceData['id'],
+                    'message' => $e->getMessage()
+                ];
 
-            $fileinfo = [
-                'tmp_name' => $filename,
-                'type' => $type,
-                'name' => $languageResource->getSpecificData('fileName')
-            ];
+                $this->revertChanges($languageResource, $languageResourcesData);
+            }
+        }
 
-            $connector->addTm($fileinfo);
+        $this->writeResult($processingErrors);
+
+        if ($progressBar->getMaxSteps() === count($processingErrors)) {
+            return self::FAILURE;
         }
 
         return self::SUCCESS;
     }
 
-    private function getUrl(InputInterface $input): Uri
+    private function getUrl(InputInterface $input, Service $service): Uri
     {
         $url = new Uri($input->getArgument(self::ARGUMENT_ENDPOINT));
 
-        // TODO validate schema and host?
+        foreach ($service->getResources() as $resource) {
+            if ($resource->getUrl() === (string)$url) {
+                throw new RuntimeException('Endpoint already exists');
+            }
+        }
 
         return $url;
     }
 
-    private function getOrmResourceId(Uri $url): ?string
+    private function getOtmResourceId(Service $service): ?string
     {
-        $service = new Service();
-
         $resourceId = null;
         foreach ($service->getResources() as $resource) {
-            if ($resource->getUrl() === (string)$url) {
-                $this->io->warning(sprintf('endpoint %s already exists', $url));
-
-                throw new \Exception('Endpoint already exists');
-            }
-
             if (str_contains($resource->getUrl(), 'otmmemoryservice')) {
                 $resourceId = $resource->getId();
             }
         }
 
         if (null === $resourceId) {
-            $this->io->warning('No OpenTM2 resource found');
-            throw new \Exception('No OpenTM2 resource found');
+            throw new RuntimeException('No OpenTM2 resource found');
         }
 
         return $resourceId;
     }
 
-    private function updateConfig(Uri $url)
+    /**
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws JsonException
+     */
+    private function updateConfig(Uri $url): void
     {
         $config = ZfExtended_Factory::get(editor_Models_Config::class);
         $config->loadByName('runtimeOptions.LanguageResources.opentm2.server');
-        $value = json_decode($config->getValue(), true);
+        $value = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
         $value[] = (string)$url;
-        $config->setValue(json_encode($value));
+        $config->setValue(json_encode($value, JSON_THROW_ON_ERROR));
         $config->save();
 
-        $dbConfig = ZfExtended_Factory::get(\ZfExtended_Resource_DbConfig::class);
+        $dbConfig = ZfExtended_Factory::get(DbConfig::class);
         $dbConfig->setBootstrap(Zend_Registry::get('bootstrap'));
         $dbConfig->init();
     }
@@ -160,7 +197,80 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
             }
         }
 
-        $this->io->info('Something went wrong: no t5memory resource id found');
-        throw new \Exception('Something went wrong: no t5memory resource id found');
+        throw new RuntimeException('Something went wrong: no t5memory resource id found');
+    }
+
+    private function generateFilename(LanguageResource $languageResource): string
+    {
+        return $languageResource->getSpecificData('fileName') . self::EXPORT_FILE_EXTENSION;
+    }
+
+    private function getFilePath(): string
+    {
+        return APPLICATION_PATH . self::DATA_RELATIVE_PATH;
+    }
+
+    private function export(
+        Connector $connector,
+        LanguageResource $languageResource,
+        string $filenameWithPath,
+        string $type
+    ): void {
+        $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
+
+        file_put_contents($filenameWithPath, $connector->getTm($type));
+
+        if (!file_exists($filenameWithPath)) {
+            throw new RuntimeException('Failed to export file to ' . $filenameWithPath);
+        }
+    }
+
+    /**
+     * @throws Zend_Exception
+     */
+    private function import(
+        Connector $connector,
+        LanguageResource $languageResource,
+        string $filenameWithPath,
+        string $type
+    ): void {
+        $fileInfo = [
+            'tmp_name' => $filenameWithPath,
+            'type' => $type,
+            'name' => basename($filenameWithPath),
+        ];
+
+        $connector->connectTo($languageResource, $languageResource->getSourceLang(), $languageResource->getTargetLang());
+        $successful = $connector->addTm($fileInfo);
+
+        if (!$successful) {
+            throw new RuntimeException('Failed to import file to ' . $filenameWithPath);
+        }
+    }
+
+    /**
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     */
+    private function revertChanges(LanguageResource $languageResource, array $primaryData): void
+    {
+        $languageResource->setSpecificData($primaryData['specificData']);
+        $languageResource->setResourceId($primaryData['resourceId']);
+
+        $languageResource->save();
+    }
+
+    private function writeResult(array $processingErrors): void
+    {
+        if (count($processingErrors) === 0) {
+            $this->io->success('Processing done');
+
+            return;
+        }
+
+        $this->io->warning('There were errors with migrating data');
+        $headers = array_map('ucfirst', array_keys(reset($processingErrors)));
+        $this->io->table($headers, $processingErrors);
     }
 }
