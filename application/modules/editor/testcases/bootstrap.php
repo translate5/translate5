@@ -69,11 +69,12 @@ ZfExtended_Test_ApiHelper::setup([
     'API_URL' => $config->runtimeOptions->server->protocol.$config->runtimeOptions->server->name,
     'DATA_DIR' => $config->runtimeOptions->dir->taskData,
     'LOGOUT_PATH' => $config->runtimeOptions->loginUrl,
-    'CAPTURE_MODE' => (getenv('DO_CAPTURE') === "1"),
-    'XDEBUG_ENABLE' => (getenv('XDEBUG_ENABLE') === "1"),
-    'KEEP_DATA' => (getenv('KEEP_DATA') === "1"),
-    'LEGACY_DATA' => (getenv('LEGACY_DATA') === "1"),
-    'LEGACY_JSON' => (getenv('LEGACY_JSON') === "1"),
+    'CAPTURE_MODE' => (getenv('DO_CAPTURE') === '1'),
+    'XDEBUG_ENABLE' => (getenv('XDEBUG_ENABLE') === '1'),
+    'KEEP_DATA' => (getenv('KEEP_DATA') === '1'),
+    'LEGACY_DATA' => (getenv('LEGACY_DATA') === '1'),
+    'LEGACY_JSON' => (getenv('LEGACY_JSON') === '1'),
+    'IS_SUITE' => (getenv('IS_SUITE') === '1'),
     'ENVIRONMENT' => $ENVIRONMENT
 ]);
 

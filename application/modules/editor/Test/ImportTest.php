@@ -85,20 +85,10 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
      */
     protected static function testSpecificSetup()
     {
-        // add a test-customer if setup-option set
-        if (static::$setupOwnCustomer) {
-            static::$ownCustomer = static::api()->addCustomer('API Testing::' . static::class);
-        }
-
         // evaluate & process the import-setup
         static::$_config = new Config(static::api(), static::class, static::getTestLogin());
         static::setupImport(static::$_config);
         static::$_config->setup();
-
-        // log the user in that is setup as the needed test-user, this must always be the last step
-        if (static::api()->login(static::$setupUserLogin)) {
-            static::assertLogin(static::$setupUserLogin);
-        }
     }
 
     /**
@@ -109,10 +99,5 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
     {
         // teardown the configured stuff
         static::$_config->teardown();
-
-        // as a final thing, remove the test-coustomer if setup-option set
-        if (static::$setupOwnCustomer) {
-            static::api()->deleteCustomer(static::$ownCustomer->id);
-        }
     }
 }

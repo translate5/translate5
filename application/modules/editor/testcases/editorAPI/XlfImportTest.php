@@ -50,7 +50,7 @@ class XlfImportTest extends editor_Test_JsonTest {
         $config
             ->addTask('en', 'de')
             ->addUploadFolder('testfiles')
-            ->addTaskConfigIniFile('runtimeOptions.autoQA.enableSegmentSpellCheck = 0')
+            ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '0')
             ->setToEditAfterImport();
     }
 

@@ -56,11 +56,17 @@ final class Task extends Resource
     private ?array $_importUsers = null;
     private ?string $_usageMode = null;
     private array $_userAssocs = [];
-    private ?string $_taskConfigIni = null;
     private ?string $_cleanupZip = null;
     private bool $_setToEditAfterImport = false;
     private bool $_waitForImported = true;
     private bool $_failOnError = true;
+    /**
+     * Defines the default-configs that will be applied for all task-imports
+     * @var array
+     */
+    private array $_importConfigs = [
+
+    ];
 
     /**
      * @param string $testClass
@@ -180,13 +186,32 @@ final class Task extends Resource
     }
 
     /**
-     * Adds the task-config.ini from raw file content
-     * @param string $fileContent
+     * Adds a needed configuration for the imported task
+     * the "runtimeOptions" scope is automatically added if not given
+     * Make sure, that the passed config-value contains parenthesises for Strings, e.g. "/§[^%]*%/"
+     * @param string $configName
+     * @param mixed $configValue
      * @return $this
      */
-    public function addTaskConfigIniFile(string $fileContent): Task
+    public function addTaskConfig(string $configName, string $configValue): Task
     {
-        $this->_taskConfigIni = $fileContent;
+        if(!str_starts_with($configName, 'runtimeOptions.')){
+            $configName = 'runtimeOptions.'.ltrim($configName, '.');
+        }
+        $this->_importConfigs[$configName] = $configValue;
+        return $this;
+    }
+
+    /**
+     * Removes a needed configuration e.g. a default configuration
+     * @param string $configName
+     * @return $this
+     */
+    public function removeTaskConfig(string $configName): Task
+    {
+        if(array_key_exists($configName, $this->_importConfigs)){
+            unset($this->_importConfigs[$configName]);
+        }
         return $this;
     }
 
@@ -507,9 +532,13 @@ final class Task extends Resource
                 $api->addFile($data['name'], $api->getFile($data['path']), $this->evaluateMime($data['path']));
             }
         }
-        // add optional task-config.ini if set
-        if ($this->_taskConfigIni != null) {
-            $api->addFilePlain('taskConfig', $this->_taskConfigIni, 'text/plain', 'task-config.ini');
+        // add optional task-configs if set
+        if (count($this->_importConfigs) > 0) {
+            $content = '';
+            foreach($this->_importConfigs as $name => $value){
+                $content .= $name.' = '.$value."\n";
+            }
+            $api->addFilePlain('taskConfig', $content, 'text/plain', 'task-config.ini');
         }
     }
 
