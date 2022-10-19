@@ -365,6 +365,8 @@ class Models_Installer_Standalone {
             $timezone = $o['timezone'];
         }
 
+        // use chosen timezone and store it in ini
+        date_default_timezone_set($timezone);
         $this->createInstallationIni(['timezone' => $timezone]);
 
         if($this->recreateDb) {
