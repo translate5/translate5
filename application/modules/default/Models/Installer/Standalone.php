@@ -32,7 +32,6 @@ class Models_Installer_Standalone {
     const INSTALL_INI = '/application/config/installation.ini';
     const CLIENT_SPECIFIC_INSTALL = '/client-specific-installation';
     const CLIENT_SPECIFIC = '/client-specific';
-    const ZEND_LIB = '/library/zend';
     const OS_UNKNOWN = 1;
     const OS_WIN = 2;
     const OS_LINUX = 3;
@@ -55,7 +54,6 @@ class Models_Installer_Standalone {
     
     /**
      * @var array
-     * zend                → path to zend, deprecated
      * help                → show help
      * maintenance         → deprecated maintenance
      * announceMaintenance → deprecated announceMaintenance
@@ -160,9 +158,6 @@ class Models_Installer_Standalone {
     protected function __construct(string $currentWorkingDir, array $options) {
         $this->options = $options;
         $this->currentWorkingDir = $currentWorkingDir;
-        if(empty($this->options['zend'])) {
-            $this->options['zend'] = $this->currentWorkingDir.self::ZEND_LIB;
-        }
         define('APPLICATION_ROOT', $this->currentWorkingDir);
         define('APPLICATION_PATH', $this->currentWorkingDir.DIRECTORY_SEPARATOR.'application');
         //requiering the following hardcoded since, autoloader must be downloaded with Zend Package
@@ -194,34 +189,23 @@ class Models_Installer_Standalone {
         }
         if(!empty($this->options['maintenance'])) {
             $this->log(PHP_EOL.'Deprecated - call ./translate5.sh maintenance');
-            $this->addZendToIncludePath();
-            $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['announceMaintenance'])) {
             $this->log(PHP_EOL.'Deprecated - call ./translate5.sh maintenance');
-            $this->addZendToIncludePath();
-            $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['dbOnly'])) {
             $this->log(PHP_EOL.'Deprecated - call via ./install-and-update.sh: see ./translate5.[sh|bat] list database !');
-            $this->addZendToIncludePath();
-            $this->initApplication();
-            $this->checkDb();
-            $this->updateDb();
             exit;
         }
         if(!empty($this->options['applicationState'])) {
             $this->log(PHP_EOL.'Deprecated - call ./translate5.sh status');
-            $this->addZendToIncludePath();
-            $this->initApplication();
-            echo json_encode(ZfExtended_Debug::applicationState());
             exit;
         }
         if(!empty($this->options['updateCheck'])) {
             $this->log(PHP_EOL.'Deprecated - call ./translate5.sh status');
-            exit; //exiting here completly after checkrun
+            exit;
         }
     }
     
@@ -239,58 +223,12 @@ class Models_Installer_Standalone {
         echo "  Arguments: \n";
         echo "    ZIPFILE                         Optional, updates the installation with the given release from the ZIP file.";
         echo "    --help                          shows this help text\n";
-        echo "    --check                         shows some status information about the current installation,\n";
-        echo "                                    to decide if maintenance mode is needed or not\n";
         echo "\n\n";
-        echo "  For other maintenance tasks call ./translate5.[sh|bat] list! ";
+        echo "  For other maintenance tasks call: \n";
+        echo "    ./translate5.[sh|bat] list";
         echo "\n\n";
     }
 
-    /**
-     * @throws Exception
-     */
-    protected function maintenanceMode(): void
-    {
-        $this->initTranslate5CliBridge();
-        $this->log(PHP_EOL.'Deprecated - maintain maintenance via ./install-and-update.sh: see ./translate5.[sh|bat] list maintenance !');
-        if(!empty($this->options['announceMaintenance'])) {
-            $input = new Symfony\Component\Console\Input\ArrayInput([
-                'command' => 'maintenance:announce',
-                'timestamp' => $this->options['announceMaintenance'],
-                '--message' => $this->options['announceMessage'],
-            ]);
-            $this->cli->run($input);
-            return;
-        }
-        switch ($this->options['maintenance']) {
-            case '0':
-            case 'false':
-            case 'Off':
-            case 'OFF':
-            case 'off':
-                $input = new Symfony\Component\Console\Input\ArrayInput([
-                    'command' => 'maintenance:disable',
-                ]);
-                $this->cli->run($input);
-                break;
-            
-            case 'show':
-                $input = new Symfony\Component\Console\Input\ArrayInput([
-                    'command' => 'maintenance:status',
-                ]);
-                $this->cli->run($input);
-                break;
-            
-            default:
-                $input = new Symfony\Component\Console\Input\ArrayInput([
-                'command' => 'maintenance:set',
-                'timestamp' => $this->options['maintenance'],
-                '--message' => $this->options['announceMessage'],
-                ]);
-                $this->cli->run($input);
-        }
-    }
-    
     protected function checkGitAndInit() {
         $this->installerFile = __FILE__;
         $this->installerHash = md5_file($this->installerFile);
