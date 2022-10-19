@@ -361,6 +361,14 @@ class Models_Installer_Standalone {
         $timezone = $this->askTimzone();
         
         $this->createInstallationIni(['timezone' => $timezone]);
+
+        if($this->recreateDb) {
+            $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
+            $conf = $this->dbCredentials;
+            $conf['dropIfExists'] = true;
+            $dbupdater->createDatabase(... $conf);
+        }
+
         if(! $this->checkDb()) {
             unlink($this->currentWorkingDir.self::INSTALL_INI);
             $this->log("\nFix the above errors and restart the installer! DB Config ".self::INSTALL_INI." was automatically removed therefore.\n");
@@ -580,12 +588,6 @@ class Models_Installer_Standalone {
         $this->log("\nCreating the database base layout...");
 
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
-        if($this->recreateDb) {
-            $config = Zend_Registry::get('config');
-            $dbConf = $config->resources->db->params->toArray();
-            $dbConf['dropIfExists'] = true;
-            $dbupdater->createDatabase(... $dbConf);
-        }
         if(! $dbupdater->initDb()) {
             $this->log('Error on creating initial DB structure, stopping installation. Result: '.print_r($dbupdater->getErrors(),1));
             exit;
