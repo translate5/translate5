@@ -103,6 +103,7 @@ class Models_Installer_Standalone {
      * @var Symfony\Component\Console\Application
      */
     protected \Symfony\Component\Console\Application $cli;
+    private bool $recreateDb = false;
 
     /**
      * @param array $options
@@ -143,6 +144,10 @@ class Models_Installer_Standalone {
         setlocale(LC_ALL, '');
         $saInstaller = new self(getcwd(), $options);
         $saInstaller->checkEnvironment();
+
+        //for developer/docker installations we re-create the DB to ensure collation etc
+        $saInstaller->recreateDb = true;
+
         $saInstaller->installation();//checks internally if steps are already done
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
@@ -570,6 +575,10 @@ class Models_Installer_Standalone {
         $this->log("\nCreating the database base layout...");
 
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
+        if($this->recreateDb) {
+            $config = Zend_Registry::get('config');
+            $dbupdater->createDatabase(... $config->resources->db->params->toArray(), dropIfExists: true);
+        }
         if(! $dbupdater->initDb()) {
             $this->log('Error on creating initial DB structure, stopping installation. Result: '.print_r($dbupdater->getErrors(),1));
             exit;
