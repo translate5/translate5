@@ -83,7 +83,15 @@ class XlfSegmentPixelLengthTest extends editor_Test_JsonTest {
                 $contentToUse = $segToEdit->targetEdit;
             }
             $editedData = $contentToUse.' - edited'.$segToEdit->segmentNrInTask;
-            static::api()->saveSegment($segToEdit->id, $editedData);
+            if(in_array($segToEdit->segmentNrInTask, [1,2,3,13,15])) {
+                static::api()->allowHttpStatusOnce(422);
+                $result = (array) static::api()->saveSegment($segToEdit->id, $editedData);
+                $this->assertEquals(422, $result['httpStatus'], 'Segment ['.$segToEdit->segmentNrInTask.'] is returning wrong HTTP Status.');
+                $this->assertEquals('The data of the saved segment is not valid. The segment content is either to long or to short.', $result['errorMessage'], 'Segment ['.$segToEdit->segmentNrInTask.'] is returning wrong or no error.');
+            }
+            else {
+                static::api()->saveSegment($segToEdit->id, $editedData);
+            }
         }
         
         $jsonFileName = 'expectedSegmentsEdited.json';

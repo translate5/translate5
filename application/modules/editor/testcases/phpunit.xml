@@ -32,5 +32,12 @@
     <testsuite name="visual">
       <file>../Plugins/VisualReview/tests/VisualImageTest.php</file>
     </testsuite>
+    <testsuite name="xlfimport">
+      <file>editorAPI/XlfImportFailTest.php</file>
+      <file>editorAPI/XlfImportTest.php</file>
+      <file>editorAPI/XlfSegmentLengthTest.php</file>
+      <file>editorAPI/XlfSegmentLinesPixelLengthTest.php</file>
+      <file>editorAPI/XlfSegmentPixelLengthTest.php</file>
+    </testsuite>
   </testsuites>
 </phpunit>

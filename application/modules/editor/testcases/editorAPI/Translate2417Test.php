@@ -64,7 +64,7 @@ class Translate2417Test extends editor_Test_JsonTest {
         static::api()->setTaskToEdit(static::getTask()->getId());
         $jsonFileName = 'expectedSegments.json';
         $segments = static::api()->getSegments($jsonFileName);
-        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
+        $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!', true, true);
 
         // now test editing the segments
         self::assertLogin('testmanager');
