@@ -148,7 +148,11 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     }
 
     /**
+     * @param array $misc
      * @return mixed
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     public function update($misc = []) {
 
@@ -249,8 +253,11 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $return['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 
+        // Set isLast-check-skip flag
+        $skipCheckIsLast = $misc['skipCheckIsLast'] ?? false;
+
         // If there are no other attributes with such dataTypeId in same TermCollection
-        if ($this->isLastOfDataTypeInCollection()) {
+        if (!$skipCheckIsLast && $this->isLastOfDataTypeInCollection()) {
 
             // Remove mapping
             ZfExtended_Factory
@@ -895,5 +902,48 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
         // Return
         return $readonly;
+    }
+
+    /**
+     * Get quantity of existing attributes having given $collectionId and $dataTypeId
+     *
+     * @param int $collectionId
+     * @param int $dataTypeId
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function qtyBy(int $collectionId, int $dataTypeId) {
+        return $this->db->getAdapter()->query('
+            SELECT COUNT(`id`) FROM `terms_attributes` WHERE `collectionId` = ? AND `dataTypeId` = ?
+        ', [$collectionId, $dataTypeId])->fetchColumn();
+    }
+
+    /**
+     * Delete existing attributes having given $collectionId and $dataTypeId
+     *
+     * @param int $collectionId
+     * @param int $dataTypeId
+     * @return string
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function deleteBy(int $collectionId, int $dataTypeId) {
+
+        // Get ids
+        $idA =  $this->db->getAdapter()->query('
+            SELECT `id` FROM `terms_attributes` WHERE `collectionId` = ? AND `dataTypeId` = ?
+        ', [$collectionId, $dataTypeId])->fetchAll(PDO::FETCH_COLUMN);
+
+        // Foreach
+        foreach ($idA as $id) {
+
+            // Load
+            $this->load($id);
+
+            // Delete
+            $this->delete(['skipCheckIsLast' => true]);
+        }
     }
 }

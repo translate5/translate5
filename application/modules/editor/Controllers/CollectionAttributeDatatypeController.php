@@ -56,6 +56,7 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
     /**
      * @throws Zend_Session_Exception
      * @throws ZfExtended_Mismatch
+     * @throws Zend_Db_Statement_Exception
      */
     public function init() {
 
@@ -136,6 +137,7 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
      * @throws ZfExtended_Mismatch
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
     public function putAction() {
 
@@ -159,11 +161,47 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
             ],
         ], $this->entity);
 
-        // Update mapping's enabled-flag
-        $this->entity->setEnabled($this->getParam('enabled'));
-        $this->entity->save();
+        // If datatype should be disabled
+        if (!$enabled = $this->getParam('enabled')) {
 
-        // Flush response
-        $this->jflush(true);
+            // Get attribute model
+            $attrM = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
+
+            // Get quantity of attributes to be removed in case of datatype disability confirmation
+            $qty = $attrM->qtyBy($this->entity->getCollectionId(), $this->entity->getDataTypeId());
+
+            // Build disability confirmation msg
+            $msg = sprintf(join('<br>', [
+                'If you disable that datatype for this termcollection,',
+                ' all %s attributes having that datatype in that',
+                'termcollections will be also deleted. Continue?']), $qty);
+        }
+
+        // If user is going to disable datatype, proceed only after such operation is confirmed
+        if ($enabled || $this->confirm($msg)) {
+
+            // Update mapping's enabled-flag
+            $this->entity->setEnabled($enabled);
+
+            // Save mapping
+            $this->entity->save();
+
+            // If mapping's enabled-flag was set to false
+            if (!$this->entity->getEnabled()) {
+
+                // Delete all terms_attributes-records
+                $attrM->deleteBy($this->entity->getCollectionId(), $this->entity->getDataTypeId());
+
+                // It means we should set exists-flag to false as well,
+                // as all attributes having dataTypeId and collectionId were deleted
+                $this->entity->setExists(false);
+
+                // Save mapping
+                $this->entity->save();
+            }
+
+            // Flush response
+            $this->jflush(true);
+        }
     }
 }

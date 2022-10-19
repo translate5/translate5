@@ -34,11 +34,39 @@ trait editor_Controllers_Traits_TermportalTrait {
      * @param $ruleA
      * @param array|null|ZfExtended_Models_Entity_Abstract $data
      * @return array
+     * @throws ZfExtended_Mismatch*@throws Zend_Db_Statement_Exception
+     * @throws Zend_Db_Statement_Exception
      * @see editor_Utils::jcheck
-     * @throws ZfExtended_Mismatch
      */
     public function jcheck($ruleA, $data = null) {
         return editor_Utils::jcheck($ruleA, $data ?? $this->getRequest()->getParams());
+    }
+
+    /**
+     * Show confirmation prompt
+     *
+     * @param $msg
+     * @param string $buttons OKCANCEL, YESNO, YESNOCANCEL
+     * @param string|null $cancelMsg Msg, that will be shown in case if 'Cancel'
+     *                    button was pressed or confirmation window was closed
+     * @return
+     */
+    public function confirm($msg, $buttons = 'OKCANCEL', $cancelMsg = null) {
+
+        // Get answer index
+        $answerIdx = editor_Utils::rif(editor_Utils::$answer, count(editor_Utils::$answer) + 1);
+
+        // Get answer
+        $answer = $this->getParam('answer' . $answerIdx);
+
+        // If no answer, flush confirmation prompt
+        if (!$answer) editor_Utils::jconfirm(is_array($msg) ? join('<br>', $msg) : $msg, $buttons);
+
+        // If answer is 'cancel' - stop request processing
+        else if ($answer == 'cancel') $this->jflush(false, $cancelMsg);
+
+        // Return answer
+        return editor_Utils::$answer[count(editor_Utils::$answer)] = $answer;
     }
 
     /**
@@ -57,6 +85,7 @@ trait editor_Controllers_Traits_TermportalTrait {
      * This may happen while running tests
      *
      * @throws ZfExtended_Mismatch
+     * @throws Zend_Db_Statement_Exception
      */
     public function handleData() {
 

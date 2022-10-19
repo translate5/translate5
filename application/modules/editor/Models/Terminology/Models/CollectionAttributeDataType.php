@@ -33,6 +33,8 @@ END LICENSE AND COPYRIGHT
  * @method integer setCollectionId() setCollectionId(int $collectionId)
  * @method integer getDataTypeId() getDataTypeId()
  * @method integer setDataTypeId() setDataTypeId(int $dataTypeId)
+ * @method integer getEnabled() getEnabled()
+ * @method integer setEnabled() setEnabled(int $enabled)
  */
 class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_CollectionAttributeDataType';
