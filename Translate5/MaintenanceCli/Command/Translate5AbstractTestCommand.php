@@ -349,7 +349,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
             // delete (if needed) and recreate DB. recreate tables
             if (
-                $this->recreateDatabase($config['host'], $config['username'], $config['password'], $config['dbname'], $testDbExists)
+                $this->recreateDatabase(... $config, exists: $testDbExists)
                 && $this->recreateTables($configs, 'test')
             ) {
                 $this->io->note('Successfully recreated database \'' . $config['dbname'] . '\'');
@@ -393,7 +393,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
             // delete and recreate DB. recreate tables
             if (
-                $this->recreateDatabase($config['host'], $config['username'], $config['password'], $config['dbname'], true)
+                $this->recreateDatabase(... $config, exists: true)
                 && $this->recreateTables($configs, 'application')
             ) {
                 $this->io->note('Successfully recreated database \'' . $config['dbname'] . '\'');
@@ -469,19 +469,18 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function recreateDatabase(string $host, string $username, string $password, string $dbname, bool $exists = false): bool
     {
-        // we need to use PDO, Zend works only with databases
-        $pdo = new \PDO('mysql:host=' . $host, $username, $password);
-        if ($exists) {
-            try {
-                $pdo->query('DROP DATABASE ' . $dbname . ';');
+        $updater = new \ZfExtended_Models_Installer_DbUpdater();
+
+        try {
+            $updater->createDatabase($host, $username, $password, $dbname, $exists);
+            if ($exists) {
                 $this->io->note('Dropped database ' . $dbname);
-            } catch (\PDOException $e) {
-                $this->io->error($e->getMessage() . "\n\n" . $e->getTraceAsString());
-                return false;
             }
+        } catch (\PDOException $e) {
+            $this->io->error($e->getMessage() . "\n\n" . $e->getTraceAsString());
+            return false;
         }
-        // now create DB from scratch
-        $pdo->query('CREATE DATABASE ' . $dbname . ' DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+
         return true;
     }
 
