@@ -76,7 +76,6 @@ class Models_Installer_Standalone {
     protected array $dbCredentials = [
             'host' => 'localhost',
             'username' => 'root',
-            'executable' => '',
             'password' => '',
             'dbname' => 'translate5',
     ];
@@ -470,10 +469,6 @@ class Models_Installer_Standalone {
         $this->log('  CREATE DATABASE IF NOT EXISTS `translate5` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'."\n");
         
         foreach($this->dbCredentials as $key => $default) {
-            //executable is determined by the surrounding bash script
-            if($key == 'executable') {
-                 continue;
-            }
             $prompt = 'Please enter the DB '.$key;
             if(!empty($default)) {
                 $prompt .= ' (default: '.$default.')';
@@ -485,10 +480,6 @@ class Models_Installer_Standalone {
         
         echo PHP_EOL.PHP_EOL.'Confirm the given DB Credentials:'.PHP_EOL.PHP_EOL;
         foreach($this->dbCredentials as $key => $value) {
-            //executable is determined by the surrounding bash script
-            if($key == 'executable') {
-                 continue;
-            }
             echo $key.': '.$value.PHP_EOL;
         }
         return 'y' === strtolower($this->prompt(PHP_EOL.'Confirm the entered data with "y", press any other key to reenter DB credentials.'.PHP_EOL));
@@ -614,9 +605,6 @@ class Models_Installer_Standalone {
         $content[] = 'resources.db.params.username = "'.$this->dbCredentials['username'].'"';
         $content[] = 'resources.db.params.password = "'.$this->dbCredentials['password'].'"';
         $content[] = 'resources.db.params.dbname = "'.$this->dbCredentials['dbname'].'"';
-        if(!empty($this->dbCredentials['executable'])) {
-            $content[] = 'resources.db.executable = "'.$this->dbCredentials['executable'].'"';
-        }
         $content[] = '';
         $content[] = '; secret for encryption of the user passwords';
         $content[] = '; WHEN YOU CHANGE THAT ALL PASSWORDS WILL BE INVALID!';
