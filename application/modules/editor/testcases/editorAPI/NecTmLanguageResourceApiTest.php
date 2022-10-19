@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * Testing what users can do with LanguageResources in addition
  * (assign them to tasks, ...) is NOT part of this test.
  */
-class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
+class NecTmLanguageResourceApiTest extends \editor_Test_ApiTest {
     
     /**
      * Name of the testfile to import for the LanguageReource (see testfiles).
@@ -67,12 +67,8 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
     /**
      *
      */
-    public static function setUpBeforeClass(): void {
+    public static function beforeTests(): void {
         self::markTestIncomplete("Still in progress!");
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        self::assertNeededUsers(); // last authed user is testmanager
-        self::assertLogin('testmanager');
-        self::assertCustomer();
     }
     
     /**
@@ -143,21 +139,14 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
          */
         
         $fileName = ($doImportFile) ? static::IMPORT_FILENAME : null;
-        $this->api()->addFile('tmUpload', $this->api()->getFile($fileName, null, false), "application/xml");
+        static::api()->addFile('tmUpload', static::api()->getFile($fileName, null, false), "application/xml");
         
         // AT WORK; next TODO: categories
         
         $params = $this->languageResourceParams;
         $params['resourceId']  = static::RESOURCE_ID;
         $params['serviceType'] = static::SERVICE_TYPE;
-        $languageResource = $this->api()->post('editor/languageresourceinstance', $params);
+        $languageResource = static::api()->post('editor/languageresourceinstance', $params);
          // TODO...
-    }
-
-    /**
-     *
-     */
-    public static function tearDownAfterClass(): void {
-        self::$api->login('testmanager');
     }
 }

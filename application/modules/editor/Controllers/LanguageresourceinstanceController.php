@@ -639,17 +639,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->setResourceType($resource->getType());
 
         //save first to generate the languageResource id
-        $this->data['id']=$this->entity->save();
-        settype($this->data['customerIds'], 'array');
-        settype($this->data['customerUseAsDefaultIds'], 'array');
-        settype($this->data['customerWriteAsDefaultIds'], 'array');
-        settype($this->data['customerPivotAsDefaultIds'], 'array');
+        $this->data['id'] = $this->entity->save();
+
+        // especially tests are not respecting the array format ...
+        editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
 
         //check and save customer assoc db entry
-        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var editor_Models_LanguageResources_CustomerAssoc $customerAssoc */
         try {
-            $customerAssoc->saveAssocRequest($this->entity->getId(),$this->data);
+            $customerAssoc->saveAssocRequest($this->entity->getId(), $this->data);
         }
         catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();
@@ -697,9 +696,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->decodePutAssociative = true;
         $this->decodePutData();
         parent::putAction();
-        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-
+        // especially tests are not respecting the array format ...
+        editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
         $customerAssoc->updateAssocRequest(
             $this->entity->getId(),
             $this->data);

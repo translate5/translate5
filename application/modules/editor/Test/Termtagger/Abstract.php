@@ -33,8 +33,14 @@ END LICENSE AND COPYRIGHT
  *
  */
 
-abstract class editor_Test_Termtagger_Abstract extends \editor_Test_Testcase {
+abstract class editor_Test_Termtagger_Abstract extends \editor_Test_UnitTest {
     public static $parentTestFolderRelativePath = 'application/modules/editor/testcases';
+    public static $parentTestFolderAbsolutePath;
+    public static $testSuitePath;
+    /**
+     * @var editor_Models_Task
+     */
+    protected static $testTask;
 
     /**
      * @var string
@@ -126,7 +132,10 @@ abstract class editor_Test_Termtagger_Abstract extends \editor_Test_Testcase {
      */
     protected static $targetLangEntity;
 
-
+    public static function setUpBeforeClass(): void {
+        self::$testTask = ZfExtended_Factory::get('editor_Models_Task');
+        parent::setUpBeforeClass();
+    }
 
     public static function init(SplFileInfo $file) {
         self::$testfile = $file;

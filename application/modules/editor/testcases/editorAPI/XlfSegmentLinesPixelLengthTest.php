@@ -26,48 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * XlfSegmentLinesPixelLengthTest imports a simple task and checks imported values about the segment lengths,
  * edits segments and checks then the edited ones again on correct content
  */
 class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
-    public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-            'lockLocked' => 1,
-        );
-        
-        $appState = self::assertAppState();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        
-        $tests = array(
-            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-        );
-        self::$api->testConfig($tests);
-        
-        $zipfile = $api->zipTestFiles('testfiles/','XLF-test.zip');
-        
-        $api->addImportFile($zipfile);
-        $api->import($task);
-        
-        $api->addUser('testlector');
-        
-        //login in setUpBeforeClass means using this user in whole testcase!
-        $api->login('testlector');
-        
-        $task = $api->getTask();
-        //open task for whole testcase
-        $api->setTaskToEdit($task->id);
+
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap',
+        'editor_Plugins_NoMissingTargetTerminology_Bootstrap'
+    ];
+
+    protected static array $requiredRuntimeOptions = [
+        'import.xlf.preserveWhitespace' => 0
+    ];
+
+    protected static string $setupUserLogin = 'testlector';
+
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de')
+            ->addUploadFolder('testfiles')
+            ->setToEditAfterImport();
     }
-    
+
     /**
      * Testing segment values directly after import
      * Other constellations of the segment length count are implicitly tested in the XlfImportTest!
@@ -75,7 +60,7 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
     public function testSegmentValuesAfterImport() {
         //get segment list (just the ones of the first file for that tests)
         $jsonFileName = 'expectedSegments.json';
-        $segments = $this->api()->getSegments($jsonFileName, 20);
+        $segments = static::api()->getSegments($jsonFileName, 20);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Imported segments are not as expected!');
     }
     
@@ -84,12 +69,29 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
      */
     public function testSegmentEditing() {
         //get segment list (just the ones of the first file for that tests)
-        $segments = $this->api()->getSegments(null, 20);
+        $segments = static::api()->getSegments(null, 20);
         $this->assertNotEmpty($segments, 'No segments are found in the Task!');
         
         require_once 'Models/Segment/TagAbstract.php';
         require_once 'Models/Segment/InternalTag.php';
-        
+
+        $failingSegments = [
+            1 => '{"targetEdit": {
+                "segmentTooManyLines": "There are 4 lines in the segment, but only 3 lines are allowed.",
+                "segmentLinesTooLong": "Not all lines in the segment match the given maximal length: 1: 252; 3: 396; 4: 468"
+            }}',
+            3 => '{"targetEdit": {
+                "segmentLinesTooLong": "Not all lines in the segment match the given maximal length: 1: 995"
+            }}',
+            4 => '{"targetEdit": {
+                "segmentLinesTooShort": "Not all lines in the segment match the given minimal length: 1: 84",
+                "segmentLinesTooLong": "Not all lines in the segment match the given maximal length: 2: 1223"
+            }}',
+            5 => '{"targetEdit": {
+                "segmentLinesTooLong": "Not all lines in the segment match the given maximal length: 2: 960"
+            }}',
+        ];
+
         foreach($segments as $segToEdit) {
             if(empty($segToEdit->editable)) {
                 continue;
@@ -101,15 +103,24 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
                 $contentToUse = $segToEdit->targetEdit;
             }
             $editedData = $this->getEditedData($contentToUse, $segToEdit->segmentNrInTask);
-            $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
-            $this->api()->putJson('editor/segment/'.$segToEdit->id, $segmentData);
+
+            if(in_array($segToEdit->segmentNrInTask, array_keys($failingSegments))) {
+                static::api()->allowHttpStatusOnce(422);
+                $result = (array) static::api()->saveSegment($segToEdit->id, $editedData);
+                $this->assertEquals(422, $result['httpStatus'], 'Segment ['.$segToEdit->segmentNrInTask.'] is returning wrong HTTP Status.');
+                $this->assertEquals(json_decode($failingSegments[$segToEdit->segmentNrInTask]), $result['errors'], 'Segment ['.$segToEdit->segmentNrInTask.'] is returning wrong or no error.');
+            }
+            else {
+                static::api()->saveSegment($segToEdit->id, $editedData);
+            }
+
         }
 
         $jsonFileName = 'expectedSegmentsEdited.json';
-        $segments = $this->api()->getSegments($jsonFileName, 20);
+        $segments = static::api()->getSegments($jsonFileName, 20);
         $this->assertSegmentsEqualsJsonFile($jsonFileName, $segments, 'Edited segments are not as expected!');
 
-        $task = $this->api()->getTask();
+        $task = static::api()->getTask();
         //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'segmentlinespixellength-en-de.xlf', 'expected-export.xlf');
     }
@@ -161,24 +172,19 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
      * @param string $fileToCompare
      */
     protected function checkExport(stdClass $task, $exportUrl, $fileToExport, $fileToCompare) {
-        $this->api()->login('testmanager');
-        $this->api()->get($exportUrl);
+        static::api()->login('testmanager');
+        static::api()->get($exportUrl);
 
         //get the exported file content
-        $path = $this->api()->getTaskDataDirectory();
+        $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/'.$fileToExport);
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/'.$fileToExport);
         //compare it
-        $expectedResult = $this->api()->getFileContent($fileToCompare);
+        $expectedResult = static::api()->getFileContent($fileToCompare);
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
         //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
         //file_put_contents('/home/tlauria/foo-'.$fileToCompare, rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
-    }
-    
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager', 'testlector');
     }
 }

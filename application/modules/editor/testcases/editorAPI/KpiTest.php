@@ -26,11 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * KpiTest imports three simple tasks, sets some KPI-relevant dates, exports some of the tasks,
  * and then checks if the KPIs (Key Performance Indicators) get calculated as expected.
  */
-class KpiTest extends \ZfExtended_Test_ApiTestcase {
+class KpiTest extends editor_Test_ImportTest {
     
     const KPI_REVIEWER = 'averageProcessingTimeReviewer';
     const KPI_TRANSLATOR = 'averageProcessingTimeTranslator';
@@ -77,38 +79,37 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      * @var string
      */
     private static $taskEndDate = 'finishedDate';
-    
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
 
+    protected static function setupImport(Config $config): void
+    {
         // If any task exists already, filtering will be wrong!
         $filteredTasks = static::getFilteredTasks();
         static::assertEquals('0', count($filteredTasks), 'The translate5 instance contains already a task with the name "'.static::$taskNameBase.'" remove this task before!');
+
         if(count($filteredTasks) === 0){
             // create the tasks and store their ids
             foreach (static::$tasksForKPI as $taskData) {
+
                 $taskNameSuffix = $taskData['taskNameSuffix'];
-                $task = array(
-                    'taskName' => static::$taskNameBase.'_'.$taskNameSuffix, //no date in file name possible here!
-                    'sourceLang' => 'en',
-                    'targetLang' => 'de'
-                );
-                self::$api->addImportFile(self::$api->getFile('../TestImportProjects/testcase-de-en.xlf'));
-                self::$api->import($task);
-
-                // store task-id for later deleting
-                $task = self::$api->getTask();
-                static::$taskIds[$taskNameSuffix] = $task->id;
-
-                //add user to the task
-                $tua = self::$api->addUser('testlector', params: [
-                    'workflow'=>'default',
-                    'workflowStepName'=>'reviewing'
-                ]);
-                static::$taskUserAssocMap[$task->id] = $tua->id;
+                $config
+                    ->addTask('en', 'de', -1, 'testcase-de-en.xlf')
+                    ->setProperty('taskName', static::$taskNameBase.'_'.$taskNameSuffix)
+                    ->addUser('testlector', params: [
+                        'workflow'=>'default',
+                        'workflowStepName'=>'reviewing'
+                    ]);
             }
+        }
+    }
+
+    /**
+     * generate some maps to work with
+     */
+    public static function beforeTests(): void {
+        for($i = 0; $i < count(static::$tasksForKPI); $i++){
+            $task = static::getTaskAt($i);
+            static::$taskIds[static::$tasksForKPI[$i]['taskNameSuffix']] = $task->getId();
+            static::$taskUserAssocMap[$task->getId()] = $task->getUserAssoc('testlector')->id;
         }
     }
 
@@ -126,7 +127,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      */
     private static function getFilteredTasks() {
         // taskGrid: apply the filter for our tasks! do NOT use the limit!
-        return self::$api->getJson('editor/task?filter='.urlencode(static::renderTaskGridFilter()));
+        return static::api()->getJson('editor/task?filter='.urlencode(static::renderTaskGridFilter()));
     }
     
     /**
@@ -163,7 +164,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $filteredTasks = static::getFilteredTasks();
         $this->assertEquals(count(static::$tasksForKPI), count($filteredTasks));
 
-        $result = self::$api->postJson('editor/task/kpi', ['filter' => static::renderTaskGridFilter()], null, false);
+        $result = static::api()->postJson('editor/task/kpi', ['filter' => static::renderTaskGridFilter()], null, false);
 
         $statistics = $this->getExpectedKpiStatistics();
 
@@ -184,13 +185,13 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
     private function runExcelExportAndImport(string $taskNameSuffix) {
         $taskId = self::$taskIds[$taskNameSuffix];
 
-        $response = self::$api->get('editor/task/'.$taskId.'/excelexport');
+        $response = static::api()->get('editor/task/'.$taskId.'/excelexport');
         $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
         file_put_contents($tempExcel, $response->getBody());
 
-        self::$api->addFile('excelreimportUpload', $tempExcel, 'application/data');
-        self::$api->post('editor/task/'.$taskId.'/excelreimport');
-        self::$api->reloadTask();
+        static::api()->addFile('excelreimportUpload', $tempExcel, 'application/data');
+        static::api()->post('editor/task/'.$taskId.'/excelreimport');
+        static::api()->reloadTask();
     }
 
     /**
@@ -207,7 +208,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $startDate = $startDate->format('Y-m-d H:i:s');
         $taskId = self::$taskIds[$taskNameSuffix];
         $assocId=self::$taskUserAssocMap[$taskId];
-        self::$api->putJson('editor/taskuserassoc/'.$assocId, [static::$taskStartDate => $startDate, static::$taskEndDate => $endDate]);
+        static::api()->putJson('editor/taskuserassoc/'.$assocId, [static::$taskStartDate => $startDate, static::$taskEndDate => $endDate]);
     }
     
     /**
@@ -228,12 +229,5 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $statistics[self::KPI_REVIEWER] = (string)round($processingTimeInDays / $nrTasks, 0);
         $statistics['excelExportUsage'] = round((($nrExported / $nrTasks) * 100),2) . '%';
         return $statistics;
-    }
-
-    public static function tearDownAfterClass(): void {
-        self::$api->login('testmanager');
-        foreach (self::$taskIds as $taskId) {
-            self::$api->deleteTask($taskId);
-        }
     }
 }

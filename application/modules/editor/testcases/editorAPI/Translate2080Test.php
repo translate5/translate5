@@ -26,19 +26,24 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**+
  * Create project with 2 tasks using importUpload_language and importUpload_type api endpoints.
  * On the backend side, the editor_Models_Import_DataProvider_Project data provider will be used to generate the file structure for the uploaded files.
  */
 class Translate2080Test extends editor_Test_JsonTest {
 
-    public static function setUpBeforeClass(): void {
-
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertCustomer();//assert the test customer
-        self::assertLogin('testmanager');
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', ['en','mk'],static::getTestCustomerId())
+            ->addUploadFile('en.xlf')
+            ->addUploadFile('mk.xlf')
+            ->addProperty('relaisLang', 'it')
+            ->addProperty('importUpload_language', ['en','mk','it'])
+            ->addProperty('importUpload_type', ['workfiles','workfiles','pivot'])
+            ->setNotToFailOnError();
     }
 
     /***
@@ -46,25 +51,7 @@ class Translate2080Test extends editor_Test_JsonTest {
      * The relais file will be matched based on the name.
      */
     public function testImportProjectWithRelais(){
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'de',
-            'targetLang' => ['en','mk'],
-            'relaisLang' => 'it',
-            'customerId' => self::$api->getCustomer()->id,
-            'edit100PercentMatch' => true,
-            'importUpload_language' => ['en','mk','it'],
-            'importUpload_type' => ['workfiles','workfiles','pivot'],
-            'autoStartImport' => 1
-        ];
-        self::assertLogin('testmanager');
-        self::$api->addImportFiles(self::$api->getFile('en.xlf'));
-        self::$api->addImportFiles(self::$api->getFile('mk.xlf'));
-        self::$api->addImportFiles(self::$api->getFile('mk.xlf'));
-        self::$api->import($task,false);
-
-        $task = self::$api->getTask();
+        $task = static::api()->getTask();
         $this->assertEquals(count($task->projectTasks), 2, 'No project tasks created.');
-        self::$api->deleteTask($task->id);
     }
 }

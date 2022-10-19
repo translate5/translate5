@@ -1,4 +1,8 @@
 <phpunit bootstrap="bootstrap.php" cacheResult="true" cacheResultFile=".phpunit.result.cache" colors="true">
+  <extensions>
+    <!-- <extension class="MittagQI\Translate5\Test\Api\BeforeFirstTest"/> -->
+    <extension class="MittagQI\Translate5\Test\Api\AfterLastTest"/>
+  </extensions>
   <logging>
     <testdoxText outputFile="last-test-result.txt"/>
   </logging>
@@ -23,9 +27,17 @@
     <testsuite name="okapi">
       <file>../Plugins/Okapi/tests/OkapiBconfTest.php</file>
       <file>../Plugins/Okapi/tests/OkapiBconfFilterTest.php</file>
+      <file>../Plugins/Okapi/tests/OkapiExportTest.php</file>
     </testsuite>
     <testsuite name="visual">
       <file>../Plugins/VisualReview/tests/VisualImageTest.php</file>
+    </testsuite>
+    <testsuite name="xlfimport">
+      <file>editorAPI/XlfImportFailTest.php</file>
+      <file>editorAPI/XlfImportTest.php</file>
+      <file>editorAPI/XlfSegmentLengthTest.php</file>
+      <file>editorAPI/XlfSegmentLinesPixelLengthTest.php</file>
+      <file>editorAPI/XlfSegmentPixelLengthTest.php</file>
     </testsuite>
   </testsuites>
 </phpunit>

@@ -625,7 +625,7 @@ class Task extends Channel {
         
         $result = FrontendMsg::create($this->instance::CHANNEL_INSTANCE, 'notifyUser', [
             'message' => 'taskClosedInOtherWindow',
-            'taskId' => $task['id'],
+            'taskGuid' => $task['taskGuid'],
         ]);
         foreach($this->instance->getConnections() as $conn) {
             /* @var $conn ConnectionInterface */

@@ -26,125 +26,86 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /***
  * Test the import progress feature. This will only test the progress report before the import is triggered
  * and the report progress after the import.
- *
  */
-class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
-    /* @var $this Translate1484Test */
-    
-    protected static $customerTest;
-    protected static $sourceLangRfc = 'de';
-    protected static $targetLangRfc = 'en';
-    
-    
-    public static function setUpBeforeClass(): void {
-        self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
-        self::assertContains('editor_Plugins_MatchAnalysis_Init', $appState->pluginsLoaded, 'Plugin MatchAnalysis must be activated for this test case!');
-        self::assertNotContains('editor_Plugins_SegmentStatistics_Bootstrap', $appState->pluginsLoaded, 'Plugin SegmentStatistics must be deactivated for this test case!');
-        self::assertContains('editor_Plugins_ZDemoMT_Init', $appState->pluginsLoaded, 'Plugin ZDemoMT must be activated for this test case!');
+class Translate2342Test extends editor_Test_ImportTest {
 
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
+    protected static array $forbiddenPlugins = [
+        'editor_Plugins_SegmentStatistics_Bootstrap',
+    ];
 
-        self::$customerTest = self::$api->postJson('editor/customer/',[
-            'name'=>'API Testing::ResourcesLogCustomer',
-            'number'=>uniqid('API Testing::ResourcesLogCustomer', true),
-        ]);
+    protected static array $requiredPlugins = [
+        'editor_Plugins_Okapi_Init',
+        'editor_Plugins_MatchAnalysis_Init',
+        'editor_Plugins_ZDemoMT_Init'
+    ];
+
+    protected static bool $setupOwnCustomer = true;
+
+    protected static function setupImport(Config $config): void
+    {
+        // we remove all "done" workers as well for this test
+        static::api()->getJson('editor/index/workercleanupstate', ['force' => 1]);
+        $sourceLangRfc = 'de';
+        $targetLangRfc = 'en';
+        $customerId = static::$ownCustomer->id;
+        $config
+            ->addLanguageResource('zdemomt', null, $customerId, $sourceLangRfc, $targetLangRfc);
+        $config
+            ->addPretranslation()
+            ->setProperty('pretranslateMt', 1);
+        $config
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
+            ->addUploadFile('import-test-file.html')
+            ->addTaskConfigIniFile('runtimeOptions.autoQA.enableSegmentSpellCheck = 0') // crucial: otherwise the self-queueing spellcheck-worker leads to unpredictable results
+            ->setNotToWaitForImported(); // this triggers the task-import to immediately start
     }
-    
+
     public function testImportAndProgress() {
 
-        // create task
-        $task =[
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerId' => self::$customerTest->id,
-            'autoStartImport' => 0
-        ];
-        self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('import-test-file.html'));
-        self::$api->import($task,false,false);
-
-        // Create dummy MT resource
-        $params =[
-            'resourceId' => 'ZDemoMT',
-            'sourceLang' => self::$sourceLangRfc,
-            'targetLang' => self::$targetLangRfc,
-            'customerIds' => [self::$customerTest->id],
-            'customerUseAsDefaultIds' => [],
-            'customerWriteAsDefaultIds' => [],
-            'serviceType' => 'editor_Plugins_ZDemoMT',
-            'serviceName'=> 'ZDemoMT',
-            'name' => 'API Testing::ZDemoMT_'.__CLASS__
-        ];
-        self::$api->addResource($params);
-
-        // Add task to languageresource assoc
-        self::$api->addTaskAssoc();
-
-        // Queue the match anlysis worker
-        $task = self::$api->getTask();
-        $params = [
-            'internalFuzzy' => 1,
-            'pretranslateMatchrate' => 100,
-            'pretranslateTmAndTerm' => 1,
-            'pretranslateMt' => 1,
-            'isTaskImport' => 0
-        ];
-        self::$api->putJson('editor/task/'.$task->id.'/pretranslation/operation', $params, null, false);
-
+        $taskId = static::getTask()->getId();
+        $taskGuid = static::getTask()->getTaskGuid();
         // now test the queued worker progress before and after the import.
-        $result = self::$api->getJson('editor/task/importprogress',[
-            'taskGuid' => $task->taskGuid
+        $result = static::api()->getJson('editor/task/importprogress',[
+            'taskGuid' => $taskGuid
         ]);
         $result = $result->progress ?? null;
         $this->assertNotEmpty($result->progress ?? null,'No results found for the import progress.');
 
         //remove the non static properties
         unset($result->taskGuid);
-        if(self::$api->isCapturing()){
-            file_put_contents(self::$api->getFile('exportInitial.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
+        if(static::api()->isCapturing()){
+            file_put_contents(static::api()->getFile('exportInitial.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
         }
 
-        $expected = self::$api->getFileContent('exportInitial.txt');
+        $expected = static::api()->getFileContent('exportInitial.txt');
         $actual = json_encode($result, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
         
         // run the import workers and check wait for task import
-        self::$api->getJson('editor/task/'.$task->id.'/import');
-        self::$api->checkTaskStateLoop();
+        static::api()->getJson('editor/task/'.$taskId.'/import');
+        static::api()->checkTaskStateLoop();
         
-        $result = self::$api->getJson('editor/task/importprogress',[
-            'taskGuid' => $task->taskGuid
+        $result = static::api()->getJson('editor/task/importprogress',[
+            'taskGuid' => $taskGuid
         ]);
         $result = $result->progress ?? null;
         $this->assertNotEmpty($result->progress ?? null,'No results found for the import progress.');
 
         //remove the non static properties
         unset($result->taskGuid);
-        if(self::$api->isCapturing()){
-            file_put_contents(self::$api->getFile('exportFinal.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
+        if(static::api()->isCapturing()){
+            file_put_contents(static::api()->getFile('exportFinal.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
         }
 
-        $expected = self::$api->getFileContent('exportFinal.txt');
+        $expected = static::api()->getFileContent('exportFinal.txt');
         $actual = json_encode($result, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
-
-        self::$api->deleteTask($task->id, 'testmanager');
-        self::$api->removeResources();
-    }
-
-
-    public static function tearDownAfterClass(): void {
-        //remove the temp customer
-        self::$api->delete('editor/customer/'.self::$customerTest->id);
     }
 }

@@ -26,61 +26,40 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+
 /**
  * Test the task joined filters
  */
-class TaskFilterTest extends \ZfExtended_Test_ApiTestcase {
-    /**
-     * Setting up the test task by fresh import, adds the lector and translator users
-     */
-    public static function setUpBeforeClass():void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
-        $task = array(
-            'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
-            'edit100PercentMatch' => true,
-        );
-        
-        self::assertTermTagger();
-        
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        $api->addImportFile('SegmentWorkflowTest/simple-en-de.zip');
-        $api->import($task);
-        
-        $api->addUser('testlector','open','reviewing',[
-            'deadlineDate'=>date("Y-m-d 00:00:00", strtotime("+1 day"))
-        
-        ]);
-        $api->reloadTask();
-        $api->addUser('testtranslator', 'waiting', 'translation',[
-            'deadlineDate'=>date("Y-m-d 00:00:00", strtotime("+2 day"))
-            
-        ]);
+class TaskFilterTest extends editor_Test_ImportTest {
+
+    protected static bool $termtaggerRequired = true;
+
+    protected static function setupImport(Config $config): void
+    {
+        $config
+            ->addTask('en', 'de', -1, 'simple-en-de.zip')
+            ->setUsageMode('simultaneous')
+            ->addUser('testlector', 'open', 'reviewing', ['deadlineDate' => date("Y-m-d 00:00:00", strtotime("+1 day"))])
+            ->addUser('testtranslator', 'waiting', 'translation', ['deadlineDate' => date("Y-m-d 00:00:00", strtotime("+2 day"))])
+            ->setProperty('taskName', static::NAME_PREFIX . 'TaskFilterTest'); // TODO FIXME: we better generate data independent from resource-names ...
     }
-    
+
     /**
      * Test if the task user assoc filters are workign
      */
     public function testTaskUserAssocFilters() {
         //test the assigment date of the task
-        $return = $this->api()->getJson('editor/task',[
-            'filter' => '[{"operator":"eq","value":"'.date("Y-m-d 00:00:00", strtotime("now")).'","property":"assignmentDate"},{"operator":"eq","value":'.self::$api->getTask()->id.',"property":"id"}]'
+        $return = static::api()->getJson('editor/task',[
+            'filter' => '[{"operator":"eq","value":"'.date("Y-m-d 00:00:00", strtotime("now")).'","property":"assignmentDate"},{"operator":"eq","value":'.static::api()->getTask()->id.',"property":"id"}]'
         ]);
         $this->assertCount(2, $return);
         
         //test the finish count filter
-        $return = $this->api()->getJson('editor/task',[
-            'filter' => '[{"operator":"eq","value":0,"property":"segmentFinishCount"},{"operator":"eq","value":'.self::$api->getTask()->id.',"property":"id"}]',
+        $return = static::api()->getJson('editor/task',[
+            'filter' => '[{"operator":"eq","value":0,"property":"segmentFinishCount"},{"operator":"eq","value":'.static::api()->getTask()->id.',"property":"id"}]',
         ]);
         $this->assertCount(1, $return);
         $this->assertEquals(0, $return[0]->segmentFinishCount);
-    }
-
-    public static function tearDownAfterClass(): void {
-        $task = self::$api->getTask();
-        self::$api->deleteTask($task->id, 'testmanager');
     }
 }

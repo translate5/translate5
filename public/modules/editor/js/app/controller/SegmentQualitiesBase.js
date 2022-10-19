@@ -236,6 +236,10 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         let me = this;
         column.renderer = function (value, meta, record, rowIndex, colIndex, store) {
             setTimeout(function () {
+                if (me.getSegmentGrid().editingPlugin.context) {
+                    return;
+                }
+
                 me.applyQualityStylesForRecord(store, record);
             }, 50);
             return value;
