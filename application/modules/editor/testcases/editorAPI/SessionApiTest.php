@@ -82,10 +82,10 @@ class SessionApiTest extends editor_Test_ImportTest {
      */
     public function testLogin() {
         static::api()->login('testlector');
-        self::assertLogin('testlector');
+        static::assertLogin('testlector');
         
         static::api()->login('testmanager');
-        self::assertLogin('testmanager');
+        static::assertLogin('testmanager');
 
         $authCookie = Helper::getAuthCookie();
         static::api()->logout();
@@ -171,13 +171,13 @@ class SessionApiTest extends editor_Test_ImportTest {
     public function __testSingleClickAuthentication() {
         static::api()->logout();
         static::api()->login('testmanager2');
-        $this->assertLogin('testmanager2');
+        static::assertLogin('testmanager2');
         static::api()->reloadTask();
         $assoc = static::api()->addUser('testlector');
         $this->assertFalse(isset($assoc->staticAuthHash), 'staticAuthHash for non API user must be empty!');
         
         static::api()->login('testapiuser');
-        $this->assertLogin('testapiuser');
+        static::assertLogin('testapiuser');
         $assoc = static::api()->getJson('editor/taskuserassoc/'.$assoc->id);
         $hash = $assoc->staticAuthHash;
         $this->assertMatchesRegularExpression('/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/',$hash, 'Single click auth hash is no valid guid');
@@ -185,7 +185,7 @@ class SessionApiTest extends editor_Test_ImportTest {
         $response = static::api()->get('editor/session?authhash='.$hash);
         $taskGuid = static::api()->getTask()->taskGuid;
         $this->assertNotFalse(strpos($response->getBody(), '"taskGuid":"'.$taskGuid.'"'), 'The editor page does not contain the expected taskGuid for the opened task.');
-        $this->assertLogin('testlector'); //must be testlector after single click auth
+        static::assertLogin('testlector'); //must be testlector after single click auth
         static::api()->logout();
     }
     
@@ -198,12 +198,12 @@ class SessionApiTest extends editor_Test_ImportTest {
     public function testSessionImpersonate() {
         static::api()->logout();
         static::api()->login('testmanager');
-        $this->assertLogin('testmanager');
+        static::assertLogin('testmanager');
         // This will replace the testmanager session with testlector
         static::api()->get('editor/session/impersonate', [
             'login' => 'testlector'
         ]);
-        $this->assertLogin('testlector');
+        static::assertLogin('testlector');
         static::api()->logout();
     }
 }
