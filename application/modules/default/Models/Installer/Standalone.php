@@ -67,6 +67,7 @@ class Models_Installer_Standalone {
      * db::password        → db password
      * db::database        → db database
      * hostname            → hostname to be used (SSL?)
+     * timezone            → timezone to be used!
      */
     protected array $options;
     
@@ -357,8 +358,13 @@ class Models_Installer_Standalone {
             $this->dbCredentials['dbname'] = $o['db::database'];
         }
 
-        $timezone = $this->askTimzone();
-        
+        if(empty($o['timezone'])) {
+            $timezone = $this->askTimzone();
+        }
+        else {
+            $timezone = $o['timezone'];
+        }
+
         $this->createInstallationIni(['timezone' => $timezone]);
 
         if($this->recreateDb) {
