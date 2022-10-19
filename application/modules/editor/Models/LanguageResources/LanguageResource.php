@@ -625,4 +625,27 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     static function exportFilename($collectionId) {
         return editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $collectionId . '/export.tbx';
     }
+
+    /**
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function insert() {
+
+        // Call parent
+        $return = parent::save();
+
+        // If new termcollection was created
+        if ($this->getResourceType() == 'termcollection') {
+
+            // Make sure
+            ZfExtended_Factory
+                ::get('editor_Models_Terminology_Models_CollectionAttributeDataType')
+                ->onTermCollectionInsert($this->getId());
+        }
+
+        // Return value returned by save() call
+        return $return;
+    }
 }

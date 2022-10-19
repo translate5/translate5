@@ -47,12 +47,13 @@ FROM
   `LEK_languageresources` `c`,
   `terms_attributes_datatype` `d`
 WHERE 
-  `c`.`resourceType` = "termcollection"  
+  `c`.`resourceType` = "termcollection";
 
 -- Set `exists` = 1 for mappings related to existing attributes
 -- For sure, existing attributes should be enabled by default, so `enabled` = 1 is set
 INSERT INTO `terms_collection_attribute_datatype` (`collectionId`,`dataTypeId`) ( 
   SELECT `collectionId`, `dataTypeId`
-  FROM `terms_attributes` 
+  FROM `terms_attributes`
+  WHERE `dataTypeId` IS NOT NULL
   GROUP BY `collectionId`, `dataTypeId`
 ) ON DUPLICATE KEY UPDATE `exists` = 1, `enabled` = 1;

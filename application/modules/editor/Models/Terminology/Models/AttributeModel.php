@@ -202,16 +202,16 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             $return = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels($misc['userName'], $misc['userGuid'], $this->getTermEntryId(), $this->getLanguage(), $this->getTermId());
 
-        // Mapping model
-        $mapping = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
+        // Load mapping-record
+        $mapping = ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_CollectionAttributeDataType')
+            ->loadBy($this->getCollectionId(), $this->getDataTypeId());
 
-        // If no mapping exists yet, e.g there are no other attributes with such dataTypeId in same TermCollection
-        if (!$mapping->existsBy($this->getCollectionId(), $this->getDataTypeId())) {
+        // If mapping-record's `exists` flag is false, e.g there are no other attributes with such dataTypeId in same TermCollection
+        if (!$mapping->getExists()) {
 
-            // Create mapping
-            $mapping->setCollectionId($this->getCollectionId());
-            $mapping->setDataTypeId($this->getDataTypeId());
-            $mapping->save();
+            // Set `exists` flag to true for mapping-record
+            $mapping->setExists(true)->save();
         }
 
         // Return
@@ -219,8 +219,11 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
     }
 
     /**
+     * @param array $misc
      * @return mixed
      * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     public function delete($misc = []) {
 
@@ -252,7 +255,9 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
             // Remove mapping
             ZfExtended_Factory
                 ::get('editor_Models_Terminology_Models_CollectionAttributeDataType')
-                ->deleteBy($this->getCollectionId(), $this->getDataTypeId());
+                ->loadBy($this->getCollectionId(), $this->getDataTypeId())
+                ->setExists(false)
+                ->save();
         }
 
         // Call parent

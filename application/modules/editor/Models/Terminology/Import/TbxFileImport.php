@@ -674,6 +674,11 @@ $memLog('Loaded terms:        ');
             // the dataType does not exist -> create it
             $this->attributeDataTypeModel->loadOrCreate($attribute->elementName, $attribute->type, [$attribute->getLevel()]);
 
+            // Maintain collection<=>datatype mappings data
+            ZfExtended_Factory
+                ::get('editor_Models_Terminology_Models_CollectionAttributeDataType')
+                ->onCustomDataTypeInsert($this->attributeDataTypeModel->getId(), $this->collection->getId());
+
             // reload all dataTypes
             $this->dataType->loadData(true);
 

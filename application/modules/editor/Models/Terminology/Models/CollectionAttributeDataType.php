@@ -45,33 +45,87 @@ class editor_Models_Terminology_Models_CollectionAttributeDataType extends ZfExt
      * @param int $collectionId
      */
     public function updateCollectionAttributeAssoc(int $collectionId){
-        $db = Zend_Db_Table::getDefaultAdapter();
-        $db->query("INSERT INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId) (SELECT collectionId,dataTypeId FROM `terms_attributes` WHERE collectionId = ? GROUP BY collectionId,dataTypeId) ON DUPLICATE KEY UPDATE id = id",[$collectionId]);
+        $this->db->getAdapter()->query("
+            INSERT INTO `terms_collection_attribute_datatype` (collectionId,dataTypeId)
+            (
+            SELECT `collectionId`, `dataTypeId` 
+            FROM `terms_attributes` 
+            WHERE collectionId = ? AND `dataTypeId` IS NOT NULL 
+            GROUP BY collectionId,dataTypeId
+            ) 
+            ON DUPLICATE KEY UPDATE `exists` = 1
+        ", $collectionId);
     }
 
     /**
-     * Delete record having given $collectionId and $dataTypeId
+     * Load record by given $collectionId and $dataTypeId
      *
      * @param int $collectionId
      * @param int $dataTypeId
+     * @return $this
      */
-    public function deleteBy(int $collectionId, int $dataTypeId) {
-        $this->db->getAdapter()->query('
-            DELETE FROM `terms_collection_attribute_datatype` WHERE `collectionId` = ? AND `dataTypeId` = ? LIMIT 1
-        ', [$collectionId, $dataTypeId]);
+    public function loadBy(int $collectionId, int $dataTypeId) {
+
+        // Fetch row by $collectionId and $dataTypeId
+        $this->row = $this->db->fetchRow('`collectionId` = "' . $collectionId . '" AND `dataTypeId` = "' . $dataTypeId . '"');
+
+        // Return model instance itself
+        return $this;
     }
 
     /**
-     * Check whether record exists having given $collectionId and $dataTypeId
+     * Set `exists` flag and return model instance itself
      *
+     * @param bool $exists
+     * @return $this
+     */
+    public function setExists(bool $exists) {
+
+        // Call parent
+        parent::setExists($exists);
+
+        // Return model instance itself
+        return $this;
+    }
+
+    /**
      * @param int $collectionId
-     * @param int $dataTypeId
-     * @return bool
+     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function existsBy(int $collectionId, int $dataTypeId) : bool {
-        return !!$this->db->getAdapter()->query('
-            SELECT `id` FROM `terms_collection_attribute_datatype` WHERE `collectionId` = ? AND `dataTypeId` = ? LIMIT 1
-        ', [$collectionId, $dataTypeId])->fetchColumn();
+    public function loadAllByCollectionId(int $collectionId) : array {
+
+        // Fetch [dataTypeId => mappingInfo] pairs
+        $data = $this->db->getAdapter()->query("
+            SELECT `dataTypeId`, JSON_OBJECT('mappingId', `id`, 'enabled', `enabled`, 'exists', `exists`) 
+            FROM `terms_collection_attribute_datatype` 
+            WHERE `collectionId` = ?"
+        , $collectionId)->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        // Json-decode mappingInfo
+        return array_map(function($value){
+            return json_decode($value);
+        }, $data);
+    }
+
+    /**
+     * @param int $collectionId
+     */
+    public function onTermCollectionInsert(int $collectionId) : void {
+        $this->db->getAdapter()->query("
+            INSERT INTO `terms_collection_attribute_datatype` (`collectionId`, `dataTypeId`, `enabled`, `exists`) 
+            SELECT ?, `id`, `isTbxBasic`, 0 FROM `terms_attributes_datatype`
+        ", $collectionId);
+    }
+
+    /**
+     * @param int $dataTypeId
+     * @param int $collectionId
+     */
+    public function onCustomDataTypeInsert(int $dataTypeId, int $collectionId) : void {
+        $this->db->getAdapter()->query("
+            INSERT INTO `terms_collection_attribute_datatype` (`collectionId`, `dataTypeId`, `enabled`, `exists`) 
+            SELECT `id`, ?, `id` = ?, 0 FROM `LEK_languageresources` WHERE `resourceType` = 'termcollection';
+        ", [$dataTypeId, $collectionId]);
     }
 }

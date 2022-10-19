@@ -72,7 +72,7 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
             in_array('termPM_allClients', $this->_session->roles)
-            //$this->isAllowed('editor_term', 'anyCollection') // use this instead of upper line when
+            //$this->isAllowed( 'editor_term', 'anyCollection') // use this instead of upper line when other branch is merged into develop
                 ?: ZfExtended_Factory
                     ::get(editor_Models_TermCollection_TermCollection::class)
                     ->getAccessibleCollectionIds(editor_User::instance()->getModel());
@@ -80,6 +80,7 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
 
     /**
      *
+     * @throws Zend_Db_Statement_Exception
      */
     public function indexAction()
     {
@@ -99,16 +100,11 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
             ],
         ]);
 
-        // Get [id => dataTypeId] pairs for each record, representing availability
-        // of a certain attribute datatype in certain TermCollection
-        $dataTypeIdA = $this->entity->db->getAdapter()->query('
-            SELECT `id`, `dataTypeId` FROM `terms_collection_attribute_datatype` WHERE `collectionId` = ?'
-            , $_['collectionId']['id'])->fetchAll(PDO::FETCH_KEY_PAIR);
-
-        // Flush those pairs
+        // Get [dataTypeId => mappingInfo] pairs for each record, representing mapping
+        // between certain attribute datatype and certain TermCollection
         $this->view->assign([
             'success' => true,
-            'dataTypeIdA' => $dataTypeIdA,
+            'mappingA' => $this->entity->loadAllByCollectionId($_['collectionId']['id'])
         ]);
     }
 
@@ -120,62 +116,28 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
     }
 
     /**
-     * Create attribute
+     *
+     */
+    public function postAction() {
+        throw new BadMethodCallException();
+    }
+
+    /**
+     *
+     */
+    public function deleteAction() {
+        throw new BadMethodCallException();
+    }
+
+    /**
+     * Change mapping record
      *
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    public function postAction() {
-
-        // Validate collectionId-param and dataTypeId-param
-        $_ = $this->jcheck([
-            'collectionId' => [
-                'req' => true,                                                      // required
-                'rex' => 'int11',                                                   // regular expression preset key or raw expression
-                'key' => 'LEK_languageresources',                                   // points to existing record in a given db table
-            ],
-            'dataTypeId' => [
-                'req' => true,
-                'rex' => 'int11',
-                'key' => 'terms_attributes_datatype'
-            ]
-        ]);
-
-        // If no or only certain collections are accessible - validate collection accessibility
-        if ($this->collectionIds !== true) $this->jcheck([
-            'collectionId' => [
-                'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
-            ],
-        ]);
-
-        // Init new record
-        $this->entity->init([
-            'collectionId' => $_['collectionId']['id'],
-            'dataTypeId'   => $_['dataTypeId']['id'],
-        ]);
-
-        // Save
-        $this->entity->save();
-
-        // Flush success
-        $this->jflush(true, ['mappingId' => $this->entity->getId()]);
-    }
-
-    /**
-     *
-     */
     public function putAction() {
-        throw new BadMethodCallException();
-    }
-
-    /**
-     * Delete attribute
-     *
-     * @throws ZfExtended_Mismatch
-     */
-    public function deleteAction() {
 
         // Validate mappingId-param
         $this->jcheck([
@@ -184,6 +146,10 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
                 'rex' => 'int11',                                                   // regular expression preset key or raw expression
                 'key' => $this->entity,
             ],
+            'enabled' => [
+                'req' => true,
+                'rex' => 'bool'
+            ]
         ]);
 
         // If no or only certain collections are accessible - validate collection accessibility
@@ -193,10 +159,11 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
             ],
         ], $this->entity);
 
-        // Delete mapping
-        $this->entity->delete();
+        // Update mapping's enabled-flag
+        $this->entity->setEnabled($this->getParam('enabled'));
+        $this->entity->save();
 
         // Flush response
-        $this->jflush(true, ['mappingId' => 0]);
+        $this->jflush(true);
     }
 }
