@@ -124,7 +124,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
                     'message' => $e->getMessage()
                 ];
 
-                $this->revertChanges($languageResource, $languageResourcesData);
+                $this->revertChanges($languageResource, $languageResourceData);
             }
         }
 
@@ -255,7 +255,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
      */
     private function revertChanges(LanguageResource $languageResource, array $primaryData): void
     {
-        $languageResource->setSpecificData($primaryData['specificData']);
+        $languageResource->setSpecificData(json_decode($primaryData['specificData'], true, 512, JSON_THROW_ON_ERROR));
         $languageResource->setResourceId($primaryData['resourceId']);
 
         $languageResource->save();
