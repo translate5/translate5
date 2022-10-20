@@ -232,8 +232,9 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             }
             return;
         }
-        
-        me.bus.send('task', 'segmentEditRequest', [context[0].get('taskGuid'), context[0].get('id')]);
+        if(rec){
+            me.bus.send('task', 'segmentEditRequest', [rec.get('taskGuid'), rec.get('id')]);
+        }
         me.editorPlugin = plugin;
     },
     onCancelChangeAlikes: function(record) {
