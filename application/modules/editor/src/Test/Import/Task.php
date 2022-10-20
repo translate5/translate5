@@ -39,6 +39,8 @@ use MittagQI\Translate5\Test\Api\Helper;
  */
 final class Task extends Resource
 {
+    const TASK_CONFIG_INI = 'task-config.ini';
+
     public string $taskName;
     public string $sourceLang = 'en';
     public string|array $targetLang = 'de';
@@ -143,6 +145,7 @@ final class Task extends Resource
 
     /**
      * Adds an additional file to the task-import that has a differen param name (for name 'importUpload' use ->addUploadFile)
+     * IMPORTANT: Can not be used with ZIP od FOLDER uploads!
      * @param string $uploadName
      * @param string $filePath
      * @return $this
@@ -439,7 +442,7 @@ final class Task extends Resource
         }
         // remnove zipped file when imported by folder
         if ($this->_cleanupZip !== null) {
-            @unlink($this->_cleanupZip);
+            @unlink($this->_cleanupZip); // TODO REMOVE
             $this->_cleanupZip = null;
         }
     }
@@ -512,10 +515,28 @@ final class Task extends Resource
     {
         if ($this->_uploadFolder !== null) {
             $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder . '/', 'testTask.zip'); // TODO FIXME: is the slash after the folder neccesary?
+            // add/change a task-config.ini if we have configs
+            if (count($this->_importConfigs) > 0){
+                $this->setTaskConfigsInZip($this->_cleanupZip);
+            }
             $api->addImportFile($this->_cleanupZip);
+            return; // zip is a highlander-format ...
         } else if ($this->_uploadFiles !== null) {
             if (count($this->_uploadFiles) === 1) {
-                $api->addImportFile($api->getFile($this->_uploadFiles[0]), $this->evaluateMime($this->_uploadFiles[0]));
+                $mime = $this->evaluateMime($this->_uploadFiles[0]);
+                $file = $api->getFile($this->_uploadFiles[0]);
+                // add/change a task-config.ini if we have configs. We must use a temporary zip then to not overwrite the original ZIP
+                if ($mime === 'application/zip' && count($this->_importConfigs) > 0){
+                    $tmpZip = dirname($file).'/tmp-'.basename($file);
+                    copy($file, $tmpZip);
+                    $this->setTaskConfigsInZip($tmpZip);
+                    $this->_cleanupZip = $tmpZip;
+                    $file = $tmpZip;
+                }
+                $api->addImportFile($file, $mime);
+                if($mime === 'application/zip'){
+                    return; // zip is a highlander-format ...
+                }
             } else {
                 foreach ($this->_uploadFiles as $relPath) {
                     $api->addImportFiles($api->getFile($relPath), $this->evaluateMime($relPath));
@@ -526,19 +547,16 @@ final class Task extends Resource
         } else {
             throw new Exception('The task to import has no files assigned');
         }
-        // add additional uploads if set
+        // add additional uploads if set (only for non ZIP of FOLDER uploads)
         if ($this->_additionalUploadFiles != null) {
             foreach ($this->_additionalUploadFiles as $data) {
                 $api->addFile($data['name'], $api->getFile($data['path']), $this->evaluateMime($data['path']));
             }
         }
-        // add optional task-configs if set
+        // add optional task-configs if set (only for non ZIP of FOLDER uploads)
         if (count($this->_importConfigs) > 0) {
-            $content = '';
-            foreach($this->_importConfigs as $name => $value){
-                $content .= $name.' = '.$value."\n";
-            }
-            $api->addFilePlain('taskConfig', $content, 'text/plain', 'task-config.ini');
+            $taskConfigIni = new TaskConfigIni(null, $this->_importConfigs);
+            $api->addFilePlain('taskConfig', $taskConfigIni->getContents(), 'text/plain', self::TASK_CONFIG_INI);
         }
     }
 
@@ -560,6 +578,29 @@ final class Task extends Resource
                  return 'application/xml';
             default:
                 return 'text/plain';
+        }
+    }
+
+    /**
+     * Adds or changes task-config.ini in a zip to enable adding configs via ::addTaskConfig for all upload formats
+     * @param string $zipPath
+     * @throws Exception
+     */
+    private function setTaskConfigsInZip(string $zipPath){
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath) === true){
+            $taskConfigContent = $zip->getFromName(self::TASK_CONFIG_INI);
+            if($taskConfigContent !== false){
+                // there is already a task-config we have to overwrite
+                $taskConfig = new TaskConfigIni($taskConfigContent, $this->_importConfigs);
+                $zip->addFromString(self::TASK_CONFIG_INI, $taskConfig->getContents(), \ZipArchive::FL_OVERWRITE);
+            } else {
+                $taskConfig = new TaskConfigIni(null, $this->_importConfigs);
+                $zip->addFromString(self::TASK_CONFIG_INI, $taskConfig->getContents());
+            }
+            $zip->close();
+        } else {
+            throw new Exception('Could not open zip \''.$zipPath.'\'');
         }
     }
 }

@@ -83,7 +83,7 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
      * internal setup for the base-classes
      * Do not override in concrete test-classes, use beforeTests there
      */
-    protected static function testSpecificSetup()
+    final protected static function testSpecificSetup()
     {
         // evaluate & process the import-setup
         static::$_config = new Config(static::api(), static::class, static::getTestLogin());
@@ -95,7 +95,7 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
      * internal teardown for the base-classes
      * Do not override in concrete test-classes, use afterTests there
      */
-    protected static function testSpecificTeardown()
+    final protected static function testSpecificTeardown()
     {
         // teardown the configured stuff
         static::$_config->teardown();

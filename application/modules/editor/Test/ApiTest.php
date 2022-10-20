@@ -170,6 +170,23 @@ abstract class editor_Test_ApiTest extends TestCase
     }
 
     /**
+     * internal setup for the inheriting testcase-classes
+     * Do not override in concrete test-classes, use beforeTests there
+     */
+    protected static function testSpecificSetup()
+    {
+    }
+
+    /**
+     * internal teardown for the inheriting testcase-classes
+     * Do not override in concrete test-classes, use afterTests there
+     */
+    protected static function testSpecificTeardown()
+    {
+
+    }
+
+    /**
      * asserts that a certain user is loggedin
      * @param string $user
      * @return stdClass the login/status JSON for further processing
@@ -232,7 +249,7 @@ abstract class editor_Test_ApiTest extends TestCase
     final public static function setUpBeforeClass(): void
     {
         try {
-            // each test gets an own api-object, the instance of the current test is for code-completion adnd does not hurt, since the constructor does nothing
+            // each test gets an own api-object, the instance of the current test is for code-completion and does not hurt, since the constructor does nothing
             static::$_api = new Helper(static::class, new static);
 
             // this runs only once with the first API-Test
@@ -303,23 +320,6 @@ abstract class editor_Test_ApiTest extends TestCase
         if(count($errors) > 0){
             static::fail(implode("\n", $errors));
         }
-    }
-
-    /**
-     * internal setup for the inheriting testcase-classes
-     * Do not override in concrete test-classes, use beforeTests there
-     */
-    protected static function testSpecificSetup()
-    {
-    }
-
-    /**
-     * internal teardown for the inheriting testcase-classes
-     * Do not override in concrete test-classes, use afterTests there
-     */
-    protected static function testSpecificTeardown()
-    {
-
     }
 
     /**
