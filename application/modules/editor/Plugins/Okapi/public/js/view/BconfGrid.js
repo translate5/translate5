@@ -183,6 +183,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                      * @returns {boolean}
                      */
                     'beforecheckchange': function(col, recordIndex, checked, clicked){
+                        // at times extJs fires this event without record what in theory must not happen
+                        if(!clicked){
+                            return;
+                        }
                         var gridView = col.getView(),
                             customer = gridView.grid.getCustomer(),
                             customerId = customer.id,
