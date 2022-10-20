@@ -217,15 +217,15 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
     enterSegment: function(plugin, context) {
         var me = this,
             msg = me.strings,
-            rec = context[0],
-            meta = me.segmentUsageData.get(rec.get('id'));
+            rec = context[0];
         if(!me.bus.isReady()) {
             Ext.Msg.alert(msg.noConnection, msg.noConnectionSeg); 
             return;
         }
         
         //if segment is not editable, we do not send a editrequest at all
-        if(! rec.get('editable')) {
+        if(rec && !rec.get('editable')) {
+            var meta = me.segmentUsageData.get(rec.get('id'));
             if(meta && meta.editingConn && meta.editingUser) {
                 Editor.MessageBox.addInfo(me.strings.inUseMsg);
                 return false;                
