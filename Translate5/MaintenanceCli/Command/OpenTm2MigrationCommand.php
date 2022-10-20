@@ -252,6 +252,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws JsonException
      */
     private function revertChanges(LanguageResource $languageResource, array $primaryData): void
     {
