@@ -145,7 +145,7 @@ final class Task extends Resource
 
     /**
      * Adds an additional file to the task-import that has a differen param name (for name 'importUpload' use ->addUploadFile)
-     * IMPORTANT: Can not be used with ZIP od FOLDER uploads!
+     * IMPORTANT: Can not be used with ZIP or FOLDER uploads!
      * @param string $uploadName
      * @param string $filePath
      * @return $this
@@ -191,7 +191,7 @@ final class Task extends Resource
     /**
      * Adds a needed configuration for the imported task
      * the "runtimeOptions" scope is automatically added if not given
-     * Make sure, that the passed config-value contains parenthesises for Strings, e.g. "/§[^%]*%/"
+     * Make sure, that the passed config-value contains parenthesises for Strings, e.g. '"/§[^%]*%/"'
      * @param string $configName
      * @param mixed $configValue
      * @return $this
@@ -206,7 +206,7 @@ final class Task extends Resource
     }
 
     /**
-     * Removes a needed configuration e.g. a default configuration
+     * Removes an added configuration e.g. a default configuration (can not be used to remove configs from task-config.ini files!)
      * @param string $configName
      * @return $this
      */
@@ -442,7 +442,7 @@ final class Task extends Resource
         }
         // remnove zipped file when imported by folder
         if ($this->_cleanupZip !== null) {
-            @unlink($this->_cleanupZip); // TODO REMOVE
+            @unlink($this->_cleanupZip);
             $this->_cleanupZip = null;
         }
     }
@@ -514,7 +514,7 @@ final class Task extends Resource
     private function upload(Helper $api)
     {
         if ($this->_uploadFolder !== null) {
-            $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder . '/', 'testTask.zip'); // TODO FIXME: is the slash after the folder neccesary?
+            $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder, 'testTask.zip');
             // add/change a task-config.ini if we have configs
             if (count($this->_importConfigs) > 0){
                 $this->setTaskConfigsInZip($this->_cleanupZip);
@@ -547,13 +547,13 @@ final class Task extends Resource
         } else {
             throw new Exception('The task to import has no files assigned');
         }
-        // add additional uploads if set (only for non ZIP of FOLDER uploads)
+        // add additional uploads if set (only for non ZIP or FOLDER uploads)
         if ($this->_additionalUploadFiles != null) {
             foreach ($this->_additionalUploadFiles as $data) {
                 $api->addFile($data['name'], $api->getFile($data['path']), $this->evaluateMime($data['path']));
             }
         }
-        // add optional task-configs if set (only for non ZIP of FOLDER uploads)
+        // add optional task-configs if set (only for non ZIP or FOLDER uploads)
         if (count($this->_importConfigs) > 0) {
             $taskConfigIni = new TaskConfigIni(null, $this->_importConfigs);
             $api->addFilePlain('taskConfig', $taskConfigIni->getContents(), 'text/plain', self::TASK_CONFIG_INI);
