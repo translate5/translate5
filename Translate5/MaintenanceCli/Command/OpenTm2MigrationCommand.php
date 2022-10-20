@@ -84,7 +84,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $url = $this->getUrl($input, $service);
         $otmResourceId = $this->getOtmResourceId($service);
 
-        $this->updateConfig($url);
+        $this->addUrlToConfig($url);
 
         $t5MemoryResourceId = $this->getT5MemoryResourceId($url);
 
@@ -126,6 +126,12 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
 
                 $this->revertChanges($languageResource, $languageResourceData);
             }
+        }
+
+        if (count($processingErrors) === 0) {
+            $this->cleanupConfig($otmResourceId);
+            $t5MemoryResourceId = $this->getT5MemoryResourceId($url);
+            $this->updateLanguageResources(array_column($languageResourcesData, 'id'), $t5MemoryResourceId);
         }
 
         $this->writeResult($processingErrors);
@@ -173,12 +179,48 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws JsonException
      */
-    private function updateConfig(Uri $url): void
+    private function addUrlToConfig(Uri $url): void
     {
         $config = ZfExtended_Factory::get(editor_Models_Config::class);
         $config->loadByName('runtimeOptions.LanguageResources.opentm2.server');
         $value = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
         $value[] = (string)$url;
+        $config->setValue(json_encode($value, JSON_THROW_ON_ERROR));
+        $config->save();
+
+        $dbConfig = ZfExtended_Factory::get(DbConfig::class);
+        $dbConfig->setBootstrap(Zend_Registry::get('bootstrap'));
+        $dbConfig->init();
+    }
+
+    /**
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws JsonException
+     */
+    private function cleanupConfig(string $otmResourceId): void
+    {
+        $service = new Service();
+
+        foreach ($service->getResources() as $resource) {
+            if ($resource->getId() === $otmResourceId) {
+                $url = $resource->getUrl();
+                break;
+            }
+        }
+
+        if (!isset($url)) {
+            throw new \RuntimeException('Something went wrong, OpenTM2 url not found, can not cleanup');
+        }
+
+        $config = ZfExtended_Factory::get(editor_Models_Config::class);
+        $config->loadByName('runtimeOptions.LanguageResources.opentm2.server');
+        $value = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
+
+        array_splice($value, array_search($url, $value, true), 1);
+
         $config->setValue(json_encode($value, JSON_THROW_ON_ERROR));
         $config->save();
 
@@ -273,5 +315,15 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $this->io->warning('There were errors with migrating data');
         $headers = array_map('ucfirst', array_keys(reset($processingErrors)));
         $this->io->table($headers, $processingErrors);
+    }
+
+    private function updateLanguageResources(array $languageResourcesIds, string $t5MemoryResourceId)
+    {
+        $sql = "UPDATE `LEK_languageresources` 
+                SET `resourceId` = '{$t5MemoryResourceId}'
+                WHERE `id` IN (" . implode(', ', $languageResourcesIds) . ")";
+
+        $languageResource = ZfExtended_Factory::get(LanguageResource::class);
+        $languageResource->db->getAdapter()->query($sql);
     }
 }
