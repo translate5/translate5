@@ -249,9 +249,9 @@ Ext.define('Editor.view.segments.Grid', {
                 widthOffsetEditable = Editor.data.columns.widthOffsetEditable,
                 labelWidth = (label.length) * widthFactorHeader,
                 maxWidth = Editor.data.columns.maxWidth,
-                isEditableTarget = type == rec.TYPE_TARGET && editable;
+                isEditableTarget = type === rec.TYPE_TARGET && editable;
             
-            if(!me.hasRelaisColumn && type == rec.TYPE_RELAIS) {
+            if(!me.hasRelaisColumn && type === rec.TYPE_RELAIS) {
                 me.hasRelaisColumn = true;
             }
             
@@ -417,6 +417,7 @@ Ext.define('Editor.view.segments.Grid', {
             options = {
                 animate: false, //may not be animated, to place the callback at the correct place 
                 callback: function(alwaysTrue, model, row) {
+                    config.record = model; // this is needed by functions that start editing after the segmment is scrolled into view: if the model is not editable and thus is not selected here, the selection will be in an outdated state
                     if(model && model.get('editable')){
                         me.selectOrFocus(rowindex);
                     }
@@ -475,7 +476,7 @@ Ext.define('Editor.view.segments.Grid', {
                 deltaY = viewHeight/2 - (rowTop + rowHeight/2);
                 break;
         }
-        if(!view.el.scroll('t', deltaY, {callback: config.callback})) {
+        if(!view.el.scroll('t', deltaY, { callback: config.callback })) {
             config.notScrollCallback();
         }
     },
@@ -542,7 +543,9 @@ Ext.define('Editor.view.segments.Grid', {
         }
 
         segIsInFocusConfig.callback = segIsInFocusConfig.notScrollCallback = function(){
-            if(forEditing) {
+            // the ->scrollTo function will not focus a non-editable segment, meaning the selection may stays in an older state
+            // to detect this, scrollTo adds the record it scrolled to and potentially selects, so we only can edit, if the scrolled record matches the selected
+            if(forEditing && me.selection && (me.selection === segIsInFocusConfig.record)) {
                 me.editingPlugin.startEdit(me.selection, null, me.editingPlugin.self.STARTEDIT_SCROLLUNDER);
                 if(me.editingPlugin.editor){
                     me.editingPlugin.editor.reposition();
@@ -552,6 +555,7 @@ Ext.define('Editor.view.segments.Grid', {
         };
         segmentNrInTask = parseInt(segmentNrInTask);
         segmentIndex = me.getStore().findBy(rec => rec.data.segmentNrInTask === segmentNrInTask); // direct access here for fastest lookup
+
         if(segmentIndex >= 0) {
             me.scrollTo(segmentIndex, segIsInFocusConfig);
         } else {
