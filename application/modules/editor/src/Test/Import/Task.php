@@ -527,11 +527,10 @@ final class Task extends Resource
                 $file = $api->getFile($this->_uploadFiles[0]);
                 // add/change a task-config.ini if we have configs. We must use a temporary zip then to not overwrite the original ZIP
                 if ($mime === 'application/zip' && count($this->_importConfigs) > 0){
-                    $tmpZip = dirname($file).'/tmp-'.basename($file);
-                    copy($file, $tmpZip);
-                    $this->setTaskConfigsInZip($tmpZip);
-                    $this->_cleanupZip = $tmpZip;
-                    $file = $tmpZip;
+                    $this->_cleanupZip = dirname($file).'/tmp-'.basename($file);
+                    copy($file, $this->_cleanupZip);
+                    $this->setTaskConfigsInZip($this->_cleanupZip);
+                    $file = $this->_cleanupZip;
                 }
                 $api->addImportFile($file, $mime);
                 if($mime === 'application/zip'){
@@ -589,7 +588,11 @@ final class Task extends Resource
     private function setTaskConfigsInZip(string $zipPath){
         $zip = new \ZipArchive();
         if ($zip->open($zipPath) === true){
-            $taskConfigContent = $zip->getFromName(self::TASK_CONFIG_INI);
+            // QUIRK: It seems normally a file in the top-level is found with /filename.extension but it seems it sometimes is found only without leading slash ?
+            $taskConfigContent = $zip->getFromName('/'.self::TASK_CONFIG_INI);
+            if($taskConfigContent === false){
+                $taskConfigContent = $zip->getFromName(self::TASK_CONFIG_INI);
+            }
             if($taskConfigContent !== false){
                 // there is already a task-config we have to overwrite
                 $taskConfig = new TaskConfigIni($taskConfigContent, $this->_importConfigs);

@@ -44,10 +44,31 @@ final class TaskConfigIni
         if ($content !== null) {
             $lines = explode("\n", trim(str_replace("\r", '', $content)));
             foreach($lines as $line){
-                if(str_contains($line, '=')){
+                // we dismiss comments
+                if(str_contains($line, '=') && mb_substr(trim($line), 0, 1) !== ';'){
                     $index = mb_strpos($line, '=');
                     $name = trim(mb_substr($line, 0, $index));
                     $value = trim(mb_substr($line, $index + 1));
+                    // the value may contains a trailing comment, we also dismiss that
+                    if(mb_substr($value, 0, 1) === '\'' || mb_substr($value, 0, 1) === '"'){
+                        // string handling: go to the last quote
+                        $quote = (mb_substr($value, 0, 1) === '"') ? '"' : '\'';
+                        $pos = 1;
+                        $length = mb_strlen($value);
+                        while($pos > 0 && $pos < $length){
+                            if(mb_substr($value, $pos, 1) === $quote && mb_substr($value, $pos - 1, 1) !== '\\'){
+                                $value = mb_substr($value, 0, $pos + 1);
+                                $pos = -1;
+                            } else {
+                                $pos++;
+                            }
+                        }
+                    } else {
+                        $parts = explode(';', $value);
+                        if(count($parts) > 1){
+                            $value = trim($parts[0]);
+                        }
+                    }
                     $this->map[$name] = $value;
                 }
             }
