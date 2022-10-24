@@ -100,7 +100,7 @@ class editor_AttributeController extends ZfExtended_RestController
         // If current user has 'termPM_allClients' role, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
-            in_array('termPM_allClients', $this->_session->roles)
+            $this->isAllowed('editor_term', 'anyCollection')
                 ?: $termCollection->getAccessibleCollectionIds(editor_User::instance()->getModel());
     }
 
@@ -325,15 +325,11 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // If current user can't edit any attribute, for example
         // has none of termPM, termPM_allClients or admin roles,
-        // but has other roles allowed to delete attributes only in certain curcumstances
+        // but has other roles allowed to delete attributes only in certain circumstances
         if (!$this->isAllowed('editor_attribute', 'putAny')) {
 
-            // Get [attrId => readonly] pairs
-            $readonlyA = $this->entity->getReadonlyByIds(
-                $attrIdA,
-                $this->_session->id, // here we're inside putAction, so we do have access
-                $this->_session->roles
-            );
+            // Get [attrId => readonly] pairs for the current user
+            $readonlyA = $this->getReadonlyFlags($attrIdA);
 
             // Prepare error msg
             $msg = count($attrIdA) == 1
@@ -514,12 +510,8 @@ class editor_AttributeController extends ZfExtended_RestController
             // Get attribute ids
             $attrIds = array_keys($entityA);
 
-            // Get [attrId => readonly] pairs
-            $readonlyA = $this->entity->getReadonlyByIds(
-                $attrIds,
-                $this->_session->id, // here we're inside deleteAction, so we do have access
-                $this->_session->roles
-            );
+            // Get [attrId => readonly] pairs for the current user
+            $readonlyA = $this->getReadonlyFlags($attrIds);
 
             // If at least one is readonly - flush failure
             foreach ($readonlyA as $attrId => $readonly)
@@ -1057,29 +1049,30 @@ class editor_AttributeController extends ZfExtended_RestController
         $current = $_['termId']->getProposal() ? 'unprocessed' : $this->entity->getValue();
 
         // Define which old values can be changed to which new values
-        $allow = false; $allowByRole = [
-            'termCustomerSearch' => false, // no change allowed
-            'termReviewer' =>  ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
-            'termFinalizer' => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
-            'termProposer' =>  [],
-            'termPM' => true, // any change allowed
-            'termPM_allClients' => true,
+        $allow = false;
+        $allowByRight = [
+            'review'    => ['unprocessed' => ['provisionallyProcessed' => true, 'rejected' => true]],
+            'finalize'  => ['provisionallyProcessed' => ['finalized' => true, 'rejected' => true]],
+            'propose'   => [],
+            'anyStatus' => true, // any change allowed
         ];
 
-        // Setup roles
-        $role = array_flip($this->_session->roles); array_walk($role, fn(&$a) => $a = true);
-
         // Merge allowed
-        foreach ($allowByRole as $i => $info)
-            if ($role[$i] ?? 0)
+        foreach ($allowByRight as $right => $info) {
+            if ($this->isAllowed('editor_term', $right)) {
                 $allow = is_bool($info) || is_bool($allow)
                     ? $info
                     : $info + $allow;
+            }
+        }
 
         // Prepare list of allowed values
-        $allowed = []; foreach(explode(',', $_['dataTypeId']['picklistValues']) as $possible)
-            if ($allow === true || (is_array($allow[$current] ?? 0) && ($allow[$current][$possible] ?? 0)))
+        $allowed = [];
+        foreach(explode(',', $_['dataTypeId']['picklistValues']) as $possible) {
+            if ($allow === true || (is_array($allow[$current] ?? 0) && ($allow[$current][$possible] ?? 0))) {
                 $allowed []= $possible;
+            }
+        }
 
         // Make sure only allowed values can be set as new value of processStatus attribute
         $this->jcheck([
