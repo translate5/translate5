@@ -134,13 +134,6 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
             ]
         ]);
 
-        // Check that current user has 'termPM_allClients'-role
-        $this->jcheck([
-            'termPM_allClients' => [
-                'req' => true
-            ],
-        ], array_flip($this->_session->roles));
-
         // Shortcuts
         $locale = $this->getParam('locale');
         $custom = json_decode($this->entity->getL10nCustom(), true);

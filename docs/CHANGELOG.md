@@ -17,6 +17,46 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.7.13] - 2022-10-24
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2994](https://jira.translate5.net/browse/TRANSLATE-2994): LanguageResources, OpenTM2 integration - t5memory roll-out** <br>
+Added new cli command for migrating OpenTM2 to t5memory.
+Check the usage of 
+./translate5.sh help otm2:migrate
+
+
+### Changed
+**[TRANSLATE-3080](https://jira.translate5.net/browse/TRANSLATE-3080): LanguageResources - Language resources Help video** <br>
+Integrate language resources video in Language-resources help page.
+
+
+### Bugfixes
+**[TRANSLATE-3082](https://jira.translate5.net/browse/TRANSLATE-3082): VisualReview / VisualTranslation - FIX alias-segments may not be translated in the live-editing when they are "far away" from each other** <br>
+FIX: Repeated segments in the right visual layout, that were several pages "away" from each other may remained untranslated when scrolling to the rear occurances
+FIX: Right WYSIWYG frame is partly untranslated in PDF-based visuals with lots of pages or when scrolling fast
+
+**[TRANSLATE-3081](https://jira.translate5.net/browse/TRANSLATE-3081): TermPortal - Fix show sub languages config level in TermPortal** <br>
+Correct the accessibility level for show sub-languages config in term portal.
+
+**[TRANSLATE-3077](https://jira.translate5.net/browse/TRANSLATE-3077): LanguageResources - Auto-start pivot translation** <br>
+Introduce a configuration to auto-start pivot pre-translation on API based task imports.
+
+**[TRANSLATE-3062](https://jira.translate5.net/browse/TRANSLATE-3062): Installation & Update, Test framework - Test DB reset and removement of mysql CLI dependency** <br>
+Removed the mysql CLI tool as dependency from translate5 PHP code.
+
+**[TRANSLATE-3061](https://jira.translate5.net/browse/TRANSLATE-3061): Test framework - FIX API Tests** <br>
+Fixed API tests, generalized test API
+
+**[TRANSLATE-3053](https://jira.translate5.net/browse/TRANSLATE-3053): Editor general - Refactor direct role usages into usages via ACL rights** <br>
+Direct role usages refactored with rights usages instead
+
+
 ## [5.7.12] - 2022-10-11
 
 ### Important Notes:

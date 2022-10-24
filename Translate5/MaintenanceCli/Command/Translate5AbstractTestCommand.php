@@ -183,6 +183,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
             $testPathOrDir = $testPath;
             $this->io->note('Running test \'' . basename($testPath) . '\'');
+            putenv('IS_SUITE=0');
 
         } else if ($testSuite !== null) {
 
@@ -193,10 +194,12 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             // must not be set when using a suite, otherwise the suite will never be triggered ...
             $testPathOrDir = '';
             putenv('DO_CAPTURE=0');
+            putenv('IS_SUITE=1');
 
         } else {
 
             putenv('DO_CAPTURE=0');
+            putenv('IS_SUITE=1');
             $testPathOrDir = 'application';
         }
 

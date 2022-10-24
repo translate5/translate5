@@ -34,7 +34,7 @@ trait editor_Controllers_Traits_TermportalTrait {
      * @param $ruleA
      * @param array|null|ZfExtended_Models_Entity_Abstract $data
      * @return array
-     * @throws ZfExtended_Mismatch*@throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Mismatch
      * @throws Zend_Db_Statement_Exception
      * @see editor_Utils::jcheck
      */
@@ -77,13 +77,14 @@ trait editor_Controllers_Traits_TermportalTrait {
      * @return mixed
      */
     public function jflush($success, $msg = '') {
-        return forward_static_call_array(array('editor_Utils', 'jflush'), func_get_args());
+        return forward_static_call_array(['editor_Utils', 'jflush'], func_get_args());
     }
 
     /**
      * If request contains json-encoded 'data'-param, decode it and append to request params
      * This may happen while running tests
      *
+     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      * @throws Zend_Db_Statement_Exception
      */
@@ -95,5 +96,33 @@ trait editor_Controllers_Traits_TermportalTrait {
                 $this->getRequest()->getParams() + (array) $data
             );
         }
+    }
+
+    /**
+     * Get [attrId => readonly] pairs for the current user
+     *
+     * @param array $attrIds
+     * @param bool $canDeleteOwn Flag indicating whether current user can't delete any attributes, but can delete own ones
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getReadonlyFlags(array $attrIds, bool $canDeleteOwn = true) : array {
+
+        // Collect rights
+        $rights = [];
+        foreach (['propose', 'review', 'finalize'] as $right) {
+            if ($this->isAllowed('editor_term', $right)) {
+                $rights []= $right;
+            }
+        }
+
+        // Get [attrId => readonly] pairs
+        return ZfExtended_Factory
+            ::get('editor_Models_Terminology_Models_AttributeModel')
+            ->getReadonlyByIds(
+                $attrIds,
+                $canDeleteOwn ? $this->_session->id : false,
+                $rights
+            );
     }
 }

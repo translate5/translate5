@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * @method string getColor() getColor()
  * @method void setColor() setColor(string $color)
  * @method string getResourceId() getResourceId() The id of the used resource
- * @method void setResourceId() setResourceId(int $resourceId)
+ * @method void setResourceId() setResourceId(string $resourceId)
  * @method string getServiceType() getServiceType() The PHP class name for the service
  * @method void setServiceType() setServiceType(string $type)
  * @method string getServiceName() getServiceName() The speakable name of the service as configured in the resource
@@ -181,6 +181,16 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         foreach ($data as $key => $value) {
             $s->where('JSON_EXTRACT(lr.specificData, "$.' . $key . '") = ?', $value);
         }
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+
+    public function getByResourceId(string $resourceId): array
+    {
+        $s = $this->db
+            ->select()
+            ->from(['lr' => 'LEK_languageresources'], ['lr.*'])
+            ->where('lr.resourceId = ?', $resourceId);
 
         return $this->db->fetchAll($s)->toArray();
     }
