@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0bf4e0b1025331c1468b30b7aa0a8b74",
+    "content-hash": "6930fff3941bac09bf07c0fbbe46bc27",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -2333,8 +2333,14 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://bitbucket.org/mittagqi/restful-zend-framework/",
-                "reference": "4d9446675787bf898cfdb84735bbfdb89bbabf8b"
+                "url": "https://bitbucket.org/mittagqi/restful-zend-framework.git",
+                "reference": "e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://bitbucket.org/mittagqi/restful-zend-framework/get/e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2.zip",
+                "reference": "e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2",
+                "shasum": ""
             },
             "default-branch": true,
             "type": "library",
@@ -2344,7 +2350,11 @@
                 ]
             },
             "description": "RESTful services with Zend Framework forked from https://github.com/codeinchaos/restful-zend-framework",
-            "time": "2022-10-20T14:34:10+00:00"
+            "homepage": "https://bitbucket.org/mittagqi/restful-zend-framework",
+            "support": {
+                "source": "https://bitbucket.org/mittagqi/restful-zend-framework/src/e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2/?at=master"
+            },
+            "time": "2022-10-24T14:40:38+00:00"
         },
         {
             "name": "monolog/monolog",
