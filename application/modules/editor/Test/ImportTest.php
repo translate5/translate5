@@ -37,7 +37,7 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
     /**
      * @var Config
      */
-    private static Config $_config;
+    private static ?Config $_config = null;
 
     /**
      * This is the central method to setup an ImportTest
@@ -97,7 +97,10 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
      */
     final protected static function testSpecificTeardown()
     {
-        // teardown the configured stuff
-        static::$_config->teardown();
+        // when early problems in the test-setup occurred, the config might not even was created
+        if(static::$_config){
+            // teardown the configured stuff
+            static::$_config->teardown();
+        }
     }
 }

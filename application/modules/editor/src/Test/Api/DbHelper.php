@@ -68,7 +68,7 @@ final class DbHelper
             $pluginmanager = \Zend_Registry::get('PluginManager');
             /* @var $pluginmanager \ZfExtended_Plugin_Manager */
             foreach ($pluginClasses as $pluginClass) {
-                $plugin = static::getPluginNameFromClass($pluginClass);
+                $plugin = \ZfExtended_Plugin_Manager::classToName($pluginClass);
                 if (!$pluginmanager->setActive($plugin, $activate)) {
                     $success = false;
                 }
@@ -104,26 +104,5 @@ final class DbHelper
         }
         $result->worker = $summary;
         return $result;
-    }
-
-    /**
-     * @param string $pluginClass
-     * @return string
-     * @throws Exception
-     */
-    private static function getPluginNameFromClass(string $pluginClass): string
-    {
-        $name = null;
-        $parts = explode('_Plugins_', $pluginClass);
-        if(count($parts) === 2){
-            $parts = explode('_', $parts[1]);
-            if(count($parts) === 2){
-                $name = $parts[0];
-            }
-        }
-        if($name === null){
-            throw new Exception('Invalid Plugin Class \''.$pluginClass.'\'');
-        }
-        return $name;
     }
 }
