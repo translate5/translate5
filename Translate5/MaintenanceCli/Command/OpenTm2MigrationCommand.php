@@ -53,7 +53,7 @@ use ZfExtended_Resource_DbConfig as DbConfig;
 
 class OpenTm2MigrationCommand extends Translate5AbstractCommand
 {
-    private const ARGUMENT_ENDPOINT = 'endpoint';
+    private const ARGUMENT_URL = 'url';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
 
@@ -66,7 +66,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $this
             ->setDescription('Migrates all existing OpenTM2 language resources to t5memory')
             ->setHelp('Tool exports OpenTM2 language resources one by one and imports data to the t5memory provided as endpoint argument')
-            ->addArgument(self::ARGUMENT_ENDPOINT, InputArgument::REQUIRED, 't5memory endpoint data to be imported to');
+            ->addArgument(self::ARGUMENT_URL, InputArgument::REQUIRED, 't5memory endpoint data to be imported to, e.g. http://t5memory.local/t5memory');
     }
 
     /**
@@ -145,7 +145,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
 
     private function getUrl(InputInterface $input, Service $service): Uri
     {
-        $url = new Uri($input->getArgument(self::ARGUMENT_ENDPOINT));
+        $url = new Uri($input->getArgument(self::ARGUMENT_URL));
 
         foreach ($service->getResources() as $resource) {
             if ($resource->getUrl() === (string)$url) {
