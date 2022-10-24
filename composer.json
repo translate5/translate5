@@ -53,15 +53,18 @@
 				}
 			}
 		}, {
-			"type" : "vcs",
+			"type" : "git",
+			"url" : "https://bitbucket.org/mittagqi/restful-zend-framework/"
+		}, {
+			"type" : "git",
 			"url" : "https://github.com/dream-group/horde-text-diff/"
 		}, {
 			"_README" : "If the pull request https://github.com/technosophos/querypath/pull/208 will go into upstream master we will not need the separate version and URL anymore. version was ~3.0",
-			"type" : "vcs",
+			"type" : "git",
 			"url" : "https://github.com/thomaslauria/querypath"
 		}, {
 			"_README" : "If our pull request will go into upstream shardj/zf1-future as project we will not need the separate version and URL anymore.",
-			"type" : "vcs",
+			"type" : "git",
 			"url" : "https://github.com/MittagQI/zf1-php7.3"
 		}, {
 			"type" : "package",
@@ -109,6 +112,7 @@
 		"jquery/jquery-ui": "1.13.0",
 		"translate5/instanttranslate-roboto-font": "26",
 		"translate5/rangy-lib": "1.3.1-dev",
+		"mittagqi/restful-zend-framework": "dev-master",
 		"axelbecher/material-design-icons": "^1.0",
 		"wilsonglasser/spout": "^3.0",
 		"setasign/tfpdf": "1.32",

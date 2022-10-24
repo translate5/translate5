@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa80a4b469a0b28cff65c60239458418",
+    "content-hash": "0bf4e0b1025331c1468b30b7aa0a8b74",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -2327,6 +2327,24 @@
                 "source": "https://github.com/Masterminds/html5-php/tree/2.7.5"
             },
             "time": "2021-07-01T14:25:37+00:00"
+        },
+        {
+            "name": "mittagqi/restful-zend-framework",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://bitbucket.org/mittagqi/restful-zend-framework/",
+                "reference": "4d9446675787bf898cfdb84735bbfdb89bbabf8b"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "./"
+                ]
+            },
+            "description": "RESTful services with Zend Framework forked from https://github.com/codeinchaos/restful-zend-framework",
+            "time": "2022-10-20T14:34:10+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -8790,7 +8808,8 @@
         "shardj/zf1-future": 20,
         "querypath/querypath": 20,
         "dream-group/horde-text-diff": 20,
-        "translate5/rangy-lib": 20
+        "translate5/rangy-lib": 20,
+        "mittagqi/restful-zend-framework": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -8813,5 +8832,5 @@
     "platform-overrides": {
         "php": "8.0.15"
     },
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }

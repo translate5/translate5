@@ -32,7 +32,6 @@ class Models_Installer_Standalone {
     const INSTALL_INI = '/application/config/installation.ini';
     const CLIENT_SPECIFIC_INSTALL = '/client-specific-installation';
     const CLIENT_SPECIFIC = '/client-specific';
-    const ZEND_LIB = '/library/zend';
     const OS_UNKNOWN = 1;
     const OS_WIN = 2;
     const OS_LINUX = 3;
@@ -55,7 +54,6 @@ class Models_Installer_Standalone {
     
     /**
      * @var array
-     * zend                → path to zend, deprecated
      * help                → show help
      * maintenance         → deprecated maintenance
      * announceMaintenance → deprecated announceMaintenance
@@ -69,6 +67,7 @@ class Models_Installer_Standalone {
      * db::password        → db password
      * db::database        → db database
      * hostname            → hostname to be used (SSL?)
+     * timezone            → timezone to be used!
      */
     protected array $options;
     
@@ -78,7 +77,6 @@ class Models_Installer_Standalone {
     protected array $dbCredentials = [
             'host' => 'localhost',
             'username' => 'root',
-            'executable' => '',
             'password' => '',
             'dbname' => 'translate5',
     ];
@@ -105,6 +103,7 @@ class Models_Installer_Standalone {
      * @var Symfony\Component\Console\Application
      */
     protected \Symfony\Component\Console\Application $cli;
+    private bool $recreateDb = false;
 
     /**
      * @param array $options
@@ -145,6 +144,15 @@ class Models_Installer_Standalone {
         setlocale(LC_ALL, '');
         $saInstaller = new self(getcwd(), $options);
         $saInstaller->checkEnvironment();
+
+        //FIXME HERE for dev installations we need extjs 6.2 and extjs 7.0.0
+        // so needing a DEV flag in dependencies config
+        // and a method which initially downloads the dev flagged deps once
+        // $saInstaller->processDevDependencies(); or so
+
+        //for developer/docker installations we re-create the DB to ensure collation etc
+        $saInstaller->recreateDb = true;
+
         $saInstaller->installation();//checks internally if steps are already done
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
@@ -160,9 +168,6 @@ class Models_Installer_Standalone {
     protected function __construct(string $currentWorkingDir, array $options) {
         $this->options = $options;
         $this->currentWorkingDir = $currentWorkingDir;
-        if(empty($this->options['zend'])) {
-            $this->options['zend'] = $this->currentWorkingDir.self::ZEND_LIB;
-        }
         define('APPLICATION_ROOT', $this->currentWorkingDir);
         define('APPLICATION_PATH', $this->currentWorkingDir.DIRECTORY_SEPARATOR.'application');
         //requiering the following hardcoded since, autoloader must be downloaded with Zend Package
@@ -194,34 +199,23 @@ class Models_Installer_Standalone {
         }
         if(!empty($this->options['maintenance'])) {
             $this->log(PHP_EOL.'Deprecated - call ./translate5.sh maintenance');
-            $this->addZendToIncludePath();
-            $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['announceMaintenance'])) {
             $this->log(PHP_EOL.'Deprecated - call ./translate5.sh maintenance');
-            $this->addZendToIncludePath();
-            $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['dbOnly'])) {
             $this->log(PHP_EOL.'Deprecated - call via ./install-and-update.sh: see ./translate5.[sh|bat] list database !');
-            $this->addZendToIncludePath();
-            $this->initApplication();
-            $this->checkDb();
-            $this->updateDb();
             exit;
         }
         if(!empty($this->options['applicationState'])) {
             $this->log(PHP_EOL.'Deprecated - call ./translate5.sh status');
-            $this->addZendToIncludePath();
-            $this->initApplication();
-            echo json_encode(ZfExtended_Debug::applicationState());
             exit;
         }
         if(!empty($this->options['updateCheck'])) {
             $this->log(PHP_EOL.'Deprecated - call ./translate5.sh status');
-            exit; //exiting here completly after checkrun
+            exit;
         }
     }
     
@@ -239,58 +233,12 @@ class Models_Installer_Standalone {
         echo "  Arguments: \n";
         echo "    ZIPFILE                         Optional, updates the installation with the given release from the ZIP file.";
         echo "    --help                          shows this help text\n";
-        echo "    --check                         shows some status information about the current installation,\n";
-        echo "                                    to decide if maintenance mode is needed or not\n";
         echo "\n\n";
-        echo "  For other maintenance tasks call ./translate5.[sh|bat] list! ";
+        echo "  For other maintenance tasks call: \n";
+        echo "    ./translate5.[sh|bat] list";
         echo "\n\n";
     }
 
-    /**
-     * @throws Exception
-     */
-    protected function maintenanceMode(): void
-    {
-        $this->initTranslate5CliBridge();
-        $this->log(PHP_EOL.'Deprecated - maintain maintenance via ./install-and-update.sh: see ./translate5.[sh|bat] list maintenance !');
-        if(!empty($this->options['announceMaintenance'])) {
-            $input = new Symfony\Component\Console\Input\ArrayInput([
-                'command' => 'maintenance:announce',
-                'timestamp' => $this->options['announceMaintenance'],
-                '--message' => $this->options['announceMessage'],
-            ]);
-            $this->cli->run($input);
-            return;
-        }
-        switch ($this->options['maintenance']) {
-            case '0':
-            case 'false':
-            case 'Off':
-            case 'OFF':
-            case 'off':
-                $input = new Symfony\Component\Console\Input\ArrayInput([
-                    'command' => 'maintenance:disable',
-                ]);
-                $this->cli->run($input);
-                break;
-            
-            case 'show':
-                $input = new Symfony\Component\Console\Input\ArrayInput([
-                    'command' => 'maintenance:status',
-                ]);
-                $this->cli->run($input);
-                break;
-            
-            default:
-                $input = new Symfony\Component\Console\Input\ArrayInput([
-                'command' => 'maintenance:set',
-                'timestamp' => $this->options['maintenance'],
-                '--message' => $this->options['announceMessage'],
-                ]);
-                $this->cli->run($input);
-        }
-    }
-    
     protected function checkGitAndInit() {
         $this->installerFile = __FILE__;
         $this->installerHash = md5_file($this->installerFile);
@@ -410,9 +358,24 @@ class Models_Installer_Standalone {
             $this->dbCredentials['dbname'] = $o['db::database'];
         }
 
-        $timezone = $this->askTimzone();
-        
+        if(empty($o['timezone'])) {
+            $timezone = $this->askTimzone();
+        }
+        else {
+            $timezone = $o['timezone'];
+        }
+
+        // use chosen timezone and store it in ini
+        date_default_timezone_set($timezone);
         $this->createInstallationIni(['timezone' => $timezone]);
+
+        if($this->recreateDb) {
+            $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
+            $conf = $this->dbCredentials;
+            $conf['dropIfExists'] = true;
+            $dbupdater->createDatabase(... $conf);
+        }
+
         if(! $this->checkDb()) {
             unlink($this->currentWorkingDir.self::INSTALL_INI);
             $this->log("\nFix the above errors and restart the installer! DB Config ".self::INSTALL_INI." was automatically removed therefore.\n");
@@ -514,10 +477,6 @@ class Models_Installer_Standalone {
         $this->log('  CREATE DATABASE IF NOT EXISTS `translate5` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'."\n");
         
         foreach($this->dbCredentials as $key => $default) {
-            //executable is determined by the surrounding bash script
-            if($key == 'executable') {
-                 continue;
-            }
             $prompt = 'Please enter the DB '.$key;
             if(!empty($default)) {
                 $prompt .= ' (default: '.$default.')';
@@ -529,10 +488,6 @@ class Models_Installer_Standalone {
         
         echo PHP_EOL.PHP_EOL.'Confirm the given DB Credentials:'.PHP_EOL.PHP_EOL;
         foreach($this->dbCredentials as $key => $value) {
-            //executable is determined by the surrounding bash script
-            if($key == 'executable') {
-                 continue;
-            }
             echo $key.': '.$value.PHP_EOL;
         }
         return 'y' === strtolower($this->prompt(PHP_EOL.'Confirm the entered data with "y", press any other key to reenter DB credentials.'.PHP_EOL));
@@ -658,9 +613,6 @@ class Models_Installer_Standalone {
         $content[] = 'resources.db.params.username = "'.$this->dbCredentials['username'].'"';
         $content[] = 'resources.db.params.password = "'.$this->dbCredentials['password'].'"';
         $content[] = 'resources.db.params.dbname = "'.$this->dbCredentials['dbname'].'"';
-        if(!empty($this->dbCredentials['executable'])) {
-            $content[] = 'resources.db.executable = "'.$this->dbCredentials['executable'].'"';
-        }
         $content[] = '';
         $content[] = '; secret for encryption of the user passwords';
         $content[] = '; WHEN YOU CHANGE THAT ALL PASSWORDS WILL BE INVALID!';

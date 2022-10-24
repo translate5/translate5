@@ -12,6 +12,9 @@
 /nbproject/
 /vendor/
 
+# External dependencies
+/public/ext-6.2.0
+
 # Files
 /.jshintrc
 /application/config/installation*
