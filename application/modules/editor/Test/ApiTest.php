@@ -214,6 +214,9 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * Asserts, that the passed actual string matches the contents of the given file
+     * TODO FIXME:
+     * - the capture-param is a unneccessary dependency and can be evaluated directly in the method
+     * - whitespace-normalization shoud be done on capturing, not on testing
      * @param string $fileName
      * @param string $actual
      * @param string|null $message
