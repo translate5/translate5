@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Api\DbHelper;
 
 /***
  * Test the import progress feature. This will only test the progress report before the import is triggered
@@ -49,7 +50,8 @@ class Translate2342Test extends editor_Test_ImportTest {
     protected static function setupImport(Config $config): void
     {
         // we remove all "done" workers as well for this test
-        static::api()->getJson('editor/index/workercleanupstate', ['force' => 1]);
+        DbHelper::cleanupWorkers(true);
+
         $sourceLangRfc = 'de';
         $targetLangRfc = 'en';
         $customerId = static::$ownCustomer->id;
@@ -61,7 +63,7 @@ class Translate2342Test extends editor_Test_ImportTest {
         $config
             ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
             ->addUploadFile('import-test-file.html')
-            ->addTaskConfigIniFile('runtimeOptions.autoQA.enableSegmentSpellCheck = 0') // crucial: otherwise the self-queueing spellcheck-worker leads to unpredictable results
+            ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '0') // crucial: otherwise the self-queueing spellcheck-worker leads to unpredictable results
             ->setNotToWaitForImported(); // this triggers the task-import to immediately start
     }
 
