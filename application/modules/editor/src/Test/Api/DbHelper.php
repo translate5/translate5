@@ -68,7 +68,7 @@ final class DbHelper
             $pluginmanager = \Zend_Registry::get('PluginManager');
             /* @var $pluginmanager \ZfExtended_Plugin_Manager */
             foreach ($pluginClasses as $pluginClass) {
-                $plugin = \ZfExtended_Plugin_Manager::classToName($pluginClass);
+                $plugin = $pluginmanager->classToName($pluginClass);
                 if (!$pluginmanager->setActive($plugin, $activate)) {
                     $success = false;
                 }
