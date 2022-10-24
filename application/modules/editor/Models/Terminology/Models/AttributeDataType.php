@@ -270,18 +270,42 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
               `a`.`picklistValues`,
               `a`.`level`,
               `a`.`isTbxBasic`,
-              `a`.`type`,
-              GROUP_CONCAT(`ac`.`collectionId`) AS `collections`
-            FROM 
-              `terms_attributes_datatype` `a` 
-              LEFT JOIN `terms_collection_attribute_datatype` `ac` ON (`ac`.`dataTypeId` = `a`.`id`)
-            WHERE `ac`.`collectionId` IN (' . join(',',$collectionIds) . ') OR ISNULL(`ac`.`collectionId`) OR `a`.`isTbxBasic`
+              `a`.`type`
+            FROM `terms_attributes_datatype` `a` 
             GROUP BY `a`.`id`
             ORDER BY `title`
         ', [':lang' => '$.' . $locale])->fetchAll(PDO::FETCH_UNIQUE);
 
         // Make sure isTbxBasic to be integer in javascript
         array_walk($attributes, fn(&$a) => $a['isTbxBasic'] += 0);
+
+        // For each of those props
+        foreach (['enabled', 'exists'] as $column) {
+
+            // Get array of [dataTypeId => termcollectionIds] pairs having $column-prop = 1
+            $colections = $this->db->getAdapter()->query('
+                SELECT `dataTypeId`, GROUP_CONCAT(`collectionId`)
+                FROM `terms_collection_attribute_datatype` 
+                WHERE `' . $column . '` = "1" AND `collectionId` IN (' . join(',',$collectionIds) . ')
+                GROUP BY `dataTypeId`
+            ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+            // Apply to $attributes
+            foreach (array_keys($attributes) as $dataTypeId) {
+                $attributes[$dataTypeId][$column . 'In'] = $colections[$dataTypeId] ?? '';
+            }
+        }
+
+        // Foreach attribute datatype - check:
+        /*foreach ($attributes as $dataTypeId => $dataType) {
+
+            // If it's not a TBX Basic datatype, and it's not enabled for any of accessible term collections
+            if (!$dataType['isTbxBasic'] && !$dataType['enabledIn']) {
+
+                // Unset it
+                unset($attributes[$dataTypeId]);
+            }
+        }*/
 
         // Return attributes
         return $attributes;

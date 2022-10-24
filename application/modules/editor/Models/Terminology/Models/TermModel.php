@@ -2534,11 +2534,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $createdBy = $this->db->getAdapter()->query('
             SELECT `termId`, MIN(CONCAT(`updatedAt`, "--", `updatedBy`)) 
             FROM `terms_term_history` 
-            WHERE `termId` IN (' . join(',', array_keys($siblings)) . ') 
+            WHERE `termId` IN (' . join(',', array_keys($siblings)) . ') AND NOT ISNULL(`updatedBy`) 
             GROUP BY `termId`
         ')->fetchAll(PDO::FETCH_KEY_PAIR);
 
-        // For each term having histiry - spoof value of createdBy with the value found in history
+        // For each term having history - spoof value of createdBy with the value found in history
         foreach ($createdBy as $termId => $info) {
             $siblings[$termId]['createdBy'] = explode('--', $info)[1];
         }

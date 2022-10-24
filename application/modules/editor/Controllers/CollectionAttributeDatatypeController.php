@@ -82,6 +82,7 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
     /**
      *
      * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Mismatch
      */
     public function indexAction()
     {
@@ -160,6 +161,16 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
                 'fis' => $this->collectionIds ?: 'invalid' // FIND_IN_SET
             ],
         ], $this->entity);
+
+        // Load dataType-record
+        $dataTypeR = $this->jcheck(['dataTypeId' => ['key' => 'terms_attributes_datatype']], $this->entity)['dataTypeId'];
+
+        // Prevent disabling dataTypes having type = 'processStatus' or 'administrativeStatus'
+        $this->jcheck([
+            'type' => [
+                'dis' => 'processStatus,administrativeStatus'
+            ]
+        ], $dataTypeR);
 
         // If datatype should be disabled
         if (!$enabled = $this->getParam('enabled')) {
