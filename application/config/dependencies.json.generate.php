@@ -117,42 +117,6 @@ $dep->dependencies = [[
   installation.'
         ]]
     ],[
-        "name" => "opentm2",
-        "label" => "OpenTM2",
-        "url" => "RELEASE:OpenTM2-Community-Edition-Setup.zip",
-        "target" => "OpenTM2-Installer",
-        "version" => "1.5.1.1",
-        "licenses" => [[
-            "uses" => "OpenTM2 Community Edition",
-            "license" => "Eclipse Public License 1.0",
-            "relpath" => "docs/third-party-licenses/OpenTM2-Community-Edition-license.txt",
-            "agreement" => 'translate5 uses {USES} (version {VERSION}).
-  Please read the following license agreement and accept it for
-  OpenTM2.
-
-    {RELPATH}
-
-  You must accept the terms of this agreement for {LABEL} by typing
-  "y" and <ENTER> before continuing with the installation.
-  If you type "y", the translate5 installer will download {LABEL}
-  for you.
-
-  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!
-    Since {LABEL} is executable only under Microsoft Windows
-    Operating Systems the installer can only download it for you.
-  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!
-
-  The Installation has to be started manually!
-
-  Please stop an already running {LABEL} instance before
-  installing / updating it!
-  The downloaded file will be located in the folder
-                
-    "OpenTM2-Installer/"
-
-  {SUFFIX}'
-        ]]
-    ],[
         "name" => "extjs-62",
         "label" => "ExtJS (Version 6)",
         "version" => "6.2.0",
@@ -162,27 +126,6 @@ $dep->dependencies = [[
             "uses" => "ExtJS",
             "license" => "GPL 3.0",
             "relpath" => "docs/third-party-licenses/ExtJs6-license.txt"
-        ]]
-    ],[
-        "name" => "extjs-ux",
-        "label" => "ThirdParty ExtJS UX libraries",
-        "version" => "6.2.0",
-        "url" => "RELEASE:extjs-ux.zip",
-        "target" => "public/modules/editor/js/ux",
-        //"licenses" => licenses are confirmed with third-party-dependencies package, since UX packages are maintained there, but pulled in separatly to public directory here
-    ],[
-    //FIXME move rangy also too composer, what prevents from doing so: it is unclear where the 1.3.1-dev version is coming from.
-    // is it from the web? Is it a local modified copy of 1.3.0? Fork the 1.3.0 apply a diff to the local files.
-    // or finally take the current zip and configure is at as package in composer, then it can be removed here too
-        "name" => "rangy",
-        "label" => "Rangy",
-        "version" => "1.3.1-dev",
-        "url" => "RELEASE:rangy.zip",
-        "target" => "public/js/rangy",
-        "licenses" => [[
-            "uses" => "Rangy",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/rangy-license.txt"
         ]]
     ]
 ];
@@ -197,6 +140,9 @@ $dep->post_install_copy = [
     "vendor/translate5/instanttranslate-roboto-font/" => "public/modules/editor/instanttranslate/fonts/roboto",
     "vendor/google/material-design-icons" => "public/modules/editor/material-design-icons/material-design-icons",
     "vendor/google/material-design-icons/LICENSE" => "public/modules/editor/material-design-icons/LICENSE",
+    'vendor/gportela85/datetimefield/src/DateTimeField.js' => 'public/modules/editor/js/ux/DateTimeField.js',
+    'vendor/gportela85/datetimefield/src/DateTimePicker.js' => 'public/modules/editor/js/ux/DateTimePicker.js',
+    'vendor/gportela85/datetimefield/src/LICENSE' => 'public/modules/editor/js/ux/LICENSE',
 ];
 
 $dep = json_encode($dep, JSON_PRETTY_PRINT);
