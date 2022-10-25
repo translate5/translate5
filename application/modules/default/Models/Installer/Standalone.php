@@ -369,12 +369,7 @@ class Models_Installer_Standalone {
         date_default_timezone_set($timezone);
         $this->createInstallationIni(['timezone' => $timezone]);
 
-        if($this->recreateDb) {
-            $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
-            $conf = $this->dbCredentials;
-            $conf['dropIfExists'] = true;
-            $dbupdater->createDatabase(... $conf);
-        }
+        $this->recreateDatabase();
 
         if(! $this->checkDb()) {
             unlink($this->currentWorkingDir.self::INSTALL_INI);
@@ -811,5 +806,40 @@ class Models_Installer_Standalone {
     {
         echo "\n".$msg."\n";
         echo str_pad('', strlen($msg), $lineChar)."\n\n";
+    }
+
+    private function recreateDatabase(): void
+    {
+        if (! $this->recreateDb) {
+            return;
+        }
+
+        $this->log('Waiting for database...');
+        $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
+        $conf = $this->dbCredentials;
+        $conf['dropIfExists'] = true;
+
+        //if DB is not (yet) reachable we wait 5x5 seconds max
+        for ($i = 0; $i < 5; $i++) {
+            try {
+                $dbupdater->createDatabase(... $conf);
+                $this->log('Initial database created.');
+                return;
+            } catch (PDOException $e) {
+                $msg = $e->getMessage();
+                if (str_contains($msg, 'SQLSTATE[HY000] [2002] Connection refused')
+                    || str_contains($msg, 'SQLSTATE[HY000] [2002] No such file or directory')
+                    ||str_contains($msg, 'SQLSTATE[HY000] [2006] MySQL server has gone away')) {
+                    sleep(5);
+                    continue;
+                } else {
+                    //do not wait:
+                    throw $e;
+                }
+            }
+        }
+        if (!empty($e)) {
+            throw $e;
+        }
     }
 }
