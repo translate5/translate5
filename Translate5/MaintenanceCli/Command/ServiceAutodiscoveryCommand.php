@@ -35,12 +35,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Plugin_Manager;
 
 
 class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'service:autodiscovery';
+    private ZfExtended_Plugin_Manager $pluginmanager;
 
     protected function configure()
     {
@@ -87,6 +89,9 @@ using the default ports.')
     {
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
+
+        $this->pluginmanager = Zend_Registry::get('PluginManager');
+
         $this->writeTitle('Translate5 service auto-discovery');
 
         $services = [
@@ -167,9 +172,12 @@ using the default ports.')
     private function serviceFrontendmessagebus()
     {
         $internalServer = 'http://frontendmessagebus:9057';
+
         if (! $this->checkServiceDefault('frontendmessagebus', 'FrontEndMessageBus', $internalServer)) {
+            $this->pluginmanager->setActive('FrontEndMessageBus', false);
             return;
         }
+        $this->pluginmanager->setActive('FrontEndMessageBus');
         $config = Zend_Registry::get('config');
         //$config->runtimeOptions.server.name
 
@@ -224,6 +232,9 @@ using the default ports.')
 
             //runtimeOptions.plugins.Okapi.serverUsed   okapi-longhorn
             $this->updateConfig('runtimeOptions.plugins.Okapi.serverUsed', 'okapi-longhorn');
+            $this->pluginmanager->setActive('Okapi');
+        } else {
+            $this->pluginmanager->setActive('Okapi', false);
         }
     }
 
@@ -242,6 +253,11 @@ using the default ports.')
 
             // runtimeOptions.plugins.SpellCheck.languagetool.url.import ["http://localhost:8081/v2"]
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.import', '["'.$url.'"]');
+
+            $this->updateConfig('runtimeOptions.plugins.SpellCheck.liveCheckOnEditing', '1');
+            $this->pluginmanager->setActive('SpellCheck');
+        } else {
+            $this->pluginmanager->setActive('SpellCheck', false);
         }
     }
 
@@ -283,13 +299,16 @@ using the default ports.')
             $this->io->writeln('Found TermTaggers: '.join(', ', $taggers));
         }
 
+        $foundATagger = false;
         foreach ($found as $key => $value) {
             if (empty($found[$key])) {
                 continue;
             }
             $value = json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            $foundATagger = true;
             $this->updateConfig('runtimeOptions.termTagger.url.'.$key, $value);
         }
+        $this->pluginmanager->setActive('TermTagger', $foundATagger);
     }
 
     /**
