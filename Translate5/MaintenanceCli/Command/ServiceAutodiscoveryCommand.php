@@ -243,15 +243,15 @@ using the default ports.')
      */
     private function serviceLanguagetool(): void
     {
-        $url = 'http://languagetool:8081/v2';
+        $url = 'http://languagetool:8010/v2';
         if ($this->checkServiceDefault('languagetool', 'Languagetool', $url)) {
-            // runtimeOptions.plugins.SpellCheck.languagetool.url.default ["http://localhost:8081/v2"]
+            // runtimeOptions.plugins.SpellCheck.languagetool.url.default ["http://localhost:8010/v2"]
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.default', '["'.$url.'"]');
 
-            // runtimeOptions.plugins.SpellCheck.languagetool.url.gui http://localhost:8081/v2
+            // runtimeOptions.plugins.SpellCheck.languagetool.url.gui http://localhost:8010/v2
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.gui', $url);
 
-            // runtimeOptions.plugins.SpellCheck.languagetool.url.import ["http://localhost:8081/v2"]
+            // runtimeOptions.plugins.SpellCheck.languagetool.url.import ["http://localhost:8010/v2"]
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.import', '["'.$url.'"]');
 
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.liveCheckOnEditing', '1');
