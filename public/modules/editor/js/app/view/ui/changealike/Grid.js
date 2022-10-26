@@ -50,10 +50,10 @@ Ext.define('Editor.view.ui.changealike.Grid', {
       'Editor.view.segments.column.AutoState'
   ],
   rowBodyTpl: new Ext.XTemplate([
-      '<span class="x-grid-cell-inner">{type}</span>',
-      '<span class="x-grid-cell-inner">{source}</span>',
-      '<span class="x-grid-cell-inner"></span>',
-      '<span class="x-grid-cell-inner">{target}</span>'
+      '<div class="x-grid-cell-inner">{type}</div>',
+      '<div class="x-grid-cell-inner">{source}</div>',
+      '<div class="x-grid-cell-inner"></div>',
+      '<div class="x-grid-cell-inner">{target}</div>'
   ]),
   initConfig: function(instanceConfig) {
     var me = this,
