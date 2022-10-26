@@ -221,16 +221,16 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
     }
 
     /**
-     * Get array of collection ids that are allowed to create attribute with current data type in
+     * Get array of collection ids that are enabled to create attribute with current data type in
      *
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function getAllowedCollectionIds() {
+    public function getEnabledCollectionIds() {
         return $this->db->getAdapter()->query('
             SELECT `collectionId` 
             FROM `terms_collection_attribute_datatype` 
-            WHERE `dataTypeId` = ?'
+            WHERE `dataTypeId` = ? AND `enabled` = "1"'
         , $this->getId())->fetchAll(PDO::FETCH_COLUMN);
     }
 
