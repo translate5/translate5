@@ -525,8 +525,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         	throw new Zend_Exception('Config runtimeOptions.dir.taskData is NOT set!');
         }
         $taskDataRoot = new SplFileInfo($config->runtimeOptions->dir->taskData);
-        if(!$taskDataRoot->isDir()) {
-            throw new Zend_Exception('TaskData root Directory does not exist: "'.$taskDataRoot->getPathname().'".');
+        if(!$taskDataRoot->isDir() && !mkdir($taskDataRoot)) {
+            throw new Zend_Exception('TaskData root Directory could not be created: "'.$taskDataRoot->getPathname().'".');
         }
         if(!$taskDataRoot->isWritable()) {
             throw new Zend_Exception('TaskData root Directory is not writeable: "'.$taskDataRoot->getPathname().'".');
@@ -1169,6 +1169,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /***
+     * FIXME move this function into a workflow scope
      * Get all autostate ids for the active tasks workflow
      *
      * @return boolean|boolean|multitype:string
