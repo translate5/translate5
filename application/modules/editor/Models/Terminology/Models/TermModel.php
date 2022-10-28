@@ -1555,10 +1555,22 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $dataTypeLocale = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
         $locales = $dataTypeLocale->loadAllWithTranslations();
 
+        /* @var $images editor_Models_Terminology_Models_ImagesModel */
+        $images = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
+
         foreach ($attributes as $attribute) {
 
             $attribute['nameTranslated'] = $locales[$attribute['dataTypeId']] ?: $attribute['elementName'];
-            $attribute['value'] = htmlentities($attribute['value']);
+            if ($attribute['type'] == 'figure') {
+                $target = $attribute['target'];
+                if ($srcA = $images->getImagePathsByTargetIds($attribute['collectionId'], [$target])) {
+                    if ($src = $srcA[$target]) {
+                        $attribute['value'] = sprintf("<img src='%s' width='150' style='display: block;'>", $src);
+                    }
+                }
+            } else {
+                $attribute['value'] = htmlentities($attribute['value']);
+            }
             
             if( empty($attribute['language'])){
                 $template['entry'][] = $attribute;
