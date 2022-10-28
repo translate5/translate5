@@ -89,14 +89,8 @@ class editor_Models_Segment_Updater {
         
         $this->segment->validate();
         
-        $this->updateTargetHashAndOriginal($this->task);
+        $this->updateTargetHashAndOriginal();
 
-        // TODO: this event is unused, remove it
-        $this->events->trigger("beforeSegmentUpdate", $this, array(
-            'entity' => $this->segment,
-            'history' => $history
-        ));
-        
         $this->updateMatchRateType();
 
         // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
@@ -207,13 +201,13 @@ class editor_Models_Segment_Updater {
             $manager->updateSegment($this->segment);
         }
     }
-    
+
     /**
      * Applies the import whitespace replacing to the edited user by the content
      * @param string $content the content to be sanitized, the value is modified directly via reference!
      * @return bool
      */
-    public function sanitizeEditedContent(string &$content): string {
+    public function sanitizeEditedContent(string &$content): bool {
         $nbsp = json_decode('"\u00a0"');
         
         //some browsers create nbsp instead of normal whitespaces, since nbsp are removed by the protectWhitespace code below

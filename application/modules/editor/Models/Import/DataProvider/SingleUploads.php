@@ -44,10 +44,9 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
 
     /**
      * consumes all the given file paths
-     * @param array $review
-     * @param array $relais optional
-     * @param array $reference optional
-     * @param string $tbx optional
+     *
+     * @param array $filesToProcess
+     * @param array $targetDirectories
      */
     public function __construct(array $filesToProcess, array $targetDirectories){
         $this->filesToProcess = $filesToProcess;

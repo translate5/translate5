@@ -354,7 +354,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
      * @param stdClass $duration
      */
     protected function updateDuration(string $field, stdClass $duration) {
-        $editField = $field.editor_Models_SegmentFieldManager::_EDIT_PREFIX;
+        $editField = $field.editor_Models_SegmentFieldManager::_EDIT_SUFFIX;
         $duration->$editField = (int)$this->_getParam('duration');
     }
 

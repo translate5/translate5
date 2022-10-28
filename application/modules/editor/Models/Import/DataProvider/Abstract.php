@@ -90,14 +90,14 @@ abstract class editor_Models_Import_DataProvider_Abstract {
                 'path' => $this->importFolder,
             ]);
         }
-        $msg = 'Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' could not be created!';
-        $this->mkdir($this->importFolder, $msg);
+        $this->mkdir($this->importFolder);
     }
 
     /**
      * deletes the temporary import folder
      */
-    protected function removeTempFolder() {
+    protected function removeTempFolder(): void
+    {
         if(isset($this->importFolder) && is_dir($this->importFolder)) {
             ZfExtended_Utils::recursiveDelete($this->importFolder);
         }
@@ -112,7 +112,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
         if(is_dir($path)){
             return;
         }
-        if(!@mkdir($path,0777,true)) {
+        if(!mkdir($path, 0777, true) && !is_dir($path)) {
             //DataProvider: Could not create folder "{path}"
             throw new editor_Models_Import_DataProvider_Exception('E1245', [
                 'task' => $this->task,
@@ -232,5 +232,32 @@ abstract class editor_Models_Import_DataProvider_Abstract {
         foreach($deletions as $file){
             @unlink($file);
         }
+    }
+
+    /***
+     * extrahiert das geholte Zip File, bricht bei Fehlern ab
+     * @param string $zipPath
+     * @param string $extractTo
+     * @return void
+     * @throws editor_Models_Import_DataProvider_Exception
+     */
+    protected function unzipArchive(string $zipPath, string $extractTo): void
+    {
+        $zip = new ZipArchive();
+        if (! $zip->open($zipPath)) {
+            // DataProvider Zip: zip file could not be opened
+            throw new editor_Models_Import_DataProvider_Exception('E1241', [
+                'task' => $this->task,
+                'zip' => $zipPath
+            ]);
+        }
+        if (! $zip->extractTo($extractTo)) {
+            // DataProvider Zip: content from zip file could not be extracted
+            throw new editor_Models_Import_DataProvider_Exception('E1242', [
+                'task' => $this->task,
+                'zip' => $extractTo
+            ]);
+        }
+        $zip->close();
     }
 }

@@ -254,7 +254,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     protected function isWorkfileFileMatch(int $arrayIndex): bool
     {
-        return $this->isWorkFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getTargetLang() || empty($this->fileLanguages[$arrayIndex]);
+        return ($this->isWorkFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getTargetLang()) || empty($this->fileLanguages[$arrayIndex]);
     }
 
     /***
@@ -308,5 +308,25 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         if(count($this->fileTypes) != count($this->files['importUpload']) && count($this->fileTypes) > ini_get('max_file_uploads')) {
             throw new editor_Models_Import_DataProvider_Exception('E1384');
         }
+    }
+
+    /**
+     * (non-PHPdoc)
+     *
+     * @see editor_Models_Import_DataProvider_Abstract::postImportHandler()
+     */
+    public function postImportHandler()
+    {
+        $this->removeTempFolder();
+    }
+
+    /**
+     * (non-PHPdoc)
+     *
+     * @see editor_Models_Import_DataProvider_Abstract::handleImportException()
+     */
+    public function handleImportException(Exception $e)
+    {
+        $this->removeTempFolder();
     }
 }

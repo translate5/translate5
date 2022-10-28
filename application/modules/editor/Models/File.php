@@ -56,7 +56,18 @@ class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
     const SKELETON_DIR_NAME = 'skeletonfiles';
     const SKELETON_PATH = '/skeletonfiles/file_%d.zlib';
     protected $dbInstanceClass = 'editor_Models_Db_Files';
-    
+
+
+    /****
+     * @param string $taskGuid
+     * @return array
+     */
+    public function loadByTaskGuid(string $taskGuid): array
+    {
+        $s = $this->db->select()->where('taskGuid = ?',$taskGuid);
+        return $this->db->fetchAll($s)->toArray();
+    }
+
     /**
      * remove dummy directory entries
      * @param array $idList

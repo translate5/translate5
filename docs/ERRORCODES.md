@@ -43,7 +43,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1224"></a>E1224  | API Filter | Unkown filter operator &quot;{operator}&quot; from ExtJS 5 Grid Filter! | The given filter operator is invalid.
 | <a id="E1225"></a>E1225  | API Filter Join | Given tableClass &quot;{tableClass}&quot; is not a subclass of Zend_Db_Table_Abstract! | The given tableClass in the join filter must be a sub class of Zend_Db_Table_Abstract
 | <a id="E1293"></a>E1293  | Installation &amp; Update | The following file does not exist or is not readable and is therefore ignored: {path} | Check the existence and access rights of the mentioned file.
-| <a id="E1294"></a>E1294  | Installation &amp; Update | Errors on calling database update - see details for more information. | This are the errors happend on calling the alter SQLs.
+| <a id="E1294"></a>E1294  | Installation &amp; Update | Warnings on calling database update - see details for more information. | This are the errors happend on calling the alter SQLs.
 | <a id="E1295"></a>E1295  | Installation &amp; Update | Result of imported DbUpdater PHP File {path}: {result} | The output of a PHP update file is logged as info.
 | <a id="E1307"></a>E1307  | Http Client | Request time out in {method}ing URL {url} | The requested service did not respond in a reasonable time.
 | <a id="E1308"></a>E1308  | Http Client | Requested Service is DOWN: {server} | The requested service is either not available or not reachable.
@@ -274,6 +274,13 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1157"></a>E1157  | Task Export | Export: the file &quot;{file}&quot; could not be exported, since had possibly already errors on import. | See error details for affected file and details.
 | <a id="E1170"></a>E1170  | Task Metadata Export | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
 
+### Task reimport
+| EventCode        | Context       | EventMessage  | Description/Solution
+| :--------------- |:------------- | :------------ | :-------------------
+| <a id="E1426"></a>E1426  | Task reimport      | Reimport: Missing required request parameter fileId.                                                                          | The required api parameter fileId was not provided or it was empty
+| <a id="E1427"></a>E1427  | Task reimport      | Reimport DataProvider: Error on file upload.                                                                                  | There was an error with the file upload. Check the error log for more info.
+| <a id="E1429"></a>E1429  | Task reimport      | Reimport DataProvider: No upload files found for task reimport.                                                               | No valid upload files found on task reimport.
+| <a id="E1430"></a>E1430  | Task reimport      | Reimport DataProvider: Unable to create copy of the zip archive.                                                              | Unable to create copy of the old zip archive when new on is create with the latest files.
 
 ### Language Resources
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -588,16 +595,15 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1269"></a>E1269  | ModelFront | ModelFront Plug-In: Error on processing the segments. Segment list with errors: {errors}. | ModelFront api responds with error for the requested segment. For more info about the error check the error log.
 
 #### Plug-In SpellCheck
-| EventCode        | Context       | EventMessage  | Description/Solution
-| :--------------- |:------------- | :------------ | :-------------------
+| EventCode        | Context            | EventMessage                                                                                                                  | Description/Solution
+| :--------------- |:-------------------|:------------------------------------------------------------------------------------------------------------------------------| :-------------------
 | <a id="E1410"></a>E1410  | Plug-In SpellCheck | SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary. | The LanguageTool server as specified in the error message is deactivated automatically. On each periodical cron call (normally all 15 minutes) all LanguageTool instances are checked for availability. If a previously deactivated LanguageTool is available again, it is reactivated automatically. To reactivate the LanguageTool servers manually just call the following SQL statement in the Database:DELETE FROM Zf_memcache WHERE id = 'SpellCheckDownList';
-| <a id="E1411"></a>E1411  | Plug-In SpellCheck | SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task. | Start the LanguageTool(s) if not already done. If the LanguageTool instances were started and crashed then, see E1410 how to reactivate the LanguageTool instances marked as offline in translate5. After reactivation, reimport the task. The task clone functionality can be used to reimport the task.
-| <a id="E1412"></a>E1412  | Plug-In SpellCheck | SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time. | Normally everything should be OK, the considered LanguageTool is probably just doing its work and can not respond to another request in an appropriate time frame. Only if this error is logged multiple times further investigations should be done.
-| <a id="E1413"></a>E1413  | Plug-In SpellCheck | SpellCheck can not work when target language is not supported by LanguageTool. | Check task target language
-| <a id="E1417"></a>E1417  | Plug-In SpellCheck | SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList} | One or more LanguageTool instances are not available. All LanguageTool instances are listed with their status. Please check them manually and restart them if needed.
-| <a id="E1418"></a>E1418  | Plug-In SpellCheck | LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app | Create a ticket for this issue with the event added.
-| <a id="E1419"></a>E1419  | Plug-In SpellCheck | SpellCheck overall run done - {segmentCounts} | Reports that the whole task was checked with the spellchecker and shows the segment status counts.
-
+| <a id="E1411"></a>E1411  | Plug-In SpellCheck | SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.                          | Start the LanguageTool(s) if not already done. If the LanguageTool instances were started and crashed then, see E1410 how to reactivate the LanguageTool instances marked as offline in translate5. After reactivation, reimport the task. The task clone functionality can be used to reimport the task.
+| <a id="E1412"></a>E1412  | Plug-In SpellCheck | SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.                   | Normally everything should be OK, the considered LanguageTool is probably just doing its work and can not respond to another request in an appropriate time frame. Only if this error is logged multiple times further investigations should be done.
+| <a id="E1413"></a>E1413  | Plug-In SpellCheck | SpellCheck can not work when target language is not supported by LanguageTool.                                                | Check task target language
+| <a id="E1417"></a>E1417  | Plug-In SpellCheck | SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList}                                | One or more LanguageTool instances are not available. All LanguageTool instances are listed with their status. Please check them manually and restart them if needed.
+| <a id="E1418"></a>E1418  | Plug-In SpellCheck | LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app        | Create a ticket for this issue with the event added.
+| <a id="E1419"></a>E1419  | Plug-In SpellCheck | SpellCheck overall run done - {segmentCounts}                                                                                 | Reports that the whole task was checked with the spellchecker and shows the segment status counts.
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number

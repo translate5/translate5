@@ -39,15 +39,13 @@ class editor_Models_SegmentFieldManager {
     
     const _MAP_DELIM = '#';
     /**
-     * @FIXME: this is called PREFIX but used as a SUFFIX ...
      * @var string
      */
-    const _EDIT_PREFIX = 'Edit';
+    const _EDIT_SUFFIX = 'Edit';
     /**
-     * @FIXME: this is called PREFIX but used as a SUFFIX ...
      * @var string
      */
-    const _TOSORT_PREFIX = 'ToSort';
+    const _TOSORT_SUFFIX = 'ToSort';
     
     /**
      * @var array
@@ -295,6 +293,15 @@ class editor_Models_SegmentFieldManager {
     public function getFirstSourceName() {
         return $this->getFirstName(editor_Models_SegmentField::TYPE_SOURCE);
     }
+
+    /***
+     * Return the first source edit field name
+     * @return string
+     */
+    public function getFirstSourceNameEdit(): string
+    {
+        return $this->getFirstSourceName().self::_EDIT_SUFFIX;
+    }
     
     /**
      * returns the first field name of the desired type
@@ -302,6 +309,16 @@ class editor_Models_SegmentFieldManager {
      */
     public function getFirstTargetName() {
         return $this->getFirstName(editor_Models_SegmentField::TYPE_TARGET);
+    }
+
+
+    /***
+     * Return the first target edit field name
+     * @return string
+     */
+    public function getFirstTargetNameEdit(): string
+    {
+        return $this->getFirstTargetName().self::_EDIT_SUFFIX;
     }
     
     /**
@@ -361,7 +378,7 @@ class editor_Models_SegmentFieldManager {
         if($this->getByName($name) === false){
             return false;
         }
-        return $name.self::_EDIT_PREFIX;
+        return $name.self::_EDIT_SUFFIX;
     }
     
     /**
@@ -386,7 +403,7 @@ class editor_Models_SegmentFieldManager {
             $name = $field->name;
             //loop over our available base data columns and calls $walker
             foreach($this->baseFieldColMap as $k => $v) {
-                if(!$field->editable && strpos($k, self::_EDIT_PREFIX) === 0) {
+                if(!$field->editable && strpos($k, self::_EDIT_SUFFIX) === 0) {
                     continue;
                 }
                 $result[] = $walker($name, $k, $v);
@@ -416,7 +433,7 @@ class editor_Models_SegmentFieldManager {
             }
             //loop over our available base data columns and generate them
             foreach($this->baseFieldColMap as $k => $v) {
-                if(!$field->editable && strpos($k, self::_EDIT_PREFIX) === 0) {
+                if(!$field->editable && strpos($k, self::_EDIT_SUFFIX) === 0) {
                     continue;
                 }
                 if($data === false) {

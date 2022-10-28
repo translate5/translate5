@@ -48,12 +48,48 @@ class Translate2551Test extends editor_Test_JsonTest {
     
     protected static function setupImport(Config $config): void
     {
-        $file = 'TRANSLATE-2551-de-en.xlf';
+
+        $config
+            ->addTask('de', 'en', static::getTestCustomerId())
+            ->addUploadFolder('testfiles');
+    }
+
+    public function testFileReimport(){
+
+        /*
+        self::api()->setTaskToEdit();
+        $segmentsExpected = static::api()->getSegmentsWithBasicData();
+        self::api()->setTaskToOpen();
+
+        static::api()->isCapturing() && file_put_contents(static::api()->getFile('expected.json', null, false), print_r($segmentsExpected,1));
+*/
+        $route = '/editor/taskid/' . $this->getTask()->getId() . '/file/';
+
+        $this->api()->get($route);
+
+        $files = $this->api()->getLastResponseDecodeed() ?? null;
+
+        self::assertNotEmpty($files,'No files found for the uploaded task.');
+
+        $files = $files[0];// the firs file will be replaced
+
+        $file = 'reimport.xliff';
         static::api()->addFile('fileReimport', static::api()->getFile($file), "application/xml");
 
-        self::api()->post('editor/file/reimport',[
-            'oldFileId' => 1,
-        ]);
+        static::api()->postJson($route, [
+            'fileId' => $files->id,
+            'taskGuid' => $this->getTask()->getTaskGuid()
+        ], null, false, true);
+
+        self::api()->setTaskToEdit();
+        $segmentsActual = static::api()->getSegmentsWithBasicData();
+        self::api()->setTaskToOpen();
+
+        static::api()->isCapturing() && file_put_contents(static::api()->getFile('expected.json', null, false), json_encode($segmentsActual, JSON_PRETTY_PRINT));
+
+        $expected = static::api()->getFileContent('expected.json');
+
+        self::assertEquals(json_encode($expected, JSON_PRETTY_PRINT), json_encode($segmentsActual, JSON_PRETTY_PRINT), 'Segments are not as expected after xlif reimport');
     }
 
 }

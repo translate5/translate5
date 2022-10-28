@@ -258,7 +258,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $searchQuery = $this->buildSearchString($parameters);
 
         //the field where the search will be performed (toSort field)
-        $searchInToSort = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $searchInToSort = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_SUFFIX;
 
         //check if search in locked segment is clicked, if yes, remove the editable filter
         $searchLocked = false;
@@ -301,7 +301,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $adapter = $this->db->getAdapter();
 
         $queryString = $parameters['searchField'];
-        $searchInField = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $searchInField = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_SUFFIX;
         $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase']) == 'true') : false;
 
         //search type regular expression

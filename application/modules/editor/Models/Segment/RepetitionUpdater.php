@@ -175,7 +175,7 @@ class editor_Models_Segment_RepetitionUpdater {
                     $this->repeatedSegment->updateToSort('target');
                 });
             }
-            $this->repeatedSegment->updateToSort('target'.editor_Models_SegmentFieldManager::_EDIT_PREFIX);
+            $this->repeatedSegment->updateToSort('target'.editor_Models_SegmentFieldManager::_EDIT_SUFFIX);
         });
     }
 
@@ -193,7 +193,7 @@ class editor_Models_Segment_RepetitionUpdater {
             $toSort = 'source';
             if($editable) {
                 $this->repeatedSegment->setSourceEdit($segmentContent);
-                $toSort .= editor_Models_SegmentFieldManager::_EDIT_PREFIX;
+                $toSort .= editor_Models_SegmentFieldManager::_EDIT_SUFFIX;
             }
             else {
                 $this->repeatedSegment->setSource($segmentContent);
