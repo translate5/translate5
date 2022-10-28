@@ -180,8 +180,9 @@ abstract class editor_Test_ApiTest extends TestCase
     /**
      * internal teardown for the inheriting testcase-classes
      * Do not override in concrete test-classes, use afterTests there
+     * @param bool $doCleanup
      */
-    protected static function testSpecificTeardown()
+    protected static function testSpecificTeardown(bool $doCleanup)
     {
 
     }
@@ -288,6 +289,8 @@ abstract class editor_Test_ApiTest extends TestCase
     {
         // everything is wrapped in try-catch to make sure, all cleanups are executed. Anyone knows a better way to collect exceptions ?
         $errors = [];
+        // for single tests, the cleanup can be prevented via KEEP_DATA
+        $doCleanup = static::api()->doCleanup();
         try {
             // this can be used in concrete tests as replacement for tearDownAfterClass()
             static::afterTests();
@@ -296,11 +299,11 @@ abstract class editor_Test_ApiTest extends TestCase
         }
         try {
             // internal method to clean up stuff in inheriting classes
-            static::testSpecificTeardown();
+            static::testSpecificTeardown($doCleanup);
         } catch (\Throwable $e){
             $errors[] = $e->getMessage();
         }
-        if (static::$setupOwnCustomer) {
+        if (static::$setupOwnCustomer && $doCleanup) {
             try {
                 static::api()->deleteCustomer(static::$ownCustomer->id);
             } catch (\Throwable $e){
@@ -314,11 +317,10 @@ abstract class editor_Test_ApiTest extends TestCase
             static::$_addedPlugins = [];
         }
         // as a final step., we check if the test left workers in the DB
-        $isSingleTest = !static::api()->isSuite(); // for single running tests, we do not want to remove the workers to make evaluation easier
-        $state = DbHelper::cleanupWorkers(false, $isSingleTest);
+        $preventRemoval = !static::api()->isSuite() || !$doCleanup; // for single running tests or if no cleanup is wanted, we do not remove the workers after test has run
+        $state = DbHelper::cleanupWorkers(false, $preventRemoval);
         if($state->cleanupNeccessary){
             $errors[] = 'The test left running, waiting, scheduled or crashed worker\'s in the DB';
-
         }
         if(count($errors) > 0){
             static::fail(implode("\n", $errors));

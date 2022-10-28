@@ -45,6 +45,12 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     protected static bool $canMimicMasterTest = true;
 
     /**
+     * @var bool
+     * Enables the -k option to let the current test to not cleanup resources & generated files
+     */
+    protected static bool $canKeepTestData = true;
+
+    /**
      * General Options of all test-commands
      */
     protected function configure()
@@ -54,12 +60,6 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             'x',
             InputOption::VALUE_NONE,
             'Send the XDEBUG cookie to enable interactive debugging.');
-
-        $this->addOption(
-            'keep-data',
-            'k',
-            InputOption::VALUE_NONE,
-            'Prevents that the test data (tasks, etc) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet.');
 
         $this->addOption(
             'stop-on-error',
@@ -72,6 +72,14 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             'f',
             InputOption::VALUE_NONE,
             'Leads to the testsuite stopping on the first failure (not error!).');
+
+        if(static::$canKeepTestData){
+            $this->addOption(
+                'keep-data',
+                'k',
+                InputOption::VALUE_NONE,
+                'Prevents that the test data (tasks, etc) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet.');
+        }
 
         if(static::$canMimicMasterTest){
             $this->addOption(
@@ -162,7 +170,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             putenv('XDEBUG_ENABLE=1');
         }
 
-        if ($this->input->getOption('keep-data')) {
+        // keeping the data only make sense for a single test
+        if (static::$canKeepTestData && $testPath !== null && $this->input->getOption('keep-data')) {
             putenv('KEEP_DATA=1');
         }
 

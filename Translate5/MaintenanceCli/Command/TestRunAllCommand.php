@@ -36,6 +36,9 @@ class TestRunAllCommand extends Translate5AbstractTestCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'test:runall';
+
+    // keeping data is not wanted for running all tests
+    protected static bool $canKeepTestData = false;
     
     protected function configure()
     {
