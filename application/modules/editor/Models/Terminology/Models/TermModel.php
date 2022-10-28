@@ -1564,9 +1564,7 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
             if ($attribute['type'] == 'figure') {
                 $target = $attribute['target'];
                 if ($srcA = $images->getImagePathsByTargetIds($attribute['collectionId'], [$target])) {
-                    if ($src = $srcA[$target]) {
-                        $attribute['value'] = sprintf("<img src='%s' width='150' style='display: block;'>", $src);
-                    }
+                    $attribute['value'] = sprintf("<img src='%s' width='150' style='display: block;'>", $srcA[$target]);
                 }
             } else {
                 $attribute['value'] = htmlentities($attribute['value']);
