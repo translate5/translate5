@@ -151,7 +151,7 @@ the format is:
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
-        $this->initTranslate5();
+        $this->initTranslate5AppOrTest();
         
         $this->withSummary = !$input->getOption('no-summary');
         if($this->withSummary) {

@@ -31,6 +31,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -75,6 +76,28 @@ abstract class Translate5AbstractCommand extends Command
     protected function initTranslate5(string $applicationEnvironment = 'application') {
         $this->translate5 = new Application();
         $this->translate5->init($applicationEnvironment);
+    }
+
+    /**
+     * Initializes the translate5 application bridge
+     * If the installation is setup for API tests, it will ask for the environment to bootstrap, otherwise the application environment will be initialized without notice
+     * This API expects  input & output to be inited
+     * @throws \Zend_Exception
+     */
+    protected function initTranslate5AppOrTest() {
+        // the app is uninitalized, so we cannot use APPLICATION_PATH
+        $installationIniFile = getcwd().'/application/config/installation.ini';
+        $iniVars = file_exists($installationIniFile) ? parse_ini_file($installationIniFile) : false;
+        if($iniVars !== false && array_key_exists('testSettings.testsAllowed', $iniVars) && $iniVars['testSettings.testsAllowed'] === '1'){
+            $question = new Question('Which database shall be used ? For the test-DB, type "t" or "test", anything else will use the application DB', 'application');
+            $answer = strtolower($this->io->askQuestion($question));
+            $environment = ($answer === 't' || $answer === 'test') ? 'test' : 'application';
+            $this->initTranslate5($environment);
+            $config = \Zend_Registry::get('config');
+            $this->io->info('Using database "'.$config->resources->db->params->dbname.'"');
+        } else {
+            $this->initTranslate5();
+        }
     }
 
     protected function getLogo() {

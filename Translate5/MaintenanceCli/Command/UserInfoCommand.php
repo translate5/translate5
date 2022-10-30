@@ -61,7 +61,7 @@ class UserInfoCommand extends UserAbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
-        $this->initTranslate5();
+        $this->initTranslate5AppOrTest();
         $identifier = $this->input->getArgument('identifier');
         
         $uuid = new \ZfExtended_Validate_Uuid();
