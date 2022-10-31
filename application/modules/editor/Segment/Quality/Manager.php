@@ -164,6 +164,17 @@ final class editor_Segment_Quality_Manager {
      * @param int $workerParentId
      */
     public function queueImport(editor_Models_Task $task, int $workerParentId=0){
+
+        // If AutoQA auto-start is disabled by config on task-level
+        if (!$task->getConfig()->runtimeOptions->autoQA->autoStartOnImport
+
+            // Or is disabled by settings on task-type-level
+            || !$task->getTaskType()->isAutoStartAutoQA()) {
+
+            // Prevent AutoQA
+            return;
+        }
+
         // add starting worker
         $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportWorker');
         /* @var $worker editor_Segment_Quality_ImportWorker */
