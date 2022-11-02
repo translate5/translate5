@@ -215,6 +215,7 @@ final class editor_Segment_Quality_Manager {
      * @param int $parentWorkerId
      * @param array $workerParams
      * @throws editor_Models_ConfigException
+     * @throws Zend_Exception
      */
     public function prepareOperation(string $processingMode, editor_Models_Task $task, int $parentWorkerId, array $workerParams=[]){
         if(self::ACTIVE) {
@@ -222,7 +223,9 @@ final class editor_Segment_Quality_Manager {
 
             // If should be skipped - do so
             if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
-                return;
+
+                // Log and return
+                return $task->logger('editor.task')->warn('E1432', 'AutoQA-step of the import process - is deactivated');
             }
 
             foreach ($this->registry as $type => $provider) {
