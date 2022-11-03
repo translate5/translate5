@@ -149,7 +149,7 @@ using the default ports.')
      */
     private function serviceT5memory(): void
     {
-        $url = 'http://t5memory:4040/t5memory';
+        $url = 'http://t5memory:8080/t5memory';
         if (!$this->checkServiceDefault('t5memory', 'T5Memory', $url)) {
             return;
         }
@@ -161,9 +161,9 @@ using the default ports.')
         if (!in_array($url, $servers)) {
             $servers[] = $url;
             $servers = json_encode($servers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            $this->updateConfigInstance($config, $servers);
         }
 
-        $this->updateConfigInstance($config, $servers);
     }
 
     /**
