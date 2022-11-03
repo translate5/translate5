@@ -97,6 +97,7 @@ class TestRunCommand extends Translate5AbstractTestCommand
                 throw new \RuntimeException('The given Test does not exist: '.$test);
             }
         }
+        // capturing options
         if($this->input->getOption('capture')){
             putenv('DO_CAPTURE=1');
             $this->io->warning([

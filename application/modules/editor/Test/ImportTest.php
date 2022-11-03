@@ -95,10 +95,10 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
      * internal teardown for the base-classes
      * Do not override in concrete test-classes, use afterTests there
      */
-    final protected static function testSpecificTeardown()
+    final protected static function testSpecificTeardown(bool $doCleanup)
     {
         // when early problems in the test-setup occurred, the config might not even was created
-        if(static::$_config){
+        if($doCleanup && static::$_config){
             // teardown the configured stuff
             static::$_config->teardown();
         }

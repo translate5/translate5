@@ -89,7 +89,7 @@ Modified values are shown bold in the simple listing.');
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
-        $this->initTranslate5();
+        $this->initTranslate5AppOrTest();
         $this->writeTitle('Change Translate5 configuration.');
 
         $config = new \editor_Models_Config();
