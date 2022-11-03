@@ -301,10 +301,8 @@ class Models_Installer_Standalone {
         $this->cli->setAutoExit(false);
         $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
         $this->cli->add(new Translate5\MaintenanceCli\Command\DatabaseUpdateCommand());
-        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceAnnounceCommand());
-        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceSetCommand());
-        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceDisableCommand());
-        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceCommand());
+
+        //FIXME can be moved into the installer CLI command:
         $this->cli->add(new Translate5\MaintenanceCli\Command\InstallerTimezoneCommand());
     }
     
@@ -764,7 +762,9 @@ class Models_Installer_Standalone {
         require_once 'library/ZfExtended/BaseIndex.php';
         ZfExtended_BaseIndex::$addMaintenanceConfig = true;
         $index = ZfExtended_BaseIndex::getInstance();
-        $index->initApplication()->bootstrap();
+        $this->waitForDatabase(function () use ($index) {
+            $index->initApplication()->bootstrap();
+        });
         $index->addModuleOptions('default');
         
         //set the hostname to the configured one:
@@ -814,18 +814,25 @@ class Models_Installer_Standalone {
             return;
         }
 
-        $this->log('Waiting for database...');
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
         $conf = $this->dbCredentials;
         $conf['dropIfExists'] = true;
 
+        $this->waitForDatabase(function () use ($dbupdater, $conf) {
+            $dbupdater->createDatabase(... $conf);
+            $this->log('Initial database created.');
+        });
+    }
+
+    private function waitForDatabase(callable $callToDb) :void
+    {
         //if DB is not (yet) reachable we wait 5x5 seconds max
+        $this->log('Waiting for database...');
         for ($i = 0; $i < 5; $i++) {
             try {
-                $dbupdater->createDatabase(... $conf);
-                $this->log('Initial database created.');
+                $callToDb();
                 return;
-            } catch (PDOException $e) {
+            } catch (Zend_Db_Adapter_Exception|PDOException $e) {
                 $msg = $e->getMessage();
                 if (str_contains($msg, 'SQLSTATE[HY000] [2002] Connection refused')
                     || str_contains($msg, 'SQLSTATE[HY000] [2002] No such file or directory')
