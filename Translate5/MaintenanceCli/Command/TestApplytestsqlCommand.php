@@ -72,6 +72,7 @@ class TestApplytestsqlCommand extends Translate5AbstractTestCommand
             // FIXME $this->initPlugins(); ??? or by auto discovery???
             // add the needed configs
             // FIXME $this->initConfiguration($configs); that must be bootstrapped differently!
+            $this->io->success('Imported all SQLs from testcases/database and hashed the test user passwords1');
             return self::SUCCESS;
         }
         if ($updater->hasErrors()) {
