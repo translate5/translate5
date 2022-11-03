@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE martif>
+<martif type="TBX" xml:lang="en">
+	<martifHeader>
+		<fileDesc>
+			<sourceDesc>
+				<p>TBX export</p>
+			</sourceDesc>
+		</fileDesc>
+	</martifHeader>
+	<text>
+		<body>
+			<termEntry id="00000000-1111-2222-3333-000000000000" cid="123456">
+				<transacGrp>
+					<transac>creation</transac>
+					<date>2019-07-15</date>
+					<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+				</transacGrp>
+				<transacGrp>
+					<transac>modification</transac>
+					<date>2019-07-15</date>
+					<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+				</transacGrp>
+				<langSet xml:lang="de-de">
+					<descripGrp>
+						<descrip type="definition" xml:lang="de-de">Test definition for the test term proposal data.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<tig>
+						<term id="37705a81-e0df-4209-9a12-eaddc93674e0">Schreibtisch</term>
+						<termNote type="processStatus">finalized</termNote>
+						<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde **MittagQi**</admin>
+						<admin type="projectSubset" target="4f759a7a-8b4e-4dae-aeed-a332dba4b0f7">Test Änderungsverfolgung </admin>
+						<admin type="projectSubset" target="3b9a499d-7264-40df-a26e-60a9555efc8f">18-00056_Gravitrax_12x </admin>
+						<admin type="projectSubset" target="aabea2bc-2e34-4a24-81cc-6366b35826f4">Testprojekt_DXF </admin>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2019-07-15</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2019-07-15</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</tig>
+				</langSet>
+			</termEntry>
+		</body>
+		<back>
+			<refObjectList type="projectSet">
+				<refObject id="4f759a7a-8b4e-4dae-aeed-a332dba4b0f7">
+					<item type="projectName">Test Änderungsverfolgung</item>
+				</refObject>
+				<refObject id="3b9a499d-7264-40df-a26e-60a9555efc8f">
+					<item type="projectName">Project uniqe name</item>
+				</refObject>
+				<refObject id="aabea2bc-2e34-4a24-81cc-6366b35826f4">
+					<item type="projectName">Testprojekt_DXF</item>
+				</refObject>
+			</refObjectList>
+			<refObjectList type="customerSet">
+				<refObject id="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">
+					<item type="customerName">Testkunde</item>
+				</refObject>
+			</refObjectList>
+			<refObjectList type="thesaurusDescrip">
+				<refObject id="ff506136-f259-4f49-9205-22f5a0af80eb">
+					<item type="thesaurusName">Testkunde</item>
+					<item type="thesaurusDescription"></item>
+					<item type="thesaurusSys">DictionaryUnknown</item>
+					<item type="thesaurusImage">XXXX</item>
+					<item type="thesaurusOwner">27EF9546-1575-4E44-96AE-5F75B9DE305B</item>
+				</refObject>
+			</refObjectList>
+		</back>
+	</text>
+</martif>

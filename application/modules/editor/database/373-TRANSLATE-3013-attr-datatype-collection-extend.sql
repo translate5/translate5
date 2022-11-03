@@ -57,3 +57,7 @@ INSERT INTO `terms_collection_attribute_datatype` (`collectionId`,`dataTypeId`) 
   WHERE `dataTypeId` IS NOT NULL
   GROUP BY `collectionId`, `dataTypeId`
 ) ON DUPLICATE KEY UPDATE `exists` = 1, `enabled` = 1;
+
+-- Add ACL-records
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor','termPM','editor_collectionattributedatatype','all');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor','termPM_allClients','editor_collectionattributedatatype','all');
