@@ -3801,10 +3801,10 @@ CREATE TABLE `Zf_acl_rules` (
 --
 
 INSERT INTO `Zf_acl_rules` VALUES
-(447,NULL,'admin','frontend','pluginSpellCheckMain'),
-(448,NULL,'editor','frontend','pluginSpellCheckMain'),
-(449,NULL,'pm','frontend','pluginSpellCheckMain'),
-(450,NULL,'pmlight','frontend','pluginSpellCheckMain'),
+(447,'editor','admin','frontend','pluginSpellCheckMain'),
+(448,'editor','editor','frontend','pluginSpellCheckMain'),
+(449,'editor','pm','frontend','pluginSpellCheckMain'),
+(450,'editor','pmlight','frontend','pluginSpellCheckMain'),
 (228,'default','admin','auto_set_role','editor'),
 (229,'default','admin','auto_set_role','pm'),
 (232,'default','api','auto_set_role','admin'),
