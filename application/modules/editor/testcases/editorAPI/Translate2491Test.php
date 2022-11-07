@@ -80,7 +80,7 @@ class Translate2491Test extends editor_Test_JsonTest {
         $this->assertNotEmpty($termsearch->data, "No terms are found in the term collection for the search string '*'");
 
         // Transfer terms to main Translate5 app
-        $transfer = static::api()->postJson('editor/plugins_termportal_data/transfer', [
+        $transfer = static::api()->postJson('editor/term/transfer', [
             'projectName' => '2 terms selected',
             'targetLang' =>  $german->id,
             'translated' =>  0,

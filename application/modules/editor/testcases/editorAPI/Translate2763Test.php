@@ -35,28 +35,32 @@ END LICENSE AND COPYRIGHT
  *
  * For details see the issue.
  */
+use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Import\LanguageResource;
+
 class Translate2763Test extends editor_Test_JsonTest {
 
-    protected static $TC_ID;
+    protected static ?LanguageResource $tc = null;
+
+    /**
+     * @param Config $config
+     * @throws \MittagQI\Translate5\Test\Import\Exception
+     */
+    protected static function setupImport(Config $config): void
+    {
+        static::$tc = $config->addLanguageResource(
+            'termcollection',
+            'testfiles/term-import-1.tbx',
+            static::getTestCustomerId()
+        )->setProperty('name', 'TC test');
+    }
 
     /**
      */
     public function test10_InitialTbxImport() {
-        static::api()->addFile('tmUpload', static::api()->getFile('testfiles/term-import-1.tbx'), 'application/xml');
-        $result = static::api()->postJson('editor/languageresourceinstance', [
-            //format jsontext???
-            'color' => '19737d',
-            'serviceName' => 'TermCollection',
-            'serviceType' => 'editor_Services_TermCollection',
-            'resourceId' => 'editor_Services_TermCollection',
-            'customerIds[]' => static::getTestCustomerId(),
-            'name' => 'TC test',
-        ]);
-
-        self::$TC_ID = $result->id ?? null;
 
         $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
-            'collectionId' => self::$TC_ID,
+            'collectionId' => static::$tc->getId(),
             'tbxBasicOnly' => '1',
             'exportImages' => '0',
         ]);
@@ -69,21 +73,24 @@ class Translate2763Test extends editor_Test_JsonTest {
      * @depends test10_InitialTbxImport
      */
     public function test20_MergeImport() {
+
+        // TODO FIXME: create a proper resource class and underlying API that will check the status in a loop and waits like for other resources
         static::api()->addFile('tmUpload', static::api()->getFile('testfiles/term-import-2.tbx'), 'application/xml');
-        static::api()->postJson('editor/languageresourceinstance/'.self::$TC_ID.'/import/', [
+        static::api()->postJson('editor/languageresourceinstance/' . static::$tc->getId() . '/import/', [
             'deleteTermsOlderThanCurrentImport' => 'on',
             'deleteProposalsLastTouchedOlderThan' => null,
         ]);
 
+        // Assume 10 seconds is enough for tbx import to be really completed
+        sleep(10);
+
         $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
-            'collectionId' => self::$TC_ID,
+            'collectionId' => static::$tc->getId(),
             'tbxBasicOnly' => '1',
             'exportImages' => '0',
         ]);
 
         $this->assertFileContents('term-export-2.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', static::api()->isCapturing());
-
-        static::api()->delete('editor/languageresourceinstance/'.self::$TC_ID.'');
     }
 
     /**

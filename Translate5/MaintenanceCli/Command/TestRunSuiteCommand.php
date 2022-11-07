@@ -38,6 +38,9 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'test:runsuite';
 
+    // keeping data is not wanted for running suites
+    protected static bool $canKeepTestData = false;
+
     protected function configure()
     {
         $this

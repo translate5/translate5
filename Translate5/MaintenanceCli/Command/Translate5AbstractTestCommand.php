@@ -45,6 +45,12 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     protected static bool $canMimicMasterTest = true;
 
     /**
+     * @var bool
+     * Enables the -k option to let the current test to not cleanup resources & generated files
+     */
+    protected static bool $canKeepTestData = true;
+
+    /**
      * General Options of all test-commands
      */
     protected function configure()
@@ -54,12 +60,6 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             'x',
             InputOption::VALUE_NONE,
             'Send the XDEBUG cookie to enable interactive debugging.');
-
-        $this->addOption(
-            'keep-data',
-            'k',
-            InputOption::VALUE_NONE,
-            'Prevents that the test data (tasks, etc) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet.');
 
         $this->addOption(
             'stop-on-error',
@@ -72,6 +72,14 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             'f',
             InputOption::VALUE_NONE,
             'Leads to the testsuite stopping on the first failure (not error!).');
+
+        if(static::$canKeepTestData){
+            $this->addOption(
+                'keep-data',
+                'k',
+                InputOption::VALUE_NONE,
+                'Prevents that the test data (tasks, etc) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet.');
+        }
 
         if(static::$canMimicMasterTest){
             $this->addOption(
@@ -162,7 +170,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             putenv('XDEBUG_ENABLE=1');
         }
 
-        if ($this->input->getOption('keep-data')) {
+        // keeping the data only make sense for a single test
+        if (static::$canKeepTestData && $testPath !== null && $this->input->getOption('keep-data')) {
             putenv('KEEP_DATA=1');
         }
 
@@ -183,6 +192,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
             $testPathOrDir = $testPath;
             $this->io->note('Running test \'' . basename($testPath) . '\'');
+            putenv('IS_SUITE=0');
 
         } else if ($testSuite !== null) {
 
@@ -193,10 +203,12 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             // must not be set when using a suite, otherwise the suite will never be triggered ...
             $testPathOrDir = '';
             putenv('DO_CAPTURE=0');
+            putenv('IS_SUITE=1');
 
         } else {
 
             putenv('DO_CAPTURE=0');
+            putenv('IS_SUITE=1');
             $testPathOrDir = 'application';
         }
 
@@ -349,7 +361,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 
             // delete (if needed) and recreate DB. recreate tables
             if (
-                $this->recreateDatabase($config['host'], $config['username'], $config['password'], $config['dbname'], $testDbExists)
+            $this->recreateDatabase($config['host'], $config['username'], $config['password'], $config['dbname'], $testDbExists)
                 && $this->recreateTables($configs, 'test')
             ) {
                 $this->io->note('Successfully recreated database \'' . $config['dbname'] . '\'');
@@ -469,19 +481,18 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function recreateDatabase(string $host, string $username, string $password, string $dbname, bool $exists = false): bool
     {
-        // we need to use PDO, Zend works only with databases
-        $pdo = new \PDO('mysql:host=' . $host, $username, $password);
-        if ($exists) {
-            try {
-                $pdo->query('DROP DATABASE ' . $dbname . ';');
+        $updater = new \ZfExtended_Models_Installer_DbUpdater();
+
+        try {
+            $updater->createDatabase($host, $username, $password, $dbname, $exists);
+            if ($exists) {
                 $this->io->note('Dropped database ' . $dbname);
-            } catch (\PDOException $e) {
-                $this->io->error($e->getMessage() . "\n\n" . $e->getTraceAsString());
-                return false;
             }
+        } catch (\PDOException $e) {
+            $this->io->error($e->getMessage() . "\n\n" . $e->getTraceAsString());
+            return false;
         }
-        // now create DB from scratch
-        $pdo->query('CREATE DATABASE ' . $dbname . ' DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+
         return true;
     }
 

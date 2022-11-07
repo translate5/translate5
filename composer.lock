@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa80a4b469a0b28cff65c60239458418",
+    "content-hash": "6930fff3941bac09bf07c0fbbe46bc27",
     "packages": [
         {
             "name": "alchemy/binary-driver",
@@ -2327,6 +2327,34 @@
                 "source": "https://github.com/Masterminds/html5-php/tree/2.7.5"
             },
             "time": "2021-07-01T14:25:37+00:00"
+        },
+        {
+            "name": "mittagqi/restful-zend-framework",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://bitbucket.org/mittagqi/restful-zend-framework.git",
+                "reference": "e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://bitbucket.org/mittagqi/restful-zend-framework/get/e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2.zip",
+                "reference": "e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "./"
+                ]
+            },
+            "description": "RESTful services with Zend Framework forked from https://github.com/codeinchaos/restful-zend-framework",
+            "homepage": "https://bitbucket.org/mittagqi/restful-zend-framework",
+            "support": {
+                "source": "https://bitbucket.org/mittagqi/restful-zend-framework/src/e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2/?at=master"
+            },
+            "time": "2022-10-24T14:40:38+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -8790,7 +8818,8 @@
         "shardj/zf1-future": 20,
         "querypath/querypath": 20,
         "dream-group/horde-text-diff": 20,
-        "translate5/rangy-lib": 20
+        "translate5/rangy-lib": 20,
+        "mittagqi/restful-zend-framework": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -8813,5 +8842,5 @@
     "platform-overrides": {
         "php": "8.0.15"
     },
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }

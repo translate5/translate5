@@ -195,16 +195,7 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segToTest->targetEdit);
         $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segToTest->target);
 
-        //edit one segment
 
-        $sourceEdit = ($isSE) ? 'Ich wiederhole mich im Zieltext - edited' : null;
-        $segment = static::api()->saveSegment($segToTest->id, 'I repeat me in the targettext', $sourceEdit);
-
-        //assert source / target after editing
-        $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit5'], $segment->source);
-        $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target); //not changed the target original
-        $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
-        
         //fetch alikes and assert correct segments found by segmentNrInTask
         $alikes = static::api()->getJson('editor/alikesegment/'.$segToTest->id);
         $segmentNrInTask = array_map(function($item){
@@ -214,6 +205,15 @@ class ChangeAlikeTranslate683Test extends editor_Test_JsonTest {
         $alikeIds = array_map(function($item){
             return $item->id;
         },$alikes);
+
+        //edit one segment
+        $sourceEdit = ($isSE) ? 'Ich wiederhole mich im Zieltext - edited' : null;
+        $segment = static::api()->saveSegment($segToTest->id, 'I repeat me in the targettext', $sourceEdit);
+
+        //assert source / target after editing
+        $this->assertFieldTextEquals($this->toCompareTarget['sourceAfterEdit5'], $segment->source);
+        $this->assertFieldTextEquals($this->toCompareTarget['targetBeforeEdit'], $segment->target); //not changed the target original
+        $this->assertFieldTextEquals($this->toCompareTarget['targetAfterEdit'], $segment->targetEdit);
         
         //save alikes
         $alikePutData = [

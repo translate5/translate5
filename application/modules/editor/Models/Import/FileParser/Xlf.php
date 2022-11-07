@@ -619,13 +619,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * parses the TransUnit attributes
      * @param array $attributes transUnit attributes
      * @param int $mid MRK tag mid or 0 if no mrk mtype seg used
-     * @param array|string $currentSource
-     * @param array|string $currentTarget
+     * @param array|null $currentSource
+     * @param array|null $currentTarget
      * @return editor_Models_Import_FileParser_SegmentAttributes
      * @throws editor_Models_Import_FileParser_Exception
      * @throws editor_Models_Import_MetaData_Exception
      */
-    protected function parseSegmentAttributes($attributes, $mid, array|string $currentSource, array|string $currentTarget): editor_Models_Import_FileParser_SegmentAttributes {
+    protected function parseSegmentAttributes($attributes, $mid, array $currentSource = null, array $currentTarget = null): editor_Models_Import_FileParser_SegmentAttributes {
         //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
         // and one trans-unit (where the id comes from) can contain multiple mrk type seg tags, which are all converted into single segments.
         // instead of using mid from the mrk type seg element, the segmentCount as additional ID part is fine.
@@ -841,7 +841,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             ];
             
             //parse attributes for each found segment not only for the whole trans-unit
-            $attributes = $this->parseSegmentAttributes($transUnit, $mid, $currentSource, $currentTarget);
+            // if the segment is plain text, or a OtherContent_Data we do not pass it
+            $attributes = $this->parseSegmentAttributes($transUnit,
+                $mid,
+                is_array($currentSource) ? $currentSource : null,
+                is_array($currentTarget) ? $currentTarget : null
+            );
+
             if($currentTarget == self::MISSING_MRK) {
                 $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_TARGET_MRK;
             } elseif($currentSource == self::MISSING_MRK) {

@@ -50,10 +50,12 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     MaintenanceDisableCommand,
     MaintenanceMessageCommand,
     MaintenanceSetCommand,
+    OpenTm2MigrationCommand,
     PluginDisableCommand,
     PluginEnableCommand,
     PluginListCommand,
     ReleaseNotesCommand,
+    ServiceAutodiscoveryCommand,
     SessionImpersonateCommand,
     StatusCommand,
     SystemCheckCommand,
@@ -63,6 +65,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     TaskSkeletonfileCommand,
     TermportalReindexCommand,
     TermportalDatatypecheckCommand,
+    TestApplytestsqlCommand,
     TestRunAllCommand,
     TestRunCommand,
     TestRunSuiteCommand,
@@ -91,10 +94,12 @@ $commands = [
     new MaintenanceDisableCommand(),
     new MaintenanceMessageCommand(),
     new MaintenanceSetCommand(),
+    new OpenTm2MigrationCommand(),
     new PluginDisableCommand(),
     new PluginEnableCommand(),
     new PluginListCommand(),
     new SegmentHistoryCommand(),
+    new ServiceAutodiscoveryCommand(),
     new SessionImpersonateCommand(),
     new StatusCommand(),
     new SystemCheckCommand(),
@@ -114,6 +119,7 @@ if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
+    $commands[] = new TestApplytestsqlCommand();
     $commands[] = new TestRunAllCommand();
     $commands[] = new TestRunCommand();
     $commands[] = new TestRunSuiteCommand();

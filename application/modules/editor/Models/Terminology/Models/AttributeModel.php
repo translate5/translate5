@@ -715,13 +715,17 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
 
     /**
      * @param array $attrIds
+     * @param $createdBy
+     * @param array $rights
+     * @return array
+     * @throws Zend_Db_Statement_Exception
      */
-    public function getReadonlyByIds(array $attrIds, $createdBy, array $roles) {
+    public function getReadonlyByIds(array $attrIds, $createdBy, array $rights) : array {
 
-        // Shortcuts to bool flags indicating whether or not current user has certain roles
-        $termReviewer  = in_array('termReviewer' , $roles);
-        $termProposer  = in_array('termProposer' , $roles);
-        $termFinalizer = in_array('termFinalizer', $roles);
+        // Shortcuts to bool flags indicating whether or not current user has certain rights
+        $canReview  =  in_array('review'  , $rights);
+        $canPropose  = in_array('propose' , $rights);
+        $canFinalize = in_array('finalize', $rights);
 
         // Get termIds for those of given attrIds that belong to term-level
         $termIds = $attrIds ? $this->db->getAdapter()->query('
@@ -820,24 +824,24 @@ class editor_Models_Terminology_Models_AttributeModel extends editor_Models_Term
                 // If distinct processStatus list consists of only 1 value, and it's 'unprocessed'
                 if ($_distinct == 'unprocessed') {
 
-                    // If current user has termProposer role, but has no termReviewer-role
-                    if ($termProposer && !$termReviewer) {
+                    // If current user has propose-right, but has no review-right
+                    if ($canPropose && !$canReview) {
 
                         // If current user can delete own attrs, and current user is current attr creator
                         if ($createdBy && $attr['createdBy'] == $createdBy) {
                             $readonly[$attrId] = false;
                         }
 
-                    // Else if current user has termReviewer role
-                    } else if ($termReviewer) {
+                    // Else if current user has review-right
+                    } else if ($canReview) {
                         $readonly[$attrId] = false;
                     }
 
                 // Else if distinct processStatus list consists of only 1 value, and it's 'provisionallyProcessed'
                 } else if ($_distinct == 'provisionallyProcessed') {
 
-                    // If current user has termFinalizer-role
-                    if ($termFinalizer) {
+                    // If current user has finalize-right
+                    if ($canFinalize) {
                         $readonly[$attrId] = false;
                     }
                 }

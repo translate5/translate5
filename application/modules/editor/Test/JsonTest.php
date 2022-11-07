@@ -57,23 +57,33 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param string $fileToCompare
      * @param stdClass $segment
      * @param string $message
-     * @param boolean $keepComments
+     * @param bool $keepComments
+     * @param bool $useOkapiHtmlSanitization
      */
-    public function assertSegmentEqualsJsonFile(string $fileToCompare, stdClass $segment, string $message='', bool $keepComments=true){
+    public function assertSegmentEqualsJsonFile(string $fileToCompare, stdClass $segment, string $message='', bool $keepComments=true, bool $useOkapiHtmlSanitization=false){
         $expectedSegment = static::api()->getFileContent($fileToCompare, $segment, true);
-        $this->assertSegmentEqualsObject($expectedSegment, $segment, $message, $keepComments);
+        $this->assertSegmentEqualsObject($expectedSegment, $segment, $message, $keepComments, $useOkapiHtmlSanitization);
     }
     /**
      * compares the given segment content with an expectation object
      * @param stdClass $expectedObj
      * @param stdClass $segment
      * @param string $message
-     * @param boolean $keepComments
+     * @param bool $keepComments
+     * @param bool $useOkapiHtmlSanitization
      */
-    public function assertSegmentEqualsObject(stdClass $expectedObj, stdClass $segment, string $message='', bool $keepComments=true){
+    public function assertSegmentEqualsObject(stdClass $expectedObj, stdClass $segment, string $message='', bool $keepComments=true, bool $useOkapiHtmlSanitization=false){
         $model = AbstractModel::create($segment, 'segment');
         if(!$keepComments){
             $model->removeComparedField('comments');
+        }
+        // special sanitization needed for Okapi HTML imports
+        if($useOkapiHtmlSanitization){
+            $model
+                ->addSanitizedField('source', 'okapifieldtext')
+                ->addSanitizedField('sourceEdit', 'okapifieldtext')
+                ->addSanitizedField('target', 'okapifieldtext')
+                ->addSanitizedField('targetEdit', 'okapifieldtext');
         }
         $model->compare($this, $expectedObj, $message);
     }
@@ -82,10 +92,12 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
      * @param string $fileToCompare
      * @param stdClass[] $segments
      * @param string $message
-     * @param boolean $keepComments
+     * @param bool $keepComments
+     * @param bool $useOkapiHtmlSanitization
      */
-    public function assertSegmentsEqualsJsonFile(string $fileToCompare, array $segments, string $message='', bool $keepComments=true){
+    public function assertSegmentsEqualsJsonFile(string $fileToCompare, array $segments, string $message='', bool $keepComments=true, bool $useOkapiHtmlSanitization=false){
         if(static::api()->isCapturing()) {
+            // TODO FIXME: why do we save the comparable data here but not the original/fetched data ? This is against the concept which implies the raw data will end up in the stored files
             foreach($segments as $idx => $segment) {
                 $model = AbstractModel::create($segment, 'segment');
                 $segments[$idx] = $model->getComparableData();
@@ -100,7 +112,7 @@ abstract class editor_Test_JsonTest extends editor_Test_ImportTest {
 
             for($i=0; $i < $numSegments; $i++){
                 $msg = (empty($message)) ? '' : $message.' [Segment '.($i + 1).']';
-                $this->assertSegmentEqualsObject($expectations[$i], $segments[$i], $msg, $keepComments);
+                $this->assertSegmentEqualsObject($expectations[$i], $segments[$i], $msg, $keepComments, $useOkapiHtmlSanitization);
             }
         } else {
             $this->assertEquals($numSegments, $numExpectations, $message.' [Number of segments does not match the expectations]');

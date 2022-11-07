@@ -641,20 +641,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
     }
 
-    /**
-     * special state for API-test to evaluate the worker-state between single test runs
-     * @throws Zend_Exception
-     */
-    public function workercleanupstateAction()
-    {
-        $this->_helper->layout->disableLayout();
-        $config = Zend_Registry::get('config');
-        // this action may removes workers and is only allowed to be called by tests
-        if(defined('APPLICATION_APITEST') && $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR']){
-            $this->view->workercleanupstate = ZfExtended_Debug::workerCleanupState($this->getParam('force') == '1');
-        }
-    }
-
     public function localizedjsstringsAction()
     {
         $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);

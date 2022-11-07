@@ -30,33 +30,21 @@ namespace Translate5\MaintenanceCli\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\Test\Config;
 
-class TestRunAllCommand extends Translate5AbstractTestCommand
+class TestApplytestsqlCommand extends Translate5AbstractTestCommand
 {
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'test:runall';
+    protected static $defaultName = 'test:applytestsql';
 
-    // keeping data is not wanted for running all tests
-    protected static bool $canKeepTestData = false;
-    
     protected function configure()
     {
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('API-Tests: Runs all.')
-        
+            ->setDescription('API-Tests: Applies the test alter SQL files to the local DB. Needed in fresh installations where tests should be called directly, like docker environments or new development installations')
+
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Runs all API-tests.');
-
-        $this->addOption(
-            'skip-database-reset',
-            's',
-            InputOption::VALUE_NONE,
-            'Will skip the database-reset before running the tests.');
-
-        parent::configure();
+            ->setHelp('Applies all test alter SQLs and sets the user passwords correctly');
     }
 
     /**
@@ -66,17 +54,34 @@ class TestRunAllCommand extends Translate5AbstractTestCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+
         $this->initInputOutput($input, $output);
 
-        // this command will work other than the other two test:run: the db-recreation is the default
-        $forceRecreation = true;
-        if($this->input->getOption('skip-database-reset')){
-            // skip database reinit if option is set.
-            $forceRecreation = false;
+        // may we should clean the application/production DB
+        $this->initTranslate5();
+
+        // Create the tables from scratch
+        $updater = new \ZfExtended_Models_Installer_DbUpdater();
+        //add the test SQL path
+        $updater->addAdditonalSqlPath(APPLICATION_PATH . '/modules/editor/testcases/database/');
+        // init DB
+        if ($updater->importAll() && !$updater->hasErrors()) {
+            // encrypt test-user passworts
+            \editor_Utils::initDemoAndTestUserPasswords();
+            // add needed plugins
+            // FIXME $this->initPlugins(); ??? or by auto discovery???
+            // add the needed configs
+            // FIXME $this->initConfiguration($configs); that must be bootstrapped differently!
+            $this->io->success('Imported all SQLs from testcases/database and hashed the test user passwords1');
+            return self::SUCCESS;
         }
-        if($this->initTestEnvironment('test', true, $forceRecreation)){
-            $this->startApiTest();
+        if ($updater->hasErrors()) {
+            $this->io->error($updater->getErrors());
         }
-        return 0;
+        if ($updater->hasWarnings()) {
+            $this->io->error($updater->getWarnings());
+        }
+
+        return self::FAILURE;
     }
 }

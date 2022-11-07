@@ -79,7 +79,7 @@ The single versions are showing only the values different to the current one! Th
     {
         $this->initInputOutput($input, $output);
         Application::$startSession = true;
-        $this->initTranslate5();
+        $this->initTranslate5AppOrTest();
         $this->writeTitle('Segment history');
         
         $this->segmentUtilities = new \editor_Models_Segment_UtilityBroker;

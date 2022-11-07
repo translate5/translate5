@@ -40,7 +40,7 @@ class XlfImportTest extends editor_Test_JsonTest {
     ];
 
     protected static array $requiredRuntimeOptions = [
-        'import.xlf.preserveWhitespace' => 0
+        'import.xlf.preserveWhitespace' => 0,
     ];
 
     protected static string $setupUserLogin = 'testlector';
@@ -50,6 +50,7 @@ class XlfImportTest extends editor_Test_JsonTest {
         $config
             ->addTask('en', 'de')
             ->addUploadFolder('testfiles')
+            ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '0')
             ->setToEditAfterImport();
     }
 
@@ -128,7 +129,17 @@ class XlfImportTest extends editor_Test_JsonTest {
         );
         foreach($segments as $idx => $segToEdit) {
             $content = strlen($segToEdit->target) > 0 ? $segToEdit->target : $segToEdit->source;
-            static::api()->saveSegment($segToEdit->id, $content.' - edited');
+
+            //segments 84, 85, 86 are too long then and should trigger segment validation
+            if(in_array($segToEdit->segmentNrInTask, [84, 85, 86])) {
+                static::api()->allowHttpStatusOnce(422);
+                $result = (array) static::api()->saveSegment($segToEdit->id, $content.' - edited');
+                $this->assertEquals(422, $result['httpStatus'], 'Segment ['.$segToEdit->segmentNrInTask.'] is returning wrong HTTP Status.');
+                $this->assertEquals('The data of the saved segment is not valid. The segment content is either to long or to short.', $result['errorMessage'], 'Segment ['.$segToEdit->segmentNrInTask.'] is returning wrong or no error.');
+            }
+            else {
+                static::api()->saveSegment($segToEdit->id, $content.' - edited');
+            }
         }
         
         /**

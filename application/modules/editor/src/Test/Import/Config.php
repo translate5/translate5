@@ -102,21 +102,41 @@ final class Config
     }
 
     /**
-     * cleans all resources up
+     * @throws Exception
      */
     public function teardown(): void
     {
+        $errors = [];
         // reversed order, first the tasks
         foreach ($this->tasks as $task) {
-            $task->cleanup($this->api, $this);
+            $this->cleanupResource($task, $errors);
         }
         // then termcollections
         foreach ($this->termCollections as $termCollection) {
-            $termCollection->cleanup($this->api, $this);
+            $this->cleanupResource($termCollection, $errors);
         }
         // then language resources
         foreach ($this->langResources as $resource) {
-            $resource->cleanup($this->api, $this);
+            $this->cleanupResource($resource, $errors);
+        }
+        if(count($errors) > 0){
+            throw new Exception(implode("\n", $errors));
+        }
+    }
+
+    /**
+     * Helper to cleanup a resource. Will catch any exceptions and collects them as we want to cleanup as much as possible
+     * @param Resource $resource
+     */
+    private function cleanupResource(Resource $resource, array &$errors)
+    {
+        if ($resource->wasImported()) {
+            try {
+                $resource->cleanup($this->api, $this);
+            } catch (\Throwable $e) {
+                // we dismiss any exceptions so following resources nevertheless can be cleaned ...
+                $errors[] = $e->getMessage();
+            }
         }
     }
 
@@ -125,7 +145,7 @@ final class Config
      * @param string|null $sourceLanguage
      * @param string|array|null $targetLanguage
      * @param int $customerId
-     * @param string|null $filePathInTestFolder: if set, the file is added as upload
+     * @param string|null $filePathInTestFolder : if set, the file is added as upload
      * @return Task
      */
     public function addTask(string $sourceLanguage = null, $targetLanguage = null, int $customerId = -1, string $filePathInTestFolder = null): Task
@@ -149,7 +169,7 @@ final class Config
     }
 
     /**
-     * @param string $type: see LanguageResource::XXX
+     * @param string $type : see LanguageResource::XXX
      * @param string|null $resourceFileName
      * @param array|null $customerIds
      * @param string|null $sourceLanguage
@@ -166,7 +186,7 @@ final class Config
             $resource->addUploadFile($resourceFileName);
         }
         if ($customerId > 0) {
-            $resource->setProperty('customerIds', [ $customerId ]);
+            $resource->setProperty('customerIds', [$customerId]);
         }
         if ($sourceLanguage !== null && $resource->hasProperty('sourceLang')) {
             $resource->setProperty('sourceLang', $sourceLanguage);

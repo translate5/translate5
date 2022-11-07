@@ -145,7 +145,7 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
                 
                 // if neither source nor target hashes are matching,
                 // then the segment is no alike of the edited segment => we ignore and log it
-                if(! $this->isValidSegment($entity, $editedSegmentId, $hasher)) {
+                if(! $this->isValidSegment($entity, $editedSegmentId)) {
                     error_log('Falsche Segmente per WDHE bearbeitet: MasterSegment:'.$editedSegmentId.' per PUT übergebene Ids:'.print_r($ids, 1).' IP:'.$_SERVER['REMOTE_ADDR']);
                     continue;
                 }
@@ -286,13 +286,10 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
      * @param editor_Models_Task $task
      * @return editor_Models_Segment_RepetitionHash
      */
-    protected function getHasher(editor_Models_Task $task) {
+    protected function getHasher(editor_Models_Task $task): editor_Models_Segment_RepetitionHash {
         //TODO: also a check is missing, if task has alternate targets or not.
         // With alternates no recalc is needed at all, since no repetition editor can be used
-        if($task->getWorkflowStep() == 1 && $task->isTranslation()){
-            return ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$task]);
-        }
-        return null;
+        return ZfExtended_Factory::get(editor_Models_Segment_RepetitionHash::class, [$task]);
     }
     
     /**
@@ -300,11 +297,8 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
      * @param editor_Models_Segment $segment
      * @param editor_Models_Segment_RepetitionHash $hasher
      */
-    protected function updateTargetHashAndOriginal(editor_Models_Segment $segment, editor_Models_Segment_RepetitionHash $hasher = null) {
-        if($hasher) {
-            //FIXME: it is currently in discussion with the community if the setTargetMd5 is done always on segment save!
-            $segment->setTargetMd5($hasher->rehashTarget($segment));
-        }
+    protected function updateTargetHashAndOriginal(editor_Models_Segment $segment, editor_Models_Segment_RepetitionHash $hasher) {
+        $segment->setTargetMd5($hasher->rehashTarget($segment));
     }
     
     /**
@@ -314,22 +308,16 @@ class Editor_AlikesegmentController extends ZfExtended_RestController {
      *
      * @param editor_Models_Segment $entity
      * @param int $editedSegmentId
-     * @param editor_Models_Segment_RepetitionHash $hasher
      * @return boolean
      */
-    protected function isValidSegment(editor_Models_Segment $entity, $editedSegmentId, editor_Models_Segment_RepetitionHash $hasher = null) {
+    protected function isValidSegment(editor_Models_Segment $entity, $editedSegmentId) {
         //without a hasher instance no hashes changes, so we don't have to load the history
-        if(empty($hasher)) {
-            $validTargetMd5 = [];
-        }
-        else {
-            $historyData = ZfExtended_Factory::get('editor_Models_SegmentHistoryData');
-            /* @var $historyData editor_Models_SegmentHistoryData */
-            //load first target hardcoded only, since repetitions may not work with multiple alternatives
-            $historyEntries = $historyData->loadBySegmentId($editedSegmentId, editor_Models_SegmentField::TYPE_TARGET, 3);
-            $validTargetMd5 = array_column($historyEntries, 'originalMd5');
-        }
-        
+        $historyData = ZfExtended_Factory::get('editor_Models_SegmentHistoryData');
+        /* @var $historyData editor_Models_SegmentHistoryData */
+        //load first target hardcoded only, since repetitions may not work with multiple alternatives
+        $historyEntries = $historyData->loadBySegmentId($editedSegmentId, editor_Models_SegmentField::TYPE_TARGET, 3);
+        $validTargetMd5 = array_column($historyEntries, 'originalMd5');
+
         //the current targetMd5 hash is valid in any case
         $validTargetMd5[] = $this->entity->getTargetMd5();
         

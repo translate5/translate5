@@ -8671,7 +8671,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             </trans-unit>
             <trans-unit id='U2VnbWVudC1Lb21tZW50YXI='>
                 <source>Segment-Kommentar</source>
-                <target></target>Segment-Kommentar
+                <target>Segment-Kommentar</target>
             </trans-unit>
             <trans-unit id='RnJlaWUgQW5tZXJrdW5n'>
                 <source>Freie Anmerkung</source>

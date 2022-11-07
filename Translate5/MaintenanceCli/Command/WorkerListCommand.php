@@ -84,7 +84,7 @@ class WorkerListCommand extends Translate5AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
-        $this->initTranslate5();
+        $this->initTranslate5AppOrTest();
         
         $this->writeTitle('worker list');
         

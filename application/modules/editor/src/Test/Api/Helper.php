@@ -556,6 +556,10 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         ]);
     }
 
+    /**
+     * deletes a customer
+     * @param int $customerId
+     */
     public function deleteCustomer(int $customerId)
     {
         $this->delete('editor/customer/' . $customerId);

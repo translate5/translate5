@@ -74,7 +74,24 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
         
         require_once 'Models/Segment/TagAbstract.php';
         require_once 'Models/Segment/InternalTag.php';
-        
+
+        $failingSegments = [
+            1 => '{"targetEdit": {
+                "segmentTooManyLines": "There are 4 lines in the segment, but only 3 lines are allowed.",
+                "segmentLinesTooLong": "Not all lines in the segment match the given maximal length: 1: 252; 3: 396; 4: 468"
+            }}',
+            3 => '{"targetEdit": {
+                "segmentLinesTooLong": "Not all lines in the segment match the given maximal length: 1: 995"
+            }}',
+            4 => '{"targetEdit": {
+                "segmentLinesTooShort": "Not all lines in the segment match the given minimal length: 1: 84",
+                "segmentLinesTooLong": "Not all lines in the segment match the given maximal length: 2: 1223"
+            }}',
+            5 => '{"targetEdit": {
+                "segmentLinesTooLong": "Not all lines in the segment match the given maximal length: 2: 960"
+            }}',
+        ];
+
         foreach($segments as $segToEdit) {
             if(empty($segToEdit->editable)) {
                 continue;
@@ -86,7 +103,17 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
                 $contentToUse = $segToEdit->targetEdit;
             }
             $editedData = $this->getEditedData($contentToUse, $segToEdit->segmentNrInTask);
-            static::api()->saveSegment($segToEdit->id, $editedData);
+
+            if(in_array($segToEdit->segmentNrInTask, array_keys($failingSegments))) {
+                static::api()->allowHttpStatusOnce(422);
+                $result = (array) static::api()->saveSegment($segToEdit->id, $editedData);
+                $this->assertEquals(422, $result['httpStatus'], 'Segment ['.$segToEdit->segmentNrInTask.'] is returning wrong HTTP Status.');
+                $this->assertEquals(json_decode($failingSegments[$segToEdit->segmentNrInTask]), $result['errors'], 'Segment ['.$segToEdit->segmentNrInTask.'] is returning wrong or no error.');
+            }
+            else {
+                static::api()->saveSegment($segToEdit->id, $editedData);
+            }
+
         }
 
         $jsonFileName = 'expectedSegmentsEdited.json';

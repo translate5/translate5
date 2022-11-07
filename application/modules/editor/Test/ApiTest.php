@@ -27,13 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Test\Api\Helper;
-use PHPUnit\Framework\SkippedTestSuiteError;
+use MittagQI\Translate5\Test\Api\DbHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Base Class for all API Tests
  * For tests importing tasks, use TaskImportTest
  */
-abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
+abstract class editor_Test_ApiTest extends TestCase
 {
     const TYPE = 'api';
 
@@ -48,6 +49,12 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
      * @var stdClass|null
      */
     private static ?stdClass $_appState = null;
+
+    /**
+     * Holds the plugins temporarily activated for a test
+     * @var array
+     */
+    private static array $_addedPlugins = [];
 
     /**
      * @var int
@@ -163,11 +170,29 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * internal setup for the inheriting testcase-classes
+     * Do not override in concrete test-classes, use beforeTests there
+     */
+    protected static function testSpecificSetup()
+    {
+    }
+
+    /**
+     * internal teardown for the inheriting testcase-classes
+     * Do not override in concrete test-classes, use afterTests there
+     * @param bool $doCleanup
+     */
+    protected static function testSpecificTeardown(bool $doCleanup)
+    {
+
+    }
+
+    /**
      * asserts that a certain user is loggedin
      * @param string $user
      * @return stdClass the login/status JSON for further processing
      */
-    public static function assertLogin($user)
+    public static function assertLogin(string $user)
     {
         $json = static::api()->getJson('editor/session/' . Helper::getAuthCookie());
         static::assertTrue(is_object($json), 'User "' . $user . '" is not authenticated!');
@@ -190,6 +215,9 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Asserts, that the passed actual string matches the contents of the given file
+     * TODO FIXME:
+     * - the capture-param is a unneccessary dependency and can be evaluated directly in the method
+     * - whitespace-normalization shoud be done on capturing, not on testing
      * @param string $fileName
      * @param string $actual
      * @param string|null $message
@@ -201,7 +229,15 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
         if ($capture) {
             file_put_contents($filePath, $actual);
         }
-        static::assertEquals(file_get_contents($filePath), $actual, $message);
+
+        $expected = file_get_contents($filePath);
+
+        // If we're on Windows - replace CRLF with LF
+        if (PHP_OS_FAMILY == 'Windows'){
+            $expected = str_replace("\r\n", "\n", $expected);
+        }
+
+        static::assertEquals($expected, $actual, $message);
     }
 
     /***
@@ -216,28 +252,79 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
 
     final public static function setUpBeforeClass(): void
     {
-        // each test gets an own api-object, the instance of the current test is for code-completion adnd does not hurt, since the constructor does nothing
-        static::$_api = new Helper(static::class, new static);
-        // this runs only once with the first API-Test
-        if (static::$_appState === null) {
-            self::testRunSetup(static::$_api);
+        try {
+            // each test gets an own api-object, the instance of the current test is for code-completion and does not hurt, since the constructor does nothing
+            static::$_api = new Helper(static::class, new static);
+
+            // this runs only once with the first API-Test
+            if (static::$_appState === null) {
+                self::testRunSetup(static::$_api);
+            }
+            // checks for the plugin & config dependencies that have been defined for this test
+            static::assertAppState();
+
+            // add a test-customer if setup-option set
+            if (static::$setupOwnCustomer) {
+                static::$ownCustomer = static::api()->addCustomer('API Testing::' . static::class);
+            }
+            // internal method to setup more stuff in inheriting classes
+            static::testSpecificSetup();
+
+            // log the user in that is setup as the needed test-user
+            if (static::api()->login(static::$setupUserLogin)) {
+                static::assertLogin(static::$setupUserLogin);
+            }
+            // this can be used in concrete tests as replacement for setUpBeforeClass()
+            static::beforeTests();
+
+        } catch(Throwable $e){
+
+            static::tearDownAfterClass();
+            throw $e;
         }
-        // checks for the plugin & config dependencies that have been defined for this test
-        static::assertAppState();
-        // internal method to create the configured setups
-        static::testSpecificSetup();
-        // this can be used in concrete tests as replacement for setUpBeforeClass()
-        static::beforeTests();
+
     }
 
     final public static function tearDownAfterClass(): void
     {
-        // this can be used in concrete tests as replacement for tearDownAfterClass()
-        static::afterTests();
-        // internal method to clan up stuff
-        static::testSpecificTeardown();
+        // everything is wrapped in try-catch to make sure, all cleanups are executed. Anyone knows a better way to collect exceptions ?
+        $errors = [];
+        // for single tests, the cleanup can be prevented via KEEP_DATA
+        $doCleanup = static::api()->doCleanup();
+        try {
+            // this can be used in concrete tests as replacement for tearDownAfterClass()
+            static::afterTests();
+        } catch (\Throwable $e){
+            $errors[] = $e->getMessage();
+        }
+        try {
+            // internal method to clean up stuff in inheriting classes
+            static::testSpecificTeardown($doCleanup);
+        } catch (\Throwable $e){
+            $errors[] = $e->getMessage();
+        }
+        if (static::$setupOwnCustomer && $doCleanup) {
+            try {
+                static::api()->deleteCustomer(static::$ownCustomer->id);
+            } catch (\Throwable $e){
+                $errors[] = $e->getMessage();
+            }
+        }
+        if(count(static::$_addedPlugins) > 0){
+            if(!DbHelper::deactivatePlugins(static::$_addedPlugins)){
+                $errors[] = 'One or more of the following neccessary Plugins could not be deactivated: \''.implode("', '", static::$_addedPlugins)."'";
+            }
+            static::$_addedPlugins = [];
+        }
         // as a final step., we check if the test left workers in the DB
-        static::assertWorkerCleanup();
+        $preventRemoval = !static::api()->isSuite() || !$doCleanup; // for single running tests or if no cleanup is wanted, we do not remove the workers after test has run
+        $state = DbHelper::cleanupWorkers(false, $preventRemoval);
+        if($state->cleanupNeccessary){
+            $errors[] = 'The test left running, waiting, scheduled or crashed worker\'s in the DB';
+        }
+        if(count($errors) > 0){
+            static::fail(implode("\n", $errors));
+        }
     }
 
     /**
@@ -253,34 +340,6 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
         static::assertNeededUsers();
         // makes sure the test customer is present in the DB and exposes it's id
         static::assertTestCustomer();
-    }
-
-    /**
-     * internal setup for the base-classes
-     * Do not override in concrete test-classes, use beforeTests there
-     */
-    protected static function testSpecificSetup()
-    {
-        // add a test-customer if setup-option set
-        if (static::$setupOwnCustomer) {
-            static::$ownCustomer = static::api()->addCustomer('API Testing::' . static::class);
-        }
-        // log the user in that is setup as the needed test-user
-        if (static::api()->login(static::$setupUserLogin)) {
-            static::assertLogin(static::$setupUserLogin);
-        }
-    }
-
-    /**
-     * internal teardown for the base-classes
-     * Do not override in concrete test-classes, use afterTests there
-     */
-    protected static function testSpecificTeardown()
-    {
-        // remove the test-coustomer if setup-option set
-        if (static::$setupOwnCustomer) {
-            static::api()->deleteCustomer(static::$ownCustomer->id);
-        }
     }
 
     /**
@@ -335,13 +394,21 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
             static::assertFalse(empty($state->termtagger), 'Termtagger Plugin not active!');
             static::assertTrue($state->termtagger->runningAll, 'Some configured termtaggers are not running: ' . print_r($state->termtagger->running, 1));
         }
-        // test the plugins whitelist
-        foreach (static::$requiredPlugins as $plugin) {
-            self::assertContains($plugin, $state->pluginsLoaded, 'Plugin ' . $plugin . ' must be activated for this test case!');
-        }
         // test the plugins blacklist
         foreach (static::$forbiddenPlugins as $plugin) {
             self::assertNotContains($plugin, $state->pluginsLoaded, 'Plugin ' . $plugin . ' must not be activated for this test case!');
+        }
+        // evaluate the plugins whitelist
+        foreach (static::$requiredPlugins as $plugin) {
+            if(!in_array($plugin, $state->pluginsLoaded)){
+                static::$_addedPlugins[] = $plugin;
+            }
+        }
+        // try to activate plugins that are needed but not loaded
+        if(count(static::$_addedPlugins) > 0){
+            if(!DbHelper::activatePlugins(static::$_addedPlugins)){
+                static::fail('One or more of the following neccessary Plugins could not be activated: \''.implode("', '", static::$_addedPlugins)."'");
+            }
         }
         // test the required runtimeOptions
         if (count(static::$requiredRuntimeOptions) > 0) {
@@ -396,21 +463,5 @@ abstract class editor_Test_ApiTest extends \PHPUnit\Framework\TestCase
         $response = static::api()->getLastResponse();
         static::assertEquals(200, $response->getStatus(), 'Load test customer Request does not respond HTTP 200! Body was: ' . $response->getBody());
         static::$_testCustomerId = $customer->id;
-    }
-
-    /**
-     * Asserts that no running, waiting, scheduled or crashed workers are left in the test after teardown
-     * @throws Zend_Http_Client_Exception
-     */
-    private static function assertWorkerCleanup()
-    {
-        static::api()->login('testapiuser');
-        $state = static::api()->getJson('editor/index/workercleanupstate');
-        if (!is_object($state)) {
-            throw new SkippedTestSuiteError('Worker cleanup state could not be fetched, terminating API-tests.' . "\n\n");
-        }
-        if($state->cleanupNeccessary){
-            static::fail('The test left running, waiting, scheduled or crashed worker\'s in the DB');
-        }
     }
 }

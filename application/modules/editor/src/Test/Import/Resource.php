@@ -244,11 +244,21 @@ abstract class Resource
     }
 
     /**
+     * Retrieves, if an Import could successfuly be made
+     * @return bool
+     */
+    public function wasImported(): bool
+    {
+        return $this->_requested;
+    }
+
+    /**
      * Certain functions of resources can only be called after import
      * @param string $additionalMessage
      * @throws Exception
      */
-    protected function checkImported(string $additionalMessage=''){
+    protected function checkImported(string $additionalMessage='')
+    {
         if(!$this->_requested){
             throw new Exception(trim('The '.get_class($this).' was not yet imported '.$additionalMessage));
         }
