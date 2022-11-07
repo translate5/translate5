@@ -8681,6 +8681,26 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Video-Anmerkung</source>
                 <target>Video-Anmerkung</target>
             </trans-unit>
+            <trans-unit id='RGF0ZWkgZXJzZXR6ZW4='>
+                <source>Datei ersetzen</source>
+                <target>Datei ersetzen</target>
+            </trans-unit>
+            <trans-unit id='TmV1ZSBEYXRlaSBob2NobGFkZW4='>
+                <source>Neue Datei hochladen</source>
+                <target>Neue Datei hochladen</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lbiBkZXIgZm9sZ2VuZGVuIERhdGVpdHlwZW4gezB9'>
+                <source>Bitte verwenden Sie einen der folgenden Dateitypen {0}</source>
+                <target>Bitte verwenden Sie einen der folgenden Dateitypen {0}</target>
+            </trans-unit>
+            <trans-unit id='QWxsZSBTZWdtZW50ZSBpbnMgVE0gc3BlaWNoZXJu'>
+                <source>Alle Segmente ins TM speichern</source>
+                <target>Alle Segmente ins TM speichern</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJuIGFsbGVyIFNlZ21lbnRlIGRlciBBdWZnYWJlIGluIGRpZSB6dWdlaMO2cmlnZW4gYmVzY2hyZWliYmFyZW4gVE1zIG5hY2ggQWt0dWFsaXNpZXJ1bmcgZGVyIEF1ZmdhYmU='>
+                <source>Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe</source>
+                <target>Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

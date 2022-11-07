@@ -8862,6 +8862,26 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Video-Anmerkung</source>
                 <target>Video annotation</target>
             </trans-unit>
+            <trans-unit id='RGF0ZWkgZXJzZXR6ZW4='>
+              <source>Datei ersetzen</source>
+              <target>Replace file</target>
+            </trans-unit>
+            <trans-unit id='TmV1ZSBEYXRlaSBob2NobGFkZW4='>
+              <source>Neue Datei hochladen</source>
+              <target>Upload new file</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lbiBkZXIgZm9sZ2VuZGVuIERhdGVpdHlwZW4gezB9'>
+                <source>Bitte verwenden Sie einen der folgenden Dateitypen {0}</source>
+                <target>Please use one of the following file-types {0}</target>
+            </trans-unit>
+            <trans-unit id='QWxsZSBTZWdtZW50ZSBpbnMgVE0gc3BlaWNoZXJu'>
+              <source>Alle Segmente ins TM speichern</source>
+              <target>Save all segments to TM</target>
+            </trans-unit>
+            <trans-unit id='U3BlaWNoZXJuIGFsbGVyIFNlZ21lbnRlIGRlciBBdWZnYWJlIGluIGRpZSB6dWdlaMO2cmlnZW4gYmVzY2hyZWliYmFyZW4gVE1zIG5hY2ggQWt0dWFsaXNpZXJ1bmcgZGVyIEF1ZmdhYmU='>
+              <source>Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe</source>
+              <target>Saving all segments of the task in associated writable TMs after updating the task.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

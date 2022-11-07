@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
@@ -48,7 +49,6 @@ class Editor_FiletreeController extends ZfExtended_RestController
     public function init()
     {
         parent::init();
-        $this->initCurrentTask();
     }
 
     /**
@@ -56,11 +56,46 @@ class Editor_FiletreeController extends ZfExtended_RestController
      */
     public function indexAction()
     {
-        $this->entity->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
+
+        // if taskGuid is provided, the request should not be in task context.
+        $taskGuid = $this->getParam('taskGuid');
+        if( empty($taskGuid)){
+            $this->initCurrentTask();
+            $taskGuid = $this->getCurrentTask()->getTaskGuid();
+        }
+
+        $this->entity->loadByTaskGuid($taskGuid);
+
+        $this->view->rows = $this->entity->getTree();
+        return;
+
+
         //by passing output handling, output is already JSON
         $contextSwitch = $this->getHelper('ContextSwitch');
         $contextSwitch->setAutoSerialization(false);
         $this->getResponse()->setBody($this->entity->getTreeAsJson());
+    }
+
+    /**
+     */
+    public function rootAction(){
+
+        // if taskGuid is provided, the request should not be in task context.
+        $taskGuid = $this->getParam('taskGuid');
+        if( empty($taskGuid)){
+            $this->initCurrentTask();
+            $taskGuid = $this->getCurrentTask()->getTaskGuid();
+        }
+
+        try {
+            $this->entity->loadByTaskGuid($taskGuid);
+            $this->view->rows = $this->entity->getTreeForStore();
+        }catch (ZfExtended_Models_Entity_NotFoundException $e){
+            // INFO: no need for exception here because this can be requested during the import, and in
+            // that point of time, there are no files yet
+            $this->view->message = 'No files where found for this taskGuid';
+            $this->view->rows = [];
+        }
     }
 
     /**
@@ -69,6 +104,8 @@ class Editor_FiletreeController extends ZfExtended_RestController
      */
     public function putAction()
     {
+        $this->initCurrentTask();
+
         $taskGuid = $this->getCurrentTask()->getTaskGuid();
         $data = json_decode($this->_getParam('data'));
 

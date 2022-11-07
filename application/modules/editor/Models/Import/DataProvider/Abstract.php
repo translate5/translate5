@@ -209,12 +209,17 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @throws editor_Models_Import_DataProvider_Exception
      */
     protected function createImportedDataArchive(string $zipFilename) {
-        $filter = new Zend_Filter_Compress(array(
-            'adapter' => 'Zip',
-            'options' => array(
-                'archive' => $zipFilename
-            ),
-        ));
+
+        /** @var Zend_Filter_Compress_Zip $zipCompresss */
+        $zipCompresss = ZfExtended_Factory::get('Zend_Filter_Compress_Zip',[
+            'options' => [
+                'archive' => $zipFilename,
+                'copyRootFolder' => false
+            ]
+        ]);
+
+        $filter = new Zend_Filter_Compress($zipCompresss);
+
         // process the additional files by temporarily adding them to the importFolder
         $deletions = [];
         foreach($this->additionalArchiveFiles as $fileName => $filePath){

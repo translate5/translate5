@@ -33,6 +33,14 @@ VALUES (null, 'editor', 'pm', 'editor_file', 'all');
 INSERT INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`)
 VALUES (null, 'editor', 'editor', 'editor_filetree', 'all');
 
-
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `typeClass`, `description`, `level`, `guiName`, `guiGroup`, `comment`)
 VALUES('runtimeOptions.worker.MittagQI\\Translate5\\Task\\Reimport\\Worker.maxParallelWorkers','1','editor','worker','3','3','','integer',NULL,'Max parallel running workers of task reimport.','1','','','');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES ('editor', 'pm', 'frontend', 'taskReimport');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES ('editor', 'admin', 'frontend', 'taskReimport');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES ('editor', 'pmlight', 'frontend', 'taskReimport');

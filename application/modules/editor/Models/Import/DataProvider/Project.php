@@ -98,7 +98,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
 
 
         // find all matching non pivot files
-        for($i=0;$i<count($this->fileLanguages);$i++){
+        for($i=0, $iMax = count($this->fileLanguages); $i< $iMax; $i++){
             if($this->isWorkfileFileMatch($i)){
                 $matchingFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
                 // collect the matching type for the file
@@ -118,7 +118,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
 
         $pivotFiles = [];
         // check for pivot and reference files
-        for($i=0;$i<count($importFilesValues);$i++){
+        for($i=0, $iMax = count($importFilesValues); $i< $iMax; $i++){
             if($this->isPivotFileMatch($i)){
                 foreach($matchingFiles as $fileName) {
                     if($this->filesMatch($fileName,$importFilesValues[$i])){

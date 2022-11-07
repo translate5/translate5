@@ -42,6 +42,8 @@ use ZfExtended_Factory;
  */
 class DataProvider extends editor_Models_Import_DataProvider_Abstract
 {
+    public const SUPORTED_FILE_EXTENSIONS = ['xliff'];
+
     private array $uploadFiles;
 
     private array $uploadErrors;
@@ -119,7 +121,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
     private function getValidFile(): array
     {
         $upload = new Zend_File_Transfer();
-        $upload->addValidator('Extension', false, 'xliff');
+        $upload->addValidator('Extension', false, self::SUPORTED_FILE_EXTENSIONS);
         // Returns all known internal file information
         $files = $upload->getFileInfo();
         $validFiles = [];

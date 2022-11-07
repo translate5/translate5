@@ -26,23 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
+Ext.define('Editor.view.admin.task.reimport.ReimportWindowViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.taskpreferences',
-    data: {
-        currentTask:null
-    },
+    alias: 'viewmodel.adminTaskReimportReimport',
+
     formulas: {
-        workflowMetadata: {
-            get: function(get) {
-                return this.get('currentTask') && this.get('currentTask').getWorkflowMetaData();
-            }
-        },
-        disabledDuringTaskImport:{
-            get: function(task) {
-                return !task || task.isImporting();
-            },
-            bind: { bindTo:'{currentTask}', deep:true }
+        isImportButtonDisabled: function(get){
+            console.log(get);
+            return get('leaf');
         }
     }
 });

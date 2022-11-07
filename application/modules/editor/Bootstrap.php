@@ -160,6 +160,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => '',
             )
         ));
+
+        $this->front->getRouter()->addRoute('editorFiletreeRootRoute', new ZfExtended_Controller_RestLikeRoute(
+            'editor/filetree/root',
+            array(
+                'module' => 'editor',
+                'controller' => 'filetree',
+                'action' => 'root'
+            )
+        ));
         
         //FIXME convert to RestLikeRoute (remove echo json_encode in action then)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(

@@ -960,8 +960,8 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-    Ext.define("Editor.locale.de.view.admin.task.PreferencesWindow", {
-        override: "Editor.view.admin.task.PreferencesWindow",
+    Ext.define("Editor.locale.de.view.admin.task.TaskManagement", {
+        override: "Editor.view.admin.task.TaskManagement",
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
             events: '<?php echo $this->translate->_('Ereignisse');?>',
@@ -2086,6 +2086,25 @@ Editor.data.l10n = {
         sourceMatchColumn: '<?php echo $this->translate->_('Quell-Treffer');?>',
         targetMatchColumn: '<?php echo $this->translate->_('Ziel-Treffer');?>',
         sameContextColumn: '<?php echo $this->translate->_('Kontext-Treffer');?>'
+    },
+    projectOverview:{
+        taskManagement:{
+            taskReimport:{
+                title:'<?php echo $this->translate->_('Datei ersetzen');?>',
+                fileNameColumnText:'<?php echo $this->translate->_('Dateiname');?>',
+                actionColumnText:'<?php echo $this->translate->_('Aktionen');?>',
+                actionColumnTooltip:'<?php echo $this->translate->_('Neue Datei hochladen');?>'
+            },
+            taskReimportWindow:{
+                title:'<?php echo $this->translate->_('Neue Datei hochladen');?>',
+                fileFieldLabel:'<?php echo $this->translate->_('Datei');?>',
+                fileUploadRegexText:'<?php echo $this->translate->_('Bitte verwenden Sie einen der folgenden Dateitypen {0}');?>',
+                saveBtnText:'<?php echo $this->translate->_('Speichern');?>',
+                cancelBtnText:'<?php echo $this->translate->_('Abbrechen');?>',
+                saveToMemoryLable:'<?php echo $this->translate->_('Alle Segmente ins TM speichern');?>',
+                saveToMemoryTooltip:'<?php echo $this->translate->_('Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe');?>'
+            }
+        }
     }
 };
 

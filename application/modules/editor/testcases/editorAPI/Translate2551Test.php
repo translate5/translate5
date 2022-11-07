@@ -56,7 +56,7 @@ class Translate2551Test extends editor_Test_JsonTest {
 
     public function testFileReimport(){
 
-        /*
+/*
         self::api()->setTaskToEdit();
         $segmentsExpected = static::api()->getSegmentsWithBasicData();
         self::api()->setTaskToOpen();
@@ -77,8 +77,7 @@ class Translate2551Test extends editor_Test_JsonTest {
         static::api()->addFile('fileReimport', static::api()->getFile($file), "application/xml");
 
         static::api()->postJson($route, [
-            'fileId' => $files->id,
-            'taskGuid' => $this->getTask()->getTaskGuid()
+            'fileId' => $files->id
         ], null, false, true);
 
         self::api()->setTaskToEdit();
