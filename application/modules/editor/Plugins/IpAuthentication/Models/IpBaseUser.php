@@ -58,11 +58,9 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
     
     public function __construct(){
         parent::__construct();
-        $remoteAdress = ZfExtended_Factory::get('ZfExtended_RemoteAddress');
-        /* @var $remoteAdress ZfExtended_RemoteAddress */
-        $this->ip = $remoteAdress->getIpAddress();
         $this->config = Zend_Registry::get('config');
         $this->_session = new Zend_Session_Namespace();
+        $this->ip = $this->resolveIp();
     }
     
     /***
@@ -282,5 +280,21 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
         $ip = ip2long($ipToCheck);
 
         return ($ip & $mask) === $subnet;
+    }
+
+    private function resolveIp(): string
+    {
+        $remoteAddress = ZfExtended_Factory::get('ZfExtended_RemoteAddress');
+
+        if ($this->config->runtimeOptions->authentication->ipbased->useProxyHeader) {
+            if (isset($_SERVER['HTTP_X_REAL_IP'])) {
+                $remoteAddress->setProxyHeader('HTTP_X_REAL_IP');
+            }
+
+            $remoteAddress->setTrustedProxies([$remoteAddress->getIpAddress()]);
+            $remoteAddress->setUseProxy();
+        }
+
+        return $remoteAddress->getIpAddress();
     }
 }
