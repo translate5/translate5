@@ -286,12 +286,14 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
     {
         $remoteAddress = ZfExtended_Factory::get('ZfExtended_RemoteAddress');
 
-        if ($this->config->runtimeOptions->authentication->ipbased->useProxyHeader) {
-            if (isset($_SERVER['HTTP_X_REAL_IP'])) {
-                $remoteAddress->setProxyHeader('HTTP_X_REAL_IP');
-            }
-
-            $remoteAddress->setTrustedProxies([$remoteAddress->getIpAddress()]);
+        $localProxies = $this->config->runtimeOptions->authentication?->ipbased?->useLocalProxy?->toArray() ?? [];
+        if (!empty($localProxies)) {
+            //if we have local proxies, we have to use real_ip added by them, since forwared_for is spoofable and
+            // also reflects remote proxies, which should be the sender IPs configured in IpCustomerMap!
+            // see also https://stackoverflow.com/questions/72557636/difference-between-x-forwarded-for-and-x-real-ip-headers
+            $remoteAddress->setProxyHeader('HTTP_X_REAL_IP');
+            //get all IPs of all configured local proxies and allow them
+            $remoteAddress->setTrustedProxies(array_merge(... array_map('gethostbynamel', $localProxies)));
             $remoteAddress->setUseProxy();
         }
 

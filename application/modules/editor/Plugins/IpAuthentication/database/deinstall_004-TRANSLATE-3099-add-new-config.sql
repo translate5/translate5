@@ -26,4 +26,4 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.authentication.ipbased.useProxyHeader';
+DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.authentication.ipbased.useLocalProxy';
