@@ -242,15 +242,15 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
      *
      * @param string $ip - IP in dot notation
      *
-     * @return int|null
+     * @return string|null
      */
-    private function resolveCustomerIdByIp(string $ip): ?int
+    private function resolveCustomerIdByIp(string $ip): ?string
     {
         $customersMap = $this->config->runtimeOptions->authentication->ipbased->IpCustomerMap->toArray();
 
         foreach ($customersMap as $ipRange => $customerId) {
             if ($this->isIpInRange($ip, $ipRange)) {
-                return $customerId;
+                return (string) $customerId;
             }
         }
 
