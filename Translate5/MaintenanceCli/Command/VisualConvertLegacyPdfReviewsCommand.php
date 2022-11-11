@@ -73,7 +73,7 @@ class VisualConvertLegacyPdfReviewsCommand extends Translate5AbstractCommand
         if(count($conversions) === 0){
             $this->io->success('No reviews had to be adjusted');
         } else {
-            $this->io->success('The following reviews have been adjusted: '."\n\n".implode("\n", $conversions));
+            $this->io->success('The following reviews have been adjusted: '."\n\n".implode("\n\n", $conversions));
         }
         return static::SUCCESS;
     }
