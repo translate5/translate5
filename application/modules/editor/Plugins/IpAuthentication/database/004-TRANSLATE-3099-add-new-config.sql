@@ -27,5 +27,5 @@
 -- */
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`,`level`)
-VALUES ('runtimeOptions.authentication.ipbased.useLocalProxy', '1', 'editor', 'system', '[]', '[]', '', 'map', 'If in local setup proxies are used, their hostname(s) must be configured here so that IP Auth may work. Only connections from the proxies are allowed and HTTP_X_REAL_IP is forced to be used as original IP for authentication.', 1);
+VALUES ('runtimeOptions.authentication.ipbased.useLocalProxy', '1', 'editor', 'system', '[]', '[]', '', 'list', 'If in local setup proxies are used, their hostname(s) must be configured here so that IP Auth may work. Only connections from the proxies are allowed and HTTP_X_REAL_IP is forced to be used as original IP for authentication.', 1);
 
