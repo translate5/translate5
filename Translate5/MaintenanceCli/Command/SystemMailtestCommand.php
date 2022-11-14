@@ -65,6 +65,11 @@ class SystemMailtestCommand extends Translate5AbstractCommand
         $config = \Zend_Registry::get('config');
         /* @var $config \Zend_Config */
 
+        if($config->runtimeOptions->sendMailDisabled) {
+            $this->io->error('config runtimeOptions->sendMailDisabled is enabled - no mail send is possible!');
+            return self::FAILURE;
+        }
+
         $configCollection = $this->flattenConfig($config->resources->mail->toArray(), 'resources.mail.');
         $configCollection[] = ['runtimeOptions.sendMailLocally' => $config->runtimeOptions->sendMailLocally];
         $configCollection[] = ['runtimeOptions.sendMailDisabled' => $config->runtimeOptions->sendMailDisabled];
@@ -76,6 +81,10 @@ class SystemMailtestCommand extends Translate5AbstractCommand
         $this->io->section('relevant configuration');
         call_user_func_array([$this->io, 'definitionList'], $configCollection);
 
+        if($config->runtimeOptions->sendMailLocally) {
+            $this->io->warning('deprecated config runtimeOptions->sendMailLocally used!');
+        }
+
         $this->io->section('Send test e-mail to "'.$email.'"');
 
         $mail = new \ZfExtended_Mailer('utf-8');
@@ -85,12 +94,12 @@ class SystemMailtestCommand extends Translate5AbstractCommand
         $mail->send();
         if(is_null($mail->getLastError())) {
             $this->io->success('Test e-mail sent!');
+            return self::SUCCESS;
         }
         else {
             $this->io->error(['Error on sending e-mail: ', (string)$mail->getLastError()]);
+            return self::FAILURE;
         }
-
-        return 0;
     }
 
     protected function flattenConfig(array $data, string $name = ''): array {
