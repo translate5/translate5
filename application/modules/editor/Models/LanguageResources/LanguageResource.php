@@ -639,25 +639,17 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
 
     /**
-     * @throws Zend_Db_Statement_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * Create [collectionId <=> dataTypeId] mappings set on term collection creation
      */
-    public function insert() {
-
-        // Call parent
-        $return = parent::save();
+    public function onAfterInsert() {
 
         // If new termcollection was created
         if ($this->getResourceType() == 'termcollection') {
 
-            // Make sure
+            // Create [collectionId <=> dataTypeId] mappings set
             ZfExtended_Factory
                 ::get(CollectionAttributeDataType::class)
                 ->onTermCollectionInsert($this->getId());
         }
-
-        // Return value returned by save() call
-        return $return;
     }
 }

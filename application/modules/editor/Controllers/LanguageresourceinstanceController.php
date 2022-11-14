@@ -639,7 +639,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->setResourceType($resource->getType());
 
         //save first to generate the languageResource id
-        $this->data['id'] = $this->entity->insert();
+        $this->data['id'] = $this->entity->save();
 
         // especially tests are not respecting the array format ...
         editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
