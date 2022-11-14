@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAttributeDataType;
+
 /**
  * Languageresources Entity Object
  *
@@ -651,7 +653,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
 
             // Make sure
             ZfExtended_Factory
-                ::get('editor_Models_Terminology_Models_CollectionAttributeDataType')
+                ::get(CollectionAttributeDataType::class)
                 ->onTermCollectionInsert($this->getId());
         }
 
