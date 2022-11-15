@@ -56,8 +56,9 @@ Ext.define('Editor.view.segments.MetaPanel', {
     
     initComponent: function() {
         var me = this,
-              showStatus = Editor.app.getTaskConfig('segments.showStatus');
-              
+            showStatus = Editor.app.getTaskConfig('segments.showStatus'),
+            isSegmentQmVisible = Editor.app.getTaskConfig('autoQA.enableQm');
+
         Ext.applyIf(me, {
             title:me.title,
             items: [{
@@ -71,6 +72,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
                   },{
                       xtype: 'segmentQm',
                       itemId: 'segmentQm',
+                      hidden:  !isSegmentQmVisible,
                       collapsible: true
                   },{
                       xtype: 'fieldset',
