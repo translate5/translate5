@@ -175,9 +175,11 @@ using the default ports.')
 
         if (! $this->checkServiceDefault('frontendmessagebus', 'FrontEndMessageBus', $internalServer)) {
             $this->pluginmanager->setActive('FrontEndMessageBus', false);
+            $this->io->success('Plug-In FrontEndMessageBus disabled!');
             return;
         }
         $this->pluginmanager->setActive('FrontEndMessageBus');
+        $this->io->success('Plug-In FrontEndMessageBus activated!');
         $config = Zend_Registry::get('config');
         //$config->runtimeOptions.server.name
 
@@ -233,8 +235,10 @@ using the default ports.')
             //runtimeOptions.plugins.Okapi.serverUsed   okapi-longhorn
             $this->updateConfig('runtimeOptions.plugins.Okapi.serverUsed', 'okapi-longhorn');
             $this->pluginmanager->setActive('Okapi');
+            $this->io->success('Plug-In Okapi activated.');
         } else {
             $this->pluginmanager->setActive('Okapi', false);
+            $this->io->success('Plug-In Okapi disabled!');
         }
     }
 
@@ -256,8 +260,10 @@ using the default ports.')
 
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.liveCheckOnEditing', '1');
             $this->pluginmanager->setActive('SpellCheck');
+            $this->io->success('Plug-In SpellCheck activated.');
         } else {
             $this->pluginmanager->setActive('SpellCheck', false);
+            $this->io->success('Plug-In SpellCheck disabled!');
         }
     }
 
@@ -309,6 +315,7 @@ using the default ports.')
             $this->updateConfig('runtimeOptions.termTagger.url.'.$key, $value);
         }
         $this->pluginmanager->setActive('TermTagger', $foundATagger);
+        $this->io->success('Plug-In TermTagger '.($foundATagger ? 'activated.' : 'disabled!'));
     }
 
     /**
