@@ -206,11 +206,11 @@ using the default ports.')
         } else {
             $this->updateConfig(
                 'runtimeOptions.plugins.FrontEndMessageBus.socketServer.port',
-                '9056'
+                '80' //9056 on direct access to the socket server
             );
             $this->updateConfig(
                 'runtimeOptions.plugins.FrontEndMessageBus.socketServer.route',
-                '/translate5'
+                '/ws/translate5' // just /translate5 on direct access to the socket server
             );
             $this->updateConfig(
                 'runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema',
