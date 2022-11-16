@@ -335,7 +335,7 @@ using the default ports.')
     private function updateConfigInstance(editor_Models_Config $config, string $newValue): void
     {
         if (! $this->input->getOption('auto-set')) {
-            $this->printCurrentConfig($config);
+            $this->printCurrentConfig($config, '; discovered value is '.$newValue);
             return;
         }
         if ($config->hasIniEntry()) {
