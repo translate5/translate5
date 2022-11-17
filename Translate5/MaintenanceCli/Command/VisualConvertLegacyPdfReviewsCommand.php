@@ -31,6 +31,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Registry;
 use ZfExtended_Plugin_Manager;
+use editor_Plugins_VisualReview_Pdf_LegacyConversion;
 
 /**
  * Command to convert all legacy PDF based reviews
@@ -69,7 +70,7 @@ class VisualConvertLegacyPdfReviewsCommand extends Translate5AbstractCommand
             $this->io->error('The visual plugin must be active to use this command !');
             return static::FAILURE;
         }
-        $conversions = \editor_Plugins_VisualReview_Pdf_LegacyConversion::convert();
+        $conversions = editor_Plugins_VisualReview_Pdf_LegacyConversion::convert();
         if(count($conversions) === 0){
             $this->io->success('No reviews had to be adjusted');
         } else {
