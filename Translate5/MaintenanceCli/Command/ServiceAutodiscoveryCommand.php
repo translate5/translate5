@@ -161,7 +161,7 @@ using the default ports.')
     private function serviceT5memory(): void
     {
         $host = $this->getHost('t5memory');
-        $url = 'http://' . $host . ':8080/t5memory';
+        $url = 'http://' . $host . ':4040/t5memory';
 
         if (!$this->checkServiceDefault($host, 'T5Memory', $url)) {
             return;
