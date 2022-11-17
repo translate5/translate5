@@ -82,7 +82,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @throws editor_Models_Import_DataProvider_Exception
      */
     protected function checkAndMakeTempImportFolder() {
-        $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
+        $this->setImportFolder();
         if(is_dir($this->importFolder)) {
             //DataProvider: Temporary directory does already exist - path: "{path}"'
             throw new editor_Models_Import_DataProvider_Exception('E1246', [
@@ -160,6 +160,27 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     protected function setTask(editor_Models_Task $task){
         $this->taskPath = $task->getAbsoluteTaskDataPath();
         $this->task = $task;
+    }
+
+    /***
+     * Set the task paths (taskPath and importFolder)
+     * @param editor_Models_Task $task
+     * @return void
+     */
+    public function setTaskPaths(editor_Models_Task $task): void
+    {
+        $this->setTask($task);
+        $this->setImportFolder();
+
+    }
+
+    /***
+     * Set the task import folder path
+     * @return void
+     */
+    protected function setImportFolder(): void
+    {
+        $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
     }
 
     /***

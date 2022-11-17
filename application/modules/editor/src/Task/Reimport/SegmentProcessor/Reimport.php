@@ -28,13 +28,19 @@
 
 namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor;
 
+use editor_Models_Export_DiffTagger_TrackChanges;
 use editor_Models_File;
 use editor_Models_Import_FileParser;
 use editor_Models_Import_SegmentProcessor;
 use editor_Models_Segment;
+use editor_Models_Segment_InternalTag;
 use editor_Models_Segment_Updater;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
+use JsonException;
+use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\ContentDefault;
+use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\Xliff;
+use Throwable;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
@@ -51,22 +57,51 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     protected ZfExtended_Logger $logger;
 
-    /***
-     * @var ZfExtended_Models_User
+    /**
+     * @var editor_Models_Segment_InternalTag
      */
-    protected ZfExtended_Models_User $user;
+    protected $segmentTagger;
+
+    /***
+     * @var editor_Models_Export_DiffTagger_TrackChanges
+     */
+    protected $diffTagger;
+
+
+    /***
+     * @var array
+     */
+    private array $segmentErrors = [];
+
+    /***
+     * Collection of segments which are updated with the reimport (target, source or both)
+     * @var array
+     */
+    private array $updatedSegments = [];
+
+    /***
+     * Segment timestamp
+     * @var string
+     */
+    private string $saveTimestamp;
 
     /**
      * @param editor_Models_Task $task
      * @param editor_Models_SegmentFieldManager $sfm
      */
-    public function __construct(editor_Models_Task $task,private editor_Models_SegmentFieldManager $sfm)
+    public function __construct(editor_Models_Task $task,private editor_Models_SegmentFieldManager $sfm, private ZfExtended_Models_User $user)
     {
         parent::__construct($task);
         $this->logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
+        $this->segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->diffTagger = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_TrackChanges', [$task, $this->user]);
     }
 
-    public function process(editor_Models_Import_FileParser $parser)
+    /**
+     * Verarbeitet ein einzelnes Segment und gibt die ermittelte SegmentId zurück
+     * @return int|false MUST return the segmentId or false
+     */
+    public function process(editor_Models_Import_FileParser $parser): bool|int
     {
         /** @var editor_Models_Segment $segment */
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
@@ -76,77 +111,62 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         try {
             $segment->loadByFileidMid($this->fileId, $mid);
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            // TODO: log the not found segment
+            /** @var ReimportSegmentErrors $reimportError */
+            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class);
+            $reimportError->setCode('E1434');
+            $reimportError->setMessage('Reimport Segment processor: No matching segment was found for the given mid.');
+            $reimportError->setData([
+                'mid' => $mid
+            ]);
+            $this->segmentErrors[$reimportError->getCode()][] = $reimportError;
             return false;
         }
-        $this->saveSegment($segment,$parser);
-        return $segment->getId();
-    }
+        try {
+            $content = $this->getContentClass($parser);
+            $content->saveSegment($segment,$this->saveTimestamp);
 
-    /**
-     */
-    protected function saveSegment(editor_Models_Segment $t5Segment,editor_Models_Import_FileParser $parser) {
+            if( $content->isUpdateSegment()){
+                $this->updatedSegments[] = $segment->getSegmentNrInTask();
+            }
 
-        $data = $parser->getFieldContents();
-        $source = $this->sfm->getFirstSourceName();
-        $target = $this->sfm->getFirstTargetName();
-        $newSource = $data[$source]["original"];
-        $newTarget = $data[$target]["original"];
-
-        // ignore the update in case source and target are empty
-        if( empty($newSource) && empty($newTarget)){
-            return;
-        }
-
-        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$this->task]);
-        /* @var editor_Models_Segment_Updater $updater */
-
-        //the history entry must be created before the original entity is modified
-        $history = $t5Segment->getNewHistoryEntity();
-
-        $saveSegment = false;
-        if( !$this->isContentEqual($t5Segment->getFieldOriginal($source),$newSource)){
-
-            $t5Segment->set($this->sfm->getFirstSourceName(),$newSource);
-            $t5Segment->set($this->sfm->getFirstSourceNameEdit(),$newSource);
-
-            $t5Segment->updateToSort($this->sfm->getFirstSourceName());
-            $t5Segment->updateToSort($this->sfm->getFirstSourceNameEdit());
-            $saveSegment = true;
-        }
-
-        if( !$this->isContentEqual($t5Segment->getFieldOriginal($target),$newTarget)){
-
-            $t5Segment->set($this->sfm->getFirstTargetName(),$newTarget);
-            $t5Segment->set($this->sfm->getFirstTargetNameEdit(),$newTarget);
-
-            $t5Segment->updateToSort($this->sfm->getFirstTargetName());
-            $t5Segment->updateToSort($this->sfm->getFirstTargetNameEdit());
-
-            $saveSegment = true;
-        }
-
-        if($saveSegment){
-            $t5Segment->setUserGuid($this->user->getUserGuid());
-            $t5Segment->setUserName($this->user->getUserName());
-            $updater->update($t5Segment, $history);
+            return $segment->getId();
+        } catch (Throwable $e) {
+            // collect the errors in case the segment can not be saved
+            /** @var ReimportSegmentErrors $reimportError */
+            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class);
+            $reimportError->setCode('E1435');
+            $reimportError->setMessage('Reimport Segment processor: Unable to save the segment');
+            $reimportError->setData([
+                'segmentNumber' => $segment->getSegmentNrInTask(),
+                'errorMessage' => $e->getMessage()
+            ]);
+            $this->segmentErrors[$reimportError->getCode()] = [$reimportError];
+            return false;
         }
 
     }
 
     /***
-     * @param string $old
-     * @param string $new
-     * @return bool
+     * @param editor_Models_Import_FileParser $parser
+     * @return ContentDefault
      */
-    public function isContentEqual(string $old , string $new): bool
+    protected function getContentClass(editor_Models_Import_FileParser $parser): ContentDefault
     {
-        // TODO: protect the tags when compare
-        // TODO: check the tags count. It needs to be retested on each check
+        $path_parts = pathinfo($this->fileName);
+        $ext = $path_parts['extension'];
+        $className = 'MittagQI\\Translate5\\Task\\Reimport\\SegmentProcessor\\SegmentContent\\'.ucfirst($ext);
+        $args = [
+            $this->task,
+            $parser->getFieldContents(),
+            $this->user
+        ];
 
-        return $old === $new;
+        if(!class_exists($className)){
+            // fallback
+            $className = ContentDefault::class;
+        }
+        return ZfExtended_Factory::get($className,$args);
     }
-
 
     /**
      * Überschriebener Post Parse Handler, erstellt in diesem Fall das Skeleton File
@@ -173,10 +193,57 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     }
 
     /**
-     * @param ZfExtended_Models_User $user
+     * Log reimport process information and errors
+     * 
+     * @return void
+     * @throws JsonException
      */
-    public function setUser(ZfExtended_Models_User $user): void
-    {
-        $this->user = $user;
+    public function log(){
+        $this->logErrors();
+        $this->logUpdated();
     }
+
+    /***
+     * Log all collected errors as warning
+     */
+    private function logErrors(): void
+    {
+        foreach ($this->segmentErrors as $code => $codeErrors){
+            $extra = [];
+            foreach ($codeErrors as $error) {
+                /* @var ReimportSegmentErrors $error */
+                $extra[] = $error->getData();
+            }
+            $this->logger->warn($code,$codeErrors[0]->getMessage(),[
+                'task' => $this->task,
+                'fileId' => $this->fileId,
+                'extra' => json_encode($extra, JSON_THROW_ON_ERROR)
+            ]);
+        }
+    }
+
+    /**
+     * Log all updated segments in the task
+     * @return void
+     */
+    private function logUpdated(): void
+    {
+        if( empty($this->updatedSegments)){
+            return;
+        }
+        $this->logger->info('E1440','File reimport finished.',[
+            'task' => $this->task,
+            'fileId' => $this->fileId,
+            'segments' => implode(',',$this->updatedSegments)
+        ]);
+    }
+
+    /**
+     * @param string $saveTimestamp
+     */
+    public function setSaveTimestamp(string $saveTimestamp): void
+    {
+        $this->saveTimestamp = $saveTimestamp;
+    }
+
 }

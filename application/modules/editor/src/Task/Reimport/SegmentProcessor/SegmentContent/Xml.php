@@ -26,32 +26,11 @@
  END LICENSE AND COPYRIGHT
  */
 
-namespace MittagQI\Translate5\Segment;
+namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
 
-use editor_Models_Segment;
-use editor_Models_Segment_Iterator;
-use ZfExtended_Models_Filter;
-
-class FilteredIterator extends editor_Models_Segment_Iterator
+/**
+ *
+ */
+class Xml extends Xliff
 {
-    private ZfExtended_Models_Filter $filter;
-
-    /**
-     * @param string $taskGuid
-     * @param editor_Models_Segment $segment The segment instance with the already defined filters and fields etc
-     */
-    public function __construct(string $taskGuid, editor_Models_Segment $segment) {
-        $this->segment = $segment;
-        $this->filter = $segment->getFilter();
-        parent::__construct($taskGuid);
-    }
-
-    protected function initSegment(): void
-    {
-        if( !is_null($this->segment)){
-            //segment is already set by constructor, just do additional things here
-            $this->segment->filterAndSort($this->filter);
-            $this->segment->setEnableWatchlistJoin();
-        }
-    }
 }

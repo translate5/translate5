@@ -463,4 +463,11 @@ abstract class editor_Models_Import_FileParser {
     public function & getFieldContents() {
         return $this->segmentData;
     }
+
+    /***
+     * @return string|null
+     */
+    public function getFileName(){
+        return $this->_fileName;
+    }
 }

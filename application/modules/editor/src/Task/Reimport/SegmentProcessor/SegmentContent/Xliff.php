@@ -26,32 +26,37 @@
  END LICENSE AND COPYRIGHT
  */
 
-namespace MittagQI\Translate5\Segment;
+namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
 
-use editor_Models_Segment;
-use editor_Models_Segment_Iterator;
-use ZfExtended_Models_Filter;
-
-class FilteredIterator extends editor_Models_Segment_Iterator
+/**
+ *
+ */
+class Xliff extends ContentDefault
 {
-    private ZfExtended_Models_Filter $filter;
 
     /**
-     * @param string $taskGuid
-     * @param editor_Models_Segment $segment The segment instance with the already defined filters and fields etc
+     * @param string $target
+     * @return void
      */
-    public function __construct(string $taskGuid, editor_Models_Segment $segment) {
-        $this->segment = $segment;
-        $this->filter = $segment->getFilter();
-        parent::__construct($taskGuid);
+    protected function updateTarget(string $target): void
+    {
+        $tempMap = [];
+        // restore org. tags; detect tag-map from t5 SOURCE segment. Only there all original tags are present.
+        $this->segmentTagger->toXliff($this->segment->getSource(), replaceMap: $tempMap);
+        $newTarget = $this->segmentTagger->reapply2dMap($this->normalizeContent($target), $tempMap);
+        $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
+
+        $this->update($newTarget,$this->sfm->getFirstTargetName(),$this->sfm->getFirstTargetNameEdit());
     }
 
-    protected function initSegment(): void
+    /**
+     * @param string $content
+     * @param array $tagMap
+     * @return string
+     */
+    protected function normalizeContent(string $content, array &$tagMap = []): string
     {
-        if( !is_null($this->segment)){
-            //segment is already set by constructor, just do additional things here
-            $this->segment->filterAndSort($this->filter);
-            $this->segment->setEnableWatchlistJoin();
-        }
+        return $this->segmentTagger->toXliff($content,replaceMap: $tagMap);
     }
+
 }

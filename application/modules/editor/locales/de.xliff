@@ -8701,6 +8701,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe</source>
                 <target>Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe</target>
             </trans-unit>
+            <trans-unit id='UmVpbXBvcnQgbMOkdWZ0'>
+              <source>Reimport läuft</source>
+              <target>Reimport läuft</target>
+            </trans-unit>
+            <trans-unit id='RGVyIGFrdHVlbGxlIEF1ZmdhYmVuc3RhdHVzIGzDpHNzdCBkaWVzZSBBa3Rpb24gbmljaHQgenUu'>
+              <source>Der aktuelle Aufgabenstatus lässt diese Aktion nicht zu.</source>
+              <target>Der aktuelle Aufgabenstatus lässt diese Aktion nicht zu.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIFJlaW1wb3J0IHd1cmRlIG1pdCBGZWhsZXJuIGFiZ2VzY2hsb3NzZW4uIFdlaXRlcmUgSW5mb3JtYXRpb25lbiBmaW5kZW4gU2llIGltIEVyZ2VibmlzcHJvdG9rb2xs'>
+              <source>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</source>
+              <target>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

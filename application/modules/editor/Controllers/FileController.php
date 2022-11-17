@@ -27,10 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
-use MittagQI\Translate5\Task\Import\FileParser\FileParserHelper;
+use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\DataProvider;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
 use MittagQI\Translate5\Task\Reimport\Worker;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
@@ -74,6 +74,7 @@ class editor_FileController extends ZfExtended_RestController
     {
 
         $fileId = $this->getParam('fileId');
+        $saveToMemory = (bool)$this->getParam('saveToMemory',false);
 
         if (empty($fileId)) {
             throw new \MittagQI\Translate5\Task\Reimport\Exception('E1426');
@@ -91,12 +92,53 @@ class editor_FileController extends ZfExtended_RestController
         $worker = ZfExtended_Factory::get(Worker::class);
 
         // init worker and queue it
-        if (!$worker->init($task->getTaskGuid(), [ 'fileId' => $fileId,  'file' => $dataProvider->getFile(), 'userGuid' => ZfExtended_Authentication::getInstance()->getUser()->getUserGuid()])) {
+        if (!$worker->init($task->getTaskGuid(), [
+            'fileId' => $fileId,
+            'file' => $dataProvider->getFile(),
+            'userGuid' => ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
+            'segmentTimestamp' => NOW_ISO,
+        ])) {
             throw new ZfExtended_Exception('Task ReImport Error on worker init()');
         }
 
-        if($worker->run()){
-            $dataProvider->archiveImportedData();
+        try {
+            $worker->queue();
+            if($saveToMemory){
+                $this->queueUpdateTmWorkers();
+            }
+
+            $this->view->success = true;
+        }catch (Throwable $exception){
+            Lock::taskUnlock($task);
+            $this->view->success = false;
+            throw  $exception;
+        }
+    }
+
+    /***
+     * Queue tm update workers for the current task. Only the writable langauge resources will be updated
+     */
+    protected function queueUpdateTmWorkers(): void
+    {
+
+        $assoc = ZfExtended_Factory::get(TaskAssociation::class);
+        /* @var MittagQI\Translate5\LanguageResource\TaskAssociation $assoc */
+
+        $resources = $assoc->getTaskUpdatable($this->getCurrentTask()->getTaskGuid());
+
+        foreach ($resources as $resource){
+            $worker = ZfExtended_Factory::get('editor_Models_LanguageResources_Worker');
+            /* @var editor_Models_LanguageResources_Worker $worker */
+
+            // init worker and queue it
+            // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost
+            if (!$worker->init($this->getCurrentTask()->getTaskGuid(), [
+                'languageResourceId' => $resource['languageResourceId'],
+                'segmentFilter' => NOW_ISO
+            ])) {
+                throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
+            }
+            $worker->queue();
         }
     }
 }

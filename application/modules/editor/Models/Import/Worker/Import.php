@@ -133,14 +133,14 @@ class editor_Models_Import_Worker_Import {
         $filesProcessedAtAll = 0;
         foreach ($filelist as $fileId => $path) {
             $path = $fileFilter->applyImportFilters($path, $fileId, $filelist);
-            $file = new SplFileInfo($this->importConfig->importFolder.'/'.$path);
-            $parser = $parserHelper->getFileParser($fileId, $file);
+            $filePath = $this->importConfig->importFolder.'/'.$path;
+            $parser = $parserHelper->getFileParser($fileId, $filePath);
             if(!$parser) {
                 continue;
             }
             
             /* @var $parser editor_Models_Import_FileParser */
-            $segProc->setSegmentFile($fileId, $file->getBasename()); //$params[1] => filename
+            $segProc->setSegmentFile($fileId, $parser->getFileName()); //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
             $parser->addSegmentProcessor($repHash);
             $parser->addSegmentProcessor($segProc);
@@ -215,13 +215,13 @@ class editor_Models_Import_Worker_Import {
         ]);
 
         foreach ($relayFiles as $fileId => $path) {
-            $file = new SplFileInfo($this->importConfig->importFolder.'/'.$path);
-            $parser = $parserHelper->getFileParser($fileId, $file);
+            $filePath = $this->importConfig->importFolder.'/'.$path;
+            $parser = $parserHelper->getFileParser($fileId, $filePath);
             if(!$parser) {
                 continue;
             }
             /* @var $parser editor_Models_Import_FileParser */
-            $segProc->setSegmentFile($fileId, $file->getBasename());
+            $segProc->setSegmentFile($fileId, $parser->getFileName());
             $parser->addSegmentProcessor($mqmProc);
             $parser->addSegmentProcessor($repHash);
             $parser->addSegmentProcessor($segProc);

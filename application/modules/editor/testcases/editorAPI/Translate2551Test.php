@@ -80,6 +80,8 @@ class Translate2551Test extends editor_Test_JsonTest {
             'fileId' => $files->id
         ], null, false, true);
 
+        static::api()->reloadTask();
+
         self::api()->setTaskToEdit();
         $segmentsActual = static::api()->getSegmentsWithBasicData();
         self::api()->setTaskToOpen();
@@ -88,7 +90,26 @@ class Translate2551Test extends editor_Test_JsonTest {
 
         $expected = static::api()->getFileContent('expected.json');
 
-        self::assertEquals(json_encode($expected, JSON_PRETTY_PRINT), json_encode($segmentsActual, JSON_PRETTY_PRINT), 'Segments are not as expected after xlif reimport');
+        $this->compoareSegments($segmentsActual,$expected);
     }
 
+    /***
+     * Compare the segments with protected tags
+     * @param array $actual
+     * @param array $expected
+     * @return void
+     */
+    public function compoareSegments(array $actual, array $expected): void
+    {
+        $segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $actualFiltered = [];
+
+        foreach ($actual as $a) {
+            $actualFiltered[$a['segmentNrInTask']] = $segmentTagger->toXliff($a['targetEdit']);
+        }
+
+        foreach ($expected as $e) {
+            static::assertEquals($actualFiltered[$e->segmentNrInTask],$segmentTagger->toXliff($e->targetEdit),'The compared segment content is not equal');
+        }
+    }
 }

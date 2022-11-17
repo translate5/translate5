@@ -199,7 +199,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
         //the history entry must be created before the original entity is modified
         $history = $t5Segment->getNewHistoryEntity();
         //update the segment
-        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$this->task]);
+        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$this->task,$this->user->getUserGuid()]);
         /* @var $updater editor_Models_Segment_Updater */
         
         if($updater->sanitizeEditedContent($newContent)) {

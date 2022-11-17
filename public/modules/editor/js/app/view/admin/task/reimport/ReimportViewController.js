@@ -66,6 +66,22 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
     },
 
     onUploadAction: function (grid, rowIndex, colIndex, actionItem, event, record, row){
+        var me = this,
+            task = me.getView().task;
+
+        // if the current task state does not allow this action (is importing, is locked or is not editable)
+        // show info message to the user
+        if( task.isImporting() || task.isLocked() || !task.isEditable() ){
+            Ext.create('Ext.window.MessageBox').show({
+                title: '',
+                msg: Editor.data.l10n.projectOverview.taskManagement.taskReimport.taskNotAllowThisActionMessage,
+                buttons: Ext.Msg.OK,
+                icon: Ext.MessageBox.INFO
+            });
+            return;
+        }
+
+
         var win = Ext.widget('adminTaskReimportReimportWindow');
         win.loadRecord(record,this.getView().task);
         win.show();

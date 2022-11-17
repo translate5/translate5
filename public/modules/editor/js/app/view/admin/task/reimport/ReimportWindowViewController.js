@@ -50,6 +50,8 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindowViewController', {
             return;
         }
 
+        task.set('state','reimport');
+
         view.setLoading(true);
 
         form.submit({
@@ -60,11 +62,13 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindowViewController', {
             url: Editor.data.restpath+'taskid/'+task.get('id')+'/file/',
             scope: me,
             success: function(form, submit) {
+                Editor.MessageBox.addSuccess(locales.fileReimportRunning);
                 record.load();
                 view.setLoading(false);
                 view.close();
             },
             failure: function(form, submit) {
+                Editor.MessageBox.addWarning(locales.fileReimportFinishedWithErrors);
                 Editor.app.getController('ServerException').handleException(submit.response);
                 view.setLoading(false);
             }

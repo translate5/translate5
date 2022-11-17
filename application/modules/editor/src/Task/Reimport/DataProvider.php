@@ -36,13 +36,14 @@ use Zend_Exception;
 use Zend_File_Transfer;
 use ZfExtended_ErrorCodeException;
 use ZfExtended_Factory;
+use ZfExtended_Utils;
 
 /***
  *
  */
 class DataProvider extends editor_Models_Import_DataProvider_Abstract
 {
-    public const SUPORTED_FILE_EXTENSIONS = ['xliff'];
+    public const SUPORTED_FILE_EXTENSIONS = ['xliff','xml'];
 
     private array $uploadFiles;
 
@@ -94,11 +95,18 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
         $path = $tree->getFileIdPath($task->getTaskGuid(),$this->fileId);
 
-        // make the _tempFolder
-        $this->checkAndMakeTempImportFolder();
+        try {
+            // make the _tempFolder
+            $this->checkAndMakeTempImportFolder();
+        }catch (editor_Models_Import_DataProvider_Exception $e){
+            // if the tmp folder exist, don't break the reimport process
+        }
 
         // extract the zip package
         $this->unzipArchive($this->getZipArchivePath(null),$this->importFolder);
+
+        // fix the bug where the import archive contains _tempImport as root folder
+        $this->fixArchiveTempFolder();
 
         // move the new file to the location in _tempFolder
         // the new file will have the same name as the one which is replaced
@@ -158,6 +166,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
     /**
      * DataProvider specific method to create the import archive
      * @param string $filename optional, provide a different archive file name
+     * @throws editor_Models_Import_DataProvider_Exception|Exception
      */
     public function archiveImportedData($filename = null)
     {
@@ -184,7 +193,30 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
      * Return unique name for an task archive used for backing up the old archive
      * @return string
      */
-    private function getArchiveUniqueName(){
+    private function getArchiveUniqueName(): string
+    {
         return $this->taskPath.DIRECTORY_SEPARATOR.date('Y-m-d__H_i_s').'_'.self::TASK_ARCHIV_ZIP_NAME;
+    }
+
+
+    /***
+     * This is a fix for a bug where the archived zip pachage is zipped with _temImport as
+     * root folder.
+     * @return void
+     */
+    private function fixArchiveTempFolder(): void
+    {
+        $doubleTempFolder = $this->importFolder.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
+
+        // check if there is _tempFolder after the zip archive is extracted
+        if( is_dir($doubleTempFolder)){
+            $fixedPath = $this->taskPath.DIRECTORY_SEPARATOR.'_fixedTempImport';
+            // move the needed content into temporary directory
+            ZfExtended_Utils::recursiveCopy($doubleTempFolder,$fixedPath);
+            // remove the incorrect tempFolder file structure
+            $this->removeTempFolder();
+            // change the fixed temporary folder name to the real temp name
+            rename($fixedPath,$this->getAbsImportPath());
+        }
     }
 }

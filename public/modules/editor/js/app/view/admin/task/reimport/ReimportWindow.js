@@ -73,7 +73,9 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
                         tooltip: locales.saveToMemoryTooltip,
                         itemId: 'saveToMemory',
                         name: 'saveToMemory',
-                        value: true
+                        inputValue: 1,
+                        uncheckedValue: 0,
+                        value: me.getCustomerSaveToMemory()
                     }]
                 }],
                 dockedItems : [{
@@ -126,5 +128,9 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
      */
     getSupportedFilesRegex: function (){
         return new RegExp('('+Editor.data.editor.task.reimport.supportedExtensions.join('|')+')');
+    },
+
+    getCustomerSaveToMemory: function (){
+        return Ext.getStore('admin.task.Config').getConfig('task.reimport.saveToMemory');
     }
 });

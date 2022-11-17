@@ -26,32 +26,66 @@
  END LICENSE AND COPYRIGHT
  */
 
-namespace MittagQI\Translate5\Segment;
+namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor;
 
-use editor_Models_Segment;
-use editor_Models_Segment_Iterator;
-use ZfExtended_Models_Filter;
-
-class FilteredIterator extends editor_Models_Segment_Iterator
+/**
+ *
+ */
+class ReimportSegmentErrors
 {
-    private ZfExtended_Models_Filter $filter;
+
+    private string $code;
+
+    private string $message;
+
+    private array $data;
 
     /**
-     * @param string $taskGuid
-     * @param editor_Models_Segment $segment The segment instance with the already defined filters and fields etc
+     * @return string
      */
-    public function __construct(string $taskGuid, editor_Models_Segment $segment) {
-        $this->segment = $segment;
-        $this->filter = $segment->getFilter();
-        parent::__construct($taskGuid);
+    public function getCode(): string
+    {
+        return $this->code;
     }
 
-    protected function initSegment(): void
+    /**
+     * @param string $code
+     */
+    public function setCode(string $code): void
     {
-        if( !is_null($this->segment)){
-            //segment is already set by constructor, just do additional things here
-            $this->segment->filterAndSort($this->filter);
-            $this->segment->setEnableWatchlistJoin();
-        }
+        $this->code = $code;
     }
+
+    /**
+     * @return string
+     */
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    /**
+     * @param string $message
+     */
+    public function setMessage(string $message): void
+    {
+        $this->message = $message;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param array $data
+     */
+    public function setData(array $data): void
+    {
+        $this->data = $data;
+    }
+
 }

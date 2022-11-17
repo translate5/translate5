@@ -44,3 +44,9 @@ VALUES ('editor', 'admin', 'frontend', 'taskReimport');
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
 VALUES ('editor', 'pmlight', 'frontend', 'taskReimport');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `type`, `description`, `level`, `guiName`, `guiGroup`)
+VALUES ('runtimeOptions.task.reimport.saveToMemory', '1', 'editor', 'reimport', '0', '0', 'boolean', 'If active, the new source and/or target content of an updated segment will be saved into the already assigned TMs (if any)', '4', 'Task re-import: save updated segments to tm', 'Task re-import');
+
+INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`)
+VALUES ('editor_Models_LanguageResources_Worker', 'MittagQI\\Translate5\\Task\\Reimport\\Worker');

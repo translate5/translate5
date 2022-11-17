@@ -112,6 +112,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_ERROR = 'error';
     const STATE_UNCONFIRMED = 'unconfirmed';
     const STATE_EXCELEXPORTED = 'ExcelExported';
+    const STATE_REIMPORT = 'reimport';
 
     const USAGE_MODE_COMPETITIVE = 'competitive';
     const USAGE_MODE_COOPERATIVE = 'cooperative';

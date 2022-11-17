@@ -27,11 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 namespace MittagQI\Translate5\Task\Import\FileParser;
+use editor_Models_Import_FileParser;
 use editor_Models_Import_FileParser_NoParserException;
 use editor_Models_Import_SupportedFileTypes;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use SplFileInfo;
+use Zend_Exception;
 use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
@@ -49,15 +51,21 @@ class FileParserHelper
         $this->supportedFiles = ZfExtended_Factory::get(editor_Models_Import_SupportedFileTypes::class);
     }
 
-    /**
+    /***
+     * Get the file parser for given fileId and file path
+     * @param int $fileId
+     * @param string $filePath
+     * @return editor_Models_Import_FileParser|null
+     * @throws Zend_Exception
      */
-    public function getFileParser(int $fileId, SplFileInfo $file)
+    public function getFileParser(int $fileId, string $filePath): ?editor_Models_Import_FileParser
     {
         try {
+            $file = new SplFileInfo($filePath);
             $parserClass = $this->lookupFileParserCls($file->getExtension(), $file);
         } catch (editor_Models_Import_FileParser_NoParserException $e) {
             Zend_Registry::get('logger')->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
-            return false;
+            return null;
         }
 
         $parser = ZfExtended_Factory::get($parserClass, [

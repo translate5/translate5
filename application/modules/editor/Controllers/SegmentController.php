@@ -303,7 +303,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
     public function putAction()
     {
-        $sessionUser = new Zend_Session_Namespace('user');
+        $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
         $this->entity->load((int)$this->_getParam('id'));
 
         //check if update is allowed
@@ -312,12 +312,12 @@ class Editor_SegmentController extends ZfExtended_RestController
         /* @var $task editor_Models_Task */
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->data->userGuid);
+        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->getUserGuid());
 
         //the history entry must be created before the original entity is modified
         $history = $this->entity->getNewHistoryEntity();
         //update the segment
-        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task]);
+        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task,$sessionUser->getUserGuid()]);
 
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList(true);
 
@@ -339,8 +339,8 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->sanitizeEditedContent($updater, $allowedAlternatesToChange);
 
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
-        $this->entity->setUserGuid($sessionUser->data->userGuid);
-        $this->entity->setUserName($sessionUser->data->userName);
+        $this->entity->setUserGuid($sessionUser->getUserGuid());
+        $this->entity->setUserName($sessionUser->getUserName());
 
         /* @var $updater editor_Models_Segment_Updater */
         $updater->update($this->entity, $history);

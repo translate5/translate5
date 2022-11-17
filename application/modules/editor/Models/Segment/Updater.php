@@ -51,8 +51,18 @@ class editor_Models_Segment_Updater {
      * @var editor_Models_Segment_UtilityBroker
      */
     protected $utilities;
-    
-    public function __construct(editor_Models_Task $task) {
+
+    /***
+     * Timestamp set for the segment before the segment is saved. If no value was set, NOW_ISO constant will be used
+     * @var string
+     */
+    private string $saveTimestamp;
+
+    /**
+     * @param editor_Models_Task $task
+     * @param string $userGuid
+     */
+    public function __construct(editor_Models_Task $task, private string $userGuid) {
         $this->task = $task;
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
@@ -85,7 +95,10 @@ class editor_Models_Segment_Updater {
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
         $workflow = $wfm->getActive($this->segment->getTaskGuid());
-        $workflow->getSegmentHandler()->beforeSegmentSave($this->segment, $this->task);
+
+        $segmentHandler = $workflow->getSegmentHandler();
+        $segmentHandler->updateUserGuid($this->userGuid);
+        $segmentHandler->beforeSegmentSave($this->segment, $this->task);
         
         $this->segment->validate();
         
@@ -105,7 +118,11 @@ class editor_Models_Segment_Updater {
         //saving history directly before normal saving,
         // so no exception between can lead to history entries without changing the master segment
         $history->save();
-        $this->segment->setTimestamp(NOW_ISO); //see TRANSLATE-922
+
+        if( !isset($this->saveTimestamp)){
+            $this->saveTimestamp = NOW_ISO;
+        }
+        $this->segment->setTimestamp($this->saveTimestamp); //see TRANSLATE-922
         $this->segment->save();
         $this->segment->updateIsTargetRepeated($this->segment->getTargetMd5(), $oldHash);
         //call after segment put handler
@@ -247,5 +264,13 @@ class editor_Models_Segment_Updater {
         $connector = $manager->getConnector($adapter,$this->task->getSourceLang(),$this->task->getTargetLang(),$this->task->getConfig());
         /* @var $connector editor_Services_Connector */
         $connector->logAdapterUsage($this->segment);
+    }
+
+    /**
+     * @param string $saveTimestamp
+     */
+    public function setSaveTimestamp(string $saveTimestamp): void
+    {
+        $this->saveTimestamp = $saveTimestamp;
     }
 }

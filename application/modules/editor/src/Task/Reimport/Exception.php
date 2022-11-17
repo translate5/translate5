@@ -47,5 +47,7 @@ class Exception extends \ZfExtended_ErrorCodeException {
         'E1427' => 'Reimport DataProvider: Error on file upload.',
         'E1429' => 'Reimport DataProvider: No upload files found for task reimport.',
         'E1430' => 'Reimport DataProvider: No upload files found for task reimport.',
+        'E1433' => 'Reimport Worker: Unable to find fileParser for the uploaded file.',
+        'E1434' => 'Reimport Segment processor: No matching segment was found for the given mid.',
     ];
 }
