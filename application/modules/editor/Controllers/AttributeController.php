@@ -163,6 +163,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
     /**
      * Create attribute
+     *
+     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
     public function postAction() {
@@ -281,13 +283,12 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
         ], $_['termId']);
 
-        // If attribute we're going to add is not a part of TBX basic standard
-        if (!$_['dataType']->getIsTbxBasic())
-            $this->jcheck([
-                'collectionId' => [
-                    'fis' => $_['dataType']->getAllowedCollectionIds() // FIND_IN_SET
-                ]
-            ], $_['termId']);
+        // Check if attribute we're going to add is of dataType which is enabled for term's TermCollection
+        $this->jcheck([
+            'collectionId' => [
+                'fis' => $_['dataType']->getEnabledCollectionIds() ?: 'invalid' // FIND_IN_SET
+            ]
+        ], $_['termId']);
 
         // Build params key
         $key = $_['termId']->getTermEntryId()

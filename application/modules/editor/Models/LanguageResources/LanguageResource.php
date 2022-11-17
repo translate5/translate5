@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAttributeDataType;
+
 /**
  * Languageresources Entity Object
  *
@@ -634,5 +636,20 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     static function exportFilename($collectionId) {
         return editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir() . 'tc_' . $collectionId . '/export.tbx';
+    }
+
+    /**
+     * Create [collectionId <=> dataTypeId] mappings set on term collection creation
+     */
+    public function onAfterInsert() {
+
+        // If new termcollection was created
+        if ($this->getResourceType() == 'termcollection') {
+
+            // Create [collectionId <=> dataTypeId] mappings set
+            ZfExtended_Factory
+                ::get(CollectionAttributeDataType::class)
+                ->onTermCollectionInsert($this->getId());
+        }
     }
 }
