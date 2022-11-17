@@ -65,7 +65,7 @@ class ContentDefault extends ContentBase
             $this->updateSegment = true;
         }
 
-        if( !$this->isContentEqual($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()),$this->getDataTarget())){
+        if( !$this->isContentEqual($this->segment->getFieldEdited($this->sfm->getFirstTargetName()),$this->getDataTarget())){
             $this->updateTarget($this->getDataTarget());
             $this->updateSegment = true;
         }

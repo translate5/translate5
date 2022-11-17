@@ -72,6 +72,13 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
     useArrows: true,
     rootVisible: false,
 
+    tbar:[{
+        xtype: 'displayfield',
+        hideLabel:true,
+        fieldCls: 'lableInfoIcon',
+        value:Ext.String.format(Editor.data.l10n.projectOverview.taskManagement.taskReimport.topBarHeaderInfo,Editor.data.editor.task.reimport.supportedExtensions.join(','))
+    }],
+
     columns: [{
         xtype: 'treecolumn',
         flex: 0.5,
@@ -82,16 +89,15 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
     },{
         xtype: 'actioncolumn',
         tooltip: Editor.data.l10n.projectOverview.taskManagement.taskReimport.actionColumnTooltip,
-        bind:{
-            text: '{l10n.projectOverview.taskManagement.taskReimport.actionColumnText}',
-            disabled:'{isImportButtonDisabled}'
-        },
         flex: 0.5,
         menuDisabled: true,
+        bind:{
+            text: '{l10n.projectOverview.taskManagement.taskReimport.actionColumnText}',
+        },
         align: 'center',
         glyph: 'f093@FontAwesome5FreeSolid',
         isDisabled:'isUploadActionDisabled',
-        handler: 'onUploadAction',
+        handler: 'onUploadAction'
     }]
 
 });

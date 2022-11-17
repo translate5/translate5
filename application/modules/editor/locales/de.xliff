@@ -8713,6 +8713,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</source>
               <target>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</target>
             </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gRGF0ZWllbiBudXIgYWt0dWFsaXNpZXJlbiwgd2VubiBkaWUgaG9jaGdlbGFkZW5lIERhdGVpIHZvbSBnbGVpY2hlbiBEYXRlaXR5cCBpc3QgdW5kIGRpZSBnbGVpY2hlIEFuemFobCB2b24gU2VnbWVudGVuIGhhdC4gRGVyemVpdCB1bnRlcnN0w7x0enRlIERhdGVpdHlwZW46IHswfQ=='>
+              <source>Sie können Dateien nur aktualisieren, wenn die hochgeladene Datei vom gleichen Dateityp ist und die gleiche Anzahl von Segmenten hat. Derzeit unterstützte Dateitypen: {0}</source>
+              <target>Sie können Dateien nur aktualisieren, wenn die hochgeladene Datei vom gleichen Dateityp ist und die gleiche Anzahl von Segmenten hat. Derzeit unterstützte Dateitypen: {0}</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

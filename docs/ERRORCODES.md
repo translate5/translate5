@@ -283,8 +283,8 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1430"></a>E1430  | Task reimport      | Reimport DataProvider: Unable to create copy of the zip archive.               | Unable to create copy of the old zip archive when new on is create with the latest files.
 | <a id="E1433"></a>E1433  | Task reimport      | Reimport Worker: Unable to find fileParser for the uploaded file.              | The uploaded file type is not supported and can not be imported.
 | <a id="E1434"></a>E1434  | Task reimport      | Reimport Segment processor: No matching segment was found for the given mid.   | In the file upload there was a segment with mid id which was not found in translate5 segments table
-| <a id="E1435"></a>E1435  | Task reimport      | Reimport Segment processor: Unable to save the segment                         | There was an error on saving the segment on reimport. For more info check the error log
-| <a id="E1440"></a>E1440  | Task reimport      | File reimport finished.                                                        | The task reimport process is finished and additional info can be seen in task log
+| <a id="E1435"></a>E1435  | Task reimport      | Reimport Segment processor: Unable to save the segment | There was an error on saving the segment on reimport. For more info check the error log
+| <a id="E1440"></a>E1440  | Task reimport      | File reimport finished. | The task reimport process is finished and additional info can be seen in task log
 
 ### Language Resources
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -607,7 +607,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1413"></a>E1413  | Plug-In SpellCheck | SpellCheck can not work when target language is not supported by LanguageTool.                                                | Check task target language
 | <a id="E1417"></a>E1417  | Plug-In SpellCheck | SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList}                                | One or more LanguageTool instances are not available. All LanguageTool instances are listed with their status. Please check them manually and restart them if needed.
 | <a id="E1418"></a>E1418  | Plug-In SpellCheck | LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app        | Create a ticket for this issue with the event added.
-| <a id="E1419"></a>E1419  | Plug-In SpellCheck | SpellCheck overall run done - {segmentCounts}                                                                                 | Reports that the whole task was checked with the spellchecker and shows the segment status counts.
+| <a id="E1419"></a>E1419  | Plug-In SpellCheck | SpellCheck overall run done - {segmentCounts} | Reports that the whole task was checked with the spellchecker and shows the segment status counts.
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number

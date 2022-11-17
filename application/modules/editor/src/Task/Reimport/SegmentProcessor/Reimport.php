@@ -194,7 +194,7 @@ class Reimport extends editor_Models_Import_SegmentProcessor
 
     /**
      * Log reimport process information and errors
-     * 
+     *
      * @return void
      * @throws JsonException
      */
@@ -228,9 +228,6 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     private function logUpdated(): void
     {
-        if( empty($this->updatedSegments)){
-            return;
-        }
         $this->logger->info('E1440','File reimport finished.',[
             'task' => $this->task,
             'fileId' => $this->fileId,

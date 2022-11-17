@@ -28,12 +28,5 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.task.reimport.ReimportWindowViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminTaskReimportReimport',
-
-    formulas: {
-        isImportButtonDisabled: function(get){
-            console.log(get);
-            return get('leaf');
-        }
-    }
+    alias: 'viewmodel.adminTaskReimportReimport'
 });
