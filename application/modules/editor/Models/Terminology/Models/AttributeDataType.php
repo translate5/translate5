@@ -80,14 +80,19 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
 
         $locale = (new Zend_Session_Namespace('user'))->data->locale;
         $labels = $this->db->getAdapter()->query('
-            SELECT `id`,`l10nSystem` FROM `terms_attributes_datatype`
-        ')->fetchAll(PDO::FETCH_KEY_PAIR);
-        foreach ($labels as $id => &$json){
-            if(!empty($json)){
-                $json = json_decode($json);
-                $json = $json->$locale;
-            }
-        }
+            SELECT
+              `id`,
+              IF (
+                  JSON_UNQUOTE(JSON_EXTRACT(`l10nCustom`, :lang)) != "",
+                  JSON_UNQUOTE(JSON_EXTRACT(`l10nCustom`, :lang)),
+                  IF (
+                    JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)) != "",
+                    JSON_UNQUOTE(JSON_EXTRACT(`l10nSystem`, :lang)),
+                    `type`
+                  )
+              ) AS `title`
+            FROM `terms_attributes_datatype`
+        ', [':lang' => '$.' . $locale])->fetchAll(PDO::FETCH_KEY_PAIR);
 
         return $labels;
     }

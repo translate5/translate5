@@ -67,6 +67,6 @@ class MaintenanceNotifyCommand extends Translate5AbstractCommand {
 
         $this->writeTitle('maintenance: sending to all connected users:');
         $this->io->write($message);
-        return 0;
+        return self::SUCCESS;
     }
 }

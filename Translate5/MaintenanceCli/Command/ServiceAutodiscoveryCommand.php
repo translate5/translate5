@@ -149,7 +149,7 @@ using the default ports.')
      */
     private function serviceT5memory(): void
     {
-        $url = 'http://t5memory:4040/t5memory';
+        $url = 'http://t5memory:8080/t5memory';
         if (!$this->checkServiceDefault('t5memory', 'T5Memory', $url)) {
             return;
         }
@@ -161,9 +161,9 @@ using the default ports.')
         if (!in_array($url, $servers)) {
             $servers[] = $url;
             $servers = json_encode($servers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            $this->updateConfigInstance($config, $servers);
         }
 
-        $this->updateConfigInstance($config, $servers);
     }
 
     /**
@@ -175,9 +175,11 @@ using the default ports.')
 
         if (! $this->checkServiceDefault('frontendmessagebus', 'FrontEndMessageBus', $internalServer)) {
             $this->pluginmanager->setActive('FrontEndMessageBus', false);
+            $this->io->success('Plug-In FrontEndMessageBus disabled!');
             return;
         }
         $this->pluginmanager->setActive('FrontEndMessageBus');
+        $this->io->success('Plug-In FrontEndMessageBus activated!');
         $config = Zend_Registry::get('config');
         //$config->runtimeOptions.server.name
 
@@ -204,11 +206,11 @@ using the default ports.')
         } else {
             $this->updateConfig(
                 'runtimeOptions.plugins.FrontEndMessageBus.socketServer.port',
-                '9056'
+                '80' //9056 on direct access to the socket server
             );
             $this->updateConfig(
                 'runtimeOptions.plugins.FrontEndMessageBus.socketServer.route',
-                '/translate5'
+                '/ws/translate5' // just /translate5 on direct access to the socket server
             );
             $this->updateConfig(
                 'runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema',
@@ -233,8 +235,10 @@ using the default ports.')
             //runtimeOptions.plugins.Okapi.serverUsed   okapi-longhorn
             $this->updateConfig('runtimeOptions.plugins.Okapi.serverUsed', 'okapi-longhorn');
             $this->pluginmanager->setActive('Okapi');
+            $this->io->success('Plug-In Okapi activated.');
         } else {
             $this->pluginmanager->setActive('Okapi', false);
+            $this->io->success('Plug-In Okapi disabled!');
         }
     }
 
@@ -256,8 +260,10 @@ using the default ports.')
 
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.liveCheckOnEditing', '1');
             $this->pluginmanager->setActive('SpellCheck');
+            $this->io->success('Plug-In SpellCheck activated.');
         } else {
             $this->pluginmanager->setActive('SpellCheck', false);
+            $this->io->success('Plug-In SpellCheck disabled!');
         }
     }
 
@@ -309,6 +315,7 @@ using the default ports.')
             $this->updateConfig('runtimeOptions.termTagger.url.'.$key, $value);
         }
         $this->pluginmanager->setActive('TermTagger', $foundATagger);
+        $this->io->success('Plug-In TermTagger '.($foundATagger ? 'activated.' : 'disabled!'));
     }
 
     /**
@@ -335,7 +342,7 @@ using the default ports.')
     private function updateConfigInstance(editor_Models_Config $config, string $newValue): void
     {
         if (! $this->input->getOption('auto-set')) {
-            $this->printCurrentConfig($config);
+            $this->printCurrentConfig($config, '; discovered value is '.$newValue);
             return;
         }
         if ($config->hasIniEntry()) {

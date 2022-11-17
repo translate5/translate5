@@ -65,6 +65,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     TaskSkeletonfileCommand,
     TermportalReindexCommand,
     TermportalDatatypecheckCommand,
+    TestApplytestsqlCommand,
     TestRunAllCommand,
     TestRunCommand,
     TestRunSuiteCommand,
@@ -118,6 +119,7 @@ if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
+    $commands[] = new TestApplytestsqlCommand();
     $commands[] = new TestRunAllCommand();
     $commands[] = new TestRunCommand();
     $commands[] = new TestRunSuiteCommand();
