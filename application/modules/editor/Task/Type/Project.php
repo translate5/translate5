@@ -36,7 +36,7 @@ class editor_Task_Type_Project extends editor_Task_Type_Abstract {
     protected bool $isProject = true;
     protected bool $isTask = false;
     protected bool $terminologyDisabled = true;
-    protected bool $autoStartAutoQA = true;
+    protected bool $autoStartAutoQA = false;
     protected bool $exportUsage = false;
 
     public function calculateImportTypes(bool $multiTarget, string &$projectType, string &$taskType) {
