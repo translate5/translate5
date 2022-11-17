@@ -81,8 +81,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1297"></a>E1297   | Task Configuration | Unable to load task config. &quot;taskGuid&quot; is not set for this entity. | taskGuid is not set for this entity.
 | <a id="E1298"></a>E1298   | Customer Configuration | Unable to load customer config. &quot;id&quot; is not set for this entity. | id is not set for this entity.
 | <a id="E1299"></a>E1299   | User Configuration | Not allowed to load user config for different user. | The current request to load the user config is not for the currently authenticated user.
-| <a id="E1324"></a>E1324   | Configuration | Updated user GUI state "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
+| <a id="E1324"></a>E1324   | User Configuration | Updated user GUI state "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
 | <a id="E1363"></a>E1363   | Configuration | Configuration value invalid: {errorMsg} | The given configuration value is invalid, check the configuration description or default value to find out what is wrong.
+| <a id="E1436"></a>E1436   | Task Configuration | Updated task-import config value "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
+| <a id="E1437"></a>E1437   | Task Configuration | Updated task config value "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
+| <a id="E1438"></a>E1438  | Customer Configuration | Updated customer config value "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
+| <a id="E1439"></a>E1439  | Configuration | Updated instance config value "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
 
 ### Categories
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -388,6 +392,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1343"></a>E1343  | Quality processing on Task Import or Segment editing | Setting the FieldTags tags by text led to a changed text-content presumably because the encoded tags have been improperly processed | Create a ticket for this issue with the event added.
 | <a id="E1391"></a>E1391  | Quality processing on Task Import or Segment editing | Two non-splittable tags interleave each other. | Create a ticket for this issue with the event added.
 | <a id="E1392"></a>E1392  | Quality processing on Task Import or Segment editing | SNC lib (which stands behind AutoQA Numbers Check) detected an error of a kind previously unknown to translate5 app | Create a ticket for this issue with the event added.
+| <a id="E1432"></a>E1432  | Quality processing on Task Import    | AutoQA-step of the import process - is deactivated | Check 'runtimeOptions.autoQA.autoStartOnImport' config option
 
 
 ### Excel Ex-Import

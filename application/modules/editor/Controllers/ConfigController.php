@@ -126,6 +126,7 @@ class editor_ConfigController extends ZfExtended_RestController {
         $this->checkConfigUpdateAllowed($level);
         $row = [];
         $logMessage = '';
+        $eventCode = '';
         $logData = [];
         switch ($level) {
             case $this->entity::CONFIG_LEVEL_USER:
@@ -138,7 +139,8 @@ class editor_ConfigController extends ZfExtended_RestController {
 
                 $row['userGuid'] = $userGuid;
                 
-                $logMessage='Updated user GUI state "{name}" to "{value}" . Old value was:"{oldValue}"';
+                $logMessage ='Updated user GUI state "{name}" to "{value}" . Old value was:"{oldValue}"';
+                $eventCode = 'E1324';
                 $logData = [
                     'userGuid' => $userGuid
                 ];
@@ -169,7 +171,8 @@ class editor_ConfigController extends ZfExtended_RestController {
                 $this->entity->setValue($value);
                 
                 $row['taskGuid'] = $taskGuid;
-                $logMessage='Updated task'.($task->isImporting() ? '-import' : '').' config value "{name}" to "{value}" . Old value was:"{oldValue}" ';
+                $logMessage='Updated task'.($task->isImporting() ? '-import' : '').' config value "{name}" to "{value}" . Old value was:"{oldValue}"';
+                $eventCode = $task->isImporting() ? 'E1436' : 'E1437';
                 $logData = [
                     'taskGuid' => $taskGuid
                 ];
@@ -184,7 +187,8 @@ class editor_ConfigController extends ZfExtended_RestController {
                 
                 $row['customerId'] = $customerId;
                 
-                $logMessage='Updated customer config value "{name}" to "{value}" . Old value was:"{oldValue}" ';
+                $logMessage='Updated customer config value "{name}" to "{value}" . Old value was:"{oldValue}"';
+                $eventCode = 'E1438';
                 $logData = [
                     'customerId' => $customerId
                 ];
@@ -194,7 +198,8 @@ class editor_ConfigController extends ZfExtended_RestController {
                 //update system config
                 $this->entity->setValue($value);
                 $this->entity->save();
-                $logMessage = 'Updated instance config value "{name}" to "{value}" . Old value was:"{oldValue}" ';
+                $logMessage = 'Updated instance config value "{name}" to "{value}" . Old value was:"{oldValue}"';
+                $eventCode = 'E1439';
                 break;
             default:
                 break;
@@ -202,7 +207,7 @@ class editor_ConfigController extends ZfExtended_RestController {
 
         //log the change if there is one
         if(!empty($logMessage)){
-            $this->log->info('E1324',$logMessage,
+            $this->log->info($eventCode,$logMessage,
                 array_merge([
                     'name' => $this->data->name,
                     'value' => $value,
