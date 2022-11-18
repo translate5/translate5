@@ -188,12 +188,12 @@ using the default ports.')
         $internalServer = 'http://' . $host . ':9057';
 
         if (!$this->checkServiceDefault($host, 'FrontEndMessageBus', $internalServer)) {
-            $this->pluginmanager->setActive('FrontEndMessageBus', false);
-            $this->io->success('Plug-In FrontEndMessageBus disabled!');
+            $this->setPluginActive('FrontEndMessageBus', false);
             return;
         }
-        $this->pluginmanager->setActive('FrontEndMessageBus');
-        $this->io->success('Plug-In FrontEndMessageBus activated!');
+
+        $this->setPluginActive('FrontEndMessageBus');
+
         $config = Zend_Registry::get('config');
         //$config->runtimeOptions.server.name
 
@@ -251,11 +251,9 @@ using the default ports.')
 
             //runtimeOptions.plugins.Okapi.serverUsed   okapi-longhorn
             $this->updateConfig('runtimeOptions.plugins.Okapi.serverUsed', 'okapi-longhorn');
-            $this->pluginmanager->setActive('Okapi');
-            $this->io->success('Plug-In Okapi activated.');
+            $this->setPluginActive('Okapi');
         } else {
-            $this->pluginmanager->setActive('Okapi', false);
-            $this->io->success('Plug-In Okapi disabled!');
+            $this->setPluginActive('Okapi', false);
         }
     }
 
@@ -278,11 +276,9 @@ using the default ports.')
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.import', '["' . $url . '"]');
 
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.liveCheckOnEditing', '1');
-            $this->pluginmanager->setActive('SpellCheck');
-            $this->io->success('Plug-In SpellCheck activated.');
+            $this->setPluginActive('SpellCheck');
         } else {
-            $this->pluginmanager->setActive('SpellCheck', false);
-            $this->io->success('Plug-In SpellCheck disabled!');
+            $this->setPluginActive('SpellCheck', false);
         }
     }
 
@@ -335,8 +331,7 @@ using the default ports.')
             $foundATagger = true;
             $this->updateConfig('runtimeOptions.termTagger.url.' . $key, $value);
         }
-        $this->pluginmanager->setActive('TermTagger', $foundATagger);
-        $this->io->success('Plug-In TermTagger '.($foundATagger ? 'activated.' : 'disabled!'));
+        $this->setPluginActive('TermTagger', $foundATagger);
     }
 
     private function servicePdfconverter(): void
@@ -376,6 +371,25 @@ using the default ports.')
     }
 
     /**
+     * En-/Disables a plugin (if auto-set is set)
+     * @param string $plugin
+     * @param bool $active
+     * @return void
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    private function setPluginActive(string $plugin, bool $active = true) {
+        if ($this->input->getOption('auto-set')) {
+            $this->pluginmanager->setActive($plugin, $active);
+            $this->io->success('Plug-In '.$plugin.' '.($active ? 'activated.' : 'disabled!'));
+        }
+        else {
+            $this->io->writeln('Would '.($active ? 'activate.' : 'disable').' Plug-In '.$plugin);
+        }
+    }
+
+    /**
      * Updates the config model instance and prints info about it
      * @param editor_Models_Config $config
      * @param string $newValue
@@ -398,7 +412,7 @@ using the default ports.')
         }
         $config->setValue($newValue);
         $config->save();
-        $this->io->success($config->getName() . ' set to ' . $newValue);
+        $this->io->writeln($config->getName() . ' set to ' . $newValue);
     }
 
     /**
