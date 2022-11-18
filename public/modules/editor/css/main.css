@@ -967,3 +967,32 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 .t5alikeGrid .x-grid-rowbody div:nth-child(2),
 .t5alikeGrid .x-grid-rowbody div:nth-child(4) {width: 307px;}
 .t5alikeGrid .x-grid-rowbody div:nth-child(3) {width: 49px;}
+
+.x-fieldset.segmentQualities {
+    background: none;
+}
+.x-fieldset.segmentQualities > legend {
+    padding: 0 4px;
+    margin-left: 16px;
+    margin-bottom: -4px;
+}
+.x-fieldset.segmentQualities .x-grid .x-column-header[id^=checkcolumn] .x-column-header-inner {
+    padding-right: 6px;
+    padding-left: 6px;
+}
+.x-column-header[id^=checkcolumn] .x-column-header-inner[data-qtip] .x-column-header-text-container {
+    border-bottom: 1px dotted;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner {
+    padding: 0 10px 1px;
+    line-height: 0;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:first-child {
+    line-height: 15px;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2) {
+    line-height: initial;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):before {
+    content: '» ';
+}

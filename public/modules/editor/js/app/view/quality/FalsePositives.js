@@ -34,11 +34,13 @@ Ext.define('Editor.view.quality.FalsePositives', {
     alias: 'widget.falsePositives',
     title: "#UT#Falsch erkannte Fehler",
     requires: [
-        'Editor.view.quality.FalsePositivesController'        
+        'Editor.view.quality.FalsePositivesController',
+        'Ext.grid.column.Check'
     ],
     controller: 'falsePositives',
     cls: 'segmentQualities',
     defaultType: 'checkbox',
+    padding: 0,
     hidden: true,
     isActive: false,
     initConfig: function(instanceConfig) {
@@ -75,15 +77,56 @@ Ext.define('Editor.view.quality.FalsePositives', {
      * Creates our GUI
      */
     createCheckboxes: function(records){
-        var added = false;
+        var data = [];
         this.removeAll();
         Ext.each(records, function(record){
             if(record.get('falsifiable')){
-                this.addCheckbox(record);
-                added = true;
+                data.push(record);
             }
         }, this);
-        if(added){
+        this.add({
+            xtype: 'grid',
+            //hideHeaders: true,
+            border: 0,
+            height: 35 + 34 * data.length,
+            store: {
+                type: 'json',
+                data: data
+            },
+            columns: [{
+                text: 'FP',
+                width: 30,
+                tooltip: 'False positive',
+                xtype: 'checkcolumn',
+                menuDisabled: true,
+                dataIndex: 'falsePositive'
+            }, {
+                text: 'Quality',
+                flex: 1,
+                menuDisabled: true,
+                dataIndex: 'text',
+                renderer: function(value, meta, record){
+                    meta.tdCls += ' quality';
+                    return '<div>' + record.get('typeText') + '</div><div>' + value + '</div>';
+                }
+            }, {
+                text: 'Content',
+                flex: 1,
+                menuDisabled: true,
+                dataIndex: 'content'
+            }, {
+                text: 'HS',
+                width: 30,
+                tooltip: 'Has similar false positives',
+                xtype: 'checkcolumn',
+                dataIndex: 'hasSimilar',
+                menuDisabled: true,
+                cell: {
+                    disabled: true
+                }
+            }]
+        });
+        if(data.length){
             this.show();
         } else {
             this.endEditing(true, false);
