@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tools\CronIpFactory;
+
 /**
  * Cron Controller
  * This controller provides methods to be called regularly.
@@ -46,12 +48,12 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
      * @see ZfExtended_Controllers_Action::init()
      */
     public function init() {
-        $config = Zend_Registry::get('config');
-        if($config->runtimeOptions->cronIP !== $_SERVER['REMOTE_ADDR']) {
+        $cronIp = CronIpFactory::create();
+        if(!$cronIp->isAllowed($_SERVER['REMOTE_ADDR'])) {
             $msg = "wrong IP to call cronjobs, must be the configured one.\n";
             http_response_code(503);
             echo $msg;
-            error_log($msg.' called by: '.$_SERVER['REMOTE_ADDR'].' allowed is: '.$config->runtimeOptions->cronIP);
+            error_log($msg.' called by: '.$_SERVER['REMOTE_ADDR'].' allowed are: ' . implode(', ', $cronIp->getAllowedIps()));
             exit;
         }
     }

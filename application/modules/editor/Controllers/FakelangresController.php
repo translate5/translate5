@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tools\CronIpFactory;
+
 /**
  */
 class Editor_FakelangresController extends ZfExtended_Controllers_Action {
@@ -34,8 +36,8 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
      * @see ZfExtended_Controllers_Action::init()
      */
     public function init() {
-        $config = Zend_Registry::get('config');
-        if($config->runtimeOptions->cronIP !== $_SERVER['REMOTE_ADDR']) {
+        $cronIp = CronIpFactory::create();
+        if(!$cronIp->isAllowed($_SERVER['REMOTE_ADDR'])) {
             throw new ZfExtended_Models_Entity_NoAccessException('Wrong IP to call fake language resources! Configure cronIP accordingly!');
         }
         $this->_helper->layout->disableLayout();
