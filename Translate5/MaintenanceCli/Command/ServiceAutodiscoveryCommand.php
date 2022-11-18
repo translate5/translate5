@@ -347,9 +347,9 @@ using the default ports.')
 
     private function serviceVisualbrowser(): void
     {
-        $url = 'ws://' . $this->getHost('headless.chrome') . ':3000';
+        $url = 'ws://' . $this->getHost('visualbrowser') . ':3000';
 
-        if (!$this->checkServiceDefault('headless.chrome', 'Headless Chrome browser', $url)) {
+        if (!$this->checkServiceDefault('visualbrowser', 'Headless Chrome browser', $url)) {
             return;
         }
 
