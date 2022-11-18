@@ -80,7 +80,7 @@ class Translate2551Test extends editor_Test_JsonTest {
             'fileId' => $files->id
         ], null, false, true);
 
-        static::api()->reloadTask();
+        static::api()->reloadTaskUntilOpen();
 
         self::api()->setTaskToEdit();
         $segmentsActual = static::api()->getSegmentsWithBasicData();

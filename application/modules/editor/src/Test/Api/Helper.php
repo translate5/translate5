@@ -311,6 +311,23 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     }
 
     /***
+     * Reload the current task until the task state is open. This can be used for checking if some task operations are
+     * finished. ex: task reimport
+     * @return void
+     */
+    public function reloadTaskUntilOpen(): void
+    {
+        $task = $this->reloadTask();
+        $reloadCount = 0;
+        while ($task->state !== 'open' && self::RELOAD_TASK_LIMIT > $reloadCount){
+            $task = $this->reloadTask();
+            error_log('Task state is: '.$task->state);
+            sleep(3);
+            $reloadCount++;
+        }
+    }
+
+    /***
      * Reload the tasks of the current project
      * @return mixed|boolean
      */
