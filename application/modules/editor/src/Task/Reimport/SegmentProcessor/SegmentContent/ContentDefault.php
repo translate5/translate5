@@ -85,7 +85,7 @@ class ContentDefault extends ContentBase
         $this->segment->setAutoStateId($segmentAutoState);
 
         $this->segmentUpdater->setSaveTimestamp($segmentSaveTimestamp);
-        $this->segmentUpdater->update($this->segment, $history);
+        $this->segmentUpdater->updateForReimport($this->segment, $history);
     }
 
     /**

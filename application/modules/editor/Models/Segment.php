@@ -1945,15 +1945,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns true if at least one target has a translation set
+     * @return bool
      */
-    public function isTargetTranslated()
+    public function isTargetTranslated(): bool
     {
         foreach ($this->segmentdata as $name => $data) {
             $field = $this->segmentFieldManager->getByName($name);
             if ($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
                 continue;
             }
-            if (!(empty($data['original']) && $data['original'] !== "0")) {
+            if (!ZfExtended_Utils::emptySegment($data['original'])) {
                 return true;
             }
         }

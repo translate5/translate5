@@ -67,72 +67,121 @@ class editor_Models_Segment_Updater {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
         $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
     }
-    
+
     /**
      * Updates the segment with all dependencies
      * @param editor_Models_Segment $segment
-     * @throws editor_Models_Segment_UnprocessableException | ZfExtended_ValidateException
+     * @param editor_Models_SegmentHistory $history
+     * @throws ZfExtended_ValidateException
+     * @throws editor_Models_ConfigException
+     * @throws editor_Models_Segment_Exception
      */
-    public function update(editor_Models_Segment $segment, editor_Models_SegmentHistory $history) {
+    public function update(editor_Models_Segment $segment, editor_Models_SegmentHistory $history): void
+    {
         $this->segment = $segment;
         $this->segment->setConfig($this->task->getConfig());
-        
-        $allowedAlternatesToChange = $this->segment->getEditableDataIndexList();
-        $updateSearchAndSort = array_intersect(array_keys($this->segment->getModifiedValues()), $allowedAlternatesToChange);
-        
-//HERE sanitizeEditedContent check (ob aufgerufen!)
-// Sinnvoll, ja nein? selbes Problem mit dem ENT_XML1 stuff, bei replace all und excel nötig. Wie ists mit der Pretranslation?
-// Wie ist das mit den TMs und en ENT_XML1??
 
-        foreach($updateSearchAndSort as $field) {
-            $this->segment->updateToSort($field);
-        }
-        
-        //if no content changed, restore the original content (which contains terms, so segment may not be retagged)
-        $this->segment->restoreNotModfied();
         $oldHash = $this->segment->getTargetMd5();
-        //@todo do this with events
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        $workflow = $wfm->getActive($this->segment->getTaskGuid());
 
-        $segmentHandler = $workflow->getSegmentHandler();
-        $segmentHandler->updateUserGuid($this->userGuid);
-        $segmentHandler->beforeSegmentSave($this->segment, $this->task);
-        
-        $this->segment->validate();
-        
+        $this->beforeSegmentUpdate($history);
+
+        $this->segment->save();
+
+        $this->afterSegmentUpdate($history,$oldHash);
+    }
+
+    /***
+     * Segment update function used when file is reimported into a task. In compare to the original update function,
+     * this excludes the language resources tm update.
+     *
+     * @param editor_Models_Segment $segment
+     * @param editor_Models_SegmentHistory $history
+     * @return void
+     * @throws ZfExtended_ValidateException
+     * @throws editor_Models_ConfigException
+     * @throws editor_Models_Segment_Exception
+     */
+    public function updateForReimport(editor_Models_Segment $segment, editor_Models_SegmentHistory $history): void
+    {
+        $this->segment = $segment;
+        $this->segment->setConfig($this->task->getConfig());
+
+        $oldHash = $this->segment->getTargetMd5();
+
+        $this->beforeSegmentUpdate($history);
+
+        $this->segment->save();
+
+        $this->segment->updateIsTargetRepeated($this->segment->getTargetMd5(), $oldHash);
+
+        //update the segment finish count for the current workflow step
+        $this->task->changeSegmentFinishCount($this->task, $this->segment->getAutoStateId(), $history->getAutoStateId());
+
+        $this->qaAfterSegmentSaveOnSegmentUpdate();
+    }
+
+    /**
+     * Required method calls after the segment is saved on segment update
+     * @param string $oldSegmentHash
+     * @param editor_Models_SegmentHistory $history
+     * @return void
+     */
+    protected function afterSegmentUpdate(editor_Models_SegmentHistory $history,string $oldSegmentHash,): void
+    {
+        $this->segment->updateIsTargetRepeated($this->segment->getTargetMd5(), $oldSegmentHash);
+
+        //call after segment put handler
+        $this->updateLanguageResources();
+
+        //update the segment finish count for the current workflow step
+        $this->task->changeSegmentFinishCount($this->task, $this->segment->getAutoStateId(), $history->getAutoStateId());
+
+        $this->qaAfterSegmentSaveOnSegmentUpdate();
+    }
+
+    /**
+     * Required method calls before the segment is saved on segment update
+     * @throws ZfExtended_ValidateException
+     */
+    protected function beforeSegmentUpdate(editor_Models_SegmentHistory $history): void
+    {
+
+        $this->updateToSort();
+
+        $this->handleWorkflowOnUpdate();
+
         $this->updateTargetHashAndOriginal();
 
         $this->updateMatchRateType();
 
-        // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
-        // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is saved,
-        // so that it would be possible to do the same AFTER segment is saved, calculate the difference and insert/delete
-        // qualities on segments where needed
-        editor_Segment_Quality_Manager::instance()->preProcessTask($this->task, editor_Segment_Processing::EDIT);
-
-        // Update the Quality Tags
-        editor_Segment_Quality_Manager::instance()->processSegment($this->segment, $this->task, editor_Segment_Processing::EDIT);
+        $this->qaBeforeSegmentSaveOnSegmentUpdate();
 
         //saving history directly before normal saving,
         // so no exception between can lead to history entries without changing the master segment
         $history->save();
 
-        if( !isset($this->saveTimestamp)){
-            $this->saveTimestamp = NOW_ISO;
+        $this->setTimestampOnSegmentUpdate();
+    }
+
+    /**
+     * Update toSort fields on segment update
+     * @return void
+     */
+    private function updateToSort(): void
+    {
+        $allowedAlternatesToChange = $this->segment->getEditableDataIndexList();
+        $updateSearchAndSort = array_intersect(array_keys($this->segment->getModifiedValues()), $allowedAlternatesToChange);
+
+        //HERE sanitizeEditedContent check (ob aufgerufen!)
+        // Sinnvoll, ja nein? selbes Problem mit dem ENT_XML1 stuff, bei replace all und excel nötig. Wie ists mit der Pretranslation?
+        // Wie ist das mit den TMs und en ENT_XML1??
+
+        foreach($updateSearchAndSort as $field) {
+            $this->segment->updateToSort($field);
         }
-        $this->segment->setTimestamp($this->saveTimestamp); //see TRANSLATE-922
-        $this->segment->save();
-        $this->segment->updateIsTargetRepeated($this->segment->getTargetMd5(), $oldHash);
-        //call after segment put handler
-        $this->updateLanguageResources();
 
-        //update the segment finish count for the current workflow step
-        $this->task->changeSegmentFinishCount($this->task, $segment->getAutoStateId(), $history->getAutoStateId());
-
-        // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
-        editor_Segment_Quality_Manager::instance()->postProcessTask($this->task, editor_Segment_Processing::EDIT);
+        //if no content changed, restore the original content (which contains terms, so segment may not be re-tagged)
+        $this->segment->restoreNotModfied();
     }
     
     /**
@@ -273,4 +322,62 @@ class editor_Models_Segment_Updater {
     {
         $this->saveTimestamp = $saveTimestamp;
     }
+
+    /**
+     * @return void
+     * @throws ZfExtended_ValidateException
+     */
+    private function handleWorkflowOnUpdate(): void
+    {
+        //@todo do this with events
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflow = $wfm->getActive($this->segment->getTaskGuid());
+
+        $segmentHandler = $workflow->getSegmentHandler();
+        $segmentHandler->updateUserGuid($this->userGuid);
+        $segmentHandler->beforeSegmentSave($this->segment, $this->task);
+
+        $this->segment->validate();
+    }
+
+    /**
+     * Necessary quality function calls on segment update before the segment is saved
+     * @return void
+     */
+    private function qaBeforeSegmentSaveOnSegmentUpdate(): void
+    {
+        // Do preparations for cases when we need full list of task's segments to be analysed for quality detection
+        // Currently it is used only for consistency-check to detect consistency qualities BEFORE segment is saved,
+        // so that it would be possible to do the same AFTER segment is saved, calculate the difference and insert/delete
+        // qualities on segments where needed
+        editor_Segment_Quality_Manager::instance()->preProcessTask($this->task, editor_Segment_Processing::EDIT);
+
+        // Update the Quality Tags
+        editor_Segment_Quality_Manager::instance()->processSegment($this->segment, $this->task, editor_Segment_Processing::EDIT);
+    }
+
+    /**
+     * Necessary quality function calls on segment update after the segment is saved
+     * @return void
+     */
+    private function qaAfterSegmentSaveOnSegmentUpdate(): void
+    {
+        // Update qualities for cases when we need full list of task's segments to be analysed for quality detection
+        editor_Segment_Quality_Manager::instance()->postProcessTask($this->task, editor_Segment_Processing::EDIT);
+    }
+
+    /***
+     * Set the segment timestamp from property or default when the property is not set
+     * @return void
+     */
+    private function setTimestampOnSegmentUpdate(): void
+    {
+        if (!isset($this->saveTimestamp)) {
+            $this->saveTimestamp = NOW_ISO;
+        }
+        $this->segment->setTimestamp($this->saveTimestamp); //see TRANSLATE-922
+    }
+
+
 }

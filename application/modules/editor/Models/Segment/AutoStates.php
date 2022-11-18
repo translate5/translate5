@@ -443,6 +443,10 @@ class editor_Models_Segment_AutoStates {
             return self::LOCKED;
         }
 
+        if( !$segment->isTargetTranslated()){
+            return self::NOT_TRANSLATED;
+        }
+
         if($tua->getRole() == $workflow::ROLE_TRANSLATOR) {
             return self::TRANSLATED;
         }
