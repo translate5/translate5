@@ -982,6 +982,7 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 }
 .x-column-header[id^=checkcolumn] .x-column-header-inner[data-qtip] .x-column-header-text-container {
     border-bottom: 1px dotted;
+    pointer-events: all;
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner {
     padding: 0 10px 1px;
@@ -994,5 +995,8 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     line-height: initial;
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):before {
-    content: '» ';
+    content: '- ';
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):after {
+    content: ' -';
 }

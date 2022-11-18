@@ -88,7 +88,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
             xtype: 'grid',
             //hideHeaders: true,
             border: 0,
-            height: 35 + 34 * data.length,
+            height: 35 + 36 * data.length,
             store: {
                 type: 'json',
                 data: data
@@ -107,13 +107,8 @@ Ext.define('Editor.view.quality.FalsePositives', {
                 dataIndex: 'text',
                 renderer: function(value, meta, record){
                     meta.tdCls += ' quality';
-                    return '<div>' + record.get('typeText') + '</div><div>' + value + '</div>';
+                    return '<div>' + record.get('typeText') + ' » ' + value + '</div><div>' + record.get('content') + '</div>';
                 }
-            }, {
-                text: 'Content',
-                flex: 1,
-                menuDisabled: true,
-                dataIndex: 'content'
             }, {
                 text: 'HS',
                 width: 30,
@@ -121,9 +116,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
                 xtype: 'checkcolumn',
                 dataIndex: 'hasSimilar',
                 menuDisabled: true,
-                cell: {
-                    disabled: true
-                }
+                disabled: true
             }]
         });
         if(data.length){
