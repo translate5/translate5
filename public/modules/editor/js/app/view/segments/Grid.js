@@ -413,6 +413,9 @@ Ext.define('Editor.view.segments.Grid', {
         if(rowindex < 0) {
             return;
         }
+        if(!config){
+            config = {};
+        }
         var me = this,
             options = {
                 animate: false, //may not be animated, to place the callback at the correct place 
@@ -559,7 +562,7 @@ Ext.define('Editor.view.segments.Grid', {
         if(segmentIndex >= 0) {
             me.scrollTo(segmentIndex, segIsInFocusConfig);
         } else {
-            me.searchPosition(segmentNrInTask, failureEventName).then(function scrollTo(index) {
+            me.searchPosition(segmentNrInTask, failureEventName).then(function(index) {
                 me.scrollTo(index, segIsInFocusConfig);
             });
         }

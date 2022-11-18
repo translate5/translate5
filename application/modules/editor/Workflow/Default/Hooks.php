@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tools\CronIpFactory;
+
 /**
  * Hook In functions for the Default Workflow.
  */
@@ -147,13 +149,13 @@ class editor_Workflow_Default_Hooks {
         }
         $auth = ZfExtended_Authentication::getInstance();
         $this->authenticatedUser = $auth->getUser();
-        $config = Zend_Registry::get('config');
-        $isCron = $config->runtimeOptions->cronIP === ($_SERVER['REMOTE_ADDR'] ?? null);
+
+        $cronIp = CronIpFactory::create();
         $isWorker = defined('ZFEXTENDED_IS_WORKER_THREAD');
 
         if(is_null($this->authenticatedUser)){
             //if cron or worker set session user data with system user
-            if(($isCron || $isWorker) && $auth->authenticateByLogin(ZfExtended_Models_User::SYSTEM_LOGIN)) {
+            if(($cronIp->isAllowed($_SERVER['REMOTE_ADDR'] ?? null) || $isWorker) && $auth->authenticateByLogin(ZfExtended_Models_User::SYSTEM_LOGIN)) {
                 $this->authenticatedUser = $auth->getUser();
             }
             else {

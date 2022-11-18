@@ -39,5 +39,8 @@
       <file>editorAPI/XlfSegmentLinesPixelLengthTest.php</file>
       <file>editorAPI/XlfSegmentPixelLengthTest.php</file>
     </testsuite>
+    <testsuite name="unit">
+      <directory>Unit</directory>
+    </testsuite>
   </testsuites>
 </phpunit>
