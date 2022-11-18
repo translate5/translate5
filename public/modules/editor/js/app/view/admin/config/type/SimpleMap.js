@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -41,59 +40,55 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
 
     record: null,
 
-    strings: {
-        title: 'Edit the config values',
-        index: 'Index',
-        value: 'Value',
-        add: 'add',
-        save: 'Save',
-        cancel: 'Cancel',
-        remove: 'remove'
-    },
     /**
      * This statics must be implemented in classes used as custom config editors
      */
     statics: {
-        getConfigEditor: function(record) {
+        getConfigEditor: function (record) {
             var win = new this({record: record});
             win.show();
 
             //prevent cell editing:
             return null;
         },
-        renderer: function(value) {
+        renderer: function (value) {
             var res = [];
-            Ext.Object.each(value, function(key, item){
+            Ext.Object.each(value, function (key, item) {
                 item = item.toString();
-                if(key === item) {
+                if (key === item) {
                     res.push(item);
-                }
-                else {
-                    res.push(key+'-'+item);
+                } else {
+                    res.push(key + '-' + item);
                 }
             });
             return res.join('; ');
         }
     },
-    initConfig: function(instanceConfig) {
+    initConfig: function (instanceConfig) {
         var me = this,
             data = [], config;
 
-        Ext.Object.each(instanceConfig.record.get('value'), function(key, value) {
+        Ext.Object.each(instanceConfig.record.get('value'), function (key, value) {
             data.push([key, value]);
         });
         config = {
-            title: me.strings.title,
+            bind: {
+                title: '{l10n.configuration.title}',
+            },
             height: 600,
             modal: true,
             width: 400,
             layout: 'fit',
             bbar: ['->', {
-                text: me.strings.save,
+                bind: {
+                    text: '{l10n.configuration.save}',
+                },
                 glyph: 'f00c@FontAwesome5FreeSolid',
                 handler: 'onSave'
-            },{
-                text: me.strings.cancel,
+            }, {
+                bind: {
+                    text: '{l10n.configuration.cancel}',
+                },
                 glyph: 'f00d@FontAwesome5FreeSolid',
                 handler: 'onCancel'
             }],
@@ -107,24 +102,32 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
                 border: false,
                 tbar: [{
                     type: 'button',
-                    text: me.strings.add,
+                    bind: {
+                        text: '{l10n.configuration.add}',
+                    },
                     glyph: 'f067@FontAwesome5FreeSolid',
                     handler: 'onAdd'
-                },{
+                }, {
                     type: 'button',
-                    text: me.strings.remove,
+                    bind: {
+                        text: '{l10n.configuration.remove}',
+                    },
                     glyph: 'f2ed@FontAwesome5FreeSolid',
                     handler: 'onRemove'
                 }],
                 columns: [{
-                    header: me.strings.index,
+                    bind: {
+                        text: '{l10n.configuration.index}',
+                    },
                     dataIndex: 'index',
                     editor: {
                         xtype: 'textfield',
                         itemId: 'index'
                     }
-                },{
-                    header: me.strings.value,
+                }, {
+                    bind: {
+                        text: '{l10n.configuration.value}',
+                    },
                     dataIndex: 'value',
                     editor: {
                         xtype: 'textfield',
@@ -145,7 +148,7 @@ Ext.define('Editor.view.admin.config.type.SimpleMap', {
             }
         };
         if (instanceConfig) {
-            config=me.self.getConfigurator().merge(me, config, instanceConfig);
+            config = me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
     }

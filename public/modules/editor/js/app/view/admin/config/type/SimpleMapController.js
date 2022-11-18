@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -40,45 +39,47 @@ Ext.define('Editor.view.admin.config.type.SimpleMapController', {
     /**
      * get the record
      */
-    init: function() {
+    init: function () {
         this.record = this.getView().initialConfig.record;
     },
 
     /**
      * on save button click
      */
-    onSave: function() {
+    onSave: function () {
         var win = this.getView(),
             grid = win.down('grid'),
             newValue = {},
             confRec = this.record;
 
-        grid.store.each(function(rec) {
+        grid.store.each(function (rec) {
             newValue[rec.get('index')] = rec.get('value');
         });
         confRec.set('value', newValue);
         win.setLoading('saving...');
         confRec.save({
-            success: function() {
+            success: function () {
                 win.setLoading(false);
                 win.close();
             },
-            failure: function() {
+            failure: function () {
                 win.setLoading(false);
             }
         });
     },
+
     /**
      * on cancel click button
      */
-    onCancel: function() {
+    onCancel: function () {
         this.record.reject();
         this.getView().close();
     },
+
     /**
      * on remove click button
      */
-    onRemove: function() {
+    onRemove: function () {
         var win = this.getView(),
             grid = win.down('grid'),
             selMod = grid.getSelectionModel();
@@ -91,14 +92,15 @@ Ext.define('Editor.view.admin.config.type.SimpleMapController', {
             selMod.select(0);
         }
     },
+
     /**
      * on add click
      */
-    onAdd: function() {
+    onAdd: function () {
         var win = this.getView(),
             grid = win.down('grid'),
             rec;
-        
+
         rec = grid.store.insert(0, {
             index: '',
             value: ''
