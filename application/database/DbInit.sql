@@ -4215,18 +4215,18 @@ INSERT INTO `Zf_acl_rules` VALUES
 (147,'editor','termProposer','termCustomerSearch','all'),
 (325,'editor','termReviewer','auto_set_role','termCustomerSearch'),
 (326,'editor','termReviewer','editor_attribute','put'),
-(419,'instantTranslate','editor','editor_languageresourcetaskpivotassoc','post'),
-(426,'instantTranslate','editor','editor_languageresourcetaskpivotassoc','pretranslationOperation'),
-(420,'pm','editor','editor_languageresourcetaskpivotassoc','all'),
-(427,'pm','editor','editor_languageresourcetaskpivotassoc','pretranslationOperation'),
-(421,'pm','editor','frontend','languageResourcesTaskPivotAssoc'),
-(422,'pmlight','editor','editor_languageresourcetaskpivotassoc','all'),
-(428,'pmlight','editor','editor_languageresourcetaskpivotassoc','pretranslationOperation'),
-(423,'pmlight','editor','frontend','languageResourcesTaskPivotAssoc'),
-(424,'termPM','editor','editor_languageresourcetaskpivotassoc','post'),
-(429,'termPM','editor','editor_languageresourcetaskpivotassoc','pretranslationOperation'),
-(425,'termPM_allClients','editor','editor_languageresourcetaskpivotassoc','post'),
-(430,'termPM_allClients','editor','editor_languageresourcetaskpivotassoc','pretranslationOperation');
+(419,'editor','instantTranslate','editor_languageresourcetaskpivotassoc','post'),
+(426,'editor','instantTranslate','editor_languageresourcetaskpivotassoc','pretranslationOperation'),
+(420,'editor','pm','editor_languageresourcetaskpivotassoc','all'),
+(427,'editor','pm','editor_languageresourcetaskpivotassoc','pretranslationOperation'),
+(421,'editor','pm','frontend','languageResourcesTaskPivotAssoc'),
+(422,'editor','pmlight','editor_languageresourcetaskpivotassoc','all'),
+(428,'editor','pmlight','editor_languageresourcetaskpivotassoc','pretranslationOperation'),
+(423,'editor','pmlight','frontend','languageResourcesTaskPivotAssoc'),
+(424,'editor','termPM','editor_languageresourcetaskpivotassoc','post'),
+(429,'editor','termPM','editor_languageresourcetaskpivotassoc','pretranslationOperation'),
+(425,'editor','termPM_allClients','editor_languageresourcetaskpivotassoc','post'),
+(430,'editor','termPM_allClients','editor_languageresourcetaskpivotassoc','pretranslationOperation');
 
 --
 -- Table structure for table `Zf_configuration`

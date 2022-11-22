@@ -959,11 +959,11 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     content: "\f0b0" !important;
 }
 .t5alikeGrid .x-grid-rowbody {padding: 0; display: table-row;}
-.t5alikeGrid .x-grid-rowbody span {
+.t5alikeGrid .x-grid-rowbody div {
     display: table-cell;
     font-style: italic;
 }
-.t5alikeGrid .x-grid-rowbody span:first-child {width: 110px;}
-.t5alikeGrid .x-grid-rowbody span:nth-child(2),
-.t5alikeGrid .x-grid-rowbody span:nth-child(4) {width: 307px;}
-.t5alikeGrid .x-grid-rowbody span:nth-child(3) {width: 49px;}
+.t5alikeGrid .x-grid-rowbody div:first-child {width: 110px;}
+.t5alikeGrid .x-grid-rowbody div:nth-child(2),
+.t5alikeGrid .x-grid-rowbody div:nth-child(4) {width: 307px;}
+.t5alikeGrid .x-grid-rowbody div:nth-child(3) {width: 49px;}

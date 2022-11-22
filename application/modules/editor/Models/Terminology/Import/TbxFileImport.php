@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Collect the terms and the terms attributes from the tbx file and save them to the database
  */
+use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAttributeDataType;
 class editor_Models_Terminology_Import_TbxFileImport
 {
     const TBX_TIG = 'tig';
@@ -212,8 +213,8 @@ class editor_Models_Terminology_Import_TbxFileImport
 
         $this->logUnknownLanguages();
 
-        $dataTypeAssoc = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
-        /* @var $dataTypeAssoc editor_Models_Terminology_Models_CollectionAttributeDataType */
+        $dataTypeAssoc = ZfExtended_Factory::get(CollectionAttributeDataType::class);
+        /* @var $dataTypeAssoc CollectionAttributeDataType */
         // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
         $dataTypeAssoc->updateCollectionAttributeAssoc($this->collection->getId());
 
@@ -673,6 +674,11 @@ $memLog('Loaded terms:        ');
         if (empty($labelId)) {
             // the dataType does not exist -> create it
             $this->attributeDataTypeModel->loadOrCreate($attribute->elementName, $attribute->type, [$attribute->getLevel()]);
+
+            // Maintain collection<=>datatype mappings data
+            ZfExtended_Factory
+                ::get(CollectionAttributeDataType::class)
+                ->onCustomDataTypeInsert($this->attributeDataTypeModel->getId(), $this->collection->getId());
 
             // reload all dataTypes
             $this->dataType->loadData(true);

@@ -74,22 +74,20 @@ class Translate2763Test extends editor_Test_JsonTest {
      */
     public function test20_MergeImport() {
 
-        // TODO FIXME: create a proper resource class and underlying API that will check the status in a loop and waits like for other resources
-        static::api()->addFile('tmUpload', static::api()->getFile('testfiles/term-import-2.tbx'), 'application/xml');
-        static::api()->postJson('editor/languageresourceinstance/' . static::$tc->getId() . '/import/', [
+        // Reimport tbx into existing term collection
+        static::api()->reimportResource(static::$tc->getId(), 'testfiles/term-import-2.tbx', [
             'deleteTermsOlderThanCurrentImport' => 'on',
             'deleteProposalsLastTouchedOlderThan' => null,
         ]);
 
-        // Assume 10 seconds is enough for tbx import to be really completed
-        sleep(10);
-
+        // Do tbx-export
         $data = static::api()->get('/editor/languageresourceinstance/tbxexport', [
             'collectionId' => static::$tc->getId(),
             'tbxBasicOnly' => '1',
             'exportImages' => '0',
         ]);
 
+        // Make sure tbx-exported content are as expected
         $this->assertFileContents('term-export-2.tbx', $this->sanitizeURL($data->getBody()), 'The exported TBX does not match the content of term-export-1.tbx', static::api()->isCapturing());
     }
 

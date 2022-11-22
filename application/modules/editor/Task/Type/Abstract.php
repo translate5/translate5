@@ -55,6 +55,12 @@ abstract class editor_Task_Type_Abstract {
     protected bool $terminologyDisabled;
 
     /**
+     * Usage of AutoQA is enabled for that type
+     * @var bool
+     */
+    protected bool $autoStartAutoQA;
+
+    /**
      * Usage of term tagging is disabled for that type
      * @var bool
      */
@@ -67,6 +73,15 @@ abstract class editor_Task_Type_Abstract {
     public function isTerminologyDisabled(): bool
     {
         return $this->terminologyDisabled;
+    }
+
+    /**
+     * Returns true if usage of AutoQA is enabled for that type
+     * @return bool
+     */
+    public function isAutoStartAutoQA(): bool
+    {
+        return $this->autoStartAutoQA;
     }
 
     /**

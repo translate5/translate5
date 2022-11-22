@@ -1555,10 +1555,20 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $dataTypeLocale = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
         $locales = $dataTypeLocale->loadAllWithTranslations();
 
+        /* @var $images editor_Models_Terminology_Models_ImagesModel */
+        $images = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
+
         foreach ($attributes as $attribute) {
 
             $attribute['nameTranslated'] = $locales[$attribute['dataTypeId']] ?: $attribute['elementName'];
-            $attribute['value'] = htmlentities($attribute['value']);
+            if ($attribute['type'] == 'figure') {
+                $target = $attribute['target'];
+                if ($srcA = $images->getImagePathsByTargetIds($attribute['collectionId'], [$target])) {
+                    $attribute['value'] = sprintf("<img src='%s' width='150' style='display: block;'>", $srcA[$target]);
+                }
+            } else {
+                $attribute['value'] = htmlentities($attribute['value']);
+            }
             
             if( empty($attribute['language'])){
                 $template['entry'][] = $attribute;
@@ -2534,13 +2544,11 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         $createdBy = $this->db->getAdapter()->query('
             SELECT `termId`, MIN(CONCAT(`updatedAt`, "--", `updatedBy`)) 
             FROM `terms_term_history` 
-            WHERE 1
-              AND `termId` IN (' . join(',', array_keys($siblings)) . ')
-              AND NOT ISNULL(`updatedBy`) 
+            WHERE `termId` IN (' . join(',', array_keys($siblings)) . ') AND NOT ISNULL(`updatedBy`) 
             GROUP BY `termId`
         ')->fetchAll(PDO::FETCH_KEY_PAIR);
 
-        // For each term having histiry - spoof value of createdBy with the value found in history
+        // For each term having history - spoof value of createdBy with the value found in history
         foreach ($createdBy as $termId => $info) {
             $siblings[$termId]['createdBy'] = explode('--', $info)[1];
         }
