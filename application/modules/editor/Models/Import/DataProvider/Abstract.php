@@ -231,15 +231,12 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      */
     protected function createImportedDataArchive(string $zipFilename) {
 
-        /** @var Zend_Filter_Compress_Zip $zipCompresss */
-        $zipCompresss = ZfExtended_Factory::get('Zend_Filter_Compress_Zip',[
+        $filter = new Zend_Filter_Compress([
+            'adapter' => 'Zip',
             'options' => [
-                'archive' => $zipFilename,
-                'copyRootFolder' => false
+                'archive' => $zipFilename
             ]
         ]);
-
-        $filter = new Zend_Filter_Compress($zipCompresss);
 
         // process the additional files by temporarily adding them to the importFolder
         $deletions = [];
@@ -258,6 +255,8 @@ abstract class editor_Models_Import_DataProvider_Abstract {
         foreach($deletions as $file){
             @unlink($file);
         }
+
+        ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFilename), self::TASK_TEMP_IMPORT);
     }
 
     /***

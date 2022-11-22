@@ -1114,6 +1114,21 @@ class editor_Utils {
         $db->query("update Zf_users set passwd = ? where email = 'noreply@translate5.net' and login != 'system'", [$asdfasdf]);
     }
 
+    /***
+     * Check if given segment(segment content) is empty. This check is tag-safe
+     * @param string|null $segmentText
+     * @return bool
+     */
+    public static function emptySegment(?string $segmentText): bool
+    {
+        if( $segmentText ==='0' || ZfExtended_Utils::emptyString($segmentText)){
+            return true;
+        }
+        /** @var editor_Models_Segment $segment */
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        return empty($segment->stripTags($segmentText));
+    }
+
 }
 
 class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {
