@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
-use MittagQI\Translate5\Task\Import\FileParser\FileParserHelper;
+use MittagQI\Translate5\Task\Import\FileParser\Factory;
 
 /**
  * Encapsulates the part of the import logic which is intended to be run in a worker
@@ -124,8 +124,8 @@ class editor_Models_Import_Worker_Import {
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Review', array($this->task, $this->importConfig));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Review */
 
-        /** @var FileParserHelper $parserHelper */
-        $parserHelper = ZfExtended_Factory::get(FileParserHelper::class,[
+        /** @var Factory $parserHelper */
+        $parserHelper = ZfExtended_Factory::get(Factory::class,[
             $this->task,
             $this->segmentFieldManager
         ]);
@@ -208,8 +208,8 @@ class editor_Models_Import_Worker_Import {
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
 
-        /** @var FileParserHelper $parserHelper */
-        $parserHelper = ZfExtended_Factory::get(FileParserHelper::class,[
+        /** @var Factory $parserHelper */
+        $parserHelper = ZfExtended_Factory::get(Factory::class,[
             $this->task,
             $this->segmentFieldManager
         ]);

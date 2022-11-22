@@ -112,11 +112,12 @@ class Reimport extends editor_Models_Import_SegmentProcessor
             $segment->loadByFileidMid($this->fileId, $mid);
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {
             /** @var ReimportSegmentErrors $reimportError */
-            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class);
-            $reimportError->setCode('E1434');
-            $reimportError->setMessage('Reimport Segment processor: No matching segment was found for the given mid.');
-            $reimportError->setData([
-                'mid' => $mid
+            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class,[
+                'E1434',
+                'Reimport Segment processor: No matching segment was found for the given mid.',
+                [
+                    'mid' => $mid
+                ]
             ]);
             $this->segmentErrors[$reimportError->getCode()][] = $reimportError;
             return false;
@@ -133,12 +134,13 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         } catch (Throwable $e) {
             // collect the errors in case the segment can not be saved
             /** @var ReimportSegmentErrors $reimportError */
-            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class);
-            $reimportError->setCode('E1435');
-            $reimportError->setMessage('Reimport Segment processor: Unable to save the segment');
-            $reimportError->setData([
-                'segmentNumber' => $segment->getSegmentNrInTask(),
-                'errorMessage' => $e->getMessage()
+            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class,[
+                'E1435',
+                'Reimport Segment processor: Unable to save the segment',
+                [
+                    'segmentNumber' => $segment->getSegmentNrInTask(),
+                    'errorMessage' => $e->getMessage()
+                ]
             ]);
             $this->segmentErrors[$reimportError->getCode()] = [$reimportError];
             return false;

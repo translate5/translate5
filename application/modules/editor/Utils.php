@@ -1121,12 +1121,12 @@ class editor_Utils {
      */
     public static function emptySegment(?string $segmentText): bool
     {
-        if( $segmentText ==='0' || ZfExtended_Utils::emptyString($segmentText)){
+        if( ZfExtended_Utils::emptyString($segmentText)){
             return true;
         }
         /** @var editor_Models_Segment $segment */
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        return empty($segment->stripTags($segmentText));
+        return ZfExtended_Utils::emptyString($segment->stripTags($segmentText));
     }
 
 }

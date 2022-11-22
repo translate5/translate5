@@ -44,7 +44,7 @@ class Editor_FiletreeController extends ZfExtended_RestController
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
-     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws Exception
      */
     public function init()
     {
@@ -52,7 +52,9 @@ class Editor_FiletreeController extends ZfExtended_RestController
     }
 
     /**
-     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws NoAccessException|JsonException
      */
     public function indexAction()
     {
@@ -67,13 +69,6 @@ class Editor_FiletreeController extends ZfExtended_RestController
         $this->entity->loadByTaskGuid($taskGuid);
 
         $this->view->rows = $this->entity->getTree();
-        return;
-
-
-        //by passing output handling, output is already JSON
-        $contextSwitch = $this->getHelper('ContextSwitch');
-        $contextSwitch->setAutoSerialization(false);
-        $this->getResponse()->setBody($this->entity->getTreeAsJson());
     }
 
     /**
@@ -99,7 +94,7 @@ class Editor_FiletreeController extends ZfExtended_RestController
     }
 
     /**
-     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws Exception
      * @throws ZfExtended_NoAccessException
      */
     public function putAction()

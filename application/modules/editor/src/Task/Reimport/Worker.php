@@ -33,7 +33,7 @@ use editor_Models_Loaders_Taskuserassoc;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
-use MittagQI\Translate5\Task\Import\FileParser\FileParserHelper;
+use MittagQI\Translate5\Task\Import\FileParser\Factory;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
 use Zend_Acl_Exception;
@@ -93,8 +93,8 @@ class Worker extends ZfExtended_Worker_Abstract {
             $segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
             $segmentFieldManager->initFields($task->getTaskGuid());
 
-            /** @var FileParserHelper $parserHelper */
-            $parserHelper = ZfExtended_Factory::get(FileParserHelper::class,[
+            /** @var Factory $parserHelper */
+            $parserHelper = ZfExtended_Factory::get(Factory::class,[
                 $task,
                 $segmentFieldManager
             ]);
@@ -140,22 +140,29 @@ class Worker extends ZfExtended_Worker_Abstract {
      * @throws Zend_Acl_Exception
      */
     protected function prepareTaskUserAssociation(editor_Models_Task $task,ZfExtended_Models_User $user): editor_Models_TaskUserAssoc {
+
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var editor_Models_TaskUserAssoc $userTaskAssoc */
+
         try {
+
             $acl=ZfExtended_Acl::getInstance();
+
             $isUserPm=$task->getPmGuid()==$user->getUserGuid();
             $isEditAllAllowed=$acl->isInAllowedRoles($user->getRoles(), 'backend', 'editAllTasks');
             $isEditAllTasks = $isEditAllAllowed || $isUserPm;
+
             //if the user is allowed to load all, use the default loader
             if($isEditAllTasks){
                 $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($user->getUserGuid(), $task);
             }else{
                 $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($user->getUserGuid(), $task);
             }
+
             $userTaskAssoc->getIsPmOverride();
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
+
             $userTaskAssoc->setUserGuid($user->getUserGuid());
             $userTaskAssoc->setTaskGuid($task->getTaskGuid());
             $userTaskAssoc->setRole('');
@@ -163,8 +170,11 @@ class Worker extends ZfExtended_Worker_Abstract {
             $userTaskAssoc->setWorkflow($task->getWorkflow());
             $userTaskAssoc->setWorkflowStepName('');
             $userTaskAssoc->setIsPmOverride(true);
+
         }
+
         $userTaskAssoc->save();
+
         return $userTaskAssoc;
     }
 

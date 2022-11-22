@@ -41,11 +41,15 @@ use ZfExtended_Logger;
 /**
  *
  */
-class FileParserHelper
+class Factory
 {
 
     private editor_Models_Import_SupportedFileTypes $supportedFiles;
 
+    /**
+     * @param editor_Models_Task $task
+     * @param editor_Models_SegmentFieldManager $segmentFieldManager
+     */
     public function __construct(private editor_Models_Task $task, private editor_Models_SegmentFieldManager $segmentFieldManager)
     {
         $this->supportedFiles = ZfExtended_Factory::get(editor_Models_Import_SupportedFileTypes::class);

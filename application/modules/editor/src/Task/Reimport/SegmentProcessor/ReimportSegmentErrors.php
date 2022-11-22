@@ -33,12 +33,15 @@ namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor;
  */
 class ReimportSegmentErrors
 {
+    /**
+     * @param string $code
+     * @param string $message
+     * @param array $data
+     */
+    public function __construct(private string $code, private string $message, private array $data)
+    {
 
-    private string $code;
-
-    private string $message;
-
-    private array $data;
+    }
 
     /**
      * @return string
@@ -46,14 +49,6 @@ class ReimportSegmentErrors
     public function getCode(): string
     {
         return $this->code;
-    }
-
-    /**
-     * @param string $code
-     */
-    public function setCode(string $code): void
-    {
-        $this->code = $code;
     }
 
     /**
@@ -65,27 +60,10 @@ class ReimportSegmentErrors
     }
 
     /**
-     * @param string $message
-     */
-    public function setMessage(string $message): void
-    {
-        $this->message = $message;
-    }
-
-    /**
      * @return array
      */
     public function getData(): array
     {
         return $this->data;
     }
-
-    /**
-     * @param array $data
-     */
-    public function setData(array $data): void
-    {
-        $this->data = $data;
-    }
-
 }

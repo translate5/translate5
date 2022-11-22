@@ -58,7 +58,7 @@ class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Files';
 
 
-    /****
+    /***
      * @param string $taskGuid
      * @return array
      */

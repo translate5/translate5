@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
+use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\DataProvider;
 use MittagQI\Translate5\Task\Reimport\Worker;
@@ -50,6 +51,12 @@ class editor_FileController extends ZfExtended_RestController
     protected $entity;
 
     /**
+     * inits the internal entity Object, handels given limit, filter and sort parameters
+     *
+     * @throws MittagQI\Translate5\Task\Current\Exception
+     * @throws NoAccessException
+     * @throws ZfExtended_Models_Entity_NotFoundException|Exception
+     * @see Zend_Controller_Action::init()
      */
     public function init()
     {
@@ -110,7 +117,6 @@ class editor_FileController extends ZfExtended_RestController
             $this->view->success = true;
         }catch (Throwable $exception){
             Lock::taskUnlock($task);
-            $this->view->success = false;
             throw  $exception;
         }
     }
@@ -122,7 +128,6 @@ class editor_FileController extends ZfExtended_RestController
     {
 
         $assoc = ZfExtended_Factory::get(TaskAssociation::class);
-        /* @var MittagQI\Translate5\LanguageResource\TaskAssociation $assoc */
 
         $resources = $assoc->getTaskUpdatable($this->getCurrentTask()->getTaskGuid());
 

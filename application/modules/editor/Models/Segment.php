@@ -1954,10 +1954,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             if ($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
                 continue;
             }
-            if (!editor_Utils::emptySegment($data['original'])) {
+            if ( !editor_Utils::emptySegment($data['edited'])) {
                 return true;
             }
         }
+
         return false;
     }
 

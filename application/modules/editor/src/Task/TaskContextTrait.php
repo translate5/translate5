@@ -92,7 +92,8 @@ trait TaskContextTrait {
      * @throws NoAccessException
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function initCurrentTask(bool $loadJob = true) {
+    protected function initCurrentTask(bool $loadJob = true): void
+    {
         $this->_restrictUsage();
         /** @var editor_Models_Task $task */
         $this->_currentTask = ZfExtended_Factory::get('editor_Models_Task');
