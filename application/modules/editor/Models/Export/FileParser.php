@@ -63,11 +63,7 @@ abstract class editor_Models_Export_FileParser {
      * @var string Klassenname des Difftaggers
      */
     protected $_classNameDifftagger = NULL;
-    /**
-     * @var object
-     */
-    protected $_difftagger = NULL;
-    
+
     /**
      * fluent container of flags controlling the export parser, may be set from config or via param or whatever
      * @var array
@@ -103,13 +99,7 @@ abstract class editor_Models_Export_FileParser {
      * @var boolean
      */
     protected $disableMqmExport = false;
-    
-    /**
-     * Container for content tag protection
-     * @var array
-     */
-    protected $originalTags;
-    
+
     /**
      * each array element contains the comments for one segment
      * the array-index is set to an ID for the comments
@@ -137,7 +127,7 @@ abstract class editor_Models_Export_FileParser {
      * collected segmentNrs with tag missing or to much tags compared to the source
      * @var array
      */
-    protected $segmentsWithTagErrors = [];
+    protected $faultySegments = [];
     
     /**
      * @var ZfExtended_Logger
@@ -201,10 +191,11 @@ abstract class editor_Models_Export_FileParser {
     
     /**
      * returns the collected segments with tag errors
+     * These will only be evaluated, if $options['checkFaultySegments'] is set
      * @return array
      */
-    public function getSegmentTagErrors() {
-        return $this->segmentsWithTagErrors;
+    public function getFaultySegments(){
+        return $this->faultySegments;
     }
     
     /**
@@ -316,24 +307,32 @@ abstract class editor_Models_Export_FileParser {
      */
     protected function getSegmentContent($segmentId, $field) {
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
+        /* @var $segment editor_Models_Segment */
         $segmentMeta = $segment->meta();
         
         // for non editable sources the edited field is empty, so we have to fetch the original
         $useEdited = !($field == editor_Models_SegmentField::TYPE_SOURCE && !$this->segmentFieldManager->isEditable($field));
-        $segmentExport = $segment->getFieldExport($field, $this->_task, $useEdited);
+        // if the auto-qa is deactivated, this flag should be true to anable dynamic searching for faults
+        $findFaultyTags = array_key_exists('checkFaultySegments', $this->options) && $this->options['checkFaultySegments'] === true;
+        $segmentExport = $segment->getFieldExport($field, $this->_task, $useEdited, true, $findFaultyTags);
 
         // This removes all segment tags but the ones needed for export
         $edited = ($segmentExport == NULL) ? '' : $segmentExport->process();
         
-        if($segmentExport != NULL && $segmentExport->tagErrorsHaveBeenFixed()){
-            // TODO INSTANTTRANSLATE: If we need a remark in the instant translate frontend, that there were errors automatically fixed, 
-            // this has to be initiated here
-            error_log('Task '.$this->_task->getTaskGuid().' Export: Internal Tag Faults have been fixed automatically');
+        if($segmentExport != NULL){
+            if($segmentExport->hasFaultyTags()){
+                $this->faultySegments[] = [
+                    'id' => $segmentId,
+                    'field' => $field,
+                    'segmentNrInTask' => $segment->getSegmentNrInTask()
+                ];
+            }
+            if($segmentExport->hasFixedFaultyTags()){
+                // TODO INSTANTTRANSLATE: If we need a remark in the instant translate frontend, that there were errors automatically fixed, this has to be initiated here
+                error_log('Task '.$this->_task->getTaskGuid().' Export: Internal Tag Faults have been fixed automatically for segment '.$segmentId);
+            }
         }
-       
-        // TODO: rework, solve with segment-tags code (-> editor_Segment_Internal_TagComparision)
-        $this->compareTags($segment, $edited, $field);
-        
+
         //count length after removing removeTrackChanges and removeTermTags
         // so that the same remove must not be done again inside of textLength
         //also add additionalMrkLength to the segment length for final length calculation
@@ -363,40 +362,7 @@ abstract class editor_Models_Export_FileParser {
         // unprotectWhitespace must be done after diffing!
         return $this->unprotectContent($diffed);
     }
-    
-    /**
-     * Compares the real tags (ignores whitespace tags) of a source and target string, track the differences between the both along the segmentNrInTask
-     * TODO FIXME: this can be done more precise with editor_Segment_FieldTags and editor_Segment_Internal_TagComparision
-     * @param editor_Models_Segment $segment
-     * @param string $target
-     */
-    protected function compareTags(editor_Models_Segment $segment, string $target, string $field) {
-        $isTranslationTask = $this->_task->isTranslation();
-        $segmentNotTranslated = $segment->getAutoStateId() == editor_Models_Segment_AutoStates::NOT_TRANSLATED;
-        //do the tag compare only if $field is editable (normally source is not)
-        $fieldInfo = $this->segmentFieldManager->getByName($field);
-        if(!$fieldInfo || !$fieldInfo->editable || $isTranslationTask && $segmentNotTranslated) {
-            return;
-        }
-        //if it was a translation task, we have to compare agains the source tags, otherwise against the field original
-        $source = $isTranslationTask ? $segment->getSource() : $segment->getFieldOriginal($field);
-        $sourceTags = $this->utilities->internalTag->getRealTags($source);
-        $targetTags = $this->utilities->internalTag->getRealTags($target);
-        $notInTarget = $this->utilities->internalTag->diffArray($sourceTags, $targetTags);
-        $notInSource = $this->utilities->internalTag->diffArray($targetTags, $sourceTags);
-        if(empty($notInSource) && empty($notInTarget)) {
-            return;
-        }
-        $this->segmentsWithTagErrors[] = [
-            'id' => $segment->getId(),
-            'fileId' => $segment->getFileId(),
-            'field' => $field,
-            'segmentNrInTask' => $segment->getSegmentNrInTask(),
-            'additionalInTarget' => $notInSource,
-            'missingInTarget' => $notInTarget,
-        ];
-    }
-    
+
     /**
      * loads the segment to the given Id, caches a limited count of segments internally
      * to prevent loading again while switching between fields
@@ -419,24 +385,7 @@ abstract class editor_Models_Export_FileParser {
         }
         return $segment;
     }
-    
-    /**
-     * creates termMarkup according to xliff-Syntax (<mrk ...)
-     *
-     * converts from:
-     * <div class="term admittedTerm transNotFound" id="term_05_1_de_1_00010-0" title="">Hause</div>
-     * to:
-     * <mrk mtype="x-term-admittedTerm" mid="term_05_1_de_1_00010">Hause</mrk>
-     * and removes the information about trans[Not]Found
-     *
-     * @param string $segment
-     * @param bool $removeTermTags, default = true
-     * @return string $segment
-     */
-    protected function removeTermTags($segment) {
-        return $this->utilities->termTag->remove($segment);
-    }
-    
+
     /**
      * Loads the skeleton file from the disk and stores it internally
      * @param editor_Models_File $file

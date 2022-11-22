@@ -108,11 +108,16 @@ class editor_Models_Export {
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
             mkdir($path);
         }
-        $segmentErrors = [];
+
+        // a list of segments that has faults (which are fixed automatically)
+        $faultySegments = [];
+        // if the auto-QA for internal tags is not active segment tag faults have to be evaluated on-the-fly
+        $checkSegmentTags = editor_Segment_Quality_Manager::instance()->isFullyCheckedType(editor_Segment_Tag::TYPE_INTERNAL, $this->task->getConfig()) === false;
+
         foreach ($filePaths as $fileId => $relPath) {
             $path = $localEncoded->encode($relPath);
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
-            $parser = $this->getFileParser((int)$fileId, $path);
+            $parser = $this->getFileParser((int)$fileId, $path, $checkSegmentTags);
             /* @var $parser editor_Models_Export_FileParser */
             if(empty($parser)) {
                 $log = Zend_Registry::get('logger')->cloneMe('editor.export');
@@ -123,24 +128,28 @@ class editor_Models_Export {
                 continue;
             }
             $parser->saveFile();
-            $errors = $parser->getSegmentTagErrors();
-            if(!empty($errors)) {
-                $segmentErrors[$fileId.' # '.$relPath] = $errors;
+            $faults = $parser->getFaultySegments();
+            if(count($faults) > 0) {
+                $faultySegments = array_merge($faultySegments, $faults);
             }
-            
             $fileFilter->applyExportFilters($path, $fileId);
         }
-        
-        if(empty($segmentErrors)) {
-            return;
+        /**
+         * If there are segment tag errors we create a warning
+         */
+        if(count($faultySegments) > 0){
+            $segments = [];
+            foreach($faultySegments as $index => $data){
+                $segments[$index] = json_encode($data, JSON_UNESCAPED_UNICODE);
+            }
+            $log = Zend_Registry::get('logger')->cloneMe('editor.export');
+            $log->warn('E1149', 'Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"].', [
+                'taskName' => $this->task->getTaskName(),
+                'taskGuid' => $this->task->getTaskGuid(),
+                'task' => $this->task,
+                'segments' => $segments
+            ]);
         }
-        $log = Zend_Registry::get('logger')->cloneMe('editor.export');
-        $log->warn('E1149', 'Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"].', [
-            'taskName' => $this->task->getTaskName(),
-            'taskGuid' => $this->task->getTaskGuid(),
-            'task' => $this->task,
-            'segments' => $segmentErrors,
-        ]);
     }
     
     /**
@@ -149,9 +158,11 @@ class editor_Models_Export {
      *
      * @param int $fileId
      * @param string $path
+     * @param bool $checkFaultySegmentTags
      * @return editor_Models_Import_FileParser|null
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function getFileParser(int $fileId, string $path){
+    protected function getFileParser(int $fileId, string $path, bool $checkFaultySegmentTags){
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($fileId);
@@ -163,7 +174,7 @@ class editor_Models_Export {
         //put the fileparser config into an object, so that it can be manipulated in the event handlers
         $fpConfig = new stdClass();
         $fpConfig->path = $path;
-        $fpConfig->options = ['diff' => $this->optionDiff];
+        $fpConfig->options = ['diff' => $this->optionDiff, 'checkFaultySegments' => $checkFaultySegmentTags];
         $fpConfig->exportParser = $exportParser;
         
         $this->events->trigger('exportFileParserConfiguration', $this, [
