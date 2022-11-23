@@ -199,7 +199,7 @@ class editor_Models_Terminology_Import_TbxFileImport
             }
         });
 
-        if(!$xmlReader->open($tbxFilePath)) {
+        if(!$xmlReader->open($tbxFilePath, flags: LIBXML_PARSEHUGE)) {
             throw new Zend_Exception('TBX file can not be opened.');
         }
 
