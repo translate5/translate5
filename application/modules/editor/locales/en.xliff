@@ -8862,9 +8862,9 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Video-Anmerkung</source>
                 <target>Video annotation</target>
             </trans-unit>
-            <trans-unit id='RGF0ZWkgZXJzZXR6ZW4='>
-              <source>Datei ersetzen</source>
-              <target>Replace file</target>
+            <trans-unit id='RGF0ZWllbiBha3R1YWxpc2llcmVu'>
+              <source>Dateien aktualisieren</source>
+              <target>Update files</target>
             </trans-unit>
             <trans-unit id='TmV1ZSBEYXRlaSBob2NobGFkZW4='>
               <source>Neue Datei hochladen</source>
@@ -8878,9 +8878,9 @@ E-Mail: service@MittagQI.com</pre>
               <source>Alle Segmente ins TM speichern</source>
               <target>Save all segments to TM</target>
             </trans-unit>
-            <trans-unit id='U3BlaWNoZXJuIGFsbGVyIFNlZ21lbnRlIGRlciBBdWZnYWJlIGluIGRpZSB6dWdlaMO2cmlnZW4gYmVzY2hyZWliYmFyZW4gVE1zIG5hY2ggQWt0dWFsaXNpZXJ1bmcgZGVyIEF1ZmdhYmU='>
-              <source>Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe</source>
-              <target>Saving all segments of the task in associated writable TMs after updating the task.</target>
+            <trans-unit id='TmFjaCBkZXIgQWt0dWFsaXNpZXJ1bmcgd2VyZGVuIGFsbGUgU2VnbWVudGUgZGVyIEF1ZmdhYmUgaW4gYWxsZSBiZXNjaHJlaWJiYXJlbiB1bmQgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbmVuIFRNcyBkdXJjaGdlc3BlaWNoZXJ0Lg=='>
+              <source>Nach der Aktualisierung werden alle Segmente der Aufgabe in alle beschreibbaren und der Aufgabe zugewiesenen TMs durchgespeichert.</source>
+              <target>After the update all segments of the task are saved into all writable TMs assigned to the task.</target>
             </trans-unit>
             <trans-unit id='UmVpbXBvcnQgbMOkdWZ0'>
               <source>Reimport läuft</source>
@@ -8905,6 +8905,14 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='SW5kZXg='>
                 <source>Index</source>
                 <target>Index</target>
+            </trans-unit>
+            <trans-unit id='RGVyIERhdGVpbmFtZSBlbnRzcHJpY2h0IG5pY2h0IGRlciB6dSBha3R1YWxpc2llcmVuZGVuIERhdGVp'>
+              <source>Der Dateiname entspricht nicht der zu aktualisierenden Datei</source>
+              <target>The file name does not match the file to be updated.</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWluYW1l'>
+              <source>Dateiname</source>
+              <target>File name</target>
             </trans-unit>
         </body>
     </file>

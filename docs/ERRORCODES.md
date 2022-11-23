@@ -279,16 +279,18 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1170"></a>E1170  | Task Metadata Export | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
 
 ### Task reimport
-| EventCode        | Context       | EventMessage                                                                   | Description/Solution
-| :--------------- |:------------- |:-------------------------------------------------------------------------------| :-------------------
-| <a id="E1426"></a>E1426  | Task reimport      | Reimport: Missing required request parameter fileId.                           | The required api parameter fileId was not provided or it was empty
-| <a id="E1427"></a>E1427  | Task reimport      | Reimport DataProvider: Error on file upload. | There was an error with the file upload. Check the error log for more info.
-| <a id="E1429"></a>E1429  | Task reimport      | Reimport DataProvider: No upload files found for task reimport.                | No valid upload files found on task reimport.
-| <a id="E1430"></a>E1430  | Task reimport      | Reimport DataProvider: Unable to create copy of the zip archive.               | Unable to create copy of the old zip archive when new on is create with the latest files.
-| <a id="E1433"></a>E1433  | Task reimport      | Reimport Worker: Unable to find fileParser for the uploaded file.              | The uploaded file type is not supported and can not be imported.
-| <a id="E1434"></a>E1434  | Task reimport      | Reimport Segment processor: No matching segment was found for the given mid.   | In the file upload there was a segment with mid id which was not found in translate5 segments table
-| <a id="E1435"></a>E1435  | Task reimport      | Reimport Segment processor: Unable to save the segment | There was an error on saving the segment on reimport. For more info check the error log
-| <a id="E1440"></a>E1440  | Task reimport      | File reimport finished. | The task reimport process is finished and additional info can be seen in task log
+| EventCode        | Context         | EventMessage                                                                          | Description/Solution
+| :--------------- |:----------------|:--------------------------------------------------------------------------------------| :-------------------
+| <a id="E1426"></a>E1426  | Task reimport   | Reimport: Missing required request parameter fileId.                                  | The required api parameter fileId was not provided or it was empty
+| <a id="E1427"></a>E1427  | Task reimport   | Reimport DataProvider: Error on file upload. | There was an error with the file upload. Check the error log for more info.
+| <a id="E1429"></a>E1429  | Task reimport   | Reimport DataProvider: No upload files found for task reimport.                       | No valid upload files found on task reimport.
+| <a id="E1430"></a>E1430  | Task reimport   | Reimport DataProvider: Unable to create copy of the zip archive.                      | Unable to create copy of the old zip archive when new on is create with the latest files.
+| <a id="E1433"></a>E1433  | Task reimport   | Reimport Worker: Unable to find fileParser for the uploaded file.                     | The uploaded file type is not supported and can not be imported.
+| <a id="E1434"></a>E1434  | Task reimport   | Reimport Segment processor: No matching segment was found for the given mid. | In the file upload there was a segment with mid id which was not found in translate5 segments table
+| <a id="E1435"></a>E1435  | Task reimport   | Reimport Segment processor: Unable to save the segment                                | There was an error on saving the segment on reimport. For more info check the error log
+| <a id="E1440"></a>E1440  | Task reimport   | File reimport finished. | The task reimport process is finished and additional info can be seen in task log
+| <a id="E1441"></a>E1441  | Task reimport   | Reimport Segment processor: No content parser found for the file with extension {ext} | For the uploaded file there is not content parser available
+
 
 ### Language Resources
 | EventCode        | Context       | EventMessage  | Description/Solution

@@ -59,6 +59,9 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
                         bind:{
                             fieldLabel:'{l10n.projectOverview.taskManagement.taskReimportWindow.fileFieldLabel}',
                         },
+                        listeners:{
+                            change:'onFileFieldChange'
+                        },
                         regexText: Ext.String.format(locales.fileUploadRegexText, Editor.data.editor.task.reimport.supportedExtensions.join(',')),
                         regex: me.getSupportedFilesRegex(),
                         labelWidth: 160,
@@ -66,16 +69,29 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
                         vtype:'tmFileUploadSize',
                         name: 'fileReimport'
                     },{
-                        xtype:'checkbox',
+                        xtype: 'displayfield',
+                        itemId:'nameDontMatchInfoLabel',
+                        hideLabel:true,
+                        fieldCls: 'lableInfoIcon',
+                        hidden:true,
                         bind:{
-                            fieldLabel:'{l10n.projectOverview.taskManagement.taskReimportWindow.saveToMemoryLable}',
-                        },
-                        tooltip: locales.saveToMemoryTooltip,
+                            value :'<i>{l10n.projectOverview.taskManagement.taskReimportWindow.nameDontMatchInfoLabel}</i>'
+                        }
+                    },{
+                        xtype:'checkbox',
                         itemId: 'saveToMemory',
                         name: 'saveToMemory',
                         inputValue: 1,
                         uncheckedValue: 0,
-                        value: me.getCustomerSaveToMemory()
+                        bind:{
+                            fieldLabel:'{l10n.projectOverview.taskManagement.taskReimportWindow.saveToMemoryLable}',
+                        },
+                        labelClsExtra: 'checkBoxLableInfoIconDefault',
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip':  locales.saveToMemoryTooltip
+                        },
+                        value: me.getCustomerSaveToMemory(),
                     }]
                 }],
                 dockedItems : [{

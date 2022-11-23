@@ -71,7 +71,32 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindowViewController', {
                 Editor.MessageBox.addWarning(locales.fileReimportFinishedWithErrors);
                 Editor.app.getController('ServerException').handleException(submit.response);
                 view.setLoading(false);
+                task.load();
             }
         });
+    },
+
+    /***
+     * File change event handler
+     * @param field
+     * @param fileName
+     */
+    onFileFieldChange: function (field, fileName){
+        var me = this,
+            view = me.getView(),
+            form = view.down('form'),
+            record = view.record,
+            infoLabel = view.down('#nameDontMatchInfoLabel');
+
+
+        // show info lable that the filename of the uploaded file and the one to be replaced are not matching
+        if( !record || Ext.isEmpty(fileName)){
+            infoLabel.setVisible(false);
+            return;
+        }
+
+        fileName = fileName.replace(/C:\\fakepath\\/g, '');
+
+        infoLabel.setVisible(record.get('filename') !== fileName);
     }
 });

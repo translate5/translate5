@@ -32,9 +32,11 @@ use editor_Models_Foldertree;
 use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Import_DataProvider_Exception;
 use editor_Models_Task;
+use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use Zend_Exception;
 use Zend_File_Transfer;
 use ZfExtended_ErrorCodeException;
+use ZfExtended_EventManager;
 use ZfExtended_Factory;
 use ZfExtended_Utils;
 
@@ -43,8 +45,6 @@ use ZfExtended_Utils;
  */
 class DataProvider extends editor_Models_Import_DataProvider_Abstract
 {
-    public const SUPORTED_FILE_EXTENSIONS = ['xliff','xml'];
-
     private array $uploadFiles;
 
     private array $uploadErrors;
@@ -52,10 +52,16 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
     private string $file;
 
     /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events = false;
+
+    /**
      * @param int $fileId
      */
     public function __construct(private int $fileId)
     {
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [self::class]);
     }
 
     /**
@@ -70,7 +76,10 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
         $this->uploadFiles = $this->getValidFile();
 
         if(!empty($this->uploadErrors)){
-            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1427',$this->uploadErrors);
+            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1427',[
+                'errors' => $this->uploadErrors,
+                'task' => $task
+            ]);
         }
 
         if( empty($this->uploadFiles)){
@@ -129,7 +138,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
     private function getValidFile(): array
     {
         $upload = new Zend_File_Transfer();
-        $upload->addValidator('Extension', false, self::SUPORTED_FILE_EXTENSIONS);
+        $upload->addValidator('Extension', false, FileHandler::getSupportedFileTypes());
         // Returns all known internal file information
         $files = $upload->getFileInfo();
         $validFiles = [];
@@ -146,6 +155,15 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
                 continue;
             }
 
+            // fire an event so external plugins can attach and validate if the current upload file
+            // is valid for reimport
+            $eventResponse = $this->events->trigger('onValidateFile', $this, ['file' => $info]);
+            if($eventResponse->stopped()){
+                foreach ($eventResponse->last() as $error){
+                    $this->uploadErrors[] = $error;
+                }
+                continue;
+            }
             $validFiles[] = $info;
         }
 

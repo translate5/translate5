@@ -34,6 +34,29 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
         'Editor.view.admin.task.reimport.ReimportWindow'
     ],
 
+    listen: {
+        messagebus: {
+            '#translate5 task': {
+                triggerReload: 'onTriggerTaskReload',
+            }
+        }
+    },
+
+    /***
+     * On task reload, refresh the files grid for the currently selected task
+     * @param params
+     */
+    onTriggerTaskReload: function (params){
+        var me = this,
+            viewTask = me.getView() && me.getView().task,
+            taskGuid = params && params.taskGuid;
+
+        if( !taskGuid || !viewTask || (viewTask.get('taskGuid')!==taskGuid)){
+            return;
+        }
+        me.loadStoreData(taskGuid);
+    },
+
     /***
      * Load tree data in the tree grid for given taskGuid
      * @param taskGuid
@@ -85,23 +108,5 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
         var win = Ext.widget('adminTaskReimportReimportWindow');
         win.loadRecord(record,this.getView().task);
         win.show();
-    },
-
-    /***
-     * Is the file upload action button disabled.
-     * It is disabled for folders and for not supported file types.
-     * The supported file types are listed in Editor.data.editor.task.reimport.supportedExtensions
-     * @param view
-     * @param rowIdx
-     * @param colIdx
-     * @param item
-     * @param record
-     * @returns {boolean}
-     */
-    isUploadActionDisabled: function(view, rowIdx, colIdx, item, record) {
-        var isFolder = !record.get('leaf'),
-            disabledByExtension = !Ext.Array.contains(Editor.data.editor.task.reimport.supportedExtensions,record.get('extension'));
-
-        return isFolder || disabledByExtension;
     }
 });

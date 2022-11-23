@@ -8681,9 +8681,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Video-Anmerkung</source>
                 <target>Video-Anmerkung</target>
             </trans-unit>
-            <trans-unit id='RGF0ZWkgZXJzZXR6ZW4='>
-                <source>Datei ersetzen</source>
-                <target>Datei ersetzen</target>
+            <trans-unit id='RGF0ZWllbiBha3R1YWxpc2llcmVu'>
+              <source>Dateien aktualisieren</source>
+              <target>Dateien aktualisieren</target>
             </trans-unit>
             <trans-unit id='TmV1ZSBEYXRlaSBob2NobGFkZW4='>
                 <source>Neue Datei hochladen</source>
@@ -8697,9 +8697,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Alle Segmente ins TM speichern</source>
                 <target>Alle Segmente ins TM speichern</target>
             </trans-unit>
-            <trans-unit id='U3BlaWNoZXJuIGFsbGVyIFNlZ21lbnRlIGRlciBBdWZnYWJlIGluIGRpZSB6dWdlaMO2cmlnZW4gYmVzY2hyZWliYmFyZW4gVE1zIG5hY2ggQWt0dWFsaXNpZXJ1bmcgZGVyIEF1ZmdhYmU='>
-                <source>Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe</source>
-                <target>Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe</target>
+            <trans-unit id='TmFjaCBkZXIgQWt0dWFsaXNpZXJ1bmcgd2VyZGVuIGFsbGUgU2VnbWVudGUgZGVyIEF1ZmdhYmUgaW4gYWxsZSBiZXNjaHJlaWJiYXJlbiB1bmQgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbmVuIFRNcyBkdXJjaGdlc3BlaWNoZXJ0Lg=='>
+                <source>Nach der Aktualisierung werden alle Segmente der Aufgabe in alle beschreibbaren und der Aufgabe zugewiesenen TMs durchgespeichert.</source>
+                <target>Nach der Aktualisierung werden alle Segmente der Aufgabe in alle beschreibbaren und der Aufgabe zugewiesenen TMs durchgespeichert.</target>
             </trans-unit>
             <trans-unit id='UmVpbXBvcnQgbMOkdWZ0'>
               <source>Reimport läuft</source>
@@ -8724,6 +8724,22 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='SW5kZXg='>
                 <source>Index</source>
                 <target>Index</target>
+            </trans-unit>
+            <trans-unit id='RGVyIERhdGVpbmFtZSBlbnRzcHJpY2h0IG5pY2h0IGRlciB6dSBha3R1YWxpc2llcmVuZGVuIERhdGVp'>
+              <source>Der Dateiname entspricht nicht der zu aktualisierenden Datei</source>
+              <target>Der Dateiname entspricht nicht der zu aktualisierenden Datei</target>
+            </trans-unit>
+			<trans-unit id='RGVyIERhdGVpdHlwIHdpcmQgZsO8ciBkaWUgQWt0dWFsaXNpZXJ1bmcgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+              <source>Der Dateityp wird für die Aktualisierung nicht unterstützt.</source>
+              <target>Der Dateityp wird für die Aktualisierung nicht unterstützt.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIERhdGVpdHlwIHdpcmQgZsO8ciBkaWUgQWt0dWFsaXNpZXJ1bmcgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+              <source>Der Dateityp wird für die Aktualisierung nicht unterstützt.</source>
+              <target>File type is not supported for updating.</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWluYW1l'>
+              <source>Dateiname</source>
+              <target>Dateiname</target>
             </trans-unit>
         </body>
     </file>

@@ -38,7 +38,9 @@ use editor_Models_Segment_Updater;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use JsonException;
+use MittagQI\Translate5\Task\Reimport\Exception;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\ContentDefault;
+use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\Xliff;
 use Throwable;
 use Zend_Registry;
@@ -100,9 +102,13 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     /**
      * Verarbeitet ein einzelnes Segment und gibt die ermittelte SegmentId zurück
      * @return int|false MUST return the segmentId or false
+     * @throws Exception
      */
     public function process(editor_Models_Import_FileParser $parser): bool|int
     {
+
+        $content = $this->getContentClass($parser);
+
         /** @var editor_Models_Segment $segment */
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         $segment->init(['taskGuid' => $this->taskGuid]);
@@ -122,8 +128,8 @@ class Reimport extends editor_Models_Import_SegmentProcessor
             $this->segmentErrors[$reimportError->getCode()][] = $reimportError;
             return false;
         }
+
         try {
-            $content = $this->getContentClass($parser);
             $content->saveSegment($segment,$this->saveTimestamp);
 
             if( $content->isUpdateSegment()){
@@ -156,18 +162,20 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     {
         $path_parts = pathinfo($this->fileName);
         $ext = $path_parts['extension'];
-        $className = 'MittagQI\\Translate5\\Task\\Reimport\\SegmentProcessor\\SegmentContent\\'.ucfirst($ext);
+        $className =  FileHandler::getClass($ext);
         $args = [
             $this->task,
             $parser->getFieldContents(),
             $this->user
         ];
 
-        if(!class_exists($className)){
-            // fallback
-            $className = ContentDefault::class;
+        if(class_exists($className)){
+            return ZfExtended_Factory::get($className,$args);
         }
-        return ZfExtended_Factory::get($className,$args);
+
+        throw new Exception('E1441',[
+            'ext' => $ext
+        ]);
     }
 
     /**

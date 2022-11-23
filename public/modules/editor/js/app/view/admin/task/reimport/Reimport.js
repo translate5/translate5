@@ -43,6 +43,9 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
     viewModel:{
         type:'adminTaskReimportReimport'
     },
+    reserveScrollbar: true,
+    useArrows: true,
+    rootVisible: false,
 
     initComponent: function() {
         var me = this;
@@ -51,6 +54,68 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
             projectTaskSelectionChange:'onProjectTaskSelectionChange',
             scope:me
         })
+    },
+
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                tbar:[{
+                    xtype: 'displayfield',
+                    hideLabel:true,
+                    fieldCls: 'lableInfoIcon',
+                    value:Ext.String.format(Editor.data.l10n.projectOverview.taskManagement.taskReimport.topBarHeaderInfo,Editor.data.editor.task.reimport.supportedExtensions.join(','))
+                }],
+                columns: [{
+                    xtype: 'treecolumn',
+                    flex: 0.5,
+                    bind:{
+                        text: '{l10n.projectOverview.taskManagement.taskReimport.fileNameColumnText}'
+                    },
+                    dataIndex: 'filename'
+                },{
+                    xtype: 'actioncolumn',
+                    flex: 0.5,
+                    menuDisabled: true,
+                    bind:{
+                        text: '{l10n.projectOverview.taskManagement.taskReimport.actionColumnText}',
+                    },
+                    align: 'center',
+                    items:[{
+                        glyph: 'f093@FontAwesome5FreeSolid',
+                        isDisabled:function (view, rowIdx, colIdx, item, record){
+                            return me.isUploadDisabled(record);
+                        },
+                        getClass: function (view, meta, record){
+                            if(me.isUploadDisabled(record)){
+                                return 'disabledButtonTooltip';
+                            }
+                            return '';
+                        },
+                        getTip: function (view, meta, record){
+                            if(me.isUploadDisabled(record) === false){
+                                return Editor.data.l10n.projectOverview.taskManagement.taskReimport.actionColumnTooltip;
+                            }
+                            return Editor.data.l10n.projectOverview.taskManagement.taskReimport.actionColumnDisabledTooltip;
+                        },
+                        handler: 'onUploadAction'
+                    }]
+                }]
+            };
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+
+    /***
+     * Check if the upload is disabled for the giver record.
+     * @param record
+     * @returns {boolean}
+     */
+    isUploadDisabled: function (record){
+        var isFolder = !record.get('leaf'),
+            disabledByExtension = !Ext.Array.contains(Editor.data.editor.task.reimport.supportedExtensions,record.get('extension'));
+        return isFolder || disabledByExtension;
     },
 
     /***
@@ -66,38 +131,6 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
         var me=this;
         me.task = newTask;
         me.getController().loadStoreData(me.task.get('taskGuid'));
-    },
-
-    reserveScrollbar: true,
-    useArrows: true,
-    rootVisible: false,
-
-    tbar:[{
-        xtype: 'displayfield',
-        hideLabel:true,
-        fieldCls: 'lableInfoIcon',
-        value:Ext.String.format(Editor.data.l10n.projectOverview.taskManagement.taskReimport.topBarHeaderInfo,Editor.data.editor.task.reimport.supportedExtensions.join(','))
-    }],
-
-    columns: [{
-        xtype: 'treecolumn',
-        flex: 0.5,
-        bind:{
-            text: '{l10n.projectOverview.taskManagement.taskReimport.fileNameColumnText}'
-        },
-        dataIndex: 'filename'
-    },{
-        xtype: 'actioncolumn',
-        tooltip: Editor.data.l10n.projectOverview.taskManagement.taskReimport.actionColumnTooltip,
-        flex: 0.5,
-        menuDisabled: true,
-        bind:{
-            text: '{l10n.projectOverview.taskManagement.taskReimport.actionColumnText}',
-        },
-        align: 'center',
-        glyph: 'f093@FontAwesome5FreeSolid',
-        isDisabled:'isUploadActionDisabled',
-        handler: 'onUploadAction'
-    }]
+    }
 
 });

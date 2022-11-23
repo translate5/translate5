@@ -2090,10 +2090,11 @@ Editor.data.l10n = {
     projectOverview:{
         taskManagement:{
             taskReimport:{
-                title:'<?php echo $this->translate->_('Datei ersetzen');?>',
+                title:'<?php echo $this->translate->_('Dateien aktualisieren');?>',
                 fileNameColumnText:'<?php echo $this->translate->_('Dateiname');?>',
                 actionColumnText:'<?php echo $this->translate->_('Aktionen');?>',
                 actionColumnTooltip:'<?php echo $this->translate->_('Neue Datei hochladen');?>',
+                actionColumnDisabledTooltip:'<?php echo $this->translate->_('Der Dateityp wird für die Aktualisierung nicht unterstützt.');?>',
                 taskNotAllowThisActionMessage:'<?php echo $this->translate->_('Der aktuelle Aufgabenstatus lässt diese Aktion nicht zu.');?>',
                 topBarHeaderInfo:'<?php echo $this->translate->_('Sie können Dateien nur aktualisieren, wenn die hochgeladene Datei vom gleichen Dateityp ist und die gleiche Anzahl von Segmenten hat. Derzeit unterstützte Dateitypen: {0}');?>'
             },
@@ -2104,9 +2105,10 @@ Editor.data.l10n = {
                 saveBtnText:'<?php echo $this->translate->_('Speichern');?>',
                 cancelBtnText:'<?php echo $this->translate->_('Abbrechen');?>',
                 saveToMemoryLable:'<?php echo $this->translate->_('Alle Segmente ins TM speichern');?>',
-                saveToMemoryTooltip:'<?php echo $this->translate->_('Speichern aller Segmente der Aufgabe in die zugehörigen beschreibbaren TMs nach Aktualisierung der Aufgabe');?>',
+                saveToMemoryTooltip:'<?php echo $this->translate->_('Nach der Aktualisierung werden alle Segmente der Aufgabe in alle beschreibbaren und der Aufgabe zugewiesenen TMs durchgespeichert.');?>',
                 fileReimportRunning:'<?php echo $this->translate->_('Reimport läuft');?>',
                 fileReimportFinishedWithErrors:'<?php echo $this->translate->_('Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll');?>',
+                nameDontMatchInfoLabel:'<?php echo $this->translate->_('Der Dateiname entspricht nicht der zu aktualisierenden Datei');?>'
             }
         }
     },

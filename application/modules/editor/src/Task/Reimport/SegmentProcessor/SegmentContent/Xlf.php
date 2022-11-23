@@ -31,6 +31,6 @@ namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
 /**
  *
  */
-class Xml extends Xliff
+class Xlf extends Xliff
 {
 }
