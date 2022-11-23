@@ -86,7 +86,6 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
 
     public function __construct(editor_Segment_FieldTags $toCheck, editor_Segment_FieldTags $against=NULL){
         parent::__construct($toCheck, $against);
-        $this->status = array();
         // the structural check can be done without against tags
         $this->checkStructure();
         // there is a against and it is not empty and toCheck also is not empty
@@ -97,6 +96,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
             // for the completeness check we need something to check against
             $this->checkCompleteness();
         }
+        $this->stati = array_unique($this->stati);
     }
     /**
      * Here we check if all tags from checkAgainst are present in the check tags
@@ -169,10 +169,18 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
         }
     }
     /**
-     * 
+     * Retrieves the internal tag states of the field tags to compare
      * @return string[]
      */
-    public function getStati(){
+    public function getStati(): array {
         return $this->stati;
+    }
+
+    /**
+     * Retrieves if the field tags have faulty internal tags
+     * @return bool
+     */
+    public function hasFaults(): bool {
+        return in_array(self::TAG_STRUCTURE_FAULTY, $this->stati);
     }
 }

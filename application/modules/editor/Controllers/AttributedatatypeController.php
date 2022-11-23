@@ -63,9 +63,6 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
 
         // If request contains json-encoded 'data'-param, decode it and append to request params
         $this->handleData();
-
-        // Pick session
-        $this->_session = (new Zend_Session_Namespace('user'))->data;
     }
 
     /**
@@ -85,7 +82,7 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
         // Get possible attribs as dataTypeId => info pairs
         $attribs = ZfExtended_Factory
             ::get('editor_Models_Terminology_Models_AttributeDataType')
-            ->getLocalized($this->_session->locale, $collectionIds);
+            ->getLocalized($this->user()->getLocale(), $collectionIds);
 
         if(empty($attribs)) {
             throw new ZfExtended_NotFoundException('No attributes found!');

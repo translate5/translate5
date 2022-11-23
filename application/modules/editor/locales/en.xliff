@@ -8862,6 +8862,14 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Video-Anmerkung</source>
                 <target>Video annotation</target>
             </trans-unit>
+            <trans-unit id='WnV3ZWlzdW5nc3dlcnRlIGJlYXJiZWl0ZW4='>
+                <source>Zuweisungswerte bearbeiten</source>
+                <target>Edit mapping values</target>
+            </trans-unit>
+            <trans-unit id='SW5kZXg='>
+                <source>Index</source>
+                <target>Index</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
