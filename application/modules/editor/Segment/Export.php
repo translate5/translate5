@@ -36,37 +36,44 @@ class editor_Segment_Export {
     /**
      * Processes a segment for export (fix internal tag faults, remove internal tags)
      * @param editor_Segment_FieldTags $fieldTags
-     * @param boolean $fixFaultyTags
+     * @param bool $fixFaultyTags: if set, faulty tags are automatically fixed
+     * @param bool $findFaultyTags: if set, tag-faults are searched on th fly instead of relying on auto-QA data
      * @return editor_Segment_Export
      */
-    public static function create(editor_Segment_FieldTags $fieldTags, bool $fixFaultyTags=true) : editor_Segment_Export {
-        return new editor_Segment_Export($fieldTags, $fixFaultyTags);
+    public static function create(editor_Segment_FieldTags $fieldTags, bool $fixFaultyTags=true, bool $findFaultyTags=false) : editor_Segment_Export {
+        return new editor_Segment_Export($fieldTags, $fixFaultyTags, $findFaultyTags);
     }
     /**
      * @var editor_Segment_FieldTags
      */
-    private $fieldTags;
+    private editor_Segment_FieldTags $fieldTags;
     /**
      * @var boolean
      */
-    private $fixFaulty;
+    private bool $fixFaulty;
     /**
      * @var boolean
      */
-    private $isFaultyInTask;
+    private bool $isFaultyInTask;
     /**
      * @var boolean
      */
-    private $tagErrorsFixed;
+    private bool $tagErrorsFixed;
     
-    private function __construct(editor_Segment_FieldTags $fieldTags, bool $fixFaultyTags){
+    private function __construct(editor_Segment_FieldTags $fieldTags, bool $fixFaultyTags, bool $findFaultyTags){
         $this->fieldTags = $fieldTags;
         $this->fixFaulty = $fixFaultyTags;
-        $this->isFaultyInTask = in_array($fieldTags->getSegmentId(), $fieldTags->getTask()->getFaultySegmentIds());
+        // we either find fauly tags dynamically or rely on the existing auto-QA data
+        if($findFaultyTags){
+            $comparison = new editor_Segment_Internal_TagComparision($fieldTags, null);
+            $this->isFaultyInTask = $comparison->hasFaults();
+        } else {
+            $this->isFaultyInTask = in_array($fieldTags->getSegmentId(), $fieldTags->getTask()->getFaultySegmentIds());
+        }
         $this->tagErrorsFixed = false;
     }
     /**
-     * Processes the 
+     * Processes the export
      * @return string
      */
     public function process() : string {
@@ -80,8 +87,20 @@ class editor_Segment_Export {
         }
         return $this->fieldTags->render();
     }
-    
-    public function tagErrorsHaveBeenFixed() : bool {
+
+    /**
+     * Retrieves if tag errors have been found
+     * @return bool
+     */
+    public function hasFaultyTags(): bool {
+        return $this->isFaultyInTask;
+    }
+
+    /**
+     * Retrieves if tag errors have been fixed
+     * @return bool
+     */
+    public function hasFixedFaultyTags(): bool {
         return $this->tagErrorsFixed;
     }
 }
