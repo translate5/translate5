@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tools\CronIpFactory;
+
 /**
  */
 class editor_Plugins_TermImport_TermImportController extends ZfExtended_RestController {
@@ -41,16 +43,28 @@ class editor_Plugins_TermImport_TermImportController extends ZfExtended_RestCont
         $this->initRestControllerSpecific();
     }
     
-    public function filesystemAction(){
+    public function filesystemAction(): void
+    {
+        $cronIp = CronIpFactory::create();
+        if(!$cronIp->isAllowed($_SERVER['REMOTE_ADDR'])) {
+            throw new ZfExtended_Models_Entity_NoAccessException('Wrong IP to call this action! Configure cronIP accordingly!');
+        }
+
         $import=ZfExtended_Factory::get('editor_Plugins_TermImport_Services_Import');
         /* @var $import editor_Plugins_TermImport_Services_Import */
-        
+
         $message=$import->handleFileSystemImport();
         $this->view->messages=$message;
     }
-    
-    
-    public function crossapiAction(){
+
+
+    public function crossapiAction(): void
+    {
+        $cronIp = CronIpFactory::create();
+        if(!$cronIp->isAllowed($_SERVER['REMOTE_ADDR'])) {
+            throw new ZfExtended_Models_Entity_NoAccessException('Wrong IP to call this action! Configure cronIP accordingly!');
+        }
+
         $import=ZfExtended_Factory::get('editor_Plugins_TermImport_Services_Import');
         /* @var $import editor_Plugins_TermImport_Services_Import */
         

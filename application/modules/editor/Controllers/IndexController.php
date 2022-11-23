@@ -36,6 +36,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\Translate5\Tools\CronIpFactory;
 
 /**
  * Dummy Index Controller
@@ -628,11 +629,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
 
-        $config = Zend_Registry::get('config');
-        $isCronIP = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
+        $cronIp = CronIpFactory::create();
         $hasAppStateACL = $acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'backend', 'applicationstate');
         //since application state contains sensible information we show that only to the cron TP, or with more details to the API users
-        if ($isCronIP || $hasAppStateACL) {
+        if ($cronIp->isAllowed($_SERVER['REMOTE_ADDR']) || $hasAppStateACL) {
             $this->view->applicationstate = ZfExtended_Debug::applicationState($hasAppStateACL);
         }
     }

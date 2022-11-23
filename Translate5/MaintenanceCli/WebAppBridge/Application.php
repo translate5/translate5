@@ -88,9 +88,6 @@ class Application {
         $this->hostname = $config->runtimeOptions->server->name;
 
         $this->version = \ZfExtended_Utils::getAppVersion();
-
-        //fix so that messagebus installation hash will work.
-        $_SERVER['SERVER_ADDR'] = $config->runtimeOptions->cronIP;
     }
 
     /**

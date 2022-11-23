@@ -78,6 +78,13 @@ class editor_Models_Terminology_Import_TbxFileImport
      */
     protected bool $mergeTerms;
 
+    /***
+     * Value of $tbxFilePath-arg used in last importXmlFile() method call
+     *
+     * @var string
+     */
+    protected string $tbxFilePath;
+
     /**
      * current term collection
      * @var editor_Models_TermCollection_TermCollection
@@ -187,6 +194,7 @@ class editor_Models_Terminology_Import_TbxFileImport
     {
         $this->collection = $collection;
         $this->mergeTerms = $mergeTerms;
+        $this->tbxFilePath = $tbxFilePath;
         $this->prepareImportArrays($user);
 
         //reset internal XML error list
@@ -199,7 +207,7 @@ class editor_Models_Terminology_Import_TbxFileImport
             }
         });
 
-        if(!$xmlReader->open($tbxFilePath)) {
+        if(!$xmlReader->open($tbxFilePath, flags: LIBXML_PARSEHUGE)) {
             throw new Zend_Exception('TBX file can not be opened.');
         }
 
@@ -365,7 +373,7 @@ $memLog('Loaded terms:        ');
             $node = new SimpleXMLElement($xmlReader->readOuterXML());
             if($listType == 'binaryData') {
                 /** @var $binImport editor_Models_Terminology_Import_TbxBinaryDataImport */
-                $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport');
+                $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport', [$this->tbxFilePath]);
                 $binImport->import($this->collection->getId(), $node);
             }
             else {

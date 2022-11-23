@@ -29,6 +29,11 @@ END LICENSE AND COPYRIGHT
 trait editor_Controllers_Traits_TermportalTrait {
 
     /**
+     * @var ZfExtended_Models_User|null
+     */
+    protected ?ZfExtended_Models_User $user;
+
+    /**
      * Alias for editor_Utils::jcheck(), except that if $data arg is not given - request params will be used by default
      *
      * @param $ruleA
@@ -121,8 +126,17 @@ trait editor_Controllers_Traits_TermportalTrait {
             ::get('editor_Models_Terminology_Models_AttributeModel')
             ->getReadonlyByIds(
                 $attrIds,
-                $canDeleteOwn ? $this->_session->id : false,
+                $canDeleteOwn ? $this->user()->getId() : false,
                 $rights
             );
+    }
+
+    /**
+     * lazy-load and return current user
+     *
+     * @return ZfExtended_Models_User|null
+     */
+    public function user() {
+        return $this->user = $this->user ?? ZfExtended_Authentication::getInstance()->getUser();
     }
 }

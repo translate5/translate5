@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Tools\IpMatcher;
+
 /***
  * Check if the current client request is configured as ip based in the zf_configuration.
  * Create/load ip based temp user.
@@ -259,27 +261,10 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
 
     /**
      * Checks if particular ip address is within the provided range
-     *
-     * @param string $ipToCheck - ip address in dot notation to check against the particular range
-     * @param string $range - ip range in dot notation with subnet mask e.g. (192.168.0.1/32)
-     *
-     * @return bool
      */
     private function isIpInRange(string $ipToCheck, string $range): bool
     {
-        [$subnet, $bits] = explode('/', $range);
-
-        // In case $range doesn't contain a subnet
-        if ($bits === null) {
-            $bits = 32;
-        }
-
-        $subnet = ip2long($subnet);
-        $mask = -1 << (32 - $bits);
-        $subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
-        $ip = ip2long($ipToCheck);
-
-        return ($ip & $mask) === $subnet;
+        return (new IpMatcher())->isIpInRange($ipToCheck, $range);
     }
 
     private function resolveIp(): string

@@ -437,7 +437,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         foreach (Config::getUserDataFolders() as $folder) {
             $userDir = $dataDirectory . '/' . $folder;
             if (is_dir($userDir)) {
-                \ZfExtended_Utils::recursiveDelete($userDir, null, false);
+                \ZfExtended_Utils::recursiveDelete($userDir, ['gitignore'], true, false);
             } else {
                 mkdir($userDir, 0777);
                 if (PHP_OS_FAMILY != 'Windows') { // TODO FIXME: on windows this may lead to an unusable installation if called with elevated rights
