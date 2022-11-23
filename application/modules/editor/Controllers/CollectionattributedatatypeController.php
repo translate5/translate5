@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  *
  */
-class editor_CollectionAttributeDatatypeController extends ZfExtended_RestController
+class editor_CollectionattributedatatypeController extends ZfExtended_RestController
 {
     /**
      * Use termportal trait

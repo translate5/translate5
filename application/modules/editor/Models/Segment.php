@@ -1048,9 +1048,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @param editor_Models_Task $task
      * @param bool $edited: If set (default) the edited content is used, otherwise the original
      * @param bool $fixKnownFaultyTags: If set (default) Tag-faults are repaired automatically (usually these tags are removed)
+     * @param bool $searchForFaultyTags: If set, Tag-faults are searched for (normally, the tag faults are evaluated by the auto-QA)
      * @return editor_Segment_Export
      */
-    public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixKnownFaultyTags=true) : ?editor_Segment_Export {
+    public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixKnownFaultyTags=true, bool $searchForFaultyTags=false) : ?editor_Segment_Export {
         //since fields can be merged from different files, data for a field can be empty
         if (empty($this->segmentdata[$field])) {
             return null;
@@ -1058,7 +1059,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $fieldTags = ($edited) ?
             new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->edited, $field, $this->segmentFieldManager->getEditIndex($field)) :
             new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->original, $field, $field);
-            return editor_Segment_Export::create($fieldTags, $fixKnownFaultyTags);
+        return editor_Segment_Export::create($fieldTags, $fixKnownFaultyTags, $searchForFaultyTags);
     }
 
     /**
