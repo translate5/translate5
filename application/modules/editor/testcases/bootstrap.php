@@ -64,9 +64,10 @@ $index->addModuleOptions('default');
 
 // runtimeOptions.dir.taskData
 $config = Zend_Registry::get('config');
+
 // crucial: setup the test-API with the neccessary pathes & url's
 ZfExtended_Test_ApiHelper::setup([
-    'API_URL' => $config->runtimeOptions->server->protocol.$config->runtimeOptions->server->name,
+    'API_URL' => ZfExtended_ApiClient::getServerBaseURL(),
     'DATA_DIR' => $config->runtimeOptions->dir->taskData,
     'LOGOUT_PATH' => $config->runtimeOptions->loginUrl,
     'CAPTURE_MODE' => (getenv('DO_CAPTURE') === '1'),
