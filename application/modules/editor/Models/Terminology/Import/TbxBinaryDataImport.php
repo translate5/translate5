@@ -30,6 +30,26 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Terminology_Import_TbxBinaryDataImport
 {
     /**
+     * Flag indicating whether binary data should be additionally base64_decode()-ed prior writing as files on disk
+     *
+     * @var bool
+     */
+    public $doubleDecode = false;
+
+    /**
+     * editor_Models_Terminology_Import_TbxBinaryDataImport constructor.
+     * @param string $tbxFilePath
+     */
+    public function __construct($tbxFilePath = '') {
+
+        // Setup doubleDecode flag
+        $this->doubleDecode = preg_match(
+            '~<sourceDesc><p>Termflow</p></sourceDesc>~',
+            file_get_contents($tbxFilePath, false, null, 0, 5 * 1024)
+        );
+    }
+
+    /**
      * imports the binary data refObject as images
      * @param int $collectionId
      * @param SimpleXMLElement $refObjectList
@@ -119,6 +139,11 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
         if ($image['encoding'] === 'hex') {
             // convert the hex string to binary
             $image['data'] = hex2bin($hexOrXbaseWithoutSpace);
+
+            // If doubleDecode flag is true - do one more decode
+            if ($this->doubleDecode) {
+                $image['data'] = base64_decode($image['data']);
+            }
         } else {
             // convert the base64 string to binary
             $image['data'] = base64_decode($hexOrXbaseWithoutSpace);

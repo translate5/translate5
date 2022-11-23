@@ -8897,6 +8897,13 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='U2llIGvDtm5uZW4gRGF0ZWllbiBudXIgYWt0dWFsaXNpZXJlbiwgd2VubiBkaWUgaG9jaGdlbGFkZW5lIERhdGVpIHZvbSBnbGVpY2hlbiBEYXRlaXR5cCBpc3QgdW5kIGRpZSBnbGVpY2hlIEFuemFobCB2b24gU2VnbWVudGVuIGhhdC4gRGVyemVpdCB1bnRlcnN0w7x0enRlIERhdGVpdHlwZW46IHswfQ=='>
               <source>Sie können Dateien nur aktualisieren, wenn die hochgeladene Datei vom gleichen Dateityp ist und die gleiche Anzahl von Segmenten hat. Derzeit unterstützte Dateitypen: {0}</source>
               <target>You can update files only if the uploaded file is of the same file type and has the same number of segments.Currently supported file types: {0}</target>
+            <trans-unit id='WnV3ZWlzdW5nc3dlcnRlIGJlYXJiZWl0ZW4='>
+                <source>Zuweisungswerte bearbeiten</source>
+                <target>Edit mapping values</target>
+            </trans-unit>
+            <trans-unit id='SW5kZXg='>
+                <source>Index</source>
+                <target>Index</target>
             </trans-unit>
         </body>
     </file>
