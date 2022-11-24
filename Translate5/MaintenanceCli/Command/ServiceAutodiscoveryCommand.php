@@ -325,6 +325,7 @@ using the default ports.')
         $foundATagger = false;
         foreach ($found as $key => $value) {
             if (empty($found[$key])) {
+                $this->updateConfig('runtimeOptions.termTagger.url.' . $key, '[]');
                 continue;
             }
             $value = json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
