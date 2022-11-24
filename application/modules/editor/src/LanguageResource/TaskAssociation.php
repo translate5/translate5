@@ -269,6 +269,19 @@ class TaskAssociation extends ZfExtended_Models_Entity_Abstract {
     }
 
     /***
+     * Get all updatable memories for a given task
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getTaskUpdatable(string $taskGuid): array
+    {
+        $s = $this->db->select()
+            ->where('taskGuid = ?',$taskGuid)
+            ->where('segmentsUpdateable = 1');
+        return $this->db->fetchAll($s)->toArray();
+    }
+
+    /***
      * Check if given resource is assigned to a task
      * @param int $resourceId
      * @param string $taskGuid

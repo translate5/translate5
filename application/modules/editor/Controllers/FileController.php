@@ -26,80 +26,124 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\Reimport\DataProvider;
+use MittagQI\Translate5\Task\Reimport\Worker;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
-class Editor_FileController extends ZfExtended_RestController {
-  use TaskContextTrait;
+/**
+ *
+ */
+class editor_FileController extends ZfExtended_RestController
+{
 
-  protected $entityClass = 'editor_Models_Foldertree';
-  
-  /**
-   * @var editor_Models_Foldertree
-   */
-  protected $entity;
+    use TaskContextTrait;
+
+    protected $entityClass = 'editor_Models_File';
 
     /**
-     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @var editor_Models_File
+     */
+    protected $entity;
+
+    /**
+     * inits the internal entity Object, handels given limit, filter and sort parameters
+     *
+     * @throws MittagQI\Translate5\Task\Current\Exception
      * @throws NoAccessException
-     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException|Exception
+     * @see Zend_Controller_Action::init()
      */
     public function init()
     {
         parent::init();
-        $this->initCurrentTask();
+        $this->initCurrentTask(false);
     }
 
-    /**
-     * @throws \MittagQI\Translate5\Task\Current\Exception
-     */
     public function indexAction()
     {
-        $this->entity->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
-        //by passing output handling, output is already JSON
-        $contextSwitch = $this->getHelper('ContextSwitch');
-        $contextSwitch->setAutoSerialization(false);
-        $this->getResponse()->setBody($this->entity->getTreeAsJson());
+        $rows = $this->entity->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
+        $this->view->assign('rows',$rows);
+        $this->view->assign('total',count($rows));
     }
 
     /**
-     * @throws \MittagQI\Translate5\Task\Current\Exception
-     * @throws ZfExtended_NoAccessException
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Exception
+     * @throws Exception
+     * @throws ZfExtended_FileUploadException
      */
-    public function putAction()
+    public function postAction()
     {
-        $taskGuid = $this->getCurrentTask()->getTaskGuid();
-        $data = json_decode($this->_getParam('data'));
 
-        $wfh = $this->_helper->workflow;
-        /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($taskGuid, editor_User::instance()->getGuid());
+        $fileId = $this->getParam('fileId');
+        $saveToMemory = (bool)$this->getParam('saveToMemory',false);
 
-        $this->entity->loadByTaskGuid($taskGuid);
-        $mover = ZfExtended_Factory::get('editor_Models_Foldertree_Mover', array($this->entity));
-        $mover->moveNode((int)$data->id, (int)$data->parentId, (int)$data->index);
-        $this->entity->syncTreeToFiles();
-        $this->syncSegmentFileOrder($taskGuid);
-        $this->view->data = $mover->getById((int)$data->id);
+        if (empty($fileId)) {
+            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1426');
+        }
+
+        $task = $this->getCurrentTask();
+
+        /** @var DataProvider $dataProvider */
+        $dataProvider = ZfExtended_Factory::get(DataProvider::class,[
+            $fileId
+        ]);
+        $dataProvider->checkAndPrepare($task);
+
+        /** @var Worker $worker */
+        $worker = ZfExtended_Factory::get(Worker::class);
+
+        // init worker and queue it
+        if (!$worker->init($task->getTaskGuid(), [
+            'fileId' => $fileId,
+            'file' => $dataProvider->getFile(),
+            'userGuid' => ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
+            'segmentTimestamp' => NOW_ISO,
+        ])) {
+            throw new ZfExtended_Exception('Task ReImport Error on worker init()');
+        }
+
+        try {
+            $worker->queue();
+            if($saveToMemory){
+                $this->queueUpdateTmWorkers();
+            }
+
+            $this->view->success = true;
+        }catch (Throwable $exception){
+            Lock::taskUnlock($task);
+            throw  $exception;
+        }
     }
-  
-  /**
-   * syncronize the Segment FileOrder Values to the corresponding Values in LEK_Files
-   * @param string $taskGuid
-   */
-  protected function syncSegmentFileOrder($taskGuid) {
-    /* @var $segment editor_Models_Segment */
-    $segment = ZfExtended_Factory::get('editor_Models_Segment');
-    $segment->syncFileOrderFromFiles($taskGuid);
-  }
-  
-  public function deleteAction()
-  {
-    throw new ZfExtended_BadMethodCallException(__CLASS__.'->delete');
-  }
-  
-  public function postAction()
-  {
-    throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
-  }
+
+    /***
+     * Queue tm update workers for the current task. Only the writable langauge resources will be updated
+     */
+    protected function queueUpdateTmWorkers(): void
+    {
+
+        $assoc = ZfExtended_Factory::get(TaskAssociation::class);
+
+        $resources = $assoc->getTaskUpdatable($this->getCurrentTask()->getTaskGuid());
+
+        foreach ($resources as $resource){
+            $worker = ZfExtended_Factory::get('editor_Models_LanguageResources_Worker');
+            /* @var editor_Models_LanguageResources_Worker $worker */
+
+            // init worker and queue it
+            // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost
+            if (!$worker->init($this->getCurrentTask()->getTaskGuid(), [
+                'languageResourceId' => $resource['languageResourceId'],
+                'segmentFilter' => NOW_ISO
+            ])) {
+                throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
+            }
+            $worker->queue();
+        }
+    }
 }

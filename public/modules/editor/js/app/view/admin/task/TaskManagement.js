@@ -26,12 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-//TODO: remove the window from the name(controller and vm to) and update all references
-Ext.define('Editor.view.admin.task.PreferencesWindow', {
+Ext.define('Editor.view.admin.task.TaskManagement', {
     extend: 'Ext.panel.Panel',
-    alias: 'widget.adminTaskPreferencesWindow',
+    alias: 'widget.adminTaskTaskManagement',
     requires: [
-        'Editor.view.admin.task.PreferencesWindowViewModel',
+        'Editor.view.admin.task.TaskManagementViewModel',
         'Editor.view.admin.task.UserAssoc',
         'Editor.view.admin.task.Preferences',
         'Editor.view.admin.task.TaskAttributes',
@@ -39,9 +38,10 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         'Editor.view.admin.task.LogGrid',
         'Editor.view.admin.task.LogWindow',
         'Editor.view.admin.config.Grid',
-        'Editor.view.LanguageResources.pivot.Assoc'
+        'Editor.view.LanguageResources.pivot.Assoc',
+        'Editor.view.admin.task.reimport.Reimport'
     ],
-    itemId: 'adminTaskPreferencesWindow',
+    itemId: 'adminTaskTaskManagement',
     header:false,
     strings: {
         close: '#UT#Fenster schließen',
@@ -51,7 +51,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     },
     layout: 'fit',
     viewModel: {
-        type: 'taskpreferences'
+        type: 'taskManagement'
     },
     initConfig: function(instanceConfig) {
         var me = this,
@@ -76,13 +76,10 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'languageResourcePivotAssoc',
                 title: me.strings.pivotAssoc,
                 bind:{
-                    task:'{currentTask}'
+                    disabled:'{disabledDuringTaskImport}'
                 }
             });
         }
-
-
-
 
         if(auth.isAllowed('editorManageQualities')) {
             tabs.push({
@@ -129,6 +126,18 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 }
             });
         }
+
+        if(auth.isAllowed('taskReimport')) {
+            tabs.push({
+                xtype: 'adminTaskReimportReimport',
+                bind: {
+                    disabled:'{disabledDuringTaskImport}',
+                    title: '{l10n.projectOverview.taskManagement.taskReimport.title}'
+                }
+            });
+        }
+
+
         
         config = {
             items : [{

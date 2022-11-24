@@ -82,8 +82,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         ref: 'adminMainSection',
         selector: '#adminMainSection'
     }, {
-        ref: 'adminTaskPreferencesWindow',
-        selector: '#adminTaskPreferencesWindow'
+        ref: 'adminTaskTaskManagement',
+        selector: '#adminTaskTaskManagement'
     }, {
         ref: 'projectGrid',
         selector: '#projectGrid'
@@ -373,7 +373,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     editorPreferencesTask: function (task) {
         var me = this;
         me.getProjectPanel().getController().redirectFocus(task, true);
-        me.getAdminTaskPreferencesWindow().down('tabpanel').setActiveTab('adminTaskUserAssoc');
+        me.getAdminTaskTaskManagement().down('tabpanel').setActiveTab('adminTaskUserAssoc');
         me.fireEvent('handleTaskPreferences', task);
     },
 
@@ -1235,6 +1235,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             return;
         }
 
+        // Setting the current task view model variable for the IMPORT wizard.
         win.getViewModel().set('currentTask', task);
         //TODO: use the current task in all other cards
         items.forEach(function (item) {

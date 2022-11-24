@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
+Ext.define('Editor.view.admin.task.TaskManagementViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.taskpreferences',
+    alias: 'viewmodel.taskManagement',
     data: {
         currentTask:null
     },

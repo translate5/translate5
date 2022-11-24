@@ -35,7 +35,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
     extend: 'Ext.app.Controller',
     models: ['admin.TaskUserAssoc', 'admin.Task', 'admin.task.UserPref'],
     stores: ['admin.Users', 'admin.TaskUserAssocs'],
-    views: ['admin.task.PreferencesWindow', 'admin.task.UserAssocGrid'],
+    views: ['admin.task.TaskManagement', 'admin.task.UserAssocGrid'],
     mixins: ['Editor.util.Util'],
     refs: [{
         ref: 'assocDelBtn',
@@ -54,7 +54,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
         selector: 'adminTaskUserAssoc #editInfoOverlay'
     }, {
         ref: 'prefWindow',
-        selector: '#adminTaskPreferencesWindow'
+        selector: '#adminTaskTaskManagement'
     }],
     messages: {
         assocSave: '#UT#Eintrag gespeichert!',

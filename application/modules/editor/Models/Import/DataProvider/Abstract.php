@@ -82,7 +82,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @throws editor_Models_Import_DataProvider_Exception
      */
     protected function checkAndMakeTempImportFolder() {
-        $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
+        $this->setImportFolder();
         if(is_dir($this->importFolder)) {
             //DataProvider: Temporary directory does already exist - path: "{path}"'
             throw new editor_Models_Import_DataProvider_Exception('E1246', [
@@ -90,14 +90,14 @@ abstract class editor_Models_Import_DataProvider_Abstract {
                 'path' => $this->importFolder,
             ]);
         }
-        $msg = 'Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' could not be created!';
-        $this->mkdir($this->importFolder, $msg);
+        $this->mkdir($this->importFolder);
     }
 
     /**
      * deletes the temporary import folder
      */
-    protected function removeTempFolder() {
+    protected function removeTempFolder(): void
+    {
         if(isset($this->importFolder) && is_dir($this->importFolder)) {
             ZfExtended_Utils::recursiveDelete($this->importFolder);
         }
@@ -112,7 +112,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
         if(is_dir($path)){
             return;
         }
-        if(!@mkdir($path,0777,true)) {
+        if(!mkdir($path, 0777, true) && !is_dir($path)) {
             //DataProvider: Could not create folder "{path}"
             throw new editor_Models_Import_DataProvider_Exception('E1245', [
                 'task' => $this->task,
@@ -163,6 +163,27 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     }
 
     /***
+     * Set the task paths (taskPath and importFolder)
+     * @param editor_Models_Task $task
+     * @return void
+     */
+    public function setTaskPaths(editor_Models_Task $task): void
+    {
+        $this->setTask($task);
+        $this->setImportFolder();
+
+    }
+
+    /***
+     * Set the task import folder path
+     * @return void
+     */
+    protected function setImportFolder(): void
+    {
+        $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
+    }
+
+    /***
      * @return editor_Models_Task
      */
     public function getTask(){
@@ -209,12 +230,14 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @throws editor_Models_Import_DataProvider_Exception
      */
     protected function createImportedDataArchive(string $zipFilename) {
-        $filter = new Zend_Filter_Compress(array(
+
+        $filter = new Zend_Filter_Compress([
             'adapter' => 'Zip',
-            'options' => array(
+            'options' => [
                 'archive' => $zipFilename
-            ),
-        ));
+            ]
+        ]);
+
         // process the additional files by temporarily adding them to the importFolder
         $deletions = [];
         foreach($this->additionalArchiveFiles as $fileName => $filePath){
@@ -232,5 +255,34 @@ abstract class editor_Models_Import_DataProvider_Abstract {
         foreach($deletions as $file){
             @unlink($file);
         }
+
+        ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFilename), self::TASK_TEMP_IMPORT);
+    }
+
+    /***
+     * extrahiert das geholte Zip File, bricht bei Fehlern ab
+     * @param string $zipPath
+     * @param string $extractTo
+     * @return void
+     * @throws editor_Models_Import_DataProvider_Exception
+     */
+    protected function unzipArchive(string $zipPath, string $extractTo): void
+    {
+        $zip = new ZipArchive();
+        if (! $zip->open($zipPath)) {
+            // DataProvider Zip: zip file could not be opened
+            throw new editor_Models_Import_DataProvider_Exception('E1241', [
+                'task' => $this->task,
+                'zip' => $zipPath
+            ]);
+        }
+        if (! $zip->extractTo($extractTo)) {
+            // DataProvider Zip: content from zip file could not be extracted
+            throw new editor_Models_Import_DataProvider_Exception('E1242', [
+                'task' => $this->task,
+                'zip' => $extractTo
+            ]);
+        }
+        $zip->close();
     }
 }

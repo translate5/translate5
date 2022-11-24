@@ -35,6 +35,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Applet\Dispatcher;
 use MittagQI\Translate5\Task\Current\NoAccessException;
+use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Tools\CronIpFactory;
 
@@ -379,6 +380,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         
         // set special characters list into a front-end view variable. This should be removed after this config is moved to lvl 16
         $this->view->Php2JsVars()->set('editor.segments.editorSpecialCharacters', $rop->editor->segments?->editorSpecialCharacters ?? '');
+
+        // add the supported file extensions for task reimport as frontend variable
+        $this->view->Php2JsVars()->set('editor.task.reimport.supportedExtensions', FileHandler::getSupportedFileTypes());
 
         $this->setJsAppData();
         $this->setQualityCheckJsVars();
@@ -763,12 +767,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $enTrans = ZfExtended_Factory::get('ZfExtended_Zendoverwrites_Translate', ['en']);
         $enMessages = $enTrans->getAdapter()->getMessages('en');
 
-        $enXliff = function ($key, $de, $en) {
-            return "<trans-unit id='" . $key . "'>\n  <source>" . $de . "</source>\n  <target>" . $en . "</target>\n</trans-unit>\n";
+        $localeTemplate = function ($key, $source, $target) {
+            return "<trans-unit id='" . $key . "'>\n  <source>" . $source . "</source>\n  <target>" . $target . "</target>\n</trans-unit>\n";
         };
 
         $this->view->enOut = [];
-        $this->view->deOut = "<trans-unit id='" . $inputKey . "'><source>" . $input . "</source><target>" . $input . "</target></trans-unit>\n";
+        $this->view->deOut = $localeTemplate($inputKey,$input,$input);
         if (empty($enMessages[$input])) {
             $deTrans = ZfExtended_Factory::get('ZfExtended_Zendoverwrites_Translate', ['de']);
             /* @var $deTrans ZfExtended_Zendoverwrites_Translate */
@@ -788,7 +792,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
                 if (empty($enMessages[$key])) {
                     continue;
                 }
-                $this->view->enOut[] = ['text' => $enXliff($inputKey, $input, $enMessages[$key]), 'matchrate' => $percentage];
+                $this->view->enOut[] = ['text' => $localeTemplate($inputKey, $input, $enMessages[$key]), 'matchrate' => $percentage];
                 if (count($this->view->enOut) >= 5) {
                     break;
                 }
@@ -798,12 +802,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         } else {
             $this->view->exactMatch = true;
             $this->view->noMatch = false;
-            $this->view->enOut[] = ['text' => $enXliff($inputKey, $input, $enMessages[$input]), 'matchrate' => 100];
+            $this->view->enOut[] = ['text' => $localeTemplate($inputKey, $input, $enMessages[$input]), 'matchrate' => 100];
         }
         if (empty($this->view->enOut)) {
             $this->view->exactMatch = false;
             $this->view->noMatch = true;
-            $this->view->enOut[] = ['text' => $enXliff($inputKey, $input, $input), 'matchrate' => 0];
+            $this->view->enOut[] = ['text' => $localeTemplate($inputKey, $input, $input), 'matchrate' => 0];
         }
     }
 

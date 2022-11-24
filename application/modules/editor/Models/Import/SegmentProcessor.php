@@ -181,13 +181,11 @@ abstract class editor_Models_Import_SegmentProcessor {
      * @param string $field
      * @return boolean
      */
-    protected function fieldHasDefaultWidth(string $field) {
-        switch ($field) {
-            case editor_Models_SegmentField::TYPE_SOURCE;
-            case editor_Models_SegmentField::TYPE_TARGET;
-            case editor_Models_SegmentField::TYPE_RELAIS;
-            return true;
-        }
-        return false;
+    protected function fieldHasDefaultWidth(string $field): bool
+    {
+        return match ($field) {
+            editor_Models_SegmentField::TYPE_SOURCE, editor_Models_SegmentField::TYPE_TARGET, editor_Models_SegmentField::TYPE_RELAIS => true,
+            default => false,
+        };
     }
 }
