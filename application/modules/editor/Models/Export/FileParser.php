@@ -313,7 +313,7 @@ abstract class editor_Models_Export_FileParser {
         // for non editable sources the edited field is empty, so we have to fetch the original
         $useEdited = !($field == editor_Models_SegmentField::TYPE_SOURCE && !$this->segmentFieldManager->isEditable($field));
         // if the auto-qa is deactivated, this flag should be true to anable dynamic searching for faults
-        // TODO FIXME: when QU is not active for segment errors, faulty tags will only be detected, not repaired. This behaviour must be discussed and the variable-naming curently says something else
+        // TODO FIXME: when auto-QA is not active for segment errors, faulty tags will only be detected, not repaired. This behaviour must be discussed and the variable-naming curently says something else
         $findFaultyTags = array_key_exists('checkFaultySegments', $this->options) && $this->options['checkFaultySegments'] === true;
         // as stated above, not to fix if we search for faults seems to be pretty schizophrenic
         // UGLY: we must check, if InstantTranslate is active to use editor_Plugins_InstantTranslate_TaskType::ID. Since this is just a TEMPORARY feature-deactivation the const-value is used instead
