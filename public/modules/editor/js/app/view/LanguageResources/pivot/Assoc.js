@@ -158,6 +158,23 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
         return me.callParent([ config ]);
     },
 
+    initComponent: function() {
+        var me = this;
+        me.callParent(arguments);
+        Ext.on({
+            projectTaskSelectionChange:'onProjectTaskSelectionChange',
+            scope:me
+        })
+    },
+
+    /***
+     * Event handler for project task change event.
+     * @param newTask
+     */
+    onProjectTaskSelectionChange: function (newTask){
+        this.loadForTask(newTask);
+    },
+
     /***
      * Load the current grid store for given task
      * @param task

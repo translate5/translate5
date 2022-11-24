@@ -48,13 +48,13 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
   },
   refs: [{
       ref: 'taskTabs',
-      selector: 'adminTaskPreferencesWindow > tabpanel'
+      selector: 'adminTaskTaskManagement > tabpanel'
   },{
       ref: 'grid',
       selector: '#languageResourcesTaskAssocGrid'
   },{
-      ref: 'adminTaskWindow',
-      selector: 'adminTaskPreferencesWindow'
+      ref: 'taskManagement',
+      selector: 'adminTaskTaskManagement'
   },{
 	  ref:'adminTaskAddWindow',
 	  selector: '#adminTaskAddWindow'
@@ -113,7 +113,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
   },
   
   /**
-   * Save save assoc record
+   * Save assoc record
    */
   saveRecord: function(record){
       var me = this,
@@ -127,8 +127,8 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
               segmentsUpdateable: record.get('segmentsUpdateable')
           });
 
-      if(me.getAdminTaskWindow()){
-          me.getAdminTaskWindow().setLoading(true);
+      if(me.getTaskManagement()){
+          me.getTaskManagement().setLoading(true);
       }
       if(record.get('checked')) {
           method = record.get('taskassocid') ? 'PUT' : 'POST';
@@ -168,11 +168,11 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
   
   hideLoadingMask:function(){
       var me=this;
-      if(!me.getAdminTaskWindow()){
+      if(!me.getTaskManagement()){
           return;
       }
-      var task = me.getAdminTaskWindow().getCurrentTask();
-      me.getAdminTaskWindow().setLoading(false);
+      var task = me.getTaskManagement().getCurrentTask();
+      me.getTaskManagement().setLoading(false);
       task && task.load();
   },
   
@@ -185,6 +185,6 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
 	  if(addTaskWindow){
 		  return addTaskWindow.down('#languageResourcesTaskAssocGrid');
 	  }
-	  return me.getAdminTaskWindow().down('#languageResourcesTaskAssocGrid');
+	  return me.getTaskManagement().down('#languageResourcesTaskAssocGrid');
   }
 });

@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  *
  */
-class editor_CollectionAttributeDatatypeController extends ZfExtended_RestController
+class editor_CollectionattributedatatypeController extends ZfExtended_RestController
 {
     /**
      * Use termportal trait
@@ -69,11 +69,10 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
         // Pick session
         $this->_session = (new Zend_Session_Namespace('user'))->data;
 
-        // If current user has 'termPM_allClients' role, it means all collections are accessible
+        // If current user has 'anyCollection'-right on 'editor_term'-resource, it means all collections are accessible
         // Else we should apply collectionsIds-restriction everywhere, so get accessible collections
         $this->collectionIds =
-            in_array('termPM_allClients', $this->_session->roles)
-            //$this->isAllowed( 'editor_term', 'anyCollection') // use this instead of upper line when other branch is merged into develop
+            $this->isAllowed( 'editor_term', 'anyCollection')
                 ?: ZfExtended_Factory
                     ::get(editor_Models_TermCollection_TermCollection::class)
                     ->getAccessibleCollectionIds(editor_User::instance()->getModel());
@@ -189,7 +188,7 @@ class editor_CollectionAttributeDatatypeController extends ZfExtended_RestContro
         }
 
         // If user is going to disable datatype, proceed only after such operation is confirmed
-        if ($enabled || $this->confirm($msg)) {
+        if ($enabled || $qty == 0 || $this->confirm($msg)) {
 
             // Update mapping's enabled-flag
             $this->entity->setEnabled($enabled);

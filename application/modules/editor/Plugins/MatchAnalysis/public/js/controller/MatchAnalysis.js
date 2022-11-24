@@ -43,11 +43,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     stores:['Editor.plugins.MatchAnalysis.store.MatchAnalysis'],
     
     refs:[{
-        ref: 'adminTaskPreferencesWindow',
-        selector: 'adminTaskPreferencesWindow'
+        ref: 'adminTaskTaskManagement',
+        selector: 'adminTaskTaskManagement'
     },{
         ref: 'preferencesTabpanal',
-        selector: 'adminTaskPreferencesWindow > tabpanel'
+        selector: 'adminTaskTaskManagement > tabpanel'
     },{
         ref:'matchAnalysisPanel',
         selector: 'matchAnalysisPanel'
@@ -89,8 +89,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
     listen:{
         component:{
-            '#adminTaskPreferencesWindow tabpanel':{
-                render:'onTaskPreferencesWindowPanelRender'
+            '#adminTaskTaskManagement tabpanel':{
+                render:'onTaskTaskManagementPanelRender'
             },
             '#adminTaskAddWindow': {
                 beforerender:'onAdminTaskWindowBeforeRender'
@@ -177,9 +177,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
 
     /***
-     * On task preferences window tabpanel render
+     * On task management tabpanel render
      */
-    onTaskPreferencesWindowPanelRender:function(panel){
+    onTaskTaskManagementPanelRender:function(panel){
         //add the matchanalysis panel in the tabpanel
         panel.insert(2,{
            xtype:'matchAnalysisPanel'
@@ -321,7 +321,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         var me=this,
             task=item.lookupViewModel(true).get('task');
         me.getProjectPanel().getController().redirectFocus(task,true);
-        me.getAdminTaskPreferencesWindow().down('tabpanel').setActiveTab('matchAnalysisPanel');
+        me.getAdminTaskTaskManagement().down('tabpanel').setActiveTab('matchAnalysisPanel');
     },
     
     /***
@@ -354,10 +354,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     matchAnalysisButtonHandler:function(button){
         var me = this,
-            win = button.up('#adminTaskPreferencesWindow'),
+            taskManagement = button.up('#adminTaskTaskManagement'),
             tmAndTermChecked = me.isCheckboxChecked('pretranslateTmAndTerm'),
             mTChecked = me.isCheckboxChecked('pretranslateMt'),
-            task = win.getCurrentTask(),
+            task = taskManagement.getCurrentTask(),
             operation = (mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
         
         me.startOperation(task.get('id'), operation, false);

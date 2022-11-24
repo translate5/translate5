@@ -93,25 +93,11 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 
     /**
      * extrahiert das geholte Zip File, bricht bei Fehlern ab
+     * @throws editor_Models_Import_DataProvider_Exception
      */
     protected function unzip()
     {
-        $zip = new ZipArchive();
-        if (! $zip->open($this->importZip)) {
-            // DataProvider Zip: zip file could not be opened
-            throw new editor_Models_Import_DataProvider_Exception('E1241', [
-                'task' => $this->task,
-                'zip' => $this->importZip
-            ]);
-        }
-        if (! $zip->extractTo($this->importFolder)) {
-            // DataProvider Zip: content from zip file could not be extracted
-            throw new editor_Models_Import_DataProvider_Exception('E1242', [
-                'task' => $this->task,
-                'zip' => $this->importZip
-            ]);
-        }
-        $zip->close();
+        $this->unzipArchive($this->importZip,$this->importFolder);
     }
 
     /**
