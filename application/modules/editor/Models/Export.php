@@ -112,6 +112,7 @@ class editor_Models_Export {
         // a list of segments that has faults (which are fixed automatically)
         $faultySegments = [];
         // if the auto-QA for internal tags is not active segment tag faults have to be evaluated on-the-fly
+        // TODO FIXME: when QU is not active for segment errors, faulty tags will only be detected, not repaired. This behaviour must be discussed and the variable-naming curently says something else
         $checkSegmentTags = editor_Segment_Quality_Manager::instance()->isFullyCheckedType(editor_Segment_Tag::TYPE_INTERNAL, $this->task->getConfig()) === false;
 
         foreach ($filePaths as $fileId => $relPath) {
