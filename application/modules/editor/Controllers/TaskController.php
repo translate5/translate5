@@ -70,16 +70,6 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $filterClass = 'editor_Models_Filter_TaskSpecific';
 
     /**
-     * @var editor_Workflow_Default
-     */
-    protected $workflow;
-
-    /**
-     * @var editor_Workflow_Manager
-     */
-    protected $workflowManager;
-
-    /**
      * @var ZfExtended_Zendoverwrites_Translate
      */
     protected $translate;
@@ -221,22 +211,7 @@ class editor_TaskController extends ZfExtended_RestController {
 
         ->initContext();
     }
-    /**
-     * init the internal used workflow
-     * @param string $wfId workflow ID. optional, if omitted use the workflow of $this->entity
-     */
-    protected function initWorkflow($wfId = null) {
-        if(empty($wfId)) {
-            $wfId = $this->entity->getWorkflow();
-        }
-        try {
-            $this->workflow = $this->workflowManager->getCached($wfId);
-        }
-        catch (Exception $e) {
-            $this->workflow = $this->workflowManager->getCached('default');
-        }
-    }
-
+    
     /**
      *
      * @see ZfExtended_RestController::indexAction()
@@ -864,65 +839,6 @@ class editor_TaskController extends ZfExtended_RestController {
             //fieldName => error message to field
             $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
         ]);
-    }
-
-    /**
-     * starts the workers of the current or given task
-     * @param string $taskGuid optional, if empty use current task
-     */
-    protected function startImportWorkers(editor_Models_Task $task = null) {
-
-        if(empty($task)) {
-            $task = $this->entity;
-        }
-
-        $tasks = [];
-        //if it is a project, start the import workers for each sub task
-        if($task->isProject()) {
-            $tasks = $task->loadProjectTasks($task->getProjectId(),true);
-
-            /** @var editor_Workflow_Manager $wfm */
-            ZfExtended_Factory::get('editor_Workflow_Manager')
-                ->getActiveByTask($task)
-                ->hookin()
-                ->doHandleProjectCreated($task);
-
-        } else {
-            $tasks[] = $task;
-        }
-
-        // we fix all task-specific configs of the task for it's remaining lifetime
-        // this is crucial to ensure, that important configs are changed throughout the lifetime that are usually not designed to be dynamical (AutoQA, Visual, ...)
-        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
-        /* @var $taskConfig editor_Models_TaskConfig */
-        $taskConfig->fixAfterImport($tasks);
-
-        $model = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $model editor_Models_Task */
-        foreach ($tasks as $t){
-
-            if(is_array($t)){
-                $model->load($t['id']);
-            } else {
-                $model = $t;
-            }
-
-            //import workers can only be started for tasks
-            if($model->isProject()) {
-                continue;
-            }
-
-            $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-            /* @var $workerModel ZfExtended_Models_Worker */
-            try {
-                $workerModel->loadFirstOf('editor_Models_Import_Worker', $model->getTaskGuid());
-                $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
-                $worker && $worker->schedulePrepared();
-            }
-            catch (ZfExtended_Models_Entity_NotFoundException $e) {
-                //if there is no worker, nothing can be done
-            }
-        }
     }
 
     /**
