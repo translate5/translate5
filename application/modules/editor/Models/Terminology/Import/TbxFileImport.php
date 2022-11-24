@@ -203,7 +203,7 @@ class editor_Models_Terminology_Import_TbxFileImport
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
                 $this->close();
-                $this->open($tbxFilePath);
+                $this->open($tbxFilePath, flags: LIBXML_PARSEHUGE);
             }
         });
 
@@ -370,7 +370,7 @@ $memLog('Loaded terms:        ');
         while ($xmlReader->read() && $xmlReader->name !== 'refObjectList');
         while ($xmlReader->name === 'refObjectList') {
             $listType = $xmlReader->getAttribute('type');
-            $node = new SimpleXMLElement($xmlReader->readOuterXML());
+            $node = new SimpleXMLElement($xmlReader->readOuterXML(), LIBXML_PARSEHUGE);
             if($listType == 'binaryData') {
                 /** @var $binImport editor_Models_Terminology_Import_TbxBinaryDataImport */
                 $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport', [$this->tbxFilePath]);
