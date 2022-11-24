@@ -101,7 +101,7 @@ class Config {
         'runtimeOptions.plugins.SpellCheck.languagetool.url.import' => null,
         'runtimeOptions.plugins.SpellCheck.languagetool.url.gui' => null,
         'runtimeOptions.plugins.VisualReview.googleCloudApiKey' => null,
-        'runtimeOptions.plugins.VisualReview.shellCommandGoogleChrome' => null,
+        'runtimeOptions.plugins.VisualReview.dockerizedHeadlessChromeUrl' => null,
         'runtimeOptions.plugins.VisualReview.shellCommandPdf2Html' => null,
         'runtimeOptions.plugins.VisualReview.shellCommandPdfMerge' => null,
         'runtimeOptions.plugins.VisualReview.shellCommandPdfOptimizer' => null,

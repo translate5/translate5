@@ -25,6 +25,7 @@
  
  END LICENSE AND COPYRIGHT
  */
+
 namespace Translate5\MaintenanceCli\Command;
 
 use editor_Models_Config;
@@ -40,6 +41,8 @@ use ZfExtended_Plugin_Manager;
 
 class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
 {
+    private const ARGUMENT_HOST = 'host';
+
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'service:autodiscovery';
     private ZfExtended_Plugin_Manager $pluginmanager;
@@ -47,13 +50,13 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
     protected function configure()
     {
         $this
-        // the short description shown while running "php bin/console list"
-        ->setDescription('Searches for common DNS names of used services and sets them in the configuration,
+            // the short description shown while running "php bin/console list"
+            ->setDescription('Searches for common DNS names of used services and sets them in the configuration,
 using the default ports.')
-        
-        // the full command description shown when running the command with
-        // the "--help" option
-        ->setHelp('Service autodiscovery and configuration by common DNS names:
+
+            // the full command description shown when running the command with
+            // the "--help" option
+            ->setHelp('Service autodiscovery and configuration by common DNS names:
             languagetool: languagetool spellchecker (scalable on node level by DNS round robin docker-compose --scale)
             t5memory: t5memory TM, scalable only behind a load balancer with consistent hash algorithm
             termtagger: one instance
@@ -61,16 +64,22 @@ using the default ports.')
             termtagger_TYPE_N: multiple instances by type, where TYPE one of default, gui, import and N as above
             frontendmessagebus: FrontEndMessage Bus, one instance
             okapi: Okapi, currently only one instance
-            visualconverter: the internal translate5 container, one instance
+            pdfconverter: the internal translate5 container, one instance
             visualbrowser: the headless browser, one instance
         ');
-        
+
         $this->addArgument(
             'service',
             InputArgument::OPTIONAL,
             'Discover a specific service only'
         );
-        
+
+        $this->addArgument(
+            'host',
+            InputArgument::OPTIONAL,
+            'Custom host for the service. Applicable only when discovering a specific service.'
+        );
+
         $this->addOption(
             'auto-set',
             's',
@@ -100,8 +109,8 @@ using the default ports.')
             'termtagger',
             'frontendmessagebus',
             'okapi',
-            //'visualconverter', TODO
-            //'visualbrowser', TODO
+            'pdfconverter',
+            'visualbrowser',
         ];
         $service = $this->input->getArgument('service');
 
@@ -116,31 +125,33 @@ using the default ports.')
     }
 
     /**
-     * @uses  serviceLanguagetool()
-     * @uses  serviceFrontendmessagebus()
+     * @param array $services
+     * @return void
      * @uses  serviceOkapi()
      * @uses  serviceT5memory()
      * @uses  serviceTermtagger()
      * @uses  serviceTermtagger()
-     * @param array $services
-     * @return void
+     * @uses  serviceLanguagetool()
+     * @uses  serviceFrontendmessagebus()
+     * @uses  servicePdfconverter()
+     * @uses  serviceVisualbrowser()
      */
     private function foreachService(array $services): void
     {
         foreach ($services as $service) {
-            call_user_func([$this, 'service'.ucfirst($service)]);
+            call_user_func([$this, 'service' . ucfirst($service)]);
         }
     }
 
     private function checkServiceDefault(string $name, string $label, string $url): bool
     {
         $result = true;
-        if (! $this->isDnsSet($name)) {
+        if (!$this->isDnsSet($name)) {
             $url = 'NONE';
             $result = false;
         }
         $this->io->writeln('');
-        $this->io->writeln('Found '.$label.': '.$url);
+        $this->io->writeln('Found ' . $label . ': ' . $url);
         return $result;
     }
 
@@ -149,8 +160,10 @@ using the default ports.')
      */
     private function serviceT5memory(): void
     {
-        $url = 'http://t5memory:8080/t5memory';
-        if (!$this->checkServiceDefault('t5memory', 'T5Memory', $url)) {
+        $host = $this->getHost('t5memory');
+        $url = 'http://' . $host . ':4040/t5memory';
+
+        if (!$this->checkServiceDefault($host, 'T5Memory', $url)) {
             return;
         }
 
@@ -171,15 +184,16 @@ using the default ports.')
      */
     private function serviceFrontendmessagebus()
     {
-        $internalServer = 'http://frontendmessagebus:9057';
+        $host = $this->getHost('frontendmessagebus');
+        $internalServer = 'http://' . $host . ':9057';
 
-        if (! $this->checkServiceDefault('frontendmessagebus', 'FrontEndMessageBus', $internalServer)) {
-            $this->pluginmanager->setActive('FrontEndMessageBus', false);
-            $this->io->success('Plug-In FrontEndMessageBus disabled!');
+        if (!$this->checkServiceDefault($host, 'FrontEndMessageBus', $internalServer)) {
+            $this->setPluginActive('FrontEndMessageBus', false);
             return;
         }
-        $this->pluginmanager->setActive('FrontEndMessageBus');
-        $this->io->success('Plug-In FrontEndMessageBus activated!');
+
+        $this->setPluginActive('FrontEndMessageBus');
+
         $config = Zend_Registry::get('config');
         //$config->runtimeOptions.server.name
 
@@ -224,21 +238,22 @@ using the default ports.')
      */
     private function serviceOkapi(): void
     {
+        $host = $this->getHost('okapi');
+        $url = 'http://' . $host . ':8080/okapi-longhorn/';
         //FIXME multiple servers / versions???
-        if ($this->checkServiceDefault('okapi', 'Okapi', 'http://okapi:8080/okapi-longhorn/')) {
+
+        if ($this->checkServiceDefault($host, 'Okapi', $url)) {
             //runtimeOptions.plugins.Okapi.server       {"okapi-longhorn":"http://localhost:8080/okapi-longhorn/"}
             $this->updateConfig(
                 'runtimeOptions.plugins.Okapi.server',
-                '{"okapi-longhorn":"http://okapi:8080/okapi-longhorn/"}'
+                '{"okapi-longhorn":"' . $url . '"}'
             );
 
             //runtimeOptions.plugins.Okapi.serverUsed   okapi-longhorn
             $this->updateConfig('runtimeOptions.plugins.Okapi.serverUsed', 'okapi-longhorn');
-            $this->pluginmanager->setActive('Okapi');
-            $this->io->success('Plug-In Okapi activated.');
+            $this->setPluginActive('Okapi');
         } else {
-            $this->pluginmanager->setActive('Okapi', false);
-            $this->io->success('Plug-In Okapi disabled!');
+            $this->setPluginActive('Okapi', false);
         }
     }
 
@@ -247,23 +262,23 @@ using the default ports.')
      */
     private function serviceLanguagetool(): void
     {
-        $url = 'http://languagetool:8010/v2';
-        if ($this->checkServiceDefault('languagetool', 'Languagetool', $url)) {
+        $host = $this->getHost('languagetool');
+        $url = 'http://' . $host . ':8010/v2';
+
+        if ($this->checkServiceDefault($host, 'Languagetool', $url)) {
             // runtimeOptions.plugins.SpellCheck.languagetool.url.default ["http://localhost:8010/v2"]
-            $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.default', '["'.$url.'"]');
+            $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.default', '["' . $url . '"]');
 
             // runtimeOptions.plugins.SpellCheck.languagetool.url.gui http://localhost:8010/v2
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.gui', $url);
 
             // runtimeOptions.plugins.SpellCheck.languagetool.url.import ["http://localhost:8010/v2"]
-            $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.import', '["'.$url.'"]');
+            $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.import', '["' . $url . '"]');
 
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.liveCheckOnEditing', '1');
-            $this->pluginmanager->setActive('SpellCheck');
-            $this->io->success('Plug-In SpellCheck activated.');
+            $this->setPluginActive('SpellCheck');
         } else {
-            $this->pluginmanager->setActive('SpellCheck', false);
-            $this->io->success('Plug-In SpellCheck disabled!');
+            $this->setPluginActive('SpellCheck', false);
         }
     }
 
@@ -281,19 +296,21 @@ using the default ports.')
             'gui' => [],
             'import' => [],
         ];
-        if ($this->isDnsSet('termtagger')) {
-            $found['default'][] = 'http://termtagger:'.$port;
+        $host = $this->getHost('termtagger');
+
+        if ($this->isDnsSet($host)) {
+            $found['default'][] = 'http://' . $host . ':' . $port;
         }
         $types = array_keys($found);
         for ($i = 1; $i <= 20; $i++) {
-            $hostname = 'termtagger_'.$i;
+            $hostname = $host . '_' . $i;
             if ($this->isDnsSet($hostname)) {
-                $found['default'][] = 'http://'.$hostname.':'.$port;
+                $found['default'][] = 'http://' . $hostname . ':' . $port;
             }
             foreach ($types as $type) {
-                $hostname = 'termtagger_'.$type.'_'.$i;
+                $hostname = $host . '_' . $type . '_' . $i;
                 if ($this->isDnsSet($hostname)) {
-                    $found[$type][] = 'http://'.$hostname.':'.$port;
+                    $found[$type][] = 'http://' . $hostname . ':' . $port;
                 }
             }
         }
@@ -302,20 +319,42 @@ using the default ports.')
         if (empty($taggers)) {
             $this->io->writeln('Found TermTaggers: NONE');
         } else {
-            $this->io->writeln('Found TermTaggers: '.join(', ', $taggers));
+            $this->io->writeln('Found TermTaggers: ' . join(', ', $taggers));
         }
 
         $foundATagger = false;
         foreach ($found as $key => $value) {
             if (empty($found[$key])) {
+                $this->updateConfig('runtimeOptions.termTagger.url.' . $key, '[]');
                 continue;
             }
             $value = json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
             $foundATagger = true;
-            $this->updateConfig('runtimeOptions.termTagger.url.'.$key, $value);
+            $this->updateConfig('runtimeOptions.termTagger.url.' . $key, $value);
         }
-        $this->pluginmanager->setActive('TermTagger', $foundATagger);
-        $this->io->success('Plug-In TermTagger '.($foundATagger ? 'activated.' : 'disabled!'));
+        $this->setPluginActive('TermTagger', $foundATagger);
+    }
+
+    private function servicePdfconverter(): void
+    {
+        $url = 'http://' . $this->getHost('pdfconverter') . ':8086';
+
+        if (!$this->checkServiceDefault('pdfconverter', 'PDF Converter', $url)) {
+            return;
+        }
+
+        $this->updateConfig('runtimeOptions.plugins.VisualReview.pdfconverterUrl', $url);
+    }
+
+    private function serviceVisualbrowser(): void
+    {
+        $url = 'ws://' . $this->getHost('visualbrowser') . ':3000';
+
+        if (!$this->checkServiceDefault('visualbrowser', 'Headless Chrome browser', $url)) {
+            return;
+        }
+
+        $this->updateConfig('runtimeOptions.plugins.VisualReview.dockerizedHeadlessChromeUrl', $url);
     }
 
     /**
@@ -333,6 +372,25 @@ using the default ports.')
     }
 
     /**
+     * En-/Disables a plugin (if auto-set is set)
+     * @param string $plugin
+     * @param bool $active
+     * @return void
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    private function setPluginActive(string $plugin, bool $active = true) {
+        if ($this->input->getOption('auto-set')) {
+            $this->pluginmanager->setActive($plugin, $active);
+            $this->io->success('Plug-In '.$plugin.' '.($active ? 'activated.' : 'disabled!'));
+        }
+        else {
+            $this->io->writeln('Would '.($active ? 'activate.' : 'disable').' Plug-In '.$plugin);
+        }
+    }
+
+    /**
      * Updates the config model instance and prints info about it
      * @param editor_Models_Config $config
      * @param string $newValue
@@ -346,7 +404,7 @@ using the default ports.')
             return;
         }
         if ($config->hasIniEntry()) {
-            $this->io->warning($config->getName().' is set in ini and can not be updated!');
+            $this->io->warning($config->getName() . ' is set in ini and can not be updated!');
             return;
         }
         if ($config->getValue() === $newValue) {
@@ -355,7 +413,7 @@ using the default ports.')
         }
         $config->setValue($newValue);
         $config->save();
-        $this->io->success($config->getName().' set to '.$newValue);
+        $this->io->writeln($config->getName() . ' set to ' . $newValue);
     }
 
     /**
@@ -368,12 +426,24 @@ using the default ports.')
         } else {
             $is = ' is: ';
         }
-        $this->io->writeln('  config '.$config->getName().$is.$config->getValue().$suffix);
+        $this->io->writeln('  config ' . $config->getName() . $is . $config->getValue() . $suffix);
     }
 
     private function isDnsSet($serviceName): bool
     {
         $ip = gethostbyname($serviceName);
         return $ip !== $serviceName;
+    }
+
+    /**
+     * Retrieve particular host from input or return default value if not provided
+     *
+     * @param string $default
+     *
+     * @return string
+     */
+    private function getHost(string $default): string
+    {
+        return $this->input->getArgument(self::ARGUMENT_HOST) ?? $default;
     }
 }

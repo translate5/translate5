@@ -60,8 +60,8 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
     protected function checkServerName() {
         $config = Zend_Registry::get('config');
         $path = '/index/testserver';
-        $url = $config->runtimeOptions->server->protocol . $config->runtimeOptions->server->name . $path;
-        
+        $url = ZfExtended_ApiClient::getServerBaseURL() . $path;
+
         $serverId = ZfExtended_Utils::uuid();
         $memcache = new ZfExtended_Cache_MySQLMemoryBackend();
         $memcache->save($serverId, self::MEMCACHE_ID);
