@@ -8681,6 +8681,42 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Video-Anmerkung</source>
                 <target>Video-Anmerkung</target>
             </trans-unit>
+            <trans-unit id='RGF0ZWllbiBha3R1YWxpc2llcmVu'>
+              <source>Dateien aktualisieren</source>
+              <target>Dateien aktualisieren</target>
+            </trans-unit>
+            <trans-unit id='TmV1ZSBEYXRlaSBob2NobGFkZW4='>
+                <source>Neue Datei hochladen</source>
+                <target>Neue Datei hochladen</target>
+            </trans-unit>
+            <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lbiBkZXIgZm9sZ2VuZGVuIERhdGVpdHlwZW4gezB9'>
+                <source>Bitte verwenden Sie einen der folgenden Dateitypen {0}</source>
+                <target>Bitte verwenden Sie einen der folgenden Dateitypen {0}</target>
+            </trans-unit>
+            <trans-unit id='QWxsZSBTZWdtZW50ZSBpbnMgVE0gc3BlaWNoZXJu'>
+                <source>Alle Segmente ins TM speichern</source>
+                <target>Alle Segmente ins TM speichern</target>
+            </trans-unit>
+            <trans-unit id='TmFjaCBkZXIgQWt0dWFsaXNpZXJ1bmcgd2VyZGVuIGFsbGUgU2VnbWVudGUgZGVyIEF1ZmdhYmUgaW4gYWxsZSBiZXNjaHJlaWJiYXJlbiB1bmQgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbmVuIFRNcyBkdXJjaGdlc3BlaWNoZXJ0Lg=='>
+                <source>Nach der Aktualisierung werden alle Segmente der Aufgabe in alle beschreibbaren und der Aufgabe zugewiesenen TMs durchgespeichert.</source>
+                <target>Nach der Aktualisierung werden alle Segmente der Aufgabe in alle beschreibbaren und der Aufgabe zugewiesenen TMs durchgespeichert.</target>
+            </trans-unit>
+            <trans-unit id='UmVpbXBvcnQgbMOkdWZ0'>
+              <source>Reimport läuft</source>
+              <target>Reimport läuft</target>
+            </trans-unit>
+            <trans-unit id='RGVyIGFrdHVlbGxlIEF1ZmdhYmVuc3RhdHVzIGzDpHNzdCBkaWVzZSBBa3Rpb24gbmljaHQgenUu'>
+              <source>Der aktuelle Aufgabenstatus lässt diese Aktion nicht zu.</source>
+              <target>Der aktuelle Aufgabenstatus lässt diese Aktion nicht zu.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIFJlaW1wb3J0IHd1cmRlIG1pdCBGZWhsZXJuIGFiZ2VzY2hsb3NzZW4uIFdlaXRlcmUgSW5mb3JtYXRpb25lbiBmaW5kZW4gU2llIGltIEVyZ2VibmlzcHJvdG9rb2xs'>
+              <source>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</source>
+              <target>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</target>
+            </trans-unit>
+            <trans-unit id='U2llIGvDtm5uZW4gRGF0ZWllbiBudXIgYWt0dWFsaXNpZXJlbiwgd2VubiBkaWUgaG9jaGdlbGFkZW5lIERhdGVpIHZvbSBnbGVpY2hlbiBEYXRlaXR5cCBpc3QgdW5kIGRpZSBnbGVpY2hlIEFuemFobCB2b24gU2VnbWVudGVuIGhhdC4gRGVyemVpdCB1bnRlcnN0w7x0enRlIERhdGVpdHlwZW46IHswfQ=='>
+              <source>Sie können Dateien nur aktualisieren, wenn die hochgeladene Datei vom gleichen Dateityp ist und die gleiche Anzahl von Segmenten hat. Derzeit unterstützte Dateitypen: {0}</source>
+              <target>Sie können Dateien nur aktualisieren, wenn die hochgeladene Datei vom gleichen Dateityp ist und die gleiche Anzahl von Segmenten hat. Derzeit unterstützte Dateitypen: {0}</target>
+           </trans-unit>
             <trans-unit id='WnV3ZWlzdW5nc3dlcnRlIGJlYXJiZWl0ZW4='>
                 <source>Zuweisungswerte bearbeiten</source>
                 <target>Zuweisungswerte bearbeiten</target>
@@ -8688,6 +8724,22 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='SW5kZXg='>
                 <source>Index</source>
                 <target>Index</target>
+            </trans-unit>
+            <trans-unit id='RGVyIERhdGVpbmFtZSBlbnRzcHJpY2h0IG5pY2h0IGRlciB6dSBha3R1YWxpc2llcmVuZGVuIERhdGVp'>
+              <source>Der Dateiname entspricht nicht der zu aktualisierenden Datei</source>
+              <target>Der Dateiname entspricht nicht der zu aktualisierenden Datei</target>
+            </trans-unit>
+			<trans-unit id='RGVyIERhdGVpdHlwIHdpcmQgZsO8ciBkaWUgQWt0dWFsaXNpZXJ1bmcgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+              <source>Der Dateityp wird für die Aktualisierung nicht unterstützt.</source>
+              <target>Der Dateityp wird für die Aktualisierung nicht unterstützt.</target>
+            </trans-unit>
+            <trans-unit id='RGVyIERhdGVpdHlwIHdpcmQgZsO8ciBkaWUgQWt0dWFsaXNpZXJ1bmcgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+              <source>Der Dateityp wird für die Aktualisierung nicht unterstützt.</source>
+              <target>File type is not supported for updating.</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWluYW1l'>
+              <source>Dateiname</source>
+              <target>Dateiname</target>
             </trans-unit>
         </body>
     </file>

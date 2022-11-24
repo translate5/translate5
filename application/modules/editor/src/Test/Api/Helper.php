@@ -584,6 +584,36 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     }
 
     /**
+     * @param string|null $jsonFileName
+     * @param int $limit
+     * @param int $start
+     * @param int $page
+     * @return array
+     */
+    public function getSegmentsWithBasicData(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1): array
+    {
+        $segments = $this->getSegments($jsonFileName,$limit,$start,$page);
+
+        $fields = ['segmentNrInTask','mid','userGuid','editable',
+            'pretrans','matchRate','isRepeated','source','sourceMd5','sourceToSort',
+            'target','targetMd5','targetToSort','targetEdit','targetEditToSort','relais',
+            'relaisMd5','relaisToSort'];
+
+        $result = [];
+        foreach ($segments as $segment){
+            $seg = (array) $segment;
+            $tmp = [];
+            foreach ($fields as $field){
+                if( isset($seg[$field])){
+                    $tmp[$field] = $seg[$field];
+                }
+            }
+            $result[] = $tmp;
+        }
+        return $result;
+    }
+
+    /**
      * Saves a segment / sends segment put
      * @param int $segmentId
      * @param string $editedTarget

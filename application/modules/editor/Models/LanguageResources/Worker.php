@@ -26,13 +26,19 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\Segment\FilteredIterator;
+use MittagQI\Translate5\Test\Filter;
+
 /**
  * Reimports the segments of a task back into the chosen TM
  */
 class editor_Models_LanguageResources_Worker extends editor_Models_Task_AbstractWorker {
+
     const STATE_REIMPORT = 'reimporttm';
 
     private string $oldState;
+
     private editor_Models_LanguageResources_LanguageResource $languageresource;
 
     /**
@@ -51,9 +57,6 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Task_Abstract
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $assoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
-        /* @var MittagQI\Translate5\LanguageResource\TaskAssociation $assoc */
-        
         $params = $this->workerModel->getParameters();
 
         $this->languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
@@ -69,31 +72,9 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Task_Abstract
         $task->save();
         $task->createMaterializedView();
 
-        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
-        /* @var $segments editor_Models_Segment_Iterator */
-        $assoc->loadByTaskGuidAndTm($task->getTaskGuid(), $params['languageResourceId']);
+        $segments = $this->getSegmentInterator($task,$params);
 
-
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-        $connector = $manager->getConnector($this->languageresource,null,null,$task->getConfig());
-        
-        foreach($segments as $segment) {
-            if(empty($segment->getTargetEdit()) || mb_strpos($segment->getTargetEdit(), "\n") !== false){
-                continue;
-            }
-            //TaskAssoc laden! daher die segmentsUpdateable info
-            if(!empty($assoc->getSegmentsUpdateable())) {
-                try {
-                    $connector->update($segment);
-                }
-                catch(ZfExtended_Zendoverwrites_Http_Exception | editor_Services_Connector_Exception) {
-                    //if the TM is not available (due service restart or whatever) we just wait some time and try it again once.
-                    sleep(30);
-                    $connector->update($segment);
-                }
-            }
-        }
+        $this->updateSegments($segments);
 
         $this->reopenTask();
         $this->getLogger()->info('E0000', 'Task reimported successfully into the desired TM');
@@ -139,5 +120,83 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Task_Abstract
             'task' => $this->task ?? null,
             'languageResource' => $this->languageresource ?? null,
         ]);
+    }
+
+    /***
+     * Get the segment iterator type based on worker params.
+     * @param editor_Models_Task $task
+     * @param array $params
+     * @return editor_Models_Segment_Iterator
+     */
+    private function getSegmentInterator(editor_Models_Task $task, array $params): editor_Models_Segment_Iterator
+    {
+        if( !isset($params['segmentFilter'])){
+            return ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
+            /* @var editor_Models_Segment_Iterator $segments */
+        }
+        // if segment filter param is set, add timestamp filter to the iterator so all loaded segments are filtered
+        // by the given timestamp
+        $filterObject = new stdClass();
+        $filterObject->field = 'timestamp';
+        $filterObject->type = 'string';
+        $filterObject->comparison = 'eq';
+        $filterObject->value = $params['segmentFilter'];
+
+        /** @var editor_Models_Segment $segment */
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        $filter = ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6', array(
+            $segment
+        ));
+        $segment->filterAndSort($filter);
+
+        $segment->getFilter()->addFilter($filterObject);
+
+        /** @var Filter $segments */
+         return ZfExtended_Factory::get(FilteredIterator::class,[
+            $task->getTaskGuid(),
+            $segment
+        ]);
+    }
+
+    /**
+     * Update the current langauge resource with all filtered segments
+     *
+     * @param editor_Models_Segment_Iterator $segments
+     * @return void
+     * @throws ZfExtended_Exception
+     */
+    public function updateSegments(editor_Models_Segment_Iterator $segments): void
+    {
+
+        // in case of filtered segments, the initialization of the segments iterator can result with no segments found for the applied filter
+        if($segments->isEmpty()){
+            return;
+        }
+
+        $assoc = ZfExtended_Factory::get(TaskAssociation::class);
+        /* @var MittagQI\Translate5\LanguageResource\TaskAssociation $assoc */
+
+        $assoc->loadByTaskGuidAndTm($this->task->getTaskGuid(), $this->workerModel->getParameters()['languageResourceId']);
+
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var editor_Services_Manager $manager */
+
+        $connector = $manager->getConnector($this->languageresource,null,null,$this->task->getConfig());
+
+        foreach ($segments as $segment) {
+            if (empty($segment->getTargetEdit()) || str_contains($segment->getTargetEdit(), "\n")) {
+                continue;
+            }
+            // check if the current langauge resources is updatable before updating
+            if (!empty($assoc->getSegmentsUpdateable())) {
+                try {
+                    $connector->update($segment);
+                } catch (ZfExtended_Zendoverwrites_Http_Exception|editor_Services_Connector_Exception) {
+                    //if the TM is not available (due service restart or whatever) we just wait some time and try it again once.
+                    sleep(30);
+                    $connector->update($segment);
+                }
+            }
+        }
     }
 }

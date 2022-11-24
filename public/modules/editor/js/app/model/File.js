@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -37,45 +36,47 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.data.Model
  */
 Ext.define('Editor.model.File', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'text', type: 'string', mapping: 'filename'}, 
-    {name: 'id', type: 'int'},
-    {name: 'parentId', type: 'int', critical: true},
-    {name: 'href', type: 'string', convert: function(v) {
-        //relative path fix since browser url does not always end with "/"
-        if(v && v.length > 0) {
-        	//encode the route and the filename
-        	var parts = v.split('/');
-        	for(var i=0;i<parts.length;i++){
-        		parts[i]=encodeURIComponent(parts[i]);
-        	}
-        	return Editor.data.restpath+parts.join('/');
+    extend: 'Ext.data.Model',
+    fields: [
+        {name: 'text', type: 'string', mapping: 'filename'},
+        {name: 'id', type: 'int'},
+        {name: 'parentId', type: 'int', critical: true},
+        {
+            name: 'href', type: 'string', convert: function (v) {
+                //relative path fix since browser url does not always end with "/"
+                if (v && v.length > 0) {
+                    //encode the route and the filename
+                    var parts = v.split('/');
+                    for (var i = 0; i < parts.length; i++) {
+                        parts[i] = encodeURIComponent(parts[i]);
+                    }
+                    return Editor.data.restpath + parts.join('/');
+                }
+                return v;
+            }
+        },
+        'cls',
+        {name: 'qtip', type: 'string', mapping: 'filename'},
+        {name: 'leaf', type: 'boolean', mapping: 'isFile', defaultValue: false},
+        {name: 'segmentid', type: 'int', defaultValue: 0},
+        {name: 'index', type: 'int', critical: true}
+    ],
+    idProperty: 'id',
+    proxy: {
+        type: 'rest',
+        url: Editor.data.restpath + 'filetree',
+        writer: {
+            encode: true,
+            rootProperty: 'data'
         }
-        return v;
-    }},
-    'cls',
-    {name: 'qtip', type: 'string', mapping: 'filename'},
-    {name: 'leaf', type: 'boolean', mapping: 'isFile', defaultValue: false},
-    {name: 'segmentid', type: 'int', defaultValue: 0},
-    {name: 'index', type: 'int', critical: true}
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'file',
-    writer: {
-      encode: true,
-      rootProperty: 'data'
+    },
+    constructor: function () {
+        this.callParent(arguments);
+        //enabling loading indexAction for id === 0
+        Ext.override(this.getProxy(), {
+            isValidId: function (id) {
+                return id || id > 0;
+            }
+        });
     }
-  },
-  constructor: function() {
-    this.callParent(arguments);
-    //enabling loading indexAction for id === 0
-    Ext.override(this.getProxy(), {
-      isValidId: function(id) {
-        return id || id > 0;
-      }
-    });
-  }
 });

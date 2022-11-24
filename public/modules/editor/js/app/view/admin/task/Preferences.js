@@ -103,9 +103,6 @@ Ext.define('Editor.view.admin.task.Preferences', {
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
-        var cmpConfig=me.callParent([config]);
-        //set the currentTask o
-        me.getViewModel().set('currentTask',me.task);
-        return cmpConfig;
+        return me.callParent([config]);
     }
 });

@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/***
+ * @fires projectSelectionChange - Global event
+ * @fires projectTaskSelectionChange - Global event
+ */
 Ext.define('Editor.view.project.ProjectPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.projectPanel',
@@ -169,8 +173,8 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             return;
         }
         var me = this,
-            preferences = me.getView().down('adminTaskPreferencesWindow'),
-            currentTask = preferences.getCurrentTask();
+            taskManagement = me.getView().down('adminTaskTaskManagement'),
+            currentTask = taskManagement.getCurrentTask();
 
         if(!currentTask || currentTask.get('taskGuid')!== params.taskGuid){
             return;
@@ -178,7 +182,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
         currentTask.load({
             callback:function (){
-                preferences.setCurrentTask(currentTask);
+                taskManagement.setCurrentTask(currentTask);
                 me.getView().down('adminTaskUserAssocGrid').getStore().load();
             }
         });
@@ -299,13 +303,13 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
                     record=grid.getStore().getById(parseInt(id));
                     if(record){
-                        me.focusRecordSilent(grid,record,'projectSelection');
+                        me.focusProjectSilent(record);
                         me.selectProjectTaskRecord(taskId);
                         return;
                     }
                     grid.getController().reloadProjects(function(){
                         record=grid.getStore().getById(parseInt(id));
-                        me.focusRecordSilent(grid,record,'projectSelection');
+                        me.focusProjectSilent(record);
                         me.selectProjectTaskRecord(taskId);
                     });
                 },
@@ -337,7 +341,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         }
 
         //focus and select the record
-        me.focusRecordSilent(grid,record,'projectTaskSelection');
+        me.focusProjectTaskSilent(record);
 
         if(!record){
             me.lookup('projectGrid').setLoading(false);
@@ -394,17 +398,43 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
 
     /***
-     * Focus and select grid record without firing the selectionchange event.
-     * This will also update the viw model variable name with the record
+     * Wrapper for record focusing,updating viewModel,firing event
+     * @param itemId
+     * @param record
+     * @param name
      */
-    focusRecordSilent:function(grid,record,name){
-        var me=this;
+    focusRecordSilent:function(itemId,record,name){
+        var me=this,
+            grid = me.lookup(itemId);
+
         grid.suspendEvent('selectionchange');
         me.getViewModel().set(name,record);
         grid.setSelection(record);
         record && grid.getView().focusRow(record);
         grid.resumeEvent('selectionchange');
+
+        // Fire global event when task or project task selection is changed
+        Ext.GlobalEvents.fireEvent(name+'Change',record);
     },
+
+    /***
+     * Focus and select project without firing the selectionchange event.
+     * This will also update the viw model variable name with the record
+     * @param record
+     */
+    focusProjectSilent: function (record){
+        this.focusRecordSilent('projectGrid',record,'projectSelection');
+    },
+
+    /***
+     * Focus and select project-task without firing the selectionchange event.
+     * This will also update the viw model variable name with the record
+     * @param record
+     */
+    focusProjectTaskSilent: function (record){
+        this.focusRecordSilent('projectTaskGrid',record,'projectTaskSelection');
+    },
+
 
     /***
      * Reset view model selections
@@ -417,8 +447,8 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         projectTaskGrid.getStore().removeAll(true);
         projectTaskGrid.view.refresh();
         //reset the vm selection properties
-        me.focusRecordSilent(projectGrid,null,'projectSelection');
-        me.focusRecordSilent(projectTaskGrid,null,'projectTaskSelection');
+        me.focusProjectSilent(null);
+        me.focusProjectTaskSilent(null);
     },
 
     /***

@@ -215,7 +215,7 @@ abstract class Resource
      */
     public function getId(): int
     {
-        return intval($this->getProperty('id'));
+        return (int)$this->getProperty('id');
     }
 
     /**
@@ -224,7 +224,7 @@ abstract class Resource
      */
     public function getName(): string
     {
-        return strval($this->getProperty('name'));
+        return (string)$this->getProperty('name');
     }
 
     /**

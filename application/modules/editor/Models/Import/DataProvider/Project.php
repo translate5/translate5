@@ -98,7 +98,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
 
 
         // find all matching non pivot files
-        for($i=0;$i<count($this->fileLanguages);$i++){
+        for($i=0, $iMax = count($this->fileLanguages); $i< $iMax; $i++){
             if($this->isWorkfileFileMatch($i)){
                 $matchingFiles[$importFilesKeys[$i]] = $importFilesValues[$i];
                 // collect the matching type for the file
@@ -118,7 +118,7 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
 
         $pivotFiles = [];
         // check for pivot and reference files
-        for($i=0;$i<count($importFilesValues);$i++){
+        for($i=0, $iMax = count($importFilesValues); $i< $iMax; $i++){
             if($this->isPivotFileMatch($i)){
                 foreach($matchingFiles as $fileName) {
                     if($this->filesMatch($fileName,$importFilesValues[$i])){
@@ -254,7 +254,11 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     protected function isWorkfileFileMatch(int $arrayIndex): bool
     {
-        return $this->isWorkFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getTargetLang() || empty($this->fileLanguages[$arrayIndex]);
+        return (
+            $this->isWorkFile($arrayIndex) && $this->fileLanguages[$arrayIndex] === $this->task->getTargetLang()
+            )
+            ||
+            empty($this->fileLanguages[$arrayIndex]);
     }
 
     /***
@@ -308,5 +312,25 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         if(count($this->fileTypes) != count($this->files['importUpload']) && count($this->fileTypes) > ini_get('max_file_uploads')) {
             throw new editor_Models_Import_DataProvider_Exception('E1384');
         }
+    }
+
+    /**
+     * (non-PHPdoc)
+     *
+     * @see editor_Models_Import_DataProvider_Abstract::postImportHandler()
+     */
+    public function postImportHandler()
+    {
+        $this->removeTempFolder();
+    }
+
+    /**
+     * (non-PHPdoc)
+     *
+     * @see editor_Models_Import_DataProvider_Abstract::handleImportException()
+     */
+    public function handleImportException(Exception $e)
+    {
+        $this->removeTempFolder();
     }
 }

@@ -258,7 +258,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $searchQuery = $this->buildSearchString($parameters);
 
         //the field where the search will be performed (toSort field)
-        $searchInToSort = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $searchInToSort = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_SUFFIX;
 
         //check if search in locked segment is clicked, if yes, remove the editable filter
         $searchLocked = false;
@@ -301,7 +301,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $adapter = $this->db->getAdapter();
 
         $queryString = $parameters['searchField'];
-        $searchInField = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $searchInField = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_SUFFIX;
         $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase']) == 'true') : false;
 
         //search type regular expression
@@ -1946,18 +1946,20 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns true if at least one target has a translation set
+     * @return bool
      */
-    public function isTargetTranslated()
+    public function isTargetTranslated(): bool
     {
         foreach ($this->segmentdata as $name => $data) {
             $field = $this->segmentFieldManager->getByName($name);
             if ($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
                 continue;
             }
-            if (!(empty($data['original']) && $data['original'] !== "0")) {
+            if ( !editor_Utils::emptySegment($data['edited'])) {
                 return true;
             }
         }
+
         return false;
     }
 
