@@ -71,7 +71,7 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
         $this->expectHeader('accept', 'application/json; charset=utf-8');
         $this->expectHeader('accept-charset', 'UTF-8');
         $authKey = Zend_Registry::get('config')->runtimeOptions->plugins->DeepL->authkey;
-        $this->expectGet('auth_key', $authKey);
+        $this->expectHeader('authorization', 'DeepL-Auth-Key '.$authKey);
 
         $isDemo = $authKey === 'demomode';
 
