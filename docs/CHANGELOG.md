@@ -9,16 +9,6 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
-
-
-
-
-
-
-
-
-
-
 ## [5.7.14] - 2022-11-24
 
 ### Important Notes:
@@ -87,9 +77,7 @@ Tags styling for context rows in repetition editor is now the same as for repeti
 TermPortlet attribute labels logic improved, Image-attribute preview shown, if exists
 
 **[TRANSLATE-3085](https://jira.translate5.net/browse/TRANSLATE-3085): TermPortal - Termportal: solve bug happening on creating attribute in batch window** <br>
-Investigate and solve bug catched by root cause, which appears on selecting the attrubute to be created within attributes batchediting window, so the error happens when on attempt to save draft attributes
-
-https://app.therootcause.io/#marc-mittag/translate5/errors/871b0f3b26eb27a5c27562390fbb7dddd14f5dba
+Made sure more debug info to be logged for case of next time occurence of a non-reproducable bug popping on attempt to save new attribute in batch editing dialog.
 
 **[TRANSLATE-3084](https://jira.translate5.net/browse/TRANSLATE-3084): TermPortal - Termportal: use TextArea for Definition-attributes** <br>
 TermPortal: textareas are now used for attributes of datatype noteText

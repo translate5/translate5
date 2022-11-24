@@ -48,8 +48,6 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
 ('2022-11-24', 'TRANSLATE-3089', 'bugfix', 'TermPortal - TermPortal: nothing happens on attribute save in batch editing mode', 'Fixed termportal batch-editing bug', '15'),
 ('2022-11-24', 'TRANSLATE-3088', 'bugfix', 'Repetition editor - Repetition editor: missing css class for context rows', 'Tags styling for context rows in repetition editor is now the same as for repetition rows', '15'),
 ('2022-11-24', 'TRANSLATE-3087', 'bugfix', 'Editor general - Editor: term tooltip shows wrong attribute labels', 'TermPortlet attribute labels logic improved, Image-attribute preview shown, if exists', '15'),
-('2022-11-24', 'TRANSLATE-3085', 'bugfix', 'TermPortal - Termportal: solve bug happening on creating attribute in batch window', 'Investigate and solve bug catched by root cause, which appears on selecting the attrubute to be created within attributes batchediting window, so the error happens when on attempt to save draft attributes
-
-https://app.therootcause.io/#marc-mittag/translate5/errors/871b0f3b26eb27a5c27562390fbb7dddd14f5dba', '15'),
+('2022-11-24', 'TRANSLATE-3085', 'bugfix', 'TermPortal - Termportal: solve bug happening on creating attribute in batch window', 'Made sure more debug info to be logged for case of next time occurence of a non-reproducable bug popping on attempt to save new attribute in batch editing dialog.', '15'),
 ('2022-11-24', 'TRANSLATE-3084', 'bugfix', 'TermPortal - Termportal: use TextArea for Definition-attributes', 'TermPortal: textareas are now used for attributes of datatype noteText', '15'),
 ('2022-11-24', 'TRANSLATE-3073', 'bugfix', 'InstantTranslate - Filetranslation must not use autoQA', 'Filetranslation-tasks do now skip AutoQA-step in the import process', '15');
