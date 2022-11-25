@@ -324,5 +324,29 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
      */
     setLastActiveField: function (field){
         this.lastActiveField = field;
-    }
+    },
+
+    highlight: function (source, search) {
+        let tagsRe = /<[^>]*>/gm;
+        let tagsProtect = '\x0f';
+        let matches = source.match(tagsRe);
+
+        if (null === matches) {
+            return source;
+        }
+
+        let result = source.replace(tagsRe, tagsProtect);
+        let searchRegexp = new RegExp(search, 'gi');
+
+        result = result.replace(searchRegexp, function (item) {
+            return '<span class="highlight">' + item + '</span>';
+        }, this);
+
+        // restore protected tags
+        matches.forEach(function (match) {
+            result = result.replace(tagsProtect, match);
+        });
+
+        return result;
+    },
 });

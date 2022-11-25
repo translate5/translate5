@@ -169,7 +169,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'root'
             )
         ));
-        
+
         //FIXME convert to RestLikeRoute (remove echo json_encode in action then)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/filemap/*',

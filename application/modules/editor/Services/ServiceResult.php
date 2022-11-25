@@ -194,4 +194,10 @@ class editor_Services_ServiceResult {
         }
         return false;
     }
+
+    public function setRawContent(string $source, string $target): void
+    {
+        $this->lastAdded->rawSource = $source;
+        $this->lastAdded->rawTarget = $target;
+    }
 }

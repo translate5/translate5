@@ -115,7 +115,15 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
                     dataIndex: 'source',
                     tdCls: 'x-selectable segment-tag-column source'+segField.getDirectionCls('source'),
                     cellWrap: true,
-                    text: me.strings.source
+                    text: me.strings.source,
+                    name: 'source',
+                    renderer: function (value) {
+                        if (me.controller.lastActiveField.id !== 'sourceSearch') {
+                            return value;
+                        }
+
+                        return me.controller.highlight(value, me.controller.lastActiveField.value);
+                    },
                 },{
                     xtype: 'gridcolumn',
                     enableTextSelection: true,
@@ -125,7 +133,15 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
                     hideable: false,
                     sortable: false,
                     cellWrap: true,
-                    text: me.strings.target
+                    text: me.strings.target,
+                    name: 'target',
+                    renderer: function (value) {
+                        if (me.controller.lastActiveField.id !== 'targetSearch') {
+                            return value;
+                        }
+
+                        return me.controller.highlight(value, me.controller.lastActiveField.value);
+                    },
                 },{
                     xtype: 'gridcolumn',
                     flex: 1,

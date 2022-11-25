@@ -29,7 +29,11 @@ END LICENSE AND COPYRIGHT
 /**
  * OpenTM2 HTTP Connection API
  */
-class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiAbstract {
+class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiAbstract
+{
+    private const MARKUP_TABLE = 'OTMXUXLF';
+    private const REQUEST_ENCTYPE = 'application/json; charset=utf-8';
+
     const MAX_STR_LENGTH = 2048;
     
     /**
@@ -62,7 +66,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
 
         $http = $this->getHttp('POST');
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        $http->setRawData(json_encode($data), self::REQUEST_ENCTYPE);
         return $this->processResponse($http->request());
     }
 
@@ -79,7 +83,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         
         $http = $this->getHttp('POST');
         $http->setConfig(['timeout' => 1200]);
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        $http->setRawData(json_encode($data), self::REQUEST_ENCTYPE);
         return $this->processResponse($http->request());
     }
     
@@ -102,7 +106,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         $http = $this->getHttpWithMemory('POST', '/import');
         $http->setConfig(['timeout' => 1200]);
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        $http->setRawData(json_encode($data), self::REQUEST_ENCTYPE);
         
         return $this->processResponse($http->request());
     }
@@ -122,7 +126,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $this->http->setMethod($method);
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
-        $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $this->http->setHeaders('Accept', self::REQUEST_ENCTYPE);
         return $this->http;
     }
     
@@ -175,7 +179,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $this->languageResource->addSpecificData('fileName', $createdName);
         $this->languageResource->save(); //saving it here makes the TM available even when the TMX import was crashed
     }
-    
+
     /**
      * retrieves the TM as TM file
      * @param string|array $mime
@@ -272,7 +276,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->sourceLangCode);
         $json->targetLang = $this->fixLanguages->key($this->languageResource->targetLangCode);
-        
+        $json->markupTable = self::MARKUP_TABLE;
+
         if($this->isToLong($queryString)) {
             $this->result = json_decode('{"ReturnValue":0,"ErrorMsg":"","NumOfFoundProposals":0}');
             return true;
@@ -289,7 +294,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         // so we take only the single filename at the moment
         $json->documentName = $filename;
 
-        $json->markupTable = 'OTMXUXLF'; //NEEDED otherwise t5memory crashes
+        $json->markupTable = self::MARKUP_TABLE; //NEEDED otherwise t5memory crashes
         $json->context = $segment->getMid(); // here MID (context was designed for dialog keys/numbers on translateable strings software)
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
@@ -307,7 +312,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             //en-UK request first
             $jsonEnUk = clone $json;
             $jsonEnUk->targetLang = 'en-UK';
-            $http->setRawData(json_encode($jsonEnUk), 'application/json; charset=utf-8');
+            $http->setRawData(json_encode($jsonEnUk), self::REQUEST_ENCTYPE);
             $resultsUK = [];
             $resultUK = $this->processResponse($http->request());
             if($resultUK) {
@@ -320,7 +325,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             }
 
             //en-GB request
-            $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+            $http->setRawData(json_encode($json), self::REQUEST_ENCTYPE);
             $resultGB = $this->processResponse($http->request());
 
             if($resultUK && $resultsUK->NumOfFoundProposals > 0) {
@@ -338,7 +343,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             return $resultGB || $resultUK;
         }
 
-        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        $http->setRawData(json_encode($json), self::REQUEST_ENCTYPE);
         return $this->processResponse($http->request());
     }
     
@@ -360,7 +365,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->numResults = 20;
         $data->msSearchAfterNumResults = 250;
         $http = $this->getHttpWithMemory('POST', 'concordancesearch');
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        $http->setRawData(json_encode($data), self::REQUEST_ENCTYPE);
         return $this->processResponse($http->request());
     }
 
@@ -388,7 +393,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->timeStamp = $this->nowDate();
         $json->context = $segment->getMid(); //INFO: this is segment stuff
 
-        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        $http->setRawData(json_encode($json), self::REQUEST_ENCTYPE);
         return $this->processResponse($http->request());
     }
 
@@ -414,7 +419,50 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->context = '';
         $json->addInfo = $json->documentName;
 
-        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        $http->setRawData(json_encode($json), self::REQUEST_ENCTYPE);
+
+        return $this->processResponse($http->request());
+    }
+
+    /**
+     * @throws Zend_Http_Client_Exception
+     * @throws JsonException
+     * @throws Exception
+     */
+    public function updateEntry(string $source, string $target): array
+    {
+        $request = [
+            'sourceLang' => $this->fixLanguages->key($this->languageResource->getSourceLangCode()),
+            'targetLang' => $this->fixLanguages->key($this->languageResource->getTargetLangCode()),
+            'source' => $source,
+            'target' => $target,
+            'markupTable' => self::MARKUP_TABLE,
+        ];
+
+        $http = $this->getHttpWithMemory('POST', 'entry');
+        $http->setRawData(json_encode($request, JSON_THROW_ON_ERROR), self::REQUEST_ENCTYPE);
+
+        $success = $this->processResponse($http->request());
+
+        if (!$success) {
+            throw new Exception();
+        }
+
+        return (array)$this->response;
+    }
+
+    public function deleteEntry(string $source, string $target): bool
+    {
+        $request = [
+            'sourceLang' => $this->fixLanguages->key($this->languageResource->getSourceLangCode()),
+            'targetLang' => $this->fixLanguages->key($this->languageResource->getTargetLangCode()),
+            'source' => $source,
+            'target' => $target,
+            'markupTable' => self::MARKUP_TABLE,
+        ];
+
+        $http = $this->getHttpWithMemory('POST', 'entrydelete');
+        $http->setRawData(json_encode($request, JSON_THROW_ON_ERROR), self::REQUEST_ENCTYPE);
 
         return $this->processResponse($http->request());
     }
@@ -442,7 +490,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->source = $source;
         $json->target = $target;
         $json->type = "Manual";
-        $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
+        $json->markupTable = self::MARKUP_TABLE; //fixed markup table for our XLIFF subset
         $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
         $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
         $json->timeStamp = $this->nowDate();

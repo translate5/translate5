@@ -1,0 +1,7 @@
+{
+  "logout": "Abmelden",
+  "localeStore": [
+    { "locale": "en", "name": "Englisch" },
+    { "locale": "de", "name": "Deutsch"  }
+  ]
+}
