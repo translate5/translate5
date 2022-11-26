@@ -315,9 +315,6 @@ Ext.define('Editor.controller.Localizer', {
         qmHasBeenRemoved: '<?php echo $this->translate->_('Die Qualität wurde entfernt');?>'
     };
     Editor.view.quality.FalsePositives.prototype.title = '<?php echo $this->translate->_('Falsch erkannte Fehler');?>';
-    Editor.view.quality.FalsePositivesController.prototype.messages = {
-    	falsePositiveUpdated: '<?php echo $this->translate->_('Der False-Positive Status wurde aktualisiert');?>'
-    };
     Editor.view.quality.admin.TaskQualities.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
   	Editor.view.quality.admin.TaskQualities.prototype.strings = {
 		category: '<?php echo $this->translate->_('Kategorie');?>',
@@ -2086,6 +2083,20 @@ Editor.data.l10n = {
         sourceMatchColumn: '<?php echo $this->translate->_('Quell-Treffer');?>',
         targetMatchColumn: '<?php echo $this->translate->_('Ziel-Treffer');?>',
         sameContextColumn: '<?php echo $this->translate->_('Kontext-Treffer');?>'
+    },
+    falsePositives: {
+        msg: {
+            updated: '<?php echo $this->translate->_('Der False-Positive Status wurde aktualisiert');?>',
+            spreaded: 'Spreaded such status for other occurrences within this task'
+        },
+        grid: {
+            falsePositive: 'Yes',
+            text: 'Quality',
+            similarQty: {
+                tooltip: 'Quantity of other occurrences of such [quality - content] pair found in this task',
+                button: 'Spread such status for all those other occurrences of such [quality - content] pair found in this task',
+            }
+        }
     },
     projectOverview:{
         taskManagement:{

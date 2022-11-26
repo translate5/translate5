@@ -378,7 +378,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1357"></a>E1357  | Terminology | TBX Import: Could not import due unknown attribute level | Very unusual that this error happens, see the msg and extra data.
 | <a id="E1393"></a>E1393  | Terminology | TBX Import: The XML structure of the TBX file is invalid: {message} | In this case the XML of the given TBX file is invalid and can not be parsed.
 | <a id="E1360"></a>E1360  | Terminology | TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states. | The listed states are unknown and can not be mapped to the usual administrative status values.<br />Please configure them in the runtimeOptions.tbx.termImportMap configuration.
-| <a id="E1361"></a>E1361  | Terminology | TBX Import: Unable to import terms due invalid Rfc5646 language code &quot;{code}&quot; | The listed language code is invalid / not configured in translate5, the corresponding terms could not be imported.
+| <a id="E1361"></a>E1361  | Terminology | TBX Import: Unable to import terms due invalid Rfc5646 language code "{code}" | The listed language code is invalid / not configured in translate5, the corresponding terms could not be imported.
 | <a id="E1364"></a>E1364  | Terminology | TermTagger overall run done - {segmentCounts} | Reports that the whole task was tagged with the termtagger and shows the segment status counts.
 
 

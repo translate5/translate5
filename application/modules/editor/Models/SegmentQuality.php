@@ -109,4 +109,11 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
         // Return spell check data
         return $data ?? [];
     }
+
+    /**
+     * Proxy to row's method
+     */
+    public function spreadFalsePositive() {
+        $this->row->spreadFalsePositive();
+    }
 }

@@ -55,7 +55,9 @@ class editor_Models_Quality_SegmentView {
             : $row->typeText;
         $row->filterable = $manager->isFilterableType($qualityRow->type);
         $row->falsifiable = $manager->canBeFalsePositiveCategory($qualityRow->type, $qualityRow->category);
-        $row->content = json_decode($qualityRow->additionalData)->content;
+        $row->content = $qualityRow->getContent();
+        $row->similarQty = $qualityRow->getSimilarQty();
+        $row->falsePositiveChanged = 0;
         $provider = $manager->getProvider($qualityRow->type);
         // add props to identify the tags in the editor
         if($provider == NULL || !$provider->hasSegmentTags()){

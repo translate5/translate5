@@ -981,7 +981,7 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     padding-left: 6px;
 }
 .x-column-header[id^=checkcolumn] .x-column-header-inner[data-qtip] .x-column-header-text-container {
-    border-bottom: 1px dotted;
+    /*border-bottom: 1px dotted;*/
     pointer-events: all;
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner {
@@ -999,4 +999,26 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 }
 .x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):after {
     content: ' -';
+}
+.t5falsePositivesGrid .fa {
+    font-family: FontAwesome5FreeSolid;
+    color: #919191;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-file-circle-question:before {
+    content: "\e4ef" !important;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-spinner:before {
+    content: "\f110" !important;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-file-circle-plus:before {
+    content: "\e494" !important;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-file-circle-minus:before {
+    content: "\e4ed" !important;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-magnifying-glass-arrow-right:before {
+    content: "\e521" !important;
+}
+.t5falsePositivesGrid .x-grid-widgetcolumn-cell-inner {
+    padding: 4px !important;
 }

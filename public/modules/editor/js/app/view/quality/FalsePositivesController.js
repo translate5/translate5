@@ -43,9 +43,6 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
             }
         }
     },
-    messages: {
-        falsePositiveUpdated: '#UT#Der False-Positive Status wurde aktualisiert'
-    },
     falsePositiveCssClass: 't5qfalpos', // as defined in editor_segment_Tag::CSS_CLASS_FALSEPOSITIVE. TODO FIXME: better add to Editor.data ?
     qualityIdDataName: 't5qid', // as defined in editor_segment_Tag::DATA_NAME_QUALITYID. TODO FIXME: better add to Editor.data ?
     /**
@@ -54,29 +51,117 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
     onQualitiesChanged: function(store){
         this.getView().rebuildByRecords(store.getRange());
     },
+
     /**
      * Handler to sync the new state with the server (to catch false positives without tags) & add decorations in the editor
      */
-    onFalsePositiveChanged: function(checkbox, checked){
-        var me = this, qualityId = checkbox.inputValue, record = checkbox.qrecord, falsePositiveVal = (checked) ? 1 : 0;
-        // if there are tags in the editor we need to decorate them (otherwise saving the editor would set the falsePositive value back to it's original state!)
-        if(record.get('hasTag') && !this.decorateFalsePositive(record, qualityId, checked)){
-            // This will be a rare case, mostly whith transitional tasks being imported before the rollout of the AutoQA but used thereafter
-            console.log('Decorating a false positive tag failes: ', qualityId, falsePositiveVal, record);
+    onFalsePositiveChanged: function(column, rowIndex, checked, record){
+        var vm = this.getViewModel(), qualityId = record.get('id'), falsePositive = (checked) ? 1 : 0;
+
+        // If there are tags in the editor we need to decorate them
+        // as otherwise saving the editor would set the falsePositive value back to it's original state!
+        if (record.get('hasTag') && !this.decorateFalsePositive(record, qualityId, checked)) {
+
+            // This will be a rare case, mostly with transitional tasks being imported before the rollout of the AutoQA but used thereafter
+            console.log('Decorating a false positive tag failes: ', qualityId, falsePositive, record);
         }
+
+        // Set falsePositive-flag on quality record on client-side
+        record.set('falsePositive', falsePositive);
+
+        // Set falsePositive-flag on quality record on server-side
         Ext.Ajax.request({
-            url: Editor.data.restpath+'quality/falsepositive',
+            url: Editor.data.restpath + 'quality/falsepositive',
             method: 'GET',
-            params: { id: qualityId, falsePositive: falsePositiveVal },
-            success: function(response){
-                record.set('falsePositive', falsePositiveVal); // updating store is currently meaningless but that may changes later on ...
-                Editor.MessageBox.addSuccess(me.messages.falsePositiveUpdated);
+            params: {
+                id: qualityId,
+                falsePositive: falsePositive
             },
-            failure: function(response){
+            success: () => {
+
+                // Set falsePositiveChanged-flag so that spread-button-widget will be enabled in the last grid column
+                record.set('falsePositiveChanged', 1);
+
+                // Commit changes
+                record.commit();
+
+                // Show toast message
+                Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.msg.updated'));
+            },
+            failure: (response) => {
+
+                // Reject changes
+                record.reject();
+
+                // Handle response
                 Editor.app.getController('ServerException').handleException(response);
             }
         });
     },
+
+    /**
+     * Spread falsePositive-flag's state for all other occurrences of such [quality - content] pair across the task
+     *
+     * @param button
+     */
+    onFalsePositiveSpread: function(button) {
+        var vm = this.getViewModel(), record = button.getWidgetRecord();
+
+        // Make request to spread
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'quality/falsepositivespread',
+            method: 'GET',
+            params: {
+                id: record.get('id')
+            },
+            success: () => {
+
+                // Set falsePositiveChanged-flag so that spread-button-widget will be disabled
+                // in the last grid column until the next time value changed in first column
+                record.set('falsePositiveChanged', 0);
+
+                // Commit changes
+                record.commit();
+
+                // Show tast message
+                Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.msg.spreaded'));
+            },
+            failure: (response) => {
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+    },
+
+    /**
+     * Renderer function for falsepositives-grid's column having [dataIndex=text]
+     *
+     * @param text
+     * @param meta
+     * @param record
+     * @returns {string}
+     */
+    falsepositivesGridTextRenderer: function(text, meta, record) {
+        meta.tdCls += ' quality';
+
+        // Build label
+        var qlty = record.get('typeText'); if (qlty !== text) qlty += ' » ' + text;
+
+        // Category index shortcut
+        var cidx = record.get('categoryIndex');
+
+        // Add the tag-icons for MQM to help to identify the MQMs in the markup
+        if (record.get('type') === 'mqm' && cidx > -1) {
+
+            // Build tag-icon src
+            var src = Editor.data.segments.subSegment.tagPath + 'qmsubsegment-{0}-left.png';
+
+            // Append img-tag to quality title
+            qlty += ' <img class="x-label-symbol qmflag qmflag-{0}" src="' + src + '"> ';
+        }
+
+        return '<div>' + Ext.String.format(qlty, cidx) + '</div><div>' + record.get('content') + '</div>';
+    },
+
     /**
      * Changes the decoration-class in the HtmlEditor of the tag
      */

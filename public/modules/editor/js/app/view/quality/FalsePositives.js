@@ -61,7 +61,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
     startEditing: function(records, segmentId, isActive){
         this.isActive = isActive;
         if(isActive && records && records.length){
-            this.createCheckboxes(records);
+            this.createGrid(records);
         }
     },
     /**
@@ -70,13 +70,13 @@ Ext.define('Editor.view.quality.FalsePositives', {
      */
     rebuildByRecords: function(records){
         if(this.isActive && records){
-            this.createCheckboxes(records);
+            this.createGrid(records);
         }
     },
     /**
      * Creates our GUI
      */
-    createCheckboxes: function(records){
+    createGrid: function(records){
         var data = [];
         this.removeAll();
         Ext.each(records, function(record){
@@ -86,7 +86,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
         }, this);
         this.add({
             xtype: 'grid',
-            //hideHeaders: true,
+            userCls: 't5falsePositivesGrid',
             border: 0,
             height: 35 + 36 * data.length,
             store: {
@@ -94,29 +94,50 @@ Ext.define('Editor.view.quality.FalsePositives', {
                 data: data
             },
             columns: [{
-                text: 'FP',
-                width: 30,
-                tooltip: 'False positive',
+                width: 35,
                 xtype: 'checkcolumn',
                 menuDisabled: true,
-                dataIndex: 'falsePositive'
+                dataIndex: 'falsePositive',
+                bind: {
+                    text: '{l10n.falsePositives.grid.falsePositive}'
+                },
+                listeners: {
+                    checkchange: 'onFalsePositiveChanged',
+                }
             }, {
-                text: 'Quality',
                 flex: 1,
                 menuDisabled: true,
                 dataIndex: 'text',
-                renderer: function(value, meta, record){
-                    meta.tdCls += ' quality';
-                    return '<div>' + record.get('typeText') + ' » ' + value + '</div><div>' + record.get('content') + '</div>';
-                }
+                bind: {
+                    text: '{l10n.falsePositives.grid.text}'
+                },
+                renderer: 'falsepositivesGridTextRenderer'
             }, {
-                text: 'HS',
-                width: 30,
-                tooltip: 'Has similar false positives',
-                xtype: 'checkcolumn',
-                dataIndex: 'hasSimilar',
+                xtype: 'widgetcolumn',
+                text: '<span class="fa fa-magnifying-glass-arrow-right"></span>',
+                width: 35,
+                bind: {
+                    tooltip: '{l10n.falsePositives.grid.similarQty.tooltip}'
+                },
+                dataIndex: 'similarQty',
+                padding: 0,
                 menuDisabled: true,
-                disabled: true
+                widget: {
+                    xtype: 'button',
+                    width: 26,
+                    height: 26,
+                    margin: 0,
+                    padding: 0,
+                    ui: "default-toolbar-small",
+                    setUi: function(ui) {this.setUI(ui);},
+                    bind: {
+                        text: '{record.similarQty}',
+                        disabled: '{record.similarQty == 0 || !record.falsePositiveChanged}',
+                        tooltip: '{l10n.falsePositives.grid.similarQty.button}',
+                        ui: '{record.similarQty == 0 || !record.falsePositiveChanged ? "default-toolbar-small" : "default"}'
+                    },
+                    handler: 'onFalsePositiveSpread'
+                }
             }]
         });
         if(data.length){
@@ -125,29 +146,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
             this.endEditing(true, false);
         }
     },
-    /**
-     * Adds a checkbox after the store was loaded
-     */
-    addCheckbox: function(record){
-        // add the tag-icons for MQM to help to identify the MQMs in the markup
-        var label = (record.get('typeText') == record.get('text')) ? record.get('typeText') : (record.get('typeText') + ' > ' + record.get('text'));
-        if(record.get('type') == 'mqm' && record.get('categoryIndex') > -1){
-            label += ' <img class="x-label-symbol qmflag qmflag-' + record.get('categoryIndex') + '" src="' 
-                + Editor.data.segments.subSegment.tagPath + 'qmsubsegment-' + record.get('categoryIndex') + '-left.png"> ';
-        }
-        this.add({
-            xtype: 'checkbox',
-            anchor: '100%',
-            name: 'segq' + record.get('id'),
-            inputValue: record.get('id'),
-            value: (record.get('falsePositive') == 1),
-            qrecord: record,
-            boxLabel: label,
-            listeners:{
-                change: 'onFalsePositiveChanged'
-            }
-        });
-    },
+
     /**
      * Hides the GUI if present
      */

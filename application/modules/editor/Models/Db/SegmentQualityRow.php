@@ -107,4 +107,101 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
         parent::save();
     }
     //*/
+
+    /**
+     * Try to get json_decode($this->additionalData)->content
+     * False is returned if it is not possible to get, or it is empty
+     *
+     * @return bool|mixed
+     */
+    public function getContent() {
+
+        // If no additional data exists for this quality - return
+        if (!$data = $this->additionalData) {
+            return false;
+        }
+
+        // Else if additional data exists, but is not json-decodable - return
+        if (!$data = json_decode($data)) {
+            return false;
+        }
+
+        // Else if it's json_decodable, but contains no content-prop or it's empty - return
+        if (!strlen($data->content)) {
+            return false;
+        }
+
+        // Return content
+        return $data->content;
+    }
+
+    /**
+     * Get quantity of similar qualities triggered by same content
+     *
+     * @return int|string
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function getSimilarQty() {
+
+        // Get content
+        $content = $this->getContent();
+
+        // If no content - return 0
+        if ($content === false) {
+            return 0;
+        }
+
+        // Get similar qty
+        return $this->getTable()->getAdapter()->query('
+            SELECT COUNT(`id`) FROM `LEK_segment_quality` WHERE `taskGuid` = ?
+              AND `id` != ?
+              AND `type` = ?
+              AND `category` = ?
+              AND `field` = ?
+              AND NOT ISNULL(`additionalData`) 
+              AND JSON_EXTRACT(`additionalData`, "$.content") = ?
+        ', [
+            $this->taskGuid,
+            $this->id,
+            $this->type,
+            $this->category,
+            $this->field,
+            $content,
+        ])->fetchColumn();
+    }
+
+    /**
+     * Spread current value of falsePositive-flag for all other occurrences of such [quality - content] pair found in this task
+     *
+     * @return int
+     */
+    public function spreadFalsePositive() {
+
+        // Get content
+        $content = $this->getContent();
+
+        // If no content - return 0
+        if ($content === false) {
+            return 0;
+        }
+
+        // Else update similar qualities' falsePositive flag
+        return $this->getTable()->getAdapter()->query('
+            UPDATE `LEK_segment_quality` SET `falsePositive` = ? WHERE `taskGuid` = ?
+              AND `id` != ?
+              AND `type` = ?
+              AND `category` = ?
+              AND `field` = ?
+              AND NOT ISNULL(`additionalData`) 
+              AND JSON_EXTRACT(`additionalData`, "$.content") = ? 
+        ', [
+            $this->falsePositive,
+            $this->taskGuid,
+            $this->id,
+            $this->type,
+            $this->category,
+            $this->field,
+            $content
+        ]);
+    }
 }
