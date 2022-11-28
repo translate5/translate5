@@ -33,7 +33,7 @@ use MittagQI\Translate5\Applet\Dispatcher;
 
 class editor_Plugins_TMMaintenance_Init extends ZfExtended_Plugin_Abstract
 {
-    protected static $description = 'Provides a functionality of managing t5memory TM';
+    protected static string $description = 'Provides a functionality of managing t5memory TM';
 
     /**
      * {@inheritdoc}
