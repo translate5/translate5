@@ -40,7 +40,7 @@ class Editor_Plugins_Tmmaintenance_ApiController extends ZfExtended_RestControll
         $model = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
 
         //get all resources for the customers of the user by language combination
-        $resources = $model->loadByUserCustomerAssocs();
+        $resources = $model->loadByUserCustomerAssocs([], [], [], ['editor_Services_OpenTM2']);
 
         $tms = array_map(
             static function (array $resource): array {

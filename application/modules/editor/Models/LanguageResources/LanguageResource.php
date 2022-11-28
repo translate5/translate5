@@ -270,40 +270,54 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     /***
      * Load all resources associated customers of a user
      *
-     * @param array $serviceNames: add service name as filter
-     * @param array $sourceLang: add source languages as filter
-     * @param array $targetLang: add target languages as filter
+     * @param array $serviceNames add service name as filter
+     * @param array $sourceLang add source languages as filter
+     * @param array $targetLang add target languages as filter
+     * @param array $serviceTypes add service type as a filter
      *
-     * @return array|array
+     * @return array
      */
-    public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=array(),$targetLang=array()){
+    public function loadByUserCustomerAssocs(
+        $serviceNames = array(),
+        $sourceLang = array(),
+        $targetLang = array(),
+        $serviceTypes = []
+    ): array {
         $customers = ZfExtended_Authentication::getInstance()->getUser()->getCustomersArray();
-        if(!empty($customers)){
-            
-            //each sdlcloud language resource can have only one language combination
-            $s=$this->db->select()
-            ->from(array('tm' => 'LEK_languageresources'),array('tm.*'))
+
+        if (empty($customers)) {
+            return [];
+        }
+
+        //each sdlcloud language resource can have only one language combination
+        $s = $this->db->select()
+            ->from(array('tm' => 'LEK_languageresources'), array('tm.*'))
             ->setIntegrityCheck(false)
             ->join(array('ca' => 'LEK_languageresources_customerassoc'), 'tm.id = ca.languageResourceId', '')
-            ->join(array('l' => 'LEK_languageresources_languages'), 'tm.id = l.languageResourceId', array('sourceLang','targetLang','sourceLangCode','targetLangCode'))
-            ->where('ca.customerId IN(?)',$customers);
+            ->join(array('l' => 'LEK_languageresources_languages'), 'tm.id = l.languageResourceId', array(
+                'sourceLang', 'targetLang', 'sourceLangCode', 'targetLangCode'
+            ))
+            ->where('ca.customerId IN(?)', $customers);
 
-            if(!empty($serviceNames)){
-                $s->where('tm.serviceName IN(?)',$serviceNames);
-            }
-            
-            if(!empty($sourceLang)){
-                $s->where('l.sourceLang IN(?)',$sourceLang);
-            }
-            
-            if(!empty($targetLang)){
-                $s->where('l.targetLang IN(?)',$targetLang);
-            }
-            $resutl=$this->db->fetchAll($s)->toArray();
-            return $this->mergeLanguages($resutl);
-            
+        if (!empty($serviceNames)) {
+            $s->where('tm.serviceName IN(?)', $serviceNames);
         }
-        return [];
+
+        if (!empty($sourceLang)) {
+            $s->where('l.sourceLang IN(?)', $sourceLang);
+        }
+
+        if (!empty($targetLang)) {
+            $s->where('l.targetLang IN(?)', $targetLang);
+        }
+
+        if (!empty($serviceTypes)) {
+            $s->where('tm.serviceType IN(?)', $serviceTypes);
+        }
+
+        $result = $this->db->fetchAll($s)->toArray();
+
+        return $this->mergeLanguages($result);
     }
     
     /**
