@@ -55,7 +55,7 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
      */
     protected $_pathPrefix = NULL;
 
-    public function __construct(string $pathPrefix = null)
+    public function __construct()
     {
         parent::__construct();
         $this->setPathPrefix(editor_Models_Import_Configuration::WORK_FILES_DIRECTORY);
