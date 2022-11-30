@@ -41,25 +41,27 @@ use ZfExtended_Plugin_Manager;
 
 class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
 {
-    private const ARGUMENT_HOST = 'host';
+    protected const ARGUMENT_HOST = 'host';
 
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'service:autodiscovery';
     /**
      * @var ZfExtended_Plugin_Manager
      */
-    private ZfExtended_Plugin_Manager $pluginmanager;
+    protected ZfExtended_Plugin_Manager $pluginmanager;
     /**
      * @var array
+     * structure: name => port
      */
-    private array $services = [
-        'languagetool',
-        't5memory',
-        'termtagger',
-        'frontendmessagebus',
-        'okapi',
-        'pdfconverter',
-        'visualbrowser'
+    protected array $services = [
+        'php' => 80, // used to configure the worker-trigger & visualbrowser access
+        'frontendmessagebus' => 9057,
+        'okapi' => 8080,
+        'languagetool' => 8010,
+        'termtagger' => 9001,
+        't5memory' => 4040,
+        'pdfconverter' => 8086,
+        'visualbrowser' => 3000
     ];
 
     protected function configure()
@@ -84,7 +86,7 @@ using the default ports.')
         ');
 
         $this->addArgument(
-            'host',
+            self::ARGUMENT_HOST,
             InputArgument::OPTIONAL,
             'Custom host for the service. Applicable only when discovering a specific service.'
         );
@@ -99,7 +101,7 @@ using the default ports.')
         $this->addOption(
             'service',
             's',
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
             'Specify the service to configure'
         );
     }
@@ -120,14 +122,18 @@ using the default ports.')
         $this->writeTitle('Translate5 service auto-discovery');
 
         // check service option
-        if (!empty($this->input->getOption('service'))) {
-
-            $service = strtolower($this->input->getOption('service'));
-            if (!in_array($service, $this->services)) {
-                $this->io->error('The service "' . $service . '" is unknown with this command.');
-                return self::FAILURE;
+        $optionServices = $this->input->getOption('service');
+        if (!empty($optionServices)) {
+            // $optionService = is_array($optionService) ? $optionService : [ $optionService ];
+            $services = [];
+            foreach($optionServices as $service){
+                $service = strtolower($service);
+                if (!array_key_exists($service, $this->services)) {
+                    $this->io->error('The service "' . $service . '" is unknown with this command.');
+                    return self::FAILURE;
+                }
+                $services[$service] = $this->services[$service];
             }
-            $services = [$service];
 
         } else {
 
@@ -142,6 +148,7 @@ using the default ports.')
     /**
      * @param array $services
      * @return void
+     * @uses  servicePhp()
      * @uses  serviceOkapi()
      * @uses  serviceT5memory()
      * @uses  serviceTermtagger()
@@ -151,22 +158,36 @@ using the default ports.')
      * @uses  servicePdfconverter()
      * @uses  serviceVisualbrowser()
      */
-    private function foreachService(array $services): void
+    protected function foreachService(array $services): void
     {
-        foreach ($services as $service) {
-            call_user_func([$this, 'service' . ucfirst($service)]);
+        foreach ($services as $service => $port) {
+            call_user_func([$this, 'service' . ucfirst($service)], $port);
         }
     }
 
+    protected function servicePhp(int $port): void
+    {
+        $host = $this->getHost('php');
+        $url = 'http://' . $host . ':' . $port;
+        if (!$this->checkServiceDefault('php (Translate5)', $url, $host, $port)) {
+            return;
+        }
+        $this->updateConfig(
+            'runtimeOptions.worker.server',
+            $url
+        );
+    }
+
     /**
+     * @param int $port
      * @throws JsonException|Zend_Exception
      */
-    private function serviceT5memory(): void
+    protected function serviceT5memory(int $port): void
     {
         $host = $this->getHost('t5memory');
-        $url = 'http://' . $host . ':4040/t5memory';
+        $url = 'http://' . $host . ':' . $port . '/t5memory';
 
-        if (!$this->checkServiceDefault($host, 'T5Memory', $url)) {
+        if (!$this->checkServiceDefault('T5Memory', $url, $host, $port)) {
             return;
         }
 
@@ -179,18 +200,18 @@ using the default ports.')
             $servers = json_encode($servers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
             $this->updateConfigInstance($config, $servers);
         }
-
     }
 
     /**
+     * @param int $port
      * @throws Zend_Exception
      */
-    private function serviceFrontendmessagebus()
+    protected function serviceFrontendmessagebus(int $port)
     {
         $host = $this->getHost('frontendmessagebus');
-        $internalServer = 'http://' . $host . ':9057';
+        $internalServer = 'http://' . $host . ':' . $port;
 
-        if (!$this->checkServiceDefault($host, 'FrontEndMessageBus', $internalServer)) {
+        if (!$this->checkServiceDefault('FrontEndMessageBus', $internalServer, $host, $port)) {
             $this->setPluginActive('FrontEndMessageBus', false);
             return;
         }
@@ -237,15 +258,16 @@ using the default ports.')
     }
 
     /**
+     * @param int $port
      * @throws Zend_Exception
      */
-    private function serviceOkapi(): void
+    protected function serviceOkapi(int $port): void
     {
         $host = $this->getHost('okapi');
-        $url = 'http://' . $host . ':8080/okapi-longhorn/';
+        $url = 'http://' . $host . ':' . $port . '/okapi-longhorn/';
         //FIXME multiple servers / versions???
 
-        if ($this->checkServiceDefault($host, 'Okapi', $url)) {
+        if ($this->checkServiceDefault('Okapi', $url, $host, $port)) {
             //runtimeOptions.plugins.Okapi.server       {"okapi-longhorn":"http://localhost:8080/okapi-longhorn/"}
             $this->updateConfig(
                 'runtimeOptions.plugins.Okapi.server',
@@ -261,39 +283,64 @@ using the default ports.')
     }
 
     /**
+     * @param int $port
      * @throws Zend_Exception
      */
-    private function serviceLanguagetool(): void
+    protected function serviceLanguagetool(int $port): void
     {
-        $host = $this->getHost('languagetool');
-        $url = 'http://' . $host . ':8010/v2';
-
-        if ($this->checkServiceDefault($host, 'Languagetool', $url)) {
-            // runtimeOptions.plugins.SpellCheck.languagetool.url.default ["http://localhost:8010/v2"]
-            $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.default', '["' . $url . '"]');
-
-            // runtimeOptions.plugins.SpellCheck.languagetool.url.gui http://localhost:8010/v2
-            $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.gui', $url);
-
-            // runtimeOptions.plugins.SpellCheck.languagetool.url.import ["http://localhost:8010/v2"]
-            $this->updateConfig('runtimeOptions.plugins.SpellCheck.languagetool.url.import', '["' . $url . '"]');
-
+        $foundInstaces = $this->findLanguagetools($port);
+        $pluginActive = $this->configureMultiInstanceService($foundInstaces, 'Languagetool', 'runtimeOptions.plugins.SpellCheck.languagetool', true);
+        $this->setPluginActive('TermTagger', $pluginActive);
+        if($pluginActive){
+            // enable live check when plugin is active
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.liveCheckOnEditing', '1');
-            $this->setPluginActive('SpellCheck');
-        } else {
-            $this->setPluginActive('SpellCheck', false);
         }
     }
 
     /**
+     * Finds the languagetool-instances
+     * @param int $port
+     * @return array[]
+     */
+    protected function findLanguagetools(int $port): array
+    {
+        $found = [
+            'default' => [],
+            'gui' => [],
+            'import' => [],
+        ];
+        // TODO FIXME: can't we have more than one ??
+        $host = $this->getHost('languagetool');
+        $url = 'http://' . $host . ':' . $port . '/v2';
+        if ($this->checkServiceDefault('Languagetool', $url, $host, $port)){
+            $found['default'][] = $url;
+            $found['gui'][] = $url;
+            $found['import'][] = $url;
+        }
+        return $found;
+    }
+
+    /**
+     * @param int $port
      * Auto discover termtaggers: either termtagger, or termtagger_N (max 20), or termtagger_TYPE_N (max 20)
      * @return void
      * @throws JsonException
      * @throws Zend_Exception
      */
-    private function serviceTermtagger(): void
+    protected function serviceTermtagger(int $port): void
     {
-        $port = '9001'; //default port
+        $foundInstaces = $this->findTermtaggers($port);
+        $pluginActive = $this->configureMultiInstanceService($foundInstaces, 'TermTagger', 'runtimeOptions.termTagger', false);
+        $this->setPluginActive('TermTagger', $pluginActive);
+    }
+
+    /**
+     * Finds the termtagger-instances
+     * @param int $port
+     * @return array[]
+     */
+    protected function findTermtaggers(int $port): array
+    {
         $found = [
             'default' => [],
             'gui' => [],
@@ -301,59 +348,51 @@ using the default ports.')
         ];
         $host = $this->getHost('termtagger');
 
-        if ($this->isDnsSet($host)) {
+        if ($this->isDnsSet($host, $port)) {
             $found['default'][] = 'http://' . $host . ':' . $port;
         }
         $types = array_keys($found);
         for ($i = 1; $i <= 20; $i++) {
             $hostname = $host . '_' . $i;
-            if ($this->isDnsSet($hostname)) {
+            if ($this->isDnsSet($hostname, $port)) {
                 $found['default'][] = 'http://' . $hostname . ':' . $port;
             }
             foreach ($types as $type) {
                 $hostname = $host . '_' . $type . '_' . $i;
-                if ($this->isDnsSet($hostname)) {
+                if ($this->isDnsSet($hostname, $port)) {
                     $found[$type][] = 'http://' . $hostname . ':' . $port;
                 }
             }
         }
-        $taggers = array_merge(... array_values($found));
-        $this->io->writeln('');
-        if (empty($taggers)) {
-            $this->io->writeln('Found TermTaggers: NONE');
-        } else {
-            $this->io->writeln('Found TermTaggers: ' . join(', ', $taggers));
-        }
-
-        $foundATagger = false;
-        foreach ($found as $key => $value) {
-            if (empty($found[$key])) {
-                $this->updateConfig('runtimeOptions.termTagger.url.' . $key, '[]');
-                continue;
-            }
-            $value = json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
-            $foundATagger = true;
-            $this->updateConfig('runtimeOptions.termTagger.url.' . $key, $value);
-        }
-        $this->setPluginActive('TermTagger', $foundATagger);
+        return $found;
     }
 
-    private function servicePdfconverter(): void
+    /**
+     * @param int $port
+     * @throws Zend_Exception
+     */
+    protected function servicePdfconverter(int $port): void
     {
-        $url = 'http://' . $this->getHost('pdfconverter') . ':8086';
+        $host = $this->getHost('pdfconverter');
+        $url = 'http://' . $host . ':' . $port;
 
-        if (!$this->checkServiceDefault('pdfconverter', 'PDF Converter', $url)) {
+        if (!$this->checkServiceDefault('PDF Converter', $url, $host, $port)) {
             return;
         }
 
         $this->updateConfig('runtimeOptions.plugins.VisualReview.pdfconverterUrl', $url);
     }
 
-    private function serviceVisualbrowser(): void
+    /**
+     * @param int $port
+     * @throws Zend_Exception
+     */
+    protected function serviceVisualbrowser(int $port): void
     {
-        $url = 'ws://' . $this->getHost('visualbrowser') . ':3000';
+        $host = $this->getHost('visualbrowser');
+        $url = 'ws://' . $host . ':' . $port;
 
-        if (!$this->checkServiceDefault('visualbrowser', 'Headless Chrome browser', $url)) {
+        if (!$this->checkServiceDefault('Headless Chrome browser', $url, $host, $port)) {
             return;
         }
 
@@ -361,21 +400,62 @@ using the default ports.')
     }
 
     /**
-     * @param string $name
+     * @param array $foundServices: hashtable with keys "default", "gui" and "import"
+     * @param string $serviceName
+     * @param string $configBase
+     * @param bool $singleGuiInstance: ugly divergency in the way multi-instance-services are set up in the config
+     * @return bool
+     * @throws JsonException
+     * @throws Zend_Exception
+     */
+    protected function configureMultiInstanceService(array $foundServices, string $serviceName, string $configBase, bool $singleGuiInstance): bool
+    {
+        $activatePlugin = false;
+        // we need all 3 service-url-types to enable the plugin
+        if (count($foundServices['default']) < 1 || count($foundServices['gui']) < 1 || count($foundServices['import']) < 1) {
+            $this->io->info('Found ' . $serviceName . 's: NONE');
+        } else {
+            $this->io->info('Found ' . $serviceName . 's: ' . json_encode($foundServices, JSON_UNESCAPED_SLASHES));
+            $activatePlugin = true;            
+        }
+        foreach ($foundServices as $key => $value) {
+            if (empty($value)) {
+                $newValue = ($key === 'gui' && $singleGuiInstance) ? '' : '[]';
+            } else {
+                $newValue = ($key === 'gui' && $singleGuiInstance) ? $value[0] : json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            }
+            $this->updateConfig($configBase . '.url.' . $key, $newValue);
+        }
+        return $activatePlugin;
+    }
+
+    /**
      * @param string $label
      * @param string $url
+     * @param string $host
+     * @param int $port
      * @return bool
      */
-    private function checkServiceDefault(string $name, string $label, string $url): bool
+    protected function checkServiceDefault(string $label, string $url, string $host, int $port): bool
     {
         $result = true;
-        if (!$this->isDnsSet($name)) {
-            $url = 'NONE (expected: '.$url.')';
+        if (!$this->isDnsSet($host, $port)) {
+            $url = 'NONE (expected: ' . $url . ')';
             $result = false;
         }
-        $this->io->writeln('');
-        $this->io->writeln('Found ' . $label . ': ' . $url);
+        $this->io->info('Found ' . $label . ': ' . $url);
         return $result;
+    }
+
+    /**
+     * @param string $host
+     * @param int $port
+     * @return bool
+     */
+    protected function isDnsSet(string $host, int $port): bool
+    {
+        $ip = gethostbyname($host);
+        return $ip !== $host;
     }
 
     /**
@@ -385,7 +465,7 @@ using the default ports.')
      * @return void
      * @throws Zend_Exception
      */
-    private function updateConfig(string $name, string $newValue): void
+    protected function updateConfig(string $name, string $newValue): void
     {
         $config = new editor_Models_Config();
         $config->loadByName($name);
@@ -401,13 +481,13 @@ using the default ports.')
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    private function setPluginActive(string $plugin, bool $active = true)
+    protected function setPluginActive(string $plugin, bool $active = true)
     {
         if ($this->input->getOption('auto-set')) {
             $this->pluginmanager->setActive($plugin, $active);
             $this->io->success('Plug-In ' . $plugin . ' ' . ($active ? 'activated.' : 'disabled!'));
         } else {
-            $this->io->writeln('Would ' . ($active ? 'activate.' : 'disable') . ' Plug-In ' . $plugin);
+            $this->io->note('Would ' . ($active ? 'activate.' : 'disable') . ' Plug-In ' . $plugin);
         }
     }
 
@@ -418,7 +498,7 @@ using the default ports.')
      * @return void
      * @throws Zend_Exception
      */
-    private function updateConfigInstance(editor_Models_Config $config, string $newValue): void
+    protected function updateConfigInstance(editor_Models_Config $config, string $newValue): void
     {
         if (!$this->input->getOption('auto-set')) {
             $this->printCurrentConfig($config, '; discovered value is ' . $newValue);
@@ -434,13 +514,13 @@ using the default ports.')
         }
         $config->setValue($newValue);
         $config->save();
-        $this->io->writeln($config->getName() . ' set to ' . $newValue);
+        $this->io->note($config->getName() . ' set to ' . $newValue);
     }
 
     /**
      * @throws Zend_Exception
      */
-    private function printCurrentConfig(editor_Models_Config $config, string $suffix = ''): void
+    protected function printCurrentConfig(editor_Models_Config $config, string $suffix = ''): void
     {
         if ($config->hasIniEntry()) {
             $is = ' is in INI: ';
@@ -451,23 +531,13 @@ using the default ports.')
     }
 
     /**
-     * @param string $serviceName
-     * @return bool
-     */
-    private function isDnsSet(string $serviceName): bool
-    {
-        $ip = gethostbyname($serviceName);
-        return $ip !== $serviceName;
-    }
-
-    /**
      * Retrieve particular host from input or return default value if not provided
      *
      * @param string $default
      *
      * @return string
      */
-    private function getHost(string $default): string
+    protected function getHost(string $default): string
     {
         return $this->input->getArgument(self::ARGUMENT_HOST) ?? $default;
     }
