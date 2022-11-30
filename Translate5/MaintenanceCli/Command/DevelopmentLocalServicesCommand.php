@@ -55,7 +55,7 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
         't5memory' => 4740,
         'termtagger' => 4701,
         'pdfconverter' => 4786,
-        'visualbrowser' => 4700
+        'visualbrowser' => 3000 // due to biderectional access, must work in "host" network mode so port cannot be virtualized
     ];
 
     private $revertSql = '';
