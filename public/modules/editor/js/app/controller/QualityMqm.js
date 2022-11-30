@@ -222,11 +222,12 @@ Ext.define('Editor.controller.QualityMqm', {
 			tagDef = this.getImgTagDomConfig(qmid, comment, sev),
 			open = Ext.DomHelper.createDom(tagDef.open),
 			close = Ext.DomHelper.createDom(tagDef.close);
-		// TODO FIXME: This check only makes sense, if the startContainer and endContainer are identical. This check widely prevents to tag the last word in a segment
+
 		// check if there is actual text selected
-		if(rangeBegin.startOffset >= rangeBegin.endOffset){
+		if(rangeBegin.startOffset === rangeBegin.endOffset) {
 		    return null;
 		}
+
 		rangeBegin.collapse(true);
 		rangeEnd.collapse(false);
 		rangeEnd.insertNode(close);
