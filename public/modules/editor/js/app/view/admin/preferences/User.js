@@ -73,7 +73,7 @@ Ext.define('Editor.view.admin.preferences.User', {
                         labelWidth: 160,
                         width:"100%",
                         inputType: 'password',
-                        minLength: 12,
+                        minLength: 8,
                         allowBlank: false
                     },
                     items: [{

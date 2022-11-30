@@ -289,16 +289,14 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                             },{
                                 inputType: 'password',
                                 name: 'passwd',
-                                itemId:'password',
-                                minLength: 12,
+                                minLength: 8,
                                 allowBlank: false,
                                 disabled: true,
                                 fieldLabel: me.strings.password
                             },{
                                 inputType: 'password',
                                 name: 'passwd_check',
-                                itemId:'passwd_check',
-                                minLength: 12,
+                                minLength: 8,
                                 allowBlank: false,
                                 disabled: true,
                                 validator: function(value) {
@@ -348,6 +346,8 @@ Ext.define('Editor.view.admin.user.AddWindow', {
         };
   
         if(instanceConfig.editMode) {
+            //TODO talk with tomas
+            //me.title = me.titleEdit;
         	config.title = me.titleEdit;
         }
 

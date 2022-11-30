@@ -1102,10 +1102,6 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
                 </figure>
                 </target>
             </trans-unit>
-            <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlLCBlaW4gU29uZGVyemVpY2hlbiB1bmQgZWluZSBaYWhsLg=='>
-              <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe, ein Sonderzeichen und eine Zahl.</source>
-              <target>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe, ein Sonderzeichen und eine Zahl.</target>
-            </trans-unit>
         </body>
     </file>
 </xliff>
