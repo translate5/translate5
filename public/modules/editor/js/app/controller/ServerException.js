@@ -252,6 +252,9 @@ Ext.define('Editor.controller.ServerException', {
                 json.errorMessage = [];
                 Ext.Object.each(errorsToUse, function(field, errors) {
                     Ext.Object.each(errors, function(key, error) {
+                        if(Ext.isArray(error)){
+                            error = error.join('<br/>')
+                        }
                         json.errorMessage.push(error);
                     });
                 });

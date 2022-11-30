@@ -8914,6 +8914,34 @@ E-Mail: service@MittagQI.com</pre>
               <source>Dateiname</source>
               <target>File name</target>
             </trans-unit>
+            <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlLCBlaW4gU29uZGVyemVpY2hlbiB1bmQgZWluZSBaYWhsLg=='>
+              <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe, ein Sonderzeichen und eine Zahl.</source>
+              <target>Minimum length: 12 characters. Minimum included: One uppercase letter, one lowercase letter, one special character and one number.</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyAxMiBaZWljaGVu">
+              <source>Mindestens 12 Zeichen</source>
+              <target>Minimum 12 characters</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW5lIFphaGw=">
+              <source>Mindestens eine Zahl</source>
+              <target>Minimum one number</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gS2xlaW5idWNoc3RhYmU=">
+              <source>Mindestens ein Kleinbuchstabe</source>
+              <target>Minimum one lowercase letter</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gR3Jvw59idWNoc3RhYmU=">
+              <source>Mindestens ein Großbuchstabe</source>
+              <target>Minimum one uppercase letter</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gU29uZGVyemVpY2hlbg==">
+              <source>Mindestens ein Sonderzeichen</source>
+              <target>Minimum one special character</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFBhc3N3b3J0IGVudGjDpGx0IGVpbiBuaWNodCBlcmxhdWJ0ZXMgV29ydC4=">
+              <source>Das Passwort enthält ein nicht erlaubtes Wort.</source>
+              <target>Password contains not allowed word.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
