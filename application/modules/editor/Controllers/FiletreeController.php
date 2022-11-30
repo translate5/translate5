@@ -58,17 +58,13 @@ class Editor_FiletreeController extends ZfExtended_RestController
      */
     public function indexAction()
     {
+        $this->initCurrentTask();
 
-        // if taskGuid is provided, the request should not be in task context.
-        $taskGuid = $this->getParam('taskGuid');
-        if( empty($taskGuid)){
-            $this->initCurrentTask();
-            $taskGuid = $this->getCurrentTask()->getTaskGuid();
-        }
-
-        $this->entity->loadByTaskGuid($taskGuid);
-
-        $this->view->rows = $this->entity->getTree();
+        $this->entity->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
+        //by passing output handling, output is already JSON
+        $contextSwitch = $this->getHelper('ContextSwitch');
+        $contextSwitch->setAutoSerialization(false);
+        $this->getResponse()->setBody($this->entity->getTreeAsJson());
     }
 
     /**
