@@ -8765,9 +8765,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Mindestens ein Sonderzeichen</source>
               <target>Mindestens ein Sonderzeichen</target>
             </trans-unit>
-            <trans-unit id="RGFzIFBhc3N3b3J0IGVudGjDpGx0IGVpbiBuaWNodCBlcmxhdWJ0ZXMgV29ydC4=">
-              <source>Das Passwort enthält ein nicht erlaubtes Wort.</source>
-              <target>Das Passwort enthält ein nicht erlaubtes Wort.</target>
+            <trans-unit id="RGFzIFBhc3N3b3J0IGVudGjDpGx0IGVpbiBXb3J0IGF1cyBkZXIgc2Nod2FyemVuIExpc3RlLg==">
+              <source>Das Passwort enthält ein Wort aus der schwarzen Liste.</source>
+              <target>Das Passwort enthält ein Wort aus der schwarzen Liste.</target>
             </trans-unit>
         </body>
     </file>
