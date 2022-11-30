@@ -139,11 +139,8 @@ Ext.define('Editor.controller.MetaPanel', {
      */
     startEdit: function (editingPlugin, context) {
         var me = this,
-            mp = me.getMetaPanel(),
             record = context.record,
-            segmentId = record.get('id'),
             isWatched = Boolean(record.get('isWatched')),
-            segmentUserAssocId = record.get('segmentUserAssocId'),
             navi = me.getNavi(),
             but = Ext.getCmp('watchSegmentBtn'),
             tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
@@ -153,7 +150,6 @@ Ext.define('Editor.controller.MetaPanel', {
             dismissDelay: 0,
             text: tooltip
         });
-        me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
         navi.show();
         navi.enable();
         me.getSegmentMeta().show();
@@ -164,6 +160,7 @@ Ext.define('Editor.controller.MetaPanel', {
             record = selectedRecords[0],
             segmentId = record.get('id');
 
+        me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
         me.record = record;
         // our component controllers are listening for the load event & create their views
         me.getQualitiesStore().load({
@@ -177,13 +174,8 @@ Ext.define('Editor.controller.MetaPanel', {
      */
     handleQualitiesLoaded: function (store, records) {
         this.getMetaFalPosPanel().loadFalsifiable(records);
-        // for cases where user is faster than store
-        if (this.editingMode == 'edit') {
-            var segmentId = this.record.get('id');
-            this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
-        } else {
-            store.removeAll(true);
-        }
+        var segmentId = this.record.get('id');
+        this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
     },
     /**
      * opens metapanel for readonly segments
