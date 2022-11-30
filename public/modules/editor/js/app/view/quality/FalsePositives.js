@@ -39,122 +39,82 @@ Ext.define('Editor.view.quality.FalsePositives', {
     ],
     controller: 'falsePositives',
     cls: 'segmentQualities',
-    defaultType: 'checkbox',
     padding: 0,
-    hidden: true,
-    isActive: false,
+    items: [{
+        xtype: 'grid',
+        userCls: 't5falsePositivesGrid',
+        border: 0,
+        height: 'auto',
+        emptyText: 'No qualities for now',
+        store: {
+            type: 'json',
+            data: []
+        },
+        columns: [{
+            width: 35,
+            xtype: 'checkcolumn',
+            menuDisabled: true,
+            dataIndex: 'falsePositive',
+            bind: {
+                text: '{l10n.falsePositives.grid.falsePositive}'
+            },
+            listeners: {
+                checkchange: 'onFalsePositiveChanged',
+            }
+        }, {
+            flex: 1,
+            menuDisabled: true,
+            dataIndex: 'text',
+            bind: {
+                text: '{l10n.falsePositives.grid.text}'
+            },
+            renderer: 'falsepositivesGridTextRenderer'
+        }, {
+            xtype: 'widgetcolumn',
+            text: '<span class="fa fa-magnifying-glass-arrow-right"></span>',
+            width: 35,
+            bind: {
+                tooltip: '{l10n.falsePositives.grid.similarQty.tooltip}'
+            },
+            dataIndex: 'similarQty',
+            padding: 0,
+            menuDisabled: true,
+            widget: {
+                xtype: 'button',
+                width: 26,
+                height: 26,
+                margin: 0,
+                padding: 0,
+                ui: "default-toolbar-small",
+                setUi: function(ui) {this.setUI(ui);},
+                bind: {
+                    text: '{record.similarQty}',
+                    disabled: '{record.similarQty == 0 || !record.falsePositiveChanged}',
+                    tooltip: '{l10n.falsePositives.grid.similarQty.button}',
+                    ui: '{record.similarQty == 0 || !record.falsePositiveChanged ? "default-toolbar-small" : "default"}'
+                },
+                handler: 'onFalsePositiveSpread'
+            }
+        }]
+    }],
     initConfig: function(instanceConfig) {
         var config = {
-            title: this.title
+            title: this.title,
         };
         if (instanceConfig) {
             this.self.getConfigurator().merge(this, config, instanceConfig);
         }
         return this.callParent([config]);
     },
+
     /**
      * Creates the checkbox components after a store load & evaluates the visibility of our view
      * @param {Editor.model.quality.Segment[]} records
-     * @param {Integer} segmentId for which the qualities should be loaded
-     * @param {boolean} isActive: if the component is active
      */
-    startEditing: function(records, segmentId, isActive){
-        this.isActive = isActive;
-        if(isActive && records && records.length){
-            this.createGrid(records);
-        }
-    },
-    /**
-     * Updates our view after a store change
-     * For simplicity we simply recreate it
-     */
-    rebuildByRecords: function(records){
-        if(this.isActive && records){
-            this.createGrid(records);
-        }
-    },
-    /**
-     * Creates our GUI
-     */
-    createGrid: function(records){
-        var data = [];
-        this.removeAll();
-        Ext.each(records, function(record){
-            if(record.get('falsifiable')){
-                data.push(record);
-            }
-        }, this);
-        this.add({
-            xtype: 'grid',
-            userCls: 't5falsePositivesGrid',
-            border: 0,
-            height: 35 + 36 * data.length,
-            store: {
-                type: 'json',
-                data: data
-            },
-            columns: [{
-                width: 35,
-                xtype: 'checkcolumn',
-                menuDisabled: true,
-                dataIndex: 'falsePositive',
-                bind: {
-                    text: '{l10n.falsePositives.grid.falsePositive}'
-                },
-                listeners: {
-                    checkchange: 'onFalsePositiveChanged',
-                }
-            }, {
-                flex: 1,
-                menuDisabled: true,
-                dataIndex: 'text',
-                bind: {
-                    text: '{l10n.falsePositives.grid.text}'
-                },
-                renderer: 'falsepositivesGridTextRenderer'
-            }, {
-                xtype: 'widgetcolumn',
-                text: '<span class="fa fa-magnifying-glass-arrow-right"></span>',
-                width: 35,
-                bind: {
-                    tooltip: '{l10n.falsePositives.grid.similarQty.tooltip}'
-                },
-                dataIndex: 'similarQty',
-                padding: 0,
-                menuDisabled: true,
-                widget: {
-                    xtype: 'button',
-                    width: 26,
-                    height: 26,
-                    margin: 0,
-                    padding: 0,
-                    ui: "default-toolbar-small",
-                    setUi: function(ui) {this.setUI(ui);},
-                    bind: {
-                        text: '{record.similarQty}',
-                        disabled: '{record.similarQty == 0 || !record.falsePositiveChanged}',
-                        tooltip: '{l10n.falsePositives.grid.similarQty.button}',
-                        ui: '{record.similarQty == 0 || !record.falsePositiveChanged ? "default-toolbar-small" : "default"}'
-                    },
-                    handler: 'onFalsePositiveSpread'
-                }
-            }]
-        });
-        if(data.length){
-            this.show();
-        } else {
-            this.endEditing(true, false);
-        }
-    },
-
-    /**
-     * Hides the GUI if present
-     */
-    endEditing: function(isActive, isSaving){
-        if(isActive){
-            this.removeAll();
-            this.hide();
-        }
+    loadFalsifiable: function(records){
+        this.down('grid').getStore().setData(
+            Ext.Array.filter(records, rec => rec.get('falsifiable'))
+        );
     }
 });
 
