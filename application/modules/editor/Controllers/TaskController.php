@@ -1241,7 +1241,7 @@ class editor_TaskController extends ZfExtended_RestController {
     }
 
     /**
-     * returns true if PUT Requests opens a task for editing or readonly
+     * returns true if PUT Requests opens a task for open or finish
      * @return boolean
      */
     protected function isLeavingTaskRequest(): bool {
