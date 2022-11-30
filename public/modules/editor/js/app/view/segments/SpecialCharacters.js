@@ -44,6 +44,8 @@ Ext.define('Editor.view.segments.SpecialCharacters', {
             specialCharacters = Editor.data.editor.segments.editorSpecialCharacters,
             config = {
                 title: me.strings.title,
+                disabled: true,
+                enableOnEdit: true,
                 items:[{
                     xtype: 'button',
                     border: 1,
