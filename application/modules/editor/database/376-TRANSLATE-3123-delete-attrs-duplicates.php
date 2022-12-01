@@ -49,9 +49,6 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-// this is workaround just to be able to use the system user when we check the workflow bellow.
-defined('ZFEXTENDED_IS_WORKER_THREAD') || define('ZFEXTENDED_IS_WORKER_THREAD', true);
-
 /* @var $attr editor_Models_Terminology_Models_AttributeModel */
 $attr = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class);
 
@@ -65,7 +62,7 @@ $allowedMulti = $attr->db->getAdapter()->query('
 // Get NOT IN (...) clause
 $dataTypeId_NOT_IN = $attr->db->getAdapter()->quoteInto('`dataTypeId` NOT IN (?)', $allowedMulti);
 
-// Get ids of all duplicated occurrences of attributes except the most recent occurrence
+// Term-level: Get ids of all duplicated occurrences of attributes except the most recent occurrence
 $olderDuplicates = $attr->db->getAdapter()->query('
   SELECT 
     REPLACE(
@@ -97,3 +94,51 @@ $attr->db->getAdapter()->query('
   SET `ta`.`termTbxId` = `tt`.`termTbxId`
   WHERE ISNULL(`ta`.`termTbxId`)
 ');
+
+// TermEntry-level: Get ids of all duplicated occurrences of attributes except the most recent occurrence
+$olderDuplicates = $attr->db->getAdapter()->query('
+  SELECT 
+    REPLACE(
+       GROUP_CONCAT(`id` ORDER BY `updatedAt` DESC, `id` DESC),
+       CONCAT(SUBSTRING_INDEX(
+        GROUP_CONCAT(
+          `id` ORDER BY `updatedAt` DESC, `id` DESC
+        ), 
+        ",", 1
+      ), ","),
+      ""
+    ) AS `older`
+  FROM `terms_attributes`
+  WHERE ISNULL(`language`) AND ' . $dataTypeId_NOT_IN . '
+  GROUP BY CONCAT(`termEntryId`, "-", `dataTypeId`, "-", `type`)
+  HAVING COUNT(`id`) > 1
+')->fetchAll(PDO::FETCH_COLUMN);
+
+// Delete older duplicates
+foreach ($olderDuplicates as $list) {
+    $attr->db->getAdapter()->query('DELETE FROM `terms_attributes` WHERE `id` IN (' . $list . ')');
+}
+
+// Language-level: Get ids of all duplicated occurrences of attributes except the most recent occurrence
+$olderDuplicates = $attr->db->getAdapter()->query('
+  SELECT 
+    REPLACE(
+       GROUP_CONCAT(`id` ORDER BY `updatedAt` DESC, `id` DESC),
+       CONCAT(SUBSTRING_INDEX(
+        GROUP_CONCAT(
+          `id` ORDER BY `updatedAt` DESC, `id` DESC
+        ), 
+        ",", 1
+      ), ","),
+      ""
+    ) AS `older`
+  FROM `terms_attributes`
+  WHERE NOT ISNULL(`language`) AND ISNULL(`termId`) AND ' . $dataTypeId_NOT_IN . '
+  GROUP BY LOWER(CONCAT(`termEntryId`, "-", `language`, "-", `dataTypeId`, "-", `type`))
+  HAVING COUNT(`id`) > 1
+')->fetchAll(PDO::FETCH_COLUMN);
+
+// Delete older duplicates
+foreach ($olderDuplicates as $list) {
+    $attr->db->getAdapter()->query('DELETE FROM `terms_attributes` WHERE `id` IN (' . $list . ')');
+}
