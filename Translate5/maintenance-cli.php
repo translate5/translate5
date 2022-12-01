@@ -56,6 +56,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     PluginListCommand,
     ReleaseNotesCommand,
     ServiceAutodiscoveryCommand,
+    DevelopmentLocalServicesCommand,
     SessionImpersonateCommand,
     StatusCommand,
     SystemCheckCommand,
@@ -137,6 +138,7 @@ if(file_exists('.git')) {
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
+    $commands[] = new DevelopmentLocalServicesCommand();
 }
 $app->addCommands($commands);
 $app->run();
