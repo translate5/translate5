@@ -124,19 +124,18 @@ using the default ports.')
         // check service option
         $optionServices = $this->input->getOption('service');
         if (!empty($optionServices)) {
-            // $optionService = is_array($optionService) ? $optionService : [ $optionService ];
             $services = [];
             foreach($optionServices as $service){
                 $service = strtolower($service);
                 if (!array_key_exists($service, $this->services)) {
                     $this->io->error('The service "' . $service . '" is unknown with this command.');
+					$this->io->writeln('Valid services are: '.join(', ', array_keys($this->services)));
                     return self::FAILURE;
                 }
                 $services[$service] = $this->services[$service];
             }
 
         } else {
-
             $services = $this->services;
         }
 
@@ -149,6 +148,7 @@ using the default ports.')
      * @param array $services
      * @return void
      * @uses  servicePhp()
+     * @uses  serviceProxy()
      * @uses  serviceOkapi()
      * @uses  serviceT5memory()
      * @uses  serviceTermtagger()
@@ -178,6 +178,20 @@ using the default ports.')
         );
     }
 
+    private function serviceProxy(int $port): void
+    {
+        $host = $this->getHost('proxy');
+        $url = 'http://' . $host . ':80/';
+
+        if (!$this->checkServiceDefault($host, 'Proxy', $url)) {
+            return;
+        }
+
+        $config = new editor_Models_Config();
+        $config->loadByName('runtimeOptions.authentication.ipbased.useLocalProxy');
+        $this->updateListConfigInstance($config, $host);
+    }
+
     /**
      * @param int $port
      * @throws JsonException|Zend_Exception
@@ -193,13 +207,7 @@ using the default ports.')
 
         $config = new editor_Models_Config();
         $config->loadByName('runtimeOptions.LanguageResources.opentm2.server');
-        $servers = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
-
-        if (!in_array($url, $servers)) {
-            $servers[] = $url;
-            $servers = json_encode($servers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
-            $this->updateConfigInstance($config, $servers);
-        }
+        $this->updateListConfigInstance($config, $url);
     }
 
     /**
@@ -515,6 +523,20 @@ using the default ports.')
         $config->setValue($newValue);
         $config->save();
         $this->io->note($config->getName() . ' set to ' . $newValue);
+    }
+
+    /**
+     * @throws Zend_Exception|JsonException
+     */
+    private function updateListConfigInstance(editor_Models_Config $config, string $newValue): void
+    {
+        $servers = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (!in_array($newValue, $servers)) {
+            $servers[] = $newValue;
+            $servers = json_encode($servers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            $this->updateConfigInstance($config, $servers);
+        }
     }
 
     /**
