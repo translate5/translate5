@@ -66,19 +66,19 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
             store = me.getView().getStore();
 
         Ext.Ajax.request({
-            url:Editor.data.restpath+'filetree',
+            url:Editor.data.restpath+'filetree/root',
             method: "GET",
             params:{
                 taskGuid:taskGuid
             },
             scope: this,
             success: function(response){
-                var resp = Ext.util.JSON.decode(response.responseText);
-
+                var resp = Ext.util.JSON.decode(response.responseText),
+                    result = resp['rows'];
                 // even if the root is disabled, adding root node is the only way to display the data !
                 me.getView().setRootNode({
                     expanded:true,
-                    children:resp
+                    children:result
                 });
 
             },

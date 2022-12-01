@@ -58,17 +58,48 @@ class Editor_FiletreeController extends ZfExtended_RestController
      */
     public function indexAction()
     {
-        $taskGuid = $this->getParam('taskGuid',false);
-        if( empty($taskGuid)){
-            $this->initCurrentTask();
-            $taskGuid = $this->getCurrentTask()->getTaskGuid();
-        }
+        $this->initCurrentTask();
 
-        $this->entity->loadByTaskGuid($taskGuid);
+        $this->entity->loadByTaskGuid($this->getCurrentTask()->getTaskGuid());
         //by passing output handling, output is already JSON
         $contextSwitch = $this->getHelper('ContextSwitch');
         $contextSwitch->setAutoSerialization(false);
-        $this->getResponse()->setBody(json_encode($this->entity->getTreeForStore(), JSON_THROW_ON_ERROR));
+        $this->getResponse()->setBody($this->entity->getTreeAsJson());
+    }
+
+    /***
+     * Action to load all files for task reimport
+     */
+    public function rootAction(){
+
+        $taskGuid = $this->getParam('taskGuid');
+        if( empty($taskGuid)){
+            ZfExtended_UnprocessableEntity::addCodes(['E1025' => 'Field "taskGuid" must be provided.']);
+            throw new ZfExtended_UnprocessableEntity('E1025');
+        }
+        /** @var editor_Models_Task $task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task->loadByTaskGuid($taskGuid);
+
+        $isPm = $task->getPmGuid() === ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+
+        $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || ($isPm);
+
+        if( $mayLoadAllTasks === false){
+            $this->view->rows = [];
+            return;
+        }
+
+        try {
+            $this->entity->loadByTaskGuid($task->getTaskGuid());
+            $this->view->rows = $this->entity->getTreeForStore();
+        }catch (ZfExtended_Models_Entity_NotFoundException $e){
+            // INFO: no need for exception here because this can be requested during the import, and in
+            // that point of time, there are no files yet
+            $this->view->message = 'No files where found for this taskGuid';
+            $this->view->rows = [];
+        }
+
     }
 
     /**
