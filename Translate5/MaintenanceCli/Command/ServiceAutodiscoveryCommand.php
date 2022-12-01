@@ -45,7 +45,22 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
 
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'service:autodiscovery';
+    /**
+     * @var ZfExtended_Plugin_Manager
+     */
     private ZfExtended_Plugin_Manager $pluginmanager;
+    /**
+     * @var array
+     */
+    private array $services = [
+        'languagetool',
+        't5memory',
+        'termtagger',
+        'frontendmessagebus',
+        'okapi',
+        'pdfconverter',
+        'visualbrowser'
+    ];
 
     protected function configure()
     {
@@ -69,12 +84,6 @@ using the default ports.')
         ');
 
         $this->addArgument(
-            'service',
-            InputArgument::OPTIONAL,
-            'Discover a specific service only'
-        );
-
-        $this->addArgument(
             'host',
             InputArgument::OPTIONAL,
             'Custom host for the service. Applicable only when discovering a specific service.'
@@ -82,9 +91,16 @@ using the default ports.')
 
         $this->addOption(
             'auto-set',
-            's',
+            'a',
             InputOption::VALUE_NONE,
             'Discover and update the configuration'
+        );
+
+        $this->addOption(
+            'service',
+            's',
+            InputOption::VALUE_REQUIRED,
+            'Specify the service to configure'
         );
     }
 
@@ -103,27 +119,19 @@ using the default ports.')
 
         $this->writeTitle('Translate5 service auto-discovery');
 
-        $services = [
-            'proxy',
-            'languagetool',
-            't5memory',
-            'termtagger',
-            'frontendmessagebus',
-            'okapi',
-            'pdfconverter',
-            'visualbrowser',
-        ];
-        $service = $this->input->getArgument('service');
+        // check service option
+        if (!empty($this->input->getOption('service'))) {
 
-        if ($service) {
-            if (! in_array($service, $services)) {
-                $this->io->error('Given service '.$service.' is invalid!');
+            $service = strtolower($this->input->getOption('service'));
+            if (!in_array($service, $this->services)) {
+                $this->io->error('The service "' . $service . '" is unknown with this command.');
                 $this->io->writeln('Valid services are: '.join(', ', $services));
                 return self::FAILURE;
             }
-
-            //discover only the given service
             $services = [$service];
+
+        } else {
+            $services = $this->services;
         }
 
         $this->foreachService($services);
@@ -149,18 +157,6 @@ using the default ports.')
         foreach ($services as $service) {
             call_user_func([$this, 'service' . ucfirst($service)]);
         }
-    }
-
-    private function checkServiceDefault(string $name, string $label, string $url): bool
-    {
-        $result = true;
-        if (!$this->isDnsSet($name)) {
-            $url = 'NONE';
-            $result = false;
-        }
-        $this->io->writeln('');
-        $this->io->writeln('Found ' . $label . ': ' . $url);
-        return $result;
     }
 
     /**
@@ -376,6 +372,24 @@ using the default ports.')
     }
 
     /**
+     * @param string $name
+     * @param string $label
+     * @param string $url
+     * @return bool
+     */
+    private function checkServiceDefault(string $name, string $label, string $url): bool
+    {
+        $result = true;
+        if (!$this->isDnsSet($name)) {
+            $url = 'NONE (expected: '.$url.')';
+            $result = false;
+        }
+        $this->io->writeln('');
+        $this->io->writeln('Found ' . $label . ': ' . $url);
+        return $result;
+    }
+
+    /**
      * Updates a config by name
      * @param string $name
      * @param string $newValue
@@ -398,13 +412,13 @@ using the default ports.')
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    private function setPluginActive(string $plugin, bool $active = true) {
+    private function setPluginActive(string $plugin, bool $active = true)
+    {
         if ($this->input->getOption('auto-set')) {
             $this->pluginmanager->setActive($plugin, $active);
-            $this->io->success('Plug-In '.$plugin.' '.($active ? 'activated.' : 'disabled!'));
-        }
-        else {
-            $this->io->writeln('Would '.($active ? 'activate.' : 'disable').' Plug-In '.$plugin);
+            $this->io->success('Plug-In ' . $plugin . ' ' . ($active ? 'activated.' : 'disabled!'));
+        } else {
+            $this->io->writeln('Would ' . ($active ? 'activate.' : 'disable') . ' Plug-In ' . $plugin);
         }
     }
 
@@ -417,8 +431,8 @@ using the default ports.')
      */
     private function updateConfigInstance(editor_Models_Config $config, string $newValue): void
     {
-        if (! $this->input->getOption('auto-set')) {
-            $this->printCurrentConfig($config, '; discovered value is '.$newValue);
+        if (!$this->input->getOption('auto-set')) {
+            $this->printCurrentConfig($config, '; discovered value is ' . $newValue);
             return;
         }
         if ($config->hasIniEntry()) {
@@ -461,7 +475,11 @@ using the default ports.')
         $this->io->writeln('  config ' . $config->getName() . $is . $config->getValue() . $suffix);
     }
 
-    private function isDnsSet($serviceName): bool
+    /**
+     * @param string $serviceName
+     * @return bool
+     */
+    private function isDnsSet(string $serviceName): bool
     {
         $ip = gethostbyname($serviceName);
         return $ip !== $serviceName;

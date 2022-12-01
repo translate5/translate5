@@ -84,7 +84,6 @@ class DevelopmentGithookCommand extends Translate5AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
-        $this->initTranslate5();
 
         $hook = $input->getArgument('hook');
         switch($hook) {

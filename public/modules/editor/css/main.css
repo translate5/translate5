@@ -99,7 +99,7 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 .segment-tag-container .x-autocontainer-innerCt div.close,
 .segment-tag-container .x-autocontainer-innerCt div.single {
     display:inline;
-    background:#cfcfcf;
+    background:#cfcfcfaa;
     border-radius:4px;
 }
 
