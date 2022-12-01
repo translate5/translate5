@@ -169,7 +169,8 @@ class editor_Models_Export {
         $file->load($fileId);
 
 
-        $exportParser = call_user_func([$file->getFileParser(), 'getExportClass']);
+        $importFileParser = $file->getFileParser();
+        $exportParser = $importFileParser::getExportClass();
 
         if(empty($exportParser) || !class_exists($exportParser)) {
             return null;
@@ -188,7 +189,8 @@ class editor_Models_Export {
         ]);
         
         return ZfExtended_Factory::get($fpConfig->exportParser, [
-            $this->task, $fileId,
+            $this->task,
+            $fileId,
             $fpConfig->path,
             $fpConfig->options
         ]);
