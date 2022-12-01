@@ -200,7 +200,7 @@ Ext.define('Editor.plugins.TermTagger.view.TermPortlet', {
                 }
 
                 attributes['language'].forEach(function (attribute){
-                    if(attribute['language'] === language){
+                    if(attribute['language'] === language && attribute['termEntryId'] === termEntryId){
                         html.push('<li>' + attribute['nameTranslated'] + ' : <i>' + attribute['value'] + '</i></li>');
                     }
                 });

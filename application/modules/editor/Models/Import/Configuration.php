@@ -280,9 +280,6 @@ class editor_Models_Import_Configuration {
             
             $reviewDir = $this->getWorkfileDir();
             $data = ['review' => basename($reviewDir)];
-            
-            //write a warrning that the proofRead is deprecated
-            $this->warnImportDirDeprecated();
         }
         if(!is_dir($reviewDir)){
             /***
@@ -321,9 +318,13 @@ class editor_Models_Import_Configuration {
      * TODO:(23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
      * @param string $importDir
      */
-    protected function warnImportDirDeprecated() {
-        $logger = Zend_Registry::get('logger')->cloneMe('editor.import.configuration');
-        /* @var $logger ZfExtended_Logger */
-        $logger->warn('E1338','IMPORTANT: The "proofRead" folder in the zip import package is deprecated from now on. In the future please always use the new folder "workfiles" instead. All files that need to be reviewed or translated will have to be placed in the new folder "workfiles" from now on. In some future version of translate5 the support for "proofRead" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.');
+    public function warnImportDirDeprecated(editor_Models_Task $task) {
+        if($this->isDeprecatedDirectoryName) {
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.import.configuration');
+            /* @var $logger ZfExtended_Logger */
+            $logger->warn('E1338','IMPORTANT: The "proofRead" folder in the zip import package is deprecated from now on. In the future please always use the new folder "workfiles" instead. All files that need to be reviewed or translated will have to be placed in the new folder "workfiles" from now on. In some future version of translate5 the support for "proofRead" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.', [
+                'task' => $task
+            ]);
+        }
     }
 }
