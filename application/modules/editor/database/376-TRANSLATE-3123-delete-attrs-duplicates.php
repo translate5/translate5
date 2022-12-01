@@ -80,7 +80,7 @@ $olderDuplicates = $attr->db->getAdapter()->query('
     ) AS `older`
   FROM `terms_attributes`
   WHERE NOT ISNULL(`termId`) AND ' . $dataTypeId_NOT_IN . '
-  GROUP BY CONCAT(`termId`, "-", `dataTypeId`)
+  GROUP BY CONCAT(`termId`, "-", `dataTypeId`, "-", `type`)
   HAVING COUNT(`id`) > 1
 ')->fetchAll(PDO::FETCH_COLUMN);
 
