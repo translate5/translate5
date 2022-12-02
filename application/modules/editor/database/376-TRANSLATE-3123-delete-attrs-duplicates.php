@@ -49,45 +49,75 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-/* @var $attr editor_Models_Terminology_Models_AttributeModel */
-$attr = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class);
+/* @var $model editor_Models_Terminology_Models_AttributeModel */
+$db = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class)->db->getAdapter();
 
 // Get ids of attribute datatypes, that are allowed to have multiple occurrences on their level
-$allowedMulti = $attr->db->getAdapter()->query('
+$allowedMulti = $db->query("
     SELECT `id` 
     FROM `terms_attributes_datatype` 
-    WHERE `type` IN ("xGraphic", "crossReference", "externalCrossReference", "figure")
-')->fetchAll(PDO::FETCH_COLUMN);
+    WHERE `type` IN ('xGraphic', 'crossReference', 'externalCrossReference', 'figure')
+")->fetchAll(PDO::FETCH_COLUMN);
 
 // Get NOT IN (...) clause
-$dataTypeId_NOT_IN = $attr->db->getAdapter()->quoteInto('`dataTypeId` NOT IN (?)', $allowedMulti);
+$dataTypeId_NOT_IN = $db->quoteInto('`dataTypeId` NOT IN (?)', $allowedMulti);
 
-// Term-level: Get ids of all duplicated occurrences of attributes except the most recent occurrence
-$olderDuplicates = $attr->db->getAdapter()->query('
-  SELECT 
-    REPLACE(
-       GROUP_CONCAT(`id` ORDER BY `updatedAt` DESC, `id` DESC),
-       CONCAT(SUBSTRING_INDEX(
-        GROUP_CONCAT(
-          `id` ORDER BY `updatedAt` DESC, `id` DESC
-        ), 
-        ",", 1
-      ), ","),
-      ""
-    ) AS `older`
-  FROM `terms_attributes`
-  WHERE NOT ISNULL(`termId`) AND ' . $dataTypeId_NOT_IN . '
-  GROUP BY CONCAT(`termId`, "-", `dataTypeId`, "-", `type`)
-  HAVING COUNT(`id`) > 1
-')->fetchAll(PDO::FETCH_COLUMN);
+// Get ids of attribute datatypes, that are picklist-datatypes
+$picklistA = $db->query("
+    SELECT `id`, 1 FROM `terms_attributes_datatype` WHERE `dataType` = 'picklist'
+")->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Delete older duplicates
-foreach ($olderDuplicates as $list) {
-    $attr->db->getAdapter()->query('DELETE FROM `terms_attributes` WHERE `id` IN (' . $list . ')');
+/**
+ * @param array $attrA
+ * @param $db Zend_Db_Adapter_Abstract
+ * @param array $picklistA
+ */
+function cleanupAttrA(array $attrA, $db, array $picklistA) {
+
+    // Foreach attr having duplicates
+    foreach ($attrA as $attrI) {
+
+        // Delete all records of this attribute except the newer one
+        $db->query("DELETE FROM `terms_attributes` WHERE `id` IN ({$attrI['older']})");
+
+        // If this attribute is not a picklist
+        if (!isset($picklistA[$attrI['dataTypeId']])) {
+
+            // Set value of newer one to be distinct concatenated values across all records (newer + older)
+            $db->query(
+                "UPDATE `terms_attributes` SET `value` = ? WHERE `id` = {$attrI['newer']}", $attrI['values']
+            );
+        }
+    }
 }
 
+// Prepare SELECT FROM
+$selectFrom = "
+  SELECT
+    SUBSTRING_INDEX(GROUP_CONCAT(`id` ORDER BY `updatedAt` DESC, `id` DESC), ',', 1) AS `newer`,
+    `dataTypeId`,
+    REPLACE (
+      GROUP_CONCAT(`id` ORDER BY `updatedAt` DESC, `id` DESC),
+      CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(`id` ORDER BY `updatedAt` DESC, `id` DESC), ',', 1), ','),
+      ''
+    ) AS `older`,
+    GROUP_CONCAT(DISTINCT `value` ORDER BY `updatedAt` DESC, `id` DESC) AS `values`,
+    COUNT(`id`) AS `qty`
+  FROM `terms_attributes`
+";
+
+// Term-level: get duplicates
+$attrA = $db->query("$selectFrom
+  WHERE NOT ISNULL(`termId`) AND $dataTypeId_NOT_IN
+  GROUP BY CONCAT(`termId`, '-', `dataTypeId`, '-', `type`)
+  HAVING COUNT(`id`) > 1
+")->fetchAll(PDO::FETCH_COLUMN);
+
+// Do cleanup
+cleanupAttrA($attrA, $db, $picklistA);
+
 // Set termTbxId for attributes where it shouldn't be but NULL
-$attr->db->getAdapter()->query('
+$db->query('
   UPDATE 
    `terms_attributes` `ta`
    LEFT JOIN `terms_term` `tt` ON (`ta`.`termId` = `tt`.`id`)
@@ -95,50 +125,22 @@ $attr->db->getAdapter()->query('
   WHERE ISNULL(`ta`.`termTbxId`)
 ');
 
-// TermEntry-level: Get ids of all duplicated occurrences of attributes except the most recent occurrence
-$olderDuplicates = $attr->db->getAdapter()->query('
-  SELECT 
-    REPLACE(
-       GROUP_CONCAT(`id` ORDER BY `updatedAt` DESC, `id` DESC),
-       CONCAT(SUBSTRING_INDEX(
-        GROUP_CONCAT(
-          `id` ORDER BY `updatedAt` DESC, `id` DESC
-        ), 
-        ",", 1
-      ), ","),
-      ""
-    ) AS `older`
-  FROM `terms_attributes`
-  WHERE ISNULL(`language`) AND ' . $dataTypeId_NOT_IN . '
-  GROUP BY CONCAT(`termEntryId`, "-", `dataTypeId`, "-", `type`)
+// TermEntry-level: get duplicates
+$attrA = $db->query("$selectFrom
+  WHERE ISNULL(`language`) AND $dataTypeId_NOT_IN
+  GROUP BY CONCAT(`termEntryId`, '-', `dataTypeId`, '-', `type`)
   HAVING COUNT(`id`) > 1
-')->fetchAll(PDO::FETCH_COLUMN);
+")->fetchAll(PDO::FETCH_COLUMN);
 
-// Delete older duplicates
-foreach ($olderDuplicates as $list) {
-    $attr->db->getAdapter()->query('DELETE FROM `terms_attributes` WHERE `id` IN (' . $list . ')');
-}
+// Do cleanup
+cleanupAttrA($attrA, $db, $picklistA);
 
-// Language-level: Get ids of all duplicated occurrences of attributes except the most recent occurrence
-$olderDuplicates = $attr->db->getAdapter()->query('
-  SELECT 
-    REPLACE(
-       GROUP_CONCAT(`id` ORDER BY `updatedAt` DESC, `id` DESC),
-       CONCAT(SUBSTRING_INDEX(
-        GROUP_CONCAT(
-          `id` ORDER BY `updatedAt` DESC, `id` DESC
-        ), 
-        ",", 1
-      ), ","),
-      ""
-    ) AS `older`
-  FROM `terms_attributes`
-  WHERE NOT ISNULL(`language`) AND ISNULL(`termId`) AND ' . $dataTypeId_NOT_IN . '
-  GROUP BY LOWER(CONCAT(`termEntryId`, "-", `language`, "-", `dataTypeId`, "-", `type`))
+// Language-level: get duplicates
+$attrA = $db->query("$selectFrom
+  WHERE NOT ISNULL(`language`) AND ISNULL(`termId`) AND $dataTypeId_NOT_IN
+  GROUP BY LOWER(CONCAT(`termEntryId`, '-', `language`, '-', `dataTypeId`, '-', `type`))
   HAVING COUNT(`id`) > 1
-')->fetchAll(PDO::FETCH_COLUMN);
+")->fetchAll(PDO::FETCH_COLUMN);
 
-// Delete older duplicates
-foreach ($olderDuplicates as $list) {
-    $attr->db->getAdapter()->query('DELETE FROM `terms_attributes` WHERE `id` IN (' . $list . ')');
-}
+// Do cleanup
+cleanupAttrA($attrA, $db, $picklistA);
