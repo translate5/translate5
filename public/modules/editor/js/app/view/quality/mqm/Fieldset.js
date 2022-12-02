@@ -51,22 +51,6 @@ Ext.define('Editor.view.quality.mqm.Fieldset', {
 		    config = {
 		        title: me.title, //see EXT6UPD-9
 			items : [{
-				xtype: 'button',
-				text: me.strings.qmAddBtn,
-				margin: '0 0 10 0',
-				menu: {
-				    xtype: 'menu',
-					bodyCls: 'qmflag-menu',
-					items: instanceConfig.menuConfig,
-					listeners: {
-	                    afterrender: function(component) {
-	                    	if(component.keyNav) {
-	                    		component.keyNav.disable();
-	                    	}
-	                    }
-                	}
-				}
-			},{
 				xtype: 'combo',
 				anchor: '100%',
 				name: 'mqmseverity',
@@ -82,6 +66,22 @@ Ext.define('Editor.view.quality.mqm.Fieldset', {
 				anchor: '100%',
 				fieldLabel: me.strings.commentLabel,
 				name: 'mqmcomment'
+			},{
+				xtype: 'button',
+				text: me.strings.qmAddBtn,
+				margin: '0 0 10 0',
+				menu: {
+					xtype: 'menu',
+					bodyCls: 'qmflag-menu',
+					items: instanceConfig.menuConfig,
+					listeners: {
+						afterrender: function(component) {
+							if(component.keyNav) {
+								component.keyNav.disable();
+							}
+						}
+					}
+				}
 			}]
 		};
         if (instanceConfig) {
