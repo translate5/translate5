@@ -101,7 +101,7 @@ $selectFrom = "
       CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(`id` ORDER BY `updatedAt` DESC, `id` DESC), ',', 1), ','),
       ''
     ) AS `older`,
-    GROUP_CONCAT(DISTINCT `value` ORDER BY `updatedAt` DESC, `id` DESC) AS `values`,
+    GROUP_CONCAT(DISTINCT TRIM(`value`) ORDER BY `updatedAt` DESC, `id` DESC SEPARATOR ', ') AS `values`,
     COUNT(`id`) AS `qty`
   FROM `terms_attributes`
 ";
@@ -111,7 +111,7 @@ $attrA = $db->query("$selectFrom
   WHERE NOT ISNULL(`termId`) AND $dataTypeId_NOT_IN
   GROUP BY CONCAT(`termId`, '-', `dataTypeId`, '-', `type`)
   HAVING COUNT(`id`) > 1
-")->fetchAll(PDO::FETCH_COLUMN);
+")->fetchAll();
 
 // Do cleanup
 cleanupAttrA($attrA, $db, $picklistA);
@@ -130,7 +130,7 @@ $attrA = $db->query("$selectFrom
   WHERE ISNULL(`language`) AND $dataTypeId_NOT_IN
   GROUP BY CONCAT(`termEntryId`, '-', `dataTypeId`, '-', `type`)
   HAVING COUNT(`id`) > 1
-")->fetchAll(PDO::FETCH_COLUMN);
+")->fetchAll();
 
 // Do cleanup
 cleanupAttrA($attrA, $db, $picklistA);
@@ -140,7 +140,7 @@ $attrA = $db->query("$selectFrom
   WHERE NOT ISNULL(`language`) AND ISNULL(`termId`) AND $dataTypeId_NOT_IN
   GROUP BY LOWER(CONCAT(`termEntryId`, '-', `language`, '-', `dataTypeId`, '-', `type`))
   HAVING COUNT(`id`) > 1
-")->fetchAll(PDO::FETCH_COLUMN);
+")->fetchAll();
 
 // Do cleanup
 cleanupAttrA($attrA, $db, $picklistA);
