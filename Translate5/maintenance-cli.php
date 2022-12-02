@@ -84,6 +84,7 @@ use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
+    new AuthTokenCommand(),
     new CachePurgeCommand(),
     new ChangelogCommand(),
     new ConfigCommand(),

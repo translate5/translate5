@@ -16,12 +16,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E9999"></a>E9999  | everywhere | Several | Default code used for old error messages, which are not converted yet to the new error code system.
 | <a id="E0001"></a>E0001  | everywhere | HTTP client logging - SEND | The raw connection content of a internal used HTTP client is logged for debugging purposes.
 | <a id="E0002"></a>E0002  | everywhere | HTTP client logging - RECEIVE | The raw connection content of a internal used HTTP client is logged for debugging purposes.
-| <a id="E1352"></a>E1352  | everywhere | No access to requested URL | The currently authenticated user is not allowed to access the requested resource.<br />Since this is normally a misconfiguration of ACL rules or programming error in the GUI (missing isAllowed check) this error is locked as error.
+| <a id="E1352"></a>E1352  | everywhere | Keine Zugriffsberechtigung! | The currently authenticated user is not allowed to access the requested resource.<br />Since this is normally a misconfiguration of ACL rules or programming error in the GUI (missing isAllowed check) this error is locked as error.
 | <a id="E1014"></a>E1014  | everywhere | Log HTTP Request {route} | The HTTP request to the server and its parameters are logged. Generally for debugging only.
 | <a id="E1015"></a>E1015  | entities | Duplicate Key | A database key for the entity to be saved does already exist.
 | <a id="E1016"></a>E1016  | entities | Integrity Constraint Violation | An entity can not be added or updated since a referenced entity does not exist (anymore).<br />Or an entity can not be updated or deleted since it is referenced by other entities.
 | <a id="E1019"></a>E1019  | everywhere | HTTP Status 404 | The requested URL / page was not found, the API endpoint in the application does not exist.
-| <a id="E1025"></a>E1025  | everywhere | HTTP Status 422 | The PUT / POST request to that URL could not be processed due invalid given data. <br />The invalid fields are listed in the result from the server.
+| <a id="E1025"></a>E1025  | everywhere | Field "taskGuid" must be provided. | The PUT / POST request to that URL could not be processed due invalid given data. <br />The invalid fields are listed in the result from the server.
 | <a id="E1026"></a>E1026  | everywhere | HTTP Status 422 | The File Upload did not succeed PUT / POST request to that URL could not be processed due invalid given data.<br />The invalid fields are listed in the result from the server.
 | <a id="E1041"></a>E1041  | everywhere | HTTP Status 409 | The PUT / POST request to that URL could not be processed due the given data would produce an invalid state of the entity on the server.<br />If possible, the causing fields are listed in the result from the server, or the error message is self explaining.
 | <a id="E1310"></a>E1310  | everywhere | HTTP Status 502 Bad Gateway | A requested service is not available, or answers with an error.
@@ -65,13 +65,15 @@ https://confluence.translate5.net/display/TAD/EventCodes
 
 ### Authentication
 
-| EventCode        | Context       | EventMessage  | Description/Solution
-| :--------------- |:------------- | :------------ | :------------------- 
-| <a id="E1156"></a>E1156  | Authentication | Tried to authenticate via hashAuthentication, but feature is disabled in the config! | Please set runtimeOptions.hashAuthentication in the configuration to one of the following values:<br />disabled: the feature is disabled and produces this error.<br />dynamic: use a dynamic auth hash.<br />static: use a static auth hash.<br />See [Single Click Authentication](https://confluence.translate5.net/display/TAD/Single+Click+Authentication).
-| <a id="E1289"></a>E1289  | Authentication | Ip based authentication: Customer with number ({number}) does't exist. | The configured customer in&nbsp; runtimeOptions.authentication.ipbased.IpCustomerMap&nbsp;<br />configuration does not exist. Default customer will be used instead.
-| <a id="E1290"></a>E1290  | Authentication | Ip based authentication: User with roles:({configuredRoles}) is not allowed to authenticate ip based. | There is no configured ip based roles for the ip based authentication or the configured roles are not allowed per acl
-| <a id="E1332"></a>E1332  | Authentication | Fail or success info log for sessionToken based authentication. | 
-| <a id="E1342"></a>E1342  | Authentication: Session impersonate | The parameter login containing the desired username is missing. | The parameter login containing the desired username is missing.
+| EventCode        | Context                              | EventMessage                                                                                          | Description/Solution
+| :--------------- |:-------------------------------------|:------------------------------------------------------------------------------------------------------| :------------------- 
+| <a id="E1156"></a>E1156  | Authentication                       | Tried to authenticate via hashAuthentication, but feature is disabled in the config!                  | Please set runtimeOptions.hashAuthentication in the configuration to one of the following values:<br />disabled: the feature is disabled and produces this error.<br />dynamic: use a dynamic auth hash.<br />static: use a static auth hash.<br />See [Single Click Authentication](https://confluence.translate5.net/display/TAD/Single+Click+Authentication).
+| <a id="E1289"></a>E1289  | Authentication                       | Ip based authentication: Customer with number ({number}) does't exist.                                | The configured customer in&nbsp; runtimeOptions.authentication.ipbased.IpCustomerMap&nbsp;<br />configuration does not exist. Default customer will be used instead.
+| <a id="E1290"></a>E1290  | Authentication                       | Ip based authentication: User with roles:({configuredRoles}) is not allowed to authenticate ip based. | There is no configured ip based roles for the ip based authentication or the configured roles are not allowed per acl
+| <a id="E1332"></a>E1332  | Authentication                       | Fail or success info log for sessionToken based authentication.                                       | 
+| <a id="E1342"></a>E1342  | Authentication: Session impersonate  | The parameter login containing the desired username is missing.                                       | The parameter login containing the desired username is missing.
+| <a id="E1443"></a>E1443  | Authentication: Token authentication | Fail or success info log for application toke based authentication.                                   | Info log when user is authenticated or the authentication failed after app token authentication check
+
 
 ### Configuration
 | EventCode        | Context       | EventMessage  | Description/Solution
