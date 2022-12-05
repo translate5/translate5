@@ -9,6 +9,42 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+
+## [5.7.15] - 2022-12-01
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3122](https://jira.translate5.net/browse/TRANSLATE-3122): TermTagger integration - Termportlet in segment-meta-panel mixes all language level attributes up** <br>
+The Termportlet in the segment-meta-panel was loading to much data and was mixing up attributes on language level.
+
+**[TRANSLATE-3120](https://jira.translate5.net/browse/TRANSLATE-3120): Editor general - Workfiles not listed in editor** <br>
+Fixes problem where the work-files where not listed in editor
+
+**[TRANSLATE-3119](https://jira.translate5.net/browse/TRANSLATE-3119): TermPortal - TermPortal: error popping once attribute disabled** <br>
+Fixed error popping on attempt to remove usages of disabled attributes from filter window in case if no filter window exists as no search yet done
+
+**[TRANSLATE-3116](https://jira.translate5.net/browse/TRANSLATE-3116): SpellCheck (LanguageTool integration) - Editor: spellcheck styling breaks custom tags markup** <br>
+Fixed spellcheck styles breaking custom tags markup
+
+**[TRANSLATE-3115](https://jira.translate5.net/browse/TRANSLATE-3115): Import/Export - proofread deprecation message was not shown on a task** <br>
+The warning that the foldername proofRead is deprecated and should not be used anymore was not logged to a task but only into the system log therefore the PMs did not notice that message.
+
+**[TRANSLATE-3113](https://jira.translate5.net/browse/TRANSLATE-3113): Editor general - Adding MQM tags is not always working** <br>
+Fixed adding MQM tags to the latest selected word in the segment editor
+
+**[TRANSLATE-3112](https://jira.translate5.net/browse/TRANSLATE-3112): Editor general - MQM severity is not working properly** <br>
+Fix MQM tag severity in tooltip in segments grid
+
+**[TRANSLATE-3111](https://jira.translate5.net/browse/TRANSLATE-3111): Editor general - Editor: matchrate filter search problem** <br>
+Fixed problem that segment filter was not applied if a range was set too quickly on a MatchRate-column's filter.
+
+**[TRANSLATE-3110](https://jira.translate5.net/browse/TRANSLATE-3110): TermPortal - TermPortal: batch-editing should be available for termPM* roles only** <br>
+BatchEdit-button is now shown for 'TermPM' and 'TermPM (all clients)' user roles only
+
+
 ## [5.7.14] - 2022-11-24
 
 ### Important Notes:
