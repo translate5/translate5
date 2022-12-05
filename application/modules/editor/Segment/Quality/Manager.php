@@ -48,7 +48,7 @@ final class editor_Segment_Quality_Manager {
     public static function autoqaOperation(editor_Models_Task $task){
         
         $parentId = editor_Task_Operation::create(editor_Task_Operation::AUTOQA, $task);
-  
+        $task->meta()->resetTbxHash([$task->getTaskGuid()]);
         self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $parentId);
         
         $workerQueue = ZfExtended_Factory::get('ZfExtended_Worker_Queue');

@@ -163,7 +163,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $projects = $projects->loadProjectTasks($task->getProjectId(), true);
             $taskGuids = array_column($projects, 'taskGuid');
         }
-        
+
+        // If it is a pretranslation operation - reset tbx hash, so that terminology will be refreshed
+        if ($params['pretranslate']) $task->meta()->resetTbxHash($taskGuids);
+
         foreach ($taskGuids as $taskGuid){
             $this->queueAnalysis($taskGuid, $params);
         }
