@@ -110,7 +110,8 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract 
      */
     public function loadByIds(array $ids){
         $s=$this->db->select()
-        ->where('id IN (?)', array_unique($ids));
+        ->where('id IN (?)', array_unique($ids))
+        ->order('name ASC');
         return $this->loadFilterdCustom($s);
     }
     
