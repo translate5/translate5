@@ -146,7 +146,7 @@ abstract class editor_Models_Import_FileParser {
      */
     public static function getExportClass():string
     {
-        return str_replace('_Import_', '_Export_', self::class);
+        return str_replace('_Import_', '_Export_', static::class);
     }
     
     /**
