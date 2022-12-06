@@ -371,7 +371,7 @@ using the default ports.')
 
         $types = array_keys($found);
         for ($i = 1; $i <= 20; $i++) {
-            $hostname = $host . '_' . $i;
+            $hostname = $host . '_' . $i.'.';
             if ($this->isDnsSet($hostname, $port)) {
                 $found['default'][] = 'http://' . $hostname . ':' . $port;
             }
