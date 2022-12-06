@@ -9,23 +9,12 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
-
-
 ## [5.8.0] - 2022-12-06
 
 ### Important Notes:
-#### 
+####  [TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055) [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
 Before updating see 
-https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration
-
-#### [TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055)
-Before updating see 
-https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration
-
-#### [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
-Before updating see 
-https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration
- 
+<mark>[translate5 5.8.0 - needed visualreview to docker migration](https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration)</mark>
 
 
 ### Added
