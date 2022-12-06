@@ -13,8 +13,8 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 ### Important Notes:
 ####  [TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055) [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
-Before updating see 
-<mark>[translate5 5.8.0 - needed visualreview to docker migration](https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration)</mark>
+<mark>Before updating see 
+[translate5 5.8.0 - needed visualreview to docker migration](https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration)!</mark>
 
 
 ### Added
