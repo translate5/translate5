@@ -167,7 +167,7 @@ using the default ports.')
 
     protected function servicePhp(int $port): void
     {
-        $host = $this->getHost('php');
+        $host = $this->getHost('php.');
         $url = 'http://' . $host . ':' . $port;
         if (!$this->checkServiceDefault('php (Translate5)', $url, $host, $port)) {
             return;
@@ -180,7 +180,7 @@ using the default ports.')
 
     private function serviceProxy(int $port): void
     {
-        $host = $this->getHost('proxy');
+        $host = $this->getHost('proxy.');
         $url = 'http://' . $host . ':80/';
 
         if (!$this->checkServiceDefault($host, 'Proxy', $url)) {
@@ -198,7 +198,7 @@ using the default ports.')
      */
     protected function serviceT5memory(int $port): void
     {
-        $host = $this->getHost('t5memory');
+        $host = $this->getHost('t5memory.');
         $url = 'http://' . $host . ':' . $port . '/t5memory';
 
         if (!$this->checkServiceDefault('T5Memory', $url, $host, $port)) {
@@ -216,7 +216,7 @@ using the default ports.')
      */
     protected function serviceFrontendmessagebus(int $port)
     {
-        $host = $this->getHost('frontendmessagebus');
+        $host = $this->getHost('frontendmessagebus.');
         $internalServer = 'http://' . $host . ':' . $port;
 
         if (!$this->checkServiceDefault('FrontEndMessageBus', $internalServer, $host, $port)) {
@@ -271,7 +271,7 @@ using the default ports.')
      */
     protected function serviceOkapi(int $port): void
     {
-        $host = $this->getHost('okapi');
+        $host = $this->getHost('okapi.');
         $url = 'http://' . $host . ':' . $port . '/okapi-longhorn/';
         //FIXME multiple servers / versions???
 
@@ -318,7 +318,7 @@ using the default ports.')
             'import' => [],
         ];
         // TODO FIXME: can't we have more than one ??
-        $host = $this->getHost('languagetool');
+        $host = $this->getHost('languagetool.');
         $url = 'http://' . $host . ':' . $port . '/v2';
         if ($this->checkServiceDefault('Languagetool', $url, $host, $port)){
             $found['default'][] = $url;
@@ -354,11 +354,21 @@ using the default ports.')
             'gui' => [],
             'import' => [],
         ];
-        $host = $this->getHost('termtagger');
-
-        if ($this->isDnsSet($host, $port)) {
-            $found['default'][] = 'http://' . $host . ':' . $port;
+        $hostToUse = $host = $this->getHost('termtagger');
+        $useDefaultHost = $host == 'termtagger';
+        if($useDefaultHost) {
+            //when using local hostnames add trailing dot here
+            $hostToUse = $host.'.';
         }
+        if ($this->isDnsSet($hostToUse, $port)) {
+            $found['default'][] = 'http://' . $hostToUse . ':' . $port;
+        }
+
+        //when using a custom host no further checks are done
+        if (!$useDefaultHost) {
+            return $found;
+        }
+
         $types = array_keys($found);
         for ($i = 1; $i <= 20; $i++) {
             $hostname = $host . '_' . $i;
@@ -381,7 +391,7 @@ using the default ports.')
      */
     protected function servicePdfconverter(int $port): void
     {
-        $host = $this->getHost('pdfconverter');
+        $host = $this->getHost('pdfconverter.');
         $url = 'http://' . $host . ':' . $port;
 
         if (!$this->checkServiceDefault('PDF Converter', $url, $host, $port)) {
@@ -397,7 +407,7 @@ using the default ports.')
      */
     protected function serviceVisualbrowser(int $port): void
     {
-        $host = $this->getHost('visualbrowser');
+        $host = $this->getHost('visualbrowser.');
         $url = 'ws://' . $host . ':' . $port;
 
         if (!$this->checkServiceDefault('Headless Chrome browser', $url, $host, $port)) {
