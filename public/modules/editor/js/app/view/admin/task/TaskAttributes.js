@@ -309,7 +309,8 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                     type : 'rest',
                     url: Editor.data.restpath+'user/pm',
                     extraParams: {
-                        sort: '[{"property":"surName","direction":"ASC"},{"property":"firstName","direction":"ASC"}]'
+                        sort: '[{"property":"surName","direction":"ASC"},{"property":"firstName","direction":"ASC"}]',
+                        pmRoles: 'pmlight'
                     },
                     reader : {
                         rootProperty: 'rows',
