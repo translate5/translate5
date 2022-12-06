@@ -103,7 +103,6 @@ class Config {
         'runtimeOptions.plugins.VisualReview.googleCloudApiKey' => null,
         'runtimeOptions.plugins.VisualReview.dockerizedHeadlessChromeUrl' => null,
         'runtimeOptions.plugins.VisualReview.pdfconverterUrl' => null,
-        'runtimeOptions.plugins.VisualReview.pdfconverterFallbackUrl' => null,
         'runtimeOptions.plugins.VisualReview.shellCommandWget' => null
     ];
 
