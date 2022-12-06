@@ -10,6 +10,50 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.8.0] - 2022-12-06
+
+### Important Notes:
+#### 
+Before updating see 
+https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration
+
+#### [TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055)
+Before updating see 
+https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration
+
+#### [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
+Before updating see 
+https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration
+ 
+
+
+### Added
+**[TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055): VisualReview / VisualTranslation - Connect visual reflow via HTTP to headless browser instance** <br>
+* Changed usage of headless Browser for the visual to use a docker-image
+* Added own Worker for the Text-Reflow Conversion
+* Legacy Cleanup: Changed fallback-implementation for visuals, where the text-reflow fails to use the translate5 standard scroller & icon library. This fixes issues with missing annotation-icons in those cases
+
+**[TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185): Installation & Update - Prepare translate5 for usage with docker** <br>
+Introducing the setup of translate5 and the used services as docker containers.
+
+
+### Changed
+**[TRANSLATE-3127](https://jira.translate5.net/browse/TRANSLATE-3127): Editor general - Change the order of form components in "Manual QA inside segment" fieldset** <br>
+MQM widget form fields ordering changed
+
+**: VisualReview / VisualTranslation - Make pdf converter reachable via network** <br>
+The previous local pdf converter is now reachable as a service via network.
+
+
+### Bugfixes
+**[TRANSLATE-3133](https://jira.translate5.net/browse/TRANSLATE-3133): TermPortal - TermPortal: sort filterwindow dropdowns alphabetically** <br>
+Filter window Clients and TermCollection dropdowns are now sorted alphabetically
+
+**[TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123): Import/Export - Tbx import: duplicated attributes should be deleted** <br>
+TBX import: removed term-level attributes duplicates
+
+
 ## [5.7.15] - 2022-12-01
 
 ### Important Notes:
