@@ -189,7 +189,7 @@ using the default ports.')
 
         $config = new editor_Models_Config();
         $config->loadByName('runtimeOptions.authentication.ipbased.useLocalProxy');
-        $this->updateListConfigInstance($config, $host);
+        $this->updateListConfigInstance($config, [ $host ]);
     }
 
     /**
@@ -204,10 +204,9 @@ using the default ports.')
         if (!$this->checkServiceDefault('T5Memory', $url, $host, $port)) {
             return;
         }
-
         $config = new editor_Models_Config();
         $config->loadByName('runtimeOptions.LanguageResources.opentm2.server');
-        $this->updateListConfigInstance($config, $url);
+        $this->addToListConfigInstance($config, $url);
     }
 
     /**
@@ -536,16 +535,38 @@ using the default ports.')
     }
 
     /**
-     * @throws Zend_Exception|JsonException
+     * @param editor_Models_Config $config
+     * @param string $newValue
+     * @throws JsonException
+     * @throws Zend_Exception
      */
-    private function updateListConfigInstance(editor_Models_Config $config, string $newValue): void
+    protected function addToListConfigInstance(editor_Models_Config $config, string $newValue): void
     {
         $servers = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
+        $newServers = [ $newValue ];
 
-        if (!in_array($newValue, $servers)) {
-            $servers[] = $newValue;
-            $servers = json_encode($servers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
-            $this->updateConfigInstance($config, $servers);
+        if (array_diff($servers, $newServers) === [] && array_diff($newServers, $servers) === []) {
+            $this->io->note($config->getName() . ' is already set to ["' . $newValue . '"]');
+        } else {
+            $newValue = json_encode($newServers, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            $this->updateConfigInstance($config, $newValue);
+        }
+    }
+
+    /**
+     * @param editor_Models_Config $config
+     * @param array $newValues
+     * @throws JsonException
+     * @throws Zend_Exception
+     */
+    protected function updateListConfigInstance(editor_Models_Config $config, array $newValues): void
+    {
+        $current = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
+        if (array_diff($current, $newValues) === [] && array_diff($newValues, $current) === []) {
+            $this->io->note($config->getName() . ' is already set to ["' . implode('","', $newValues) . '"]');
+        } else {
+            $newValue = json_encode($newValues, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            $this->updateConfigInstance($config, $newValue);
         }
     }
 
