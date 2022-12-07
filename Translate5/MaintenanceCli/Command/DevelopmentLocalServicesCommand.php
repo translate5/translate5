@@ -58,7 +58,7 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
         'visualbrowser' => 3000 // due to biderectional access, must work in "host" network mode so port cannot be virtualized
     ];
 
-    private $revertSql = '';
+    private string $revertSql = '';
 
     protected function configure()
     {
@@ -271,5 +271,17 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
             $this->revertSql .= "UPDATE `Zf_configuration` SET `value` = '".$config->getValue()."' WHERE `name` = '".$config->getName()."';\n";
         }
         parent::updateConfigInstance($config, $newValue);
+    }
+
+    /**
+     * Needs to be rerouted to ensure t5memory is set to the desired value only
+     * @param editor_Models_Config $config
+     * @param string $newValue
+     * @throws Zend_Exception
+     * @throws \JsonException
+     */
+    protected function addToListConfigInstance(editor_Models_Config $config, string $newValue): void
+    {
+        $this->updateListConfigInstance($config, [ $newValue ]);
     }
 }
