@@ -298,7 +298,7 @@ using the default ports.')
     {
         $foundInstaces = $this->findLanguagetools($port);
         $pluginActive = $this->configureMultiInstanceService($foundInstaces, 'Languagetool', 'runtimeOptions.plugins.SpellCheck.languagetool', true);
-        $this->setPluginActive('TermTagger', $pluginActive);
+        $this->setPluginActive('Languagetool', $pluginActive);
         if($pluginActive){
             // enable live check when plugin is active
             $this->updateConfig('runtimeOptions.plugins.SpellCheck.liveCheckOnEditing', '1');
