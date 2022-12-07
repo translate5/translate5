@@ -105,7 +105,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
         $this->_createFprmTest('okf_itshtml5@invalid-xml-values.fprm', 'okf_itshtml5@local-standard_html5_customized', true, [], false, ['org.w3c.its.ITSException', 'Invalid value', "'translate'"]);
         $this->_createFprmTest('okf_html@invalid-yaml.fprm', 'okf_html@local-html_customized', false, ['Invalid YAML']);
         // HINT: the extendedValidationErrors may depend on the longhorn version
-        $this->_createFprmTest('okf_xmlstream@invalid-yaml-values.fprm', 'okf_xmlstream@local-xml_stream_customized', true, [], false, ['java.lang.ClassCastException', 'java.lang.String cannot be cast to class java.lang.Boolean']);
+        $this->_createFprmTest('okf_xmlstream@invalid-yaml-values.fprm', 'okf_xmlstream@local-xml_stream_customized', true, [], false, ['java.lang.ClassCastException', 'java.lang.String', 'cannot be cast to', 'java.lang.Boolean']);
     }
 
     /**
@@ -273,7 +273,7 @@ class OkapiBconfFilterTest extends editor_Test_JsonTest {
                     self::assertTrue((property_exists($result, 'success') && $result->success === false), 'Could save faulty FPRM "'.$filename.'"');
                     $error = strtolower($result->error);
                     foreach($extendedValidationErrors as $errorPart){
-                        self::assertEquals(true, str_contains($error, strtolower($errorPart)));
+                        self::assertEquals(true, str_contains(strtolower($error), strtolower($errorPart)), 'Error "'.$error.'" did not contain expected part "'.$errorPart.'"');
                     }
                 }
             }
