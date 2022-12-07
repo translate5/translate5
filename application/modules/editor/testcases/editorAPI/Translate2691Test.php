@@ -31,10 +31,29 @@ END LICENSE AND COPYRIGHT
  * For details see the issue.
  */
 class Translate2691Test extends \editor_Test_ApiTest {
+
     /**
      * Testing segment values directly after import
      */
     public function testSegmentValuesAfterImport() {
+
+        $target = "Xyxyx abcdexyz d'foobar par un partenaire de service apr\xc3\xa8s-vente du fooxxx ou un autre partenaire de service apr\xc3\xa8s-vente qualifi\xc3\xa9 ou par un blabla qualifi\xc3\xa9 et en faire";
+        $edited = "Xyxyx abcdexyz d'foobar par un R\xc3\xa9zyxvewe Xyz\xc3\xa9\xc3\xa9 du fooxxx ou un autre R\xc3\xa9zyxvewe Xyz\xc3\xa9\xc3\xa9 qualifi\xc3\xa9 ou par un blabla sp\xc3\xa9cialis\xc3\xa9 et en faire";
+        $date = '2021-11-03 08:15';
+        $name = 'Thomas Test';
+        $approval = 'Xyxyx abcdexyz d\'foobar par un <mrk mtype="x-sdl-added" sdl:revid="XXX">Rézyxvewe</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">partenaire</mrk> <mrk mtype="x-sdl-added" sdl:revid="XXX">Xyzéé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">de service après-vente</mrk> du fooxxx ou un autre <mrk mtype="x-sdl-added" sdl:revid="XXX">Rézyxvewe</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">partenaire</mrk> <mrk mtype="x-sdl-added" sdl:revid="XXX">Xyzéé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">de service après-vente</mrk> qualifié ou par un blabla <mrk mtype="x-sdl-added" sdl:revid="XXX">spécialisé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">qualifié</mrk> et en faire';
+        $tagger = new \editor_Models_Export_DiffTagger_Sdlxliff();
+        // diff tagging
+        $result = $tagger->diffSegment($target, $edited, $date, $name);
+        // replace/normalize ids
+        $result = preg_replace('/sdl:revid="[^"]+"/', 'sdl:revid="XXX"', $result);
+
+        $this->assertEquals($approval, $result, 'The diff-tagged content is not as expected.');
+
+        /**
+         * OLD implementation, using ZfExtended_Worker_Callback which does not work anymore
+         * TODO FIXME: Why was that used and "kann das weg" ?
+
         $worker = new \ZfExtended_Worker_Callback();
         $worker->init(null, [
             'class' => 'editor_Models_Export_DiffTagger_Sdlxliff',
@@ -45,8 +64,6 @@ class Translate2691Test extends \editor_Test_ApiTest {
             'name' => 'Thomas Test',
             'result' => 'Xyxyx abcdexyz d\'foobar par un <mrk mtype="x-sdl-added" sdl:revid="XXX">Rézyxvewe</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">partenaire</mrk> <mrk mtype="x-sdl-added" sdl:revid="XXX">Xyzéé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">de service après-vente</mrk> du fooxxx ou un autre <mrk mtype="x-sdl-added" sdl:revid="XXX">Rézyxvewe</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">partenaire</mrk> <mrk mtype="x-sdl-added" sdl:revid="XXX">Xyzéé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">de service après-vente</mrk> qualifié ou par un blabla <mrk mtype="x-sdl-added" sdl:revid="XXX">spécialisé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">qualifié</mrk> et en faire',
         ]);
-
-        //if the diff algorithm is defect we will timeout here
         $worker->setBlocking(true, 5);
         try {
             $worker->queue();
@@ -61,10 +78,7 @@ class Translate2691Test extends \editor_Test_ApiTest {
             throw $e;
         }
         $this->assertTrue(true);
-        //code to call the differ directly (use above data)
-        // $bar = new \editor_Models_Export_DiffTagger_Sdlxliff();
-        // $result = $bar->diffSegment($foo1,$foo2,'2021-11-03 08:15','Thomas Test');
 
-        // $this->assertEquals($approval, preg_replace('/sdl:revid="[^"]+"/', 'sdl:revid="XXX"', $result), 'The diff content is not as expected.');
+         */
     }
 }
