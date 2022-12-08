@@ -30,7 +30,9 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
+use Translate5\MaintenanceCli\Command\{
+    AuthTokenCommand,
+    CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
     DatabaseUpdateCommand,
