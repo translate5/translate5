@@ -52,7 +52,7 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
         'frontendmessagebus' => 4757,
         'okapi' => 4780,
         'languagetool' => 4710,
-        't5memory' => 4740,
+        // 't5memory' => 4740, // TODO FIXME: Currently, t5memory is not working properly. To get tests runninng, use old opentm2
         'termtagger' => 4701,
         'pdfconverter' => 4786,
         'visualbrowser' => 3000 // due to biderectional access, must work in "host" network mode so port cannot be virtualized
