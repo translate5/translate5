@@ -16,12 +16,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E9999"></a>E9999  | everywhere | Several | Default code used for old error messages, which are not converted yet to the new error code system.
 | <a id="E0001"></a>E0001  | everywhere | HTTP client logging - SEND | The raw connection content of a internal used HTTP client is logged for debugging purposes.
 | <a id="E0002"></a>E0002  | everywhere | HTTP client logging - RECEIVE | The raw connection content of a internal used HTTP client is logged for debugging purposes.
-| <a id="E1352"></a>E1352  | everywhere | Keine Zugriffsberechtigung! | The currently authenticated user is not allowed to access the requested resource.<br />Since this is normally a misconfiguration of ACL rules or programming error in the GUI (missing isAllowed check) this error is locked as error.
+| <a id="E1352"></a>E1352  | everywhere | No access to requested URL | The currently authenticated user is not allowed to access the requested resource.<br />Since this is normally a misconfiguration of ACL rules or programming error in the GUI (missing isAllowed check) this error is locked as error.
 | <a id="E1014"></a>E1014  | everywhere | Log HTTP Request {route} | The HTTP request to the server and its parameters are logged. Generally for debugging only.
 | <a id="E1015"></a>E1015  | entities | Duplicate Key | A database key for the entity to be saved does already exist.
 | <a id="E1016"></a>E1016  | entities | Integrity Constraint Violation | An entity can not be added or updated since a referenced entity does not exist (anymore).<br />Or an entity can not be updated or deleted since it is referenced by other entities.
 | <a id="E1019"></a>E1019  | everywhere | HTTP Status 404 | The requested URL / page was not found, the API endpoint in the application does not exist.
-| <a id="E1025"></a>E1025  | everywhere | Field "taskGuid" must be provided. | The PUT / POST request to that URL could not be processed due invalid given data. <br />The invalid fields are listed in the result from the server.
+| <a id="E1025"></a>E1025  | everywhere | HTTP Status 422 | The PUT / POST request to that URL could not be processed due invalid given data. <br />The invalid fields are listed in the result from the server.
 | <a id="E1026"></a>E1026  | everywhere | HTTP Status 422 | The File Upload did not succeed PUT / POST request to that URL could not be processed due invalid given data.<br />The invalid fields are listed in the result from the server.
 | <a id="E1041"></a>E1041  | everywhere | HTTP Status 409 | The PUT / POST request to that URL could not be processed due the given data would produce an invalid state of the entity on the server.<br />If possible, the causing fields are listed in the result from the server, or the error message is self explaining.
 | <a id="E1310"></a>E1310  | everywhere | HTTP Status 502 Bad Gateway | A requested service is not available, or answers with an error.
