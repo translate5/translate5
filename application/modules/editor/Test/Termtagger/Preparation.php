@@ -26,14 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
 /**
+ * OUTDATED base implementation for testing the Termtagger
  * Tests / validates the Testcase described in the .testcase XML file
  */
 class editor_Test_Termtagger_Preparation extends editor_Test_Termtagger_Abstract{

@@ -140,7 +140,7 @@ class editor_Models_Segment_Whitespace {
         '/\x{2008}/u' => ['ts' => 'e28088', 'text' => self::LABEL_CHARACTER, 'title' => 'Punctuation Space'],
         '/\x{2009}/u' => ['ts' => 'e28089', 'text' => self::LABEL_CHARACTER, 'title' => 'Thin Space'],
         '/\x{200A}/u' => ['ts' => 'e2808a', 'text' => self::LABEL_CHARACTER, 'title' => 'Hair Space'],
-        '/\x{200B}/u' => ['ts' => 'e2808b', 'text' => '[SWSP]', 'title' => 'Zero Width Space (ZWSP)'],
+        '/\x{200B}/u' => ['ts' => 'e2808b', 'text' => '[ZWSP]', 'title' => 'Zero Width Space (ZWSP)'],
         '/\x{2028}/u' => ['ts' => 'e280a8', 'text' => '[LS]', 'title' => 'Line Separator'],
         '/\x{2029}/u' => ['ts' => 'e280a9', 'text' => '[PS]', 'title' => 'Paragraph Separator'],
         '/\x{202F}/u' => ['ts' => 'e280af', 'text' => '[NNBSP]', 'title' => 'Narrow No-Break Space (NNBSP)'],

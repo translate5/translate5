@@ -45,6 +45,7 @@ Ext.define('Editor.view.segments.column.State', {
   showInMetaTooltip: true,
   filter: {
       type: 'list',
+      updateBuffer: 0,
       labelField: 'label',
       phpMode: false,
       options: Editor.data.segments.stateFlags

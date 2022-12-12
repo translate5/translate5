@@ -138,6 +138,16 @@ abstract class editor_Models_Import_FileParser {
     public static function getFileExtensions() {
         throw new ZfExtended_Exception('Method must be overwritten in subclass!'); //with strict standards statics may not abstract!
     }
+
+    /***
+     * Get the export class out of the import class file name with replacing the Import with Export
+     * folder name. It is expected that the import and export classes are in Import/Export folders accordingly
+     * @return string
+     */
+    public static function getExportClass():string
+    {
+        return str_replace('_Import_', '_Export_', static::class);
+    }
     
     /**
      * Basically we assume that each Parser is able to parse its exceptions, so this functions defaults to return true.
