@@ -127,7 +127,7 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
         }
 
         // Else if it's json_decodable, but contains no content-prop or it's empty - return
-        if (!strlen($data->content)) {
+        if (!strlen($data->content ?? '')) {
             return false;
         }
 

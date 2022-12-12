@@ -146,6 +146,7 @@ Ext.define('Editor.controller.MetaPanel', {
             tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
         me.editingMode = 'edit';
         but.toggle(isWatched, true);
+        me.toggleOnEdit(true);
         but.setTooltip({
             dismissDelay: 0,
             text: tooltip
@@ -155,11 +156,30 @@ Ext.define('Editor.controller.MetaPanel', {
         me.getSegmentMeta().show();
     },
 
+    /**
+     * Toggle GUI items on editor open/close
+     *
+     * @param enable
+     */
+    toggleOnEdit: function(toggle) {
+        this.getMetaPanel().query('[enableOnEdit]').forEach(item => item.setDisabled(!toggle))
+    },
+
     handleSegmentSelectionChange: function(sm, selectedRecords) {
+
+        // If no selection - return
+        if (selectedRecords.length == 0) {
+            return;
+        }
+
         var me = this,
             record = selectedRecords[0],
             segmentId = record.get('id');
 
+        /*// Prevent qualities from being reloaded if editor is opened
+        if (me.editingMode === 'edit') {
+            return;
+        }*/
         me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
         me.record = record;
         // our component controllers are listening for the load event & create their views
@@ -207,6 +227,7 @@ Ext.define('Editor.controller.MetaPanel', {
         this.record.set('stateId', this.getMetaInfoForm().getValues().stateId);
         this.getMetaQmPanel().endEditing(this.hasQmQualities, true);
         this.editingMode = 'none';
+        this.toggleOnEdit(false);
     },
     /**
      * Editor.view.segments.RowEditing canceledit handler
@@ -215,6 +236,7 @@ Ext.define('Editor.controller.MetaPanel', {
     cancelEdit: function () {
         this.getMetaQmPanel().endEditing(this.hasQmQualities, false);
         this.editingMode = 'none';
+        this.toggleOnEdit(false);
     },
     /**
      * Changes the state box by keyboard shortcut instead of mouseclick
