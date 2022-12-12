@@ -68,7 +68,7 @@ class Translate2081Test extends editor_Test_JsonTest {
 
         $config = static::getConfig();
         $task = $config
-            ->addTask(static::$sourceLangRfc, static::$targetLangRfc, static::$ownCustomer->id, 'TRANSLATE-2545-de-en.xlf')
+            ->addTask(static::$sourceLangRfc, static::$targetLangRfc, static::$ownCustomer->id, 'TRANSLATE-2081-de-en.xlf')
             ->setNotToFailOnError();
         $config->import($task);
 
