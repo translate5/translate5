@@ -88,6 +88,21 @@ class TermportalDatatypecheckCommand extends Translate5AbstractCommand
             }
         }
 
+        // Get Fetch duplicated attrs separately for each level
+        $duplicate = $checker->checkAttributeDuplicates();
+
+        // Foreach level
+        foreach ($duplicate as $level => $info) {
+
+            if (empty($info)) {
+                $this->io->success("There are not duplicated attributes detected at $level-level");
+            } else {
+                $this->io->section("The following duplicated attributes are detected at $level-level");
+                $headers = array_keys(reset($info));
+                $this->io->table($headers, $info);
+            }
+        }
+
         return 0;
     }
 }

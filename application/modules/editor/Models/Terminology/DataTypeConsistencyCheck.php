@@ -357,4 +357,83 @@ where tad.id IS NULL;
             'differentContent' => $differentContent,
         ];
     }
+
+    /**
+     * Fetch duplicated attrs separately for each level
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function checkAttributeDuplicates() {
+
+        /** @var editor_Models_Terminology_Models_AttributeModel $model */
+        $model = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class);
+        $db = $model->db->getAdapter();
+
+        // Get attribute-duplicates on term-level
+        $term = $db->query("
+            SELECT
+              COUNT(`ta`.`id`) AS `qty`,
+              SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1) AS `newestId`,
+              REPLACE (
+                GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC),
+                CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1), ','),
+                ''
+              ) AS `olderIds`,
+              CONCAT (`type`, '-', `termId`, '-', `dataTypeId`) AS `type-termId-dataTypeId`,
+              MAX(`createdAt`),
+              MAX(`updatedAt`)
+            FROM `terms_attributes` `ta`
+            WHERE NOT ISNULL (`termId`) AND `type` NOT IN ('xGraphic', 'crossReference', 'externalCrossReference', 'figure')
+            GROUP BY `type-termId-dataTypeId`
+            HAVING `qty` > 1
+            ORDER BY `type-termId-dataTypeId` LIKE 'processStatus%' DESC, `qty` DESC, `newestId` DESC
+            LIMIT 100
+        ")->fetchAll();
+
+        // Get attribute-duplicates on language-level
+        $language = $db->query("
+            SELECT
+              COUNT(`ta`.`id`) AS `qty`,
+              SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1) AS `newestId`,
+              REPLACE (
+                GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC),
+                CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1), ','),
+                ''
+              ) AS `olderIds`,
+              CONCAT(`type`, '-', `termEntryId`, '-', `language`, '-', `dataTypeId`) AS `type-termEntryId-language-dataTypeId`,
+              MAX(`createdAt`),
+              MAX(`updatedAt`)
+            FROM `terms_attributes` `ta`
+            WHERE NOT ISNULL(`language`) AND ISNULL(`termId`) AND `type` NOT IN ('xGraphic', 'crossReference', 'externalCrossReference', 'figure')
+            GROUP BY `type-termEntryId-language-dataTypeId`
+            HAVING `qty` > 1
+            ORDER BY `qty` DESC, `newestId` DESC
+            LIMIT 100
+        ")->fetchAll();
+
+        // Get attribute-duplicates on termEntry-level
+        $termEntry = $db->query("
+            SELECT
+              COUNT(`ta`.`id`) AS `qty`,
+              SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1) AS `newestId`,
+              REPLACE (
+                GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC),
+                CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1), ','),
+                ''
+              ) AS `olderIds`,
+              CONCAT(`type`, '-', `termEntryId`, '-', `dataTypeId`) AS `type-termEntryId-dataTypeId`,
+              MAX(`createdAt`),
+              MAX(`updatedAt`)
+            FROM `terms_attributes` `ta`
+            WHERE ISNULL(`language`) AND `type` NOT IN ('xGraphic', 'crossReference', 'externalCrossReference', 'figure')
+            GROUP BY `type-termEntryId-dataTypeId`
+            HAVING `qty` > 1
+            ORDER BY `qty` DESC, `newestId` DESC
+            LIMIT 100
+        ")->fetchAll();
+
+        // Return duplicates info by level
+        return compact('term', 'language', 'termEntry');
+    }
 }
