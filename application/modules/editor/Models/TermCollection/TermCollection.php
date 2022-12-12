@@ -161,7 +161,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * @param string $taskGuid
      * @return array
      */
-    public function getCollectionsForTask(string $taskGuid): array
+    public function getCollectionsForTask(string $taskGuid, bool $idsOnly = true): array
     {
         $service = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
@@ -174,11 +174,13 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             ->where('lr.serviceName=?',$service->getName());
         $rows = $this->db->fetchAll($s)->toArray();
 
-        if (!empty($rows)) {
+        if (empty($rows)) {
+            return [];
+        }
+        if($idsOnly) {
             return array_column($rows, 'id');
         }
-
-        return [];
+        return $rows;
     }
 
     /***

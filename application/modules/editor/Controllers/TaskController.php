@@ -1071,7 +1071,7 @@ class editor_TaskController extends ZfExtended_RestController {
             //id is always set as modified, therefore we don't log task changes if id is the only modified
             $modified = $this->entity->getModifiedValues();
             if(!array_key_exists('id', $modified) || count($modified) > 1) {
-                $this->logInfo('Task modified: ');
+                $this->logInfo('Task modified - prev. value was: ');
             }
         }
 
@@ -1241,7 +1241,7 @@ class editor_TaskController extends ZfExtended_RestController {
     }
 
     /**
-     * returns true if PUT Requests opens a task for editing or readonly
+     * returns true if PUT Requests opens a task for open or finish
      * @return boolean
      */
     protected function isLeavingTaskRequest(): bool {

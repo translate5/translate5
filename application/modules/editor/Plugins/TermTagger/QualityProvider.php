@@ -218,6 +218,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
      * @param editor_Models_Segment_Meta $meta
      */
     private function prepareSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta) {
+
         // disable when source/target language similar, see TRANSLATE-2373
         if($task->isSourceAndTargetLanguageSimilar()){
             return;
@@ -234,7 +235,8 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
             'termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED
         ],[
             'taskGuid = ?' => $task->getTaskGuid(),
-            'termtagState = ?' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED,
+            // FIX failed operations: when workers crashed etc. segments will stay in state "inprogress" forever without this
+            'termtagState IN (?)' => [ editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_INPROGRESS ],
         ]);
     }
 }

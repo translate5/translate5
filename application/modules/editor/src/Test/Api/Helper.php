@@ -810,6 +810,29 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         }
     }
 
+    /**
+     * Checks, if the passed configs are set
+     * @param string[] $configNames
+     * @return bool
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function checkConfigsToBeSet(array $configNames): bool
+    {
+        $allSet = true;
+        foreach ($configNames as $name) {
+            if (!str_starts_with($name, 'runtimeOptions.')) {
+                $name = 'runtimeOptions.' . $name;
+            }
+            $config = $this->getJson('editor/config', [
+                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"like"}]',
+            ]);
+            if(count($config) !== 1 || empty($config[0]->value)){
+                $allSet = false;
+            }
+        }
+        return $allSet;
+    }
+
     //endregion
 
     /**

@@ -55,7 +55,7 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
      */
     protected $_pathPrefix = NULL;
 
-    public function __construct(string $pathPrefix = null)
+    public function __construct()
     {
         parent::__construct();
         $this->setPathPrefix(editor_Models_Import_Configuration::WORK_FILES_DIRECTORY);
@@ -92,7 +92,12 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
         return $this->objectTree;
     }
 
-    public function getTreeForStore(){
+    /**
+     * @return array|null
+     * @throws JsonException
+     */
+    public function getTreeForStore(): ?array
+    {
         $tree = $this->getTree();
 
         foreach ($tree as $t){
@@ -101,6 +106,11 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
         return $tree;
     }
 
+    /**
+     * Adopt the file tree, so it can be easily used for file store on the frontend
+     * @param stdClass $object
+     * @return stdClass|void
+     */
     public function normalizeStoreTree(stdClass $object){
         $object->extension = pathinfo($object->filename, PATHINFO_EXTENSION);;
         if( empty($object->children)){

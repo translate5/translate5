@@ -39,7 +39,8 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
     protected static bool $termtaggerRequired = true;
 
     protected static array $forbiddenPlugins = [
-        'editor_Plugins_ManualStatusCheck_Bootstrap'
+        editor_Plugins_ManualStatusCheck_Bootstrap::class,
+        editor_Plugins_Translate24_Init::class
     ];
 
     protected static array $requiredRuntimeOptions = [

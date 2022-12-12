@@ -79,6 +79,7 @@ Ext.define('Editor.view.segments.column.IsRepeated', {
                     type: 'list',
                     labelField: 'label',
                     phpMode: false,
+                    updateBuffer: 0,
                     options: [{
                         id: 0,
                         label: me.strings.filter.none
