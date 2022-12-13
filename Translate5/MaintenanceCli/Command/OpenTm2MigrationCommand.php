@@ -37,6 +37,7 @@ use RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use editor_Services_OpenTM2_Connector as Connector;
 use editor_Services_OpenTM2_Service as Service;
@@ -53,11 +54,12 @@ use ZfExtended_Resource_DbConfig as DbConfig;
 
 class OpenTm2MigrationCommand extends Translate5AbstractCommand
 {
-    private const ARGUMENT_URL = 'url';
+    private const ARGUMENT_TARGET_URL = 'targetUrl';
+    private const OPTION_SOURCE_URL = 'sourceUrl';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
 
-    protected static $defaultName = 'otm2:migrate';
+    protected static $defaultName = 't5memory:migrate';
 
     protected function configure(): void
     {
@@ -66,7 +68,8 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $this
             ->setDescription('Migrates all existing OpenTM2 language resources to t5memory')
             ->setHelp('Tool exports OpenTM2 language resources one by one and imports data to the t5memory provided as endpoint argument')
-            ->addArgument(self::ARGUMENT_URL, InputArgument::REQUIRED, 't5memory endpoint data to be imported to, e.g. http://t5memory.local/t5memory');
+            ->addArgument(self::ARGUMENT_TARGET_URL, InputArgument::REQUIRED, 't5memory endpoint data to be imported to, e.g. http://t5memory.local/t5memory')
+            ->addOption(self::OPTION_SOURCE_URL, 's', InputOption::VALUE_OPTIONAL, 'Endpoint data is exported from, e.g. http://t5memory.local/t5memory');
     }
 
     /**
@@ -81,16 +84,16 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
 
         $service = new Service();
 
-        $url = $this->getUrl($input, $service);
-        $otmResourceId = $this->getOtmResourceId($service);
+        $targetUrl = $this->getTargetUrl($input, $service);
+        $sourceResourceId = $this->getSourceResourceId($input, $service);
 
-        $this->addUrlToConfig($url);
+        $this->addUrlToConfig($targetUrl);
 
-        $t5MemoryResourceId = $this->getT5MemoryResourceId($url);
+        $targetResourceId = $this->getTargetResourceId($targetUrl);
 
         $processingErrors = [];
         $connector = new Connector();
-        $languageResourcesData = ZfExtended_Factory::get(LanguageResource::class)->getByResourceId($otmResourceId);
+        $languageResourcesData = ZfExtended_Factory::get(LanguageResource::class)->getByResourceId($sourceResourceId);
 
         $progressBar = new ProgressBar($output, count($languageResourcesData));
 
@@ -114,7 +117,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
                 continue;
             }
 
-            $languageResource->setResourceId($t5MemoryResourceId);
+            $languageResource->setResourceId($targetResourceId);
 
             try {
                 $this->import($connector, $languageResource, $filenameWithPath, $type);
@@ -129,9 +132,9 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         }
 
         if (count($processingErrors) === 0) {
-            $this->cleanupConfig($otmResourceId);
-            $t5MemoryResourceId = $this->getT5MemoryResourceId($url);
-            $this->updateLanguageResources(array_column($languageResourcesData, 'id'), $t5MemoryResourceId);
+            $this->cleanupConfig($sourceResourceId);
+            $targetResourceId = $this->getTargetResourceId($targetUrl);
+            $this->updateLanguageResources(array_column($languageResourcesData, 'id'), $targetResourceId);
         }
 
         $this->writeResult($processingErrors);
@@ -143,9 +146,9 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         return self::SUCCESS;
     }
 
-    private function getUrl(InputInterface $input, Service $service): Uri
+    private function getTargetUrl(InputInterface $input, Service $service): Uri
     {
-        $url = new Uri($input->getArgument(self::ARGUMENT_URL));
+        $url = new Uri($input->getArgument(self::ARGUMENT_TARGET_URL));
 
         foreach ($service->getResources() as $resource) {
             if ($resource->getUrl() === (string)$url) {
@@ -156,17 +159,23 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         return $url;
     }
 
-    private function getOtmResourceId(Service $service): ?string
+    private function getSourceResourceId(InputInterface $input, Service $service): ?string
     {
+        $sourceUrl = $input->getOption(self::OPTION_SOURCE_URL);
+
         $resourceId = null;
         foreach ($service->getResources() as $resource) {
-            if (str_contains($resource->getUrl(), 'otmmemoryservice')) {
+            if (($sourceUrl && $resource->getUrl() === $sourceUrl)
+                || str_contains($resource->getUrl(), 'otmmemoryservice')
+            ) {
                 $resourceId = $resource->getId();
+
+                break;
             }
         }
 
         if (null === $resourceId) {
-            throw new RuntimeException('No OpenTM2 resource found');
+            throw new RuntimeException('No resource for given url found');
         }
 
         return $resourceId;
@@ -229,7 +238,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $dbConfig->init();
     }
 
-    private function getT5MemoryResourceId(Uri $url): string
+    private function getTargetResourceId(Uri $url): string
     {
         $service = new Service();
 

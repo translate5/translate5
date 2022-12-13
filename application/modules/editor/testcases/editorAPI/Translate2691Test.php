@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Testcase for TRANSLATE-2691 SDLXLIFF diff export fails with old version of diff library and the here used content in an endless loop
  * For details see the issue.
  */
-class Translate2691Test extends \editor_Test_ApiTest {
+class Translate2691Test extends \editor_Test_UnitTest {
 
     /**
      * Testing segment values directly after import
@@ -49,36 +49,5 @@ class Translate2691Test extends \editor_Test_ApiTest {
         $result = preg_replace('/sdl:revid="[^"]+"/', 'sdl:revid="XXX"', $result);
 
         $this->assertEquals($approval, $result, 'The diff-tagged content is not as expected.');
-
-        /**
-         * OLD implementation, using ZfExtended_Worker_Callback which does not work anymore
-         * TODO FIXME: Why was that used and "kann das weg" ?
-
-        $worker = new \ZfExtended_Worker_Callback();
-        $worker->init(null, [
-            'class' => 'editor_Models_Export_DiffTagger_Sdlxliff',
-            'callback' => 'diffTestCall',
-            'target' => "Xyxyx abcdexyz d'foobar par un partenaire de service apr\xc3\xa8s-vente du fooxxx ou un autre partenaire de service apr\xc3\xa8s-vente qualifi\xc3\xa9 ou par un blabla qualifi\xc3\xa9 et en faire",
-            'edited' => "Xyxyx abcdexyz d'foobar par un R\xc3\xa9zyxvewe Xyz\xc3\xa9\xc3\xa9 du fooxxx ou un autre R\xc3\xa9zyxvewe Xyz\xc3\xa9\xc3\xa9 qualifi\xc3\xa9 ou par un blabla sp\xc3\xa9cialis\xc3\xa9 et en faire",
-            'date' => '2021-11-03 08:15',
-            'name' => 'Thomas Test',
-            'result' => 'Xyxyx abcdexyz d\'foobar par un <mrk mtype="x-sdl-added" sdl:revid="XXX">Rézyxvewe</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">partenaire</mrk> <mrk mtype="x-sdl-added" sdl:revid="XXX">Xyzéé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">de service après-vente</mrk> du fooxxx ou un autre <mrk mtype="x-sdl-added" sdl:revid="XXX">Rézyxvewe</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">partenaire</mrk> <mrk mtype="x-sdl-added" sdl:revid="XXX">Xyzéé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">de service après-vente</mrk> qualifié ou par un blabla <mrk mtype="x-sdl-added" sdl:revid="XXX">spécialisé</mrk><mrk mtype="x-sdl-deleted" sdl:revid="XXX">qualifié</mrk> et en faire',
-        ]);
-        $worker->setBlocking(true, 5);
-        try {
-            $worker->queue();
-        }
-        catch(\ZfExtended_Exception $e) {
-            if(strpos($e->getMessage(), 'was queued blocking and timed out') !== false) {
-                $this->fail('Diff algorithm timed out, the diff lib is not up to date!');
-            }
-            if(strpos($e->getMessage(), 'is defunct!') !== false) {
-                $this->fail('Check the error log why the test call failed!');
-            }
-            throw $e;
-        }
-        $this->assertTrue(true);
-
-         */
     }
 }

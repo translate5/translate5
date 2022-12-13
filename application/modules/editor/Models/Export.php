@@ -85,7 +85,7 @@ class editor_Models_Export {
             $recursivedircleaner->delete($exportRootFolder);
         }
         
-        if(!file_exists($exportRootFolder) && !@mkdir($exportRootFolder, 0777, true)){
+        if(!file_exists($exportRootFolder) && !mkdir($exportRootFolder, 0777, true) && !is_dir($exportRootFolder)){
             throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRootFolder));
         }
         
