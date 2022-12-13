@@ -37,7 +37,7 @@ use Symfony\Component\Console\Input\InputOption;
 class SessionImpersonateCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'auth:session:impersonate';
+    protected static $defaultName = 'auth:impersonate';
     
     protected function configure()
     {
