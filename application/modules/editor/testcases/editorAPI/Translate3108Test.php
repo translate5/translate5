@@ -43,8 +43,6 @@ class Translate3108Test extends editor_Test_JsonTest {
         $auth = ZfExtended_Factory::get('ZfExtended_Auth_Token_Entity');
         /** @var ZfExtended_Auth_Token_Entity $auth */
 
-        $auth->create(self::$userLogin).'ace';
-
         Helper::setApplicationToken($auth->create(self::$userLogin));
 
         static::api()->getJson('editor/task/');
