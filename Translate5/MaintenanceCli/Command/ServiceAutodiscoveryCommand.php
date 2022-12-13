@@ -391,7 +391,7 @@ using the default ports.')
      */
     protected function servicePdfconverter(int $port): void
     {
-        $host = $this->getHost('pdfconverter.');
+        $host = $this->getHost('pdfconverter');
         $url = 'http://' . $host . ':' . $port;
 
         if (!$this->checkServiceDefault('PDF Converter', $url, $host, $port)) {
