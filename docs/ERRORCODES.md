@@ -65,13 +65,15 @@ https://confluence.translate5.net/display/TAD/EventCodes
 
 ### Authentication
 
-| EventCode        | Context       | EventMessage  | Description/Solution
-| :--------------- |:------------- | :------------ | :------------------- 
-| <a id="E1156"></a>E1156  | Authentication | Tried to authenticate via hashAuthentication, but feature is disabled in the config! | Please set runtimeOptions.hashAuthentication in the configuration to one of the following values:<br />disabled: the feature is disabled and produces this error.<br />dynamic: use a dynamic auth hash.<br />static: use a static auth hash.<br />See [Single Click Authentication](https://confluence.translate5.net/display/TAD/Single+Click+Authentication).
-| <a id="E1289"></a>E1289  | Authentication | Ip based authentication: Customer with number ({number}) does't exist. | The configured customer in&nbsp; runtimeOptions.authentication.ipbased.IpCustomerMap&nbsp;<br />configuration does not exist. Default customer will be used instead.
-| <a id="E1290"></a>E1290  | Authentication | Ip based authentication: User with roles:({configuredRoles}) is not allowed to authenticate ip based. | There is no configured ip based roles for the ip based authentication or the configured roles are not allowed per acl
-| <a id="E1332"></a>E1332  | Authentication | Fail or success info log for sessionToken based authentication. | 
-| <a id="E1342"></a>E1342  | Authentication: Session impersonate | The parameter login containing the desired username is missing. | The parameter login containing the desired username is missing.
+| EventCode        | Context                              | EventMessage                                                                                          | Description/Solution
+| :--------------- |:-------------------------------------|:------------------------------------------------------------------------------------------------------| :------------------- 
+| <a id="E1156"></a>E1156  | Authentication                       | Tried to authenticate via hashAuthentication, but feature is disabled in the config!                  | Please set runtimeOptions.hashAuthentication in the configuration to one of the following values:<br />disabled: the feature is disabled and produces this error.<br />dynamic: use a dynamic auth hash.<br />static: use a static auth hash.<br />See [Single Click Authentication](https://confluence.translate5.net/display/TAD/Single+Click+Authentication).
+| <a id="E1289"></a>E1289  | Authentication                       | Ip based authentication: Customer with number ({number}) does't exist.                                | The configured customer in&nbsp; runtimeOptions.authentication.ipbased.IpCustomerMap&nbsp;<br />configuration does not exist. Default customer will be used instead.
+| <a id="E1290"></a>E1290  | Authentication                       | Ip based authentication: User with roles:({configuredRoles}) is not allowed to authenticate ip based. | There is no configured ip based roles for the ip based authentication or the configured roles are not allowed per acl
+| <a id="E1332"></a>E1332  | Authentication                       | Fail or success info log for sessionToken based authentication.                                       | 
+| <a id="E1342"></a>E1342  | Authentication: Session impersonate  | The parameter login containing the desired username is missing.                                       | The parameter login containing the desired username is missing.
+| <a id="E1443"></a>E1443  | Authentication: Token authentication | Fail or success info log for application toke based authentication.                                   | Info log when user is authenticated or the authentication failed after app token authentication check
+
 
 ### Configuration
 | EventCode        | Context       | EventMessage  | Description/Solution
