@@ -146,6 +146,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         if(!isset($params['pretranslateMt'])){
             $params['pretranslateMt'] = $config->runtimeOptions->plugins->MatchAnalysis->pretranslateMtDefault;
         }
+        if(!isset($params['pretranslateMatchrate'])){
+            $params['pretranslateMatchrate'] = $config->runtimeOptions->plugins->MatchAnalysis->pretranslateMatchRate;
+        }
 
         settype($params['internalFuzzy'], 'boolean');
         settype($params['pretranslateTmAndTerm'], 'boolean');
