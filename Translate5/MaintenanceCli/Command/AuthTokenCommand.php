@@ -37,7 +37,7 @@ use ZfExtended_Factory;
 class AuthTokenCommand extends Translate5AbstractCommand {
     
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'token:create';
+    protected static $defaultName = 'auth:apptoken:add';
     
     protected function configure()
     {
@@ -56,6 +56,12 @@ class AuthTokenCommand extends Translate5AbstractCommand {
             'User login for whom this authentication token will be generate for'
         );
 
+        $this->addArgument(
+            'desc',
+            InputArgument::REQUIRED,
+            'Description for the generated token'
+        );
+
     }
     
     /**
@@ -71,11 +77,12 @@ class AuthTokenCommand extends Translate5AbstractCommand {
         $this->writeTitle('Translate5 authentication token');
 
         $login = $input->getArgument('login');
+        $desc = $input->getArgument('desc');
 
         $auth = ZfExtended_Factory::get('ZfExtended_Auth_Token_Entity');
         /** @var ZfExtended_Auth_Token_Entity $auth */
 
-        $token = $auth->create($login);
+        $token = $auth->create($login,$desc);
 
         $this->writeAssoc([
             'Token' => $token

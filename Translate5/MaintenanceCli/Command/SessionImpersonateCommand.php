@@ -37,10 +37,12 @@ use Symfony\Component\Console\Input\InputOption;
 class SessionImpersonateCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'session:impersonate';
+    protected static $defaultName = 'auth:session:impersonate';
     
     protected function configure()
     {
+        $this->setAliases(['session:impersonate']);
+        
         $this
         // the short description shown while running "php bin/console list"
         ->setDescription('Returns a URL to authenticate password less as the given user.')
