@@ -25,5 +25,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`) VALUES ('runtimeOptions.plugins.MatchAnalysis.pretranslateMatchRate', '1', 'editor', 'plugins', '100', '100', '', 'integer', 'Default pretranslation match-rate when pretranslationg.', '4', 'Pre-translate defautl matchrate', 'Match analysis: defaults');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`) VALUES ('runtimeOptions.plugins.MatchAnalysis.pretranslateMatchRate', '1', 'editor', 'plugins', '100', '100', '', 'integer', 'Default pretranslation match-rate when pre-translating.', '4', 'Pre-translate default match-rate', 'Match analysis: defaults');
 
