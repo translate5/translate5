@@ -276,47 +276,49 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     getPmFieldConfig: function() {
         var me=this,
             auth = Editor.app.authenticatedUser;
-        if(!auth.isAllowed('editorEditTaskPm') || !auth.isAllowed('editorEditAllTasks')) {
+        if(auth.isAllowed('editorEditTaskPm') || auth.isAllowed('editorEditAllTasks')) {
             return {
-                xtype: 'displayfield',
-                name: 'pmGuid',
+                xtype: 'combo',
+                fieldLabel: me.strings.pmGuid,
                 bind:'{currentTask.pmGuid}',
-                fieldLabel: me.strings.pmGuid
-            };
-        }
-        return {
-            xtype: 'combo',
-            fieldLabel: me.strings.pmGuid,
-            bind:'{currentTask.pmGuid}',
-            allowBlank: false,
-            typeAhead: false,
-            forceSelection: true,
-            anyMatch: true,
-            queryMode: 'local',
-            name: 'pmGuid',
-            itemId: 'pmGuid',
-            displayField: 'longUserName',
-            valueField: 'userGuid',
-            listConfig: {
-                loadMask: false
-            },
-            store: {
-                autoLoad: true,
-                storeId: 'pmGuidCombo_User',
-                model: 'Editor.model.admin.User',
-                pageSize: 0,
-                proxy : {
-                    type : 'rest',
-                    url: Editor.data.restpath+'user/pm',
-                    extraParams: {
-                        sort: '[{"property":"surName","direction":"ASC"},{"property":"firstName","direction":"ASC"}]'
-                    },
-                    reader : {
-                        rootProperty: 'rows',
-                        type : 'json'
+                allowBlank: false,
+                typeAhead: false,
+                forceSelection: true,
+                anyMatch: true,
+                queryMode: 'local',
+                name: 'pmGuid',
+                itemId: 'pmGuid',
+                displayField: 'longUserName',
+                valueField: 'userGuid',
+                listConfig: {
+                    loadMask: false
+                },
+                store: {
+                    autoLoad: true,
+                    storeId: 'pmGuidCombo_User',
+                    model: 'Editor.model.admin.User',
+                    pageSize: 0,
+                    proxy : {
+                        type : 'rest',
+                        url: Editor.data.restpath+'user/pm',
+                        extraParams: {
+                            sort: '[{"property":"surName","direction":"ASC"},{"property":"firstName","direction":"ASC"}]',
+                            pmRoles: 'pmlight'
+                        },
+                        reader : {
+                            rootProperty: 'rows',
+                            type : 'json'
+                        }
                     }
                 }
-            }
+            };
+        }
+
+        return {
+            xtype: 'displayfield',
+            name: 'pmGuid',
+            bind:'{currentTask.pmGuid}',
+            fieldLabel: me.strings.pmGuid
         };
     }
   });

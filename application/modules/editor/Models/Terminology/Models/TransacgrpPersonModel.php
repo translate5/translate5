@@ -121,9 +121,12 @@ class editor_Models_Terminology_Models_TransacgrpPersonModel extends editor_Mode
         $where = $this->db->getAdapter()->quoteInto('`collectionId` IN (?)', $collectionIds);
 
         // Get transacgrp person dictionary
-        $tbxPersonA = $this->db->getAdapter()->query('
-            SELECT `id`, `name` FROM `terms_transacgrp_person` WHERE ' . $where
-        )->fetchAll();
+        $tbxPersonA = $this->db->getAdapter()->query("
+            SELECT GROUP_CONCAT(`id`) AS `ids`, `name` 
+            FROM `terms_transacgrp_person` 
+            WHERE $where
+            GROUP BY `name`
+        ")->fetchAll();
 
         // Setup combobox-recognizable data for tbxCreatedBy and tbxUpdatedBy filterWindow filters
         foreach (['tbxCreatedBy', 'tbxUpdatedBy'] as $prop)
