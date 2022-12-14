@@ -34,8 +34,12 @@ use editor_Models_Segment_InternalTag;
 use editor_Models_Segment_Updater;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
+use Zend_Exception;
+use Zend_Registry;
 use ZfExtended_Factory;
 use ZfExtended_Models_User;
+use ZfExtended_Plugin_Exception;
+use ZfExtended_Plugin_Manager;
 
 /**
  *
@@ -124,11 +128,11 @@ abstract class ContentBase
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    protected function getDataSource(): mixed
+    protected function getDataSource(): ?string
     {
-        return $this->segmentData[$this->sfm->getFirstSourceName()]['original'];
+        return $this->segmentData[$this->sfm->getFirstSourceName()]['original'] ?? null;
     }
 
     /**
@@ -162,6 +166,18 @@ abstract class ContentBase
     protected function isContentEqual(string $old , string $new): bool
     {
         return $this->normalizeContent($old) === $this->normalizeContent($new);
+    }
+
+    /**
+     * @return bool
+     * @throws Zend_Exception
+     * @throws ZfExtended_Plugin_Exception
+     */
+    protected function isTrackChangesActive(): bool
+    {
+        $pluginmanager = Zend_Registry::get('PluginManager');
+        /* @var ZfExtended_Plugin_Manager $pluginmanager */
+        return $pluginmanager->get('TrackChanges') !== null;
     }
 
 }

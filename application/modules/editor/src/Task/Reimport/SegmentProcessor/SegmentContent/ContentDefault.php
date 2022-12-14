@@ -60,7 +60,10 @@ class ContentDefault extends ContentBase
         //the history entry must be created before the original entity is modified
         $history = $this->segment->getNewHistoryEntity();
 
-        if( !$this->isContentEqual($this->segment->getFieldOriginal($this->sfm->getFirstSourceName()),$this->getDataSource())){
+        //basically a source must exist, if not (in some specific XLF dialects) its null and must be ignored
+        $newSource = $this->getDataSource();
+        if (!is_null($newSource) &&
+            !$this->isContentEqual($this->segment->getFieldOriginal($this->sfm->getFirstSourceName()), $newSource)) {
             $this->updateSource($this->getDataSource());
             $this->updateSegment = true;
         }
@@ -98,7 +101,9 @@ class ContentDefault extends ContentBase
         $this->segmentTagger->protect($this->segment->getSource());
         $newTarget = $this->segmentTagger->reapply2dMap($this->normalizeContent($target), $this->segmentTagger->getOriginalTags());
 
-        $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
+        if( $this->isTrackChangesActive()) {
+            $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
+        }
 
         $this->update($newTarget,$this->sfm->getFirstTargetName(),$this->sfm->getFirstTargetNameEdit());
     }

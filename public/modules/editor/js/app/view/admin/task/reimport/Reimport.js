@@ -61,9 +61,9 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
             config = {
                 tbar:[{
                     xtype: 'displayfield',
+                    width:'80%',
                     hideLabel:true,
-                    fieldCls: 'lableInfoIcon',
-                    value:Ext.String.format(Editor.data.l10n.projectOverview.taskManagement.taskReimport.topBarHeaderInfo,Editor.data.editor.task.reimport.supportedExtensions.join(','))
+                    value:'<i>' + Ext.String.format(Editor.data.l10n.projectOverview.taskManagement.taskReimport.topBarHeaderInfo,Editor.data.editor.task.reimport.supportedExtensions.join(','))+ '</i>'
                 }],
                 columns: [{
                     xtype: 'treecolumn',
