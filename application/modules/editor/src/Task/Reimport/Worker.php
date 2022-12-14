@@ -110,6 +110,8 @@ class Worker extends ZfExtended_Worker_Abstract {
                 ]);
             }
 
+            $parser->setIsReimport();
+
             $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class,[ $task , $segmentFieldManager,$user]);
             $this->segmentProcessor->setSegmentFile($params['fileId'], $parser->getFileName());
             $this->segmentProcessor->setSaveTimestamp($params['segmentTimestamp']);

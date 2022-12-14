@@ -124,11 +124,11 @@ abstract class ContentBase
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    protected function getDataSource(): mixed
+    protected function getDataSource(): ?string
     {
-        return $this->segmentData[$this->sfm->getFirstSourceName()]['original'];
+        return $this->segmentData[$this->sfm->getFirstSourceName()]['original'] ?? null;
     }
 
     /**
