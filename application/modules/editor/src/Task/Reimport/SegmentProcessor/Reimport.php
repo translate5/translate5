@@ -63,12 +63,6 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     protected $segmentTagger;
 
     /***
-     * @var editor_Models_Export_DiffTagger_TrackChanges
-     */
-    protected $diffTagger;
-
-
-    /***
      * @var array
      */
     private array $segmentErrors = [];
@@ -94,7 +88,6 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         parent::__construct($task);
         $this->logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
         $this->segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->diffTagger = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_TrackChanges', [$task, $this->user]);
     }
 
     /**
