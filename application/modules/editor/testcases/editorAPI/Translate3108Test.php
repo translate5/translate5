@@ -31,7 +31,7 @@ use MittagQI\Translate5\Test\Api\Helper;
 /***
  * Application token authentication
  */
-class Translate3108Test extends editor_Test_JsonTest {
+class Translate3108Test extends editor_Test_ApiTest {
 
     private static string $userLogin = 'testmanager';
     
@@ -54,6 +54,11 @@ class Translate3108Test extends editor_Test_JsonTest {
 
         static::api()->getJson('editor/task/',expectedToFail: true);
         $response = static::api()->getLastResponse();
-        self::assertNotContains($response->getStatus(),[200],'Something is wrong, authenticated with invalid token is possible!!!');
+        self::assertNotContains($response->getStatus(),[200],'Something is wrong, authentication with invalid app-token is possible!');
+    }
+
+    public static function afterTests(): void
+    {
+        Helper::unsetApplicationToken();
     }
 }
