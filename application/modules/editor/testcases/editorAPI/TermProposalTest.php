@@ -485,7 +485,7 @@ class TermProposalTest extends \editor_Test_ApiTest {
         $this->assertSearchResultQty(1, ['termTbxId' => '37705a81-e0df-4209-9a12-eaddc93674e0']);
 
         // Get 'termproposer test'-person id
-        $tbxPersonId = array_column(self::$setup->filterWindow->tbxCreatedBy, 'id', 'name')['termproposer test'];
+        $tbxPersonId = array_column(self::$setup->filterWindow->tbxCreatedBy, 'ids', 'name')['termproposer test'];
 
         // Two terms created by that person
         $this->assertSearchResultQty(2, ['tbxCreatedBy' => $tbxPersonId]);

@@ -679,6 +679,21 @@ $memLog('Loaded terms:        ');
 
         // check if the dataType exist for the element
         $labelId = $this->dataType->getForAttribute($attribute);
+
+        // If elementName was spoofed
+        if (isset($attribute->wasElementName)) {
+
+            // Prepare log msg
+            $msg = 'TBX Import: Attribute has known type, but has elementName unexpected for that type so changed to expected one';
+
+            // Do log
+            $this->log($msg, 'E1446', [
+                'type' => $attribute->type,
+                'wasElementName' => $attribute->wasElementName,
+                'elementName' => $attribute->elementName,
+            ], 'warn');
+        }
+
         if (empty($labelId)) {
             // the dataType does not exist -> create it
             $this->attributeDataTypeModel->loadOrCreate($attribute->elementName, $attribute->type, [$attribute->getLevel()]);
@@ -701,6 +716,19 @@ $memLog('Loaded terms:        ');
 
         // add the attribute to the global attributes collection
         $this->bulkAttribute->add($attribute);
+
+        // If target was cleared due to unsupported for type
+        if (isset($attribute->wasTarget)) {
+
+            // Prepare log msg
+            $msg = 'TBX Import: Attribute target was emptied as unsupported for that attribute type';
+
+            // Do log
+            $this->log($msg, 'E1447', [
+                'type' => $attribute->type,
+                'wasTarget' => $attribute->wasTarget,
+            ], 'warn');
+        }
 
         return $attribute;
     }

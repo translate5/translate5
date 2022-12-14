@@ -27,25 +27,43 @@ END LICENSE AND COPYRIGHT
 */
 class editor_Models_Terminology_TbxObjects_DataType {
 
-
-    /***
-     * Collection of all data types with unique key from label-type-name
+    /**
+     * Collection of all data types, 0-indexed
+     *
      * @var array
      */
     protected $data = [];
 
-    /***
-     * Load all attribute data types in data array.
-     * Each row will be unique key from label-type-name and the row value will be the dataTypeId
+    /**
+     * Collection of all data types, `type`-indexed
+     *
+     * @var array
+     */
+    protected $byType = [];
+
+    /**
+     * Load existing data types to be easy accessible for further use
+     *
      * @param bool $reload
      */
-    public function loadData(bool $reload = false){
-        if(!empty($this->data && !$reload)){
+    public function loadData(bool $reload = false) {
+
+        // If datatypes are already loaded, and no reload should be done - return
+        if (!empty($this->data) && !$reload) {
             return;
         }
-        $dataType = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
+
         /* @var $dataType editor_Models_Terminology_Models_AttributeDataType */
-        $this->data = $dataType->loadAllTranslated();
+        $dataType = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeDataType::class);
+
+        // Load existing datatypes as 0-indexed array
+        $this->data = $dataType->loadAll();
+
+        // As long as we rely on that `type` is unique for each record across whole datatypes-table,
+        // here we set up additional `type`-indexed array of datatype-records to quicker check possibility
+        foreach ($this->data as $item) {
+            $this->byType[ strtolower($item['type']) ] = $item;
+        }
     }
 
     /***
@@ -56,6 +74,28 @@ class editor_Models_Terminology_TbxObjects_DataType {
      * @throws ZfExtended_ErrorCodeException
      */
     public function getForAttribute(editor_Models_Terminology_TbxObjects_Attribute $attribute){
+
+        // If node's type-attr is not empty
+        if ($type = strtolower($attribute->type)) {
+
+            // If matching datatype is found among existing ones by node's type-attr
+            if ($item = $this->byType[$type] ?? 0) {
+
+                // If matching datatype's expected node name does not match actual node name
+                if ($item['label'] !== $attribute->elementName) {
+
+                    // Backup node actual name
+                    $attribute->wasElementName = $attribute->elementName;
+
+                    // Spoof node actual name with expected one
+                    $attribute->elementName = $item['label'];
+                }
+
+                // Return dataTypeId
+                return $item['id'];
+            }
+        }
+
         $labelTypeMatches = [];
         foreach ($this->data as $data) {
 
@@ -89,6 +129,6 @@ class editor_Models_Terminology_TbxObjects_DataType {
      * Reset the current dataType collection array
      */
     public function resetData(){
-        $this->data =  [];
+        $this->data = $this->byType = [];
     }
 }
