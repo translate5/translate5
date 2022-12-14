@@ -44,7 +44,10 @@ class Xliff extends ContentDefault
         // restore org. tags; detect tag-map from t5 SOURCE segment. Only there all original tags are present.
         $this->segmentTagger->toXliff($this->segment->getSource(), replaceMap: $tempMap);
         $newTarget = $this->segmentTagger->reapply2dMap($this->normalizeContent($target), $tempMap);
-        $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
+
+        if( $this->isTrackChangesActive()){
+            $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
+        }
 
         $this->update($newTarget,$this->sfm->getFirstTargetName(),$this->sfm->getFirstTargetNameEdit());
     }

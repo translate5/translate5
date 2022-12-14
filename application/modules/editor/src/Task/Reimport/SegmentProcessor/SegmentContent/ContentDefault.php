@@ -101,7 +101,9 @@ class ContentDefault extends ContentBase
         $this->segmentTagger->protect($this->segment->getSource());
         $newTarget = $this->segmentTagger->reapply2dMap($this->normalizeContent($target), $this->segmentTagger->getOriginalTags());
 
-        $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
+        if( $this->isTrackChangesActive()) {
+            $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
+        }
 
         $this->update($newTarget,$this->sfm->getFirstTargetName(),$this->sfm->getFirstTargetNameEdit());
     }
