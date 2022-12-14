@@ -388,7 +388,7 @@ where tad.id IS NULL;
             GROUP BY `type-termId-dataTypeId`
             HAVING `qty` > 1
             ORDER BY `type-termId-dataTypeId` LIKE 'processStatus%' DESC, `qty` DESC, `newestId` DESC
-            LIMIT 100
+            LIMIT 10
         ")->fetchAll();
 
         // Get attribute-duplicates on language-level
@@ -409,7 +409,7 @@ where tad.id IS NULL;
             GROUP BY `type-termEntryId-language-dataTypeId`
             HAVING `qty` > 1
             ORDER BY `qty` DESC, `newestId` DESC
-            LIMIT 100
+            LIMIT 10
         ")->fetchAll();
 
         // Get attribute-duplicates on termEntry-level
@@ -430,10 +430,72 @@ where tad.id IS NULL;
             GROUP BY `type-termEntryId-dataTypeId`
             HAVING `qty` > 1
             ORDER BY `qty` DESC, `newestId` DESC
-            LIMIT 100
+            LIMIT 10
         ")->fetchAll();
 
         // Return duplicates info by level
         return compact('term', 'language', 'termEntry');
+    }
+
+    /**
+     * Get first 10 term-level attributes having no termTbxId
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function noTermTbxId() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class)
+            ->db->getAdapter()->query("
+                SELECT `id`, `termId`, `dataTypeId`, `type` 
+                FROM `terms_attributes` 
+                WHERE NOT ISNULL(`termId`) AND ISNULL(`termTbxId`)
+                LIMIT 10
+            ")->fetchAll();
+    }
+
+    /**
+     * Get all cases when attributes have same dataTypeId but different type
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function sameDataTypeIdDiffType() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class)
+            ->db->getAdapter()->query("
+                SELECT `dataTypeId`, COUNT(DISTINCT `type`) AS `type-qty`, GROUP_CONCAT(DISTINCT `type`) AS `type-list`
+                FROM `terms_attributes`
+                GROUP BY `dataTypeId`
+                HAVING `type-qty` > 1
+            ")->fetchAll();
+    }
+
+    /**
+     * Get all cases when attributes have same type but different elementName
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function sameTypeDiffElementName() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class)
+            ->db->getAdapter()->query("
+                SELECT 
+                  `type`,  
+                  COUNT(DISTINCT `elementName`) AS `qty`,
+                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT `dataTypeId`  ORDER BY `dataTypeId` ASC), ',', 1) AS `correct-dataTypeId`,
+                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT `elementName` ORDER BY `dataTypeId` ASC), ',', 1) AS `correct-elementName`,
+                  REPLACE (
+                    GROUP_CONCAT(DISTINCT `dataTypeId` ORDER BY `dataTypeId` ASC),
+                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT `dataTypeId` ORDER BY `dataTypeId` ASC), ',', 1), ','),
+                    ''
+                  ) AS `mistake-dataTypeIds-list`,
+                  REPLACE (
+                    GROUP_CONCAT(DISTINCT `elementName` ORDER BY `dataTypeId` ASC),
+                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT `elementName` ORDER BY `dataTypeId` ASC), ',', 1), ','),
+                    ''
+                  ) AS `mistake-elementNames-list`
+                FROM `terms_attributes`
+                GROUP BY `type`
+                HAVING `qty` > 1
+            ")->fetchAll();
     }
 }
