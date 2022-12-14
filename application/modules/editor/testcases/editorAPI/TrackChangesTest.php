@@ -89,7 +89,7 @@ class TrackChangesTest extends editor_Test_ImportTest {
         $this->assertFileExists($pathToZip);
         
         //get the exported file content
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/testcase-de-en.xlf');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/testcase-de-en.xlf');
         $expectedResult = static::api()->getFileContent('expected-export-testcase-de-en.xlf');
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
         //file_put_contents('/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/TrackChangesTest/new-export.xlf', rtrim($exportedFile));
