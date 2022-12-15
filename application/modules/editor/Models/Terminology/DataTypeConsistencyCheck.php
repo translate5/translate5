@@ -281,7 +281,7 @@ protected array $referenceData = [
     [
         "label" => "descrip",
         "type" => "figure",
-        "l10nSystem" => null,
+        "l10nSystem" => "{\"de\":\"Bild\",\"en\":\"Image\"}",
         "level" => "entry,language",
         "dataType" => "plainText",
         "picklistValues" => null,
@@ -322,17 +322,17 @@ where tad.id IS NULL;
         $tree = [];
         foreach($all as $datatype) {
             //we use empty string instead null as key
-            $tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''][$datatype['level'] ?? ''] = $datatype;
+            $tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''] = $datatype;
         }
 
         $notFound = [];
         $differentContent = [];
         foreach($this->referenceData as $datatype) {
-            if(empty($tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''][$datatype['level'] ?? ''])) {
+            if(empty($tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''])) {
                 $notFound[] = $datatype;
                 continue;
             }
-            $found = $tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''][$datatype['level'] ?? ''];
+            $found = $tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''];
             $diff = false;
             foreach ($datatype as $k => $v) {
                 if($k === 'picklistValues') {
@@ -481,19 +481,37 @@ where tad.id IS NULL;
                 SELECT 
                   `type`,  
                   COUNT(DISTINCT `elementName`) AS `qty`,
-                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT `dataTypeId`  ORDER BY `dataTypeId` ASC), ',', 1) AS `correct-dataTypeId`,
-                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT `elementName` ORDER BY `dataTypeId` ASC), ',', 1) AS `correct-elementName`,
+                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`dataTypeId`, '-', `elementName`) ORDER BY `dataTypeId` ASC), ',', 1) AS `correct-dataTypeId-elementName`,
                   REPLACE (
-                    GROUP_CONCAT(DISTINCT `dataTypeId` ORDER BY `dataTypeId` ASC),
-                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT `dataTypeId` ORDER BY `dataTypeId` ASC), ',', 1), ','),
+                    GROUP_CONCAT(DISTINCT CONCAT(`dataTypeId`, '-', `elementName`) ORDER BY `dataTypeId` ASC),
+                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`dataTypeId`, '-', `elementName`) ORDER BY `dataTypeId` ASC), ',', 1), ','),
                     ''
-                  ) AS `mistake-dataTypeIds-list`,
-                  REPLACE (
-                    GROUP_CONCAT(DISTINCT `elementName` ORDER BY `dataTypeId` ASC),
-                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT `elementName` ORDER BY `dataTypeId` ASC), ',', 1), ','),
-                    ''
-                  ) AS `mistake-elementNames-list`
+                  ) AS `mistake-list`
                 FROM `terms_attributes`
+                GROUP BY `type`
+                HAVING `qty` > 1
+            ")->fetchAll();
+    }
+
+    /**
+     * Get all cases when datatypes have same type but different label
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function sameTypeDiffLabel() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeDataType::class)
+            ->db->getAdapter()->query("
+                SELECT 
+                  `type`,  
+                  COUNT(DISTINCT `label`) AS `qty`,
+                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`) ORDER BY `id` ASC), ',', 1) AS `correct-id-label`,
+                  REPLACE (
+                    GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`) ORDER BY `id` ASC),
+                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`) ORDER BY `id` ASC), ',', 1), ','),
+                    ''
+                  ) AS `mistake-list`
+                FROM `terms_attributes_datatype`
                 GROUP BY `type`
                 HAVING `qty` > 1
             ")->fetchAll();

@@ -127,6 +127,14 @@ class TermportalDatatypecheckCommand extends Translate5AbstractCommand
             $this->io->table(array_keys(reset($sameTypeDiffElementName)), $sameTypeDiffElementName);
         }
 
+        // Get all cases when datatypes have same type but different label
+        if (empty($sameTypeDiffLabel = $checker->sameTypeDiffLabel())) {
+            $this->io->success("There are no datatypes having same type but different label");
+        } else {
+            $this->io->section("All cases when datatypes have same type but different label");
+            $this->io->table(array_keys(reset($sameTypeDiffLabel)), $sameTypeDiffLabel);
+        }
+
         return 0;
     }
 }

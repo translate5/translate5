@@ -144,3 +144,47 @@ $attrA = $db->query("$selectFrom
 
 // Do cleanup
 cleanupAttrA($attrA, $db, $picklistA);
+
+// Get checker
+$checker = new \editor_Models_Terminology_DataTypeConsistencyCheck();
+
+// Foreach sameTypeDiffElementName-case found
+foreach ($checker->sameTypeDiffElementName() as $case) {
+
+    // Get correct dataTypeId and elementName
+    list ($correct['dataTypeId'], $correct['elementName']) = explode('-', $case['correct-dataTypeId-elementName']);
+
+    // Foreach mistake
+    foreach (explode(',', $case['mistake-list']) as $item) {
+
+        // Extract mistake's dataTypeId and elementName
+        list ($mistake['dataTypeId'], $mistake['elementName']) = explode('-', $item);
+
+        // Fix db data
+        $db->query("
+            UPDATE `terms_attributes` 
+            SET `dataTypeId` = '{$correct['dataTypeId']}', `elementName` = '{$correct['elementName']}'
+            WHERE 1
+              AND `dataTypeId` = '{$mistake['dataTypeId']}'
+              AND `elementName` = '{$mistake['elementName']}'
+              AND `type` = '{$case['type']}'
+        ");
+    }
+}
+
+// Foreach sameTypeDiffLabel-case found
+foreach ($checker->sameTypeDiffLabel() as $case) {
+
+    // Get correct id and label
+    list ($correct['id'], $correct['label']) = explode('-', $case['correct-id-label']);
+
+    // Foreach mistake
+    foreach (explode(',', $case['mistake-list']) as $item) {
+
+        // Extract mistake's id and label
+        list ($mistake['id'], $mistake['label']) = explode('-', $item);
+
+        // Delete datatype-record created by mistake
+        $db->query("DELETE FROM `terms_attributes_datatype` WHERE `id` = '{$mistake['id']}'");
+    }
+}
