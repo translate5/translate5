@@ -298,7 +298,7 @@ protected array $referenceData = [
     public function checkAttributesAgainstDataTypes(): array {
         /** @var editor_Models_Terminology_Models_AttributeDataType $model */
         $model = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        $q = $model->db->getAdapter()->query('select tad.id datatypeid, tad.label datatypeTag, tad.type datatypeType, ta.collectionId, ta.elementName attributeTag, ta.`type` attributeType
+        $q = $model->db->getAdapter()->query('select tad.id datatypeId, tad.label datatypeTag, tad.type datatypeType, ta.collectionId, ta.elementName attributeTag, ta.`type` attributeType
 from terms_attributes_datatype tad 
     JOIN terms_attributes ta on tad.id = ta.dataTypeId and (tad.label != ta.elementName or tad.`type` != ta.`type`) 
 group by tad.id, tad.label, tad.type, ta.collectionId, ta.elementName, ta.`type`
