@@ -10,17 +10,19 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
-## [5.8.1] - 2022-12-16
+## [5.8.1] - 2022-12-16 and [5.8.0] - 2022-12-06
 
 ### Important Notes:
+####  [TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055) [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
+<mark>Before updating see 
+[translate5 5.8.0 - needed visualreview to docker migration](https://confluence.translate5.net/x/BYAIG)!</mark>
+
+
 #### [TRANSLATE-3108](https://jira.translate5.net/browse/TRANSLATE-3108)
 API Users should switch to appTokens instead plain password usage! 
 This is mandatory with one of the next releases.
 For usage see: https://confluence.translate5.net/x/AQAoG
 
-#### [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
-Before updating see 
-https://confluence.translate5.net/x/BYAIG
 
 #### [TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764)
 The format of the export.zip is changing! 
@@ -35,6 +37,14 @@ Via CLI tool appTokens can now be added to dedicated users. Such app tokens shou
 
 **[TRANSLATE-3069](https://jira.translate5.net/browse/TRANSLATE-3069): LanguageResources - TM pre-translation match rate set to 80 as default** <br>
 Enables the minimum value form pre-translate TM match-rate to be configurable for client.
+
+**[TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185): Installation & Update - Prepare translate5 for usage with docker** <br>
+Introducing the setup of translate5 and the used services as docker containers.
+
+**[TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055): VisualReview / VisualTranslation - Connect visual reflow via HTTP to headless browser instance** <br>
+* Changed usage of headless Browser for the visual to use a docker-image
+* Added own Worker for the Text-Reflow Conversion
+* Legacy Cleanup: Changed fallback-implementation for visuals, where the text-reflow fails to use the translate5 standard scroller & icon library. This fixes issues with missing annotation-icons in those cases
 
 **[TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185): Installation & Update - Prepare translate5 for usage with docker** <br>
 Introducing the setup of translate5 and the used services as docker containers.
@@ -54,6 +64,12 @@ Added API tests for all types of visuals
 **[TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764): Import/Export - Restructuring of export.zip** <br>
 The content structure of the export zip changed. In the future it does NOT contain any more a folder with the task guid, but directly on the highest level of the zip all files of the task that were translated/reviewed.
 
+**[TRANSLATE-3127](https://jira.translate5.net/browse/TRANSLATE-3127): Editor general - Change the order of form components in "Manual QA inside segment" fieldset** <br>
+MQM widget form fields ordering changed
+
+**: VisualReview / VisualTranslation - Make pdf converter reachable via network** <br>
+The previous local pdf converter is now reachable as a service via network.
+
 
 ### Bugfixes
 **[TRANSLATE-3137](https://jira.translate5.net/browse/TRANSLATE-3137): TermPortal - TermPortal: missing ACL for pure termportal-users** <br>
@@ -71,39 +87,12 @@ PmLight user is now allowed to change PM of a project
 **[TRANSLATE-3128](https://jira.translate5.net/browse/TRANSLATE-3128): Task Management - PM of task can not be changed to PM light user** <br>
 Task can be assigned to pmLight user now
 
-
-## [5.8.0] - 2022-12-06
-
-### Important Notes:
-####  [TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055) [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
-<mark>Before updating see 
-[translate5 5.8.0 - needed visualreview to docker migration](https://confluence.translate5.net/display/CON/translate5+5.8.0+-+needed+visualreview+to+docker+migration)!</mark>
-
-
-### Added
-**[TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055): VisualReview / VisualTranslation - Connect visual reflow via HTTP to headless browser instance** <br>
-* Changed usage of headless Browser for the visual to use a docker-image
-* Added own Worker for the Text-Reflow Conversion
-* Legacy Cleanup: Changed fallback-implementation for visuals, where the text-reflow fails to use the translate5 standard scroller & icon library. This fixes issues with missing annotation-icons in those cases
-
-**[TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185): Installation & Update - Prepare translate5 for usage with docker** <br>
-Introducing the setup of translate5 and the used services as docker containers.
-
-
-### Changed
-**[TRANSLATE-3127](https://jira.translate5.net/browse/TRANSLATE-3127): Editor general - Change the order of form components in "Manual QA inside segment" fieldset** <br>
-MQM widget form fields ordering changed
-
-**: VisualReview / VisualTranslation - Make pdf converter reachable via network** <br>
-The previous local pdf converter is now reachable as a service via network.
-
-
-### Bugfixes
 **[TRANSLATE-3133](https://jira.translate5.net/browse/TRANSLATE-3133): TermPortal - TermPortal: sort filterwindow dropdowns alphabetically** <br>
 Filter window Clients and TermCollection dropdowns are now sorted alphabetically
 
 **[TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123): Import/Export - Tbx import: duplicated attributes should be deleted** <br>
 TBX import: removed term-level attributes duplicates
+
 
 
 ## [5.7.15] - 2022-12-01
