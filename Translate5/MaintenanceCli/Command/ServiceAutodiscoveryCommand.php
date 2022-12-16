@@ -376,7 +376,7 @@ using the default ports.')
                 $found['default'][] = 'http://' . $hostname . ':' . $port;
             }
             foreach ($types as $type) {
-                $hostname = $host . '_' . $type . '_' . $i;
+                $hostname = $host . '_' . $type . '_' . $i.'.';
                 if ($this->isDnsSet($hostname, $port)) {
                     $found[$type][] = 'http://' . $hostname . ':' . $port;
                 }
@@ -430,7 +430,7 @@ using the default ports.')
     {
         $activatePlugin = false;
         // we need all 3 service-url-types to enable the plugin
-        if (count($foundServices['default']) < 1 || count($foundServices['gui']) < 1 || count($foundServices['import']) < 1) {
+        if (count($foundServices['default']) < 1 && count($foundServices['gui']) < 1 && count($foundServices['import']) < 1) {
             $this->io->info('Found ' . $serviceName . 's: NONE');
         } else {
             $this->io->info('Found ' . $serviceName . 's: ' . json_encode($foundServices, JSON_UNESCAPED_SLASHES));
@@ -490,7 +490,7 @@ using the default ports.')
             $config->loadByName($name);
             $this->updateConfigInstance($config, $newValue);
         } catch (ZfExtended_Models_Entity_NotFoundException) {
-            $this->io->warning('Config not '.$name.' not found and there fore not set! Missing plug-in?');
+            $this->io->warning('Config not '.$name.' not found and there fore not set-able! Missing plug-in?');
         }
     }
 
