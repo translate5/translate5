@@ -36,6 +36,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Plugin_Manager;
 
 
@@ -485,8 +486,12 @@ using the default ports.')
     protected function updateConfig(string $name, string $newValue): void
     {
         $config = new editor_Models_Config();
-        $config->loadByName($name);
-        $this->updateConfigInstance($config, $newValue);
+        try  {
+            $config->loadByName($name);
+            $this->updateConfigInstance($config, $newValue);
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
+            $this->io->warning('Config not '.$name.' not found and there fore not set! Missing plug-in?');
+        }
     }
 
     /**
