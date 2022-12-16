@@ -9,6 +9,69 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+
+## [5.8.1] - 2022-12-16
+
+### Important Notes:
+#### [TRANSLATE-3108](https://jira.translate5.net/browse/TRANSLATE-3108)
+API Users should switch to appTokens instead plain password usage! 
+This is mandatory with one of the next releases.
+For usage see: https://confluence.translate5.net/x/AQAoG
+
+#### [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
+Before updating see 
+https://confluence.translate5.net/x/BYAIG
+
+#### [TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764)
+The format of the export.zip is changing! 
+Previously the export.zip was containing a folder named like the taskGuid.
+This is removed and the content directories are now directly in export.zip root.
+ 
+
+
+### Added
+**[TRANSLATE-3108](https://jira.translate5.net/browse/TRANSLATE-3108): Main back-end mechanisms (Worker, Logging, etc.) - App tokens for API authentication** <br>
+Via CLI tool appTokens can now be added to dedicated users. Such app tokens should be used then in the future for authentication via API.
+
+**[TRANSLATE-3069](https://jira.translate5.net/browse/TRANSLATE-3069): LanguageResources - TM pre-translation match rate set to 80 as default** <br>
+Enables the minimum value form pre-translate TM match-rate to be configurable for client.
+
+**[TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185): Installation & Update - Prepare translate5 for usage with docker** <br>
+Introducing the setup of translate5 and the used services as docker containers.
+
+
+### Changed
+**[TRANSLATE-3143](https://jira.translate5.net/browse/TRANSLATE-3143): Editor Length Check - Change some default config values for pixel length check** <br>
+The settings runtimeOptions.lengthRestriction.automaticNewLineAdding and 
+runtimeOptions.lengthRestriction.newLineReplaceWhitespace are set now to off by default. 
+
+**[TRANSLATE-3134](https://jira.translate5.net/browse/TRANSLATE-3134): OpenTM2 integration - Amend translate5 to send appropriate json terminator to t5memory** <br>
+Request json sent to t5memory is now pretty printed
+
+**[TRANSLATE-2925](https://jira.translate5.net/browse/TRANSLATE-2925): VisualReview / VisualTranslation - API tests for all types of visuals** <br>
+Added API tests for all types of visuals
+
+**[TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764): Import/Export - Restructuring of export.zip** <br>
+The content structure of the export zip changed. In the future it does NOT contain any more a folder with the task guid, but directly on the highest level of the zip all files of the task that were translated/reviewed.
+
+
+### Bugfixes
+**[TRANSLATE-3137](https://jira.translate5.net/browse/TRANSLATE-3137): TermPortal - TermPortal: missing ACL for pure termportal-users** <br>
+added missing ACL rules for pure TermPortal users
+
+**[TRANSLATE-3132](https://jira.translate5.net/browse/TRANSLATE-3132): TermPortal - TermPortal: duplicated users in 'Created by' filter** <br>
+only distinct user names are now shown in 'Created by' and 'Updated by' filters
+
+**[TRANSLATE-3131](https://jira.translate5.net/browse/TRANSLATE-3131): TermTagger integration - Termtagger not synchronized with Terminology** <br>
+Task terminology is now refreshed prior Analyse/Re-check operations
+
+**[TRANSLATE-3129](https://jira.translate5.net/browse/TRANSLATE-3129): Task Management - PM light can not choose different PM for a project** <br>
+PmLight user is now allowed to change PM of a project
+
+**[TRANSLATE-3128](https://jira.translate5.net/browse/TRANSLATE-3128): Task Management - PM of task can not be changed to PM light user** <br>
+Task can be assigned to pmLight user now
+
+
 ## [5.8.0] - 2022-12-06
 
 ### Important Notes:
