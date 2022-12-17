@@ -22,6 +22,10 @@
                 <source>Passwort neu setzen</source>
                 <target>Reset password</target>
             </trans-unit>
+            <trans-unit id="TG9naW5uYW1lIGdlw6RuZGVydA==">
+                <source>Loginname geändert</source>
+                <target>Login name changed</target>
+            </trans-unit>
             <trans-unit id="UU0gU3Vic2VnbWVudGU=">
                 <source>QM Subsegmente</source>
                 <target state="needs-review-adaptation">QM Subsegments</target>
@@ -305,6 +309,28 @@ If your key is no longer valid, you can request a new one at any time.
 ------------------------------
 
 If you did not send the request yourself, please inform us of this.
+
+{footer}</target>
+            </trans-unit>
+            <trans-unit id='e2hlYWRlcn0KV2lyIGhhYmVuIGZlc3RnZXN0ZWxsdCwgZGFzcyBJaHIgTG9naW4tTmFtZSBuaWNodCB1bnRlcnN0w7x0enRlIFplaWNoZW4gZW50aMOkbHQuCkRlciBMb2dpbi1OYW1lIHd1cmRlIGF1dG9tYXRpc2NoIGdlw6RuZGVydC4KCklociBuZXVlciBMb2dpbi1OYW1lOgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0Ke25ld0xvZ2lufQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCntmb290ZXJ9'>
+                <source>{header}
+Wir haben festgestellt, dass Ihr Login-Name nicht unterstützte Zeichen enthält.
+Der Login-Name wurde automatisch geändert.
+
+Ihr neuer Login-Name:
+------------------------------
+{newLogin}
+------------------------------
+
+{footer}</source>
+                <target>{header}
+We have found that your login name contains unsupported characters.
+The login name was changed automatically.
+
+Your new login name:
+------------------------------
+{newLogin}
+------------------------------
 
 {footer}</target>
             </trans-unit>
