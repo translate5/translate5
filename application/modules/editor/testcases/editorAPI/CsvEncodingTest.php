@@ -179,7 +179,7 @@ class CsvEncodingTest extends editor_Test_JsonTest {
         $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFile = $removeMqmIds(static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/specialCharactersInCSV.csv'));
+        $exportedFile = $removeMqmIds(static::api()->getFileContentFromZipPath($pathToZip, '/specialCharactersInCSV.csv'));
         //compare it
         $expectedResult = $removeMqmIds(static::api()->getFileContent($fileToCompare));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);

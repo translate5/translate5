@@ -118,7 +118,7 @@ class XlfSegmentPixelLengthTest extends editor_Test_JsonTest {
         $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/'.$fileToExport);
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/'.$fileToExport);
 
         if(static::api()->isCapturing()) {
             file_put_contents(static::api()->getFile($fileToCompare, null, false), rtrim($exportedFile));
