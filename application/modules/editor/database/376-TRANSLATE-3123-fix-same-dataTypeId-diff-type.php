@@ -55,12 +55,6 @@ $dataType = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeDa
 /* @var $db Zend_Db_Adapter_Pdo_Mysql */
 $db = $dataType->db->getAdapter();
 
-// Array of [dataTypeId => [collectionId1 => true, ...]]
-// Presence of certain dataTypeId among the keys mean such dataType was created during this script execution
-// So that we need to maintain values of `enabled` and `exists` column for all [collectionId => dataTypeId]
-// mappings related to each collectionId where problem was detected and solution required to create new dataType-record
-$mappingA = [];
-
 // Fetch [type => id] pairs for all datatype-records
 $byType = $db->query("
     SELECT `type`, `id` FROM `terms_attributes_datatype`
@@ -78,30 +72,13 @@ $byType = $db->query("
  * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
  * @throws ZfExtended_Models_Entity_NotFoundException
  */
-function findOrCreateDataType(editor_Models_Terminology_Models_AttributeDataType $dataType, $problem, &$byType, &$mappingA) {
+function findOrCreateDataType(editor_Models_Terminology_Models_AttributeDataType $dataType, $problem, &$byType) {
 
     // If there is an existing datatype-record having type same as attribute-record type
     if ($dataTypeId = $byType[$problem['attributeType']] ?? 0) {
 
         // Load datatype-record by id
         $dataType->load($dataTypeId);
-
-        // If this datatype was created during this script execution,
-        // it mean that values of `enabled` and `exists` were initially set by default to 0 for all
-        // [collectionId => dataTypeId] mappings related to this collectionId,
-        // so, if those were not set to 1 so far - do it
-        if (isset($mappingA[$dataTypeId]) && !isset($mappingA[$dataTypeId][ $problem['collectionId'] ])) {
-
-            // Do maintain
-            $dataType->db->getAdapter()->query("
-                UPDATE `terms_collection_attribute_datatype` 
-                SET `enabled` = 1, `exists` = 1
-                WHERE `dataTypeId` = '$dataTypeId' AND `collectionId` = '{$problem['collectionId']}' 
-            ");
-
-            // Mark as maintained
-            $mappingA[$dataTypeId][ $problem['collectionId'] ] = true;
-        }
 
     // Else
     } else {
@@ -117,15 +94,6 @@ function findOrCreateDataType(editor_Models_Terminology_Models_AttributeDataType
 
         // Add to dict to be further available
         $byType[$dataType->getType()] = $dataType->getId();
-
-        // Maintain collection<=>datatype mappings data
-        $dataType->db->getAdapter()->query("
-            INSERT INTO `terms_collection_attribute_datatype` (`collectionId`, `dataTypeId`, `enabled`, `exists`) 
-            SELECT `id`, ?, `id` = ?, `id` = ? FROM `LEK_languageresources` WHERE `resourceType` = 'termcollection'
-        ", [$dataType->getId(), $problem['collectionId'], $problem['collectionId']]);
-
-        // Setup mapping-flag
-        $mappingA[ $dataType->getId() ][ $problem['collectionId'] ] = true;
     }
 }
 
@@ -170,7 +138,7 @@ foreach ($checker->checkAttributesAgainstDataTypes() as $problem) {
             : $problem;
 
         // Load correct datatype-record into $dataType model instance (such record is created, if need)
-        findOrCreateDataType($dataType, $_problem, $byType, $mappingA);
+        findOrCreateDataType($dataType, $_problem, $byType);
 
         // Update attributes
         updateAttributes($dataType, $problem);
@@ -183,7 +151,7 @@ foreach ($checker->checkAttributesAgainstDataTypes() as $problem) {
         $whereColumn = $problem['datatypeType'] == 'NOT EXISTENT' ? 'id' : 'dataTypeId';
 
         // Load correct datatype-record into $dataType model instance (such record is created, if need)
-        findOrCreateDataType($dataType, $problem, $byType, $mappingA);
+        findOrCreateDataType($dataType, $problem, $byType);
 
         // Update attributes
         updateAttributes($dataType, $problem, $whereColumn);

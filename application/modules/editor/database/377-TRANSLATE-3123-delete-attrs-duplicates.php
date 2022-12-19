@@ -148,7 +148,7 @@ cleanupAttrA($attrA, $db, $picklistA);
 // Get checker
 $checker = new \editor_Models_Terminology_DataTypeConsistencyCheck();
 
-// Foreach sameTypeDiffElementName-case found
+// Foreach sameTypeDiffElementName-case found among attribute-records
 foreach ($checker->sameTypeDiffElementName() as $case) {
 
     // Get correct dataTypeId and elementName
@@ -172,7 +172,7 @@ foreach ($checker->sameTypeDiffElementName() as $case) {
     }
 }
 
-// Foreach sameTypeDiffLabel-case found
+// Foreach sameTypeDiffLabel-case found among datatype-records
 foreach ($checker->sameTypeDiffLabel() as $case) {
 
     // Get correct id and label
