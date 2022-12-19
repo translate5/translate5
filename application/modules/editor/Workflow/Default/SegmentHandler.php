@@ -35,15 +35,17 @@ class editor_Workflow_Default_SegmentHandler {
      */
     protected $workflow;
 
-    /***
-     * User to be used when loading the tua for the edited task
-     * @var string
+    /**
+     * User to be used when loading the tua for the edited task | null if not authenticated
+     * @var string|null
      */
-    private string $userGuid;
+    private ?string $userGuid = null;
 
     public function __construct(editor_Workflow_Default $workflow) {
         $this->workflow = $workflow;
-        $this->userGuid = ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+        if(ZfExtended_Authentication::getInstance()->isAuthenticated()) {
+            $this->userGuid = ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+        }
     }
 
     /***
