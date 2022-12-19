@@ -8894,9 +8894,9 @@ E-Mail: service@MittagQI.com</pre>
               <source>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</source>
               <target>The reimport was completed with errors. For more info check the result log.</target>
             </trans-unit>
-            <trans-unit id='U2llIGvDtm5uZW4gRGF0ZWllbiBudXIgYWt0dWFsaXNpZXJlbiwgd2VubiBkaWUgaG9jaGdlbGFkZW5lIERhdGVpIHZvbSBnbGVpY2hlbiBEYXRlaXR5cCBpc3QgdW5kIGRpZSBnbGVpY2hlIEFuemFobCB2b24gU2VnbWVudGVuIGhhdC4gRGVyemVpdCB1bnRlcnN0w7x0enRlIERhdGVpdHlwZW46IHswfQ=='>
-              <source>Sie können Dateien nur aktualisieren, wenn die hochgeladene Datei vom gleichen Dateityp ist und die gleiche Anzahl von Segmenten hat. Derzeit unterstützte Dateitypen: {0}</source>
-              <target>You can update files only if the uploaded file is of the same file type and has the same number of segments.Currently supported file types: {0}</target>
+            <trans-unit id='QXXDn2VyaGFsYiB2b24gdHJhbnNsYXRlNSBnZcOkbmRlcnRlIFppZWwtU2VnbWVudGluaGFsdGUgc2luZCBuYWNoIGRlbSBSZS1JbXBvcnQgYWxzIMOEbmRlcnVuZ3NtYXJraWVydW5nZW4gaW0gU2VnbWVudCB6dSBzZWhlbi4gw4RuZGVydW5nc21hcmtpZXJ1bmdlbiBpbiBTZWdtZW50ZW4gdm9uIGJldm9yIGRlbSBSZS1JbXBvcnQgZ2VoZW4gdmVybG9yZW4uIEdlw6RuZGVydGUgUXVlbGxzZWdtZW50ZSB3ZXJkZW4gZWJlbmZhbGxzIGFrdHVhbGlzaWVydC4gTmV1IGhpbnp1Z2Vmw7xndGUgU2VnbWVudGUgKHouIEIuIGR1cmNoIGVpbmVuIFNlZ21lbnQtU3BsaXQpIHdlcmRlbiBpZ25vcmllcnQuIERlcnplaXQga8O2bm5lbiBkaWUgZm9sZ2VuZGVuIGJpbGluZ3VhbGVuIERhdGVpZW4gYWt0dWFsaXNpZXJ0IHdlcmRlbjogezB9'>
+              <source>Außerhalb von translate5 geänderte Ziel-Segmentinhalte sind nach dem Re-Import als Änderungsmarkierungen im Segment zu sehen. Änderungsmarkierungen in Segmenten von bevor dem Re-Import gehen verloren. Geänderte Quellsegmente werden ebenfalls aktualisiert. Neu hinzugefügte Segmente (z. B. durch einen Segment-Split) werden ignoriert. Derzeit können die folgenden bilingualen Dateien aktualisiert werden: {0}</source>
+              <target>Target segment contents changed outside translate5 are visible as tracked change marks in the segment after re-import. Change marks in segments from before the re-import are lost. Changed source segments are also updated. Newly added segments (e. g. from a segment split) will be ignored. Currently the following bilingual files can be updated: {0}</target>
             </trans-unit>
             <trans-unit id='WnV3ZWlzdW5nc3dlcnRlIGJlYXJiZWl0ZW4='>
                 <source>Zuweisungswerte bearbeiten</source>

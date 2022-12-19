@@ -132,7 +132,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
     }
 
     protected function _testExportSdlXliff(string $pathToZip) {
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, static::api()->getTask()->taskGuid.'/01-sdlxliff-en-de.sdlxliff');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/01-sdlxliff-en-de.sdlxliff');
         $expectedResult = static::api()->getFileContent('export-assert.sdlxliff', $exportedFile);
         //Since we replace only our own comments, we can leave Medium and 1.0 as fixed string, since they are currently not modifiable by translate5
         $s = [
@@ -154,7 +154,7 @@ class SegmentCommentRoundtripTest extends editor_Test_JsonTest {
     }
 
     protected function _testExportMemoQXliff(string $pathToZip) {
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, static::api()->getTask()->taskGuid.'/02-memoq-de-en.mqxliff');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/02-memoq-de-en.mqxliff');
         $expectedResult = static::api()->getFileContent('export-assert.mqxliff', $exportedFile);
         //Since we replace only our own comments, we can leave Medium and 1.0 as fixed string, since they are currently not modifiable by translate5
         $s = [

@@ -88,7 +88,7 @@ class Translate682Test extends editor_Test_ImportTest {
             return preg_replace('/(sdl:revid="|rev-def id=")[a-z0-9-]{36}"/', '\1foo-bar"', $string);
         };
         
-        $exportedData = $replaceDynamicRevId(static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/testsamples.sdlxliff'));
+        $exportedData = $replaceDynamicRevId(static::api()->getFileContentFromZipPath($pathToZip, '/testsamples.sdlxliff'));
         $expectedData = $replaceDynamicRevId(static::api()->getFileContent('expectedResult.sdlxliff'));
         
         $this->assertEquals(rtrim($expectedData), rtrim($exportedData), 'Exported result does not equal to expected SDLXLIFF content');

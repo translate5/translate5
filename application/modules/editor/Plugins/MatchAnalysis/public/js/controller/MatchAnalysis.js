@@ -273,7 +273,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     fields: ['id', 'value'],
                     data : storeData
                 }),
-                value:100,
+                value:Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateMatchRate'),
                 displayField: 'value',
                 valueField: 'id',
                 queryMode: 'local'
@@ -375,7 +375,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     startOperation: function(taskId, operation, importDefaults){
         var params = {
-            pretranslateMatchrate: this.getComponentByItemId('cbMinMatchrate').getValue(),
             isTaskImport: this.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
             batchQuery: this.isCheckboxChecked('batchQuery')
         };
@@ -384,6 +383,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             params.internalFuzzy = this.isCheckboxChecked('cbInternalFuzzy');
             params.pretranslateTmAndTerm = this.isCheckboxChecked('pretranslateTmAndTerm');
             params.pretranslateMt = this.isCheckboxChecked('pretranslateMt');
+            params.pretranslateMatchrate = this.getComponentByItemId('cbMinMatchrate').getValue();
         }
         Editor.util.TaskActions.operation(operation, taskId, params);
     },
@@ -421,11 +421,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         var me=this,
             cbInternalFuzzy = me.getComponentByItemId('cbInternalFuzzy'),
             pretranslateMt = me.getComponentByItemId('pretranslateMt'),
-            pretranslateTmAndTerm = me.getComponentByItemId('pretranslateTmAndTerm');
+            pretranslateTmAndTerm = me.getComponentByItemId('pretranslateTmAndTerm'),
+            cbMinMatchrate = me.getComponentByItemId('cbMinMatchrate');
 
         cbInternalFuzzy && cbInternalFuzzy.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.internalFuzzyDefault'));
         pretranslateMt && pretranslateMt.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateMtDefault'));
         pretranslateTmAndTerm && pretranslateTmAndTerm.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateTmAndTermDefault'));
+        cbMinMatchrate && cbMinMatchrate.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateMatchRate'));
     },
     
     /***
