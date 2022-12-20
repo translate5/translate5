@@ -1476,7 +1476,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function additionalValidations() {
 
-        if( (bool)$this->getParam('forced',false) === false) {
+        if((bool)$this->getParam('forced',false) === false && $this->getRequest()->isPut()) {
             $customerIds = $this->getDataField('customerIds') ?? [];
             /** @var CleanupAssociation $assocClean */
             $assocClean = ZfExtended_Factory::get(CleanupAssociation::class, [
