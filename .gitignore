@@ -1,4 +1,5 @@
 # User data dirs
+/data/ConnectWorldserver*
 /data/editorImportedTasks*
 /data/editorOkapiBconf*
 /data/editorVisualReviewFonts*

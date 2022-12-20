@@ -119,7 +119,8 @@
 		"league/flysystem": "^3.0",
 		"league/flysystem-sftp": "^3.0",
 		"symfony/yaml": "^6.0",
-		"symfony/lock": "^6.0"
+		"symfony/lock": "^6.0",
+		"nategood/httpful": "^0.3.2"
     },
 	"extra" : {
 		"merge-plugin" : {
