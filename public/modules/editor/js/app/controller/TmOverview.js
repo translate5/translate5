@@ -137,6 +137,11 @@ Ext.define('Editor.controller.TmOverview', {
             '#Editor.store.LanguageResources.LanguageResource': {
                 update: 'addRecordToImportCheck'
             }
+        },
+        controller:{
+            '#ServerException':{
+                serverExceptionE1447: 'onServerExceptionE1447Handler'
+            }
         }
     },
     /**
@@ -260,32 +265,7 @@ Ext.define('Editor.controller.TmOverview', {
     },
     
     handleSaveEditClick: function(button){
-        var me = this,
-            window = button.up('window'),
-            form = window.down('form'),
-            record = form.getRecord();
-
-        if(!form.isValid()) {
-            return;
-        }
-        record.reject();
-
-        form.updateRecord(record);
-        
-        window.setLoading(true);
-        record.save({
-            failure: function(records, op) {
-                window.setLoading(false);
-                Editor.app.getController('ServerException').handleException(op.error.response);
-            },
-            success: function() {
-                var msg = Ext.String.format(me.strings.edited, record.get('name'));
-                me.getTmOverviewPanel().getStore().load();
-                window.setLoading(false);
-                window.close();
-                Editor.MessageBox.addSuccess(msg);
-            }
-        });
+        this.editLangaugeResource();
     },
     
     handleSaveImportClick: function(button){
@@ -331,6 +311,44 @@ Ext.define('Editor.controller.TmOverview', {
             }
         });
     },
+
+    /***
+     * Edit language resource
+     * @param forced
+     */
+    editLangaugeResource: function (forced){
+        var me = this,
+            window = Ext.ComponentQuery.query('#editTmWindow')[0],
+            form = window.down('form'),
+            record = form.getRecord();
+
+        if(!form.isValid()) {
+            return;
+        }
+        record.reject();
+
+        form.updateRecord(record);
+
+        window.setLoading(true);
+        record.save({
+            preventDefaultHandler: true,
+            params:{
+                forced: Ext.isEmpty(forced) ? 0 : 1
+            },
+            failure: function(records, op) {
+                window.setLoading(false);
+                Editor.app.getController('ServerException').handleException(op.error.response);
+            },
+            success: function() {
+                var msg = Ext.String.format(me.strings.edited, record.get('name'));
+                me.getTmOverviewPanel().getStore().load();
+                window.setLoading(false);
+                window.close();
+                Editor.MessageBox.addSuccess(msg);
+            }
+        });
+    },
+
     /**
      * Checks loaded LanguageResources and reloads LanguageResources with status import periodically
      * @param {Ext.data.Store} store
@@ -687,5 +705,27 @@ Ext.define('Editor.controller.TmOverview', {
         var params = {}, url = Editor.data.restpath+'languageresourceinstance/xlsxexport?';
         params['collectionId'] = rec.get('id');
         window.open(url+Ext.urlEncode(params));
+    },
+
+    onServerExceptionE1447Handler: function (response,ecode) {
+        var me = this;
+
+        Ext.create('Ext.window.MessageBox').show({
+            title: Editor.data.l10n.languageResources.editLanguageResource.conflictErrorTitle,
+            msg: response.errorMessage,
+            buttons: Ext.Msg.YESNO,
+            fn:function(button){
+                if(button === "yes"){
+                    me.editLangaugeResource(true);
+                    return true;
+                }
+                return false;
+            },
+            scope:me,
+            defaultFocus:'no',
+            icon: Ext.MessageBox.QUESTION
+        });
+
+        return false;
     }
 });
