@@ -1646,7 +1646,11 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         // remove the taskGuid from root folder name in the exported package
-        ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
+        if ($context == 'xliff2'
+            || $this->config->runtimeOptions->editor->export->noguiddir
+            || $this->getParam('noguiddir', false)) {
+            ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
+        }
 
         if($diff) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
