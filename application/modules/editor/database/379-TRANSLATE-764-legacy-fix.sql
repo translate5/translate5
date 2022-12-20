@@ -27,7 +27,7 @@
 
 
 INSERT INTO Zf_configuration (name, confirmed, module, category, value, `default`, defaults, type, typeClass, description, level, guiName, guiGroup, comment)
-VALUES ('runtimeOptions.editor.export.noguiddir', 1, 'editor', 'export', '1', '1', '', 'boolean', null,
-        'If set to active, the export.zip contains directly the workfiles. If disabled a taskguid directory is created, containing the workfiles (legacy).', 2, 'Export zip guid folder', 'File formats', '');
+VALUES ('runtimeOptions.editor.export.taskguiddirectory', 1, 'editor', 'export', '0', '0', '', 'boolean', null,
+        'If set to true, the export.zip contains a taskguid directory, containing the workfiles (legacy). If disabled the zip contains directly the workflows.', 2, 'Export zip guid folder', 'File formats', '');
 
 

@@ -1645,10 +1645,12 @@ class editor_TaskController extends ZfExtended_RestController {
             exit;
         }
 
+        $taskguiddirectory = $this->getParam('taskguiddirectory');
+        if(is_null($taskguiddirectory)) {
+            $taskguiddirectory = $this->config->runtimeOptions->editor->export->taskguiddirectory;
+        }
         // remove the taskGuid from root folder name in the exported package
-        if ($context == 'xliff2'
-            || $this->config->runtimeOptions->editor->export->noguiddir
-            || $this->getParam('noguiddir', false)) {
+        if ($context == 'xliff2' || !$taskguiddirectory) {
             ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
         }
 
