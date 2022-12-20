@@ -1644,12 +1644,9 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->provideFiletranslationDownload($exportFolder);
             exit;
         }
-        
-        //currently we can only strip the directory path for xliff2 exports, since for default exports we need this as legacy code
-        // can be used in general with implementation of TRANSLATE-764
-        if($context == 'xliff2') {
-            ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
-        }
+
+        // remove the taskGuid from root folder name in the exported package
+        ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
 
         if($diff) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();

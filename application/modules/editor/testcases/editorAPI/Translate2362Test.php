@@ -100,7 +100,7 @@ class Translate2362Test extends editor_Test_JsonTest {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/TRANSLATE-2362-de-en.xlf');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/TRANSLATE-2362-de-en.xlf');
         //file_put_contents(static::api()->getFile('export-TRANSLATE-2362-de-en.xlf', null, false), $exportedFile);
         $expectedResult = static::api()->getFileContent('export-TRANSLATE-2362-de-en.xlf');
         

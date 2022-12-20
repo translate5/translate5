@@ -131,6 +131,8 @@ abstract class editor_Models_Import_FileParser {
      */
     protected int $shortTagIdent = 1;
 
+    protected bool $isReimport = false;
+
     /**
      * returns the file extensions (in lower case) parsable by this fileparser
      * @return array;
@@ -288,7 +290,7 @@ abstract class editor_Models_Import_FileParser {
             //preset the md5 field with the plain string
             //the different processors have then the ability to modify it
             //the final segment processor creates then the hash before storing it into the DB
-            $field['originalMd5'] = $field['original'];
+            $field['originalMd5'] = $field['original'] ?? null;
         }
         
         foreach($this->segmentProcessor as $p) {
@@ -479,5 +481,14 @@ abstract class editor_Models_Import_FileParser {
      */
     public function getFileName(){
         return $this->_fileName;
+    }
+
+    /**
+     * Set internal isReimport flag!
+     * @param bool $isReimport
+     * @return void
+     */
+    public function setIsReimport(bool $isReimport = true) {
+        $this->isReimport = $isReimport;
     }
 }

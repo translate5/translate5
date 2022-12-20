@@ -126,6 +126,10 @@
                 <source>Passwort neu setzen</source>
                 <target>Passwort neu setzen</target>
             </trans-unit>
+            <trans-unit id='TG9naW5uYW1lIGdlw6RuZGVydA=='>
+                <source>Loginname geändert</source>
+                <target>Loginname geändert</target>
+            </trans-unit>
             <trans-unit id='VW5nw7xsdGlnZSBMb2dpbmRhdGVuITxici8+SGFiZW4gU2llIElociBQYXNzd29ydCB2ZXJnZXNzZW4gb2RlciBiaXNsYW5nIG5vY2gga2VpbiBQYXNzd29ydCBmw7xyIElocmVuIExvZ2luIGdlc2V0enQ/ICBTaWUga8O2bm5lbiBqZWRlcnplaXQgZWluZW4gbmV1ZW4gTGluayAlc2hpZXIlcyBhbmZvcmRlcm4u'>
                 <source>Ungültige Logindaten!
                     <br/>Haben Sie Ihr Passwort vergessen oder bislang noch kein Passwort für Ihren Login gesetzt?  Sie können jederzeit einen neuen Link %shier%s anfordern.
@@ -815,6 +819,28 @@ Sollte Ihr Schlüssel nicht mehr gültig sein, können Sie unter jederzeit einen
 ------------------------------
 
 Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüber zu informieren.
+
+{footer}</target>
+            </trans-unit>
+            <trans-unit id='e2hlYWRlcn0KV2lyIGhhYmVuIGZlc3RnZXN0ZWxsdCwgZGFzcyBJaHIgTG9naW4tTmFtZSBuaWNodCB1bnRlcnN0w7x0enRlIFplaWNoZW4gZW50aMOkbHQuCkRlciBMb2dpbi1OYW1lIHd1cmRlIGF1dG9tYXRpc2NoIGdlw6RuZGVydC4KCklociBuZXVlciBMb2dpbi1OYW1lOgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0Ke25ld0xvZ2lufQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCntmb290ZXJ9'>
+                <source>{header}
+Wir haben festgestellt, dass Ihr Login-Name nicht unterstützte Zeichen enthält.
+Der Login-Name wurde automatisch geändert.
+
+Ihr neuer Login-Name:
+------------------------------
+{newLogin}
+------------------------------
+
+{footer}</source>
+                <target>{header}
+Wir haben festgestellt, dass Ihr Login-Name nicht unterstützte Zeichen enthält.
+Der Login-Name wurde automatisch geändert.
+
+Ihr neuer Login-Name:
+------------------------------
+{newLogin}
+------------------------------
 
 {footer}</target>
             </trans-unit>

@@ -79,11 +79,18 @@ class editor_Models_Import_Worker_Behaviour extends ZfExtended_Worker_Behaviour_
     public function registerShutdown() {
         register_shutdown_function(function($task, $worker) {
             $error = error_get_last();
-            if(!is_null($error) && ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
+            if (!is_null($error) && ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
                 /* @var $task editor_Models_Task */
-                if(!is_null($task) && $task->isImporting()) {
+                if (!is_null($task) && $task->isImporting()) {
                     // should only set to error if task was really on import
                     $task->setErroneous();
+                    if (Zend_Registry::isRegistered('logger')) {
+                        $logger = Zend_Registry::get('logger');
+                        /* @var $logger ZfExtended_Logger */
+                        $logger->error('E1027', 'Fatal system error on task usage - check system log!', [
+                            'task' => $task,
+                        ]);
+                    }
                 }
                 if(!is_null($worker)) {
                     /* @var $worker ZfExtended_Models_Worker */

@@ -258,7 +258,7 @@ class BasicSegmentEditingTest extends editor_Test_JsonTest {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/install-unix.apache2.html.sdlxliff');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/install-unix.apache2.html.sdlxliff');
         //file_put_contents('/home/tlauria/foo.sdlxliff', $exportedFile);
         $expectedResult = static::api()->getFileContent('export-assert.sdlxliff');
         
