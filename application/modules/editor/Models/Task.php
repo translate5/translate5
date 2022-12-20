@@ -391,7 +391,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return string
      */
     public function getTasknameForDownload(string $suffix, $prefix = '') {
-        return iconv('UTF-8', 'ASCII//TRANSLIT', $prefix.$this->getTaskName().$suffix);
+        //see TS-2156 and https://stackoverflow.com/questions/1401317/remove-non-utf8-characters-from-string
+        $name = preg_replace('/[^[:print:]\n]/u', '', iconv("UTF-8", "UTF-8//IGNORE", $this->getTaskName()));
+        return iconv('UTF-8', 'ASCII//TRANSLIT', $prefix.$name.$suffix);
     }
 
     /**
