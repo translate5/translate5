@@ -987,7 +987,7 @@ class editor_TaskController extends ZfExtended_RestController {
             //id is always set as modified, therefore we don't log task changes if id is the only modified
             $modified = $this->entity->getModifiedValues();
             if(!array_key_exists('id', $modified) || count($modified) > 1) {
-                $this->logInfo('Task modified: ');
+                $this->logInfo('Task modified - prev. value was: ');
             }
         }
 
@@ -1157,7 +1157,7 @@ class editor_TaskController extends ZfExtended_RestController {
     }
 
     /**
-     * returns true if PUT Requests opens a task for editing or readonly
+     * returns true if PUT Requests opens a task for open or finish
      * @return boolean
      */
     protected function isLeavingTaskRequest(): bool {
@@ -1560,10 +1560,13 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->provideFiletranslationDownload($exportFolder);
             exit;
         }
-        
-        //currently we can only strip the directory path for xliff2 exports, since for default exports we need this as legacy code
-        // can be used in general with implementation of TRANSLATE-764
-        if($context == 'xliff2') {
+
+        $taskguiddirectory = $this->getParam('taskguiddirectory');
+        if(is_null($taskguiddirectory)) {
+            $taskguiddirectory = $this->config->runtimeOptions->editor->export->taskguiddirectory;
+        }
+        // remove the taskGuid from root folder name in the exported package
+        if ($context == 'xliff2' || !$taskguiddirectory) {
             ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
         }
 

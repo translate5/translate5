@@ -179,7 +179,7 @@ class XlfSegmentLinesPixelLengthTest extends editor_Test_JsonTest {
         $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/'.$fileToExport);
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/'.$fileToExport);
         //compare it
         $expectedResult = static::api()->getFileContent($fileToCompare);
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));

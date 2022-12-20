@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuer;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use MittagQI\Translate5\Task\Import\FileParser\Factory;
 
 /**
  * Encapsulates the part of the import logic which is intended to be run in a worker
@@ -59,19 +60,11 @@ class editor_Models_Import_Worker_Import {
      */
     protected $events;
     
-    /**
-     * @var editor_Models_Import_SupportedFileTypes
-     */
-    protected $supportedFiles;
-
-    
     public function __construct() {
         $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        
-        $this->supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
     }
     
     /**
@@ -130,18 +123,24 @@ class editor_Models_Import_Worker_Import {
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Review', array($this->task, $this->importConfig));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Review */
-        
+
+        /** @var Factory $parserHelper */
+        $parserHelper = ZfExtended_Factory::get(Factory::class,[
+            $this->task,
+            $this->segmentFieldManager
+        ]);
+
         $filesProcessedAtAll = 0;
         foreach ($filelist as $fileId => $path) {
             $path = $fileFilter->applyImportFilters($path, $fileId, $filelist);
-            $file = new SplFileInfo($this->importConfig->importFolder.'/'.$path);
-            $parser = $this->getFileParser($fileId, $file);
+            $filePath = $this->importConfig->importFolder.'/'.$path;
+            $parser = $parserHelper->getFileParser($fileId, $filePath);
             if(!$parser) {
                 continue;
             }
             
             /* @var $parser editor_Models_Import_FileParser */
-            $segProc->setSegmentFile($fileId, $file->getBasename()); //$params[1] => filename
+            $segProc->setSegmentFile($fileId, $parser->getFileName()); //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
             $parser->addSegmentProcessor($repHash);
             $parser->addSegmentProcessor($segProc);
@@ -185,61 +184,6 @@ class editor_Models_Import_Worker_Import {
     }
     
     /**
-     */
-    protected function getFileParser(int $fileId, SplFileInfo $file){
-        try {
-            $parserClass = $this->lookupFileParserCls($file->getExtension(), $file);
-        } catch(editor_Models_Import_FileParser_NoParserException $e) {
-            Zend_Registry::get('logger')->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
-            return false;
-        }
-        
-        $parser = ZfExtended_Factory::get($parserClass, [
-            $file->getPathname(),
-            $file->getBasename(),
-            $fileId,
-            $this->task
-        ]);
-        /* var $parser editor_Models_Import_FileParser */
-        $parser->setSegmentFieldManager($this->segmentFieldManager);
-        return $parser;
-    }
-    
-    /**
-     * Looks for a suitable file parser and returns the corresponding file parser cls
-     * @param string $extension
-     * @param SplFileInfo $file
-     * @throws editor_Models_Import_FileParser_NoParserException
-     * @return string
-     */
-    protected function lookupFileParserCls(string $extension, SplFileInfo $file): string {
-        $parserClasses = $this->supportedFiles->getParser($extension);
-        $errorMsg = '';
-        $errorMessages = [];
-        
-        $fileObject = $file->openFile('r', false);
-        $fileHead = $fileObject->fread(512);
-        foreach($parserClasses as $parserClass) {
-            if($parserClass::isParsable($fileHead, $errorMsg)) {
-                // if the first found file parser to that extension may parse it, we use it
-                return $parserClass;
-            }
-            if(!empty($errorMsg)) {
-                $errorMessages[$parserClass] = $errorMsg;
-            }
-        }
-        
-        //'For the given fileextension no parser is registered.'
-        throw new editor_Models_Import_FileParser_NoParserException('E1060', [
-            'file' => $file->getPathname(),
-            'task' => $this->task,
-            'extension' => $extension,
-            'errorMessages' => $errorMessages,
-            'availableParsers' => $this->supportedFiles->getSupportedExtensions(),
-        ]);
-    }
-
-    /**
      * Importiert die Relais Dateien
      */
     protected function importRelaisFiles(): void
@@ -263,14 +207,21 @@ class editor_Models_Import_Worker_Import {
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
+
+        /** @var Factory $parserHelper */
+        $parserHelper = ZfExtended_Factory::get(Factory::class,[
+            $this->task,
+            $this->segmentFieldManager
+        ]);
+
         foreach ($relayFiles as $fileId => $path) {
-            $file = new SplFileInfo($this->importConfig->importFolder.'/'.$path);
-            $parser = $this->getFileParser($fileId, $file);
+            $filePath = $this->importConfig->importFolder.'/'.$path;
+            $parser = $parserHelper->getFileParser($fileId, $filePath);
             if(!$parser) {
                 continue;
             }
             /* @var $parser editor_Models_Import_FileParser */
-            $segProc->setSegmentFile($fileId, $file->getBasename());
+            $segProc->setSegmentFile($fileId, $parser->getFileName());
             $parser->addSegmentProcessor($mqmProc);
             $parser->addSegmentProcessor($repHash);
             $parser->addSegmentProcessor($segProc);

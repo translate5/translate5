@@ -43,8 +43,10 @@ class Translate2081Test extends editor_Test_JsonTest {
 
     /***
      * Add default user assoc and validate the results
+     * Create the task and validate if the auto assign is done
      */
-    public function testDefaultUserAssoc(){
+    public function testAutoAssign(): void
+    {
 
         $params = [
             'customerId' => static::$ownCustomer->id,
@@ -55,27 +57,18 @@ class Translate2081Test extends editor_Test_JsonTest {
             'workflowStepName' => 'translation'
         ];
         $result = static::api()->postJson('editor/userassocdefault', $params);
-        unset($result->id);
-        unset($result->customerId);
+        unset($result->id, $result->customerId);
         if(static::api()->isCapturing()){
             file_put_contents(static::api()->getFile('assocResult.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
         }
         $expected = static::api()->getFileContent('assocResult.txt');
-        $actual = json_encode($result, JSON_PRETTY_PRINT);
+        $actual = json_encode($result, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
-        self::assertEquals($expected, $actual, "The expected file (assocResult) an the result file does not match.");
-    }
-
-    /***
-     * Create the task and validate if the auto assign is done
-     *
-     * @depends testDefaultUserAssoc
-     */
-    public function testTaskAutoAssign(){
+        self::assertEquals($expected, $actual, 'The expected file (assocResult) an the result file does not match.');
 
         $config = static::getConfig();
         $task = $config
-            ->addTask(static::$sourceLangRfc, static::$targetLangRfc, static::$ownCustomer->id, 'TRANSLATE-2545-de-en.xlf')
+            ->addTask(static::$sourceLangRfc, static::$targetLangRfc, static::$ownCustomer->id, 'TRANSLATE-2081-de-en.xlf')
             ->setNotToFailOnError();
         $config->import($task);
 
@@ -87,17 +80,11 @@ class Translate2081Test extends editor_Test_JsonTest {
         // TODO FIXME: write a reusable Model for this !
         //filter out the non static data
         $data = array_map(function($assoc){
-            unset($assoc->id);
-            unset($assoc->taskGuid);
-            unset($assoc->usedInternalSessionUniqId);
-            unset($assoc->staticAuthHash);
-            unset($assoc->editable);
-            unset($assoc->deletable);
-            unset($assoc->assignmentDate);
+            unset($assoc->id, $assoc->taskGuid, $assoc->usedInternalSessionUniqId, $assoc->staticAuthHash, $assoc->editable, $assoc->deletable, $assoc->assignmentDate);
             return $assoc;
         }, $data);
 
         $expectedData = static::api()->getFileContent('expected.json', $data, true);
-        $this->assertEquals($expectedData, $data, 'The expected users are not auto assigned to the task');
+        static::assertEquals($expectedData, $data, 'The expected users are not auto assigned to the task');
     }
 }

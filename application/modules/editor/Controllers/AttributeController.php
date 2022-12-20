@@ -92,9 +92,6 @@ class editor_AttributeController extends ZfExtended_RestController
         // If request contains json-encoded 'data'-param, decode it and append to request params
         $this->handleData();
 
-        // Pick session
-        $this->_session = (new Zend_Session_Namespace('user'))->data;
-
         $termCollection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
 
         // If current user has 'termPM_allClients' role, it means all collections are accessible
@@ -163,6 +160,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
     /**
      * Create attribute
+     *
+     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Mismatch
      */
     public function postAction() {
@@ -281,13 +280,12 @@ class editor_AttributeController extends ZfExtended_RestController
             ],
         ], $_['termId']);
 
-        // If attribute we're going to add is not a part of TBX basic standard
-        if (!$_['dataType']->getIsTbxBasic())
-            $this->jcheck([
-                'collectionId' => [
-                    'fis' => $_['dataType']->getAllowedCollectionIds() // FIND_IN_SET
-                ]
-            ], $_['termId']);
+        // Check if attribute we're going to add is of dataType which is enabled for term's TermCollection
+        $this->jcheck([
+            'collectionId' => [
+                'fis' => $_['dataType']->getEnabledCollectionIds() ?: 'invalid' // FIND_IN_SET
+            ]
+        ], $_['termId']);
 
         // Build params key
         $key = $_['termId']->getTermEntryId()
@@ -537,8 +535,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Delete attribute
             $data = $this->entity->delete([
-                'userName' => $this->_session->userName,
-                'userGuid' => $this->_session->userGuid,
+                'userName' => $this->user()->getUserName(),
+                'userGuid' => $this->user()->getUserGuid(),
             ]);
 
             // Flush response data
@@ -564,8 +562,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Save attr and affect transacgrp-records
         $updated = $this->entity->insert($misc = [
-            'userName' => $this->_session->userName,
-            'userGuid' => $this->_session->userGuid,
+            'userName' => $this->user()->getUserName(),
+            'userGuid' => $this->user()->getUserGuid(),
         ]);
 
         // Prepare inserted data to be flushed into response json
@@ -597,8 +595,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Save attr and affect transacgrp-records
         $updated = $this->entity->insert($misc = [
-            'userName' => $this->_session->userName,
-            'userGuid' => $this->_session->userGuid,
+            'userName' => $this->user()->getUserName(),
+            'userGuid' => $this->user()->getUserGuid(),
         ]);
 
         // Prepare inserted data to be flushed into response json
@@ -630,8 +628,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Save attr and affect transacgrp-records
         $updated = $this->entity->insert($misc = [
-            'userName' => $this->_session->userName,
-            'userGuid' => $this->_session->userGuid,
+            'userName' => $this->user()->getUserName(),
+            'userGuid' => $this->user()->getUserGuid(),
         ]);
 
         // Prepare inserted data to be flushed into response json
@@ -683,8 +681,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Save attr and affect transacgrp-records
         $updated = $this->entity->insert($misc = [
-            'userName' => $this->_session->userName,
-            'userGuid' => $this->_session->userGuid
+            'userName' => $this->user()->getUserName(),
+            'userGuid' => $this->user()->getUserGuid()
         ]);
 
         // Prepare inserted data to be flushed into response json
@@ -737,8 +735,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Update attribute
         $updated = $this->entity->update($misc = [
-            'userName' => $this->_session->userName,
-            'userGuid' => $this->_session->userGuid,
+            'userName' => $this->user()->getUserName(),
+            'userGuid' => $this->user()->getUserGuid(),
         ]);
 
         // Setup $isValidUrl flag indicating whether `target`-prop contains a valid url
@@ -774,8 +772,8 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // Update attribute
         $data['updated'] = $this->entity->update([
-            'userName' => $this->_session->userName,
-            'userGuid' => $this->_session->userGuid,
+            'userName' => $this->user()->getUserName(),
+            'userGuid' => $this->user()->getUserGuid(),
         ]);
 
         // If given target is not empty
@@ -843,8 +841,8 @@ class editor_AttributeController extends ZfExtended_RestController
             // for all levels starting from term-level and up to top
             $updated = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
-                    $this->_session->userName,
-                    $this->_session->userGuid,
+                    $this->user()->getUserName(),
+                    $this->user()->getUserGuid(),
                     $this->entity->getTermEntryId(),
                     $this->entity->getLanguage()
                 );
@@ -871,7 +869,7 @@ class editor_AttributeController extends ZfExtended_RestController
         $_ = $this->_attrupdateCheck($drop ? false : true);
 
         // Default response data to be flushed in case of attribute change
-        $data = ['success' => true, 'updated' => $this->_session->userName . ', ' . date('d.m.Y H:i:s')];
+        $data = ['success' => true, 'updated' => $this->user()->getUserName() . ', ' . date('d.m.Y H:i:s')];
 
         // If attr was not yet changed after importing from tbx - append current value to response
         if (!$this->entity->getIsCreatedLocally()) $data['imported'] = $this->entity->getValue();
@@ -904,9 +902,9 @@ class editor_AttributeController extends ZfExtended_RestController
             // Do process status change, incl. detaching proposal if need, etc
             $data += $_['termId']->doProcessStatusChange(
                 $value,
-                $this->_session->id,
-                $this->_session->userName,
-                $this->_session->userGuid,
+                $this->user()->getId(),
+                $this->user()->getUserName(),
+                $this->user()->getUserGuid(),
                 $this->entity
             );
 
@@ -919,7 +917,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
             // Update attribute value
             $this->entity->setValue($value);
-            $this->entity->setUpdatedBy($this->_session->id);
+            $this->entity->setUpdatedBy($this->user()->getId());
             $this->entity->setIsCreatedLocally(1);
             $this->entity->update();
 
@@ -945,8 +943,8 @@ class editor_AttributeController extends ZfExtended_RestController
         // for all levels starting from term-level and up to top
         $data['updated'] = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
             ->affectLevels(
-                $this->_session->userName,
-                $this->_session->userGuid,
+                $this->user()->getUserName(),
+                $this->user()->getUserGuid(),
                 $this->entity->getTermEntryId(),
                 $this->entity->getLanguage(),
                 $this->entity->getTermId()
@@ -990,7 +988,7 @@ class editor_AttributeController extends ZfExtended_RestController
 
         // If status is modified save it to the DB
         if ($termM->isModified('status')) {
-            $termM->setUpdatedBy($this->_session->id);
+            $termM->setUpdatedBy($this->user()->getId());
             $termM->update(['updateProcessStatusAttr' => false]);
 
             // Return new status
@@ -1103,9 +1101,9 @@ class editor_AttributeController extends ZfExtended_RestController
             'termId'       => $this->getParam('termId') ?: null,
             'termTbxId'    => $this->getParam('termId') ? $_['termId']->getTermTbxId() : null,
             'isCreatedLocally' => 1,
-            'createdBy' => $this->_session->id,
+            'createdBy' => $this->user()->getId(),
             'createdAt' => date('Y-m-d H:i:s'),
-            'updatedBy' => $this->_session->id,
+            'updatedBy' => $this->user()->getId(),
             'updatedAt' => date('Y-m-d H:i:s'),
             'termEntryGuid' => $_['termId']->getTermEntryGuid(),
             //'langSetGuid' => null,

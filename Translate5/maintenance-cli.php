@@ -30,7 +30,9 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
+use Translate5\MaintenanceCli\Command\{
+    AuthTokenCommand,
+    CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
     DatabaseUpdateCommand,
@@ -56,6 +58,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     PluginListCommand,
     ReleaseNotesCommand,
     ServiceAutodiscoveryCommand,
+    DevelopmentLocalServicesCommand,
     SessionImpersonateCommand,
     StatusCommand,
     SystemCheckCommand,
@@ -65,14 +68,17 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     TaskSkeletonfileCommand,
     TermportalReindexCommand,
     TermportalDatatypecheckCommand,
+    TestApplytestsqlCommand,
     TestRunAllCommand,
     TestRunCommand,
     TestRunSuiteCommand,
     TestApplicationRunCommand,
     TestAddIniSectionCommand,
     TestCleanupCommand,
+    TestCreateFaultySegmentCommand,
     UserCreateCommand,
     UserInfoCommand,
+    VisualConvertLegacyPdfReviewsCommand,
     WorkerCleanCommand,
     WorkerListCommand,
     WorkerQueueCommand};
@@ -80,6 +86,7 @@ use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
+    new AuthTokenCommand(),
     new CachePurgeCommand(),
     new ChangelogCommand(),
     new ConfigCommand(),
@@ -110,6 +117,7 @@ $commands = [
     new TermportalDatatypecheckCommand(),
     new UserCreateCommand(),
     new UserInfoCommand(),
+    new VisualConvertLegacyPdfReviewsCommand(),
     new WorkerCleanCommand(),
     new WorkerListCommand(),
     new WorkerQueueCommand(),
@@ -118,12 +126,14 @@ if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new DevelopmentCreatetestCommand();
+    $commands[] = new TestApplytestsqlCommand();
     $commands[] = new TestRunAllCommand();
     $commands[] = new TestRunCommand();
     $commands[] = new TestRunSuiteCommand();
     $commands[] = new TestApplicationRunCommand();
     $commands[] = new TestAddIniSectionCommand();
     $commands[] = new TestCleanupCommand();
+    $commands[] = new TestCreateFaultySegmentCommand();
     $commands[] = new ReleaseNotesCommand();
     $commands[] = new DevelopmentNewModelCommand();
     $commands[] = new DevelopmentEcodeCommand();
@@ -131,6 +141,7 @@ if(file_exists('.git')) {
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
+    $commands[] = new DevelopmentLocalServicesCommand();
 }
 $app->addCommands($commands);
 $app->run();

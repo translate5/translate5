@@ -35,6 +35,10 @@ use MittagQI\Translate5\Test\Filter;
  */
 class QualityBaseTest extends editor_Test_JsonTest {
 
+    protected static array $forbiddenPlugins = [
+        editor_Plugins_Translate24_Init::class
+    ];
+
     protected static array $requiredRuntimeOptions = [
         'autoQA.enableInternalTagCheck' => 1,
         'autoQA.enableEdited100MatchCheck' => 1,

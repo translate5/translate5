@@ -11,11 +11,241 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+## [5.8.2] - 2022-12-20
+
+### Important Notes:
+#### [TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123)
+Users who already adjusted the checkboxes, indicating whether some attribute datatype is enabled for some TermCollection - have to redo this
+
+#### [TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764)
+UPDATE: The format of the export.zip is changing! 
+Previously the export.zip was containing a folder named like the taskGuid.
+This is removed and the content directories are now directly in export.zip root.
+The legacy behaviour can be kept by setting in config runtimeOptions.editor.export.taskguiddirectory to 1
+or completely controlled by using a GET parameter taskguiddirectory with 0 or 1 on export URL.
+ 
+
+
+### Changed
+**[TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764): Import/Export - Restructuring of export.zip** <br>
+UPDATE: The content structure of the export zip changed. In the future it does NOT contain any more a folder with the task guid, but directly on the highest level of the zip all files of the task that were translated/reviewed.
+
+
+### Bugfixes
+**[TRANSLATE-3150](https://jira.translate5.net/browse/TRANSLATE-3150): TermPortal - TermPortal: term status tooltips old locale after locale changed** <br>
+Search results icons tooltips language is now changed on GUI language change
+
+**[TRANSLATE-3149](https://jira.translate5.net/browse/TRANSLATE-3149): Task Management, WebSocket Server - 403 Forbidden messages in opened task** <br>
+Users with an unstable internet connection got multiple 403 Forbidden error messages.
+
+**[TRANSLATE-3145](https://jira.translate5.net/browse/TRANSLATE-3145): TermPortal - TermPortal: problem on creating Chinese term** <br>
+fixed problem popping on creating term in Chinese language
+
+**[TRANSLATE-3144](https://jira.translate5.net/browse/TRANSLATE-3144): Export - Task export crashes with apache internal server error - no PHP error** <br>
+If the tasks name contains non printable invalid UTF8 characters, the task was not exportable.
+
+**[TRANSLATE-3130](https://jira.translate5.net/browse/TRANSLATE-3130): User Management - Login name with space or maybe other unusual characters causes problems** <br>
+User validator was changed to prevent creating users with login name containing a space character
+
+**[TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123): Import/Export - Tbx import: handling duplicated attributes** <br>
+TBX import: removed term-level attributes duplicates
+
+
+## [5.8.1] - 2022-12-16 and [5.8.0] - 2022-12-06
+
+### Important Notes:
+####  [TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055) [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
+<mark>Before updating see 
+[translate5 5.8.0 - needed visualreview to docker migration](https://confluence.translate5.net/x/BYAIG)!</mark>
+
+
+#### [TRANSLATE-3108](https://jira.translate5.net/browse/TRANSLATE-3108)
+API Users should switch to appTokens instead plain password usage! 
+This is mandatory with one of the next releases.
+For usage see: https://confluence.translate5.net/x/AQAoG
+
+
+#### [TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764)
+The format of the export.zip is changing! 
+Previously the export.zip was containing a folder named like the taskGuid.
+This is removed and the content directories are now directly in export.zip root.
+ 
+
+
+### Added
+**[TRANSLATE-3108](https://jira.translate5.net/browse/TRANSLATE-3108): Main back-end mechanisms (Worker, Logging, etc.) - App tokens for API authentication** <br>
+Via CLI tool appTokens can now be added to dedicated users. Such app tokens should be used then in the future for authentication via API.
+
+**[TRANSLATE-3069](https://jira.translate5.net/browse/TRANSLATE-3069): LanguageResources - TM pre-translation match rate set to 80 as default** <br>
+Enables the minimum value form pre-translate TM match-rate to be configurable for client.
+
+**[TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185): Installation & Update - Prepare translate5 for usage with docker** <br>
+Introducing the setup of translate5 and the used services as docker containers.
+
+**[TRANSLATE-3055](https://jira.translate5.net/browse/TRANSLATE-3055): VisualReview / VisualTranslation - Connect visual reflow via HTTP to headless browser instance** <br>
+* Changed usage of headless Browser for the visual to use a docker-image
+* Added own Worker for the Text-Reflow Conversion
+* Legacy Cleanup: Changed fallback-implementation for visuals, where the text-reflow fails to use the translate5 standard scroller & icon library. This fixes issues with missing annotation-icons in those cases
+
+**[TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185): Installation & Update - Prepare translate5 for usage with docker** <br>
+Introducing the setup of translate5 and the used services as docker containers.
+
+
+### Changed
+**[TRANSLATE-3143](https://jira.translate5.net/browse/TRANSLATE-3143): Editor Length Check - Change some default config values for pixel length check** <br>
+The settings runtimeOptions.lengthRestriction.automaticNewLineAdding and 
+runtimeOptions.lengthRestriction.newLineReplaceWhitespace are set now to off by default. 
+
+**[TRANSLATE-3134](https://jira.translate5.net/browse/TRANSLATE-3134): OpenTM2 integration - Amend translate5 to send appropriate json terminator to t5memory** <br>
+Request json sent to t5memory is now pretty printed
+
+**[TRANSLATE-2925](https://jira.translate5.net/browse/TRANSLATE-2925): VisualReview / VisualTranslation - API tests for all types of visuals** <br>
+Added API tests for all types of visuals
+
+**[TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764): Import/Export - Restructuring of export.zip** <br>
+The content structure of the export zip changed. In the future it does NOT contain any more a folder with the task guid, but directly on the highest level of the zip all files of the task that were translated/reviewed.
+
+**[TRANSLATE-3127](https://jira.translate5.net/browse/TRANSLATE-3127): Editor general - Change the order of form components in "Manual QA inside segment" fieldset** <br>
+MQM widget form fields ordering changed
+
+**: VisualReview / VisualTranslation - Make pdf converter reachable via network** <br>
+The previous local pdf converter is now reachable as a service via network.
+
+
+### Bugfixes
+**[TRANSLATE-3137](https://jira.translate5.net/browse/TRANSLATE-3137): TermPortal - TermPortal: missing ACL for pure termportal-users** <br>
+added missing ACL rules for pure TermPortal users
+
+**[TRANSLATE-3132](https://jira.translate5.net/browse/TRANSLATE-3132): TermPortal - TermPortal: duplicated users in 'Created by' filter** <br>
+only distinct user names are now shown in 'Created by' and 'Updated by' filters
+
+**[TRANSLATE-3131](https://jira.translate5.net/browse/TRANSLATE-3131): TermTagger integration - Termtagger not synchronized with Terminology** <br>
+Task terminology is now refreshed prior Analyse/Re-check operations
+
+**[TRANSLATE-3129](https://jira.translate5.net/browse/TRANSLATE-3129): Task Management - PM light can not choose different PM for a project** <br>
+PmLight user is now allowed to change PM of a project
+
+**[TRANSLATE-3128](https://jira.translate5.net/browse/TRANSLATE-3128): Task Management - PM of task can not be changed to PM light user** <br>
+Task can be assigned to pmLight user now
+
+**[TRANSLATE-3133](https://jira.translate5.net/browse/TRANSLATE-3133): TermPortal - TermPortal: sort filterwindow dropdowns alphabetically** <br>
+Filter window Clients and TermCollection dropdowns are now sorted alphabetically
+
+**[TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123): Import/Export - Tbx import: duplicated attributes should be deleted** <br>
+TBX import: removed term-level attributes duplicates
 
 
 
+## [5.7.15] - 2022-12-01
+
+### Important Notes:
+ 
 
 
+### Bugfixes
+**[TRANSLATE-3122](https://jira.translate5.net/browse/TRANSLATE-3122): TermTagger integration - Termportlet in segment-meta-panel mixes all language level attributes up** <br>
+The Termportlet in the segment-meta-panel was loading to much data and was mixing up attributes on language level.
+
+**[TRANSLATE-3120](https://jira.translate5.net/browse/TRANSLATE-3120): Editor general - Workfiles not listed in editor** <br>
+Fixes problem where the work-files where not listed in editor
+
+**[TRANSLATE-3119](https://jira.translate5.net/browse/TRANSLATE-3119): TermPortal - TermPortal: error popping once attribute disabled** <br>
+Fixed error popping on attempt to remove usages of disabled attributes from filter window in case if no filter window exists as no search yet done
+
+**[TRANSLATE-3116](https://jira.translate5.net/browse/TRANSLATE-3116): SpellCheck (LanguageTool integration) - Editor: spellcheck styling breaks custom tags markup** <br>
+Fixed spellcheck styles breaking custom tags markup
+
+**[TRANSLATE-3115](https://jira.translate5.net/browse/TRANSLATE-3115): Import/Export - proofread deprecation message was not shown on a task** <br>
+The warning that the foldername proofRead is deprecated and should not be used anymore was not logged to a task but only into the system log therefore the PMs did not notice that message.
+
+**[TRANSLATE-3113](https://jira.translate5.net/browse/TRANSLATE-3113): Editor general - Adding MQM tags is not always working** <br>
+Fixed adding MQM tags to the latest selected word in the segment editor
+
+**[TRANSLATE-3112](https://jira.translate5.net/browse/TRANSLATE-3112): Editor general - MQM severity is not working properly** <br>
+Fix MQM tag severity in tooltip in segments grid
+
+**[TRANSLATE-3111](https://jira.translate5.net/browse/TRANSLATE-3111): Editor general - Editor: matchrate filter search problem** <br>
+Fixed problem that segment filter was not applied if a range was set too quickly on a MatchRate-column's filter.
+
+**[TRANSLATE-3110](https://jira.translate5.net/browse/TRANSLATE-3110): TermPortal - TermPortal: batch-editing should be available for termPM* roles only** <br>
+BatchEdit-button is now shown for 'TermPM' and 'TermPM (all clients)' user roles only
+
+
+## [5.7.14] - 2022-11-24
+
+### Important Notes:
+#### [TRANSLATE-2551](https://jira.translate5.net/browse/TRANSLATE-2551)
+Changements in "/editor/file" API endpoint - normally there was no practical use case to access it via external API - though we want to mention here that the API endpoint file was renamed to /editor/filetree.
+ 
+
+
+### Added
+**[TRANSLATE-3013](https://jira.translate5.net/browse/TRANSLATE-3013): TermPortal - TermPortal: Define available attributes** <br>
+TermPortal: added ability to define which attributes are available in which TermCollections
+
+**[TRANSLATE-2551](https://jira.translate5.net/browse/TRANSLATE-2551): Import/Export - Update Task with xliff** <br>
+Enable existing file to be replaced and with this the segments will be updated in the task.
+
+
+### Changed
+**[TRANSLATE-3101](https://jira.translate5.net/browse/TRANSLATE-3101): TermTagger integration - Change TermImportController to be accessible by cron** <br>
+editor/plugins_termimport_termimport/filesystem and editor/plugins_termimport_termimport/crossapi actions are now protected based on the calling IP address (cronIP)
+
+**[TRANSLATE-3100](https://jira.translate5.net/browse/TRANSLATE-3100): Editor general - CronIp improvement** <br>
+Configuration runtimeOptions.cronIP now supports: 
+  - multiple comma-separated values
+  - IP with subnet (CIDR)
+  - domain names
+
+**[TRANSLATE-3099](https://jira.translate5.net/browse/TRANSLATE-3099): Editor general - IP-authentication is not working in docker environment** <br>
+Add a new configuration value to enable the usage of IP authentication behind a local proxy.
+
+**[TRANSLATE-3092](https://jira.translate5.net/browse/TRANSLATE-3092): Test framework - Test API: Implement status-check loop for tbx-reimport** <br>
+Test API: Status-check loop for tbx reimport implemented
+
+**[TRANSLATE-3086](https://jira.translate5.net/browse/TRANSLATE-3086): TermPortal - Termportal: add introduction window with embedded youtube video** <br>
+TermPortal: introduction dialog with youtube video is now shown once TermPortal is opened
+
+
+### Bugfixes
+**[TRANSLATE-3107](https://jira.translate5.net/browse/TRANSLATE-3107): TermPortal, TermTagger integration - TBX import with huge image nodes fail** <br>
+TBX files with huge images inside could crash the TBX import leading to incomplete term collections.
+
+**[TRANSLATE-3106](https://jira.translate5.net/browse/TRANSLATE-3106): Editor general - Prevent Google automatic site translation** <br>
+Added Metatag to prevent automatic page translation in Chrome & Firefox
+
+**[TRANSLATE-3105](https://jira.translate5.net/browse/TRANSLATE-3105): Export - Export of OKAPI tasks may generate wrong warning about tag-errors** <br>
+FIX: Exporting a task generated with OKAPI may caused falsely warnings about tag-errors
+
+**[TRANSLATE-3104](https://jira.translate5.net/browse/TRANSLATE-3104): Configuration - Implement a simple key value config editor for map types** <br>
+Added editor for configurations of type json map. Therefore changed `runtimeOptions.lengthRestriction.pixelMapping` to be visible and editable in UI
+
+**[TRANSLATE-3098](https://jira.translate5.net/browse/TRANSLATE-3098): Editor general - Enable qm config is not respected in task meta panel** <br>
+The config for disabling segment qm panel will be evaluated now.
+
+**[TRANSLATE-3091](https://jira.translate5.net/browse/TRANSLATE-3091): TermPortal - TermPortal: RootCause error shown while browsing crossReference** <br>
+Fixed bug, happening on attempt to navigate to crossReference
+
+**[TRANSLATE-3090](https://jira.translate5.net/browse/TRANSLATE-3090): TermPortal - TermPortal: change DE-placeholder for noTermDefinedFor-field in filter-window** <br>
+Some wordings improved for TermPortal GUI
+
+**[TRANSLATE-3089](https://jira.translate5.net/browse/TRANSLATE-3089): TermPortal - TermPortal: nothing happens on attribute save in batch editing mode** <br>
+Fixed termportal batch-editing bug
+
+**[TRANSLATE-3088](https://jira.translate5.net/browse/TRANSLATE-3088): Repetition editor - Repetition editor: missing css class for context rows** <br>
+Tags styling for context rows in repetition editor is now the same as for repetition rows
+
+**[TRANSLATE-3087](https://jira.translate5.net/browse/TRANSLATE-3087): Editor general - Editor: term tooltip shows wrong attribute labels** <br>
+TermPortlet attribute labels logic improved, Image-attribute preview shown, if exists
+
+**[TRANSLATE-3085](https://jira.translate5.net/browse/TRANSLATE-3085): TermPortal - Termportal: solve bug happening on creating attribute in batch window** <br>
+Made sure more debug info to be logged for case of next time occurence of a non-reproducable bug popping on attempt to save new attribute in batch editing dialog.
+
+**[TRANSLATE-3084](https://jira.translate5.net/browse/TRANSLATE-3084): TermPortal - Termportal: use TextArea for Definition-attributes** <br>
+TermPortal: textareas are now used for attributes of datatype noteText
+
+**[TRANSLATE-3073](https://jira.translate5.net/browse/TRANSLATE-3073): InstantTranslate - Filetranslation must not use autoQA** <br>
+Filetranslation-tasks do now skip AutoQA-step in the import process
 
 
 ## [5.7.13] - 2022-10-24

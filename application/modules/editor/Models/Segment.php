@@ -258,7 +258,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $searchQuery = $this->buildSearchString($parameters);
 
         //the field where the search will be performed (toSort field)
-        $searchInToSort = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $searchInToSort = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_SUFFIX;
 
         //check if search in locked segment is clicked, if yes, remove the editable filter
         $searchLocked = false;
@@ -301,7 +301,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $adapter = $this->db->getAdapter();
 
         $queryString = $parameters['searchField'];
-        $searchInField = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $searchInField = $parameters['searchInField'] . editor_Models_SegmentFieldManager::_TOSORT_SUFFIX;
         $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase']) == 'true') : false;
 
         //search type regular expression
@@ -1047,10 +1047,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * @param string $field
      * @param editor_Models_Task $task
      * @param bool $edited: If set (default) the edited content is used, otherwise the original
-     * @param bool $fixKnownFaultyTags: If set (default) Tag-faults are repaired automatically (usually these tags are removed)
+     * @param bool $fixFaultyTags: If set (default) Tag-faults are repaired automatically (usually these tags are removed)
+     * @param bool $searchForFaultyTags: If set, Tag-faults are searched for (normally, the tag faults are evaluated by the auto-QA)
      * @return editor_Segment_Export
      */
-    public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixKnownFaultyTags=true) : ?editor_Segment_Export {
+    public function getFieldExport(string $field, editor_Models_Task $task, bool $edited=true, bool $fixFaultyTags=true, bool $searchForFaultyTags=false) : ?editor_Segment_Export {
         //since fields can be merged from different files, data for a field can be empty
         if (empty($this->segmentdata[$field])) {
             return null;
@@ -1058,7 +1059,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $fieldTags = ($edited) ?
             new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->edited, $field, $this->segmentFieldManager->getEditIndex($field)) :
             new editor_Segment_FieldTags($task, $this->getId(), $this->segmentdata[$field]->original, $field, $field);
-            return editor_Segment_Export::create($fieldTags, $fixKnownFaultyTags);
+        return editor_Segment_Export::create($fieldTags, $fixFaultyTags, $searchForFaultyTags);
     }
 
     /**
@@ -1945,18 +1946,20 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     /**
      * returns true if at least one target has a translation set
+     * @return bool
      */
-    public function isTargetTranslated()
+    public function isTargetTranslated(): bool
     {
         foreach ($this->segmentdata as $name => $data) {
             $field = $this->segmentFieldManager->getByName($name);
             if ($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
                 continue;
             }
-            if (!(empty($data['original']) && $data['original'] !== "0")) {
+            if ( !editor_Utils::emptySegment($data['edited'])) {
                 return true;
             }
         }
+
         return false;
     }
 

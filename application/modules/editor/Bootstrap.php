@@ -127,16 +127,16 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     public function _initRestRoutes()
     {
         
-        $restRoute = new Zend_Rest_Route($this->front, array(), array(
+        $restRoute = new Zend_Rest_Route($this->front, [], [
             'editor' => [
-                'file', 'segment', 'alikesegment', 'customer', 'customermeta', 'referencefile', 'comment', 'attributedatatype',
+                'file','filetree', 'segment', 'alikesegment', 'customer', 'customermeta', 'referencefile', 'comment', 'attributedatatype',
                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                 'config', 'segmentuserassoc', 'session', 'language','termcollection',
                 'languageresourceresource','languageresourcetaskassoc','languageresourcetaskpivotassoc',
                 'languageresourceinstance','taskusertracking', 'term', 'attribute', 'termattribute', 'category',
-                'quality','userassocdefault', 'log'
+                'quality','userassocdefault', 'log', 'collectionattributedatatype'
             ],
-        ));
+        ]);
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
         /**
@@ -158,6 +158,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             array(
                 'module' => 'editor',
                 'action' => '',
+            )
+        ));
+
+        $this->front->getRouter()->addRoute('editorFiletreeRootRoute', new ZfExtended_Controller_RestLikeRoute(
+            'editor/filetree/root',
+            array(
+                'module' => 'editor',
+                'controller' => 'filetree',
+                'action' => 'root'
             )
         ));
         

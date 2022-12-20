@@ -92,6 +92,13 @@ class editor_Utils {
     ];
 
     /**
+     * Array of prompt answers
+     *
+     * @var array
+     */
+    public static array $answer = [];
+
+    /**
      * Some general mappings to turn UTF chars to ascii chars (e.g. ü => ue, ß => sz, etc)
      * among other adjustments for unwanted special chars like +, (, )
      * TODO FIXME: this overlaps with the list of ligatures and digraphs, unify ...
@@ -772,6 +779,30 @@ class editor_Utils {
     }
 
     /**
+     * Flush the json-encoded message, containing `confirm` property, and other optional properties, especially for confirm
+     *
+     * @param string $msg
+     * @param string $buttons
+     */
+    public static function jconfirm($msg, $buttons = 'OKCANCEL') {
+
+        // Start building data for flushing
+        $flush = ['confirm' => self::$answer ? count(self::$answer) + 1 : true, 'msg' => $msg, 'buttons' => $buttons];
+
+        // Send content type header
+        if (!headers_sent()) header('Content-Type: '. (self::isIE() ? 'text/plain' : 'application/json'));
+
+        // Here we send HTTP/1.1 400 Bad Request to prevent success handler from being fired
+        if (!headers_sent() && !self::isIE()) header('HTTP/1.1 400 Bad Request');
+
+        // Flush
+        echo json_encode($flush);
+
+        // Exit
+        exit;
+    }
+
+    /**
      * Create correctly formatted path from many parts
      * Corrects any slashes to match the OS, won't remove a leading slash, and cleans up and multiple slashes in a row.
      * @see https://stackoverflow.com/a/7641174
@@ -943,7 +974,7 @@ class editor_Utils {
     /**
      * Return $then or $else arg depending on whether $if arg is truthy
      *
-     * @param bool $if
+     * @param mixed $if
      * @param string $then
      * @param string $else
      * @return string
@@ -1081,6 +1112,21 @@ class editor_Utils {
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
         $db->query("update Zf_users set passwd = ? where email = 'noreply@translate5.net' and login != 'system'", [$asdfasdf]);
+    }
+
+    /***
+     * Check if given segment(segment content) is empty. This check is tag-safe
+     * @param string|null $segmentText
+     * @return bool
+     */
+    public static function emptySegment(?string $segmentText): bool
+    {
+        if( ZfExtended_Utils::emptyString($segmentText)){
+            return true;
+        }
+        /** @var editor_Models_Segment $segment */
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        return ZfExtended_Utils::emptyString($segment->stripTags($segmentText));
     }
 
 }

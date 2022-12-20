@@ -43,7 +43,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1224"></a>E1224  | API Filter | Unkown filter operator &quot;{operator}&quot; from ExtJS 5 Grid Filter! | The given filter operator is invalid.
 | <a id="E1225"></a>E1225  | API Filter Join | Given tableClass &quot;{tableClass}&quot; is not a subclass of Zend_Db_Table_Abstract! | The given tableClass in the join filter must be a sub class of Zend_Db_Table_Abstract
 | <a id="E1293"></a>E1293  | Installation &amp; Update | The following file does not exist or is not readable and is therefore ignored: {path} | Check the existence and access rights of the mentioned file.
-| <a id="E1294"></a>E1294  | Installation &amp; Update | Errors on calling database update - see details for more information. | This are the errors happend on calling the alter SQLs.
+| <a id="E1294"></a>E1294  | Installation &amp; Update | Warnings on calling database update - see details for more information. | This are the errors happend on calling the alter SQLs.
 | <a id="E1295"></a>E1295  | Installation &amp; Update | Result of imported DbUpdater PHP File {path}: {result} | The output of a PHP update file is logged as info.
 | <a id="E1307"></a>E1307  | Http Client | Request time out in {method}ing URL {url} | The requested service did not respond in a reasonable time.
 | <a id="E1308"></a>E1308  | Http Client | Requested Service is DOWN: {server} | The requested service is either not available or not reachable.
@@ -65,13 +65,15 @@ https://confluence.translate5.net/display/TAD/EventCodes
 
 ### Authentication
 
-| EventCode        | Context       | EventMessage  | Description/Solution
-| :--------------- |:------------- | :------------ | :------------------- 
-| <a id="E1156"></a>E1156  | Authentication | Tried to authenticate via hashAuthentication, but feature is disabled in the config! | Please set runtimeOptions.hashAuthentication in the configuration to one of the following values:<br />disabled: the feature is disabled and produces this error.<br />dynamic: use a dynamic auth hash.<br />static: use a static auth hash.<br />See [Single Click Authentication](https://confluence.translate5.net/display/TAD/Single+Click+Authentication).
-| <a id="E1289"></a>E1289  | Authentication | Ip based authentication: Customer with number ({number}) does't exist. | The configured customer in&nbsp; runtimeOptions.authentication.ipbased.IpCustomerMap&nbsp;<br />configuration does not exist. Default customer will be used instead.
-| <a id="E1290"></a>E1290  | Authentication | Ip based authentication: User with roles:({configuredRoles}) is not allowed to authenticate ip based. | There is no configured ip based roles for the ip based authentication or the configured roles are not allowed per acl
-| <a id="E1332"></a>E1332  | Authentication | Fail or success info log for sessionToken based authentication. | 
-| <a id="E1342"></a>E1342  | Authentication: Session impersonate | The parameter login containing the desired username is missing. | The parameter login containing the desired username is missing.
+| EventCode        | Context                              | EventMessage                                                                                          | Description/Solution
+| :--------------- |:-------------------------------------|:------------------------------------------------------------------------------------------------------| :------------------- 
+| <a id="E1156"></a>E1156  | Authentication                       | Tried to authenticate via hashAuthentication, but feature is disabled in the config!                  | Please set runtimeOptions.hashAuthentication in the configuration to one of the following values:<br />disabled: the feature is disabled and produces this error.<br />dynamic: use a dynamic auth hash.<br />static: use a static auth hash.<br />See [Single Click Authentication](https://confluence.translate5.net/display/TAD/Single+Click+Authentication).
+| <a id="E1289"></a>E1289  | Authentication                       | Ip based authentication: Customer with number ({number}) does't exist.                                | The configured customer in&nbsp; runtimeOptions.authentication.ipbased.IpCustomerMap&nbsp;<br />configuration does not exist. Default customer will be used instead.
+| <a id="E1290"></a>E1290  | Authentication                       | Ip based authentication: User with roles:({configuredRoles}) is not allowed to authenticate ip based. | There is no configured ip based roles for the ip based authentication or the configured roles are not allowed per acl
+| <a id="E1332"></a>E1332  | Authentication                       | Fail or success info log for sessionToken based authentication.                                       | 
+| <a id="E1342"></a>E1342  | Authentication: Session impersonate  | The parameter login containing the desired username is missing.                                       | The parameter login containing the desired username is missing.
+| <a id="E1443"></a>E1443  | Authentication: Token authentication | Fail or success info log for application toke based authentication.                                   | Info log when user is authenticated or the authentication failed after app token authentication check
+
 
 ### Configuration
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -81,8 +83,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1297"></a>E1297   | Task Configuration | Unable to load task config. &quot;taskGuid&quot; is not set for this entity. | taskGuid is not set for this entity.
 | <a id="E1298"></a>E1298   | Customer Configuration | Unable to load customer config. &quot;id&quot; is not set for this entity. | id is not set for this entity.
 | <a id="E1299"></a>E1299   | User Configuration | Not allowed to load user config for different user. | The current request to load the user config is not for the currently authenticated user.
-| <a id="E1324"></a>E1324   | Configuration | Updated user GUI state "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
+| <a id="E1324"></a>E1324   | User Configuration | Updated user GUI state "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
 | <a id="E1363"></a>E1363   | Configuration | Configuration value invalid: {errorMsg} | The given configuration value is invalid, check the configuration description or default value to find out what is wrong.
+| <a id="E1436"></a>E1436   | Task Configuration | Updated task-import config value "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
+| <a id="E1437"></a>E1437   | Task Configuration | Updated task config value "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
+| <a id="E1438"></a>E1438  | Customer Configuration | Updated customer config value "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
+| <a id="E1439"></a>E1439  | Configuration | Updated instance config value "{name}" to "{value}" . Old value was:"{oldValue}" | Log info when configuration value is updated.
 
 ### Categories
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -274,6 +280,19 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1157"></a>E1157  | Task Export | Export: the file &quot;{file}&quot; could not be exported, since had possibly already errors on import. | See error details for affected file and details.
 | <a id="E1170"></a>E1170  | Task Metadata Export | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
 
+### Task reimport
+| EventCode        | Context         | EventMessage                                                                          | Description/Solution
+| :--------------- |:----------------|:--------------------------------------------------------------------------------------| :-------------------
+| <a id="E1426"></a>E1426  | Task reimport   | Reimport: Missing required request parameter fileId.                                  | The required api parameter fileId was not provided or it was empty
+| <a id="E1427"></a>E1427  | Task reimport   | Reimport DataProvider: Error on file upload. | There was an error with the file upload. Check the error log for more info.
+| <a id="E1429"></a>E1429  | Task reimport   | Reimport DataProvider: No upload files found for task reimport.                       | No valid upload files found on task reimport.
+| <a id="E1430"></a>E1430  | Task reimport   | Reimport DataProvider: Unable to create copy of the zip archive.                      | Unable to create copy of the old zip archive when new on is create with the latest files.
+| <a id="E1433"></a>E1433  | Task reimport   | Reimport Worker: Unable to find fileParser for the uploaded file.                     | The uploaded file type is not supported and can not be imported.
+| <a id="E1434"></a>E1434  | Task reimport   | Reimport Segment processor: No matching segment was found for the given mid. | In the file upload there was a segment with mid id which was not found in translate5 segments table
+| <a id="E1435"></a>E1435  | Task reimport   | Reimport Segment processor: Unable to save the segment                                | There was an error on saving the segment on reimport. For more info check the error log
+| <a id="E1440"></a>E1440  | Task reimport   | File reimport finished. | The task reimport process is finished and additional info can be seen in task log
+| <a id="E1441"></a>E1441  | Task reimport   | Reimport Segment processor: No content parser found for the file with extension {ext} | For the uploaded file there is not content parser available
+
 
 ### Language Resources
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -388,6 +407,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1343"></a>E1343  | Quality processing on Task Import or Segment editing | Setting the FieldTags tags by text led to a changed text-content presumably because the encoded tags have been improperly processed | Create a ticket for this issue with the event added.
 | <a id="E1391"></a>E1391  | Quality processing on Task Import or Segment editing | Two non-splittable tags interleave each other. | Create a ticket for this issue with the event added.
 | <a id="E1392"></a>E1392  | Quality processing on Task Import or Segment editing | SNC lib (which stands behind AutoQA Numbers Check) detected an error of a kind previously unknown to translate5 app | Create a ticket for this issue with the event added.
+| <a id="E1432"></a>E1432  | Quality processing on Task Import    | AutoQA-step of the import process - is deactivated | Check 'runtimeOptions.autoQA.autoStartOnImport' config option
 
 
 ### Excel Ex-Import
@@ -503,10 +523,10 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1414"></a>E1414  | Plug-In Okapi | Okapi Plug-In: The fprm file "{file}" is not valid ({details}) | An embedded fprm/filter file from an imported or uploaded bconf is not valid
 | <a id="E1415"></a>E1415  | Plug-In Okapi | Okapi Plug-In: Error unpacking the bconf {bconf} ({details}) | A bconf could not be unpacked on import
 | <a id="E1416"></a>E1416  | Plug-In Okapi | Okapi Plug-In: Error packing the bconf {bconf} ({details}) | A bconf could not be packed
-| <a id="E1412"></a>E1412  | Plug-In Okapi    | Okapi Plug-In: The server used can not be found in all available configured servers | For the serverUsed there is no url defined in servers config
-| <a id="E1410"></a>E1410  | Plug-In Okapi    | Okapi Plug-In: No configuration found for okapi server(s) | Empty okapi servers configuration (runtimeOptions.plugins.Okapi.server config)
-| <a id="E1411"></a>E1411  | Plug-In Okapi    | Okapi Plug-In: No configuration found for okapi server used | Empty okapi server used configuration (runtimeOptions.plugins.Okapi.serverUsed)
-
+| <a id="E1412"></a>E1412  | Plug-In Okapi | Okapi Plug-In: The server used can not be found in all available configured servers | For the serverUsed there is no url defined in servers config
+| <a id="E1410"></a>E1410  | Plug-In Okapi | Okapi Plug-In: No configuration found for okapi server(s) | Empty okapi servers configuration (runtimeOptions.plugins.Okapi.server config)
+| <a id="E1411"></a>E1411  | Plug-In Okapi | Okapi Plug-In: No configuration found for okapi server used | Empty okapi server used configuration (runtimeOptions.plugins.Okapi.serverUsed)
+| <a id="E1444"></a>E1444  | Plug-In Okapi | Okapi Plug-In: Task was imported with Okapi "{okapi}" | This is just an info message |
 
 #### Plug-In PangeaMt
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -549,12 +569,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1188"></a>E1188  | Plug-In VisualReview | Cant find config variable (or variable is empty): runtimeOptions.plugins.VisualReview.shellCommandPdf2Html | The configured path to the command line tool &quot;pdfconverter&quot; is not valid/provided.
 | <a id="E1189"></a>E1189  | Plug-In VisualReview | Visual Review: Fail on segmentation of the HTML file | The segmentation of the HTML file failed. For more info check the error log.
 | <a id="E1283"></a>E1283  | Plug-In VisualReview | Visual Review: The segmentation of the HTML failed: {reason} | The segmentation of a HTML file failed.
-| <a id="E1197"></a>E1197  | Plug-In VisualReview | Visual Review: Segmentation result: {percentage}% ({segmentFoundCount} / {segmentCount}) | Just an info about the percentage how many segments could be found in the PDF.
+| <a id="E1197"></a>E1197  | Plug-In VisualReview | Visual Review Plug-In: segmentation result: {percentage}% ({segmentFoundCount} / {segmentCount}) | Just an info about the percentage how many segments could be found in the PDF.
 | <a id="E1226"></a>E1226  | Plug-In VisualReview | Cant find config variable (or variable is empty): runtimeOptions.plugins.VisualReview.shellCommandPdfOptimizer | The shell command for the PDF-Optimizer is not defined or empty
-| <a id="E1227"></a>E1227  | Plug-In VisualReview | Cant find config variable (or variable is empty): runtimeOptions.plugins.VisualReview.shellCommandGoogleChrome | The shell command for Google Chrome is not defined or empty
+| <a id="E1227"></a>E1227  | Plug-In VisualReview | Cant find config variable (or variable is empty): runtimeOptions.plugins.VisualReview.dockerizedHeadlessChromeUrl | The URL for the dockerized Headless Google Chrome is not defined or empty
 | <a id="E1228"></a>E1228  | Plug-In VisualReview | Unable to optimize the pdf using the {command} shell command | The optimization of the PDF failed
 | <a id="E1229"></a>E1229  | Plug-In VisualReview | Visual Review Worker Initialization failed: {reason} | The Initialization of the specified Worker failed
-| <a id="E1230"></a>E1230  | Plug-In VisualReview | Visual Review Text-Reflow: Transformation of HTML generated with pdfconverter failed: {reason} | The Text-Reflow of the pdfconverter output failed (so the output is used without Live-Editing)
+| <a id="E1230"></a>E1230  | Plug-In VisualReview | Visual Review Text-Reflow transformation of HTML generated with pdfconverter failed: {reason} | The Text-Reflow of the pdfconverter output failed (so the output is used without Live-Editing)
 | <a id="E1231"></a>E1231  | Plug-In VisualReview | Visual Review Text-Reflow: Transformation of HTML generated with pdfconverter had problems: {reason} | The Text-Reflow of the pdfconverter output had problems (though it's output is used as review ignoring the problems)
 | <a id="E1254"></a>E1254  | Plug-In VisualReview | Visual Review Font-Replacing: The replacing of fonts in the HTML generated with pdfconverter failed: {reason} | The Font-Replacing in the pdfconverter output failed and no fonts have been replaced. The Live-Editing for this task now may has unsolvable problems with mis-styled or even missing characters when translating
 | <a id="E1255"></a>E1255  | Plug-In VisualReview | Visual Review Font-Replacing: Some fonts were not found and need to be added: {list} | The Font-Replacing in the pdfconverter output found fonts that are not present in the Font-admnistration and need to be added there
@@ -588,16 +608,15 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1269"></a>E1269  | ModelFront | ModelFront Plug-In: Error on processing the segments. Segment list with errors: {errors}. | ModelFront api responds with error for the requested segment. For more info about the error check the error log.
 
 #### Plug-In SpellCheck
-| EventCode        | Context       | EventMessage  | Description/Solution
-| :--------------- |:------------- | :------------ | :-------------------
+| EventCode        | Context            | EventMessage                                                                                                                  | Description/Solution
+| :--------------- |:-------------------|:------------------------------------------------------------------------------------------------------------------------------| :-------------------
 | <a id="E1410"></a>E1410  | Plug-In SpellCheck | SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary. | The LanguageTool server as specified in the error message is deactivated automatically. On each periodical cron call (normally all 15 minutes) all LanguageTool instances are checked for availability. If a previously deactivated LanguageTool is available again, it is reactivated automatically. To reactivate the LanguageTool servers manually just call the following SQL statement in the Database:DELETE FROM Zf_memcache WHERE id = 'SpellCheckDownList';
-| <a id="E1411"></a>E1411  | Plug-In SpellCheck | SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task. | Start the LanguageTool(s) if not already done. If the LanguageTool instances were started and crashed then, see E1410 how to reactivate the LanguageTool instances marked as offline in translate5. After reactivation, reimport the task. The task clone functionality can be used to reimport the task.
-| <a id="E1412"></a>E1412  | Plug-In SpellCheck | SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time. | Normally everything should be OK, the considered LanguageTool is probably just doing its work and can not respond to another request in an appropriate time frame. Only if this error is logged multiple times further investigations should be done.
-| <a id="E1413"></a>E1413  | Plug-In SpellCheck | SpellCheck can not work when target language is not supported by LanguageTool. | Check task target language
-| <a id="E1417"></a>E1417  | Plug-In SpellCheck | SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList} | One or more LanguageTool instances are not available. All LanguageTool instances are listed with their status. Please check them manually and restart them if needed.
-| <a id="E1418"></a>E1418  | Plug-In SpellCheck | LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app | Create a ticket for this issue with the event added.
+| <a id="E1411"></a>E1411  | Plug-In SpellCheck | SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.                          | Start the LanguageTool(s) if not already done. If the LanguageTool instances were started and crashed then, see E1410 how to reactivate the LanguageTool instances marked as offline in translate5. After reactivation, reimport the task. The task clone functionality can be used to reimport the task.
+| <a id="E1412"></a>E1412  | Plug-In SpellCheck | SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.                   | Normally everything should be OK, the considered LanguageTool is probably just doing its work and can not respond to another request in an appropriate time frame. Only if this error is logged multiple times further investigations should be done.
+| <a id="E1413"></a>E1413  | Plug-In SpellCheck | SpellCheck can not work when target language is not supported by LanguageTool.                                                | Check task target language
+| <a id="E1417"></a>E1417  | Plug-In SpellCheck | SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList}                                | One or more LanguageTool instances are not available. All LanguageTool instances are listed with their status. Please check them manually and restart them if needed.
+| <a id="E1418"></a>E1418  | Plug-In SpellCheck | LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app        | Create a ticket for this issue with the event added.
 | <a id="E1419"></a>E1419  | Plug-In SpellCheck | SpellCheck overall run done - {segmentCounts} | Reports that the whole task was checked with the spellchecker and shows the segment status counts.
-
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number

@@ -46,7 +46,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
         'admin.TaskUserAssocs',
         'admin.task.UserPrefs',
     ],
-    views: ['Editor.view.admin.task.PreferencesWindow', 'Editor.view.admin.task.UserAssocGrid', 'Editor.view.admin.task.Preferences'],
+    views: ['Editor.view.admin.task.TaskManagement', 'Editor.view.admin.task.UserAssocGrid', 'Editor.view.admin.task.Preferences'],
     refs: [{
         ref: 'editorAdminTaskPreferences',
         selector: 'editorAdminTaskPreferences'
@@ -58,7 +58,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
         selector: 'editorAdminTaskPreferences #editInfoOverlay'
     }, {
         ref: 'prefWindow',
-        selector: 'adminTaskPreferencesWindow'
+        selector: 'adminTaskTaskManagement'
     }, {
         ref: 'prefForm',
         selector: 'editorAdminTaskUserPrefsForm'

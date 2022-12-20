@@ -34,7 +34,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
         'Editor.view.project.ProjectTaskGrid',
         'Editor.view.project.ProjectPanelViewController',
         'Editor.view.project.ProjectPanelViewModel',
-        'Editor.view.admin.task.PreferencesWindow'
+        'Editor.view.admin.task.TaskManagement'
     ],
     itemId: 'projectPanel',
     controller:'projectPanel',
@@ -104,7 +104,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
                         store:'{projectTasks}'
                     }
                 },{
-                    xtype:'adminTaskPreferencesWindow',
+                    xtype:'adminTaskTaskManagement',
                     scrollable: true,
                     stateful: {
                         height: true,

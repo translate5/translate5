@@ -30,6 +30,7 @@ use MittagQI\Translate5\Segment\FilteredIterator;
 use MittagQI\Translate5\Segment\Operations;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\Translate5\Terminology\TermportletData;
 
 class Editor_SegmentController extends ZfExtended_RestController
 {
@@ -303,7 +304,7 @@ class Editor_SegmentController extends ZfExtended_RestController
 
     public function putAction()
     {
-        $sessionUser = new Zend_Session_Namespace('user');
+        $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
         $this->entity->load((int)$this->_getParam('id'));
 
         //check if update is allowed
@@ -312,12 +313,12 @@ class Editor_SegmentController extends ZfExtended_RestController
         /* @var $task editor_Models_Task */
         $wfh = $this->_helper->workflow;
         /* @var $wfh Editor_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->data->userGuid);
+        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->getUserGuid());
 
         //the history entry must be created before the original entity is modified
         $history = $this->entity->getNewHistoryEntity();
         //update the segment
-        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task]);
+        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task,$sessionUser->getUserGuid()]);
 
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList(true);
 
@@ -339,8 +340,8 @@ class Editor_SegmentController extends ZfExtended_RestController
         $this->sanitizeEditedContent($updater, $allowedAlternatesToChange);
 
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
-        $this->entity->setUserGuid($sessionUser->data->userGuid);
-        $this->entity->setUserName($sessionUser->data->userName);
+        $this->entity->setUserGuid($sessionUser->getUserGuid());
+        $this->entity->setUserName($sessionUser->getUserName());
 
         /* @var $updater editor_Models_Segment_Updater */
         $updater->update($this->entity, $history);
@@ -782,61 +783,43 @@ class Editor_SegmentController extends ZfExtended_RestController
         exit;
     }
 
+    /**
+     * @throws ZfExtended_Plugin_Exception
+     * @throws Zend_Exception
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     */
     public function termsAction()
     {
         $pluginmanager = Zend_Registry::get('PluginManager');
         /* @var $pluginmanager ZfExtended_Plugin_Manager */
         $plugin = $pluginmanager->get('TermPortal');
 
-        $context = new stdClass();
+        $segment = \ZfExtended_Factory::get(editor_Models_Segment::class);
+        $segment->load((int) $this->_getParam('id'));
 
+        //generate portlet data
+        $data = (new TermportletData(
+            $this->getCurrentTask(),
+            $this->isAllowed('editor_termportal') && !empty($plugin)
+        ))->generate($segment);
+
+        //add translations
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-
-        $context->linkPortal = $this->isAllowed('editor_termportal') && !empty($plugin);
-
-        //Erstellung und Setzen der Nutzdaten:
-        /** @var editor_Models_Terminology_Models_TermModel $terms */
-        $terms = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        $context->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
-        $context->termGroups = $terms->getByTaskGuidAndSegment($this->getCurrentTask()->getTaskGuid(), (int)$this->_getParam('id'));
-
-        $context->locales = new stdClass();
-
-        $context->locales->entryAttrs = $translate->_('Attribute auf Eintragsebene');
-        $context->locales->languageAttrs = $translate->_('Attribute auf Sprachebene');
-        $context->locales->termAttrs = $translate->_('Attribute auf Benennungsebene');
-
-        $context->noTerms = empty($context->termGroups);
-        if($context->noTerms){
-            $context->locales->noTermsMessage = $translate->_('Keine Terminologie vorhanden!');
+        $data['locales']['entryAttrs'] = $translate->_('Attribute auf Eintragsebene');
+        $data['locales']['languageAttrs'] = $translate->_('Attribute auf Sprachebene');
+        $data['locales']['termAttrs'] = $translate->_('Attribute auf Benennungsebene');
+        if($data['noTerms']){
+            $data['locales']['noTermsMessage'] = $translate->_('Keine Terminologie vorhanden!');
         }
 
-        $termEntryIds = [];
-        foreach ($context->termGroups as $termGroup) {
-            foreach ($termGroup as $term){
-                $termEntryIds[] = $term->termEntryId;
-            }
-        }
-
-        $context->attributeGroups = !empty($termEntryIds) ? $terms->getAttributesGroups(array_filter($termEntryIds)) : [];
-
-        $context->termStatMap = editor_Models_Terminology_Models_TermModel::getTermStatusMap();
-
-        $context->termStatus = [
+        $data['termStatus'] = [
             'permitted' => $translate->_('erlaubte Benennung'),
             'forbidden' => $translate->_('verbotene Benennung'),
             'preferred' => $translate->_('Vorzugsbenennung'),
             'unknown' => $translate->_('Unbekannter Term Status'),
         ];
 
-        
-        /** @var editor_Models_Languages $languages */
-        $languages = ZfExtended_Factory::get('editor_Models_Languages');
-        $context->flags = $languages->loadAllKeyCustom('rfc5646');
-
-        $context->applicationRundir = APPLICATION_RUNDIR;
-
-        echo Zend_Json::encode((object) $context, Zend_Json::TYPE_OBJECT);
+        echo Zend_Json::encode($data, Zend_Json::TYPE_OBJECT);
     }
 
     /**

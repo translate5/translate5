@@ -48,7 +48,9 @@ final class editor_Segment_Quality_Manager {
     public static function autoqaOperation(editor_Models_Task $task){
         
         $parentId = editor_Task_Operation::create(editor_Task_Operation::AUTOQA, $task);
-  
+
+        // this triggers a refresh of the task's TBX cache
+        $task->meta()->resetTbxHash([$task->getTaskGuid()]);
         self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $parentId);
         
         $workerQueue = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
@@ -164,6 +166,7 @@ final class editor_Segment_Quality_Manager {
      * @param int $workerParentId
      */
     public function queueImport(editor_Models_Task $task, int $workerParentId=0){
+
         // add starting worker
         $worker = ZfExtended_Factory::get('editor_Segment_Quality_ImportWorker');
         /* @var $worker editor_Segment_Quality_ImportWorker */
@@ -206,16 +209,27 @@ final class editor_Segment_Quality_Manager {
     public function prepareTagTerms(editor_Models_Task $task, int $parentWorkerId) {
         $this->prepareOperation(editor_Segment_Processing::TAGTERMS, $task, $parentWorkerId);
     }
+
     /**
      * Prepares the quality workers depending on the context/processing type
      * @param string $processingMode
      * @param editor_Models_Task $task
      * @param int $parentWorkerId
      * @param array $workerParams
+     * @throws editor_Models_ConfigException
+     * @throws Zend_Exception
      */
     public function prepareOperation(string $processingMode, editor_Models_Task $task, int $parentWorkerId, array $workerParams=[]){
         if(self::ACTIVE) {
             $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+
+            // If should be skipped - do so
+            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
+
+                // Log and return
+                return $task->logger('editor.task')->warn('E1432', 'AutoQA-step of the import process - is deactivated');
+            }
+
             foreach ($this->registry as $type => $provider) {
                 /* @var $provider editor_Segment_Quality_Provider */
                 if ($provider->hasOperationWorker($processingMode, $qualityConfig)) {
@@ -224,13 +238,21 @@ final class editor_Segment_Quality_Manager {
             }
         }
     }
+
     /**
      * Finishes an operation: processes all non-worker providers & saves the processed tags-model back to the segments
      * @param editor_Models_Task $task
+     * @throws editor_Models_ConfigException
      */
     public function finishOperation(string $processingMode, editor_Models_Task $task){
         if(self::ACTIVE) {
             $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+
+            // If should be skipped - do so
+            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
+                return;
+            }
+
             $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
             /* @var $db editor_Models_Db_Segments */
             $db->getAdapter()->beginTransaction();
@@ -275,15 +297,23 @@ final class editor_Segment_Quality_Manager {
             $db->getAdapter()->commit();
         }
     }
+
     /**
-     * 
+     *
      * @param editor_Models_Segment $segment
      * @param editor_Models_Task $task
      * @param string $processingMode
+     * @throws editor_Models_ConfigException
      */
     public function processSegment(editor_Models_Segment $segment, editor_Models_Task $task, string $processingMode){
         if(self::ACTIVE) {
             $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+
+            // If should be skipped - do so
+            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
+                return;
+            }
+
             $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
             foreach ($this->registry as $type => $provider) {
                 /* @var $provider editor_Segment_Quality_Provider */
@@ -292,7 +322,7 @@ final class editor_Segment_Quality_Manager {
             $tags->flush();
         }
     }
-    
+
     /**
      * Special API for qualities which can only be evaluated by processing all segments of a task
      * This method is called BEFORE saving the segments and it's repetitions
@@ -300,44 +330,87 @@ final class editor_Segment_Quality_Manager {
      *
      * @param editor_Models_Task $task
      * @param string $processingMode
+     * @throws editor_Models_ConfigException
      */
     public function preProcessTask(editor_Models_Task $task, string $processingMode) {
         if(self::ACTIVE) {
             $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+
+            // If should be skipped - do so
+            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
+                return;
+            }
+
             foreach ($this->registry as $type => $provider) {
                 /* @var $provider editor_Segment_Quality_Provider */
                 $provider->preProcessTask($task, $qualityConfig, $processingMode);
             }
         }
     }
-    
+
+    /**
+     * Return true if $processingMode arg is 'import' and autoStartOnImport
+     * is disabled either on task-config level or on task-type-config-level
+     *
+     * @param $processingMode
+     * @param editor_Models_Task $task
+     * @param Zend_Config $qualityConfig
+     * @return bool
+     */
+    public function skipOnImport($processingMode, editor_Models_Task $task, Zend_Config $qualityConfig) : bool {
+
+        // If $processingMode is not 'import' question about whether skip or not - is not applicable her
+        if ($processingMode != editor_Segment_Processing::IMPORT) {
+
+            // So return false
+            return false;
+        }
+
+        // If autoStatOnImport is disabled either on task-config level or on task-type-config-level - return true
+        return !$qualityConfig->autoStartOnImport || !$task->getTaskType()->isAutoStartAutoQA();
+    }
+
     /**
      * Special API for qualities which can only be evaluated by processing all segments of a task
      * This method is called AFTER saving the segments and it's repetitions
      *
      * @param editor_Models_Task $task
      * @param string $processingMode
+     * @throws editor_Models_ConfigException
      */
     public function postProcessTask(editor_Models_Task $task, string $processingMode) {
         if(self::ACTIVE){
             $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+
+            // If should be skipped - do so
+            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
+                return;
+            }
+
             foreach ($this->registry as $type => $provider) {
                 /* @var $provider editor_Segment_Quality_Provider */
                 $provider->postProcessTask($task, $qualityConfig, $processingMode);
             }
         }
     }
-    
+
     /**
      * Alike Segments have a special processing as they clone some qualities from their original segment
      * @param editor_Models_Segment $segment
      * @param editor_Models_Task $task
      * @param editor_Segment_Alike_Qualities $alikeQualities
+     * @throws editor_Models_ConfigException
      */
     public function processAlikeSegment(editor_Models_Segment $segment, editor_Models_Task $task, editor_Segment_Alike_Qualities $alikeQualities){
         if(self::ACTIVE) {
             $processingMode = editor_Segment_Processing::ALIKE;
             $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+
+            // If should be skipped - do so
+            if ($this->skipOnImport($processingMode, $task, $qualityConfig)) {
+                return;
+            }
+
             $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
             $tags->initAlikeQualities($alikeQualities);
             foreach ($this->registry as $type => $provider) {

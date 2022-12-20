@@ -57,7 +57,7 @@ class Translate1804CsvTest extends Translate1804Test {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/01-csv-en-de.csv');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/01-csv-en-de.csv');
         //file_put_contents(static::api()->getFile('export-01-csv-en-de-new.csv', null, false), $exportedFile);
         $expectedResult = static::api()->getFileContent('export-01-csv-en-de.csv');
         

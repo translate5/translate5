@@ -41,6 +41,7 @@ Ext.define('Editor.view.segments.column.Comments', {
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'comments',
     filter: {
+        updateBuffer: 0,
         type: 'string'
     },
     showInMetaTooltip: true,

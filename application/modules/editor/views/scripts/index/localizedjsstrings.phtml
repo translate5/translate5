@@ -960,8 +960,8 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-    Ext.define("Editor.locale.de.view.admin.task.PreferencesWindow", {
-        override: "Editor.view.admin.task.PreferencesWindow",
+    Ext.define("Editor.locale.de.view.admin.task.TaskManagement", {
+        override: "Editor.view.admin.task.TaskManagement",
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
             events: '<?php echo $this->translate->_('Ereignisse');?>',
@@ -2086,6 +2086,40 @@ Editor.data.l10n = {
         sourceMatchColumn: '<?php echo $this->translate->_('Quell-Treffer');?>',
         targetMatchColumn: '<?php echo $this->translate->_('Ziel-Treffer');?>',
         sameContextColumn: '<?php echo $this->translate->_('Kontext-Treffer');?>'
+    },
+    projectOverview:{
+        taskManagement:{
+            taskReimport:{
+                title:'<?php echo $this->translate->_('Dateien aktualisieren');?>',
+                fileNameColumnText:'<?php echo $this->translate->_('Dateiname');?>',
+                actionColumnText:'<?php echo $this->translate->_('Aktionen');?>',
+                actionColumnTooltip:'<?php echo $this->translate->_('Neue Datei hochladen');?>',
+                actionColumnDisabledTooltip:'<?php echo $this->translate->_('Der Dateityp wird für die Aktualisierung nicht unterstützt.');?>',
+                taskNotAllowThisActionMessage:'<?php echo $this->translate->_('Der aktuelle Aufgabenstatus lässt diese Aktion nicht zu.');?>',
+                topBarHeaderInfo:'<?php echo $this->translate->_('Außerhalb von translate5 geänderte Ziel-Segmentinhalte sind nach dem Re-Import als Änderungsmarkierungen im Segment zu sehen. Änderungsmarkierungen in Segmenten von bevor dem Re-Import gehen verloren. Geänderte Quellsegmente werden ebenfalls aktualisiert. Neu hinzugefügte Segmente (z. B. durch einen Segment-Split) werden ignoriert. Derzeit können die folgenden bilingualen Dateien aktualisiert werden: {0}');?>'
+            },
+            taskReimportWindow:{
+                title:'<?php echo $this->translate->_('Neue Datei hochladen');?>',
+                fileFieldLabel:'<?php echo $this->translate->_('Datei');?>',
+                fileUploadRegexText:'<?php echo $this->translate->_('Bitte verwenden Sie einen der folgenden Dateitypen {0}');?>',
+                saveBtnText:'<?php echo $this->translate->_('Speichern');?>',
+                cancelBtnText:'<?php echo $this->translate->_('Abbrechen');?>',
+                saveToMemoryLable:'<?php echo $this->translate->_('Alle Segmente ins TM speichern');?>',
+                saveToMemoryTooltip:'<?php echo $this->translate->_('Nach der Aktualisierung werden alle Segmente der Aufgabe in alle beschreibbaren und der Aufgabe zugewiesenen TMs durchgespeichert.');?>',
+                fileReimportRunning:'<?php echo $this->translate->_('Reimport läuft');?>',
+                fileReimportFinishedWithErrors:'<?php echo $this->translate->_('Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll');?>',
+                nameDontMatchInfoLabel:'<?php echo $this->translate->_('Der Dateiname entspricht nicht der zu aktualisierenden Datei');?>'
+            }
+        }
+    },
+    configuration: {
+        title:'<?php echo $this->translate->_('Zuweisungswerte bearbeiten');?>',
+        index:'<?php echo $this->translate->_('Index');?>',
+        value:'<?php echo $this->translate->_('Wert');?>',
+        add:'<?php echo $this->translate->_('Hinzufügen');?>',
+        remove:'<?php echo $this->translate->_('Entfernen');?>',
+        save:'<?php echo $this->translate->_('Speichern');?>',
+        cancel:'<?php echo $this->translate->_('Abbrechen');?>',
     }
 };
 

@@ -64,9 +64,6 @@ class editor_TermController extends ZfExtended_RestController
         // If request contains json-encoded 'data'-param, decode it and append to request params
         $this->handleData();
 
-        // Pick session
-        $this->_session = (new Zend_Session_Namespace('user'))->data;
-
         $termCollection = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
 
         // If current user has 'termPM_allClients' role, it means all collections are accessible
@@ -132,8 +129,8 @@ class editor_TermController extends ZfExtended_RestController
                 'term' => trim($params['sourceTerm']),
                 'status' => 'preferredTerm', // which status should be set initially ?
             ], $te)->insert([
-                'userName' => $this->_session->userName,
-                'userGuid' => $this->_session->userGuid
+                'userName' => $this->user()->getUserName(),
+                'userGuid' => $this->user()->getUserGuid()
             ]);
 
             // Increment term and attribute stats diff
@@ -152,8 +149,8 @@ class editor_TermController extends ZfExtended_RestController
             'status' => $termNoteStatus->getDefaultTermStatus(),
         ], $te)->insert([
             'note' => trim($params['note'] ?? ''),
-            'userName' => $this->_session->userName,
-            'userGuid' => $this->_session->userGuid,
+            'userName' => $this->user()->getUserName(),
+            'userGuid' => $this->user()->getUserGuid(),
         ]);
 
         // Increment term and attribute stats diff
@@ -273,8 +270,8 @@ class editor_TermController extends ZfExtended_RestController
 
             // Insert
             $termEntry->insert([
-                'userName' => $this->_session->userName,
-                'userGuid' => $this->_session->userGuid
+                'userName' => $this->user()->getUserName(),
+                'userGuid' => $this->user()->getUserGuid()
             ]);
         }
 
@@ -303,7 +300,7 @@ class editor_TermController extends ZfExtended_RestController
             'guid' => ZfExtended_Utils::uuid(),
             'processStatus' => 'unprocessed',
             'definition' => '',
-            'updatedBy' => $this->_session->id,
+            'updatedBy' => $this->user()->getId(),
             'updatedAt' => date('Y-m-d H:i:s')
         ]);
 
@@ -352,7 +349,7 @@ class editor_TermController extends ZfExtended_RestController
 
         // Setup a flag indicating whether current user can edit current term
         $editable = $canChangeAny
-            || ($canPropose  && $this->entity->getCreatedBy() == $this->_session->id)
+            || ($canPropose  && $this->entity->getCreatedBy() == $this->user()->getId())
             || ($canReview   && $isUnprocessed)
             || ($canFinalize && $isProvisionallyProcessed);
 
@@ -364,12 +361,12 @@ class editor_TermController extends ZfExtended_RestController
 
         // Update proposal
         $this->entity->setProposal(trim($params['proposal'] ?? ''));
-        $this->entity->setUpdatedBy($this->_session->id);
+        $this->entity->setUpdatedBy($this->user()->getId());
 
         // Save, and pass params required to update `terms_transacgrp`-records of type 'modification' for all 3 levels
         $updated = $this->entity->update([
-            'userName' => $this->_session->userName,
-            'userGuid' => $this->_session->userGuid
+            'userName' => $this->user()->getUserName(),
+            'userGuid' => $this->user()->getUserGuid()
         ]);
 
         // Flush response data
@@ -406,7 +403,7 @@ class editor_TermController extends ZfExtended_RestController
         // do not have delete-right on editor_term-resource, so the execution won't even reach
         // for them, but if at some point of time they would be granted then the below line
         // should be amended to rely on termProposer-role explicitly
-        $deletable = $canDeleteAny || $this->entity->getCreatedBy() == $this->_session->id;
+        $deletable = $canDeleteAny || $this->entity->getCreatedBy() == $this->user()->getId();
 
         // If current term is not deletable - flush failure
         if (!$deletable) $this->jflush(false, 'This term is not deletable');
@@ -449,8 +446,8 @@ class editor_TermController extends ZfExtended_RestController
             // Affect `terms_transacgrp` 'modification'-records for entry- and (maybe) language-level
             ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel')
                 ->affectLevels(
-                    $this->_session->userName,
-                    $this->_session->userGuid,
+                    $this->user()->getUserName(),
+                    $this->user()->getUserGuid(),
                     $termEntryId,
                     $data['isLast'] == 'language' ? null : $language
                 );
@@ -467,7 +464,7 @@ class editor_TermController extends ZfExtended_RestController
 
         // Setup 'modified' prop, so that modification info, specified in
         // entry- and (maybe) language-level panels can be updated
-        $data['modified'] = $this->_session->userName . ', ' . date('d.m.Y H:i:s');
+        $data['modified'] = $this->user()->getUserName() . ', ' . date('d.m.Y H:i:s');
 
         // Flush response data
         $this->view->assign($data);

@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Collect the terms and the terms attributes from the tbx file and save them to the database
  */
+use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAttributeDataType;
 class editor_Models_Terminology_Import_TbxFileImport
 {
     const TBX_TIG = 'tig';
@@ -76,6 +77,13 @@ class editor_Models_Terminology_Import_TbxFileImport
      * @var bool
      */
     protected bool $mergeTerms;
+
+    /***
+     * Value of $tbxFilePath-arg used in last importXmlFile() method call
+     *
+     * @var string
+     */
+    protected string $tbxFilePath;
 
     /**
      * current term collection
@@ -186,6 +194,7 @@ class editor_Models_Terminology_Import_TbxFileImport
     {
         $this->collection = $collection;
         $this->mergeTerms = $mergeTerms;
+        $this->tbxFilePath = $tbxFilePath;
         $this->prepareImportArrays($user);
 
         //reset internal XML error list
@@ -194,11 +203,11 @@ class editor_Models_Terminology_Import_TbxFileImport
         $xmlReader = (new class() extends XMLReader {
             public function reopen(string $tbxFilePath) {
                 $this->close();
-                $this->open($tbxFilePath);
+                $this->open($tbxFilePath, flags: LIBXML_PARSEHUGE);
             }
         });
 
-        if(!$xmlReader->open($tbxFilePath)) {
+        if(!$xmlReader->open($tbxFilePath, flags: LIBXML_PARSEHUGE)) {
             throw new Zend_Exception('TBX file can not be opened.');
         }
 
@@ -212,8 +221,8 @@ class editor_Models_Terminology_Import_TbxFileImport
 
         $this->logUnknownLanguages();
 
-        $dataTypeAssoc = ZfExtended_Factory::get('editor_Models_Terminology_Models_CollectionAttributeDataType');
-        /* @var $dataTypeAssoc editor_Models_Terminology_Models_CollectionAttributeDataType */
+        $dataTypeAssoc = ZfExtended_Factory::get(CollectionAttributeDataType::class);
+        /* @var $dataTypeAssoc CollectionAttributeDataType */
         // insert all attribute data types for current collection in the terms_collection_attribute_datatype table
         $dataTypeAssoc->updateCollectionAttributeAssoc($this->collection->getId());
 
@@ -361,10 +370,10 @@ $memLog('Loaded terms:        ');
         while ($xmlReader->read() && $xmlReader->name !== 'refObjectList');
         while ($xmlReader->name === 'refObjectList') {
             $listType = $xmlReader->getAttribute('type');
-            $node = new SimpleXMLElement($xmlReader->readOuterXML());
+            $node = new SimpleXMLElement($xmlReader->readOuterXML(), LIBXML_PARSEHUGE);
             if($listType == 'binaryData') {
                 /** @var $binImport editor_Models_Terminology_Import_TbxBinaryDataImport */
-                $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport');
+                $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport', [$this->tbxFilePath]);
                 $binImport->import($this->collection->getId(), $node);
             }
             else {
@@ -673,6 +682,11 @@ $memLog('Loaded terms:        ');
         if (empty($labelId)) {
             // the dataType does not exist -> create it
             $this->attributeDataTypeModel->loadOrCreate($attribute->elementName, $attribute->type, [$attribute->getLevel()]);
+
+            // Maintain collection<=>datatype mappings data
+            ZfExtended_Factory
+                ::get(CollectionAttributeDataType::class)
+                ->onCustomDataTypeInsert($this->attributeDataTypeModel->getId(), $this->collection->getId());
 
             // reload all dataTypes
             $this->dataType->loadData(true);

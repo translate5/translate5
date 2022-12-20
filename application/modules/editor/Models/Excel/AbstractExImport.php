@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Lock;
+
 /**#@+
  * @author Marc Mittag
  * @package editor
@@ -53,15 +55,7 @@ abstract class editor_Models_Excel_AbstractExImport {
      * @return bool
      */
     public function taskLock(editor_Models_Task $task) : bool {
-        if(!$task->lock(NOW_ISO, editor_Models_Task::STATE_EXCELEXPORTED)) {
-            $this->log->debug('E0000', 'Excel Export: task lock failed');
-            return FALSE;
-        }
-        
-        $task->setState(editor_Models_Task::STATE_EXCELEXPORTED);
-        $task->save();
-        $this->log->debug('E0000', 'Excel Export: task lock success');
-        return TRUE;
+        return Lock::taskLock($task,editor_Models_Task::STATE_EXCELEXPORTED);
     }
     /**
      * lock the task for editing and set the tasks state to "isExcelExported"
@@ -69,13 +63,6 @@ abstract class editor_Models_Excel_AbstractExImport {
      * @return bool
      */
     public function taskUnlock(editor_Models_Task $task) : bool {
-        if (!$task->unlock()) {
-            $this->log->debug('E0000', 'Excel Export: task unlock failed');
-            return FALSE;
-        }
-        $task->setState(editor_Models_Task::STATE_OPEN);
-        $task->save();
-        $this->log->debug('E0000', 'Excel Export: task unlock success');
-        return TRUE;
+        return Lock::taskUnlock($task);
     }
 }

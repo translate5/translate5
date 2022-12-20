@@ -131,12 +131,24 @@ abstract class editor_Models_Import_FileParser {
      */
     protected int $shortTagIdent = 1;
 
+    protected bool $isReimport = false;
+
     /**
      * returns the file extensions (in lower case) parsable by this fileparser
      * @return array;
      */
     public static function getFileExtensions() {
         throw new ZfExtended_Exception('Method must be overwritten in subclass!'); //with strict standards statics may not abstract!
+    }
+
+    /***
+     * Get the export class out of the import class file name with replacing the Import with Export
+     * folder name. It is expected that the import and export classes are in Import/Export folders accordingly
+     * @return string
+     */
+    public static function getExportClass():string
+    {
+        return str_replace('_Import_', '_Export_', static::class);
     }
     
     /**
@@ -278,7 +290,7 @@ abstract class editor_Models_Import_FileParser {
             //preset the md5 field with the plain string
             //the different processors have then the ability to modify it
             //the final segment processor creates then the hash before storing it into the DB
-            $field['originalMd5'] = $field['original'];
+            $field['originalMd5'] = $field['original'] ?? null;
         }
         
         foreach($this->segmentProcessor as $p) {
@@ -462,5 +474,21 @@ abstract class editor_Models_Import_FileParser {
      */
     public function & getFieldContents() {
         return $this->segmentData;
+    }
+
+    /***
+     * @return string|null
+     */
+    public function getFileName(){
+        return $this->_fileName;
+    }
+
+    /**
+     * Set internal isReimport flag!
+     * @param bool $isReimport
+     * @return void
+     */
+    public function setIsReimport(bool $isReimport = true) {
+        $this->isReimport = $isReimport;
     }
 }

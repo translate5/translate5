@@ -584,6 +584,36 @@ final class Helper extends \ZfExtended_Test_ApiHelper
     }
 
     /**
+     * @param string|null $jsonFileName
+     * @param int $limit
+     * @param int $start
+     * @param int $page
+     * @return array
+     */
+    public function getSegmentsWithBasicData(string $jsonFileName = null, int $limit = 200, int $start = 0, int $page = 1): array
+    {
+        $segments = $this->getSegments($jsonFileName,$limit,$start,$page);
+
+        $fields = ['segmentNrInTask','mid','userGuid','editable',
+            'pretrans','matchRate','isRepeated','source','sourceMd5','sourceToSort',
+            'target','targetMd5','targetToSort','targetEdit','targetEditToSort','relais',
+            'relaisMd5','relaisToSort'];
+
+        $result = [];
+        foreach ($segments as $segment){
+            $seg = (array) $segment;
+            $tmp = [];
+            foreach ($fields as $field){
+                if( isset($seg[$field])){
+                    $tmp[$field] = $seg[$field];
+                }
+            }
+            $result[] = $tmp;
+        }
+        return $result;
+    }
+
+    /**
      * Saves a segment / sends segment put
      * @param int $segmentId
      * @param string $editedTarget
@@ -674,6 +704,83 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         return $result;
     }
 
+    /***
+     * Reimport tbx into existing language resource
+     *
+     * @param int $resourceId
+     * @param string|null $fileName
+     * @param array $params
+     * @param bool $waitForImport
+     * @param string $testDir
+     * @return array|\stdClass
+     * @throws \Zend_Http_Client_Exception
+     * @throws Exception
+     */
+    public function reimportResource(int $resourceId, string $fileName, array $params, bool $waitForImport = true, string $testDir = '')
+    {
+        if (!empty($this->filesToAdd)) {
+            throw new Exception('There are already some files added as pending request and not sent yet! Send them first to the server before calling addResource!');
+        }
+
+        // Add file for upload
+        $this->addFile('tmUpload', $this->getFile($fileName, $testDir), "application/xml");
+
+        // Submit that
+        $resource = $this->postJson('editor/languageresourceinstance/' . $resourceId . '/import/', $params);
+
+        // Make sure it's the same resource we've submitted file for
+        $this->test::assertEquals($resourceId, $resource->id);
+
+        // Log that we submitted tbx-file
+        error_log("Language resource reimport tbx-file submitted. " . $resource->name);
+
+        // Check whether reimport tbx started
+        $result = $this->getJson('editor/languageresourceinstance/' . $resource->id);
+
+        // If we won't wait for import completed - just return result
+        if (!$waitForImport) {
+            return $result;
+        }
+
+        // Log current status
+        error_log('Languageresource reimport status check:' . $result->status);
+
+        // Counter initial value
+        $counter = 0;
+
+        // Enter status-checking loop
+        while ($result->status != 'available') {
+
+            // If reimport status is error - break
+            if ($result->status == 'error') {
+                break;
+            }
+
+            // If RELOAD_RESOURCE_LIMIT reached - break
+            if ($counter == self::RELOAD_RESOURCE_LIMIT) {
+                break;
+            }
+
+            // Wait a bit
+            sleep(2);
+
+            // Get fresh status
+            $result = $this->getJson('editor/languageresourceinstance/' . $result->id);
+
+            // Log status
+            error_log('Languageresource reimport status check ' . $counter . '/' . self::RELOAD_RESOURCE_LIMIT . ' state: ' . $result->status);
+
+            // Increment counter
+            $counter++;
+        }
+
+        // Make sure reimport completed
+        $this->test::assertEquals('available', $result->status, 'Resource import of ' . $resource->name . ' stopped. Resource state is:' . $result->status);
+
+        // Return
+        return $result;
+    }
+
     //endregion
     //region Config API
     /******************************************************* CONFIG/RUNTIMEOPTIONS API *******************************************************/
@@ -701,6 +808,29 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                 $this->test::assertEquals($value, $config[0]->value, 'Config ' . $name . ' in instance config is not as expected: ');
             }
         }
+    }
+
+    /**
+     * Checks, if the passed configs are set
+     * @param string[] $configNames
+     * @return bool
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function checkConfigsToBeSet(array $configNames): bool
+    {
+        $allSet = true;
+        foreach ($configNames as $name) {
+            if (!str_starts_with($name, 'runtimeOptions.')) {
+                $name = 'runtimeOptions.' . $name;
+            }
+            $config = $this->getJson('editor/config', [
+                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"like"}]',
+            ]);
+            if(count($config) !== 1 || empty($config[0]->value)){
+                $allSet = false;
+            }
+        }
+        return $allSet;
     }
 
     //endregion

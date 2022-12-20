@@ -1,0 +1,344 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:ax="AcrossXliff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" ax:time-stamp="10/25/2017 15:16:56">
+  <file source-language="en-GB" ax:src-lang="5553337a-7fa9-4f72-b0d5-f8ec440dbefa" target-language="de-DE" ax:trg-lang="b5ce7dc8-b8bf-494a-9461-691b4f5e30cd" original="yogaPptx.pptx" datatype="x-across-translation" category="General" ax:start-date="10/25/2017 12:22:00" ax:due-date="10/26/2017 13:22:00">
+    <header>
+      <tool tool-id="Across.XLIFF" tool-name="Across.XLIFF" tool-version="1.1" tool-company="Across Systems GmbH" />
+      <ax:project>
+        <ax:name>DEV-Test (Stephan)</ax:name>
+        <ax:responsible-person contact-name="Default Supervisor" />
+      </ax:project>
+      <ax:properties>
+        <ax:property name="subjects">
+          <ax:value>General</ax:value>
+        </ax:property>
+      </ax:properties>
+    </header>
+    <body>
+      <trans-unit id="56" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="1" ax:s-font-name="Source Sans Pro" ax:s-font-size="48.0" ax:s-fore-color="-2361863" ax:s-bold="False" ax:s-strike="False" />Welcome to the world of yoga<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="1" ax:s-font-name="Source Sans Pro" ax:s-font-size="48.0" ax:s-fore-color="-2361863" ax:s-bold="False" ax:s-strike="False" />Willkommen in der Welt des Yoga<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="1" ax:s-font-name="Source Sans Pro" ax:s-font-size="48.0" ax:s-fore-color="-2361863" ax:s-bold="False" ax:s-strike="False" />Welcome to the world of yoga<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="1" ax:s-font-name="Source Sans Pro" ax:s-font-size="48.0" ax:s-fore-color="-2361863" ax:s-bold="False" ax:s-strike="False" />Willkommen in der Welt des Yoga<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:16</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:16</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="59" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="60" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />is a group of physical, mental, and spiritual practices or disciplines which originated in ancient India.<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />is a group of physical, mental, and spiritual practices or disciplines which originated in ancient India.<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />is a group of physical, mental, and spiritual practices or disciplines which originated in ancient India.<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />is a group of physical, mental, and spiritual practices or disciplines which originated in ancient India.<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="61" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />There is a broad variety of yoga schools, practices, and goals in Hinduism, Buddhism, and Jainism.<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />There is a broad variety of yoga schools, practices, and goals in Hinduism, Buddhism, and Jainism.<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />There is a broad variety of yoga schools, practices, and goals in Hinduism, Buddhism, and Jainism.<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />There is a broad variety of yoga schools, practices, and goals in Hinduism, Buddhism, and Jainism.<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="62" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Among the most well-known types of yoga are Hatha yoga and Rāja yoga.<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Among the most well-known types of yoga are Hatha yoga and Rāja yoga.<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Among the most well-known types of yoga are Hatha yoga and Rāja yoga.<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Among the most well-known types of yoga are Hatha yoga and Rāja yoga.<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="65" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="66" ax:state-name="Translated" ax:state-id="3" ax:state-flags="4194304">
+        <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The origins of yoga have been speculated to date back to pre-Vedic Indian traditions.<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The origins of yoga have been speculated to date back to pre-Vedic Indian traditions.<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="51%">
+          <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The origins of yoga have been speculated to date back to pre-Vedic Indian traditions; it is mentioned in the Rigveda, but most likely developed around the sixth and fifth centuries BCE, in ancient India's ascetic and śramaṇa movements.<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The origins of yoga have been speculated to date back to pre-Vedic Indian traditions; it is mentioned in the Rigveda, but most likely developed around the sixth and fifth centuries BCE, in ancient India's ascetic and śramaṇa movements.<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="67" ax:state-name="Translated" ax:state-id="3" ax:state-flags="4194304">
+        <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />It is mentioned in the Rigveda, but most likely developed around the sixth and fifth centuries BCE, in ancient India's ascetic and śramaṇa movements.<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />It is mentioned in the Rigveda, but most likely developed around the sixth and fifth centuries BCE, in ancient India's ascetic and śramaṇa movements.<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="75%">
+          <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The origins of yoga have been speculated to date back to pre-Vedic Indian traditions; it is mentioned in the Rigveda, but most likely developed around the sixth and fifth centuries BCE, in ancient India's ascetic and śramaṇa movements.<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The origins of yoga have been speculated to date back to pre-Vedic Indian traditions; it is mentioned in the Rigveda, but most likely developed around the sixth and fifth centuries BCE, in ancient India's ascetic and śramaṇa movements.<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="70" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="2" ax:s-font-name="Arial" ax:s-font-size="44.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Yoga<ept id="2" rid="1" /><bpt id="3" rid="2" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" /> (/ˈjoʊɡə/; Sanskrit, योगः Listen)<ept id="4" rid="2" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="71" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The chronology of earliest texts describing yoga-practices is unclear, varyingly credited to Hindu Upanishads.<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The chronology of earliest texts describing yoga-practices is unclear, varyingly credited to Hindu Upanishads.<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The chronology of earliest texts describing yoga-practices is unclear, varyingly credited to Hindu Upanishads.<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The chronology of earliest texts describing yoga-practices is unclear, varyingly credited to Hindu Upanishads.<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="72" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The Yoga Sutras of Patanjali date from the first half of the 1st millennium CE, but only gained prominence in the West in the 20th century.<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The Yoga Sutras of Patanjali date from the first half of the 1st millennium CE, but only gained prominence in the West in the 20th century.<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The Yoga Sutras of Patanjali date from the first half of the 1st millennium CE, but only gained prominence in the West in the 20th century.<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />The Yoga Sutras of Patanjali date from the first half of the 1st millennium CE, but only gained prominence in the West in the 20th century.<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="73" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Hatha yoga texts emerged around the 11th century with origins in tantra.<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Hatha yoga texts emerged around the 11th century with origins in tantra.<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Hatha yoga texts emerged around the 11th century with origins in tantra.<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="3" ax:s-font-name="Arial" ax:s-font-size="32.0" ax:s-fore-color="-16777216" ax:s-bold="False" ax:s-strike="False" />Hatha yoga texts emerged around the 11th century with origins in tantra.<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="77" ax:state-name="Translated" ax:state-id="3" ax:state-flags="12713984">
+        <source><bpt id="1" rid="1" ax:s-id="1" ax:s-font-name="Source Sans Pro" ax:s-font-size="48.0" ax:s-fore-color="-2361863" ax:s-bold="False" ax:s-strike="False" />Thank you !!!<ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="1" ax:s-font-name="Source Sans Pro" ax:s-font-size="48.0" ax:s-fore-color="-2361863" ax:s-bold="False" ax:s-strike="False" />Vielen Dank !!!<ept id="2" rid="1" /></target>
+        <alt-trans match-quality="100%">
+          <source><bpt id="1" rid="1" ax:s-id="1" ax:s-font-name="Source Sans Pro" ax:s-font-size="48.0" ax:s-fore-color="-2361863" ax:s-bold="False" ax:s-strike="False" />Thank you !!!<ept id="2" rid="1" /></source>
+          <target><bpt id="1" rid="1" ax:s-id="1" ax:s-font-name="Source Sans Pro" ax:s-font-size="48.0" ax:s-fore-color="-2361863" ax:s-bold="False" ax:s-strike="False" />Vielen Dank !!!<ept id="2" rid="1" /></target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Default Supervisor</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>10/24/2017 12:10:17</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

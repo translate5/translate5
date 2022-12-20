@@ -34,9 +34,28 @@ class editor_Workflow_Default_SegmentHandler {
      * @var editor_Workflow_Default
      */
     protected $workflow;
-    
+
+    /**
+     * User to be used when loading the tua for the edited task | null if not authenticated
+     * @var string|null
+     */
+    private ?string $userGuid = null;
+
     public function __construct(editor_Workflow_Default $workflow) {
         $this->workflow = $workflow;
+        if(ZfExtended_Authentication::getInstance()->isAuthenticated()) {
+            $this->userGuid = ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+        }
+    }
+
+    /***
+     * Change the current userGuid used for loading the tua for the edited task
+     * @param string $newUserGuid
+     * @return void
+     */
+    public function updateUserGuid(string $newUserGuid): void
+    {
+        $this->userGuid = $newUserGuid;
     }
     
     /**
@@ -80,10 +99,9 @@ class editor_Workflow_Default_SegmentHandler {
      * @param editor_Models_Task $task
      */
     protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates, editor_Models_Task $task) {
-        $sessionUser = new Zend_Session_Namespace('user');
-        
+
         //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUser->data->userGuid, $task);
+        $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->userGuid, $task);
         if($tua->getIsPmOverride() == 1){
             $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
             $segmentToSave->setWorkflowStep($this->workflow::STEP_PM_CHECK);

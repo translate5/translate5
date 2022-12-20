@@ -1,8 +1,6 @@
 # User data dirs
 /data/ConnectWorldserver*
-/data/editorImportedTasks*
-/data/editorOkapiBconf*
-/data/editorVisualReviewFonts*
+/data/editor*
 /data/purchaseOrderPdfs*
 /data/tbx-import*
 /data/dummyTm_*

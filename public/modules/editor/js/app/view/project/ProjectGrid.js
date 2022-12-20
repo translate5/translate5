@@ -224,6 +224,9 @@ Ext.define('Editor.view.project.ProjectGrid', {
         if(rowindex < 0) {
             return;
         }
+        if(!config){
+            config = {};
+        }
         var me = this;
         me.ensureVisible(rowindex, config);
     },
