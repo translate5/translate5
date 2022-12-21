@@ -78,6 +78,7 @@ Ext.define('Editor.view.admin.preferences.User', {
                     },
                     items: [{
                         name: 'oldpasswd',
+                        minLength: 8,
                         bind: {
                             fieldLabel: '{l10n.preferences.user.oldpasswd}'
                         }
