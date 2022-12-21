@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Test\Import;
 
 use MittagQI\Translate5\Test\Api\Helper;
+use Zend_Http_Client_Exception;
 
 /**
  * Represents the api-request configuration for a task
@@ -605,5 +606,17 @@ final class Task extends Resource
         } else {
             throw new Exception('Could not open zip \''.$zipPath.'\'');
         }
+    }
+
+    /**
+     * @param Helper $api
+     * @return void
+     * @throws Exception
+     * @throws Zend_Http_Client_Exception
+     */
+    public function getAvaliableResources(Helper $api){
+        return $api->getJson('editor/languageresourcetaskassoc',[
+            'filter' => '[{"operator":"eq","value":"' . $this->getTaskGuid() . '","property":"taskGuid"}]'
+        ]);
     }
 }
