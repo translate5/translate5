@@ -782,7 +782,7 @@ class editor_Models_Import_FileParser_XmlParser {
         }
         if ($xml === false) {
             throw new editor_Models_Import_FileParser_InvalidXMLException('E1448', [
-                'libxmlerrors' => libxml_get_errors()
+                'libxmlerrors' => json_encode(libxml_get_errors())
             ]);
         }
         return $xml;
