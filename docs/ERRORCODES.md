@@ -72,7 +72,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1290"></a>E1290  | Authentication                       | Ip based authentication: User with roles:({configuredRoles}) is not allowed to authenticate ip based. | There is no configured ip based roles for the ip based authentication or the configured roles are not allowed per acl
 | <a id="E1332"></a>E1332  | Authentication                       | Fail or success info log for sessionToken based authentication.                                       | 
 | <a id="E1342"></a>E1342  | Authentication: Session impersonate  | The parameter login containing the desired username is missing.                                       | The parameter login containing the desired username is missing.
-| <a id="E1443"></a>E1443  | Authentication: Token authentication | Fail or success info log for application toke based authentication.                                   | Info log when user is authenticated or the authentication failed after app token authentication check
+| <a id="E1443"></a>E1443  | Authentication: Token authentication | Authentication Token: The token is not valid | Info log when user is authenticated or the authentication failed after app token authentication check
 
 
 ### Configuration
