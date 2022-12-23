@@ -38,3 +38,6 @@ VALUES (NULL, 'editor', 'editor', 'frontend', 'editorAnalysisTask');
 
 INSERT INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`) 
 VALUES (NULL, 'editor', 'editor', 'frontend', 'pluginMatchAnalysisMatchAnalysis');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `type`, `description`, `level`, `guiName`, `guiGroup`) VALUES ('runtimeOptions.plugins.MatchAnalysis.enableAnalysisActionMenu', '1', 'editor', 'plugins', '1', '1', 'boolean', 'Enable analysis menu in task action', '4', 'Enable analysis menu option', 'Match analysis: defaults');
+

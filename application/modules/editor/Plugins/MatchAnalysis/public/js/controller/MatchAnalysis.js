@@ -104,7 +104,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 startMatchAnalysis: 'onStartOperation'
             },
             'taskActionMenu': {
-                itemsinitialized: 'onTaskActionColumnItemsInitialized'
+                itemsinitialized: 'onTaskActionColumnItemsInitialized',
+                show: 'onTaskActionMenuShow'
             }
         },
         controller:{
@@ -142,7 +143,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     onTaskActionColumnItemsInitialized: function(items) {
         var me=this;
         items.push({
-            text:this.strings.taskGridIconTooltip,
+            text: me.strings.taskGridIconTooltip,
+            itemId:'analysisActionItem',
             glyph: 'f200@FontAwesome5FreeSolid',
             action: 'editorAnalysisTask',
             hidden:true,
@@ -150,10 +152,34 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 hidden:'{!isNotErrorImportPendingCustom}'
             },
             scope:me,
+            disabled: true,
             handler:me.onMatchAnalysisMenuClick,
             sortIndex:8
         });
     },
+
+    /***
+     *
+     * @param menu
+     */
+    onTaskActionMenuShow: function (menu){
+        var me=this,
+            configStore = Ext.create('Editor.store.admin.CustomerConfig'),
+            vm = menu.getViewModel(),
+            task = vm && vm.get('task');
+
+        if( !task){
+            return;
+        }
+
+        configStore.loadByCustomerId(task.get('customerId'),function (){
+            var config = configStore.getConfig('plugins.MatchAnalysis.enableAnalysisActionMenu'),
+                menuItem = menu.down('#analysisActionItem');
+
+            menuItem.setDisabled(!config);
+        });
+    },
+
     /**
      * Inserts the language resource card into the task import wizard
      */
@@ -315,12 +341,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     onMatchAnalysisMenuClick:function(item){
         var me=this,
-            task=item.lookupViewModel(true).get('task');
+            task=item.lookupViewModel(true).get('task'),
+            win = Ext.create('Editor.plugins.MatchAnalysis.view.AnalysisWindow');
 
-        //me.getProjectPanel().getController().redirectFocus(task,true);
-        //me.getAdminTaskTaskManagement().down('tabpanel').setActiveTab('matchAnalysisPanel');
-
-        var win = Ext.create('Editor.plugins.MatchAnalysis.view.AnalysisWindow');
         win.setTask(task);
         win.show();
     },
