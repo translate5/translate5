@@ -36,7 +36,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     requires: [
         'Editor.plugins.MatchAnalysis.view.AnalysisPanel',
         'Editor.plugins.MatchAnalysis.view.LanguageResources',
-        'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig'
+        'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig',
+        'Editor.plugins.MatchAnalysis.view.AnalysisWindow'
     ],
     
     models: ['Editor.plugins.MatchAnalysis.model.MatchAnalysis'],
@@ -113,11 +114,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
-            }
-        },
-        store:{
-            '#languageResourcesTaskAssoc':{
-                load:'onLanguageResourcesTaskAssocStoreLoad'
             }
         }
     },
@@ -320,8 +316,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     onMatchAnalysisMenuClick:function(item){
         var me=this,
             task=item.lookupViewModel(true).get('task');
-        me.getProjectPanel().getController().redirectFocus(task,true);
-        me.getAdminTaskTaskManagement().down('tabpanel').setActiveTab('matchAnalysisPanel');
+
+        //me.getProjectPanel().getController().redirectFocus(task,true);
+        //me.getAdminTaskTaskManagement().down('tabpanel').setActiveTab('matchAnalysisPanel');
+
+        var win = Ext.create('Editor.plugins.MatchAnalysis.view.AnalysisWindow');
+        win.setTask(task);
+        win.show();
     },
     
     /***
