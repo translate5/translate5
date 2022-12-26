@@ -11,6 +11,29 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.8.3] - 2022-12-26
+
+### Important Notes:
+#### [TRANSLATE-3156](https://jira.translate5.net/browse/TRANSLATE-3156)
+For API users creating languages via LCID only: 
+We updated a bunch of LCIDs. Backup languages table and compare the content with the table after update.
+ 
+
+
+### Changed
+**[TRANSLATE-3156](https://jira.translate5.net/browse/TRANSLATE-3156): Import/Export - Add missing LCID values** <br>
+Update and add missing LCIDs.
+
+
+### Bugfixes
+**[TRANSLATE-3152](https://jira.translate5.net/browse/TRANSLATE-3152): Editor general - Term portlet fix** <br>
+5.8.3: Hotfixed the wrong encoding of image tags in the term portlet.
+
+**[TRANSLATE-3151](https://jira.translate5.net/browse/TRANSLATE-3151): Import/Export - Import of xliff file fails because of > inside an attribute value of a ph tag** <br>
+Introduce a xmlpreparse config which cleans and normalizes the XML structure of the imported XLF files.
+
+
 ## [5.8.2] - 2022-12-20
 
 ### Important Notes:
