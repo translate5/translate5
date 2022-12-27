@@ -27,6 +27,9 @@
  */
 
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
+use MittagQI\Translate5\Models\Import\PauseImportWorker;
+use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
+use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker;
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides the match-analysis and pre-translation against language-resources.';
@@ -312,6 +315,11 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         if(!empty($this->batchAssocs) && $workerParameters['batchQuery']){
             $this->queueBatchWorkers($task, $workerParameters, $parentWorkerId);
         }
+
+        $worker = ZfExtended_Factory::get(PauseMatchAnalysisWorker::class);
+        $worker->init($taskGuid, [PauseImportWorker::PROCESSOR => PauseMatchAnalysisProcessor::class]);
+        $worker->queue($parentWorkerId);
+
         // init worker and queue it
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
