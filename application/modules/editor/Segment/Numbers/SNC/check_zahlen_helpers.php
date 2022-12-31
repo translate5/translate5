@@ -4488,7 +4488,7 @@ function compareNumCounts_sameDiv($numsCount, $checkSeg, $currentData, $checkPro
 
                     $checkProps['checkSubType_extra'] = 'Dubiose Zahl aus SRC unverändert in TRG übernommen.';
                     $checkProps['checkSubType_extra_EN'] = 'Dubious number from SRC unchanged in TRG';
-                    $checkResults['checkMessage'] = "Dubiose 'Zahl' [{$numOrig}] aus SRC unverändert in TRG übernommen.<br><span class=\"fs_13\">&rarr; Falls es sich dabei um eine fehlerhaft formatierte Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, fügen Sie bitte in TRG diese Leerzeichen ein, um Mehrdeutigkeit zu vermeiden. <br>&rarr; Falls dagegen in SRC der falsche Tausendertrenner verwendet wurden, igorieren Sie bitte diese Meldung.</span>";
+                    $checkResults['checkMessage'] = "Dubiose Zahl [{$numOrig}] aus SRC unverändert in TRG übernommen.<br><span class=\"fs_13\">&rarr; Falls es sich dabei um eine fehlerhaft formatierte Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, fügen Sie bitte in TRG diese Leerzeichen ein, um Mehrdeutigkeit zu vermeiden. <br>&rarr; Falls dagegen in SRC der falsche Tausendertrenner verwendet wurden, igorieren Sie bitte diese Meldung.</span>";
                     $checkResults['checkMessage_EN'] = "Dubious number [{$numOrig}] from SRC found unchanged in TRG.<br><span class=\"fs_13\">&rarr; If this 'number' is actually a badly formatted list with missing spaces between list elements, please insert these spaces in TRG to avoid ambiguity.<br>&rarr; If the wrong 1000s separator was used in a real number in SRC, please ignore this message (and sorry for the inconvenience).</span>";
 
                     $match = $numOrig;

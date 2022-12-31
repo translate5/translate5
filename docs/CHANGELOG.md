@@ -10,6 +10,70 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [5.8.3] - 2022-12-26
+
+### Important Notes:
+#### [TRANSLATE-3156](https://jira.translate5.net/browse/TRANSLATE-3156)
+For API users creating languages via LCID only: 
+We updated a bunch of LCIDs. Backup languages table and compare the content with the table after update.
+ 
+
+
+### Changed
+**[TRANSLATE-3156](https://jira.translate5.net/browse/TRANSLATE-3156): Import/Export - Add missing LCID values** <br>
+Update and add missing LCIDs.
+
+
+### Bugfixes
+**[TRANSLATE-3152](https://jira.translate5.net/browse/TRANSLATE-3152): Editor general - Term portlet fix** <br>
+5.8.3: Hotfixed the wrong encoding of image tags in the term portlet.
+
+**[TRANSLATE-3151](https://jira.translate5.net/browse/TRANSLATE-3151): Import/Export - Import of xliff file fails because of > inside an attribute value of a ph tag** <br>
+Introduce a xmlpreparse config which cleans and normalizes the XML structure of the imported XLF files.
+
+
+## [5.8.2] - 2022-12-20
+
+### Important Notes:
+#### [TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123)
+Users who already adjusted the checkboxes, indicating whether some attribute datatype is enabled for some TermCollection - have to redo this
+
+#### [TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764)
+UPDATE: The format of the export.zip is changing! 
+Previously the export.zip was containing a folder named like the taskGuid.
+This is removed and the content directories are now directly in export.zip root.
+The legacy behaviour can be kept by setting in config runtimeOptions.editor.export.taskguiddirectory to 1
+or completely controlled by using a GET parameter taskguiddirectory with 0 or 1 on export URL.
+ 
+
+
+### Changed
+**[TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764): Import/Export - Restructuring of export.zip** <br>
+UPDATE: The content structure of the export zip changed. In the future it does NOT contain any more a folder with the task guid, but directly on the highest level of the zip all files of the task that were translated/reviewed.
+
+
+### Bugfixes
+**[TRANSLATE-3150](https://jira.translate5.net/browse/TRANSLATE-3150): TermPortal - TermPortal: term status tooltips old locale after locale changed** <br>
+Search results icons tooltips language is now changed on GUI language change
+
+**[TRANSLATE-3149](https://jira.translate5.net/browse/TRANSLATE-3149): Task Management, WebSocket Server - 403 Forbidden messages in opened task** <br>
+Users with an unstable internet connection got multiple 403 Forbidden error messages.
+
+**[TRANSLATE-3145](https://jira.translate5.net/browse/TRANSLATE-3145): TermPortal - TermPortal: problem on creating Chinese term** <br>
+fixed problem popping on creating term in Chinese language
+
+**[TRANSLATE-3144](https://jira.translate5.net/browse/TRANSLATE-3144): Export - Task export crashes with apache internal server error - no PHP error** <br>
+If the tasks name contains non printable invalid UTF8 characters, the task was not exportable.
+
+**[TRANSLATE-3130](https://jira.translate5.net/browse/TRANSLATE-3130): User Management - Login name with space or maybe other unusual characters causes problems** <br>
+User validator was changed to prevent creating users with login name containing a space character
+
+**[TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123): Import/Export - Tbx import: handling duplicated attributes** <br>
+TBX import: removed term-level attributes duplicates
+
+
 ## [5.8.1] - 2022-12-16 and [5.8.0] - 2022-12-06
 
 ### Important Notes:

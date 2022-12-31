@@ -198,11 +198,25 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             });
         }
 
-        Editor.app.viewport && Editor.app.viewport.unmask();
-        
         if(grid && Editor.data.task) {
-            this.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
-        } 
+            let me = this,
+                task = Editor.data.task;
+
+            task.set('userState', task.get('userState'));
+            task.save({
+                success: function() {
+                    Editor.app.viewport && Editor.app.viewport.unmask();
+                    me.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
+                },
+                failure: function(record, op) {
+                    Editor.app.viewport && Editor.app.viewport.unmask();
+                    Editor.app.getController('ServerException').handleFailedRequest(op.error.status, op.error.statusText, op.error.response);
+                }
+            });
+        }
+        else {
+            Editor.app.viewport && Editor.app.viewport.unmask();
+        }
         
         if(grid && (sel = grid.getSelectionModel().getSelection()) && sel.length > 0) {
             me.clickSegment(null, sel[0]);
