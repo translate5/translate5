@@ -974,6 +974,7 @@ class editor_TaskController extends ZfExtended_RestController {
 
         //throws exceptions if task not accessable
         $this->checkTaskAccess();
+        $this->checkTaskStateTransition();
         
         //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
@@ -1094,6 +1095,21 @@ class editor_TaskController extends ZfExtended_RestController {
                 '$isTaskDisallowReading' => $isTaskDisallowReading,
             ]);
             throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+    }
+
+    private function checkTaskStateTransition(): void
+    {
+        $closingTask = ($this->data->state ?? null) === 'end';
+
+        if($closingTask && null !== $this->entity->getLocked()) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1161' => "The job can not be modified, since the user has already opened the task for editing. You are to late.",
+            ]);
+
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1161', [
+                'id' => 'Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.',
+            ]);
         }
     }
 
