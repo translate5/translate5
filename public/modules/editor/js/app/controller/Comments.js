@@ -256,10 +256,8 @@ Ext.define('Editor.controller.Comments', {
     */
     loadCommentPanel: function(pan) {
         var me = this,
-            plug = me.getEditPlugin(),
-            rec = plug.editing && plug.context.record || me.record,
+            rec = me.record,
             id = rec && rec.get('id'),
-            box = me.getCommentContainer(),
             form = me.getCommentForm();
             
         if(!form || !id){

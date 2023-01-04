@@ -86,6 +86,9 @@ Ext.define('Editor.controller.MetaPanel', {
                 beforeedit: 'startEdit',
                 canceledit: 'cancelEdit',
                 edit: 'saveEdit'
+            },
+            '#segmentgrid segmentroweditor': {
+                afterrender: 'onSegmentEditorAfterRender'
             }
         },
         controller: {
@@ -165,6 +168,22 @@ Ext.define('Editor.controller.MetaPanel', {
         this.getMetaPanel().query('[enableOnEdit]').forEach(item => item.setDisabled(!toggle))
     },
 
+    /**
+     * Bind handler on click-event for segmenteditor to simulate selectionchange-event for segmentgrid
+     * so that right panel (terms, qualities and comments) is reloaded as if segmentgrid's selection
+     * would go back to edited segment
+     *
+     * @param segmenteditor
+     */
+    onSegmentEditorAfterRender: function(segmenteditor) {
+        segmenteditor.el.on({
+            click: () => {
+                this.getSegmentGrid().getView().select(segmenteditor.context.record)
+            },
+            scope: this
+        });
+    },
+
     handleSegmentSelectionChange: function(sm, selectedRecords) {
 
         // If no selection - return
@@ -176,10 +195,6 @@ Ext.define('Editor.controller.MetaPanel', {
             record = selectedRecords[0],
             segmentId = record.get('id');
 
-        /*// Prevent qualities from being reloaded if editor is opened
-        if (me.editingMode === 'edit') {
-            return;
-        }*/
         me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
         me.record = record;
         // our component controllers are listening for the load event & create their views
