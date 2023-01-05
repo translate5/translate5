@@ -83,6 +83,7 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
         // Get spell check data
         $_data = $this->db->getAdapter()->query('
             SELECT 
+              `id`,     
               `segmentId`, 
               `field`, 
               `additionalData`, 
@@ -96,7 +97,9 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
 
         // Group by `segmentId` and `field`
         foreach ($_data as $_item) {
-            $data[ $_item['segmentId'] ][ $_item['field'] ] []= json_decode($_item['additionalData']);
+            $additionalData = json_decode($_item['additionalData']);
+            $additionalData->id = (int) $_item['id'];
+            $data[ $_item['segmentId'] ][ $_item['field'] ] []= $additionalData;
         }
 
         // Foreach given segmentId

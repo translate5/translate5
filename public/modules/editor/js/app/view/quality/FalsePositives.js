@@ -44,6 +44,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
         xtype: 'grid',
         userCls: 't5falsePositivesGrid',
         border: 0,
+        width: 277,
         height: 'auto',
         emptyText: 'No qualities for now',
         store: {
@@ -55,6 +56,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
             xtype: 'checkcolumn',
             menuDisabled: true,
             dataIndex: 'falsePositive',
+            sortable: false,
             bind: {
                 text: '{l10n.falsePositives.grid.falsePositive}'
             },
@@ -64,6 +66,7 @@ Ext.define('Editor.view.quality.FalsePositives', {
         }, {
             flex: 1,
             menuDisabled: true,
+            sortable: false,
             dataIndex: 'text',
             bind: {
                 text: '{l10n.falsePositives.grid.text}'

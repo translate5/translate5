@@ -974,7 +974,9 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 .x-fieldset.segmentQualities > legend {
     padding: 0 4px;
     margin-left: 16px;
-    margin-bottom: -4px;
+    margin-bottom: -10px;
+    z-index: 1;
+    position: relative;
 }
 .x-fieldset.segmentQualities .x-grid .x-column-header[id^=checkcolumn] .x-column-header-inner {
     padding-right: 6px;
@@ -1021,4 +1023,56 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 }
 .t5falsePositivesGrid .x-grid-widgetcolumn-cell-inner {
     padding: 4px !important;
+}
+.x-column-header-last {
+    border-right-width: 0 !important;
+}
+.x-fieldset.segmentQualities .x-column-header.x-column-header-focus .x-column-header-inner:after {
+    border: none;
+}
+.x-fieldset.segmentQualities .x-column-header-over {
+    background-color: inherit;
+}
+.x-grid-body {
+    border-top-width: 1px;
+}
+.x-accordion-item .x-grid-header-ct {
+    border-bottom-width: 0 !important;
+}
+.fa-circle-xmark:before {
+    content: "\f057" !important;
+}
+.x-layer.x-fieldset.segmentQualities {
+    background: white;
+}
+.x-layer.x-fieldset.segmentQualities > legend {
+    background: white;
+    border-top: 1px solid #d0d0d0;
+    padding-left: 6px;
+}
+.x-layer.x-fieldset.segmentQualities > legend .x-fa {
+    margin-left: 5px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+.x-layer.x-fieldset.segmentQualities > legend .x-tool {
+    display: none;
+}
+.x-layer.x-fieldset.segmentQualities > legend:after,
+.x-layer.x-fieldset.segmentQualities > legend:before {
+    content: '';
+    display: inline-block;
+    background: #bbbbbb;
+    width: 1px;
+    height: 11px;
+    position: absolute;
+}
+.x-layer.x-fieldset.segmentQualities > legend:after {
+    right: 0;
+}
+.x-layer.x-fieldset.segmentQualities > legend:before {
+    left: 0;
+}
+.x-layer.x-fieldset-header-default > .x-fieldset-header-text {
+    padding-top: 0;
 }

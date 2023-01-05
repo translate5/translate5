@@ -85,7 +85,8 @@ Ext.define('Editor.controller.MetaPanel', {
                 selectionchange: 'handleSegmentSelectionChange',
                 beforeedit: 'startEdit',
                 canceledit: 'cancelEdit',
-                edit: 'saveEdit'
+                edit: 'saveEdit',
+                itemcontextmenu: 'onSegmentContextMenu'
             },
             '#segmentgrid segmentroweditor': {
                 afterrender: 'onSegmentEditorAfterRender'
@@ -184,6 +185,80 @@ Ext.define('Editor.controller.MetaPanel', {
         });
     },
 
+    /**
+     * Open grid with ability to apply false positive status for a certain quality and all other similar qualities
+     *
+     * @param view
+     * @param record
+     * @param dom
+     * @param idx
+     * @param event
+     */
+    onSegmentContextMenu: function(view, record, dom, idx, event) {
+        var me = this, tag = event.getTarget('[data-t5qid]'), id;
+
+        // If right-click was NOT on tag having data-t5qid attribute
+        if (!tag) {
+
+            // If right-click was made outside of some quality-tag - hide previously opened right-click grid, if any
+            if (me.segmentRightClickGrid) me.segmentRightClickGrid.hide();
+
+            // Return
+            return;
+        }
+
+        // Get quality id
+        id = tag.getAttribute('data-t5qid');
+
+        // Prevent native content menu from being shown
+        event.preventDefault();
+
+        // If no segment right-click grid created yet - create
+        if (!me.segmentRightClickGrid) {
+            me.segmentRightClickGrid = Ext.create({
+                xtype: 'falsePositives',
+                shadow: false,
+                floating: true,
+                draggable: true,
+                collapsible: true, // collapse/expand tool is hidden by css
+                title: 'False positive?<span class="x-fa fa-circle-xmark" title="Close"></span>',
+                toggle: function(ev, dom, opts) {
+                    if (ev.getTarget('.x-fa')) opts.scope.hide();
+                }
+            });
+        }
+
+        // Show grid
+        me.segmentRightClickGrid.down('grid').setEmptyText('Loading...');
+        me.segmentRightClickGrid.showBy(tag, 't-b?', [0, 10]);
+
+        // Pick quality by id once qualities store is loaded
+        me.loadSegmentRightClickGridRow(id);
+    },
+
+    /**
+     * Load certain quality-record into grid opened on right-click on quality-tag inside some segment
+     */
+    loadSegmentRightClickGridRow: function(id) {
+        var me = this, data = [], rec;
+
+        // If record is already initialized within the store
+        if (rec = me.getMetaFalPosPanel().down('grid').getStore().getById(id)) {
+
+            // Pick it's data
+            data.push(rec.getData());
+
+        // Else
+        } else {
+
+            // Try again in 200ms
+            Ext.defer(() => me.loadSegmentRightClickGridRow(id), 200);
+        }
+
+        // Set data
+        me.segmentRightClickGrid.down('grid').getStore().setData(data);
+    },
+
     handleSegmentSelectionChange: function(sm, selectedRecords) {
 
         // If no selection - return
@@ -194,6 +269,9 @@ Ext.define('Editor.controller.MetaPanel', {
         var me = this,
             record = selectedRecords[0],
             segmentId = record.get('id');
+
+        // Hide segmentRightClickGrid, if it was previously opened
+        if (me.segmentRightClickGrid) me.segmentRightClickGrid.hide();
 
         me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
         me.record = record;
