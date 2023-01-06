@@ -100,7 +100,10 @@ class editor_QualityController extends ZfExtended_RestController {
      */
     public function falsepositivespreadAction() {
         $this->entityLoad();
-        $this->entity->spreadFalsePositive();
+        $ids = $this->entity->spreadFalsePositive();
+        $ids = $ids ? explode(',', $ids) : [];
+        array_walk($ids, fn(&$item) => $item *= 1);
+        $this->view->ids = $ids;
         $this->view->success = 1;
     }
 

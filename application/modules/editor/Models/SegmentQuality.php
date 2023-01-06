@@ -85,7 +85,8 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
             SELECT 
               `id`,     
               `segmentId`, 
-              `field`, 
+              `field`,
+              `falsePositive`,     
               `additionalData`, 
               JSON_EXTRACT(`additionalData`, "$.matchIndex") AS `matchIndex`
             FROM `LEK_segment_quality` 
@@ -99,7 +100,46 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
         foreach ($_data as $_item) {
             $additionalData = json_decode($_item['additionalData']);
             $additionalData->id = (int) $_item['id'];
+            $additionalData->falsePositive = (int) $_item['falsePositive'];
             $data[ $_item['segmentId'] ][ $_item['field'] ] []= $additionalData;
+        }
+
+        // Foreach given segmentId
+        foreach ($segmentIds as $segmentId) {
+
+            // If no spell check data found make sure
+            $data[$segmentId] = $data[$segmentId] ?? new stdClass();
+        }
+
+        // Return spell check data
+        return $data ?? [];
+    }
+
+    /**
+     * Fetch spell check data for given segments ids
+     */
+    public function getTermTaggerData(array $segmentIds) {
+
+        // Get spell check data
+        $_data = $this->db->getAdapter()->query('
+            SELECT 
+              `id`,     
+              `segmentId`, 
+              `field`,
+              `falsePositive`
+            FROM `LEK_segment_quality` 
+            WHERE 1
+              AND `segmentId` IN (' . join(',', $segmentIds ?: [0]) . ')
+              AND `type` = "term"
+            ORDER BY `segmentId`, `field`, `startIndex`
+        ')->fetchAll();
+
+        // Group by `segmentId` and `field`
+        foreach ($_data as $_item) {
+            $data[ $_item['segmentId'] ][ $_item['field'] ] []= [
+                'id' => (int) $_item['id'],
+                'falsePositive' => (int) $_item['falsePositive']
+            ];
         }
 
         // Foreach given segmentId
@@ -117,6 +157,6 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
      * Proxy to row's method
      */
     public function spreadFalsePositive() {
-        $this->row->spreadFalsePositive();
+        return $this->row->spreadFalsePositive();
     }
 }

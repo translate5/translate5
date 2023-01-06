@@ -57,7 +57,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      * Handler to sync the new state with the server (to catch false positives without tags) & add decorations in the editor
      */
     onFalsePositiveChanged: function(column, rowIndex, checked, record){
-        var vm = this.getViewModel(), qualityId = record.get('id'), falsePositive = (checked) ? 1 : 0;
+        var me = this, vm = this.getViewModel(), qualityId = record.get('id'), falsePositive = (checked) ? 1 : 0;
 
         // If there are tags in the editor we need to decorate them
         // as otherwise saving the editor would set the falsePositive value back to it's original state!
@@ -88,6 +88,9 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
 
                 // Show toast message
                 Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.msg.updated'));
+
+                // Update data-t5qfp="true/false" attribute for the quality tag/node
+                me.applyFalsePositiveStyle(record.get('id'), falsePositive);
             },
             failure: (response) => {
 
@@ -101,12 +104,27 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
     },
 
     /**
+     * Update data-t5qfp="true/false" attribute for the quality tag/node
+     *
+     * @param qualityId
+     * @param falsePositive
+     */
+    applyFalsePositiveStyle: function(qualityId, falsePositive) {
+
+        // Get quality tag/node
+        var qnode = document.querySelector('[data-t5qid="' + qualityId + '"]');
+
+        // If found - update data-t5qfp="" attribute
+        if (qnode) qnode.setAttribute('data-t5qfp', falsePositive ? 'true' : 'false');
+    },
+
+    /**
      * Spread falsePositive-flag's state for all other occurrences of such [quality - content] pair across the task
      *
      * @param button
      */
     onFalsePositiveSpread: function(button) {
-        var vm = this.getViewModel(), record = button.getWidgetRecord();
+        var me = this, vm = this.getViewModel(), record = button.getWidgetRecord();
 
         // Make request to spread
         Ext.Ajax.request({
@@ -115,7 +133,8 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
             params: {
                 id: record.get('id')
             },
-            success: () => {
+            success: (xhr) => {
+                var json;
 
                 // Set falsePositiveChanged-flag so that spread-button-widget will be disabled
                 // in the last grid column until the next time value changed in first column
@@ -126,6 +145,13 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
 
                 // Show tast message
                 Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.msg.spreaded'));
+
+                // If response is json-decodable
+                if (json = Ext.JSON.decode(xhr.responseText, true)) {
+
+                    // Update data-t5qfp="true/false" attribute for the similar qualities tags/nodes
+                    json.ids.forEach((id) => me.applyFalsePositiveStyle(id, record.get('falsePositive')));
+                }
             },
             failure: (response) => {
                 Editor.app.getController('ServerException').handleException(response);

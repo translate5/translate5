@@ -64,6 +64,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         // Attributes for the quality-Node
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-quality-activeMatchIndex',
         ATTRIBUTE_QUALITY_ID: 'data-t5qid',
+        ATTRIBUTE_QUALITY_FALSEPOSITIVE: 'data-t5qfp',
     },
 
     /**
@@ -295,6 +296,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         // activeMatchIndex
         nodeElParams[me.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
         nodeElParams[me.self.ATTRIBUTE_QUALITY_ID] = match.id;
+        nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE] = match.falsePositive ? 'true' : 'false';
         // create and return node
         return Ext.DomHelper.createDom(nodeElParams);
     },

@@ -141,7 +141,7 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
      * @return int|string
      * @throws Zend_Db_Statement_Exception
      */
-    public function getSimilarQty() {
+    public function getSimilar($mode = 'qty') {
 
         // Get content
         $content = $this->getContent();
@@ -151,9 +151,22 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
             return 0;
         }
 
+        // Shortcut
+        $db = $this->getTable()->getAdapter();
+
+        // Get mysql function
+        $fn = ['qty' => 'COUNT', 'ids' => 'GROUP_CONCAT'];
+
+        // If $mode arg is 'ids'
+        if ($mode == 'ids') {
+
+            // Increase group_concat_max_len to maximum value for 32-bit platforms
+            $db->query('SET @@session.group_concat_max_len = 4294967295');
+        }
+
         // Get similar qty
-        return $this->getTable()->getAdapter()->query('
-            SELECT COUNT(`id`) FROM `LEK_segment_quality` WHERE `taskGuid` = ?
+        return $db->query('
+            SELECT ' . $fn[$mode] . '(`id`) FROM `LEK_segment_quality` WHERE `taskGuid` = ?
               AND `id` != ?
               AND `type` = ?
               AND `category` = ?
@@ -185,23 +198,20 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
             return 0;
         }
 
-        // Else update similar qualities' falsePositive flag
-        return $this->getTable()->getAdapter()->query('
-            UPDATE `LEK_segment_quality` SET `falsePositive` = ? WHERE `taskGuid` = ?
-              AND `id` != ?
-              AND `type` = ?
-              AND `category` = ?
-              AND `field` = ?
-              AND NOT ISNULL(`additionalData`) 
-              AND JSON_EXTRACT(`additionalData`, "$.content") = ? 
-        ', [
+        // Get ids of similar qualities
+        $ids = $this->getSimilar('ids');
+
+        // Update similar qualities' falsePositive flag
+        if ($ids) $this->getTable()->getAdapter()->query("
+            UPDATE `LEK_segment_quality` 
+            SET `falsePositive` = ? 
+            WHERE `taskGuid` = ? AND `id` IN ($ids)
+        ", [
             $this->falsePositive,
-            $this->taskGuid,
-            $this->id,
-            $this->type,
-            $this->category,
-            $this->field,
-            $content
+            $this->taskGuid
         ]);
+
+        // Return ids of similar qualities
+        return $ids;
     }
 }

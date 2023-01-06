@@ -1076,3 +1076,12 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 .x-layer.x-fieldset-header-default > .x-fieldset-header-text {
     padding-top: 0;
 }
+.t5quality[data-t5qfp="true"],
+#change-alike-window div.transNotFound[data-t5qfp="true"],
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound[data-t5qfp="true"],
+.segment-tag-container.type-source div.transNotFound[data-t5qfp="true"] {
+    text-decoration-style: dashed;
+    text-decoration-line: underline;
+    text-decoration-color: limegreen;
+    text-underline-offset: 7px;
+}

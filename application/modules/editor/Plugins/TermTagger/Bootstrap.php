@@ -84,6 +84,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
 
         $this->eventManager->attach('editor_TaskController', 'tagtermsOperation', [$this, 'handleTagtermsOperation']);
+        $this->eventManager->attach('Editor_SegmentController', 'afterIndexAction', [$this, 'handleAfterSegmentIndex']);
     }
 
     /***
@@ -105,6 +106,40 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $view = $event->getParam('view');
         /* @var $view Zend_View_Interface */
         $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
+    }
+
+    /**
+     * Append spellcheck data for each segment within segments store data
+     *
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterSegmentIndex(Zend_EventManager_Event $event) {
+
+        // Get array of segment ids
+        $view = $event->getParam('view');
+        $segmentIds = array_column($view->rows, 'id');
+
+        // Get [segmentId => termTaggerData] pairs
+        $segmentTermTaggerDataById = ZfExtended_Factory
+            ::get('editor_Models_SegmentQuality')
+            ->getTermTaggerData($segmentIds);
+
+        // Apply to response
+        foreach ($view->rows as &$row) {
+            foreach ($segmentTermTaggerDataById[$row['id']] as $field => $qualityA) {
+                foreach ([$field, $field . 'Edit'] as $_field) {
+                    if (isset($row[$_field])) {
+                        foreach ($qualityA as $quality) {
+                            $row[$_field] = preg_replace(
+                                '~data-t5qid="' . $quality['id'] . '"~',
+                                '$0 data-t5qfp="' . ($quality['falsePositive'] ? 'true' : 'false') . '"',
+                                $row[$_field]
+                            );
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
