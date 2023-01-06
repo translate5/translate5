@@ -57,7 +57,8 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      * Handler to sync the new state with the server (to catch false positives without tags) & add decorations in the editor
      */
     onFalsePositiveChanged: function(column, rowIndex, checked, record){
-        var me = this, vm = this.getViewModel(), qualityId = record.get('id'), falsePositive = (checked) ? 1 : 0;
+        var me = this, vm = this.getViewModel(), qualityId = record.get('id'), falsePositive = (checked) ? 1 : 0,
+            other, otherRec;
 
         // If there are tags in the editor we need to decorate them
         // as otherwise saving the editor would set the falsePositive value back to it's original state!
@@ -91,6 +92,22 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
 
                 // Update data-t5qfp="true/false" attribute for the quality tag/node
                 me.applyFalsePositiveStyle(record.get('id'), falsePositive);
+
+                // Prepare component query selector for other instance of falsePositive-panel
+                other = 'falsePositives[floating=' + (!column.up('fieldset').floating).toString() + ']';
+
+                // If other instance of falsePositive-panel exists
+                if (other = Ext.ComponentQuery.query(other).pop()) {
+
+                    // Replicate change of falsePositive-prop to the corresponding quality-record
+                    if (otherRec = other.down('grid').getStore().getById(record.get('id'))) {
+                        otherRec.set({
+                            falsePositive: falsePositive,
+                            falsePositiveChanged: 1
+                        });
+                        otherRec.commit();
+                    }
+                }
             },
             failure: (response) => {
 
@@ -111,11 +128,35 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      */
     applyFalsePositiveStyle: function(qualityId, falsePositive) {
 
-        // Get quality tag/node
-        var qnode = document.querySelector('[data-t5qid="' + qualityId + '"]');
+        // Get quality tags/nodes
+        var tagA = document.querySelectorAll('[data-t5qid="' + qualityId + '"]'),
+            tip = 'Right-click to set as false positive', cell, row, rid, rec, id;
 
         // If found - update data-t5qfp="" attribute
-        if (qnode) qnode.setAttribute('data-t5qfp', falsePositive ? 'true' : 'false');
+        tagA.forEach(tag => {
+
+            // Update data-t5qfp attr
+            tag.setAttribute('data-t5qfp', falsePositive ? 'true' : 'false');
+
+            // Set/remove data-qtip attr
+            falsePositive
+                ? tag.removeAttribute('data-qtip')
+                : tag.setAttribute('data-qtip', tip);
+
+            // If tag is inside source-column
+            if (cell = tag.closest('td[data-columnid="sourceColumn"]')) {
+
+                // Get record
+                row = cell.closest('table.x-grid-item');
+                rid = row.getAttribute('data-recordid');
+                rec = Ext.getCmp(row.getAttribute('data-boundview')).getStore().getByInternalId(rid);
+
+                // Update source, so that updated value will be picked by segmenteditor once opened
+                tag.removeAttribute('id');
+                rec.set('source', cell.querySelector('.x-grid-cell-inner').innerHTML + '');
+                rec.commit();
+            }
+        });
     },
 
     /**
@@ -124,7 +165,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      * @param button
      */
     onFalsePositiveSpread: function(button) {
-        var me = this, vm = this.getViewModel(), record = button.getWidgetRecord();
+        var me = this, vm = this.getViewModel(), record = button.getWidgetRecord(), other, otherRec;
 
         // Make request to spread
         Ext.Ajax.request({
@@ -142,6 +183,19 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
 
                 // Commit changes
                 record.commit();
+
+                // Prepare component query selector for other instance of falsePositive-panel
+                other = 'falsePositives[floating=' + (!button.up('fieldset').floating).toString() + ']';
+
+                // If other instance of falsePositive-panel exists
+                if (other = Ext.ComponentQuery.query(other).pop()) {
+
+                    // Replicate change of falsePositiveChanged-prop to the corresponding quality-record
+                    if (otherRec = other.down('grid').getStore().getById(record.get('id'))) {
+                        otherRec.set('falsePositiveChanged', 0);
+                        otherRec.commit();
+                    }
+                }
 
                 // Show tast message
                 Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.msg.spreaded'));

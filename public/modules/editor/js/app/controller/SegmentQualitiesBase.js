@@ -65,6 +65,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-quality-activeMatchIndex',
         ATTRIBUTE_QUALITY_ID: 'data-t5qid',
         ATTRIBUTE_QUALITY_FALSEPOSITIVE: 'data-t5qfp',
+        ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP: 'data-qtip',
     },
 
     /**
@@ -297,6 +298,9 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         nodeElParams[me.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
         nodeElParams[me.self.ATTRIBUTE_QUALITY_ID] = match.id;
         nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE] = match.falsePositive ? 'true' : 'false';
+        if (!match.falsePositive) {
+            nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP] = 'Right-click to set as false positive';
+        }
         // create and return node
         return Ext.DomHelper.createDom(nodeElParams);
     },

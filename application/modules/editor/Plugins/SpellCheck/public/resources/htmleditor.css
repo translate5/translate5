@@ -33,37 +33,38 @@ END LICENSE AND COPYRIGHT
     position: relative;
 }
 
-.t5quality .trackchanges {
-    border-bottom: 3px dotted;
-    border-color: red;
+.t5quality.t5general, .t5quality.t5general .trackchanges,
+.t5quality.t5style, .t5quality.t5style .trackchanges,
+.t5quality.t5grammar, .t5quality.t5grammar .trackchanges,
+.t5quality.t5misspelling, .t5quality.t5misspelling .trackchanges,
+.t5quality.t5typographical, .t5quality.t5typographical .trackchanges {
+    text-decoration-style: wavy;
+    text-underline-offset: 1px;
+    text-decoration-line: underline;
+    padding-bottom: 2px;
 }
 
 /* gray */
 .t5quality.t5general, .t5quality.t5general .trackchanges {
-    border-bottom: 3px dotted;
-    border-color: #808080;
+    text-decoration-color: #808080;
 }
 
 /* blue */
 .t5quality.t5style, .t5quality.t5style .trackchanges {
-    border-bottom: 3px dotted;
-    border-color: #458fe6;
+    text-decoration-color: #458fe6;
 }
 
 /* dark yellow */
 .t5quality.t5grammar, .t5quality.t5grammar .trackchanges {
-    border-bottom: 3px dotted;
-    border-color: #ab8906;
+    text-decoration-color: #ab8906;
 }
 
 /* red-violet */
 .t5quality.t5misspelling, .t5quality.t5misspelling .trackchanges {
-    border-bottom: 3px dotted;
-    border-color: #e645a8;
+    text-decoration-color: #e645a8;
 }
 
 /* dark-purple */
 .t5quality.t5typographical, .t5quality.t5typographical .trackchanges {
-    border-bottom: 3px dotted;
-    border-color: #4d004d;
+    text-decoration-color: #4d004d;
 }

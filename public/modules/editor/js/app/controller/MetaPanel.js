@@ -181,6 +181,9 @@ Ext.define('Editor.controller.MetaPanel', {
             click: () => {
                 this.getSegmentGrid().getView().select(segmenteditor.context.record)
             },
+            contextmenu: (event) => {
+                this.onSegmentContextMenu(null, null, null, null, event);
+            },
             scope: this
         });
     },

@@ -245,11 +245,23 @@ div.single + div {
 
 #change-alike-window div.transNotFound,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound,
-.segment-tag-container.type-source div.transNotFound {border-bottom-color:#ff0000;}
+.segment-tag-container.type-source div.transNotFound {
+    text-decoration-style: solid;
+    text-decoration-color: red;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    border-bottom: 0;
+}
 
 #change-alike-window div.transNotDefined,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotDefined,
-.segment-tag-container.type-source div.transNotDefined {border-bottom-color:#8F4C36;}
+.segment-tag-container.type-source div.transNotDefined {
+    text-decoration-style: solid;
+    text-decoration-color: #8F4C36;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    border-bottom: 0;
+}
 
 .segment-tag-column div.x-grid-cell-inner div.notRecommended,
 .segment-tag-container div.notRecommended,
@@ -1080,8 +1092,6 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 #change-alike-window div.transNotFound[data-t5qfp="true"],
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound[data-t5qfp="true"],
 .segment-tag-container.type-source div.transNotFound[data-t5qfp="true"] {
-    text-decoration-style: dashed;
-    text-decoration-line: underline;
-    text-decoration-color: limegreen;
-    text-underline-offset: 7px;
+    border-bottom: 1px solid limegreen;
+    padding-bottom: 2px;
 }

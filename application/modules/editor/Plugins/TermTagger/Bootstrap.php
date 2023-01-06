@@ -132,7 +132,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
                         foreach ($qualityA as $quality) {
                             $row[$_field] = preg_replace(
                                 '~data-t5qid="' . $quality['id'] . '"~',
-                                '$0 data-t5qfp="' . ($quality['falsePositive'] ? 'true' : 'false') . '"',
+                                '$0 data-t5qfp="' . ($quality['falsePositive'] ? 'true' : 'false') . '"'
+                                . ($quality['falsePositive'] ? '' : ' data-qtip="Right-click to set as false positive"'),
                                 $row[$_field]
                             );
                         }
