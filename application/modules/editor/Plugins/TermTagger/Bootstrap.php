@@ -124,6 +124,10 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
             ::get('editor_Models_SegmentQuality')
             ->getTermTaggerData($segmentIds);
 
+        // Get tooltip
+        $tip = ZfExtended_Zendoverwrites_Translate::getInstance()
+            ->_('Rechts klicken um als "falsch erkannt" zu markieren');
+
         // Apply to response
         foreach ($view->rows as &$row) {
             foreach ($segmentTermTaggerDataById[$row['id']] as $field => $qualityA) {
@@ -133,7 +137,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
                             $row[$_field] = preg_replace(
                                 '~data-t5qid="' . $quality['id'] . '"~',
                                 '$0 data-t5qfp="' . ($quality['falsePositive'] ? 'true' : 'false') . '"'
-                                . ($quality['falsePositive'] ? '' : ' data-qtip="Right-click to set as false positive"'),
+                                . editor_Utils::rif(!$quality['falsePositive'], ' data-qtip="' . $tip . '"'),
                                 $row[$_field]
                             );
                         }

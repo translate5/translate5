@@ -32,7 +32,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.FalsePositives', {
     extend: 'Ext.form.FieldSet',
     alias: 'widget.falsePositives',
-    title: "#UT#Falsch erkannte Fehler",
     requires: [
         'Editor.view.quality.FalsePositivesController',
         'Ext.grid.column.Check'
@@ -40,13 +39,16 @@ Ext.define('Editor.view.quality.FalsePositives', {
     controller: 'falsePositives',
     cls: 'segmentQualities',
     padding: 0,
+    bind: {
+        title: '{l10n.falsePositives.legend.fixed}'
+    },
     items: [{
         xtype: 'grid',
         userCls: 't5falsePositivesGrid',
         border: 0,
         width: 277,
         height: 'auto',
-        emptyText: 'No qualities for now',
+        emptyText: Editor.data.l10n.falsePositives.grid.emptyText,
         store: {
             type: 'json',
             data: []

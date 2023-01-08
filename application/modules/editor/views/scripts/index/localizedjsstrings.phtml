@@ -314,7 +314,6 @@ Ext.define('Editor.controller.Localizer', {
         qmHasBeenAdded: '<?php echo $this->translate->_('Die Qualität wurde hinzugefügt');?>',
         qmHasBeenRemoved: '<?php echo $this->translate->_('Die Qualität wurde entfernt');?>'
     };
-    Editor.view.quality.FalsePositives.prototype.title = '<?php echo $this->translate->_('Falsch erkannte Fehler');?>';
     Editor.view.quality.admin.TaskQualities.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
   	Editor.view.quality.admin.TaskQualities.prototype.strings = {
 		category: '<?php echo $this->translate->_('Kategorie');?>',
@@ -2085,16 +2084,23 @@ Editor.data.l10n = {
         sameContextColumn: '<?php echo $this->translate->_('Kontext-Treffer');?>'
     },
     falsePositives: {
+        hover: '<?php echo $this->translate->_('Rechts klicken um als "falsch erkannt" zu markieren')?>',
+        legend: {
+            fixed: '<?php echo $this->translate->_('Falsch erkannte Fehler?')?>',
+            float: '<?php echo $this->translate->_('Ein falsch erkannter Fehler?')?>'
+        },
+        close: '<?php echo $this->translate->_('Schließen');?>',
         msg: {
             updated: '<?php echo $this->translate->_('Der False-Positive Status wurde aktualisiert');?>',
-            spreaded: 'Spreaded such status for other occurrences within this task'
+            spreaded: '<?php echo $this->translate->_('Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt');?>'
         },
         grid: {
-            falsePositive: 'Yes',
-            text: 'Quality',
+            falsePositive: '<?php echo $this->translate->_('Ja');?>',
+            text: '<?php echo $this->translate->_('Qualität');?>',
+            emptyText: '<?php echo $this->translate->_('Ladequalität..');?>',
             similarQty: {
-                tooltip: 'Quantity of other occurrences of such [quality - content] pair found in this task',
-                button: 'Spread such status for all those other occurrences of such [quality - content] pair found in this task',
+                tooltip: '<?php echo $this->translate->_('Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>',
+                button: '<?php echo $this->translate->_('Verbreiten Sie diesen Status für alle anderen Vorkommen eines solchen [Qualitätsinhalt] -Paares, das in dieser Aufgabe gefunden wurde');?>'
             }
         }
     },

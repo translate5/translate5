@@ -224,7 +224,9 @@ Ext.define('Editor.controller.MetaPanel', {
                 floating: true,
                 draggable: true,
                 collapsible: true, // collapse/expand tool is hidden by css
-                title: 'False positive?<span class="x-fa fa-circle-xmark" title="Close"></span>',
+                bind: {
+                    title: '{l10n.falsePositives.legend.float} <span class="x-fa fa-circle-xmark" title="{l10n.falsePositives.close}"></span>'
+                },
                 toggle: function(ev, dom, opts) {
                     if (ev.getTarget('.x-fa')) opts.scope.hide();
                 }
@@ -232,7 +234,6 @@ Ext.define('Editor.controller.MetaPanel', {
         }
 
         // Show grid
-        me.segmentRightClickGrid.down('grid').setEmptyText('Loading...');
         me.segmentRightClickGrid.showBy(tag, 't-b?', [0, 10]);
 
         // Pick quality by id once qualities store is loaded

@@ -5963,7 +5963,15 @@ The following task was imported with errors / warnings / notices. Please take ca
             </trans-unit>
             <trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcg=='>
                 <source>Falsch erkannte Fehler</source>
+                <target>False positives</target>
+            </trans-unit>
+            <trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcj8='>
+                <source>Falsch erkannte Fehler?</source>
                 <target>False positives?</target>
+            </trans-unit>
+            <trans-unit id='RWluIGZhbHNjaCBlcmthbm50ZXIgRmVobGVyPw=='>
+                <source>Ein falsch erkannter Fehler?</source>
+                <target>False positive?</target>
             </trans-unit>
             <trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'>
                 <source>Interne Tag Fehler</source>
@@ -5992,6 +6000,38 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='>
                 <source>Der False-Positive Status wurde aktualisiert</source>
                 <target>The false-positive state has been updated</target>
+            </trans-unit>
+            <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFuZGVyZSBFcmVpZ25pc3NlIGlubmVyaGFsYiBkaWVzZXIgQXVmZ2FiZSB2ZXJ0ZWlsdA=='>
+                <source>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</source>
+                <target>Spreaded such status for other occurrences within this task</target>
+            </trans-unit>
+            <trans-unit id='UmVjaHRzIGtsaWNrZW4gdW0gYWxzICJmYWxzY2ggZXJrYW5udCIgenUgbWFya2llcmVu'>
+                <source>Rechts klicken um als "falsch erkannt" zu markieren</source>
+                <target>Right-click to set as false positve</target>
+            </trans-unit>
+            <trans-unit id='QW56YWhsIGFuZGVyZXIgVm9ya29tbWVuIGVpbmVzIHNvbGNoZW4gUGFhcmVzIFtRdWFsaXTDpHQgLSBJbmhhbHRdLCBkaWUgaW4gZGllc2VyIEF1ZmdhYmUgZ2VmdW5kZW4gd3VyZGVu'>
+                <source>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
+                <target>Quantity of other occurrences of such [quality - content] pair found in this task</target>
+            </trans-unit>
+            <trans-unit id='VmVyYnJlaXRlbiBTaWUgZGllc2VuIFN0YXR1cyBmw7xyIGFsbGUgYW5kZXJlbiBWb3Jrb21tZW4gZWluZXMgc29sY2hlbiBbUXVhbGl0w6R0c2luaGFsdF0gLVBhYXJlcywgZGFzIGluIGRpZXNlciBBdWZnYWJlIGdlZnVuZGVuIHd1cmRl'>
+                <source>Verbreiten Sie diesen Status für alle anderen Vorkommen eines solchen [Qualitätsinhalt] -Paares, das in dieser Aufgabe gefunden wurde</source>
+                <target>Spread such status for all those other occurrences of such [quality - content] pair found in this task</target>
+            </trans-unit>
+            <trans-unit id='SmE='>
+                <source>Ja</source>
+                <target>Yes</target>
+            </trans-unit>
+            <trans-unit id='UXVhbGl0w6R0'>
+                <source>Qualität</source>
+                <target>Quality</target>
+            </trans-unit>
+            <trans-unit id='TGFkZXF1YWxpdMOkdC4u'>
+                <source>Ladequalität..</source>
+                <target>Loading quality..</target>
+            </trans-unit>
+            <trans-unit id='U2NobGllw59lbg=='>
+                <source>Schließen</source>
+                <target>Close</target>
             </trans-unit>
             <trans-unit id='QWNodHVuZw=='>
                 <source>Achtung</source>

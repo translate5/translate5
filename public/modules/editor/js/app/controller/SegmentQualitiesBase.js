@@ -299,7 +299,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         nodeElParams[me.self.ATTRIBUTE_QUALITY_ID] = match.id;
         nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE] = match.falsePositive ? 'true' : 'false';
         if (!match.falsePositive) {
-            nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP] = 'Right-click to set as false positive';
+            nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP] = Editor.data.l10n.falsePositives.hover;
         }
         // create and return node
         return Ext.DomHelper.createDom(nodeElParams);
