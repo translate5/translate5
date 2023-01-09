@@ -12,6 +12,26 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.8.4] - 2023-01-09
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3157](https://jira.translate5.net/browse/TRANSLATE-3157): SpellCheck (LanguageTool integration) - Summon new SNC-error with the one SpellCheck is already counting** <br>
+SNC-error beginnig with  "Dubiose 'Zahl' ..." renamed to "Dubiose Zahl" for being counted as already known to Translate5
+
+
+### Bugfixes
+**[TRANSLATE-3146](https://jira.translate5.net/browse/TRANSLATE-3146): TermPortal - Attribute tooltip has annoying latency** <br>
+Tooltips do now have no before-show delay
+
+**[TRANSLATE-3095](https://jira.translate5.net/browse/TRANSLATE-3095): TermPortal - Not all available TermCollections visible in drop-down menu** <br>
+Filter window's TermCollection dropdown problem not appearing anymore
+
+
 ## [5.8.3] - 2022-12-26
 
 ### Important Notes:
