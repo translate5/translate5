@@ -234,6 +234,7 @@ Ext.define('Editor.controller.MetaPanel', {
         }
 
         // Show grid
+        me.segmentRightClickGrid.down('grid').setEmptyText(Editor.data.l10n.falsePositives.grid.emptyText);
         me.segmentRightClickGrid.showBy(tag, 't-b?', [0, 10]);
 
         // Pick quality by id once qualities store is loaded

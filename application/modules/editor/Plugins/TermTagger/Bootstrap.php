@@ -126,7 +126,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 
         // Get tooltip
         $tip = ZfExtended_Zendoverwrites_Translate::getInstance()
-            ->_('Rechts klicken um als "falsch erkannt" zu markieren');
+            ->_('Rechts klicken um als \'falsch erkannt\' zu markieren');
 
         // Apply to response
         foreach ($view->rows as &$row) {

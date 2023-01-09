@@ -7731,9 +7731,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</source>
                 <target>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</target>
             </trans-unit>
-            <trans-unit id='UmVjaHRzIGtsaWNrZW4gdW0gYWxzICJmYWxzY2ggZXJrYW5udCIgenUgbWFya2llcmVu'>
-                <source>Rechts klicken um als "falsch erkannt" zu markieren</source>
-                <target>Rechts klicken um als "falsch erkannt" zu markieren</target>
+            <trans-unit id='UmVjaHRzIGtsaWNrZW4gdW0gYWxzICdmYWxzY2ggZXJrYW5udCcgenUgbWFya2llcmVu'>
+                <source>Rechts klicken um als 'falsch erkannt' zu markieren</source>
+                <target>Rechts klicken um als 'falsch erkannt' zu markieren</target>
             </trans-unit>
             <trans-unit id='QW56YWhsIGFuZGVyZXIgVm9ya29tbWVuIGVpbmVzIHNvbGNoZW4gUGFhcmVzIFtRdWFsaXTDpHQgLSBJbmhhbHRdLCBkaWUgaW4gZGllc2VyIEF1ZmdhYmUgZ2VmdW5kZW4gd3VyZGVu'>
                 <source>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>

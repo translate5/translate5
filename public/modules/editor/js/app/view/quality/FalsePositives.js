@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -48,7 +47,6 @@ Ext.define('Editor.view.quality.FalsePositives', {
         border: 0,
         width: 277,
         height: 'auto',
-        emptyText: Editor.data.l10n.falsePositives.grid.emptyText,
         store: {
             type: 'json',
             data: []
