@@ -934,6 +934,9 @@ class editor_TaskController extends ZfExtended_RestController {
         // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time.
         $this->decodePutData();
 
+        //throws exceptions if task not closable
+        $this->checkTaskStateTransition();
+
         $this->handleCancelImport();
 
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
@@ -974,7 +977,6 @@ class editor_TaskController extends ZfExtended_RestController {
 
         //throws exceptions if task not accessable
         $this->checkTaskAccess();
-        $this->checkTaskStateTransition();
         
         //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
@@ -1103,12 +1105,15 @@ class editor_TaskController extends ZfExtended_RestController {
         $closingTask = ($this->data->state ?? null) === 'end';
 
         if($closingTask && null !== $this->entity->getLocked()) {
+            $message = ZfExtended_Zendoverwrites_Translate::getInstance()
+                ->_("Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.");
+
             ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1161' => "The job can not be modified, since the user has already opened the task for editing. You are to late.",
+                'E1161' => $message,
             ]);
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1161', [
-                'id' => 'Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.',
+                'userState' => $message,
             ]);
         }
     }

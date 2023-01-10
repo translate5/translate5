@@ -4476,6 +4476,10 @@ More information can be found in the task property window in the tab events.
                 <source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source>
                 <target>The job can not be modified, since the user has already opened the task for editing.</target>
             </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUga2FubiBuaWNodCB2b24gZWluZW0gUE0gYmVlbmRldCB3ZXJkZW4sIHdlaWwgZWluIEJlbnV0emVyIGRpZSBBdWZnYWJlIHp1ciBCZWFyYmVpdHVuZyBnZcO2ZmZuZXQgaGF0Lg=='>
+                <source>Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.</source>
+                <target>The task can not be set to ended by a PM, because a user has opened the task for editing.</target>
+            </trans-unit>
             <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZHVyY2ggYW5kZXJlbiBCZW51dHplciDDvGJlcm5vbW1lbg=='>
                 <source>Translate5 - Aufgabe durch anderen Benutzer übernommen</source>
                 <target>Translate5 - another user took responsibility for the task</target>
