@@ -83,6 +83,7 @@ END LICENSE AND COPYRIGHT
             'GroupShare'        => $translate->_("GroupShare"),
         ],
     );
+    $this->Php2JsVars()->set('logoutOnWindowClose', Zend_Registry::get('config')->runtimeOptions->logoutOnWindowClose);
     $this->Php2JsVars()->set('languageresource.translatedStrings', $this->translations);
     $this->Php2JsVars()->set('allDbLanguages', $this->allDbLanguages);
 
