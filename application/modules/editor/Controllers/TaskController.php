@@ -1100,6 +1100,13 @@ class editor_TaskController extends ZfExtended_RestController {
         }
     }
 
+    /**
+     * Check if task is allowed to be transferred to the particular state
+     *
+     * @return void
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
+     */
     private function checkTaskStateTransition(): void
     {
         $closingTask = ($this->data->state ?? null) === 'end';
