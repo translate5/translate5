@@ -32,11 +32,31 @@ namespace MittagQI\Translate5\Models\Import;
 
 use editor_Models_Task as Task;
 
+/**
+ * Should be implemented by processors that are executed by pause workers
+ */
 interface PauseWorkerProcessorInterface
 {
+    /**
+     * Shows if the worker should wait and then check again
+     * If false - the pause worker should be finished
+     *
+     * @param Task $task
+     * @return bool
+     */
     public function shouldWait(Task $task): bool;
 
-    public function getMaxWaitTime(): int;
+    /**
+     * Shows maximum amount of time the worker should wait until finished
+     *
+     * @return int
+     */
+    public function getMaxWaitTimeSeconds(): int;
 
-    public function getSleepTime(): int;
+    /**
+     * Shows how much time the worker should wait until the next check
+     *
+     * @return int
+     */
+    public function getSleepTimeSeconds(): int;
 }

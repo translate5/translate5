@@ -35,11 +35,13 @@ use editor_Services_Manager as Manager;
 use editor_Services_OpenTM2_Connector as OpenTm2Connector;
 use editor_Services_Connector_FilebasedAbstract as AbstractConnector;
 use Exception;
-use MittagQI\Translate5\Models\Import\PauseImportWorker;
 use MittagQI\Translate5\Models\Import\PauseWorkerProcessorInterface;
 use editor_Models_Task as Task;
 use ZfExtended_Factory;
 
+/**
+ * Processor that pauses the match analysis while t5memory (or opentm2) is importing a file
+ */
 class PauseMatchAnalysisProcessor implements PauseWorkerProcessorInterface
 {
     private $config;
@@ -74,14 +76,14 @@ class PauseMatchAnalysisProcessor implements PauseWorkerProcessorInterface
         return false;
     }
 
-    public function getMaxWaitTime(): int
+    public function getMaxWaitTimeSeconds(): int
     {
         return $this->config->runtimeOptions->worker->{PauseMatchAnalysisWorker::class}->maxPauseTime;
     }
 
-    public function getSleepTime(): int
+    public function getSleepTimeSeconds(): int
     {
-        // Config?
+        // TODO Config?
         return 5;
     }
 }

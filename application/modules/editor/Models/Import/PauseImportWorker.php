@@ -30,7 +30,10 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Models\Import;
 
-class PauseImportWorker extends \editor_Models_Task_AbstractWorker
+/**
+ * Base class for pause workers
+ */
+abstract class PauseImportWorker extends \editor_Models_Task_AbstractWorker
 {
     public const PROCESSOR = 'processor';
     
@@ -48,16 +51,16 @@ class PauseImportWorker extends \editor_Models_Task_AbstractWorker
         /** @var PauseWorkerProcessorInterface $processor */
         $processor = \ZfExtended_Factory::get($params[self::PROCESSOR]);
 
-        $sleepTime = $processor->getSleepTime();
-        $time = 0;
-        $maxTime = $processor->getMaxWaitTime();
+        $sleepTime = $processor->getSleepTimeSeconds();
+        $maxTime = $processor->getMaxWaitTimeSeconds();
+        $elapsedTime = 0;
 
-        while ($time < $maxTime) {
+        while ($elapsedTime < $maxTime) {
             if (!$processor->shouldWait($this->task)) {
                 break;
             }
 
-            $time+= $sleepTime;
+            $elapsedTime+= $sleepTime;
             sleep($sleepTime);
         }
 
