@@ -199,7 +199,7 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
 
     $('#translations').on('touchstart click','.term-info',function(){
         var term = $(this).attr('id'),
-            lang = $("#targetLocale").val(),
+            lang = $(this).attr('data-languagerfc'),
             collectionId = $(this).parent().find('[data-languageresource-type=termcollection]').attr('id'),
             q = top.window.Ext.ComponentQuery.query,
             vm = q('main').pop().getViewModel(),
