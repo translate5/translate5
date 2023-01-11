@@ -29,93 +29,12 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.matchAnalysisPanel',
 
-    exportAction:function (type){
-        var me= this,
-            params = {},
-            task = me.getView().lookupViewModel(true).get('currentTask');
-
-        params.taskGuid = task.get('taskGuid');
-        params.type = type.itemId;
-        params.unitType = me.getView().down('#unitType').getValue();
-        window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
-    },
-    /***
-     * On match analysis record is loaded in the store
-     */
-    onAnalysisRecordLoad:function(store) {
-        var me=this,
-        	view=me.getView(),
-            vm = view.getViewModel(),
-            task = vm.get('currentTask'),
-        	record=store.getAt(0),
-            hasData = !!record;
-
-        vm.set('hasAnalysisData', hasData);
-
-        view.down('#infoPanel').update({
-            hasAnalysisData: hasData,
-            created: record && record.get('created'),
-            internalFuzzy: record && record.get('internalFuzzy'),
-            editFullMatch: task && task.get('edit100PercentMatch'),
-            strings: view.strings
-        });
-    },
-
-    /***
-     * Before analysis store is loaded, add additional parameters to the proxy
-     * @param store
-     */
-    onAnalysisBeforeLoad:function( store){
+    onMatchAnalysisPanelActivate:function(){
         var me = this,
             view = me.getView(),
-            proxy=store.getProxy(),
-            unitTypeField = view && view.down('#unitType'),
-            unitTypeValue = Editor.data.plugins.MatchAnalysis.calculateBasedOn;
+            grid = view && view.down('matchAnalysisGrid'),
+            store = grid && grid.getStore();
 
-        try {
-            // in some cases, when the grid is clicked to fast, the field dom element is not set (it can be because of
-            // extjs cache) and getting the value using getValue method produces js error
-            if(unitTypeField){
-                unitTypeValue = unitTypeField.getValue();
-            }
-        }catch (e){
-            if( !Ext.isEmpty(unitTypeField.value)){
-                unitTypeValue = unitTypeField.value;
-            }
-        }
-        var merged = Ext.merge({}, proxy.getExtraParams(), {
-                unitType:unitTypeValue
-            });
-        proxy.setExtraParams(merged);
-    },
-
-    onMatchAnalysisPanelActivate:function(){
-        this.reloadAnalysisStore();
-    },
-
-    /**
-     * reconfigure the grid to use the configured match rate fields
-     * @param {Editor.plugins.MatchAnalysis.store.MatchAnalysis} store
-     * @param {Object} meta
-     */
-    onMetaChange: function(store, meta) {
-        var view = this.getView(),
-            grid = view && view.down('#matchAnalysisGrid');
-        grid && grid.reconfigure(store, view.getColumnConfig(meta.fields));
-    },
-
-    /***
-     * Unit type combo box select - event handler
-     */
-    onUnitTypeSelect: function (){
-        this.reloadAnalysisStore();
-    },
-
-    /***
-     *
-     */
-    reloadAnalysisStore: function (){
-        var me=this;
-        me.getView().down('#matchAnalysisGrid').getStore().load();
+        store && store.load();
     }
 });

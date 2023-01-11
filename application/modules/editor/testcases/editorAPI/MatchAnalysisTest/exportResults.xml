@@ -2,7 +2,7 @@
 <task name="analyse">
   <taskInfo taskId="UNTESTABLECONTENT" runAt="UNTESTABLECONTENT" runTime="UNTESTABLECONTENT">
     <project name="API Testing::MatchAnalysisTest" number="UNTESTABLECONTENT"/>
-    <language lcid="" name="Deutsch"/>
+    <language lcid="7" name="Deutsch"/>
     <customer name="Alex, Test Customer"/>
     <tm name="MATESTresource1"/>
     <tm name="MATESTresource2"/>
