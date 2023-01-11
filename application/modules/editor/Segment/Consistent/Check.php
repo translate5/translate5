@@ -146,8 +146,8 @@ class editor_Segment_Consistent_Check {
                 SELECT GROUP_CONCAT(`segmentNrInTask`) AS `ids`
                 FROM `' . $this->mvName . '` 
                 WHERE `' . $col['target'] . '` != "" AND `' . $col['source'] . '` != ""
-                GROUP BY `' . $col['source'] . '`
-                HAVING COUNT(DISTINCT `' . $col['target'] . '`) > 1
+                GROUP BY BINARY `' . $col['source'] . '`
+                HAVING COUNT(DISTINCT BINARY `' . $col['target'] . '`) > 1
             ')->fetchAll(PDO::FETCH_COLUMN);
 
             // Get ids of segments having inconsistent sources
@@ -155,8 +155,8 @@ class editor_Segment_Consistent_Check {
                 SELECT GROUP_CONCAT(`segmentNrInTask`) AS `ids`
                 FROM `' . $this->mvName . '` 
                 WHERE `' . $col['source'] . '` != "" AND `' . $col['target'] . '` != "" 
-                GROUP BY `' . $col['target'] . '`
-                HAVING COUNT(DISTINCT `' . $col['source'] . '`) > 1        
+                GROUP BY BINARY `' . $col['target'] . '`
+                HAVING COUNT(DISTINCT BINARY `' . $col['source'] . '`) > 1        
             ')->fetchAll(PDO::FETCH_COLUMN);
         }
 
