@@ -26,5 +26,5 @@
 -- */
 
 DELETE FROM `Zf_worker_dependencies` WHERE `worker` = 'editor_Plugins_MatchAnalysis_Worker' AND `dependency` = 'MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker';
-
 DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.worker.MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker.maxParallelWorkers';
+DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.worker.MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker.maxPauseTime';

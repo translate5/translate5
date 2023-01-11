@@ -26,8 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Import\PauseImportWorker;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
-use MittagQI\Translate5\Models\Import\PauseImportWorker;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker;
 

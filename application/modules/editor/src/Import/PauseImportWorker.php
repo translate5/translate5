@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Models\Import;
+namespace MittagQI\Translate5\Import;
 
 /**
  * Base class for pause workers

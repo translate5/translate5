@@ -31,12 +31,12 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Plugins\MatchAnalysis;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
+use editor_Models_Task as Task;
+use editor_Services_Connector_FilebasedAbstract as AbstractConnector;
 use editor_Services_Manager as Manager;
 use editor_Services_OpenTM2_Connector as OpenTm2Connector;
-use editor_Services_Connector_FilebasedAbstract as AbstractConnector;
 use Exception;
-use MittagQI\Translate5\Models\Import\PauseWorkerProcessorInterface;
-use editor_Models_Task as Task;
+use MittagQI\Translate5\Import\PauseWorkerProcessorInterface;
 use ZfExtended_Factory;
 
 /**

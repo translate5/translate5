@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Plugins\MatchAnalysis;
 
-use MittagQI\Translate5\Models\Import\PauseImportWorker;
+use MittagQI\Translate5\Import\PauseImportWorker;
 
 /**
  * Worker that pauses the match analysis import worker
