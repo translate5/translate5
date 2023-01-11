@@ -72,6 +72,7 @@ class editor_Models_Export_Terminology_Tbx {
     protected array $tabs = [];
 
     /**
+     * File path where the tbx will be saved. Only evaluated if $exportAsFile is set to true.
      * @var string
      */
     protected string $file = '';
@@ -82,6 +83,12 @@ class editor_Models_Export_Terminology_Tbx {
      * @var bool
      */
     public bool $skipDefinition = false;
+
+    /***
+     * True to export the collection as file at $file location
+     * @var bool
+     */
+    private bool $exportAsFile = false;
 
     public function __construct()
     {
@@ -276,8 +283,10 @@ class editor_Models_Export_Terminology_Tbx {
     public function exportCollectionById(int $collectionId, string $userName, $tbxBasicOnly = false, $exportImages = true,
                                          $byTermEntryQty = 1000, $byImageQty = 50, $selected = null) {
 
-        // Setup export file absolute path
-        $this->file = editor_Models_LanguageResources_LanguageResource::exportFilename($collectionId);
+        if( $this->isExportAsFile() && empty($this->getFile())){
+            // export as file is set but the file path is empty or not valid
+            throw new editor_Models_Export_Terminology_Exception('E1449');
+        }
 
         // Models shortcuts
         $termM = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
@@ -578,11 +587,16 @@ class editor_Models_Export_Terminology_Tbx {
         // Build raw output
         $raw = join("\n", $lines) . "\n";
 
-        // Flush raw output
-        echo $raw;
+        if( $this->isExportAsFile()){
+            // Write lines
+            file_put_contents($this->file, $raw, $overwrite ? null : FILE_APPEND);
+        }else{
+            // Flush raw output
+            echo $raw;
+        }
 
-        // Write lines
-        //file_put_contents($this->file, $raw, $overwrite ? null : FILE_APPEND);
+
+
 
         // Clear lines
         $lines = [];
@@ -635,5 +649,37 @@ class editor_Models_Export_Terminology_Tbx {
     private function isEmptyTerm(?string $term): bool
     {
         return editor_Models_Terminology_Models_TermModel::isEmptyTerm($term);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile(): string
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param string $file
+     */
+    public function setFile(string $file): void
+    {
+        $this->file = $file;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isExportAsFile(): bool
+    {
+        return $this->exportAsFile;
+    }
+
+    /**
+     * @param bool $exportAsFile
+     */
+    public function setExportAsFile(bool $exportAsFile): void
+    {
+        $this->exportAsFile = $exportAsFile;
     }
 }
