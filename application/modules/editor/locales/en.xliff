@@ -5997,10 +5997,6 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Die Qualität wurde entfernt</source>
                 <target>The quality has been removed</target>
             </trans-unit>
-            <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='>
-                <source>Der False-Positive Status wurde aktualisiert</source>
-                <target>The false-positive state has been updated</target>
-            </trans-unit>
             <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFuZGVyZSBFcmVpZ25pc3NlIGlubmVyaGFsYiBkaWVzZXIgQXVmZ2FiZSB2ZXJ0ZWlsdA=='>
                 <source>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</source>
                 <target>Spreaded such status for other occurrences within this task</target>

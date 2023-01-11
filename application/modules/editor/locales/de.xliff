@@ -7723,10 +7723,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Die Qualität wurde entfernt</source>
                 <target>Die Qualität wurde entfernt</target>
             </trans-unit>
-            <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='>
-                <source>Der False-Positive Status wurde aktualisiert</source>
-                <target>Der False-Positive Status wurde aktualisiert</target>
-            </trans-unit>
             <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFuZGVyZSBFcmVpZ25pc3NlIGlubmVyaGFsYiBkaWVzZXIgQXVmZ2FiZSB2ZXJ0ZWlsdA=='>
                 <source>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</source>
                 <target>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</target>

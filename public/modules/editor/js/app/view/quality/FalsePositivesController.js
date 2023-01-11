@@ -87,9 +87,6 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 // Commit changes
                 record.commit();
 
-                // Show toast message
-                Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.msg.updated'));
-
                 // Update data-t5qfp="true/false" attribute for the quality tag/node
                 me.applyFalsePositiveStyle(record.get('id'), falsePositive);
 
@@ -198,7 +195,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 }
 
                 // Show tast message
-                Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.msg.spreaded'));
+                Editor.MessageBox.addSuccess(vm.get('l10n.falsePositives.spreaded'));
 
                 // If response is json-decodable
                 if (json = Ext.JSON.decode(xhr.responseText, true)) {
