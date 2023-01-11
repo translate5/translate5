@@ -146,21 +146,12 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                     },
                     sortIndex: 8
                 }, {
-                    text: me.messages.taskPrefs,
-                    action: 'editorPreferencesTask',
-                    hidden: true,
-                    bind: {
-                        hidden: '{!isEditorPreferencesTask}'
-                    },
-                    glyph: 'f085@FontAwesome5FreeSolid',
-                    sortIndex: 9
-                }, {
                     xtype: 'menuseparator',
                     hidden: true,
                     bind: {
                         hidden: '{!isMenuGroupVisible}'
                     },
-                    sortIndex: 10
+                    sortIndex: 9
                 }, {
                     text: me.messages.actionClone,
                     action: 'editorCloneTask',
@@ -169,14 +160,14 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                         hidden: '{!isEditorCloneTask}'
                     },
                     glyph: 'f24d@FontAwesome5FreeSolid',
-                    sortIndex: 11
+                    sortIndex: 10
                 }, {
                     xtype: 'menuseparator',
                     hidden: true,
                     bind: {
                         hidden: '{!isMenuGroupVisible}'
                     },
-                    sortIndex: 12
+                    sortIndex: 11
                 }, {
                     // - Export Icon, bei Klick darauf öffnet sich ein Menü mit den verschiedenen Export Möglichkeiten.
                     // Die einzelnen Menüpunkte ebenfalls per isAllowed abfragen.
@@ -189,7 +180,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                         exportMenu: '{exportMenuConfig}'
                     },
                     glyph: 'f56e@FontAwesome5FreeSolid',
-                    sortIndex: 13,
+                    sortIndex: 12,
                     publishes: {
                         exportMenu: true
                     },
@@ -208,7 +199,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                         hidden: '{!isEditorExcelreimportTask}'
                     },
                     glyph: 'f1c3@FontAwesome5FreeSolid',
-                    sortIndex: 14
+                    sortIndex: 13
                 }, {
                     xtype: 'menuseparator',
                     hidden: true,
@@ -216,7 +207,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                         hidden: '{!isMenuGroupVisible}'
 
                     },
-                    sortIndex: 15
+                    sortIndex: 14
                 }, {
                     text: me.messages.actionDelete,
                     action: 'editorDeleteTask',
@@ -225,23 +216,14 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                         hidden: '{!isEditorDeleteTask}'
                     },
                     glyph: 'f2ed@FontAwesome5FreeSolid',
-                    sortIndex: 16
+                    sortIndex: 15
                 }, {
                     xtype: 'menuseparator',
                     hidden: true,
                     bind: {
                         hidden: '{!isMenuGroupVisible}'
                     },
-                    sortIndex: 17
-                }, {
-                    text: me.messages.actionLog,
-                    action: 'editorLogTask',
-                    hidden: true,
-                    bind: {
-                        hidden: '{!isEditorLogTask}'
-                    },
-                    glyph: 'f1da@FontAwesome5FreeSolid',
-                    sortIndex: 18
+                    sortIndex: 16
                 }]
             };
 
