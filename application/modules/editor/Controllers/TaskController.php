@@ -1112,14 +1112,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $closingTask = ($this->data->state ?? null) === 'end';
 
         if($closingTask && null !== $this->entity->getLocked()) {
-            $message = $this->translate->_("Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.");
-
             ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1161' => $message,
+                'E1161' => 'The task can not be set to ended by a PM, because a user has opened the task for editing.',
             ]);
 
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1161', [
-                'userState' => $message . '1234567890',
+                'Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.',
             ]);
         }
     }
