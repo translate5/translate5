@@ -9,6 +9,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
+			"MittagQI\\ZfExtended\\" : "library/ZfExtended",
 			"MittagQI\\Translate5\\" : "application/modules/editor/src",
 			"MittagQI\\Translate5\\Models\\" : "application/modules/editor/Models",
 			"MittagQI\\Translate5\\Plugins\\" : "application/modules/editor/Plugins",

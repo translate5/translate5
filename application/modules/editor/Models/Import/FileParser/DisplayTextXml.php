@@ -328,6 +328,7 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
             }
             $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.displayTextXml');
             $logger->warn('E1277', 'Unknown XML tags "{tag}" discovered in file "{fileName} (id {fileId})"!', [
+                'tag' => $tag,
                 'task' => $this->task,
                 'fileName' => $this->_fileName,
                 'fileId' => $this->_fileId,

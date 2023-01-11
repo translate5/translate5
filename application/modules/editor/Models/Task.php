@@ -107,6 +107,8 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
     const STATE_END = 'end';
+    const STATE_PREPARATION = 'preparation';
+    const STATE_POST_PROCESSING = 'postprocessing';
     const STATE_IMPORT = 'import';
     const STATE_PROJECT = 'project'; //seems to be used as import status for projects!
     const STATE_ERROR = 'error';

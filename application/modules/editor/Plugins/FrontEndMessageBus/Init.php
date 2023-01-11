@@ -166,20 +166,20 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     /**
      * @param Zend_EventManager_Event $event
      */
-    public function handleJobPut(Zend_EventManager_Event $event) {
+    public function handleJobPut(Zend_EventManager_Event $event): void
+    {
         //1. load the desired job
         $id = $event->getParam('params')['id'] ?? 0;
         $job = clone $event->getParam('entity');
         /* @var $job editor_Models_TaskUserAssoc */
         try {
             $job->load($id); //empty id evaluates above to 0 which triggers not found then
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
             return;
         }
 
         //2. check if there is a locking session, if no, do nothing
-        if(empty($job->getUsedInternalSessionUniqId())) {
+        if (empty($job->getUsedInternalSessionUniqId())) {
             return;
         }
 
@@ -188,25 +188,23 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $row = $sessIntId->fetchRow(['internalSessionUniqId = ?' => $job->getUsedInternalSessionUniqId()]);
         $result = $this->bus->sessionHasConnection($row->session_id);
         $hasConnection = $result->instanceResult ?? true; //in doubt say true so the job is not unlocked!
-        if(empty($row) || $hasConnection) { //row is empty, this is cleaned by the next garbage collection call
+        if (empty($row) || $hasConnection) { //row is empty, this is cleaned by the next garbage collection call
             return;
         }
 
         //4. release job for that user if the session has no connections anymore in the socket server
-        if($job->getIsPmOverride()) {
+        if ($job->getIsPmOverride()) {
             $job->deletePmOverride();
-        }
-        else {
+        } else {
             //direct update, no entity save to override entity version check
             $job->db->update([
                 'usedState' => null,
                 'usedInternalSessionUniqId' => null,
-            ],['id' => $job->getId()]);
+            ], ['id = ?' => $job->getId()]);
         }
 
         //5. unlock the task too, if locked by the jobs user
-        $task = ZfExtended_Factory::get('editor_Models_task');
-        /* @var $task editor_Models_task */
+        $task = ZfExtended_Factory::get(editor_Models_task::class);
         $task->unlockForUser($job->getUserGuid(), $job->getTaskGuid());
     }
     
