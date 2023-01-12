@@ -134,6 +134,12 @@ Ext.define('Editor.view.ToolTip', {
         qmtype = node.className.match(/qmflag-([0-9]+)/);
         if(qmtype && qmtype.length > 1) {
             meta.cls = node.className.split(' ');
+            // open/close classes are added on the backend while saving
+            // and classes ordering can't be changed now, so just shift first class
+            // if it is open or close
+            if (['open', 'close'].includes(meta.cls[0])) {
+                meta.cls.shift();
+            }
             meta.sev = Ext.StoreMgr.get('Severities').getById(meta.cls.shift());
             meta.sev = meta.sev ? meta.sev.get('text') : '';
             meta.qmid = qmtype[1];

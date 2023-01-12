@@ -62,7 +62,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
 
         $http = $this->getHttp('POST');
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
     }
 
@@ -79,7 +79,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         
         $http = $this->getHttp('POST');
         $http->setConfig(['timeout' => 1200]);
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
     }
     
@@ -102,8 +102,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         $http = $this->getHttpWithMemory('POST', '/import');
         $http->setConfig(['timeout' => 1200]);
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        
+        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+
         return $this->processResponse($http->request());
     }
     
@@ -307,7 +307,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             //en-UK request first
             $jsonEnUk = clone $json;
             $jsonEnUk->targetLang = 'en-UK';
-            $http->setRawData(json_encode($jsonEnUk), 'application/json; charset=utf-8');
+            $http->setRawData($this->jsonEncode($jsonEnUk), 'application/json; charset=utf-8');
             $resultsUK = [];
             $resultUK = $this->processResponse($http->request());
             if($resultUK) {
@@ -320,7 +320,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             }
 
             //en-GB request
-            $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+            $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
             $resultGB = $this->processResponse($http->request());
 
             if($resultUK && $resultsUK->NumOfFoundProposals > 0) {
@@ -338,7 +338,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             return $resultGB || $resultUK;
         }
 
-        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
     }
     
@@ -360,7 +360,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $data->numResults = 20;
         $data->msSearchAfterNumResults = 250;
         $http = $this->getHttpWithMemory('POST', 'concordancesearch');
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
     }
 
@@ -388,7 +388,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->timeStamp = $this->nowDate();
         $json->context = $segment->getMid(); //INFO: this is segment stuff
 
-        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
         return $this->processResponse($http->request());
     }
 
@@ -414,7 +414,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->context = '';
         $json->addInfo = $json->documentName;
 
-        $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
+        $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
 
         return $this->processResponse($http->request());
     }
@@ -540,5 +540,25 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         // we have to count and add them to get the real count
         $smileyCount = preg_match_all('/[\x{10000}-\x{10FFFF}]/mu', $string);
         return ($realCharLength + $smileyCount) > self::MAX_STR_LENGTH;
+    }
+
+    /**
+     * @param array|stdClass $data
+     *
+     * @return string
+     *
+     * @throws JsonException
+     */
+    private function jsonEncode($data): string
+    {
+        $flags = JSON_THROW_ON_ERROR;
+
+        if (!$this->isOpenTM2()) {
+            $flags = JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT;
+        }
+
+        // Due to error in proxygen library in t5memory json closing brace should follow a new line symbol (should be "\n}" instead of "}"),
+        // otherwise such a json won't be parsed correctly
+        return json_encode($data, $flags);
     }
 }

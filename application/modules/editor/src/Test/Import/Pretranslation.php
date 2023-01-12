@@ -36,7 +36,7 @@ use MittagQI\Translate5\Test\Api\Helper;
 final class Pretranslation extends Operation
 {
     public int $internalFuzzy = 1;
-    public int $pretranslateMatchrate = 100;
+    public ?int $pretranslateMatchrate = 100;
     public int $pretranslateTmAndTerm = 1;
     public int $pretranslateMt = 0;
     public int $isTaskImport = 0;

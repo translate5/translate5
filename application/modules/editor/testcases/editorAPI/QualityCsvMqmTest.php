@@ -39,7 +39,8 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
     protected static bool $termtaggerRequired = true;
 
     protected static array $forbiddenPlugins = [
-        'editor_Plugins_ManualStatusCheck_Bootstrap'
+        editor_Plugins_ManualStatusCheck_Bootstrap::class,
+        editor_Plugins_Translate24_Init::class
     ];
 
     protected static array $requiredRuntimeOptions = [
@@ -185,7 +186,7 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFileContent = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
+        $exportedFileContent = static::api()->getFileContentFromZipPath($pathToZip, '/apiTest.csv');
         // get the expected content
         $expectedResult = static::api()->getFileContent($fileToCompare, $exportedFileContent);
         $foundIds = [];

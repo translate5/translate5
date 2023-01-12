@@ -30,7 +30,9 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
+use Translate5\MaintenanceCli\Command\{
+    AuthTokenCommand,
+    CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
     DatabaseUpdateCommand,
@@ -56,6 +58,7 @@ use Translate5\MaintenanceCli\Command\{CachePurgeCommand,
     PluginListCommand,
     ReleaseNotesCommand,
     ServiceAutodiscoveryCommand,
+    DevelopmentLocalServicesCommand,
     SessionImpersonateCommand,
     StatusCommand,
     SystemCheckCommand,
@@ -83,6 +86,7 @@ use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
+    new AuthTokenCommand(),
     new CachePurgeCommand(),
     new ChangelogCommand(),
     new ConfigCommand(),
@@ -137,6 +141,7 @@ if(file_exists('.git')) {
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxTs1040Command();
     $commands[] = new \Translate5\MaintenanceCli\Command\TmxFixOpenTM2Command();
     $commands[] = new DevelopmentOkapiBconfNextVersionCommand();
+    $commands[] = new DevelopmentLocalServicesCommand();
 }
 $app->addCommands($commands);
 $app->run();

@@ -118,7 +118,7 @@ Ext.define('Editor.plugins.TermTagger.view.TermPortlet', {
 
                     // generate the term attributes tooltip and add the term classes
                     termHtml += '<span data-qtip="' // tooltip start
-                        +this.renderAttributes(term.id,term.termEntryId,term.language,parent)
+                        + Ext.String.htmlEncode(this.renderAttributes(term.id,term.termEntryId,term.language,parent))
                         +'" ' + // tooltip end
                         'class="'+classes.join(' ')+'">' + termValue +
                         '</span>' ;
@@ -200,7 +200,7 @@ Ext.define('Editor.plugins.TermTagger.view.TermPortlet', {
                 }
 
                 attributes['language'].forEach(function (attribute){
-                    if(attribute['language'] === language){
+                    if(attribute['language'] === language && attribute['termEntryId'] === termEntryId){
                         html.push('<li>' + attribute['nameTranslated'] + ' : <i>' + attribute['value'] + '</i></li>');
                     }
                 });

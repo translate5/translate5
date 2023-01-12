@@ -56,9 +56,10 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * A language resource that is saved must have at least one customer assigned
      * (if none is given, we use the defaultcustomer).
      * @param int $id
-     * @param array $data : request parametars
+     * @param array $data : request parameters
      */
-    public function saveAssocRequest(int $id, array $data){
+    public function saveAssocRequest(int $id, array $data): void
+    {
         
         $customers = $data['customerIds'] ?? [];
         $useAsDefault = $data['customerUseAsDefaultIds'] ?? [];
@@ -68,7 +69,6 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         // Check if (at least one) customer is set and use the 'defaultcustomer' if not
         if (empty($customers)) {
             $customer = ZfExtended_Factory::get('editor_Models_Customer_Customer');
-            /* @var $customer editor_Models_Customer_Customer */
             $customer->loadByDefaultCustomer();
             $customers[] = $customer->getId();
         }
@@ -104,14 +104,14 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * 
      * @param int $languageResourceId
      * @param array $customers
-     * @param array $useAsDefault : list of all customers which useAsDefault is 1
-     * @param array $writeAsDefault : list of all customers which writeAsDefault is 1
-     * @param array $pivotAsDefault : list of all customers which pivotAsDefault is 1
+     * @param array $useAsDefault  list of all customers which useAsDefault is 1
+     * @param array $writeAsDefault  list of all customers which writeAsDefault is 1
+     * @param array $pivotAsDefault  list of all customers which pivotAsDefault is 1
      */
-    public function addAssocs(int $languageResourceId, array $customers, array $useAsDefault = [], array $writeAsDefault = [], array $pivotAsDefault = []){
+    public function addAssocs(int $languageResourceId, array $customers, array $useAsDefault = [], array $writeAsDefault = [], array $pivotAsDefault = []): void
+    {
         foreach ($customers as $id){
             $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            /* @var $model editor_Models_LanguageResources_CustomerAssoc */
             $model->setCustomerId($id);
             $model->setLanguageResourceId($languageResourceId);
             $model->setUseAsDefault(in_array($id, $useAsDefault));

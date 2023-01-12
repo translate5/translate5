@@ -100,11 +100,11 @@ class Translate1804Test extends editor_Test_JsonTest {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/02-sdlxliff-en-de.sdlxliff');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/02-sdlxliff-en-de.sdlxliff');
         //file_put_contents(static::api()->getFile('export-02-sdlxliff-en-de-new.sdlxliff', null, false), $exportedFile);
         $expectedResult = static::api()->getFileContent('export-02-sdlxliff-en-de.sdlxliff');
         
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/03-xlf-en-de.xlf');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, '/03-xlf-en-de.xlf');
         //file_put_contents(static::api()->getFile('export-03-xlf-en-de-new.xlf', null, false), $exportedFile);
         $expectedResult = static::api()->getFileContent('export-03-xlf-en-de.xlf');
         

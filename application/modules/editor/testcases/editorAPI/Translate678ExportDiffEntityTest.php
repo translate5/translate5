@@ -84,7 +84,7 @@ class Translate678ExportDiffEntityTest extends editor_Test_ImportTest {
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedData = static::api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/apiTest.csv');
+        $exportedData = static::api()->getFileContentFromZipPath($pathToZip, '/apiTest.csv');
         
         $expectedData = static::api()->getFileContent('apiTest.csv');
         //insert the swapped <> characters into the expectedData for comparsion

@@ -124,7 +124,7 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
         
         $this->setClassNamePrefix($input->getOption('plugin'));
         
-        $name = $input->getOption('name');
+        $name = $input->getOption('name') ?? '';
         $this->checkFile($dbDirectory, $name);
         
         $table = $input->getOption('table');
@@ -160,7 +160,7 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
         }
         $dir = basename($search);
         if($dir != 'Models') {
-            $this->io->warning(['Given path does not end with Models. Please check that and move the created files.','Path: '.$search]);
+            //$this->io->warning(['Given path does not end with Models. Please check that and move the created files.','Path: '.$search]);
         }
         return $search;
     }
@@ -177,7 +177,9 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
         }
         $validatorDir = $modelDirectory.DIRECTORY_SEPARATOR.'Validator';
         if(!is_dir($validatorDir)) {
-            throw new \Exception('Given path is no directory! Path: '.$validatorDir);
+            if (!mkdir($validatorDir) && !is_dir($validatorDir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $validatorDir));
+            }
         }
         return $validatorDir;
     }
@@ -193,8 +195,8 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
             $modelDirectory = $this->getDirectory();
         }
         $dbDir = $modelDirectory.DIRECTORY_SEPARATOR.'Db';
-        if(!is_dir($dbDir)) {
-            throw new \Exception('Given path is no directory! Path: '.$dbDir);
+        if(!is_dir($dbDir) && !mkdir($dbDir) && !is_dir($dbDir)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $dbDir));
         }
         return $dbDir;
     }

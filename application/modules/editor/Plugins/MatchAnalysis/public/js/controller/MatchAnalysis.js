@@ -36,7 +36,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     requires: [
         'Editor.plugins.MatchAnalysis.view.AnalysisPanel',
         'Editor.plugins.MatchAnalysis.view.LanguageResources',
-        'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig'
+        'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig',
+        'Editor.plugins.MatchAnalysis.view.AnalysisWindow'
     ],
     
     models: ['Editor.plugins.MatchAnalysis.model.MatchAnalysis'],
@@ -103,7 +104,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 startMatchAnalysis: 'onStartOperation'
             },
             'taskActionMenu': {
-                itemsinitialized: 'onTaskActionColumnItemsInitialized'
+                itemsinitialized: 'onTaskActionColumnItemsInitialized',
+                show: 'onTaskActionMenuShow'
             }
         },
         controller:{
@@ -113,11 +115,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
-            }
-        },
-        store:{
-            '#languageResourcesTaskAssoc':{
-                load:'onLanguageResourcesTaskAssocStoreLoad'
             }
         }
     },
@@ -146,7 +143,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     onTaskActionColumnItemsInitialized: function(items) {
         var me=this;
         items.push({
-            text:this.strings.taskGridIconTooltip,
+            text: me.strings.taskGridIconTooltip,
+            itemId:'analysisActionItem',
             glyph: 'f200@FontAwesome5FreeSolid',
             action: 'editorAnalysisTask',
             hidden:true,
@@ -154,10 +152,34 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 hidden:'{!isNotErrorImportPendingCustom}'
             },
             scope:me,
+            disabled: true,
             handler:me.onMatchAnalysisMenuClick,
             sortIndex:8
         });
     },
+
+    /***
+     *
+     * @param menu
+     */
+    onTaskActionMenuShow: function (menu){
+        var me=this,
+            configStore = Ext.create('Editor.store.admin.CustomerConfig'),
+            vm = menu.getViewModel(),
+            task = vm && vm.get('task');
+
+        if( !task){
+            return;
+        }
+
+        configStore.loadByCustomerId(task.get('customerId'),function (){
+            var config = configStore.getConfig('plugins.MatchAnalysis.enableAnalysisActionMenu'),
+                menuItem = menu.down('#analysisActionItem');
+
+            menuItem.setDisabled(!config);
+        });
+    },
+
     /**
      * Inserts the language resource card into the task import wizard
      */
@@ -273,7 +295,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     fields: ['id', 'value'],
                     data : storeData
                 }),
-                value:100,
+                value:Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateMatchRate'),
                 displayField: 'value',
                 valueField: 'id',
                 queryMode: 'local'
@@ -319,9 +341,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     onMatchAnalysisMenuClick:function(item){
         var me=this,
-            task=item.lookupViewModel(true).get('task');
-        me.getProjectPanel().getController().redirectFocus(task,true);
-        me.getAdminTaskTaskManagement().down('tabpanel').setActiveTab('matchAnalysisPanel');
+            task=item.lookupViewModel(true).get('task'),
+            win = Ext.create('Editor.plugins.MatchAnalysis.view.AnalysisWindow');
+
+        win.setTask(task);
+        win.show();
     },
     
     /***
@@ -375,7 +399,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     startOperation: function(taskId, operation, importDefaults){
         var params = {
-            pretranslateMatchrate: this.getComponentByItemId('cbMinMatchrate').getValue(),
             isTaskImport: this.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
             batchQuery: this.isCheckboxChecked('batchQuery')
         };
@@ -384,6 +407,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             params.internalFuzzy = this.isCheckboxChecked('cbInternalFuzzy');
             params.pretranslateTmAndTerm = this.isCheckboxChecked('pretranslateTmAndTerm');
             params.pretranslateMt = this.isCheckboxChecked('pretranslateMt');
+            params.pretranslateMatchrate = this.getComponentByItemId('cbMinMatchrate').getValue();
         }
         Editor.util.TaskActions.operation(operation, taskId, params);
     },
@@ -421,11 +445,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         var me=this,
             cbInternalFuzzy = me.getComponentByItemId('cbInternalFuzzy'),
             pretranslateMt = me.getComponentByItemId('pretranslateMt'),
-            pretranslateTmAndTerm = me.getComponentByItemId('pretranslateTmAndTerm');
+            pretranslateTmAndTerm = me.getComponentByItemId('pretranslateTmAndTerm'),
+            cbMinMatchrate = me.getComponentByItemId('cbMinMatchrate');
 
         cbInternalFuzzy && cbInternalFuzzy.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.internalFuzzyDefault'));
         pretranslateMt && pretranslateMt.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateMtDefault'));
         pretranslateTmAndTerm && pretranslateTmAndTerm.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateTmAndTermDefault'));
+        cbMinMatchrate && cbMinMatchrate.setValue(Editor.app.getTaskConfig('plugins.MatchAnalysis.pretranslateMatchRate'));
     },
     
     /***

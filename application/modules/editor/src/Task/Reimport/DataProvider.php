@@ -29,12 +29,14 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Task\Reimport;
 
 use editor_Models_Foldertree;
+use editor_Models_Import_Configuration;
 use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Import_DataProvider_Exception;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use Zend_Exception;
 use Zend_File_Transfer;
+use Zend_Registry;
 use ZfExtended_ErrorCodeException;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
@@ -99,11 +101,6 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
      */
     protected function handleUploads(editor_Models_Task $task): void
     {
-        /** @var editor_Models_Foldertree $tree */
-        $tree = ZfExtended_Factory::get('editor_Models_Foldertree');
-
-        $path = $tree->getFileIdPath($task->getTaskGuid(),$this->fileId);
-
         try {
             // make the _tempFolder
             $this->checkAndMakeTempImportFolder();
@@ -119,7 +116,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
         // move the new file to the location in _tempFolder
         // the new file will have the same name as the one which is replaced
-        $newFile = $this->importFolder.DIRECTORY_SEPARATOR.$path;
+        $newFile = $this->getOriginalFilePath($task);
 
         // move uploaded file into upload target
         if (!move_uploaded_file($this->uploadFiles['tmp_name'], $newFile)) {
@@ -178,6 +175,36 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
     public function getFile(): string
     {
         return $this->file;
+    }
+
+    /***
+     * Get the given file absolute path on the disk after the zip package is extracted.
+     * This function will also handle in case the workfiles directory inside the zip archive
+     * still uses the old name (proofRead)
+     * @param editor_Models_Task $task
+     * @return string
+     * @throws Zend_Exception
+     */
+    private function getOriginalFilePath(editor_Models_Task $task): string
+    {
+        /** @var editor_Models_Foldertree $tree */
+        $tree = ZfExtended_Factory::get('editor_Models_Foldertree');
+
+        $tree->setPathPrefix('');
+
+        $path = $tree->getFileIdPath($task->getTaskGuid(),$this->fileId);
+
+        $workfilesDir = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
+
+        $newFile = $this->importFolder.DIRECTORY_SEPARATOR.$workfilesDir.DIRECTORY_SEPARATOR.$path;
+
+        if( !is_file($newFile)){
+            // if the file does not exist withing workfiles directory, try to find it from the configured file name
+            $config = Zend_Registry::get('config');
+            $workfilesDir = $config->runtimeOptions->import->proofReadDirectory;
+            $newFile = $this->importFolder.DIRECTORY_SEPARATOR.$workfilesDir.DIRECTORY_SEPARATOR.$path;
+        }
+        return $newFile;
     }
 
 

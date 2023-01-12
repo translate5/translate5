@@ -26,13 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
+/**
+ * OUTDATED base implementation for testing the Termtagger
  */
-
 abstract class editor_Test_Termtagger_Abstract extends \editor_Test_UnitTest {
     public static $parentTestFolderRelativePath = 'application/modules/editor/testcases';
     public static $parentTestFolderAbsolutePath;
@@ -171,5 +167,33 @@ abstract class editor_Test_Termtagger_Abstract extends \editor_Test_UnitTest {
         self::$description = $description->innerHTML();
         self::$mandatory = (self::$qpTest->attr('mandatory')==='yes')?true:false;
         self::$name = self::$qpTest->attr('name');
+    }
+
+    public function testPassedAssertionSource() {
+        $a = self::$assertion.'Source';
+        $this->$a();
+    }
+
+    public function testPassedAssertionTarget() {
+        $a = self::$assertion.'Target';
+        $this->$a();
+    }
+
+    protected function assertOutputEqualsSource() {
+        self::$sourceTagged = $this->removeDataTbxIdFromString(self::$sourceTagged);
+        self::$expectedSource = $this->removeDataTbxIdFromString(self::$expectedSource);
+
+        $this->assertEquals(self::$expectedSource, self::$sourceTagged, 'The source content did not meet the expected result. <br><br><b>Expected source</b>: <br><br><pre>'.htmlentities(self::$expectedSource, ENT_HTML5, 'utf-8').'</pre><br><br><b>Retrieved source</b>: <br><br><pre>'.htmlentities(self::$sourceTagged, ENT_HTML5, 'utf-8').'</pre>');
+    }
+
+    protected function assertOutputEqualsTarget() {
+        self::$targetTagged = $this->removeDataTbxIdFromString(self::$targetTagged);
+        self::$expectedTarget = $this->removeDataTbxIdFromString(self::$expectedTarget);
+
+        $this->assertEquals(self::$expectedTarget, self::$targetTagged, 'The target content did not meet the expected result. <br><br><b>Expected target</b>: <br><br><pre>'.htmlentities(self::$expectedTarget, ENT_HTML5, 'utf-8').'</pre><br><br><b>Retrieved target</b>: <br><br><pre>'.htmlentities(self::$targetTagged, ENT_HTML5, 'utf-8').'</pre>');
+    }
+
+    protected function removeDataTbxIdFromString($string) {
+        return preg_replace('#data-tbxid="[^"]+"#', 'data-tbxid=""', $string);
     }
 }

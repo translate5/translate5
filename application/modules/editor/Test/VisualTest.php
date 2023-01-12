@@ -79,6 +79,22 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
             $this->assertTrue(str_contains($html, $text), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' did not contain "'.$text.'"]');
         }
     }
+
+    /**
+     * Asserts whether the visual html file defined by $isSplitFile and $index exists and does not contain the given text
+     * @param string $text
+     * @param bool $isSplitFile
+     * @param int $index
+     * @param string $message
+     */
+    public function assertVisualHtmlNotContains(string $text, bool $isSplitFile=false, int $index=0, string $message=''){
+        $html = $this->getVisualHtmlFile($isSplitFile, $index);
+        if(empty($html)){
+            $this->assertTrue(!empty($html), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' was not found or had no contents]');
+        } else {
+            $this->assertFalse(str_contains($html, $text), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' did not contain "'.$text.'"]');
+        }
+    }
     /**
      * Asserts whether the visual html file defined by $isSplitFile and $index contains the given text
      * @param string $pattern
