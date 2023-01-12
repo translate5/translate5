@@ -1132,9 +1132,9 @@ Ihr neuer Login-Name:
                 </figure>
                 </target>
             </trans-unit>
-            <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlLCBlaW4gU29uZGVyemVpY2hlbiB1bmQgZWluZSBaYWhsLg=='>
-              <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe, ein Sonderzeichen und eine Zahl.</source>
-              <target>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe, ein Sonderzeichen und eine Zahl.</target>
+            <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlIHVuZCBlaW5lIFphaGwu'>
+              <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</source>
+              <target>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</target>
             </trans-unit>
             <trans-unit id="TWluZGVzdGVucyAxMiBaZWljaGVu">
               <source>Mindestens 12 Zeichen</source>
