@@ -1326,7 +1326,7 @@ Ext.define('Editor.controller.Editor', {
     },
     /***
      * F3 editor event handler.
-     * This will set the focus in the sourceSearch field of concordance search panel
+     * This will set the focus in the targetSearch field of concordance search panel
      */
     handleF3KeyPress: function() {
         var me = this,
