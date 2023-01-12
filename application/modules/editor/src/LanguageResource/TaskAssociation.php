@@ -48,7 +48,7 @@ use ZfExtended_Models_Entity_Abstract;
  * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(int $autoCreatedOnImport)
  */
-class TaskAssociation extends ZfExtended_Models_Entity_Abstract {
+class TaskAssociation extends AssociationAbstract {
 
     protected $dbInstanceClass = 'MittagQI\Translate5\LanguageResource\Db\TaskAssociation';
     protected $validatorInstanceClass = 'MittagQI\Translate5\LanguageResource\Validator\TaskAssociation'; //→ here the new validator class
@@ -280,47 +280,5 @@ class TaskAssociation extends ZfExtended_Models_Entity_Abstract {
             ->where('taskGuid = ?',$taskGuid)
             ->where('segmentsUpdateable = 1');
         return $this->db->fetchAll($s)->toArray();
-    }
-
-    /***
-     * Check if given resource is assigned to a task
-     * @param int $resourceId
-     * @param string $taskGuid
-     * @return bool
-     */
-    public function isAssigned(int $resourceId, string $taskGuid): bool
-    {
-        $s = $this->db->select()
-            ->where('taskGuid = ?',$taskGuid)
-            ->where('languageResourceId = ?',$resourceId);
-        return empty($this->db->getAdapter()->fetchAll($s)) === false;
-    }
-
-
-    /***
-     * @param array $customers
-     * @return array
-     * @throws \Zend_Db_Table_Exception
-     */
-    public function getAssociatedByCustomer(array $customers): array
-    {
-        $s = $this->db->select()
-            ->from(['ta' => $this->db->info(Zend_Db_Table_Abstract::NAME)],['ta.*'])
-            ->setIntegrityCheck(false)
-            ->join(['t' => 'LEK_task'], 'ta.taskGuid = t.taskGuid',['t.taskName as taskName'])
-            ->where('t.customerId IN(?)',$customers);
-        return $this->db->fetchAll($s)->toArray();
-    }
-
-    /**
-     * @param array $ids
-     * @return bool
-     */
-    public function deleteByIds(array $ids): bool
-    {
-        $cast = array_map('intval', $ids);
-        return $this->db->delete([
-            'id IN(?)' => $cast
-        ]) > 0;
     }
 }

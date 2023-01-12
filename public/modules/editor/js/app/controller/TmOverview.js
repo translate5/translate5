@@ -708,11 +708,24 @@ Ext.define('Editor.controller.TmOverview', {
     },
 
     onServerExceptionE1447Handler: function (response,ecode) {
-        var me = this;
+        var me = this,
+            translated = response.errorsTranslated,
+            extraData = response.extraData ? response.extraData : null,
+            taskListReduced = extraData ? extraData.taskList : [],
+            tasksCount = taskListReduced.length;
+
+        if(tasksCount > 10){
+            taskListReduced = taskListReduced.slice(0,9);
+            taskListReduced.push(' + '+(tasksCount+9)+' '+ Editor.data.l10n.tmOverview.more);
+        }
+
+        taskListReduced = taskListReduced.map(function (i){
+            return '<li>'+i+'</li>';
+        });
 
         Ext.create('Ext.window.MessageBox').show({
             title: Editor.data.l10n.languageResources.editLanguageResource.conflictErrorTitle,
-            msg: response.errorMessage,
+            msg: Ext.String.format('{0} <ul>{1}</ul> {2}',translated.errorMessages[0],taskListReduced.join(''),translated.errorMessages[1]),
             buttons: Ext.Msg.YESNO,
             fn:function(button){
                 if(button === "yes"){

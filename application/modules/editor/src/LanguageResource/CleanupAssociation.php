@@ -28,12 +28,16 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource;
 
+use editor_Models_LanguageResources_CustomerAssoc;
 use Zend_Db_Table_Exception;
+use ZfExtended_BadGatewayErrorCode;
+use ZfExtended_ErrorCodeException;
+use ZfExtended_Exception;
 use ZfExtended_Factory;
 use ZfExtended_UnprocessableEntity;
 
 /**
- * Check and clean the resource/pivot associations on a task when customer is removed from the langauge resource.
+ * Check and clean the resource/pivot associations on a task when customer is removed from the language resource.
  *
  */
 class CleanupAssociation
@@ -58,7 +62,7 @@ class CleanupAssociation
             return [];
         }
 
-        $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        $assoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
         $customerAssocs = $assoc->loadCustomerIds($this->languageResourceId);
 
         $removed = array_diff($customerAssocs,$this->removedCustomers);
@@ -67,7 +71,7 @@ class CleanupAssociation
         }
 
         $taskAssoc = ZfExtended_Factory::get($entityClass);
-        return $taskAssoc->getAssociatedByCustomer($removed);
+        return $taskAssoc->getAssociatedByCustomer($removed,$this->languageResourceId);
     }
 
     /***
@@ -118,17 +122,17 @@ class CleanupAssociation
         $taskAssocs = $this->getConflictTaskAssoc();
         if( !empty($taskAssocs)){
             $ids = array_column($taskAssocs,'id');
-            /** @var TaskAssociation $tasAssoc */
-            $tasAssoc = ZfExtended_Factory::get(TaskAssociation::class);
-            $tasAssoc->deleteByIds($ids);
+            /** @var TaskAssociation $taskAssoc */
+            $taskAssoc = ZfExtended_Factory::get(TaskAssociation::class);
+            $taskAssoc->deleteByIds($ids);
         }
 
         $taskPivotAssocs = $this->getConflictTaskPivotAssoc();
         if( !empty($taskPivotAssocs)){
             $ids = array_column($taskPivotAssocs,'id');
-            /** @var TaskPivotAssociation $tasAssoc */
-            $tasAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
-            $tasAssoc->deleteByIds($ids);
+            /** @var TaskPivotAssociation $taskAssoc */
+            $taskAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
+            $taskAssoc->deleteByIds($ids);
         }
     }
 
@@ -138,20 +142,17 @@ class CleanupAssociation
      * @throws \ZfExtended_ErrorCodeException
      */
     private function throwException(array $taskNames){
-        $taskList = ['<ul>'];
-        foreach ($taskNames as $name){
-            $taskList[] = '<li>'.$name.'</li>';
-        }
-        $taskList[] = '</ul>';
-        $message = str_replace('{taskList}',implode('',$taskList),'Die entfernten Kunden werden in den folgenden Aufgaben verwendet: {taskList}. Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.');
         ZfExtended_UnprocessableEntity::addCodes([
-            'E1447' => $message,
+            'E1447' => 'This resource is assigned to a task via the removed customer.',
         ], 'languageresource');
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1447',[
-            'customerIds' => 'Removed clients are used in tasks.'
-        ],[
-            'taskNames' => $taskNames
+            'errorMessages' => [
+                'Die entfernten Kunden werden in den folgenden Aufgaben verwendet:',
+                'Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.'
+            ]
+        ],extraData: [
+            'taskList' => $taskNames
         ]);
     }
 

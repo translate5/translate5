@@ -694,25 +694,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     public function putAction() {
         $this->decodePutAssociative = true;
-        $this->decodePutData();
 
-        $this->entityLoad();
-        $this->processClientReferenceVersion();
-        $this->setDataInEntity();
-        if ($this->validate()) {
+        parent::putAction();
+        if ($this->wasValid) {
 
-            $this->entity->save();
 
             if( (bool)$this->getParam('forced',false) === true){
-                $customerIds = $this->getDataField('customerIds') ?? [];
-                $clean = ZfExtended_Factory::get(CleanupAssociation::class,[
-                    $customerIds,
-                    $this->entity->getId()
-                ]);
-                $clean->cleanAssociation();
+                $this->checkOrCleanAssociation(true);
             }
-
-            $this->view->rows = $this->entity->getDataObject();
 
             // especially tests are not respecting the array format ...
             editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
@@ -1476,15 +1465,29 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function additionalValidations() {
 
-        if((bool)$this->getParam('forced',false) === false && $this->getRequest()->isPut()) {
-            $customerIds = $this->getDataField('customerIds') ?? [];
-            /** @var CleanupAssociation $assocClean */
-            $assocClean = ZfExtended_Factory::get(CleanupAssociation::class, [
-                $customerIds,
-                $this->entity->getId()
-            ]);
-            $assocClean->check();
+        if( $this->getRequest()->isPut() === false || (bool)$this->getParam('forced',false) === true){
+            return;
         }
+        // check for association to be cleaned only when it is put and the forced flag is not set
+        $this->checkOrCleanAssociation(false);
+    }
+
+    /**
+     * Check of clean associations.
+     * @param bool $clean
+     * @return void
+     * @throws Zend_Db_Table_Exception
+     * @throws ZfExtended_ErrorCodeException
+     */
+    private function checkOrCleanAssociation(bool $clean): void
+    {
+        $customerIds = $this->getDataField('customerIds') ?? [];
+        $assocClean = ZfExtended_Factory::get(CleanupAssociation::class, [
+            $customerIds,
+            $this->entity->getId()
+        ]);
+
+        $clean ? $assocClean->cleanAssociation() : $assocClean->check();
     }
 
 }
