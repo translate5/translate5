@@ -8922,6 +8922,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Pivotsprache</source>
                 <target>Pivot language</target>
             </trans-unit>
+            <trans-unit id='UGl2b3RzcHJhY2hl'>
+                <source>Language resource of selected resource type can not be created in UI.</source>
+                <target>Language resource of selected resource type can not be created in UI.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

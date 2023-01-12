@@ -103,6 +103,13 @@ class editor_Models_LanguageResources_Resource {
      * @var string
      */
     protected $authKey;
+
+    /**
+     * Some resources can be created only through API
+     *
+     * @var bool
+     */
+    protected bool $canBeCreatedInUI = true;
     
     public function __construct($id, $name, $url) {
         $this->id = $id;
@@ -301,5 +308,13 @@ class editor_Models_LanguageResources_Resource {
     public function getInitialStatus(&$statusInfo) {
         $statusInfo = 'Wählen Sie die Ressource aus um weitere Infos zu bekommen.';
         return editor_Services_Connector_Abstract::STATUS_NOTCHECKED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBeCreatedInUI(): bool
+    {
+        return $this->canBeCreatedInUI;
     }
 }

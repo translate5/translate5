@@ -621,6 +621,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $manager editor_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
 
+        if (!$resource->canBeCreatedInUI()) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1041', ['Language resource of selected resource type can not be created in UI.']);
+        }
+
         $sourceLangId = $this->getParam('sourceLang');
         $targetLangId = $this->getParam('targetLang');
 
