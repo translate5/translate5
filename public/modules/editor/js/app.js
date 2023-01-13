@@ -189,7 +189,7 @@ Ext.application({
 
         this.handleMissingSlash();
         this.callParent(arguments);
-        this.logoutOnWindowClose();
+        logoutOnWindowClose();
     },
 
     launch: function () {
@@ -267,61 +267,6 @@ Ext.application({
         me.fireEvent('editorAppLaunched');
     },
 
-    /**
-     * Setup a counter for browser tabs having opened t5 app, and return current value of that counter
-     * If diff arg is expected to be -1, +1, and if so counter will be incremented/decremented and updated value is returned
-     *
-     * @param diff
-     * @returns {number}
-     */
-    tabQty: function(diff) {
-        var key = 'translate5-tabQty', ls = localStorage, qty = parseInt(ls.getItem(key) || 0);
-
-        // Update qty if need
-        if (diff) {
-
-            // Update value in localStorage
-            ls.setItem(key, qty + diff);
-        }
-
-        // Return original or updated qty
-        return parseInt(ls.getItem(key));
-    },
-
-    /**
-     * If configured the user is logged out on window close
-     */
-    logoutOnWindowClose: function () {
-        var me = this;
-
-        if (!Editor.data.logoutOnWindowClose) {
-            return;
-        }
-
-        // Increment t5 app tabs qty
-        me.tabQty(+1);
-
-        Ext.get(window).on({
-            beforeunload: function () {
-
-                // Decrement t5 app tabs counter, and if this was not the last tab - return
-                if (me.tabQty(-1)) {
-                    return;
-                }
-
-                // If logoutOnWindowClose-config is temporarily turned Off - do nothing
-                if (!Editor.data.logoutOnWindowClose) {
-                    return;
-                }
-                var fd = new FormData();
-                fd.append('zfExtended', Ext.util.Cookies.get('zfExtended'));
-                fd.append('noredirect', 1);
-                // destroy the user session and prevent redirect
-                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout', fd);
-                Ext.util.Cookies.clear('zfExtended'); // remove now invalid session cookie
-            }
-        });
-    },
     /**
      * opens the editor with the given Task
      * firing the adminViewportClosed event
