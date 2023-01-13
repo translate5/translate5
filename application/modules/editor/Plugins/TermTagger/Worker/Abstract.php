@@ -272,8 +272,11 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             // Rollback transaction
             $db->getAdapter()->rollBack();
 
-            // Log exception
-            $this->getLogger()->warn('E9999', $e->getMessage(), [
+            // Log original exception
+            $this->getLogger()->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
+
+            // Log task event
+            $this->getLogger()->warn('E1451', "Recoverable error on termtagging: {$e->getMessage()} - see system log for details.", [
                 'task' => $this->task,
                 'segments' => $segmentIds,
             ]);
