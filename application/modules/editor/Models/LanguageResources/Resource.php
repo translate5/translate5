@@ -90,6 +90,7 @@ class editor_Models_LanguageResources_Resource {
             'searchable' => 'searchable',
             'writable' => 'writable',
             'defaultColor' => 'defaultColor',
+            'creatable' => 'creatable',
     );
     
     /**
@@ -105,11 +106,11 @@ class editor_Models_LanguageResources_Resource {
     protected $authKey;
 
     /**
-     * Some resources can be created only through API
+     * Some resources can be created only through API call
      *
      * @var bool
      */
-    protected bool $canBeCreatedInUI = true;
+    protected bool $creatable = true;
     
     public function __construct($id, $name, $url) {
         $this->id = $id;
@@ -313,8 +314,8 @@ class editor_Models_LanguageResources_Resource {
     /**
      * @return bool
      */
-    public function canBeCreatedInUI(): bool
+    public function getCreatable(): bool
     {
-        return $this->canBeCreatedInUI;
+        return $this->creatable;
     }
 }
