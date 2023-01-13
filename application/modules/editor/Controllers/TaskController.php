@@ -934,6 +934,9 @@ class editor_TaskController extends ZfExtended_RestController {
         // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time.
         $this->decodePutData();
 
+        //throws exceptions if task not closable
+        $this->checkTaskStateTransition();
+
         $this->handleCancelImport();
 
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
@@ -1094,6 +1097,28 @@ class editor_TaskController extends ZfExtended_RestController {
                 '$isTaskDisallowReading' => $isTaskDisallowReading,
             ]);
             throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+    }
+
+    /**
+     * Check if task is allowed to be transferred to the particular state
+     *
+     * @return void
+     * @throws Zend_Exception
+     * @throws ZfExtended_ErrorCodeException
+     */
+    private function checkTaskStateTransition(): void
+    {
+        $closingTask = ($this->data->state ?? null) === 'end';
+
+        if($closingTask && null !== $this->entity->getLocked()) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1161' => 'The task can not be set to ended by a PM, because a user has opened the task for editing.',
+            ]);
+
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1161', [
+                'Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.',
+            ]);
         }
     }
 
