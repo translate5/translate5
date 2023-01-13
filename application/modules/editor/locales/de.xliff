@@ -7735,9 +7735,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
                 <target>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</target>
             </trans-unit>
-            <trans-unit id='VmVyYnJlaXRlbiBTaWUgZGllc2VuIFN0YXR1cyBmw7xyIGFsbGUgYW5kZXJlbiBWb3Jrb21tZW4gZWluZXMgc29sY2hlbiBbUXVhbGl0w6R0c2luaGFsdF0gLVBhYXJlcywgZGFzIGluIGRpZXNlciBBdWZnYWJlIGdlZnVuZGVuIHd1cmRl'>
-                <source>Verbreiten Sie diesen Status für alle anderen Vorkommen eines solchen [Qualitätsinhalt] -Paares, das in dieser Aufgabe gefunden wurde</source>
-                <target>Verbreiten Sie diesen Status für alle anderen Vorkommen eines solchen [Qualitätsinhalt] -Paares, das in dieser Aufgabe gefunden wurde</target>
+            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgaW4gYW5kZXJlbiBTZWdtZW50ZW4gZWJlbmZhbGxzIMOkbmRlcm4u'>
+                <source>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</source>
+                <target>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</target>
             </trans-unit>
             <trans-unit id='SmE='>
                 <source>Ja</source>
