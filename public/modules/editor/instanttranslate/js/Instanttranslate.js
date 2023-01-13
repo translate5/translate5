@@ -1623,7 +1623,9 @@ function checkInstantTranslation() {
  * @returns {number}
  */
 function tabQty(diff) {
-    var key = 'translate5-tabQty', ls = localStorage, qty = parseInt(ls.getItem(key) || 0);
+    var key = 'translate5-tabQty',
+        ls = localStorage,
+        qty = parseInt(ls.getItem(key) || 0);
 
     // Update qty if need
     if (diff) {
@@ -1654,7 +1656,7 @@ function logoutOnWindowClose() {
     onbeforeunload = () => {
 
         // Decrement t5 app tabs qty, and if this was the last tab - do logout
-        if (me.tabQty(-1)) {
+        if (me.tabQty(-1) > 0) {
             return;
         }
 
@@ -1664,11 +1666,15 @@ function logoutOnWindowClose() {
         }
 
         // Get regexp to pick zfExtended-cookie
-        var rex = /(?:^|; )zfExtended=([^;]*)(?:; |$)/, m = document.cookie.match(rex), zfExtended = m ? m[1] : false;
+        var rex = /(?:^|; )zfExtended=([^;]*)(?:; |$)/,
+            m = document.cookie.match(rex),
+            zfExtended = m ? m[1] : false;
 
         // Prepare FormData object to be submitted via sendBeacon()
         var fd = new FormData();
-        if (zfExtended) fd.append('zfExtended', zfExtended);
+        if (zfExtended) {
+            fd.append('zfExtended', zfExtended);
+        }
         fd.append('noredirect', 1);
 
         // Destroy the user session and prevent redirect
