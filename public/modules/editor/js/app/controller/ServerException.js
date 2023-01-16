@@ -230,13 +230,11 @@ Ext.define('Editor.controller.ServerException', {
                     icon: Ext.MessageBox.WARNING
                 });
                 return;
-            case 409: //Conflict: show message from server
-            //FIXME the errors coming with a translation, should show the error message directly, without introduction text
-                Editor.MessageBox.addError(appendServerMsg(str["409"]), errorCode);
-                return;
-            //422 unprocessable entity: normally the errors are shown via form.markInvalid. 
-            // If not, we add up the error message with info from the payload
-            case 422: 
+            case 409:
+                //Conflict: show message from server
+            case 422:
+                //422 unprocessable entity: normally the errors are shown via form.markInvalid.
+                // If not, we add up the error message with info from the payload
                 var errorsToUse;
                 if(json.errorMessage && json.errorsTranslated) {
                     Ext.Logger.warn('Original Error (a translated version was shown to the user): ' + json.errorMessage);
@@ -246,7 +244,7 @@ Ext.define('Editor.controller.ServerException', {
                     errorsToUse = json.errors;
                 }
                 else {
-                    Editor.MessageBox.addError(str["409"]+'<ul><li>'+json.errorMessage+'</li></ul>', errorCode);
+                    Editor.MessageBox.addError(appendServerMsg(str["409"]), errorCode);
                     return;
                 }
                 json.errorMessage = [];

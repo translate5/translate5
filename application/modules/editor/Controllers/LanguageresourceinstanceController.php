@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\LanguageResource\CleanupAssociation;
+use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
@@ -148,6 +149,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageResourceInstance->init($languageresource);
 
             $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
+
             if(empty($resource)) {
                 $languageresource['status'] = editor_Services_Connector_Abstract::STATUS_ERROR;
                 $languageresource['statusInfo'] = $t->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
@@ -518,17 +520,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->total = $events->getTotalByLanguageResourceId($this->entity->getId());
     }
 
-    private function prepareTaskInfo($languageResourceids) {
+    private function prepareTaskInfo($languageResourceids)
+    {
+        $assocs = ZfExtended_Factory::get(TaskAssociation::class);
 
-        /* @var $assocs MittagQI\Translate5\LanguageResource\TaskAssociation */
-        $assocs = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        $tasksInfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
 
-        $taskinfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
-        if(empty($taskinfo)) {
+        if(empty($tasksInfo)) {
             return;
         }
         //group array by languageResourceid
-        $this->groupedTaskInfo = $this->convertTasknames($taskinfo);
+        $this->groupedTaskInfo = $this->convertTasknames($tasksInfo);
     }
 
     /**
@@ -538,15 +540,22 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function convertTasknames(array $taskInfoList) {
         $result = [];
-        foreach($taskInfoList as $one) {
-            if(!isset($result[$one['languageResourceId']])) {
-                $result[$one['languageResourceId']] = array();
+        foreach($taskInfoList as $taskInfo) {
+            if(!isset($result[$taskInfo['languageResourceId']])) {
+                $result[$taskInfo['languageResourceId']] = array();
             }
-            $taskToPrint = $one['taskName'];
-            if(!empty($one['taskNr'])) {
-                $taskToPrint .= ' ('.$one['taskNr'].')';
+
+            $taskToPrint = $taskInfo['taskName'];
+
+            if(!empty($taskInfo['taskNr'])) {
+                $taskToPrint .= ' ('.$taskInfo['taskNr'].')';
             }
-            $result[$one['languageResourceId']][] = $taskToPrint;
+
+            if ($taskInfo['state'] === editor_Models_Task::STATE_IMPORT) {
+                $taskToPrint .= ' - importing';
+            }
+
+            $result[$taskInfo['languageResourceId']][] = $taskToPrint;
         }
         return $result;
     }
@@ -737,6 +746,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         if(!$resource->getFilebased()) {
             throw new ZfExtended_ValidateException('Requested languageResource is not filebased!');
+        }
+
+        if($this->hasImportingAssociatedTasks((int)$this->entity->getId())) {
+            throw new ZfExtended_ValidateException('Language resource has associated task that is currently importing');
         }
 
         //upload errors are handled in handleAdditionalFileUpload
@@ -1488,6 +1501,26 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         ]);
 
         $clean ? $assocClean->cleanAssociation() : $assocClean->check();
+    }
+
+    private function hasImportingAssociatedTasks(int $languageResourceId): bool
+    {
+        $taskAssociation = ZfExtended_Factory::get(TaskAssociation::class);
+
+        $tasksInfos = $taskAssociation->getTaskInfoForLanguageResources([$languageResourceId]);
+
+        if (count($tasksInfos) === 0) {
+            return false;
+        }
+
+        $importingTasks = array_filter(
+            $tasksInfos,
+            static function (array $taskInfo) {
+                return $taskInfo['state'] === editor_Models_Task::STATE_IMPORT;
+            }
+        );
+
+        return count($importingTasks) > 0;
     }
 
 }

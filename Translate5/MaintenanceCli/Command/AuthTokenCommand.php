@@ -82,7 +82,7 @@ class AuthTokenCommand extends Translate5AbstractCommand {
         $auth = ZfExtended_Factory::get('ZfExtended_Auth_Token_Entity');
         /** @var ZfExtended_Auth_Token_Entity $auth */
 
-        $token = $auth->create($login,$desc);
+        $token = $auth->create($login, $desc);
 
         $this->writeAssoc([
             'Token' => $token

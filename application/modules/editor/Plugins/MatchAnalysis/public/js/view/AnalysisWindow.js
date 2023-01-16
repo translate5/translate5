@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,17 +25,40 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
-class editor_Models_Import_FileParser_InvalidXMLException extends ZfExtended_ErrorCodeException {
-    /**
-     * @var string
-     */
-    protected $origin = 'import.fileparser';
-    
-    static protected $localErrorCodes = [
-        'E1024' => 'Invalid XML: expected closing "{closingTag}" tag, but got tag "{receivedTag}".',
-        'E1448' => 'Invalid XML on pre-processing: For concrete errors see details.',
-    ];
-}
+Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisWindow', {
+    extend: 'Ext.window.Window',
+    alias: 'widget.analysisWindow',
+
+    itemId: 'analysisWindow',
+    width: '80%',
+    height: '80%',
+    autoHeight: true,
+    autoScroll: true,
+    modal: true,
+    layout:'fit',
+
+    initConfig: function (instanceConfig) {
+        var me = this,
+            config = {
+                bind:{
+                  title:'{l10n.MatchAnalysis.analysisWindow.title}'
+                },
+                items:[{
+                    xtype:'matchAnalysisPanel',
+                    header:false
+                }]
+            };
+
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+
+    setTask: function (task){
+        var me = this,
+            grid = me.down('matchAnalysisGrid');
+
+        grid & grid.setTask(task);
+    }
+});

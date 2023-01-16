@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use editor_Models_Import_FileParser_XmlParser as XmlParser;
 
 /**
  * Fileparsing for import of XLIFF 1.1 and 1.2 files
@@ -217,9 +218,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function parse() {
         $this->segmentCount = 0;
-        $this->xmlparser = $parser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $parser editor_Models_Import_FileParser_XmlParser */
-        
+
+        $options = [
+            'preparsexml' => $this->config->runtimeOptions->import->xlf->preparse
+        ];
+
+        $this->xmlparser = $parser = ZfExtended_Factory::get(XmlParser::class, [$options]);
+
         $this->registerStructural();
         $this->registerMeta();
         $this->registerContent();

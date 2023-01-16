@@ -40,13 +40,15 @@ END LICENSE AND COPYRIGHT
 class editor_Services_Manager {
     const CLS_SERVICE = '_Service';
     const CLS_CONNECTOR = '_Connector';
+
+    public const SERVICE_OPENTM2 = 'editor_Services_OpenTM2';
     
     /**
      * The services provided with this plugin are hardcoded:
      * @var array
      */
     static protected $registeredServices = array(
-        'editor_Services_OpenTM2',
+        self::SERVICE_OPENTM2,
         'editor_Services_Moses',
         'editor_Services_LucyLT',
         'editor_Services_TermCollection',

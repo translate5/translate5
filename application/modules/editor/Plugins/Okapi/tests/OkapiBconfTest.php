@@ -115,8 +115,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
     public function test30_AutoImportAndVersionUpdate() {
         if(!self::isMasterTest()){
-            self::assertTrue(true);
-            fwrite(STDERR, "\n" . __FUNCTION__ . " runs only in master test to not mess with important default bconf.\n");
+            self::markTestSkipped('runs only in master test to not mess with important default bconf.');
             return;
         }
         $bconf = self::$bconf;
