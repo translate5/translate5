@@ -110,6 +110,7 @@ abstract class editor_Services_Connector_HttpApiAbstract {
     }
     
     /**
+     * FIXME must be removed by using ZfExtended_Zendoverwrites_Http_JsonClient instead!
      * parses and processes the response of OpenTM2, and handles the errors
      * @param Zend_Http_Response $response
      * @return boolean

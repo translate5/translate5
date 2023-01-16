@@ -4,7 +4,7 @@
 <body>
 <trans-unit id="NFDBB2FA9-tu1" xml:space="preserve">
 <source xml:lang="de">Das ist ein Test</source>
-<seg-source><mrk mid="0" mtype="seg">Das ist ein Test</mrk></seg-source>
+<seg-source>Das ist ein Test</seg-source>
 <target xml:lang="en">This is a test</target>
 </trans-unit>
 </body>

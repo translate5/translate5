@@ -1326,21 +1326,22 @@ Ext.define('Editor.controller.Editor', {
     },
     /***
      * F3 editor event handler.
-     * This will set the focus in the sourceSearch field of concordence search panel
+     * This will set the focus in the targetSearch field of concordance search panel
      */
     handleF3KeyPress: function() {
         var me = this,
             searchGrid = me.getLanguageResourceSearchGrid(),
-            searchField;
+            field;
 
         me.searchConcordenceOrSynonym(searchGrid,function (selectedText){
-            searchField = searchGrid.down('#sourceSearch');
+            field = searchGrid.down('#targetSearch');
             if( selectedText === ''){
-                searchField.focus(false,500);
+                field.focus(false,500);
                 return;
             }
-            searchField.setValue(selectedText);
-            searchGrid.getController().setLastActiveField(searchField);
+
+            field.setValue(selectedText);
+            searchGrid.getController().setLastActiveField(field);
             searchGrid.getController().handleSearchAll();
         });
 

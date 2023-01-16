@@ -1,0 +1,4 @@
+Create a testsuite running as Unit-Tests to test the termtagger
+* Using the configured Termtagger API directly
+* use the data in /data as reference
+* check editor_Test_Termtagger_Abstract and editor_Test_Termtagger_Preparation for base-implementation, use or remove those classes

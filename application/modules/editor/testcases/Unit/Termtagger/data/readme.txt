@@ -1,3 +1,5 @@
+!!! THIS README IS OUTDATED AND JUST FOR REFERENCE !!!
+
 ****************
 Testing openTMStermTagger
 ****************

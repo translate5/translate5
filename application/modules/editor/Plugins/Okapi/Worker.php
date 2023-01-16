@@ -130,9 +130,19 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
         
         try {
+            $taskConfig = $this->task->getConfig();
             $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector',[
-                $this->task->getConfig()
+                $taskConfig
             ]);
+
+            $okapiConfig = $taskConfig->runtimeOptions->plugins->Okapi;
+            $serverUsed = $okapiConfig->serverUsed ?? 'not set';
+            $this->logger->info('E1444', 'Okapi Plug-In: Task was imported with Okapi "{okapi}"', [
+                'task' => $this->task,
+                'okapi' => $serverUsed,
+                'okapiUrl' => $okapiConfig->server?->$serverUsed ?? 'server used not found',
+            ], ['tasklog', 'ecode']);
+
             /* @var $api editor_Plugins_Okapi_Connector */
             $api->createProject();
             // upload the BCONF set by worker-params

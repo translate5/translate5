@@ -198,6 +198,9 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             // If current tag appears before the word having quality-error
             if (tags[i].index <= start) {
 
+                // Debug
+                if (debug) console.log('tag#', i, 'both start and end will be shifted');
+
                 // If it's one of the whitespace-tags
                 if (tags[i][2] === undefined) {
 
@@ -217,6 +220,33 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
 
                 // Do shift
                 start += shift;
+                end += shift;
+
+            // Else if current tag appears after the position where the word
+            // having quality-error begins, but before the position where the word ends
+            } else if (tags[i].index <= end) {
+
+                // Debug
+                if (debug) console.log('tag#', i, 'end will be shifted only, end is', end);
+
+                // If it's one of the whitespace-tags
+                if (tags[i][2] === undefined) {
+
+                    // Shift quality coords to the right, by whitespace-tag's outerHTML length,
+                    // which is = 4 in most cases, as whitespace tags look like <1/>, <2/> etc
+                    shift = tags[i][0].length;
+
+                // Else if it's one of the del-tags
+                } else {
+
+                    // Shift quality coords to the right, by del-tags content length
+                    shift = tags[i][2].length;
+                }
+
+                // Debug
+                if (debug) console.log('tag#', i, 'end was', end, 'end now', end + shift);
+
+                // Do shift
                 end += shift;
             }
         }

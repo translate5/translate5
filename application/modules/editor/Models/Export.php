@@ -85,7 +85,7 @@ class editor_Models_Export {
             $recursivedircleaner->delete($exportRootFolder);
         }
         
-        if(!file_exists($exportRootFolder) && !@mkdir($exportRootFolder, 0777, true)){
+        if(!file_exists($exportRootFolder) && !mkdir($exportRootFolder, 0777, true) && !is_dir($exportRootFolder)){
             throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRootFolder));
         }
         
@@ -167,7 +167,11 @@ class editor_Models_Export {
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($fileId);
-        $exportParser = str_replace('_Import_', '_Export_', $file->getFileParser());
+
+
+        $importFileParser = $file->getFileParser();
+        $exportParser = $importFileParser::getExportClass();
+
         if(empty($exportParser) || !class_exists($exportParser)) {
             return null;
         }
@@ -185,7 +189,8 @@ class editor_Models_Export {
         ]);
         
         return ZfExtended_Factory::get($fpConfig->exportParser, [
-            $this->task, $fileId,
+            $this->task,
+            $fileId,
             $fpConfig->path,
             $fpConfig->options
         ]);

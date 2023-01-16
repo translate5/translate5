@@ -266,7 +266,7 @@ class '.$name.' extends editor_Test_JsonTest {
         $this->assertFileExists($pathToZip);
         
         $exportFileName = \'export-'.$issue.'-de-en.xlf\';
-        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, $task->getTaskGuid().\'/'.$issue.'-de-en.xlf\');
+        $exportedFile = static::api()->getFileContentFromZipPath($pathToZip, \'/'.$issue.'-de-en.xlf\');
 // REMINDER FOR TEST USAGE:
 // This is the manual way to save files when the command-option -c (= capture) was set
         if(static::api()->isCapturing()){

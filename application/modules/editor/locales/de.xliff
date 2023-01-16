@@ -6258,6 +6258,10 @@ Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften 
                 <source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source>
                 <target>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</target>
             </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUga2FubiBuaWNodCB2b24gZWluZW0gUE0gYmVlbmRldCB3ZXJkZW4sIHdlaWwgZWluIEJlbnV0emVyIGRpZSBBdWZnYWJlIHp1ciBCZWFyYmVpdHVuZyBnZcO2ZmZuZXQgaGF0Lg=='>
+                <source>Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.</source>
+                <target>Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.</target>
+            </trans-unit>
             <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZHVyY2ggYW5kZXJlbiBCZW51dHplciDDvGJlcm5vbW1lbg=='>
                 <source>Translate5 - Aufgabe durch anderen Benutzer übernommen</source>
                 <target>Translate5 - Aufgabe durch anderen Benutzer übernommen</target>
@@ -8713,9 +8717,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</source>
               <target>Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll</target>
             </trans-unit>
-            <trans-unit id='U2llIGvDtm5uZW4gRGF0ZWllbiBudXIgYWt0dWFsaXNpZXJlbiwgd2VubiBkaWUgaG9jaGdlbGFkZW5lIERhdGVpIHZvbSBnbGVpY2hlbiBEYXRlaXR5cCBpc3QgdW5kIGRpZSBnbGVpY2hlIEFuemFobCB2b24gU2VnbWVudGVuIGhhdC4gRGVyemVpdCB1bnRlcnN0w7x0enRlIERhdGVpdHlwZW46IHswfQ=='>
-              <source>Sie können Dateien nur aktualisieren, wenn die hochgeladene Datei vom gleichen Dateityp ist und die gleiche Anzahl von Segmenten hat. Derzeit unterstützte Dateitypen: {0}</source>
-              <target>Sie können Dateien nur aktualisieren, wenn die hochgeladene Datei vom gleichen Dateityp ist und die gleiche Anzahl von Segmenten hat. Derzeit unterstützte Dateitypen: {0}</target>
+            <trans-unit id='QXXDn2VyaGFsYiB2b24gdHJhbnNsYXRlNSBnZcOkbmRlcnRlIFppZWwtU2VnbWVudGluaGFsdGUgc2luZCBuYWNoIGRlbSBSZS1JbXBvcnQgYWxzIMOEbmRlcnVuZ3NtYXJraWVydW5nZW4gaW0gU2VnbWVudCB6dSBzZWhlbi4gw4RuZGVydW5nc21hcmtpZXJ1bmdlbiBpbiBTZWdtZW50ZW4gdm9uIGJldm9yIGRlbSBSZS1JbXBvcnQgZ2VoZW4gdmVybG9yZW4uIEdlw6RuZGVydGUgUXVlbGxzZWdtZW50ZSB3ZXJkZW4gZWJlbmZhbGxzIGFrdHVhbGlzaWVydC4gTmV1IGhpbnp1Z2Vmw7xndGUgU2VnbWVudGUgKHouIEIuIGR1cmNoIGVpbmVuIFNlZ21lbnQtU3BsaXQpIHdlcmRlbiBpZ25vcmllcnQuIERlcnplaXQga8O2bm5lbiBkaWUgZm9sZ2VuZGVuIGJpbGluZ3VhbGVuIERhdGVpZW4gYWt0dWFsaXNpZXJ0IHdlcmRlbjogezB9'>
+              <source>Außerhalb von translate5 geänderte Ziel-Segmentinhalte sind nach dem Re-Import als Änderungsmarkierungen im Segment zu sehen. Änderungsmarkierungen in Segmenten von bevor dem Re-Import gehen verloren. Geänderte Quellsegmente werden ebenfalls aktualisiert. Neu hinzugefügte Segmente (z. B. durch einen Segment-Split) werden ignoriert. Derzeit können die folgenden bilingualen Dateien aktualisiert werden: {0}</source>
+              <target>Außerhalb von translate5 geänderte Ziel-Segmentinhalte sind nach dem Re-Import als Änderungsmarkierungen im Segment zu sehen. Änderungsmarkierungen in Segmenten von bevor dem Re-Import gehen verloren. Geänderte Quellsegmente werden ebenfalls aktualisiert. Neu hinzugefügte Segmente (z. B. durch einen Segment-Split) werden ignoriert. Derzeit können die folgenden bilingualen Dateien aktualisiert werden: {0}</target>
            </trans-unit>
             <trans-unit id='WnV3ZWlzdW5nc3dlcnRlIGJlYXJiZWl0ZW4='>
                 <source>Zuweisungswerte bearbeiten</source>

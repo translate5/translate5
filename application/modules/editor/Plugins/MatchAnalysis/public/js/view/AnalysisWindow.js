@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,18 +25,40 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+ 
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- * 
- */
-class editor_Plugins_Testplugin_TestController extends ZfExtended_Controllers_Action  {
-    
-    public function demoAction() {
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
-        echo "Hello world!";
-    }
-}
+Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisWindow', {
+    extend: 'Ext.window.Window',
+    alias: 'widget.analysisWindow',
 
+    itemId: 'analysisWindow',
+    width: '80%',
+    height: '80%',
+    autoHeight: true,
+    autoScroll: true,
+    modal: true,
+    layout:'fit',
+
+    initConfig: function (instanceConfig) {
+        var me = this,
+            config = {
+                bind:{
+                  title:'{l10n.MatchAnalysis.analysisWindow.title}'
+                },
+                items:[{
+                    xtype:'matchAnalysisPanel',
+                    header:false
+                }]
+            };
+
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+
+    setTask: function (task){
+        var me = this,
+            grid = me.down('matchAnalysisGrid');
+
+        grid & grid.setTask(task);
+    }
+});

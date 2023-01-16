@@ -47,6 +47,7 @@ Ext.define('Editor.view.segments.column.Editable', {
   
   filter: {
        type: 'boolean',
+       updateBuffer: 0,
        //yes / no must be flipped, since in DB its editable, but in GUI we speak from blocked (so negated)
        yesText: Ext.grid.filters.filter.Boolean.prototype.noText,
        noText: Ext.grid.filters.filter.Boolean.prototype.yesText

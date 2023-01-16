@@ -599,8 +599,14 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     private function jsonEncode($data): string
     {
+        $flags = JSON_THROW_ON_ERROR;
+
+        if (!$this->isOpenTM2()) {
+            $flags = JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT;
+        }
+
         // Due to error in proxygen library in t5memory json closing brace should follow a new line symbol (should be "\n}" instead of "}"),
         // otherwise such a json won't be parsed correctly
-        return json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+        return json_encode($data, $flags);
     }
 }

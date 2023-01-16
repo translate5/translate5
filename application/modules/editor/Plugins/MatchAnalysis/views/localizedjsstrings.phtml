@@ -56,9 +56,15 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
     Ext.define("Editor.locale.plugins.MatchAnalysis.view.AnalysisPanel", {
         override: "Editor.plugins.MatchAnalysis.view.AnalysisPanel",
         strings: {
+            tabTitle:'<?php echo $this->translate->_("Analyse");?>',
+        }
+    });
+
+    Ext.define("Editor.locale.plugins.MatchAnalysis.view.AnalysisGrid", {
+        override: "Editor.plugins.MatchAnalysis.view.AnalysisGrid",
+        strings: {
             noMatch:'<?php echo $this->translate->_("Keine Treffer");?>',
             matchCount:'<?php echo $this->translate->_("Summe");?>',
-            tabTitle:'<?php echo $this->translate->_("Analyse");?>',
             exportAnalysis:'<?php echo $this->translate->_("Export als Excel");?>',
             exportAnalysisXML:'<?php echo $this->translate->_("Export Trados-like XML");?>',
             noAnalysis:'<?php echo $this->translate->_("Es wurde bisher keine Analyse erstellt. Starten Sie eine Analyse im Tab “Sprachressourcen zuweisen“");?>',
@@ -82,4 +88,10 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
             wizardTitle:'<?php echo $this->translate->_("Sprachressourcen zuweisen");?>'
         }
     });
+
+    Editor.data.l10n.MatchAnalysis = {
+        analysisWindow:{
+            title: '<?php echo $this->translate->_('Match-Analyse');?>'
+        }
+    };
 });

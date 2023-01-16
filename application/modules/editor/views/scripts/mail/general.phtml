@@ -106,10 +106,10 @@ if(!empty($this->project)) {
 
     // If the customer domain is set, use this domain as portal url and link
     if (empty($customer->getDomain())) {
-        $data['portalLink']='<a href="' . $portal . $urlPart . '">' . $portal . '</a>';
+        $data['portalLink']='<a href="'.$portal.$urlPart.'">'.$portal.$urlPart.'</a>';
     } else {
         $data['portalUrl'] = $customer->getDomain();
-        $data['portalLink'] = '<a href="' . $data['portalUrl'] . $urlPart . '">' . $customer->getDomain() . '</a>';
+        $data['portalLink'] = '<a href="'.$data['portalUrl'].$urlPart.'">'.$customer->getDomain().$urlPart.'</a>';
     }
 }
 if(!empty($this->task)) {
@@ -126,11 +126,11 @@ if(!empty($this->task)) {
     $customer->load($this->task->getCustomerId());
     //if the customer domain is set, use this domain as portal url and link
     if(empty($customer->getDomain())){
-        $data['portalLink']='<a href="'.$portal.$urlPart.'">'.$portal.'</a>';
+        $data['portalLink']='<a href="'.$portal.$urlPart.'">'.$portal.$urlPart.'</a>';
     }
     else {
         $data['portalUrl']=$customer->getDomain();
-        $data['portalLink']='<a href="'.$customer->getDomain().$urlPart.'">'.$customer->getDomain().'</a>';
+        $data['portalLink']='<a href="'.$customer->getDomain().$urlPart.'">'.$customer->getDomain().$urlPart.'</a>';
     }
     
     //we have to pre-apply the relaisLang Fragment to inject the language itself

@@ -4,7 +4,17 @@
  * Here ale place all task import related functions just to split them from the main controller
  */
 trait editor_Controllers_Task_ImportTrait {
-
+    
+    /**
+     * @var editor_Workflow_Default
+     */
+    protected $workflow;
+    
+    /**
+     * @var editor_Workflow_Manager
+     */
+    protected $workflowManager;
+    
     /***
      * Handles the import for non project data.
      * This will evaluate what kind of data provider should be used, and it will process the uploaded files
@@ -136,7 +146,7 @@ trait editor_Controllers_Task_ImportTrait {
             $import->import($dp, $this->data);
         } catch (ZfExtended_ErrorCodeException $e){
             // in case there is task, remove it
-            $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
+            $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$task]);
             /* @var $remover editor_Models_Task_Remover */
             $remover->remove(true);
 
@@ -150,7 +160,81 @@ trait editor_Controllers_Task_ImportTrait {
             throw $e;
         }
     }
-
+    
+    /**
+     * init the internal used workflow
+     * @param string $wfId workflow ID. optional, if omitted use the workflow of $this->entity
+     */
+    protected function initWorkflow($wfId = null) {
+        if(empty($wfId) && isset($this->entity)) {
+            $wfId = $this->entity->getWorkflow();
+        }
+        try {
+            $this->workflow = $this->workflowManager->getCached($wfId);
+        }
+        catch (Exception $e) {
+            $this->workflow = $this->workflowManager->getCached('default');
+        }
+    }
+    
+    /**
+     * starts the workers of the current or given task
+     * @param string $taskGuid optional, if empty use current task
+     */
+    protected function startImportWorkers(editor_Models_Task $task = null) {
+        if(empty($task)) {
+            $task = $this->entity;
+        }
+        
+        $tasks = [];
+        //if it is a project, start the import workers for each sub task
+        if($task->isProject()) {
+            $tasks = $task->loadProjectTasks($task->getProjectId(),true);
+            
+            /** @var editor_Workflow_Manager $wfm */
+            ZfExtended_Factory::get('editor_Workflow_Manager')
+                ->getActiveByTask($task)
+                ->hookin()
+                ->doHandleProjectCreated($task);
+            
+        } else {
+            $tasks[] = $task;
+        }
+        
+        // we fix all task-specific configs of the task for it's remaining lifetime
+        // this is crucial to ensure, that important configs are changed throughout the lifetime that are usually not designed to be dynamical (AutoQA, Visual, ...)
+        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+        /* @var $taskConfig editor_Models_TaskConfig */
+        $taskConfig->fixAfterImport($tasks);
+    
+        $model = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $model editor_Models_Task */
+        foreach ($tasks as $t){
+            
+            if(is_array($t)){
+                $model->load($t['id']);
+            } else {
+                $model = $t;
+            }
+            
+            //import workers can only be started for tasks
+            if($model->isProject()) {
+                continue;
+            }
+            
+            $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+            /* @var $workerModel ZfExtended_Models_Worker */
+            try {
+                $workerModel->loadFirstOf('editor_Models_Import_Worker', $model->getTaskGuid());
+                $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
+                $worker && $worker->schedulePrepared();
+            }
+            catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                //if there is no worker, nothing can be done
+            }
+        }
+    }
+    
     /***
      * Handle the task usage log for given entity. This will update the sum counter or insert new record
      * based on the unique key of `taskType`,`customerId`,`yearAndMonth`
