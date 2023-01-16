@@ -1,0 +1,236 @@
+<?xml version='1.0'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Export of translate5 termCollection</title>
+                <note>Contains the languages: de, en, ru</note>
+            </titleStmt>
+            <sourceDesc>
+                <p>File is exported from translate5 instance at https://translate5.local by the user Pavel Perminov</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="id9a714500-d3c5-4069-8d92-1e610f5437d1">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Pavel Perminov</transacNote>
+                    <date>2022-07-30</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                    <date>2022-12-21</date>
+                </transacGrp>
+                <langSet xml:lang="en">
+                    <note >some comment, language1, some language-level comment, sss177, lang-level comment12, 111111, ssss, sss</note>
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-07-30</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-10-28</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id162dcd89-6aef-48a3-9c2a-d7d412bd9e0f">jam</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <descrip type="context">some context</descrip>
+                        <termNote type="grammaticalGender">masculine</termNote>
+                        <termNote type="preferred">somepreferref</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-07-30</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-10-28</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-07-30</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-09-06</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id4f19c201-e089-457e-98b8-3b926e4aa36d">marmelade</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-07-30</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-09-06</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="id60093f56-da59-4074-9d1a-9803464a9402">
+                <descrip type="definition">asdasd</descrip>
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Pavel Perminov</transacNote>
+                    <date>2022-07-30</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                    <date>2022-12-21</date>
+                </transacGrp>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-07-30</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-12-21</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id7181743b-30a1-4f35-b909-6567bec9edd5">stau</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <xref type="xGraphic" target="http://google.com">asdasd</xref>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-07-30</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-12-20</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-07-30</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-09-07</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id44e1dc32-1747-489f-8633-e92b0fa328a5">jam</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-09-07</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-09-07</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="idf7182d4e-2e63-43a8-916d-371d928df601">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Pavel Perminov</transacNote>
+                    <date>2022-09-07</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                    <date>2022-10-17</date>
+                </transacGrp>
+                <langSet xml:lang="ru">
+                    <tig>
+                        <term id="id74e8ef44-0538-4835-ac8f-b07a9871fd32">пробка</term>
+                    </tig>
+                    <tig>
+                        <term id="id73a3f45f-ae67-4c70-833d-4e44e538f743">варенье</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-09-07</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-09-07</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id6418e19e-048d-4bfa-b627-233341dc1528">jam</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-09-07</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-09-07</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-09-07</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                        <date>2022-09-07</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id9b1862dd-6eee-44dc-ba18-67ed1b047a95">term3</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-09-07</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Pavel Perminov</transacNote>
+                            <date>2022-09-07</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+        <back>
+            <refObjectList type="respPerson">
+                <refObject id="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">
+                    <item type="fn">Pavel Perminov</item>
+                    <item type="role">editor,pm,termCustomerSearch,termProposer,termFinalizer,termPM,termReviewer,instantTranslate</item>
+                    <item type="email">noreply@translate5.net</item>
+                </refObject>
+            </refObjectList>
+        </back>
+    </text>
+</martif>

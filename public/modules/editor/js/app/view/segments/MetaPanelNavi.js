@@ -98,6 +98,8 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
 
         items = [{
             xtype: 'container',
+            disabled: true,
+            enableOnEdit: true,
             layout: {
                 type: 'hbox'
             },

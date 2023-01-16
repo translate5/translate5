@@ -245,11 +245,23 @@ div.single + div {
 
 #change-alike-window div.transNotFound,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound,
-.segment-tag-container.type-source div.transNotFound {border-bottom-color:#ff0000;}
+.segment-tag-container.type-source div.transNotFound {
+    text-decoration-style: solid;
+    text-decoration-color: red;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    border-bottom: 0;
+}
 
 #change-alike-window div.transNotDefined,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotDefined,
-.segment-tag-container.type-source div.transNotDefined {border-bottom-color:#8F4C36;}
+.segment-tag-container.type-source div.transNotDefined {
+    text-decoration-style: solid;
+    text-decoration-color: #8F4C36;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    border-bottom: 0;
+}
 
 .segment-tag-column div.x-grid-cell-inner div.notRecommended,
 .segment-tag-container div.notRecommended,
@@ -967,3 +979,119 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 .t5alikeGrid .x-grid-rowbody div:nth-child(2),
 .t5alikeGrid .x-grid-rowbody div:nth-child(4) {width: 307px;}
 .t5alikeGrid .x-grid-rowbody div:nth-child(3) {width: 49px;}
+
+.x-fieldset.segmentQualities {
+    background: none;
+}
+.x-fieldset.segmentQualities > legend {
+    padding: 0 4px;
+    margin-left: 16px;
+    margin-bottom: -10px;
+    z-index: 1;
+    position: relative;
+}
+.x-fieldset.segmentQualities .x-grid .x-column-header[id^=checkcolumn] .x-column-header-inner {
+    padding-right: 6px;
+    padding-left: 6px;
+}
+.x-column-header[id^=checkcolumn] .x-column-header-inner[data-qtip] .x-column-header-text-container {
+    /*border-bottom: 1px dotted;*/
+    pointer-events: all;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner {
+    padding: 0 10px 1px;
+    line-height: 0;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:first-child {
+    line-height: 15px;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2) {
+    line-height: initial;
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):before {
+    content: '- ';
+}
+.x-fieldset.segmentQualities .quality .x-grid-cell-inner > div:nth-child(2):after {
+    content: ' -';
+}
+.t5falsePositivesGrid .fa {
+    font-family: FontAwesome5FreeSolid;
+    color: #919191;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-file-circle-question:before {
+    content: "\e4ef" !important;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-spinner:before {
+    content: "\f110" !important;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-file-circle-plus:before {
+    content: "\e494" !important;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-file-circle-minus:before {
+    content: "\e4ed" !important;
+}
+.t5falsePositivesGrid .x-grid-header-ct .fa.fa-magnifying-glass-arrow-right:before {
+    content: "\e521" !important;
+}
+.t5falsePositivesGrid .x-grid-widgetcolumn-cell-inner {
+    padding: 4px !important;
+}
+.x-column-header-last {
+    border-right-width: 0 !important;
+}
+.x-fieldset.segmentQualities .x-column-header.x-column-header-focus .x-column-header-inner:after {
+    border: none;
+}
+.x-fieldset.segmentQualities .x-column-header-over {
+    background-color: inherit;
+}
+.x-grid-body {
+    border-top-width: 1px;
+}
+.x-accordion-item .x-grid-header-ct {
+    border-bottom-width: 0 !important;
+}
+.fa-circle-xmark:before {
+    content: "\f057" !important;
+}
+.x-layer.x-fieldset.segmentQualities {
+    background: white;
+}
+.x-layer.x-fieldset.segmentQualities > legend {
+    background: white;
+    border-top: 1px solid #d0d0d0;
+    padding-left: 6px;
+}
+.x-layer.x-fieldset.segmentQualities > legend .x-fa {
+    margin-left: 5px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+.x-layer.x-fieldset.segmentQualities > legend .x-tool {
+    display: none;
+}
+.x-layer.x-fieldset.segmentQualities > legend:after,
+.x-layer.x-fieldset.segmentQualities > legend:before {
+    content: '';
+    display: inline-block;
+    background: #bbbbbb;
+    width: 1px;
+    height: 11px;
+    position: absolute;
+}
+.x-layer.x-fieldset.segmentQualities > legend:after {
+    right: 0;
+}
+.x-layer.x-fieldset.segmentQualities > legend:before {
+    left: 0;
+}
+.x-layer.x-fieldset-header-default > .x-fieldset-header-text {
+    padding-top: 0;
+}
+.t5quality[data-t5qfp="true"],
+#change-alike-window div.transNotFound[data-t5qfp="true"],
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound[data-t5qfp="true"],
+.segment-tag-container.type-source div.transNotFound[data-t5qfp="true"] {
+    border-bottom: 1px solid limegreen;
+    padding-bottom: 2px;
+}

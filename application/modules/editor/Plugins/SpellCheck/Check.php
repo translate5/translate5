@@ -175,6 +175,10 @@ class editor_Plugins_SpellCheck_Check {
 
                 // Convert into special data structure
                 $this->states[$category] []= (object) [
+                    'content'           => mb_substr(
+                        $match->context->text,
+                        $match->context->offset,
+                        $match->context->length),
                     'matchIndex'        => $index,                                                       // Integer
                     'range'             => [                                                             // Rangy bookmark
                         'start' => $match->offset,

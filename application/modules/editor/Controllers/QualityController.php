@@ -94,6 +94,16 @@ class editor_QualityController extends ZfExtended_RestController {
         $this->view->rows = $view->getRows();
         $this->view->total = count($this->view->rows);
     }
+
+    /**
+     * Spread current value of falsePositive-flag for all other occurrences of such [quality - content] pair found in this task
+     */
+    public function falsepositivespreadAction() {
+        $this->entityLoad();
+        $this->view->ids = $this->entity->spreadFalsePositive();
+        $this->view->success = 1;
+    }
+
     /**
      * Sets the false-positive for a segment
      */

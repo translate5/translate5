@@ -82,9 +82,14 @@ Ext.define('Editor.controller.MetaPanel', {
             },
             '#segmentgrid': {
                 afterrender: 'initEditPluginHandler',
+                selectionchange: 'handleSegmentSelectionChange',
                 beforeedit: 'startEdit',
                 canceledit: 'cancelEdit',
-                edit: 'saveEdit'
+                edit: 'saveEdit',
+                itemcontextmenu: 'onSegmentContextMenu'
+            },
+            '#segmentgrid segmentroweditor': {
+                afterrender: 'onSegmentEditorAfterRender'
             }
         },
         controller: {
@@ -138,45 +143,155 @@ Ext.define('Editor.controller.MetaPanel', {
      */
     startEdit: function (editingPlugin, context) {
         var me = this,
-            mp = me.getMetaPanel(),
             record = context.record,
-            segmentId = record.get('id'),
             isWatched = Boolean(record.get('isWatched')),
-            segmentUserAssocId = record.get('segmentUserAssocId'),
             navi = me.getNavi(),
             but = Ext.getCmp('watchSegmentBtn'),
             tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
         me.editingMode = 'edit';
         but.toggle(isWatched, true);
+        me.toggleOnEdit(true);
         but.setTooltip({
             dismissDelay: 0,
             text: tooltip
         });
-        me.record = record;
+        navi.show();
+        navi.enable();
+        me.getSegmentMeta().show();
+    },
+
+    /**
+     * Toggle GUI items on editor open/close
+     *
+     * @param enable
+     */
+    toggleOnEdit: function(toggle) {
+        this.getMetaPanel().query('[enableOnEdit]').forEach(item => item.setDisabled(!toggle))
+    },
+
+    /**
+     * Bind handler on click-event for segmenteditor to simulate selectionchange-event for segmentgrid
+     * so that right panel (terms, qualities and comments) is reloaded as if segmentgrid's selection
+     * would go back to edited segment
+     *
+     * @param segmenteditor
+     */
+    onSegmentEditorAfterRender: function(segmenteditor) {
+        segmenteditor.el.on({
+            click: () => {
+                this.getSegmentGrid().getView().select(segmenteditor.context.record)
+            },
+            contextmenu: (event) => {
+                this.onSegmentContextMenu(null, null, null, null, event);
+            },
+            scope: this
+        });
+    },
+
+    /**
+     * Open grid with ability to apply false positive status for a certain quality and all other similar qualities
+     *
+     * @param view
+     * @param record
+     * @param dom
+     * @param idx
+     * @param event
+     */
+    onSegmentContextMenu: function(view, record, dom, idx, event) {
+        var me = this, tag = event.getTarget('[data-t5qid]'), id;
+
+        // If right-click was NOT on tag having data-t5qid attribute
+        if (!tag) {
+
+            // If right-click was made outside of some quality-tag - hide previously opened right-click grid, if any
+            if (me.segmentRightClickGrid) me.segmentRightClickGrid.hide();
+
+            return;
+        }
+
+        // Get quality id
+        id = tag.getAttribute('data-t5qid');
+
+        // Prevent native content menu from being shown
+        event.preventDefault();
+
+        // If no segment right-click grid created yet - create
+        if (!me.segmentRightClickGrid) {
+            me.segmentRightClickGrid = Ext.create({
+                xtype: 'falsePositives',
+                shadow: false,
+                floating: true,
+                draggable: true,
+                collapsible: true, // collapse/expand tool is hidden by css
+                bind: {
+                    title: '{l10n.falsePositives.legend.float} <span class="x-fa fa-circle-xmark" title="{l10n.falsePositives.close}"></span>'
+                },
+                toggle: function(ev, dom, opts) {
+                    if (ev.getTarget('.x-fa')) opts.scope.hide();
+                }
+            });
+        }
+
+        // Show grid
+        me.segmentRightClickGrid.down('grid').setEmptyText(Editor.data.l10n.falsePositives.grid.emptyText);
+        me.segmentRightClickGrid.showBy(tag, 't-b?', [0, 10]);
+
+        // Pick quality by id once qualities store is loaded
+        me.loadSegmentRightClickGridRow(id);
+    },
+
+    /**
+     * Load certain quality-record into grid opened on right-click on quality-tag inside some segment
+     */
+    loadSegmentRightClickGridRow: function(id) {
+        var me = this, data = [], rec;
+
+        // If record is already initialized within the store
+        if (rec = me.getMetaFalPosPanel().down('grid').getStore().getById(id)) {
+
+            // Pick it's data
+            data.push(rec.getData());
+
+        } else {
+
+            // Try again in 200ms
+            Ext.defer(() => me.loadSegmentRightClickGridRow(id), 200);
+        }
+
+        // Set data
+        me.segmentRightClickGrid.down('grid').getStore().setData(data);
+    },
+
+    handleSegmentSelectionChange: function(sm, selectedRecords) {
+
+        // If no selection - return
+        if (selectedRecords.length == 0) {
+            return;
+        }
+
+        var me = this,
+            record = selectedRecords[0],
+            segmentId = record.get('id');
+
+        // Hide segmentRightClickGrid, if it was previously opened
+        if (me.segmentRightClickGrid) me.segmentRightClickGrid.hide();
+
         me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
+        me.record = record;
         // our component controllers are listening for the load event & create their views
         me.getQualitiesStore().load({
             params: {segmentId: segmentId}
         });
         me.loadRecord(me.record);
-        navi.show();
-        navi.enable();
-        me.getSegmentMeta().show();
-        mp.enable();
-
     },
+
     /**
      * Starts the creation of the segment's quality related GUIs
      */
     handleQualitiesLoaded: function (store, records) {
-        // for cases where user is faster than store
-        if (this.editingMode == 'edit') {
-            var segmentId = this.record.get('id');
-            this.getMetaFalPosPanel().startEditing(records, segmentId, true);
-            this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
-        } else {
-            store.removeAll(true);
-        }
+        this.getMetaFalPosPanel().loadFalsifiable(records);
+        var segmentId = this.record.get('id');
+        this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
     },
     /**
      * opens metapanel for readonly segments
@@ -206,23 +321,18 @@ Ext.define('Editor.controller.MetaPanel', {
      */
     saveEdit: function () {
         this.record.set('stateId', this.getMetaInfoForm().getValues().stateId);
-        //close the metapanel
-        this.getMetaPanel().disable();
-        this.getMetaFalPosPanel().endEditing(true, true);
         this.getMetaQmPanel().endEditing(this.hasQmQualities, true);
-        this.getQualitiesStore().removeAll(true);
         this.editingMode = 'none';
+        this.toggleOnEdit(false);
     },
     /**
      * Editor.view.segments.RowEditing canceledit handler
      * @hint metapanel
      */
     cancelEdit: function () {
-        this.getMetaPanel().disable();
-        this.getMetaFalPosPanel().endEditing(true, false);
         this.getMetaQmPanel().endEditing(this.hasQmQualities, false);
-        this.getQualitiesStore().removeAll(true);
         this.editingMode = 'none';
+        this.toggleOnEdit(false);
     },
     /**
      * Changes the state box by keyboard shortcut instead of mouseclick

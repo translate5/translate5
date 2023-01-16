@@ -53,14 +53,14 @@ https://confluence.translate5.net/display/TAD/EventCodes
 ### Request params validation
 | EventCode        | Context       | EventMessage  | Description/Solution
 | :--------------- |:------------- | :------------ | :------------------- 
-| <a id="E2000"></a>E2000  | Validation | Param &quot;{0}&quot; - is not given | Param is not given at all, or given but is empty
-| <a id="E2001"></a>E2001  | Validation | Value &quot;{0}&quot; of param &quot;{1}&quot; - is in invalid format | Param is given but has an invalid format. For example: wrong email format, wrong number format, etc
-| <a id="E2002"></a>E2002  | Validation |No object of type &quot;{0}&quot; was found by key &quot;{1}&quot; | No object was found in the database by the given key
-| <a id="E2003"></a>E2003  | Validation |Wrong value | Given value is not equal to the value that is stored/provided by server-side
-| <a id="E2004"></a>E2004  | Validation |Value &quot;{0}&quot; of param &quot;{1}&quot; - is not in the list of allowed values | There is the list of allowed values, but given value is <strong>not in</strong> that list
-| <a id="E2005"></a>E2005  | Validation |Value &quot;{0}&quot; of param &quot;{1}&quot; - is in the list of disabled values | There is the list of disabled values, but given value is <strong>in</strong> that list
-| <a id="E2006"></a>E2006  | Validation |Value &quot;{0}&quot; of param &quot;{1}&quot; - is not unique. It should be unique. | The given value already exists within certain column of certain database table
-| <a id="E2007"></a>E2007  | Validation | Extension &quot;{0}&quot; of file &quot;{1}&quot; - is not in the list of allowed values | The file type uploaded in the termportal is not allowed
+| <a id="E2000"></a>E2000  | Validation | Param "{0}" - is not given | Param is not given at all, or given but is empty
+| <a id="E2001"></a>E2001  | Validation | Value "{0}" of param "{1}" - is in invalid format | Param is given but has an invalid format. For example: wrong email format, wrong number format, etc
+| <a id="E2002"></a>E2002  | Validation | No object of type "{0}" was found by key "{1}" | No object was found in the database by the given key
+| <a id="E2003"></a>E2003  | Validation | Wrong value | Given value is not equal to the value that is stored/provided by server-side
+| <a id="E2004"></a>E2004  | Validation | Value "{0}" of param "{1}" - is not in the list of allowed values | There is the list of allowed values, but given value is <strong>not in</strong> that list
+| <a id="E2005"></a>E2005  | Validation | Value "{0}" of param "{1}" - is in the list of disabled values | There is the list of disabled values, but given value is <strong>in</strong> that list
+| <a id="E2006"></a>E2006  | Validation | Value "{0}" of param "{1}" - is not unique. It should be unique. | The given value already exists within certain column of certain database table
+| <a id="E2007"></a>E2007  | Validation | Extension "{0}" of file "{1}" - is not in the list of allowed values | The file type uploaded in the termportal is not allowed
 
 
 ### Authentication
@@ -381,7 +381,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1357"></a>E1357  | Terminology | TBX Import: Could not import due unknown attribute level | Very unusual that this error happens, see the msg and extra data.
 | <a id="E1393"></a>E1393  | Terminology | TBX Import: The XML structure of the TBX file is invalid: {message} | In this case the XML of the given TBX file is invalid and can not be parsed.
 | <a id="E1360"></a>E1360  | Terminology | TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states. | The listed states are unknown and can not be mapped to the usual administrative status values.<br />Please configure them in the runtimeOptions.tbx.termImportMap configuration.
-| <a id="E1361"></a>E1361  | Terminology | TBX Import: Unable to import terms due invalid Rfc5646 language code &quot;{code}&quot; | The listed language code is invalid / not configured in translate5, the corresponding terms could not be imported.
+| <a id="E1361"></a>E1361  | Terminology | TBX Import: Unable to import terms due invalid Rfc5646 language code "{code}" | The listed language code is invalid / not configured in translate5, the corresponding terms could not be imported.
 | <a id="E1364"></a>E1364  | Terminology | TermTagger overall run done - {segmentCounts} | Reports that the whole task was tagged with the termtagger and shows the segment status counts.
 | <a id="E1451"></a>E1451  | Terminology | Recoverable error on termtagging: {message} | See system log for details.
 
