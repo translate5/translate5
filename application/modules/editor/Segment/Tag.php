@@ -366,6 +366,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public function getAdditionalData() : stdClass {
         $data = new stdClass();
+        $data->content = $this->content;
         $data->hash = md5($this->content);
         return $data;
     }

@@ -82,6 +82,7 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
     $('#locale').selectmenu({
         change: function() {
             var action = $(this).val();
+            Editor.data.logoutOnWindowClose = false;
             $("#languageSelector").attr("action", "?locale=" + action);
             $("#languageSelector").submit();
         }
@@ -1181,7 +1182,9 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
                     '<a href="' + taskData.downloadUrl + '" class="color-grey_09" target="_blank" title="Download">'
                     + '<h2>'+taskData.taskName+' <small class="color-grey_06">('+taskData.orderDate+')</small><svg class="icon icon-t5_download floatRight" /></h2>'
                     + '</a>';
-                $innerContent += '(' + Editor.data.languageresource.translatedStrings.availableUntil+' '+taskData.removeDate+')';
+                if (taskData.removeDate) {
+                    $innerContent += '(' + Editor.data.languageresource.translatedStrings.availableUntil+' '+taskData.removeDate+')';
+                }
                 break;
         }
         $htmlFile += '<div class="box box__result__header '+$headerClassAddition+' font-size-big marginTop">';
@@ -1612,4 +1615,11 @@ function checkInstantTranslation() {
     }
     // Start translation:
     startTimerForInstantTranslation();
+}
+
+// If we're not within an iframe
+if (window.parent.location === window.location) {
+
+    // Put a handler on window close, if need
+    logoutOnWindowClose();
 }

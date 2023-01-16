@@ -239,30 +239,51 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
     private function loadUntaggedSegmentIds(): array {
         $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $db editor_Models_Db_SegmentMeta */
-        
-        $db->getAdapter()->beginTransaction();
-        $sql = $db->select()
-            ->from($db, ['segmentId'])
-            ->where('taskGuid = ?', $this->task->getTaskGuid())
-            ->where('termtagState IS NULL OR termtagState IN (?)', [editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED])
-            ->order('id')
-            ->limit(editor_Plugins_TermTagger_Configuration::IMPORT_SEGMENTS_PER_CALL)
-            ->forUpdate(Zend_Db_Select::FU_MODE_SKIP);
-        $segmentIds = $db->fetchAll($sql)->toArray();
-        $segmentIds = array_column($segmentIds, 'segmentId');
-        
-        if(empty($segmentIds)) {
+
+        try {
+
+            $db->getAdapter()->beginTransaction();
+            $sql = $db->select()
+                ->from($db, ['segmentId'])
+                ->where('taskGuid = ?', $this->task->getTaskGuid())
+                ->where('termtagState IS NULL OR termtagState IN (?)', [editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED])
+                ->order('id')
+                ->limit(editor_Plugins_TermTagger_Configuration::IMPORT_SEGMENTS_PER_CALL)
+                ->forUpdate(Zend_Db_Select::FU_MODE_SKIP);
+            $segmentIds = $db->fetchAll($sql)->toArray();
+            $segmentIds = array_column($segmentIds, 'segmentId');
+
+            if(empty($segmentIds)) {
+                $db->getAdapter()->commit();
+                return $segmentIds;
+            }
+
+            $db->update(['termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_INPROGRESS], [
+                'taskGuid = ?' => $this->task->getTaskGuid(),
+                'segmentId in (?)' => $segmentIds,
+            ]);
             $db->getAdapter()->commit();
+
             return $segmentIds;
+
+        // Catch and log exception
+        } catch (Exception $e) {
+
+            // Rollback transaction
+            $db->getAdapter()->rollBack();
+
+            // Log original exception
+            $this->getLogger()->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
+
+            // Log task event
+            $this->getLogger()->warn('E1451', "Recoverable error on termtagging: {$e->getMessage()} - see system log for details.", [
+                'task' => $this->task,
+                'segments' => $segmentIds,
+            ]);
+
+            // Return empty array
+            return [];
         }
-        
-        $db->update(['termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_INPROGRESS], [
-            'taskGuid = ?' => $this->task->getTaskGuid(),
-            'segmentId in (?)' => $segmentIds,
-        ]);
-        $db->getAdapter()->commit();
-        
-        return $segmentIds;
     }
 
     /**

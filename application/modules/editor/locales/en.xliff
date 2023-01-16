@@ -5969,6 +5969,14 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Falsch erkannte Fehler</source>
                 <target>False positives</target>
             </trans-unit>
+            <trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcj8='>
+                <source>Falsch erkannte Fehler?</source>
+                <target>False positives?</target>
+            </trans-unit>
+            <trans-unit id='RWluIGZhbHNjaCBlcmthbm50ZXIgRmVobGVyPw=='>
+                <source>Ein falsch erkannter Fehler?</source>
+                <target>False positive?</target>
+            </trans-unit>
             <trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'>
                 <source>Interne Tag Fehler</source>
                 <target>Internal tag errors</target>
@@ -5993,9 +6001,37 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Die Qualität wurde entfernt</source>
                 <target>The quality has been removed</target>
             </trans-unit>
-            <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='>
-                <source>Der False-Positive Status wurde aktualisiert</source>
-                <target>The false-positive state has been updated</target>
+            <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFuZGVyZSBFcmVpZ25pc3NlIGlubmVyaGFsYiBkaWVzZXIgQXVmZ2FiZSB2ZXJ0ZWlsdA=='>
+                <source>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</source>
+                <target>Spreaded such status for other occurrences within this task</target>
+            </trans-unit>
+            <trans-unit id='UmVjaHRzIGtsaWNrZW4gdW0gYWxzICdmYWxzY2ggZXJrYW5udCcgenUgbWFya2llcmVu'>
+                <source>Rechts klicken um als 'falsch erkannt' zu markieren</source>
+                <target>Right-click to set as false positive</target>
+            </trans-unit>
+            <trans-unit id='QW56YWhsIGFuZGVyZXIgVm9ya29tbWVuIGVpbmVzIHNvbGNoZW4gUGFhcmVzIFtRdWFsaXTDpHQgLSBJbmhhbHRdLCBkaWUgaW4gZGllc2VyIEF1ZmdhYmUgZ2VmdW5kZW4gd3VyZGVu'>
+                <source>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
+                <target>Quantity of other occurrences of such [quality - content] pair found in this task</target>
+            </trans-unit>
+            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgaW4gYW5kZXJlbiBTZWdtZW50ZW4gZWJlbmZhbGxzIMOkbmRlcm4u'>
+                <source>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</source>
+                <target>Change all identical errors in other segments also.</target>
+            </trans-unit>
+            <trans-unit id='SmE='>
+                <source>Ja</source>
+                <target>Yes</target>
+            </trans-unit>
+            <trans-unit id='UXVhbGl0w6R0'>
+                <source>Qualität</source>
+                <target>Quality</target>
+            </trans-unit>
+            <trans-unit id='TGFkZXF1YWxpdMOkdC4u'>
+                <source>Ladequalität..</source>
+                <target>Loading quality..</target>
+            </trans-unit>
+            <trans-unit id='U2NobGllw59lbg=='>
+                <source>Schließen</source>
+                <target>Close</target>
             </trans-unit>
             <trans-unit id='QWNodHVuZw=='>
                 <source>Achtung</source>
@@ -8918,6 +8954,34 @@ E-Mail: service@MittagQI.com</pre>
               <source>Dateiname</source>
               <target>File name</target>
             </trans-unit>
+            <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlIHVuZCBlaW5lIFphaGwu'>
+              <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</source>
+              <target>Minimum length: 12 characters. Minimum included: One uppercase letter, one lowercase letter and one number.</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyAxMiBaZWljaGVu">
+              <source>Mindestens 12 Zeichen</source>
+              <target>Minimum 12 characters</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW5lIFphaGw=">
+              <source>Mindestens eine Zahl</source>
+              <target>Minimum one number</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gS2xlaW5idWNoc3RhYmU=">
+              <source>Mindestens ein Kleinbuchstabe</source>
+              <target>Minimum one lowercase letter</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gR3Jvw59idWNoc3RhYmU=">
+              <source>Mindestens ein Großbuchstabe</source>
+              <target>Minimum one uppercase letter</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gU29uZGVyemVpY2hlbg==">
+              <source>Mindestens ein Sonderzeichen</source>
+              <target>Minimum one special character</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFBhc3N3b3J0IGVudGjDpGx0IGVpbiBXb3J0IGF1cyBkZXIgc2Nod2FyemVuIExpc3RlLg==">
+              <source>Das Passwort enthält ein Wort aus der schwarzen Liste.</source>
+              <target>Password contains black-listed word.</target>
+            </trans-unit>
             <trans-unit id='UGl2b3RzcHJhY2hl'>
                 <source>Pivotsprache</source>
                 <target>Pivot language</target>
@@ -8937,6 +9001,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='bWVocg=='>
               <source>mehr</source>
               <target>more</target>
+            </trans-unit>
+            <trans-unit id='U3ByYWNocmVzc291cmNlIGRlcyBhdXNnZXfDpGhsdGVuIFJlc3NvdXJjZW50eXBzIGthbm4gaW4gZGVyIEJlbnV0emVyb2JlcmZsw6RjaGUgbmljaHQgZXJzdGVsbHQgd2VyZGVuLg=='>
+                <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
+                <target>Language resource of selected resource type can not be created in UI.</target>
             </trans-unit>
         </body>
     </file>

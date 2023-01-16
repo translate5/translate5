@@ -63,6 +63,9 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         // CSS-Classes for error-types
         // Attributes for the quality-Node
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-quality-activeMatchIndex',
+        ATTRIBUTE_QUALITY_ID: 'data-t5qid',
+        ATTRIBUTE_QUALITY_FALSEPOSITIVE: 'data-t5qfp',
+        ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP: 'data-qtip',
     },
 
     /**
@@ -293,6 +296,11 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         nodeElParams['cls'] = me.self.CSS_CLASSNAME_MATCH + ' ' + match.cssClassErrorType;
         // activeMatchIndex
         nodeElParams[me.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
+        nodeElParams[me.self.ATTRIBUTE_QUALITY_ID] = match.id;
+        nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE] = match.falsePositive ? 'true' : 'false';
+        if (!match.falsePositive) {
+            nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP] = Editor.data.l10n.falsePositives.hover;
+        }
         // create and return node
         return Ext.DomHelper.createDom(nodeElParams);
     },

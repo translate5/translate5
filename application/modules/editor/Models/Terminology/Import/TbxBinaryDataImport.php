@@ -36,6 +36,11 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
      */
     public $doubleDecode = false;
 
+    /***
+     * @var ZfExtended_Logger
+     */
+    protected ZfExtended_Logger $logger;
+
     /**
      * editor_Models_Terminology_Import_TbxBinaryDataImport constructor.
      * @param string $tbxFilePath
@@ -47,6 +52,7 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
             '~<sourceDesc><p>Termflow</p></sourceDesc>~',
             file_get_contents($tbxFilePath, false, null, 0, 5 * 1024)
         );
+        $this->logger = Zend_Registry::get('logger');
     }
 
     /**
@@ -55,8 +61,10 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
      * @param SimpleXMLElement $refObjectList
      * @throws editor_Models_Terminology_Import_Exception
      */
-    public function import(int $collectionId, SimpleXMLElement $refObjectList)
+    public function import(editor_Models_TermCollection_TermCollection $collection, SimpleXMLElement $refObjectList)
     {
+        $collectionId = $collection->getId();
+
         /** @var $imagesModel editor_Models_Terminology_Models_ImagesModel */
         $imagesModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
         $imagesModel->checkImageTermCollectionFolder($collectionId);
@@ -94,7 +102,8 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
         if(!empty($missingFiles)) {
             $this->logger->warn('E1028', 'TBX Import: there are image files in the database which are missing on the disk', [
                 'termCollectionId' => $collectionId,
-                'missingFiles' => $missingFiles,
+                'languageResource' => $collection,
+                'missingFiles' => $missingFiles
             ]);
         }
     }

@@ -314,10 +314,6 @@ Ext.define('Editor.controller.Localizer', {
         qmHasBeenAdded: '<?php echo $this->translate->_('Die Qualität wurde hinzugefügt');?>',
         qmHasBeenRemoved: '<?php echo $this->translate->_('Die Qualität wurde entfernt');?>'
     };
-    Editor.view.quality.FalsePositives.prototype.title = '<?php echo $this->translate->_('Falsch erkannte Fehler');?>';
-    Editor.view.quality.FalsePositivesController.prototype.messages = {
-    	falsePositiveUpdated: '<?php echo $this->translate->_('Der False-Positive Status wurde aktualisiert');?>'
-    };
     Editor.view.quality.admin.TaskQualities.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
   	Editor.view.quality.admin.TaskQualities.prototype.strings = {
 		category: '<?php echo $this->translate->_('Kategorie');?>',
@@ -2090,6 +2086,24 @@ Editor.data.l10n = {
         targetMatchColumn: '<?php echo $this->translate->_('Ziel-Treffer');?>',
         sameContextColumn: '<?php echo $this->translate->_('Kontext-Treffer');?>'
     },
+    falsePositives: {
+        hover: '<?php echo $this->translate->_('Rechts klicken um als \'falsch erkannt\' zu markieren')?>',
+        legend: {
+            fixed: '<?php echo $this->translate->_('Falsch erkannte Fehler?')?>',
+            float: '<?php echo $this->translate->_('Ein falsch erkannter Fehler?')?>'
+        },
+        close: '<?php echo $this->translate->_('Schließen');?>',
+        spreaded: '<?php echo $this->translate->_('Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt');?>',
+        grid: {
+            falsePositive: '<?php echo $this->translate->_('Ja');?>',
+            text: '<?php echo $this->translate->_('Qualität');?>',
+            emptyText: '<?php echo $this->translate->_('Ladequalität..');?>',
+            similarQty: {
+                tooltip: '<?php echo $this->translate->_('Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden');?>',
+                button: '<?php echo $this->translate->_('Alle identischen Fehler in anderen Segmenten ebenfalls ändern.');?>'
+            }
+        }
+    },
     projectOverview:{
         taskManagement:{
             taskReimport:{
@@ -2128,6 +2142,11 @@ Editor.data.l10n = {
         remove:'<?php echo $this->translate->_('Entfernen');?>',
         save:'<?php echo $this->translate->_('Speichern');?>',
         cancel:'<?php echo $this->translate->_('Abbrechen');?>',
+    },
+    user:{
+        addEditWindow:{
+            notValidPasswordDefaultMessage:'<?php echo $this->translate->_('Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.');?>'
+        }
     }
 };
 

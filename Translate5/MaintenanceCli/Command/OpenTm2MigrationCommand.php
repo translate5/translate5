@@ -56,8 +56,12 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
 {
     private const ARGUMENT_TARGET_URL = 'targetUrl';
     private const OPTION_SOURCE_URL = 'sourceUrl';
+    private const OPTION_DO_NOT_WAIT_IMPORT_FINISHED = 'doNotWaitImportFinish';
+    private const OPTION_WAIT_TIMEOUT = 'wait-timeout';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
+    private const DEFAULT_WAIT_TIME_SECONDS = 300;
+    private const DEFAULT_WAIT_TICK_TIME_SECONDS = 5;
 
     protected static $defaultName = 't5memory:migrate';
 
@@ -69,7 +73,9 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
             ->setDescription('Migrates all existing OpenTM2 language resources to t5memory')
             ->setHelp('Tool exports OpenTM2 language resources one by one and imports data to the t5memory provided as endpoint argument')
             ->addArgument(self::ARGUMENT_TARGET_URL, InputArgument::REQUIRED, 't5memory endpoint data to be imported to, e.g. http://t5memory.local/t5memory')
-            ->addOption(self::OPTION_SOURCE_URL, 's', InputOption::VALUE_OPTIONAL, 'Endpoint data is exported from, e.g. http://t5memory.local/t5memory');
+            ->addOption(self::OPTION_SOURCE_URL, 's', InputOption::VALUE_OPTIONAL, 'Endpoint data is exported from, e.g. http://t5memory.local/t5memory')
+            ->addOption(self::OPTION_DO_NOT_WAIT_IMPORT_FINISHED, 'd', InputOption::VALUE_NEGATABLE, 'Skips waiting for import to finish before processing next language resource', false)
+            ->addOption(self::OPTION_WAIT_TIMEOUT, 't', InputOption::VALUE_OPTIONAL, 'Timeout in seconds for waiting for import to finish', self::DEFAULT_WAIT_TIME_SECONDS);
     }
 
     /**
@@ -87,13 +93,20 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $targetUrl = $this->getTargetUrl($input, $service);
         $sourceResourceId = $this->getSourceResourceId($input, $service);
 
+        $languageResourcesData = ZfExtended_Factory::get(LanguageResource::class)->getByResourceId($sourceResourceId);
+
+        if (count($languageResourcesData) === 0) {
+            $this->io->warning('Nothing to process. Exit.');
+
+            return self::SUCCESS;
+        }
+
         $this->addUrlToConfig($targetUrl);
 
         $targetResourceId = $this->getTargetResourceId($targetUrl);
 
         $processingErrors = [];
         $connector = new Connector();
-        $languageResourcesData = ZfExtended_Factory::get(LanguageResource::class)->getByResourceId($sourceResourceId);
 
         $progressBar = new ProgressBar($output, count($languageResourcesData));
 
@@ -297,6 +310,8 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         if (!$successful) {
             throw new RuntimeException('Failed to import file to ' . $filenameWithPath);
         }
+
+        $this->waitUntilImportFinished($connector);
     }
 
     /**
@@ -334,5 +349,42 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
 
         $languageResource = ZfExtended_Factory::get(LanguageResource::class);
         $languageResource->db->getAdapter()->query($sql);
+    }
+
+    private function waitUntilImportFinished(Connector $connector): void
+    {
+        if ($this->input->getOption(self::OPTION_DO_NOT_WAIT_IMPORT_FINISHED)) {
+            $this->io->text("\nSkip waiting for import finished");
+
+            return;
+        }
+
+        $this->io->text("\nWaiting until import finished");
+
+        $timeElapsed = 0;
+        $maxWaitTime = (int)$this->input->getOption(self::OPTION_WAIT_TIMEOUT);
+        $waitTimeBetweenChecks = self::DEFAULT_WAIT_TICK_TIME_SECONDS;
+
+        $progressBar = $this->io->createProgressBar($maxWaitTime);
+        $progressBar->start();
+
+        while ($timeElapsed < $maxWaitTime) {
+            $status = $connector->getStatus($connector->getResource());
+
+            if ($status === \editor_Services_Connector_Abstract::STATUS_AVAILABLE) {
+                $this->io->success('Import finished');
+                $progressBar->finish();
+
+                return;
+            }
+
+            sleep($waitTimeBetweenChecks);
+            $timeElapsed += $waitTimeBetweenChecks;
+            $progressBar->advance($waitTimeBetweenChecks);
+        }
+
+        $progressBar->finish();
+
+        $this->io->warning('Import not finished after ' . $maxWaitTime . ' seconds');
     }
 }

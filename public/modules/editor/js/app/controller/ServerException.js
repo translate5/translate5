@@ -150,8 +150,17 @@ Ext.define('Editor.controller.ServerException', {
             }
         }
         catch(e){
+            var msg = 'Invalid JSON';
             //if there is no valid JSON, the error is probably not from us. With 0 we pass by the below switch and just print the error
             status = 0; 
+            text += '<br><br> Invalid JSON from Server!';
+            if(response && Ext.isEmpty(response.getAllResponseHeaders()['x-translate5-version'])) {
+                text += '<br>Answer seems to come from a proxy!';
+                msg += ' - answer seems not to be from translate5 - x-translate5-version header is missing.'
+            }
+
+            Editor.MessageBox.addError(text);
+            jslogger && jslogger.logException(new Error(msg));
         }
         if(json && json.errorCode === 'E1381') {
             Ext.Logger.error("E1381 error on the backend");
@@ -250,6 +259,9 @@ Ext.define('Editor.controller.ServerException', {
                 json.errorMessage = [];
                 Ext.Object.each(errorsToUse, function(field, errors) {
                     Ext.Object.each(errors, function(key, error) {
+                        if(Ext.isArray(error)){
+                            error = error.join('<br/>')
+                        }
                         json.errorMessage.push(error);
                     });
                 });
