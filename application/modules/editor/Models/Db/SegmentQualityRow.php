@@ -114,7 +114,7 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
      *
      * @return bool|mixed
      */
-    public function getContent() {
+    public function getContent() : bool|string {
 
         // If no additional data exists for this quality - return
         if (!$data = $this->additionalData) {
@@ -141,32 +141,21 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
      * @return int|string
      * @throws Zend_Db_Statement_Exception
      */
-    public function getSimilar($mode = 'qty') {
-
-        // Get content
-        $content = $this->getContent();
-
-        // If no content - return 0
-        if ($content === false) {
-            return 0;
-        }
+    /**
+     * @param string $mode
+     * @return PDOStatement
+     */
+    private function getSimilarQualityStmt($mode = 'qty') {
 
         // Shortcut
         $db = $this->getTable()->getAdapter();
 
-        // Get mysql function
-        $fn = ['qty' => 'COUNT', 'ids' => 'GROUP_CONCAT'];
+        // Get mysql expression to be used in SELECT clause
+        $select = ['qty' => 'COUNT(`id`)', 'ids' => '`id`'];
 
-        // If $mode arg is 'ids'
-        if ($mode == 'ids') {
-
-            // Increase group_concat_max_len to maximum value for 32-bit platforms
-            $db->query('SET @@session.group_concat_max_len = 4294967295');
-        }
-
-        // Get similar qty
+        // Prepare and return statement
         return $db->query('
-            SELECT ' . $fn[$mode] . '(`id`) FROM `LEK_segment_quality` WHERE `taskGuid` = ?
+            SELECT ' . $select[$mode] . ' FROM `LEK_segment_quality` WHERE `taskGuid` = ?
               AND `id` != ?
               AND `type` = ?
               AND `category` = ?
@@ -179,39 +168,68 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
             $this->type,
             $this->category,
             $this->field,
-            $content,
-        ])->fetchColumn();
+            $this->getContent(),
+        ]);
     }
 
     /**
      * Spread current value of falsePositive-flag for all other occurrences of such [quality - content] pair found in this task
      *
-     * @return int
+     * @return array
      */
-    public function spreadFalsePositive() {
+    public function spreadFalsePositive() : array {
 
         // Get content
         $content = $this->getContent();
 
-        // If no content - return 0
+        // If no content - return empty array
         if ($content === false) {
-            return 0;
+            return [];
         }
 
         // Get ids of similar qualities
-        $ids = $this->getSimilar('ids');
+        $ids = $this->getSimilarQualityIds();
 
         // Update similar qualities' falsePositive flag
-        if ($ids) $this->getTable()->getAdapter()->query("
-            UPDATE `LEK_segment_quality` 
-            SET `falsePositive` = ? 
-            WHERE `taskGuid` = ? AND `id` IN ($ids)
-        ", [
-            $this->falsePositive,
-            $this->taskGuid
-        ]);
+        if ($ids) {
+
+            // Prepare comma-separated list of ids
+            $in = join(',', $ids);
+
+            // Do spread
+            $this->getTable()->getAdapter()->query("
+                UPDATE `LEK_segment_quality` 
+                SET `falsePositive` = ? 
+                WHERE `taskGuid` = ? AND `id` IN ($in)
+            ", [
+                $this->falsePositive,
+                $this->taskGuid
+            ]);
+        }
 
         // Return ids of similar qualities
         return $ids;
+    }
+
+    /**
+     * Get array of ids of all other qualities similar to current quality across this task
+     *
+     * @return int
+     */
+    public function getSimilarQualityIds(): array {
+        return $this->getContent() === false
+            ? []
+            : $this->getSimilarQualityStmt('ids')->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get quantity of all other qualities similar to current quality across this task
+     *
+     * @return int
+     */
+    public function getSimilarQualityQty() : int {
+        return $this->getContent() === false
+            ? 0
+            : (int) $this->getSimilarQualityStmt('qty')->fetchColumn();
     }
 }

@@ -118,7 +118,7 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
     /**
      * Fetch spell check data for given segments ids
      */
-    public function getTermTaggerData(array $segmentIds) {
+    public function getTermTaggerData(array $segmentIds) : array {
 
         // Get spell check data
         $_data = $this->db->getAdapter()->query('
@@ -155,8 +155,10 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Proxy to row's method
+     *
+     * @return array
      */
-    public function spreadFalsePositive() {
+    public function spreadFalsePositive() : array {
         return $this->row->spreadFalsePositive();
     }
 }

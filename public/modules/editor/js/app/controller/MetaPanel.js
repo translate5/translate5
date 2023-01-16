@@ -206,7 +206,6 @@ Ext.define('Editor.controller.MetaPanel', {
             // If right-click was made outside of some quality-tag - hide previously opened right-click grid, if any
             if (me.segmentRightClickGrid) me.segmentRightClickGrid.hide();
 
-            // Return
             return;
         }
 
