@@ -252,7 +252,6 @@ Ext.define('Editor.controller.MetaPanel', {
             // Pick it's data
             data.push(rec.getData());
 
-        // Else
         } else {
 
             // Try again in 200ms
