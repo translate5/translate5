@@ -8986,6 +8986,22 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Pivotsprache</source>
                 <target>Pivot language</target>
             </trans-unit>
+            <trans-unit id='S29uZmxpa3QgaGluc2ljaHRsaWNoIHp1Z2V3aWVzZW5lciBBdWZnYWJlbg=='>
+              <source>Konflikt hinsichtlich zugewiesener Aufgaben</source>
+              <target>Conflict regarding assigned tasks</target>
+            </trans-unit>
+            <trans-unit id='RGllIGVudGZlcm50ZW4gS3VuZGVuIHdlcmRlbiBpbiBkZW4gZm9sZ2VuZGVuIEF1ZmdhYmVuIHZlcndlbmRldDo='>
+              <source>Die entfernten Kunden werden in den folgenden Aufgaben verwendet:</source>
+              <target>The removed client(s) are used in the folowing tasks:</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBTaWUgZGllc2UgS3VuZGVuIGVudGZlcm5lbiwgd2lyZCBkaWUgWnVvcmRudW5nIGRpZXNlciBTcHJhY2hyZXNzb3VyY2UgenUgZGVuIEF1ZmdhYmVuIGRpZXNlciBLdW5kZW4gYXVmZ2Vob2Jlbi4gTcO2Y2h0ZW4gU2llIGRpZSBadXdlaXN1bmdlbiBhdWZoZWJlbj8gTnVyIGRhbm4ga8O2bm5lbiBTaWUgZGllIEt1bmRlbiBhdXMgZGllc2VyIFNwcmFjaHJlc3NvdXJjZSBoaWVyIGluIGRlciBTcHJhY2hyZXNzb3VyY2VudmVyd2FsdHVuZyBlbnRmZXJuZW4u'>
+              <source>Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.</source>
+              <target>Removing those clients will unassign this language resource from the tasks of those clients. Do you want to unassign it? Only then you can remove the client from this language resource here in the language resource management.</target>
+            </trans-unit>
+            <trans-unit id='bWVocg=='>
+              <source>mehr</source>
+              <target>more</target>
+            </trans-unit>
             <trans-unit id='U3ByYWNocmVzc291cmNlIGRlcyBhdXNnZXfDpGhsdGVuIFJlc3NvdXJjZW50eXBzIGthbm4gaW4gZGVyIEJlbnV0emVyb2JlcmZsw6RjaGUgbmljaHQgZXJzdGVsbHQgd2VyZGVuLg=='>
                 <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
                 <target>Language resource of selected resource type can not be created in UI.</target>

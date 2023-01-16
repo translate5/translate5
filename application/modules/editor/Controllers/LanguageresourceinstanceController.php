@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\CleanupAssociation;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
@@ -706,16 +707,23 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     public function putAction() {
         $this->decodePutAssociative = true;
-        $this->decodePutData();
+
         parent::putAction();
-        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-        // especially tests are not respecting the array format ...
-        editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
-        $customerAssoc->updateAssocRequest(
-            $this->entity->getId(),
-            $this->data);
-        $this->addAssocData();
+        if ($this->wasValid) {
+
+
+            if( (bool)$this->getParam('forced',false) === true){
+                $this->checkOrCleanAssociation(true);
+            }
+
+            // especially tests are not respecting the array format ...
+            editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
+
+            $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+            $customerAssoc->updateAssocRequest($this->entity->getId(),$this->data);
+
+            $this->addAssocData();
+        }
     }
 
     /**
@@ -1468,6 +1476,37 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         return empty($return) ? '' : Zend_Json::encode($return);
     }
 
+    /**
+     * The above injectors add additional error messages, which are evaluated here
+     * @throws ZfExtended_ValidateException
+     */
+    protected function additionalValidations() {
+
+        if( $this->getRequest()->isPut() === false || (bool)$this->getParam('forced',false) === true){
+            return;
+        }
+        // check for association to be cleaned only when it is put and the forced flag is not set
+        $this->checkOrCleanAssociation(false);
+    }
+
+    /**
+     * Check of clean associations.
+     * @param bool $clean
+     * @return void
+     * @throws Zend_Db_Table_Exception
+     * @throws ZfExtended_ErrorCodeException
+     */
+    private function checkOrCleanAssociation(bool $clean): void
+    {
+        $customerIds = $this->getDataField('customerIds') ?? [];
+        $assocClean = ZfExtended_Factory::get(CleanupAssociation::class, [
+            $customerIds,
+            $this->entity->getId()
+        ]);
+
+        $clean ? $assocClean->cleanAssociation() : $assocClean->check();
+    }
+
     private function hasImportingAssociatedTasks(int $languageResourceId): bool
     {
         $taskAssociation = ZfExtended_Factory::get(TaskAssociation::class);
@@ -1487,4 +1526,5 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         return count($importingTasks) > 0;
     }
+
 }

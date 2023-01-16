@@ -2009,6 +2009,9 @@ Ext.define('Editor.controller.Localizer', {
 
 //when all translations in the above way are converted to the JSON way, we can just create a set of JSON files, using the ordinary translation way
 Editor.data.l10n = {
+    tmOverview:{
+        more: '<?php echo $this->translate->_('mehr');?>'
+    },
     segmentGrid: {
         batchOperations: {
             loading: {
@@ -2124,6 +2127,11 @@ Editor.data.l10n = {
                 fileReimportFinishedWithErrors:'<?php echo $this->translate->_('Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll');?>',
                 nameDontMatchInfoLabel:'<?php echo $this->translate->_('Der Dateiname entspricht nicht der zu aktualisierenden Datei');?>'
             }
+        }
+    },
+    languageResources:{
+        editLanguageResource:{
+            conflictErrorTitle:'<?php echo $this->translate->_('Konflikt hinsichtlich zugewiesener Aufgaben');?>'
         }
     },
     configuration: {

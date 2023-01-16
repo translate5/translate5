@@ -334,6 +334,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1358"></a>E1358  | Language&nbsp;Resource Term Collection | Term Collection Import: Unable to open zip file from file-path: {filePath} | See the error log for details.
 | <a id="E1359"></a>E1359  | Language&nbsp;Resource Term Collection | Term Collection Import: Content from zip file could not be extracted. | See the error log for details.
 | <a id="E1403"></a>E1403  | Language&nbsp;Resource pivot pre-translation    | The taskGuid is required as parameter | The taskGuid is not provided as parameter on the request | 
+| <a id="E1447"></a>E1447  | Language Resources    | This resource is assigned to a task via the removed customer. | The un-assigned customer(s) from the resource is used in the listed tasks. If this customer is removed from the resource, the resource and pivot association must be removed
 
 ### Terminology
 | EventCode        | Context       | EventMessage  | Description/Solution
