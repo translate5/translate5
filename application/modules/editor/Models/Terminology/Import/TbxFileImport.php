@@ -374,7 +374,7 @@ $memLog('Loaded terms:        ');
             if($listType == 'binaryData') {
                 /** @var $binImport editor_Models_Terminology_Import_TbxBinaryDataImport */
                 $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport', [$this->tbxFilePath]);
-                $binImport->import($this->collection->getId(), $node);
+                $binImport->import($this->collection, $node);
             }
             else {
                 $this->importOtherRefObjects($node, $listType);
