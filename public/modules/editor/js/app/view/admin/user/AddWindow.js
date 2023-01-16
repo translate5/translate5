@@ -82,7 +82,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
     layout:'fit',
     initComponent: function() {
         var me = this;
-        
+
         me.callParent(arguments);
         me.on('beforeshow', function(){
             me.down('fieldset#passwords').setDisablePasswords(true);
@@ -98,7 +98,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
             },
             bottomInfo = [me.strings.bottomInfo],
             translations = [];
-        
+
         if(!instanceConfig.editMode) {
             bottomInfo.push(me.strings.bottomPwInfo);
         }
@@ -109,7 +109,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 return;
             }
             roles.push({
-                boxLabel: value.label, 
+                boxLabel: value.label,
                 name: 'roles_helper',
                 value: key,
                 handler: me.roleCheckChange
@@ -148,10 +148,10 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                             fieldLabel: me.strings.genderLabel,
                             //columns: 1,
                             items: [
-                                    {boxLabel: me.strings.genderFemale, name: 'gender', inputValue: 'f'},
-                                    {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'},
-                                    {boxLabel: me.strings.genderNeutral, name: 'gender', inputValue: 'n'}
-                                    ]
+                                {boxLabel: me.strings.genderFemale, name: 'gender', inputValue: 'f'},
+                                {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'},
+                                {boxLabel: me.strings.genderNeutral, name: 'gender', inputValue: 'n'}
+                            ]
                         },{
                             xtype: 'fieldcontainer',
                             fieldLabel: me.strings.nameLabel,
@@ -289,14 +289,16 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                             },{
                                 inputType: 'password',
                                 name: 'passwd',
-                                minLength: 8,
+                                itemId:'password',
+                                minLength: 12,
                                 allowBlank: false,
                                 disabled: true,
                                 fieldLabel: me.strings.password
                             },{
                                 inputType: 'password',
                                 name: 'passwd_check',
-                                minLength: 8,
+                                itemId:'passwd_check',
+                                minLength: 12,
                                 allowBlank: false,
                                 disabled: true,
                                 validator: function(value) {
@@ -344,11 +346,9 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 }]
             }]
         };
-  
+
         if(instanceConfig.editMode) {
-            //TODO talk with tomas
-            //me.title = me.titleEdit;
-        	config.title = me.titleEdit;
+            config.title = me.titleEdit;
         }
 
         if (instanceConfig) {
@@ -375,19 +375,19 @@ Ext.define('Editor.view.admin.user.AddWindow', {
      */
     loadRecord: function(record) {
         var me=this,
-        	form=me.down('form'),
-        	roles = record.get('roles').split(',');
+            form=me.down('form'),
+            roles = record.get('roles').split(',');
         form.loadRecord(record);
         Ext.Array.forEach(this.query('#rolesGroup checkbox'), function(item) {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
         });
-        
+
         if(form.isDisabled() && record.get('openIdIssuer')!=''){
-        	form.add({
+            form.add({
                 xtype: 'container',
                 html: '<p>'+me.strings.bottomOpenIdNoEditInfo+'</p><p style="margin-top:5px;margin-left:5px;"></p>',
                 dock : 'bottom'
-        	});
+            });
         }
     }
 });
