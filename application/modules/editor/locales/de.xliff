@@ -6258,6 +6258,10 @@ Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften 
                 <source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source>
                 <target>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</target>
             </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUga2FubiBuaWNodCB2b24gZWluZW0gUE0gYmVlbmRldCB3ZXJkZW4sIHdlaWwgZWluIEJlbnV0emVyIGRpZSBBdWZnYWJlIHp1ciBCZWFyYmVpdHVuZyBnZcO2ZmZuZXQgaGF0Lg=='>
+                <source>Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.</source>
+                <target>Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.</target>
+            </trans-unit>
             <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZHVyY2ggYW5kZXJlbiBCZW51dHplciDDvGJlcm5vbW1lbg=='>
                 <source>Translate5 - Aufgabe durch anderen Benutzer übernommen</source>
                 <target>Translate5 - Aufgabe durch anderen Benutzer übernommen</target>

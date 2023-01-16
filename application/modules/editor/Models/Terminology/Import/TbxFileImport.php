@@ -561,6 +561,9 @@ $memLog('Loaded terms:        ');
         if (isset($tig->note)) {
             $this->setAttributeTypes($tig->note, $newTerm);
         }
+        if (isset($tig->descrip)) {
+            $this->setAttributeTypes($tig->descrip, $newTerm);
+        }
         if (isset($tig->admin)) {
             $this->setAttributeTypes($tig->admin, $newTerm);
         }
