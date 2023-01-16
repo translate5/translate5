@@ -82,6 +82,7 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
     $('#locale').selectmenu({
         change: function() {
             var action = $(this).val();
+            Editor.data.logoutOnWindowClose = false;
             $("#languageSelector").attr("action", "?locale=" + action);
             $("#languageSelector").submit();
         }
@@ -1612,4 +1613,11 @@ function checkInstantTranslation() {
     }
     // Start translation:
     startTimerForInstantTranslation();
+}
+
+// If we're not within an iframe
+if (window.parent.location === window.location) {
+
+    // Put a handler on window close, if need
+    logoutOnWindowClose();
 }
