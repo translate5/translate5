@@ -8745,6 +8745,34 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Dateiname</source>
               <target>Dateiname</target>
             </trans-unit>
+            <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlIHVuZCBlaW5lIFphaGwu'>
+              <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</source>
+              <target>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyAxMiBaZWljaGVu">
+              <source>Mindestens 12 Zeichen</source>
+              <target>Mindestens 12 Zeichen</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW5lIFphaGw=">
+              <source>Mindestens eine Zahl</source>
+              <target>Mindestens eine Zahl</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gS2xlaW5idWNoc3RhYmU=">
+              <source>Mindestens ein Kleinbuchstabe</source>
+              <target>Mindestens ein Kleinbuchstabe</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gR3Jvw59idWNoc3RhYmU=">
+              <source>Mindestens ein Großbuchstabe</source>
+              <target>Mindestens ein Großbuchstabe</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gU29uZGVyemVpY2hlbg==">
+              <source>Mindestens ein Sonderzeichen</source>
+              <target>Mindestens ein Sonderzeichen</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFBhc3N3b3J0IGVudGjDpGx0IGVpbiBXb3J0IGF1cyBkZXIgc2Nod2FyemVuIExpc3RlLg==">
+              <source>Das Passwort enthält ein Wort aus der schwarzen Liste.</source>
+              <target>Das Passwort enthält ein Wort aus der schwarzen Liste.</target>
+            </trans-unit>
             <trans-unit id='U3ByYWNocmVzc291cmNlIGRlcyBhdXNnZXfDpGhsdGVuIFJlc3NvdXJjZW50eXBzIGthbm4gaW4gZGVyIEJlbnV0emVyb2JlcmZsw6RjaGUgbmljaHQgZXJzdGVsbHQgd2VyZGVuLg=='>
               <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
               <target>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</target>
