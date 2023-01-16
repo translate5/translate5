@@ -33,8 +33,12 @@ use editor_Models_Export_Exception;
 use editor_Models_Export_Worker;
 use editor_Models_Task;
 use editor_Services_TermCollection_Service;
+use Throwable;
+use Zend_EventManager_StaticEventManager;
+use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_Factory;
+use ZfExtended_Logger;
 use ZfExtended_Zendoverwrites_Controller_Action_HelperBroker;
 
 /**
@@ -71,6 +75,11 @@ class Worker extends editor_Models_Export_Worker {
             $task
         ]);
         $root = $structure->initFileStructure();
+
+        $this->events->trigger('initPackageFileStructure',$this,[
+            'rootFolder' => $root,
+            'task' => $task
+        ]);
 
         return $this->initFolderExport($task, $diff, $root);
     }
@@ -113,8 +122,15 @@ class Worker extends editor_Models_Export_Worker {
             return false;
         }
 
-        $this->exportTask($parameters);
-        //$this->exportCollection($parameters);
+        try {
+            $this->exportTask($parameters);
+            //$this->exportCollection($parameters);
+        }catch (Throwable $throwable){
+            $logger = Zend_Registry::get('logger');
+            /* @var $logger ZfExtended_Logger */
+            $logger->exception($throwable);
+            return false;
+        }
 
 
         // TODO: check the event context. Is this event required for my case ? Are any other events in export ?

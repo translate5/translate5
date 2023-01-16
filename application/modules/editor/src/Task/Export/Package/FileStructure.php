@@ -34,16 +34,21 @@ class FileStructure
 {
     public const PACKAGE_FOLDER_NAME = '_exportPackage';
 
-    private const PACKAGE_FILE = 'xliff';
+    public const PACKAGE_FILE = 'xliff';
 
-    private const PACKAGE_MEMORY = 'tmx';
+    public const PACKAGE_MEMORY = 'tmx';
 
-    private const PACKAGE_COLLECTION = 'tbx';
+    public const PACKAGE_COLLECTION = 'tbx';
+
+    public const PACKAGE_REFERENCE = 'reference';
 
     /**
      * @param editor_Models_Task $task
      */
-    public function __construct(private editor_Models_Task $task) {    }
+    public function __construct(private editor_Models_Task $task)
+    {
+
+    }
 
 
     /**
@@ -62,6 +67,10 @@ class FileStructure
 
         $collection = $this->getCollectionFolder();
         mkdir($collection) || is_dir($collection);
+
+        $reference = $this->getReferenceFolcer();
+        mkdir($reference) || is_dir($reference);
+
         return $root;
     }
 
@@ -95,5 +104,10 @@ class FileStructure
     public function getCollectionFolder(): string
     {
         return $this->getRootFolder().DIRECTORY_SEPARATOR . self::PACKAGE_COLLECTION;
+    }
+
+    public function getReferenceFolcer(): string
+    {
+        return $this->getRootFolder().DIRECTORY_SEPARATOR . self::PACKAGE_REFERENCE;
     }
 }
