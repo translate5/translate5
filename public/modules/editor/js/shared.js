@@ -1,4 +1,8 @@
 /**
+ * SHARED JS: shared between translate5 and its applets - therefore written in vanilla JS since different JS frameworks used in different applets.
+ */
+ 
+/**
  * Setup a counter for browser tabs having opened t5 app, and return current value of that counter
  * If diff arg is expected to be -1, +1, and if so counter will be incremented/decremented and updated value is returned
  *
