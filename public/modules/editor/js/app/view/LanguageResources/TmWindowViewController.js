@@ -291,6 +291,11 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         view.getViewModel().set('uploadLabel',isTc ? view.strings.collection : view.strings.file);
 
         isTc ? uploadField.labelEl.addCls('lableInfoIcon') : uploadField.labelEl.removeCls('lableInfoIcon');
-    }
+    },
 
+    onResourceBeforeSelect: function(combo, record) {
+        if (!record.data.creatable) {
+            return false;
+        }
+    },
 });

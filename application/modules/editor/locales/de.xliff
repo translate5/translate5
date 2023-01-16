@@ -8773,6 +8773,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Das Passwort enthält ein Wort aus der schwarzen Liste.</source>
               <target>Das Passwort enthält ein Wort aus der schwarzen Liste.</target>
             </trans-unit>
+            <trans-unit id='U3ByYWNocmVzc291cmNlIGRlcyBhdXNnZXfDpGhsdGVuIFJlc3NvdXJjZW50eXBzIGthbm4gaW4gZGVyIEJlbnV0emVyb2JlcmZsw6RjaGUgbmljaHQgZXJzdGVsbHQgd2VyZGVuLg=='>
+              <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
+              <target>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
