@@ -621,6 +621,16 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1418"></a>E1418  | Plug-In SpellCheck | LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app        | Create a ticket for this issue with the event added.
 | <a id="E1419"></a>E1419  | Plug-In SpellCheck | SpellCheck overall run done - {segmentCounts} | Reports that the whole task was checked with the spellchecker and shows the segment status counts.
 
+#### Plug-In TermImport
+| EventCode               | Context            | EventMessage                                                       | Description/Solution                            |
+|:------------------------|:-------------------|:-------------------------------------------------------------------|:------------------------------------------------|
+| <a id="E1455"></a>E1455 | Plug-In TermImport | Across TBX Export: Can not wait until job "{job}" is finished      | Check with additional data what the problem is. |
+| <a id="E1456"></a>E1456 | Plug-In TermImport | Across TBX Export: Error on connecting to Across under "{url}"     | Check with additional data what the problem is. |
+| <a id="E1457"></a>E1457 | Plug-In TermImport | Across TBX Export: Can not create Across security token            | Check with additional data what the problem is. |
+| <a id="E1458"></a>E1458 | Plug-In TermImport | Across TBX Export: Error on communication with Across              | Check with additional data what the problem is. |
+| <a id="E1459"></a>E1459 | Plug-In TermImport | Across TBX Export: Can not create temporary filestream             | Check with additional data what the problem is. |
+| <a id="E1460"></a>E1460 | Plug-In TermImport | Across TBX Export: Can not read from file with fileguid {fileGuid} | Check with additional data what the problem is. |
+
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number
 - No structure in the numbering to prevent discussions is it an error E12XX or E45XX
