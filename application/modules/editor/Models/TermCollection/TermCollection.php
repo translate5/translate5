@@ -44,12 +44,20 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             $params['customerIds'] = explode(',',$params['customerIds']);
         }
         $import->customerIds = $params['customerIds'];
-
-        $sessionUser = new Zend_Session_Namespace('user');
-        $userGuid = $params['userGuid'] ?? $sessionUser->data->userGuid;
-        $import->loadUser($userGuid);
-
+        $import->loadUser($this->getUserGuid($params));
         return $import->parseTbxFile($filePath, $params['collectionId']);
+    }
+
+    private function getUserGuid(array $params): string {
+        if(array_key_exists('userGuid', $params) && !empty($params['userGuid'])) {
+            return $params['userGuid'];
+        }
+
+        if(ZfExtended_Authentication::getInstance()->isAuthenticated()) {
+            return ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
+        }
+
+        return ZfExtended_Models_User::SYSTEM_GUID;
     }
 
     /**
