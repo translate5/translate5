@@ -25,30 +25,26 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-namespace MittagQI\Translate5\Task\Export\Exported;
 
-use editor_Models_Export_Exception;
-use editor_Models_Export_Exported_ZipDefaultWorker;
-use editor_Models_Task;
-use MittagQI\Translate5\Task\Export\Package\ExportSource;
-use SplFileInfo;
-use ZfExtended_Utils;
-
-/**
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-class PackageWorker extends editor_Models_Export_Exported_ZipDefaultWorker {
+
+namespace MittagQI\Translate5\Task\Export\Package;
+
+class Exception extends \ZfExtended_ErrorCodeException {
 
     /**
-     * Create export zip file from the generate package directory package directory
-     * @param editor_Models_Task $task
-     * @throws editor_Models_Export_Exception
+     * @var string
      */
-    protected function doWork(editor_Models_Task $task): void
-    {
-        //TODO: before doing the zipping, validate if the file structure exist and if there is content inside. Maybe
-        // this is job of the previous process and this should not be reached if there is invalid content
-        parent::doWork($task);
-        $params = $this->workerModel->getParameters();
-        ZfExtended_Utils::cleanZipPaths(new SplFileInfo($params['zipFile']), basename(ExportSource::PACKAGE_FOLDER_NAME));
-    }
+    protected $domain = 'editor.task.export.package';
+
+    protected static array $localErrorCodes = [
+        'E1452' => 'Export package: Task contains not supported files for package export',
+        'E1453' => 'Export package: Source package validation fail',
+        'E1454' => 'Export package: Unable to create resource export folder'
+    ];
 }

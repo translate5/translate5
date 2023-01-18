@@ -26,49 +26,35 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Task\Export\Package;
 
-use editor_Models_Task;
-use MittagQI\Translate5\Task\Export\Exported\PackageWorker;
-use Zend_Session;
+namespace MittagQI\Translate5\Task\Export\Package\Source;
+
+use editor_Models_Import_DirectoryParser_ReferenceFiles;
+use MittagQI\Translate5\Task\Export\Package\ExportSource;
 use ZfExtended_Factory;
+use ZfExtended_Models_Worker;
+use ZfExtended_Utils;
 
-/**
- *
- */
-class Downloader
+class Reference extends Base
 {
 
+    protected string $fileName = 'reference';
+
+
     /**
-     * @param editor_Models_Task $task
-     * @param bool $diff
      * @return void
      */
-    public function downloadPackage(editor_Models_Task $task, bool $diff): void
+    public function export(?ZfExtended_Models_Worker $workerModel): void
     {
-        $worker = ZfExtended_Factory::get(Worker::class);
-        $exportFolder = $worker->initExport($task, $diff);
-
-        $workerId = $worker->queue();
-
-        $worker = ZfExtended_Factory::get(PackageWorker::class);
-
-        $contextParams = [
-            'exportFolder' => $exportFolder,
-            'cookie' => Zend_Session::getId()
-        ];
-
-        // Setup worker. 'cookie' in 2nd arg is important only if $context is 'transfer'
-        $zipFile = $worker->setup($task->getTaskGuid(), $contextParams);
-
-
-        $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
-        $worker->queue($workerId);
-
-        header('Content-Type: application/zip', TRUE);
-        header('Content-Disposition: attachment; filename="'.$task->getTasknameForDownload('ExportPackage.zip').'"');
-        readfile($zipFile);
-        unlink($zipFile);
+        $referencesDirectory = $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
+        if( !is_dir($referencesDirectory)){
+            // in case there is no references' directory, ignore the copy
+            return;
+        }
+        ZfExtended_Utils::recursiveCopy($referencesDirectory,$this->getFolderPath());
     }
 
+    public function validate(): void
+    {
+    }
 }

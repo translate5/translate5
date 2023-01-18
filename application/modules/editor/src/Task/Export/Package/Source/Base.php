@@ -26,49 +26,53 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Task\Export\Package;
+namespace MittagQI\Translate5\Task\Export\Package\Source;
 
 use editor_Models_Task;
-use MittagQI\Translate5\Task\Export\Exported\PackageWorker;
-use Zend_Session;
-use ZfExtended_Factory;
+use MittagQI\Translate5\Task\Export\Package\ExportSource;
+use ZfExtended_Models_Worker;
 
-/**
- *
- */
-class Downloader
+abstract class Base
 {
+
+    protected string $fileName;
+
+    protected string $folderPath;
+
 
     /**
      * @param editor_Models_Task $task
-     * @param bool $diff
+     */
+    public function __construct(protected editor_Models_Task $task, protected ExportSource $exportSource)
+    {
+        $this->folderPath = $exportSource->getRootFolder().DIRECTORY_SEPARATOR.$this->fileName;
+    }
+
+    /**
+     * Validate source before export. In case of invalid source, throw exception
      * @return void
      */
-    public function downloadPackage(editor_Models_Task $task, bool $diff): void
+    abstract public function validate(): void;
+
+    /**
+     * @return void
+     */
+    abstract public function export(?ZfExtended_Models_Worker $workerModel): void;
+
+    /***
+     * @return string
+     */
+    public function getFolderPath(): string
     {
-        $worker = ZfExtended_Factory::get(Worker::class);
-        $exportFolder = $worker->initExport($task, $diff);
+        return $this->folderPath;
+    }
 
-        $workerId = $worker->queue();
-
-        $worker = ZfExtended_Factory::get(PackageWorker::class);
-
-        $contextParams = [
-            'exportFolder' => $exportFolder,
-            'cookie' => Zend_Session::getId()
-        ];
-
-        // Setup worker. 'cookie' in 2nd arg is important only if $context is 'transfer'
-        $zipFile = $worker->setup($task->getTaskGuid(), $contextParams);
-
-
-        $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
-        $worker->queue($workerId);
-
-        header('Content-Type: application/zip', TRUE);
-        header('Content-Disposition: attachment; filename="'.$task->getTasknameForDownload('ExportPackage.zip').'"');
-        readfile($zipFile);
-        unlink($zipFile);
+    /**
+     * @return ExportSource
+     */
+    public function getExportSource(): ExportSource
+    {
+        return $this->exportSource;
     }
 
 }

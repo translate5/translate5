@@ -279,6 +279,9 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1149"></a>E1149  | Task Export | Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"]. | See error details for affected segments and details.
 | <a id="E1157"></a>E1157  | Task Export | Export: the file &quot;{file}&quot; could not be exported, since had possibly already errors on import. | See error details for affected file and details.
 | <a id="E1170"></a>E1170  | Task Metadata Export | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
+| <a id="E1452"></a>E1452  | Export package     | Export package: Task contains not supported files for package export | TODO DESCRIPTION / SOLUTION
+| <a id="E1453"></a>E1453  | Export package     | Export package: Source package validation fail | TODO DESCRIPTION / SOLUTION
+| <a id="E1454"></a>E1454  | Export package     | Export package: Unable to create resource export folder | There was a problem when creating the resources folders. For more info check the error log
 
 ### Task reimport
 | EventCode        | Context         | EventMessage                                                                          | Description/Solution

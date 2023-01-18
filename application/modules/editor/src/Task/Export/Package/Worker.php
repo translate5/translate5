@@ -28,37 +28,23 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Export\Package;
 
-use editor_Models_Export;
-use editor_Models_Export_Exception;
 use editor_Models_Export_Worker;
 use editor_Models_Task;
-use editor_Services_TermCollection_Service;
 use Throwable;
-use Zend_EventManager_StaticEventManager;
 use Zend_Registry;
 use ZfExtended_Authentication;
 use ZfExtended_Factory;
 use ZfExtended_Logger;
-use ZfExtended_Zendoverwrites_Controller_Action_HelperBroker;
 
 /**
  *
  */
 class Worker extends editor_Models_Export_Worker {
 
-    private editor_Models_Task $task;
-
     /***
-     * @param $parameters
-     * @return bool
+     * @var ExportSource
      */
-    protected function validateParameters($parameters = array())
-    {
-        if ( !parent::validateParameters($parameters)){
-            return false;
-        }
-        return !empty($parameters['userGuid']);
-    }
+    private ExportSource $exportSource;
 
     /**
      *
@@ -70,18 +56,38 @@ class Worker extends editor_Models_Export_Worker {
     {
         $this->task = $task;
 
-        /* @var FileStructure $structure */
-        $structure = ZfExtended_Factory::get(FileStructure::class,[
-            $task
+        $this->exportSource = ZfExtended_Factory::get(ExportSource::class,[
+            $this->task
         ]);
-        $root = $structure->initFileStructure();
 
-        $this->events->trigger('initPackageFileStructure',$this,[
-            'rootFolder' => $root,
-            'task' => $task
-        ]);
+        $root = $this->exportSource->initFileStructure();
+
+        try {
+            $this->exportSource->validate();
+            $this->events->trigger('initPackageFileStructure',$this,[
+                'exportSource' => $this->exportSource,
+                'task' => $this->task
+            ]);
+        }catch (Throwable $throwable){
+            throw new Exception('E1453',[
+                'task'=> $task
+            ], $throwable);
+        }
+
 
         return $this->initFolderExport($task, $diff, $root);
+    }
+
+    /***
+     * @param $parameters
+     * @return bool
+     */
+    protected function validateParameters($parameters = array()): bool
+    {
+        if ( !parent::validateParameters($parameters)){
+            return false;
+        }
+        return !empty($parameters['userGuid']);
     }
 
     /**
@@ -117,83 +123,20 @@ class Worker extends editor_Models_Export_Worker {
         }
 
         if(!$this->validateParameters($parameters)) {
-            //no separate logging here, missing diff is not possible,
-            // directory problems are loggeed above
             return false;
         }
 
         try {
-            $this->exportTask($parameters);
-            //$this->exportCollection($parameters);
+            $this->exportSource = ZfExtended_Factory::get(ExportSource::class,[
+                $this->task
+            ]);
+            $this->exportSource->export($this->workerModel);
         }catch (Throwable $throwable){
             $logger = Zend_Registry::get('logger');
-            /* @var $logger ZfExtended_Logger */
+            /* @var ZfExtended_Logger $logger */
             $logger->exception($throwable);
             return false;
         }
-
-
-        // TODO: check the event context. Is this event required for my case ? Are any other events in export ?
-        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
-        //$eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array($exportClass));
-        //$eventManager->trigger('afterExport', $this, array('task' => $task, 'parentWorkerId' => $this->workerModel->getId()));
         return true;
-    }
-
-    private function exportTask(array $workerParams){
-
-        /* @var FileStructure $structure */
-        $structure = ZfExtended_Factory::get(FileStructure::class,[
-            $this->task
-        ]);
-
-        if(!is_dir($structure->getFilesFolder()) || !is_writable($structure->getFilesFolder())){
-            //The task export folder does not exist or is not writeable, no export ZIP file can be created.
-            throw new editor_Models_Export_Exception('E1147', [
-                'task' => $this->task,
-                'exportFolder' => $structure->getFilesFolder(),
-            ]);
-        }
-
-        // TODO: validate if all all of the files inside the export are allowed
-
-        $export = ZfExtended_Factory::get('editor_Models_Export');
-        /* @var editor_Models_Export $export */
-        $export->setTaskToExport($this->task, $workerParams['diff']);
-        $export->export($structure->getFilesFolder(), $this->workerModel->getId());
-
-    }
-
-    public function exportCollection(array $workerParams){
-
-        /* @var FileStructure $structure */
-        $structure = ZfExtended_Factory::get(FileStructure::class,[
-            $this->task
-        ]);
-
-        $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
-        /* @var editor_Services_TermCollection_Service $service */
-        /** @var TaskAssociation $assoc */
-        $assoc = ZfExtended_Factory::get(TaskAssociation::class);
-        
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        $user->loadByGuid($workerParams['userGuid']);
-
-        $assocs = $assoc->loadAssocByServiceName($this->taskGuid,$service->getName());
-
-        $export = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
-        $export->setExportAsFile(true);
-
-        $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-            'LocalEncoded'
-        );
-
-        $path = $structure->getCollectionFolder();
-
-        foreach ($assocs as $item) {
-            $filePath = $localEncoded->encode($path.DIRECTORY_SEPARATOR.$item['languageResourceId'].'.tbx');
-            $export->setFile($filePath);
-            $export->exportCollectionById($item['languageResourceId'],$user->getUserName());
-        }
     }
 }

@@ -8741,6 +8741,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Dateiname</source>
               <target>Dateiname</target>
             </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCBoZXJ1bnRlcmxhZGVu'>
+              <source>Übersetzerpaket herunterladen</source>
+              <target>Übersetzerpaket herunterladen</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

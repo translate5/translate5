@@ -8918,6 +8918,10 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Pivotsprache</source>
                 <target>Pivot language</target>
             </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCBoZXJ1bnRlcmxhZGVu'>
+              <source>Übersetzerpaket herunterladen</source>
+              <target>Export translator package</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

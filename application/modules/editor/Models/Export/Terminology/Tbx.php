@@ -353,7 +353,12 @@ class editor_Models_Export_Terminology_Tbx {
         // Open <text> and <body> nodes
         $line []= $this->tabs[1] . '<text>';
         $line []= $this->tabs[2] . '<body>';
-        $this->write($line, $selected ? null : $collectionName);
+
+        if( $this->isExportAsFile() ){
+            $this->write($line);
+        }else{
+            $this->write($line, $selected ? null : $collectionName);
+        }
 
         // While in normal use - skipDefinition flag is false,
         // so definitions ARE NOT skipped while exporting tbx contents
@@ -494,7 +499,9 @@ class editor_Models_Export_Terminology_Tbx {
         // Read
         //header('Content-Type: text/xml;');
         //readfile($this->file);
-        if (!$selected) die();
+        if (!$selected && !$this->isExportAsFile()) {
+            die();
+        }
     }
 
     public function descripGrpNodes($level, &$line, &$attrA, &$trscA, $termEntryId, $language = '', $termId = '') {

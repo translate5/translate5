@@ -154,7 +154,9 @@ Ext.define('Editor.view.admin.ExportMenu', {
             },{
                 itemId: 'packageExportItem',
                 hidden: !exportAllowed,
-                text: 'Export translator package',
+                bind:{
+                    text:'{l10n.tasksGrid.exportMenu.packageExportItem}'
+                },
                 hrefTarget: '_blank',
                 href: me.makePath('task/export/id/{0}?format=package'),
             }];
@@ -175,14 +177,6 @@ Ext.define('Editor.view.admin.ExportMenu', {
     },
     transferHandler: function (c) {
         Ext.Msg.alert('Status', 'Starting re-import of translated terms...');
-        Ext.Ajax.request({url: c.path});
-    },
-    
-    /***
-     *
-     * @param c
-     */
-    packageHandler: function (c){
         Ext.Ajax.request({url: c.path});
     }
 });

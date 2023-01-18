@@ -1607,7 +1607,6 @@ class editor_TaskController extends ZfExtended_RestController {
                 $this->view->layout()->disableLayout();
                 $this->_helper->viewRenderer->setNoRender(true);
 
-                /** @var Downloader $packageDownloader */
                 $packageDownloader = ZfExtended_Factory::get(Downloader::class);
                 $packageDownloader->downloadPackage($this->entity,$diff);
                 exit;
