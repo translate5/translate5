@@ -124,6 +124,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const TABLE_ALIAS = 'LEK_task';
 
     const INTERNAL_LOCK = '*translate5InternalLock*';
+    /**
+     * The directory inside a task's data dir where log's can be stored (e.g. logs from docker-services)
+     */
+    const LOG_DIR = 'log';
 
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
@@ -516,6 +520,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $this->taskDataPath = $config->runtimeOptions->dir->taskData.DIRECTORY_SEPARATOR.$taskDataRel;
         }
         return $this->taskDataPath;
+    }
+
+    /**
+     * The log dir for various task-specific logs
+     * @return string
+     */
+    public function getAbsoluteTaskLogPath(): string
+    {
+        return $this->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . self::LOG_DIR;
     }
 
     /**
