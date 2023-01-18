@@ -104,9 +104,9 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * Holds the own customer if configured to be created
-     * @var stdClass
+     * @var stdClass|null
      */
-    protected static stdClass $ownCustomer;
+    protected static ?stdClass $ownCustomer = null;
 
     /**
      * Retrieves the test API
@@ -141,7 +141,7 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     final public static function getOwnCustomerId(): ?int
     {
-        return static::$ownCustomer ? static::$ownCustomer->id : null;
+        return static::$ownCustomer?->id;
     }
 
     /**
@@ -305,7 +305,9 @@ abstract class editor_Test_ApiTest extends TestCase
         }
         if (static::$setupOwnCustomer && $doCleanup) {
             try {
-                static::api()->deleteCustomer(static::$ownCustomer->id);
+                if($customerId = static::getOwnCustomerId()) {
+                    static::api()->deleteCustomer($customerId);
+                }
             } catch (\Throwable $e){
                 $errors[] = $e->getMessage();
             }

@@ -37,6 +37,11 @@ class Translate3077Test extends editor_Test_JsonTest
     protected static array $requiredPlugins = [
         'editor_Plugins_DeepL_Init'
     ];
+
+    protected static array $requiredRuntimeOptions = [
+        'plugins.DeepL.server' => null, //null checks for no concrete value but if not empty
+        'plugins.DeepL.authkey' => null, //null checks for no concrete value but if not empty
+    ];
     
     protected static bool $setupOwnCustomer = true;
 
