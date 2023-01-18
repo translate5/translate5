@@ -27,11 +27,11 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Models_TermCollection_TermCollection extends editor_Models_LanguageResources_LanguageResource {
-    /***
+    /**
      * Import the tbx files in the term collection
      * @param array $filePath
      * @param array $params
-     * @return void|boolean
+     * @return bool|null
      */
     public function importTbx(array $filePath, array $params): ?bool
     {
@@ -40,7 +40,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $import->mergeTerms = $params['mergeTerms'] ?? false;
         //import source (filesystem or crossApi)
         $import->importSource = $params['importSource'] ?? "";
-        if(is_string($params['customerIds'])){
+        if (is_string($params['customerIds'])) {
             $params['customerIds'] = explode(',',$params['customerIds']);
         }
         $import->customerIds = $params['customerIds'];
@@ -48,12 +48,13 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         return $import->parseTbxFile($filePath, $params['collectionId']);
     }
 
-    private function getUserGuid(array $params): string {
-        if(array_key_exists('userGuid', $params) && !empty($params['userGuid'])) {
+    private function getUserGuid(array $params): string
+    {
+        if (array_key_exists('userGuid', $params) && !empty($params['userGuid'])) {
             return $params['userGuid'];
         }
 
-        if(ZfExtended_Authentication::getInstance()->isAuthenticated()) {
+        if (ZfExtended_Authentication::getInstance()->isAuthenticated()) {
             return ZfExtended_Authentication::getInstance()->getUser()->getUserGuid();
         }
 
