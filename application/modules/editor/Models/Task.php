@@ -523,12 +523,19 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * The log dir for various task-specific logs
+     * The log dir for various task-specific logs, will be created if it does not exist
+     * @param bool $createIfNeccessary
      * @return string
      */
-    public function getAbsoluteTaskLogPath(): string
+    public function getAbsoluteTaskLogPath(bool $createIfNeccessary=true): string
     {
-        return $this->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . self::LOG_DIR;
+        $logDir =  $this->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . self::LOG_DIR;
+        if ($createIfNeccessary && !is_dir($logDir)) {
+            if (!mkdir($logDir, 0777, true) && !is_dir($logDir)) {
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $logDir));
+            }
+        }
+        return $logDir;
     }
 
     /**
