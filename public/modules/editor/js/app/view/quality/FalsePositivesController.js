@@ -127,7 +127,7 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
 
         // Get quality tags/nodes
         var tagA = document.querySelectorAll('[data-t5qid="' + qualityId + '"]'),
-            tip = 'Right-click to set as false positive', cell, row, rid, rec, id;
+            tip = Editor.data.l10n.falsePositives.hover, cell, row, rid, rec;
 
         // If found - update data-t5qfp="" attribute
         tagA.forEach(tag => {
@@ -151,6 +151,9 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                 // Update source, so that updated value will be picked by segmenteditor once opened
                 tag.removeAttribute('id');
                 rec.set('source', cell.querySelector('.x-grid-cell-inner').innerHTML + '');
+
+                // Set up sourceUpdated-flag to prevent endless loop
+                rec.set('sourceUpdated', true);
                 rec.commit();
             }
         });
