@@ -88,10 +88,11 @@ Ext.define('Editor.view.quality.FalsePositives', {
                 height: 26,
                 margin: 0,
                 padding: 0,
+                defaultBindProperty: false,
                 ui: "default-toolbar-small",
                 setUi: function(ui) {this.setUI(ui);},
                 bind: {
-                    text: '{record.content ? record.similarQty + "" : "-"}',
+                    text: '{record.content ? record.similarQty : "-"}',
                     disabled: '{record.similarQty == 0 || !record.falsePositiveChanged}',
                     tooltip: '{l10n.falsePositives.grid.similarQty.button}',
                     ui: '{record.similarQty == 0 || !record.falsePositiveChanged ? "default-toolbar-small" : "default"}'

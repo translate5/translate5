@@ -240,7 +240,8 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
             qlty += ' <img class="x-label-symbol qmflag qmflag-{0}" src="' + src + '"> ';
         }
 
-        return '<div>' + Ext.String.format(qlty, cidx) + '</div><div>' + record.get('content') + '</div>';
+        // Return
+        return '<div>' + Ext.String.format(qlty, cidx) + '</div><div>' + (record.get('content') || 'no content') + '</div>';
     },
 
     /**
