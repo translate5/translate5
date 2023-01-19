@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><its:rules xmlns:its="http://www.w3.org/2005/11/its" xmlns:fct="http://www.fct.de/general" xmlns:fm="http://www.fct.de/general" xmlns:itsx="http://www.w3.org/2008/12/its-extensions" xmlns:okp="okapi-framework:xmlfilter-options" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0">
+<!-- See ITS specification at: http://www.w3.org/TR/its/ -->
+ <its:translateRule selector="//*" translate="no"/>
+ <its:translateRule selector="//string" translate="yes"/>
+ <its:withinTextRule selector="//color|//font|//decor|//size|//br|//lists|//lnhgt|//space|//fstyl|//tstyl" withinText="yes"/>
+</its:rules>
