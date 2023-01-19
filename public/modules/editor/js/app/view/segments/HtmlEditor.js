@@ -325,6 +325,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param {Boolean} initMarkupMapOnly optional, default false/omitted
    */
   insertMarkup: function(value, initMarkupMapOnly) {
+      if(initMarkupMapOnly) {
+          //reset markup table, we want to keep only the ones given here
+          this.markupImages = {};
+      }
       var html = this.markup(value).join(''),
           doc = this.getDoc(),
           sel, range, frag, node, el, lastNode, rangeForNode,
