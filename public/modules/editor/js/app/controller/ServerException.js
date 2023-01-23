@@ -191,6 +191,7 @@ Ext.define('Editor.controller.ServerException', {
         }
         errorCode = json && json.errorCode;
         switch(status) {
+            case 0:
             case -1:
                 //if the XHR was aborted, do nothing here, since this is "wanted" behaviour
                 if(response.aborted) {
