@@ -602,7 +602,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       data.key = data.type+data.nr;
       data.shortTag = '&lt;'+data.shortTag+'&gt;';
-      data.whitespaceTag = /nbsp|tab|space|newline/.test(className);
+      data.whitespaceTag = /nbsp|tab|space|newline|char/.test(className);
       if(data.whitespaceTag) {
           data.type += ' whitespace';
           if (/newline/.test(className)) {
