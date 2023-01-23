@@ -119,9 +119,12 @@ class editor_Models_Segment_Whitespace {
     const PROTECTED_CHARACTERS = [
         //array semantics:
         // 'regex'     => ['utf8 encoding as done by our unpack', 'name as from https://www.compart.com/en/unicode/'],
+        //NOT SPACE CHARACTERs
         '/\p{Co}/u'   => [], //All private use chars, as HTML &#xE000; empty array to trigger default text
         '/\x{0003}/u' => ['ts' => '03', 'text' => '[ETX]', 'title' => 'End of Text (ETX)'], //TS-240
         '/\x{0008}/u' => ['ts' => '08', 'text' => '[BS]', 'title' => 'Backspace (BS)'],
+
+        //SPACE CHARACTERs - TODO move that whitespace types to the space type of internal tags
         '/\x{0009}/u' => ['ts' => '09', 'text' => '[HT]', 'title' => 'Character Tabulation (HT,TAB)'],
         '/\x{000B}/u' => ['ts' => '0b', 'text' => '[VT]', 'title' => 'Line Tabulation (VT)'],
         '/\x{000C}/u' => ['ts' => '0c', 'text' => '[FF]', 'title' => 'Form Feed (FF)'],

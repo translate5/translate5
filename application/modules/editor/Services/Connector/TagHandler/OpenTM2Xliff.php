@@ -46,7 +46,7 @@ class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_
      * {@inheritDoc}
      * @see editor_Services_Connector_TagHandler_Xliff::prepareQuery()
      */
-    public function prepareQuery(string $queryString, int $segmentId=-1): string {
+    public function prepareQuery(string $queryString): string {
         $queryString = parent::prepareQuery($queryString);
         $queryString = str_replace(['<x id="','<ex id="','<bx id="'], ['<x mid="','<ex mid="','<bx mid="'], $queryString);
         return str_replace(["\r\n","\n","\r"], '<ph type="lb"/>', $queryString);
@@ -56,7 +56,7 @@ class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_
      * {@inheritDoc}
      * @see editor_Services_Connector_TagHandler_Xliff::restoreInResult()
      */
-    public function restoreInResult(string $resultString, int $segmentId=-1): ?string {
+    public function restoreInResult(string $resultString): ?string {
         return parent::restoreInResult(str_replace([
             '<x mid="',
             '<bx mid="',
