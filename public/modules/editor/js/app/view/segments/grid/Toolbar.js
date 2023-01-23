@@ -226,17 +226,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         disabled: '{!isEditingSegment}',
                     }
                 }, {
-                    itemId: 'watchSegmentBtn',
-                    dispatcher: true,
-                    hidden: true,
-                    id: 'watchSegmentBtn',
-                    icon: Editor.data.moduleFolder + 'images/star.png',
-                    enableToggle: true,
-                    bind: {
-                        tooltip: '{l10n.segmentGrid.toolbar.bookmarkBtn}',
-                        disabled: '{!isEditingSegment}',
-                    }
-                }, {
                     itemId: 'resetSegmentBtn',
                     dispatcher: true,
                     hidden: true,
@@ -339,17 +328,16 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     icon: Editor.data.moduleFolder + 'images/scrollTo.png',
                     iconAlign: 'right'
                 }, {
-                    xtype: 'button',
-                    itemId: 'bookmarkBtn',
+                    itemId: 'watchSegmentBtn',
+                    dispatcher: true,
                     hidden: true,
+                    icon: Editor.data.moduleFolder + 'images/star.png',
                     enableToggle: true,
                     bind: {
                         pressed: '{segmentIsWatched}',
-                        //if a segment is edited the button in the meta panel must be used
-                        disabled: '{isEditingSegment || !selectedSegment}',
-                        icon: Editor.data.moduleFolder+'images/{segmentIsWatched ? "star_remove" : "star_add"}.png',
+                        icon: Editor.data.moduleFolder + 'images/{segmentIsWatched ? "star_remove" : "star_add"}.png',
                         tooltip: {
-                            text: '{l10n.segmentGrid.toolbar.bookmarkBtn}',
+                            text: '{segmentIsWatched ? l10n.segmentGrid.toolbar.stopWatchingSegment : l10n.segmentGrid.toolbar.startWatchingSegment}',
                             showDelay: 0
                         }
                     }
@@ -391,13 +379,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             icon: Editor.data.moduleFolder + 'images/cross.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.cancel}',
-                                disabled: '{!isEditingSegment}',
-                            }
-                        }, {
-                            itemId: 'watchSegmentBtn',
-                            icon: Editor.data.moduleFolder + 'images/star.png',
-                            bind: {
-                                text: '{l10n.segmentGrid.toolbar.bookmarkBtn}',
                                 disabled: '{!isEditingSegment}',
                             }
                         }, {
@@ -480,11 +461,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             },
                             icon: Editor.data.moduleFolder + 'images/scrollTo.png',
                         }, {
-                            itemId: 'bookmarkBtn',
+                            itemId: 'watchSegmentBtn',
                             icon: Editor.data.moduleFolder + 'images/star_add.png',
                             bind: {
-                                disabled: '{!selectedSegment}',
-                                text: '{l10n.segmentGrid.toolbar.bookmarkBtn}',
+                                text: '{segmentIsWatched ? l10n.segmentGrid.toolbar.stopWatchingSegment : l10n.segmentGrid.toolbar.startWatchingSegment}',
                                 icon: Editor.data.moduleFolder + 'images/{segmentIsWatched ? "star_remove" : "star_add"}.png'
                             }
                         }, {

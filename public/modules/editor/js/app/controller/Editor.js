@@ -1798,37 +1798,29 @@ Ext.define('Editor.controller.Editor', {
     },
     /**
      * Handler for watchSegmentBtn
-     * @param {Ext.button.Button} button
      */
     watchSegment: function() {
-        if(!this.isEditing){
-            let segment = this.getSegmentGrid()?.getViewModel()?.get('selectedSegment');
-            /** @var {Editor.model.Segment} segment */
-            segment && segment.toogleBookmark();
-            return;
-        }
         var me = this,
             ed = me.getEditPlugin(),
-            record = ed.context.record,
-            isWatched = Boolean(record.get('isWatched')),
-            navi = me.getNavi(),
-            startText = navi.item_startWatchingSegment,
-            stopText = navi.item_stopWatchingSegment,
-            but = navi.down('#watchSegmentBtn'),
-            success = function() {
-                var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
-                    autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
-                //but.setTooltip(isWatched ? startText : stopText);
-                //but.toggle(!isWatched, true);
-                //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
-                autoStateCell && displayfield.setValue(autoStateCell.getHtml());
-            },
-            failure = function() {
-                but.setTooltip(isWatched ? stopText : startText);
-                but.toggle(isWatched, true);
-            };
+            edited = ed.context?.record,
+            selected = this.getSegmentGrid()?.getViewModel()?.get('selectedSegment');
 
-        record.toogleBookmark(success, failure);
+        // If we're not editing segment, or we are, but grid selection moved to another segment
+        if (!me.isEditing || (selected && selected.get('id') !== edited.get('id'))) {
+
+            // Toggle bookmark for the segment which is currently selected and is not the one that is being edited
+            return selected?.toogleBookmark();
+        }
+
+        // Toggle bookmark for the segment that is currently being edited
+        edited.toogleBookmark(() => {
+            var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
+                autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
+
+            // Update autostate displayfield, since the displayfields are getting the rendered content,
+            // we have to fetch it here from rendered HTML too
+            autoStateCell && displayfield.setValue(autoStateCell.getHtml());
+        });
     },
 
     /**

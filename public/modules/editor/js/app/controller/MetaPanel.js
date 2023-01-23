@@ -142,19 +142,9 @@ Ext.define('Editor.controller.MetaPanel', {
      * @param {Object} editingPlugin
      */
     startEdit: function (editingPlugin, context) {
-        var me = this,
-            record = context.record,
-            isWatched = Boolean(record.get('isWatched')),
-            navi = me.getNavi(),
-            but = Ext.getCmp('watchSegmentBtn'),
-            tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
+        var me = this, navi = me.getNavi();
         me.editingMode = 'edit';
-        but.toggle(isWatched, true);
         me.toggleOnEdit(true);
-        but.setTooltip({
-            dismissDelay: 0,
-            text: tooltip
-        });
         navi.show();
         navi.enable();
         me.getSegmentMeta().show();
