@@ -43,33 +43,38 @@ use ZfExtended_Factory;
 use ZfExtended_Utils;
 
 /***
- *
+ * Handle single file data in task reimport. This class will validate and prepare single file for task reimport.
  */
 class DataProvider extends editor_Models_Import_DataProvider_Abstract
 {
-    private array $uploadFiles;
 
-    private array $uploadErrors;
+    protected int $fileId;
 
-    private string $file;
+    protected array $uploadFiles;
+
+    protected array $uploadErrors;
+
+
+    protected string $file;
 
     /**
      * @var ZfExtended_EventManager
      */
     protected $events = false;
 
-    /**
-     * @param int $fileId
-     */
-    public function __construct(private int $fileId)
+
+
+    public function __construct()
     {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [self::class]);
     }
 
-    /**
-     * (non-PHPdoc)
-     * @throws editor_Models_Import_DataProvider_Exception|ZfExtended_ErrorCodeException|Zend_Exception
-     * @see editor_Models_Import_DataProvider_Abstract::checkAndPrepare()
+    /***
+     * @param editor_Models_Task $task
+     * @param int $fileId
+     * @return void
+     * @throws Exception
+     * @throws Zend_Exception
      */
     public function checkAndPrepare(editor_Models_Task $task)
     {
@@ -77,15 +82,17 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
         $this->uploadFiles = $this->getValidFile();
 
-        if(!empty($this->uploadErrors)){
-            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1427',[
+        if( !empty($this->uploadErrors)){
+            throw new Exception('E1427',[
                 'errors' => $this->uploadErrors,
                 'task' => $task
             ]);
         }
 
         if( empty($this->uploadFiles)){
-            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1429');
+            throw new Exception('E1429',[
+                'task' => $task
+            ]);
         }
 
         $this->handleUploads($task);
@@ -101,6 +108,22 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
      */
     protected function handleUploads(editor_Models_Task $task): void
     {
+        // unpack the import archive in the tempImport folder location. This will be used for file/s reimport
+        $this->unpackImportArchive();
+
+        // replace the uploaded file in the matched file on the disk. The file on the disk is located in the
+        // tempImport directory (extracted from the zip ImportArchive)
+        $this->replaceUploadFile($this->uploadFiles['tmp_name'],$this->fileId);
+    }
+
+    /***
+     * Unzip the import archive in temImport folder. The old version of the file/s will be replaced with the matching
+     * file from the reimport.
+     * @return void
+     * @throws editor_Models_Import_DataProvider_Exception
+     */
+    protected function unpackImportArchive(): void
+    {
         try {
             // make the _tempFolder
             $this->checkAndMakeTempImportFolder();
@@ -113,27 +136,47 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
         // fix the bug where the import archive contains _tempImport as root folder
         $this->fixArchiveTempFolder();
+    }
+    /***
+     * Replace the original file in the tempImport directory with the matching uploaded file
+     * @return void
+     */
+    protected function replaceUploadFile(string $newFile,int $fileId): void
+    {
 
         // move the new file to the location in _tempFolder
         // the new file will have the same name as the one which is replaced
-        $newFile = $this->getOriginalFilePath($task);
+        $replaceFile = $this->getOriginalFilePath($this->task,$fileId);
 
+        $this->replaceFile($newFile,$replaceFile);
+
+        $this->file  = $replaceFile;
+    }
+
+    /***
+     * Replace existing task file with another. This expects the source file to be uploaded file
+     * @param string $newFile
+     * @param string $replaceFile
+     * @return void
+     * @throws Exception
+     */
+    protected function replaceFile(string $newFile, string $replaceFile): void
+    {
         // move uploaded file into upload target
-        if (!move_uploaded_file($this->uploadFiles['tmp_name'], $newFile)) {
+        if (!move_uploaded_file($newFile, $replaceFile)) {
             throw new \MittagQI\Translate5\Task\Reimport\Exception('E1427',[
-                'file' => 'Unable to move the uploaded file to:'.$newFile
+                'file' => 'Unable to move the uploaded file to:'.$replaceFile
             ]);
         }
-
-        $this->file  = $newFile;
     }
 
     /***
      * Validate and return all valid files
      * @return array
      */
-    private function getValidFile(): array
+    protected function getValidFile(): array
     {
+
         $upload = new Zend_File_Transfer();
         $upload->addValidator('Extension', false, FileHandler::getSupportedFileTypes());
         // Returns all known internal file information
@@ -170,29 +213,33 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
 
     /**
-     * @return string
+     * @return array
      */
-    public function getFile(): string
+    public function getFiles(): array
     {
-        return $this->file;
+        return [
+            $this->fileId => $this->file
+        ];
     }
 
     /***
      * Get the given file absolute path on the disk after the zip package is extracted.
      * This function will also handle in case the workfiles directory inside the zip archive
      * still uses the old name (proofRead)
+     *
      * @param editor_Models_Task $task
+     * @param int $fileId
      * @return string
      * @throws Zend_Exception
      */
-    private function getOriginalFilePath(editor_Models_Task $task): string
+    protected function getOriginalFilePath(editor_Models_Task $task, int $fileId): string
     {
         /** @var editor_Models_Foldertree $tree */
         $tree = ZfExtended_Factory::get('editor_Models_Foldertree');
 
         $tree->setPathPrefix('');
 
-        $path = $tree->getFileIdPath($task->getTaskGuid(),$this->fileId);
+        $path = $tree->getFileIdPath($task->getTaskGuid(),$fileId);
 
         $workfilesDir = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
 
@@ -263,5 +310,21 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
             // change the fixed temporary folder name to the real temp name
             rename($fixedPath,$this->getAbsImportPath());
         }
+    }
+
+    /***
+     * @return void
+     */
+    public function cleanTempFolder(): void
+    {
+        $this->removeTempFolder();
+    }
+
+    /**
+     * @param int $fileId
+     */
+    public function setFileId(int $fileId): void
+    {
+        $this->fileId = $fileId;
     }
 }

@@ -68,7 +68,7 @@ class Worker extends editor_Models_Export_Worker {
                 'exportSource' => $this->exportSource,
                 'task' => $this->task
             ]);
-        }catch (Throwable $throwable){
+        }catch (ZfExtended_ErrorCodeException $throwable){
             throw new Exception('E1453',[
                 'task'=> $task
             ], $throwable);

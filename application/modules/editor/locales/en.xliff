@@ -8922,6 +8922,26 @@ E-Mail: service@MittagQI.com</pre>
               <source>Übersetzerpaket herunterladen</source>
               <target>Export translator package</target>
             </trans-unit>
+            <trans-unit id='RGF0ZWllbiB2ZXJ3YWx0ZW4='>
+              <source>Dateien verwalten</source>
+              <target>Manage files</target>
+            </trans-unit>
+            <trans-unit id='QmlsaW5ndWFsZSBEYXRlaWVu'>
+              <source>Bilinguale Dateien</source>
+              <target>Bilingual files</target>
+            </trans-unit>
+            <trans-unit id='QXVzZ2FuZ3NkYXRlaWVu'>
+              <source>Ausgangsdateien</source>
+              <target>Source files</target>
+            </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCBoZXJ1bnRlcmxhZGVu'>
+              <source>Übersetzerpaket herunterladen</source>
+              <target>Export translator package</target>
+            </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCByZS1pbXBvcnRpZXJlbg=='>
+              <source>Übersetzerpaket re-importieren</source>
+              <target>Re-import translator package</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

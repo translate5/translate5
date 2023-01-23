@@ -31,10 +31,19 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
     alias: 'controller.adminTaskReimportReimport',
 
     requires:[
-        'Editor.view.admin.task.reimport.ReimportWindow'
+        'Editor.view.admin.task.reimport.ReimportWindow',
+        'Editor.view.admin.task.reimport.ReimportZipWindow',
     ],
 
     listen: {
+        component:{
+            '#exportTranslatorPackage':{
+                click:'onExportTranslatorPackageClick'
+            },
+            '#importTranslatorPackage':{
+                click:'onImportTranslatorPackageClick'
+            }
+        },
         messagebus: {
             '#translate5 task': {
                 triggerReload: 'onTriggerTaskReload',
@@ -88,7 +97,11 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
         });
     },
 
-    onUploadAction: function (grid, rowIndex, colIndex, actionItem, event, record, row){
+    /***
+     * Check if the current task allows reimport action
+     * @returns {boolean}
+     */
+    isReimportAllowewd: function (){
         var me = this,
             task = me.getView().task;
 
@@ -101,12 +114,44 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.INFO
             });
+            return false;
+        }
+        return true;
+    },
+
+    onUploadAction: function (grid, rowIndex, colIndex, actionItem, event, record, row){
+        var me = this;
+
+        if( me.isReimportAllowewd() === false){
             return;
         }
 
-
         var win = Ext.widget('adminTaskReimportReimportWindow');
         win.loadRecord(record,this.getView().task);
+        win.show();
+    },
+
+    /***
+     *
+     */
+    onExportTranslatorPackageClick: function (){
+        var me = this,
+            task = me.getView().task;
+        window.open(Editor.data.restpath + Ext.String.format('task/export/id/{0}?format=package', task.get('id')), '_blank');
+    },
+
+    /***
+     *
+     */
+    onImportTranslatorPackageClick: function (){
+        var me = this;
+
+        if( me.isReimportAllowewd() === false){
+            return;
+        }
+
+        var win = Ext.widget('adminTaskReimportReimportZipWindow');
+        win.loadRecord(me.getView().task);
         win.show();
     }
 });

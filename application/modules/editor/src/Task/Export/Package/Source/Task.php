@@ -31,7 +31,9 @@ namespace MittagQI\Translate5\Task\Export\Package\Source;
 use editor_Models_Export;
 use editor_Models_Export_Exception;
 use editor_Models_File;
+use editor_Models_Task;
 use MittagQI\Translate5\Task\Export\Package\Exception;
+use MittagQI\Translate5\Task\Export\Package\ExportSource;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
@@ -42,7 +44,16 @@ use ZfExtended_Models_Worker;
 class Task extends Base
 {
 
-    protected string $fileName = 'xliff';
+    /***
+     * Folder name where all segment files will be placed in the export package
+     */
+    public const TASK_FOLDER_NAME = 'xliff';
+
+    public function __construct(editor_Models_Task $task, ExportSource $exportSource)
+    {
+        $this->fileName = self::TASK_FOLDER_NAME;
+        parent::__construct($task,$exportSource);
+    }
 
     /**
      * @return void

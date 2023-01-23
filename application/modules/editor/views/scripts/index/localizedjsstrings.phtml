@@ -2095,13 +2095,21 @@ Editor.data.l10n = {
     projectOverview:{
         taskManagement:{
             taskReimport:{
-                title:'<?php echo $this->translate->_('Dateien aktualisieren');?>',
+                title:'<?php echo $this->translate->_('Bilinguale Dateien');?>',
                 fileNameColumnText:'<?php echo $this->translate->_('Dateiname');?>',
                 actionColumnText:'<?php echo $this->translate->_('Aktionen');?>',
                 actionColumnTooltip:'<?php echo $this->translate->_('Neue Datei hochladen');?>',
                 actionColumnDisabledTooltip:'<?php echo $this->translate->_('Der Dateityp wird für die Aktualisierung nicht unterstützt.');?>',
                 taskNotAllowThisActionMessage:'<?php echo $this->translate->_('Der aktuelle Aufgabenstatus lässt diese Aktion nicht zu.');?>',
-                topBarHeaderInfo:'<?php echo $this->translate->_('Außerhalb von translate5 geänderte Ziel-Segmentinhalte sind nach dem Re-Import als Änderungsmarkierungen im Segment zu sehen. Änderungsmarkierungen in Segmenten von bevor dem Re-Import gehen verloren. Geänderte Quellsegmente werden ebenfalls aktualisiert. Neu hinzugefügte Segmente (z. B. durch einen Segment-Split) werden ignoriert. Derzeit können die folgenden bilingualen Dateien aktualisiert werden: {0}');?>'
+                topBarHeaderInfo:'<?php echo $this->translate->_('Außerhalb von translate5 geänderte Ziel-Segmentinhalte sind nach dem Re-Import als Änderungsmarkierungen im Segment zu sehen. Änderungsmarkierungen in Segmenten von bevor dem Re-Import gehen verloren. Geänderte Quellsegmente werden ebenfalls aktualisiert. Neu hinzugefügte Segmente (z. B. durch einen Segment-Split) werden ignoriert. Derzeit können die folgenden bilingualen Dateien aktualisiert werden: {0}');?>',
+                exportTranslatorPackage:'<?php echo $this->translate->_('Übersetzerpaket herunterladen');?>',
+                importTranslatorPackage:'<?php echo $this->translate->_('Übersetzerpaket re-importieren');?>'
+            },
+            referenceFiles:{
+                title:'<?php echo $this->translate->_('Referenzdateien');?>'
+            },
+            sourceFiles:{
+                title:'<?php echo $this->translate->_('Ausgangsdateien');?>'
             },
             taskReimportWindow:{
                 title:'<?php echo $this->translate->_('Neue Datei hochladen');?>',
@@ -2114,6 +2122,12 @@ Editor.data.l10n = {
                 fileReimportRunning:'<?php echo $this->translate->_('Reimport läuft');?>',
                 fileReimportFinishedWithErrors:'<?php echo $this->translate->_('Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll');?>',
                 nameDontMatchInfoLabel:'<?php echo $this->translate->_('Der Dateiname entspricht nicht der zu aktualisierenden Datei');?>'
+            },
+            taskReimportZipWindow:{
+                title:'<?php echo $this->translate->_('Übersetzerpaket re-importieren');?>',
+            },
+            taskManageFiles:{
+                title: '<?php echo $this->translate->_('Dateien verwalten');?>'
             }
         }
     },

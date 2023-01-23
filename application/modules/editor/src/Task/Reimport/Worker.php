@@ -28,12 +28,9 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Reimport;
 
-use editor_Models_Import_FileParser;
 use editor_Models_Loaders_Taskuserassoc;
-use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
-use MittagQI\Translate5\Task\Import\FileParser\Factory;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
 use Zend_Acl_Exception;
@@ -58,7 +55,7 @@ class Worker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        $neededEntries = ['fileId', 'file', 'userGuid','segmentTimestamp'];
+        $neededEntries = ['files', 'userGuid','segmentTimestamp'];
         $foundEntries = array_keys($parameters);
         $keyDiff = array_diff($neededEntries, $foundEntries);
         //if there is not keyDiff all needed were found
@@ -89,44 +86,22 @@ class Worker extends ZfExtended_Worker_Abstract {
 
             Lock::taskLock($task,$task::STATE_REIMPORT);
 
-            /** @var editor_Models_SegmentFieldManager $segmentFieldManager */
-            $segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-            $segmentFieldManager->initFields($task->getTaskGuid());
-
-            /** @var Factory $parserHelper */
-            $parserHelper = ZfExtended_Factory::get(Factory::class,[
+            $reimportFile = ZfExtended_Factory::get(ReimportFile::class,[
                 $task,
-                $segmentFieldManager
+                $user
             ]);
 
-            // get the parser dynamically even of only xliff is supported
-            $parser = $parserHelper->getFileParser($params['fileId'],$params['file']);
-            /* @var editor_Models_Import_FileParser $parser */
-
-            if( is_null($parser)){
-                throw new \MittagQI\Translate5\Task\Reimport\Exception('E1433',[
-                    'file' => $params['fileId'],
-                    'task' => $task
-                ]);
+            foreach ($params['files'] as $fileId => $file){
+                $reimportFile->import($fileId,$file,$params['segmentTimestamp']);
+                $reimportFile->getSegmentProcessor()->log();
             }
 
-            $parser->setIsReimport();
-
-            $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class,[ $task , $segmentFieldManager,$user]);
-            $this->segmentProcessor->setSegmentFile($params['fileId'], $parser->getFileName());
-            $this->segmentProcessor->setSaveTimestamp($params['segmentTimestamp']);
-
-            $parser->addSegmentProcessor($this->segmentProcessor);
-            $parser->parseFile();
         } finally {
             //if it was a PM override, delete it again
             if($tua->getIsPmOverride()) {
                 $tua->delete();
             }
-            $this->segmentProcessor->log();
-
             $this->archiveImportedData($task);
-
             Lock::taskUnlock($task);
         }
 
@@ -189,9 +164,7 @@ class Worker extends ZfExtended_Worker_Abstract {
      */
     private function archiveImportedData(editor_Models_Task $task){
         /** @var DataProvider $dp */
-        $dp = ZfExtended_Factory::get(DataProvider::class,[
-            $this->workerModel->getParameters()['fileId']
-        ]);
+        $dp = ZfExtended_Factory::get(DataProvider::class);
         $dp->setTaskPaths($task);
         $dp->archiveImportedData();
     }

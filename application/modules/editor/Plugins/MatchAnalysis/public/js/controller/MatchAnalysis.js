@@ -89,7 +89,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
     listen:{
         component:{
-            '#adminTaskTaskManagement tabpanel':{
+            '#adminTaskTaskManagement #taskManagementTabPanel':{
                 render:'onTaskTaskManagementPanelRender'
             },
             '#adminTaskAddWindow': {
