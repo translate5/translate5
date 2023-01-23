@@ -48,6 +48,7 @@ class editor_Segment_Internal_TagCheckBase {
      * @var editor_Segment_FieldTags
      */
     protected $fieldTags;
+
     /**
      * 
      * @param editor_Segment_FieldTags $toCheck
@@ -56,11 +57,21 @@ class editor_Segment_Internal_TagCheckBase {
     public function __construct(editor_Segment_FieldTags $toCheck, editor_Segment_FieldTags $against=NULL){
         $this->fieldTags = $toCheck;
         $this->fieldTags->sort();
-        $this->checkTags = $toCheck->getByType(editor_Segment_Tag::TYPE_INTERNAL);
+        $this->checkTags = $this->extractRelevantTags($toCheck);
         $this->numCheckTags = count($this->checkTags);
         // the structural check can be done without against tags
         $this->findCounterparts();
     }
+
+    /**
+     * Extracts the relevant tags for the check out of the field tags (usually all internal-tags)
+     * @param editor_Segment_FieldTags $fieldTags
+     * @return editor_Segment_Internal_Tag[]
+     */
+    protected function extractRelevantTags(editor_Segment_FieldTags $fieldTags) : array {
+        return $fieldTags->getByType(editor_Segment_Tag::TYPE_INTERNAL);
+    }
+
     /**
      * Finds for an opener the corresponding closer, no matter if there are overlaps or anything else
      */
