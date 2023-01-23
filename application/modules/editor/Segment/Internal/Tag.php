@@ -89,6 +89,10 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * @var string
      */
     const CSS_CLASS_TAB = 'tab';
+    /**
+     * @var string
+     */
+    const CSS_CLASS_CHAR = 'char';
 
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
 
@@ -241,6 +245,14 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
      */
     public function isWhitespace() : bool {
         return ($this->isSingle() && ($this->hasClass(self::CSS_CLASS_NEWLINE) || $this->hasClass(self::CSS_CLASS_NBSP) || $this->hasClass(self::CSS_CLASS_SPACE) || $this->hasClass(self::CSS_CLASS_TAB)));
+    }
+
+    /**
+     * Evaluates, if the internal tag represents a special character that was turned to a tag to protect it from processing
+     * @return boolean
+     */
+    public function isSpecialCharacter() : bool {
+        return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_CHAR));
     }
     /**
      * Evaluates, if the internal tag represents a newline
