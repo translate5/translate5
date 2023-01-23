@@ -126,7 +126,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
             /* @var $tag editor_Segment_Internal_Tag */
             if($tag->isWhitespace()){
                 $hashesWhitespaceCheck[] = $tag->getComparisionHash();
-            } else if(!$tag->isSpecialCharacter()) {
+            } else {
                 $hashesInternalCheck[] = $tag->getComparisionHash();
             }
         }
@@ -134,7 +134,7 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
             /* @var $tag editor_Segment_Internal_Tag */
             if($tag->isWhitespace()){
                 $hashesWhitespaceAgainst[] = $tag->getComparisionHash();
-            } else if(!$tag->isSpecialCharacter()) {
+            } else {
                 $hashesInternalAgainst[] = $tag->getComparisionHash();
             }
         } 
