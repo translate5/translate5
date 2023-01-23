@@ -1411,10 +1411,7 @@
                     <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(STRG + ENTER)
                 </source>
-                <target>Save.
-                    <br/>Open next unconfirmed editable segment
-                    <br/>(CTRL + ENTER)
-                </target>
+                <target>Save. Open next unconfirmed editable segment (CTRL + ENTER)</target>
             </trans-unit>
             <trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgU0hJRlQgKyBFTlRFUik='>
                 <source>Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
@@ -1445,20 +1442,14 @@
                     <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(ALT + Bild ↓)
                 </source>
-                <target>Don't save.
-                    <br/>Open next unconfirmed editable segment
-                    <br/>(ALT + page ↓)
-                </target>
+                <target>Don't save. Open next unconfirmed editable segment (ALT + page ↓)</target>
             </trans-unit>
             <trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+Vm9yaGVyaWdlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihBTFQgKyBCaWxkIOKGkSk='>
                 <source>Nicht speichern.
                     <br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(ALT + Bild ↑)
                 </source>
-                <target>Don't save.
-                    <br/>Open previous unconfirmed editable segment
-                    <br/>(ALT + page ↑)
-                </target>
+                <target>Don't save. Open previous unconfirmed editable segment (ALT + page ↑)</target>
             </trans-unit>
             <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
                 <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>

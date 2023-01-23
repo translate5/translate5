@@ -64,10 +64,10 @@ Ext.define('Editor.controller.MetaPanel', {
         selector: '#metapanel segmentsMetapanel'
     }, {
         ref: 'leftBtn',
-        selector: '#metapanel #goAlternateLeftBtn'
+        selector: 'menu #goAlternateLeftBtn'
     }, {
         ref: 'rightBtn',
-        selector: '#metapanel #goAlternateRightBtn'
+        selector: 'menu #goAlternateRightBtn'
     }, {
         ref: 'navi',
         selector: '#metapanel #naviToolbar'

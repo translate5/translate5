@@ -335,21 +335,6 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip_nokey = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen (ESC)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern (STRG + S)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_reset = '<?php echo $this->translate->_('Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)');?>';
-
-    Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ALT + ←)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren (STRG + ALT + →)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_next = '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)');?>';
 
    Ext.define("Editor.locale.de.view.segments.MetaPanel", {
         override: "Editor.view.segments.MetaPanel",
@@ -2036,7 +2021,25 @@ Editor.data.l10n = {
             segmentLockBtn: '<?php echo $this->translate->_('Segment sperren bzw. entsperren (STRG + L)');?>',
             bookmarkBtn: '<?php echo $this->translate->_('Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen (STRG + D)');?>',
             searchAndReplaceButtonTooltip: '<?php echo $this->translate->_('Suchen und Ersetzen anzeigen (STRG + F, STRG + H)');?>',
-            searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>'
+            searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>',
+
+            save: '<?php echo $this->translate->_('Speichern (STRG + S)');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen (ESC)');?>',
+            reset: '<?php echo $this->translate->_('Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)');?>',
+            startWatchingSegment: '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>',
+            stopWatchingSegment: '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>',
+
+            saveAndNext: '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>',
+            saveAndNextFiltered: '<?php echo $this->translate->_('Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)');?>',
+
+            saveAndPrevious: '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>',
+            alternateLeft: '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ALT + ←)');?>',
+            alternateRight: '<?php echo $this->translate->_('Nächste Spalte editieren (STRG + ALT + →)');?>',
+
+            next: '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)');?>',
+            nextFiltered: '<?php echo $this->translate->_('Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)');?>',
+            prev: '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>',
+            prevFiltered: '<?php echo $this->translate->_('Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)');?>',
         }
     },
     projectGrid:{

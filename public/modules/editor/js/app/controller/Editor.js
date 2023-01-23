@@ -115,8 +115,13 @@ Ext.define('Editor.controller.Editor', {
             }
         },
         component: {
-            '#metapanel metapanelNavi button' : {
+            '#metapanel metapanelNavi button, segmentsToolbar [dispatcher]' : {
                 click : 'buttonClickDispatcher'
+            },
+            '#segmentActionMenu menucheckitem': {
+                beforecheckchange: item => item.allowCheckChange,
+                click: 'onSegmentActionMenuItemClick',
+                checkchange: 'onSegmentActionMenuItemToggle'
             },
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
@@ -135,7 +140,7 @@ Ext.define('Editor.controller.Editor', {
                 select:'onSegmentGridSelect',
                 segmentSizeChanged:'onSegmentGridSegmentsSizeChanged'
             },
-            '#segmentgrid segmentsToolbar #scrollToSegmentBtn': {
+            '#segmentgrid segmentsToolbar #scrollToSegmentBtn, #segmentActionMenu #scrollToSegmentBtn': {
                 click: 'focusSegmentShortcut'
             },
             '#showReferenceFilesButton': {
@@ -1813,8 +1818,8 @@ Ext.define('Editor.controller.Editor', {
             success = function() {
                 var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
                     autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
-                but.setTooltip(isWatched ? startText : stopText);
-                but.toggle(!isWatched, true);
+                //but.setTooltip(isWatched ? startText : stopText);
+                //but.toggle(!isWatched, true);
                 //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
                 autoStateCell && displayfield.setValue(autoStateCell.getHtml());
             },
@@ -2006,5 +2011,30 @@ Ext.define('Editor.controller.Editor', {
             return '';
         }
         return rangeForSelection.text();
+    },
+
+    /**
+     * Distinguish between menu item itself click and menu item checkbox click
+     *
+     * @param item
+     * @param event
+     */
+    onSegmentActionMenuItemClick: function(item, event) {
+        if (event.getTarget('.x-menu-item-checkbox')) {
+            item.allowCheckChange = true;
+            item.setChecked(!item.checked);
+            item.allowCheckChange = false;
+        } else {
+            this.buttonClickDispatcher(item);
+        }
+    },
+
+    /**
+     * Toggle corresponding segment action button in the toolbar
+     *
+     * @param item
+     */
+    onSegmentActionMenuItemToggle: function(item) {
+        this.getSegmentGrid().down('segmentsToolbar #' + item.itemId).setVisible(item.checked);
     }
 });

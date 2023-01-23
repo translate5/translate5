@@ -2905,10 +2905,7 @@
                     <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(STRG + ENTER)
                 </source>
-                <target>Speichern. 
-                    <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
-                    <br/>(STRG + ENTER)
-                </target>
+                <target>Speichern. Nächstes unbestätigtes, bearbeitbares Segment öffnen (STRG + ENTER)</target>
             </trans-unit>
             <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyDihpMp'>
                 <source>Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)</source>
@@ -2935,20 +2932,14 @@
                     <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(ALT + Bild ↓)
                 </source>
-                <target>Nicht speichern.
-                    <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
-                    <br/>(ALT + Bild ↓)
-                </target>
+                <target>Nicht speichern. Nächstes unbestätigtes, bearbeitbares Segment öffnen (ALT + Bild ↓)</target>
             </trans-unit>
             <trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+Vm9yaGVyaWdlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihBTFQgKyBCaWxkIOKGkSk='>
                 <source>Nicht speichern.
                     <br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(ALT + Bild ↑)
                 </source>
-                <target>Nicht speichern.
-                    <br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen
-                    <br/>(ALT + Bild ↑)
-                </target>
+                <target>Nicht speichern. Vorheriges unbestätigtes, bearbeitbares Segment öffnen (ALT + Bild ↑)</target>
             </trans-unit>
             <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
                 <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>

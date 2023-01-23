@@ -1095,3 +1095,7 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     border-bottom: 1px solid limegreen;
     padding-bottom: 2px;
 }
+dl {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
