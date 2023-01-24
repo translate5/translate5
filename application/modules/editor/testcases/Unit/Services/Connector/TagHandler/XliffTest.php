@@ -36,18 +36,20 @@ use editor_Services_Connector_TagHandler_Xliff as Xliff;
  * Testcase for TRANSLATE-2895 tests the boundary / framing tag removing in the XLF import
  * For details see the issue.
  */
-class XliffTest extends \editor_Test_UnitTest {
+class XliffTest extends \editor_Test_UnitTest
+{
 
-    private Xliff $xliffMockPaired;
-    private Xliff $xliffMock;
+    private Xliff $xliffUnderTestPaired;
+    private Xliff $xliffUnderTest;
 
     protected function setUp(): void
     {
-        $this->xliffMock = new Xliff(['gTagPairing' => false]);
-        $this->xliffMockPaired = new Xliff();
+        $this->xliffUnderTest = new Xliff(['gTagPairing' => false]);
+        $this->xliffUnderTestPaired = new Xliff();
     }
 
-    public function testPrepareQuery() {
+    public function testPrepareQuery()
+    {
         $testSets = [[
             'queriesToTest' => 'plain text',
             'expectedQueries' => 'plain text',
@@ -75,23 +77,23 @@ class XliffTest extends \editor_Test_UnitTest {
             //since the tag map is stored internally, we have to test query and result restore directly after each other
             $this->assertEquals(
                 $data['expectedQueries'],
-                $this->xliffMock->prepareQuery($data['queriesToTest']),
+                $this->xliffUnderTest->prepareQuery($data['queriesToTest']),
                 'prepared query is not as expected!'
             );
             $this->assertEquals(
                 $data['restoredResults'],
-                $this->xliffMock->restoreInResult($data['resultsToQueries']),
+                $this->xliffUnderTest->restoreInResult($data['resultsToQueries']),
                 'restored result is not as expected!'
             );
 
             $this->assertEquals(
                 $data['expectedQueriesPaired'],
-                $this->xliffMockPaired->prepareQuery($data['queriesToTest']),
+                $this->xliffUnderTestPaired->prepareQuery($data['queriesToTest']),
                 'prepared paired query is not as expected!'
             );
             $this->assertEquals(
                 $data['restoredResultsPaired'],
-                $this->xliffMockPaired->restoreInResult($data['resultsToQueries']),
+                $this->xliffUnderTestPaired->restoreInResult($data['resultsToQueries']),
                 'restored paired result is not as expected!'
             );
         }

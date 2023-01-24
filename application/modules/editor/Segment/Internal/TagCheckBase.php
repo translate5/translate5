@@ -68,7 +68,8 @@ class editor_Segment_Internal_TagCheckBase {
      * @param editor_Segment_FieldTags $fieldTags
      * @return editor_Segment_Internal_Tag[]
      */
-    protected function extractRelevantTags(editor_Segment_FieldTags $fieldTags) : array {
+    protected function extractRelevantTags(editor_Segment_FieldTags $fieldTags) : array
+    {
         return $fieldTags->getByType(editor_Segment_Tag::TYPE_INTERNAL);
     }
 

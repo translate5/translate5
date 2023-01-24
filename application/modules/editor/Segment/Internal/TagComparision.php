@@ -104,10 +104,12 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
      * @param editor_Segment_FieldTags $fieldTags
      * @return editor_Segment_Internal_Tag[]
      */
-    protected function extractRelevantTags(editor_Segment_FieldTags $fieldTags) : array {
+    protected function extractRelevantTags(editor_Segment_FieldTags $fieldTags) : array
+    {
         $relevantTags = [];
-        foreach($fieldTags->getByType(editor_Segment_Tag::TYPE_INTERNAL) as $internalTag){ /* @var $internalTag editor_Segment_Internal_Tag */
-            if(!$internalTag->isSpecialCharacter()){
+        foreach ($fieldTags->getByType(editor_Segment_Tag::TYPE_INTERNAL) as $internalTag) {
+            /* @var $internalTag editor_Segment_Internal_Tag */
+            if (!$internalTag->isSpecialCharacter()) {
                 $relevantTags[] = $internalTag;
             }
         }

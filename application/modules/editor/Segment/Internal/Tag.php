@@ -251,7 +251,8 @@ final class editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * Evaluates, if the internal tag represents a special character that was turned to a tag to protect it from processing
      * @return boolean
      */
-    public function isSpecialCharacter() : bool {
+    public function isSpecialCharacter() : bool
+    {
         return ($this->isSingle() && $this->hasClass(self::CSS_CLASS_CHAR));
     }
     /**
