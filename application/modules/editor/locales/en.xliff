@@ -468,7 +468,7 @@
             </trans-unit>
             <trans-unit id="QmVudXR6ZXIgc3BlaWNoZXJu">
                 <source>Benutzer speichern</source>
-                <target>save user</target>
+                <target>Save user</target>
             </trans-unit>
             <trans-unit id='UE0gbGVrdG9yaWVydA=='>
                 <source>PM lektoriert</source>
@@ -1461,11 +1461,11 @@
             </trans-unit>
             <trans-unit id='QWJicmVjaGVuIChFU0Mp'>
                 <source>Abbrechen (ESC)</source>
-                <target>cancel (ESC)</target>
+                <target>Cancel (ESC)</target>
             </trans-unit>
             <trans-unit id='U3BlaWNoZXJuIChTVFJHICsgUyk='>
                 <source>Speichern (STRG + S)</source>
-                <target>save (CTRL + S)</target>
+                <target>Save (CTRL + S)</target>
             </trans-unit>
             <trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoQUxUICsgUyBkYW5hY2ggezB9KQ=='>
                 <source>Segment auf den ausgewählten Status setzen (ALT + S danach {0})</source>
@@ -3728,7 +3728,7 @@ A task was associated to you in the task-portal {portalLink}.
             </trans-unit>
             <trans-unit id='U2VnbWVudGUgenVyw7xja3NwZWljaGVybg=='>
                 <source>Segmente zurückspeichern</source>
-                <target>save back segments to TM</target>
+                <target>Save back segments to TM</target>
             </trans-unit>
             <trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBpbiBGb3JtIGVpbmVyIFRNWCBEYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVtIFRNIGhpbnp1ZsO8Z2Vu'>
                 <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
@@ -3844,11 +3844,11 @@ A task was associated to you in the task-portal {portalLink}.
             </trans-unit>
             <trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmdyw7bDn2VybiAoU1RSRyArICsp">
                 <source>Segmentschriftgrad vergrößern (STRG + +)</source>
-                <target>increase segment font-size (STRG + +)</target>
+                <target>Increase segment font-size (STRG + +)</target>
             </trans-unit>
             <trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmtsZWluZXJuIChTVFJHICsgLSk=">
                 <source>Segmentschriftgrad verkleinern (STRG + -)</source>
-                <target>decrease segment font-size (STRG + -)</target>
+                <target>Decrease segment font-size (STRG + -)</target>
             </trans-unit>
             <trans-unit id='SW5zdGFudFRyYW5zbGF0ZQ=='>
                 <source>InstantTranslate</source>
@@ -6110,7 +6110,15 @@ The following task was imported with errors / warnings / notices. Please take ca
             </trans-unit>
             <trans-unit id="U2VnbWVudCBzcGVycmVuIGJ6dy4gZW50c3BlcnJlbiAoU1RSRyArIEwp">
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
-                <target>lock / unlock the selected segment (CTRL + L)</target>
+                <target>Lock / unlock the selected segment (CTRL + L)</target>
+            </trans-unit>
+            <trans-unit id="QWxsZXI=">
+                <source>Aller</source>
+                <target>All</target>
+            </trans-unit>
+            <trans-unit id="WmVpY2hlbg==">
+                <source>Zeichen</source>
+                <target>Chars</target>
             </trans-unit>
             <trans-unit id="U3ByaW5nZSB6dSBTZWdtZW50IG1pdCBOciAoU1RSRyArIEcp">
                 <source>Springe zu Segment mit Nr (STRG + G)</source>

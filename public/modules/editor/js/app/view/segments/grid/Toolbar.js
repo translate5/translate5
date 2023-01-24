@@ -174,14 +174,14 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'tbseparator'
                 },{
                     xtype: 'button',
+                    glyph: 'e17b@FontAwesome5FreeSolid',
                     itemId: 'clearSortAndFilterBtn',
                     cls: 'clearSortAndFilterBtn',
                     bind: {
                         tooltip: {
                             text: '{l10n.segmentGrid.toolbar.clearSortAndFilterTooltip}',
                             showDelay: 0
-                        },
-                        text: '{l10n.segmentGrid.toolbar.clearSortAndFilterBtn}'
+                        }
                     }
                 },{
                     xtype: 'tbseparator'
@@ -363,7 +363,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                 }, {
                     xtype: 'button',
-                    text: 'All',
+                    bind: {
+                        text: '{l10n.segmentGrid.toolbar.all}'
+                    },
                     menu: {
                         itemId: 'segmentActionMenu',
                         defaults: {
@@ -529,9 +531,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 },{
                     xtype: 'button',
                     itemId: 'specialChars',
-                    text: 'Chars',
                     hidden: !(userCanModifyWhitespaceTags && userCanInsertWhitespaceTags),
                     bind: {
+                        text: '{l10n.segmentGrid.toolbar.chars}',
                         disabled: '{!isEditingSegment}',
                     },
                     menu: {
@@ -540,8 +542,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         },
                         floating: true,
                         disabled: false,
-                        xtype: 'specialCharacters',
-                        width: 270
+                        xtype: 'specialCharacters'
                     }
                 },{
                 	xtype: 'tbfill'

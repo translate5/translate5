@@ -47,6 +47,7 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.segments.Grid',
         'Editor.view.segments.MetaPanelNavi',
         'Editor.view.segments.MetaPanel',
+        'Editor.view.segments.TerminologyPanel',
         'Editor.view.quality.FilterPanel',
         'Editor.view.comments.Navigation',
         'Editor.view.Filepanel'
@@ -148,6 +149,12 @@ Ext.define('Editor.view.ViewPortEditor', {
                     xtype: 'segmentsMetapanel',
                     stateId: 'editor.eastPanelSegmentsMetapanel',
                     stateEvents: ['collapse', 'expand'],
+                    stateful:true
+                },{
+                    xtype: 'terminologyPanel',
+                    stateId: 'editor.eastPanelSegmentsTerminology',
+                    stateEvents: ['collapse', 'expand'],
+                    hidden: true,
                     stateful:true
                 },{
                     xtype: 'commentPanel',

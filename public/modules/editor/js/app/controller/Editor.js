@@ -151,20 +151,23 @@ Ext.define('Editor.controller.Editor', {
             'taskConfirmationWindow button': {
                 click:'taskConfirm'
             },
-            '#naviToolbar #btnInsertWhitespaceNbsp': {
+            'segmentsToolbar #btnInsertWhitespaceNbsp': {
                 click: 'insertWhitespaceNbsp'
             },
-            '#naviToolbar #btnInsertWhitespaceNewline': {
+            'segmentsToolbar #btnInsertWhitespaceNewline': {
                 click: 'insertWhitespaceNewline'
             },
-            '#naviToolbar #btnInsertWhitespaceTab': {
+            'segmentsToolbar #btnInsertWhitespaceTab': {
                 click: 'insertWhitespaceTab'
             },
-            '#naviToolbar specialCharactersButton': {
+            'segmentsToolbar specialCharactersButton': {
                 click: 'insertSpecialCharacter'
             },
             '#segmentMinMaxLength': {
                 insertNewline: 'insertWhitespaceNewline'
+            },
+            'segmentsToolbar #specialChars': {
+                disable: btn => btn.hideMenu()
             }
         },
         store:{

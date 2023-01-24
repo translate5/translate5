@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.TermTagger.controller.Main', {
     extend: 'Ext.app.Controller',
-    requires: ['Editor.plugins.TermTagger.view.TermPortletFieldset'],
+    requires: ['Editor.plugins.TermTagger.view.TermPortlet'],
 
     listen: {
         component: {
@@ -59,11 +59,11 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
      *
      */
     metaInfoFormAfterRenderHandler: function (form){
+        var tp = form.up('#metapanel').down('terminologyPanel');
 
-        if(Editor.data.task.get('terminologie')){
-            form.insert(0,{
-                xtype:'termPortalTermPortletFieldset'
-            });
+        if (Editor.data.task.get('terminologie')) {
+            tp.add({xtype: 'termPortalTermPortlet'});
+            tp.show();
         }
     },
 

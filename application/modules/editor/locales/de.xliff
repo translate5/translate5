@@ -7974,6 +7974,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
                 <target>Segment sperren bzw. entsperren (STRG + L)</target>
             </trans-unit>
+            <trans-unit id="QWxsZXI=">
+                <source>Aller</source>
+                <target>Aller</target>
+            </trans-unit>
+            <trans-unit id="WmVpY2hlbg==">
+                <source>Zeichen</source>
+                <target>Zeichen</target>
+            </trans-unit>
             <trans-unit id="U3ByaW5nZSB6dSBTZWdtZW50IG1pdCBOciAoU1RSRyArIEcp">
                 <source>Springe zu Segment mit Nr (STRG + G)</source>
                 <target>Springe zu Segment mit Nr (STRG + G)</target>
