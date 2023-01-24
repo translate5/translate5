@@ -39,10 +39,9 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
     /**
      * protects the internal tags as xliff tags x,bx,ex and g pair
      * @param string $queryString
-     * @param int $segmentId
      * @return string
      */
-    public function prepareQuery(string $queryString, int $segmentId=-1): string {
+    public function prepareQuery(string $queryString): string {
         $this->realTagCount = 0;
         
         //1. whitespace preparation
@@ -51,14 +50,13 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
         //2. strip all tags and set real tag count
         return strip_tags($this->utilities->internalTag->replace($queryString, '', -1, $this->realTagCount));
     }
-    
+
     /**
      * protects the internal tags for language resource processing as defined in the class
-     * @param string $queryString
-     * @param int $segmentId
+     * @param string $resultString
      * @return string
      */
-    public function restoreInResult(string $resultString, int $segmentId=-1): string {
+    public function restoreInResult(string $resultString): string {
         return $this->importWhitespaceFromTagLessQuery($resultString);
     }
 }

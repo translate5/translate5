@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\LanguageResource;
 
 use Zend_Db_Expr;
+use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Row_Abstract;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Abstract;
@@ -47,7 +48,7 @@ use ZfExtended_Models_Entity_Abstract;
  * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(int $autoCreatedOnImport)
  */
-class TaskAssociation extends ZfExtended_Models_Entity_Abstract {
+class TaskAssociation extends AssociationAbstract {
 
     protected $dbInstanceClass = 'MittagQI\Translate5\LanguageResource\Db\TaskAssociation';
     protected $validatorInstanceClass = 'MittagQI\Translate5\LanguageResource\Validator\TaskAssociation'; //→ here the new validator class
@@ -279,19 +280,5 @@ class TaskAssociation extends ZfExtended_Models_Entity_Abstract {
             ->where('taskGuid = ?',$taskGuid)
             ->where('segmentsUpdateable = 1');
         return $this->db->fetchAll($s)->toArray();
-    }
-
-    /***
-     * Check if given resource is assigned to a task
-     * @param int $resourceId
-     * @param string $taskGuid
-     * @return bool
-     */
-    public function isAssigned(int $resourceId, string $taskGuid): bool
-    {
-        $s = $this->db->select()
-            ->where('taskGuid = ?',$taskGuid)
-            ->where('languageResourceId = ?',$resourceId);
-        return empty($this->db->getAdapter()->fetchAll($s)) === false;
     }
 }

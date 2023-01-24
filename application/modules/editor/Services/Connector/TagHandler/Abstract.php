@@ -106,18 +106,16 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     /**
      * protects the internal tags for language resource processing as defined in the class
      * @param string $queryString
-     * @param int $segmentId: optional: only used by some Taghandlers and only provided by some connectors
      * @return string
      */
-    abstract public function prepareQuery(string $queryString, int $segmentId=-1): string;
+    abstract public function prepareQuery(string $queryString): string;
     
     /**
      * protects the internal tags for language resource processing as defined in the class
      * @param string $resultString
-     * @param int $segmentId if given must match what was provided with the prepareQuery call for this result
      * @return string|null returns NULL on error
      */
-    abstract public function restoreInResult(string $resultString, int $segmentId=-1): ?string;
+    abstract public function restoreInResult(string $resultString): ?string;
     
     /**
      * Returns true if last restoreInResult call had errors
@@ -175,5 +173,10 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      */
     public function getUtilities() : editor_Models_Segment_UtilityBroker {
         return $this->utilities;
+    }
+
+    public function setCurrentSegment(editor_Models_Segment $segment): void
+    {
+        //empty function stub - to be implemented where needed
     }
 }

@@ -16,10 +16,11 @@ _translate5.sh()
 
     if [[ ${cur} == --* ]]; then
         state="option"
-        opts=("--help:Display help for the given command. When no command is given display help for the <info>list</info> command" "--quiet:Do not output any message" "--verbose:Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug" "--version:Display this application version" "--ansi:Force \(or disable --no-ansi\) ANSI output" "--no-ansi:Negate the "--ansi" option" "--no-interaction:Do not ask any interactive question")
+        opts=("--help:Display help for the given command. When no command is given display help for the <info\>list</info\> command" "--quiet:Do not output any message" "--verbose:Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug" "--version:Display this application version" "--ansi:Force \(or disable --no-ansi\) ANSI output" "--no-ansi:Negate the "--ansi" option" "--no-interaction:Do not ask any interactive question")
     elif [[ $cur == $com ]]; then
         state="command"
-        coms=("_complete:Internal command to provide shell completion suggestions" "changelog:Show the last changelog entries." "completion:Dump the shell completion script" "config:List, get and set translate5 configuration values." "help:Display help for a command" "list:List commands" "log:Query the translate5 log" "status:Prints a instance status." "cache\:purge:Cleans the application cache." "database\:update:Maintain database updates." "dev\:createtest:Development: Creates a new API test, gets the name \(ISSUE-XXX\) from the current branch." "dev\:githook:Development: Executes code checks invoked by git hooks. The checks are implemented in here." "dev\:newdbchange:Development: Creates a new DB alter file, gets the filename from the current branch." "dev\:newmodel:Development: Creates a new model php file." "dev\:runtest:Development: Runs all or a given test a new API test." "maintenance\:announce:Sends an announcement via email with the given time and message to the configured users." "maintenance\:disable:Disable the maintenance mode." "maintenance\:message:Sets just a message in the maintenance announce message box to application users." "maintenance\:notify:Sends a message directly to all connected users \(if messagebus enabled\) which opens a popup to the user then." "maintenance\:set:Sets the maintenance mode." "maintenance\:status:Returns information about the maintenance mode." "plugin\:disable:Deactivate one or more plug-ins." "plugin\:enable:Activate one or more plug-ins." "plugin\:list:List all installed plugins." "release\:notes:Updates the release notes, only usable in development installations." "segment\:history:Shows the segment editing history, from the oldest to the current version." "session\:impersonate:Returns a URL to authenticate password less as the given user." "system\:check:Checks the system requirements." "system\:mailtest:Sends a test e-mail to the given address as argument." "task\:clean:provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories" "termportal\:datatypecheck:Checks the integrity of the term datatypes against the content in the attributes table. This is necessary due TRANSLATE-2797." "termportal\:reindex:Re-index the fulltext index of the term database." "tmx\:ts1040:Helper tool to convert TMX files according to TS-1040" "user\:create:Creates a user via CLI." "user\:info:Returns information about one or more users in translate5." "worker\:list:Prints a list of current workers or details about one worker" "worker\:queue:Triggers the worker queue - may be necessary after an apache restart or maintenance mode.")
+        coms=("_complete:Internal command to provide shell completion suggestions" "changelog:Show the last changelog entries." "completion:Dump the shell completion script" "config:List, get and set translate5 configuration values." "help:Display help for a command" "list:List commands" "log:Query the translate5 log" "status:Prints a instance status." "auth\:apptoken\:add:Generates auth token used for authentication in translate5" "auth\:impersonate:Returns a URL to authenticate password less as the given user." "cache\:purge:Cleans the application cache." "database\:update:Maintain database updates." "dev\:createtest:Development: Creates a new API test, gets the name \(ISSUE-XXX\) from the current branch." "dev\:ecode:Development: Returns the next free ecode and blocks it globally \(via our server\)" "dev\:githook:Development: Executes code checks invoked by git hooks. The checks are implemented in here." "dev\:localservices:Local Development only: Searches and sets the dockerized services matching the "docker-compose-localdev.yml" docker-compose-file" "dev\:newdbchange:Development: Creates a new DB alter file, gets the filename from the current branch." "dev\:newmodel:Development: Creates a new model php file." "dev\:okapibconfversion:Development: Increases the current revision of the git-based OKAPI bconv version by 1 and checks for SRX changes" "dev\:triggerworkflow:Development: Triggers a workflow action / notification, identified by class name and function" "l10n\:add:TODO." "l10n\:remove:TODO." "maintenance\:announce:Sends an announcement via email with the given time and message to the configured users." "maintenance\:disable:Disable the maintenance mode." "maintenance\:message:Sets just a message in the maintenance announce message box to application users." "maintenance\:notify:Sends a message directly to all connected users \(if messagebus enabled\) which opens a popup to the user then." "maintenance\:set:Sets the maintenance mode." "maintenance\:status:Returns information about the maintenance mode." "plugin\:disable:Deactivate one or more plug-ins." "plugin\:enable:Activate one or more plug-ins." "plugin\:list:List all installed plugins." "release\:notes:Updates the release notes, only usable in development installations." "segment\:history:Shows the segment editing history, from the oldest to the current version." "service\:autodiscovery:Searches for common DNS names of used services and sets them in the configuration,\
+ using the default ports." "system\:check:Checks the system requirements." "system\:mailtest:Sends a test e-mail to the given address as argument." "t5memory\:migrate:Migrates all existing OpenTM2 language resources to t5memory" "task\:clean:provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories" "task\:info:Queries the task table and provides a listing of all found tasks, or detailed information if found only a single task." "task\:skeletonfile:List and show the content of a tasks import data skeleton file\(s\)" "termportal\:datatypecheck:Checks the integrity of the term datatypes against the content in the attributes table. This is necessary due TRANSLATE-2797." "termportal\:reindex:Re-index the fulltext index of the term database." "test\:addinisection:API-Tests: Transfers important configs to the installation.ini\'s test-section." "test\:applytestsql:API-Tests: Applies the test alter SQL files to the local DB. Needed in fresh installations where tests should be called directly, like docker environments or new development installations" "test\:apprun:API-Tests: Runs all tests for the application environment." "test\:cleanup:API-Tests: Removes all workers, unlocks all locked tasks and cleans incomplete bconf\'s to clean test residuals." "test\:createfaultysegment:API-Tests: Manipulates a segment to contain a tag-error in the edited target" "test\:run:API-Tests: Runs a single test." "test\:runall:API-Tests: Runs all." "test\:runsuite:API-Tests: Runs a test suite." "tmx\:otmfix:Helper tool to sanitize TMX files with invalid XML exported from OpenTM2 according to TRANSLATE-2835" "tmx\:ts1040:Helper tool to convert TMX files according to TS-1040" "user\:create:Creates a user via CLI." "user\:info:Returns information about one or more users in translate5." "visual\:convertlegacypdfs:Visual: Converts all PDF based reviews using the legacy scroller" "worker\:clean:Removes all done workers from the worker table" "worker\:list:Prints a list of current workers or details about one worker" "worker\:queue:Triggers the worker queue - may be necessary after an apache restart or maintenance mode.")
     fi
 
     case $state in
@@ -54,11 +55,19 @@ _translate5.sh()
             ;;
 
             log)
-            opts+=("--level:Filtering for specific level\(s\). If given as string, only the level given as string is shown. Given as integer: filtering for all levels as bitmask." "--follow:Show the most recent log entries, and continuously print new entries as they are appended to the log. Do not show a summary." "--all:Shows the full blown log data \(extra, trace, etc\)" "--since:Shows log data since the given point in time \(strtotime parsable string\)." "--until:Shows log data until the given point in time \(strtotime parsable string\). If the parameter starts with a "+" it is automatically added to the since date." "--no-summary:Do not print the summary and intro texts - for further shell scripting." "--summary-only:Print only the summary." "--purge:Warning: purges the logs found be the given filters. Is asking for confirmation of not used with -q\|--quiet or -n\|--no-interaction.")
+            opts+=("--level:Filtering for specific level\(s\). If given as string, only the level given as string is shown. Given as integer: filtering for all levels as bitmask." "--follow:Show the most recent log entries, and continuously print new entries as they are appended to the log. Do not show a summary." "--all:Shows the full blown log data \(extra, trace, etc\)" "--since:Shows log data since the given point in time \(strtotime parsable string\)." "--until:Shows log data until the given point in time \(strtotime parsable string\). If the parameter starts with a "+" it is automatically added to the since date." "--last:Shows only the last X log entries \(default 5\)." "--no-summary:Do not print the summary and intro texts - for further shell scripting." "--summary-only:Print only the summary." "--purge:Warning: purges the logs found be the given filters. Is asking for confirmation of not used with -q\|--quiet or -n\|--no-interaction.")
             ;;
 
             status)
             opts+=()
+            ;;
+
+            auth:apptoken:add)
+            opts+=()
+            ;;
+
+            auth:impersonate)
+            opts+=("--segment-id:Give a segment ID to generate a URL pointing directly to that segment.")
             ;;
 
             cache:purge)
@@ -70,11 +79,19 @@ _translate5.sh()
             ;;
 
             dev:createtest)
-            opts+=("--name:Force a name \(must end with Test!\) instead of getting it from the branch.")
+            opts+=("--name:Force a name \(must end with Test!\) instead of getting it from the branch." "--plugin:Create the test in the given Plugin \(give the relative path to the plugin root!\).")
+            ;;
+
+            dev:ecode)
+            opts+=()
             ;;
 
             dev:githook)
             opts+=()
+            ;;
+
+            dev:localservices)
+            opts+=("--auto-set:Discover and update the configuration")
             ;;
 
             dev:newdbchange)
@@ -85,8 +102,20 @@ _translate5.sh()
             opts+=("--name:Force to enter Model name" "--table:Force to enter database table name" "--plugin:Plugin name when the current files are create in plugin contenxt.")
             ;;
 
-            dev:runtest)
-            opts+=("--capture:Use this option to re-capture the test data of a test. Probably not all tests are adopted yet to support this switch." "--legacy-segment:Use this option when re-capturing segment test data to use the old order of the segment data. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c" "--xdebug:Send the XDEBUG cookie to enable interactive debugging." "--keep-data:Prevents that the test data \(tasks, etc\) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet.")
+            dev:okapibconfversion)
+            opts+=()
+            ;;
+
+            dev:triggerworkflow)
+            opts+=("--taskid:The task ID of the task to be used as current task" "--options:The action parameters / options given as JSON string as it would be stored in the LEK_workflow_action table")
+            ;;
+
+            l10n:add)
+            opts+=("--path:The path to the xliff files, if omitted defaulting to the editor/locales files." "--replace:Replace the trans-unit identified by --after instead of appending to it." "--after:The source content after which the new content should be added.")
+            ;;
+
+            l10n:remove)
+            opts+=("--path:The path to the xliff files, if omitted defaulting to the editor/locales files.")
             ;;
 
             maintenance:announce)
@@ -133,8 +162,8 @@ _translate5.sh()
             opts+=("--task:Give a task ID or taskGuid here, then the argument "segment" is interpreted as segment nr in that task instead as a unique segment id.")
             ;;
 
-            session:impersonate)
-            opts+=("--segment-id:Give a segment ID to generate a URL pointing directly to that segment.")
+            service:autodiscovery)
+            opts+=("--auto-set:Discover and update the configuration" "--service:Specify the service to configure")
             ;;
 
             system:check)
@@ -145,8 +174,20 @@ _translate5.sh()
             opts+=()
             ;;
 
+            t5memory:migrate)
+            opts+=("--sourceUrl:Endpoint data is exported from, e.g. http://t5memory.local/t5memory" "--doNotWaitImportFinish:Skips waiting for import to finish before processing next language resource" "--no-doNotWaitImportFinish:Negate the "--doNotWaitImportFinish" option" "--wait-timeout:Timeout in seconds for waiting for import to finish")
+            ;;
+
             task:clean)
             opts+=("--delete-error:deletes one \(with ID\) or all tasks with errors" "--delete-import:deletes one task in state import" "--set-to-error:sets a task to status error \(for example to gain access to clone/delete/download of a hanging import task\)" "--delete-data:deletes all orphaned data folders")
+            ;;
+
+            task:info)
+            opts+=("--id-only:Force to search the identifier only in the ID column \(to prevent find tasks containing the ID in one of the other searched columns\)" "--detail:Shows all data fields of the task \(expect qmSubsegmentFlags\) and task meta instead the overview")
+            ;;
+
+            task:skeletonfile)
+            opts+=("--list-files:List the available files only" "--dump-all:Dumps all files with file names as sections - output not usable as plain file after redirecting" "--dump-one:Dumps one raw file for redirecting on CLI, needs the fileid as argument")
             ;;
 
             termportal:datatypecheck)
@@ -155,6 +196,42 @@ _translate5.sh()
 
             termportal:reindex)
             opts+=()
+            ;;
+
+            test:addinisection)
+            opts+=()
+            ;;
+
+            test:applytestsql)
+            opts+=()
+            ;;
+
+            test:apprun)
+            opts+=("--recreate-database:Use this option to recreate the application database with it\'s name being prompted. This will also clean the /data directory contents." "--database-recreation:Use this option to recreate the application database with it\'s name as option. This will also clean the /data directory contents." "--xdebug:Send the XDEBUG cookie to enable interactive debugging." "--stop-on-error:Leads to the testsuite stopping on the first error \(not failure!\)." "--stop-on-failure:Leads to the testsuite stopping on the first failure \(not error!\)." "--keep-data:Prevents that the test data \(tasks, etc\) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet.")
+            ;;
+
+            test:cleanup)
+            opts+=("--application-database-cleanup:Clean the production/application database instead of the test database")
+            ;;
+
+            test:createfaultysegment)
+            opts+=()
+            ;;
+
+            test:run)
+            opts+=("--capture:Use this option to re-capture the test data of a test. Probably not all tests are adopted yet to support this switch." "--legacy-segment:Use this option when re-capturing segment test data to use the old order of the segment data. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c" "--legacy-json:Use this option when re-capturing test data to use the old json style. Comparing the changes then with git diff is easier. Then commit and re-run the test without this option, then finally commit the result. Only usable with -c" "--recreate-database:Use this option to recreate the test database before running the test." "--xdebug:Send the XDEBUG cookie to enable interactive debugging." "--stop-on-error:Leads to the testsuite stopping on the first error \(not failure!\)." "--stop-on-failure:Leads to the testsuite stopping on the first failure \(not error!\)." "--keep-data:Prevents that the test data \(tasks, etc\) is cleaned up after the test. Useful for debugging a test. Must be implemented in the test itself, so not all tests support that flag yet." "--master-test:Leads to the testsuite running in master mode. Be aware that this might create costs for using paid external APIs.")
+            ;;
+
+            test:runall)
+            opts+=("--skip-database-reset:Will skip the database-reset before running the tests." "--xdebug:Send the XDEBUG cookie to enable interactive debugging." "--stop-on-error:Leads to the testsuite stopping on the first error \(not failure!\)." "--stop-on-failure:Leads to the testsuite stopping on the first failure \(not error!\)." "--master-test:Leads to the testsuite running in master mode. Be aware that this might create costs for using paid external APIs.")
+            ;;
+
+            test:runsuite)
+            opts+=("--recreate-database:Use this option to recreate the test database before running the test." "--xdebug:Send the XDEBUG cookie to enable interactive debugging." "--stop-on-error:Leads to the testsuite stopping on the first error \(not failure!\)." "--stop-on-failure:Leads to the testsuite stopping on the first failure \(not error!\)." "--master-test:Leads to the testsuite running in master mode. Be aware that this might create costs for using paid external APIs.")
+            ;;
+
+            tmx:otmfix)
+            opts+=("--write:writes the output back to a new file \(same name with .cleaned.tmx suffix\) instead to stdout")
             ;;
 
             tmx:ts1040)
@@ -167,6 +244,14 @@ _translate5.sh()
 
             user:info)
             opts+=()
+            ;;
+
+            visual:convertlegacypdfs)
+            opts+=()
+            ;;
+
+            worker:clean)
+            opts+=("--all:Removes defunc workers." "--running:Removes the running workers - which makes sense if they were crashed but not set to defunct - keeps done without --all")
             ;;
 
             worker:list)

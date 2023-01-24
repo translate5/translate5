@@ -171,9 +171,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
                 },
                 success: function(savedRecord) {
                     record.commit(true);
+                    var newFilterId = (identifier === 'NEW@FILTER') ? savedRecord.get('id') : null; // this is needed to hint at a newly added filter record in the extension update!
                     identifier = savedRecord.get('identifier'); // crucial: identifier was changed from the backend!
                     // update the maps in the store & remove extension from other items
-                    store.updateExtensionsByIdentifier(identifier, extensions, true);
+                    store.updateExtensionsByIdentifier(identifier, extensions, true, newFilterId);
                 }
             });
         } else if(!isCustom && extensionsChanged){
@@ -189,7 +190,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterRowEditing', {
                     record.set('extensions', extensions, { silent: true, dirty: false });
                     record.commit();
                     // update the maps in the store & remove extension from other items
-                    store.updateExtensionsByIdentifier(identifier, extensions, false);
+                    store.updateExtensionsByIdentifier(identifier, extensions, false, null);
                 },
                 failure: function(response){
                     Editor.app.getController('ServerException').handleException(response);

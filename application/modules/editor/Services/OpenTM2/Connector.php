@@ -489,6 +489,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $status = $this->api->getResult()->tmxImportStatus;
         switch($status) {
             case 'available':
+                if (isset($this->api->getResult()->importTime) && $this->api->getResult()->importTime === 'not finished') {
+                    return self::STATUS_IMPORT;
+                }
+
                 return self::STATUS_AVAILABLE;
             case 'import':
                 $this->lastStatusInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';

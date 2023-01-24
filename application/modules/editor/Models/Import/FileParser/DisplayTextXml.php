@@ -324,6 +324,8 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
                 case 'translockdt':
                 case 'string':
                 case 'inset':
+                case 'Remarks1':
+                case 'Remarks2':
                     return;
             }
             $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.displayTextXml');

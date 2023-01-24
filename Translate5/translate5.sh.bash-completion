@@ -25,8 +25,16 @@ _translate5.sh()
 
         case "$com" in
 
+            _complete)
+            opts="${opts} --shell --input --current --symfony"
+            ;;
+
             changelog)
-            opts="${opts} --important"
+            opts="${opts} --important --summary"
+            ;;
+
+            completion)
+            opts="${opts} --debug"
             ;;
 
             config)
@@ -38,11 +46,27 @@ _translate5.sh()
             ;;
 
             list)
-            opts="${opts} --raw --format"
+            opts="${opts} --raw --format --short"
             ;;
 
             log)
-            opts="${opts} --level --follow --all --since --until --no-summary --summary-only --purge"
+            opts="${opts} --level --follow --all --since --until --last --no-summary --summary-only --purge"
+            ;;
+
+            status)
+            opts="${opts} "
+            ;;
+
+            auth:apptoken:add)
+            opts="${opts} "
+            ;;
+
+            auth:impersonate)
+            opts="${opts} --segment-id"
+            ;;
+
+            cache:purge)
+            opts="${opts} "
             ;;
 
             database:update)
@@ -50,11 +74,19 @@ _translate5.sh()
             ;;
 
             dev:createtest)
-            opts="${opts} --name"
+            opts="${opts} --name --plugin"
+            ;;
+
+            dev:ecode)
+            opts="${opts} "
             ;;
 
             dev:githook)
             opts="${opts} "
+            ;;
+
+            dev:localservices)
+            opts="${opts} --auto-set"
             ;;
 
             dev:newdbchange)
@@ -63,6 +95,22 @@ _translate5.sh()
 
             dev:newmodel)
             opts="${opts} --name --table --plugin"
+            ;;
+
+            dev:okapibconfversion)
+            opts="${opts} "
+            ;;
+
+            dev:triggerworkflow)
+            opts="${opts} --taskid --options"
+            ;;
+
+            l10n:add)
+            opts="${opts} --path --replace --after"
+            ;;
+
+            l10n:remove)
+            opts="${opts} --path"
             ;;
 
             maintenance:announce)
@@ -74,6 +122,10 @@ _translate5.sh()
             ;;
 
             maintenance:message)
+            opts="${opts} "
+            ;;
+
+            maintenance:notify)
             opts="${opts} "
             ;;
 
@@ -105,20 +157,104 @@ _translate5.sh()
             opts="${opts} --task"
             ;;
 
-            session:impersonate)
-            opts="${opts} --segment-id"
+            service:autodiscovery)
+            opts="${opts} --auto-set --service"
             ;;
 
             system:check)
             opts="${opts} --pre-installation"
             ;;
 
+            system:mailtest)
+            opts="${opts} "
+            ;;
+
+            t5memory:migrate)
+            opts="${opts} --sourceUrl --doNotWaitImportFinish --no-doNotWaitImportFinish --wait-timeout"
+            ;;
+
             task:clean)
             opts="${opts} --delete-error --delete-import --set-to-error --delete-data"
             ;;
 
+            task:info)
+            opts="${opts} --id-only --detail"
+            ;;
+
+            task:skeletonfile)
+            opts="${opts} --list-files --dump-all --dump-one"
+            ;;
+
+            termportal:datatypecheck)
+            opts="${opts} "
+            ;;
+
+            termportal:reindex)
+            opts="${opts} "
+            ;;
+
+            test:addinisection)
+            opts="${opts} "
+            ;;
+
+            test:applytestsql)
+            opts="${opts} "
+            ;;
+
+            test:apprun)
+            opts="${opts} --recreate-database --database-recreation --xdebug --stop-on-error --stop-on-failure --keep-data"
+            ;;
+
+            test:cleanup)
+            opts="${opts} --application-database-cleanup"
+            ;;
+
+            test:createfaultysegment)
+            opts="${opts} "
+            ;;
+
+            test:run)
+            opts="${opts} --capture --legacy-segment --legacy-json --recreate-database --xdebug --stop-on-error --stop-on-failure --keep-data --master-test"
+            ;;
+
+            test:runall)
+            opts="${opts} --skip-database-reset --xdebug --stop-on-error --stop-on-failure --master-test"
+            ;;
+
+            test:runsuite)
+            opts="${opts} --recreate-database --xdebug --stop-on-error --stop-on-failure --master-test"
+            ;;
+
+            tmx:otmfix)
+            opts="${opts} --write"
+            ;;
+
+            tmx:ts1040)
+            opts="${opts} --analyze --count --utf8out --write"
+            ;;
+
+            user:create)
+            opts="${opts} --roles --choose-roles --locale"
+            ;;
+
+            user:info)
+            opts="${opts} "
+            ;;
+
+            visual:convertlegacypdfs)
+            opts="${opts} "
+            ;;
+
+            worker:clean)
+            opts="${opts} --all --running"
+            ;;
+
             worker:list)
             opts="${opts} --all"
+            ;;
+
+            worker:queue)
+            opts="${opts} "
             ;;
 
         esac
@@ -131,7 +267,7 @@ _translate5.sh()
 
     # completing for a command
     if [[ $cur == $com ]]; then
-        coms="changelog config help list log database:update dev:createtest dev:githook dev:newdbchange dev:newmodel maintenance:announce maintenance:disable maintenance:message maintenance:set maintenance:status plugin:disable plugin:enable plugin:list release:notes segment:history session:impersonate system:check task:clean worker:list"
+        coms="_complete changelog completion config help list log status auth:apptoken:add auth:impersonate cache:purge database:update dev:createtest dev:ecode dev:githook dev:localservices dev:newdbchange dev:newmodel dev:okapibconfversion dev:triggerworkflow l10n:add l10n:remove maintenance:announce maintenance:disable maintenance:message maintenance:notify maintenance:set maintenance:status plugin:disable plugin:enable plugin:list release:notes segment:history service:autodiscovery system:check system:mailtest t5memory:migrate task:clean task:info task:skeletonfile termportal:datatypecheck termportal:reindex test:addinisection test:applytestsql test:apprun test:cleanup test:createfaultysegment test:run test:runall test:runsuite tmx:otmfix tmx:ts1040 user:create user:info visual:convertlegacypdfs worker:clean worker:list worker:queue"
 
         COMPREPLY=($(compgen -W "${coms}" -- ${cur}))
         __ltrim_colon_completions "$cur"

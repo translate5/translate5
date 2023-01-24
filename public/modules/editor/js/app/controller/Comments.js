@@ -73,6 +73,7 @@ Ext.define('Editor.controller.Comments', {
                 '#segmentgrid' : {
                     itemdblclick: 'handleCommentsColumnDblClick',
                     itemclick: 'handleCommentsColumnClick',
+                    selectionchange: 'handleSegmentSelectionChange',
                     beforeedit: 'onStartEdit',
                     canceledit: 'cancelEdit',
                     edit: 'cancelEdit'
@@ -99,7 +100,7 @@ Ext.define('Editor.controller.Comments', {
                 }
             }
     },
-    
+
     /**
      * on cancelling the segment edit the active comment is resetted by creating a new one
      */
@@ -207,6 +208,26 @@ Ext.define('Editor.controller.Comments', {
             //listen here to "#commentwindow #commentpanel" triggers then o
         }
     },
+
+
+    handleSegmentSelectionChange: function(sm, selectedRecords) {
+        var me = this;
+        me.refCache={};
+        var commentPanel=me.getCommentPanel();
+
+        if(!commentPanel){
+            return;
+        }
+
+        // If no selection - return
+        if (selectedRecords.length == 0) {
+            return;
+        }
+
+        me.record = selectedRecords[0];
+        me.loadCommentPanel();
+    },
+
     /**
      * handles starting the segment editor
      * @param {Object} context
@@ -235,10 +256,8 @@ Ext.define('Editor.controller.Comments', {
     */
     loadCommentPanel: function(pan) {
         var me = this,
-            plug = me.getEditPlugin(),
-            rec = plug.editing && plug.context.record || me.record,
+            rec = me.record,
             id = rec && rec.get('id'),
-            box = me.getCommentContainer(),
             form = me.getCommentForm();
             
         if(!form || !id){

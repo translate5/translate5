@@ -49,6 +49,14 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
                 'termportal' => $this->_helper->ClientSpecific->getCss('termportal') ?? false,
         ];
 
+        // Setup basic info
+        $Editor = [
+            'data' => [
+                'logoutOnWindowClose' => $rop->logoutOnWindowClose,
+                'pathToRunDir' => APPLICATION_RUNDIR
+            ]
+        ];
+
         // If it is turned On
         if ($this->view->enableJsLogger) {
 
@@ -58,21 +66,22 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
             // Assign view params, required for RootCause usage
             $this->view->assign([
                 'appVersion' => ZfExtended_Utils::getAppVersion(),
-                'extJsVersion' => '7.0.0.168 GPL',
-                'Editor' => [
-                    'data' => [
-                        'app' => [
-                            'controllers' => [],
-                            'user' => [
-                                'login' => $user->login,
-                                'email' => $user->email,
-                                'userGuid' => $user->userGuid
-                            ]
-                        ]
-                    ]
-                ]
+                'extJsVersion' => '7.0.0.168 GPL'
             ]);
+
+            // Append app info
+            $Editor['data']['app'] = [
+                'controllers' => [],
+                'user' => [
+                    'login' => $user->login,
+                    'email' => $user->email,
+                    'userGuid' => $user->userGuid
+                ]
+            ];
         }
+
+        // Assign editor params
+        $this->view->assign(['Editor' => $Editor]);
 
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);

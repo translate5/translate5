@@ -30,7 +30,12 @@
       <file>../Plugins/Okapi/tests/OkapiExportTest.php</file>
     </testsuite>
     <testsuite name="visual">
+      <file>../Plugins/VisualReview/tests/VisualHtmlTest.php</file>
       <file>../Plugins/VisualReview/tests/VisualImageTest.php</file>
+      <file>../Plugins/VisualReview/tests/VisualPdfTest.php</file>
+      <file>../Plugins/VisualReview/tests/VisualMergePdfTest.php</file>
+      <file>../Plugins/VisualReview/tests/VisualVideoTest.php</file>
+      <file>../Plugins/VisualReview/tests/VisualWgetTest.php</file>
     </testsuite>
     <testsuite name="xlfimport">
       <file>editorAPI/XlfImportFailTest.php</file>

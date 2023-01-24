@@ -63,6 +63,9 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         // CSS-Classes for error-types
         // Attributes for the quality-Node
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-quality-activeMatchIndex',
+        ATTRIBUTE_QUALITY_ID: 'data-t5qid',
+        ATTRIBUTE_QUALITY_FALSEPOSITIVE: 'data-t5qfp',
+        ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP: 'data-qtip',
     },
 
     /**
@@ -75,32 +78,57 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
     applyQualityStylesForRecord: function (store, rec, operation) {
         let grid = this.getSegmentGrid(),
             view = grid.down('tableview'),
-            target,
+            field,
             cellNode,
-            matches;
+            rowSelector = '#' + view.id + '-record-' + rec.internalId,
+            colSelector;
 
-        let qualityTargets = Editor.data.quality.types;
+        // If we're here due to source-prop is updated - return
+        if (rec.get('sourceUpdated')) {
+            return;
+        }
 
-        for (const field of qualityTargets) {
-            let data = rec.get(field.field);
+        // Foreach quality type that can appear inside the segment
+        for (const type of Editor.data.quality.types) {
 
-            for (target in data) {
-                for (let columnPostfix of field.columnPostfixes) {
-                    data[target].forEach(function (item) {
-                        item.range.containerNode = document.querySelector(
-                            '#' + view.id + '-record-' + rec.internalId
-                            + ' [data-columnid="' + target + columnPostfix + '"] .x-grid-cell-inner'
-                        );
-                    });
-                    cellNode = data[target][0].range.containerNode;
-                    matches = data[target];
-                    this.applyCustomMatches(cellNode, matches, operation === 'cancelled');
+            // Get qualities data
+            let data = rec.get(type.field);
+
+            // Foreach field where qualities were detected
+            for (field in data) {
+
+                // Get
+                for (let columnPostfix of type.columnPostfixes) {
+
+                    // Build grid cell column selector
+                    colSelector = '[data-columnid="' + field + columnPostfix + '"] .x-grid-cell-inner';
+
+                    // Get grid cell node
+                    cellNode = document.querySelector(rowSelector + ' ' + colSelector);
+
+                    // If we're going to apply termtagger-qualities styles
+                    if (type.field === 'termTagger') {
+
+                        // Foreach quality - apply false positive styles
+                        for (const quality of data[field]) {
+                            this.applyFalsePositiveStyle(quality.id, quality.falsePositive);
+                        }
+
+                    // Else if we're going to apply styles for other quality types (only spellcheck-qualities currently)
+                    } else {
+
+                        // Make sure each match range to have it's own node ref
+                        data[field].forEach(match => match.range.containerNode = cellNode);
+
+                        // Apply matches
+                        this.applyCustomMatches(cellNode, data[field], operation === 'cancelled');
+                    }
                 }
             }
         }
     },
 
-    applyCustomMatches: function (cellNode, matches, skipMindDelTags) {
+    applyCustomMatches: function (cellNode, matches, skipMindTags) {
         if (!cellNode) {
             return;
         }
@@ -114,7 +142,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         me.cleanUpNode(cellNode);
         rangeForMatch = rangy.createRange(cellNode);
         Ext.Array.each(matches, function (match, index) {
-            if (!skipMindDelTags) {
+            if (!skipMindTags) {
                 me.mindTags(match);
             }
 
@@ -293,7 +321,14 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         nodeElParams['cls'] = me.self.CSS_CLASSNAME_MATCH + ' ' + match.cssClassErrorType;
         // activeMatchIndex
         nodeElParams[me.self.ATTRIBUTE_ACTIVEMATCHINDEX] = index;
+        nodeElParams[me.self.ATTRIBUTE_QUALITY_ID] = match.id;
+        nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE] = match.falsePositive ? 'true' : 'false';
+        if (!match.falsePositive) {
+            nodeElParams[me.self.ATTRIBUTE_QUALITY_FALSEPOSITIVE_TIP] = Editor.data.l10n.falsePositives.hover;
+        }
         // create and return node
         return Ext.DomHelper.createDom(nodeElParams);
     },
+}, function() {
+    this.borrow(Editor.view.quality.FalsePositivesController, ['applyFalsePositiveStyle']);
 });

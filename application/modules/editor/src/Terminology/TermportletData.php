@@ -276,7 +276,7 @@ class TermportletData
                         sprintf('<img src="%s" width="150" style="display: block;" alt="Image">', $srcA[$target]);
                 }
             } else {
-                $attribute['value'] = htmlentities($attribute['value']);
+                $attribute['value'] = $attribute['value'];
             }
 
             if (empty($attribute['language'])) {

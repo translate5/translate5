@@ -355,7 +355,37 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         ->where($tableName.'.resourceType IN(?)',$resourceTypes);
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
+    /**
+     * Loads the task to languageResource assocs by list of taskGuids and serviceTypes
+     *
+     * @param array $taskGuidList
+     * @param array $serviceTypes
+     *
+     * @return array
+     *
+     * @throws Zend_Db_Table_Exception
+     */
+    public function loadByAssociatedTaskGuidListAndServiceTypes(array $taskGuidList, array $serviceTypes): array
+    {
+        if (count($taskGuidList) === 0) {
+            return [];
+        }
+
+        $assocDb = new MittagQI\Translate5\LanguageResource\Db\TaskAssociation();
+        $tableName = $this->db->info($assocDb::NAME);
+        $assocName = $assocDb->info($assocDb::NAME);
+
+        $s = $this->db->select()
+            ->from($this->db, array('*', $assocName . '.taskGuid', $assocName . '.segmentsUpdateable'))
+            ->setIntegrityCheck(false)
+            ->join($assocName, $assocName . '.`languageResourceId` = ' . $tableName . '.`id`', '')
+            ->where($assocName . '.`taskGuid` IN (?)', $taskGuidList)
+            ->where($tableName . '.serviceType IN(?)', $serviceTypes);
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+
     /**
      * loads the language resources to a specific service resource ID (language resource to a specific server (=resource))
      * @param string $serviceResourceId

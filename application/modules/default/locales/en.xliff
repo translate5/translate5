@@ -583,6 +583,34 @@ Your new login name:
                 </figure>
                 </target>
             </trans-unit>
+            <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlIHVuZCBlaW5lIFphaGwu'>
+              <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</source>
+              <target>Minimum length: 12 characters. Minimum included: One uppercase letter, one lowercase letter and one number.</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyAxMiBaZWljaGVu">
+              <source>Mindestens 12 Zeichen</source>
+              <target>Minimum 12 characters</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW5lIFphaGw=">
+              <source>Mindestens eine Zahl</source>
+              <target>Minimum one number</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gS2xlaW5idWNoc3RhYmU=">
+              <source>Mindestens ein Kleinbuchstabe</source>
+              <target>Minimum one lowercase letter</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gR3Jvw59idWNoc3RhYmU=">
+              <source>Mindestens ein Großbuchstabe</source>
+              <target>Minimum one uppercase letter</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gU29uZGVyemVpY2hlbg==">
+              <source>Mindestens ein Sonderzeichen</source>
+              <target>Minimum one special character</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFBhc3N3b3J0IGVudGjDpGx0IGVpbiBXb3J0IGF1cyBkZXIgc2Nod2FyemVuIExpc3RlLg==">
+              <source>Das Passwort enthält ein Wort aus der schwarzen Liste.</source>
+              <target>Password contains black-listed word.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
