@@ -28,7 +28,6 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Task\CurrentTask;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
-use MittagQI\Translate5\Task\Export\Package\Worker;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
@@ -1603,13 +1602,17 @@ class editor_TaskController extends ZfExtended_RestController {
                 break;
 
             case 'package':
-                $this->entity->checkStateAllowsActions();
-                $this->view->layout()->disableLayout();
-                $this->_helper->viewRenderer->setNoRender(true);
+                try {
+                    $this->entity->checkStateAllowsActions();
+                    $packageDownloader = ZfExtended_Factory::get(Downloader::class);
+                    $packageDownloader->downloadPackage($this->entity,$diff);
+                    $this->logInfo('Task package exported', ['context' => $context, 'diff' => $diff]);
+                    exit;
+                }catch (\MittagQI\Translate5\Task\Export\Package\Exception $exception){
+                    echo $exception->getMessage();
+                    exit;
+                }
 
-                $packageDownloader = ZfExtended_Factory::get(Downloader::class);
-                $packageDownloader->downloadPackage($this->entity,$diff);
-                exit;
             case 'filetranslation':
             case 'transfer':
             default:

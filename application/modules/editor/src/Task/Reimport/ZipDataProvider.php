@@ -29,7 +29,6 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Task\Reimport;
 
 use editor_Models_Foldertree;
-use editor_Models_Import_Configuration;
 use editor_Models_Import_DataProvider_Exception;
 use editor_Models_Task;
 use FilesystemIterator;
@@ -78,14 +77,15 @@ class ZipDataProvider extends DataProvider
         );
 
         $tree = ZfExtended_Factory::get(editor_Models_Foldertree::class);
-        $tree->setPathPrefix(''); // reset the path prefix to empty not to get the paths inside workfiles folder
         $paths = $tree->getPaths($this->task->getTaskGuid(),editor_Models_Foldertree::TYPE_FILE);
 
         $log = Zend_Registry::get('logger');
 
         foreach($objects as $file => $fileInfo) {
             if($fileInfo->isFile()) {
-                $fileName = str_replace($xlifPath,'',$file);
+
+                // remove the task path from the fileName, so it is easy to compare
+                $fileName = str_replace($this->tmpArchive.DIRECTORY_SEPARATOR,'',$file);
 
                 $matchFound = false;
                 foreach ($paths as $fileId => $originalFile){

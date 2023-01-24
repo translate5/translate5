@@ -92,7 +92,13 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
                     }
                 }
             });
-        } 
+        }
+
+        if(auth.isAllowed('taskReimport')) {
+            tabs.push({
+                xtype: 'taskManageFilesMain'
+            });
+        }
         
         if(auth.isAllowed('editorEditTaskPm') || 
             auth.isAllowed('editorEditTaskOrderDate') ||
@@ -127,14 +133,7 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
             });
         }
 
-        if(auth.isAllowed('taskReimport')) {
-            tabs.push({
-                xtype: 'taskManageFilesMain'
-            });
-        }
 
-
-        
         config = {
             items : [{
                 xtype: 'tabpanel',

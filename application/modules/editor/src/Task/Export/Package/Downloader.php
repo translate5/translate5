@@ -46,6 +46,12 @@ class Downloader
      */
     public function downloadPackage(editor_Models_Task $task, bool $diff): void
     {
+
+        // Turn off limitations?
+        ignore_user_abort(1);
+
+        set_time_limit(0);
+
         $worker = ZfExtended_Factory::get(Worker::class);
         $exportFolder = $worker->initExport($task, $diff);
 
@@ -65,8 +71,8 @@ class Downloader
         $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
         $worker->queue($workerId);
 
-        header('Content-Type: application/zip', TRUE);
-        header('Content-Disposition: attachment; filename="'.$task->getTasknameForDownload('ExportPackage.zip').'"');
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="'.$task->getTasknameForDownload('_exportPackage.zip').'"');
         readfile($zipFile);
         unlink($zipFile);
     }

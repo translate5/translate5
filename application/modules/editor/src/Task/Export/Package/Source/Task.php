@@ -47,7 +47,7 @@ class Task extends Base
     /***
      * Folder name where all segment files will be placed in the export package
      */
-    public const TASK_FOLDER_NAME = 'xliff';
+    public const TASK_FOLDER_NAME = 'workfiles';
 
     public function __construct(editor_Models_Task $task, ExportSource $exportSource)
     {
