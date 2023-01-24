@@ -4126,9 +4126,9 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Der referenzierte Kunde existiert nicht (mehr).</source>
                 <target>The referenced customer does not exist (anymore).</target>
             </trans-unit>
-            <trans-unit id='QW5zaWNodA=='>
-                <source>Ansicht</source>
-                <target>View mode</target>
+            <trans-unit id='RWluc3RlbGx1bmdlbiAy'>
+                <source>Einstellungen 2</source>
+                <target>Settings</target>
             </trans-unit>
             <trans-unit id='RXJlaWduaXNzZSB6dSBBdWZnYWJlICJ7MH0i'>
                 <source>Ereignisse zu Aufgabe "{0}"</source>
@@ -7196,7 +7196,7 @@ The following task was imported with errors / warnings / notices. Please take ca
             </trans-unit>
             <trans-unit id="VmVyaGFsdGVuIGRlcyBXaWVkZXJob2x1bmdzZWRpdG9y">
                 <source>Verhalten des Wiederholungseditor</source>
-                <target>Repetition editor setting</target>
+                <target>Repetition editor settings</target>
             </trans-unit>
             <trans-unit id="SW1tZXIgYXV0b21hdGlzY2ggZXJzZXR6ZW4gdW5kIFN0YXR1cyBzZXR6ZW4=">
                 <source>Immer automatisch ersetzen und Status setzen</source>

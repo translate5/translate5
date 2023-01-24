@@ -50,7 +50,9 @@ Ext.define('Editor.view.preferences.Window', {
     initConfig: function(instanceConfig) {
       var me = this,
       config = {
-        title: me.title, //see EXT6UPD-9
+        bind: {
+          title: '{l10n.preferences.window.title}',
+        },
         items: [
           {
             xtype: 'form',

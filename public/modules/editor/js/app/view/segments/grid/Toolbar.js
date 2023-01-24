@@ -45,29 +45,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     	'Editor.view.segments.grid.ToolbarViewModel',
     	'Editor.view.segments.grid.ToolbarViewController'
     ],
-    //Item Strings: 
-    item_viewModesMenu: '#UT#Ansichtsmodus',
-    item_viewModeBtn: '#UT#Details (nur Lesemodus)',
-    item_editModeBtn: '#UT#Details',
-    item_ergonomicModeBtn: '#UT#Normal',
-    item_ergonomicModeReadonlyBtn: '#UT#Normal (nur Lesemodus)',
-    item_hideTagBtn: '#UT#Tags verbergen',
-    item_shortTagBtn: '#UT#Tag-Kurzansicht',
-    item_fullTagBtn: '#UT#Tag-Vollansicht',
-    item_optionsTagBtn: '#UT#Einstellungen',
-    item_zoomIn: '#UT#Segmentschriftgrad vergrößern',
-    item_zoomOut: '#UT#Segmentschriftgrad verkleinern',
-    item_clearSortAndFilterBtn: '#UT#Tabelle zurücksetzen',
-    item_clearSortAndFilterTooltip: '#UT#Sortierung und Filter zurücksetzen',
-    item_watchListFilterBtn: '#UT#Lesezeichen',
-    item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
-    item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
-    item_repeatedFilterBtn: '#UT#Nur wiederholt',
-    item_showRepeatedSegments: '#UT#Nur Segmente mit Wiederholungen anzeigen',
-    item_themeMenuConfigText:'#UT#Layout',
-    strings:{
-        interfaceTranslation:'#UT#Oberfläche'
-    },
     controller: 'segmentsToolbar',
     viewModel: {
         type:'segmentsToolbar'
@@ -77,47 +54,62 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
 		        config,
 		        menu;
             
-            menu={
+            menu = {
                 xtype: 'menu',
                 items: [{
+                    itemId: 'preferencesBtn',
+                    bind: {
+                        text: '{l10n.preferences.window.title}',
+                    }
+                }, '-', {
                     xtype: 'menuitem',
-                    mode:{
+                    mode: {
                         type: 'editMode'
                     },
-                    text: me.item_editModeBtn,
+                    bind: {
+                        text: '{l10n.segmentGrid.toolbar.editModeBtn}'
+                    },
                     group: 'toggleView',
                     textAlign: 'left'
-                },{
+                }, {
                     xtype: 'menuitem',
-                    mode:{
+                    mode: {
                         type: 'ergonomicMode',
                     },
-                    text: me.item_ergonomicModeBtn,
+                    bind: {
+                        text: '{l10n.segmentGrid.toolbar.ergonomicModeBtn}'
+                    },
                     group: 'toggleView',
                     textAlign: 'left'
-                },{
+                }, {
                     xtype: 'menuseparator'
-                },{
+                }, {
                     xtype: 'menucheckitem',
                     itemId: 'hideTagBtn',
-                    text: me.item_hideTagBtn,
+                    bind: {
+                        text: '{l10n.segmentGrid.toolbar.hideTagBtn}'
+                    },
                     tagMode: 'hide',
                     group: 'tagMode'
-                },{
+                }, {
                     xtype: 'menucheckitem',
                     itemId: 'shortTagBtn',
                     checked: true,
-                    text: me.item_shortTagBtn,
+                    bind: {
+                        text: '{l10n.segmentGrid.toolbar.shortTagBtn}'
+                    },
                     tagMode: 'short',
                     group: 'tagMode'
-                },{
+                }, {
                     xtype: 'menucheckitem',
                     itemId: 'fullTagBtn',
                     checked: true,
-                    text: me.item_fullTagBtn,
+                    bind: {
+                        text: '{l10n.segmentGrid.toolbar.fullTagBtn}'
+                    },
                     tagMode: 'full',
                     group: 'tagMode'
-                },{
+                }, {
                     xtype: 'menuseparator'
                 }]
             };
@@ -126,10 +118,12 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             Ext.Object.each(Editor.data.translations, function(i, n) {
                 menu.items.push({
                     xtype: 'menucheckitem',
-                    itemId: 'localeMenuItem'+i,
-                    checked: Editor.data.locale==i,
-                    text: n+' '+me.strings.interfaceTranslation,
-                    value:i,
+                    itemId: 'localeMenuItem' + i,
+                    checked: Editor.data.locale == i,
+                    bind: {
+                        text: n + ' {l10n.segmentGrid.toolbar.strings.interfaceTranslation}',
+                    },
+                    value: i,
                     tagMode: 'full',
                     group: 'localeMenuGroup'
                 });
@@ -147,9 +141,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             config = {
                 items: [{
                     xtype: 'button',
-                    text:me.item_viewModesMenu,
+                    bind: {
+                        text: '{l10n.segmentGrid.toolbar.settings}',
+                    },
                     itemId: 'viewModeMenu',
-                    menu:menu
+                    menu: menu
                 },{
                     xtype: 'tbseparator'
                 },{
@@ -157,18 +153,22 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     type: 'segment-zoom',
                     itemId: 'zoomInBtn',
                     iconCls: 'ico-zoom-in',
-                    tooltip: {
-                        text: me.item_zoomIn,
-                        showDelay: 0
-                    }
+                    bind: {
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.zoomIn}',
+                            showDelay: 0
+                        }
+                    },
                 },{
                     xtype: 'button',
                     type: 'segment-zoom',
                     itemId: 'zoomOutBtn',
                     iconCls: 'ico-zoom-out',
-                    tooltip: {
-                        text: me.item_zoomOut,
-                        showDelay: 0
+                    bind: {
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.zoomOut}',
+                            showDelay: 0
+                        }
                     }
                 },{
                     xtype: 'tbseparator'
@@ -176,11 +176,13 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     itemId: 'clearSortAndFilterBtn',
                     cls: 'clearSortAndFilterBtn',
-                    tooltip: {
-                        text: me.item_clearSortAndFilterTooltip,
-                        showDelay: 0
-                    },
-                    text: me.item_clearSortAndFilterBtn
+                    bind: {
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.clearSortAndFilterTooltip}',
+                            showDelay: 0
+                        },
+                        text: '{l10n.segmentGrid.toolbar.clearSortAndFilterBtn}'
+                    }
                 },{
                     xtype: 'tbseparator'
                 },{
@@ -188,9 +190,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     itemId: 'watchListFilterBtn',
                     cls: 'watchListFilterBtn',
                     enableToggle: true,
-                    tooltip: {
-                        text: me.item_showBookmarkedSegments,
-                        showDelay: 0
+                    bind: {
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.showBookmarkedSegments}',
+                            showDelay: 0
+                        }
                     },
                     icon: Editor.data.moduleFolder+'images/show_bookmarks.png'
                 },{
@@ -198,13 +202,13 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     glyph: 'f0c5@FontAwesome5FreeSolid',
                     itemId: 'filterBtnRepeated',
                     bind: {
-                        hidden: '{!taskHasDefaultLayout}'
+                        hidden: '{!taskHasDefaultLayout}',
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.showRepeatedSegments}',
+                            showDelay: 0
+                        }
                     },
                     enableToggle: true,
-                    tooltip: {
-                        text: me.item_showRepeatedSegments,
-                        showDelay: 0
-                    },
                 }, {
                     xtype: 'tbseparator',
                 }, {
@@ -317,7 +321,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     }
                 }, {
                     xtype: 'button',
-                    itemId: 'scrollToSegmentBtn',
+                    itemId: 'focusSegmentShortcutBtn',
+                    dispatcher: true,
                     hidden: true,
                     bind: {
                         tooltip:{
@@ -455,7 +460,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                                 disabled: '{!isEditingSegment}',
                             }
                         }, '-', {
-                            itemId: 'scrollToSegmentBtn',
+                            itemId: 'focusSegmentShortcutBtn',
                             bind: {
                                 text: '{scrollToTooltip}' //is a formula!
                             },
@@ -542,17 +547,15 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 	xtype: 'tbfill'
                 },{
                     xtype: 'button',
-                    itemId: 'optionsBtn',
-                    text: me.item_optionsTagBtn
-                },{
-                    xtype: 'button',
                     //FIXME let me come from a config:
                     href: 'http://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts',
                     hrefTarget: '_blank',
-                    icon: Editor.data.moduleFolder+'images/help.png',
-                    tooltip: {
-                        text: me.item_helpTooltip,
-                        showDelay: 0
+                    icon: Editor.data.moduleFolder + 'images/help.png',
+                    bind: {
+                        tooltip: {
+                            text: '{l10n.segmentGrid.toolbar.helpTooltip}',
+                            showDelay: 0
+                        }
                     }
                 }]
             };
@@ -575,7 +578,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
         Ext.Array.each(uiThemesRecord.get('defaults'), function(i) {
             menuItems.push({
                 text: (Editor.data.frontend.config.themesName[i] !== undefined) ? Editor.data.frontend.config.themesName[i]  :  Ext.String.capitalize(i),
-                value:i,
+                value: i,
                 checked: uiThemesRecord.get('value') === i,
                 group: 'uiTheme',
                 handler: function (item){
@@ -585,9 +588,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
         });
 
         config = {
-            text:me.item_themeMenuConfigText,
-            menu:{
-                items:menuItems
+            bind: {
+                text: '{l10n.segmentGrid.toolbar.themeMenuConfigText}'
+            },
+            menu: {
+                items: menuItems
             }
         };
 

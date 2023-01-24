@@ -140,9 +140,6 @@ Ext.define('Editor.controller.Editor', {
                 select:'onSegmentGridSelect',
                 segmentSizeChanged:'onSegmentGridSegmentsSizeChanged'
             },
-            '#segmentgrid segmentsToolbar #scrollToSegmentBtn, #segmentActionMenu #scrollToSegmentBtn': {
-                click: 'focusSegmentShortcut'
-            },
             '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
             },

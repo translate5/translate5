@@ -200,7 +200,7 @@ Ext.define('Editor.controller.Segments', {
    * @param {Integer} new segment count to be displayed
    */
   updateFilteredCountDisplay: function(newTotal) {
-      var btn_text = this.getSegmentsToolbar().item_clearSortAndFilterBtn;
+      var btn_text = this.getSegmentsToolbar().getViewModel().get('l10n.segmentGrid.toolbar.clearSortAndFilterBtn');
       btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
       this.getResetFilterBtn().setText(btn_text);
   },

@@ -93,8 +93,8 @@ Ext.define('Editor.controller.ChangeAlike', {
     ref : 'alikeGrid',
     selector : '#changealikeWindow gridpanel'
   },{
-    ref : 'optionsBtn',
-    selector : '#segmentgrid #optionsBtn'
+    ref : 'preferencesBtn',
+    selector : '#segmentgrid #preferencesBtn'
   }],
   listen: {
       messagebus: {
@@ -169,7 +169,7 @@ Ext.define('Editor.controller.ChangeAlike', {
           enabledACL = auth.isAllowed('useChangeAlikes'),
           enabled = auth.isAllowed('useChangeAlikes', t);
       //disable the whole settings button, since no other settings are currently available!
-      me.getOptionsBtn().setVisible(enabled);
+      me.getPreferencesBtn().setVisible(enabled);
       me.isDisabled = ! enabled;
       me.getEditPlugin().on('beforeedit', me.handleBeforeEdit, me);
       if(!t.get('defaultSegmentLayout') && enabledACL) {
