@@ -48,9 +48,9 @@ class XliffTest extends \editor_Test_UnitTest
         $this->xliffUnderTestPaired = new Xliff();
     }
 
-    public function testPrepareQuery()
+    public function provideData(): array
     {
-        $testSets = [[
+        return [[
             'queriesToTest' => 'plain text',
             'expectedQueries' => 'plain text',
             'expectedQueriesPaired' => 'plain text',
@@ -73,29 +73,41 @@ class XliffTest extends \editor_Test_UnitTest
             'restoredResults' => '<div class="open 6270742069643d2231223e266c743b636f6e74656e742d312667743b3c2f627074 internal-tag ownttip"><span class="short" title="&lt;content-1&gt;">&lt;1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;content-1&gt;</span></div>Δ<div class="close 6570742069643d2231223e266c743b2f636f6e74656e742d312667743b3c2f657074 internal-tag ownttip"><span class="short" title="&lt;/content-1&gt;">&lt;/1&gt;</span><span class="full" data-originalid="1" data-length="-1">&lt;/content-1&gt;</span></div><div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="toignore-4" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>H = 1,00<div class="single 636861722074733d2265323830383922206c656e6774683d2231222f char internal-tag ownttip"><span title="&lt;3/&gt;: Thin Space" class="short">&lt;3/&gt;</span><span data-originalid="char" data-length="1" class="full">□</span></div>m translatedtext.<div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="toignore-5" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',
             'restoredResultsPaired' => '<div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="toignore-4" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>Δ<div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="toignore-5" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div><div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;6/&gt;</span><span data-originalid="toignore-6" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>H = 1,00<div class="single 636861722074733d2265323830383922206c656e6774683d2231222f char internal-tag ownttip"><span title="&lt;3/&gt;: Thin Space" class="short">&lt;3/&gt;</span><span data-originalid="char" data-length="1" class="full">□</span></div>m translatedtext.<div class="single ignoreInEditor internal-tag ownttip"><span title="&lt;AdditionalTagFromTM/&gt;" class="short">&lt;7/&gt;</span><span data-originalid="toignore-7" data-length="-1" class="full">&lt;AdditionalTagFromTM/&gt;</span></div>',
         ]];
-        foreach ($testSets as $data) {
-            //since the tag map is stored internally, we have to test query and result restore directly after each other
-            $this->assertEquals(
-                $data['expectedQueries'],
-                $this->xliffUnderTest->prepareQuery($data['queriesToTest']),
-                'prepared query is not as expected!'
-            );
-            $this->assertEquals(
-                $data['restoredResults'],
-                $this->xliffUnderTest->restoreInResult($data['resultsToQueries']),
-                'restored result is not as expected!'
-            );
+    }
 
-            $this->assertEquals(
-                $data['expectedQueriesPaired'],
-                $this->xliffUnderTestPaired->prepareQuery($data['queriesToTest']),
-                'prepared paired query is not as expected!'
-            );
-            $this->assertEquals(
-                $data['restoredResultsPaired'],
-                $this->xliffUnderTestPaired->restoreInResult($data['resultsToQueries']),
-                'restored paired result is not as expected!'
-            );
-        }
+    /**
+     * @dataProvider provideData
+     */
+    public function testPrepareQuery(
+        string $queriesToTest,
+        string $expectedQueries,
+        string $expectedQueriesPaired,
+        string $resultsToQueries,
+        string $restoredResults,
+        string $restoredResultsPaired
+    )
+    {
+        //since the tag map is stored internally, we have to test query and result restore directly after each other
+        $this->assertEquals(
+            $expectedQueries,
+            $this->xliffUnderTest->prepareQuery($queriesToTest),
+            'prepared query is not as expected!'
+        );
+        $this->assertEquals(
+            $restoredResults,
+            $this->xliffUnderTest->restoreInResult($resultsToQueries),
+            'restored result is not as expected!'
+        );
+
+        $this->assertEquals(
+            $expectedQueriesPaired,
+            $this->xliffUnderTestPaired->prepareQuery($queriesToTest),
+            'prepared paired query is not as expected!'
+        );
+        $this->assertEquals(
+            $restoredResultsPaired,
+            $this->xliffUnderTestPaired->restoreInResult($resultsToQueries),
+            'restored paired result is not as expected!'
+        );
     }
 }
