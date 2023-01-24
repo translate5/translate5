@@ -174,4 +174,9 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     public function getUtilities() : editor_Models_Segment_UtilityBroker {
         return $this->utilities;
     }
+
+    public function setCurrentSegment(editor_Models_Segment $segment): void
+    {
+        //empty function stub - to be implemented where needed
+    }
 }

@@ -40,7 +40,7 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
      * @var Tags[]
      */
     private array $repairTags = [];
-    private ?editor_Models_Segment $currentSegment;
+    private ?editor_Models_Segment $currentSegment = null;
 
     public function __construct(){
         $this->logger = ZfExtended_Factory::get('ZfExtended_Logger_Queued');
@@ -88,7 +88,7 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
         }
     }
 
-    public function setCurrentSegment(editor_Models_Segment $segment)
+    public function setCurrentSegment(editor_Models_Segment $segment): void
     {
         $this->currentSegment = $segment;
     }

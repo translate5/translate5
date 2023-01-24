@@ -113,7 +113,8 @@ trait editor_Services_Connector_BatchTrait {
             if(strlen($contentField) > 0 && $this->languageResource->isMt()){
                 continue;
             }
-            $querySegment = $this->tagHandler->prepareQuery($this->getQueryString($segment), $segment->getId());
+            $this->tagHandler->setCurrentSegment($segment);
+            $querySegment = $this->tagHandler->prepareQuery($this->getQueryString($segment));
             $batchQuery[] = [
                 //set the query string to segment map. Later it will be used to reapply the tags
                 'segment' => clone $segment,
