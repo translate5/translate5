@@ -65,7 +65,7 @@ function logoutOnWindowClose() {
         fd.append('noredirect', 1);
 
         // Destroy the user session and prevent redirect
-        navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout', fd);
+        navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout?beacon=true', fd);
 
         // Remove now invalid session cookie
         document.cookie = document.cookie.replace(rex, '; ').replace(/^; |; $/, '');
