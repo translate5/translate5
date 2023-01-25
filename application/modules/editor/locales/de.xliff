@@ -5673,6 +5673,10 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Einstellungen 2</source>
                 <target>Einstellungen</target>
             </trans-unit>
+            <trans-unit id='V2llZGVyaG9sdW5nc2VkaXRvcg=='>
+                <source>Wiederholungseditor</source>
+                <target>Wiederholungseditor</target>
+            </trans-unit>
             <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='>
                 <source>Unbekannter Term Status</source>
                 <target>Unbekannter Term Status</target>

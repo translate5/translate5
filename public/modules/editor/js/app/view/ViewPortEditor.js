@@ -146,15 +146,14 @@ Ext.define('Editor.view.ViewPortEditor', {
                     dock: 'top'
                 }],
                 items: [{
-                    xtype: 'segmentsMetapanel',
-                    stateId: 'editor.eastPanelSegmentsMetapanel',
-                    stateEvents: ['collapse', 'expand'],
-                    stateful:true
-                },{
                     xtype: 'terminologyPanel',
                     stateId: 'editor.eastPanelSegmentsTerminology',
                     stateEvents: ['collapse', 'expand'],
-                    hidden: true,
+                    stateful:true
+                },{
+                    xtype: 'segmentsMetapanel',
+                    stateId: 'editor.eastPanelSegmentsMetapanel',
+                    stateEvents: ['collapse', 'expand'],
                     stateful:true
                 },{
                     xtype: 'commentPanel',

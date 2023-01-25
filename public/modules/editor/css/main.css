@@ -1099,3 +1099,6 @@ dl {
     margin-top: 5px;
     margin-bottom: 5px;
 }
+.x-fieldset-header-default > .x-fieldset-header-text {
+    font-size: 15px;
+}

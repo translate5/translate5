@@ -57,9 +57,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             menu = {
                 xtype: 'menu',
                 items: [{
-                    itemId: 'preferencesBtn',
+                    itemId: 'repetitionsBtn',
                     bind: {
-                        text: '{l10n.preferences.window.title}',
+                        text: '{l10n.segmentGrid.toolbar.repetitionBtn}',
                     }
                 }, '-', {
                     xtype: 'menuitem',

@@ -4130,6 +4130,10 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Einstellungen 2</source>
                 <target>Settings</target>
             </trans-unit>
+            <trans-unit id='V2llZGVyaG9sdW5nc2VkaXRvcg=='>
+                <source>Wiederholungseditor</source>
+                <target>Repetition editor</target>
+            </trans-unit>
             <trans-unit id='RXJlaWduaXNzZSB6dSBBdWZnYWJlICJ7MH0i'>
                 <source>Ereignisse zu Aufgabe "{0}"</source>
                 <target>Events for task "{0}"</target>

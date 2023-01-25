@@ -304,19 +304,6 @@ Ext.define('Editor.controller.Localizer', {
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
 
-    Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip_nokey = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>';
-
-   Ext.define("Editor.locale.de.view.segments.MetaPanel", {
-        override: "Editor.view.segments.MetaPanel",
-        strings: {
-            title: '<?php echo $this->translate->_('Segment-Metadaten');?>',
-        }
-    });
-
     Ext.define("Editor.locale.de.view.segments.SpecialCharacters", {
         override: "Editor.view.segments.SpecialCharacters",
         strings: {
@@ -1996,7 +1983,7 @@ Editor.data.l10n = {
             hideTagBtn: '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>',
             shortTagBtn: '<?php echo $this->translate->_('Tag-Kurzansicht');?>',
             fullTagBtn: '<?php echo $this->translate->_('Tag-Vollansicht');?>',
-            preferencesBtn: '<?php echo $this->translate->_('Wiederholung');?>',
+            repetitionBtn: '<?php echo $this->translate->_('Wiederholungseditor');?>',
             zoomIn: '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>',
             zoomOut: '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>',
             clearSortAndFilterBtn: '<?php echo $this->translate->_('Tabelle zurücksetzen');?>',
@@ -2060,9 +2047,8 @@ Editor.data.l10n = {
             changeUiLangaugeLabelText: '<?php echo $this->translate->_('Sprache ändern');?>',
             passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>'
         },
-        window: {
-            title: '<?php echo $this->translate->_('Einstellungen');?>',
-            radiogroup: '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>',
+        repetitions: {
+            title: '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>',
             alikeBehaviourAlways: '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen, wenn');?>',
             alikeBehaviourIndividual: '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>',
             alikeBehaviourNever: '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>',
@@ -2085,6 +2071,12 @@ Editor.data.l10n = {
         sourceMatchColumn: '<?php echo $this->translate->_('Quell-Treffer');?>',
         targetMatchColumn: '<?php echo $this->translate->_('Ziel-Treffer');?>',
         sameContextColumn: '<?php echo $this->translate->_('Kontext-Treffer');?>'
+    },
+    metaPanel: {
+        title: '<?php echo $this->translate->_('Qualitätssicherung');?>',
+        metaStates_title: '<?php echo $this->translate->_('Status');?>',
+        metaStates_tooltip: '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>',
+        metaStates_tooltip_nokey: '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>'
     },
     falsePositives: {
         hover: '<?php echo $this->translate->_('Rechts klicken um als \'falsch erkannt\' zu markieren')?>',
