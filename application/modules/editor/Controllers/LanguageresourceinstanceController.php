@@ -612,7 +612,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         exit;
     }
 
-    public function postAction(){
+    public function postAction()
+    {
         $this->entity->init();
         $this->data = $this->getAllParams(); //since its a fileupload, this is a normal POST
         $this->setDataInEntity($this->postBlacklist);
@@ -622,8 +623,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $manager editor_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
 
-        if (!$resource->getCreatable()) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1041', ['Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.']);
+        if ($resource && !$resource->getCreatable()) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1041', [
+                'Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.'
+            ]);
         }
 
         $sourceLangId = $this->getParam('sourceLang');

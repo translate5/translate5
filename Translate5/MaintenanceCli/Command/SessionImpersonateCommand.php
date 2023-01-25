@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
@@ -52,12 +53,17 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         ->setHelp('Generates a new session for the given user and returns a URL to use that session in a browser.');
         
         $this->addArgument('login', InputArgument::REQUIRED, 'The login (username) to generate a session for.');
-        
+        $this->addArgument(
+            'task',
+            InputArgument::OPTIONAL,
+            'Optional: a plain numeric task ID or a taskGuid (with or without curly braces) to be added to the final URL'
+        );
+
         $this->addOption(
             'segment-id',
             's',
             InputOption::VALUE_REQUIRED,
-            'Give a segment ID to generate a URL pointing directly to that segment.');
+            'Give a segment ID only to generate a URL pointing directly to that segment.');
     }
 
     /**
@@ -107,22 +113,45 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         $userSession->loginByApiAuth = true;
         return 0;
     }
-    
-    protected function makeUrlPath(string $token) {
-        $url = $this->translate5->getHostname().'/editor?sessionToken='.$token;
+
+    /**
+     * @throws \ZfExtended_Models_Entity_NotFoundException
+     */
+    protected function makeUrlPath(string $token): string
+    {
+        $token = '?sessionToken='.$token;
+        $url = $this->translate5->getHostname().'/editor';
         $segmentId = $this->input->getOption('segment-id');
-        if(empty($segmentId)) {
+        $taskId = $this->input->getArgument('task');
+
+        if (!empty($segmentId) && !empty($taskId)) {
+            throw new LogicException('Using a segment ID and a task ID / Guid at the same time is not possible!');
+        }
+
+        if (empty($segmentId) && empty($taskId)) {
+            return $url.$token;
+        }
+
+        if (! empty($segmentId)) {
+            $segment = \ZfExtended_Factory::get(\editor_Models_Segment::class);
+            $segment->load($segmentId);
+            $taskId = $segment->getTaskGuid();
+        }
+
+        $task = \ZfExtended_Factory::get(\editor_Models_Task::class);
+
+        if (is_numeric($taskId)) {
+            $task->load($taskId);
+        } else {
+            $taskId = '{'.trim($taskId, '{}').'}'; //ensure that {} are always given for load
+            $task->loadByTaskGuid($taskId);
+        }
+
+        $url .= '/taskid/'.$task->getId().$token;
+
+        if (empty($segment)) {
             return $url;
         }
-        
-        $segment = \ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment \editor_Models_Segment */
-        $segment->load($segmentId);
-        
-        $task = \ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task \editor_Models_Task */
-        $task->loadByTaskGuid($segment->getTaskGuid());
-        
         return $url.'#task/'.$task->getId().'/'.$segment->getSegmentNrInTask().'/edit';
     }
 }

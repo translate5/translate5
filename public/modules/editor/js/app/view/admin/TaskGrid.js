@@ -363,6 +363,16 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 },
                 items: [{
                     xtype: 'gridcolumn',
+                    width: 140,
+                    dataIndex: 'taskGuid',
+                    stateId: 'taskGuid',
+                    hidden: true,
+                    filter: {
+                        type: 'string'
+                    },
+                    text: me.text_cols.taskGuid
+                },{
+                    xtype: 'gridcolumn',
                     width: 60,
                     dataIndex: 'id',
                     stateId: 'id',
@@ -782,15 +792,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
         if (Editor.data.debug && Editor.data.debug.showTaskGuid) {
             config.columns.items.unshift({
-                xtype: 'gridcolumn',
-                width: 140,
-                dataIndex: 'taskGuid',
-                stateId: 'taskGuid',
-                filter: {
-                    type: 'string'
-                },
-                text: 'taskGuid'
-            }, {
                 xtype: 'gridcolumn',
                 width: 120,
                 dataIndex: 'workflow',

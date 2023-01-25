@@ -45,14 +45,20 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
         $taskGuid = static::getTask()->getTaskGuid();
         return static::api()->getJson('/editor/plugins_visualreview_visualreview/files?taskGuid='.urlencode($taskGuid), [], $jsonFileName);
     }
+
     /**
      * Retrieves the visuals HTML file for the given index
-     * @param bool $isSplitFile: if given, this will be the split file (it does not always exist!)
-     * @param int $index: index of the file, matches the fileOrder of the visual source file
+     * @param bool $isSplitFile : if given, this will be the split file (it does not always exist!)
+     * @param int $index : index of the file, matches the fileOrder of the visual source file
      * @return false|string
+     * @throws \MittagQI\Translate5\Test\Import\Exception
      */
-    protected function getVisualHtmlFile(bool $isSplitFile=false, int $index=0){
-        return file_get_contents(static::getTask()->getDataDirectory().editor_Plugins_VisualReview_Source_Files::FOLDER_REVIEW_DEPRICATED.'/'.$this->getVisualHtmlFileName($isSplitFile, $index));
+    protected function getVisualHtmlFile(bool $isSplitFile=false, int $index=0) {
+        $fileName = static::getTask()->getDataDirectory()
+            .editor_Plugins_VisualReview_Source_Files::FOLDER_REVIEW_DEPRICATED
+            .'/'.$this->getVisualHtmlFileName($isSplitFile, $index);
+        $this->assertFileExists($fileName);
+        return file_get_contents($fileName);
     }
     /**
      * Retrieves the visuals HTML file name for the given index and if split

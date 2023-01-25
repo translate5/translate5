@@ -98,7 +98,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
             $results = $this->api->getResult();
             foreach ($results as $segmentResults) {
                 //a single response is the same as for batch processing:
-                $this->processBatchResult($segmentResults, $segment->getId());
+                $this->processBatchResult($segmentResults);
             }
             return $this->resultList;
         }
@@ -217,14 +217,14 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * {@inheritDoc}
      * @see editor_Services_Connector_BatchTrait::processBatchResult()
      */
-    protected function processBatchResult($segmentResults, int $segmentId=-1) {
+    protected function processBatchResult($segmentResults) {
         if(!isset($segmentResults->translations) || empty($segmentResults->translations[0])) {
             //if there is no translation we do not process any result
             return;
         }
         //since we translate only to one target language, we will receive only one result in the translations array:
         $result = $segmentResults->translations[0];
-        $this->resultList->addResult($this->tagHandler->restoreInResult($result->text, $segmentId), $this->defaultMatchRate);
+        $this->resultList->addResult($this->tagHandler->restoreInResult($result->text), $this->defaultMatchRate);
     }
     
     /**

@@ -91,12 +91,29 @@ class editor_Segment_Internal_TagComparision extends editor_Segment_Internal_Tag
         // there is a against and it is not empty and toCheck also is not empty
         if($against != NULL && !$against->isEmpty() && !$toCheck->isEmpty()){
             $against->sort();
-            $this->againstTags = $against->getByType(editor_Segment_Tag::TYPE_INTERNAL);
+            $this->againstTags = $this->extractRelevantTags($against);
             $this->numAgainstTags = count($this->againstTags);
             // for the completeness check we need something to check against
             $this->checkCompleteness();
         }
         $this->stati = array_unique($this->stati);
+    }
+
+    /**
+     * For Tag-Comparision special characters protected as tags are irrelevant
+     * @param editor_Segment_FieldTags $fieldTags
+     * @return editor_Segment_Internal_Tag[]
+     */
+    protected function extractRelevantTags(editor_Segment_FieldTags $fieldTags) : array
+    {
+        $relevantTags = [];
+        foreach ($fieldTags->getByType(editor_Segment_Tag::TYPE_INTERNAL) as $internalTag) {
+            /* @var $internalTag editor_Segment_Internal_Tag */
+            if (!$internalTag->isSpecialCharacter()) {
+                $relevantTags[] = $internalTag;
+            }
+        }
+        return $relevantTags;
     }
     /**
      * Here we check if all tags from checkAgainst are present in the check tags

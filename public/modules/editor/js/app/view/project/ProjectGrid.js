@@ -78,6 +78,16 @@ Ext.define('Editor.view.project.ProjectGrid', {
         	config={
         		languageStore: Ext.StoreMgr.get('admin.Languages'),
         		columns:[{
+                    xtype: 'gridcolumn',
+                    width: 140,
+                    dataIndex: 'taskGuid',
+                    stateId: 'taskGuid',
+                    hidden: true,
+                    filter: {
+                        type: 'string'
+                    },
+                    text: 'TaskGuid'
+                },{
         			xtype: 'gridcolumn',
         			width: 60,
         			dataIndex: 'id',
