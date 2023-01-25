@@ -68,6 +68,7 @@ function logoutOnWindowClose() {
         navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout?beacon=true', fd);
 
         // Remove now invalid session cookie
-        document.cookie = document.cookie.replace(rex, '; ').replace(/^; |; $/, '');
+        document.cookie = "zfExtended=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        //document.cookie = document.cookie.replace(rex, '; ').replace(/^; |; $/, '');
     }
 }
