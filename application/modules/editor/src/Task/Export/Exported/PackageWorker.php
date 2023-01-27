@@ -45,8 +45,6 @@ class PackageWorker extends editor_Models_Export_Exported_ZipDefaultWorker {
      */
     protected function doWork(editor_Models_Task $task): void
     {
-        //TODO: before doing the zipping, validate if the file structure exist and if there is content inside. Maybe
-        // this is job of the previous process and this should not be reached if there is invalid content
         parent::doWork($task);
         $params = $this->workerModel->getParameters();
         ZfExtended_Utils::cleanZipPaths(new SplFileInfo($params['zipFile']), basename(ExportSource::PACKAGE_FOLDER_NAME));

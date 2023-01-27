@@ -26,11 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Reimport\ZipDataProvider;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Import\TermCollectionResource;
 
-/**
- * Testcase for TRANSLATE-3117 //TODO FOR TEST USAGE: add a description
- * For details see the issue.
+/***
+ * Test the reimport and package export features.
+ * Task will be imported alongside termcollection an opentm2 memory.
+ *
  */
 class Translate3117Test extends editor_Test_JsonTest {
 
@@ -46,17 +49,117 @@ class Translate3117Test extends editor_Test_JsonTest {
         'runtimeOptions.import.xlf.ignoreFramingTags' => 'all'
     ];
  
-    protected static bool $setupOwnCustomer = false;
+    protected static bool $setupOwnCustomer = true;
     
     protected static string $setupUserLogin = 'testmanager';
-    
+
+    /***
+     * Segment target on import
+     * @var array|string[]
+     */
+    private static array $segmentsOnImport = [
+        '1' => 'Bar',
+        '2' => 'Translation for segment 2',
+        '3' => 'Translation for Segment Three',
+        '4' => 'Bar',
+        '5' => 'Gjb',
+        '6' => 'Guerr'
+    ];
+
+    /***
+     * Segment target on reimport
+     * @var array|string[]
+     */
+    private static array $segmentsOnReimport = [
+        '1' => 'First segment is changed after reimport',
+        '2' => 'Translation for segment 2',
+        '3' => 'Translation for Segment Three',
+        '4' => 'Bar reimport',
+        '5' => 'Gjb reimport 2 segment',
+        '6' => 'Guerr reimport of the 3 segment.'
+    ];
+
+    protected static TermCollectionResource $termCollection;
+
+    protected static array $exportPackageStructure = [
+        'tbx/',
+        'reference/',
+        'tmx/',
+        'tmx/OpenTm2-Translate3117Test-1.tmx',
+        'workfiles/',
+        'workfiles/Task-en-de.html.xlf',
+        'workfiles/Level1/',
+        'workfiles/Level1/Task-en-de.html.xlf'
+    ];
+
     protected static function setupImport(Config $config): void
     {
+
+        $ownCustomerId = static::$ownCustomer->id;
+
+        self::$termCollection = $config
+            ->addLanguageResource('termcollection', 'Term.tbx', $ownCustomerId)
+            ->addDefaultCustomerId($ownCustomerId);
+
+        $config
+            ->addLanguageResource('opentm2', 'resource1.tmx', $ownCustomerId, 'en', 'de')
+            ->addDefaultCustomerId($ownCustomerId);
+
+        $config
+            ->addTask('en', 'de', $ownCustomerId, 'Import.zip')
+            ->setToEditAfterImport();
     }
 
     /**
      */
-    public function testSegmentValuesAfterImport()
+    public function testReimport()
     {
+        $importSegments = static::api()->getSegmentsWithBasicData();
+
+        // validate the value on import
+        foreach ($importSegments as $segment){
+            $expected = self::$segmentsOnImport[$segment['segmentNrInTask']];
+            self::assertEquals($expected,$segment['targetEditToSort'],'Segment does not match the expected import value');
+        }
+
+        $taskId = static::api()->reloadTask()->id;
+
+        static::api()->setTaskToOpen();
+
+        static::api()->addFile(ZipDataProvider::UPLOAD_FILE_FIELD, static::api()->getFile('Reimport.zip'), 'application/data');
+        static::api()->post('editor/taskid/'.$taskId.'/file/package');
+
+        static::api()->setTaskToEdit();
+
+        $reimportSegments = static::api()->getSegmentsWithBasicData();
+
+        // validate the value on import
+        foreach ($reimportSegments as $segment){
+            $expected = self::$segmentsOnReimport[$segment['segmentNrInTask']];
+            self::assertEquals($expected,$segment['targetEditToSort'],'Segment does not match the expected import value');
+        }
     }
+
+    public function testExportPackage(){
+        $task = static::api()->getTask();
+        $response = static::api()->get('editor/task/export/id/'.$task->id.'?format=package');
+
+        $file = tempnam(sys_get_temp_dir(), 'PackageExport');
+
+        file_put_contents($file, $response->getBody());
+
+        $zip = new ZipArchive();
+        self::assertEquals($zip->open($file),true,'Unable to open the exported zip archive');
+
+        // The term collection name is dynamic -> add to package structure the name to be checked for tbx
+        static::$exportPackageStructure[] = 'tbx/'.self::$termCollection->getId().'.tbx';
+
+        // reimport file is supported by the segment processor
+        for ($idx = 0; $zipFile = $zip->statIndex($idx); $idx++) {
+            self::assertContains($zipFile['name'],static::$exportPackageStructure,'The export file structure is not as expected');
+        }
+
+        unlink($file);
+    }
+
 }

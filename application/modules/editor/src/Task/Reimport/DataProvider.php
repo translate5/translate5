@@ -128,7 +128,10 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
             // make the _tempFolder
             $this->checkAndMakeTempImportFolder();
         }catch (editor_Models_Import_DataProvider_Exception $e){
-            // if the tmp folder exist, don't break the reimport process
+            // if the tmp folder exist, don't break the reimport process, delete the folder and content, and create new
+            ZfExtended_Utils::recursiveDelete($this->importFolder);
+            // create new importDir
+            $this->checkAndMakeTempImportFolder();
         }
 
         // extract the zip package

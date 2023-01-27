@@ -126,11 +126,16 @@ class editor_FileController extends ZfExtended_RestController
             'files' => $dataProvider->getFiles(),// fileId => fileInfo mapping
             'userGuid' => ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
             'segmentTimestamp' => NOW_ISO,
+            'dataProviderClass' => $dataProviderClass
         ])) {
             throw new ZfExtended_Exception('Task ReImport Error on worker init()');
         }
 
         try {
+            // use blocking for tests env only
+            if( APPLICATION_ENV === ZfExtended_BaseIndex::ENVIRONMENT_TEST){
+                $worker->setBlocking();
+            }
             $worker->queue();
             if($this->getParam('saveToMemory',false)){
                 $this->queueUpdateTmWorkers();
@@ -139,9 +144,8 @@ class editor_FileController extends ZfExtended_RestController
             $this->view->success = true;
         }catch (Throwable $exception){
             Lock::taskUnlock($task);
-            throw  $exception;
-        } finally {
             $dataProvider->cleanTempFolder();
+            throw  $exception;
         }
     }
 

@@ -28,11 +28,13 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Reimport;
 
+use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Loaders_Taskuserassoc;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
+use Throwable;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
@@ -55,7 +57,7 @@ class Worker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        $neededEntries = ['files', 'userGuid','segmentTimestamp'];
+        $neededEntries = ['files', 'userGuid','segmentTimestamp','dataProviderClass'];
         $foundEntries = array_keys($parameters);
         $keyDiff = array_diff($neededEntries, $foundEntries);
         //if there is not keyDiff all needed were found
@@ -95,14 +97,14 @@ class Worker extends ZfExtended_Worker_Abstract {
                 $reimportFile->import($fileId,$file,$params['segmentTimestamp']);
                 $reimportFile->getSegmentProcessor()->log();
             }
-
         } finally {
             //if it was a PM override, delete it again
             if($tua->getIsPmOverride()) {
                 $tua->delete();
             }
-            $this->archiveImportedData($task);
             Lock::taskUnlock($task);
+            $this->archiveImportedData($task);
+            $this->cleanupImportFolder($params['dataProviderClass'],$task);
         }
 
         return true;
@@ -169,4 +171,17 @@ class Worker extends ZfExtended_Worker_Abstract {
         $dp->archiveImportedData();
     }
 
+
+    /**
+     * Clean the temporary folders used for extracting zip archives.
+     * @param string $dataProviderClass
+     * @param editor_Models_Task $task
+     * @return void
+     */
+    private function cleanupImportFolder(string $dataProviderClass, editor_Models_Task $task): void
+    {
+        $dp = ZfExtended_Factory::get($dataProviderClass);
+        $dp->setTaskPaths($task);
+        $dp->cleanTempFolder();
+    }
 }

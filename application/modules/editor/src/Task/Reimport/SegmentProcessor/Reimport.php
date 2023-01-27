@@ -229,10 +229,12 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     private function logUpdated(): void
     {
-        $this->logger->info('E1440','File reimport finished.',[
+        $this->logger->info('E1440','Reimport for the file "{filename}" is finished. Total updated segments: {updateCount}.',[
             'task' => $this->task,
             'fileId' => $this->fileId,
-            'segments' => implode(',',$this->updatedSegments)
+            'updateCount' => count($this->updatedSegments),
+            'segments' => implode(',',$this->updatedSegments),
+            'filename' => $this->fileName
         ]);
     }
 
