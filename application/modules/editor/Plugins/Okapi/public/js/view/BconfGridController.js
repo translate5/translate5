@@ -32,12 +32,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
     FILE_UPLOAD_NAME: 'bconffile',
     listen: {
         store: {
-            '#bconffilterStore': {
+            'bconffilterStore': {
                 // listens to changes in extensions of custom filters (which need to be updated in our view
                 customFilterExtensionsChanged: function(bconfId, extensions){
                     var record = this.getView().getStore().getById(bconfId);
                     if(record){
-                        record.set('customExtensions', extensions, {silent: true, dirty: false});
+                        record.set('customExtensions', extensions, { dirty: false });
                     }
                 }
             }
@@ -109,8 +109,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         view.select(rowIndex); // we need a selected row
         var me = this;
         // UGLY/FIXME: it seems the row selection events interfere with the prompt, which is immediately closed when clicking on a delete-icon of an unselected row.
-        Ext.defer(function(){ this.doDeleteBconf(view); }, 50, this);
+        Ext.defer(function(){ me.doDeleteBconf(view); }, 50, me);
     },
+    /**
+     *
+     * @param view
+     */
     doDeleteBconf: function(view){
         Ext.Msg.confirm(view.grid.strings.confirmDeleteTitle + `: <i>"${view.selection.get('name')}"</i>`, view.grid.strings.confirmDeleteMessage, function(btnId){
             if(btnId === 'yes'){
@@ -127,7 +131,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         view.select(rowIndex);
         var me = this;
         // UGLY/FIXME: it seems the row selection events interfere with the prompt, which is immediately closed when clicking on a clone-icon of an unselected row.
-        Ext.defer(function(){ this.doCloneBconf(view); }, 50, this);
+        Ext.defer(function(){ me.doCloneBconf(view); }, 50, me);
     },
     doCloneBconf: async function(view){
         var name,
@@ -169,8 +173,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
 
     showFilterGrid: function(view, rowIndex){
         view.select(rowIndex);
-        if(!location.hash.endsWith('/filters')){
-            location.hash += '/filters';
+        if(!window.location.hash.endsWith('/filters')){
+            window.location.hash += '/filters';
         }
         var filterGrid = Ext.getCmp('bconfFilterGrid'),
             bconf = view.store.getById(view.selection.id);
@@ -194,7 +198,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             maximizable: true,
             //height: '95%',
             //width: '95%',
-            resizable: true,
+            resizable: true
         });
         filterGrid.show();
     },

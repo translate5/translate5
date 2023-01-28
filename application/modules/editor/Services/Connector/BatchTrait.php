@@ -61,6 +61,8 @@ trait editor_Services_Connector_BatchTrait {
      */
     private string $contentField = editor_Models_SegmentField::TYPE_TARGET;
 
+    private editor_Models_Segment $lastDefaultSegmentSet;
+
     /**
      * returns the collected batchExceptions or an empty array
      * @return array
@@ -111,7 +113,8 @@ trait editor_Services_Connector_BatchTrait {
             if(strlen($contentField) > 0 && $this->languageResource->isMt()){
                 continue;
             }
-            $querySegment = $this->tagHandler->prepareQuery($this->getQueryString($segment), $segment->getId());
+            $this->tagHandler->setCurrentSegment($segment);
+            $querySegment = $this->tagHandler->prepareQuery($this->getQueryString($segment));
             $batchQuery[] = [
                 //set the query string to segment map. Later it will be used to reapply the tags
                 'segment' => clone $segment,
@@ -223,7 +226,7 @@ trait editor_Services_Connector_BatchTrait {
             $segmentId = $query['segment']->getId();
             $this->getQueryStringAndSetAsDefault($query['segment']);
             $this->tagHandler->setTagMap($query['tagMap']);
-            $this->processBatchResult($segmentResults, $segmentId);
+            $this->processBatchResult($segmentResults);
             
             $this->logForSegment($query['segment']);
             
@@ -234,6 +237,17 @@ trait editor_Services_Connector_BatchTrait {
             
             $this->resultList->resetResult();
         }
+    }
+
+    /**
+     * get query string from segment and set it as result default source
+     * @param editor_Models_Segment $segment
+     * @return string
+     */
+    protected function getQueryStringAndSetAsDefault(editor_Models_Segment $segment): string
+    {
+        $this->lastDefaultSegmentSet = $segment;
+        return parent::getQueryStringAndSetAsDefault($segment);
     }
 
     /**
@@ -248,9 +262,8 @@ trait editor_Services_Connector_BatchTrait {
     /**
      * process (add to the result list and decode) results from the language resource
      * @param mixed $segmentResults
-     * @param int $segmentId: only needed by same tag handlers
      */
-    abstract protected function processBatchResult($segmentResults, int $segmentId=-1);
+    abstract protected function processBatchResult($segmentResults);
     
     /**
      * @param int $segmentId
