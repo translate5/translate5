@@ -499,16 +499,16 @@ where tad.id IS NULL;
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function sameTypeDiffLabel() {
+    public function sameTypeDiffLabelOrLevel() {
         return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeDataType::class)
             ->db->getAdapter()->query("
                 SELECT 
                   `type`,  
-                  COUNT(DISTINCT `label`) AS `qty`,
-                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`) ORDER BY `id` ASC), ',', 1) AS `correct-id-label`,
+                  COUNT(DISTINCT CONCAT(`label`, '-', `level`)) AS `qty`,
+                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`, '-', `level`) ORDER BY `id` ASC SEPARATOR ';'), ';', 1) AS `correct-id-label-level`,
                   REPLACE (
-                    GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`) ORDER BY `id` ASC),
-                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`) ORDER BY `id` ASC), ',', 1), ','),
+                    GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`, '-', `level`) ORDER BY `id` ASC SEPARATOR ';'),
+                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`, '-', `level`) ORDER BY `id` ASC SEPARATOR ';'), ';', 1), ';'),
                     ''
                   ) AS `mistake-list`
                 FROM `terms_attributes_datatype`

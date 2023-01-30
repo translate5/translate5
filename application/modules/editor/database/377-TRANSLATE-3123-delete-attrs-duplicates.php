@@ -172,19 +172,35 @@ foreach ($checker->sameTypeDiffElementName() as $case) {
     }
 }
 
-// Foreach sameTypeDiffLabel-case found among datatype-records
-foreach ($checker->sameTypeDiffLabel() as $case) {
+// Foreach sameTypeDiffLabelOrLevel-case found among datatype-records
+foreach ($checker->sameTypeDiffLabelOrLevel() as $case) {
 
     // Get correct id and label
-    list ($correct['id'], $correct['label']) = explode('-', $case['correct-id-label']);
+    list ($correct['id'], $correct['label'], $correct['level']) = explode('-', $case['correct-id-label-level']);
+
+    // Get levels
+    $level = array_flip(explode(',', $correct['level']));
 
     // Foreach mistake
-    foreach (explode(',', $case['mistake-list']) as $item) {
+    foreach (explode(';', $case['mistake-list']) as $item) {
 
         // Extract mistake's id and label
-        list ($mistake['id'], $mistake['label']) = explode('-', $item);
+        list ($mistake['id'], $mistake['label'], $mistake['level']) = explode('-', $item);
 
         // Delete datatype-record created by mistake
         $db->query("DELETE FROM `terms_attributes_datatype` WHERE `id` = '{$mistake['id']}'");
+
+        // Merge levels
+        $level += array_flip(explode(',', $mistake['level']));
+    }
+
+    // Get merged comma-separated list of levels
+    $level = join(',', array_keys($level));
+
+    // If not equal to original list of levels
+    if ($level != $correct['level']) {
+
+        // Delete datatype-record created by mistake
+        $db->query("UPDATE `terms_attributes_datatype` SET `level` = '$level' WHERE `id` = '{$correct['id']}'");
     }
 }
