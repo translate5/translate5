@@ -35,7 +35,7 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         file: '#UT#TBX-Datei',
         importTbx: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
-        importSuccess: '#UT#Weitere Term-Collection Daten erfolgreich importiert!',
+        importSuccess: '#UT#Die Datei wurde hochgeladen. Der Import läuft nun im Hintergrund.',
         save: '#UT#Importieren',
         cancel: '#UT#Abbrechen',
         mergeTerms:'#UT#Termeinträge verschmelzen',
