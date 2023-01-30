@@ -35,6 +35,7 @@ use ZfExtended_ErrorCodeException;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
 use ZfExtended_UnprocessableEntity;
+use ZfExtended_Utils;
 
 /**
  * Check and clean the resource/pivot associations on a task when customer is removed from the language resource.
@@ -65,9 +66,19 @@ class CleanupAssociation
         $assoc = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
         $customerAssocs = $assoc->loadCustomerIds($this->languageResourceId);
 
-        $removed = array_diff($customerAssocs,$this->removedCustomers);
-        if (empty($removed)){
-            return [];
+        $deleteAll = ZfExtended_Utils::isArrayEqual($customerAssocs,$this->removedCustomers);
+
+        // if all customers are removed, this means it is delete request and based on this, we remove all associations
+        // based on those customers
+        if( $deleteAll === false){
+
+            $removed = array_diff($customerAssocs,$this->removedCustomers);
+            // in case we remove all
+            if (empty($removed)){
+                return [];
+            }
+        }else{
+            $removed = $this->removedCustomers;
         }
 
         $taskAssoc = ZfExtended_Factory::get($entityClass);

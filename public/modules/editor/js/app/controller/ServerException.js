@@ -145,7 +145,7 @@ Ext.define('Editor.controller.ServerException', {
 
             // Fire custom error code events for custom handling. The code bellow will not be processed If the event handler function returns false
             // This is used in plugin context for custom error handling
-            if(json && json.errorCode && this.fireEvent('serverException'+json.errorCode,json,json.errorCode) === false){
+            if(json && json.errorCode && this.fireEvent('serverException'+json.errorCode,json,json.errorCode,response) === false){
                 return;
             }
         }
