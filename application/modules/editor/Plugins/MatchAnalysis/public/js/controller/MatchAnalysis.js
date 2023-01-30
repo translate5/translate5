@@ -36,7 +36,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     requires: [
         'Editor.plugins.MatchAnalysis.view.AnalysisPanel',
         'Editor.plugins.MatchAnalysis.view.LanguageResources',
-        'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig'
+        'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig',
+        'Editor.plugins.MatchAnalysis.view.AnalysisWindow'
     ],
     
     models: ['Editor.plugins.MatchAnalysis.model.MatchAnalysis'],
@@ -103,7 +104,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 startMatchAnalysis: 'onStartOperation'
             },
             'taskActionMenu': {
-                itemsinitialized: 'onTaskActionColumnItemsInitialized'
+                itemsinitialized: 'onTaskActionColumnItemsInitialized',
+                show: 'onTaskActionMenuShow'
             }
         },
         controller:{
@@ -146,7 +148,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     onTaskActionColumnItemsInitialized: function(items) {
         var me=this;
         items.push({
-            text:this.strings.taskGridIconTooltip,
+            text: me.strings.taskGridIconTooltip,
+            itemId:'analysisActionItem',
             glyph: 'f200@FontAwesome5FreeSolid',
             action: 'editorAnalysisTask',
             hidden:true,
@@ -154,14 +157,37 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 hidden:'{!isNotErrorImportPendingCustom}'
             },
             scope:me,
+            disabled: true,
             handler:me.onMatchAnalysisMenuClick,
             sortIndex:8
         });
     },
+
+    /***
+     *
+     * @param menu
+     */
+    onTaskActionMenuShow: function (menu){
+        var configStore = Ext.create('Editor.store.admin.CustomerConfig'),
+            vm = menu.getViewModel(),
+            task = vm && vm.get('task');
+
+        if(!task){
+            return;
+        }
+
+        configStore.loadByCustomerId(task.get('customerId'),function (){
+            var config = configStore.getConfig('plugins.MatchAnalysis.enableAnalysisActionMenu'),
+                menuItem = menu.down('#analysisActionItem');
+
+            menuItem.setDisabled(!config);
+        });
+    },
+
     /**
      * Inserts the language resource card into the task import wizard
      */
-    onAdminTaskWindowBeforeRender:function(window,eOpts){
+    onAdminTaskWindowBeforeRender: function(window){
         var me=this;
         window.insertCard({
             xtype:'languageResourcesWizardPanel',
@@ -179,14 +205,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     /***
      * On task management tabpanel render
      */
-    onTaskTaskManagementPanelRender:function(panel){
+    onTaskTaskManagementPanelRender: function(panel){
         //add the matchanalysis panel in the tabpanel
         panel.insert(2,{
            xtype:'matchAnalysisPanel'
         });
     },
 
-    onLanguageResourcesPanelRender:function(panel){
+    onLanguageResourcesPanelRender: function(panel){
         var me=this,
             storeData=[];
 
@@ -294,7 +320,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         }]);
     },
 
-    onLanguageResourcesPanelActivate:function (){
+    onLanguageResourcesPanelActivate: function (){
         // update the field defaults from config after the panel is visually visible
         this.updateDefaultFields();
     },
@@ -302,11 +328,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     /***
      * Event handler after a task was successfully created
      */
-    onTaskCreated:function(task){
+    onTaskCreated: function(task){
         this.loadTaskAssoc(task);
     },
     
-    onLanguageResourcesWizardPanelActivate:function(panel){
+    onLanguageResourcesWizardPanelActivate: function(panel){
         if(!panel.task){
             return;
         }
@@ -317,17 +343,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         me.updateDefaultFields();
     },
     
-    onMatchAnalysisMenuClick:function(item){
-        var me=this,
-            task=item.lookupViewModel(true).get('task');
-        me.getProjectPanel().getController().redirectFocus(task,true);
-        me.getAdminTaskTaskManagement().down('tabpanel').setActiveTab('matchAnalysisPanel');
+    onMatchAnalysisMenuClick: function(item){
+        var task = item.lookupViewModel(true).get('task'),
+            win = Ext.create('Editor.plugins.MatchAnalysis.view.AnalysisWindow');
+
+        win.setTask(task);
+        win.show();
     },
     
     /***
      * Load match resources task assoc store
      */
-    loadTaskAssoc:function(task){
+    loadTaskAssoc: function(task){
         var taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
         //load the task assoc store
         taskAssoc.handleLoadPreferences(taskAssoc,task);
@@ -336,9 +363,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     /***
      * On language resource task assoc store load event handler
      */
-    onLanguageResourcesTaskAssocStoreLoad:function(store){
-        var me=this;
-        me.updateTaskAssoc(store);
+    onLanguageResourcesTaskAssocStoreLoad: function(store){
+        this.updateTaskAssoc(store);
     },
 
     /***
@@ -352,7 +378,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         this.startOperation(taskId, operation, false);
     },
     
-    matchAnalysisButtonHandler:function(button){
+    matchAnalysisButtonHandler: function(button){
         var me = this,
             taskManagement = button.up('#adminTaskTaskManagement'),
             tmAndTermChecked = me.isCheckboxChecked('pretranslateTmAndTerm'),
@@ -391,25 +417,26 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     /***
      * Language resource to task assoc after save event handler
      */
-    onTaskAssocSavingFinished:function(record,store){
+    onTaskAssocSavingFinished: function(record, store){
         this.updateTaskAssoc(store);
     },
 
     /***
      * Updates task assoc panel fields and view model fields
      */
-    updateTaskAssoc:function(assocStore){
-        var me=this,
-            panels=Ext.ComponentQuery.query('languageResourceTaskAssocPanel'),
-            store=assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid() : null);
-        if(!panels || panels.length<1 || !store){
+    updateTaskAssoc: function(assocStore){
+        var me = this,
+            panels = Ext.ComponentQuery.query('languageResourceTaskAssocPanel'),
+            store = assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid() : null); // TODO FIXME: How can a Panel act as a store ??
+        if(!panels || panels.length < 1 || !store){
             return;
         }
-        for(var i=0;i<panels.length;i++){
-            var pnl=panels[i],
-                vm=pnl.getViewModel();
-            //set the view model items variable
-            vm && vm.set('items',(store.getData().getSource() || store.getData()).getRange());
+        for(var i=0; i < panels.length; i++){
+            var pnl = panels[i],
+                vm = pnl.getViewModel(),
+                items = (store.getData().getSource() || store.getData()).getRange();
+               //set the view model items variable
+            vm && vm.set('items', items);
         }
     },
 
@@ -433,7 +460,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     /***
      * Get component by itemId
      */
-    getComponentByItemId:function(itemId){
+    getComponentByItemId: function(itemId){
         var context = Ext.ComponentQuery.query('adminTaskAddWindow')[0], // for import use the import window as context
             cmp=null;
 
@@ -454,7 +481,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     /***
      * Check if the checbox component is checked
      */
-    isCheckboxChecked:function(itemId){
+    isCheckboxChecked: function(itemId){
         var component=this.getComponentByItemId(itemId);
         if(!component || component.isDisabled()){
             return 0;

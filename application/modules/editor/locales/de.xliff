@@ -6258,6 +6258,10 @@ Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften 
                 <source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source>
                 <target>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</target>
             </trans-unit>
+            <trans-unit id='RGllIEF1ZmdhYmUga2FubiBuaWNodCB2b24gZWluZW0gUE0gYmVlbmRldCB3ZXJkZW4sIHdlaWwgZWluIEJlbnV0emVyIGRpZSBBdWZnYWJlIHp1ciBCZWFyYmVpdHVuZyBnZcO2ZmZuZXQgaGF0Lg=='>
+                <source>Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.</source>
+                <target>Die Aufgabe kann nicht von einem PM beendet werden, weil ein Benutzer die Aufgabe zur Bearbeitung geöffnet hat.</target>
+            </trans-unit>
             <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZHVyY2ggYW5kZXJlbiBCZW51dHplciDDvGJlcm5vbW1lbg=='>
                 <source>Translate5 - Aufgabe durch anderen Benutzer übernommen</source>
                 <target>Translate5 - Aufgabe durch anderen Benutzer übernommen</target>
@@ -7691,6 +7695,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Falsch erkannte Fehler</source>
                 <target>Falsch erkannte Fehler</target>
             </trans-unit>
+            <trans-unit id='RmFsc2NoIGVya2FubnRlIEZlaGxlcj8='>
+                <source>Falsch erkannte Fehler?</source>
+                <target>Falsch erkannte Fehler?</target>
+            </trans-unit>
+            <trans-unit id='RWluIGZhbHNjaCBlcmthbm50ZXIgRmVobGVyPw=='>
+                <source>Ein falsch erkannter Fehler?</source>
+                <target>Ein falsch erkannter Fehler?</target>
+            </trans-unit>
             <trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'>
                 <source>Interne Tag Fehler</source>
                 <target>Interne Tag Fehler</target>
@@ -7715,9 +7727,37 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Die Qualität wurde entfernt</source>
                 <target>Die Qualität wurde entfernt</target>
             </trans-unit>
-            <trans-unit id='RGVyIEZhbHNlLVBvc2l0aXZlIFN0YXR1cyB3dXJkZSBha3R1YWxpc2llcnQ='>
-                <source>Der False-Positive Status wurde aktualisiert</source>
-                <target>Der False-Positive Status wurde aktualisiert</target>
+            <trans-unit id='RGllc2VuIFN0YXR1cyBmw7xyIGFuZGVyZSBFcmVpZ25pc3NlIGlubmVyaGFsYiBkaWVzZXIgQXVmZ2FiZSB2ZXJ0ZWlsdA=='>
+                <source>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</source>
+                <target>Diesen Status für andere Ereignisse innerhalb dieser Aufgabe verteilt</target>
+            </trans-unit>
+            <trans-unit id='UmVjaHRzIGtsaWNrZW4gdW0gYWxzICdmYWxzY2ggZXJrYW5udCcgenUgbWFya2llcmVu'>
+                <source>Rechts klicken um als 'falsch erkannt' zu markieren</source>
+                <target>Rechts klicken um als 'falsch erkannt' zu markieren</target>
+            </trans-unit>
+            <trans-unit id='QW56YWhsIGFuZGVyZXIgVm9ya29tbWVuIGVpbmVzIHNvbGNoZW4gUGFhcmVzIFtRdWFsaXTDpHQgLSBJbmhhbHRdLCBkaWUgaW4gZGllc2VyIEF1ZmdhYmUgZ2VmdW5kZW4gd3VyZGVu'>
+                <source>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
+                <target>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</target>
+            </trans-unit>
+            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgaW4gYW5kZXJlbiBTZWdtZW50ZW4gZWJlbmZhbGxzIMOkbmRlcm4u'>
+                <source>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</source>
+                <target>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</target>
+            </trans-unit>
+            <trans-unit id='SmE='>
+                <source>Ja</source>
+                <target>Ja</target>
+            </trans-unit>
+            <trans-unit id='UXVhbGl0w6R0'>
+                <source>Qualität</source>
+                <target>Qualität</target>
+            </trans-unit>
+            <trans-unit id='TGFkZXF1YWxpdMOkdC4u'>
+                <source>Ladequalität..</source>
+                <target>Ladequalität..</target>
+            </trans-unit>
+            <trans-unit id='U2NobGllw59lbg=='>
+                <source>Schließen</source>
+                <target>Schließen</target>
             </trans-unit>
             <trans-unit id='QWNodHVuZw=='>
                 <source>Achtung</source>
@@ -8740,6 +8780,54 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='RGF0ZWluYW1l'>
               <source>Dateiname</source>
               <target>Dateiname</target>
+            </trans-unit>
+            <trans-unit id='S29uZmxpa3QgaGluc2ljaHRsaWNoIHp1Z2V3aWVzZW5lciBBdWZnYWJlbg=='>
+              <source>Konflikt hinsichtlich zugewiesener Aufgaben</source>
+              <target>Konflikt hinsichtlich zugewiesener Aufgaben</target>
+            </trans-unit>
+            <trans-unit id='RGllIGVudGZlcm50ZW4gS3VuZGVuIHdlcmRlbiBpbiBkZW4gZm9sZ2VuZGVuIEF1ZmdhYmVuIHZlcndlbmRldDo'>
+              <source>Die entfernten Kunden werden in den folgenden Aufgaben verwendet:</source>
+              <target>Die entfernten Kunden werden in den folgenden Aufgaben verwendet:</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBTaWUgZGllc2UgS3VuZGVuIGVudGZlcm5lbiwgd2lyZCBkaWUgWnVvcmRudW5nIGRpZXNlciBTcHJhY2hyZXNzb3VyY2UgenUgZGVuIEF1ZmdhYmVuIGRpZXNlciBLdW5kZW4gYXVmZ2Vob2Jlbi4gTcO2Y2h0ZW4gU2llIGRpZSBadXdlaXN1bmdlbiBhdWZoZWJlbj8gTnVyIGRhbm4ga8O2bm5lbiBTaWUgZGllIEt1bmRlbiBhdXMgZGllc2VyIFNwcmFjaHJlc3NvdXJjZSBoaWVyIGluIGRlciBTcHJhY2hyZXNzb3VyY2VudmVyd2FsdHVuZyBlbnRmZXJuZW4u'>
+              <source>Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.</source>
+              <target>Wenn Sie diese Kunden entfernen, wird die Zuordnung dieser Sprachressource zu den Aufgaben dieser Kunden aufgehoben. Möchten Sie die Zuweisungen aufheben? Nur dann können Sie die Kunden aus dieser Sprachressource hier in der Sprachressourcenverwaltung entfernen.</target>
+            </trans-unit>
+            <trans-unit id='bWVocg=='>
+              <source>mehr</source>
+              <target>mehr</target>
+            </trans-unit>
+            <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlIHVuZCBlaW5lIFphaGwu'>
+              <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</source>
+              <target>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyAxMiBaZWljaGVu">
+              <source>Mindestens 12 Zeichen</source>
+              <target>Mindestens 12 Zeichen</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW5lIFphaGw=">
+              <source>Mindestens eine Zahl</source>
+              <target>Mindestens eine Zahl</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gS2xlaW5idWNoc3RhYmU=">
+              <source>Mindestens ein Kleinbuchstabe</source>
+              <target>Mindestens ein Kleinbuchstabe</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gR3Jvw59idWNoc3RhYmU=">
+              <source>Mindestens ein Großbuchstabe</source>
+              <target>Mindestens ein Großbuchstabe</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gU29uZGVyemVpY2hlbg==">
+              <source>Mindestens ein Sonderzeichen</source>
+              <target>Mindestens ein Sonderzeichen</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFBhc3N3b3J0IGVudGjDpGx0IGVpbiBXb3J0IGF1cyBkZXIgc2Nod2FyemVuIExpc3RlLg==">
+              <source>Das Passwort enthält ein Wort aus der schwarzen Liste.</source>
+              <target>Das Passwort enthält ein Wort aus der schwarzen Liste.</target>
+            </trans-unit>
+            <trans-unit id='U3ByYWNocmVzc291cmNlIGRlcyBhdXNnZXfDpGhsdGVuIFJlc3NvdXJjZW50eXBzIGthbm4gaW4gZGVyIEJlbnV0emVyb2JlcmZsw6RjaGUgbmljaHQgZXJzdGVsbHQgd2VyZGVuLg=='>
+              <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
+              <target>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</target>
             </trans-unit>
         </body>
     </file>

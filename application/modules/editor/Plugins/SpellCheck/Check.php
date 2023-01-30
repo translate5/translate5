@@ -65,6 +65,7 @@ class editor_Plugins_SpellCheck_Check {
     const WHITESPACE              = 'whitespace';
     const TERMINOLOGY             = 'terminology';
     const INTERNATIONALIZATION    = 'internationalization';
+    const NON_CONFORMANCE         = 'non-conformance';
 
     // Remaining error types
     const GRAMMAR         = 'grammar';
@@ -94,6 +95,7 @@ class editor_Plugins_SpellCheck_Check {
         self::WHITESPACE              => self::CSS_GROUP_STYLE,
         self::TERMINOLOGY             => self::CSS_GROUP_STYLE,
         self::INTERNATIONALIZATION    => self::CSS_GROUP_STYLE,
+        self::NON_CONFORMANCE         => self::CSS_GROUP_STYLE,
 
         // Remaining
         self::GRAMMAR       => self::CSS_GRAMMAR,
@@ -119,6 +121,7 @@ class editor_Plugins_SpellCheck_Check {
         'whitespace'              => self::WHITESPACE,
         'terminology'             => self::TERMINOLOGY,
         'internationalization'    => self::INTERNATIONALIZATION,
+        'non-conformance'         => self::NON_CONFORMANCE,
 
         // Remaining error types
         'grammar'                 => self::GRAMMAR,
@@ -172,6 +175,10 @@ class editor_Plugins_SpellCheck_Check {
 
                 // Convert into special data structure
                 $this->states[$category] []= (object) [
+                    'content'           => mb_substr(
+                        $match->context->text,
+                        $match->context->offset,
+                        $match->context->length),
                     'matchIndex'        => $index,                                                       // Integer
                     'range'             => [                                                             // Rangy bookmark
                         'start' => $match->offset,

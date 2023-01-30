@@ -102,6 +102,8 @@ class AcrossSoapConnector extends SoapClient  {
     public function __construct($apiUrl, $apiLogin, $apiPass) {
         $soapConfig = [
                         //'location' => self::$ACROSS_API_URL_WSDL,
+                        //needed for tunneling via SSH to the across Server - otherwise we are redirected
+                        'location' => $apiUrl.self::$ACROSS_API_URL_WSDL,
                         //'uri' => self::$ACROSS_API_URL_WSDL, // TODO: what is this parameter for?
                         'soap_version' => SOAP_1_1,
                         'trace' => 1,
@@ -113,7 +115,10 @@ class AcrossSoapConnector extends SoapClient  {
             $this->createSecurityToken($apiLogin,$apiPass);
         }
         catch (SoapFault $e) {
-            throw new AcrossSoapConnectorException('Error on connecting to Across under "'.self::$ACROSS_API_URL_WSDL.'"', $e);
+            //E1456 Error on connecting to Across under "{url}"
+            throw new AcrossSoapConnectorException('E1456', [
+                'url' => $soapConfig['location']
+            ], $e);
         }
     }
     
@@ -126,7 +131,8 @@ class AcrossSoapConnector extends SoapClient  {
         $result = $this->__soapCall('Authorization.CreateSecurityToken', [$apiLogin, $apiPassword]);
         
         if ($result->errorcode) {
-            throw new AcrossSoapConnectorException('can not create Across security token', $result);
+            //E1457: can not create Across security token
+            throw new AcrossSoapConnectorException('E1457', ['result' => $result]);
         }
         
         $this->securityToken = $result->data;
@@ -166,14 +172,14 @@ class AcrossSoapConnector extends SoapClient  {
         }
         catch (SoapFault $e) {
             if ($iteration >= 10) {
-                $tempDetails = ['function' => $function_name,
-                                'arguments' => $arguments,
-                                'options' => $options,
-                                'input_headers' => $input_headers,
-                                'output_headers' => $output_headers,
-                                'exception' => $e
-                ];
-                throw new AcrossSoapConnectorException('Error on communication with Across', $tempDetails);
+                //E1458: Error on communication with Across
+                throw new AcrossSoapConnectorException('E1458', [
+                    'function' => $function_name,
+                    //'arguments' => $arguments, contains credentials
+                    'options' => $options,
+                    'input_headers' => $input_headers,
+                    'output_headers' => $output_headers,
+                ], $e);
             }
             usleep(300000); // wait for a while until the next call is submitted (!unit is microseconds, so 1.000.000 is one second)
             return $this->__soapCall($function_name, $arguments, $options, $input_headers, $output_headers, ++$iteration);
@@ -203,10 +209,11 @@ class AcrossSoapConnector extends SoapClient  {
         $result = $this->__soapCall('FileManager.CreateFileStream', $params);
         
         if ($result->errorcode) {
-            throw new AcrossSoapConnectorException('can not create temporary filestream', $result);
+            // E1459: can not create temporary filestream
+            throw new AcrossSoapConnectorException('E1459', ['result' => $result]);
         }
         
-        return $fileGuid = $result->data;
+        return $result->data;
     }
     
     /**
@@ -220,7 +227,11 @@ class AcrossSoapConnector extends SoapClient  {
         $result = $this->__soapCall('FileManager.GetFileFromServer', $params);
         
         if ($result->errorcode) {
-            throw new AcrossSoapConnectorException('can not read from file with fileguid '.$fileGuid, $result);
+            // E1460: Can not read from file with fileguid {fileGuid}
+            throw new AcrossSoapConnectorException('E1460', [
+                'result' => $result,
+                'fileGuid' => $fileGuid,
+            ]);
         }
         
         return $result->data;
@@ -235,23 +246,28 @@ class AcrossSoapConnector extends SoapClient  {
         $params = [$this->securityToken, $fileGuid];
         $result = $this->__soapCall('FileManager.RemoveFileFromServer', $params);
     }
-    
+
     /**
      * Wait until the job of the across-API-object $acrossApiObject with guid $guid is finished.
      * on error throws AcrossSoapConnectorException
-     *  
-     * @param string $acrossApiObject<br>
+     *
+     * @param string $acrossApiObject <br>
      * e.g. 'TaskManager', 'DocumentManager', ... an element of the list under https://wiki.across.net/display/ASCS/crossAPI+SI+Objects+Description
      * @param string $guid
-     * 
+     *
      * @return TRUE
+     * @throws AcrossSoapConnectorException
      */
     protected function waitUntilJobIsFinished($acrossApiObjectName, $guid) {
         $params = [$this->securityToken, $guid];
         $result = $this->__soapCall($acrossApiObjectName.'.GetJobStatus', $params);
         
         if ($result->errorcode) {
-            throw new AcrossSoapConnectorException('can not wait until job "'.$acrossApiObjectName.'" is finished)', $result);
+            // E1455: can not wait until job "{job}" is finished
+            throw new AcrossSoapConnectorException('E1455', [
+                'job' => $acrossApiObjectName,
+                'result' => $result
+            ]);
         }
         
         // if job is still running
@@ -271,11 +287,18 @@ class AcrossSoapConnector extends SoapClient  {
 /**
  * Special AcrossSoapConnector Exception extends the normal Exception
  */
-class AcrossSoapConnectorException extends Exception {
-    public function __construct($text, $additionalInformations = NULL) {
-        if (!is_null($additionalInformations)) {
-            $text .= "\n\n".print_r($additionalInformations, true);
-        }
-        parent::__construct($text);
-    }
+class AcrossSoapConnectorException extends ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $domain = 'plugin.termimport';
+
+    protected static $localErrorCodes = [
+        'E1455' => 'Across TBX Export: Can not wait until job "{job}" is finished',
+        'E1456' => 'Across TBX Export: Error on connecting to Across under "{url}"',
+        'E1457' => 'Across TBX Export: Can not create Across security token',
+        'E1458' => 'Across TBX Export: Error on communication with Across',
+        'E1459' => 'Across TBX Export: Can not create temporary filestream',
+        'E1460' => 'Across TBX Export: Can not read from file with fileguid {fileGuid}',
+    ];
 }

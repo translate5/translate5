@@ -81,12 +81,15 @@ class editor_Models_Import_FileParser_XmlParser {
      */
     private array $options = [
         'normalizeTags' => true,
+        'preparsexml' => false,
     ];
 
     /**
      * Options:
      * normalizeTags:   true by default: all tags are lowerized. According to XML spec, tags ARE case sensitive,
      *                  but on XLF import we ignore the case. Nevermind there are some cases where it must be disabled.
+     * preparse:        To normalize plain > chars in attributes, or single quotes for attributes a preparsing with
+     *                  simplexml can be done to get a sane XML for regex based parsing.
      * @param array $options
      */
     public function __construct(array $options = []) {
@@ -104,6 +107,7 @@ class editor_Models_Import_FileParser_XmlParser {
      * @return string the parsed string with all callbacks applied
      */
     public function parse(string $xml, bool $preserveWhitespaceRoot = false, array $validTags = []): string {
+        $xml = $this->preparseXml($xml);
         $this->nonXmlBlocks = [];
         $xml = preg_replace_callback('/(<!\[CDATA\[.*?\]\]>)|(<!--.*?-->)/s', function($item){
             $id = count($this->nonXmlBlocks);
@@ -761,5 +765,26 @@ class editor_Models_Import_FileParser_XmlParser {
     
     public function join(array $chunks): string {
         return join('', $chunks);
+    }
+
+    private function preparseXml(string $xml): string
+    {
+        if (!$this->options['preparsexml']) {
+           return $xml;
+        }
+
+        //Due TRANSLATE-3151
+        libxml_use_internal_errors(true);
+        $dom = simplexml_load_string($xml);
+        $xml = false; // since asXML may return false on error we use that as default
+        if ($dom) {
+            $xml = $dom->asXML();
+        }
+        if ($xml === false) {
+            throw new editor_Models_Import_FileParser_InvalidXMLException('E1448', [
+                'libxmlerrors' => json_encode(libxml_get_errors())
+            ]);
+        }
+        return $xml;
     }
 }

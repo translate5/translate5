@@ -147,8 +147,12 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * {@inheritDoc}
      * @see editor_Services_Connector_BatchTrait::processBatchResult()
      */
-    protected function processBatchResult($segmentResults, int $segmentId=-1) {
-        $this->resultList->addResult($this->tagHandler->restoreInResult($segmentResults['text'] ?? '', $segmentId), $this->defaultMatchRate);
+    protected function processBatchResult($segmentResults)
+    {
+        $this->resultList->addResult(
+            $this->tagHandler->restoreInResult($segmentResults['text'] ?? ''),
+            $this->defaultMatchRate
+        );
     }
     
     /**

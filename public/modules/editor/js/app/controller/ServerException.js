@@ -145,13 +145,22 @@ Ext.define('Editor.controller.ServerException', {
 
             // Fire custom error code events for custom handling. The code bellow will not be processed If the event handler function returns false
             // This is used in plugin context for custom error handling
-            if(json && json.errorCode && this.fireEvent('serverException'+json.errorCode,json,json.errorCode) === false){
+            if(json && json.errorCode && this.fireEvent('serverException'+json.errorCode,json,json.errorCode,response) === false){
                 return;
             }
         }
         catch(e){
+            var msg = 'Invalid JSON';
             //if there is no valid JSON, the error is probably not from us. With 0 we pass by the below switch and just print the error
             status = 0; 
+            text += '<br><br> Invalid JSON from Server!';
+            if(response && Ext.isEmpty(response.getAllResponseHeaders()['x-translate5-version'])) {
+                text += '<br>Answer seems to come from a proxy!';
+                msg += ' - answer seems not to be from translate5 - x-translate5-version header is missing.'
+            }
+
+            Editor.MessageBox.addError(text);
+            jslogger && jslogger.logException(new Error(msg));
         }
         if(json && json.errorCode === 'E1381') {
             Ext.Logger.error("E1381 error on the backend");
@@ -182,6 +191,7 @@ Ext.define('Editor.controller.ServerException', {
         }
         errorCode = json && json.errorCode;
         switch(status) {
+            case 0:
             case -1:
                 //if the XHR was aborted, do nothing here, since this is "wanted" behaviour
                 if(response.aborted) {
@@ -230,13 +240,11 @@ Ext.define('Editor.controller.ServerException', {
                     icon: Ext.MessageBox.WARNING
                 });
                 return;
-            case 409: //Conflict: show message from server
-            //FIXME the errors coming with a translation, should show the error message directly, without introduction text
-                Editor.MessageBox.addError(appendServerMsg(str["409"]), errorCode);
-                return;
-            //422 unprocessable entity: normally the errors are shown via form.markInvalid. 
-            // If not, we add up the error message with info from the payload
-            case 422: 
+            case 409:
+                //Conflict: show message from server
+            case 422:
+                //422 unprocessable entity: normally the errors are shown via form.markInvalid.
+                // If not, we add up the error message with info from the payload
                 var errorsToUse;
                 if(json.errorMessage && json.errorsTranslated) {
                     Ext.Logger.warn('Original Error (a translated version was shown to the user): ' + json.errorMessage);
@@ -246,12 +254,15 @@ Ext.define('Editor.controller.ServerException', {
                     errorsToUse = json.errors;
                 }
                 else {
-                    Editor.MessageBox.addError(str["409"]+'<ul><li>'+json.errorMessage+'</li></ul>', errorCode);
+                    Editor.MessageBox.addError(appendServerMsg(str["409"]), errorCode);
                     return;
                 }
                 json.errorMessage = [];
                 Ext.Object.each(errorsToUse, function(field, errors) {
                     Ext.Object.each(errors, function(key, error) {
+                        if(Ext.isArray(error)){
+                            error = error.join('<br/>')
+                        }
                         json.errorMessage.push(error);
                     });
                 });

@@ -4,6 +4,7 @@ namespace MittagQI\Translate5\LanguageResource;
 
 use editor_Models_Languages;
 use Zend_Db_Expr;
+use Zend_Db_Table_Abstract;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Abstract;
 
@@ -15,7 +16,7 @@ use ZfExtended_Models_Entity_Abstract;
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  */
-class TaskPivotAssociation extends ZfExtended_Models_Entity_Abstract {
+class TaskPivotAssociation extends AssociationAbstract {
     protected $dbInstanceClass = 'MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation';
     protected $validatorInstanceClass = 'MittagQI\Translate5\LanguageResource\Validator\TaskPivotAssociation';
 
@@ -88,39 +89,4 @@ class TaskPivotAssociation extends ZfExtended_Models_Entity_Abstract {
         return $this->loadFilterdCustom($s);
     }
 
-    /***
-     * @param string $taskGuid
-     * @return array|null
-     */
-    public function loadTaskAssociated(string $taskGuid): ?array
-    {
-        $s = $this->db->select()
-            ->where('taskGuid = ?',$taskGuid);
-        return $this->db->getAdapter()->fetchAll($s);
-    }
-
-    /***
-     * Check if given resource is assigned to a task
-     * @param int $resourceId
-     * @param string $taskGuid
-     * @return bool
-     */
-    public function isAssigned(int $resourceId, string $taskGuid): bool
-    {
-        $s = $this->db->select()
-            ->where('taskGuid = ?',$taskGuid)
-            ->where('languageResourceId = ?',$resourceId);
-        return empty($this->db->getAdapter()->fetchAll($s)) === false;
-    }
-
-    /***
-     * Delete all associations for given taskGuid
-     *
-     * @param string $taskGuid
-     * @return bool
-     */
-    public function deleteAllForTask(string $taskGuid): bool
-    {
-        return $this->db->delete(['taskGuid = ?' => $taskGuid]) > 0;
-    }
 }

@@ -107,6 +107,8 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
     const STATE_END = 'end';
+    const STATE_PREPARATION = 'preparation';
+    const STATE_POST_PROCESSING = 'postprocessing';
     const STATE_IMPORT = 'import';
     const STATE_PROJECT = 'project'; //seems to be used as import status for projects!
     const STATE_ERROR = 'error';
@@ -122,6 +124,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const TABLE_ALIAS = 'LEK_task';
 
     const INTERNAL_LOCK = '*translate5InternalLock*';
+    /**
+     * The directory inside a task's data dir where log's can be stored (e.g. logs from docker-services)
+     */
+    const LOG_DIR = 'log';
 
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
@@ -391,7 +397,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return string
      */
     public function getTasknameForDownload(string $suffix, $prefix = '') {
-        return iconv('UTF-8', 'ASCII//TRANSLIT', $prefix.$this->getTaskName().$suffix);
+        //see TS-2156 and https://stackoverflow.com/questions/1401317/remove-non-utf8-characters-from-string
+        $name = preg_replace('/[^[:print:]\n]/u', '', iconv("UTF-8", "UTF-8//IGNORE", $this->getTaskName()));
+        return iconv('UTF-8', 'ASCII//TRANSLIT', $prefix.$name.$suffix);
     }
 
     /**
@@ -512,6 +520,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $this->taskDataPath = $config->runtimeOptions->dir->taskData.DIRECTORY_SEPARATOR.$taskDataRel;
         }
         return $this->taskDataPath;
+    }
+
+    /**
+     * The log dir for various task-specific logs, will be created if it does not exist
+     * @param bool $createIfNeccessary
+     * @return string
+     */
+    public function getAbsoluteTaskLogPath(bool $createIfNeccessary=true): string
+    {
+        $logDir =  $this->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . self::LOG_DIR;
+        if ($createIfNeccessary && !is_dir($logDir)) {
+            if (!mkdir($logDir, 0777, true) && !is_dir($logDir)) {
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $logDir));
+            }
+        }
+        return $logDir;
     }
 
     /**

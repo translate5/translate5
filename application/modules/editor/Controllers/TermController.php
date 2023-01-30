@@ -539,7 +539,7 @@ class editor_TermController extends ZfExtended_RestController
             // Make sure all terms belong to 1 distinct language, that is equal to sourceLang-param
             $this->jcheck([
                 'distinctQty' => ['eql' => 1],
-                'language'    => ['eql' => $_['sourceLang']['rfc5646']]
+                'language'    => ['eql' => explode('-', $_['sourceLang']['rfc5646'])[0]]
             ], [
                 'distinctQty' => count($languageA),
                 'language'    => array_keys($languageA)[0]

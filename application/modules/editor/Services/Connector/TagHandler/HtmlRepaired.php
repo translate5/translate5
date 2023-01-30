@@ -40,23 +40,24 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
      * @var Tags[]
      */
     private array $repairTags = [];
+    private ?editor_Models_Segment $currentSegment = null;
 
     public function __construct(){
         $this->logger = ZfExtended_Factory::get('ZfExtended_Logger_Queued');
     }
+
     /**
      * Turns the internal tags (start & end) to simple singular img-tags to increase chances to restore them
      * Therefore a re-identifyable id must be provided
      * @param string $queryString
-     * @param int $segmentId
      * @return string
      * @throws ZfExtended_Exception
      */
-    public function prepareQuery(string $queryString, int $segmentId=-1): string {
-        if($segmentId < 0){
-            throw new ZfExtended_Exception('editor_Services_Connector_TagHandler_HtmlRepaired::prepareQuery: A segmentId must be provided per query to use this tag-handler');
+    public function prepareQuery(string $queryString): string {
+        if ($this->currentSegment === null) {
+            throw new ZfExtended_Exception('editor_Services_Connector_TagHandler_HtmlRepaired::prepareQuery: A currentSegment must be provided per query to use this tag-handler');
         }
-        $key = 'rt'.$segmentId;
+        $key = 'rt'.$this->currentSegment->getId();
         try {
             // this tries to load the segment's
             $this->repairTags[$key] = new Tags($queryString);
@@ -70,21 +71,25 @@ class editor_Services_Connector_TagHandler_HtmlRepaired extends editor_Services_
     /**
      * restores the tags from the sent image-tags and repairs lost tags or tag fragments
      * @param string $resultString
-     * @param int $segmentId
      * @return string|null
      * @throws ZfExtended_Exception
      */
-    public function restoreInResult(string $resultString, int $segmentId=-1): ?string {
-        if($segmentId < 0){
-            throw new ZfExtended_Exception('editor_Services_Connector_TagHandler_HtmlRepaired::restoreInResult: A segmentId must be provided per restore that identifies the query to use this tag-handler');
+    public function restoreInResult(string $resultString): ?string {
+        if (empty($this->currentSegment)) {
+            throw new ZfExtended_Exception('editor_Services_Connector_TagHandler_HtmlRepaired::restoreInResult: A currentSegment must be provided per restore that identifies the query to use this tag-handler');
         }
         $this->hasRestoreErrors = false;
-        $key = 'rt'.$segmentId;
+        $key = 'rt'.$this->currentSegment->getId();
         try {
             return $this->repairTags[$key]->recreateTags($resultString);
         } catch(Exception $e) {
             $this->hasRestoreErrors = true;
             return strip_tags($resultString);
         }
+    }
+
+    public function setCurrentSegment(editor_Models_Segment $segment): void
+    {
+        $this->currentSegment = $segment;
     }
 }

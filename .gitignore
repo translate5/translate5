@@ -1,4 +1,5 @@
 # User data dirs
+/data/ConnectWorldserver*
 /data/editor*
 /data/purchaseOrderPdfs*
 /data/tbx-import*

@@ -231,6 +231,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             case editor_Plugins_SpellCheck_Check::WHITESPACE              : return $translate->_('There is a mismatch in whitespace between source and target content or the text violates specific rules related to the use of whitespace.');
             case editor_Plugins_SpellCheck_Check::TERMINOLOGY             : return $translate->_('An incorrect term or a term from the wrong domain was used or terms are used inconsistently.');
             case editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION    : return $translate->_('There is an issue related to the internationalization of content.');
+            case editor_Plugins_SpellCheck_Check::NON_CONFORMANCE         : return $translate->_('Statistically detect wrong use of words that are easily confused');
 
             case editor_Plugins_SpellCheck_Check::GRAMMAR                 : return $translate->_('The text contains a grammatical error (including errors of syntax and morphology).');
             case editor_Plugins_SpellCheck_Check::MISSPELLING             : return $translate->_('The text contains a misspelling.');
@@ -265,6 +266,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             case editor_Plugins_SpellCheck_Check::WHITESPACE              : return $translate->_('Whitespace');
             case editor_Plugins_SpellCheck_Check::TERMINOLOGY             : return $translate->_('Terminology');
             case editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION    : return $translate->_('Internationalization');
+            case editor_Plugins_SpellCheck_Check::NON_CONFORMANCE         : return $translate->_('Non-conformance');
 
             case editor_Plugins_SpellCheck_Check::GRAMMAR                 : return $translate->_('Grammar');
             case editor_Plugins_SpellCheck_Check::MISSPELLING             : return $translate->_('Spelling');
@@ -297,6 +299,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
                 editor_Plugins_SpellCheck_Check::WHITESPACE,
                 editor_Plugins_SpellCheck_Check::TERMINOLOGY,
                 editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION,
+                editor_Plugins_SpellCheck_Check::NON_CONFORMANCE,
             ],
             editor_Plugins_SpellCheck_Check::GRAMMAR,
             editor_Plugins_SpellCheck_Check::MISSPELLING,

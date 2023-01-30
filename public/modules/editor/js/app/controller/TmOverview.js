@@ -137,6 +137,11 @@ Ext.define('Editor.controller.TmOverview', {
             '#Editor.store.LanguageResources.LanguageResource': {
                 update: 'addRecordToImportCheck'
             }
+        },
+        controller:{
+            '#ServerException':{
+                serverExceptionE1447: 'onServerExceptionE1447Handler'
+            }
         }
     },
     /**
@@ -260,32 +265,7 @@ Ext.define('Editor.controller.TmOverview', {
     },
     
     handleSaveEditClick: function(button){
-        var me = this,
-            window = button.up('window'),
-            form = window.down('form'),
-            record = form.getRecord();
-
-        if(!form.isValid()) {
-            return;
-        }
-        record.reject();
-
-        form.updateRecord(record);
-        
-        window.setLoading(true);
-        record.save({
-            failure: function(records, op) {
-                window.setLoading(false);
-                Editor.app.getController('ServerException').handleException(op.error.response);
-            },
-            success: function() {
-                var msg = Ext.String.format(me.strings.edited, record.get('name'));
-                me.getTmOverviewPanel().getStore().load();
-                window.setLoading(false);
-                window.close();
-                Editor.MessageBox.addSuccess(msg);
-            }
-        });
+        this.editLangaugeResource();
     },
     
     handleSaveImportClick: function(button){
@@ -331,6 +311,71 @@ Ext.define('Editor.controller.TmOverview', {
             }
         });
     },
+
+    /***
+     * Edit language resource
+     * @param forced
+     */
+    editLangaugeResource: function (forced){
+        var me = this,
+            window = Ext.ComponentQuery.query('#editTmWindow')[0],
+            form = window.down('form'),
+            record = form.getRecord();
+
+        if(!form.isValid()) {
+            return;
+        }
+        record.reject();
+
+        form.updateRecord(record);
+
+        window.setLoading(true);
+        record.save({
+            preventDefaultHandler: true,
+            params:{
+                forced: Ext.isEmpty(forced) ? 0 : 1
+            },
+            failure: function(records, op) {
+                window.setLoading(false);
+                Editor.app.getController('ServerException').handleException(op.error.response);
+            },
+            success: function() {
+                var msg = Ext.String.format(me.strings.edited, record.get('name'));
+                me.getTmOverviewPanel().getStore().load();
+                window.setLoading(false);
+                window.close();
+                Editor.MessageBox.addSuccess(msg);
+            }
+        });
+    },
+
+    /***
+     * Delete given language resource and send additional params with the request
+     * @param rec
+     * @param params
+     */
+    deleteLanguageResource: function (rec,params){
+        var me = this,
+            additionalParams = params ? params : {},
+            store = me.getTmOverviewPanel().getStore(),
+            msg = me.strings;
+
+        rec.drop();
+        rec.save({
+            params: additionalParams,
+            failure: function() {
+                rec.reject();
+                store && store.load();
+            },
+            success: function(record, operation) {
+                store && store.load();
+                store.remove(rec);
+                Editor.MessageBox.addSuccess(Ext.String.format(msg.deleted, rec.get('name')));
+                Editor.MessageBox.addByOperation(operation);
+            }
+        });
+    },
+
     /**
      * Checks loaded LanguageResources and reloads LanguageResources with status import periodically
      * @param {Ext.data.Store} store
@@ -465,7 +510,8 @@ Ext.define('Editor.controller.TmOverview', {
         menu.showAt(ev.getXY());
     },
     handleDeleteTm : function(view, cell, cellIdx, rec){
-        var msg = this.strings,
+        var me = this,
+            msg = me.strings,
             store = view.getStore(),
             noConn = rec.get('status') === rec.STATUS_NOCONNECTION,
             info = Ext.String.format(noConn ? msg.deleteConfirmLocalText : msg.deleteConfirmText, rec.get('name')),
@@ -477,20 +523,7 @@ Ext.define('Editor.controller.TmOverview', {
             if(btn !== 'yes') {
                 return;
             }
-            rec.drop();
-            rec.save({
-                params: params,
-                failure: function() {
-                    rec.reject();
-                    store && store.load();
-                },
-                success: function(record, operation) {
-                    store && store.load();
-                    store.remove(rec);
-                    Editor.MessageBox.addSuccess(Ext.String.format(msg.deleted, rec.get('name')));
-                    Editor.MessageBox.addByOperation(operation);
-                }
-            });
+            me.deleteLanguageResource(rec,params);
         });
     },
     /***
@@ -687,5 +720,52 @@ Ext.define('Editor.controller.TmOverview', {
         var params = {}, url = Editor.data.restpath+'languageresourceinstance/xlsxexport?';
         params['collectionId'] = rec.get('id');
         window.open(url+Ext.urlEncode(params));
+    },
+
+    onServerExceptionE1447Handler: function (responseText,ecode,response) {
+        var me = this,
+            translated = responseText.errorsTranslated,
+            extraData = responseText.extraData ? responseText.extraData : null,
+            taskListReduced = extraData ? extraData.taskList : [],
+            tasksCount = taskListReduced.length,
+            request = response ? response.request : false,
+            record = (request && request.records) ? request.records[0] : false,
+            isDelete = request.method ? request.method.toLowerCase() === 'delete'  : false;
+
+        if(tasksCount > 10){
+            taskListReduced = taskListReduced.slice(0,9);
+            taskListReduced.push(' + '+(tasksCount+9)+' '+ Editor.data.l10n.tmOverview.more);
+        }
+
+        taskListReduced = taskListReduced.map(function (i){
+            return '<li>'+i+'</li>';
+        });
+
+        Ext.create('Ext.window.MessageBox').show({
+            title: Editor.data.l10n.languageResources.editLanguageResource.conflictErrorTitle,
+            msg: Ext.String.format('{0} <ul>{1}</ul> {2}',translated.errorMessages[0],taskListReduced.join(''),translated.errorMessages[1]),
+            buttons: Ext.Msg.YESNO,
+            fn:function(button){
+                if(button === "yes"){
+                    if( isDelete === false){
+                        me.editLangaugeResource(true);
+                        return true
+                    }
+
+                    if( record){
+                        me.deleteLanguageResource(request.records[0],{
+                            forced : true
+                        });
+                    }
+                    return true;
+                }
+                return false;
+            },
+            scope:me,
+            defaultFocus:'no',
+            icon: Ext.MessageBox.QUESTION
+        });
+
+        return false;
     }
 });

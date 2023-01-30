@@ -126,6 +126,10 @@
                 <source>Passwort neu setzen</source>
                 <target>Passwort neu setzen</target>
             </trans-unit>
+            <trans-unit id='TG9naW5uYW1lIGdlw6RuZGVydA=='>
+                <source>Loginname geändert</source>
+                <target>Loginname geändert</target>
+            </trans-unit>
             <trans-unit id='VW5nw7xsdGlnZSBMb2dpbmRhdGVuITxici8+SGFiZW4gU2llIElociBQYXNzd29ydCB2ZXJnZXNzZW4gb2RlciBiaXNsYW5nIG5vY2gga2VpbiBQYXNzd29ydCBmw7xyIElocmVuIExvZ2luIGdlc2V0enQ/ICBTaWUga8O2bm5lbiBqZWRlcnplaXQgZWluZW4gbmV1ZW4gTGluayAlc2hpZXIlcyBhbmZvcmRlcm4u'>
                 <source>Ungültige Logindaten!
                     <br/>Haben Sie Ihr Passwort vergessen oder bislang noch kein Passwort für Ihren Login gesetzt?  Sie können jederzeit einen neuen Link %shier%s anfordern.
@@ -818,6 +822,28 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 
 {footer}</target>
             </trans-unit>
+            <trans-unit id='e2hlYWRlcn0KV2lyIGhhYmVuIGZlc3RnZXN0ZWxsdCwgZGFzcyBJaHIgTG9naW4tTmFtZSBuaWNodCB1bnRlcnN0w7x0enRlIFplaWNoZW4gZW50aMOkbHQuCkRlciBMb2dpbi1OYW1lIHd1cmRlIGF1dG9tYXRpc2NoIGdlw6RuZGVydC4KCklociBuZXVlciBMb2dpbi1OYW1lOgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0Ke25ld0xvZ2lufQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCntmb290ZXJ9'>
+                <source>{header}
+Wir haben festgestellt, dass Ihr Login-Name nicht unterstützte Zeichen enthält.
+Der Login-Name wurde automatisch geändert.
+
+Ihr neuer Login-Name:
+------------------------------
+{newLogin}
+------------------------------
+
+{footer}</source>
+                <target>{header}
+Wir haben festgestellt, dass Ihr Login-Name nicht unterstützte Zeichen enthält.
+Der Login-Name wurde automatisch geändert.
+
+Ihr neuer Login-Name:
+------------------------------
+{newLogin}
+------------------------------
+
+{footer}</target>
+            </trans-unit>
             <trans-unit id='VHJ5IG9ubGluZQ=='>
                 <source>Try online</source>
                 <target>Try online</target>
@@ -1105,6 +1131,34 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
                       <a target="youtubevideoframe" href="https://www.youtube.com/embed/fgSm2Ygw0uk?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
                 </figure>
                 </target>
+            </trans-unit>
+            <trans-unit id='TWluZGVzdGzDpG5nZTogMTIgWmVpY2hlbi4gTWluZGVzdGVucyBlbnRoYWx0ZW46IEVpbiBHcm/Dn2J1Y2hzdGFiZSwgZWluIEtsZWluYnVjaHN0YWJlIHVuZCBlaW5lIFphaGwu'>
+              <source>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</source>
+              <target>Mindestlänge: 12 Zeichen. Mindestens enthalten: Ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyAxMiBaZWljaGVu">
+              <source>Mindestens 12 Zeichen</source>
+              <target>Mindestens 12 Zeichen</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW5lIFphaGw=">
+              <source>Mindestens eine Zahl</source>
+              <target>Mindestens eine Zahl</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gS2xlaW5idWNoc3RhYmU=">
+              <source>Mindestens ein Kleinbuchstabe</source>
+              <target>Mindestens ein Kleinbuchstabe</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gR3Jvw59idWNoc3RhYmU=">
+              <source>Mindestens ein Großbuchstabe</source>
+              <target>Mindestens ein Großbuchstabe</target>
+            </trans-unit>
+            <trans-unit id="TWluZGVzdGVucyBlaW4gU29uZGVyemVpY2hlbg==">
+              <source>Mindestens ein Sonderzeichen</source>
+              <target>Mindestens ein Sonderzeichen</target>
+            </trans-unit>
+            <trans-unit id="RGFzIFBhc3N3b3J0IGVudGjDpGx0IGVpbiBXb3J0IGF1cyBkZXIgc2Nod2FyemVuIExpc3RlLg==">
+              <source>Das Passwort enthält ein Wort aus der schwarzen Liste.</source>
+              <target>Das Passwort enthält ein Wort aus der schwarzen Liste.</target>
             </trans-unit>
         </body>
     </file>

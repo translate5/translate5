@@ -10,6 +10,189 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+
+## [5.8.5] - 2023-01-24
+
+### Important Notes:
+#### [TRANSLATE-3039](https://jira.translate5.net/browse/TRANSLATE-3039)
+The password rules were changed: The password length must be at least 12 characters and must have mixed content (lower / uppercase / numbers). 
+This affects new users and when the password is changed!
+ 
+
+
+### Added
+**[TRANSLATE-3172](https://jira.translate5.net/browse/TRANSLATE-3172): file format settings - XML File Filter Settings for Figma** <br>
+Added XML filter for Figma (collaborative software)
+
+**[TRANSLATE-3136](https://jira.translate5.net/browse/TRANSLATE-3136): MatchAnalysis & Pretranslation - Show analysis results for editor users** <br>
+Analysis results are available for all users with editor role.
+
+**[TRANSLATE-3054](https://jira.translate5.net/browse/TRANSLATE-3054): Auto-QA - Batch-set multiple AutoQA errors of type LanguageTool or Terminology to false positive** <br>
+It is now possible to batch-set false-positive for similar autoQA-qualities
+
+
+### Changed
+**[TRANSLATE-3170](https://jira.translate5.net/browse/TRANSLATE-3170): VisualReview / VisualTranslation - Improve error-logging for pdfconverter** <br>
+Improve logging and data clean up in external service PDFconverter
+
+**[TRANSLATE-3169](https://jira.translate5.net/browse/TRANSLATE-3169): SpellCheck (LanguageTool integration) - Make 'non-conformance' error to be counted** <br>
+'non-conformance' errors detected by LanguageTool are now counted by AutoQA
+
+**[TRANSLATE-3039](https://jira.translate5.net/browse/TRANSLATE-3039): Editor general - Improve password rules (4.7)** <br>
+The current password rule (just 8 characters) was to lax. The new user password roles requirements can be found in this link: https://confluence.translate5.net/x/AYBVG
+
+**[TRANSLATE-294](https://jira.translate5.net/browse/TRANSLATE-294): Editor general - Add the task guid in the task overview as hidden column for better debugging** <br>
+Add the TaskGuid as by default hidden column to the task grid.
+
+
+### Bugfixes
+**[TRANSLATE-3174](https://jira.translate5.net/browse/TRANSLATE-3174): Auto-QA, Import/Export - Ignore protected character tags (mostly whitespace) from tagcheck** <br>
+Several fixes in context of tag check of data coming from a language resource containing several tags and whitespaces converted to translate5 space tags.
+
+**[TRANSLATE-3173](https://jira.translate5.net/browse/TRANSLATE-3173): file format settings - Change of file extension association does not refresh grid** <br>
+FIX: Bconf-Grid "Extensions" column was not updated after custom filters have been added or removed
+
+**[TRANSLATE-3171](https://jira.translate5.net/browse/TRANSLATE-3171): LanguageResources - Additional tags from manually taken over TM match is triggering tag check** <br>
+Tagcheck was producing a false positive on saving a manually taken over segment from LanguageResource.
+
+**[TRANSLATE-3168](https://jira.translate5.net/browse/TRANSLATE-3168): TermPortal - Terms transfer source language problem** <br>
+Terms transfer sublanguage problem fixed
+
+**[TRANSLATE-3167](https://jira.translate5.net/browse/TRANSLATE-3167): TBX-Import - Logger is missing in TbxBinaryDataImport class** <br>
+Fix problem with tbx import logging in binary data.
+
+**[TRANSLATE-3166](https://jira.translate5.net/browse/TRANSLATE-3166): TBX-Import - Missing support for TBX-standard tags on tbx-import** <br>
+Not all descripGrp tags where imported by the TBX import.
+
+**[TRANSLATE-3165](https://jira.translate5.net/browse/TRANSLATE-3165): TBX-Import - TBX import ignores custom attributes within descrip tags** <br>
+term-level attributes using <descrip>-tags are now not ignored on tbx-import
+
+**[TRANSLATE-3163](https://jira.translate5.net/browse/TRANSLATE-3163): Configuration - Typos system configuration texts** <br>
+Fix typos and textual inconsistencies in configuration labels and descriptions.
+
+**[TRANSLATE-3161](https://jira.translate5.net/browse/TRANSLATE-3161): InstantTranslate - languageId-problem on opening term in TermPortal** <br>
+Fix 'Open term in TermPortal' when using sublanguages.
+
+**[TRANSLATE-3160](https://jira.translate5.net/browse/TRANSLATE-3160): Editor general - Keyboard shortcut for concordance search not working as described** <br>
+Fix the field to focus on F3 shortcut usage.
+
+**[TRANSLATE-3159](https://jira.translate5.net/browse/TRANSLATE-3159): LanguageResources - Server Error 500 when filtering language resources** <br>
+Fixed server error popping on filtering languageresources by name and customer
+
+**[TRANSLATE-3158](https://jira.translate5.net/browse/TRANSLATE-3158): SpellCheck (LanguageTool integration), TermTagger integration - Task is unusable due status error caused by a recoverable error** <br>
+Task is not unusable anymore in case of termtagger-worker exception
+
+**[TRANSLATE-3155](https://jira.translate5.net/browse/TRANSLATE-3155): Task Management - Ending a task, that is currently in task state edit is possible** <br>
+If task is opened for editing it's not possible to change its state to ended
+
+**[TRANSLATE-3154](https://jira.translate5.net/browse/TRANSLATE-3154): Auto-QA - Consistency check should be case sensitive** <br>
+Consistency check is now case-sensitive
+
+**[TRANSLATE-3149](https://jira.translate5.net/browse/TRANSLATE-3149): Task Management, WebSocket Server - 403 Forbidden messages in opened task** <br>
+Users are getting multiple 403 Forbidden error messages.
+On instances with a lot of users not logging out, this might also happen often due a bug in removing such stalled sessions. This is fixed in 5.8.5.
+For users with unstable internet connections this was fixed in 5.8.2.
+
+**[TRANSLATE-3147](https://jira.translate5.net/browse/TRANSLATE-3147): InstantTranslate - Availability time in InstantTranslate makes no sense for IP-based Auth** <br>
+Translated file download's 'available until' line is not shown for IP-based users
+
+**[TRANSLATE-3142](https://jira.translate5.net/browse/TRANSLATE-3142): SpellCheck (LanguageTool integration) - Improve user feedback when spellchecker is overloaded** <br>
+Improved error message if segment save runs into a timeout.
+
+**[TRANSLATE-3140](https://jira.translate5.net/browse/TRANSLATE-3140): OpenTM2 integration - Evaluate t5memory status on usage** <br>
+A new worker was introduced for pausing match analysis if t5memory is importing a file
+
+**[TRANSLATE-3126](https://jira.translate5.net/browse/TRANSLATE-3126): InstantTranslate, TermPortal - Logout on window close also in instanttranslate and termportal** <br>
+logoutOnWindowClose-config triggers now logout when last tab is closed not anymore already on first tab.
+
+**[TRANSLATE-3052](https://jira.translate5.net/browse/TRANSLATE-3052): LanguageResources - Clean resource assignments after customer is removed** <br>
+Removing customer from resource will be prevented in case this resource is used/assigned to a task.
+
+
+## [5.8.4] - 2023-01-09
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3157](https://jira.translate5.net/browse/TRANSLATE-3157): SpellCheck (LanguageTool integration) - Summon new SNC-error with the one SpellCheck is already counting** <br>
+SNC-error beginnig with  "Dubiose 'Zahl' ..." renamed to "Dubiose Zahl" for being counted as already known to Translate5
+
+
+### Bugfixes
+**[TRANSLATE-3146](https://jira.translate5.net/browse/TRANSLATE-3146): TermPortal - Attribute tooltip has annoying latency** <br>
+Tooltips do now have no before-show delay
+
+**[TRANSLATE-3095](https://jira.translate5.net/browse/TRANSLATE-3095): TermPortal - Not all available TermCollections visible in drop-down menu** <br>
+Filter window's TermCollection dropdown problem not appearing anymore
+
+
+## [5.8.3] - 2022-12-26
+
+### Important Notes:
+#### [TRANSLATE-3156](https://jira.translate5.net/browse/TRANSLATE-3156)
+For API users creating languages via LCID only: 
+We updated a bunch of LCIDs. Backup languages table and compare the content with the table after update.
+ 
+
+
+### Changed
+**[TRANSLATE-3156](https://jira.translate5.net/browse/TRANSLATE-3156): Import/Export - Add missing LCID values** <br>
+Update and add missing LCIDs.
+
+
+### Bugfixes
+**[TRANSLATE-3152](https://jira.translate5.net/browse/TRANSLATE-3152): Editor general - Term portlet fix** <br>
+5.8.3: Hotfixed the wrong encoding of image tags in the term portlet.
+
+**[TRANSLATE-3151](https://jira.translate5.net/browse/TRANSLATE-3151): Import/Export - Import of xliff file fails because of > inside an attribute value of a ph tag** <br>
+Introduce a xmlpreparse config which cleans and normalizes the XML structure of the imported XLF files.
+
+
+## [5.8.2] - 2022-12-20
+
+### Important Notes:
+#### [TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123)
+Users who already adjusted the checkboxes, indicating whether some attribute datatype is enabled for some TermCollection - have to redo this
+
+#### [TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764)
+UPDATE: The format of the export.zip is changing! 
+Previously the export.zip was containing a folder named like the taskGuid.
+This is removed and the content directories are now directly in export.zip root.
+The legacy behaviour can be kept by setting in config runtimeOptions.editor.export.taskguiddirectory to 1
+or completely controlled by using a GET parameter taskguiddirectory with 0 or 1 on export URL.
+ 
+
+
+### Changed
+**[TRANSLATE-764](https://jira.translate5.net/browse/TRANSLATE-764): Import/Export - Restructuring of export.zip** <br>
+UPDATE: The content structure of the export zip changed. In the future it does NOT contain any more a folder with the task guid, but directly on the highest level of the zip all files of the task that were translated/reviewed.
+
+
+### Bugfixes
+**[TRANSLATE-3150](https://jira.translate5.net/browse/TRANSLATE-3150): TermPortal - TermPortal: term status tooltips old locale after locale changed** <br>
+Search results icons tooltips language is now changed on GUI language change
+
+**[TRANSLATE-3149](https://jira.translate5.net/browse/TRANSLATE-3149): Task Management, WebSocket Server - 403 Forbidden messages in opened task** <br>
+Users with an unstable internet connection got multiple 403 Forbidden error messages.
+
+**[TRANSLATE-3145](https://jira.translate5.net/browse/TRANSLATE-3145): TermPortal - TermPortal: problem on creating Chinese term** <br>
+fixed problem popping on creating term in Chinese language
+
+**[TRANSLATE-3144](https://jira.translate5.net/browse/TRANSLATE-3144): Export - Task export crashes with apache internal server error - no PHP error** <br>
+If the tasks name contains non printable invalid UTF8 characters, the task was not exportable.
+
+**[TRANSLATE-3130](https://jira.translate5.net/browse/TRANSLATE-3130): User Management - Login name with space or maybe other unusual characters causes problems** <br>
+User validator was changed to prevent creating users with login name containing a space character
+
+**[TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123): Import/Export - Tbx import: handling duplicated attributes** <br>
+TBX import: removed term-level attributes duplicates
+
+
 ## [5.8.1] - 2022-12-16 and [5.8.0] - 2022-12-06
 
 ### Important Notes:
