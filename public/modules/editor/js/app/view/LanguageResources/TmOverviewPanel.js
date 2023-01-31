@@ -179,8 +179,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         },
 	                    getTip:function(view,metadata,r){
                             return service(r).getAddTooltip(r);
-	                    }
-                        
+	                    },
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
+                        },
                     },{
                         action: 'download',
                         getClass:function(v,meta,r) {
@@ -188,7 +190,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         },
 	                    getTip:function(view,metadata,r){
 	                    	return service(r).getDownloadTooltip(r);
-	                    }
+	                    },
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
+                        },
                     },{
                         action: 'export',
                         getClass:function(v,meta,r) {
@@ -196,7 +201,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         },
 	                    getTip:function(view,metadata,r){
 	                    	return service(r).getExportTooltip(r);
-	                    }
+	                    },
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return [record.STATUS_IMPORT, record.STATUS_LOADING].includes(record.get('status'));
+                        },
                     },{
                         tooltip: me.strings.log,
                         action: 'log',
