@@ -5433,9 +5433,9 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>TBX Datei importieren</source>
                 <target>TBX Datei importieren</target>
             </trans-unit>
-            <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gZXJmb2xncmVpY2ggaW1wb3J0aWVydCE='>
-                <source>Weitere Term-Collection Daten erfolgreich importiert!</source>
-                <target>Weitere Term-Collection Daten erfolgreich importiert!</target>
+            <trans-unit id='RGllIERhdGVpIHd1cmRlIGhvY2hnZWxhZGVuLiBEZXIgSW1wb3J0IGzDpHVmdCBudW4gaW0gSGludGVyZ3J1bmQu'>
+                <source>Die Datei wurde hochgeladen. Der Import läuft nun im Hintergrund.</source>
+                <target>Die Datei wurde hochgeladen. Der Import läuft nun im Hintergrund.</target>
             </trans-unit>
             <trans-unit id='VGVybWVpbnRyw6RnZSB2ZXJzY2htZWx6ZW4='>
                 <source>Termeinträge verschmelzen</source>

@@ -293,7 +293,7 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
     //start translation manually via button
     $('.click-starts-translation').click(function(){
         if (chosenSourceIsText) {
-            startTranslation();
+            startTranslation(false);
         } else {
             startFileTranslation();
         }
@@ -307,11 +307,11 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
     });
     // initially, we appear as text translation
     showSourceIsText();
-
-    clearAllErrorMessages();
     setAllowedFileTypes();
     setfileUploadLanguageCombinationsAvailable();
     setTextForSource();
+
+    clearAllErrorMessages(true);
 
     // start with checking according to the locales as stored for user
     checkInstantTranslation();
@@ -497,7 +497,7 @@ function updateLocalesSelectLists(el) {
  */
 function hasEnginesForLanguageCombination() {
 	var returnValue = isSourceTargetAvailable($("#sourceLocale").val(), $("#targetLocale").val()),
-		isDisableButton = !isSourceTargetAvailable($("#targetLocale").val(), $("#sourceLocale").val());//switch source and target so the other way arround is checked
+		isDisableButton = !isSourceTargetAvailable($("#targetLocale").val(), $("#sourceLocale").val()); //switch source and target so the other way arround is checked
 	//the button is disabled when for the target as source there is no source as target
 	$("#switchSourceTarget").prop("disabled", isDisableButton);
     if(isDisableButton){
@@ -600,7 +600,7 @@ function startFileTranslation() {
         showSourceError(Editor.data.languageresource.translatedStrings.uploadFileNotFound);
         return;
     }
-    clearAllErrorMessages();
+    clearAllErrorMessages(false);
     $.each(uploadedFiles, function(key, value){
         fileName = value.name;
         fileType = fileName.substr(fileName.lastIndexOf('.')+1,fileName.length);
@@ -612,21 +612,28 @@ function startFileTranslation() {
         showSourceError(Editor.data.languageresource.translatedStrings.notAllowed + ': ' + fileTypesErrorList.join());
         return;
     }
-    startTranslation();
+    startTranslation(false);
 }
 
 /* --------------- prepare, start and terminate translations  --------------- */
 function startTimerForInstantTranslation() {
     terminateTranslation();
     editIdleTimer = setTimeout(function() {
-        startTranslation(); // TODO: this can start a filetranslation without calling startFileTranslation()
+        startTranslation(true); // TODO: this can start a filetranslation without calling startFileTranslation()
     }, Editor.data.apps.instanttranslate.translateDelay);
 }
-function startTranslation() {
-    var textToTranslate,
-        translationInProgressID;
-    // Check if any engines are available for that language-combination.
 
+/**
+ *
+ * @param {Boolean} isTimerInitiated
+ */
+function startTranslation(isTimerInitiated) {
+
+    // dismiss timer started file translations: should only be possible explicitly
+    if(isTimerInitiated && !chosenSourceIsText){
+        return;
+    }
+    // Check if any engines are available for that language-combination.
     if (!hasEnginesForLanguageCombination()) {
         hideTranslations();
         showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
@@ -657,8 +664,8 @@ function startTranslation() {
         return;
     }
     terminateTranslation();
-    textToTranslate = getInputTextValueTrim();
-    translationInProgressID = new Date().getTime();
+    var textToTranslate = getInputTextValueTrim();
+    var translationInProgressID = new Date().getTime();
     // store both for comparison on other places
     latestTextToTranslate = textToTranslate;
     latestTranslationInProgressID = translationInProgressID;
@@ -707,7 +714,7 @@ function translateText(textToTranslate, translationInProgressID){
             if (result.errors !== undefined && result.errors !== '') {
                 showTargetError(result.errors);
             } else {
-                clearAllErrorMessages();
+                clearAllErrorMessages(false);
                 translateTextResponse = result.rows;
                 fillTranslation();
             }
@@ -1125,7 +1132,7 @@ function getDownloads(){
         url: Editor.data.restpath+'instanttranslateapi/filelist',
         dataType: 'json',
         success: function(result){
-            clearAllErrorMessages();
+            clearAllErrorMessages(false);
             $('#sourceFile').val('');
             showDownloads(result.allPretranslatedFiles, result.dateAsOf);
             stopLoadingState();
@@ -1382,13 +1389,17 @@ function createJqXhrError(jqXHR, textStatus, errorThrown) {
     return '<strong>Error:</strong> ' + textStatus;
 }
 
-function clearAllErrorMessages() {
+/**
+ *
+ * @param {Boolean} checkLanguages
+ */
+function clearAllErrorMessages(checkLanguages) {
     $('.instant-translation-error').html('').hide();
     $("#sourceIsText").removeClass('source-text-error');
     $('#sourceError').html('').hide();
     $("#targetError").html('').hide();
-    // ALWAYS: Check if any engines are available for that language-combination.
-    if (!hasEnginesForLanguageCombination()) {
+    // Check if any engines are available for that language-combination if wanted
+    if (checkLanguages && !hasEnginesForLanguageCombination()) {
         hideTranslations();
         showTargetError(Editor.data.languageresource.translatedStrings.noLanguageResource);
         return;
@@ -1438,7 +1449,7 @@ function toggleSource($source) {
 function changeLanguage(){
     if(chosenSourceIsText){
         checkInstantTranslation();
-        startTranslation();
+        startTranslation(false);
     } else {
         checkFileTranslation();
     }
@@ -1531,7 +1542,7 @@ function unescapeHtml(text){
  */
 function showGui(){
     abortTranslateText();
-    clearAllErrorMessages();
+    clearAllErrorMessages(false);
     document.getElementById("sourceFile").value = "";
     if(chosenSourceIsText) {
         showSourceIsText();
@@ -1594,7 +1605,7 @@ function checkInstantTranslation() {
     latestTextToTranslate = '';
     $('#translations').html('');
     // Neither are former error-messages valid any longer:
-    clearAllErrorMessages();
+    clearAllErrorMessages(false);
     // If fileUpload is possible for currently chosen languages, show text accordingly:
     setTextForSource();
     // Check if any engines are available for that language-combination.
