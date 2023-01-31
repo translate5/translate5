@@ -3637,7 +3637,7 @@ A task was associated to you in the task-portal {portalLink}.
             </trans-unit>
             <trans-unit id='S29ua29yZGFuenN1Y2hl'>
                 <source>Konkordanzsuche</source>
-                <target>concordance search</target>
+                <target>Concordance search</target>
             </trans-unit>
             <trans-unit id='TWF0Y2hlcw=='>
                 <source>Matches</source>
@@ -6480,6 +6480,10 @@ The following task was imported with errors / warnings / notices. Please take ca
             <trans-unit id='QXVmZ2FiZSAiezB9IiBnZWzDtnNjaHQ='>
                 <source>Aufgabe "{0}" gelöscht</source>
                 <target>Task "{0}" deleted</target>
+            </trans-unit>
+            <trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSB7MH0gd2lyZCBnZXJhZGUgaW1wb3J0aWVydC4gQml0dGUgd2FydGVuIFNpZSwgYmlzIGRlciBJbXBvcnQgYWJnZXNjaGxvc3NlbiBpc3Qu'>
+                <source>Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.</source>
+                <target>Language resource {0} is being imported at the moment. Please wait until the import is finished.</target>
             </trans-unit>
             <trans-unit id='QmVncmlmZmUgaW4gZGVyIFRCWCB3ZXJkZW4gaW1tZXIgenVlcnN0IG5hY2ggSUQgbWl0IGJlc3RlaGVuZGVuIEVpbnRyw6RnZW4gaW4gZGVyIFRlcm1Db2xsZWN0aW9uIHp1c2FtbWVuZ2Vmw7xocnQuIFdlbm4gVGVybWUgenVzYW1tZW5mw7xocmVuIGFuZ2VrcmV1enQgaXN0IHVuZCBkaWUgSUQgaW4gZGVyIFRCWCBuaWNodCBpbiBkZXIgVGVybUNvbGxlY3Rpb24gZ2VmdW5kZW4gd2lyZCwgd2lyZCBnZXN1Y2h0LCBvYiBkZXJzZWxiZSBCZWdyaWZmIGJlcmVpdHMgaW4gZGVyc2VsYmVuIFNwcmFjaGUgZXhpc3RpZXJ0LiBXZW5uIGphLCB3ZXJkZW4gZGllIGdlc2FtdGVuIFRlcm1laW50csOkZ2UgenVzYW1tZW5nZWbDvGhydC4gSW5zYmVzb25kZXJlIGJlaSBlaW5lciBUZXJtQ29sbGVjdGlvbiBtaXQgdmllbGVuIFNwcmFjaGVuIGthbm4gZGllcyB6dSB1bmVyd8O8bnNjaHRlbiBFcmdlYm5pc3NlbiBmw7xocmVuLg=='>
                 <source>Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.</source>

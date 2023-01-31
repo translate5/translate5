@@ -486,11 +486,12 @@ class TermProposalTest extends \editor_Test_ApiTest {
 
         // Get 'termproposer test'-person id
         $tbxPersonId = -1;
-        foreach(self::$setup->filterWindow->tbxCreatedBy as $createdBy){ /* @var stdClass $createdBy */
-            if($createdBy->name === 'termproposer test'){
+        foreach (self::$setup->filterWindow->tbxCreatedBy as $createdBy){ /* @var stdClass $createdBy */
+            if ($createdBy->name === 'termproposer test') {
                 $tbxPersonId = $createdBy->ids;
             }
         }
+
         // Two terms created by that person
         $this->assertSearchResultQty(2, ['tbxCreatedBy' => $tbxPersonId]);
 
