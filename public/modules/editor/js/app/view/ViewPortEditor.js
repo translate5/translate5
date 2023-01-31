@@ -141,10 +141,6 @@ Ext.define('Editor.view.ViewPortEditor', {
                 border:0,
                 itemId: 'metapanel',
                 layout: { type:'accordion' },
-                dockedItems: [{
-                    xtype: 'metapanelNavi',
-                    dock: 'top'
-                }],
                 items: [{
                     xtype: 'terminologyPanel',
                     stateId: 'editor.eastPanelSegmentsTerminology',

@@ -115,7 +115,7 @@ Ext.define('Editor.controller.Editor', {
             }
         },
         component: {
-            '#metapanel metapanelNavi button, segmentsToolbar [dispatcher]' : {
+            'segmentsToolbar [dispatcher]' : {
                 click : 'buttonClickDispatcher'
             },
             '#segmentActionMenu menucheckitem': {
@@ -2017,7 +2017,12 @@ Ext.define('Editor.controller.Editor', {
             item.setChecked(!item.checked);
             item.allowCheckChange = false;
         } else {
-            this.buttonClickDispatcher(item);
+            var button = this.getSegmentGrid().down('segmentsToolbar #' + item.itemId);
+            if (button.dispatcher) {
+                this.buttonClickDispatcher(item);
+            } else {
+                button.click();
+            }
         }
     },
 
