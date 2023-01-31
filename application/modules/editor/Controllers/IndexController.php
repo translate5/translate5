@@ -636,7 +636,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $cronIp = CronIpFactory::create();
         $hasAppStateACL = $acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'backend', 'applicationstate');
         //since application state contains sensible information we show that only to the cron TP, or with more details to the API users
-        if ($cronIp->isAllowed($_SERVER['REMOTE_ADDR']) || $hasAppStateACL) {
+        if ($cronIp->isAllowed() || $hasAppStateACL) {
             $this->view->applicationstate = ZfExtended_Debug::applicationState($hasAppStateACL);
         }
     }

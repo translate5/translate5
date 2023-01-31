@@ -35,6 +35,7 @@ use MittagQI\Translate5\Tools\IpMatcher;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zend_Config;
+use ZfExtended_RemoteAddress;
 
 class CronIpTest extends TestCase
 {
@@ -45,6 +46,7 @@ class CronIpTest extends TestCase
     {
         $this->configMock = $this->createConfiguredMock(Zend_Config::class, []);
         $this->ipMatcherMock = $this->createConfiguredMock(IpMatcher::class, []);
+        $this->remoteAddressMock = $this->createConfiguredMock(ZfExtended_RemoteAddress::class, []);
     }
 
     public function testEmptyConfig(): void
@@ -52,6 +54,7 @@ class CronIpTest extends TestCase
         $cronIp = $this->createCronIp('');
 
         $this->ipMatcherMock->expects(self::never())->method('isIpInRange');
+        $this->remoteAddressMock->expects(self::never())->method('getIpAddress');
 
         self::assertFalse($cronIp->isAllowed($this->getFakeIpV4()));
     }
@@ -65,6 +68,18 @@ class CronIpTest extends TestCase
         $this->ipMatcherMock->expects(self::atLeast(1))->method('isIpInRange')->willReturn(false);
 
         self::assertFalse($cronIp->isAllowed($this->getFakeIpV4()));
+    }
+
+    public function testWithEmptyGiven(): void
+    {
+        $ip = $this->getFakeIpV4();
+
+        $cronIp = $this->createCronIp($ip);
+
+        $this->ipMatcherMock->expects(self::never())->method('isIpInRange');
+        $this->remoteAddressMock->expects(self::atLeast(1))->method('getIpAddress')->willReturn($ip);
+
+        self::assertTrue($cronIp->isAllowed(null));
     }
 
     public function testIpMatch(): void
@@ -119,7 +134,7 @@ class CronIpTest extends TestCase
     {
         $this->mockConfigValue($value);
 
-        return new CronIp($this->configMock, $this->ipMatcherMock);
+        return new CronIp($this->configMock, $this->ipMatcherMock, $this->remoteAddressMock);
     }
 
     public function mockConfigValue(string $value): void
