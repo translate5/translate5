@@ -494,6 +494,32 @@ where tad.id IS NULL;
     }
 
     /**
+     * Get all cases when attributes exist on unexpected levels
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function sameTypeUnexpectedLevel() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeDataType::class)
+            ->db->getAdapter()->query("
+                WITH `data` AS (
+                  SELECT
+                    `dataTypeId`, 
+                    `type`, 
+                    GROUP_CONCAT(DISTINCT IF(ISNULL(`language`), 'entry', IF(ISNULL(`termId`), 'language', 'term'))) AS `actual-levels`
+                  FROM `terms_attributes` 
+                  GROUP BY `dataTypeId`
+                )
+                SELECT `d`.*, `m`.`level` AS `expected-levels`
+                FROM `data` `d` 
+                  JOIN `terms_attributes_datatype` `m` ON (`d`.`dataTypeId` = `m`.`id`)
+                WHERE (`actual-levels` LIKE '%term%'     AND `m`.`level` NOT LIKE '%term%')
+                   OR (`actual-levels` LIKE '%language%' AND `m`.`level` NOT LIKE '%language%')
+                   OR (`actual-levels` LIKE '%entry%'    AND `m`.`level` NOT LIKE '%entry%')
+            ")->fetchAll();
+    }
+
+    /**
      * Get all cases when datatypes have same type but different label
      *
      * @return array

@@ -127,6 +127,14 @@ class TermportalDatatypecheckCommand extends Translate5AbstractCommand
             $this->io->table(array_keys(reset($sameTypeDiffElementName)), $sameTypeDiffElementName);
         }
 
+        // Get all cases when attributes exist on unexpected levels
+        if (empty($sameTypeUnexpectedLevel = $checker->sameTypeUnexpectedLevel())) {
+            $this->io->success("There are no attributes existing on unexpected levels");
+        } else {
+            $this->io->section("All cases when attributes exist on unexpected levels");
+            $this->io->table(array_keys(reset($sameTypeUnexpectedLevel)), $sameTypeUnexpectedLevel);
+        }
+
         // Get all cases when datatypes have same type but different label
         if (empty($sameTypeDiffLabel = $checker->sameTypeDiffLabelOrLevel())) {
             $this->io->success("There are no datatypes having same type but different label or level");

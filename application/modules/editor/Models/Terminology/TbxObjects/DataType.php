@@ -91,6 +91,16 @@ class editor_Models_Terminology_TbxObjects_DataType {
                     $attribute->elementName = $item['label'];
                 }
 
+                // If matching datatype's expected levels-list does not contain actual level
+                if (strpos($item['level'], $attribute->getLevel()) === false) {
+
+                    // Update levels list within preloaded datatypes dictionary
+                    $this->byType[$type]['level'] = $item['level'] . ',' . $attribute->getLevel();
+
+                    // Setup unexpectedLevel-flag
+                    $attribute->unexpectedLevel = true;
+                }
+
                 // Return dataTypeId
                 return $item['id'];
             }

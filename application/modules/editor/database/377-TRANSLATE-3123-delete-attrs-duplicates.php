@@ -172,6 +172,22 @@ foreach ($checker->sameTypeDiffElementName() as $case) {
     }
 }
 
+// Foreach sameTypeUnexpectedLevel-case found among attribute-records
+foreach ($checker->sameTypeUnexpectedLevel() as $case) {
+
+    // Get expected levels
+    $level = array_flip(explode(',', $case['expected-levels']));
+
+    // Merge with actual levels
+    $level += array_flip(explode(',', $case['actual-levels']));
+
+    // Get merged comma-separated list of levels
+    $level = join(',', array_keys($level));
+
+    // Delete datatype-record created by mistake
+    $db->query("UPDATE `terms_attributes_datatype` SET `level` = '$level' WHERE `id` = '{$case['dataTypeId']}'");
+}
+
 // Foreach sameTypeDiffLabelOrLevel-case found among datatype-records
 foreach ($checker->sameTypeDiffLabelOrLevel() as $case) {
 
@@ -200,7 +216,7 @@ foreach ($checker->sameTypeDiffLabelOrLevel() as $case) {
     // If not equal to original list of levels
     if ($level != $correct['level']) {
 
-        // Delete datatype-record created by mistake
+        // Update datatype-record with merged levels list
         $db->query("UPDATE `terms_attributes_datatype` SET `level` = '$level' WHERE `id` = '{$correct['id']}'");
     }
 }

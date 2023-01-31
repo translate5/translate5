@@ -697,6 +697,28 @@ $memLog('Loaded terms:        ');
             ], 'warn');
         }
 
+        // If level is unexpected
+        if (isset($attribute->unexpectedLevel)) {
+
+            // Update datatype's expected levels list
+            $this->attributeDataTypeModel->load($labelId);
+            $unexpected = $attribute->getLevel();
+            $wasExpected = $this->attributeDataTypeModel->getLevel();
+            $this->attributeDataTypeModel->setLevel($nowExpected = "$wasExpected,$unexpected");
+            $this->attributeDataTypeModel->save();
+
+            // Prepare log msg
+            $msg = 'TBX Import: Attribute has known type, but is at level unexpected for that type so that level is added to the list of expected';
+
+            // Do log
+            $this->log($msg, 'E1463', [
+                'type' => $attribute->type,
+                'unexpectedLevel' => $unexpected,
+                'wasExpectedLevels' => $wasExpected,
+                'nowExpectedLevels' => $nowExpected
+            ], 'warn');
+        }
+
         if (empty($labelId)) {
             // the dataType does not exist -> create it
             $this->attributeDataTypeModel->loadOrCreate($attribute->elementName, $attribute->type, [$attribute->getLevel()]);
