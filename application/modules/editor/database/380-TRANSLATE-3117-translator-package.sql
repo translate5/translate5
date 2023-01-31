@@ -50,3 +50,8 @@ INSERT INTO `Zf_worker_dependencies` (`id`, `worker`, `dependency`) VALUES (NULL
 INSERT INTO `Zf_worker_dependencies` (`id`, `worker`, `dependency`) VALUES (NULL, 'MittagQI\\Translate5\\Task\\Export\\Exported\\PackageWorker', 'editor_Plugins_SegmentStatistics_Worker');
 INSERT INTO `Zf_worker_dependencies` (`id`, `worker`, `dependency`) VALUES (NULL, 'MittagQI\\Translate5\\Task\\Export\\Exported\\PackageWorker', 'editor_Plugins_SegmentStatistics_WriteStatisticsWorker');
 
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES ('editor', 'editor', 'frontend', 'editorPackageExport');
+
+INSERT INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`)
+VALUES (NULL, 'editor', 'editor', 'editor_task', 'export');

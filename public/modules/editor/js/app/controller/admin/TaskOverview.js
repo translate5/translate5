@@ -959,6 +959,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         });
     },
 
+    /**
+     * Clones the task
+     * @param {Editor.model.admin.Task} task
+     */
+    editorPackageExport: function (task, event) {
+        window.open(Editor.data.restpath + Ext.String.format('task/export/id/{0}?format=package', task.get('id')),'_blank');
+    },
+
     /***
      * Task action menu click handler
      */

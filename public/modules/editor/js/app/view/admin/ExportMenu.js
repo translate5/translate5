@@ -52,6 +52,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
         var task = this.initialConfig.task;
         return Editor.data.restpath + Ext.String.format(path, task.get('id'), task.get('taskGuid'), field);
     },
+
     initComponent: function () {
         var me = this,
             task = me.initialConfig.task;
@@ -151,14 +152,6 @@ Ext.define('Editor.view.admin.ExportMenu', {
                 hidden: !Editor.app.authenticatedUser.isAllowed('editorExportExcelhistory', me.task),
                 text: me.messages.exportExcelHistory,
                 handler: alertHandler
-            },{
-                itemId: 'packageExportItem',
-                hidden: !exportAllowed,
-                bind:{
-                    text:'{l10n.tasksGrid.exportMenu.packageExportItem}'
-                },
-                hrefTarget: '_blank',
-                href: me.makePath('task/export/id/{0}?format=package'),
             }];
 
         if (fields !== false) {

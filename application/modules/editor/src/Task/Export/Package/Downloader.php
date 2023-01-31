@@ -71,8 +71,11 @@ class Downloader
         $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
         $worker->queue($workerId);
 
+
+        $filename = $task->getTasknameForDownload('_exportPackage.zip');
+
         header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename=\"'.$task->getTasknameForDownload('_exportPackage.zip').'\"');
+        header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '; filename=' . $filename);
         readfile($zipFile);
         unlink($zipFile);
     }
