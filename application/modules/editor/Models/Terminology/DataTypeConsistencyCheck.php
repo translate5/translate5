@@ -281,7 +281,7 @@ protected array $referenceData = [
     [
         "label" => "descrip",
         "type" => "figure",
-        "l10nSystem" => null,
+        "l10nSystem" => "{\"de\":\"Bild\",\"en\":\"Image\"}",
         "level" => "entry,language",
         "dataType" => "plainText",
         "picklistValues" => null,
@@ -298,7 +298,7 @@ protected array $referenceData = [
     public function checkAttributesAgainstDataTypes(): array {
         /** @var editor_Models_Terminology_Models_AttributeDataType $model */
         $model = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeDataType');
-        $q = $model->db->getAdapter()->query('select tad.id datatypeid, tad.label datatypeTag, tad.type datatypeType, ta.collectionId, ta.elementName attributeTag, ta.`type` attributeType
+        $q = $model->db->getAdapter()->query('select tad.id datatypeId, tad.label datatypeTag, tad.type datatypeType, ta.collectionId, ta.elementName attributeTag, ta.`type` attributeType
 from terms_attributes_datatype tad 
     JOIN terms_attributes ta on tad.id = ta.dataTypeId and (tad.label != ta.elementName or tad.`type` != ta.`type`) 
 group by tad.id, tad.label, tad.type, ta.collectionId, ta.elementName, ta.`type`
@@ -322,17 +322,17 @@ where tad.id IS NULL;
         $tree = [];
         foreach($all as $datatype) {
             //we use empty string instead null as key
-            $tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''][$datatype['level'] ?? ''] = $datatype;
+            $tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''] = $datatype;
         }
 
         $notFound = [];
         $differentContent = [];
         foreach($this->referenceData as $datatype) {
-            if(empty($tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''][$datatype['level'] ?? ''])) {
+            if(empty($tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''])) {
                 $notFound[] = $datatype;
                 continue;
             }
-            $found = $tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''][$datatype['level'] ?? ''];
+            $found = $tree[$datatype['label'] ?? ''][$datatype['type'] ?? ''];
             $diff = false;
             foreach ($datatype as $k => $v) {
                 if($k === 'picklistValues') {
@@ -356,5 +356,190 @@ where tad.id IS NULL;
             'notFound' => $notFound,
             'differentContent' => $differentContent,
         ];
+    }
+
+    /**
+     * Fetch duplicated attrs separately for each level
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function checkAttributeDuplicates() {
+
+        /** @var editor_Models_Terminology_Models_AttributeModel $model */
+        $model = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class);
+        $db = $model->db->getAdapter();
+
+        // Get attribute-duplicates on term-level
+        $term = $db->query("
+            SELECT
+              COUNT(`ta`.`id`) AS `qty`,
+              SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1) AS `newestId`,
+              REPLACE (
+                GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC),
+                CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1), ','),
+                ''
+              ) AS `olderIds`,
+              CONCAT (`type`, '-', `termId`, '-', `dataTypeId`) AS `type-termId-dataTypeId`,
+              MAX(`createdAt`),
+              MAX(`updatedAt`)
+            FROM `terms_attributes` `ta`
+            WHERE NOT ISNULL (`termId`) AND `type` NOT IN ('xGraphic', 'crossReference', 'externalCrossReference', 'figure')
+            GROUP BY `type-termId-dataTypeId`
+            HAVING `qty` > 1
+            ORDER BY `type-termId-dataTypeId` LIKE 'processStatus%' DESC, `qty` DESC, `newestId` DESC
+            LIMIT 10
+        ")->fetchAll();
+
+        // Get attribute-duplicates on language-level
+        $language = $db->query("
+            SELECT
+              COUNT(`ta`.`id`) AS `qty`,
+              SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1) AS `newestId`,
+              REPLACE (
+                GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC),
+                CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1), ','),
+                ''
+              ) AS `olderIds`,
+              CONCAT(`type`, '-', `termEntryId`, '-', `language`, '-', `dataTypeId`) AS `type-termEntryId-language-dataTypeId`,
+              MAX(`createdAt`),
+              MAX(`updatedAt`)
+            FROM `terms_attributes` `ta`
+            WHERE NOT ISNULL(`language`) AND ISNULL(`termId`) AND `type` NOT IN ('xGraphic', 'crossReference', 'externalCrossReference', 'figure')
+            GROUP BY `type-termEntryId-language-dataTypeId`
+            HAVING `qty` > 1
+            ORDER BY `qty` DESC, `newestId` DESC
+            LIMIT 10
+        ")->fetchAll();
+
+        // Get attribute-duplicates on termEntry-level
+        $termEntry = $db->query("
+            SELECT
+              COUNT(`ta`.`id`) AS `qty`,
+              SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1) AS `newestId`,
+              REPLACE (
+                GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC),
+                CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(`ta`.`id` ORDER BY `updatedAt` DESC, `ta`.`id` DESC), ',', 1), ','),
+                ''
+              ) AS `olderIds`,
+              CONCAT(`type`, '-', `termEntryId`, '-', `dataTypeId`) AS `type-termEntryId-dataTypeId`,
+              MAX(`createdAt`),
+              MAX(`updatedAt`)
+            FROM `terms_attributes` `ta`
+            WHERE ISNULL(`language`) AND `type` NOT IN ('xGraphic', 'crossReference', 'externalCrossReference', 'figure')
+            GROUP BY `type-termEntryId-dataTypeId`
+            HAVING `qty` > 1
+            ORDER BY `qty` DESC, `newestId` DESC
+            LIMIT 10
+        ")->fetchAll();
+
+        // Return duplicates info by level
+        return compact('term', 'language', 'termEntry');
+    }
+
+    /**
+     * Get first 10 term-level attributes having no termTbxId
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function noTermTbxId() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class)
+            ->db->getAdapter()->query("
+                SELECT `id`, `termId`, `dataTypeId`, `type` 
+                FROM `terms_attributes` 
+                WHERE NOT ISNULL(`termId`) AND ISNULL(`termTbxId`)
+                LIMIT 10
+            ")->fetchAll();
+    }
+
+    /**
+     * Get all cases when attributes have same dataTypeId but different type
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function sameDataTypeIdDiffType() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class)
+            ->db->getAdapter()->query("
+                SELECT `dataTypeId`, COUNT(DISTINCT `type`) AS `type-qty`, GROUP_CONCAT(DISTINCT `type`) AS `type-list`
+                FROM `terms_attributes`
+                GROUP BY `dataTypeId`
+                HAVING `type-qty` > 1
+            ")->fetchAll();
+    }
+
+    /**
+     * Get all cases when attributes have same type but different elementName
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function sameTypeDiffElementName() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class)
+            ->db->getAdapter()->query("
+                SELECT 
+                  `type`,  
+                  COUNT(DISTINCT `elementName`) AS `qty`,
+                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`dataTypeId`, '-', `elementName`) ORDER BY `dataTypeId` ASC), ',', 1) AS `correct-dataTypeId-elementName`,
+                  REPLACE (
+                    GROUP_CONCAT(DISTINCT CONCAT(`dataTypeId`, '-', `elementName`) ORDER BY `dataTypeId` ASC),
+                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`dataTypeId`, '-', `elementName`) ORDER BY `dataTypeId` ASC), ',', 1), ','),
+                    ''
+                  ) AS `mistake-list`
+                FROM `terms_attributes`
+                GROUP BY `type`
+                HAVING `qty` > 1
+            ")->fetchAll();
+    }
+
+    /**
+     * Get all cases when attributes exist on unexpected levels
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function sameTypeUnexpectedLevel() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeDataType::class)
+            ->db->getAdapter()->query("
+                WITH `data` AS (
+                  SELECT
+                    `dataTypeId`, 
+                    `type`, 
+                    GROUP_CONCAT(DISTINCT IF(ISNULL(`language`), 'entry', IF(ISNULL(`termId`), 'language', 'term'))) AS `actual-levels`
+                  FROM `terms_attributes` 
+                  GROUP BY `dataTypeId`
+                )
+                SELECT `d`.*, `m`.`level` AS `expected-levels`
+                FROM `data` `d` 
+                  JOIN `terms_attributes_datatype` `m` ON (`d`.`dataTypeId` = `m`.`id`)
+                WHERE (`actual-levels` LIKE '%term%'     AND `m`.`level` NOT LIKE '%term%')
+                   OR (`actual-levels` LIKE '%language%' AND `m`.`level` NOT LIKE '%language%')
+                   OR (`actual-levels` LIKE '%entry%'    AND `m`.`level` NOT LIKE '%entry%')
+            ")->fetchAll();
+    }
+
+    /**
+     * Get all cases when datatypes have same type but different label
+     *
+     * @return array
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function sameTypeDiffLabelOrLevel() {
+        return ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeDataType::class)
+            ->db->getAdapter()->query("
+                SELECT 
+                  `type`,  
+                  COUNT(DISTINCT CONCAT(`label`, '-', `level`)) AS `qty`,
+                  SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`, '-', `level`) ORDER BY `id` ASC SEPARATOR ';'), ';', 1) AS `correct-id-label-level`,
+                  REPLACE (
+                    GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`, '-', `level`) ORDER BY `id` ASC SEPARATOR ';'),
+                    CONCAT(SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT CONCAT(`id`, '-', `label`, '-', `level`) ORDER BY `id` ASC SEPARATOR ';'), ';', 1), ';'),
+                    ''
+                  ) AS `mistake-list`
+                FROM `terms_attributes_datatype`
+                GROUP BY `type`
+                HAVING `qty` > 1
+            ")->fetchAll();
     }
 }

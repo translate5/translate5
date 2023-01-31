@@ -97,24 +97,6 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
         return $labels;
     }
 
-    /***
-     * Return all labels with translated labelText
-     * @return array
-     */
-    public function loadAllTranslated(bool $addUniqueKey = false): array
-    {
-        $labels = $this->loadAll();
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        foreach ($labels as &$label){
-            if (empty($label['labelText'])) {
-                continue;
-            }
-            $label['labelText'] = $translate->_($label['labelText']);
-        }
-
-        return $labels;
-    }
-
     /**
      * Get comma-separated list of ids of tbx-basic attributes
      *
