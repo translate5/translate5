@@ -1,8 +1,8 @@
 {
     "success": 1,
     "row": {
-        "id": "98459",
-        "segmentId": "1140969",
+        "id": "750",
+        "segmentId": "10",
         "field": "",
         "type": "qm",
         "category": "qm_3",
@@ -12,6 +12,9 @@
         "text": "Terminology problem",
         "filterable": true,
         "falsifiable": true,
+        "content": false,
+        "similarQty": 0,
+        "falsePositiveChanged": 0,
         "hasTag": false,
         "tagName": "",
         "cssClass": ""
