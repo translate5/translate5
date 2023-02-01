@@ -217,6 +217,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             $verbose,
             $stopOnError,
             $stopOnFailure,
+            '--cache-result-file='.APPLICATION_ROOT.'/data/cache/.phpunit.result.cache',
+            '--testdox-text='.APPLICATION_ROOT.'/data/tmp/last-test-result.txt',
             '--configuration',
             $configurationFilePath,
             $suiteOption,
