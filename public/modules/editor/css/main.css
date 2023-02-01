@@ -1102,3 +1102,13 @@ dl {
 .x-fieldset-header-default > .x-fieldset-header-text {
     font-size: 15px;
 }
+#segment-metadata .x-fieldset > legend {
+    padding-bottom: 0;
+    padding-top: 0;
+}
+#segment-metadata .x-fieldset.segmentQualities {
+    margin-bottom: 8px;
+}
+#segment-metadata .x-fieldset.x-fieldset-collapsed.segmentQualities {
+    margin-bottom: 25px;
+}

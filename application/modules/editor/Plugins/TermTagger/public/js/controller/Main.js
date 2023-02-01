@@ -63,7 +63,11 @@ Ext.define('Editor.plugins.TermTagger.controller.Main', {
 
         if (Editor.data.task.get('terminologie')) {
             tp.add({xtype: 'termPortalTermPortlet'});
-            tp.show();
+        } else {
+            if (!tp.collapsed) {
+                tp.collapse();
+            }
+            tp.hide();
         }
     },
 

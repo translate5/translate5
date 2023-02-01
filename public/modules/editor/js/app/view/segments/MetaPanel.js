@@ -61,19 +61,26 @@ Ext.define('Editor.view.segments.MetaPanel', {
                 xtype: 'form',
                 border: 0,
                 itemId: 'metaInfoForm',
+                defaults: {
+                    stateEvents: ['collapse', 'expand'],
+                    stateful: {
+                        collapsed: true
+                    },
+                    collapsible: true
+                },
                 items: [{
                       xtype: 'falsePositives',
                       itemId: 'falsePositives',
-                      collapsible: true
+                      stateId: 'editor.eastPanelSegmentsFalsePositives',
                   },{
                       xtype: 'segmentQm',
                       itemId: 'segmentQm',
+                      stateId: 'editor.eastPanelSegmentsMqmWhole',
                       hidden:  !isSegmentQmVisible,
-                      collapsible: true
                   },{
                       xtype: 'fieldset',
                       itemId: 'metaStates',
-                      collapsible: true,
+                      stateId: 'editor.eastPanelSegmentsMetaStates',
                       defaultType: 'radio',
                       hidden:  !showStatus,
                       bind: {

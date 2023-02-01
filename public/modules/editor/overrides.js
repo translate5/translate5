@@ -1325,6 +1325,25 @@ Ext.override(Ext.grid.column.Column, {
 });
 
 /**
+ * Enabling the collapsed-config to be stateful, as otherwise
+ * it is applied too late, e.g after component is painted
+ */
+ Ext.override(Ext.form.FieldSet, {
+    getState: function() {
+        var me = this,
+            state = me.callParent();
+        return me.addPropertyToState(state, 'collapsed', me.collapsed);
+    },
+    applyState: function(state ) {
+        if(state && state.collapsed) {
+            this.setCollapsed(state.collapsed);
+            delete state.collapsed;
+        }
+        this.callParent([state]);
+    }
+});
+
+/**
  * We use an empty {} as default value, but Window applyState crash when called with an empty object.
  */
 Ext.override(Ext.window.Window, {
