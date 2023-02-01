@@ -69,9 +69,6 @@ Ext.define('Editor.controller.Editor', {
         ref : 'segmentGrid',
         selector : '#segmentgrid'
     },{
-        ref : 'navi',
-        selector : '#metapanel #naviToolbar'
-    },{
         ref:'filepanel',
         selector:'#filepanel'
     },{

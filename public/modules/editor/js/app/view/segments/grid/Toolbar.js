@@ -42,6 +42,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     alias: 'widget.segmentsToolbar',
 
     requires: [
+    	'Editor.view.segments.SpecialCharacters',
     	'Editor.view.segments.grid.ToolbarViewModel',
     	'Editor.view.segments.grid.ToolbarViewController'
     ],

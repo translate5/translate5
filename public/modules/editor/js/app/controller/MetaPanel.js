@@ -69,9 +69,6 @@ Ext.define('Editor.controller.MetaPanel', {
         ref: 'rightBtn',
         selector: 'menu #goAlternateRightBtn'
     }, {
-        ref: 'navi',
-        selector: '#metapanel #naviToolbar'
-    }, {
         ref: 'segmentGrid',
         selector: '#segmentgrid'
     }],
@@ -142,11 +139,9 @@ Ext.define('Editor.controller.MetaPanel', {
      * @param {Object} editingPlugin
      */
     startEdit: function (editingPlugin, context) {
-        var me = this, navi = me.getNavi();
+        var me = this;
         me.editingMode = 'edit';
         me.toggleOnEdit(true);
-        navi.show();
-        navi.enable();
         me.getSegmentMeta().show();
     },
 
@@ -294,7 +289,6 @@ Ext.define('Editor.controller.MetaPanel', {
         me.record = record;
         me.getSegmentMeta().hide();
         mp.enable();
-        me.getNavi().hide();
     },
     /**
      * lädt die konkreten record ins Meta Panel

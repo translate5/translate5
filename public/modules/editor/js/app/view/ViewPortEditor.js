@@ -45,7 +45,6 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.fileorder.Tree',
         'Editor.view.fileorder.ReferenceTree',
         'Editor.view.segments.Grid',
-        'Editor.view.segments.MetaPanelNavi',
         'Editor.view.segments.MetaPanel',
         'Editor.view.segments.TerminologyPanel',
         'Editor.view.quality.FilterPanel',
