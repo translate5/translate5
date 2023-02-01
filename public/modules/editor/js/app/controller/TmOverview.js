@@ -71,8 +71,8 @@ Ext.define('Editor.controller.TmOverview', {
         exportTmx: '#UT#als TMX Datei exportieren',
         exportZippedTmx: '#UT#als gezippte TMX Datei exportieren',
         mergeTermsWarnTitle: '#UT#Nicht empfohlen!',
-        mergeTermsWarnMessage: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.'
-
+        mergeTermsWarnMessage: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.',
+        importing: '#UT#Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.'
     },
     refs:[{
         ref: 'tmOverviewPanel',
@@ -428,6 +428,13 @@ Ext.define('Editor.controller.TmOverview', {
         var importWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getImportWindow(),
             win = Ext.widget(importWindow);
         win.loadRecord(rec);
+
+        if (rec.data.status === rec.STATUS_IMPORT) {
+            this.showCurrentlyImportingMessage(rec);
+
+            return;
+        }
+
         win.show();
     },
     handleTmGridActionColumnClick:function(view, cell, row, col, ev, record) {
@@ -498,6 +505,12 @@ Ext.define('Editor.controller.TmOverview', {
                 }
                 return items;
             };
+
+        if (rec.data.status === rec.STATUS_IMPORT) {
+            this.showCurrentlyImportingMessage(rec);
+
+            return;
+        }
 
         if (!url.match(proxy.slashRe)) {
             url += '/';
@@ -651,6 +664,13 @@ Ext.define('Editor.controller.TmOverview', {
             me.exportTcMenuCache.termCollectionExportActionMenu = menu = Ext.widget('termCollectionExportActionMenu');
         }
         menu.record = newRecord;
+
+        if (newRecord.data.status === newRecord.STATUS_IMPORT) {
+            this.showCurrentlyImportingMessage(newRecord);
+
+            return;
+        }
+
         menu.showAt(event.getXY());
     },
 
@@ -767,5 +787,14 @@ Ext.define('Editor.controller.TmOverview', {
         });
 
         return false;
+    },
+
+    showCurrentlyImportingMessage: function (record) {
+        Ext.MessageBox.show({
+            title: '',
+            msg: Ext.String.format(this.strings.importing, record.data.name),
+            buttons: Ext.MessageBox.OK,
+            icon: Ext.MessageBox.WARNING
+        });
     }
 });
