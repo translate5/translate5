@@ -50,27 +50,27 @@ class TbxImportApiTest extends \editor_Test_ApiTest {
 
 
         //import the first tbx file,
-        $this->singleTest($collectionId, 'Term.tbx', 13, 66, 6,5);
+        $this->singleTest($collectionId, 'Term.tbx', 13, 63, 6,5);
 
         //change existing term entry attribute
         //change existing term attribute
         //change existing term content
         //add new term to term collection
-        $this->singleTest($collectionId, 'Term1.tbx', 14, 71, 6,5);
+        $this->singleTest($collectionId, 'Term1.tbx', 14, 68, 6,5);
 
         // different term entry id, different term id, same language and term content -> update the term and
         // check if the other terms in the tbx term entry can be merged
         // Merge: the term <term id="462bed50-6779-4cb1-be6b-223e78b54f26">Desk</term> will be merged to: <term id="462bed50-6779-4cb1-be6b-223e78b54f26">Table</term>
         // reason is because other terms in the importing term entry are merged and the found term entry is used to merge "Desk" to "Table"
-        $this->singleTest($collectionId, 'Term2.tbx', 14, 71, 6,5);
+        $this->singleTest($collectionId, 'Term2.tbx', 14, 68, 6,5);
 
         //add new terms to the term collection
         //handle the unknown tags
-        $this->singleTest($collectionId, 'Export.tbx', 16, 92, 10,9);
+        $this->singleTest($collectionId, 'Export.tbx', 16, 88, 10,9);
 
         // Change term content and add 2 new attributes (admin and note attributes)
         // On the second term, add 2 new attributes (termNote with custom type and note)
-        $this->singleTest($collectionId, 'ExportTermChange.tbx', 16, 96, 10,9);
+        $this->singleTest($collectionId, 'ExportTermChange.tbx', 16, 91, 10,9);
 
         // clean up
         static::api()->login('testmanager');
