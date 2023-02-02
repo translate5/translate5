@@ -2029,6 +2029,14 @@ Ext.define('Editor.controller.Editor', {
      * @param item
      */
     onSegmentActionMenuItemToggle: function(item) {
-        this.getSegmentGrid().down('segmentsToolbar #' + item.itemId).setVisible(item.checked);
+
+        // Update comma-separated itemIds of checked items within menu's stateful checkedItems-prop
+        item.up().checkedItems = Ext.Array.pluck(item.up().query('[checked]'), 'itemId').join(',');
+
+        // Save state
+        item.up().saveState();
+
+        // Toggle button visibility
+        item.up('toolbar').down('#' + item.itemId).setVisible(item.checked);
     }
 });

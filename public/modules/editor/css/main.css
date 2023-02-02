@@ -1112,3 +1112,9 @@ dl {
 #segment-metadata .x-fieldset.x-fieldset-collapsed.segmentQualities {
     margin-bottom: 25px;
 }
+.x-menu-item-active .x-menu-item-text {
+    font-weight: 300;
+}
+#segment-grid .x-btn.x-item-disabled {
+    pointer-events: all;
+}

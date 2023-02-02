@@ -138,7 +138,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             }
             var useHNavArrow = false,
                 userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
-                userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags');
+                userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
+                checkedItems = Ext.state.Manager.getProvider().get('editor.segmentActionMenu')?.checkedItems || '';
+
             config = {
                 items: [{
                     xtype: 'button',
@@ -215,7 +217,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'saveBtn',
                     dispatcher: true,
-                    hidden: false,
+                    hidden: !~checkedItems.indexOf('saveBtn'),
                     icon: Editor.data.moduleFolder + 'images/tick.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.save}',
@@ -224,7 +226,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'cancelBtn',
                     dispatcher: true,
-                    hidden: false,
+                    hidden: !~checkedItems.indexOf('cancelBtn'),
                     icon: Editor.data.moduleFolder + 'images/cross.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.cancel}',
@@ -233,7 +235,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'resetSegmentBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('resetSegmentBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_undo.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.reset}',
@@ -242,7 +244,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'goToUpperByWorkflowNoSaveBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('goToUpperByWorkflowNoSaveBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_up_filtered_nosave.png ',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.prevFiltered}',
@@ -251,7 +253,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'saveNextByWorkflowBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('saveNextByWorkflowBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_down_filtered.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.saveAndNextFiltered}',
@@ -260,7 +262,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'goToLowerByWorkflowNoSaveBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('goToLowerByWorkflowNoSaveBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_down_filtered_nosave.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.nextFiltered}',
@@ -269,7 +271,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'savePreviousBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('savePreviousBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_up.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.saveAndPrevious}',
@@ -278,7 +280,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'goToUpperNoSaveBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('goToUpperNoSaveBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_up_nosave.png ',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.prev}',
@@ -287,7 +289,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'goAlternateLeftBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('goAlternateLeftBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_left.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.alternateLeft}',
@@ -296,7 +298,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'saveNextBtn',
                     dispatcher: true,
-                    hidden: false,
+                    hidden: !~checkedItems.indexOf('saveNextBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_down.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.saveAndNext}',
@@ -305,7 +307,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'goToLowerNoSaveBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('goToLowerNoSaveBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_down_nosave.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.next}',
@@ -314,7 +316,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'goAlternateRightBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('goAlternateRightBtn'),
                     icon: Editor.data.moduleFolder + 'images/arrow_right.png',
                     bind: {
                         tooltip: '{l10n.segmentGrid.toolbar.alternateRight}',
@@ -324,7 +326,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'button',
                     itemId: 'focusSegmentShortcutBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('focusSegmentShortcutBtn'),
                     bind: {
                         tooltip:{
                             dismissDelay: 0,
@@ -336,7 +338,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     itemId: 'watchSegmentBtn',
                     dispatcher: true,
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('watchSegmentBtn'),
                     icon: Editor.data.moduleFolder + 'images/star.png',
                     enableToggle: true,
                     bind: {
@@ -350,7 +352,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     xtype: 'button',
                     itemId: 'segmentLockBtn',
-                    hidden: true,
+                    hidden: !~checkedItems.indexOf('segmentLockBtn'),
                     enableToggle: true,
                     bind: {
                         icon: Editor.data.moduleFolder + 'images/{segmentIsEditable ? "lock_open" : "lock"}.png',
@@ -369,13 +371,18 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                     menu: {
                         itemId: 'segmentActionMenu',
+                        stateId: 'editor.segmentActionMenu',
+                        stateful: {
+                            checkedItems: true
+                        },
                         defaults: {
                             xtype: 'menucheckitem',
-                            allowCheckChange: false
+                            allowCheckChange: false,
+                            checkableDespiteDisabled: true
                         },
                         items: [{
                             itemId: 'saveBtn',
-                            checked: true,
+                            checked: !!~checkedItems.indexOf('saveBtn'),
                             icon: Editor.data.moduleFolder + 'images/tick.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.save}',
@@ -383,7 +390,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'cancelBtn',
-                            checked: true,
+                            checked: !!~checkedItems.indexOf('cancelBtn'),
                             icon: Editor.data.moduleFolder + 'images/cross.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.cancel}',
@@ -391,6 +398,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'resetSegmentBtn',
+                            checked: !!~checkedItems.indexOf('resetSegmentBtn'),
                             icon: Editor.data.moduleFolder + 'images/arrow_undo.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.reset}',
@@ -398,6 +406,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, '-', {
                             itemId: 'goToUpperByWorkflowNoSaveBtn',
+                            checked: !!~checkedItems.indexOf('goToUpperByWorkflowNoSaveBtn'),
                             icon: Editor.data.moduleFolder + 'images/arrow_up_filtered_nosave.png ',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.prevFiltered}',
@@ -405,6 +414,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'saveNextByWorkflowBtn',
+                            checked: !!~checkedItems.indexOf('saveNextByWorkflowBtn'),
                             icon: Editor.data.moduleFolder + 'images/arrow_down_filtered.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.saveAndNextFiltered}',
@@ -412,6 +422,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'goToLowerByWorkflowNoSaveBtn',
+                            checked: !!~checkedItems.indexOf('goToLowerByWorkflowNoSaveBtn'),
                             icon: Editor.data.moduleFolder + 'images/arrow_down_filtered_nosave.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.nextFiltered}',
@@ -419,6 +430,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, '-', {
                             itemId: 'savePreviousBtn',
+                            checked: !!~checkedItems.indexOf('savePreviousBtn'),
                             icon: Editor.data.moduleFolder + 'images/arrow_up.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.saveAndPrevious}',
@@ -426,6 +438,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'goToUpperNoSaveBtn',
+                            checked: !!~checkedItems.indexOf('goToUpperNoSaveBtn'),
                             icon: Editor.data.moduleFolder + 'images/arrow_up_nosave.png ',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.prev}',
@@ -433,6 +446,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'goAlternateLeftBtn',
+                            checked: !!~checkedItems.indexOf('goAlternateLeftBtn'),
                             hidden: !useHNavArrow,
                             icon: Editor.data.moduleFolder + 'images/arrow_left.png',
                             bind: {
@@ -441,7 +455,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'saveNextBtn',
-                            checked: true,
+                            checked: !!~checkedItems.indexOf('saveNextBtn'),
                             icon: Editor.data.moduleFolder + 'images/arrow_down.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.saveAndNext}',
@@ -449,6 +463,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'goToLowerNoSaveBtn',
+                            checked: !!~checkedItems.indexOf('goToLowerNoSaveBtn'),
                             icon: Editor.data.moduleFolder + 'images/arrow_down_nosave.png',
                             bind: {
                                 text: '{l10n.segmentGrid.toolbar.next}',
@@ -456,6 +471,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'goAlternateRightBtn',
+                            checked: !!~checkedItems.indexOf('goAlternateRightBtn'),
                             hidden: !useHNavArrow,
                             icon: Editor.data.moduleFolder + 'images/arrow_right.png',
                             bind: {
@@ -464,12 +480,14 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, '-', {
                             itemId: 'focusSegmentShortcutBtn',
+                            checked: !!~checkedItems.indexOf('focusSegmentShortcutBtn'),
                             bind: {
                                 text: '{scrollToTooltip}' //is a formula!
                             },
                             icon: Editor.data.moduleFolder + 'images/scrollTo.png',
                         }, {
                             itemId: 'watchSegmentBtn',
+                            checked: !!~checkedItems.indexOf('watchSegmentBtn'),
                             icon: Editor.data.moduleFolder + 'images/star_add.png',
                             bind: {
                                 text: '{segmentIsWatched ? l10n.segmentGrid.toolbar.stopWatchingSegment : l10n.segmentGrid.toolbar.startWatchingSegment}',
@@ -477,6 +495,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             }
                         }, {
                             itemId: 'segmentLockBtn',
+                            checked: !!~checkedItems.indexOf('segmentLockBtn'),
                             hidden: !Editor.app.authenticatedUser.isAllowed('lockSegmentOperation') || !Editor.app.authenticatedUser.isAllowed('unlockSegmentOperation'),
                             icon: Editor.data.moduleFolder + 'images/lock.png',
                             bind: {

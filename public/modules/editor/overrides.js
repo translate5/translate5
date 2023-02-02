@@ -168,6 +168,34 @@ Ext.override(Ext.menu.Item, {
 });
 
 /**
+ * Added support for checkableDespiteDisabled config
+ */
+Ext.override(Ext.menu.CheckItem, {
+    checkableDespiteDisabled: false,
+    onClick: function(e) {
+        var me = this, isDisabled = null;
+
+        // If click was on checkbox of a disabled menu item but checkableDespiteDisabled-flag is true
+        if (me.checkEl.contains(e.target) && me.disabled) {
+
+            // Turn disabled-flag to false temporary
+            me.disabled = false;
+
+            // Remember that
+            isDisabled = true;
+        }
+
+        // Call parent
+        this.callParent([e]);
+
+        // Restore disabled-prop back to true
+        if (isDisabled) {
+            me.disabled = true;
+        }
+    }
+});
+
+/**
  * TRANSLATE-834: Triton Theme: Tooltip on columns is missing
  * All columns should have a tooltip with the same content as the title when nothing other is configured
  */

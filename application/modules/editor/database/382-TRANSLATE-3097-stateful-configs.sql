@@ -25,7 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
--- Right panel
+-- Right panel and top segment toolbar buttons visibility
 INSERT IGNORE INTO `Zf_configuration`
 (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `typeClass`, `description`, `level`, `guiName`, `guiGroup`, `comment`)
 VALUES
@@ -42,4 +42,7 @@ VALUES
  'Default state configuration for the editor east panel segments Manual QA (inside segment). If this field value is empty ({} is not an empty value!), no state will be applied/saved for this component.','32','Editor right panel review segment Manual QA (inside segment) data default configuration','Editor: UI layout & more',''),
 
 ('runtimeOptions.frontend.defaultState.editor.eastPanelSegmentsMetaStates','1','editor','system','{}','{}','','map',NULL,
- 'Default state configuration for the editor east panel segments status. If this field value is empty ({} is not an empty value!), no state will be applied/saved for this component.','32','Editor right panel review segment status default configuration','Editor: UI layout & more','');
+ 'Default state configuration for the editor east panel segments status. If this field value is empty ({} is not an empty value!), no state will be applied/saved for this component.','32','Editor right panel review segment status default configuration','Editor: UI layout & more',''),
+
+('runtimeOptions.frontend.defaultState.editor.segmentActionMenu','1','editor','system','{checkedItems: "saveBtn,cancelBtn,saveNextBtn"}','{checkedItems: "saveBtn,cancelBtn,saveNextBtn"}','','map',NULL,
+ 'Default state of which segment action menu items should be additionally shown as buttons in the segment grid top toolbar. If this field value is empty ({} is not an empty value!), no state will be applied/saved for this component.','32','Editor toolbar segment action buttons visibility','Editor: UI layout & more','');
