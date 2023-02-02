@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Ifsnop\Mysqldump\Mysqldump;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -37,7 +38,8 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'database:backup';
-    
+    private bool $useGzip;
+
     protected function configure()
     {
         $this
@@ -47,6 +49,20 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
         // the full command description shown when running the command with
         // the "--help" option
         ->setHelp('Saves a database backup - by default under data/db-backup/');
+
+        $this->addArgument(
+            'target',
+            InputArgument::OPTIONAL,
+            'If exists and is directory, is created there as new file. If does not exist, assume as file name.'
+        );
+
+        $this->addOption(
+            name: 'gzip',
+            shortcut: 'z',
+            mode: InputOption::VALUE_NONE,
+            description: 'Sort by row count instead of size.'
+        );
+
 
     }
 
@@ -58,37 +74,34 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
+        $this->useGzip = (bool) $input->getOption('gzip');
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $backup_dir = APPLICATION_DATA.'/backup';
-
         $this->writeTitle('database backup');
-
-        if (!is_dir($backup_dir)) {
-           @mkdir($backup_dir);
-        }
-        if (!is_writable($backup_dir)) {
-            throw new \RuntimeException('Backup directory can not be created or is not writable: '.$backup_dir);
-        }
 
         $config = \Zend_Registry::get('config');
         $params = $config->resources->db->params->toArray();
 
-        //FIXME HERE
-        // target dir/filename and gzip as param
-        // logrotate and log/php_error.log
-
         try {
-            $dump = new \Ifsnop\Mysqldump\Mysqldump($this->makeDsn($params), $params['username'], $params['password']);
+            $dump = new Mysqldump(
+                $this->makeDsn($params),
+                $params['username'],
+                $params['password'],
+                [
+                    'compress' => $this->useGzip ? Mysqldump::GZIPSTREAM : Mysqldump::NONE
+                ]
+            );
+
             $dump->setInfoHook(function($object, $info) {
                 if ($object === 'table') {
                     $this->io->writeln(' '.str_pad($info['name'], 50).' ('.$info['rowCount'].' rows)');
                 }
             });
-            $this->io->writeln('Backup table: ');
-            $dump->start($backup_dir.'/dump.sql');
+            $this->io->writeln(' backing up tables: ');
+            $target = $this->modifyNameSuffix($this->getDestination());
+            $dump->start($target);
+            $this->io->success('Backup file create: '.$target);
         } catch (\Exception $e) {
             echo 'mysqldump-php error: ' . $e->getMessage();
         }
@@ -106,5 +119,33 @@ class DatabaseBackupCommand extends Translate5AbstractCommand
             }
         };
         return $dsn->_dsn();
+    }
+
+    private function modifyNameSuffix(string $filename): string
+    {
+        if($this->useGzip && !str_ends_with($filename, '.gz')) {
+            $filename .= '.gzip';
+        }
+        return $filename;
+    }
+
+    private function getDestination(): string
+    {
+        $file = '/'.date('Y-m-d-H-i-s').'.sql';
+        $backup_dir = APPLICATION_DATA.'/backup';
+
+        if ($givenTarget = $this->input->getArgument('target')) {
+            if (is_dir($givenTarget)) {
+                return $givenTarget . $file;
+            }
+            return $givenTarget;
+        }
+        if (!is_dir($backup_dir)) {
+            @mkdir($backup_dir);
+        }
+        if (!is_writable($backup_dir)) {
+            throw new \RuntimeException('Backup directory can not be created or is not writable: '.$backup_dir);
+        }
+        return $backup_dir.$file;
     }
 }
