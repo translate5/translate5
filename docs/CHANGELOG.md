@@ -14,6 +14,42 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.8.6] - 2023-02-01
+
+### Important Notes:
+#### [TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123)
+Users who already adjusted the checkboxes, indicating whether some attribute datatype is enabled for some TermCollection - have to redo this
+
+#### [TRANSLATE-3039](https://jira.translate5.net/browse/TRANSLATE-3039)
+The password rules were changed: The password length must be at least 12 characters and must have mixed content (lower / uppercase / numbers). 
+This affects new users and when the password is changed!
+ 
+
+
+### Changed
+**[TRANSLATE-3039](https://jira.translate5.net/browse/TRANSLATE-3039): Editor general - Improve password rules (4.7)** <br>
+The current password rule (just 8 characters) was to lax. The new user password roles requirements can be found in this link: https://confluence.translate5.net/x/AYBVG (released in 5.8.5, fixes in 5.8.6)
+
+
+
+### Bugfixes
+**[TRANSLATE-3180](https://jira.translate5.net/browse/TRANSLATE-3180): Main back-end mechanisms (Worker, Logging, etc.) - Changing user association in import wizard does not take effect** <br>
+Fix for a problem when user association is modified in the import wizard.
+
+**[TRANSLATE-3178](https://jira.translate5.net/browse/TRANSLATE-3178): VisualReview / VisualTranslation - Visual Video import: Blank Segments cause subtitle-number to sip into next segment and empty segment to be skipped** <br>
+FIX: Video SRT Import: Subtitles with Timestamp but without Content caused Quirks in the Segmentation
+
+**[TRANSLATE-3176](https://jira.translate5.net/browse/TRANSLATE-3176): Export, Main back-end mechanisms (Worker, Logging, etc.) - Filenames with quotes are truncated upon download** <br>
+Quotes in the task name led to cut of filenames on export. Fixed in 5.8.6.
+
+**[TRANSLATE-3175](https://jira.translate5.net/browse/TRANSLATE-3175): LanguageResources - Need to allow importing new file only after importing is finished** <br>
+Language resource import and export buttons are disabled while importing is in progress
+
+**[TRANSLATE-3123](https://jira.translate5.net/browse/TRANSLATE-3123): Import/Export - Tbx import: handling duplicated attributes** <br>
+TBX import: removed term-level attributes duplicates
+
+
 ## [5.8.5] - 2023-01-24
 
 ### Important Notes:
