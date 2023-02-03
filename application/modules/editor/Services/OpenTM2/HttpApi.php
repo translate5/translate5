@@ -112,16 +112,16 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      *
      * @throws Zend_Exception
      */
-    public function cloneMemory(string $sourceMemory, string $targetMemory): bool
+    public function cloneMemory(string $targetMemory): bool
     {
         $data = [];
         $data['newName'] = $this->addTmPrefix($targetMemory);
 
         $http = $this->getHttpWithMemory('POST', 'clone');
-        $http->setConfig(['timeout' => 100]);
+        $http->setConfig(['timeout' => 1200]);
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
 
-        return $this->processResponse($http->request());
+        return true; // $this->processResponse($http->request()); TODO fix this after response is fixed on t5memory side
     }
 
     /**

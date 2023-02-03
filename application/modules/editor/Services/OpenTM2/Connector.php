@@ -575,7 +575,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $data = $this->getTm($validExportTypes[$mime]);
             $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
         } else {
-            $this->api->cloneMemory($this->languageResource->getSpecificData('fileName'), $fuzzyFileName);
+            $this->api->cloneMemory($fuzzyFileName);
         }
 
         $fuzzyLanguageResource = clone $this->languageResource;
@@ -595,23 +595,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // copy the worker user guid
         $connector->setWorkerUserGuid($this->getWorkerUserGuid());
         $connector->isInternalFuzzy = true;
-
-        // TODO this should be changed to PauseWorker mechanism, but that requires refactoring \editor_Plugins_MatchAnalysis_Analysis::initConnectors()
-        // and connected stuff, so will be done in a separate task
-        $sleepTimeSeconds = 5;
-        $maxTimeSeconds = 300;
-        $elapsedTime = 0;
-
-        while ($elapsedTime < $maxTimeSeconds) {
-            $status = $connector->getStatus($fuzzyLanguageResource->getResource());
-
-            if ($status === self::STATUS_AVAILABLE) {
-                break;
-            }
-
-            $elapsedTime += $sleepTimeSeconds;
-            sleep($sleepTimeSeconds);
-        }
 
         return $connector;
     }
