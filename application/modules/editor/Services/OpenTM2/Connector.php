@@ -558,37 +558,61 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @throws ZfExtended_NotFoundException
      * @return editor_Services_Connector_Abstract
      */
-    public function initForFuzzyAnalysis($analysisId) {
-        $mime="TM";
+    public function initForFuzzyAnalysis($analysisId)
+    {
+        $mime = "TM";
         $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidExportTypes();
-        
-        if(empty($validExportTypes[$mime])){
-            throw new ZfExtended_NotFoundException('Can not download in format '.$mime);
+
+        if (empty($validExportTypes[$mime])) {
+            throw new ZfExtended_NotFoundException('Can not download in format ' . $mime);
         }
-        $data = $this->getTm($validExportTypes[$mime]);
-        
+
         $fuzzyFileName = $this->renderFuzzyLanguageResourceName($this->languageResource->getSpecificData('fileName'), $analysisId);
-        $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
-        
+        $this->api->setResource($this->languageResource->getResource());
+
+        if ($this->api->isOpenTM2()) {
+            $data = $this->getTm($validExportTypes[$mime]);
+            $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
+        } else {
+            $this->api->cloneMemory($this->languageResource->getSpecificData('fileName'), $fuzzyFileName);
+        }
+
         $fuzzyLanguageResource = clone $this->languageResource;
-        /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
-        
+
         //visualized name:
         $fuzzyLanguageResourceName = $this->renderFuzzyLanguageResourceName($this->languageResource->getName(), $analysisId);
         $fuzzyLanguageResource->setName($fuzzyLanguageResourceName);
         $fuzzyLanguageResource->addSpecificData('fileName', $fuzzyFileName);
         //INFO: The resources logging requires resource with valid id.
         //$fuzzyLanguageResource->setId(null);
-        
-        $connector = ZfExtended_Factory::get(get_class($this));
+
+        $connector = ZfExtended_Factory::get(self::class);
         /* @var $connector editor_Services_Connector */
-        $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
+        $connector->connectTo($fuzzyLanguageResource, $this->languageResource->getSourceLang(), $this->languageResource->getTargetLang());
         // copy the current config (for task specific config)
         $connector->setConfig($this->getConfig());
         // copy the worker user guid
         $connector->setWorkerUserGuid($this->getWorkerUserGuid());
         $connector->isInternalFuzzy = true;
+
+        // TODO this should be changed to PauseWorker mechanism, but that requires refactoring \editor_Plugins_MatchAnalysis_Analysis::initConnectors()
+        // and connected stuff, so will be done in a separate task
+        $sleepTimeSeconds = 5;
+        $maxTimeSeconds = 300;
+        $elapsedTime = 0;
+
+        while ($elapsedTime < $maxTimeSeconds) {
+            $status = $connector->getStatus($fuzzyLanguageResource->getResource());
+
+            if ($status === self::STATUS_AVAILABLE) {
+                break;
+            }
+
+            $elapsedTime += $sleepTimeSeconds;
+            sleep($sleepTimeSeconds);
+        }
+
         return $connector;
     }
     
