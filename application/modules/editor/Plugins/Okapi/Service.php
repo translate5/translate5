@@ -59,7 +59,7 @@ final class Service extends DockerService {
         return true;
     }
 
-    public function locate(SymfonyStyle $io, bool $writeToConfig, mixed $url, bool $doSave=false, array $config = []): bool
+    public function locate(SymfonyStyle $io, mixed $url, bool $doSave=false, array $config = []): bool
     {
         if(empty($url)){
             $url = $this->configurationConfig['url'];

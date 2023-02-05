@@ -63,13 +63,12 @@ abstract class DockerService extends AbstractService
     /**
      * Base implementation for simple docker-services
      * @param SymfonyStyle $io
-     * @param bool $writeToConfig
      * @param mixed $url
      * @param bool $doSave
      * @param array $config: optional to inject further dependencies
      * @return bool
      */
-    public function locate(SymfonyStyle $io, bool $writeToConfig, mixed $url, bool $doSave = false, array $config = []): bool
+    public function locate(SymfonyStyle $io, mixed $url, bool $doSave = false, array $config = []): bool
     {
         $configType = $this->configurationConfig['type'];
         $configName = $this->configurationConfig['name'];

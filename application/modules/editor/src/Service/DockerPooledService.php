@@ -115,13 +115,12 @@ abstract class DockerPooledService extends DockerService
      * Implementation for pooled services.
      * In this case, it is expected, the $url-param is an assoc array containing 3 further arrays with urls: 'default, 'gui', 'import' OR the config "autodetect" is set and $url is a simple value
      * @param SymfonyStyle $io
-     * @param bool $writeToConfig
      * @param mixed $url
      * @param bool $doSave
      * @param array $config : optional to inject further dependencies. With pooled-services, a "autodetect" integer can be set, that leads to detecting services by a special namimg-scheme "service-gui-1"
      * @return bool
      */
-    public function locate(SymfonyStyle $io, bool $writeToConfig, mixed $url, bool $doSave = false, array $config = []): bool
+    public function locate(SymfonyStyle $io, mixed $url, bool $doSave = false, array $config = []): bool
     {
         $pooledUrls = ['default' => [], 'gui' => [], 'import' => []];
         $autodetect = (array_key_exists('autodetect', $config) && is_int($config['autodetect'])) ? $config['autodetect'] : -1;
@@ -152,7 +151,7 @@ abstract class DockerPooledService extends DockerService
                 }
             }
             if(empty($pooledUrls['default'])){
-                $this->output('No default pooled URLs have been found', $io, 'warning');
+                $this->output('No default pooled URLs have been found for "'.$this->getName().'"', $io, 'info');
                 return false;
             }
             $this->updatePooledConfigurationConfig($pooledUrls, $doSave, $io);
