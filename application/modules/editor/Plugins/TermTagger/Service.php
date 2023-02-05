@@ -124,15 +124,16 @@ final class editor_Plugins_TermTagger_Service extends DockerMultiService {
     
     /**
      * Load a tbx-file $tbxFilePath into the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file
-     *
-     * @param string $url url of the TermTagger-Server
-     * @param string $tbxHash TBX hash
-     * @param string $tbxData TBX data
+     * @param string $url
+     * @param string $tbxHash
+     * @param string $tbxData
+     * @param ZfExtended_Logger $logger
+     * @return stdClass|null
+     * @throws Zend_Http_Client_Exception
      * @throws editor_Plugins_TermTagger_Exception_Open
      * @throws editor_Plugins_TermTagger_Exception_Request
-     * @return Zend_Http_Response
      */
-    public function open(string $url, string $tbxHash, string $tbxData) {
+    public function loadTBX(string $url, string $tbxHash, string $tbxData, ZfExtended_Logger $logger) {
         if(empty($tbxHash)) {
             //Could not load TBX into TermTagger: TBX hash is empty.
             throw new editor_Plugins_TermTagger_Exception_Open('E1116', [
@@ -141,9 +142,9 @@ final class editor_Plugins_TermTagger_Service extends DockerMultiService {
         }
         
         // get default- and additional- (if any) -options for server-communication
-        $serverCommunication = new stdClass();
-        $serverCommunication->tbxFile = $tbxHash;
-        $serverCommunication->tbxdata = $tbxData;
+        $serviceData = new stdClass();
+        $serviceData->tbxFile = $tbxHash;
+        $serviceData->tbxdata = $tbxData;
         
         // send request to TermTagger-server
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/');
@@ -151,17 +152,17 @@ final class editor_Plugins_TermTagger_Service extends DockerMultiService {
             'timeout' => self::CONNECT_TIMEOUT,
             'request_timeout' => editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT
         ]);
-        $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
+        $httpClient->setRawData(json_encode($serviceData), 'application/json');
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         $success = $this->wasSuccessfull();
-        if($success && $response = $this->decodeServiceResult($response)) {
+        if($success && $response = $this->decodeServiceResult($logger, $response)) {
             return $response;
         }
         $data = [
             'httpStatus' => $this->getLastStatus(),
             'termTaggerUrl' => $httpClient->getUri(true),
             'plainServerResponse' => print_r($response, true),
-            'requestedData' => $serverCommunication,
+            'requestedData' => $serviceData,
         ];
         $errorCode = $success ? 'E1118' : 'E1117';
         //E1117: Could not load TBX into TermTagger: TermTagger HTTP result was not successful!

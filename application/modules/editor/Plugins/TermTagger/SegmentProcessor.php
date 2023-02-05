@@ -106,7 +106,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
     /**
      * @var boolean
      */
-    private boolean $isWorkerThread;
+    private bool $isWorkerThread;
 
     /**
      * @var editor_Plugins_TermTagger_Service
@@ -117,6 +117,11 @@ class editor_Plugins_TermTagger_SegmentProcessor {
      * @var editor_Plugins_TermTagger_Service_Data
      */
     private editor_Plugins_TermTagger_Service_Data $serviceData;
+
+    /**
+     * @var editor_Plugins_TermTagger_RecalcTransFound
+     */
+    private editor_Plugins_TermTagger_RecalcTransFound $recalcTransFound;
 
     /**
      * @var editor_Models_Segment_TermTag
@@ -165,6 +170,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
         $this->isWorkerThread = $isWorkerThread;
         $this->logger = Zend_Registry::get('logger')->cloneMe(editor_Plugins_TermTagger_Configuration::getLoggerDomain($processingMode));
         $this->termtaggerService = editor_Plugins_TermTagger_Bootstrap::createService('termtagger');
+        $this->recalcTransFound = ZfExtended_Factory::get(editor_Plugins_TermTagger_RecalcTransFound::class, [ $this->task ]);
         // various outdated tag-helpers - use TagSequence/FieldTags based code instead
         $this->termTagHelper = ZfExtended_Factory::get(editor_Models_Segment_TermTag::class);
         $this->internalTagHelper = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
@@ -185,11 +191,11 @@ class editor_Plugins_TermTagger_SegmentProcessor {
         // creating the service-data model used by the termtagger-service
         $this->serviceData = $this->createServiceData($segmentsTags);
         // check TBX hash
-        $this->config->checkTermTaggerTbx($this->termtaggerService, $slot, $this->serviceData->tbxFile);
+        $this->checkTermTaggerTbx($slot, $this->serviceData->tbxFile);
         // request our service / tag the terms
         $result = $this->tagTerms($slot);
         // marks terms in the source-tags with transFound, if a translation is present in the target
-        $taggedSegments = $this->config->markTransFound($result->segments);
+        $taggedSegments = $this->markTransFound($result->segments);
 
         $taggedSegmentsById = $this->groupResponseById($taggedSegments);
         foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
@@ -455,5 +461,74 @@ class editor_Plugins_TermTagger_SegmentProcessor {
     private function createUniqueKey(stdClass $segment, string $field) : string
     {
         return $segment->field.'-'.$segment->id.'-'.$field;
+    }
+
+    /**
+     * marks terms in the source with transFound, if translation is present in the target
+     * and with transNotFound if not. A translation which is of type
+     * editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED or editor_Models_Terminology_Models_TermModel::STAT_SUPERSEDED
+     * is handled as transNotFound
+     *
+     * @param array $segments array of stdClass. example: array(object(stdClass)#529 (4) {
+     * @return array $segments
+     */
+    public function markTransFound(array $segments): array
+    {
+        /*
+            ["field"] => string(10) "targetEdit"
+            ["id"] => string(7) "4596006"
+            ["source"] => string(35) "Die neue VORTEILE Motorenbroschüre"
+            ["target"] => string(149) "Il nuovo dépliant PRODUCT INFO <div title="" class="term admittedTerm transNotFound stemmed" data-tbxid="term_00_1_IT_1_08795">motori</div>"),
+            another object, ...
+         */
+        return $this->recalcTransFound->recalcList($segments);
+    }
+
+    /**
+     * Checks if tbx-file with hash $tbxHash is loaded on the TermTagger-server behind $url.
+     * If not already loaded, tries to load the tbx-file from the task.
+     * Throws Exceptions if TBX could not be loaded!
+     * @param string $url
+     * @param string|null $tbxHash
+     * @throws editor_Plugins_TermTagger_Exception_Abstract
+     * @throws editor_Plugins_TermTagger_Exception_Open
+     */
+    private function checkTermTaggerTbx(string $url, ?string &$tbxHash)
+    {
+        try {
+            // test if tbx-file is already loaded
+            if (!empty($tbxHash) && $this->termtaggerService->ping($url, $tbxHash)) {
+                return;
+            }
+            // getDataTbx also creates the TbxHash
+            $tbx = $this->getTbxData();
+            $tbxHash = $this->task->meta()->getTbxHash();
+            $this->termtaggerService->loadTBX($url, $tbxHash, $tbx, $this->logger);
+        }
+        catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
+            $e->addExtraData([
+                'task' => $this->task,
+                'termTaggerUrl' => $url,
+            ]);
+            throw $e;
+        }
+    }
+    /**
+     * returns the TBX string to be loaded into the termtagger
+     * @throws editor_Plugins_TermTagger_Exception_Open
+     * @return string
+     */
+    private function getTbxData()
+    {
+        // try to load tbx-file to the TermTagger-server
+        $tbxFileInfo = new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($this->task));
+        $tbxParser = ZfExtended_Factory::get(editor_Models_Import_TermListParser_Tbx::class);
+        try {
+            return $tbxParser->assertTbxExists($this->task, $tbxFileInfo);
+        }
+        catch (editor_Models_Term_TbxCreationException $e){
+            //'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
+            throw new editor_Plugins_TermTagger_Exception_Open('E1116', [], $e);
+        }
     }
 }
