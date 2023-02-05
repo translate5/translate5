@@ -30,7 +30,6 @@ namespace MittagQI\Translate5\Service;
 
 /**
  * The t5memory languageResource Service
- * TODO FIXME: The check must be more sophisticated thjen just checking if the URL can be pinged
  */
 final class T5Memory extends DockerService {
 

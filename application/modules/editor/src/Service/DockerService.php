@@ -346,6 +346,9 @@ abstract class DockerService extends AbstractService
                 return ($value === true) ? '1' : '0';
 
             case ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST:
+                if(!is_array($value)){
+                    $value = [ $value ];
+                }
                 return json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
 
             default:
