@@ -275,7 +275,7 @@ using the default ports.')
             $this->pluginmanager->setActive($plugin, $active);
             $this->io->success('Plug-In ' . $plugin . ' ' . ($active ? 'activated.' : 'disabled!'));
         } else {
-            $this->io->note('Would ' . ($active ? 'activate.' : 'disable') . ' Plug-In ' . $plugin);
+            $this->io->note('Would ' . ($active ? 'activate' : 'disable') . ' Plug-In ' . $plugin);
         }
     }
 }
