@@ -45,8 +45,44 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
 
     /**
      * @var array
-     * structure: name => port, for multiinstance services [termtagger, languagetool], the lowest defines the sequence
+     * structure: name => [ url (string or array for pooled services), config (optional) ]
      */
+    protected array $services = [
+        'php' => [
+            'url' => 'http://php:80',
+            'config' => ['remove' => true] // will remove the worker-config as the server url works for local dev
+        ],
+        't5memory' => [
+            'url' => 'http://localhost:4740/t5memory',
+        ],
+        'frontendmessagebus' => [
+            'url' => 'http://localhost:4757',
+            'config' => ['socketServer' => 'ws://localhost:4756/translate5'] // special host/port for local-dev
+        ],
+        'okapi' => [
+            'url' => 'http://localhost:4780/okapi-longhorn/'
+        ],
+        'languagetool' => [
+            'url' => [
+                'default' => ['http://localhost:4710/v2', 'http://localhost:4711/v2'],
+                'gui' => ['http://localhost:4712/v2'],
+                'import' => ['http://localhost:4710/v2', 'http://localhost:4711/v2', 'http://localhost:4712/v2']
+            ]
+        ],
+        'termtagger' => [
+            'url' => [
+                'default' => ['http://localhost:4701'],
+                'gui' => ['http://localhost:4702'],
+                'import' => ['http://localhost:4701', 'http://localhost:4702']
+            ]
+        ],
+        'pdfconverter' => [
+            'url' => 'http://localhost:4786'
+        ],
+        'visualbrowser' => [
+            'url' => 'ws://localhost:3000' // due to biderectional access, must work in "host" network mode so port cannot be virtualized
+        ]
+    ];
 
 
     private string $revertSql = '';
@@ -89,40 +125,5 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
         return self::SUCCESS;
     }
 
-    protected array $services = [
-        'php' => [
-            'url' => 'http://php:80',
-            'config' => ['remove' => true] // will remove the worker-config as the server url works for local dev
-        ],
-        't5memory' => [
-            'url' => 'http://localhost:4740/t5memory',
-        ],
-        'frontendmessagebus' => [
-            'url' => 'http://localhost:4757',
-            'config' => ['socketServer' => 'ws://localhost:4756/translate5'] // special host/port for local-dev
-        ],
-        'okapi' => [
-            'url' => 'http://localhost:4780/okapi-longhorn/'
-        ],
-        'languagetool' => [
-            'url' => [
-                'default' => ['http://localhost:4710/v2', 'http://localhost:4711/v2'],
-                'gui' => ['http://localhost:4712/v2'],
-                'import' => ['http://localhost:4710/v2', 'http://localhost:4711/v2', 'http://localhost:4712/v2']
-            ]
-        ],
-        'termtagger' => [
-            'url' => [
-                'default' => ['http://localhost:4701'],
-                'gui' => ['http://localhost:4702'],
-                'import' => ['http://localhost:4701', 'http://localhost:4702']
-            ]
-        ],
-        'pdfconverter' => [
-            'url' => 'http://localhost:4786'
-        ],
-        'visualbrowser' => [
-            'url' => 'ws://localhost:3000' // due to biderectional access, must work in "host" network mode so port cannot be virtualized
-        ]
-    ];
+
 }

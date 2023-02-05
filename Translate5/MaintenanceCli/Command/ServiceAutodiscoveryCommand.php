@@ -52,7 +52,7 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
 
     /**
      * @var array
-     * structure: name => [ scheme, host, port, path, config (optional) ]
+     * structure: name => [ url (string or array for pooled services), config (optional) ]
      */
     protected array $services = [
         'php' => [
