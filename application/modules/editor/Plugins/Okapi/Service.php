@@ -61,6 +61,12 @@ final class Service extends DockerService {
 
     public function locate(SymfonyStyle $io, mixed $url, bool $doSave=false, array $config = []): bool
     {
+        if(array_key_exists('remove', $config) && $config['remove'] === true){
+            $this->updateConfigurationConfig('runtimeOptions.plugins.Okapi.server', 'string', '', $doSave, $io);
+            $this->updateConfigurationConfig('runtimeOptions.plugins.Okapi.serverUsed', 'string', '', $doSave, $io);
+            return false;
+        }
+
         if(empty($url)){
             $url = $this->configurationConfig['url'];
         }

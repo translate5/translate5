@@ -28,8 +28,6 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use editor_Models_Config;
-use JsonException;
 use MittagQI\Translate5\Service\Services;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,62 +55,35 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
      * structure: name => [ scheme, host, port, path, config (optional) ]
      */
     protected array $services = [
-        'php' => [ // used to configure the worker-trigger & visualbrowser access
-            'scheme' => 'http',
-            'host' => 'php.',
-            'port' => 80,
-            'path' => ''
+        'php' => [
+            'url' => 'http://php.:80' // used to configure the worker-trigger & visualbrowser access
         ],
         /*
         'proxy' => [
-            'scheme' => 'http',
-            'host' => 'proxy.',
-            'port' => 80,
-            'path' => '/'
+            'url' => 'http://proxy.:80/'
         ],
         */
         't5memory' => [
-            'scheme' => 'http',
-            'host' => 't5memory.',
-            'port' => 4040,
-            'path' => '/t5memory'
+            'url' => 'http://t5memory.:4040/t5memory'
         ],
         'frontendmessagebus' => [
-            'scheme' => 'http',
-            'host' => 'frontendmessagebus.',
-            'port' => 9057,
-            'path' => ''
+            'url' => 'http://frontendmessagebus.:9057'
         ],
         'okapi' => [
-            'scheme' => 'http',
-            'host' => 'okapi.',
-            'port' => 8080,
-            'path' => '/okapi-longhorn/'
+            'url' => 'http://okapi.:8080/okapi-longhorn/'
         ],
         'languagetool' => [
-            'scheme' => 'http',
-            'host' => 'languagetool.',
-            'port' => 8010,
-            'path' => '/v2'
+            'url' => ['default' => ['http://languagetool.:8010/v2'], 'gui' => ['http://languagetool.:8010/v2'], 'import' => ['http://languagetool.:8010/v2']] // pooled service, needs at least 3 entries
         ],
         'termtagger' => [
-            'scheme' => 'http',
-            'host' => 'termtagger',
-            'port' => 9001,
-            'path' => '',
-            'config' => ['autodetect' => 20]
+            'url' => 'http://termtagger:9001',
+            'config' => ['autodetect' => 20] // pooled service with autodetect
         ],
         'pdfconverter' => [
-            'scheme' => 'http',
-            'host' => 'pdfconverter.',
-            'port' => 8086,
-            'path' => ''
+            'url' => 'http://pdfconverter.:8086'
         ],
         'visualbrowser' => [
-            'scheme' => 'ws',
-            'host' => 'visualbrowser.',
-            'port' => 3000,
-            'path' => ''
+            'url' => 'ws://visualbrowser.:3000'
         ]
     ];
 
@@ -221,8 +192,19 @@ using the default ports.')
             if (array_key_exists($serviceName, $configuredServices)) {
 
                 $configuredService = $configuredServices[$serviceName];
-                $serviceHost = empty($host) ? $service['host'] : $host;
-                $serviceUrl = $service['scheme'] . '://' . $serviceHost . ':' . $service['port'] . $service['path'];
+                if(is_array($service['url'])){
+
+                    $serviceUrl = $service['url'];
+                    if(!array_key_exists('default', $serviceUrl) || !array_key_exists('gui', $serviceUrl) || !array_key_exists('import', $serviceUrl)){
+                        throw new Zend_Exception('Service "'.$serviceName.'" pooled URLs are not properly defined');
+                    }
+                    $serviceUrl['default'] = $this->createServiceUrl($serviceUrl['default'], $host, true);
+                    $serviceUrl['gui'] = $this->createServiceUrl($serviceUrl['gui'], $host, true);
+                    $serviceUrl['import'] = $this->createServiceUrl($serviceUrl['import'], $host, true);
+
+                } else {
+                    $serviceUrl = $this->createServiceUrl($service['url'], $host);
+                }
                 $serviceConfig = array_key_exists('config', $service) ? $service['config'] : [];
 
                 if ($configuredService->locate($this->io, $serviceUrl, $doSave, $serviceConfig)) {
@@ -249,6 +231,32 @@ using the default ports.')
                 $this->io->note('Service "' . $serviceName . '" was not found in the instance\'s configured services probably because the holding plugin is not active.');
             }
         }
+    }
+
+    /**
+     * Replaces the host if a custom host is given
+     * @param string|array $url
+     * @param string|null $host
+     * @param bool $forceArray;
+     * @return string|array
+     */
+    protected function createServiceUrl(mixed $url, string $host = null, bool $forceArray = false): mixed
+    {
+        if (!empty($host)) {
+            if(is_array($url)){
+                $newUrls = [];
+                foreach($url as $newUrl){
+                    $newUrls[] = $this->createServiceUrl($newUrl, $host);
+                }
+                return $newUrls;
+            }
+            $url =
+                parse_url($url, PHP_URL_SCHEME)
+                . '://' . $host . ':'
+                . parse_url($url, PHP_URL_PORT)
+                . (parse_url($url, PHP_URL_PATH) ?? '');
+        }
+        return ($forceArray && !is_array($url)) ? [ $url ] : $url;
     }
 
     /**

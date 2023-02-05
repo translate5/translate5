@@ -123,8 +123,13 @@ abstract class DockerPooledService extends DockerService
     public function locate(SymfonyStyle $io, mixed $url, bool $doSave = false, array $config = []): bool
     {
         $pooledUrls = ['default' => [], 'gui' => [], 'import' => []];
-        $autodetect = (array_key_exists('autodetect', $config) && is_int($config['autodetect'])) ? $config['autodetect'] : -1;
 
+        if(array_key_exists('remove', $config) && $config['remove'] === true){
+            $this->updatePooledConfigurationConfig($pooledUrls, $doSave, $io);
+            return false;
+        }
+
+        $autodetect = (array_key_exists('autodetect', $config) && is_int($config['autodetect'])) ? $config['autodetect'] : -1;
         if($autodetect > 1){
 
             if(is_array($url) || empty($url)){

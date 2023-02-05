@@ -68,27 +68,65 @@ final class Service extends DockerService
 
     public function locate(SymfonyStyle $io, mixed $url, bool $doSave = false, array $config = []): bool
     {
+        if(array_key_exists('remove', $config) && $config['remove'] === true){
+            // reset all configs
+            $this->updateConfigurationConfigs('', '', '', '', '', $doSave, $io);
+            return false;
+        }
+
         if (empty($url)) {
             $url = $this->configurationConfig['url'];
         }
         if (!$this->checkPotentialServiceUrl($this->getName(), $url, $io)) {
             return false;
         }
-        // save the messageBusURI
-        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.messageBusURI', 'string', $url, $doSave, $io);
-
-        // save the socket-server data
+        // evaluate the socket-server data
         $isHttps = ($this->config->runtimeOptions->server->protocol === 'https://');
-        $schema = ($isHttps) ? 'wss' : 'ws';
-        $host = $this->config->runtimeOptions->server->name; // TODO FIXME add getenv for especially set different server, like our messagebus.translate5.net
-        $port = ($isHttps) ? '443' : '80';
-        $route = ($isHttps) ? '/wss/translate5' : '/ws/translate5';
+        // may data is set by config-option
+        if(array_key_exists('socketServer', $config) && !empty($config['socketServer'])){
 
-        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema', 'string', $schema, $doSave, $io);
+            $scheme = parse_url($config['socketServer'], PHP_URL_SCHEME);
+            $host = parse_url($config['socketServer'], PHP_URL_HOST);
+            $port = parse_url($config['socketServer'], PHP_URL_PORT);
+            $path = parse_url($config['socketServer'], PHP_URL_PATH) ?? '';
+
+        } else {
+
+            // the normal way: evaluating
+            $scheme = ($isHttps) ? 'wss' : 'ws';
+            $host = $this->config->runtimeOptions->server->name; // TODO FIXME add getenv for especially set different server, like our messagebus.translate5.net
+            $port = ($isHttps) ? '443' : '80';
+            $path = ($isHttps) ? '/wss/translate5' : '/ws/translate5';
+
+        }
+        // save all evaluated configs
+        $this->updateConfigurationConfigs($url, $scheme, $host, $port, $path, $doSave, $io);
+
+        return true;
+    }
+
+    /**
+     * Helper to save all messagebus related stuff
+     * @param string $url
+     * @param string $schema
+     * @param string $host
+     * @param int $port
+     * @param string $route
+     * @param bool $doSave
+     * @param SymfonyStyle $io
+     * @throws \JsonException
+     * @throws \Zend_Db_Statement_Exception
+     * @throws \Zend_Exception
+     * @throws \ZfExtended_Exception
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    private function updateConfigurationConfigs(string $url, string $scheme, string  $host, int $port, string $route, bool $doSave, SymfonyStyle $io)
+    {
+        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.messageBusURI', 'string', $url, $doSave, $io);
+        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema', 'string', $scheme, $doSave, $io);
         $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost', 'string', $host, $doSave, $io);
         $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.port', 'string', $port, $doSave, $io);
         $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.route', 'string', $route, $doSave, $io);
-
-        return true;
     }
 }

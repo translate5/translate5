@@ -67,11 +67,23 @@ abstract class DockerService extends AbstractService
      * @param bool $doSave
      * @param array $config: optional to inject further dependencies
      * @return bool
+     * @throws JsonException
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     public function locate(SymfonyStyle $io, mixed $url, bool $doSave = false, array $config = []): bool
     {
-        $configType = $this->configurationConfig['type'];
         $configName = $this->configurationConfig['name'];
+        $configType = $this->configurationConfig['type'];
+
+        if(array_key_exists('remove', $config) && $config['remove'] === true){
+            $this->updateConfigurationConfig($configName, $configType, [], $doSave, $io);
+            return false;
+        }
+
         $isAdditive = array_key_exists('additive', $this->configurationConfig) ? $this->configurationConfig['additive'] : false; // TODO: do we need this ?
         if (empty($url)) {
             $url = $this->configurationConfig['url'];
@@ -290,11 +302,6 @@ abstract class DockerService extends AbstractService
 
             } else {
 
-                // compatibility: if a list shall be saved as single value, we simply take the first item
-                if(is_array($newValue)){
-                    $newValue = (count($newValue) === 0) ? '' : $newValue[0];
-                }
-
                 $updateValue = $this->createConfigurationUpdateValue($type, $newValue);
                 if ($updateValue === $config->getValue()) {
 
@@ -330,6 +337,9 @@ abstract class DockerService extends AbstractService
             case ZfExtended_DbConfig_Type_CoreTypes::TYPE_STRING:
             case ZfExtended_DbConfig_Type_CoreTypes::TYPE_FLOAT:
             case ZfExtended_DbConfig_Type_CoreTypes::TYPE_INTEGER:
+                if(is_array($value)){
+                    return (count($value) === 0) ? '' : strval($value[0]);
+                }
                 return strval($value);
 
             case ZfExtended_DbConfig_Type_CoreTypes::TYPE_BOOLEAN:
