@@ -29,7 +29,41 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Plugins\SpellCheck\LanguageTool;
 
 use MittagQI\Translate5\Service\DockerMultiService;
+use editor_Plugins_SpellCheck_LanguageTool_Adapter;
 
 final class Service extends DockerMultiService {
 
+    protected array $configurationConfig = [
+        'name' => 'runtimeOptions.plugins.SpellCheck.languagetool.url.default',
+        'type' => 'list',
+        'url' => 'http://languagetool.:8010/v2'
+    ];
+
+    protected array $guiConfigurationConfig = [
+        'name' => 'runtimeOptions.plugins.SpellCheck.languagetool.url.gui',
+        'type' => 'string',
+        'url' => 'http://languagetool.:8010/v2'
+    ];
+
+    protected array $importConfigurationConfig = [
+        'name' => 'runtimeOptions.plugins.SpellCheck.languagetool.url.import',
+        'type' => 'list',
+        'url' => 'http://languagetool.:8010/v2'
+    ];
+
+    protected function customServiceCheck(string $url): bool
+    {
+        $adapter = $this->getAdapter($url);
+        return $adapter->testServerUrl($url);
+    }
+
+    /**
+     * Creates an SpellCheck Adapter
+     * @param string $serviceUrl
+     * @return editor_Plugins_SpellCheck_LanguageTool_Adapter
+     */
+    public function getAdapter(string $serviceUrl): editor_Plugins_SpellCheck_LanguageTool_Adapter
+    {
+        return new editor_Plugins_SpellCheck_LanguageTool_Adapter($serviceUrl);
+    }
 }

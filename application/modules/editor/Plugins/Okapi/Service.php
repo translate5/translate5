@@ -51,9 +51,9 @@ final class Service extends DockerService {
             $this->errors[] = 'There is no URL configured.';
             return false;
         }
-        $satusUrl = rtrim($url, '/') . '/projects';
-        if (!$this->checkConfiguredServiceStatusUrl($satusUrl)) {
-            $this->errors[] = 'A request on "' . $satusUrl . '" did not bring the expected status "200".';
+        $healthcheckUrl = rtrim($url, '/') . '/projects';
+        if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl)) {
+            $this->errors[] = 'A request on "' . $healthcheckUrl . '" did not bring the expected status "200".';
             return false;
         }
         return true;

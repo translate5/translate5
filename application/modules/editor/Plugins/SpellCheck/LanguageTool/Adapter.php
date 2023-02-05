@@ -132,8 +132,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
         // Get version and assign into $version arg passed by reference
         $version = $response->software->version;
 
-        // Return response
-        return $response;
+        return ($this->lastStatus === 200);
     }
 
     /**

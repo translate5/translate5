@@ -109,7 +109,7 @@ abstract class DockerService extends AbstractService
         } else {
             foreach ($urls as $url) {
                 if (empty($url)) {
-                    $this->errors[] = 'There is an empty configuration value set.';
+                    $this->errors[] = 'There is an empty URL set.';
                     $checked = false;
                 } else if (empty($healthCheck)) {
                     if (!$this->checkConfiguredServiceUrl($url)) {
@@ -117,9 +117,9 @@ abstract class DockerService extends AbstractService
                         $checked = false;
                     }
                 } else {
-                    $satusUrl = rtrim($url, '/') . $healthCheck;
-                    if (!$this->checkConfiguredServiceStatusUrl($satusUrl)) {
-                        $this->errors[] = 'A request on "' . $satusUrl . '" did not bring the expected status "200".';
+                    $healthcheckUrl = rtrim($url, '/') . $healthCheck;
+                    if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl)) {
+                        $this->errors[] = 'A request on "' . $healthcheckUrl . '" did not bring the expected status "200".';
                         $checked = false;
                     }
                 }
@@ -129,11 +129,26 @@ abstract class DockerService extends AbstractService
     }
 
     /**
+     * Retrieves the service-url for a simple service
+     * In case of multiple configured this will be the first
+     * @return string|null
+     * @throws ZfExtended_Exception
+     */
+    public function getServiceUrl(): ?string
+    {
+        $values = $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type'], true);
+        if(count($values) > 0){
+            return $values[0];
+        }
+        return null;
+    }
+
+    /**
      * Checks a dedicated status-url on a service or an URL that could be used in such manner
      * @param string $url
      * @return bool
      */
-    public function checkConfiguredServiceStatusUrl(string $url): bool
+    protected function checkConfiguredHealthCheckUrl(string $url): bool
     {
         $httpClient = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
@@ -148,7 +163,7 @@ abstract class DockerService extends AbstractService
      * @param string $url
      * @return bool
      */
-    public function checkConfiguredServiceUrl(string $url): bool
+    protected function checkConfiguredServiceUrl(string $url): bool
     {
         $host = parse_url($url, PHP_URL_HOST);
         $port = parse_url($url, PHP_URL_PORT);
@@ -200,10 +215,11 @@ abstract class DockerService extends AbstractService
      * Retrieves the value with the config-name like "" out of the global config object
      * @param string $configName
      * @param string $configType
+     * @param bool $asArray: if set, the result will be an array for simple types
      * @return mixed
      * @throws ZfExtended_Exception
      */
-    protected function getConfigValueFromName(string $configName, string $configType): mixed
+    protected function getConfigValueFromName(string $configName, string $configType, bool $asArray = false): mixed
     {
         $value = $this->config;
         try {
@@ -215,6 +231,9 @@ abstract class DockerService extends AbstractService
         }
         if ($configType === ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST) {
             return $value->toArray();
+        }
+        if($asArray){
+            return (empty($value) && $value != '0') ? [] : [ $value ];
         }
         return $value;
     }

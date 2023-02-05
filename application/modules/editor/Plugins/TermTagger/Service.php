@@ -44,6 +44,24 @@ final class editor_Plugins_TermTagger_Service extends DockerMultiService {
      */
     const DEFAULT_TAG_TIMEOUT = 10;
 
+    protected array $configurationConfig = [
+        'name' => 'runtimeOptions.termTagger.url.default',
+        'type' => 'list',
+        'url' => 'http://termtagger:9001'
+    ];
+
+    protected array $guiConfigurationConfig = [
+        'name' => 'runtimeOptions.termTagger.url.gui',
+        'type' => 'list',
+        'url' => 'http://termtagger:9001'
+    ];
+
+    protected array $importConfigurationConfig = [
+        'name' => 'runtimeOptions.termTagger.url.import',
+        'type' => 'list',
+        'url' => 'http://termtagger:9001'
+    ];
+
     /**
      * contains the HTTP status of the last request
      * @var integer
@@ -56,6 +74,16 @@ final class editor_Plugins_TermTagger_Service extends DockerMultiService {
      */
     public function getConfiguredUrls() {
         return $this->config->runtimeOptions->termTagger->url->toArray();
+    }
+
+    /**
+     * Wiring our testServerUrl-API to use for the general service check
+     * @param string $url
+     * @return bool
+     */
+    protected function customServiceCheck(string $url): bool
+    {
+        return $this->testServerUrl($url);
     }
     
     /**
