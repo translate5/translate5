@@ -64,11 +64,12 @@ abstract class DockerService extends AbstractService
      * Base implementation for simple docker-services
      * @param SymfonyStyle $io
      * @param bool $writeToConfig
-     * @param string|array $url
+     * @param mixed $url
      * @param bool $doSave
+     * @param array $config: optional to inject further dependencies
      * @return bool
      */
-    public function locate(SymfonyStyle $io, bool $writeToConfig, mixed $url, bool $doSave = false): bool
+    public function locate(SymfonyStyle $io, bool $writeToConfig, mixed $url, bool $doSave = false, array $config = []): bool
     {
         $configType = $this->configurationConfig['type'];
         $configName = $this->configurationConfig['name'];
@@ -137,7 +138,7 @@ abstract class DockerService extends AbstractService
     public function getServiceUrl(): ?string
     {
         $values = $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type'], true);
-        if(count($values) > 0){
+        if (count($values) > 0) {
             return $values[0];
         }
         return null;
@@ -215,7 +216,7 @@ abstract class DockerService extends AbstractService
      * Retrieves the value with the config-name like "" out of the global config object
      * @param string $configName
      * @param string $configType
-     * @param bool $asArray: if set, the result will be an array for simple types
+     * @param bool $asArray : if set, the result will be an array for simple types
      * @return mixed
      * @throws ZfExtended_Exception
      */
@@ -232,8 +233,8 @@ abstract class DockerService extends AbstractService
         if ($configType === ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST) {
             return $value->toArray();
         }
-        if($asArray){
-            return (empty($value) && $value != '0') ? [] : [ $value ];
+        if ($asArray) {
+            return $this->convertValueToArray($value);
         }
         return $value;
     }
@@ -289,6 +290,11 @@ abstract class DockerService extends AbstractService
                 }
 
             } else {
+
+                // compatibility: if a list shall be saved as single value, we simply take the first item
+                if(is_array($newValue)){
+                    $newValue = (count($newValue) === 0) ? '' : $newValue[0];
+                }
 
                 $updateValue = $this->createConfigurationUpdateValue($type, $newValue);
                 if ($updateValue === $config->getValue()) {
@@ -349,5 +355,17 @@ abstract class DockerService extends AbstractService
     {
         $is = $config->hasIniEntry() ? ' is in INI: ' : ' is: ';
         return '  config ' . $config->getName() . $is . $config->getValue() . $suffix;
+    }
+
+    /**
+     * @param mixed $value
+     * @return array
+     */
+    protected function convertValueToArray(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        return (empty($value) && $value != '0') ? [] : [$value];
     }
 }

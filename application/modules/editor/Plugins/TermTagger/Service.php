@@ -26,12 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Service\DockerMultiService;
+use MittagQI\Translate5\Service\DockerPooledService;
 
 /**
  * Service Class of Plugin "TermTagger"
  */
-final class editor_Plugins_TermTagger_Service extends DockerMultiService {
+final class editor_Plugins_TermTagger_Service extends DockerPooledService {
 
     /**
      * The timeout for connections is fix, the request timeout depends on the request type and comes from the config
@@ -47,19 +47,19 @@ final class editor_Plugins_TermTagger_Service extends DockerMultiService {
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.termTagger.url.default',
         'type' => 'list',
-        'url' => 'http://termtagger:9001'
+        'url' => 'http://termtagger.:9001'
     ];
 
     protected array $guiConfigurationConfig = [
         'name' => 'runtimeOptions.termTagger.url.gui',
         'type' => 'list',
-        'url' => 'http://termtagger:9001'
+        'url' => 'http://termtagger.:9001'
     ];
 
     protected array $importConfigurationConfig = [
         'name' => 'runtimeOptions.termTagger.url.import',
         'type' => 'list',
-        'url' => 'http://termtagger:9001'
+        'url' => 'http://termtagger.:9001'
     ];
 
     /**

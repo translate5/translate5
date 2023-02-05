@@ -31,7 +31,8 @@ namespace MittagQI\Translate5\Plugins\FrontEndMessageBus;
 use MittagQI\Translate5\Service\DockerService;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-final class Service extends DockerService {
+final class Service extends DockerService
+{
 
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.plugins.FrontEndMessageBus.messageBusURI',
@@ -45,7 +46,7 @@ final class Service extends DockerService {
         $messageBusUrl = $this->config->runtimeOptions->plugins->FrontEndMessageBus->messageBusURI;
         $socketServer = $this->config->runtimeOptions->plugins->FrontEndMessageBus->socketServer;
         $host = empty($socketServer->host) ? $this->config->runtimeOptions->server->name : $socketServer->host;
-        $socketServerUrl = $socketServer->schema.'://'.$host.':'.$socketServer->port.$socketServer->route;
+        $socketServerUrl = $socketServer->schema . '://' . $host . ':' . $socketServer->port . $socketServer->route;
 
         if (empty($messageBusUrl)) {
             $this->errors[] = 'There is no URL configured.';
@@ -65,12 +66,12 @@ final class Service extends DockerService {
         return $checked;
     }
 
-    public function locate(SymfonyStyle $io, bool $writeToConfig, mixed $url, bool $doSave=false): bool
+    public function locate(SymfonyStyle $io, bool $writeToConfig, mixed $url, bool $doSave = false, array $config = []): bool
     {
-        if(empty($url)){
+        if (empty($url)) {
             $url = $this->configurationConfig['url'];
         }
-        if(!$this->checkPotentialServiceUrl($this->getName(), $url, $io)){
+        if (!$this->checkPotentialServiceUrl($this->getName(), $url, $io)) {
             return false;
         }
         // save the messageBusURI
@@ -85,7 +86,7 @@ final class Service extends DockerService {
 
         $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema', 'string', $schema, $doSave, $io);
         $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost', 'string', $host, $doSave, $io);
-        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.port','string', $port, $doSave, $io);
+        $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.port', 'string', $port, $doSave, $io);
         $this->updateConfigurationConfig('runtimeOptions.plugins.FrontEndMessageBus.socketServer.route', 'string', $route, $doSave, $io);
 
         return true;
