@@ -280,7 +280,7 @@ abstract class DockerService extends AbstractService
             if ($type === ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST) {
 
                 $newValue = is_array($newValue) ? $newValue : [$newValue];
-                $oldValue = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
+                $oldValue = empty($config->getValue()) ? [] : json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
 
                 if (!is_array($newValue) || !is_array($oldValue)) {
                     throw new ZfExtended_Exception('Updating List: old value or new value are not of type array');
@@ -313,8 +313,6 @@ abstract class DockerService extends AbstractService
                     $config->save();
                 }
             }
-            $config->setValue($updateValue);
-            $config->save();
 
         } else {
 
