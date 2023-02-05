@@ -290,44 +290,4 @@ class editor_Plugins_TermTagger_Configuration {
             throw new editor_Plugins_TermTagger_Exception_Open('E1116', [], $e);
         }
     }
-    
-    /**
-     * Creates the server communication service for the current task and the given segment-tags
-     * @param editor_Segment_Tags[] $segmentsTags
-     * @return editor_Plugins_TermTagger_Service_ServerCommunication
-     */
-    public function createServerCommunicationServiceFromTags(array $segmentsTags) : editor_Plugins_TermTagger_Service_ServerCommunication {
-        
-        $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($this->task));
-        /* @var $service editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
-            
-            // should not happen but who knows in which processingMode the tags have been generated
-            if(!$tags->hasSource()){
-                throw new ZfExtended_Exception('Passed segment tags did not contain a source '.$tags->getSegmentId());
-            }
-            
-            // this is somehow "doppelt gemoppelt"
-            $typesToExclude = [editor_Plugins_TermTagger_QualityProvider::qualityType()];
-            
-            $source = $tags->getSource();
-            $sourceText = $source->render();
-            $firstTargetText = null;
-
-            foreach($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
-                
-                $targetText = $target->render($typesToExclude);
-                $service->addSegment($target->getSegmentId(), $target->getTermtaggerName(), $sourceText, $targetText);
-                if($firstTargetText === null){
-                    $firstTargetText = $targetText;
-                }
-            }
-            if($tags->hasOriginalSource()){
-                $sourceOriginal = $tags->getOriginalSource();
-                $service->addSegment($sourceOriginal->getSegmentId(), $sourceOriginal->getTermtaggerName(), $sourceOriginal->render($typesToExclude), $firstTargetText);
-            }
-        }
-        return $service;
-    }
 }

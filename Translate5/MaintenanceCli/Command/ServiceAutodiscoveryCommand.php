@@ -56,11 +56,11 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
      */
     protected array $services = [
         'php' => 80, // used to configure the worker-trigger & visualbrowser access
+        't5memory' => 4040,
         'frontendmessagebus' => 9057,
         'okapi' => 8080,
         'languagetool' => 8010,
         'termtagger' => 9001,
-        't5memory' => 4040,
         'pdfconverter' => 8086,
         'visualbrowser' => 3000
     ];

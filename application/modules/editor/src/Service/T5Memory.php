@@ -28,11 +28,17 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Service;
 
-abstract class DockerMultiService extends DockerService {
+/**
+ * The t5memory languageResource Service
+ * TODO FIXME: The check must be more sophisticated thjen just checking if the URL can be pinged
+ */
+final class T5Memory extends DockerService {
 
-    public function check(): bool
-    {
-        $this->errors[] = 'Docker-Multi-Service "'.$this->getName().'" is not implemented';
-        return false;
-    }
+    protected array $configurationConfig = [
+        'name' => 'runtimeOptions.LanguageResources.opentm2.server',
+        'type' => 'list',
+        'url' => 'http://t5memory.:4040/t5memory',
+        'healthcheck' => '/', // requesting th ebas url will retrieve a 200 status
+        'additive' => true // TODO: is this neccessary ?
+    ];
 }

@@ -28,11 +28,15 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Service;
 
-abstract class DockerMultiService extends DockerService {
+/**
+ * Represents the Proxy-Service for a dockerized T5
+ */
+final class Proxy extends DockerService {
 
-    public function check(): bool
-    {
-        $this->errors[] = 'Docker-Multi-Service "'.$this->getName().'" is not implemented';
-        return false;
-    }
+    protected array $configurationConfig = [
+        'name' => 'runtimeOptions.authentication.ipbased.useLocalProxy',
+        'type' => 'list',
+        'url' => 'http://proxy.:80/',
+        'optional' => true
+    ];
 }

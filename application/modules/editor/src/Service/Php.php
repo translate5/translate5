@@ -28,11 +28,15 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Service;
 
-abstract class DockerMultiService extends DockerService {
+/**
+ * Represents the dockerized T5-app itself
+ */
+final class Php extends DockerService {
 
-    public function check(): bool
-    {
-        $this->errors[] = 'Docker-Multi-Service "'.$this->getName().'" is not implemented';
-        return false;
-    }
+    protected array $configurationConfig = [
+        'name' => 'runtimeOptions.worker.server',
+        'type' => 'string',
+        'url' => 'http://php.:80',
+        'optional' => true
+    ];
 }

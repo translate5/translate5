@@ -38,6 +38,7 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\Translate5\Service\Services;
 
 /**
  * Dummy Index Controller
@@ -145,7 +146,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     public function systemstatusAction() {
         $this->_helper->layout->disableLayout();
         $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
-        $this->view->validationResults = $validator->validate();
+        $results = $validator->validate();
+        Services::addServiceChecksAsSystemChecks($results, false);
+        $this->view->validationResults = $results;
     }
 
     /**

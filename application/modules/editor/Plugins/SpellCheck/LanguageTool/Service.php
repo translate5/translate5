@@ -26,13 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Service;
+namespace MittagQI\Translate5\Plugins\SpellCheck\LanguageTool;
 
-abstract class DockerMultiService extends DockerService {
+use MittagQI\Translate5\Service\DockerMultiService;
 
-    public function check(): bool
-    {
-        $this->errors[] = 'Docker-Multi-Service "'.$this->getName().'" is not implemented';
-        return false;
-    }
+final class Service extends DockerMultiService {
+
 }

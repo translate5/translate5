@@ -28,23 +28,307 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Service;
 
-use MittagQI\ZfExtended\Service;
+use Throwable;
+use Zend_Exception;
+use JsonException;
+use Zend_Db_Statement_Exception;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
+use ZfExtended_Exception;
+use ZfExtended_Factory;
+use editor_Models_Config;
+use ZfExtended_DbConfig_Type_CoreTypes;
+use MittagQI\ZfExtended\Service\AbstractService;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-abstract class DockerService extends Service {
+/**
+ * This is a service that is represented by a single config-value that either is a simple string or a list
+ * Consrete Implementations must have a valid $configurationConfig!
+ */
+abstract class DockerService extends AbstractService
+{
 
+    /**
+     * An assoc array that has to have at least 3 props:
+     * "name": of the config
+     * "type": of the config (either string, integer, boolean or list)
+     * "url": the default-url, must have protocol, host & port
+     * "additive": optional, if set to true, the configured value is added to the existing config if it does not exist
+     * "optional": optional, if set to true, this will result in only a warning if the service is not configured
+     * "healthcheck": optional, if set to a value like /status, this will be used to check the health of the service with a GET request that is expected to return status "200"
+     * @var array
+     */
+    protected array $configurationConfig;
+
+    /**
+     * Base implementation for simple docker-services
+     * @param SymfonyStyle $io
+     * @param bool $writeToConfig
+     * @param string|array $url
+     * @param bool $doSave
+     * @return bool
+     */
+    public function locate(SymfonyStyle $io, bool $writeToConfig, mixed $url, bool $doSave = false): bool
+    {
+        $configType = $this->configurationConfig['type'];
+        $configName = $this->configurationConfig['name'];
+        $isAdditive = array_key_exists('additive', $this->configurationConfig) ? $this->configurationConfig['additive'] : false; // TODO: do we need this ?
+        if (empty($url)) {
+            $url = $this->configurationConfig['url'];
+        }
+        if ($this->checkPotentialServiceUrl($this->getName(), $url, $io)) {
+            $this->updateConfigurationConfig($configName, $configType, $url, $doSave, $io, $isAdditive);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Base implementation for simple docker-services
+     * @return bool
+     */
+    public function check(): bool
+    {
+        $checked = true;
+        $this->isOptional = array_key_exists('optional', $this->configurationConfig) ? $this->configurationConfig['optional'] : false;
+        $healthCheck = array_key_exists('healthcheck', $this->configurationConfig) ? $this->configurationConfig['healthcheck'] : null;
+        $urls = $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type']);
+
+        if (empty($urls)) {
+            $urls = [];
+        } else if (!is_array($urls)) {
+            $urls = [$urls];
+        }
+        if (count($urls) === 0) {
+            if ($this->isOptional) {
+                $this->warnings[] = 'There is no URL configured.';
+            } else {
+                $this->errors[] = 'There is no URL configured.';
+                $checked = false;
+            }
+        } else {
+            foreach ($urls as $url) {
+                if (empty($url)) {
+                    $this->errors[] = 'There is an empty configuration value set.';
+                    $checked = false;
+                } else if (empty($healthCheck)) {
+                    if (!$this->checkConfiguredServiceUrl($url)) {
+                        $this->errors[] = 'The configured URL "' . $url . '" is not reachable.';
+                        $checked = false;
+                    }
+                } else {
+                    $satusUrl = rtrim($url, '/') . $healthCheck;
+                    if (!$this->checkConfiguredServiceStatusUrl($satusUrl)) {
+                        $this->errors[] = 'A request on "' . $satusUrl . '" did not bring the expected status "200".';
+                        $checked = false;
+                    }
+                }
+            }
+        }
+        return $checked;
+    }
+
+    /**
+     * Checks a dedicated status-url on a service or an URL that could be used in such manner
+     * @param string $url
+     * @return bool
+     */
+    public function checkConfiguredServiceStatusUrl(string $url): bool
+    {
+        $httpClient = ZfExtended_Factory::get('Zend_Http_Client');
+        /* @var $http Zend_Http_Client */
+        $httpClient->setUri($url);
+        $response = $httpClient->request('GET');
+        // the status request must return 200
+        return ($response->getStatus() === 200);
+    }
+
+    /**
+     * Checks a single URL (usually pointing to a docker container)
+     * @param string $url
+     * @return bool
+     */
+    public function checkConfiguredServiceUrl(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        $port = parse_url($url, PHP_URL_PORT);
+        if (empty($host)) {
+            return false;
+        }
+        if (empty($port) || $port === false) {
+            $port = null;
+        }
+        return $this->isDnsSet($host, $port);
+    }
+
+    /**
+     * Checks if the expected service URL is reachable
+     * @param string $label
+     * @param string $url
+     * @param SymfonyStyle|null $io
+     * @return bool
+     */
+    protected function checkPotentialServiceUrl(string $label, string $url, SymfonyStyle $io = null): bool
+    {
+        $result = true;
+        $host = parse_url($url, PHP_URL_HOST);
+        $port = parse_url($url, PHP_URL_PORT);
+        if (!$this->isDnsSet($host, $port)) {
+            $url = 'NONE (expected: ' . $url . ')';
+            $result = false;
+        }
+        $this->output('Found "' . $label . '": ' . $url, $io, 'info');
+        return $result;
+    }
 
     /**
      * @param string $host
      * @param int $port
      * @return bool
      */
-    protected function isDnsSet(string $host, int $port): bool
+    protected function isDnsSet(string $host, int $port = null): bool
     {
         $connection = @fsockopen($host, $port);
-        if (is_resource($connection)){
+        if (is_resource($connection)) {
             fclose($connection);
             return true;
         }
         return false;
+    }
+
+    /**
+     * Retrieves the value with the config-name like "" out of the global config object
+     * @param string $configName
+     * @param string $configType
+     * @return mixed
+     * @throws ZfExtended_Exception
+     */
+    protected function getConfigValueFromName(string $configName, string $configType): mixed
+    {
+        $value = $this->config;
+        try {
+            foreach (explode('.', $configName) as $section) {
+                $value = $value->$section;
+            }
+        } catch (Throwable) {
+            throw new ZfExtended_Exception('Global Config did not contain "' . $configName . '"');
+        }
+        if ($configType === ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST) {
+            return $value->toArray();
+        }
+        return $value;
+    }
+
+    /**
+     * Updates Config values for the service
+     * @param string $name
+     * @param string $type
+     * @param mixed $newValue
+     * @param bool $doSave
+     * @param SymfonyStyle|null $io
+     * @param bool $addToExisting
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws JsonException
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    protected function updateConfigurationConfig(string $name, string $type, mixed $newValue, bool $doSave, SymfonyStyle $io = null, bool $addToExisting = false)
+    {
+        $config = new editor_Models_Config();
+        $config->loadByName($name);
+
+        if ($config->hasIniEntry()) {
+            $this->output($config->getName() . ' is set in ini and can not be updated!', $io, 'warning');
+            return;
+        }
+
+        if ($doSave) {
+
+            if ($type === ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST) {
+
+                $newValue = is_array($newValue) ? $newValue : [$newValue];
+                $oldValue = json_decode($config->getValue(), true, 512, JSON_THROW_ON_ERROR);
+
+                if (!is_array($newValue) || !is_array($oldValue)) {
+                    throw new ZfExtended_Exception('Updating List: old value or new value are not of type array');
+                }
+
+                if ($addToExisting && count(array_unique(array_merge($newValue, $oldValue))) === count($oldValue)) {
+
+                    $this->output($config->getName() . ' already contains [ ' . implode(', ', $newValue) . ' ]', $io, 'note');
+
+                } else if (array_diff($oldValue, $newValue) === [] && array_diff($newValue, $oldValue) === []) {
+
+                    $this->output($config->getName() . ' is already set to [ ' . implode(', ', $newValue) . ' ]', $io, 'note');
+
+                } else {
+
+                    $config->setValue($this->createConfigurationUpdateValue($type, $newValue));
+                    $config->save();
+                }
+
+            } else {
+
+                $updateValue = $this->createConfigurationUpdateValue($type, $newValue);
+                if ($updateValue === $config->getValue()) {
+
+                    $this->output($config->getName() . ' is already set to ' . $updateValue, $io, 'note');
+
+                } else {
+
+                    $config->setValue($updateValue);
+                    $config->save();
+                }
+            }
+            $config->setValue($updateValue);
+            $config->save();
+
+        } else {
+
+            $msg = $this->createConfigurationUpdateMsg($config, '; discovered value is ' . $this->createConfigurationUpdateValue($type, $newValue));
+            $this->output($msg, $io, 'writeln');
+        }
+    }
+
+    /**
+     * Stringifies an value for a config-update
+     * @param string $type
+     * @param mixed $value
+     * @return string
+     * @throws ZfExtended_Exception
+     */
+    protected function createConfigurationUpdateValue(string $type, mixed $value): string
+    {
+        switch ($type) {
+
+            case ZfExtended_DbConfig_Type_CoreTypes::TYPE_STRING:
+            case ZfExtended_DbConfig_Type_CoreTypes::TYPE_FLOAT:
+            case ZfExtended_DbConfig_Type_CoreTypes::TYPE_INTEGER:
+                return strval($value);
+
+            case ZfExtended_DbConfig_Type_CoreTypes::TYPE_BOOLEAN:
+                return ($value === true) ? '1' : '0';
+
+            case ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST:
+                return json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+
+            default:
+                throw new ZfExtended_Exception('Unsupported config-type "' . $type . '"');
+        }
+    }
+
+    /**
+     * Creates an info-message about the passed config
+     * @param editor_Models_Config $config
+     * @param string $suffix
+     * @return string
+     * @throws Zend_Exception
+     */
+    protected function createConfigurationUpdateMsg(editor_Models_Config $config, string $suffix = ''): string
+    {
+        $is = $config->hasIniEntry() ? ' is in INI: ' : ' is: ';
+        return '  config ' . $config->getName() . $is . $config->getValue() . $suffix;
     }
 }

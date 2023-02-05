@@ -31,10 +31,9 @@ namespace Translate5\MaintenanceCli\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use MittagQI\Translate5\Service\Services;
 use Zend_Exception;
-use Zend_Registry;
-use ZfExtended_Models_Entity_NotFoundException;
-use ZfExtended_Plugin_Manager;
+
 
 
 class ServiceCheckCommand extends Translate5AbstractCommand
@@ -46,11 +45,11 @@ class ServiceCheckCommand extends Translate5AbstractCommand
     {
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('Checks all configured services (bas & plugins) if they are setup & working correctly.')
+            ->setDescription('Checks all configured services (base & plugins) if they are setup & working correctly.')
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Checks all configured services (bas & plugins) if they are setup & working correctly');
+            ->setHelp('Checks all configured services (base & plugins) if they are setup & working correctly');
 
         $this->addOption(
             'service',
@@ -71,12 +70,27 @@ class ServiceCheckCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $pluginmanager = Zend_Registry::get('PluginManager');
+        $config = \Zend_Registry::get('config');
+        // load all configured plugins
+        $pluginmanager = \Zend_Registry::get('PluginManager');
+        $pluginmanager->bootstrap();
 
         $this->writeTitle('Translate5 service check');
 
+        $serviceName = $input->getOption('service');
 
-
+        if(empty($serviceName)){
+            foreach(Services::getAllServices($config) as $service){
+                $service->serviceCheck($this->io);
+            }
+        } else {
+            $service = Services::findService($config, $serviceName);
+            if(empty($service)){
+                $this->io->warning('The service "'.$serviceName.'" could not be found for the current configuration');
+            } else {
+                $service->serviceCheck($this->io);
+            }
+        }
         return self::SUCCESS;
     }
 }

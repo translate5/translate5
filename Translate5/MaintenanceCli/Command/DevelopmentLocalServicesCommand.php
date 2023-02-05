@@ -49,10 +49,10 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
      */
     protected array $services = [
         'php' => 80, // will remove the worker-config as the server url works for local dev
+        't5memory' => 4740,
         'frontendmessagebus' => 4757,
         'okapi' => 4780,
         'languagetool' => 4710,
-        // 't5memory' => 4740, // TODO FIXME: Currently, t5memory is not working properly. To get tests runninng, use old opentm2
         'termtagger' => 4701,
         'pdfconverter' => 4786,
         'visualbrowser' => 3000 // due to biderectional access, must work in "host" network mode so port cannot be virtualized
