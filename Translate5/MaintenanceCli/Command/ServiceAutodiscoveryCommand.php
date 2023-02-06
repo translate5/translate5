@@ -159,10 +159,16 @@ using the default ports.')
                 }
                 $services[$service] = $this->services[$service];
             }
+            // a single service can be set to a custom host
             $host = empty($this->input->getArgument(self::ARGUMENT_HOST)) ? null : $this->input->getArgument(self::ARGUMENT_HOST);
 
         } else {
+
             $services = $this->services;
+
+            if(!empty($this->input->getArgument(self::ARGUMENT_HOST))){
+                $this->io->warning('The host will be ignored when configuring all services');
+            }
         }
 
         $this->setServices($services, $doSave, $host);

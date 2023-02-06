@@ -90,6 +90,11 @@ final class Service extends DockerService
             $port = parse_url($config['socketServer'], PHP_URL_PORT);
             $path = parse_url($config['socketServer'], PHP_URL_PATH) ?? '';
 
+            if($isHttps && $scheme !== 'wss'){
+                $this->output('The socket-server must also be on SSL if the installation runs on SSL/HTTPS', $io, 'warning');
+                return false;
+            }
+
         } else {
 
             // the normal way: evaluating
