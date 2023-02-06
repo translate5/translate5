@@ -290,11 +290,11 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
 
         // Catch timeout
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $httpException) {
-            throw new TimeOutException('E1412', $extraData, $httpException);
+            throw new TimeOutException('E1468', $extraData, $httpException);
 
         // Catch spot down
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $httpException) {
-            throw new DownException('E1410', $extraData, $httpException);
+            throw new DownException('E1468', $extraData, $httpException);
 
         // Catch no response
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $httpException) {

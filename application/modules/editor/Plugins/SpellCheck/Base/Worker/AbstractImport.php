@@ -295,35 +295,7 @@ abstract class AbstractImport extends editor_Segment_Quality_SegmentWorker
      */
     private function loadUncheckedSegmentIds(): array
     {
-        $db = ZfExtended_Factory::get(editor_Models_Db_SegmentMeta::class);
-        $columnName = $this->getMetaColumnName();
-
-        // Get unchecked segments ids
-        $db->getAdapter()->beginTransaction();
-        $sql = $db->select()
-            ->from($db, ['segmentId'])
-            ->where('taskGuid = ?', $this->task->getTaskGuid())
-            ->where(sprintf('%1$s IS NULL OR %1$s IN (?)', $columnName), [SegmentState::SEGMENT_STATE_UNCHECKED])
-            ->order('id')
-            ->limit($this->getConfiguration()->getSegmentsPerCallAmount())
-            ->forUpdate(Zend_Db_Select::FU_MODE_SKIP);
-        $segmentIds = $db->fetchAll($sql)->toArray();
-
-        // If not empty
-        if ($segmentIds = array_column($segmentIds, 'segmentId')) {
-
-            // Lock those segments by setting their status as 'inprogress', so that they won't be touched by other workers
-            $db->update([$columnName => SegmentState::SEGMENT_STATE_INPROGRESS], [
-                'taskGuid = ?' => $this->task->getTaskGuid(),
-                'segmentId in (?)' => $segmentIds,
-            ]);
-        }
-
-        // Commit the transaction
-        $db->getAdapter()->commit();
-
-        // Return unchecked segments ids (even if empty)
-        return $segmentIds;
+        return $this->loadNextSegmentIdsForProcessing(SegmentState::SEGMENT_STATE_UNCHECKED, true, $this->getConfiguration()->getSegmentsPerCallAmount());
     }
 
     /**
@@ -334,18 +306,68 @@ abstract class AbstractImport extends editor_Segment_Quality_SegmentWorker
      */
     private function loadNextRecheckSegmentId(): array
     {
-        $dbMeta = ZfExtended_Factory::get(editor_Models_Db_SegmentMeta::class);
+        return $this->loadNextSegmentIdsForProcessing(SegmentState::SEGMENT_STATE_RECHECK);
+    }
+
+    /**
+     * Get segments by state and set their state to "inprogress"
+     * @param string $segmentState
+     * @param bool $findNullState
+     * @param int $limit
+     * @return array
+     */
+    private function loadNextSegmentIdsForProcessing(string $segmentState, bool $findNullState = false, int $limit = 1): array
+    {
+        $db = ZfExtended_Factory::get(editor_Models_Db_SegmentMeta::class);
         $columnName = $this->getMetaColumnName();
 
-        // Get list of segments to be rechecked limited to 1
-        $sql = $dbMeta->select()
-            ->from($dbMeta, ['segmentId'])
-            ->where('taskGuid = ?', $this->task->getTaskGuid())
-            ->where(sprintf('%1$s IS NULL OR %1$s = ?', $columnName), [SegmentState::SEGMENT_STATE_RECHECK])
-            ->limit(1);
+        try {
+            // Get unchecked segments ids
+            $stateWhereCond = ($findNullState) ? $columnName . ' IS NULL OR ' . $columnName . ' = ?' : $columnName . ' = ?';
+            $db->getAdapter()->beginTransaction();
+            $sql = $db->select()
+                ->from($db, ['segmentId'])
+                ->where('taskGuid = ?', $this->task->getTaskGuid())
+                ->where($stateWhereCond, $segmentState)
+                ->order('id')
+                ->limit($limit)
+                ->forUpdate(Zend_Db_Select::FU_MODE_SKIP);
 
-        // Return an array containing 1 segmentId
-        return array_column($dbMeta->fetchAll($sql)->toArray(), 'segmentId');
+            $segmentIds = $db->fetchAll($sql)->toArray();
+            // If not empty
+            if ($segmentIds = array_column($segmentIds, 'segmentId')) {
+
+                // Lock those segments by setting their status as 'inprogress', so that they won't be touched by other workers
+                $db->update([$columnName => SegmentState::SEGMENT_STATE_INPROGRESS], [
+                    'taskGuid = ?' => $this->task->getTaskGuid(),
+                    'segmentId in (?)' => $segmentIds,
+                ]);
+            }
+            // Commit the transaction
+            $db->getAdapter()->commit();
+
+            // Return unchecked segments ids (even if empty)
+            return $segmentIds;
+
+        } catch (Exception $e) {
+
+            // Rollback transaction
+            $db->getAdapter()->rollBack();
+
+            // Log original exception
+            $this->getLogger()->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
+
+            // Log task event
+            $this->getLogger()->warn('E1464', "Recoverable error on spellchecking: {recoverableError} - see system log for details.", [
+                'task' => $this->task,
+                'segments' => $segmentIds,
+                'recoverableError' => $e->getMessage()
+            ]);
+
+            // Return empty array
+            return [];
+        }
+
     }
 
     private function reportDefectSegments(): void
@@ -392,7 +414,7 @@ abstract class AbstractImport extends editor_Segment_Quality_SegmentWorker
         }
 
         // Do log
-        $this->getLogger()->warn('E1123', 'Some segments could not be checked by the ' . self::class, [
+        $this->getLogger()->warn('E1465', 'Some segments could not be checked by the spellchecker', [
             'task' => $this->task,
             'uncheckableSegments' => $segmentsToLog,
         ]);
@@ -401,15 +423,17 @@ abstract class AbstractImport extends editor_Segment_Quality_SegmentWorker
     /**
      * @throws DownException
      */
-    protected function raiseNoAvailableResourceException() {
-        // E1411 No reachable LanguageTool instances available, please specify LanguageTool urls to import this task.
-        throw new DownException('E1411', [
+    protected function raiseNoAvailableResourceException()
+    {
+        // E1466 No reachable LanguageTool instances available, please specify LanguageTool urls to import this task.
+        throw new DownException('E1466', [
             'task' => $this->task
         ]);
     }
 
     /*************************** SINGLE SEGMENT PROCESSING ***************************/
-    protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool {
+    protected function processSegmentTags(editor_Segment_Tags $tags, string $slot): bool
+    {
         return true;
     }
 
@@ -418,7 +442,7 @@ abstract class AbstractImport extends editor_Segment_Quality_SegmentWorker
      *
      * @return float
      */
-    protected function calculateProgressDone() : float
+    protected function calculateProgressDone(): float
     {
         $meta = ZfExtended_Factory::get(editor_Models_Segment_Meta::class);
 
