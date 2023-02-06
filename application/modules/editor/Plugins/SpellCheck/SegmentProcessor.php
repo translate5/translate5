@@ -57,7 +57,7 @@ class editor_Plugins_SpellCheck_SegmentProcessor implements SegmentProcessorInte
         if (!$slot) {
 
             // Get connector instance with default slot
-            $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Adapter');
+            $connector = ZfExtended_Factory::get(editor_Plugins_SpellCheck_LanguageTool_Adapter::class);
 
             // Get that default slot
             $slot = $connector->getApiBaseUrl();
@@ -69,7 +69,7 @@ class editor_Plugins_SpellCheck_SegmentProcessor implements SegmentProcessorInte
         }
 
         // Get connector instance for given $slot
-        return self::$connector[$slot] ?? self::$connector[$slot] = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Adapter', [$slot]);
+        return self::$connector[$slot] ?? self::$connector[$slot] = ZfExtended_Factory::get(editor_Plugins_SpellCheck_LanguageTool_Adapter::class, [$slot]);
     }
 
     /**

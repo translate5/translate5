@@ -124,9 +124,7 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
         $spellchecker = new stdClass();
 
         // Get SpellCheck-plugin's LanguageTool-adapter
-        $scAdapter = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Adapter');
-
-        /* @var $scAdapter editor_Plugins_SpellCheck_LanguageTool_Adapter */
+        $scAdapter = ZfExtended_Factory::get(editor_Plugins_SpellCheck_LanguageTool_Adapter::class);
         $spellchecker->configured = $scAdapter->getConfiguredUrls();
 
         // Get all unique LanguageTool unique url endpoints
