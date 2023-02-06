@@ -810,6 +810,25 @@ final class Helper extends \ZfExtended_Test_ApiHelper
         }
     }
 
+    /***
+     * Get instance level config fro given config name. This function will not perform any asserts
+     * @param string $configName
+     * @return mixed|null
+     * @throws \Zend_Http_Client_Exception
+     */
+    public function getConfig(string $configName){
+        $config = $this->getJson('editor/config');
+        if( empty($config)){
+            return null;
+        }
+        foreach ($config as $c){
+            if ($c->name === $configName){
+                return $c;
+            }
+        }
+        return null;
+    }
+
     /**
      * Checks, if the passed configs are set
      * @param string[] $configNames
