@@ -31,7 +31,7 @@ namespace MittagQI\Translate5\Service;
 /**
  * The t5memory languageResource Service
  */
-final class T5Memory extends DockerService {
+final class T5Memory extends DockerServiceAbstract {
 
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.LanguageResources.opentm2.server',

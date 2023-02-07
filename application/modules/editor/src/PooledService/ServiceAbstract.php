@@ -26,8 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Service;
+namespace MittagQI\Translate5\PooledService;
 
+use MittagQI\Translate5\Service\DockerServiceAbstract;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use ZfExtended_Exception;
 
@@ -35,17 +36,16 @@ use ZfExtended_Exception;
  * This represents a multi-url service where the URLs are pooled for "gui" (for editing), "import" and "default"
  * The default-service is represented by $configurationConfig while gui and import have their own setup-data
  */
-abstract class DockerPooledService extends DockerService
+abstract class ServiceAbstract extends DockerServiceAbstract
 {
-
     /**
-     * Structure see DockerService::configurationConfig
+     * Structure see DockerServiceAbstract::configurationConfig
      * @var array
      */
     protected array $guiConfigurationConfig;
 
     /**
-     * Structure see DockerService::configurationConfig
+     * Structure see DockerServiceAbstract::configurationConfig
      * @var array
      */
     protected array $importConfigurationConfig;
@@ -78,6 +78,30 @@ abstract class DockerPooledService extends DockerService
     public function getImportServiceUrls(): array
     {
         return $this->getConfigValueFromName($this->importConfigurationConfig['name'], $this->importConfigurationConfig['type'], true);
+    }
+
+    /**
+     * Retrieves one of our Pools
+     * @param string $pool
+     * @return array
+     * @throws ZfExtended_Exception
+     */
+    public function getPooledServiceUrls(string $pool): array
+    {
+        switch ($pool){
+
+            case 'default':
+                return $this->getDefaultServiceUrls();
+
+            case 'gui':
+                return $this->getGuiServiceUrls();
+
+            case 'import':
+                return $this->getImportServiceUrls();
+
+            default:
+                throw new ZfExtended_Exception('PooledService::getPooledServiceUrls: pool must be: default | gui | import');
+        }
     }
 
     public function check(): bool
@@ -133,13 +157,13 @@ abstract class DockerPooledService extends DockerService
         if($autodetect > 1){
 
             if(is_array($url) || empty($url)){
-                throw new ZfExtended_Exception('DockerPooledService::locate: in case of autodetection the url must be a simple value');
+                throw new ZfExtended_Exception('PooledService::locate: in case of autodetection the url must be a simple value');
             }
             $host = parse_url($url, PHP_URL_HOST);
             $port = parse_url($url, PHP_URL_PORT);
             $path = parse_url($url, PHP_URL_PATH) ?? '';
             if(empty($host) || empty($port)){
-                throw new ZfExtended_Exception('DockerPooledService::locate: the url did not contain host and port');
+                throw new ZfExtended_Exception('PooledService::locate: the url did not contain host and port');
             }
             // detecting the url's to use
             $types = array_keys($pooledUrls);
@@ -179,7 +203,7 @@ abstract class DockerPooledService extends DockerService
                 $url['import'] = $this->importConfigurationConfig['url'];
             }
             if (empty($url['default'])) {
-                throw new ZfExtended_Exception('DockerPooledService::locate: param gui must be an assoc array with entries "default", "gui" and "import"');
+                throw new ZfExtended_Exception('PooledService::locate: param gui must be an assoc array with entries "default", "gui" and "import"');
             }
             $pooledUrls['default'] = $this->convertValueToArray($url['default']);
             $pooledUrls['gui'] = $this->convertValueToArray($url['gui']);

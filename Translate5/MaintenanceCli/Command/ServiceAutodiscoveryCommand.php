@@ -219,7 +219,7 @@ using the default ports.')
                         $this->setPluginActive($configuredService->getPluginName(), true, $doSave);
                     } else {
                         $msg = ($doSave) ? 'Have configured service' : 'Would configure service';
-                        $this->io->success($msg . ' "' . $serviceName . '"');
+                        $this->io->info($msg . ' "' . $serviceName . '"');
                     }
 
                 } else {

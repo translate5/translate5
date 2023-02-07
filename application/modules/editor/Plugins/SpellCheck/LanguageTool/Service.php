@@ -28,10 +28,10 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\SpellCheck\LanguageTool;
 
-use MittagQI\Translate5\Service\DockerPooledService;
+use MittagQI\Translate5\PooledService\ServiceAbstract;
 use editor_Plugins_SpellCheck_LanguageTool_Adapter;
 
-final class Service extends DockerPooledService {
+final class Service extends ServiceAbstract {
 
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.plugins.SpellCheck.languagetool.url.default',

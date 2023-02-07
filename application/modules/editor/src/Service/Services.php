@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Service;
 
-use MittagQI\ZfExtended\Service\AbstractService;
+use MittagQI\ZfExtended\Service\ServiceAbstract;
 use Zend_Config;
 use Zend_Exception;
 use ZfExtended_Plugin_Exception;
@@ -55,10 +55,10 @@ final class Services
      * Retrieves a global service by it's name
      * @param string $serviceName
      * @param Zend_Config|null $config
-     * @return AbstractService
+     * @return ServiceAbstract
      * @throws ZfExtended_Exception
      */
-    public static function getService(string $serviceName, Zend_Config $config=null): AbstractService
+    public static function getService(string $serviceName, Zend_Config $config=null): ServiceAbstract
     {
         if(!array_key_exists($serviceName, static::$services)){
             throw new ZfExtended_Exception('Service "'.$serviceName.'" not configured in the global Services');
@@ -70,7 +70,7 @@ final class Services
      * Retrieves all global/base services
      * Returned will be an assoc array like $serviceName => $service
      * @param Zend_Config $config
-     * @return AbstractService[];
+     * @return ServiceAbstract[];
      */
     public static function getServices(Zend_Config $config): array
     {
@@ -86,7 +86,7 @@ final class Services
      * Returned will be an assoc array like $serviceName => $service
      * @param Zend_Config $config
      * @param bool $loadPlugins: if set, the plugins will be bootstrapped first
-     * @return AbstractService[]
+     * @return ServiceAbstract[]
      * @throws ZfExtended_Exception
      * @throws Zend_Exception
      * @throws ZfExtended_Plugin_Exception
@@ -116,11 +116,11 @@ final class Services
      * @param Zend_Config $config
      * @param string $serviceName
      * @param bool $loadPlugins: if set, the plugins will be bootstrapped first
-     * @return AbstractService|null
+     * @return ServiceAbstract|null
      * @throws Zend_Exception
      * @throws ZfExtended_Exception
      */
-    public static function findService(Zend_Config $config, string $serviceName, bool $loadPlugins=false): ?AbstractService
+    public static function findService(Zend_Config $config, string $serviceName, bool $loadPlugins=false): ?ServiceAbstract
     {
         $pluginManager = Zend_Registry::get('PluginManager');
         if($loadPlugins){
@@ -146,7 +146,9 @@ final class Services
     {
         $services = self::getAllServices(Zend_Registry::get('config'), $loadPlugins);
         foreach($services as $serviceName => $service){
-            $results[$serviceName] = $service->systemCheck();
+            if(!$service->isCheckSkipped()){
+                $results[$serviceName] = $service->systemCheck();
+            }
         }
     }
 }

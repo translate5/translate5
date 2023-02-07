@@ -26,12 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Service\DockerPooledService;
+use MittagQI\Translate5\PooledService\ServiceAbstract;
 
 /**
  * Service Class of Plugin "TermTagger"
  */
-final class editor_Plugins_TermTagger_Service extends DockerPooledService {
+final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
 
     /**
      * The timeout for connections is fix, the request timeout depends on the request type and comes from the config

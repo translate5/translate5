@@ -31,7 +31,7 @@ namespace MittagQI\Translate5\Service;
 /**
  * Represents the Proxy-Service for a dockerized T5
  */
-final class Proxy extends DockerService {
+final class Proxy extends DockerServiceAbstract {
 
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.authentication.ipbased.useLocalProxy',

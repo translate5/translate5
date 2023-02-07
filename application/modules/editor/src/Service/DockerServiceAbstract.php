@@ -32,20 +32,21 @@ use Throwable;
 use Zend_Exception;
 use JsonException;
 use Zend_Db_Statement_Exception;
+use Zend_Http_Client;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
 use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
 use editor_Models_Config;
 use ZfExtended_DbConfig_Type_CoreTypes;
-use MittagQI\ZfExtended\Service\AbstractService;
+use MittagQI\ZfExtended\Service\ServiceAbstract;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * This is a service that is represented by a single config-value that either is a simple string or a list
  * Consrete Implementations must have a valid $configurationConfig!
  */
-abstract class DockerService extends AbstractService
+abstract class DockerServiceAbstract extends ServiceAbstract
 {
 
     /**
@@ -102,7 +103,6 @@ abstract class DockerService extends AbstractService
     public function check(): bool
     {
         $checked = true;
-        $this->isOptional = array_key_exists('optional', $this->configurationConfig) ? $this->configurationConfig['optional'] : false;
         $healthCheck = array_key_exists('healthcheck', $this->configurationConfig) ? $this->configurationConfig['healthcheck'] : null;
         $urls = $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type']);
 
@@ -112,12 +112,8 @@ abstract class DockerService extends AbstractService
             $urls = [$urls];
         }
         if (count($urls) === 0) {
-            if ($this->isOptional) {
-                $this->warnings[] = 'There is no URL configured.';
-            } else {
-                $this->errors[] = 'There is no URL configured.';
-                $checked = false;
-            }
+            $this->errors[] = 'There is no URL configured.';
+            $checked = false;
         } else {
             foreach ($urls as $url) {
                 if (empty($url)) {
@@ -138,6 +134,19 @@ abstract class DockerService extends AbstractService
             }
         }
         return $checked;
+    }
+
+    /**
+     * Services neccessary only for full dockerized setups should not show up in other context's and can be marked as "optional"
+     * @return bool
+     * @throws ZfExtended_Exception
+     */
+    public function isCheckSkipped(): bool
+    {
+        return
+            array_key_exists('optional', $this->configurationConfig)
+            && $this->configurationConfig['optional'] === true
+            && empty($this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type']));
     }
 
     /**
@@ -162,12 +171,17 @@ abstract class DockerService extends AbstractService
      */
     protected function checkConfiguredHealthCheckUrl(string $url): bool
     {
-        $httpClient = ZfExtended_Factory::get('Zend_Http_Client');
-        /* @var $http Zend_Http_Client */
-        $httpClient->setUri($url);
-        $response = $httpClient->request('GET');
-        // the status request must return 200
-        return ($response->getStatus() === 200);
+        try {
+            $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
+            /* @var $http Zend_Http_Client */
+            $httpClient->setUri($url);
+            $response = $httpClient->request('GET');
+            // the status request must return 200
+            return ($response->getStatus() === 200);
+
+        } catch (Throwable $e){
+            return false;
+        }
     }
 
     /**

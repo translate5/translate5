@@ -28,10 +28,10 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\FrontEndMessageBus;
 
-use MittagQI\Translate5\Service\DockerService;
+use MittagQI\Translate5\Service\DockerServiceAbstract;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-final class Service extends DockerService
+final class Service extends DockerServiceAbstract
 {
 
     protected array $configurationConfig = [

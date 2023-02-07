@@ -28,12 +28,12 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\Okapi;
 
-use MittagQI\Translate5\Service\DockerService;
+use MittagQI\Translate5\Service\DockerServiceAbstract;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use ZfExtended_Factory;
 use editor_Plugins_Okapi_Connector;
 
-final class Service extends DockerService {
+final class Service extends DockerServiceAbstract {
 
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.plugins.Okapi.server',

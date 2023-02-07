@@ -31,7 +31,7 @@ namespace MittagQI\Translate5\Service;
 /**
  * Represents the dockerized T5-app itself
  */
-final class Php extends DockerService {
+final class Php extends DockerServiceAbstract {
 
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.worker.server',
