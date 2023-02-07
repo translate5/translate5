@@ -237,19 +237,44 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
      * @return array
      */
     private function loadUntaggedSegmentIds(): array {
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
-        /* @var $db editor_Models_Db_SegmentMeta */
+        return $this->loadNextSegmentIdsForProcessing(
+            editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED,
+            true,
+            editor_Plugins_TermTagger_Configuration::IMPORT_SEGMENTS_PER_CALL);
+    }
 
+    /**
+     * returns a list with the next segmentId where terms are marked as to be "retagged"
+     * returns only one segment since this segments has to be single tagged
+     *
+     * @return array
+     */
+    private function loadNextRetagSegmentId(): array {
+        return $this->loadNextSegmentIdsForProcessing(editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_RETAG);
+    }
+
+    /**
+     * Get segments by state and set their state to "inprogress"
+     * @param string $segmentState
+     * @param bool $findNullState
+     * @param int $limit
+     * @return array
+     */
+    private function loadNextSegmentIdsForProcessing(string $segmentState, bool $findNullState = false, int $limit = 1): array {
+
+        $db = ZfExtended_Factory::get(editor_Models_Db_SegmentMeta::class);
         try {
 
             $db->getAdapter()->beginTransaction();
+            $stateWhereCond = ($findNullState) ? 'termtagState IS NULL OR termtagState = ?' : 'termtagState = ?';
             $sql = $db->select()
                 ->from($db, ['segmentId'])
                 ->where('taskGuid = ?', $this->task->getTaskGuid())
-                ->where('termtagState IS NULL OR termtagState IN (?)', [editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED])
+                ->where($stateWhereCond, $segmentState)
                 ->order('id')
-                ->limit(editor_Plugins_TermTagger_Configuration::IMPORT_SEGMENTS_PER_CALL)
+                ->limit($limit)
                 ->forUpdate(Zend_Db_Select::FU_MODE_SKIP);
+
             $segmentIds = $db->fetchAll($sql)->toArray();
             $segmentIds = array_column($segmentIds, 'segmentId');
 
@@ -263,10 +288,9 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
                 'segmentId in (?)' => $segmentIds,
             ]);
             $db->getAdapter()->commit();
-
             return $segmentIds;
 
-        // Catch and log exception
+            // Catch and log exception
         } catch (Exception $e) {
 
             // Rollback transaction
@@ -284,26 +308,6 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
             // Return empty array
             return [];
         }
-    }
-
-    /**
-     * returns a list with the next segmentId where terms are marked as to be "retagged"
-     * returns only one segment since this segments has to be single tagged
-     *
-     * @return array
-     */
-    private function loadNextRetagSegmentId(): array {
-        // get list of untagged segments
-        $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
-        /* @var $dbMeta editor_Models_Db_SegmentMeta */
-        
-        $sql = $dbMeta->select()
-            ->from($dbMeta, ['segmentId'])
-            ->where('taskGuid = ?', $this->task->getTaskGuid())
-            ->where('termtagState IS NULL OR termtagState = ?', [editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_RETAG])
-            ->limit(1);
-        
-        return array_column($dbMeta->fetchAll($sql)->toArray(), 'segmentId');
     }
     /**
      * sets the meta TermtagState of the given segment ids to the given state
