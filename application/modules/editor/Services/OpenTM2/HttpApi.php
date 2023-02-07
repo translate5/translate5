@@ -121,7 +121,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $http->setConfig(['timeout' => 1200]);
         $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
 
-        return true; // $this->processResponse($http->request()); TODO fix this after response is fixed on t5memory side
+        return $this->processResponse($http->request());
     }
 
     /**
