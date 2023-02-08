@@ -173,7 +173,6 @@ abstract class DockerServiceAbstract extends ServiceAbstract
     {
         try {
             $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
-            /* @var $http Zend_Http_Client */
             $httpClient->setUri($url);
             $response = $httpClient->request('GET');
             // the status request must return 200
