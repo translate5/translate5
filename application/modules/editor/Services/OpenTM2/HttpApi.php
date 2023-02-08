@@ -140,6 +140,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
         $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $this->http->setConfig(['timeout' => 30]);
+
         return $this->http;
     }
     
