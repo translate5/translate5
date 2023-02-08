@@ -54,7 +54,10 @@ final class Service extends ServiceAbstract {
     protected function customServiceCheck(string $url): bool
     {
         $adapter = $this->getAdapter($url);
-        return $adapter->testServerUrl($url);
+        $version = null;
+        $result = $adapter->testServerUrl($url, $version);
+        $this->version = (!empty($version)) ? strval($version) : null;
+        return $result;
     }
 
     /**

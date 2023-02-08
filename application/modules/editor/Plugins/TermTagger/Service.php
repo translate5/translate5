@@ -83,7 +83,16 @@ final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
      */
     protected function customServiceCheck(string $url): bool
     {
-        return $this->testServerUrl($url);
+        $version = null;
+        $result = $this->testServerUrl($url, $version);
+        if(!empty($version)){
+            // will be markup like <html> <title>TermTagger Version Information</title><body><h1>TermTagger Version Information</h1><h2>TermTagger REST Server</h2><b>Version:</b> 0.16<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.TermTaggerRestServer<br /><b>Compile Date: </b>Thu Jan 26 17:42:24 UTC 2023<hr><h2>TermTagger:</h2><b>Version:</b> 9.01<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.XliffTermTagger<br /><b>Compile Date: </b>Mon Jun 10 18:33:52 UTC 2019<hr><h2>OpenTMS Version: </h2>0.2.1</body></html>
+            $parts = explode('Version:', $version);
+            $parts = (count($parts) > 1) ? explode('<br', $parts[1]) : [];
+            $version = (count($parts) > 0) ? trim(strip_tags($parts[0])) : null;
+            $this->version = (!empty($version)) ? $version : null;
+        }
+        return $result;
     }
     
     /**
