@@ -172,7 +172,7 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
      * @param newTask
      */
     onProjectTaskSelectionChange: function (newTask){
-        this.loadForTask(newTask);
+        this.setTask(newTask);
     },
 
     /***

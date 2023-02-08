@@ -136,11 +136,6 @@ Ext.define('Editor.view.ViewPortEditor', {
                 me.getBrandConfig(),{
                 xtype: 'panel',
                 region: 'center',
-                listeners: {
-                    afterrender: function() {
-                        this.disable();
-                    }
-                },
                 preventHeader: true,
                 border:0,
                 itemId: 'metapanel',

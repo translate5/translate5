@@ -76,6 +76,15 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
                 store.allExtensions = metadata.allExtensions;
                 store.setExtensionMapping(metadata.extensionMapping);
             }
+        },
+        'remove': function(store, records){
+            Ext.Array.each(records, function(record){
+                store.identifierMap.delete(record.get('identifier'));
+                if(record.get('isCustom')){
+                    store.customIdentifierMap.delete(record.get('identifier'));
+                    store.updateCustomExtensionsInBconfGrid(record.get('bconfId'));
+                }
+            });
         }
     },
     initConfig: function(config){
@@ -144,8 +153,16 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
      * @param {string} identifier
      * @param {Array} extensions
      * @param {boolean} isCustom
+     * @param {int} addedFilterId
      */
-    updateExtensionsByIdentifier: function(identifier, extensions, isCustom){
+    updateExtensionsByIdentifier: function(identifier, extensions, isCustom, addedFilterId){
+        // newly added filters must be added to our identifier maps first ...
+        if(addedFilterId !== null){
+            this.identifierMap.set(identifier, addedFilterId);
+            if(isCustom){
+                this.customIdentifierMap.set(identifier, addedFilterId);
+            }
+        }
         var record,
             extBefore = [], // represents the extensions the changed item currently has
             customChanged = isCustom; // evaluates, if the custom extensions have been changed
@@ -176,19 +193,35 @@ Ext.define('Editor.plugins.Okapi.store.BconfFilterStore', {
         });
         // finally, if the extensions of custom items changed we fire an according event
         if(customChanged){
-            var bconfId, allCustomExts = [];
-            // collect all custom extensions
-            this.customIdentifierMap.forEach(id => {
-                record = this.getById(id);
-                if(record){
-                    allCustomExts = allCustomExts.concat(record.get('extensions'));
-                    bconfId = record.get('bconfId');
-                }
-            });
-            // the bconf grid will listen and update a bconf accordingly
-            this.fireEvent('customFilterExtensionsChanged', bconfId, allCustomExts);
+            this.updateCustomExtensionsInBconfGrid(null);
         }
     },
+
+    /**
+     * Notifies the bconf grid that an item has changed
+     * @param {int} removedFilterBconfId: in case of a removal we may have no mapped items and therefore a call from the filter deletion must pass the bconfid
+     */
+    updateCustomExtensionsInBconfGrid: function(removedFilterBconfId){
+        var record, bconfId = null, allCustomExts = [];
+        // collect all custom extensions
+        this.customIdentifierMap.forEach(id => {
+            record = this.getById(id);
+            if(record){
+                allCustomExts = allCustomExts.concat(record.get('extensions'));
+                bconfId = record.get('bconfId');
+            }
+        });
+        if(bconfId === null && removedFilterBconfId !== null){
+            bconfId = removedFilterBconfId;
+        }
+        if(bconfId !== null){
+            this.fireEvent('customFilterExtensionsChanged', bconfId, allCustomExts);
+        } else {
+            console.log('ERROR: BconfFilterStore.updateCustomExtensionsInBconfGrid: no bconfId was found nor given!');
+        }
+    },
+
+
     /**
      * Retrieves all exensions that shall be shown in the tagfield selector
      * @returns {[]}

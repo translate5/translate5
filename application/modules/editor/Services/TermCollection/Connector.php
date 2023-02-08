@@ -153,7 +153,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                     $res['term'] = $this->tagHandler->restoreInResult($res['term']);
                 }
                 if(isset($res['language'])){
-                    $res['languageRfc'] = $lngs[$res['language']] ?? null;
+                    $res['languageRfc'] = $lngs[$res['languageId']] ?? null;
                 }
                 //set the default source and the result depending of where the search is triggered
                 $this->resultList->setDefaultSource($field == 'source' ? $res['default'.$field] : $res['term']);

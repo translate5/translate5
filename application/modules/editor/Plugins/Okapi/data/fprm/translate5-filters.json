@@ -54,6 +54,15 @@
         "extensions": []
     },
     {
+        "id": "translate5-Figma",
+        "type": "okf_xml",
+        "replaceId": "",
+        "name": "t5 Figma",
+        "description": "translate5 adjusted filter for Figma XML files",
+        "mime": "text/xml",
+        "extensions": []
+    },
+    {
         "id": "translate5-tbx-translate-definitions-setup-ITS",
         "type": "okf_xml",
         "replaceId": "",

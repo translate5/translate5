@@ -1,11 +1,8 @@
-<phpunit bootstrap="bootstrap.php" cacheResult="true" cacheResultFile=".phpunit.result.cache" colors="true">
+<phpunit bootstrap="bootstrap.php" cacheResult="true" colors="true">
   <extensions>
     <!-- <extension class="MittagQI\Translate5\Test\Api\BeforeFirstTest"/> -->
     <extension class="MittagQI\Translate5\Test\Api\AfterLastTest"/>
   </extensions>
-  <logging>
-    <testdoxText outputFile="last-test-result.txt"/>
-  </logging>
   <testsuites>
     <testsuite name="segment-tags">
       <file>editorAPI/SegmentTagsTest.php</file>

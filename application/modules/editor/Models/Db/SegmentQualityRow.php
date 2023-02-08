@@ -107,4 +107,129 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
         parent::save();
     }
     //*/
+
+    /**
+     * Try to get json_decode($this->additionalData)->content
+     * False is returned if it is not possible to get, or it is empty
+     *
+     * @return bool|mixed
+     */
+    public function getContent() : bool|string {
+
+        // If no additional data exists for this quality - return
+        if (!$data = $this->additionalData) {
+            return false;
+        }
+
+        // Else if additional data exists, but is not json-decodable - return
+        if (!$data = json_decode($data)) {
+            return false;
+        }
+
+        // Else if it's json_decodable, but contains no content-prop or it's empty - return
+        if (!strlen($data->content ?? '')) {
+            return false;
+        }
+
+        // Return content
+        return $data->content;
+    }
+
+    /**
+     * Get quantity of similar qualities triggered by same content
+     *
+     * @return int|string
+     * @throws Zend_Db_Statement_Exception
+     */
+    /**
+     * @param string $mode
+     * @return PDOStatement
+     */
+    private function getSimilarQualityStmt($mode = 'qty') {
+
+        // Shortcut
+        $db = $this->getTable()->getAdapter();
+
+        // Get mysql expression to be used in SELECT clause
+        $select = ['qty' => 'COUNT(`id`)', 'ids' => '`id`'];
+
+        // Prepare and return statement
+        return $db->query('
+            SELECT ' . $select[$mode] . ' FROM `LEK_segment_quality` WHERE `taskGuid` = ?
+              AND `id` != ?
+              AND `type` = ?
+              AND `category` = ?
+              AND `field` = ?
+              AND NOT ISNULL(`additionalData`) 
+              AND JSON_EXTRACT(`additionalData`, "$.content") = ?
+        ', [
+            $this->taskGuid,
+            $this->id,
+            $this->type,
+            $this->category,
+            $this->field,
+            $this->getContent(),
+        ]);
+    }
+
+    /**
+     * Spread current value of falsePositive-flag for all other occurrences of such [quality - content] pair found in this task
+     *
+     * @return array
+     */
+    public function spreadFalsePositive() : array {
+
+        // Get content
+        $content = $this->getContent();
+
+        // If no content - return empty array
+        if ($content === false) {
+            return [];
+        }
+
+        // Get ids of similar qualities
+        $ids = $this->getSimilarQualityIds();
+
+        // Update similar qualities' falsePositive flag
+        if ($ids) {
+
+            // Prepare comma-separated list of ids
+            $in = join(',', $ids);
+
+            // Do spread
+            $this->getTable()->getAdapter()->query("
+                UPDATE `LEK_segment_quality` 
+                SET `falsePositive` = ? 
+                WHERE `taskGuid` = ? AND `id` IN ($in)
+            ", [
+                $this->falsePositive,
+                $this->taskGuid
+            ]);
+        }
+
+        // Return ids of similar qualities
+        return $ids;
+    }
+
+    /**
+     * Get array of ids of all other qualities similar to current quality across this task
+     *
+     * @return int
+     */
+    public function getSimilarQualityIds(): array {
+        return $this->getContent() === false
+            ? []
+            : $this->getSimilarQualityStmt('ids')->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Get quantity of all other qualities similar to current quality across this task
+     *
+     * @return int
+     */
+    public function getSimilarQualityQty() : int {
+        return $this->getContent() === false
+            ? 0
+            : (int) $this->getSimilarQualityStmt('qty')->fetchColumn();
+    }
 }

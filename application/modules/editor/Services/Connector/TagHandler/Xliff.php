@@ -67,7 +67,8 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         }
 
         //replace unusable <ph|it etc> tags with usable <x|bx etc> tags
-        $this->xmlparser->registerElement(
+        $this->xmlparserUnusableTags = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        $this->xmlparserUnusableTags->registerElement(
             't5xliffresult > it,t5xliffresult > ph,t5xliffresult > ept,t5xliffresult > bpt',
             null,
             function($tag, $key, $opener){
@@ -82,22 +83,21 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
                         $tag = '<x';
                         break;
                 }
-                $this->xmlparser->replaceChunk($opener['openerKey'], '', $opener['isSingle'] ? 1 : ($key-$opener['openerKey']+1));
-                $this->xmlparser->replaceChunk($opener['openerKey'], $tag.' mid="additional-'.($this->additionalTagCount++).'" />');
+                $this->xmlparserUnusableTags->replaceChunk($opener['openerKey'], '', $opener['isSingle'] ? 1 : ($key-$opener['openerKey']+1));
+                $this->xmlparserUnusableTags->replaceChunk($opener['openerKey'], $tag.' mid="additional-'.($this->additionalTagCount++).'" />');
             }
         );
     }
-    
+
     /**
      * protects the internal tags as xliff tags x,bx,ex and g pair
      *
      * calculates and sets map and mapCount internally
      *
      * @param string $queryString
-     * @param int $segmentId
      * @return string
      */
-    public function prepareQuery(string $queryString, int $segmentId=-1): string {
+    public function prepareQuery(string $queryString): string {
         $this->realTagCount = 0;
         $tag = $this->utilities->internalTag;
         $queryString = $this->restoreWhitespaceForQuery($queryString);
@@ -116,14 +116,13 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         $this->mapCount = count($this->map);
         return $queryString;
     }
-    
+
     /**
      * protects the internal tags for language resource processing as defined in the class
-     * @param string $queryString
-     * @param int $segmentId
+     * @param string $resultString
      * @return string|NULL NULL on error
      */
-    public function restoreInResult(string $resultString, int $segmentId=-1): ?string {
+    public function restoreInResult(string $resultString): ?string {
         $this->hasRestoreErrors = false;
         //strip other then x|ex|bx|g|/g
         $resultString = strip_tags($this->replaceTagsWithContent($resultString), '<x><x/><bx><bx/><ex><ex/><g>');
@@ -155,7 +154,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         //just concat source and target to check both:
         if(preg_match('#<(it|ph|ept|bpt)[^>]*>#', $content)) {
             //surround the content with tmp tags(used later as selectors)
-            $content = $this->xmlparser->parse('<t5xliffresult>'.$content.'</t5xliffresult>');
+            $content = $this->xmlparserUnusableTags->parse('<t5xliffresult>'.$content.'</t5xliffresult>');
             
             //remove the helper tags
             return strtr($content, [

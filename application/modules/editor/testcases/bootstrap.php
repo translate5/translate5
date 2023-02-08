@@ -55,6 +55,10 @@ defined('APPLICATION_ENV') || define('APPLICATION_ENV', $ENVIRONMENT);
 // thus this flag can only be evaluated for "classic" UNIT-tests
 define('APPLICATION_UNITTEST', true);
 
+if(empty(ini_get('error_log'))) {
+    ini_set('error_log', APPLICATION_ROOT.'/data/php-tests.log');
+}
+
 require_once 'Zend/Session.php';
 Zend_Session::$_unitTestEnabled = true;
 require_once 'library/ZfExtended/BaseIndex.php';

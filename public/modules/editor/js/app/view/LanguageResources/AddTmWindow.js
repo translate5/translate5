@@ -107,7 +107,8 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                         displayField: 'name',
                         store: 'Editor.store.LanguageResources.Resources',
                         listeners: {
-                            change: 'onResourceChange'
+                            change: 'onResourceChange',
+                            beforeselect: 'onResourceBeforeSelect'
                         },
                         fieldLabel: me.strings.resource
                     }, {

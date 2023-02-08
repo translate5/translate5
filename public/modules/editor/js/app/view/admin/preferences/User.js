@@ -73,11 +73,12 @@ Ext.define('Editor.view.admin.preferences.User', {
                         labelWidth: 160,
                         width:"100%",
                         inputType: 'password',
-                        minLength: 8,
+                        minLength: 12,
                         allowBlank: false
                     },
                     items: [{
                         name: 'oldpasswd',
+                        minLength: 8,
                         bind: {
                             fieldLabel: '{l10n.preferences.user.oldpasswd}'
                         }

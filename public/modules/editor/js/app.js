@@ -189,7 +189,7 @@ Ext.application({
 
         this.handleMissingSlash();
         this.callParent(arguments);
-        this.logoutOnWindowClose();
+        logoutOnWindowClose();
     },
 
     launch: function () {
@@ -266,27 +266,7 @@ Ext.application({
 
         me.fireEvent('editorAppLaunched');
     },
-    /**
-     * If configured the user is logged out on window close
-     */
-    logoutOnWindowClose: function () {
-        if (!Editor.data.logoutOnWindowClose) {
-            return;
-        }
-        Ext.get(window).on({
-            beforeunload: function () {
-                if (!Editor.data.logoutOnWindowClose) {
-                    return;
-                }
-                var fd = new FormData();
-                fd.append('zfExtended', Ext.util.Cookies.get('zfExtended'));
-                fd.append('noredirect', 1);
-                // destroy the user session and prevent redirect
-                navigator.sendBeacon(Editor.data.pathToRunDir + '/login/logout', fd);
-                Ext.util.Cookies.clear('zfExtended'); // remove now invalid session cookie
-            }
-        });
-    },
+
     /**
      * opens the editor with the given Task
      * firing the adminViewportClosed event

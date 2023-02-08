@@ -53,14 +53,14 @@ https://confluence.translate5.net/display/TAD/EventCodes
 ### Request params validation
 | EventCode        | Context       | EventMessage  | Description/Solution
 | :--------------- |:------------- | :------------ | :------------------- 
-| <a id="E2000"></a>E2000  | Validation | Param &quot;{0}&quot; - is not given | Param is not given at all, or given but is empty
-| <a id="E2001"></a>E2001  | Validation | Value &quot;{0}&quot; of param &quot;{1}&quot; - is in invalid format | Param is given but has an invalid format. For example: wrong email format, wrong number format, etc
-| <a id="E2002"></a>E2002  | Validation |No object of type &quot;{0}&quot; was found by key &quot;{1}&quot; | No object was found in the database by the given key
-| <a id="E2003"></a>E2003  | Validation |Wrong value | Given value is not equal to the value that is stored/provided by server-side
-| <a id="E2004"></a>E2004  | Validation |Value &quot;{0}&quot; of param &quot;{1}&quot; - is not in the list of allowed values | There is the list of allowed values, but given value is <strong>not in</strong> that list
-| <a id="E2005"></a>E2005  | Validation |Value &quot;{0}&quot; of param &quot;{1}&quot; - is in the list of disabled values | There is the list of disabled values, but given value is <strong>in</strong> that list
-| <a id="E2006"></a>E2006  | Validation |Value &quot;{0}&quot; of param &quot;{1}&quot; - is not unique. It should be unique. | The given value already exists within certain column of certain database table
-| <a id="E2007"></a>E2007  | Validation | Extension &quot;{0}&quot; of file &quot;{1}&quot; - is not in the list of allowed values | The file type uploaded in the termportal is not allowed
+| <a id="E2000"></a>E2000  | Validation | Param "{0}" - is not given | Param is not given at all, or given but is empty
+| <a id="E2001"></a>E2001  | Validation | Value "{0}" of param "{1}" - is in invalid format | Param is given but has an invalid format. For example: wrong email format, wrong number format, etc
+| <a id="E2002"></a>E2002  | Validation | No object of type "{0}" was found by key "{1}" | No object was found in the database by the given key
+| <a id="E2003"></a>E2003  | Validation | Wrong value | Given value is not equal to the value that is stored/provided by server-side
+| <a id="E2004"></a>E2004  | Validation | Value "{0}" of param "{1}" - is not in the list of allowed values | There is the list of allowed values, but given value is <strong>not in</strong> that list
+| <a id="E2005"></a>E2005  | Validation | Value "{0}" of param "{1}" - is in the list of disabled values | There is the list of disabled values, but given value is <strong>in</strong> that list
+| <a id="E2006"></a>E2006  | Validation | Value "{0}" of param "{1}" - is not unique. It should be unique. | The given value already exists within certain column of certain database table
+| <a id="E2007"></a>E2007  | Validation | Extension "{0}" of file "{1}" - is not in the list of allowed values | The file type uploaded in the termportal is not allowed
 
 
 ### Authentication
@@ -334,6 +334,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1358"></a>E1358  | Language&nbsp;Resource Term Collection | Term Collection Import: Unable to open zip file from file-path: {filePath} | See the error log for details.
 | <a id="E1359"></a>E1359  | Language&nbsp;Resource Term Collection | Term Collection Import: Content from zip file could not be extracted. | See the error log for details.
 | <a id="E1403"></a>E1403  | Language&nbsp;Resource pivot pre-translation    | The taskGuid is required as parameter | The taskGuid is not provided as parameter on the request | 
+| <a id="E1447"></a>E1447  | Language Resources    | This resource is assigned to a task via the removed customer. | The un-assigned customer(s) from the resource is used in the listed tasks. If this customer is removed from the resource, the resource and pivot association must be removed
 
 ### Terminology
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -381,8 +382,12 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1357"></a>E1357  | Terminology | TBX Import: Could not import due unknown attribute level | Very unusual that this error happens, see the msg and extra data.
 | <a id="E1393"></a>E1393  | Terminology | TBX Import: The XML structure of the TBX file is invalid: {message} | In this case the XML of the given TBX file is invalid and can not be parsed.
 | <a id="E1360"></a>E1360  | Terminology | TBX Import: The TBX contains terms with unknown administrative / normative states. See details for a list of states. | The listed states are unknown and can not be mapped to the usual administrative status values.<br />Please configure them in the runtimeOptions.tbx.termImportMap configuration.
-| <a id="E1361"></a>E1361  | Terminology | TBX Import: Unable to import terms due invalid Rfc5646 language code &quot;{code}&quot; | The listed language code is invalid / not configured in translate5, the corresponding terms could not be imported.
+| <a id="E1361"></a>E1361  | Terminology | TBX Import: Unable to import terms due invalid Rfc5646 language code "{code}" | The listed language code is invalid / not configured in translate5, the corresponding terms could not be imported.
+| <a id="E1446"></a>E1446  | Terminology | TBX Import: Attribute has known type, but has elementName unexpected for that type so changed to expected one | See the extra data to check values of type, wasElementName (e.g. unexpected for that type) and elementName (expected one) 
+| <a id="E1463"></a>E1463  | Terminology | TBX Import: Attribute has known type, but is at level unexpected for that type so that level is added to the list of expected | See the extra data to check values of type, unexpectedLevel (e.g. unexpected for that type), wasExpectedLevels and nowExpectedLevels
+| <a id="E1447"></a>E1447  | Terminology | TBX Import: Attribute target was emptied as unsupported for that attribute type | See the extra data to check values of type and wasTarget
 | <a id="E1364"></a>E1364  | Terminology | TermTagger overall run done - {segmentCounts} | Reports that the whole task was tagged with the termtagger and shows the segment status counts.
+| <a id="E1451"></a>E1451  | Terminology | Recoverable error on termtagging: {message} | See system log for details.
 
 
 ### Segment
@@ -611,13 +616,25 @@ https://confluence.translate5.net/display/TAD/EventCodes
 #### Plug-In SpellCheck
 | EventCode        | Context            | EventMessage                                                                                                                  | Description/Solution
 | :--------------- |:-------------------|:------------------------------------------------------------------------------------------------------------------------------| :-------------------
-| <a id="E1410"></a>E1410  | Plug-In SpellCheck | SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary. | The LanguageTool server as specified in the error message is deactivated automatically. On each periodical cron call (normally all 15 minutes) all LanguageTool instances are checked for availability. If a previously deactivated LanguageTool is available again, it is reactivated automatically. To reactivate the LanguageTool servers manually just call the following SQL statement in the Database:DELETE FROM Zf_memcache WHERE id = 'SpellCheckDownList';
-| <a id="E1411"></a>E1411  | Plug-In SpellCheck | SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.                          | Start the LanguageTool(s) if not already done. If the LanguageTool instances were started and crashed then, see E1410 how to reactivate the LanguageTool instances marked as offline in translate5. After reactivation, reimport the task. The task clone functionality can be used to reimport the task.
-| <a id="E1412"></a>E1412  | Plug-In SpellCheck | SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.                   | Normally everything should be OK, the considered LanguageTool is probably just doing its work and can not respond to another request in an appropriate time frame. Only if this error is logged multiple times further investigations should be done.
 | <a id="E1413"></a>E1413  | Plug-In SpellCheck | SpellCheck can not work when target language is not supported by LanguageTool. | Check task target language
 | <a id="E1417"></a>E1417  | Plug-In SpellCheck | SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList} | One or more LanguageTool instances are not available. All LanguageTool instances are listed with their status. Please check them manually and restart them if needed.
 | <a id="E1418"></a>E1418  | Plug-In SpellCheck | LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app        | Create a ticket for this issue with the event added.
 | <a id="E1419"></a>E1419  | Plug-In SpellCheck | SpellCheck overall run done - {segmentCounts} | Reports that the whole task was checked with the spellchecker and shows the segment status counts.
+| <a id="E1464"></a>E1464  | Plug-In SpellCheck | Recoverable error on spellchecking: {recoverableError} - see system log for details. | This Error is more informative and there is no urgent todo, see the details of the event
+| <a id="E1465"></a>E1465  | Plug-In SpellCheck | Some segments could not be checked by the spellchecker | This Error is more informative and there is no urgent todo, see the details of the event
+| <a id="E1467"></a>E1467  | Plug-In SpellCheck | SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary. | The LanguageTool server as specified in the error message is deactivated automatically. On each periodical cron call (normally all 15 minutes) all LanguageTool instances are checked for availability. If a previously deactivated LanguageTool is available again, it is reactivated automatically. To reactivate the LanguageTool servers manually just call the following SQL statement in the Database:DELETE FROM Zf_memcache WHERE id = 'SpellCheckDownList';
+| <a id="E1466"></a>E1466  | Plug-In SpellCheck | SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.                          | Start the LanguageTool(s) if not already done. If the LanguageTool instances were started and crashed then, see E1467 how to reactivate the LanguageTool instances marked as offline in translate5. After reactivation, reimport the task. The task clone functionality can be used to reimport the task.
+| <a id="E1468"></a>E1468  | Plug-In SpellCheck | SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.                   | Normally everything should be OK, the considered LanguageTool is probably just doing its work and can not respond to another request in an appropriate time frame. Only if this error is logged multiple times further investigations should be done.
+
+#### Plug-In TermImport
+| EventCode               | Context            | EventMessage                                                       | Description/Solution                            |
+|:------------------------|:-------------------|:-------------------------------------------------------------------|:------------------------------------------------|
+| <a id="E1455"></a>E1455 | Plug-In TermImport | Across TBX Export: Can not wait until job "{job}" is finished      | Check with additional data what the problem is. |
+| <a id="E1456"></a>E1456 | Plug-In TermImport | Across TBX Export: Error on connecting to Across under "{url}"     | Check with additional data what the problem is. |
+| <a id="E1457"></a>E1457 | Plug-In TermImport | Across TBX Export: Can not create Across security token            | Check with additional data what the problem is. |
+| <a id="E1458"></a>E1458 | Plug-In TermImport | Across TBX Export: Error on communication with Across              | Check with additional data what the problem is. |
+| <a id="E1459"></a>E1459 | Plug-In TermImport | Across TBX Export: Can not create temporary filestream             | Check with additional data what the problem is. |
+| <a id="E1460"></a>E1460 | Plug-In TermImport | Across TBX Export: Can not read from file with fileguid {fileGuid} | Check with additional data what the problem is. |
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number

@@ -62,6 +62,7 @@ class editor_Segment_Internal_TagRepair extends editor_Segment_Internal_TagCheck
         parent::__construct($toRepair, $against);
         $this->fixStructure();
     }
+
     /**
      * Checks if the structure of internal tags is correct, every opener has his corresponding closer without overlaps
      */

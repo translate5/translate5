@@ -52,6 +52,8 @@ Ext.define('Editor.view.quality.mqm.Fieldset', {
 		        title: me.title, //see EXT6UPD-9
 			items : [{
 				xtype: 'combo',
+				disabled: true,
+				enableOnEdit: true,
 				anchor: '100%',
 				name: 'mqmseverity',
 				queryMode: 'local',
@@ -63,10 +65,14 @@ Ext.define('Editor.view.quality.mqm.Fieldset', {
 			    valueField: 'id'
 			},{
 				xtype: 'textfield',
+				disabled: true,
+				enableOnEdit: true,
 				anchor: '100%',
 				fieldLabel: me.strings.commentLabel,
 				name: 'mqmcomment'
 			},{
+				disabled: true,
+				enableOnEdit: true,
 				xtype: 'button',
 				text: me.strings.qmAddBtn,
 				margin: '0 0 10 0',
