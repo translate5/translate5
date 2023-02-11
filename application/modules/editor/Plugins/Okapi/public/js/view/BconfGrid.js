@@ -55,7 +55,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     },
     text_cols: {
         name: '#UT#Name',
-        extensions: '#UT#Erweiterungen',
+        extensions: '#UT#Geänderte Filter',
+        extensionsTooltip: '#UT#Dateitypen, für die Filter angepasst wurden',
         description: '#UT#Beschreibung',
         action: '#UT#Aktionen',
         uploadBconf: '#UT#Bconf hochladen',
@@ -93,7 +94,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         uniqueName: '#UT#Eindeutiger Name',
         upload: '#UT#Upload',
         uploadBconf: '#UT#Bconf hochladen',
-        configureFilters: '#UT#Filter konfigurieren'
+        configureFilters: '#UT#Filter konfigurieren',
+        supportetFormats: '#UT#Unterstützte Dateiformate'
     },
     viewConfig: {
         enableTextSelection: true, // neccessary for pointer class to have effect on whole row
@@ -139,7 +141,8 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 renderer: function(value){
                     return value.join(', ');
                 },
-                text: me.text_cols.extensions
+                text: me.text_cols.extensions,
+                tooltip: me.text_cols.extensionsTooltip
             },
             {
                 xtype: 'gridcolumn',

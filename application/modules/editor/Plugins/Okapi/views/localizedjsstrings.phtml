@@ -37,6 +37,7 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
         text_cols: {
             name: '<?php echo $this->translate->_('Name'); ?>',
             extensions: '<?php echo $this->translate->_('Erweiterungen'); ?>',
+            extensionsTooltip: '<?php echo $this->translate->_('Dateitypen, für die Filter angepasst wurden'); ?>',
             description: '<?php echo $this->translate->_('Beschreibung'); ?>',
             action: '<?php echo $this->translate->_('Aktionen'); ?>',
             uploadBconf: '<?php echo $this->translate->_('Bconf hochladen'); ?>',
@@ -76,7 +77,8 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
             uniqueName: '<?php echo $this->translate->_('Eindeutiger Name'); ?>',
             upload: '<?php echo $this->translate->_('Hochladen'); ?>',
             uploadBconf: '<?php echo $this->translate->_('Bconf hochladen'); ?>',
-            configureFilters: '<?php echo $this->translate->_('Filter konfigurieren'); ?>'
+            configureFilters: '<?php echo $this->translate->_('Filter konfigurieren'); ?>',
+            supportetFormats: '<?php echo $this->translate->_('Unterstützte Dateiformate'); ?>'
         }
     });
     Ext.define('Editor.locale.plugins.Okapi.view.BconfFilterGrid', {
