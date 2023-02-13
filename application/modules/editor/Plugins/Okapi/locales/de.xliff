@@ -60,10 +60,6 @@
                 <source>Löschen</source>
                 <target>Löschen</target>
             </trans-unit>
-            <trans-unit id='S29waWVyZW4='>
-                <source>Kopieren</source>
-                <target>Kopieren</target>
-            </trans-unit>
             <trans-unit id='U3RhbmRhcmQ='>
                 <source>Standard</source>
                 <target>Standard</target>
@@ -108,14 +104,6 @@
                 <source>-Datei</source>
                 <target>-Datei</target>
             </trans-unit>
-            <trans-unit id='ezB9ezF9IGhlcnVudGVybGFkZW4='>
-                <source>{0}{1} herunterladen</source>
-                <target>{0}{1} herunterladen</target>
-            </trans-unit>
-            <trans-unit id='ezB9ezF9IGhvY2hsYWRlbg=='>
-                <source>{0}{1} hochladen</source>
-                <target>{0}{1} hochladen</target>
-            </trans-unit>
             <trans-unit id='RmlsdGVy=='>
                 <source>Filter</source>
                 <target>Filter</target>
@@ -143,6 +131,10 @@
             <trans-unit id='RHVyY2hzdWNoZW4uLi4='>
                 <source>Durchsuchen...</source>
                 <target>Durchsuchen...</target>
+            </trans-unit>
+            <trans-unit id='VW50ZXJzdMO8dHp0ZSBEYXRlaWZvcm1hdGU='>
+                <source>Unterstützte Dateiformate</source>
+                <target>Unterstützte Dateiformate</target>
             </trans-unit>
             <trans-unit id='RGF0ZWl0eXBlbg=='>
                 <source>Dateitypen</source>
@@ -223,6 +215,54 @@
             <trans-unit id='T0tBUEkgSGlsZmU='>
                 <source>OKAPI Hilfe</source>
                 <target>OKAPI Hilfe</target>
+            </trans-unit>
+            <trans-unit id='QW5wYXNzZW4gdm9uIERhdGVpZmlsdGVybiBpbiBkaWVzZW0gRmlsdGVyc2V0'>
+                <source>Anpassen von Dateifiltern in diesem Filterset</source>
+                <target>Anpassen von Dateifiltern in diesem Filterset</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQsIHdlbm4gbmljaHQgYXVmIEt1bmRlbmViZW5lIMO8YmVyc2NocmllYmVu'>
+                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset, wenn nicht auf Kundenebene überschrieben</source>
+                <target>Standardmäßig bei der Projekterstellung ausgewähltes Filterset, wenn nicht auf Kundenebene überschrieben.</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgZsO8ciBkaWVzZW4gS3VuZGVu'>
+                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden</source>
+                <target>Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyc2V0IGzDtnNjaGVu'>
+                <source>Filterset löschen</source>
+                <target>Filterset löschen</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyc2V0IGtsb25lbg=='>
+                <source>Filterset klonen</source>
+                <target>Filterset klonen</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyc2V0IGFscyBiY29uZi1EYXRlaSBoZXJ1bnRlcmxhZGVu'>
+                <source>Filterset als bconf-Datei herunterladen</source>
+                <target>Filterset als bconf-Datei herunterladen</target>
+            </trans-unit>
+            <trans-unit id='U1JYLURhdGVpLCBkaWUgZGllIFNlZ21lbnRpZXJ1bmdzcmVnZWxuIGbDvHIgZGllIFF1ZWxsZSBlbnRow6RsdA=='>
+                <source>SRX-Datei, die die Segmentierungsregeln für die Quelle enthält. Wird für native Dateiformate verwendet.</source>
+                <target>SRX-Datei, die die Segmentierungsregeln für die Quelle enthält. Wird für native Dateiformate verwendet.</target>
+            </trans-unit>
+            <trans-unit id='UXVlbGwgU1JYLURhdGVpIGhvY2hsYWRlbiB1bmQgU1JYLVJlZ2VsbiBkaWVzZXMgRmlsdGVyc2F0emVzIGVyc2V0emVu'>
+                <source>Quell SRX-Datei hochladen und SRX-Regeln dieses Filtersatzes ersetzen</source>
+                <target>SRX-Datei hochladen und SRX-Regeln dieses Filtersatzes ersetzen. Er enthält die Segmentierungsregeln für die Quelle. Wird für native Dateiformate verwendet.</target>
+            </trans-unit>
+            <trans-unit id='TGFkZW4gU2llIGRpZSBRdWVsbCBTUlgtRGF0ZWkgaGVydW50ZXI='>
+                <source>Laden Sie die SRX-Datei herunter. Sie enthält die Segmentierungsregeln für die Quelle. Wird für native Dateiformate verwendet.</source>
+                <target>Laden Sie die SRX-Datei herunter. Sie enthält die Segmentierungsregeln für die Quelle. Wird für native Dateiformate verwendet.</target>
+            </trans-unit>
+            <trans-unit id='U1JYLURhdGVpLCBkaWUgU2VnbWVudGllcnVuZ3NyZWdlbG4gZW50aMOkbHQsIGRpZSB6dXIgd2VpdGVyZW4gU2VnbWVudGllcnVuZyBkZXMgdGFyZ2V0cyB2b24geGxpZmYtRGF0ZWllbiB2ZXJ3ZW5kZXQgd2VyZGVuIGvDtm5uZW4='>
+                <source>SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</source>
+                <target>SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</target>
+            </trans-unit>
+            <trans-unit id='SG9jaGxhZGVuIGRlciB0YXJnZXQtU1JYLURhdGVp'>
+                <source>Hochladen der target-SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</source>
+                <target>Hochladen der target-SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</target>
+            </trans-unit>
+            <trans-unit id='SGVydW50ZXJsYWRlbiBkZXIgdGFyZ2V0LVNSWC1EYXRlaQ=='>
+                <source>Herunterladen der target-SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</source>
+                <target>Herunterladen der target-SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</target>
             </trans-unit>
         </body>
     </file>

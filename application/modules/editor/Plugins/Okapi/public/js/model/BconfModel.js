@@ -31,7 +31,7 @@
  *  "id": "20",
  *  "customerId": null,
  *  "name": "Translate5-Standard",
- *  "description": "The default .bconf used for file imports unless another one is configured",
+ *  "description": "The default set of file filters. Copy to customize filters. Or go to "Clients" and customize filters there.",
  *  "isDefault": "1",
  *  "versionIdx": "2",
  *  "customExtensions": ["xml","html","sdxliff"]

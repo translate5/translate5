@@ -299,7 +299,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         if($sysBconfRow == NULL){
             $sysBconfPath = editor_Plugins_Okapi_Init::getDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
             $sysBconfName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
-            $sysBconfDescription = 'The default .bconf used for file imports unless another one is configured';
+            $sysBconfDescription = 'The default set of file filters. Copy to customize filters. Or go to "Clients" and customize filters there.';
             $sysBconf = new editor_Plugins_Okapi_Bconf_Entity();
             $sysBconf->import($sysBconfPath, $sysBconfName, $sysBconfDescription, NULL);
             $sysBconf->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);

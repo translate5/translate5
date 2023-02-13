@@ -46,6 +46,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
     glyph: 'f1c9@FontAwesome5FreeSolid',
     /** @property {string} routePrefix Used to setup routes on different view instances */
     routePrefix: '',
+    helpLink: 'http://www.okapiframework.org/wiki/index.php?title=Filters#Supported_File_Formats',
     listeners: {
         beforeedit: 'handleBeforeedit',
         show: 'loadOkapiFilters'
@@ -58,30 +59,39 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         extensions: '#UT#Geänderte Filter',
         extensionsTooltip: '#UT#Dateitypen, für die Filter angepasst wurden',
         description: '#UT#Beschreibung',
+        standard: '#UT#Standard',
+        standardTooltip: '#UT#Standardmäßig bei der Projekterstellung ausgewähltes Filterset, wenn nicht auf Kundenebene überschrieben',
+        customerStandard: '#UT#Kundenstandard',
+        customerStandardTooltip: '#UT#Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden',
+        filters: '#UT#Filter',
+        filtersTooltip: '#UT#Anpassen von Dateifiltern in diesem Filterset',
         action: '#UT#Aktionen',
+        actionDelete: '#UT#Filterset löschen',
+        actionClone: '#UT#Filterset klonen',
+        actionDownload: 'Filterset als bconf-Datei herunterladen',
+        sourceSrx: '#UT#Source SRX',
+        sourceSrxTooltip: '#UT#LSRX-Datei, die die Segmentierungsregeln für die Quelle enthält',
+        sourceSrxUpTooltip: '#UT#Quell SRX-Datei hochladen und SRX-Regeln dieses Filtersatzes ersetzen',
+        sourceSrxDownTooltip: '#UT#Laden Sie die Quell SRX-Datei herunter',
+        targetSrx: '#UT#Target SRX',
+        targetSrxTooltip: '#UT#SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können',
+        targetSrxUpTooltip: '#UT#Hochladen der target-SRX-Datei',
+        targetSrxDownTooltip: '#UT#Herunterladen der target-SRX-Datei',
         uploadBconf: '#UT#Bconf hochladen',
         fileSuffix: '#UT#-Datei',
-        fileDlTemplate: '#UT#{0}{1} herunterladen',
-        fileUpTemplate: '#UT#{0}{1} hochladen',
-        filters: '#UT#Filter',
         srx: '#UT#SRX-Datei',
-        sourceSrx: '#UT#Source SRX',
-        targetSrx: '#UT#Target SRX',
-        pipeline: '#UT#Pipeline',
-        standard: '#UT#Standard',
-        customerStandard: '#UT#Kundenstandard'
+        pipeline: '#UT#Pipeline'
     },
     strings: {
         addBconf: '#UT#Bconf hinzufügen',
         bconfRequired: '#UT#wird benötigt',
         browse: '#UT#Durchsuchen...',
+        supprtedFormats: '#UT#Unterstützte Dateiformate',
         confirmDeleteMessage: '#UT#Möchten Sie diese Bconf-Datei wirklich löschen?',
         confirmDeleteTitle: '#UT#Bconf löschen',
-        copy: '#UT#Kopieren',
         deleteSuccess: '#UT#Bconf-Datei gelöscht',
         edit: '#UT#Bearbeiten',
         editBconf: '#UT#Bconf-Datei bearbeiten',
-        export: '#UT#Exportieren',
         fileUploaded: '#UT#{0}-Datei erfolgreich hochgeladen.',
         invalidMsg: '#UT#Die hochgeladene Datei ist keine gültige {0}-Datei.',
         invalidTitle: '#UT#Ungültige {0}-Datei',
@@ -89,12 +99,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         nameExists: '#UT#Dieser Name ist schon vergeben',
         newBconf: '#UT#Neue Bconf-Datei',
         refresh: '#UT#Aktualisieren',
-        remove: '#UT#Löschen',
         searchEmptyText: '#UT#Suchen',
         uniqueName: '#UT#Eindeutiger Name',
         upload: '#UT#Upload',
         uploadBconf: '#UT#Bconf hochladen',
-        configureFilters: '#UT#Filter konfigurieren',
         supportetFormats: '#UT#Unterstützte Dateiformate'
     },
     viewConfig: {
@@ -161,12 +169,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
             },{
                 xtype: 'checkcolumn',
                 text: me.text_cols.customerStandard,
+                tooltip: me.text_cols.customerStandardTooltip,  // QUIRK: needed to work
                 width: 90,
                 itemId: 'customerDefaultColumn',
                 hidden: !instanceConfig.isCustomerGrid,
                 hideable: instanceConfig.isCustomerGrid,
                 tdCls: 'pointer',
-                tooltip: '',  // QUIRK: needed to work
                 // QUIRK: This is a purely synthetic column that renders based on the associated customer, so no dataIndex is set
                 // This is way easier than trying to model this dynamic relation canonically
                 renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
@@ -207,15 +215,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                                 })
                             },
                             success: function() {
-                                var store, storeId;
+                                var storeId, store, sCustomer;
                                 // unfortunately there are two customer stores, which both act as source for the TaskImport customer selector, so we have to update them both
                                 for(storeId of ['customersStore', 'userCustomers']){
-                                    if(store = Ext.getStore(storeId)){
-                                        if(customer = store.getById(customerId)){
-                                            if(customer){
-                                                customer.set('defaultBconfId', newBconfId, { commit: true, silent: true });
-                                            }
-                                        }
+                                    store = Ext.getStore(storeId);
+                                    sCustomer = (store) ? store.getById(customerId) : null;
+                                    if(store && sCustomer){
+                                        sCustomer.set('defaultBconfId', newBconfId, { commit: true, silent: true });
                                     }
                                 }
                                 // refresh the grid for the changed record
@@ -238,9 +244,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
             },{
                 xtype: 'checkcolumn',
                 text: me.text_cols.standard,
+                tooltip: me.text_cols.standardTooltip,
                 dataIndex: 'isDefault',
                 itemId: 'globalDefaultColumn',
-                tooltip: '', // QUIRK: needed to work
                 disabled: instanceConfig.isCustomerGrid,
                 width: 60,
                 renderer: function(isDefault, metaData, record, rowIdx, colIdx, store, view){
@@ -276,9 +282,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 menuDisabled: true,
                 width: 60,
                 text: me.text_cols.filters,
+                tooltip: me.text_cols.filtersTooltip,
                 menuText: me.text_cols.filters,
                 items: [{
-                    tooltip: me.strings.configureFilters,
+                    tooltip: me.text_cols.filtersTooltip,
                     isAllowedFor: 'bconfEdit',
                     glyph: 'f0b0@FontAwesome5FreeSolid',
                     isDisabled: 'isEditDisabled',
@@ -295,21 +302,21 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 menuDisabled: true,
                 items: [
                     {
-                        tooltip: me.strings.remove,
+                        tooltip: me.text_cols.actionDelete,
                         isAllowedFor: 'bconfDelete',
                         glyph: 'f2ed@FontAwesome5FreeSolid',
                         isDisabled: 'isDeleteDisabled',
                         handler: 'deleteBconf'
                     },
                     {
-                        tooltip: me.strings.copy,
+                        tooltip: me.text_cols.actionClone,
                         isAllowedFor: 'bconfCopy',
                         margin: '0 0 0 10px',
                         glyph: 'f24d@FontAwesome5FreeSolid',
                         handler: 'cloneBconf'
                     },
                     {
-                        tooltip: me.strings.export,
+                        tooltip: me.text_cols.actionDownload,
                         isAllowedFor: 'bconfDelete',
                         glyph: 'f019@FontAwesome5FreeSolid',
                         handler: 'downloadBconf'
@@ -319,6 +326,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 xtype: 'actioncolumn',
                 align: 'center',
                 text: me.text_cols.sourceSrx,
+                tooltip: me.text_cols.sourceSrxTooltip,
                 menuText: me.text_cols.sourceSrx,
                 width: 90,
                 menuDisabled: true,
@@ -328,16 +336,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         glyph: 'f093@FontAwesome5FreeSolid',
                         isDisabled: 'isEditDisabled',
                         purpose: 'source',
-                        tooltip: new Ext.Template(me.text_cols.fileUpTemplate)
-                            .apply(['Source SRX', me.text_cols.fileSuffix]),
+                        tooltip: me.text_cols.sourceSrxUpTooltip,
                         handler: 'showSRXChooser',
                     },
                     {
                         isAllowedFor: 'bconfDelete',
                         glyph: 'f019@FontAwesome5FreeSolid',
                         purpose: 'source',
-                        tooltip: new Ext.Template(me.text_cols.fileDlTemplate)
-                            .apply(['Source SRX', me.text_cols.fileSuffix]),
+                        tooltip: me.text_cols.sourceSrxDownTooltip,
                         handler: 'downloadSRX'
                     },
                 ]
@@ -345,6 +351,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 xtype: 'actioncolumn',
                 align: 'center',
                 text: me.text_cols.targetSrx,
+                tooltip: me.text_cols.targetSrxTooltip,
                 menuText: me.text_cols.targetSrx,
                 width: 90,
                 menuDisabled: true,
@@ -354,16 +361,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                         glyph: 'f093@FontAwesome5FreeSolid',
                         isDisabled: 'isEditDisabled',
                         purpose: 'target',
-                        tooltip: new Ext.Template(me.text_cols.fileUpTemplate)
-                            .apply(['Target SRX', me.text_cols.fileSuffix]),
+                        tooltip: me.text_cols.targetSrxUpTooltip,
                         handler: 'showSRXChooser',
                     },
                     {
                         isAllowedFor: 'bconfDelete',
                         glyph: 'f019@FontAwesome5FreeSolid',
                         purpose: 'target',
-                        tooltip: new Ext.Template(me.text_cols.fileDlTemplate)
-                            .apply(['Target SRX', me.text_cols.fileSuffix]),
+                        tooltip: me.text_cols.targetSrxDownTooltip,
                         handler: 'downloadSRX'
                     }
                 ]
@@ -407,6 +412,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     listeners: {
                         change: 'filterByText',
                         buffer: 150
+                    }
+                },
+                {
+                    xtype: 'button',
+                    iconCls: 'x-fa fa-link',
+                    text: me.strings.supprtedFormats,
+                    handler: function(btn){
+                        window.open(btn.up('grid').helpLink, '_blank');
                     }
                 },
                 {
