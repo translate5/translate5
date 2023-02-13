@@ -220,9 +220,9 @@
                 <source>Anpassen von Dateifiltern in diesem Filterset</source>
                 <target>Anpassen von Dateifiltern in diesem Filterset</target>
             </trans-unit>
-            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQsIHdlbm4gbmljaHQgYXVmIEt1bmRlbmViZW5lIMO8YmVyc2NocmllYmVu'>
-                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset, wenn nicht auf Kundenebene überschrieben</source>
-                <target>Standardmäßig bei der Projekterstellung ausgewähltes Filterset, wenn nicht auf Kundenebene überschrieben.</target>
+            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgaW5zb2Zlcm4gbmljaHQgYXVmIEt1bmRlbmViZW5lIMO8YmVyc2NocmllYmVu'>
+                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben</source>
+                <target>Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben</target>
             </trans-unit>
             <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgZsO8ciBkaWVzZW4gS3VuZGVu'>
                 <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden</source>

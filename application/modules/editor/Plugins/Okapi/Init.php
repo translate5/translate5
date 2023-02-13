@@ -288,7 +288,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'clone'
             ]);
         $r->addRoute('plugins_okapi_bconf_clone', $route);
-
+        // route to set the non-customer default
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/setdefault',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action'     => 'setdefault'
+            ]);
+        $r->addRoute('plugins_okapi_bconf_setdefault', $route);
 
         // routes for bconf filters
         $route = new Zend_Rest_Route($f, [], [

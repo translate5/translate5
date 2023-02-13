@@ -60,7 +60,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         extensionsTooltip: '#UT#Dateitypen, für die Filter angepasst wurden',
         description: '#UT#Beschreibung',
         standard: '#UT#Standard',
-        standardTooltip: '#UT#Standardmäßig bei der Projekterstellung ausgewähltes Filterset, wenn nicht auf Kundenebene überschrieben',
+        standardTooltip: '#UT#Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben',
         customerStandard: '#UT#Kundenstandard',
         customerStandardTooltip: '#UT#Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden',
         filters: '#UT#Filter',
@@ -169,7 +169,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
             },{
                 xtype: 'checkcolumn',
                 text: me.text_cols.customerStandard,
-                tooltip: me.text_cols.customerStandardTooltip,  // QUIRK: needed to work
+                tooltip: me.text_cols.customerStandardTooltip,
                 width: 90,
                 itemId: 'customerDefaultColumn',
                 hidden: !instanceConfig.isCustomerGrid,
@@ -190,21 +190,21 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                      * @param col
                      * @param recordIndex
                      * @param {boolean} checked the status of the checkbox
-                     * @param clicked the record whose row was clicked
+                     * @param record the record whose row was clicked
                      * @returns {boolean}
                      */
-                    'beforecheckchange': function(col, recordIndex, checked, clicked){
+                    'beforecheckchange': function(col, recordIndex, checked, record){
                         // at times extJs fires this event without record what in theory must not happen
-                        if(!clicked){
+                        if(!record){
                             return;
                         }
                         var gridView = col.getView(),
                             customer = gridView.grid.getCustomer(),
                             customerId = customer.id,
                             oldBconfId = customer.get('defaultBconfId'),
-                            newChecked = (oldBconfId !== clicked.id), // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
-                            newBconfId = newChecked ? clicked.id : null;
-                        gridView.select(clicked);
+                            newChecked = (oldBconfId !== record.id), // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
+                            newBconfId = newChecked ? record.id : null;
+                        gridView.select(record);
                         Ext.Ajax.request({
                             url: Editor.data.restpath + 'customermeta',
                             method: 'PUT',
@@ -220,12 +220,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                                 for(storeId of ['customersStore', 'userCustomers']){
                                     store = Ext.getStore(storeId);
                                     sCustomer = (store) ? store.getById(customerId) : null;
-                                    if(store && sCustomer){
+                                    if(sCustomer){
                                         sCustomer.set('defaultBconfId', newBconfId, { commit: true, silent: true });
                                     }
                                 }
                                 // refresh the grid for the changed record
-                                gridView.refresh(clicked);
+                                gridView.refreshNode(record);
                                 if(oldBconfId !== null){
                                     // if there was a old record, refresh the grid for the old record
                                     var bconf = gridView.getStore().getById(oldBconfId);
@@ -258,21 +258,40 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 },
                 listeners: {
                     'beforecheckchange': function(col, recordIndex, checked, record){
-                        var view = col.getView(),
-                            grid = view.ownerGrid,
-                            store = grid.store,
-                            oldDefault;
-                        view.select(record);
-                        if(grid.isCustomerGrid || !checked){ // Cannot set in customerGrid, cannot deselect global default
+                        // at times extJs fires this event without record what in theory must not happen. Also not-checked events must be dismissed
+                        if(!record || !checked){
                             return false;
-                        } else if(checked){ // must uncheck old default
-                            oldDefault = store.getAt(store.findBy(({data}) => data.isDefault && !data.customerId));
-                            if(oldDefault && oldDefault !== record){
-                                oldDefault.set('isDefault', { commit: false }); // QUIRK: prevent saving twice this way
-                                oldDefault.commit();
-                            }
                         }
-                        Editor.data.plugins.Okapi.systemDefaultBconfId = record.id; // Crucial: the default-id is a global that must be updated!
+                        var gridView = col.getView();
+                        gridView.select(record);
+                        Ext.Ajax.request({
+                            url: Editor.data.restpath + 'plugins_okapi_bconf/setdefault',
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            },
+                            params: {
+                                id: record.id
+                            },
+                            success: function(xhr) {
+                                var result = Ext.JSON.decode(xhr.responseText, true);
+                                record.set('isDefault', true, { dirty: false, commit: false, silent: false });
+                                gridView.refreshNode(record);
+                                Editor.data.plugins.Okapi.systemDefaultBconfId = record.getId(); // Crucial: the default-id is a global that must be updated!
+                                if(result.oldId && result.oldId > 0){
+                                    var store = gridView.ownerGrid.getStore(),
+                                        oldRrecord = store.getById(result.oldId);
+                                    if(oldRrecord){
+                                        oldRrecord.set('isDefault', false, { dirty: false, commit: false, silent: false });
+                                        gridView.refreshNode(oldRrecord);
+                                     }
+                                }
+                              },
+                            failure: function(xhr){
+                                Editor.app.getController('ServerException').handleException(xhr);
+                            }
+                        });
+                        return false;
                     }
                 }
             },{
@@ -386,7 +405,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     width: 'auto',
                     handler: function(btn){
                         Editor.util.Util.chooseFile('.bconf')
-                            .then(files => btn.up('grid').getController().uploadBconf(files[0]));
+                            .then(function(files){ btn.up('grid').getController().uploadBconf(files[0]); });
                     }
                 },
                 {
@@ -405,7 +424,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     triggers: {
                         clear: {
                             cls: Ext.baseCSSPrefix + 'form-clear-trigger',
-                            handler: field => field.setValue(null) || field.focus(),
+                            handler: function(field){
+                                field.setValue(null);
+                                field.focus();
+                            },
                             hidden: true
                         }
                     },

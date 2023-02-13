@@ -224,13 +224,13 @@
                 <source>Anpassen von Dateifiltern in diesem Filterset</source>
                 <target>Customize file filters in this filter set</target>
             </trans-unit>
-            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQsIHdlbm4gbmljaHQgYXVmIEt1bmRlbmViZW5lIMO8YmVyc2NocmllYmVu'>
-                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset, wenn nicht auf Kundenebene überschrieben</source>
-                <target>Filter set selected by default on project creation if not overwritten on client level.</target>
+            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgaW5zb2Zlcm4gbmljaHQgYXVmIEt1bmRlbmViZW5lIMO8YmVyc2NocmllYmVu'>
+                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben</source>
+                <target>Filter set selected by default on project creation if not overwritten on client level</target>
             </trans-unit>
             <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgZsO8ciBkaWVzZW4gS3VuZGVu'>
                 <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden</source>
-                <target>Filter set selected by default on project creation for this customer.</target>
+                <target>Filter set selected by default on project creation for this customer</target>
             </trans-unit>
             <trans-unit id='RmlsdGVyc2V0IGzDtnNjaGVu'>
                 <source>Filterset löschen</source>
