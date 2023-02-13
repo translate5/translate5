@@ -6116,8 +6116,8 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
                 <target>Lock / unlock the selected segment (CTRL + L)</target>
             </trans-unit>
-            <trans-unit id="QWxsZXI=">
-                <source>Aller</source>
+            <trans-unit id="QWxsZQ==">
+                <source>Alle</source>
                 <target>All</target>
             </trans-unit>
             <trans-unit id="WmVpY2hlbg==">
