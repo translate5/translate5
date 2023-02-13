@@ -427,7 +427,10 @@ Ext.define('Editor.view.segments.Grid', {
                     me.positionRowAfterScroll(rowindex, row, config);
                 }
             };
-        me.ensureVisible(rowindex, options);
+
+        if (!me.getStore().isLoading()) {
+            me.ensureVisible(rowindex, options);
+        }
     },
     /**
      * positions the given row to the given target, for valid targets see scrollTo
