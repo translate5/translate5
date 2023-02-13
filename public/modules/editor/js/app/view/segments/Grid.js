@@ -428,6 +428,10 @@ Ext.define('Editor.view.segments.Grid', {
                 }
             };
 
+        // If ensureVisible() method is called during store is loading
+        // it leads to that 'PageMap asked for range which it does not have'-error is raised
+        // so it looks like that call changes some things internally regarding how bufferedStore
+        // is loaded and rendered
         if (!me.getStore().isLoading()) {
             me.ensureVisible(rowindex, options);
         }
