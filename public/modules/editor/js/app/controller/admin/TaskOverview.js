@@ -1259,6 +1259,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         if (!activeTab) {
             return;
         }
+        activeTab.getController().isAfterImport = true;
         activeTab.getController().redirectFocus(task, false);
     },
 

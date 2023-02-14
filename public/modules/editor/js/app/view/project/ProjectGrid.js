@@ -231,7 +231,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
      * @param {Object} config
      */
     scrollTo: function(rowindex, config) {
-        if(rowindex < 0) {
+        if(rowindex < 0 || this.getStore().isLoading()) {
             return;
         }
         if(!config){
@@ -239,6 +239,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
         }
         var me = this;
         me.ensureVisible(rowindex, config);
+        console.log('scrollTo', me.getStore().isLoading(), me.getStore().isLoaded(), me.getView().refreshing);
     },
 
     initComponent:function(){

@@ -129,7 +129,22 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     onProjectFocusRoute:function(id){
         var me=this;
-        me.selectProjectRecord(id);
+
+        // If we reach this line through handleProjectAfterImport() call
+        if (me.isAfterImport && false) {
+
+            // We should not call selectProjectRecord() method, as otherwise
+            // there will be an attempt to focus the project in the project grid twice
+            // because the 2nd of that 'twice' will be triggered by reloadProjects() call
+            // which is after handleProjectAfterImport() call, so here we just remove the isAfterImport
+            delete me.isAfterImport;
+
+        // Else do as usual
+        } else {
+            var grid = me.lookup('projectGrid');
+            //console.log('project focus', grid.getStore().getCount(), grid.getView().all.getCount());
+            me.selectProjectRecord(id);
+        }
     },
 
     /***
@@ -137,6 +152,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     onProjectTaskFocusRoute:function(id,taskId){
         var me=this;
+
+        var grid = me.lookup('projectGrid');
+        //console.log('project task focus', id, taskId, grid.getView().refreshing, grid.getStore().getById(parseInt(id)));
+        //console.trace();
         //focus the project record
         me.selectProjectRecord(id,taskId);
     },
@@ -225,6 +244,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
             return;
         }
         //force rerouting to the desired project/task in the hash (this contains also a selected one!)
+        // Initial load 2
         me.redirectTo(Ext.util.History.getToken(), true);
     },
 
@@ -276,9 +296,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         var me=this,
             grid=me.lookup('projectGrid'),
             record=null;
-
+        console.log('select project record', id, taskId);
         //search for the task store record index
-        me.searchIndex(id,grid).then(function(index){
+        me.searchIndex(id,grid).then(function(index, exists){
             var store = grid.getStore();
             //do not scroll on empty store
             if(store.getTotalCount() === 0){
@@ -287,8 +307,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 }
                 return;
             }
+            console.log('select project record then', index, 'exists', !!exists);
             grid.scrollTo(index,{
                 callback:function(){
+                    //console.log('zxczxczxc', index);
                     //no db index is found
                     if(index===undefined || index<0){
                         Editor.MessageBox.addInfo(me.strings.noProjectMessage);
@@ -368,7 +390,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         //the record exist in the grid view
         if(index!=null){
             return new Ext.Promise(function (resolve, reject) {
-                resolve(index);
+                resolve(index, true);
             });
         }
         //the grid does not exist in the grid, get the index from the db
@@ -376,6 +398,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);
         params['projectsOnly'] = true;
         return new Ext.Promise(function (resolve, reject) {
+            console.log('position request for id', id);
             Ext.Ajax.request({
                 url: Editor.data.restpath+'task/'+id+'/position',
                 method: 'GET',
