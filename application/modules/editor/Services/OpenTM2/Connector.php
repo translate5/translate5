@@ -487,7 +487,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @return string
      */
     protected function processImportStatus() {
-        $status = $this->api->getResult()->tmxImportStatus;
+        $status = $this->api->getResult() ? $this->api->getResult()->tmxImportStatus : '';
         switch($status) {
             case 'available':
                 if (isset($this->api->getResult()->importTime) && $this->api->getResult()->importTime === 'not finished') {

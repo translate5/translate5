@@ -31,8 +31,8 @@ use MittagQI\Translate5\Test\Import\Config;
 /**
  * Match analysis tests.
  * The test will check if the current codebase provides a valid matchanalysis test results.
- * The valid test results are counted by hand and they are correct.
- *
+ * The valid test results are counted by hand.
+ * For more info about the segment results check the Analysis test result Info.ods document in the test folder
  */
 class MatchAnalysisTest extends editor_Test_ImportTest {
     
@@ -42,27 +42,40 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
         'editor_Plugins_InstantTranslate_Init'
     ];
 
+    /***
+     * Configs which are changed for test tests and needs to be revoked after the test is done
+     * @var array
+     */
+    protected static $changedConfigs = [];
+
     protected static function setupImport(Config $config): void
     {
-        $sourceLangRfc = 'de';
-        $targetLangRfc = 'en';
+        $sourceLangRfc = 'en';
+        $targetLangRfc = 'de';
         $customerId = static::getTestCustomerId();
+
+        // collect the original config value so it will be set again after the test is finished
+        self::$changedConfigs[] = static::api()->getConfig('runtimeOptions.frontend.importTask.edit100PercentMatch');
+
+        static::api()->putJson('editor/config/',[
+            'value' => 0,
+            'name' => 'runtimeOptions.frontend.importTask.edit100PercentMatch'
+        ]);
+
         $config
-            ->addLanguageResource('opentm2', 'resource1.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
-            ->setProperty('name', 'MATESTresource1'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->addLanguageResource('opentm2', 'MatchAnalysisTest_TM.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
+            ->setProperty('name', 'MatchAnalysisTest_TM');
         $config
-            ->addLanguageResource('opentm2', 'resource2.tmx', $customerId, $sourceLangRfc, $targetLangRfc)
-            ->setProperty('name', 'MATESTresource2'); // TODO FIXME: we better generate data independent from resource-names ...
-        $config
-            ->addLanguageResource('termcollection', 'collection.tbx', $customerId)
-            ->setProperty('name', 'MATESTresource3'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->addLanguageResource('termcollection', 'MatchAnalysisTest_Collection.tbx', $customerId)
+            ->setProperty('name', 'MatchAnalysisTest_Collection');
         $config
             ->addPretranslation();
+
         $config
-            ->addTask($sourceLangRfc, $targetLangRfc, $customerId)
-            ->addUploadFolder('testfiles')
-            ->setProperty('wordCount', 1270)
-            ->setProperty('taskName', 'API Testing::MatchAnalysisTest'); // TODO FIXME: we better generate data independent from resource-names ...
+            ->addTask($sourceLangRfc, $targetLangRfc, $customerId,'Test-task-en-de_v2.html')
+            ->setProperty('wordCount', 114)
+            ->setProperty('taskName', 'API Testing::MatchAnalysisTest')
+            ->setProperty('edit100PercentMatch',true);
     }
 
     /***
@@ -169,7 +182,7 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
     private function filterTaskAnalysis(array &$data) : array {
         // remove the created timestamp since is not relevant for the test
         foreach ($data as &$a){
-            unset($a->created);
+            unset($a->created,$a->id,$a->taskGuid,$a->segmentId);
         }
         usort($data, function($a, $b){ return strcmp($a->resourceName, $b->resourceName); });
         return $data;
@@ -179,15 +192,24 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
      * @param array $data
      * @return array
      */
-    private function filterUngroupedAnalysis(array &$data){
-        // remove some of the unneeded columns
+    private function filterUngroupedAnalysis(array &$data): array
+    {
+        // remove some unneeded columns
         foreach ($data as &$a){
-            unset($a->id);
-            unset($a->taskGuid);
-            unset($a->analysisId);
-            unset($a->segmentId);
-            unset($a->languageResourceid);
+            unset($a->id, $a->taskGuid, $a->analysisId, $a->segmentId, $a->languageResourceid);
         }
         return $data;
+    }
+
+    public static function afterTests(): void
+    {
+        parent::afterTests();
+
+        foreach (self::$changedConfigs as $c){
+            static::api()->putJson('editor/config/',[
+                'value' => $c->value,
+                'name' => $c->name
+            ]);
+        }
     }
 }
