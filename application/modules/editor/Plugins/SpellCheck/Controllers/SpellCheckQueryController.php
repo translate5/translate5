@@ -62,7 +62,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
         }
 
         $this->view->rows = ZfExtended_Factory
-            ::get('editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter')
+            ::get(editor_Plugins_SpellCheck_LanguageTool_Adapter::class)
             ->getSupportedLanguage($targetLangCode);
     }
 
@@ -78,7 +78,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
             return;
         }
         
-        $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter');
+        $connector = ZfExtended_Factory::get(editor_Plugins_SpellCheck_LanguageTool_Adapter::class);
         $this->view->rows = $connector->getMatches($text,$language);
     }
     

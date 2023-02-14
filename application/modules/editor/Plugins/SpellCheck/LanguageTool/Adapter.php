@@ -35,7 +35,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\TimeOutException;
  * Connector to LanguageTool
  * https://languagetool.org/http-api/swagger-ui/#/default
  */
-class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
+class editor_Plugins_SpellCheck_LanguageTool_Adapter {
     
     /**
      * LanguageTool
@@ -132,8 +132,7 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
         // Get version and assign into $version arg passed by reference
         $version = $response->software->version;
 
-        // Return response
-        return $response;
+        return ($this->lastStatus === 200);
     }
 
     /**

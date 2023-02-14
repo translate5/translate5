@@ -37,6 +37,14 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     protected static bool $activateForTests = true;
 
     /**
+     * The services we use
+     * @var string[]
+     */
+    protected static array $services = [
+        'termtagger' => editor_Plugins_TermTagger_Service::class
+    ];
+
+    /**
      * @var ZfExtended_Logger
      */
     protected $log;
@@ -291,16 +299,18 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @return stdClass
      */
     public function termtaggerState() {
-        $testTimeout = 10;
+
         $termtagger = new stdClass();
-        $ttService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', ['editor.terminology', $testTimeout, $testTimeout]);
+        // create service
+        $ttService = $this->getService('termtagger');
         /* @var $ttService editor_Plugins_TermTagger_Service */
         $termtagger->configured = $ttService->getConfiguredUrls();
-        $allUrls = array_unique(call_user_func_array('array_merge', array_values((array)$termtagger->configured)));
-        $running = array();
-        $version = array();
+        $allUrls = array_unique(call_user_func_array('array_merge', array_values((array) $termtagger->configured)));
+        $running = [];
+        $version = [];
         $termtagger->runningAll = true;
         foreach($allUrls as $url) {
+            $version[$url] = null;
             $running[$url] = $ttService->testServerUrl($url, $version[$url]);
             $termtagger->runningAll = $running[$url] && $termtagger->runningAll;
         }
