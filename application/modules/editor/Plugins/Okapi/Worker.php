@@ -136,7 +136,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             ]);
             // dirty way to evaluate if a bconf is from the import-zip: when in the ZIP, the task-folder is in the path
             $bconfWasInZip = str_contains($params['bconfFilePath'], trim($this->task->getTaskGuid(), '{}')) ? ' (from Import-ZIP)' : '';
-            error_log($params['bconfFilePath'].$bconfWasInZip);
             $okapiConfig = $taskConfig->runtimeOptions->plugins->Okapi;
             $serverUsed = $okapiConfig->serverUsed ?? 'not set';
             $this->logger->info('E1444', 'Okapi Plug-In: Task was imported with Okapi "{okapi}"', [
