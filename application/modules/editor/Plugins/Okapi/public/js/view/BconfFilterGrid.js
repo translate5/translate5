@@ -74,9 +74,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
         configuration: '#UT#Filter konfigurieren',
         showDefaultFilters: '#UT#Standard Filter anzeigen',
         hideDefaultFilters: '#UT#Standard Filter verstecken',
+        editTexts: '#UT#Filternamen, zugehörige Dateierweiterungen, MIME-Typ und Beschreibung bearbeiten',
+        editTextsRowTip: '#UT#Doppelklicken, um Filternamen, zugehörige Dateierweiterungen, MIME-Typ und Beschreibung zu bearbeiten',
+        clone: '#UT#Filter klonen',
         refresh: '#UT#Aktualisieren',
         remove: '#UT#Löschen',
-        emptySearch: '#UT#Suchen',
+        emptySearch: '#UT#Filter suchen',
         uniqueName: '#UT#Eindeutiger Name'
     },
     store: {
@@ -113,12 +116,12 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     defaults: {margin: '0 10 0'},
                     items: [{
                         xtype: 'button',
-                        width: 160,
+                        width: 200,
                         iconCls: 'x-fa fa-eye',
                         reference: 'showDefaultsBtn',
                         enableToggle: true,
                         toggleHandler: 'toggleDefaultsFilter',
-                        text: this.strings.showDefaultFilters,
+                        text: me.strings.showDefaultFilters,
                     }, {
                         xtype: 'tbspacer',
                         flex: 1
@@ -128,7 +131,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         checkChangeBuffer: 300,
                         itemId: 'search',
                         flex: 1,
-                        emptyText: this.strings.emptySearch,
+                        emptyText: me.strings.emptySearch,
                         triggers: {
                             clear: {
                                 cls: Ext.baseCSSPrefix + 'form-clear-trigger',
@@ -155,6 +158,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                 },{
                     xtype: 'gridcolumn',
                     dataIndex: 'name',
+                    renderer: me.editableColumnRenderer,
                     editor: {
                         xtype: 'textfield',
                         allowOnlyWhitespace: false,
@@ -175,7 +179,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         }
                     },
                     stateId: 'name',
-                    width: 300,
+                    width: 275,
                     filter: {
                         type: 'string'
                     },
@@ -183,19 +187,14 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'identifier',
-                    width: 300,
-                    text: me.text_cols.identifier,
-                    renderer: function(value, metaData, record){
-                        if(value === 'NEW@FILTER'){
-                            // this mimics rainbow-behaviour
-                            return record.get('okapiType') + '@copy-of-' + record.get('okapiId');
-                        }
-                        return value;
-                    }
+                    renderer: me.identifierColumnRenderer,
+                    width: 275,
+                    text: me.text_cols.identifier
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'mimeType',
-                    width: 300,
+                    renderer: me.editableColumnRenderer,
+                    width: 200,
                     editor: {
                         xtype: 'textfield'
                     },
@@ -203,7 +202,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                 }, {
                     xtype: 'gridcolumn',
                     dataIndex: 'extensions',
-                    width: 200,
+                    width: 175,
                     stateId: 'extensions',
                     renderer: function(value){
                         return value.join(', ');
@@ -219,7 +218,9 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     },
                 }, {
                     xtype: 'gridcolumn',
+                    tooltip: me.strings.editTextsRowTip,
                     dataIndex: 'description',
+                    renderer: me.descriptionColumnRenderer,
                     stateId: 'notes',
                     flex: 1,
                     editor: {
@@ -244,7 +245,13 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                         glyph: 'f044@FontAwesome5FreeSolid',
                         handler: 'editFPRM'
                     }, {
-                        tooltip: me.strings.configuration,
+                        tooltip: me.strings.editTexts,
+                        isAllowedFor: 'bconfEdit',
+                        isDisabled: 'isEditDisabled',
+                        glyph: 'f303@FontAwesome5FreeSolid',
+                        handler: 'editTexts'
+                    }, {
+                        tooltip: me.strings.clone,
                         isAllowedFor: 'isFromTranslate5',
                         isDisabled: 'isCloneDisabled',
                         glyph: 'f24d@FontAwesome5FreeSolid',
@@ -259,6 +266,44 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                 }],
             };
         return me.callParent([Ext.apply(config, instanceConfig)]);
+    },
+
+    /**
+     *
+     * @param {String} value
+     * @param {Object} metadata
+     * @returns {String}
+     */
+    editableColumnRenderer: function(value, metadata) {
+        metadata.tdAttr = 'data-qtip="' + this.strings.editTextsRowTip + '"';
+        return value;
+    },
+    /**
+     *
+     * @param {String} value
+     * @param {Object} metadata
+     * @returns {String}
+     */
+    descriptionColumnRenderer: function(value, metadata) {
+        if(value){
+            metadata.tdAttr = 'data-qtip="' + value.replace('"', '“').replace("'", '‘') + '"';
+        }
+        return value;
+    },
+    /**
+     *
+     * @param {String} value
+     * @param {Object} metadata
+     * @param {Object} record
+     * @returns {String}
+     */
+    identifierColumnRenderer: function(value, metadata, record) {
+        metadata.tdAttr = 'data-qtip="' + value + '"';
+        if(value === 'NEW@FILTER'){
+            // this mimics rainbow-behaviour
+            return record.get('okapiType') + '@copy-of-' + record.get('okapiId');
+        }
+        return value;
     },
     /**
      * @returns {string}

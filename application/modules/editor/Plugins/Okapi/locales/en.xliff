@@ -268,6 +268,34 @@
                 <source>Herunterladen der target-SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</source>
                 <target>Download target-SRX file containing segmentation rules, that can be used to further segment the target of xliff files. Target segmentation of xliff is not supported by translate5 so far, therefore this setting has no effect so far.</target>
             </trans-unit>
+            <trans-unit id='WnVtIEFucGFzc2VuIGRlcyBGaWx0ZXJzIGhpZXIgZGVuIEZpbHRlciBrb3BpZXJlbg=='>
+                <source>Zum Anpassen des Filters hier den Filter kopieren</source>
+                <target>Copy filter configuration to customize it</target>
+            </trans-unit>
+            <trans-unit id='RG9wcGVsa2xpY2tlbiB6dW0gYmVhcmJlaXRlbg=='>
+                <source>Doppelklicken zum bearbeiten</source>
+                <target>Double-click to edit</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVybmFtZW4sIHp1Z2Vow7ZyaWdlIERhdGVpZXJ3ZWl0ZXJ1bmdlbiwgTUlNRS1UeXAgdW5kIEJlc2NocmVpYnVuZyBiZWFyYmVpdGVu'>
+                <source>Filternamen, zugehörige Dateierweiterungen, MIME-Typ und Beschreibung bearbeiten</source>
+                <target>Edit filter name, associated file extensions, used MIME-type and description</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyIHN1Y2hlbg=='>
+                <source>Filter suchen</source>
+                <target>Search for filter</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyIGtsb25lbg=='>
+                <source>Filter klonen</source>
+                <target>Clone filter</target>
+            </trans-unit>
+            <trans-unit id='w4RuZGVydW5nZW4genVyw7xja3NldHplbg=='>
+                <source>Änderungen zurücksetzen</source>
+                <target>Reset changes</target>
+            </trans-unit>
+            <trans-unit id='RGFzIE9rYXBpIEZyYW1ld29yayB3aXJkIGF1ZiBkZXIgU2VydmVyc2VpdGUgZsO8ciBEYXRlaWtvbnZlcnRpZXJ1bmdlbiB2ZXJ3ZW5kZXQ='>
+                <source>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet. Daher werden die Filteroptionen in der Okapi-Hilfe erläutert.</source>
+                <target>The Okapi Framework is used on the server side for file conversions. Therefore the filter options are explained on Okapis help pages.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
