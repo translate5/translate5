@@ -60,7 +60,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
     private const OPTION_WAIT_TIMEOUT = 'wait-timeout';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
-    private const DEFAULT_WAIT_TIME_SECONDS = 300;
+    private const DEFAULT_WAIT_TIME_SECONDS = 600;
     private const DEFAULT_WAIT_TICK_TIME_SECONDS = 5;
 
     protected static $defaultName = 't5memory:migrate';
@@ -357,7 +357,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
             return;
         }
 
-        $this->io->text("\nWaiting until import finished");
+        $this->io->text("\nWaiting until import is finished");
 
         $timeElapsed = 0;
         $maxWaitTime = (int)$this->input->getOption(self::OPTION_WAIT_TIMEOUT);
@@ -374,6 +374,13 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
                 $progressBar->finish();
 
                 return;
+            }
+
+            if ($status === \editor_Services_Connector_Abstract::STATUS_ERROR) {
+                $progressBar->finish();
+                $this->io->warning('Error occurred during importing');
+
+                throw new RuntimeException('Error occurred during importing');
             }
 
             sleep($waitTimeBetweenChecks);
