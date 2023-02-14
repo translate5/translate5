@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<tmx version="1.4">
+  <header creationtoolversion="0.4.4" gitCommit="22dd0764 * Updated to v0_4_4 * fixed asan crash during memory realocation" segtype="sentence" adminlang="en-us" srclang="en" o-tmf="t5memory" creationtool="t5memory" datatype="plaintext" />
+  <body>
+    <tu tuid="1" creationdate="20230202T141425Z">
+      <prop type="tmgr:segNum">1</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>What is Lorem Ipsum?</seg>
+      </tuv>
+      <tuv xml:lang="de-DE">
+        <seg>Was ist Lorem Ipsum?</seg>
+      </tuv>
+    </tu>
+    <tu tuid="2" creationdate="20230202T141426Z">
+      <prop type="tmgr:segNum">2</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</seg>
+      </tuv>
+      <tuv xml:lang="de-DE">
+        <seg>Lorem Ipsum ist ein einfacher Blindtext der Druck- und Setzindustrie.</seg>
+      </tuv>
+    </tu>
+    <tu tuid="3" creationdate="20230202T141425Z">
+      <prop type="tmgr:segNum">3</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</seg>
+      </tuv>
+      <tuv xml:lang="de-DE">
+        <seg>Lorem Ipsum ist seit dem Jahr 1500, als ein unbekannter Drucker eine Druckfahne nahm und sie zu einem Musterbuch zusammensetzte, der Standard für Blindtexte in der Industrie.</seg>
+      </tuv>
+    </tu>
+    <tu tuid="4" creationdate="20230202T141426Z">
+      <prop type="tmgr:segNum">4</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</seg>
+      </tuv>
+      <tuv xml:lang="de-DE">
+        <seg>Sie hat nicht nur fünf Jahrhunderte, sondern auch den Sprung zum elektronischen Schriftsatz überlebt und ist im Wesentlichen unverändert geblieben.</seg>
+      </tuv>
+    </tu>
+    <tu tuid="5" creationdate="20230206T163113Z">
+      <prop type="tmgr:segNum">0</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de_v2.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</seg>
+      </tuv>
+      <tuv xml:lang="de">
+        <seg>Sie hat nicht nur fünf Jahrhunderte, sondern auch den Sprung zum elektronischen Schriftsatz überlebt und ist im Wesentlichen unverändert geblieben.</seg>
+      </tuv>
+    </tu>
+    <tu tuid="6" creationdate="20230202T141425Z">
+      <prop type="tmgr:segNum">5</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</seg>
+      </tuv>
+      <tuv xml:lang="de-DE">
+        <seg>Es wurde in den 1960er Jahren mit der Veröffentlichung von Letraset-Bögen mit Lorem Ipsum Passagen populär, und in jüngerer Zeit mit Desktop-Publishing-Software wie Aldus PageMaker, die Versionen von Lorem Ipsum enthält.</seg>
+      </tuv>
+    </tu>
+    <tu tuid="7" creationdate="20230202T141425Z">
+      <prop type="tmgr:segNum">6</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</seg>
+      </tuv>
+      <tuv xml:lang="de-DE">
+        <seg>Es ist eine altbekannte Tatsache, dass ein Leser vom lesbaren Inhalt einer Seite abgelenkt wird, wenn er das Layout betrachtet.</seg>
+      </tuv>
+    </tu>
+    <tu tuid="8" creationdate="20230202T141425Z">
+      <prop type="tmgr:segNum">7</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</seg>
+      </tuv>
+      <tuv xml:lang="de-DE">
+        <seg>Der Sinn der Verwendung von Lorem Ipsum besteht darin, dass es eine mehr oder weniger normale Verteilung der Buchstaben hat, im Gegensatz zur Verwendung von &quot;Inhalt hier, Inhalt hier&quot;, wodurch es wie lesbares Englisch aussieht.</seg>
+      </tuv>
+    </tu>
+    <tu tuid="9" creationdate="20230202T141425Z">
+      <prop type="tmgr:segNum">8</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem Ipsum' will uncover many web sites still in their infancy.</seg>
+      </tuv>
+      <tuv xml:lang="de-DE">
+        <seg>Viele Desktop-Publishing-Pakete und Webseiten-Editoren verwenden inzwischen Lorem Ipsum als Standardtextvorlage, und eine Suche nach &quot;lorem Ipsum&quot; führt zu vielen Websites, die noch in den Kinderschuhen stecken.</seg>
+      </tuv>
+    </tu>
+    <tu tuid="10" creationdate="20230202T141426Z">
+      <prop type="tmgr:segNum">9</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Test-task-en-de.html</prop>
+      <tuv xml:lang="en-US">
+        <seg>Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</seg>
+      </tuv>
+      <tuv xml:lang="de-DE">
+        <seg>Im Laufe der Jahre haben sich verschiedene Versionen herausgebildet, manchmal aus Versehen, manchmal absichtlich (mit Humor und ähnlichem).</seg>
+      </tuv>
+    </tu>
+  </body>
+</tmx>
