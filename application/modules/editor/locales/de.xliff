@@ -8785,6 +8785,30 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Dateiname</source>
               <target>Dateiname</target>
             </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCBoZXJ1bnRlcmxhZGVu'>
+              <source>Übersetzerpaket herunterladen</source>
+              <target>Übersetzerpaket herunterladen</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWllbiB2ZXJ3YWx0ZW4='>
+              <source>Dateien verwalten</source>
+              <target>Dateien verwalten</target>
+            </trans-unit>
+            <trans-unit id='QmlsaW5ndWFsZSBEYXRlaWVu'>
+              <source>Bilinguale Dateien</source>
+              <target>Bilinguale Dateien</target>
+            </trans-unit>
+            <trans-unit id='QXVzZ2FuZ3NkYXRlaWVu'>
+              <source>Ausgangsdateien</source>
+              <target>Ausgangsdateien</target>
+            </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCBoZXJ1bnRlcmxhZGVu'>
+              <source>Übersetzerpaket herunterladen</source>
+              <target>Übersetzerpaket herunterladen</target>
+            </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCByZS1pbXBvcnRpZXJlbg=='>
+              <source>Übersetzerpaket re-importieren</source>
+              <target>Übersetzerpaket re-importieren</target>
+			</trans-unit>
             <trans-unit id='S29uZmxpa3QgaGluc2ljaHRsaWNoIHp1Z2V3aWVzZW5lciBBdWZnYWJlbg=='>
               <source>Konflikt hinsichtlich zugewiesener Aufgaben</source>
               <target>Konflikt hinsichtlich zugewiesener Aufgaben</target>

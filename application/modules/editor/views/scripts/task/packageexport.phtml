@@ -26,43 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
-
-/**
- * List of file types and file type handler class for segment content processor
- */
-class FileHandler
-{
-
-    private static array $supportedFileTypes = [
-        'xlf' => Xlf::class,
-        'xliff' => Xliff::class
-    ];
-
-    /**
-     * @param string $fileType
-     * @param string $class
-     * @return void
-     */
-    public static function addFileHandler(string $fileType, string $class): void
-    {
-        self::$supportedFileTypes[$fileType] = $class;
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public static function getSupportedFileTypes(): array
-    {
-        return array_keys(self::$supportedFileTypes);
-    }
-
-    /***
-     * @param string $type
-     * @return mixed|string
-     */
-    public static function getClass(string $type)
-    {
-        return self::$supportedFileTypes[$type] ?? '';
-    }
+// This will print the error message to the user in case errors happen during the package export.
+echo '<script>';
+if (isset($this->error)) {
+    echo '
+    var editor = window.opener ? window.opener.Editor : null;
+    if(editor){
+        editor.MessageBox.addError("' . $this->error . '");
+    }';
 }
+echo 'window.close();</script>';

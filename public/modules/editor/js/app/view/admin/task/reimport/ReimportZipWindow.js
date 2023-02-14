@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,31 +26,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
-namespace MittagQI\Translate5\Task\Reimport;
-
-class Exception extends \ZfExtended_ErrorCodeException
-{
-
+Ext.define('Editor.view.admin.task.reimport.ReimportZipWindow', {
+    extend: 'Editor.view.admin.task.reimport.ReimportWindow',
+    alias: 'widget.adminTaskReimportReimportZipWindow',
+    itemId: 'adminTaskReimportReimportZipWindow',
+    controller:'adminTaskReimportReimportZipWindow',
+    requires:['Editor.view.admin.task.reimport.ReimportZipWindowViewController'],
+    supportedExtensions: ['zip','ZIP'],
+    bind:{
+        title:'{l10n.projectOverview.taskManagement.taskReimportZipWindow.title}'
+    },
     /**
-     * @var string
      */
-    protected $domain = 'editor.task.reimport';
-
-    protected static array $localErrorCodes = [
-        'E1426' => 'Reimport: Missing required request parameter fileId.',
-        'E1427' => 'Reimport DataProvider: Error on file upload.',
-        'E1429' => 'Reimport DataProvider: No upload files found for task reimport.',
-        'E1430' => 'Reimport DataProvider: No upload files found for task reimport.',
-        'E1433' => 'Reimport Worker: Unable to find fileParser for the uploaded file.',
-        'E1434' => 'Reimport Segment processor: No matching segment was found for the given mid.',
-        'E1441' => 'Reimport Segment processor: No content parser found for the file with extension {ext}',
-        'E1462' => 'Reimport ZipDataProvider: Unable to replace the original file with the uploaded version'
-    ];
-}
+    loadRecord: function(task) {
+        var me=this;
+        me.task = task;
+    }
+});

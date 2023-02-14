@@ -26,43 +26,53 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
+namespace MittagQI\Translate5\Task\Export\Package\Source;
 
-/**
- * List of file types and file type handler class for segment content processor
- */
-class FileHandler
+use editor_Models_Task;
+use MittagQI\Translate5\Task\Export\Package\ExportSource;
+use ZfExtended_Models_Worker;
+
+abstract class Base
 {
 
-    private static array $supportedFileTypes = [
-        'xlf' => Xlf::class,
-        'xliff' => Xliff::class
-    ];
+    protected string $fileName;
+
+    protected string $folderPath;
+
 
     /**
-     * @param string $fileType
-     * @param string $class
+     * @param editor_Models_Task $task
+     */
+    public function __construct(protected editor_Models_Task $task, protected ExportSource $exportSource)
+    {
+        $this->folderPath = $exportSource->getRootFolder().DIRECTORY_SEPARATOR.$this->fileName;
+    }
+
+    /**
+     * Validate source before export. In case of invalid source, throw exception
      * @return void
      */
-    public static function addFileHandler(string $fileType, string $class): void
+    abstract public function validate(): void;
+
+    /**
+     * @return void
+     */
+    abstract public function export(?ZfExtended_Models_Worker $workerModel): void;
+
+    /***
+     * @return string
+     */
+    public function getFolderPath(): string
     {
-        self::$supportedFileTypes[$fileType] = $class;
+        return $this->folderPath;
     }
 
     /**
-     * @return array|string[]
+     * @return ExportSource
      */
-    public static function getSupportedFileTypes(): array
+    public function getExportSource(): ExportSource
     {
-        return array_keys(self::$supportedFileTypes);
+        return $this->exportSource;
     }
 
-    /***
-     * @param string $type
-     * @return mixed|string
-     */
-    public static function getClass(string $type)
-    {
-        return self::$supportedFileTypes[$type] ?? '';
-    }
 }

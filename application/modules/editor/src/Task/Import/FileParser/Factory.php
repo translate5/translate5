@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 namespace MittagQI\Translate5\Task\Import\FileParser;
+
 use editor_Models_Import_FileParser;
 use editor_Models_Import_FileParser_NoParserException;
 use editor_Models_Import_SupportedFileTypes;

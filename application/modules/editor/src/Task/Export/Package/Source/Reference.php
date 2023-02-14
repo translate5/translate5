@@ -26,43 +26,35 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
 
-/**
- * List of file types and file type handler class for segment content processor
- */
-class FileHandler
+namespace MittagQI\Translate5\Task\Export\Package\Source;
+
+use editor_Models_Import_DirectoryParser_ReferenceFiles;
+use MittagQI\Translate5\Task\Export\Package\ExportSource;
+use ZfExtended_Factory;
+use ZfExtended_Models_Worker;
+use ZfExtended_Utils;
+
+class Reference extends Base
 {
 
-    private static array $supportedFileTypes = [
-        'xlf' => Xlf::class,
-        'xliff' => Xliff::class
-    ];
+    protected string $fileName = 'reference';
+
 
     /**
-     * @param string $fileType
-     * @param string $class
      * @return void
      */
-    public static function addFileHandler(string $fileType, string $class): void
+    public function export(?ZfExtended_Models_Worker $workerModel): void
     {
-        self::$supportedFileTypes[$fileType] = $class;
+        $referencesDirectory = $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.editor_Models_Import_DirectoryParser_ReferenceFiles::getDirectory();
+        if( !is_dir($referencesDirectory)){
+            // in case there is no references' directory, ignore the copy
+            return;
+        }
+        ZfExtended_Utils::recursiveCopy($referencesDirectory,$this->getFolderPath());
     }
 
-    /**
-     * @return array|string[]
-     */
-    public static function getSupportedFileTypes(): array
+    public function validate(): void
     {
-        return array_keys(self::$supportedFileTypes);
-    }
-
-    /***
-     * @param string $type
-     * @return mixed|string
-     */
-    public static function getClass(string $type)
-    {
-        return self::$supportedFileTypes[$type] ?? '';
     }
 }

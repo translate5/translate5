@@ -25,32 +25,30 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+namespace MittagQI\Translate5\Task\Export\Exported;
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
+use editor_Models_Export_Exception;
+use editor_Models_Export_Exported_ZipDefaultWorker;
+use editor_Models_Task;
+use MittagQI\Translate5\Task\Export\Package\ExportSource;
+use SplFileInfo;
+use ZfExtended_Factory;
+use ZfExtended_Models_Worker;
+use ZfExtended_Utils;
+
+/**
  */
-
-namespace MittagQI\Translate5\Task\Reimport;
-
-class Exception extends \ZfExtended_ErrorCodeException
-{
+class PackageWorker extends editor_Models_Export_Exported_ZipDefaultWorker {
 
     /**
-     * @var string
+     * Create export zip file from the generate package directory
+     * @param editor_Models_Task $task
+     * @throws editor_Models_Export_Exception
      */
-    protected $domain = 'editor.task.reimport';
-
-    protected static array $localErrorCodes = [
-        'E1426' => 'Reimport: Missing required request parameter fileId.',
-        'E1427' => 'Reimport DataProvider: Error on file upload.',
-        'E1429' => 'Reimport DataProvider: No upload files found for task reimport.',
-        'E1430' => 'Reimport DataProvider: No upload files found for task reimport.',
-        'E1433' => 'Reimport Worker: Unable to find fileParser for the uploaded file.',
-        'E1434' => 'Reimport Segment processor: No matching segment was found for the given mid.',
-        'E1441' => 'Reimport Segment processor: No content parser found for the file with extension {ext}',
-        'E1462' => 'Reimport ZipDataProvider: Unable to replace the original file with the uploaded version'
-    ];
+    protected function doWork(editor_Models_Task $task): void
+    {
+        parent::doWork($task);
+        $params = $this->workerModel->getParameters();
+        ZfExtended_Utils::cleanZipPaths(new SplFileInfo($params['zipFile']), basename(ExportSource::PACKAGE_FOLDER_NAME));
+    }
 }

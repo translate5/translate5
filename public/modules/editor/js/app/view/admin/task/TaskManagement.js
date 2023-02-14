@@ -39,7 +39,7 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
         'Editor.view.admin.task.LogWindow',
         'Editor.view.admin.config.Grid',
         'Editor.view.LanguageResources.pivot.Assoc',
-        'Editor.view.admin.task.reimport.Reimport'
+        'Editor.view.admin.task.ManageFiles.Main'
     ],
     itemId: 'adminTaskTaskManagement',
     header:false,
@@ -92,7 +92,13 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
                     }
                 }
             });
-        } 
+        }
+
+        if(auth.isAllowed('taskReimport')) {
+            tabs.push({
+                xtype: 'taskManageFilesMain'
+            });
+        }
         
         if(auth.isAllowed('editorEditTaskPm') || 
             auth.isAllowed('editorEditTaskOrderDate') ||
@@ -127,21 +133,11 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
             });
         }
 
-        if(auth.isAllowed('taskReimport')) {
-            tabs.push({
-                xtype: 'adminTaskReimportReimport',
-                bind: {
-                    disabled:'{disabledDuringTaskImport}',
-                    title: '{l10n.projectOverview.taskManagement.taskReimport.title}'
-                }
-            });
-        }
 
-
-        
         config = {
             items : [{
                 xtype: 'tabpanel',
+                itemId: 'taskManagementTabPanel',
                 activeTab: 0,
                 items: tabs
             }]
