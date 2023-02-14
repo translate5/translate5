@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Task\CurrentTask;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
+use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
@@ -1543,17 +1544,30 @@ class editor_TaskController extends ZfExtended_RestController {
                 break;
 
             case 'package':
+                if( $this->entity->isLocked($this->entity->getTaskGuid())){
+                    $this->view->assign('error','Unable to export task package. The task is locked');
+                    echo $this->view->render('task/packageexport.phtml');
+                    exit;
+                }
                 try {
                     $this->entity->checkStateAllowsActions();
+                    Lock::taskLock($this->entity,Downloader::TASK_PACKAGE_EXPORT_STATE);
+
                     $packageDownloader = ZfExtended_Factory::get(Downloader::class);
                     $packageDownloader->downloadPackage($this->entity,$diff);
                     $this->logInfo('Task package exported', ['context' => $context, 'diff' => $diff]);
-                    exit;
-                }catch (\MittagQI\Translate5\Task\Export\Package\Exception $exception){
-                    echo $exception->getMessage();
-                    exit;
+                    Lock::taskUnlock($this->entity);
+                }catch (Throwable $exception){
+                    Lock::taskUnlock($this->entity);
+                    $this->log->exception($exception,[
+                        'extra' => [
+                            'task' => $this->entity
+                        ]
+                    ]);
+                    $this->view->assign('error','Error on task package export. For more info check the event log.');
+                    echo $this->view->render('task/packageexport.phtml');
                 }
-
+                exit;
             case 'filetranslation':
             case 'transfer':
             default:

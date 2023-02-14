@@ -38,6 +38,7 @@ use ZfExtended_Factory;
  */
 class Downloader
 {
+    public const TASK_PACKAGE_EXPORT_STATE = 'PackageExport';
 
     /**
      * @param editor_Models_Task $task
@@ -63,19 +64,13 @@ class Downloader
             'exportFolder' => $exportFolder,
             'cookie' => Zend_Session::getId()
         ];
-
-        // Setup worker. 'cookie' in 2nd arg is important only if $context is 'transfer'
         $zipFile = $worker->setup($task->getTaskGuid(), $contextParams);
-
 
         $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
         $worker->queue($workerId);
 
-
-        $filename = $task->getTasknameForDownload('_exportPackage.zip');
-
         header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '; filename=' . $filename);
+        header('Content-Disposition: attachment; filename="'.$task->getTasknameForDownload('_exportPackage.zip').'"');
         readfile($zipFile);
         unlink($zipFile);
     }

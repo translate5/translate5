@@ -92,6 +92,12 @@ class Translate3117Test extends editor_Test_JsonTest {
         'workfiles/Level1/Task-en-de.html.xlf'
     ];
 
+    /***
+     * Import archive path on the disk
+     * @var string
+     */
+    protected static string $importArchive;
+
     protected static function setupImport(Config $config): void
     {
 
@@ -141,15 +147,17 @@ class Translate3117Test extends editor_Test_JsonTest {
     }
 
     public function testExportPackage(){
+        static::api()->setTaskToOpen();
+
         $task = static::api()->getTask();
         $response = static::api()->get('editor/task/export/id/'.$task->id.'?format=package');
 
-        $file = tempnam(sys_get_temp_dir(), 'PackageExport');
+        self::$importArchive = tempnam(sys_get_temp_dir(), 'PackageExport');
 
-        file_put_contents($file, $response->getBody());
+        file_put_contents(self::$importArchive, $response->getBody());
 
         $zip = new ZipArchive();
-        self::assertEquals($zip->open($file),true,'Unable to open the exported zip archive');
+        self::assertEquals(true, $zip->open(self::$importArchive),'Unable to open the exported zip archive');
 
         // The term collection name is dynamic -> add to package structure the name to be checked for tbx
         static::$exportPackageStructure[] = 'tbx/'.self::$termCollection->getId().'.tbx';
@@ -158,8 +166,14 @@ class Translate3117Test extends editor_Test_JsonTest {
         for ($idx = 0; $zipFile = $zip->statIndex($idx); $idx++) {
             self::assertContains($zipFile['name'],static::$exportPackageStructure,'The export file structure is not as expected');
         }
+    }
 
-        unlink($file);
+    public static function afterTests(): void
+    {
+        if(isset(self::$importArchive)){
+            unlink(self::$importArchive);
+        }
+        parent::afterTests();
     }
 
 }

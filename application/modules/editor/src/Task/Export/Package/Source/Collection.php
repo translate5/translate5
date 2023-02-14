@@ -50,14 +50,14 @@ class Collection extends Base
     }
 
     /***
-     * @param ZfExtended_Models_Worker|null $workeModel
+     * @param ZfExtended_Models_Worker|null $workerModel
      * @return void
      * @throws \Zend_Db_Statement_Exception
      * @throws \ZfExtended_Models_Entity_NotFoundException
      */
-    public function export(?ZfExtended_Models_Worker $workeModel): void
+    public function export(?ZfExtended_Models_Worker $workerModel): void
     {
-        $params = $workeModel->getParameters();
+        $params = $workerModel->getParameters();
 
         $service=ZfExtended_Factory::get(editor_Services_TermCollection_Service::class);
         /** @var TaskAssociation $assoc */
@@ -71,12 +71,8 @@ class Collection extends Base
         $export = ZfExtended_Factory::get(editor_Models_Export_Terminology_Tbx::class);
         $export->setExportAsFile(true);
 
-        $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-            'LocalEncoded'
-        );
-
         foreach ($assocs as $item) {
-            $filePath = $localEncoded->encode($this->getFolderPath().DIRECTORY_SEPARATOR.$item['languageResourceId'].'.tbx');
+            $filePath = $this->getFolderPath().DIRECTORY_SEPARATOR.$item['languageResourceId'].'.tbx';
             $export->setFile($filePath);
             $export->exportCollectionById($item['languageResourceId'],$user->getUserName());
         }

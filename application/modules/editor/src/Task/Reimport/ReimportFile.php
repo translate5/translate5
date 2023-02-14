@@ -49,11 +49,9 @@ class ReimportFile
     }
 
     public function import(int $fileId, string $filePath,string $segmentTimestamp){
-        /** @var editor_Models_SegmentFieldManager $segmentFieldManager */
-        $segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $segmentFieldManager = ZfExtended_Factory::get(editor_Models_SegmentFieldManager::class);
         $segmentFieldManager->initFields($this->task->getTaskGuid());
 
-        /** @var Factory $parserHelper */
         $parserHelper = ZfExtended_Factory::get(Factory::class,[
             $this->task,
             $segmentFieldManager

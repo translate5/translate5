@@ -34,6 +34,7 @@ use MittagQI\Translate5\Task\Export\Package\Source\Collection;
 use MittagQI\Translate5\Task\Export\Package\Source\Memory;
 use MittagQI\Translate5\Task\Export\Package\Source\Reference;
 use MittagQI\Translate5\Task\Export\Package\Source\Task;
+use ZfExtended_ErrorCodeException;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 use ZfExtended_Utils;
@@ -101,7 +102,6 @@ class ExportSource
     }
 
     public function export(ZfExtended_Models_Worker $workerModel){
-
         // validate export sources
         foreach ($this->getExportSources() as $resource){
             /** @var Base $r */

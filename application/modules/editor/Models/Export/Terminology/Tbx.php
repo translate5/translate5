@@ -27,6 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * FIXME: 1. code cleanup
+ *        2. extract the file generation stream as separate classes. One for download, one for raw/file based export
+ *
  * exports term data stored in translate5 to valid TBX files
  */
 class editor_Models_Export_Terminology_Tbx {

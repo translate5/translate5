@@ -137,6 +137,7 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
     onExportTranslatorPackageClick: function (){
         var me = this,
             task = me.getView().task;
+        task.set('state','PackageExport');
         window.open(Editor.data.restpath + Ext.String.format('task/export/id/{0}?format=package', task.get('id')), '_blank');
     },
 

@@ -134,8 +134,12 @@ class Worker extends editor_Models_Export_Worker {
         }catch (Throwable $throwable){
             $logger = Zend_Registry::get('logger');
             /* @var ZfExtended_Logger $logger */
-            $logger->exception($throwable);
-            return false;
+            $logger->exception($throwable,[
+                'extra' => [
+                    'task' => $this->task
+                ]
+            ]);
+            throw $throwable;
         }
         return true;
     }

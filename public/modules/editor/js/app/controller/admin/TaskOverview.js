@@ -961,6 +961,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 
     /**
      * Clones the task
+     * TODO: this should be fixed with the export issue. One export url generator for all exports (as idea for implementation)
      * @param {Editor.model.admin.Task} task
      */
     editorPackageExport: function (task, event) {

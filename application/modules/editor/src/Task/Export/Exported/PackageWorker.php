@@ -32,6 +32,8 @@ use editor_Models_Export_Exported_ZipDefaultWorker;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Export\Package\ExportSource;
 use SplFileInfo;
+use ZfExtended_Factory;
+use ZfExtended_Models_Worker;
 use ZfExtended_Utils;
 
 /**
@@ -39,7 +41,7 @@ use ZfExtended_Utils;
 class PackageWorker extends editor_Models_Export_Exported_ZipDefaultWorker {
 
     /**
-     * Create export zip file from the generate package directory package directory
+     * Create export zip file from the generate package directory
      * @param editor_Models_Task $task
      * @throws editor_Models_Export_Exception
      */

@@ -82,14 +82,14 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
         $this->uploadFiles = $this->getValidFile();
 
-        if( !empty($this->uploadErrors)){
+        if(!empty($this->uploadErrors)){
             throw new Exception('E1427',[
                 'errors' => $this->uploadErrors,
                 'task' => $task
             ]);
         }
 
-        if( empty($this->uploadFiles)){
+        if(empty($this->uploadFiles)){
             throw new Exception('E1429',[
                 'task' => $task
             ]);
@@ -248,7 +248,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
         $newFile = $this->importFolder.DIRECTORY_SEPARATOR.$workfilesDir.DIRECTORY_SEPARATOR.$path;
 
-        if( !is_file($newFile)){
+        if(!is_file($newFile)){
             // if the file does not exist withing workfiles directory, try to find it from the configured file name
             $config = Zend_Registry::get('config');
             $workfilesDir = $config->runtimeOptions->import->proofReadDirectory;
@@ -272,7 +272,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
             $target = $this->getArchiveUniqueName();
 
-            if( !copy($zipPath, $target)) {
+            if(!copy($zipPath, $target)) {
                 throw new Exception('E1430', [
                     'task' => $this->task,
                     'file' => $zipPath,
@@ -304,7 +304,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
         $doubleTempFolder = $this->importFolder.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
 
         // check if there is _tempFolder after the zip archive is extracted
-        if( is_dir($doubleTempFolder)){
+        if(is_dir($doubleTempFolder)){
             $fixedPath = $this->taskPath.DIRECTORY_SEPARATOR.'_fixedTempImport';
             // move the needed content into temporary directory
             ZfExtended_Utils::recursiveCopy($doubleTempFolder,$fixedPath);
