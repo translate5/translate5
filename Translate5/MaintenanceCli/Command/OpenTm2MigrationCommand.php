@@ -384,5 +384,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $progressBar->finish();
 
         $this->io->warning('Import not finished after ' . $maxWaitTime . ' seconds');
+
+        throw new RuntimeException('Import not finished after ' . $maxWaitTime . ' seconds');
     }
 }
