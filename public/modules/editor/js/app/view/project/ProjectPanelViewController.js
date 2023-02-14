@@ -129,20 +129,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     onProjectFocusRoute:function(id){
         var me=this;
-
-        // If we reach this line through handleProjectAfterImport() call
-        if (me.isAfterImport) {
-
-            // We should not call selectProjectRecord() method, as otherwise
-            // there will be an attempt to focus the project in the project grid twice
-            // because the 2nd of that 'twice' will be triggered by reloadProjects() call
-            // which is after handleProjectAfterImport() call, so here we just remove the isAfterImport
-            delete me.isAfterImport;
-
-        // Else do as usual
-        } else {
-            me.selectProjectRecord(id);
-        }
+        me.selectProjectRecord(id);
     },
 
     /***
@@ -150,7 +137,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     onProjectTaskFocusRoute:function(id,taskId){
         var me=this;
-
         //focus the project record
         me.selectProjectRecord(id,taskId);
     },
