@@ -412,8 +412,6 @@ Ext.application({
         tabPanel = me.viewport.down('#adminMainSection');
 
         // on intial load we have to trigger the opening of the desired tab manually:
-        // Initial load 1
-        console.log('openAdministration', me.unmatchedRoute, '-', tabPanel.getActiveTabDefaultRoute());
         me.redirectTo(me.unmatchedRoute ? me.unmatchedRoute : tabPanel.getActiveTabDefaultRoute(), true);
         me.unmatchedRoute = false; //we disable unmatchedRoute handling after first usage
 

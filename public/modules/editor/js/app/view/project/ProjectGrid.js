@@ -239,7 +239,6 @@ Ext.define('Editor.view.project.ProjectGrid', {
         }
         var me = this;
         me.ensureVisible(rowindex, config);
-        console.log('scrollTo', me.getStore().isLoading(), me.getStore().isLoaded(), me.getView().refreshing);
     },
 
     initComponent:function(){
