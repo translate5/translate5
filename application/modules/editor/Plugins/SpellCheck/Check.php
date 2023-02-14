@@ -141,7 +141,7 @@ class editor_Plugins_SpellCheck_Check {
      *
      * @param editor_Models_Segment $segment
      * @param $targetField
-     * @param editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter $connector
+     * @param editor_Plugins_SpellCheck_LanguageTool_Adapter $connector
      * @param $spellCheckLang
      * @throws Zend_Exception
      * @throws DownException
@@ -150,7 +150,7 @@ class editor_Plugins_SpellCheck_Check {
      * @throws TimeOutException
      */
     public function __construct(editor_Models_Segment $segment, $targetField,
-                                editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter $connector, $spellCheckLang) {
+                                editor_Plugins_SpellCheck_LanguageTool_Adapter $connector, $spellCheckLang) {
 
         // Get target text, strip tags, replace htmlentities
         $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();

@@ -37,6 +37,19 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
      */
     protected $importObject;
 
+    /**
+     * List of datatypes for which target-attribute on tbx-node is supported.
+     * Basically this means that multiple occurrences of such datatypes are allowed on their level
+     *
+     * @var array
+     */
+    public static $targetSupported = [
+        'xGraphic' => true,
+        'externalCrossReference' => true,
+        'crossReference' => true,
+        'figure' => true,
+    ];
+
     /***
      * Internal cache of the toBeProcessed attributes used for checking duplicates
      * @var array
@@ -86,6 +99,24 @@ class editor_Models_Terminology_BulkOperation_Attribute extends editor_Models_Te
      */
     private function checkForDuplicates(editor_Models_Terminology_TbxObjects_Abstract $importObject): bool
     {
+        // If type is not empty
+        if ($type = $importObject->type ?? '') {
+
+            // If target is not empty as well
+            if ($importObject->target ?? '') {
+
+                // If target is NOT supported for that type
+                if (!isset(static::$targetSupported[$type])) {
+
+                    // Backup target
+                    $importObject->wasTarget = $importObject->target;
+
+                    // Set target to be empty
+                    $importObject->target = '';
+                }
+            }
+        }
+
         if( !isset($this->duplicateCheck[$importObject->getCollectionKey()])){
             $this->duplicateCheck[$importObject->getCollectionKey()] = true;
             return false;

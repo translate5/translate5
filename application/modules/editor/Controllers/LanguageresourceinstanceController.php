@@ -716,7 +716,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
 
             if( (bool)$this->getParam('forced',false) === true){
-                $this->checkOrCleanAssociation(true);
+                $this->checkOrCleanAssociation(true, $this->getDataField('customerIds') ?? []);
             }
 
             // especially tests are not respecting the array format ...
@@ -1209,6 +1209,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->db->getAdapter()->beginTransaction();
         try {
             $entity = clone $this->entity;
+
+            $clean = (bool)$this->getParam('forced',false);
+
+            $this->checkOrCleanAssociation($clean,$this->entity->getCustomers() ?? []);
+
             //delete the entity in the DB
             $this->entity->delete();
         }
@@ -1489,7 +1494,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return;
         }
         // check for association to be cleaned only when it is put and the forced flag is not set
-        $this->checkOrCleanAssociation(false);
+        $this->checkOrCleanAssociation(false,$this->getDataField('customerIds') ?? []);
     }
 
     /**
@@ -1499,9 +1504,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @throws Zend_Db_Table_Exception
      * @throws ZfExtended_ErrorCodeException
      */
-    private function checkOrCleanAssociation(bool $clean): void
+    private function checkOrCleanAssociation(bool $clean, array $customerIds): void
     {
-        $customerIds = $this->getDataField('customerIds') ?? [];
         $assocClean = ZfExtended_Factory::get(CleanupAssociation::class, [
             $customerIds,
             $this->entity->getId()

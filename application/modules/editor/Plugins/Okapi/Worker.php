@@ -183,7 +183,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
 
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
-        $plugin = $pm->get($pm->classToName(get_class($this)));
+        $plugin = $pm->get($pm::getPluginNameByClass(get_class($this)));
         
         $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector',[
             $this->task->getConfig()

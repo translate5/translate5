@@ -1,7 +1,7 @@
 [
     {
-        "id": "97974",
-        "segmentId": "1140964",
+        "id": "265",
+        "segmentId": "5",
         "field": "target",
         "type": "mqm",
         "category": "mqm_3",
@@ -11,13 +11,16 @@
         "text": "Mistranslation",
         "filterable": true,
         "falsifiable": true,
+        "content": "betretenen",
+        "similarQty": 0,
+        "falsePositiveChanged": 0,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"
     },
     {
-        "id": "97973",
-        "segmentId": "1140964",
+        "id": "264",
+        "segmentId": "5",
         "field": "target",
         "type": "mqm",
         "category": "mqm_2",
@@ -27,6 +30,9 @@
         "text": "Terminology",
         "filterable": true,
         "falsifiable": true,
+        "content": "gelagerten",
+        "similarQty": 0,
+        "falsePositiveChanged": 0,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"

@@ -1,8 +1,8 @@
 {
     "success": 1,
     "row": {
-        "id": "98458",
-        "segmentId": "1140964",
+        "id": "749",
+        "segmentId": "5",
         "field": "",
         "type": "qm",
         "category": "qm_1",
@@ -12,6 +12,9 @@
         "text": "Demo QM error 1",
         "filterable": true,
         "falsifiable": true,
+        "content": false,
+        "similarQty": 0,
+        "falsePositiveChanged": 0,
         "hasTag": false,
         "tagName": "",
         "cssClass": ""

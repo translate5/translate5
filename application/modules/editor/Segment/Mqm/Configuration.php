@@ -89,7 +89,7 @@ final class editor_Segment_Mqm_Configuration {
      */
     public function findMqmSeverity(array $cssClasses, string $default=null) : ?string {
         foreach($this->mqmSeverities as $severity){
-            if(in_array($severity, $this->mqmSeverities)){
+            if(in_array($severity, $cssClasses)){
                 return $severity;
             }
         }

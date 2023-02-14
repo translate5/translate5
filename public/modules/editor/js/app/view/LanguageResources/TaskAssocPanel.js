@@ -87,7 +87,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                             {
                                 formatValue: function(values) {
                                     var ret=values.name;
-                                    if(values.groupField=='taskGuid'){
+                                    if(values.groupField === 'taskGuid'){
                                         //when taskGuid is active as grouping, render the task name as group value
                                         var data=values.rows && values.rows[0];
                                         return data ? data.get('taskName') : ret;

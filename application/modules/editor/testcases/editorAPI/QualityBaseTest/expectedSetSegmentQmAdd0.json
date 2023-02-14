@@ -1,8 +1,8 @@
 {
     "success": 1,
     "row": {
-        "id": "98457",
-        "segmentId": "1140960",
+        "id": "748",
+        "segmentId": "1",
         "field": "",
         "type": "qm",
         "category": "qm_4",
@@ -12,6 +12,9 @@
         "text": "Fluency issue",
         "filterable": true,
         "falsifiable": true,
+        "content": false,
+        "similarQty": 0,
+        "falsePositiveChanged": 0,
         "hasTag": false,
         "tagName": "",
         "cssClass": ""

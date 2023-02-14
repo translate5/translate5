@@ -39,7 +39,15 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     
     protected static string $description = 'Provides the MessageBus (WebSocket) functionality for multi-user usage and other functions improving the user experience.';
     protected static bool $activateForTests = true;
-    
+
+    /**
+     * The services we use
+     * @var string[]
+     */
+    protected static array $services = [
+        'frontendmessagebus' => MittagQI\Translate5\Plugins\FrontEndMessageBus\Service::class
+    ];
+
     /**
      * @var editor_Plugins_FrontEndMessageBus_Bus
      */

@@ -1,7 +1,7 @@
 [
     {
-        "id": "97669",
-        "segmentId": "1140969",
+        "id": "15",
+        "segmentId": "10",
         "field": "target",
         "type": "spellcheck",
         "category": "misspelling",
@@ -11,13 +11,16 @@
         "text": "Spelling",
         "filterable": true,
         "falsifiable": true,
+        "content": "Mk-rt",
+        "similarQty": 0,
+        "falsePositiveChanged": 0,
         "hasTag": true,
         "tagName": "span",
         "cssClass": "any"
     },
     {
-        "id": "97670",
-        "segmentId": "1140969",
+        "id": "16",
+        "segmentId": "10",
         "field": "target",
         "type": "spellcheck",
         "category": "misspelling",
@@ -27,13 +30,16 @@
         "text": "Spelling",
         "filterable": true,
         "falsifiable": true,
+        "content": "Servo-Fahrtensysteme",
+        "similarQty": 0,
+        "falsePositiveChanged": 0,
         "hasTag": true,
         "tagName": "span",
         "cssClass": "any"
     },
     {
-        "id": "97983",
-        "segmentId": "1140969",
+        "id": "274",
+        "segmentId": "10",
         "field": "target",
         "type": "mqm",
         "category": "mqm_2",
@@ -43,6 +49,9 @@
         "text": "Terminology",
         "filterable": true,
         "falsifiable": true,
+        "content": "Fahrtensysteme",
+        "similarQty": 0,
+        "falsePositiveChanged": 0,
         "hasTag": true,
         "tagName": "img",
         "cssClass": "qmflag"
