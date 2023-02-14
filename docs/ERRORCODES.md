@@ -385,7 +385,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1361"></a>E1361  | Terminology | TBX Import: Unable to import terms due invalid Rfc5646 language code "{code}" | The listed language code is invalid / not configured in translate5, the corresponding terms could not be imported.
 | <a id="E1446"></a>E1446  | Terminology | TBX Import: Attribute has known type, but has elementName unexpected for that type so changed to expected one | See the extra data to check values of type, wasElementName (e.g. unexpected for that type) and elementName (expected one) 
 | <a id="E1463"></a>E1463  | Terminology | TBX Import: Attribute has known type, but is at level unexpected for that type so that level is added to the list of expected | See the extra data to check values of type, unexpectedLevel (e.g. unexpected for that type), wasExpectedLevels and nowExpectedLevels
-| <a id="E1447"></a>E1447  | Terminology | TBX Import: Attribute target was emptied as unsupported for that attribute type | See the extra data to check values of type and wasTarget
+| <a id="E1472"></a>E1472  | Terminology | TBX Import: Attribute target was emptied as unsupported for that attribute type | See the extra data to check values of type and wasTarget
 | <a id="E1364"></a>E1364  | Terminology | TermTagger overall run done - {segmentCounts} | Reports that the whole task was tagged with the termtagger and shows the segment status counts.
 | <a id="E1451"></a>E1451  | Terminology | Recoverable error on termtagging: {message} | See system log for details.
 
@@ -635,6 +635,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1458"></a>E1458 | Plug-In TermImport | Across TBX Export: Error on communication with Across              | Check with additional data what the problem is. |
 | <a id="E1459"></a>E1459 | Plug-In TermImport | Across TBX Export: Can not create temporary filestream             | Check with additional data what the problem is. |
 | <a id="E1460"></a>E1460 | Plug-In TermImport | Across TBX Export: Can not read from file with fileguid {fileGuid} | Check with additional data what the problem is. |
+| <a id="E1472"></a>E1472  | TODO    | SET ME BY USING ME! {TEST} | TODO DESCRIPTION / SOLUTION
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number

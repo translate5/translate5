@@ -749,7 +749,7 @@ $memLog('Loaded terms:        ');
             $msg = 'TBX Import: Attribute target was emptied as unsupported for that attribute type';
 
             // Do log
-            $this->log($msg, 'E1447', [
+            $this->log($msg, 'E1472', [
                 'type' => $attribute->type,
                 'wasTarget' => $attribute->wasTarget,
             ], 'warn');
