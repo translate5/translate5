@@ -44,25 +44,27 @@ class ReimportFile
 
     private Reimport $segmentProcessor;
 
-    public function __construct(private editor_Models_Task $task, private ZfExtended_Models_User $user){
+    public function __construct(private editor_Models_Task $task, private ZfExtended_Models_User $user)
+    {
 
     }
 
-    public function import(int $fileId, string $filePath,string $segmentTimestamp){
+    public function import(int $fileId, string $filePath, string $segmentTimestamp)
+    {
         $segmentFieldManager = ZfExtended_Factory::get(editor_Models_SegmentFieldManager::class);
         $segmentFieldManager->initFields($this->task->getTaskGuid());
 
-        $parserHelper = ZfExtended_Factory::get(Factory::class,[
+        $parserHelper = ZfExtended_Factory::get(Factory::class, [
             $this->task,
             $segmentFieldManager
         ]);
 
         // get the parser dynamically even of only xliff is supported
-        $parser = $parserHelper->getFileParser($fileId,$filePath);
+        $parser = $parserHelper->getFileParser($fileId, $filePath);
         /* @var editor_Models_Import_FileParser $parser */
 
-        if( is_null($parser)){
-            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1433',[
+        if (is_null($parser)) {
+            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1433', [
                 'file' => $fileId,
                 'task' => $this->task
             ]);
@@ -70,7 +72,7 @@ class ReimportFile
 
         $parser->setIsReimport();
 
-        $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class,[ $this->task , $segmentFieldManager,$this->user]);
+        $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class, [$this->task, $segmentFieldManager, $this->user]);
         $this->segmentProcessor->setSegmentFile($fileId, $parser->getFileName());
         $this->segmentProcessor->setSaveTimestamp($segmentTimestamp);
 

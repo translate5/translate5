@@ -63,7 +63,6 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
     protected $events = false;
 
 
-
     public function __construct()
     {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', [self::class]);
@@ -82,15 +81,15 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
         $this->uploadFiles = $this->getValidFile();
 
-        if(!empty($this->uploadErrors)){
-            throw new Exception('E1427',[
+        if (!empty($this->uploadErrors)) {
+            throw new Exception('E1427', [
                 'errors' => $this->uploadErrors,
                 'task' => $task
             ]);
         }
 
-        if(empty($this->uploadFiles)){
-            throw new Exception('E1429',[
+        if (empty($this->uploadFiles)) {
+            throw new Exception('E1429', [
                 'task' => $task
             ]);
         }
@@ -113,7 +112,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
         // replace the uploaded file in the matched file on the disk. The file on the disk is located in the
         // tempImport directory (extracted from the zip ImportArchive)
-        $this->replaceUploadFile($this->uploadFiles['tmp_name'],$this->fileId);
+        $this->replaceUploadFile($this->uploadFiles['tmp_name'], $this->fileId);
     }
 
     /***
@@ -127,7 +126,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
         try {
             // make the _tempFolder
             $this->checkAndMakeTempImportFolder();
-        }catch (editor_Models_Import_DataProvider_Exception $e){
+        } catch (editor_Models_Import_DataProvider_Exception $e) {
             // if the tmp folder exist, don't break the reimport process, delete the folder and content, and create new
             ZfExtended_Utils::recursiveDelete($this->importFolder);
             // create new importDir
@@ -135,25 +134,26 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
         }
 
         // extract the zip package
-        $this->unzipArchive($this->getZipArchivePath(null),$this->importFolder);
+        $this->unzipArchive($this->getZipArchivePath(null), $this->importFolder);
 
         // fix the bug where the import archive contains _tempImport as root folder
         $this->fixArchiveTempFolder();
     }
+
     /***
      * Replace the original file in the tempImport directory with the matching uploaded file
      * @return void
      */
-    protected function replaceUploadFile(string $newFile,int $fileId): void
+    protected function replaceUploadFile(string $newFile, int $fileId): void
     {
 
         // move the new file to the location in _tempFolder
         // the new file will have the same name as the one which is replaced
-        $replaceFile = $this->getOriginalFilePath($this->task,$fileId);
+        $replaceFile = $this->getOriginalFilePath($this->task, $fileId);
 
-        $this->replaceFile($newFile,$replaceFile);
+        $this->replaceFile($newFile, $replaceFile);
 
-        $this->file  = $replaceFile;
+        $this->file = $replaceFile;
     }
 
     /***
@@ -167,8 +167,8 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
     {
         // move uploaded file into upload target
         if (!move_uploaded_file($newFile, $replaceFile)) {
-            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1427',[
-                'file' => 'Unable to move the uploaded file to:'.$replaceFile
+            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1427', [
+                'file' => 'Unable to move the uploaded file to:' . $replaceFile
             ]);
         }
     }
@@ -194,15 +194,15 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
             // validators are ok ?
             if (!$upload->isValid($file)) {
-                $this->uploadErrors[] = 'The file:' .$info['name']. ' is with invalid file extension';
+                $this->uploadErrors[] = 'The file:' . $info['name'] . ' is with invalid file extension';
                 continue;
             }
 
             // fire an event so external plugins can attach and validate if the current upload file
             // is valid for reimport
             $eventResponse = $this->events->trigger('onValidateFile', $this, ['file' => $info]);
-            if($eventResponse->stopped()){
-                foreach ($eventResponse->last() as $error){
+            if ($eventResponse->stopped()) {
+                foreach ($eventResponse->last() as $error) {
                     $this->uploadErrors[] = $error;
                 }
                 continue;
@@ -242,17 +242,17 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
         $tree->setPathPrefix('');
 
-        $path = $tree->getFileIdPath($task->getTaskGuid(),$fileId);
+        $path = $tree->getFileIdPath($task->getTaskGuid(), $fileId);
 
         $workfilesDir = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
 
-        $newFile = $this->importFolder.DIRECTORY_SEPARATOR.$workfilesDir.DIRECTORY_SEPARATOR.$path;
+        $newFile = $this->importFolder . DIRECTORY_SEPARATOR . $workfilesDir . DIRECTORY_SEPARATOR . $path;
 
-        if(!is_file($newFile)){
+        if (!is_file($newFile)) {
             // if the file does not exist withing workfiles directory, try to find it from the configured file name
             $config = Zend_Registry::get('config');
             $workfilesDir = $config->runtimeOptions->import->proofReadDirectory;
-            $newFile = $this->importFolder.DIRECTORY_SEPARATOR.$workfilesDir.DIRECTORY_SEPARATOR.$path;
+            $newFile = $this->importFolder . DIRECTORY_SEPARATOR . $workfilesDir . DIRECTORY_SEPARATOR . $path;
         }
         return $newFile;
     }
@@ -272,7 +272,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
 
             $target = $this->getArchiveUniqueName();
 
-            if(!copy($zipPath, $target)) {
+            if (!copy($zipPath, $target)) {
                 throw new Exception('E1430', [
                     'task' => $this->task,
                     'file' => $zipPath,
@@ -290,7 +290,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
      */
     private function getArchiveUniqueName(): string
     {
-        return $this->taskPath.DIRECTORY_SEPARATOR.date('Y-m-d__H_i_s').'_'.self::TASK_ARCHIV_ZIP_NAME;
+        return $this->taskPath . DIRECTORY_SEPARATOR . date('Y-m-d__H_i_s') . '_' . self::TASK_ARCHIV_ZIP_NAME;
     }
 
 
@@ -301,17 +301,17 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
      */
     private function fixArchiveTempFolder(): void
     {
-        $doubleTempFolder = $this->importFolder.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
+        $doubleTempFolder = $this->importFolder . DIRECTORY_SEPARATOR . self::TASK_TEMP_IMPORT;
 
         // check if there is _tempFolder after the zip archive is extracted
-        if(is_dir($doubleTempFolder)){
-            $fixedPath = $this->taskPath.DIRECTORY_SEPARATOR.'_fixedTempImport';
+        if (is_dir($doubleTempFolder)) {
+            $fixedPath = $this->taskPath . DIRECTORY_SEPARATOR . '_fixedTempImport';
             // move the needed content into temporary directory
-            ZfExtended_Utils::recursiveCopy($doubleTempFolder,$fixedPath);
+            ZfExtended_Utils::recursiveCopy($doubleTempFolder, $fixedPath);
             // remove the incorrect tempFolder file structure
             $this->removeTempFolder();
             // change the fixed temporary folder name to the real temp name
-            rename($fixedPath,$this->getAbsImportPath());
+            rename($fixedPath, $this->getAbsImportPath());
         }
     }
 

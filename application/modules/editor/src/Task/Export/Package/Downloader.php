@@ -70,7 +70,7 @@ class Downloader
         $worker->queue($workerId);
 
         header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="'.$task->getTasknameForDownload('_exportPackage.zip').'"');
+        header('Content-Disposition: attachment; filename="' . $task->getTasknameForDownload('_exportPackage.zip') . '"');
         readfile($zipFile);
         unlink($zipFile);
     }

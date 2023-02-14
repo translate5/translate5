@@ -39,7 +39,8 @@ use ZfExtended_Logger;
 /**
  *
  */
-class Worker extends editor_Models_Export_Worker {
+class Worker extends editor_Models_Export_Worker
+{
 
     /***
      * @var ExportSource
@@ -56,7 +57,7 @@ class Worker extends editor_Models_Export_Worker {
     {
         $this->task = $task;
 
-        $this->exportSource = ZfExtended_Factory::get(ExportSource::class,[
+        $this->exportSource = ZfExtended_Factory::get(ExportSource::class, [
             $this->task
         ]);
 
@@ -64,13 +65,13 @@ class Worker extends editor_Models_Export_Worker {
 
         try {
             $this->exportSource->validate();
-            $this->events->trigger('initPackageFileStructure',$this,[
+            $this->events->trigger('initPackageFileStructure', $this, [
                 'exportSource' => $this->exportSource,
                 'task' => $this->task
             ]);
-        }catch (ZfExtended_ErrorCodeException $throwable){
-            throw new Exception('E1453',[
-                'task'=> $task
+        } catch (ZfExtended_ErrorCodeException $throwable) {
+            throw new Exception('E1453', [
+                'task' => $task
             ], $throwable);
         }
 
@@ -84,7 +85,7 @@ class Worker extends editor_Models_Export_Worker {
      */
     protected function validateParameters($parameters = array()): bool
     {
-        if ( !parent::validateParameters($parameters)){
+        if (!parent::validateParameters($parameters)) {
             return false;
         }
         return !empty($parameters['userGuid']);
@@ -97,7 +98,8 @@ class Worker extends editor_Models_Export_Worker {
      * @param string $exportFolder
      * @return string the folder which receives the exported data
      */
-    public function initFolderExport(editor_Models_Task $task, bool $diff, string $exportFolder) {
+    public function initFolderExport(editor_Models_Task $task, bool $diff, string $exportFolder)
+    {
         $parameter = [
             'diff' => $diff,
             self::PARAM_EXPORT_FOLDER => $exportFolder,
@@ -117,24 +119,24 @@ class Worker extends editor_Models_Export_Worker {
         // The Dataprovider can itself hook on to several import events
         $parameters = $this->workerModel->getParameters();
 
-        if( empty($this->task)){
+        if (empty($this->task)) {
             $this->task = ZfExtended_Factory::get('editor_Models_Task');
             $this->task->loadByTaskGuid($this->taskGuid);
         }
 
-        if(!$this->validateParameters($parameters)) {
+        if (!$this->validateParameters($parameters)) {
             return false;
         }
 
         try {
-            $this->exportSource = ZfExtended_Factory::get(ExportSource::class,[
+            $this->exportSource = ZfExtended_Factory::get(ExportSource::class, [
                 $this->task
             ]);
             $this->exportSource->export($this->workerModel);
-        }catch (Throwable $throwable){
+        } catch (Throwable $throwable) {
             $logger = Zend_Registry::get('logger');
             /* @var ZfExtended_Logger $logger */
-            $logger->exception($throwable,[
+            $logger->exception($throwable, [
                 'extra' => [
                     'task' => $this->task
                 ]

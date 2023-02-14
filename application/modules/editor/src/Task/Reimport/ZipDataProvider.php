@@ -71,7 +71,7 @@ class ZipDataProvider extends DataProvider
         $this->unzipReimportArchive();
 
         // get the workfiles path in the uploaded reimport package
-        $xlifPath = $this->getZipArchivePath(self::TEMP_REIMPORT_ARCHIVE).DIRECTORY_SEPARATOR.Task::TASK_FOLDER_NAME.DIRECTORY_SEPARATOR;
+        $xlifPath = $this->getZipArchivePath(self::TEMP_REIMPORT_ARCHIVE) . DIRECTORY_SEPARATOR . Task::TASK_FOLDER_NAME . DIRECTORY_SEPARATOR;
 
         $objects = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($xlifPath, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::SELF_FIRST
@@ -79,25 +79,25 @@ class ZipDataProvider extends DataProvider
 
         // load the original file tree and the files path
         $tree = ZfExtended_Factory::get(editor_Models_Foldertree::class);
-        $paths = $tree->getPaths($this->task->getTaskGuid(),editor_Models_Foldertree::TYPE_FILE);
+        $paths = $tree->getPaths($this->task->getTaskGuid(), editor_Models_Foldertree::TYPE_FILE);
 
         $log = Zend_Registry::get('logger');
 
         // for each file in the reimport workfiles directory
-        foreach($objects as $file => $fileInfo) {
-            if($fileInfo->isFile()) {
+        foreach ($objects as $file => $fileInfo) {
+            if ($fileInfo->isFile()) {
 
                 // remove the task path from the fileName, so it is easy to compare
-                $fileName = str_replace($this->getZipArchivePath(self::TEMP_REIMPORT_ARCHIVE).DIRECTORY_SEPARATOR,'',$file);
+                $fileName = str_replace($this->getZipArchivePath(self::TEMP_REIMPORT_ARCHIVE) . DIRECTORY_SEPARATOR, '', $file);
 
                 $matchFound = false;
-                foreach ($paths as $fileId => $originalFile){
-                    if( $fileName === $originalFile){
+                foreach ($paths as $fileId => $originalFile) {
+                    if ($fileName === $originalFile) {
                         $this->matchedFiles[$fileId] = $file;
                         $matchFound = true;
                     }
                 }
-                if( !$matchFound){
+                if (!$matchFound) {
                     $log->warn('E1461', 'Reimport ZipDataProvider: The provided file in the zip package can not be name-matched with any of the task files.', [
                         'task' => $this->task,
                         'fileName' => $fileName
@@ -108,8 +108,8 @@ class ZipDataProvider extends DataProvider
 
         // move the matched files from the reimport folder to the import folder where later will be used by the
         // reimport worker to reimport the files into the task
-        foreach ($this->matchedFiles as $fileId => $fileName){
-            $this->replaceUploadFile($fileName,$fileId);
+        foreach ($this->matchedFiles as $fileId => $fileName) {
+            $this->replaceUploadFile($fileName, $fileId);
         }
     }
 
@@ -122,8 +122,8 @@ class ZipDataProvider extends DataProvider
      */
     protected function replaceFile(string $newFile, string $replaceFile): void
     {
-        if( !copy($newFile,$replaceFile)){
-            throw new Exception('E1462',[
+        if (!copy($newFile, $replaceFile)) {
+            throw new Exception('E1462', [
                 'original' => $replaceFile,
                 'newFile' => $newFile
             ]);
@@ -143,11 +143,11 @@ class ZipDataProvider extends DataProvider
     protected function unzipReimportArchive(): void
     {
         $tempReimportArchive = $this->getZipArchivePath(self::TEMP_REIMPORT_ARCHIVE);
-        if( is_dir($tempReimportArchive)){
+        if (is_dir($tempReimportArchive)) {
             ZfExtended_Utils::recursiveDelete($tempReimportArchive);
         }
         $this->mkdir($tempReimportArchive);
-        $this->unzipArchive($this->uploadFiles['tmp_name'],$tempReimportArchive);
+        $this->unzipArchive($this->uploadFiles['tmp_name'], $tempReimportArchive);
     }
 
 
@@ -164,7 +164,7 @@ class ZipDataProvider extends DataProvider
 
         // Returns all known internal file information
         $file = $upload->getFileInfo()[self::UPLOAD_FILE_FIELD] ?? [];
-        if( empty($file)){
+        if (empty($file)) {
             return [];
         }
 
@@ -175,12 +175,12 @@ class ZipDataProvider extends DataProvider
 
         // validators are ok ?
         if (!$upload->isValid(self::UPLOAD_FILE_FIELD)) {
-            $this->uploadErrors[] = 'The file:' .$file['name']. ' is with invalid file extension';
+            $this->uploadErrors[] = 'The file:' . $file['name'] . ' is with invalid file extension';
             return [];
         }
 
         // are the files valid in the zip xliff folder
-        if($this->validateUploadZipContent($file) === false){
+        if ($this->validateUploadZipContent($file) === false) {
             return [];
         }
         return $file;
@@ -197,7 +197,7 @@ class ZipDataProvider extends DataProvider
     {
 
         $zip = new ZipArchive();
-        if (! $zip->open($zipFileInfo['tmp_name'])) {
+        if (!$zip->open($zipFileInfo['tmp_name'])) {
             // DataProvider Zip: zip file could not be opened
             throw new editor_Models_Import_DataProvider_Exception('E1241', [
                 'task' => $this->task,
@@ -211,12 +211,12 @@ class ZipDataProvider extends DataProvider
         for ($idx = 0; $zipFile = $zip->statIndex($idx); $idx++) {
 
             // get only files and ignore folders
-            if (!is_dir($zipFile['name']) && str_starts_with($zipFile['name'],Task::TASK_FOLDER_NAME) && !str_ends_with($zipFile['name'],DIRECTORY_SEPARATOR)) {
+            if (!is_dir($zipFile['name']) && str_starts_with($zipFile['name'], Task::TASK_FOLDER_NAME) && !str_ends_with($zipFile['name'], DIRECTORY_SEPARATOR)) {
 
                 // get the file extension and check if is it supported by segment processor
                 $extension = strtolower(pathinfo($zipFile['name'], PATHINFO_EXTENSION));
-                if( !in_array($extension, FileHandler::getSupportedFileTypes(), true)){
-                    $this->uploadErrors[] = 'The reimport zip package contains unsupported file for reimport. The file:' .$zipFile['name']. ' is with invalid file extension';
+                if (!in_array($extension, FileHandler::getSupportedFileTypes(), true)) {
+                    $this->uploadErrors[] = 'The reimport zip package contains unsupported file for reimport. The file:' . $zipFile['name'] . ' is with invalid file extension';
                     continue;
                 }
                 // fire an event so external plugins can attach and validate if the current upload file is valid for reimport
@@ -225,9 +225,9 @@ class ZipDataProvider extends DataProvider
                     'data' => $zip->getFromIndex($idx)
                 ]]);
 
-                if($eventResponse->stopped()){
+                if ($eventResponse->stopped()) {
                     // external plugin reported that the current file is not supported or has errors.
-                    foreach ($eventResponse->last() as $error){
+                    foreach ($eventResponse->last() as $error) {
                         $this->uploadErrors[] = $error;
                         continue;
                     }
@@ -248,7 +248,7 @@ class ZipDataProvider extends DataProvider
     {
         // first delete the temporary archive from the reimport, and after this delete the regular temporary import folder
         $zipArchive = $this->getZipArchivePath(self::TEMP_REIMPORT_ARCHIVE);
-        if(is_dir($zipArchive)) {
+        if (is_dir($zipArchive)) {
             ZfExtended_Utils::recursiveDelete($zipArchive);
         }
         // delete the regular import folder

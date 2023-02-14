@@ -45,11 +45,11 @@ class Xliff extends ContentDefault
         $this->segmentTagger->toXliff($this->segment->getSource(), replaceMap: $tempMap);
         $newTarget = $this->segmentTagger->reapply2dMap($this->normalizeContent($target), $tempMap);
 
-        if( $this->isTrackChangesActive()){
+        if ($this->isTrackChangesActive()) {
             $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
         }
 
-        $this->update($newTarget,$this->sfm->getFirstTargetName(),$this->sfm->getFirstTargetNameEdit());
+        $this->update($newTarget, $this->sfm->getFirstTargetName(), $this->sfm->getFirstTargetNameEdit());
     }
 
     /**
@@ -59,7 +59,7 @@ class Xliff extends ContentDefault
      */
     protected function normalizeContent(string $content, array &$tagMap = []): string
     {
-        return $this->segmentTagger->toXliff($content,replaceMap: $tagMap);
+        return $this->segmentTagger->toXliff($content, replaceMap: $tagMap);
     }
 
 }

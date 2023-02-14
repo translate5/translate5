@@ -41,7 +41,8 @@ use ZfExtended_Models_Entity_NotFoundException;
  * This trait defines a controller to be in task context (so a task is opened) and provides access to it
  * To be used for controllers only!
  */
-trait TaskContextTrait {
+trait TaskContextTrait
+{
 
     private ?editor_Models_Task $_currentTask = null;
     private ?editor_Models_TaskUserAssoc $_currentJob = null;
@@ -50,8 +51,9 @@ trait TaskContextTrait {
      * This trait is only usable in controllers and in plugins
      * @throws Current\Exception
      */
-    protected function _restrictUsage() {
-        if(!is_a($this, '\Zend_Controller_Action')) {
+    protected function _restrictUsage()
+    {
+        if (!is_a($this, '\Zend_Controller_Action')) {
             throw new Current\Exception('E1234');
         }
     }
@@ -64,8 +66,9 @@ trait TaskContextTrait {
      * @throws NoAccessException
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function initCurrentTaskByGuid(?string $taskGuid, bool $loadJob = true) {
-        if(empty($taskGuid)) {
+    protected function initCurrentTaskByGuid(?string $taskGuid, bool $loadJob = true)
+    {
+        if (empty($taskGuid)) {
             $this->initCurrentTask();
             return;
         }
@@ -73,7 +76,7 @@ trait TaskContextTrait {
         /** @var editor_Models_Task $task */
         $this->_currentTask = ZfExtended_Factory::get('editor_Models_Task');
         $this->_currentTask->loadByTaskGuid($taskGuid);
-        if($loadJob) {
+        if ($loadJob) {
             $this->_loadCurrentJob();
         }
     }
@@ -99,7 +102,7 @@ trait TaskContextTrait {
         $this->_currentTask = ZfExtended_Factory::get('editor_Models_Task');
 
         $taskId = editor_Controllers_Plugins_LoadCurrentTask::getTaskId();
-        if(is_null($taskId)) {
+        if (is_null($taskId)) {
             // Access to CurrentTask was requested but no task ID was given in the URL.
             // if we get here this is a programming error, either the currentTask was used outside a current task context,
             // or the taskId was not provided in the URL
@@ -109,7 +112,7 @@ trait TaskContextTrait {
         //NotFound Exception of the loader should bubble up, so no catch for that here
         $this->_currentTask->load($taskId);
 
-        if($loadJob){
+        if ($loadJob) {
             $this->_loadCurrentJob();
         }
     }
@@ -118,7 +121,8 @@ trait TaskContextTrait {
      * Loads the current job of the current user to the current task
      * @throws NoAccessException
      */
-    protected function _loadCurrentJob() {
+    protected function _loadCurrentJob()
+    {
         //load job, if there is no job in usage, throw 403
         $userGuid = editor_User::instance()->getGuid();
 
@@ -126,7 +130,7 @@ trait TaskContextTrait {
 
         //TODO if it turns out, that the checking of the jobs to find out if the user is allowed to access the taskid is to error prone,
         // then change to a taskid list of opened tasks in the session
-        if(is_null($this->_currentJob)) {
+        if (is_null($this->_currentJob)) {
             throw new NoAccessException(); //ensures that no segments for example can be loaded if task was not opened properly
         }
     }
@@ -135,12 +139,14 @@ trait TaskContextTrait {
      * Returns the currently USED job, null if none used (though jobs may exist for that user and task!)
      * @return editor_Models_TaskUserAssoc|null
      */
-    public function getCurrentJob(): ?editor_Models_TaskUserAssoc {
+    public function getCurrentJob(): ?editor_Models_TaskUserAssoc
+    {
         return $this->_currentJob;
     }
 
-    public function getCurrentTask(): editor_Models_Task {
-        if(is_null($this->_currentTask)) {
+    public function getCurrentTask(): editor_Models_Task
+    {
+        if (is_null($this->_currentTask)) {
             //Access to CurrentTask was requested but it was NOT initialized yet.
             throw new Current\Exception('E1382');
         }
@@ -152,7 +158,8 @@ trait TaskContextTrait {
      * @param string $taskGuid
      * @throws NoAccessException
      */
-    public function validateTaskAccess(string $taskGuid){
+    public function validateTaskAccess(string $taskGuid)
+    {
         if ($this->_currentTask->getTaskGuid() !== $taskGuid) {
             //if the given to be validated taskGuid is not valid (so the current one), we prevent access
             throw new NoAccessException();

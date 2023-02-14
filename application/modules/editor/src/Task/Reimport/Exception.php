@@ -35,7 +35,8 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Reimport;
 
-class Exception extends \ZfExtended_ErrorCodeException {
+class Exception extends \ZfExtended_ErrorCodeException
+{
 
     /**
      * @var string

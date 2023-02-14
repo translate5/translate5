@@ -83,7 +83,7 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      * @param editor_Models_Task $task
      * @param editor_Models_SegmentFieldManager $sfm
      */
-    public function __construct(editor_Models_Task $task,private editor_Models_SegmentFieldManager $sfm, private ZfExtended_Models_User $user)
+    public function __construct(editor_Models_Task $task, private editor_Models_SegmentFieldManager $sfm, private ZfExtended_Models_User $user)
     {
         parent::__construct($task);
         $this->logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
@@ -107,9 +107,9 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         $mid = $parser->getMid();
         try {
             $segment->loadByFileidMid($this->fileId, $mid);
-        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             /** @var ReimportSegmentErrors $reimportError */
-            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class,[
+            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class, [
                 'E1434',
                 'Reimport Segment processor: No matching segment was found for the given mid.',
                 [
@@ -121,9 +121,9 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         }
 
         try {
-            $content->saveSegment($segment,$this->saveTimestamp);
+            $content->saveSegment($segment, $this->saveTimestamp);
 
-            if( $content->isUpdateSegment()){
+            if ($content->isUpdateSegment()) {
                 $this->updatedSegments[] = $segment->getSegmentNrInTask();
             }
 
@@ -131,7 +131,7 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         } catch (Throwable $e) {
             // collect the errors in case the segment can not be saved
             /** @var ReimportSegmentErrors $reimportError */
-            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class,[
+            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class, [
                 'E1435',
                 'Reimport Segment processor: Unable to save the segment',
                 [
@@ -153,18 +153,18 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     {
         $path_parts = pathinfo($this->fileName);
         $ext = $path_parts['extension'];
-        $className =  FileHandler::getClass($ext);
+        $className = FileHandler::getClass($ext);
         $args = [
             $this->task,
             $parser->getFieldContents(),
             $this->user
         ];
 
-        if(class_exists($className)){
-            return ZfExtended_Factory::get($className,$args);
+        if (class_exists($className)) {
+            return ZfExtended_Factory::get($className, $args);
         }
 
-        throw new Exception('E1441',[
+        throw new Exception('E1441', [
             'ext' => $ext
         ]);
     }
@@ -199,7 +199,8 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      * @return void
      * @throws JsonException
      */
-    public function log(){
+    public function log()
+    {
         $this->logErrors();
         $this->logUpdated();
     }
@@ -209,13 +210,13 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     private function logErrors(): void
     {
-        foreach ($this->segmentErrors as $code => $codeErrors){
+        foreach ($this->segmentErrors as $code => $codeErrors) {
             $extra = [];
             foreach ($codeErrors as $error) {
                 /* @var ReimportSegmentErrors $error */
                 $extra[] = $error->getData();
             }
-            $this->logger->warn($code,$codeErrors[0]->getMessage(),[
+            $this->logger->warn($code, $codeErrors[0]->getMessage(), [
                 'task' => $this->task,
                 'fileId' => $this->fileId,
                 'extra' => json_encode($extra, JSON_THROW_ON_ERROR)
@@ -229,11 +230,11 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     private function logUpdated(): void
     {
-        $this->logger->info('E1440','Reimport for the file "{filename}" is finished. Total updated segments: {updateCount}.',[
+        $this->logger->info('E1440', 'Reimport for the file "{filename}" is finished. Total updated segments: {updateCount}.', [
             'task' => $this->task,
             'fileId' => $this->fileId,
             'updateCount' => count($this->updatedSegments),
-            'segments' => implode(',',$this->updatedSegments),
+            'segments' => implode(',', $this->updatedSegments),
             'filename' => $this->fileName
         ]);
     }

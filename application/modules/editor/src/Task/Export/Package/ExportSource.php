@@ -65,16 +65,16 @@ class ExportSource
     public function initFileStructure(): string
     {
         $root = $this->getRootFolder();
-        if( is_dir($root)){
+        if (is_dir($root)) {
             ZfExtended_Utils::recursiveDelete($root);
         }
 
         $this->mkdir($root);
 
         // create folder path for each exportable source
-        foreach ($this->exportSources as $resource){
+        foreach ($this->exportSources as $resource) {
             /** @var Base $r */
-            $r = ZfExtended_Factory::get($resource,[
+            $r = ZfExtended_Factory::get($resource, [
                 $this->task,
                 $this
             ]);
@@ -91,9 +91,9 @@ class ExportSource
     public function validate(): void
     {
         // validate export sources
-        foreach ($this->getExportSources() as $resource){
+        foreach ($this->getExportSources() as $resource) {
             /** @var Base $r */
-            $r = ZfExtended_Factory::get($resource,[
+            $r = ZfExtended_Factory::get($resource, [
                 $this->task,
                 $this
             ]);
@@ -101,11 +101,12 @@ class ExportSource
         }
     }
 
-    public function export(ZfExtended_Models_Worker $workerModel){
+    public function export(ZfExtended_Models_Worker $workerModel)
+    {
         // validate export sources
-        foreach ($this->getExportSources() as $resource){
+        foreach ($this->getExportSources() as $resource) {
             /** @var Base $r */
-            $r = ZfExtended_Factory::get($resource,[
+            $r = ZfExtended_Factory::get($resource, [
                 $this->task,
                 $this
             ]);
@@ -119,11 +120,11 @@ class ExportSource
      */
     private function mkdir($path): void
     {
-        if( is_dir($path)){
+        if (is_dir($path)) {
             return;
         }
         if (!mkdir($path) && !is_dir($path)) {
-            throw new Exception('E1454',[
+            throw new Exception('E1454', [
                 'path' => $path
             ]);
         }
@@ -134,7 +135,7 @@ class ExportSource
      */
     public function getRootFolder(): string
     {
-        return $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.self::PACKAGE_FOLDER_NAME;
+        return $this->task->getAbsoluteTaskDataPath() . DIRECTORY_SEPARATOR . self::PACKAGE_FOLDER_NAME;
     }
 
     /**
