@@ -443,20 +443,21 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->lastStatusInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
         }
-        
+
+        //lets check the internal state before calling API for status as import worker may be running
+        $status = $this->languageResource->getSpecificData('status') ?? '';
+        if($status === self::STATUS_IMPORT) {
+            $this->lastStatusInfo = 'TM wird noch importiert und ist daher auch noch nicht nutzbar.';
+            // FIXME thats not 100% correct here, since when it was crashed while the import it may stay on status import
+            // need to add status reset if it hanged up
+            return self::STATUS_IMPORT;
+        }
+
         if($this->api->status()) {
             return $this->processImportStatus();
         }
         //down here the result contained an error, the json was invalid or HTTP Status was not 20X
-        
-        //lets check the internal state before we just print the 404 default:
-        $status = $this->languageResource->getSpecificData('status') ?? '';
-        if($status == self::STATUS_IMPORT) {
-            $this->lastStatusInfo = 'TM wird noch importiert und ist daher auch noch nicht nutzbar.';
-            //FIXME thats not 100% correct here, since when it was crashed while the import it may stay on status import
-            return self::STATUS_IMPORT;
-        }
-        
+
         //Warning: this evaluates to "available" in the GUI, see the following explanation:
         //a 404 response from the status call means:
         // - OpenTM2 is online
@@ -486,7 +487,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @return string
      */
     protected function processImportStatus() {
-        $status = $this->api->getResult()->tmxImportStatus;
+        $status = $this->api->getResult() ? $this->api->getResult()->tmxImportStatus : '';
         switch($status) {
             case 'available':
                 if (isset($this->api->getResult()->importTime) && $this->api->getResult()->importTime === 'not finished') {

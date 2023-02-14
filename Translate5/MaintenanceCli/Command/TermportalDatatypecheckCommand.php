@@ -88,6 +88,61 @@ class TermportalDatatypecheckCommand extends Translate5AbstractCommand
             }
         }
 
+        // Get duplicated attrs separately for each level
+        $duplicate = $checker->checkAttributeDuplicates();
+
+        // Foreach level
+        foreach ($duplicate as $level => $info) {
+
+            if (empty($info)) {
+                $this->io->success("There are no duplicated attributes found at $level-level");
+            } else {
+                $this->io->section("The following duplicated attributes are found at $level-level");
+                $headers = array_keys(reset($info));
+                $this->io->table($headers, $info);
+            }
+        }
+
+        // Show first 10 term-level attributes having no termTbxId
+        if (empty($noTermTbxId = $checker->noTermTbxId())) {
+            $this->io->success("There are no term-level attributes having no termTbxId");
+        } else {
+            $this->io->section("First 10 of term-level attributes have no termTbxId");
+            $this->io->table(array_keys(reset($noTermTbxId)), $noTermTbxId);
+        }
+
+        // Get all cases when attributes have same dataTypeId but different type
+        if (empty($sameDataTypeIdDiffType = $checker->sameDataTypeIdDiffType())) {
+            $this->io->success("There are no attributes having same dataTypeId but different type");
+        } else {
+            $this->io->section("Cases when attributes have same dataTypeId but different type");
+            $this->io->table(array_keys(reset($sameDataTypeIdDiffType)), $sameDataTypeIdDiffType);
+        }
+
+        // Get all cases when attributes have same type but different elementName
+        if (empty($sameTypeDiffElementName = $checker->sameTypeDiffElementName())) {
+            $this->io->success("There are no attributes having same type but different elementName");
+        } else {
+            $this->io->section("All cases when attributes have same type but different elementName");
+            $this->io->table(array_keys(reset($sameTypeDiffElementName)), $sameTypeDiffElementName);
+        }
+
+        // Get all cases when attributes exist on unexpected levels
+        if (empty($sameTypeUnexpectedLevel = $checker->sameTypeUnexpectedLevel())) {
+            $this->io->success("There are no attributes existing on unexpected levels");
+        } else {
+            $this->io->section("All cases when attributes exist on unexpected levels");
+            $this->io->table(array_keys(reset($sameTypeUnexpectedLevel)), $sameTypeUnexpectedLevel);
+        }
+
+        // Get all cases when datatypes have same type but different label
+        if (empty($sameTypeDiffLabel = $checker->sameTypeDiffLabelOrLevel())) {
+            $this->io->success("There are no datatypes having same type but different label or level");
+        } else {
+            $this->io->section("All cases when datatypes have same type but different label or level");
+            $this->io->table(array_keys(reset($sameTypeDiffLabel)), $sameTypeDiffLabel);
+        }
+
         return 0;
     }
 }
