@@ -25,28 +25,30 @@
  
  END LICENSE AND COPYRIGHT
  */
+
 namespace Translate5\MaintenanceCli\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Zend_Db;
+use Zend_Exception;
+use Zend_Registry;
 
 class DatabaseStatCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'database:stat';
-    
+
     protected function configure()
     {
         $this
-        // the short description shown while running "php bin/console list"
-        ->setDescription('Brief statistics about the database')
-        
-        // the full command description shown when running the command with
-        // the "--help" option
-        ->setHelp('Brief statistics about the database');
+            // the short description shown while running "php bin/console list"
+            ->setDescription('Brief statistics about the database')
+
+            // the full command description shown when running the command with
+            // the "--help" option
+            ->setHelp('Brief statistics about the database');
 
         $this->addOption(
             'all',
@@ -65,7 +67,7 @@ class DatabaseStatCommand extends Translate5AbstractCommand
     /**
      * Execute the command
      * {@inheritDoc}
-     * @throws \Zend_Exception
+     * @throws Zend_Exception
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -74,8 +76,8 @@ class DatabaseStatCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $dbConfig = \Zend_Registry::get('config')->resources->db;
-        $db = \Zend_Db::factory($dbConfig);
+        $dbConfig = Zend_Registry::get('config')->resources->db;
+        $db = Zend_Db::factory($dbConfig);
         $sql = 'SELECT TABLE_NAME AS `table`, ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS `size (MB)`,
                     TABLE_ROWS AS `row count`
                 FROM information_schema.TABLES
@@ -87,7 +89,7 @@ class DatabaseStatCommand extends Translate5AbstractCommand
             $sql .= ' ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC';
         }
 
-        if (! $this->input->getOption('all')) {
+        if (!$this->input->getOption('all')) {
             $sql .= ' limit 15';
         }
 

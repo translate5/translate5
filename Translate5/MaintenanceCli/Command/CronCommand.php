@@ -25,6 +25,7 @@
  
  END LICENSE AND COPYRIGHT
  */
+
 namespace Translate5\MaintenanceCli\Command;
 
 use MittagQI\Translate5\Tools\Cronjobs;
@@ -33,20 +34,21 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Factory;
 
 class CronCommand extends Translate5AbstractCommand
 {
     protected static $defaultName = 'cron';
-    
+
     protected function configure()
     {
         $this
-        // the short description shown while running "php bin/console list"
-        ->setDescription('Trigger the internal cron jobs')
-        
-        // the full command description shown when running the command with
-        // the "--help" option
-        ->setHelp('Trigger the internal cron jobs - by default the periodical one, daily by calling with --daily');
+            // the short description shown while running "php bin/console list"
+            ->setDescription('Trigger the internal cron jobs')
+
+            // the full command description shown when running the command with
+            // the "--help" option
+            ->setHelp('Trigger the internal cron jobs - by default the periodical one, daily by calling with --daily');
 
         $this->addOption(
             name: 'daily',
@@ -67,7 +69,7 @@ class CronCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $cron = \ZfExtended_Factory::get(Cronjobs::class,[
+        $cron = ZfExtended_Factory::get(Cronjobs::class, [
             Zend_Registry::get('bootstrap')
         ]);
         if ($input->getOption('daily')) {
