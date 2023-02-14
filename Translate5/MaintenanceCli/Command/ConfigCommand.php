@@ -191,7 +191,7 @@ Modified values are shown bold in the simple listing.');
         $type = $typeManager->getType($config->getTypeClass());
 
         $error = null;
-        if(!$type->validateValue($config->getType(), $exactConfig['value'], $error)) {
+        if(!$type->validateValue($config, $exactConfig['value'], $error)) {
             $this->io->error(sprintf('The given value "%s" is not valid, the error is: %s', $exactConfig['value'], $error));
             return 1;
         }

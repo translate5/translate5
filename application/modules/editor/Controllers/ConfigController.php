@@ -93,7 +93,7 @@ class editor_ConfigController extends ZfExtended_RestController {
 
         $error = null;
         $value = (string) $this->data->value; //the value is validated as string, and is saved as string to DB later
-        if(!$type->validateValue($this->entity->getType(), $value, $error)) {
+        if(!$type->validateValue($this->entity, $value, $error)) {
             throw new ZfExtended_UnprocessableEntity('E1363', ['errorMsg' => $error]);
         }
         if(!$type->isValidInDefaults($this->entity, $value)) {
