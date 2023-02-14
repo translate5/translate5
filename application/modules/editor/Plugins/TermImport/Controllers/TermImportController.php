@@ -46,7 +46,7 @@ class editor_Plugins_TermImport_TermImportController extends ZfExtended_RestCont
     public function filesystemAction(): void
     {
         $cronIp = CronIpFactory::create();
-        if(!$cronIp->isAllowed($_SERVER['REMOTE_ADDR'])) {
+        if (!$cronIp->isAllowed()) {
             throw new ZfExtended_Models_Entity_NoAccessException('Wrong IP to call this action! Configure cronIP accordingly!');
         }
 
@@ -61,7 +61,7 @@ class editor_Plugins_TermImport_TermImportController extends ZfExtended_RestCont
     public function crossapiAction(): void
     {
         $cronIp = CronIpFactory::create();
-        if(!$cronIp->isAllowed($_SERVER['REMOTE_ADDR'])) {
+        if(!$cronIp->isAllowed()) {
             throw new ZfExtended_Models_Entity_NoAccessException('Wrong IP to call this action! Configure cronIP accordingly!');
         }
 
