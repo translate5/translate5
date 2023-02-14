@@ -40,9 +40,6 @@
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
-    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
-    protected static bool $activateForTests = true;
-
     /**
      * The current internal version index of the bconf's
      * This must be increased each time, a git-based fprm or srx is changed
@@ -81,11 +78,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'vrsz', 'vsdm', 'vsdx', 'wcml', 'wix', 'xlsm', 'xlsx', 'xltm', 'xltx', 'xml', 'yaml', 'yml'
     ];
 
-    /**
-     * @var editor_Plugins_Okapi_Bconf_Entity
-     */
-    private static $cachedBconf = NULL;
-    
     /**
      * Retrieves the config-based path to the default export bconf
      * @param editor_Models_Task $task
@@ -178,6 +170,22 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         sort($extensions);
         return $extensions;
     }
+
+    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
+    protected static bool $activateForTests = true;
+
+    /**
+     * The services we use
+     * @var string[]
+     */
+    protected static array $services = [
+        'okapi' => MittagQI\Translate5\Plugins\Okapi\Service::class
+    ];
+
+    /**
+     * @var editor_Plugins_Okapi_Bconf_Entity
+     */
+    private static $cachedBconf = NULL;
 
     protected $localePath = 'locales';
 

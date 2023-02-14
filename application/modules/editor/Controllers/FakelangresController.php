@@ -37,7 +37,7 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
      */
     public function init() {
         $cronIp = CronIpFactory::create();
-        if(!$cronIp->isAllowed($_SERVER['REMOTE_ADDR'])) {
+        if(!$cronIp->isAllowed()) {
             throw new ZfExtended_Models_Entity_NoAccessException('Wrong IP to call fake language resources! Configure cronIP accordingly!');
         }
         $this->_helper->layout->disableLayout();

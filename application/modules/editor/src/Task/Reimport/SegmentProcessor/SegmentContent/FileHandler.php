@@ -61,7 +61,8 @@ class FileHandler
      * @param string $type
      * @return mixed|string
      */
-    public static function getClass(string $type){
+    public static function getClass(string $type)
+    {
         return self::$supportedFileTypes[$type] ?? '';
     }
 }

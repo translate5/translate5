@@ -134,13 +134,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector',[
                 $taskConfig
             ]);
-
+            // dirty way to evaluate if a bconf is from the import-zip: when in the ZIP, the task-folder is in the path
+            $bconfWasInZip = str_contains($params['bconfFilePath'], trim($this->task->getTaskGuid(), '{}')) ? ' (from Import-ZIP)' : '';
             $okapiConfig = $taskConfig->runtimeOptions->plugins->Okapi;
             $serverUsed = $okapiConfig->serverUsed ?? 'not set';
             $this->logger->info('E1444', 'Okapi Plug-In: Task was imported with Okapi "{okapi}"', [
                 'task' => $this->task,
                 'okapi' => $serverUsed,
                 'okapiUrl' => $okapiConfig->server?->$serverUsed ?? 'server used not found',
+                'usedBconf' => basename($params['bconfFilePath']) . $bconfWasInZip
             ], ['tasklog', 'ecode']);
 
             /* @var $api editor_Plugins_Okapi_Connector */
@@ -183,7 +185,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
 
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
-        $plugin = $pm->get($pm->classToName(get_class($this)));
+        $plugin = $pm->get($pm::getPluginNameByClass(get_class($this)));
         
         $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector',[
             $this->task->getConfig()

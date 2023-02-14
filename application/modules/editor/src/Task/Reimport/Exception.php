@@ -35,7 +35,8 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Reimport;
 
-class Exception extends \ZfExtended_ErrorCodeException {
+class Exception extends \ZfExtended_ErrorCodeException
+{
 
     /**
      * @var string
@@ -49,6 +50,7 @@ class Exception extends \ZfExtended_ErrorCodeException {
         'E1430' => 'Reimport DataProvider: No upload files found for task reimport.',
         'E1433' => 'Reimport Worker: Unable to find fileParser for the uploaded file.',
         'E1434' => 'Reimport Segment processor: No matching segment was found for the given mid.',
-        'E1441' => 'Reimport Segment processor: No content parser found for the file with extension {ext}'
+        'E1441' => 'Reimport Segment processor: No content parser found for the file with extension {ext}',
+        'E1462' => 'Reimport ZipDataProvider: Unable to replace the original file with the uploaded version'
     ];
 }

@@ -74,7 +74,7 @@ class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Expor
         $zipFile = tempnam($task->getAbsoluteTaskDataPath(), 'taskExport_');
 
         // Call parent
-        parent::init($taskGuid, [
+        $this->init($taskGuid, [
             'folderToBeZipped' => $parameters['exportFolder'],
             'zipFile' => $zipFile,
         ]);

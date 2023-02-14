@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use stringEncode\Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
@@ -191,7 +192,7 @@ Modified values are shown bold in the simple listing.');
         $type = $typeManager->getType($config->getTypeClass());
 
         $error = null;
-        if(!$type->validateValue($config->getType(), $exactConfig['value'], $error)) {
+        if(!$type->validateValue($config, $exactConfig['value'], $error)) {
             $this->io->error(sprintf('The given value "%s" is not valid, the error is: %s', $exactConfig['value'], $error));
             return 1;
         }
@@ -214,20 +215,22 @@ Modified values are shown bold in the simple listing.');
         }
         return 0;
     }
-    
+
     /**
      * Prints a config entry with all details
      * @param array $configData
+     * @param \editor_Models_Config $config
      */
     protected function showDetail(array $configData, \editor_Models_Config $config) {
         $value = OutputFormatter::escape((string) $configData['value']);
         $hasIni = array_key_exists('overwritten', $configData);
-        if($configData['value'] != $configData['default']) {
+        if ($configData['value'] != $configData['default']) {
             $value = '<options=bold>'.$value.'</>';
         }
-        
+        $name = (string) $configData['name'];
+
         $out = [
-            '       <info>name: <options=bold>'.OutputFormatter::escape((string) $configData['name']).'</>',
+            '       <info>name: <options=bold>'.OutputFormatter::escape($name).'</>',
             '      value: '.$value,
             '    default: '.OutputFormatter::escape((string) $configData['default']),
             '   category: '.OutputFormatter::escape((string) $configData['category']),
@@ -237,19 +240,37 @@ Modified values are shown bold in the simple listing.');
             '      level: '.$config->getConfigLevelLabel($configData['level']).' - '.$configData['level'],
             'description: '.OutputFormatter::escape((string) $configData['description']),
             '    comment: '.OutputFormatter::escape((string) $configData['comment']),
-            '',
         ];
-        
-        if($hasIni) {
+
+
+
+        $out[] = ''; //spacer
+
+        if ($hasIni) {
             $out[1] = '  ini value: <options=bold>'.OutputFormatter::escape($configData['value']).'</>';
             array_splice($out, 2, 0, '             <error>The value is set in the installation.ini and must be changed (or removed) there!</>');
-            array_splice($out, 3, 0, '   db value: '.OutputFormatter::escape((string) $configData['overwritten']).'');
+            array_splice($out, 3, 0, '   db value: '.OutputFormatter::escape((string) $configData['overwritten']));
         }
-        if(array_key_exists('oldvalue', $configData)) {
+        if (array_key_exists('oldvalue', $configData)) {
             $out[1] = '  '.($hasIni ? 'ini':'new').' value: <fg=green;options=bold>'.OutputFormatter::escape($configData['value']).'</>';
             array_splice($out, 2, 0, '  old value: <fg=red>'.OutputFormatter::escape($configData['oldvalue']).'</>');
         }
         
         $this->io->text($out);
+
+        if ((int) $configData['level'] >= $config::CONFIG_LEVEL_INSTANCE) {
+            $db = new \editor_Models_Db_CustomerConfig();
+            $customerConfig = $db->fetchAll($sql = $db
+                ->select()->setIntegrityCheck(false)
+                ->from($db, ['value'])
+                ->joinLeft('LEK_customer', 'LEK_customer.id = LEK_customer_config.customerId', ['name', 'number', ''])
+                ->where('LEK_customer_config.name = ?', $name)
+            );
+            $perCustomer = $customerConfig->toArray();
+            if (!empty($perCustomer)) {
+                $this->io->section('Configuration overwritten per Customer: ');
+                $this->writeTable($perCustomer);
+            }
+        }
     }
 }
