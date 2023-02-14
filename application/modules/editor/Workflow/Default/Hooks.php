@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\Translate5\Tools\Cronjobs;
 
 /**
  * Hook In functions for the Default Workflow.
@@ -150,15 +151,14 @@ class editor_Workflow_Default_Hooks {
         $auth = ZfExtended_Authentication::getInstance();
         $this->authenticatedUser = $auth->getUser();
 
-        $cronIp = CronIpFactory::create();
         $isWorker = defined('ZFEXTENDED_IS_WORKER_THREAD');
 
-        if(is_null($this->authenticatedUser)){
+        if (is_null($this->authenticatedUser)) {
             //if cron or worker set session user data with system user
-            if(($cronIp->isAllowed($_SERVER['REMOTE_ADDR'] ?? null) || $isWorker) && $auth->authenticateByLogin(ZfExtended_Models_User::SYSTEM_LOGIN)) {
+            if ((Cronjobs::isRunning() || $isWorker)
+                && $auth->authenticateByLogin(ZfExtended_Models_User::SYSTEM_LOGIN)) {
                 $this->authenticatedUser = $auth->getUser();
-            }
-            else {
+            } else {
                 throw new ZfExtended_NotAuthenticatedException("Cannot authenticate the system user!");
             }
         }

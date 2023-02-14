@@ -45,18 +45,45 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
 
     /**
      * @var array
-     * structure: name => port, for multiinstance services [termtagger, languagetool], the lowest defines the sequence
+     * structure: name => [ url (string or array for pooled services), config (optional) ]
      */
     protected array $services = [
-        'php' => 80, // will remove the worker-config as the server url works for local dev
-        'frontendmessagebus' => 4757,
-        'okapi' => 4780,
-        'languagetool' => 4710,
-        // 't5memory' => 4740, // TODO FIXME: Currently, t5memory is not working properly. To get tests runninng, use old opentm2
-        'termtagger' => 4701,
-        'pdfconverter' => 4786,
-        'visualbrowser' => 3000 // due to biderectional access, must work in "host" network mode so port cannot be virtualized
+        'php' => [
+            'url' => 'http://php:80',
+            'config' => ['remove' => true] // will remove the worker-config as the server url works for local dev
+        ],
+        't5memory' => [
+            'url' => 'http://localhost:4740/t5memory',
+        ],
+        'frontendmessagebus' => [
+            'url' => 'http://localhost:4757',
+            'config' => ['socketServer' => 'ws://localhost:4756/translate5'] // special host/port for local-dev
+        ],
+        'okapi' => [
+            'url' => 'http://localhost:4780/okapi-longhorn/'
+        ],
+        'languagetool' => [
+            'url' => [
+                'default' => ['http://localhost:4710/v2', 'http://localhost:4711/v2'],
+                'gui' => ['http://localhost:4712/v2'],
+                'import' => ['http://localhost:4710/v2', 'http://localhost:4711/v2', 'http://localhost:4712/v2']
+            ]
+        ],
+        'termtagger' => [
+            'url' => [
+                'default' => ['http://localhost:4701'],
+                'gui' => ['http://localhost:4702'],
+                'import' => ['http://localhost:4701', 'http://localhost:4702']
+            ]
+        ],
+        'pdfconverter' => [
+            'url' => 'http://localhost:4786'
+        ],
+        'visualbrowser' => [
+            'url' => 'ws://localhost:3000' // due to biderectional access, must work in "host" network mode so port cannot be virtualized
+        ]
     ];
+
 
     private string $revertSql = '';
 
@@ -69,12 +96,6 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp('Local Development only: Searches and sets the dockerized services matching the "docker-compose-localdev.yml" docker-compose-file');
-
-        $this->addArgument(
-            self::ARGUMENT_HOST,
-            InputArgument::OPTIONAL,
-            'Custom host for the service. Applicable only when discovering a specific service.'
-        );
 
         $this->addOption(
             'auto-set',
@@ -95,193 +116,14 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        $this->pluginmanager = Zend_Registry::get('PluginManager');
-
         $this->writeTitle('Local Development: Service auto-discovery');
 
-        $this->foreachService($this->services);
+        $doSave = (!$this->input->getOption('auto-set')) ? false : true;
 
-        if ($this->input->getOption('auto-set')) {
-            $this->io->writeln('');
-            $this->io->note('You can revert the changes with the following SQL:');
-            $this->io->write($this->revertSql);
-        }
-        $this->io->writeln('');
+        $this->setServices($this->services, $doSave);
 
         return self::SUCCESS;
     }
 
-    /**
-     * @param int $port
-     * @throws Zend_Exception
-     */
-    protected function serviceFrontendmessagebus(int $port)
-    {
-        $host = $this->getHost('frontendmessagebus');
-        $config = Zend_Registry::get('config');
-        $internalServer = 'http://' . $host . ':' . $port;
 
-        if (!$this->checkServiceDefault('FrontEndMessageBus', $internalServer, $host, $port)) {
-            $this->setPluginActive('FrontEndMessageBus', false);
-            return;
-        }
-        if ($config->runtimeOptions->server->protocol === 'https://') {
-            $this->io->error('The localdev configuration will not work with SSL/HTTPS');
-            $this->setPluginActive('FrontEndMessageBus', false);
-            return;
-        }
-        $this->updateConfig('runtimeOptions.plugins.FrontEndMessageBus.messageBusURI', $internalServer);
-        $this->updateConfig(
-            'runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost',
-            $host
-        );
-        $this->updateConfig(
-            'runtimeOptions.plugins.FrontEndMessageBus.socketServer.port',
-            ($port - 1)
-        );
-        $this->updateConfig(
-            'runtimeOptions.plugins.FrontEndMessageBus.socketServer.route',
-            '/translate5' // just /translate5 on direct access to the socket server
-        );
-        $this->updateConfig(
-            'runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema',
-            'ws'
-        );
-        $this->setPluginActive('FrontEndMessageBus', true);
-    }
-
-    protected function servicePhp(int $port): void
-    {
-        // for localhost environments the worker URL stays empty
-        $this->updateConfig(
-            'runtimeOptions.worker.server',
-            ''
-        );
-    }
-
-    /**
-     * Finds the languagetool-instances
-     * expects three languagetools defined, languagetool_1 and languagetool_2, languagetool_3
-     * @param int $port
-     * @return array[]
-     */
-    protected function findLanguagetools(int $port): array
-    {
-        $found = [
-            'default' => [],
-            'gui' => [],
-            'import' => [],
-        ];
-        for($i = 0; $i < 3; $i++){
-            $host = $this->getHost('languagetool_'.($i + 1));
-            $url = 'http://' . $host . ':' . ($port + $i) . '/v2';
-            if ($this->checkServiceDefault('Languagetool '.($i + 1), $url, $host, ($port + $i))){
-                if($i == 0){
-                    $found['gui'][] = $url;
-                } else {
-                    $found['default'][] = $url;
-                }
-                $found['import'][] = $url;
-            }
-        }
-        return $found;
-    }
-
-    /**
-     * expects two termtaggers defined, termtagger_1 and termtagger_2
-     * @param int $port
-     * @return array[]
-     */
-    protected function findTermtaggers(int $port): array
-    {
-        //
-        $found = [
-            'default' => [],
-            'gui' => [],
-            'import' => [],
-        ];
-        $host = $this->getHost('termtagger_1');
-        if ($this->isDnsSet($host, $port)) {
-            $found['default'][] = 'http://' . $host . ':' . $port;
-            $found['import'][] = 'http://' . $host . ':' . $port;
-        }
-        $host = $this->getHost('termtagger_2');
-        $port++;
-        if ($this->isDnsSet($host, $port)) {
-            $found['gui'][] = 'http://' . $host . ':' . $port;
-            $found['import'][] = 'http://' . $host . ':' . $port;
-        }
-        return $found;
-    }
-
-    /**
-     * @param string $label
-     * @param string $url
-     * @param string $host
-     * @param int $port
-     * @return bool
-     */
-    protected function checkServiceDefault(string $label, string $url, string $host, int $port): bool
-    {
-        $result = true;
-        $url = $host . ':' . $port;
-        if (!$this->isDnsSet($host, $port)) {
-            $url = 'NONE (expected: ' . $url . ')';
-            $result = false;
-        }
-        $this->io->info('Found ' . $label . ': ' . $url);
-        return $result;
-    }
-
-    /**
-     * @param string $host
-     * @param int $port
-     * @return bool
-     */
-    protected function isDnsSet(string $host, int $port): bool
-    {
-        $connection = @fsockopen($host, $port);
-        if (is_resource($connection)){
-            fclose($connection);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * No host-by servicename with local development
-     * @param string $default
-     * @return string
-     */
-    protected function getHost(string $default): string
-    {
-        return $this->input->getArgument(self::ARGUMENT_HOST) ?? 'localhost';
-    }
-
-    /**
-     * Updates the config model instance and prints info about it
-     * @param editor_Models_Config $config
-     * @param string $newValue
-     * @return void
-     * @throws Zend_Exception
-     */
-    protected function updateConfigInstance(editor_Models_Config $config, string $newValue): void
-    {
-        if ($this->input->getOption('auto-set')) {
-            $this->revertSql .= "UPDATE `Zf_configuration` SET `value` = '".$config->getValue()."' WHERE `name` = '".$config->getName()."';\n";
-        }
-        parent::updateConfigInstance($config, $newValue);
-    }
-
-    /**
-     * Needs to be rerouted to ensure t5memory is set to the desired value only
-     * @param editor_Models_Config $config
-     * @param string $newValue
-     * @throws Zend_Exception
-     * @throws \JsonException
-     */
-    protected function addToListConfigInstance(editor_Models_Config $config, string $newValue): void
-    {
-        $this->updateListConfigInstance($config, [ $newValue ]);
-    }
 }

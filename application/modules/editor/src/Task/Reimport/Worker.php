@@ -28,14 +28,13 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Reimport;
 
-use editor_Models_Import_FileParser;
+use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Loaders_Taskuserassoc;
-use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
-use MittagQI\Translate5\Task\Import\FileParser\Factory;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
+use Throwable;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
@@ -46,7 +45,8 @@ use ZfExtended_Worker_Abstract;
 /**
  * Contains the Excel Reimport Worker
  */
-class Worker extends ZfExtended_Worker_Abstract {
+class Worker extends ZfExtended_Worker_Abstract
+{
 
     /***
      * @var Reimport
@@ -57,8 +57,9 @@ class Worker extends ZfExtended_Worker_Abstract {
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
-    protected function validateParameters($parameters = array()) {
-        $neededEntries = ['fileId', 'file', 'userGuid','segmentTimestamp'];
+    protected function validateParameters($parameters = array())
+    {
+        $neededEntries = ['files', 'userGuid', 'segmentTimestamp', 'dataProviderClass'];
         $foundEntries = array_keys($parameters);
         $keyDiff = array_diff($neededEntries, $foundEntries);
         //if there is not keyDiff all needed were found
@@ -69,7 +70,8 @@ class Worker extends ZfExtended_Worker_Abstract {
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
-    public function work() {
+    public function work()
+    {
 
         $params = $this->workerModel->getParameters();
 
@@ -83,51 +85,29 @@ class Worker extends ZfExtended_Worker_Abstract {
 
 
         //contains the TUA which is used to alter the segments
-        $tua = $this->prepareTaskUserAssociation($task,$user);
+        $tua = $this->prepareTaskUserAssociation($task, $user);
 
         try {
 
-            Lock::taskLock($task,$task::STATE_REIMPORT);
+            Lock::taskLock($task, $task::STATE_REIMPORT);
 
-            /** @var editor_Models_SegmentFieldManager $segmentFieldManager */
-            $segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-            $segmentFieldManager->initFields($task->getTaskGuid());
-
-            /** @var Factory $parserHelper */
-            $parserHelper = ZfExtended_Factory::get(Factory::class,[
+            $reimportFile = ZfExtended_Factory::get(ReimportFile::class, [
                 $task,
-                $segmentFieldManager
+                $user
             ]);
 
-            // get the parser dynamically even of only xliff is supported
-            $parser = $parserHelper->getFileParser($params['fileId'],$params['file']);
-            /* @var editor_Models_Import_FileParser $parser */
-
-            if( is_null($parser)){
-                throw new \MittagQI\Translate5\Task\Reimport\Exception('E1433',[
-                    'file' => $params['fileId'],
-                    'task' => $task
-                ]);
+            foreach ($params['files'] as $fileId => $file) {
+                $reimportFile->import($fileId, $file, $params['segmentTimestamp']);
+                $reimportFile->getSegmentProcessor()->log();
             }
-
-            $parser->setIsReimport();
-
-            $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class,[ $task , $segmentFieldManager,$user]);
-            $this->segmentProcessor->setSegmentFile($params['fileId'], $parser->getFileName());
-            $this->segmentProcessor->setSaveTimestamp($params['segmentTimestamp']);
-
-            $parser->addSegmentProcessor($this->segmentProcessor);
-            $parser->parseFile();
         } finally {
             //if it was a PM override, delete it again
-            if($tua->getIsPmOverride()) {
+            if ($tua->getIsPmOverride()) {
                 $tua->delete();
             }
-            $this->segmentProcessor->log();
-
-            $this->archiveImportedData($task);
-
             Lock::taskUnlock($task);
+            $this->archiveImportedData($task);
+            $this->cleanupImportFolder($params['dataProviderClass'], $task);
         }
 
         return true;
@@ -141,29 +121,29 @@ class Worker extends ZfExtended_Worker_Abstract {
      * @return editor_Models_TaskUserAssoc
      * @throws Zend_Acl_Exception
      */
-    protected function prepareTaskUserAssociation(editor_Models_Task $task,ZfExtended_Models_User $user): editor_Models_TaskUserAssoc {
+    protected function prepareTaskUserAssociation(editor_Models_Task $task, ZfExtended_Models_User $user): editor_Models_TaskUserAssoc
+    {
 
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var editor_Models_TaskUserAssoc $userTaskAssoc */
 
         try {
 
-            $acl=ZfExtended_Acl::getInstance();
+            $acl = ZfExtended_Acl::getInstance();
 
-            $isUserPm=$task->getPmGuid()==$user->getUserGuid();
-            $isEditAllAllowed=$acl->isInAllowedRoles($user->getRoles(), 'backend', 'editAllTasks');
+            $isUserPm = $task->getPmGuid() == $user->getUserGuid();
+            $isEditAllAllowed = $acl->isInAllowedRoles($user->getRoles(), 'backend', 'editAllTasks');
             $isEditAllTasks = $isEditAllAllowed || $isUserPm;
 
             //if the user is allowed to load all, use the default loader
-            if($isEditAllTasks){
+            if ($isEditAllTasks) {
                 $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($user->getUserGuid(), $task);
-            }else{
+            } else {
                 $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($user->getUserGuid(), $task);
             }
 
             $userTaskAssoc->getIsPmOverride();
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
 
             $userTaskAssoc->setUserGuid($user->getUserGuid());
             $userTaskAssoc->setTaskGuid($task->getTaskGuid());
@@ -187,13 +167,25 @@ class Worker extends ZfExtended_Worker_Abstract {
      * @throws Exception
      * @throws \editor_Models_Import_DataProvider_Exception
      */
-    private function archiveImportedData(editor_Models_Task $task){
+    private function archiveImportedData(editor_Models_Task $task)
+    {
         /** @var DataProvider $dp */
-        $dp = ZfExtended_Factory::get(DataProvider::class,[
-            $this->workerModel->getParameters()['fileId']
-        ]);
+        $dp = ZfExtended_Factory::get(DataProvider::class);
         $dp->setTaskPaths($task);
         $dp->archiveImportedData();
     }
 
+
+    /**
+     * Clean the temporary folders used for extracting zip archives.
+     * @param string $dataProviderClass
+     * @param editor_Models_Task $task
+     * @return void
+     */
+    private function cleanupImportFolder(string $dataProviderClass, editor_Models_Task $task): void
+    {
+        $dp = ZfExtended_Factory::get($dataProviderClass);
+        $dp->setTaskPaths($task);
+        $dp->cleanTempFolder();
+    }
 }

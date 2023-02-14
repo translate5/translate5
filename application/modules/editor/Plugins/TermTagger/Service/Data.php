@@ -27,9 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Service-ServerCommunication Class of Plugin "TermTagger"
+ * Temporary model used for transforming segnments to usable data for the termtagger
  */
-class editor_Plugins_TermTagger_Service_ServerCommunication {
+class editor_Plugins_TermTagger_Service_Data {
     
     /**
      * TBX file / hash

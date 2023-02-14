@@ -42,11 +42,12 @@ class Lock
      * @param editor_Models_Task $task
      * @return bool
      */
-    public static function taskLock(editor_Models_Task $task, string $lockId) : bool {
+    public static function taskLock(editor_Models_Task $task, string $lockId): bool
+    {
         $log = Zend_Registry::get('logger')->cloneMe('editor.task');
 
-        if(!$task->lock(NOW_ISO, $lockId)) {
-            $log->debug('E0000', 'Task lock: task lock failed',[
+        if (!$task->lock(NOW_ISO, $lockId)) {
+            $log->debug('E0000', 'Task lock: task lock failed', [
                 'task' => $task,
                 'lockId' => $lockId
             ]);
@@ -55,7 +56,7 @@ class Lock
 
         $task->setState($lockId);
         $task->save();
-        $log->debug('E0000', 'Task lock: task lock success',[
+        $log->debug('E0000', 'Task lock: task lock success', [
             'task' => $task,
             'lockId' => $lockId
         ]);
@@ -67,11 +68,12 @@ class Lock
      * @param editor_Models_Task $task
      * @return bool
      */
-    public static function taskUnlock(editor_Models_Task $task) : bool {
+    public static function taskUnlock(editor_Models_Task $task): bool
+    {
         $log = Zend_Registry::get('logger')->cloneMe('editor.task');
 
         if (!$task->unlock()) {
-            $log->debug('E0000', 'Task unlock: task unlock failed',[
+            $log->debug('E0000', 'Task unlock: task unlock failed', [
                 'task' => $task,
                 'lockId' => $task->getState()
             ]);
@@ -79,7 +81,7 @@ class Lock
         }
         $task->setState(editor_Models_Task::STATE_OPEN);
         $task->save();
-        $log->debug('E0000', 'Task unlock: task unlock success',[
+        $log->debug('E0000', 'Task unlock: task unlock success', [
             'task' => $task
         ]);
         return false;

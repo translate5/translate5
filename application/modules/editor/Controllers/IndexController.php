@@ -38,6 +38,7 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\Translate5\Service\Services;
 
 /**
  * Dummy Index Controller
@@ -145,7 +146,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     public function systemstatusAction() {
         $this->_helper->layout->disableLayout();
         $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
-        $this->view->validationResults = $validator->validate();
+        $results = $validator->validate();
+        Services::addServiceChecksAsSystemChecks($results, false);
+        $this->view->validationResults = $results;
     }
 
     /**
@@ -636,7 +639,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $cronIp = CronIpFactory::create();
         $hasAppStateACL = $acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'backend', 'applicationstate');
         //since application state contains sensible information we show that only to the cron TP, or with more details to the API users
-        if ($cronIp->isAllowed($_SERVER['REMOTE_ADDR']) || $hasAppStateACL) {
+        if ($cronIp->isAllowed() || $hasAppStateACL) {
             $this->view->applicationstate = ZfExtended_Debug::applicationState($hasAppStateACL);
         }
     }

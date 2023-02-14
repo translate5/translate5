@@ -33,6 +33,7 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\DataProvider;
 use MittagQI\Translate5\Task\Reimport\Worker;
+use MittagQI\Translate5\Task\Reimport\ZipDataProvider;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
@@ -81,18 +82,40 @@ class editor_FileController extends ZfExtended_RestController
     {
 
         $fileId = $this->getParam('fileId');
-        $saveToMemory = (bool)$this->getParam('saveToMemory',false);
 
         if (empty($fileId)) {
             throw new \MittagQI\Translate5\Task\Reimport\Exception('E1426');
         }
 
+        $this->taskReimport($fileId);
+    }
+
+    /***
+     * @return void
+     * @throws Throwable
+     * @throws ZfExtended_Exception
+     */
+    public function packageAction(){
+        $this->taskReimport(null);
+    }
+
+    /***
+     * Reimport file or zip package into the current task
+     * @param int|null $fileId
+     * @return void
+     * @throws Exception
+     * @throws Throwable
+     * @throws ZfExtended_Exception
+     */
+    private function taskReimport(int $fileId = null){
         $task = $this->getCurrentTask();
 
-        /** @var DataProvider $dataProvider */
-        $dataProvider = ZfExtended_Factory::get(DataProvider::class,[
-            $fileId
-        ]);
+        $dataProviderClass = $fileId ? DataProvider::class : ZipDataProvider::class;
+
+        $dataProvider = ZfExtended_Factory::get($dataProviderClass);
+        if ($fileId){
+            $dataProvider->setFileId($fileId);
+        }
         $dataProvider->checkAndPrepare($task);
 
         /** @var Worker $worker */
@@ -100,23 +123,28 @@ class editor_FileController extends ZfExtended_RestController
 
         // init worker and queue it
         if (!$worker->init($task->getTaskGuid(), [
-            'fileId' => $fileId,
-            'file' => $dataProvider->getFile(),
+            'files' => $dataProvider->getFiles(),// fileId => fileInfo mapping
             'userGuid' => ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
             'segmentTimestamp' => NOW_ISO,
+            'dataProviderClass' => $dataProviderClass
         ])) {
             throw new ZfExtended_Exception('Task ReImport Error on worker init()');
         }
 
         try {
+            // use blocking for tests env only
+            if( APPLICATION_ENV === ZfExtended_BaseIndex::ENVIRONMENT_TEST){
+                $worker->setBlocking();
+            }
             $worker->queue();
-            if($saveToMemory){
+            if($this->getParam('saveToMemory',false)){
                 $this->queueUpdateTmWorkers();
             }
 
             $this->view->success = true;
         }catch (Throwable $exception){
             Lock::taskUnlock($task);
+            $dataProvider->cleanTempFolder();
             throw  $exception;
         }
     }

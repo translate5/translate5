@@ -113,14 +113,14 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
      */
     public function normalizeStoreTree(stdClass $object){
         $object->extension = pathinfo($object->filename, PATHINFO_EXTENSION);;
+        $object->leaf = $object->isFile ?? false;
         if( empty($object->children)){
-            $object->leaf = true;
             return $object;
         }
-        $object->leaf = false;
+
         $object->expanded = true;
         foreach ($object->children as $child){
-            return $this->normalizeStoreTree($child);
+            $this->normalizeStoreTree($child);
         }
     }
 

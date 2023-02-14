@@ -54,11 +54,14 @@ abstract class AbstractException extends \ZfExtended_ErrorCodeException
      * @var array
      */
     protected static array $localErrorCodes = [
-        // TODO how to change spell check to 24 translate
-        'E1410' => 'SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary.',
-        'E1411' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
-        'E1412' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.',
         'E1413' => 'SpellCheck can not work when target language is not supported by LanguageTool.',
         'E1417' => 'SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList}',
+        'E1418' => 'LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app',
+        'E1419' => 'SpellCheck overall run done - {segmentCounts}',
+        'E1464' => 'Recoverable error on spellchecking: {recoverableError} - see system log for details.',
+        'E1465' => 'Some segments could not be checked by the spellchecker',
+        'E1466' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
+        'E1467' => 'SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary.',
+        'E1468' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.'
     ];
 }
