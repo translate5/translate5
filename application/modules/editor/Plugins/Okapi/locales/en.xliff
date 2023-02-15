@@ -22,11 +22,11 @@
             </trans-unit>
             <trans-unit id='R2XDpG5kZXJ0ZSBGaWx0ZXI='>
                 <source>Geänderte Filter</source>
-                <target>Geänderte Filter</target>
+                <target>Modified file filters</target>
             </trans-unit>
             <trans-unit id='RGF0ZWl0eXBlbiwgZsO8ciBkaWUgRmlsdGVyIGFuZ2VwYXNzdCB3dXJkZW4='>
                 <source>Dateitypen, für die Filter angepasst wurden</source>
-                <target>Dateitypen, für die Filter angepasst wurden</target>
+                <target>File etensions for which file filters are modified in the filter set</target>
             </trans-unit>
             <trans-unit id='QmVzY2hyZWlidW5n'>
                 <source>Beschreibung</source>
