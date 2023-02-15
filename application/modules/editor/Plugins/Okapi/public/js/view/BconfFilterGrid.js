@@ -220,17 +220,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
                     xtype: 'gridcolumn',
                     tooltip: me.strings.editTextsRowTip,
                     dataIndex: 'description',
-                    renderer: me.descriptionColumnRenderer,
+                    renderer: me.tooltippedColumnRenderer,
                     stateId: 'notes',
                     flex: 1,
                     editor: {
-                        xtype: 'textfield'
+                        xtype: 'textfield',
+                        margin: '0, -115, 0, 0'
                     },
                     text: me.text_cols.description
                 }, {
                     xtype: 'actioncolumn',
                     cellFocusable: false, // prevent actionItemCLick from entering RowEditMode
-                    width: 3 * 28 + 8 + 28,
+                    width: 120,
                     stateId: 'okapiGridActionColumn',
                     align: 'center',
                     text: me.text_cols.actions,
@@ -284,7 +285,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
      * @param {Object} metadata
      * @returns {String}
      */
-    descriptionColumnRenderer: function(value, metadata) {
+    tooltippedColumnRenderer: function(value, metadata) {
         if(value){
             metadata.tdAttr = 'data-qtip="' + value.replace('"', '“').replace("'", '‘') + '"';
         }

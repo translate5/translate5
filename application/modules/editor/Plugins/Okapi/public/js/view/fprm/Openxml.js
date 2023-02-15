@@ -125,8 +125,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'bPreferenceTranslatePowerpointNotes.b': {},
             'bPreferenceTranslatePowerpointMasters.b': {},
             'bPreferenceIgnorePlaceholdersInPowerpointMasters.b': {},
-            'bPreferencePowerpointIncludedSlideNumbersOnly.b': {},
-            'tsPowerpointIncludedSlideNumbers.i': { type: 'tagfield', identifier: 'sln', guiData: 'numbers' }
+            'bPreferencePowerpointIncludedSlideNumbersOnly.b': { type: 'boolset', children: {
+                'tsPowerpointIncludedSlideNumbers.i': { type: 'tagfield', identifier: 'sln', guiData: 'numbers' }
+            }}
         }}
     },
     initConfig: function(config){
@@ -300,6 +301,10 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
         delete vals['tsExcelExcludedColumnsSheet1.i'];
         delete vals['tsExcelExcludedColumnsSheet2.i'];
         delete vals['tsExcelExcludedColumnsSheet3.i'];
+        // when bPreferencePowerpointIncludedSlideNumbersOnly.b is disabled, this would not be included, but the FPRM-settings expect this value to exist
+        if(!vals.hasOwnProperty('tsPowerpointIncludedSlideNumbers.i')){
+            vals['tsPowerpointIncludedSlideNumbers.i'] = 0;
+        }
         return vals;
     },
     /**
@@ -311,6 +316,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             this.form.findField('tsExcelExcludedColumnsSheet1.i').setRawValue([]);
             this.form.findField('tsExcelExcludedColumnsSheet2.i').setRawValue([]);
             this.form.findField('tsExcelExcludedColumnsSheet3.i').setRawValue([]);
+        }
+        if(this.form.findField('bPreferencePowerpointIncludedSlideNumbersOnly.b').getValue() === false){
+            this.form.findField('tsPowerpointIncludedSlideNumbers.i').setRawValue([]);
         }
     }
 });

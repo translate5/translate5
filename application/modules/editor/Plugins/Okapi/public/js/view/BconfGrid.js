@@ -137,17 +137,25 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                 width: 260,
                 dataIndex: 'name',
                 stateId: 'name',
+                renderer: function(value, metadata){
+                    metadata.tdAttr = 'data-qtip="' + value + '"';
+                    return value;
+                },
                 flex: 1,
                 editor: 'textfield',
                 text: me.text_cols.name
             },
             {
                 xtype: 'gridcolumn',
-                width: 110,
+                width: 120,
                 dataIndex: 'customExtensions',
                 stateId: 'customExtensions',
-                renderer: function(value){
-                    return value.join(', ');
+                renderer: function(value, metadata){
+                    value = value.join(', ');
+                    if(value){
+                        metadata.tdAttr = 'data-qtip="' + value + '"';
+                    }
+                    return value;
                 },
                 text: me.text_cols.extensions,
                 tooltip: me.text_cols.extensionsTooltip
@@ -451,5 +459,5 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
             ],
         }];
         return me.callParent([Ext.apply(config, instanceConfig)]);
-    },
+    }
 });
