@@ -32,3 +32,9 @@ END LICENSE AND COPYRIGHT
     color: #34383f;
     opacity:1 !important;
 }
+
+.t5chosenDefault, .t5leveledGrid .t5level0.t5chosenDefault, .t5leveledGrid.t5noLevels .t5level0.t5chosenDefault { background-color: #fdeaac; }
+.t5leveledGrid .t5level1.t5chosenDefault { background-color: #ffefbb; }
+.t5leveledGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected.x-grid-item-alt { background-color: #f6f6f6; }
+.t5leveledGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected { border-style: solid; border-color: #e9e9e9; }
+.t5leveledGrid .x-grid-view.x-grid-with-row-lines .x-grid-item-selected + .x-grid-item { border-top-style: solid; border-top-color: #e9e9e9; }

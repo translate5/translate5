@@ -27,3 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 /* This css will be applied when this theme is active. */
+
+.t5leveledGrid .t5level0 { background-color: rgba(219, 231, 250, .4); }
+.t5chosenDefault, .t5leveledGrid .t5level0.t5chosenDefault, .t5leveledGrid.t5noLevels .t5level0.t5chosenDefault { background-color: #d4e3fb; }
+.t5leveledGrid .t5level1.t5chosenDefault { background-color: #dfe8f6; }
+.t5leveledGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected.x-grid-item-alt { background-color: #fafafa; }
+.t5leveledGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected { border-style: solid; border-color: #ededed; }
+.t5leveledGrid .x-grid-view.x-grid-with-row-lines .x-grid-item-selected + .x-grid-item { border-top-style: solid; border-top-color: #ededed; }
+
+
