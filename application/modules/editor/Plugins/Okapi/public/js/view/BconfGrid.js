@@ -192,62 +192,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     return this.defaultRenderer.apply(this, [isDefault, metaData, record, rowIdx, colIdx, store, view]);
                 },
                 listeners: {
-                    /** @method
-                     * There is always a row to be highlighted and one to be unhighlighted
-                     * The exception is, when system default is (de)selected as customer default - then don't refresh old
-                     * @param col
-                     * @param recordIndex
-                     * @param {boolean} checked the status of the checkbox
-                     * @param record the record whose row was clicked
-                     * @returns {boolean}
-                     */
-                    'beforecheckchange': function(col, recordIndex, checked, record){
-                        // at times extJs fires this event without record what in theory must not happen
-                        if(!record){
-                            return;
-                        }
-                        var gridView = col.getView(),
-                            customer = gridView.grid.getCustomer(),
-                            customerId = customer.id,
-                            oldBconfId = customer.get('defaultBconfId'),
-                            newChecked = (oldBconfId !== record.id), // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
-                            newBconfId = newChecked ? record.id : null;
-                        gridView.select(record);
-                        Ext.Ajax.request({
-                            url: Editor.data.restpath + 'customermeta',
-                            method: 'PUT',
-                            params: {
-                                id: customerId,
-                                data: Ext.encode({
-                                    defaultBconfId: newBconfId
-                                })
-                            },
-                            success: function() {
-                                var storeId, store, sCustomer;
-                                // unfortunately there are two customer stores, which both act as source for the TaskImport customer selector, so we have to update them both
-                                for(storeId of ['customersStore', 'userCustomers']){
-                                    store = Ext.getStore(storeId);
-                                    sCustomer = (store) ? store.getById(customerId) : null;
-                                    if(sCustomer){
-                                        sCustomer.set('defaultBconfId', newBconfId, { commit: true, silent: true });
-                                    }
-                                }
-                                // refresh the grid for the changed record
-                                gridView.refreshNode(record);
-                                if(oldBconfId !== null){
-                                    // if there was a old record, refresh the grid for the old record
-                                    var bconf = gridView.getStore().getById(oldBconfId);
-                                    if(bconf){
-                                        gridView.refreshNode(bconf);
-                                    }
-                                }
-                            },
-                            failure: function(response){
-                                Editor.app.getController('ServerException').handleException(response);
-                            }
-                        });
-                        return false; // checked state handled manually via view.refresh
-                    }
+                    beforecheckchange: 'onBeforeCustomerCheckChange'
                 }
             },{
                 xtype: 'checkcolumn',
@@ -265,42 +210,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     return this.defaultRenderer.apply(this, arguments);
                 },
                 listeners: {
-                    'beforecheckchange': function(col, recordIndex, checked, record){
-                        // at times extJs fires this event without record what in theory must not happen. Also not-checked events must be dismissed
-                        if(!record || !checked){
-                            return false;
-                        }
-                        var gridView = col.getView();
-                        gridView.select(record);
-                        Ext.Ajax.request({
-                            url: Editor.data.restpath + 'plugins_okapi_bconf/setdefault',
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'application/json'
-                            },
-                            params: {
-                                id: record.id
-                            },
-                            success: function(xhr) {
-                                var result = Ext.JSON.decode(xhr.responseText, true);
-                                record.set('isDefault', true, { dirty: false, commit: false, silent: false });
-                                gridView.refreshNode(record);
-                                Editor.data.plugins.Okapi.systemDefaultBconfId = record.getId(); // Crucial: the default-id is a global that must be updated!
-                                if(result.oldId && result.oldId > 0){
-                                    var store = gridView.ownerGrid.getStore(),
-                                        oldRrecord = store.getById(result.oldId);
-                                    if(oldRrecord){
-                                        oldRrecord.set('isDefault', false, { dirty: false, commit: false, silent: false });
-                                        gridView.refreshNode(oldRrecord);
-                                     }
-                                }
-                              },
-                            failure: function(xhr){
-                                Editor.app.getController('ServerException').handleException(xhr);
-                            }
-                        });
-                        return false;
-                    }
+                    beforecheckchange: 'onBeforeGlobalCheckChange'
                 }
             },{
                 xtype: 'actioncolumn',
