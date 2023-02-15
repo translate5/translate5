@@ -73,14 +73,18 @@ class OkapiListCommand extends Translate5AbstractCommand
         }
 
         $this->writeTitle($this->getDescription());
-        $this->io->writeln('Set as choose-able defaults:');
-        $defaults = $config->getServerUsedDefaults($selected);
-        foreach ($defaults as &$default) {
-            if ($default === $selected) {
-                $default = '<info>' . $default . '</info>';
+        if ($this->isPorcelain) {
+            $this->output->writeln('');
+        } else {
+            $this->io->writeln('Set as choose-able defaults:');
+            $defaults = $config->getServerUsedDefaults($selected);
+            foreach ($defaults as &$default) {
+                if ($default === $selected) {
+                    $default = '<info>' . $default . '</info>';
+                }
             }
+            $this->io->writeln(' ' . join(', ', $defaults));
         }
-        $this->io->writeln(' ' . join(', ', $defaults));
 
         $table = [];
         foreach ($usage as $serverName => $data) {
