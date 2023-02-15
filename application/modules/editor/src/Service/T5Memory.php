@@ -50,21 +50,18 @@ final class T5Memory extends DockerServiceAbstract {
         try {
             $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
             $httpClient->setUri($url);
-            // $httpClient->setHeaders('Accept', 'application/json');
+            $httpClient->setHeaders('Accept', 'application/json');
             $response = $httpClient->request('GET');
             // the status request must return 200
             if($response->getStatus() === 200) {
-                // for now there is a BUG in the t5memory response for /resources and we have to parse dirtily
+                // older revisions returned broken JSON so we have to try JSON and then a more hacky regex approach
+                $resources = json_decode($response->getBody());
                 $matches = [];
-                if(preg_match('~"Version"\s*:\s*"([^"]+)"~', $response->getBody(), $matches) === 1){
+                if($resources){
+                    $this->version = (property_exists($resources, 'Version')) ? $resources->Version : null;
+                } else if(preg_match('~"Version"\s*:\s*"([^"]+)"~', $response->getBody(), $matches) === 1){
                     $this->version = (count($matches) > 0) ? $matches[1] : null;
                 }
-                /* implementation when BUG is fixed
-                $props = json_decode($response->getBody());
-                if$props && property_exists($props, 'Version')){
-                    $this->version = $props->Version;
-                }
-                */
                 return true;
             }
             return false;
