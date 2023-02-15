@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -37,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.controller.TmOverview', {
-    extend : 'Ext.app.Controller',
+    extend: 'Ext.app.Controller',
     views: [
         'Editor.view.LanguageResources.TmOverviewPanel',
         'Editor.view.LanguageResources.AddTmWindow',
@@ -50,8 +49,8 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.TbxExport',
         'Editor.view.LanguageResources.services.Default'
     ],
-    models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.LanguageResource'],
-    stores:[
+    models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource', 'Editor.model.LanguageResources.LanguageResource'],
+    stores: [
         'Editor.store.LanguageResources.Resources',
         'Editor.store.LanguageResources.LanguageResource',
         'Editor.store.LanguageResources.SdlEngine',
@@ -66,7 +65,7 @@ Ext.define('Editor.controller.TmOverview', {
         edited: '#UT#Die Sprachressource "{0}" wurde erfolgreich geändert.',
         created: '#UT#Die Sprachressource "{0}" wurde erfolgreich erstellt.',
         noResourcesAssigned: '#UT#Keine Sprachressourcen zugewiesen.',
-        taskassocgridcell:'#UT#Zugewiesene Sprachressourcen',
+        taskassocgridcell: '#UT#Zugewiesene Sprachressourcen',
         exportTm: '#UT#als TM Datei exportieren',
         exportTmx: '#UT#als TMX Datei exportieren',
         exportZippedTmx: '#UT#als gezippte TMX Datei exportieren',
@@ -74,51 +73,51 @@ Ext.define('Editor.controller.TmOverview', {
         mergeTermsWarnMessage: '#UT#Begriffe in der TBX werden immer zuerst nach ID mit bestehenden Einträgen in der TermCollection zusammengeführt. Wenn Terme zusammenführen angekreuzt ist und die ID in der TBX nicht in der TermCollection gefunden wird, wird gesucht, ob derselbe Begriff bereits in derselben Sprache existiert. Wenn ja, werden die gesamten Termeinträge zusammengeführt. Insbesondere bei einer TermCollection mit vielen Sprachen kann dies zu unerwünschten Ergebnissen führen.',
         importing: '#UT#Die Sprachressource {0} wird gerade importiert. Bitte warten Sie, bis der Import abgeschlossen ist.'
     },
-    refs:[{
+    refs: [{
         ref: 'tmOverviewPanel',
         selector: '#tmOverviewPanel'
-    },{
+    }, {
         ref: 'AddTmForm',
         selector: '#addTmWindow form'
-    },{
+    }, {
         ref: 'TmWindow',
         selector: '#addTmWindow'
     }],
     listen: {
         component: {
-            '#tmOverviewPanel':{
+            '#tmOverviewPanel': {
                 celldblclick: 'onTmOverviewPanelCellDblClick'
             },
-            '#btnAddTm':{
-                click:'handleOnAddTmClick'
+            '#btnAddTm': {
+                click: 'handleOnAddTmClick'
             },
-            'addTmWindow #save-tm-btn':{
-                click:'handleSaveAddClick'
+            'addTmWindow #save-tm-btn': {
+                click: 'handleSaveAddClick'
             },
-            'editTmWindow #save-tm-btn':{
-                click:'handleSaveEditClick'
+            'editTmWindow #save-tm-btn': {
+                click: 'handleSaveEditClick'
             },
-            'importTmWindow #save-tm-btn':{
-                click:'handleSaveImportClick'
+            'importTmWindow #save-tm-btn': {
+                click: 'handleSaveImportClick'
             },
-            '#cancel-tm-btn':{
-                click:'handleCancelClick'
+            '#cancel-tm-btn': {
+                click: 'handleCancelClick'
             },
-            '#tmOverviewPanel actioncolumn':{
-                click:'handleTmGridActionColumnClick'
+            '#tmOverviewPanel actioncolumn': {
+                click: 'handleTmGridActionColumnClick'
             },
-            '#tmOverviewPanel pagingtoolbar':{
-                afterrender: function(pagebar){
+            '#tmOverviewPanel pagingtoolbar': {
+                afterrender: function (pagebar) {
                     //fix render issue where the pagecount in the bar is not shown correctly, 
                     // even though all given pageing data in pagebar is correct. Possible ExtJS Bug
-                    pagebar.onLoad(); 
+                    pagebar.onLoad();
                 }
             },
-            '#tmOverviewPanel #btnRefresh':{
-                click:'handleButtonRefreshClick'
+            '#tmOverviewPanel #btnRefresh': {
+                click: 'handleButtonRefreshClick'
             },
             '#adminTaskGrid': {
-                beforerender:'injectTaskassocColumn'
+                beforerender: 'injectTaskassocColumn'
             },
             'addTmWindow combo[name="resourceId"]': {
                 select: 'handleResourceChanged'
@@ -138,9 +137,10 @@ Ext.define('Editor.controller.TmOverview', {
                 update: 'addRecordToImportCheck'
             }
         },
-        controller:{
-            '#ServerException':{
-                serverExceptionE1447: 'onServerExceptionE1447Handler'
+        controller: {
+            '#ServerException': {
+                serverExceptionE1447: 'onServerExceptionE1447Handler',
+                serverExceptionE1473: 'onServerExceptionE1473Handler'
             }
         }
     },
@@ -159,7 +159,7 @@ Ext.define('Editor.controller.TmOverview', {
     exportTcMenuCache: [],
 
 
-    init: function() {
+    init: function () {
         var me = this;
         //add the taskassocs field to the task model
         Editor.model.admin.Task.replaceFields({
@@ -169,12 +169,12 @@ Ext.define('Editor.controller.TmOverview', {
         //add the default service interceptor instance
         //this needs to be initialized here, since the service classes are used in the tmoverview panel
         Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.Default'));
-        
+
         //define task to reload importing tasks
         me.checkImportingRecordsTask = Ext.TaskManager.newTask({
-            run: function(){
+            run: function () {
                 var rec;
-                while(me.importingRecords.length > 0) {
+                while (me.importingRecords.length > 0) {
                     rec = me.importingRecords.shift();
                     rec.set('status', rec.STATUS_LOADING);
                     rec.load();
@@ -193,24 +193,24 @@ Ext.define('Editor.controller.TmOverview', {
      * @param cellIndex
      * @param record
      */
-    onTmOverviewPanelCellDblClick:function( view, cell, cellIndex, record){
+    onTmOverviewPanelCellDblClick: function (view, cell, cellIndex, record) {
         var me = this,
-            grid=view.up('tmOverviewPanel');
+            grid = view.up('tmOverviewPanel');
         // call the selection row handler. This will also fetch fresh record version
-        grid.onGridRowSelect(grid,[record],function (newRecord){
-            me.handleEditTm(view,cell,cellIndex,newRecord);
+        grid.onGridRowSelect(grid, [record], function (newRecord) {
+            me.handleEditTm(view, cell, cellIndex, newRecord);
         });
     },
 
-    handleOnAddTmClick : function(){
+    handleOnAddTmClick: function () {
         var win = Ext.widget('addTmWindow');
         win.show();
     },
-    handleButtonRefreshClick : function(){
+    handleButtonRefreshClick: function () {
         this.getTmOverviewPanel().getStore().load();
         Ext.StoreManager.get('Editor.store.LanguageResources.Resources').load();
     },
-    handleSaveAddClick:function(button){
+    handleSaveAddClick: function (button) {
         var me = this,
             window = me.getTmWindow(),
             windowViewController = window.getController(),
@@ -218,44 +218,44 @@ Ext.define('Editor.controller.TmOverview', {
             resourceField = form.down('combo[name="resourceId"]'),
             serviceName = resourceField.getSelection() && resourceField.getSelection().get('serviceName'),
             helppage = resourceField.getSelection() && resourceField.getSelection().get('helppage');
-        
-        if(!form.isValid()) {
+
+        if (!form.isValid()) {
             return;
         }
-        
+
         if (!windowViewController.isValidService(serviceName, helppage)) {
             return;
         }
 
         //check and update the form fields from the engine
         me.handleEngineSelect(form);
-        
+
         window.setLoading(true);
         form.submit({
             timeout: 3600, //1h, is seconds here, ensure upload of bigger files
             params: {
                 format: 'jsontext'
             },
-            url: Editor.data.restpath+'languageresourceinstance',
+            url: Editor.data.restpath + 'languageresourceinstance',
             scope: me,
-            success: function(form, submit) {
+            success: function (form, submit) {
                 var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
                 this.getTmOverviewPanel().getStore().load();
                 window.setLoading(false);
                 window.close();
                 Editor.MessageBox.addSuccess(msg);
             },
-            failure: function(form, submit) {
+            failure: function (form, submit) {
                 var res = submit.result;
                 window.setLoading(false);
                 //submit results are always state 200.
                 //If success false and errors is an array, this errors are shown in the form directly,
                 // so we dont need the handleException
-                if(!res || res.success || !Ext.isArray(res.errors)) {
+                if (!res || res.success || !Ext.isArray(res.errors)) {
                     Editor.app.getController('ServerException').handleException(submit.response);
                     return;
                 }
-                if(Ext.isArray(res.errors)) {
+                if (Ext.isArray(res.errors)) {
                     form.markInvalid(res.errors);
                     me.showGeneralErrors(res.errors);
                     return;
@@ -263,18 +263,18 @@ Ext.define('Editor.controller.TmOverview', {
             }
         });
     },
-    
-    handleSaveEditClick: function(button){
+
+    handleSaveEditClick: function (button) {
         this.editLangaugeResource();
     },
-    
-    handleSaveImportClick: function(button){
+
+    handleSaveImportClick: function (button) {
         var me = this,
             window = button.up('window'),
             form = window.down('form'),
             record = window.languageResourceRecord;
 
-        if(!form.isValid()) {
+        if (!form.isValid()) {
             return;
         }
 
@@ -283,27 +283,27 @@ Ext.define('Editor.controller.TmOverview', {
             params: {
                 format: 'jsontext'
             },
-            url: Editor.data.restpath+'languageresourceinstance/'+record.get('id')+'/import/',
+            url: Editor.data.restpath + 'languageresourceinstance/' + record.get('id') + '/import/',
             scope: me,
-            success: function(form, submit) {
+            success: function (form, submit) {
                 record.load();
                 window.setLoading(false);
                 window.close();
                 Editor.MessageBox.addSuccess(window.strings.importSuccess);
             },
-            failure: function(form, submit) {
+            failure: function (form, submit) {
                 var res = submit.result;
                 window.setLoading(false);
                 //submit results are always state 200.
-                if(res && res.httpStatus) {
+                if (res && res.httpStatus) {
                     submit.response.status = res.httpStatus;
                 }
                 //If success false and errors is an array, this errors are shown in the form directly,
                 // so we dont need the handleException
-                if(res.success || !Ext.isArray(res.errors) || !res.message || res.message !== 'NOT OK') {
+                if (res.success || !Ext.isArray(res.errors) || !res.message || res.message !== 'NOT OK') {
                     Editor.app.getController('ServerException').handleException(submit.response);
                 }
-                if(Ext.isArray(res.errors)) {
+                if (Ext.isArray(res.errors)) {
                     form.markInvalid(res.errors);
                     me.showGeneralErrors(res.errors);
                     return;
@@ -316,13 +316,13 @@ Ext.define('Editor.controller.TmOverview', {
      * Edit language resource
      * @param forced
      */
-    editLangaugeResource: function (forced){
+    editLangaugeResource: function (forced) {
         var me = this,
             window = Ext.ComponentQuery.query('#editTmWindow')[0],
             form = window.down('form'),
             record = form.getRecord();
 
-        if(!form.isValid()) {
+        if (!form.isValid()) {
             return;
         }
         record.reject();
@@ -332,14 +332,14 @@ Ext.define('Editor.controller.TmOverview', {
         window.setLoading(true);
         record.save({
             preventDefaultHandler: true,
-            params:{
+            params: {
                 forced: Ext.isEmpty(forced) ? 0 : 1
             },
-            failure: function(records, op) {
+            failure: function (records, op) {
                 window.setLoading(false);
                 Editor.app.getController('ServerException').handleException(op.error.response);
             },
-            success: function() {
+            success: function () {
                 var msg = Ext.String.format(me.strings.edited, record.get('name'));
                 me.getTmOverviewPanel().getStore().load();
                 window.setLoading(false);
@@ -354,7 +354,7 @@ Ext.define('Editor.controller.TmOverview', {
      * @param rec
      * @param params
      */
-    deleteLanguageResource: function (rec,params){
+    deleteLanguageResource: function (rec, params) {
         var me = this,
             additionalParams = params ? params : {},
             store = me.getTmOverviewPanel().getStore(),
@@ -363,11 +363,11 @@ Ext.define('Editor.controller.TmOverview', {
         rec.drop();
         rec.save({
             params: additionalParams,
-            failure: function() {
+            failure: function () {
                 rec.reject();
                 store && store.load();
             },
-            success: function(record, operation) {
+            success: function (record, operation) {
                 store && store.load();
                 store.remove(rec);
                 Editor.MessageBox.addSuccess(Ext.String.format(msg.deleted, rec.get('name')));
@@ -380,9 +380,9 @@ Ext.define('Editor.controller.TmOverview', {
      * Checks loaded LanguageResources and reloads LanguageResources with status import periodically
      * @param {Ext.data.Store} store
      */
-    addRecordToImportCheck: function(store, record) {
+    addRecordToImportCheck: function (store, record) {
         var me = this;
-        if(record.get('status') === record.STATUS_IMPORT) {
+        if (record.get('status') === record.STATUS_IMPORT) {
             me.importingRecords.push(record);
             me.checkImportingRecordsTask.start();
         }
@@ -390,40 +390,37 @@ Ext.define('Editor.controller.TmOverview', {
     /**
      * Loops over the given error array and shows additional non formfield specfific errors
      */
-    showGeneralErrors: function (errors){
-        Ext.Array.each(errors, function(item){
-            if(!item.id || item.id === -1) {
+    showGeneralErrors: function (errors) {
+        Ext.Array.each(errors, function (item) {
+            if (!item.id || item.id === -1) {
                 Editor.MessageBox.getInstance().showDirectError(item.msg || item._errorMessage, item.data);
             }
         });
     },
-    handleCancelClick: function(button){
-        var window = button.up('window'),
-            form=window.down('form').getForm();
-
-        form.reset();
+    handleCancelClick: function (button) {
+        var window = button.up('window');
         window.close();
     },
-    handleLogTm:function(view, cell, cellIdx, rec){
-        var win = Ext.widget('languageResourcesLogLogWindow',{
-        	languageResource:rec
+    handleLogTm: function (view, cell, cellIdx, rec) {
+        var win = Ext.widget('languageResourcesLogLogWindow', {
+            languageResource: rec
         });
         win.show();
         win.load();
     },
-    handleEditTm : function(view, cell, cellIdx, rec){
+    handleEditTm: function (view, cell, cellIdx, rec) {
         var win = Ext.widget('editTmWindow');
-        win.getViewModel().getStore('customers').load(function(){
+        win.getViewModel().getStore('customers').load(function () {
             win.loadRecord(rec);
             win.show();
         });
     },
-    handleShowTasks: function(view, cell, cellIdx, rec){
+    handleShowTasks: function (view, cell, cellIdx, rec) {
         var win = Ext.widget('languageResourceTaskGridWindow');
         win.loadRecord(rec);
         win.show();
     },
-    handleImportTm : function(view, cell, cellIdx, rec){
+    handleImportTm: function (view, cell, cellIdx, rec) {
         //find the import window from the service name
         var importWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getImportWindow(),
             win = Ext.widget(importWindow);
@@ -437,53 +434,53 @@ Ext.define('Editor.controller.TmOverview', {
 
         win.show();
     },
-    handleTmGridActionColumnClick:function(view, cell, row, col, ev, record) {
+    handleTmGridActionColumnClick: function (view, cell, row, col, ev, record) {
         var me = this,
-            grid=view.up('tmOverviewPanel'),
+            grid = view.up('tmOverviewPanel'),
             f = ev.getTarget().className.match(/ico-tm-([^ ]+)/);
 
 
         // call the selection row handler. This will also fetch fresh record version
-        grid.onGridRowSelect(grid,[record],function (newRecord){
-            switch(f && f[1]) {
+        grid.onGridRowSelect(grid, [record], function (newRecord) {
+            switch (f && f[1]) {
                 case 'edit':
-                    me.handleEditTm(view,cell,col,newRecord);
+                    me.handleEditTm(view, cell, col, newRecord);
                     break;
                 case 'tasks':
-                    me.handleShowTasks(view,cell,col,newRecord);
+                    me.handleShowTasks(view, cell, col, newRecord);
                     break;
                 case 'import':
-                    me.handleImportTm(view,cell,col,newRecord);
+                    me.handleImportTm(view, cell, col, newRecord);
                     break;
                 case 'download':
-                    me.handleDownloadTm(view,cell,col,newRecord, ev);
+                    me.handleDownloadTm(view, cell, col, newRecord, ev);
                     break;
                 case 'delete':
-                    me.handleDeleteTm(view,cell,col,newRecord);
+                    me.handleDeleteTm(view, cell, col, newRecord);
                     break;
                 case 'export':
-                    me.showExportActionMenu(newRecord,ev);
+                    me.showExportActionMenu(newRecord, ev);
                     break;
                 case 'log':
-                    me.handleLogTm(view,cell,col,newRecord);
+                    me.handleLogTm(view, cell, col, newRecord);
                     break;
             }
         });
     },
-    handleDownloadTm : function(view, cell, cellIdx, rec, ev){
+    handleDownloadTm: function (view, cell, cellIdx, rec, ev) {
         var me = this,
             proxy = rec.proxy,
             id = rec.getId(),
             url = proxy.getUrl(),
             menu,
             filetypes = Editor.util.LanguageResources.getService(rec.get('serviceName')).getValidFiletypes(),
-            createMenuItems = function() {
+            createMenuItems = function () {
                 var items = [];
                 if (filetypes.indexOf('tm') !== -1) {
                     items.push({
                         itemId: 'exportTm',
                         hrefTarget: '_blank',
-                        href: url+'/download.tm',
+                        href: url + '/download.tm',
                         text: me.strings.exportTm
                     });
                 }
@@ -491,16 +488,16 @@ Ext.define('Editor.controller.TmOverview', {
                     items.push({
                         itemId: 'exportTmx',
                         hrefTarget: '_blank',
-                        href: url+'/download.tmx',
-                        text : me.strings.exportTmx
+                        href: url + '/download.tmx',
+                        text: me.strings.exportTmx
                     });
                 }
                 if (filetypes.indexOf('zip') !== -1) {
                     items.push({
                         itemId: 'exportZippedTmx',
                         hrefTarget: '_blank',
-                        href: url+'/download.zip',
-                        text : me.strings.exportZippedTmx
+                        href: url + '/download.zip',
+                        text: me.strings.exportZippedTmx
                     });
                 }
                 return items;
@@ -517,12 +514,12 @@ Ext.define('Editor.controller.TmOverview', {
         }
         url += encodeURIComponent(id);
 
-        menu = Ext.widget('menu', { 
+        menu = Ext.widget('menu', {
             items: createMenuItems()
         });
         menu.showAt(ev.getXY());
     },
-    handleDeleteTm : function(view, cell, cellIdx, rec){
+    handleDeleteTm: function (view, cell, cellIdx, rec) {
         var me = this,
             msg = me.strings,
             store = view.getStore(),
@@ -531,56 +528,56 @@ Ext.define('Editor.controller.TmOverview', {
             //force local deletion when no connection to resource
             params = noConn ? {deleteLocally: true} : {};
 
-        
-        Ext.Msg.confirm(noConn ? msg.deleteConfirmLocal : msg.deleteConfirm, info, function(btn){
-            if(btn !== 'yes') {
+
+        Ext.Msg.confirm(noConn ? msg.deleteConfirmLocal : msg.deleteConfirm, info, function (btn) {
+            if (btn !== 'yes') {
                 return;
             }
-            me.deleteLanguageResource(rec,params);
+            me.deleteLanguageResource(rec, params);
         });
     },
     /***
      * this function will insert the taskassoc column in to the adminTaskGrid
      */
-    injectTaskassocColumn:function(taskgrid){
+    injectTaskassocColumn: function (taskgrid) {
         var me = this,
             grid = taskgrid.getView().grid,
             column;
-        
-        if(grid.down('gridcolumn[dataIndex=taskassocs]')){
+
+        if (grid.down('gridcolumn[dataIndex=taskassocs]')) {
             return;
         }
-        
+
         column = Ext.create('Ext.grid.column.Column', {
             xtype: 'gridcolumn',
             width: 45,
-            dataIndex:'taskassocs',
+            dataIndex: 'taskassocs',
             stateId: 'taskassocColumn',
             tdCls: 'taskassocs',
             sortable: false,
             cls: 'taskassocs',
-            text:me.strings.taskassocgridcell,
-            renderer: function(v, meta){
+            text: me.strings.taskassocgridcell,
+            renderer: function (v, meta) {
                 var strservices = [],
                     i, languageResource;
-                if(!v || v.length === 0){
-                    meta.tdAttr = 'data-qtip="'+me.strings.noResourcesAssigned+'"';
+                if (!v || v.length === 0) {
+                    meta.tdAttr = 'data-qtip="' + me.strings.noResourcesAssigned + '"';
                     //meta.tdCls  = meta.tdCls  + ' info-icon';
                     return '';
                 }
-                for(i=0;i<v.length;i++){
+                for (i = 0; i < v.length; i++) {
                     languageResource = v[i];
-                    strservices.push(languageResource.name+' ('+languageResource.serviceName+')');
+                    strservices.push(languageResource.name + ' (' + languageResource.serviceName + ')');
                     //meta.tdAttr = 'data-qtip="'+languageResource.name+' ('+languageResource.serviceName+')<br/>"';
                 }
-                meta.tdAttr = 'data-qtip="'+strservices.join('<br />')+'"';
+                meta.tdAttr = 'data-qtip="' + strservices.join('<br />') + '"';
                 return v.length;
             }
         });
         grid.headerCt.insert((grid.down('gridcolumn[dataIndex=userCount]').fullColumnIndex + 1), column);//inserting the dynamic column into grid
         grid.getView().refresh();
     },
-    handleResourceChanged: function(combo, record) {
+    handleResourceChanged: function (combo, record) {
         var form = this.getAddTmForm().getForm(),
             disableUpload = !record.get('filebased'),
             filefield = form.findField('tmUpload');
@@ -590,26 +587,26 @@ Ext.define('Editor.controller.TmOverview', {
         filefield.setDisabled(disableUpload);
         filefield.setReadOnly(disableUpload);
     },
-    handleChangeImportFile: function(field, val){
+    handleChangeImportFile: function (field, val) {
         var name = this.getAddTmForm().down('textfield[name=name]'),
             srcLang = this.getAddTmForm().down('combo[name=sourceLang]'),
             targetLang = this.getAddTmForm().down('combo[name=targetLang]'),
             langs = val.match(/-([a-zA-Z]{2,3})-([a-zA-Z]{2,3})\.[^.]+$/);
 
-        if(name.getValue() == '') {
+        if (name.getValue() == '') {
             name.setValue(val.replace(/\.[^.]+$/, ''));
         }
         //simple algorithmus to get the language from the filenam
-        if(langs && langs.length == 3) {
+        if (langs && langs.length == 3) {
             var srcStore = srcLang.store,
                 targetStore = targetLang.store,
-                srcIdx = srcStore.find('label', '('+langs[1]+')', 0, true, true),
-                targetIdx = targetStore.find('label', '('+langs[2]+')', 0, true, true);
+                srcIdx = srcStore.find('label', '(' + langs[1] + ')', 0, true, true),
+                targetIdx = targetStore.find('label', '(' + langs[2] + ')', 0, true, true);
 
-            if(srcIdx >= 0) {
+            if (srcIdx >= 0) {
                 srcLang.setValue(srcStore.getAt(srcIdx).get('id'));
             }
-            if(targetIdx >= 0) {
+            if (targetIdx >= 0) {
                 targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
             }
         }
@@ -618,28 +615,28 @@ Ext.define('Editor.controller.TmOverview', {
     /**
      * Set the labelText(domainCode) when engine with domain code is selected
      */
-    handleEngineSelect:function(form){
-        var sdlEngine=form.down('#sdlEngine').getSelection();
-        
+    handleEngineSelect: function (form) {
+        var sdlEngine = form.down('#sdlEngine').getSelection();
+
         //set the labelText field with the domain code if exist
-        if(sdlEngine){
+        if (sdlEngine) {
             form.getForm().findField('specificData').setValue(JSON.stringify({
-            	domainCode:sdlEngine.get('domainCode'),
-        		engineName:sdlEngine.get('name')
+                domainCode: sdlEngine.get('domainCode'),
+                engineName: sdlEngine.get('name')
             }));
         }
-        
+
         // the same for plugins
-        this.fireEvent('engineSelect',form);
+        this.fireEvent('engineSelect', form);
     },
 
     /**
      * Get language labels joined with "," for given language ids
      */
-    getLanguageLable:function(languageIds){
-        var labels=[],
-            lngStore=Ext.StoreManager.get('admin.Languages');
-        languageIds.forEach(function(id){
+    getLanguageLable: function (languageIds) {
+        var labels = [],
+            lngStore = Ext.StoreManager.get('admin.Languages');
+        languageIds.forEach(function (id) {
             labels.push(lngStore.getById(id).get('label'));
         });
         return labels.join(',');
@@ -651,11 +648,11 @@ Ext.define('Editor.controller.TmOverview', {
      * @param newRecord
      * @param event
      */
-    showExportActionMenu: function (newRecord,event) {
+    showExportActionMenu: function (newRecord, event) {
         var me = this,
             menu = me.exportTcMenuCache.termCollectionExportActionMenu;
 
-        if(me.fireEvent('beforeShowExportActionMenu',newRecord) === false){
+        if (me.fireEvent('beforeShowExportActionMenu', newRecord) === false) {
             return;
         }
 
@@ -680,7 +677,7 @@ Ext.define('Editor.controller.TmOverview', {
      * @param item
      * @param ev
      */
-    onTermCollectionExportActionMenuClick:function (com, item, ev) {
+    onTermCollectionExportActionMenuClick: function (com, item, ev) {
         var me = this,
             action = item && item.action;
 
@@ -696,8 +693,8 @@ Ext.define('Editor.controller.TmOverview', {
      * @param checkbox
      * @param newValue
      */
-    onMergeTermsChange:function (checkbox,newValue){
-        if(newValue === true){
+    onMergeTermsChange: function (checkbox, newValue) {
+        if (newValue === true) {
             Ext.Msg.show({
                 title: this.strings.mergeTermsWarnTitle,
                 message: this.strings.mergeTermsWarnMessage,
@@ -712,11 +709,11 @@ Ext.define('Editor.controller.TmOverview', {
      *
      * @param rec
      */
-    exportProposal:function(rec){
-    	var proposalWindow=Ext.create('Editor.view.LanguageResources.ProposalExport',{
-    		record:rec
-    	});
-    	proposalWindow.show();
+    exportProposal: function (rec) {
+        var proposalWindow = Ext.create('Editor.view.LanguageResources.ProposalExport', {
+            record: rec
+        });
+        proposalWindow.show();
     },
 
     /***
@@ -724,9 +721,9 @@ Ext.define('Editor.controller.TmOverview', {
      *
      * @param rec
      */
-    exportCollection:function (rec){
-        var tbxWindow=Ext.create('Editor.view.LanguageResources.TbxExport',{
-            record:rec
+    exportCollection: function (rec) {
+        var tbxWindow = Ext.create('Editor.view.LanguageResources.TbxExport', {
+            record: rec
         });
         tbxWindow.show();
     },
@@ -736,13 +733,28 @@ Ext.define('Editor.controller.TmOverview', {
      *
      * @param rec
      */
-    exportSpreadsheet:function (rec){
-        var params = {}, url = Editor.data.restpath+'languageresourceinstance/xlsxexport?';
+    exportSpreadsheet: function (rec) {
+        var params = {}, url = Editor.data.restpath + 'languageresourceinstance/xlsxexport?';
         params['collectionId'] = rec.get('id');
-        window.open(url+Ext.urlEncode(params));
+        window.open(url + Ext.urlEncode(params));
     },
 
-    onServerExceptionE1447Handler: function (responseText,ecode,response) {
+    onServerExceptionE1473Handler: function (responseText, ecode, response) {
+        return this.showConflictWindowEventHandler(responseText, ecode, response);
+    },
+
+    onServerExceptionE1447Handler: function (responseText, ecode, response) {
+        return this.showConflictWindowEventHandler(responseText, ecode, response);
+    },
+
+    /***
+     * Conflict error handler when resource is deleted or modified. This is custom function for E1473 and E1447 events
+     * @param responseText
+     * @param ecode
+     * @param response
+     * @returns {boolean}
+     */
+    showConflictWindowEventHandler: function (responseText, ecode, response) {
         var me = this,
             translated = responseText.errorsTranslated,
             extraData = responseText.extraData ? responseText.extraData : null,
@@ -750,39 +762,39 @@ Ext.define('Editor.controller.TmOverview', {
             tasksCount = taskListReduced.length,
             request = response ? response.request : false,
             record = (request && request.records) ? request.records[0] : false,
-            isDelete = request.method ? request.method.toLowerCase() === 'delete'  : false;
+            isDelete = request.method ? request.method.toLowerCase() === 'delete' : false;
 
-        if(tasksCount > 10){
-            taskListReduced = taskListReduced.slice(0,9);
-            taskListReduced.push(' + '+(tasksCount+9)+' '+ Editor.data.l10n.tmOverview.more);
+        if (tasksCount > 10) {
+            taskListReduced = taskListReduced.slice(0, 9);
+            taskListReduced.push(' + ' + (tasksCount + 9) + ' ' + Editor.data.l10n.tmOverview.more);
         }
 
-        taskListReduced = taskListReduced.map(function (i){
-            return '<li>'+i+'</li>';
+        taskListReduced = taskListReduced.map(function (i) {
+            return '<li>' + i + '</li>';
         });
 
         Ext.create('Ext.window.MessageBox').show({
             title: Editor.data.l10n.languageResources.editLanguageResource.conflictErrorTitle,
-            msg: Ext.String.format('{0} <ul>{1}</ul> {2}',translated.errorMessages[0],taskListReduced.join(''),translated.errorMessages[1]),
+            msg: Ext.String.format('{0} <ul>{1}</ul> {2}', translated.errorMessages[0], taskListReduced.join(''), translated.errorMessages[1]),
             buttons: Ext.Msg.YESNO,
-            fn:function(button){
-                if(button === "yes"){
-                    if( isDelete === false){
+            fn: function (button) {
+                if (button === "yes") {
+                    if (isDelete === false) {
                         me.editLangaugeResource(true);
                         return true
                     }
 
-                    if( record){
-                        me.deleteLanguageResource(request.records[0],{
-                            forced : true
+                    if (record) {
+                        me.deleteLanguageResource(request.records[0], {
+                            forced: true
                         });
                     }
                     return true;
                 }
                 return false;
             },
-            scope:me,
-            defaultFocus:'no',
+            scope: me,
+            defaultFocus: 'no',
             icon: Ext.MessageBox.QUESTION
         });
 

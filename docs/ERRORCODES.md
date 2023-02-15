@@ -307,7 +307,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1050"></a>E1050  | Language Resources; Task | Referenced language resource not found. | This error can happen on the association of language resources to tasks, if the a chosen language resource was deleted in the meantime.
 | <a id="E1051"></a>E1051  | Language Resources; Task | Cannot remove language resource from task, since task is used at the moment. | The association of a language resource to a task can not removed, since the affected task is used by a user at the moment.
 | <a id="E1106"></a>E1106  | Language Resources | Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager! | This happens if a task has associated a language resource, which has completly deactivated (for example by deactivating the plug-in).
-| <a id="E1158"></a>E1158  | Language Resources | A&nbsp;Language Resources cannot be deleted as long as tasks are assigned to this Language Resource. | Remove all tasks first from that resource.
+| <a id="E1158"></a>E1158  | Language Resources | A Language Resources cannot be deleted as long as tasks are assigned to this Language Resource. | Remove all tasks first from that resource.
 | <a id="E1169"></a>E1169  | Language Resources | The task is in use and cannot be reimported into the associated language resources. | Check who or what process is locking the task
 | <a id="E1282"></a>E1282  | Language Resources; Service; Connector | Language resource&nbsp;communication error. | General language resources error. It can happend when segment pre-translation is requested, general task pre-translation or instant-translate search. For more info check the error log,
 | <a id="E1311"></a>E1311  | Language Resources | Could not connect to language resource {service}: server not reachable | The server of the language resource is not reachable. This means that the server/service is not running, there is a network problem, or the service is not configured properly.
@@ -339,6 +339,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1359"></a>E1359  | Language&nbsp;Resource Term Collection | Term Collection Import: Content from zip file could not be extracted. | See the error log for details.
 | <a id="E1403"></a>E1403  | Language&nbsp;Resource pivot pre-translation    | The taskGuid is required as parameter | The taskGuid is not provided as parameter on the request | 
 | <a id="E1447"></a>E1447  | Language Resources    | This resource is assigned to a task via the removed customer. | The un-assigned customer(s) from the resource is used in the listed tasks. If this customer is removed from the resource, the resource and pivot association must be removed
+| <a id="E1473"></a>E1473  | Language Resources    | This resource is assigned to a task                                | The removed resource is assigned to a task and can be only deleted using the force param.
 
 ### Terminology
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -393,6 +394,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1364"></a>E1364  | Terminology | TermTagger overall run done - {segmentCounts} | Reports that the whole task was tagged with the termtagger and shows the segment status counts.
 | <a id="E1449"></a>E1449  | Terminology | TBX Export: No valid file path is found for exported collection | The export file-path of a term collection was not set on tbx export
 | <a id="E1451"></a>E1451  | Terminology | Recoverable error on termtagging: {message} | See system log for details.
+| <a id="E1472"></a>E1472  | Terminology | TBX Import: Attribute target was emptied as unsupported for that attribute type                                                                   |
 
 
 ### Segment
@@ -640,7 +642,6 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1458"></a>E1458 | Plug-In TermImport | Across TBX Export: Error on communication with Across              | Check with additional data what the problem is. |
 | <a id="E1459"></a>E1459 | Plug-In TermImport | Across TBX Export: Can not create temporary filestream             | Check with additional data what the problem is. |
 | <a id="E1460"></a>E1460 | Plug-In TermImport | Across TBX Export: Can not read from file with fileguid {fileGuid} | Check with additional data what the problem is. |
-| <a id="E1472"></a>E1472  | TODO    | SET ME BY USING ME! {TEST} | TODO DESCRIPTION / SOLUTION
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number
