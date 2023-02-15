@@ -940,9 +940,10 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     pointer-events: auto !important;
 }
 
-.t5leveledGrid .x-grid-with-row-lines .x-grid-item.x-grid-item-selected { border-style: inherit; border-color: inherit; }
-.t5leveledGrid .x-grid-with-row-lines .x-grid-item-selected + .x-grid-item { border-top-style: inherit; border-top-color: inherit; }
-.t5leveledGrid  .x-grid-item-selected { color: inherit; background-color: inherit; }
+/* BCONF management*/
+.t5noselectionGrid .x-grid-with-row-lines .x-grid-item.x-grid-item-selected { border-style: inherit; border-color: inherit; }
+.t5noselectionGrid .x-grid-with-row-lines .x-grid-item-selected + .x-grid-item { border-top-style: inherit; border-top-color: inherit; }
+.t5noselectionGrid .x-grid-item-selected { color: inherit; background-color: inherit; }
 .t5leveledGrid .t5level0 { background-color: rgba(255, 239, 187, .3); }
 .t5leveledGrid.t5noLevels .t5level0 { background-color: transparent; }
 .t5leveledGrid .t5level1 .x-grid-item,
@@ -955,7 +956,6 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 .t5actionColumnGrid .x-action-col-icon { margin: 5px; }
 #bconfFprmEditor textarea.mono { background-color: rgba(160, 160, 160, 0.35); }
 #bconfFprmEditor .x-form-form-item.x-form-item-no-label::before { content:''; display:none; }
-
 
 .t5alikeGrid .x-grid-header-ct .t5source-match > div {background:url("../images/sourceLanguage.png") no-repeat 10px 9px;}
 .t5alikeGrid .x-grid-header-ct .t5target-match > div {background:url("../images/targetLanguage.png") no-repeat 10px 9px;}

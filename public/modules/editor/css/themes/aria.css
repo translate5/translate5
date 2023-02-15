@@ -72,6 +72,6 @@ tr.import td div {
 .t5leveledGrid .t5level0 { background-color: rgba(219, 231, 250, .4); }
 .t5chosenDefault, .t5leveledGrid .t5level0.t5chosenDefault, .t5leveledGrid.t5noLevels .t5level0.t5chosenDefault { color: #000; background-color: #ed9200; }
 .t5leveledGrid .t5level1.t5chosenDefault { color: #000; background-color: #c89748; }
-.t5leveledGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected.x-grid-item-alt { background-color: #1a232b; }
-.t5leveledGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected { border-style: solid; border-color: #ededed; }
-.t5leveledGrid .x-grid-view.x-grid-with-row-lines .x-grid-item-selected + .x-grid-item { border-top-style: solid; border-top-color: #ededed; }
+.t5noselectionGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected.x-grid-item-alt { background-color: #1a232b; }
+.t5noselectionGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected { border-style: solid; border-color: #ededed; }
+.t5noselectionGrid .x-grid-view.x-grid-with-row-lines .x-grid-item-selected + .x-grid-item { border-top-style: solid; border-top-color: #ededed; }

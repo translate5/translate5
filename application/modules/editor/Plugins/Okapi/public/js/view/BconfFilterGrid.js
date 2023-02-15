@@ -60,7 +60,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGrid', {
     searchValSet: '',
     searchValCache: '',
     isNewRecordSearchSet: false,
-    cls: 't5actionColumnGrid t5leveledGrid',
+    cls: 't5actionColumnGrid t5leveledGrid t5noselectionGrid',
     text_cols: {
         name: '#UT#Name',
         extensions: '#UT#Dateitypen',

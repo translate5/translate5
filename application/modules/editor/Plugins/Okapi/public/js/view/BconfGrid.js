@@ -125,7 +125,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         var me = this,
             config = {};
         config.title = me.title; //see EXT6UPD-9
-        config.userCls = instanceConfig.isCustomerGrid ? 't5actionColumnGrid t5leveledGrid' : 't5actionColumnGrid'; // for the non-customer view, we do not need the leveled grid decorations
+        config.userCls = instanceConfig.isCustomerGrid ? 't5actionColumnGrid t5leveledGrid t5noselectionGrid' : 't5actionColumnGrid t5noselectionGrid'; // for the non-customer view, we do not need the leveled grid decorations
         config.columns = [{
                 xtype: 'gridcolumn',
                 dataIndex: 'id',
