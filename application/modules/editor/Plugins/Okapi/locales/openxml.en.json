@@ -40,8 +40,8 @@
     "bPreferenceTranslatePowerpointNotes": "Translate notes",
     "bPreferenceTranslatePowerpointMasters": "Translate masters",
     "bPreferenceIgnorePlaceholdersInPowerpointMasters": "Ignore placeholder text in masters",
-    "bPreferencePowerpointIncludedSlideNumbersOnly": "Translate included slide numbers only",
-    "tsPowerpointIncludedSlideNumbers": "Included slide numbers",
+    "bPreferencePowerpointIncludedSlideNumbersOnly": "Translate selected slide numbers only",
+    "tsPowerpointIncludedSlideNumbers": "Slides to translate",
     "sPreferenceLineSeparatorReplacement": "Line seperator replacement",
     "bReorderPowerpointNotesAndComments": "Reorder powerpoint notes and comments",
     "bPreferenceAllowEmptyTargets": "Allow empty targets"

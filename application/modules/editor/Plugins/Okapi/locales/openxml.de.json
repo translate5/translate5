@@ -40,8 +40,8 @@
     "bPreferenceTranslatePowerpointNotes": "Anmerkungen übersetzen",
     "bPreferenceTranslatePowerpointMasters": "Vorlagen übersetzen",
     "bPreferenceIgnorePlaceholdersInPowerpointMasters": "Platzhalter-Text in Vorlagen ignorieren",
-    "bPreferencePowerpointIncludedSlideNumbersOnly": "Nur enthaltene Slides übersetzen",
-    "tsPowerpointIncludedSlideNumbers": "Enthaltene Slides",
+    "bPreferencePowerpointIncludedSlideNumbersOnly": "Nur ausgewählte Folien übersetzen",
+    "tsPowerpointIncludedSlideNumbers": "Nur gewählte Folien werden übersetzt",
     "sPreferenceLineSeparatorReplacement": "Ersatz für Linien-Trennzeichen",
     "bReorderPowerpointNotesAndComments": "PowerPoint Anmerkungen und Kommentare neu ordnen",
     "bPreferenceAllowEmptyTargets": "Leere Zieltexte erlauben"
