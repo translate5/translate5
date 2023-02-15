@@ -679,21 +679,28 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $task = $params['task'];
         $workerParentId = $params['workerParentId'];
         // retrieving the bconf to use
-        $bconfFilePath = ($this->bconfInZip == NULL) ?
-            static::getImportBconf($task)->getPath() // the normal way: retrieve the bconf to use from the task meta
-            : $this->bconfInZip; // COMPATIBILITY: we use the bconf from the ZIP file here if there was one bypassing the bconf management
+        if(empty($this->bconfInZip)){
+            // the normal way: retrieve the bconf to use from the task meta
+            $bconf = static::getImportBconf($task);
+            $bconfFilePath = $bconf->getPath();
+            $bconfName = $bconf->getName().' (id: '.$bconf->getId().')';
+        } else {
+            // COMPATIBILITY: we use the bconf from the ZIP file here if there was one bypassing the bconf management
+            $bconfFilePath = $this->bconfInZip;
+            $bconfName = basename($this->bconfInZip).' (from Import-ZIP)';
+        }
         $params = [
             'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
             'fileId' => $fileId,
             'file' => (string) $file,
             'importFolder' => $importFolder,
             'importConfig' => $params['importConfig'],
-            'bconfFilePath' => $bconfFilePath
+            'bconfFilePath' => $bconfFilePath,
+            'bconfName' => $bconfName
         ];
 
         // init worker and queue it
-        /** @var editor_Plugins_Okapi_Worker $worker */
-        $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
+        $worker = ZfExtended_Factory::get(editor_Plugins_Okapi_Worker::class);
         if (!$worker->init($task->getTaskGuid(), $params)) {
             return false;
         }
