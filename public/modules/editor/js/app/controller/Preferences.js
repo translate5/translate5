@@ -63,7 +63,7 @@ Ext.define('Editor.controller.Preferences', {
           '#preferencesWindow #cancelBtn': {
               click: 'handleCancel'
           },
-          '#segmentgrid #optionsBtn' : {
+          '#segmentgrid #repetitionsBtn' : {
               click: 'showPreferences'
           }
       }

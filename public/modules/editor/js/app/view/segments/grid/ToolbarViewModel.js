@@ -72,5 +72,8 @@ Ext.define('Editor.view.segments.grid.ToolbarViewModel', {
         isErgoView: function(get) {
             return get('viewmodeIsErgonomic') && get('editorIsReadonly');
         }
+    },
+    data: {
+        trackChangesButtonsActive: false
     }
 });
