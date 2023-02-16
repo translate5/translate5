@@ -94,9 +94,9 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Openxml', {
             'bPreferenceReplaceNoBreakHyphenTag.b': {},
             'bExtractExternalHyperlinks.b': {},
             'tsComplexFieldDefinitionsToExtract.i': { type: 'tagfield', identifier: 'cfd', guiData: 'translateableHyperlinkFields' },
-            'bInExcludeMode.b': {},
-            'bInExcludeHighlightMode.b': {},
+            'bInExcludeMode.b': { type: 'radio' },
             'tsExcludeWordStyles.i': { type: 'tagfield', identifier: 'sss', guiData: 'wordStyles' },
+            'bInExcludeHighlightMode.b': { type: 'radio' },
             'tsWordHighlightColors.i': { type: 'tagfield', identifier: 'hlt', guiData: 'colorNames' },
             'tsWordExcludedColors.i': { type: 'tagfield', identifier: 'yyy', guiData: 'colors' },
             'bPreferenceTranslateWordExcludeColors.b': { config: { hidden: true }}

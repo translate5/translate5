@@ -59,7 +59,9 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         integer : '#UT#Ganzzahl',
         validationFailed: '#UT#Ihre Änderungen sind nicht valide',
         changesInvalid: '#UT#Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden',
-        successfullySaved: '#UT#Der Filter wurde erfolgreich gespeichert'
+        successfullySaved: '#UT#Der Filter wurde erfolgreich gespeichert',
+        yes: '#UT#Ja',
+        no: '#UT#Nein'
     },
     initConfig: function(instanceConfig){
         var config = {
