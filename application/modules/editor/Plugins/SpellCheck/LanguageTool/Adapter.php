@@ -35,7 +35,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\TimeOutException;
  * Connector to LanguageTool
  * https://languagetool.org/http-api/swagger-ui/#/default
  */
-class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
+class editor_Plugins_SpellCheck_LanguageTool_Adapter {
     
     /**
      * LanguageTool
@@ -132,8 +132,7 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
         // Get version and assign into $version arg passed by reference
         $version = $response->software->version;
 
-        // Return response
-        return $response;
+        return ($this->lastStatus === 200);
     }
 
     /**
@@ -291,11 +290,11 @@ class editor_Plugins_SpellCheck_Adapter_LanguageTool_Adapter {
 
         // Catch timeout
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $httpException) {
-            throw new TimeOutException('E1412', $extraData, $httpException);
+            throw new TimeOutException('E1468', $extraData, $httpException);
 
         // Catch spot down
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $httpException) {
-            throw new DownException('E1410', $extraData, $httpException);
+            throw new DownException('E1468', $extraData, $httpException);
 
         // Catch no response
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $httpException) {

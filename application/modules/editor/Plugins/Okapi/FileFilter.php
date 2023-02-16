@@ -58,9 +58,7 @@ class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter {
      * @see editor_Models_File_IFilter::applyExportFilter()
      */
     public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters){
-        $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
-        /* @var $worker editor_Plugins_Okapi_Worker */
-        
+        $worker = ZfExtended_Factory::get(editor_Plugins_Okapi_Worker::class);
         $params=[
                 'type' => editor_Plugins_Okapi_Worker::TYPE_EXPORT,
                 'fileId'=>$fileId,

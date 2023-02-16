@@ -44,16 +44,12 @@ Ext.define('Editor.view.segments.MetaPanel', {
     scrollable: 'y',
     frameHeader: false,
     id: 'segment-metadata',
-    strings:{
-        title: '#UT#Segment-Metadaten',
+    bind: {
+        title: '{l10n.metaPanel.title}'
     },
     segmentStateId: -1, // caches the segment state to safely capture user originating radio changes. ExtJs suspendEvent && resumeEvent do not work for radios :-(
     layout: 'auto',
 
-    item_metaStates_title: '#UT#Status',
-    item_metaStates_tooltip: '#UT#Segment auf den ausgewählten Status setzen (ALT + S danach {0})',
-    item_metaStates_tooltip_nokey: '#UT#Segment auf den ausgewählten Status setzen',
-    
     initComponent: function() {
         var me = this,
             showStatus = Editor.app.getTaskConfig('segments.showStatus'),
@@ -65,22 +61,31 @@ Ext.define('Editor.view.segments.MetaPanel', {
                 xtype: 'form',
                 border: 0,
                 itemId: 'metaInfoForm',
+                defaults: {
+                    stateEvents: ['collapse', 'expand'],
+                    stateful: {
+                        collapsed: true
+                    },
+                    collapsible: true
+                },
                 items: [{
                       xtype: 'falsePositives',
                       itemId: 'falsePositives',
-                      collapsible: true
+                      stateId: 'editor.eastPanelSegmentsFalsePositives',
                   },{
                       xtype: 'segmentQm',
                       itemId: 'segmentQm',
+                      stateId: 'editor.eastPanelSegmentsMqmWhole',
                       hidden:  !isSegmentQmVisible,
-                      collapsible: true
                   },{
                       xtype: 'fieldset',
                       itemId: 'metaStates',
-                      collapsible: true,
+                      stateId: 'editor.eastPanelSegmentsMetaStates',
                       defaultType: 'radio',
                       hidden:  !showStatus,
-                      title: me.item_metaStates_title
+                      bind: {
+                          title: '{l10n.metaPanel.metaStates_title}'
+                      }
                   }]
               }
           ]
@@ -96,14 +101,16 @@ Ext.define('Editor.view.segments.MetaPanel', {
         var me = this,
             stati = me.down('#metaStates'),
             flags = Editor.data.segments.stateFlags,
-            counter = 1;
-        
+            counter = 1,
+            metaStates_tooltip = Editor.data.l10n.metaPanel.metaStates_tooltip,
+            metaStates_tooltip_nokey = Editor.data.l10n.metaPanel.metaStates_tooltip_nokey;
+
         Ext.each(flags, function(item){
             var tooltip;
             if(counter < 10) {
-                tooltip = Ext.String.format(me.item_metaStates_tooltip, counter++);
+                tooltip = Ext.String.format(metaStates_tooltip, counter++);
             } else {
-                tooltip = me.item_metaStates_tooltip_nokey;
+                tooltip = metaStates_tooltip_nokey;
             }
             stati.add({
                 xtype: 'radio',

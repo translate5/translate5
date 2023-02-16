@@ -64,13 +64,10 @@ Ext.define('Editor.controller.MetaPanel', {
         selector: '#metapanel segmentsMetapanel'
     }, {
         ref: 'leftBtn',
-        selector: '#metapanel #goAlternateLeftBtn'
+        selector: 'menu #goAlternateLeftBtn'
     }, {
         ref: 'rightBtn',
-        selector: '#metapanel #goAlternateRightBtn'
-    }, {
-        ref: 'navi',
-        selector: '#metapanel #naviToolbar'
+        selector: 'menu #goAlternateRightBtn'
     }, {
         ref: 'segmentGrid',
         selector: '#segmentgrid'
@@ -142,21 +139,9 @@ Ext.define('Editor.controller.MetaPanel', {
      * @param {Object} editingPlugin
      */
     startEdit: function (editingPlugin, context) {
-        var me = this,
-            record = context.record,
-            isWatched = Boolean(record.get('isWatched')),
-            navi = me.getNavi(),
-            but = Ext.getCmp('watchSegmentBtn'),
-            tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
+        var me = this;
         me.editingMode = 'edit';
-        but.toggle(isWatched, true);
         me.toggleOnEdit(true);
-        but.setTooltip({
-            dismissDelay: 0,
-            text: tooltip
-        });
-        navi.show();
-        navi.enable();
         me.getSegmentMeta().show();
     },
 
@@ -304,7 +289,6 @@ Ext.define('Editor.controller.MetaPanel', {
         me.record = record;
         me.getSegmentMeta().hide();
         mp.enable();
-        me.getNavi().hide();
     },
     /**
      * lädt die konkreten record ins Meta Panel

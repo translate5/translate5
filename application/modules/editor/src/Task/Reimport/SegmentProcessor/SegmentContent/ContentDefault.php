@@ -53,7 +53,7 @@ class ContentDefault extends ContentBase
         $this->updateSegment = false;
 
         // ignore the update in case source and target are empty
-        if( empty($this->getDataSource()) && empty($this->getDataTarget())){
+        if (empty($this->getDataSource()) && empty($this->getDataTarget())) {
             return;
         }
 
@@ -68,12 +68,12 @@ class ContentDefault extends ContentBase
             $this->updateSegment = true;
         }
 
-        if( !$this->isContentEqual($this->segment->getFieldEdited($this->sfm->getFirstTargetName()),$this->getDataTarget())){
+        if (!$this->isContentEqual($this->segment->getFieldEdited($this->sfm->getFirstTargetName()), $this->getDataTarget())) {
             $this->updateTarget($this->getDataTarget());
             $this->updateSegment = true;
         }
 
-        if( $this->updateSegment === false){
+        if ($this->updateSegment === false) {
             // no update needed, skip the save
             return;
         }
@@ -82,7 +82,7 @@ class ContentDefault extends ContentBase
         $this->segment->setUserName($this->user->getUserName());
 
         $segmentAutoState = editor_Models_Segment_AutoStates::REVIEWED_PM;
-        if( empty($this->getDataTarget())){
+        if (empty($this->getDataTarget())) {
             $segmentAutoState = editor_Models_Segment_AutoStates::NOT_TRANSLATED;
         }
         $this->segment->setAutoStateId($segmentAutoState);
@@ -101,11 +101,11 @@ class ContentDefault extends ContentBase
         $this->segmentTagger->protect($this->segment->getSource());
         $newTarget = $this->segmentTagger->reapply2dMap($this->normalizeContent($target), $this->segmentTagger->getOriginalTags());
 
-        if( $this->isTrackChangesActive()) {
+        if ($this->isTrackChangesActive()) {
             $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
         }
 
-        $this->update($newTarget,$this->sfm->getFirstTargetName(),$this->sfm->getFirstTargetNameEdit());
+        $this->update($newTarget, $this->sfm->getFirstTargetName(), $this->sfm->getFirstTargetNameEdit());
     }
 
     /**

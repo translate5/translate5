@@ -1,0 +1,94 @@
+<?xml version='1.0'?><!DOCTYPE martif SYSTEM "TBXBasiccoreStructV02.dtd">
+<martif>
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Export of translate5 termCollection Match Analysis Collection</title>
+                <note>Contains the languages: en, de</note>
+            </titleStmt>
+            <sourceDesc>
+                <p>File is exported from translate5 instance at https://translate5.local by the user Project Manager</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">http://www.lisa.org/fileadmin/standards/tbx_basic/TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="id1841189b-7538-4ead-9a24-4aee627b0a2f">
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote type="responsibility" target="">Project Manager</transacNote>
+                    <date>2023-02-03</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                    <date>2023-02-03</date>
+                </transacGrp>
+                <langSet xml:lang="en">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2023-02-03</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2023-02-03</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id5efd8b43-8cb4-4ef6-bf20-ce503af32d53">Terminology segment</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2023-02-03</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2023-02-03</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <transacGrp>
+                        <transac type="transactionType">origination</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2023-02-03</date>
+                    </transacGrp>
+                    <transacGrp>
+                        <transac type="transactionType">modification</transac>
+                        <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                        <date>2023-02-03</date>
+                    </transacGrp>
+                    <tig>
+                        <term id="id077e5f66-906f-4bce-894d-f05cef709ccc">Terminologiesegment</term>
+                        <termNote type="processStatus">finalized</termNote>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2023-02-03</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote type="responsibility" target="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">Project Manager</transacNote>
+                            <date>2023-02-03</date>
+                        </transacGrp>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+        <back>
+            <refObjectList type="respPerson">
+                <refObject id="{e6828cdf-2ee0-4a25-af0a-92e6f060e9eb}">
+                    <item type="fn">Project Manager</item>
+                    <item type="role">admin,instantTranslate,pm,termCustomerSearch,termProposer,editor,instantTranslateWriteTm,systemadmin,termFinalizer,termPM,termPM_allClients,termReviewer</item>
+                    <item type="email">noreply@translate5.net</item>
+                </refObject>
+            </refObjectList>
+        </back>
+    </text>
+</martif>

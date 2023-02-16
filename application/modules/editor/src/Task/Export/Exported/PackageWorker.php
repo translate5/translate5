@@ -1,3 +1,4 @@
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -24,23 +25,30 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+namespace MittagQI\Translate5\Task\Export\Exported;
+
+use editor_Models_Export_Exception;
+use editor_Models_Export_Exported_ZipDefaultWorker;
+use editor_Models_Task;
+use MittagQI\Translate5\Task\Export\Package\ExportSource;
+use SplFileInfo;
+use ZfExtended_Factory;
+use ZfExtended_Models_Worker;
+use ZfExtended_Utils;
 
 /**
- * @class Editor.plugins.TermTagger.view.TermPortletFieldset
  */
-Ext.define('Editor.plugins.TermTagger.view.TermPortletFieldset', {
-    extend: 'Ext.form.FieldSet',
-    alias: 'widget.termPortalTermPortletFieldset',
-    requires: ['Editor.plugins.TermTagger.view.TermPortlet'],
+class PackageWorker extends editor_Models_Export_Exported_ZipDefaultWorker {
 
-    itemId: 'metaTerms',
-    collapsible: true,
-    title: '#UT#Terminologie',
-    bind: {
-        title: '{l10n.TermTagger.termPortletFieldset.title}',
-    },
-    anchor: '100%',
-    items: [{
-        xtype: 'termPortalTermPortlet'
-    }]
-});
+    /**
+     * Create export zip file from the generate package directory
+     * @param editor_Models_Task $task
+     * @throws editor_Models_Export_Exception
+     */
+    protected function doWork(editor_Models_Task $task): void
+    {
+        parent::doWork($task);
+        $params = $this->workerModel->getParameters();
+        ZfExtended_Utils::cleanZipPaths(new SplFileInfo($params['zipFile']), basename(ExportSource::PACKAGE_FOLDER_NAME));
+    }
+}

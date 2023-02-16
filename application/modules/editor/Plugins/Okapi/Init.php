@@ -40,9 +40,6 @@
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
-    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
-    protected static bool $activateForTests = true;
-
     /**
      * The current internal version index of the bconf's
      * This must be increased each time, a git-based fprm or srx is changed
@@ -81,11 +78,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'vrsz', 'vsdm', 'vsdx', 'wcml', 'wix', 'xlsm', 'xlsx', 'xltm', 'xltx', 'xml', 'yaml', 'yml'
     ];
 
-    /**
-     * @var editor_Plugins_Okapi_Bconf_Entity
-     */
-    private static $cachedBconf = NULL;
-    
     /**
      * Retrieves the config-based path to the default export bconf
      * @param editor_Models_Task $task
@@ -178,6 +170,22 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         sort($extensions);
         return $extensions;
     }
+
+    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
+    protected static bool $activateForTests = true;
+
+    /**
+     * The services we use
+     * @var string[]
+     */
+    protected static array $services = [
+        'okapi' => MittagQI\Translate5\Plugins\Okapi\Service::class
+    ];
+
+    /**
+     * @var editor_Plugins_Okapi_Bconf_Entity
+     */
+    private static $cachedBconf = NULL;
 
     protected $localePath = 'locales';
 
@@ -288,7 +296,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 'action'     => 'clone'
             ]);
         $r->addRoute('plugins_okapi_bconf_clone', $route);
-
+        // route to set the non-customer default
+        $route = new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_okapi_bconf/setdefault',
+            [
+                'module'     => 'editor',
+                'controller' => 'plugins_okapi_bconf',
+                'action'     => 'setdefault'
+            ]);
+        $r->addRoute('plugins_okapi_bconf_setdefault', $route);
 
         // routes for bconf filters
         $route = new Zend_Rest_Route($f, [], [
@@ -663,21 +679,28 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $task = $params['task'];
         $workerParentId = $params['workerParentId'];
         // retrieving the bconf to use
-        $bconfFilePath = ($this->bconfInZip == NULL) ?
-            static::getImportBconf($task)->getPath() // the normal way: retrieve the bconf to use from the task meta
-            : $this->bconfInZip; // COMPATIBILITY: we use the bconf from the ZIP file here if there was one bypassing the bconf management
+        if(empty($this->bconfInZip)){
+            // the normal way: retrieve the bconf to use from the task meta
+            $bconf = static::getImportBconf($task);
+            $bconfFilePath = $bconf->getPath();
+            $bconfName = $bconf->getName().' (id: '.$bconf->getId().')';
+        } else {
+            // COMPATIBILITY: we use the bconf from the ZIP file here if there was one bypassing the bconf management
+            $bconfFilePath = $this->bconfInZip;
+            $bconfName = basename($this->bconfInZip).' (from Import-ZIP)';
+        }
         $params = [
             'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
             'fileId' => $fileId,
             'file' => (string) $file,
             'importFolder' => $importFolder,
             'importConfig' => $params['importConfig'],
-            'bconfFilePath' => $bconfFilePath
+            'bconfFilePath' => $bconfFilePath,
+            'bconfName' => $bconfName
         ];
 
         // init worker and queue it
-        /** @var editor_Plugins_Okapi_Worker $worker */
-        $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
+        $worker = ZfExtended_Factory::get(editor_Plugins_Okapi_Worker::class);
         if (!$worker->init($task->getTaskGuid(), $params)) {
             return false;
         }

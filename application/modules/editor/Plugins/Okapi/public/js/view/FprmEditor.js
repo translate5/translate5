@@ -38,6 +38,7 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
     constrainHeader: true,
     iconCls: 'x-fa fa-edit',
     loadMask: true,
+    resetable: false,
     title: {
         text: "FPRM Editor"
     },
@@ -45,18 +46,22 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
         bconfFilter: null
     },
     strings: {
-        title: "#UT#Editiere Filter Typ {0} von Bconf {1}",
-        help: "#UT#OKAPI Hilfe",
-        save: "#UT#Speichern",
-        cancel: "#UT#Abbrechen",
-        invalidTitle: "#UT#Bearbeitung fehlerhaft",
-        invalidField: '#UT#Feld "{0}" vom Typ "{1}" ist nicht valide',
-        float: "#UT#Gleitkommazahl",
-        boolean : "#UT#Boolscher Wert",
-        integer : "#UT#Ganzzahl",
-        validationFailed: "#UT#Ihre Änderungen sind nicht valide",
-        changesInvalid: "#UT#Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden",
-        successfullySaved: "#UT#Der Filter wurde erfolgreich gespeichert"
+        title: '#UT#Editiere Filter Typ {0} von Bconf {1}',
+        help: '#UT#OKAPI Hilfe',
+        helpTooltip: '#UT#Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet',
+        save: '#UT#Speichern',
+        cancel: '#UT#Abbrechen',
+        reset: '#UT#Änderungen zurücksetzen',
+        invalidTitle: '#UT#Bearbeitung fehlerhaft',
+        invalidField: "#UT#Feld '{0}' vom Typ '{1}' ist nicht valide",
+        float: '#UT#Gleitkommazahl',
+        boolean : '#UT#Boolscher Wert',
+        integer : '#UT#Ganzzahl',
+        validationFailed: '#UT#Ihre Änderungen sind nicht valide',
+        changesInvalid: '#UT#Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden',
+        successfullySaved: '#UT#Der Filter wurde erfolgreich gespeichert',
+        yes: '#UT#Ja',
+        no: '#UT#Nein'
     },
     initConfig: function(instanceConfig){
         var config = {
@@ -73,7 +78,8 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
             form: null,
             tools: [{
                 iconCls: 'x-fa fa-undo',
-                tooltip: '#UT#Refresh',
+                tooltip: this.strings.reset,
+                hidden: !this.resetable,
                 handler: function(e, el, owner){
                     var editor = owner.up('window');
                     editor.unload();
@@ -102,10 +108,13 @@ Ext.define('Editor.plugins.Okapi.view.FprmEditor', {
                         toolbar.down('button#help').setStyle('left', '0px');
                     }
                 },
-                items: [
-                    { xtype: 'component', flex: 1 },{
+                items: [{
+                    xtype: 'component',
+                    flex: 1
+                },{
                     xtype: 'button',
                     text: this.strings.help,
+                    tooltip: this.strings.helpTooltip,
                     itemId: 'help',
                     hidden: true,
                     iconCls: 'x-fa fa-book',

@@ -117,14 +117,16 @@ class Models_Installer_Standalone {
         //initially we have to load the locales from the environment
         setlocale(LC_ALL, '');
         $saInstaller = new self(getcwd(), $options);
-        $saInstaller->checkAndCallTools();
+        $saInstaller->checkAndCallTools(); //obsolete, checks only for help
         $saInstaller->checkGitAndInit();
         $saInstaller->processDependencies();
+
+        //down from here, all code could be moved into a symfony command
         $saInstaller->checkEnvironment();
-        $saInstaller->addZendToIncludePath();
+        $saInstaller->addZendToIncludePath(); //obsolete in CLI installer
         $saInstaller->installation();//checks internally if steps are already done
-        $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
-        $saInstaller->initApplication();
+        $saInstaller->cleanUpDeletedFiles(); //must be before initApplication! → must be replaced with zip based clean up, may be a single command
+        $saInstaller->initApplication(); //obsolete in CLI context
         $saInstaller->postInstallation();
         $saInstaller->updateDb(); //this does also cache cleaning!
         $saInstaller->checkDb();
@@ -299,6 +301,7 @@ class Models_Installer_Standalone {
         require_once $this->currentWorkingDir. self::VENDOR_AUTOLOAD_PHP;
         $this->cli = new Symfony\Component\Console\Application();
         $this->cli->setAutoExit(false);
+        //add only here the new CLI installer call
         $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
         $this->cli->add(new Translate5\MaintenanceCli\Command\DatabaseUpdateCommand());
 
@@ -338,45 +341,45 @@ class Models_Installer_Standalone {
      */
     protected function installation(): void
     {
-        $o = $this->options;
+        $iniFile = $this->currentWorkingDir.self::INSTALL_INI;
+        $iniExists = file_exists($iniFile);
 
-        //assume installation success if installation.ini exists!
-        if(file_exists($this->currentWorkingDir.self::INSTALL_INI)){
+        //assume installation success if installation.ini exists already and we are in no developer installation
+        if ($iniExists && !$this->recreateDb) {
             return;
         }
-        $this->isInstallation = true;
+        $this->isInstallation = true; //is reset later if dbIsEmpty
         $this->logSection('Translate5 Installation');
-        
-        if(!is_array($o) || empty($o['db::host']) || empty($o['db::username']) || empty($o['db::password']) || empty($o['db::database'])) {
-            while(! $this->promptDbCredentials()){};
+
+        if ($iniExists) {
+            $conf = new Zend_Config_Ini($iniFile,'application', ['scannerMode' => INI_SCANNER_TYPED]);
+            $this->dbCredentials = $conf->resources->db->params->toArray();
+            date_default_timezone_set($this->options['timezone']);
         } else {
-            $this->dbCredentials['host']     = $o['db::host'];
-            $this->dbCredentials['username'] = $o['db::username'];
-            $this->dbCredentials['password'] = $o['db::password'];
-            $this->dbCredentials['dbname'] = $o['db::database'];
+            $this->boostrapInstallationIni();
+            if ($this->recreateDb) {
+                //only in development installations and if no ini was there
+                $this->recreateDatabase();
+            }
         }
+        $this->mockDbConfig();
 
-        if(empty($o['timezone'])) {
-            $timezone = $this->askTimzone();
-        }
-        else {
-            $timezone = $o['timezone'];
-        }
-
-        // use chosen timezone and store it in ini
-        date_default_timezone_set($timezone);
-        $this->createInstallationIni(['timezone' => $timezone]);
-
-        $this->recreateDatabase();
-
-        if(! $this->checkDb()) {
-            unlink($this->currentWorkingDir.self::INSTALL_INI);
-            $this->log("\nFix the above errors and restart the installer! DB Config ".self::INSTALL_INI." was automatically removed therefore.\n");
+        if (!$this->checkDb()) {
+            if ($iniExists) {
+                //if ini was already there we have to keep it!
+                $this->log("\nFix the above errors and restart the installer! \n");
+            } else {
+                unlink($this->currentWorkingDir.self::INSTALL_INI);
+                $this->log("\nFix the above errors and restart the installer! DB Config ".self::INSTALL_INI." was automatically removed therefore.\n");
+            }
             exit;
         }
+
         $this->initDb();
         $this->promptHostname();
-        $this->moveClientSpecific();
+        if(!$iniExists) {
+            $this->moveClientSpecific();
+        }
     }
     
     /**
@@ -577,9 +580,13 @@ class Models_Installer_Standalone {
      */
     protected function initDb(): void
     {
-        $this->log("\nCreating the database base layout...");
-
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
+        if(!$dbupdater->isDbEmpty()) {
+            $this->isInstallation = false;
+            $this->log('DB is not empty, we are reusing and updating it...');
+            return;
+        }
+        $this->log("\nCreating the database base layout...");
         if(! $dbupdater->initDb()) {
             $this->log('Error on creating initial DB structure, stopping installation. Result: '.print_r($dbupdater->getErrors(),1));
             exit;
@@ -625,23 +632,7 @@ class Models_Installer_Standalone {
         } else {
             $this->log("\nDB Config could NOT be stored in .".self::INSTALL_INI."!\n");
         }
-        
-        Zend_Registry::set('config', new Zend_Config([
-            'resources' => new Zend_Config([
-                'db' => new Zend_Config([
-                    'adapter' => "PDO_MYSQL",
-                    'isDefaultTableAdapter' => 1,
-                    'params' => new Zend_Config([
-                        'charset' => "utf8mb4",
-                        'host' => $this->dbCredentials['host'],
-                        'username' => $this->dbCredentials['username'],
-                        'password' => $this->dbCredentials['password'],
-                        'dbname' => $this->dbCredentials['dbname'],
-                    ])
-                ])
-            ])
-        ]));
-        
+
         return ($bytes > 0);
     }
 
@@ -650,15 +641,20 @@ class Models_Installer_Standalone {
      * @return bool
      * @throws Exception
      */
-    protected function checkDb(): bool {
+    protected function checkDb(): bool
+    {
         $this->initTranslate5CliBridge();
         $input = new Symfony\Component\Console\Input\ArrayInput([
             'command' => 'system:check',
             'module' => 'database',
             '--pre-installation' => null,
             '--ansi' => null,
+            '--verbose' => null,
         ]);
-        return $this->cli->run($input) === 0;
+        $this->cli->setCatchExceptions(false);
+        return $this->waitForDatabase(function () use ($input) {
+            return $this->cli->run($input) === 0;
+        });
     }
 
     /**
@@ -810,10 +806,6 @@ class Models_Installer_Standalone {
 
     private function recreateDatabase(): void
     {
-        if (! $this->recreateDb) {
-            return;
-        }
-
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
         $conf = $this->dbCredentials;
         $conf['dropIfExists'] = true;
@@ -824,19 +816,20 @@ class Models_Installer_Standalone {
         });
     }
 
-    private function waitForDatabase(callable $callToDb) :void
+    private function waitForDatabase(callable $callToDb): mixed
     {
         //if DB is not (yet) reachable we wait 5x5 seconds max
         $this->log('Waiting for database...');
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 10; $i++) {
+            $wasCaught = false;
             try {
-                $callToDb();
-                return;
+                return $callToDb();
             } catch (Zend_Db_Adapter_Exception|PDOException $e) {
+                $wasCaught = true;
                 $msg = $e->getMessage();
                 if (str_contains($msg, 'SQLSTATE[HY000] [2002] Connection refused')
                     || str_contains($msg, 'SQLSTATE[HY000] [2002] No such file or directory')
-                    ||str_contains($msg, 'SQLSTATE[HY000] [2006] MySQL server has gone away')) {
+                    || str_contains($msg, 'SQLSTATE[HY000] [2006] MySQL server has gone away')) {
                     sleep(5);
                     continue;
                 } else {
@@ -845,8 +838,60 @@ class Models_Installer_Standalone {
                 }
             }
         }
-        if (!empty($e)) {
+        if (!$wasCaught && !empty($e)) {
             throw $e;
         }
+        throw new Exception('Database not reachable after 50 seconds...');
+    }
+
+    /**
+     * Ask / gets the needed config values and creates the installation.ini
+     * @return void
+     * @throws Exception
+     */
+    private function boostrapInstallationIni(): void
+    {
+        $o = $this->options;
+        if (!is_array($o) || empty($o['db::host']) || empty($o['db::username']) || empty($o['db::password']) || empty($o['db::database'])) {
+            while (!$this->promptDbCredentials()) {
+            };
+        } else {
+            $this->dbCredentials['host'] = $o['db::host'];
+            $this->dbCredentials['username'] = $o['db::username'];
+            $this->dbCredentials['password'] = $o['db::password'];
+            $this->dbCredentials['dbname'] = $o['db::database'];
+        }
+
+        if (empty($o['timezone'])) {
+            $timezone = $this->askTimzone();
+        } else {
+            $timezone = $o['timezone'];
+        }
+
+        // use chosen timezone and store it in ini
+        date_default_timezone_set($timezone);
+        $this->createInstallationIni(['timezone' => $timezone]);
+    }
+
+    /**
+     * @return void
+     */
+    private function mockDbConfig(): void
+    {
+        Zend_Registry::set('config', new Zend_Config([
+            'resources' => new Zend_Config([
+                'db' => new Zend_Config([
+                    'adapter' => "PDO_MYSQL",
+                    'isDefaultTableAdapter' => 1,
+                    'params' => new Zend_Config([
+                        'charset' => "utf8mb4",
+                        'host' => $this->dbCredentials['host'],
+                        'username' => $this->dbCredentials['username'],
+                        'password' => $this->dbCredentials['password'],
+                        'dbname' => $this->dbCredentials['dbname'],
+                    ])
+                ])
+            ])
+        ]));
     }
 }

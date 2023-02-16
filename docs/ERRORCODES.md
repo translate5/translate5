@@ -280,20 +280,24 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1149"></a>E1149  | Task Export | Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"]. | See error details for affected segments and details.
 | <a id="E1157"></a>E1157  | Task Export | Export: the file &quot;{file}&quot; could not be exported, since had possibly already errors on import. | See error details for affected file and details.
 | <a id="E1170"></a>E1170  | Task Metadata Export | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
+| <a id="E1452"></a>E1452  | Export package     | Export package: Task contains not supported files for package export | The exported task contains files which are not supported by the package export.
+| <a id="E1453"></a>E1453  | Export package     | Export package: Source package validation fail | The validation for one or multiple package sources failed. Check the event log for more info
+| <a id="E1454"></a>E1454  | Export package     | Export package: Unable to create resource export folder | There was a problem when creating the resources folders. For more info check the error log
 
 ### Task reimport
-| EventCode        | Context         | EventMessage                                                                          | Description/Solution
-| :--------------- |:----------------|:--------------------------------------------------------------------------------------| :-------------------
-| <a id="E1426"></a>E1426  | Task reimport   | Reimport: Missing required request parameter fileId.                                  | The required api parameter fileId was not provided or it was empty
-| <a id="E1427"></a>E1427  | Task reimport   | Reimport DataProvider: Error on file upload. | There was an error with the file upload. Check the error log for more info.
-| <a id="E1429"></a>E1429  | Task reimport   | Reimport DataProvider: No upload files found for task reimport.                       | No valid upload files found on task reimport.
-| <a id="E1430"></a>E1430  | Task reimport   | Reimport DataProvider: Unable to create copy of the zip archive.                      | Unable to create copy of the old zip archive when new on is create with the latest files.
-| <a id="E1433"></a>E1433  | Task reimport   | Reimport Worker: Unable to find fileParser for the uploaded file.                     | The uploaded file type is not supported and can not be imported.
-| <a id="E1434"></a>E1434  | Task reimport   | Reimport Segment processor: No matching segment was found for the given mid. | In the file upload there was a segment with mid id which was not found in translate5 segments table
-| <a id="E1435"></a>E1435  | Task reimport   | Reimport Segment processor: Unable to save the segment                                | There was an error on saving the segment on reimport. For more info check the error log
-| <a id="E1440"></a>E1440  | Task reimport   | File reimport finished. | The task reimport process is finished and additional info can be seen in task log
-| <a id="E1441"></a>E1441  | Task reimport   | Reimport Segment processor: No content parser found for the file with extension {ext} | For the uploaded file there is not content parser available
-
+| EventCode        | Context         | EventMessage                                                                                                       | Description/Solution
+| :--------------- |:----------------|:-------------------------------------------------------------------------------------------------------------------| :-------------------
+| <a id="E1426"></a>E1426  | Task reimport   | Reimport: Missing required request parameter fileId.                                                               | The required api parameter fileId was not provided or it was empty
+| <a id="E1427"></a>E1427  | Task reimport   | Reimport DataProvider: Error on file upload.                                                                       | There was an error with the file upload. Check the error log for more info.
+| <a id="E1429"></a>E1429  | Task reimport   | Reimport DataProvider: No upload files found for task reimport. | No valid upload files found on task reimport.
+| <a id="E1430"></a>E1430  | Task reimport   | Reimport DataProvider: Unable to create copy of the zip archive.                                                   | Unable to create copy of the old zip archive when new on is create with the latest files.
+| <a id="E1433"></a>E1433  | Task reimport   | Reimport Worker: Unable to find fileParser for the uploaded file.                                                  | The uploaded file type is not supported and can not be imported.
+| <a id="E1434"></a>E1434  | Task reimport   | Reimport Segment processor: No matching segment was found for the given mid.                                       | In the file upload there was a segment with mid id which was not found in translate5 segments table
+| <a id="E1435"></a>E1435  | Task reimport   | Reimport Segment processor: Unable to save the segment                                                             | There was an error on saving the segment on reimport. For more info check the error log
+| <a id="E1440"></a>E1440  | Task reimport   | Reimport for the file "{filename}" is finished. Total updated segments: {updateCount}. | The task reimport process is finished and additional info can be seen in task log
+| <a id="E1441"></a>E1441  | Task reimport   | Reimport Segment processor: No content parser found for the file with extension {ext}                              | For the uploaded file there is not content parser available
+| <a id="E1461"></a>E1461  | Task reimport   | Reimport ZipDataProvider: The provided file in the zip package can not be name-matched with any of the task files. | The zip package contains fails which can not be matched by name with the existing task files.
+| <a id="E1462"></a>E1462  | Task reimport   | Reimport ZipDataProvider: Unable to replace the original file with the uploaded version                            | Error happen when trying to copy/replace the original file with the new version of the file on the disk.
 
 ### Language Resources
 | EventCode        | Context       | EventMessage  | Description/Solution
@@ -385,8 +389,9 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1361"></a>E1361  | Terminology | TBX Import: Unable to import terms due invalid Rfc5646 language code "{code}" | The listed language code is invalid / not configured in translate5, the corresponding terms could not be imported.
 | <a id="E1446"></a>E1446  | Terminology | TBX Import: Attribute has known type, but has elementName unexpected for that type so changed to expected one | See the extra data to check values of type, wasElementName (e.g. unexpected for that type) and elementName (expected one) 
 | <a id="E1463"></a>E1463  | Terminology | TBX Import: Attribute has known type, but is at level unexpected for that type so that level is added to the list of expected | See the extra data to check values of type, unexpectedLevel (e.g. unexpected for that type), wasExpectedLevels and nowExpectedLevels
-| <a id="E1447"></a>E1447  | Terminology | TBX Import: Attribute target was emptied as unsupported for that attribute type | See the extra data to check values of type and wasTarget
+| <a id="E1472"></a>E1472  | Terminology | TBX Import: Attribute target was emptied as unsupported for that attribute type | See the extra data to check values of type and wasTarget
 | <a id="E1364"></a>E1364  | Terminology | TermTagger overall run done - {segmentCounts} | Reports that the whole task was tagged with the termtagger and shows the segment status counts.
+| <a id="E1449"></a>E1449  | Terminology | TBX Export: No valid file path is found for exported collection | The export file-path of a term collection was not set on tbx export
 | <a id="E1451"></a>E1451  | Terminology | Recoverable error on termtagging: {message} | See system log for details.
 
 
@@ -616,13 +621,15 @@ https://confluence.translate5.net/display/TAD/EventCodes
 #### Plug-In SpellCheck
 | EventCode        | Context            | EventMessage                                                                                                                  | Description/Solution
 | :--------------- |:-------------------|:------------------------------------------------------------------------------------------------------------------------------| :-------------------
-| <a id="E1410"></a>E1410  | Plug-In SpellCheck | SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary. | The LanguageTool server as specified in the error message is deactivated automatically. On each periodical cron call (normally all 15 minutes) all LanguageTool instances are checked for availability. If a previously deactivated LanguageTool is available again, it is reactivated automatically. To reactivate the LanguageTool servers manually just call the following SQL statement in the Database:DELETE FROM Zf_memcache WHERE id = 'SpellCheckDownList';
-| <a id="E1411"></a>E1411  | Plug-In SpellCheck | SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.                          | Start the LanguageTool(s) if not already done. If the LanguageTool instances were started and crashed then, see E1410 how to reactivate the LanguageTool instances marked as offline in translate5. After reactivation, reimport the task. The task clone functionality can be used to reimport the task.
-| <a id="E1412"></a>E1412  | Plug-In SpellCheck | SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.                   | Normally everything should be OK, the considered LanguageTool is probably just doing its work and can not respond to another request in an appropriate time frame. Only if this error is logged multiple times further investigations should be done.
 | <a id="E1413"></a>E1413  | Plug-In SpellCheck | SpellCheck can not work when target language is not supported by LanguageTool. | Check task target language
 | <a id="E1417"></a>E1417  | Plug-In SpellCheck | SpellCheck DOWN: one or more configured LanguageTool instances are not available: {serverList} | One or more LanguageTool instances are not available. All LanguageTool instances are listed with their status. Please check them manually and restart them if needed.
 | <a id="E1418"></a>E1418  | Plug-In SpellCheck | LanguageTool (which stands behind AutoQA Spell Check) detected an error of a kind previously unknown to translate5 app        | Create a ticket for this issue with the event added.
 | <a id="E1419"></a>E1419  | Plug-In SpellCheck | SpellCheck overall run done - {segmentCounts} | Reports that the whole task was checked with the spellchecker and shows the segment status counts.
+| <a id="E1464"></a>E1464  | Plug-In SpellCheck | Recoverable error on spellchecking: {recoverableError} - see system log for details. | This Error is more informative and there is no urgent todo, see the details of the event
+| <a id="E1465"></a>E1465  | Plug-In SpellCheck | Some segments could not be checked by the spellchecker | This Error is more informative and there is no urgent todo, see the details of the event
+| <a id="E1467"></a>E1467  | Plug-In SpellCheck | SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary. | The LanguageTool server as specified in the error message is deactivated automatically. On each periodical cron call (normally all 15 minutes) all LanguageTool instances are checked for availability. If a previously deactivated LanguageTool is available again, it is reactivated automatically. To reactivate the LanguageTool servers manually just call the following SQL statement in the Database:DELETE FROM Zf_memcache WHERE id = 'SpellCheckDownList';
+| <a id="E1466"></a>E1466  | Plug-In SpellCheck | SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.                          | Start the LanguageTool(s) if not already done. If the LanguageTool instances were started and crashed then, see E1467 how to reactivate the LanguageTool instances marked as offline in translate5. After reactivation, reimport the task. The task clone functionality can be used to reimport the task.
+| <a id="E1468"></a>E1468  | Plug-In SpellCheck | SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.                   | Normally everything should be OK, the considered LanguageTool is probably just doing its work and can not respond to another request in an appropriate time frame. Only if this error is logged multiple times further investigations should be done.
 
 #### Plug-In TermImport
 | EventCode               | Context            | EventMessage                                                       | Description/Solution                            |
@@ -633,6 +640,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1458"></a>E1458 | Plug-In TermImport | Across TBX Export: Error on communication with Across              | Check with additional data what the problem is. |
 | <a id="E1459"></a>E1459 | Plug-In TermImport | Across TBX Export: Can not create temporary filestream             | Check with additional data what the problem is. |
 | <a id="E1460"></a>E1460 | Plug-In TermImport | Across TBX Export: Can not read from file with fileguid {fileGuid} | Check with additional data what the problem is. |
+| <a id="E1472"></a>E1472  | TODO    | SET ME BY USING ME! {TEST} | TODO DESCRIPTION / SOLUTION
 
 ## EventCode Design rules / decisions
 - Prefixed with &quot;E&quot; so that a search for the error code through the code is more reliable than just searching for a number

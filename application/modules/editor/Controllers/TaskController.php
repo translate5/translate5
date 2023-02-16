@@ -27,6 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Task\CurrentTask;
+use MittagQI\Translate5\Task\Export\Package\Downloader;
+use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
@@ -208,6 +210,12 @@ class editor_TaskController extends ZfExtended_RestController {
             ]
         ])
         ->addActionContext('export', 'excelhistory')
+
+        ->addContext('package', [
+            'headers' => [
+                'Content-Type'          => 'application/zip',
+            ]
+        ])->addActionContext('export', 'package')
 
         ->initContext();
     }
@@ -1500,7 +1508,14 @@ class editor_TaskController extends ZfExtended_RestController {
      * does the export as zip file.
      */
     public function exportAction() {
+        if($this->isMaintenanceLoginLock(30)) {
+            //since file is fetched for download we simply print out that text without decoration.
+            echo 'Maintenance is scheduled, exports are not possible at the moment.';
+            exit;
+        }
+
         $this->getAction();
+
         $diff = (boolean)$this->getRequest()->getParam('diff');
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
 
@@ -1528,20 +1543,38 @@ class editor_TaskController extends ZfExtended_RestController {
                 $exportFolder = $worker->initExport($this->entity);
                 break;
 
+            case 'package':
+                if( $this->entity->isLocked($this->entity->getTaskGuid())){
+                    $this->view->assign('error','Unable to export task package. The task is locked');
+                    echo $this->view->render('task/packageexport.phtml');
+                    exit;
+                }
+                try {
+                    $this->entity->checkStateAllowsActions();
+                    Lock::taskLock($this->entity,Downloader::TASK_PACKAGE_EXPORT_STATE);
+
+                    $packageDownloader = ZfExtended_Factory::get(Downloader::class);
+                    $packageDownloader->downloadPackage($this->entity,$diff);
+                    $this->logInfo('Task package exported', ['context' => $context, 'diff' => $diff]);
+                    Lock::taskUnlock($this->entity);
+                }catch (Throwable $exception){
+                    Lock::taskUnlock($this->entity);
+                    $this->log->exception($exception,[
+                        'extra' => [
+                            'task' => $this->entity
+                        ]
+                    ]);
+                    $this->view->assign('error','Error on task package export. For more info check the event log.');
+                    echo $this->view->render('task/packageexport.phtml');
+                }
+                exit;
             case 'filetranslation':
             case 'transfer':
             default:
                 $this->entity->checkStateAllowsActions();
                 $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
-                /* @var $worker editor_Models_Export_Worker */
                 $exportFolder = $worker->initExport($this->entity, $diff);
                 break;
-        }
-
-        if($this->isMaintenanceLoginLock(30)) {
-            //since file is fetched for download we simply print out that text without decoration.
-            echo 'Maintenance is scheduled, exports are not possible at the moment.';
-            exit;
         }
 
         //FIXME multiple problems here with the export worker
