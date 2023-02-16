@@ -27,3 +27,5 @@
 
 INSERT IGNORE INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`)
 VALUES (null, 'editor', 'pm', 'frontend', 'downloadImportArchive');
+INSERT IGNORE INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`)
+VALUES (null, 'editor', 'pmlight', 'frontend', 'downloadImportArchive');
