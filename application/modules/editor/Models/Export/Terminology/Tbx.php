@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Cors;
+
 /**
  * FIXME: 1. code cleanup
  *        2. extract the file generation stream as separate classes. One for download, one for raw/file based export
@@ -582,6 +584,8 @@ class editor_Models_Export_Terminology_Tbx {
             $filename = is_string($overwrite) ? rawurlencode($overwrite) : 'export';
 
             // Set up headers
+            // CORS header
+            Cors::sendResponseHeader();
             header('Cache-Control: no-cache');
             header('X-Accel-Buffering: no');
             header('Content-Type: text/xml');

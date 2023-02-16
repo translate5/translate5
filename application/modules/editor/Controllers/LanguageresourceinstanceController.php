@@ -30,6 +30,7 @@ use MittagQI\Translate5\LanguageResource\CleanupAssociation;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Cors;
 
 /***
  * Language resource controller
@@ -605,6 +606,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         $data = $connector->getTm($validExportTypes[$type]);
+        // CORS header
+        Cors::sendResponseHeader();
         header('Content-Type: '.$validExportTypes[$type], TRUE);
         $type = '.'.strtolower($type);
         header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getName()).$type.'"');
@@ -855,6 +858,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $filename = rawurlencode($_['collectionId']['name']);
 
             // Set up headers
+            // CORS header
+            Cors::sendResponseHeader();
             header('Cache-Control: no-cache');
             header('X-Accel-Buffering: no');
             header('Content-Type: text/xml');

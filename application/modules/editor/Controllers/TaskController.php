@@ -30,6 +30,7 @@ use MittagQI\Translate5\Task\CurrentTask;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Cors;
 
 /**
  *
@@ -1704,6 +1705,8 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
+        // CORS header
+        Cors::sendResponseHeader();
         header('Content-Description: File Transfer');
         header('Content-Disposition: attachment; filename="'.$filenameExport.'"');
         header('Content-Transfer-Encoding: binary');
@@ -1723,6 +1726,8 @@ class editor_TaskController extends ZfExtended_RestController {
         // disable layout and view
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
+        // CORS header
+        Cors::sendResponseHeader();
         header('Content-Type: application/zip', TRUE);
         header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($nameSuffix).'"');
         readfile($zipFile);

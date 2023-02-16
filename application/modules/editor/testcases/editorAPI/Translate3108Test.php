@@ -55,7 +55,7 @@ class Translate3108Test extends editor_Test_ImportTest {
         $response = static::api()->getLastResponse();
         self::assertContains($response->getStatus(),[200],'Error on authentication with app token');
         // the access-control header should be present
-        self::assertStringContainsString('Access-control-allow-origin: *', $response->getHeadersAsString());
+        self::assertStringContainsString('Access-Control-Allow-Origin: *', $response->getHeadersAsString());
     }
 
     public function testInvalidTokenAuthentication()

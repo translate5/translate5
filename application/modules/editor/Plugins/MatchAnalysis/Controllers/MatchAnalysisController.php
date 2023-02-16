@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\ZfExtended\Cors;
+
 /**
  */
 class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController
@@ -122,7 +124,9 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                 $x = $exporter->generateXML($rows, $params['taskGuid']);
 
                 $fileName = $fileName.' '.date('- Y-m-d').'.xml';
-                
+
+                // CORS header
+                Cors::sendResponseHeader();
                 header("Content-Disposition: attachment; filename*=UTF-8''".rawurlencode($fileName));
                 header('Content-Type:text/xml');
                 // if you want to directly download then set expires time

@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Cors;
+
 class editor_Models_LanguageResources_UsageExporter{
     
     const MONTHLY_SUMMARY_BY_RESOURCE = 'MonthlySummaryByResource';
@@ -397,6 +399,8 @@ class editor_Models_LanguageResources_UsageExporter{
                 'path'=>$finalZip
             ]);
         }
+        // CORS header
+        Cors::sendResponseHeader();
         header('Content-Type: application/zip', TRUE);
         header('Content-Disposition: attachment; filename="'.$name.'"');
         readfile($finalZip);
