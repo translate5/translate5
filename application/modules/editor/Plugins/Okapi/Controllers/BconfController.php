@@ -173,4 +173,15 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $segmentation = editor_Plugins_Okapi_Bconf_Segmentation::instance();
         $segmentation->processUpload($this->entity, $field, $_FILES['srx']['tmp_name'], basename($_FILES['srx']['name']));
     }
+
+    /**
+     * Sets the non-customer/common default bconf
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function setdefaultAction(){
+        $this->entityLoad();
+        $this->view->oldId = $this->entity->setAsDefaultBconf();
+    }
 }

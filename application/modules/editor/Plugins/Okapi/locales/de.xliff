@@ -1,221 +1,297 @@
 <?xml version="1.0"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
-<!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
-<!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
-<file original="php-sourcecode" source-language="de" target-language="de" datatype="php">
-<body>
-<trans-unit id='RGF0ZWlmb3JtYXRrb252ZXJ0aWVydW5n'>
-    <source>Dateiformatkonvertierung</source>
-    <target>Dateiformatkonvertierung</target>
-</trans-unit>
-<trans-unit id='RGF0ZWlmb3JtYXQtIHVuZCBTZWdtZW50aWVydW5nc2VpbnN0ZWxsdW5nZW4='>
-    <source>Dateiformat- und Segmentierungseinstellungen</source>
-    <target>Dateiformat- und Segmentierungseinstellungen</target>
-</trans-unit>
-<trans-unit id='TmFtZQ=='>
-    <source>Name</source>
-    <target>Name</target>
-</trans-unit>
-<trans-unit id='RWluZGV1dGlnZXIgTmFtZQ=='>
-    <source>Eindeutiger Name</source>
-    <target>Eindeutiger Name</target>
-</trans-unit>
-<trans-unit id='RXJ3ZWl0ZXJ1bmdlbg=='>
-    <source>Erweiterungen</source>
-    <target>Erweiterungen</target>
-</trans-unit>
-<trans-unit id='QmVzY2hyZWlidW5n'>
-    <source>Beschreibung</source>
-    <target>Beschreibung</target>
-</trans-unit>
-<trans-unit id='QWt0aW9uZW4='>
-    <source>Aktionen</source>
-    <target>Aktionen</target>
-</trans-unit>
-<trans-unit id='QmNvbmYgaG9jaGxhZGVu'>
-    <source>Bconf hochladen</source>
-    <target>Bconf hochladen</target>
-</trans-unit>
-<trans-unit id='U1JYLURhdGVp'>
-    <source>SRX-Datei</source>
-    <target>SRX-Datei</target>
-</trans-unit>
-<trans-unit id='U291cmNlIFNSWA=='>
-    <source>Source SRX</source>
-    <target>Source SRX</target>
-</trans-unit>
-<trans-unit id='VGFyZ2V0IFNSWA=='>
-    <source>Target SRX</source>
-    <target>Target SRX</target>
-</trans-unit>
-<trans-unit id='QmVhcmJlaXRlbg=='>
-    <source>Bearbeiten</source>
-    <target>Bearbeiten</target>
-</trans-unit>
-<trans-unit id='TMO2c2NoZW4='>
-    <source>Löschen</source>
-    <target>Löschen</target>
-</trans-unit>
-<trans-unit id='S29waWVyZW4='>
-    <source>Kopieren</source>
-    <target>Kopieren</target>
-</trans-unit>
-<trans-unit id='U3RhbmRhcmQ='>
-    <source>Standard</source>
-    <target>Standard</target>
-</trans-unit>
-<trans-unit id='S3VuZGVuc3RhbmRhcmQ='>
-    <source>Kundenstandard</source>
-    <target>Kundenstandard</target>
-</trans-unit>
-<trans-unit id='QmNvbmYgbMO2c2NoZW4='>
-    <source>Bconf löschen</source>
-    <target>Bconf löschen</target>
-</trans-unit>
-<trans-unit id='TcO2Y2h0ZW4gU2llIGRpZXNlIEJjb25mLURhdGVpIHdpcmtsaWNoIGzDtnNjaGVuPw=='>
-    <source>Möchten Sie diese Bconf-Datei wirklich löschen?</source>
-    <target>Möchten Sie diese Bconf-Datei wirklich löschen?</target>
-</trans-unit>
-<trans-unit id='QmNvbmYtRGF0ZWkgZ2Vsw7ZzY2h0'>
-    <source>Bconf-Datei gelöscht</source>
-    <target>Bconf-Datei gelöscht</target>
-</trans-unit>
-<trans-unit id='VW5nw7xsdGlnZSB7MH0tRGF0ZWk='>
-    <source>Ungültige {0}-Datei</source>
-    <target>Ungültige {0}-Datei</target>
-</trans-unit>
-<trans-unit id='ezB9LURhdGVpIGVyZm9sZ3JlaWNoIGhvY2hnZWxhZGVuLg=='>
-    <source>{0}-Datei erfolgreich hochgeladen.</source>
-    <target>{0}-Datei erfolgreich hochgeladen.</target>
-</trans-unit>
-<trans-unit id='RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2UgezB9LURhdGVpLg=='>
-    <source>Die hochgeladene Datei ist keine gültige {0}-Datei.</source>
-    <target>Die hochgeladene Datei ist keine gültige {0}-Datei.</target>
-</trans-unit>
-<trans-unit id='TmV1ZSBCY29uZi1EYXRlaQ=='>
-    <source>Neue Bconf-Datei</source>
-    <target>Neue Bconf-Datei</target>
-</trans-unit>
-<trans-unit id='QmNvbmYtRGF0ZWkgYmVhcmJlaXRlbg=='>
-    <source>Bconf-Datei bearbeiten</source>
-    <target>Bconf-Datei bearbeiten</target>
-</trans-unit>
-<trans-unit id='LURhdGVp'>
-    <source>-Datei</source>
-    <target>-Datei</target>
-</trans-unit>
-<trans-unit id='ezB9ezF9IGhlcnVudGVybGFkZW4='>
-    <source>{0}{1} herunterladen</source>
-    <target>{0}{1} herunterladen</target>
-</trans-unit>
-<trans-unit id='ezB9ezF9IGhvY2hsYWRlbg=='>
-    <source>{0}{1} hochladen</source>
-    <target>{0}{1} hochladen</target>
-</trans-unit>
-<trans-unit id='RmlsdGVy=='>
-    <source>Filter</source>
-    <target>Filter</target>
-</trans-unit>
-<trans-unit id='RmlsdGVyIGtvbmZpZ3VyaWVyZW4='>
-    <source>Filter konfigurieren</source>
-    <target>Filter konfigurieren</target>
-</trans-unit>
-<trans-unit id='UGlwZWxpbmU='>
-    <source>Pipeline</source>
-    <target>Pipeline</target>
-</trans-unit>
-<trans-unit id='QmNvbmYgaGluenVmw7xnZW4='>
-    <source>Bconf hinzufügen</source>
-    <target>Bconf hinzufügen</target>
-</trans-unit>
-<trans-unit id='d2lyZCBiZW7DtnRpZ3Q='>
-    <source>wird benötigt</source>
-    <target>wird benötigt</target>
-</trans-unit>
-<trans-unit id='RHVyY2hzdWNoZW4uLi4='>
-    <source>Durchsuchen...</source>
-    <target>Durchsuchen...</target>
-</trans-unit>
-<trans-unit id='RGF0ZWl0eXBlbg=='>
-    <source>Dateitypen</source>
-    <target>Dateitypen</target>
-</trans-unit>
-<trans-unit id='TUlNRS1UeXA='>
-    <source>MIME-Typ</source>
-    <target>MIME-Typ</target>
-</trans-unit>
-<trans-unit id='S2VubnVuZw=='>
-    <source>Kennung</source>
-    <target>Kennung</target>
-</trans-unit>
-<trans-unit id='RmlsdGVyIGlu'>
-    <source>Filter in</source>
-    <target>Filter in</target>
-</trans-unit>
-<trans-unit id='U3RhbmRhcmQgRmlsdGVyIGFuemVpZ2Vu'>
-    <source>Standard Filter anzeigen</source>
-    <target>Standard Filter anzeigen</target>
-</trans-unit>
-<trans-unit id='U3RhbmRhcmQgRmlsdGVyIHZlcnN0ZWNrZW4='>
-    <source>Standard Filter verstecken</source>
-    <target>Standard Filter verstecken</target>
-</trans-unit>
-<trans-unit id='SW5mb3JtYXRpb25lbiBmZWhsZW4='>
-    <source>Informationen fehlen</source>
-    <target>Informationen fehlen</target>
-</trans-unit>
-<trans-unit id='RGVyIHVyc3Byw7xuZ2xpY2hlIE5hbWUgbXVzcyB2ZXLDpG5kZXJ0IHdlcmRlbg=='>
-    <source>Der ursprüngliche Name muss verändert werden</source>
-    <target>Der ursprüngliche Name muss verändert werden</target>
-</trans-unit>
-<trans-unit id='RXMgbXVzcyBlaW4gZW5kZXV0aWdlciBOYW1lIGFuZ2VnZWJlbiB3ZXJkZW4='>
-    <source>Es muss ein endeutiger Name angegeben werden</source>
-    <target>Es muss ein endeutiger Name angegeben werden</target>
-</trans-unit>
-<trans-unit id='RGVyIE5hbWUgZGFyZiBuaWNodCBkZW4gQmVncmlmZiAidHJhbnNsYXRlNSIgZW50aGFsdGVu'>
-    <source>Der Name darf nicht den Begriff "translate5" enthalten</source>
-    <target>Der Name darf nicht den Begriff "translate5" enthalten</target>
-</trans-unit>
-<trans-unit id='RXMgbXVzcyBtaW5kZXN0ZW5zIGVpbiBEYXRlaXR5cCBhbmdlZ2ViZW4gd2VyZGVu'>
-    <source>Es muss mindestens ein Dateityp angegeben werden</source>
-    <target>Es muss mindestens ein Dateityp angegeben werden</target>
-</trans-unit>
-<trans-unit id='QmVhcmJlaXRlIEZpbHRlciBUeXAgezB9IHZvbiBCY29uZiB7MX0='>
-    <source>Bearbeite Filter Typ {0} von Bconf {1}</source>
-    <target>Bearbeite Filter Typ {0} von Bconf {1}</target>
-</trans-unit>
-<trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZQ=='>
-    <source>Ihre Änderungen sind nicht valide</source>
-    <target>Ihre Änderungen sind nicht valide</target>
-</trans-unit>
-<trans-unit id='RmVsZCAiezB9IiB2b20gVHlwICJ7MX0iIGlzdCBuaWNodCB2YWxpZGU='>
-    <source>Feld "{0}" vom Typ "{1}" ist nicht valide</source>
-    <target>Feld "{0}" vom Typ "{1}" ist nicht valide</target>
-</trans-unit>
-<trans-unit id='R2xlaXRrb21tYXphaGw='>
-    <source>Gleitkommazahl</source>
-    <target>Gleitkommazahl</target>
-</trans-unit>
-<trans-unit id='Qm9vbHNjaGVyIFdlcnQ='>
-    <source>Boolscher Wert</source>
-    <target>Boolscher Wert</target>
-</trans-unit>
-<trans-unit id='R2FuenphaGw='>
-    <source>Ganzzahl</source>
-    <target>Ganzzahl</target>
-</trans-unit>
-<trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZSwgZGFoZXIga29ubnRlIGRlciBGaWx0ZXIgbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu'>
-    <source>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</source>
-    <target>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</target>
-</trans-unit>
-<trans-unit id='RmlsdGVyIHd1cmRlIGVyZm9sZ3JlaWNoIGdlc3BlaWNoZXJ0'>
-    <source>Filter wurde erfolgreich gespeichert</source>
-    <target>Filter wurde erfolgreich gespeichert</target>
-</trans-unit>
-<trans-unit id='T0tBUEkgSGlsZmU='>
-    <source>OKAPI Hilfe</source>
-    <target>OKAPI Hilfe</target>
-</trans-unit>
-</body>
-</file>
+    <!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
+    <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
+    <file original="php-sourcecode" source-language="de" target-language="de" datatype="php">
+        <body>
+            <trans-unit id='RGF0ZWlmb3JtYXRrb252ZXJ0aWVydW5n'>
+                <source>Dateiformatkonvertierung</source>
+                <target>Dateiformatkonvertierung</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWlmb3JtYXQtIHVuZCBTZWdtZW50aWVydW5nc2VpbnN0ZWxsdW5nZW4='>
+                <source>Dateiformat- und Segmentierungseinstellungen</source>
+                <target>Dateiformat- und Segmentierungseinstellungen</target>
+            </trans-unit>
+            <trans-unit id='TmFtZQ=='>
+                <source>Name</source>
+                <target>Name</target>
+            </trans-unit>
+            <trans-unit id='RWluZGV1dGlnZXIgTmFtZQ=='>
+                <source>Eindeutiger Name</source>
+                <target>Eindeutiger Name</target>
+            </trans-unit>
+            <trans-unit id='R2XDpG5kZXJ0ZSBGaWx0ZXI='>
+                <source>Geänderte Filter</source>
+                <target>Geänderte Filter</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWl0eXBlbiwgZsO8ciBkaWUgRmlsdGVyIGFuZ2VwYXNzdCB3dXJkZW4='>
+                <source>Dateitypen, für die Filter angepasst wurden</source>
+                <target>Dateitypen, für die Filter angepasst wurden</target>
+            </trans-unit>
+            <trans-unit id='QmVzY2hyZWlidW5n'>
+                <source>Beschreibung</source>
+                <target>Beschreibung</target>
+            </trans-unit>
+            <trans-unit id='QWt0aW9uZW4='>
+                <source>Aktionen</source>
+                <target>Aktionen</target>
+            </trans-unit>
+            <trans-unit id='QmNvbmYgaG9jaGxhZGVu'>
+                <source>Bconf hochladen</source>
+                <target>Bconf hochladen</target>
+            </trans-unit>
+            <trans-unit id='U1JYLURhdGVp'>
+                <source>SRX-Datei</source>
+                <target>SRX-Datei</target>
+            </trans-unit>
+            <trans-unit id='U291cmNlIFNSWA=='>
+                <source>Source SRX</source>
+                <target>Source SRX</target>
+            </trans-unit>
+            <trans-unit id='VGFyZ2V0IFNSWA=='>
+                <source>Target SRX</source>
+                <target>Target SRX</target>
+            </trans-unit>
+            <trans-unit id='QmVhcmJlaXRlbg=='>
+                <source>Bearbeiten</source>
+                <target>Bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='TMO2c2NoZW4='>
+                <source>Löschen</source>
+                <target>Löschen</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmQ='>
+                <source>Standard</source>
+                <target>Standard</target>
+            </trans-unit>
+            <trans-unit id='S3VuZGVuc3RhbmRhcmQ='>
+                <source>Kundenstandard</source>
+                <target>Kundenstandard</target>
+            </trans-unit>
+            <trans-unit id='QmNvbmYgbMO2c2NoZW4='>
+                <source>Bconf löschen</source>
+                <target>Bconf löschen</target>
+            </trans-unit>
+            <trans-unit id='TcO2Y2h0ZW4gU2llIGRpZXNlIEJjb25mLURhdGVpIHdpcmtsaWNoIGzDtnNjaGVuPw=='>
+                <source>Möchten Sie diese Bconf-Datei wirklich löschen?</source>
+                <target>Möchten Sie diese Bconf-Datei wirklich löschen?</target>
+            </trans-unit>
+            <trans-unit id='QmNvbmYtRGF0ZWkgZ2Vsw7ZzY2h0'>
+                <source>Bconf-Datei gelöscht</source>
+                <target>Bconf-Datei gelöscht</target>
+            </trans-unit>
+            <trans-unit id='VW5nw7xsdGlnZSB7MH0tRGF0ZWk='>
+                <source>Ungültige {0}-Datei</source>
+                <target>Ungültige {0}-Datei</target>
+            </trans-unit>
+            <trans-unit id='ezB9LURhdGVpIGVyZm9sZ3JlaWNoIGhvY2hnZWxhZGVuLg=='>
+                <source>{0}-Datei erfolgreich hochgeladen.</source>
+                <target>{0}-Datei erfolgreich hochgeladen.</target>
+            </trans-unit>
+            <trans-unit id='RGllIGhvY2hnZWxhZGVuZSBEYXRlaSBpc3Qga2VpbmUgZ8O8bHRpZ2UgezB9LURhdGVpLg=='>
+                <source>Die hochgeladene Datei ist keine gültige {0}-Datei.</source>
+                <target>Die hochgeladene Datei ist keine gültige {0}-Datei.</target>
+            </trans-unit>
+            <trans-unit id='TmV1ZSBCY29uZi1EYXRlaQ=='>
+                <source>Neue Bconf-Datei</source>
+                <target>Neue Bconf-Datei</target>
+            </trans-unit>
+            <trans-unit id='QmNvbmYtRGF0ZWkgYmVhcmJlaXRlbg=='>
+                <source>Bconf-Datei bearbeiten</source>
+                <target>Bconf-Datei bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='LURhdGVp'>
+                <source>-Datei</source>
+                <target>-Datei</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVy=='>
+                <source>Filter</source>
+                <target>Filter</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyIGtvbmZpZ3VyaWVyZW4='>
+                <source>Filter konfigurieren</source>
+                <target>Filter konfigurieren</target>
+            </trans-unit>
+            <trans-unit id='VW50ZXJzdMO8dHp0ZSBEYXRlaWZvcm1hdGU='>
+                <source>Unterstützte Dateiformate</source>
+                <target>Unterstützte Dateiformate</target>
+            </trans-unit>
+            <trans-unit id='UGlwZWxpbmU='>
+                <source>Pipeline</source>
+                <target>Pipeline</target>
+            </trans-unit>
+            <trans-unit id='QmNvbmYgaGluenVmw7xnZW4='>
+                <source>Bconf hinzufügen</source>
+                <target>Bconf hinzufügen</target>
+            </trans-unit>
+            <trans-unit id='d2lyZCBiZW7DtnRpZ3Q='>
+                <source>wird benötigt</source>
+                <target>wird benötigt</target>
+            </trans-unit>
+            <trans-unit id='RHVyY2hzdWNoZW4uLi4='>
+                <source>Durchsuchen...</source>
+                <target>Durchsuchen...</target>
+            </trans-unit>
+            <trans-unit id='VW50ZXJzdMO8dHp0ZSBEYXRlaWZvcm1hdGU='>
+                <source>Unterstützte Dateiformate</source>
+                <target>Unterstützte Dateiformate</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWl0eXBlbg=='>
+                <source>Dateitypen</source>
+                <target>Dateitypen</target>
+            </trans-unit>
+            <trans-unit id='TUlNRS1UeXA='>
+                <source>MIME-Typ</source>
+                <target>MIME-Typ</target>
+            </trans-unit>
+            <trans-unit id='S2VubnVuZw=='>
+                <source>Kennung</source>
+                <target>Kennung</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyIGlu'>
+                <source>Filter in</source>
+                <target>Filter in</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmQgRmlsdGVyIGFuemVpZ2Vu'>
+                <source>Standard Filter anzeigen</source>
+                <target>Standard Filter anzeigen</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmQgRmlsdGVyIHZlcnN0ZWNrZW4='>
+                <source>Standard Filter verstecken</source>
+                <target>Standard Filter verstecken</target>
+            </trans-unit>
+            <trans-unit id='SW5mb3JtYXRpb25lbiBmZWhsZW4='>
+                <source>Informationen fehlen</source>
+                <target>Informationen fehlen</target>
+            </trans-unit>
+            <trans-unit id='RGVyIHVyc3Byw7xuZ2xpY2hlIE5hbWUgbXVzcyB2ZXLDpG5kZXJ0IHdlcmRlbg=='>
+                <source>Der ursprüngliche Name muss verändert werden</source>
+                <target>Der ursprüngliche Name muss verändert werden</target>
+            </trans-unit>
+            <trans-unit id='RXMgbXVzcyBlaW4gZW5kZXV0aWdlciBOYW1lIGFuZ2VnZWJlbiB3ZXJkZW4='>
+                <source>Es muss ein endeutiger Name angegeben werden</source>
+                <target>Es muss ein endeutiger Name angegeben werden</target>
+            </trans-unit>
+            <trans-unit id='RGVyIE5hbWUgZGFyZiBuaWNodCBkZW4gQmVncmlmZiAidHJhbnNsYXRlNSIgZW50aGFsdGVu'>
+                <source>Der Name darf nicht den Begriff "translate5" enthalten</source>
+                <target>Der Name darf nicht den Begriff "translate5" enthalten</target>
+            </trans-unit>
+            <trans-unit id='RXMgbXVzcyBtaW5kZXN0ZW5zIGVpbiBEYXRlaXR5cCBhbmdlZ2ViZW4gd2VyZGVu'>
+                <source>Es muss mindestens ein Dateityp angegeben werden</source>
+                <target>Es muss mindestens ein Dateityp angegeben werden</target>
+            </trans-unit>
+            <trans-unit id='QmVhcmJlaXRlIEZpbHRlciBUeXAgezB9IHZvbiBCY29uZiB7MX0='>
+                <source>Bearbeite Filter Typ {0} von Bconf {1}</source>
+                <target>Bearbeite Filter Typ {0} von Bconf {1}</target>
+            </trans-unit>
+            <trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZQ=='>
+                <source>Ihre Änderungen sind nicht valide</source>
+                <target>Ihre Änderungen sind nicht valide</target>
+            </trans-unit>
+            <trans-unit id='RmVsZCAiezB9IiB2b20gVHlwICJ7MX0iIGlzdCBuaWNodCB2YWxpZGU='>
+                <source>Feld "{0}" vom Typ "{1}" ist nicht valide</source>
+                <target>Feld "{0}" vom Typ "{1}" ist nicht valide</target>
+            </trans-unit>
+            <trans-unit id='R2xlaXRrb21tYXphaGw='>
+                <source>Gleitkommazahl</source>
+                <target>Gleitkommazahl</target>
+            </trans-unit>
+            <trans-unit id='Qm9vbHNjaGVyIFdlcnQ='>
+                <source>Boolscher Wert</source>
+                <target>Boolscher Wert</target>
+            </trans-unit>
+            <trans-unit id='R2FuenphaGw='>
+                <source>Ganzzahl</source>
+                <target>Ganzzahl</target>
+            </trans-unit>
+            <trans-unit id='SWhyZSDDhG5kZXJ1bmdlbiBzaW5kIG5pY2h0IHZhbGlkZSwgZGFoZXIga29ubnRlIGRlciBGaWx0ZXIgbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVu'>
+                <source>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</source>
+                <target>Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyIHd1cmRlIGVyZm9sZ3JlaWNoIGdlc3BlaWNoZXJ0'>
+                <source>Filter wurde erfolgreich gespeichert</source>
+                <target>Filter wurde erfolgreich gespeichert</target>
+            </trans-unit>
+            <trans-unit id='T0tBUEkgSGlsZmU='>
+                <source>OKAPI Hilfe</source>
+                <target>OKAPI Hilfe</target>
+            </trans-unit>
+            <trans-unit id='QW5wYXNzZW4gdm9uIERhdGVpZmlsdGVybiBpbiBkaWVzZW0gRmlsdGVyc2V0'>
+                <source>Anpassen von Dateifiltern in diesem Filterset</source>
+                <target>Anpassen von Dateifiltern in diesem Filterset</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgaW5zb2Zlcm4gbmljaHQgYXVmIEt1bmRlbmViZW5lIMO8YmVyc2NocmllYmVu'>
+                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben</source>
+                <target>Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben</target>
+            </trans-unit>
+            <trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGVyc3RlbGx1bmcgYXVzZ2V3w6RobHRlcyBGaWx0ZXJzZXQgZsO8ciBkaWVzZW4gS3VuZGVu'>
+                <source>Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden</source>
+                <target>Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyc2V0IGzDtnNjaGVu'>
+                <source>Filterset löschen</source>
+                <target>Filterset löschen</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyc2V0IGtsb25lbg=='>
+                <source>Filterset klonen</source>
+                <target>Filterset klonen</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyc2V0IGFscyBiY29uZi1EYXRlaSBoZXJ1bnRlcmxhZGVu'>
+                <source>Filterset als bconf-Datei herunterladen</source>
+                <target>Filterset als bconf-Datei herunterladen</target>
+            </trans-unit>
+            <trans-unit id='U1JYLURhdGVpLCBkaWUgZGllIFNlZ21lbnRpZXJ1bmdzcmVnZWxuIGbDvHIgZGllIFF1ZWxsZSBlbnRow6RsdA=='>
+                <source>SRX-Datei, die die Segmentierungsregeln für die Quelle enthält. Wird für native Dateiformate verwendet.</source>
+                <target>SRX-Datei, die die Segmentierungsregeln für die Quelle enthält. Wird für native Dateiformate verwendet.</target>
+            </trans-unit>
+            <trans-unit id='UXVlbGwgU1JYLURhdGVpIGhvY2hsYWRlbiB1bmQgU1JYLVJlZ2VsbiBkaWVzZXMgRmlsdGVyc2F0emVzIGVyc2V0emVu'>
+                <source>Quell SRX-Datei hochladen und SRX-Regeln dieses Filtersatzes ersetzen</source>
+                <target>SRX-Datei hochladen und SRX-Regeln dieses Filtersatzes ersetzen. Er enthält die Segmentierungsregeln für die Quelle. Wird für native Dateiformate verwendet.</target>
+            </trans-unit>
+            <trans-unit id='TGFkZW4gU2llIGRpZSBRdWVsbCBTUlgtRGF0ZWkgaGVydW50ZXI='>
+                <source>Laden Sie die SRX-Datei herunter. Sie enthält die Segmentierungsregeln für die Quelle. Wird für native Dateiformate verwendet.</source>
+                <target>Laden Sie die SRX-Datei herunter. Sie enthält die Segmentierungsregeln für die Quelle. Wird für native Dateiformate verwendet.</target>
+            </trans-unit>
+            <trans-unit id='U1JYLURhdGVpLCBkaWUgU2VnbWVudGllcnVuZ3NyZWdlbG4gZW50aMOkbHQsIGRpZSB6dXIgd2VpdGVyZW4gU2VnbWVudGllcnVuZyBkZXMgdGFyZ2V0cyB2b24geGxpZmYtRGF0ZWllbiB2ZXJ3ZW5kZXQgd2VyZGVuIGvDtm5uZW4='>
+                <source>SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</source>
+                <target>SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</target>
+            </trans-unit>
+            <trans-unit id='SG9jaGxhZGVuIGRlciB0YXJnZXQtU1JYLURhdGVp'>
+                <source>Hochladen der target-SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</source>
+                <target>Hochladen der target-SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</target>
+            </trans-unit>
+            <trans-unit id='SGVydW50ZXJsYWRlbiBkZXIgdGFyZ2V0LVNSWC1EYXRlaQ=='>
+                <source>Herunterladen der target-SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</source>
+                <target>Herunterladen der target-SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können. Die Zielsegmentierung von xliff wird von translate5 bisher allerdings nicht unterstützt, daher hat diese Einstellung bislang keine Auswirkung.</target>
+            </trans-unit>
+            <trans-unit id='WnVtIEFucGFzc2VuIGRlcyBGaWx0ZXJzIGhpZXIgZGVuIEZpbHRlciBrb3BpZXJlbg=='>
+                <source>Zum Anpassen des Filters hier den Filter kopieren</source>
+                <target>Zum Anpassen des Filters hier den Filter kopieren</target>
+            </trans-unit>
+            <trans-unit id='RG9wcGVsa2xpY2tlbiB6dW0gYmVhcmJlaXRlbg=='>
+                <source>Doppelklicken zum bearbeiten</source>
+                <target>Doppelklicken zum bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVybmFtZW4sIHp1Z2Vow7ZyaWdlIERhdGVpZXJ3ZWl0ZXJ1bmdlbiwgTUlNRS1UeXAgdW5kIEJlc2NocmVpYnVuZyBiZWFyYmVpdGVu'>
+                <source>Filternamen, zugehörige Dateierweiterungen, MIME-Typ und Beschreibung bearbeiten</source>
+                <target>Filternamen, zugehörige Dateierweiterungen, MIME-Typ und Beschreibung bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyIHN1Y2hlbg=='>
+                <source>Filter suchen</source>
+                <target>Filter suchen</target>
+            </trans-unit>
+            <trans-unit id='RmlsdGVyIGtsb25lbg=='>
+                <source>Filter klonen</source>
+                <target>Filter klonen</target>
+            </trans-unit>
+            <trans-unit id='w4RuZGVydW5nZW4genVyw7xja3NldHplbg=='>
+                <source>Änderungen zurücksetzen</source>
+                <target>Änderungen zurücksetzen</target>
+            </trans-unit>
+            <trans-unit id='RGFzIE9rYXBpIEZyYW1ld29yayB3aXJkIGF1ZiBkZXIgU2VydmVyc2VpdGUgZsO8ciBEYXRlaWtvbnZlcnRpZXJ1bmdlbiB2ZXJ3ZW5kZXQ='>
+                <source>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet. Daher werden die Filteroptionen in der Okapi-Hilfe erläutert.</source>
+                <target>Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet. Daher werden die Filteroptionen in der Okapi-Hilfe erläutert.</target>
+            </trans-unit>
+        </body>
+    </file>
 </xliff>
