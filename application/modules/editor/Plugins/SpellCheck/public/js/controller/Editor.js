@@ -41,8 +41,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     extend: 'Ext.app.Controller',
     requires: [
-        'Editor.util.SegmentContent',
-        'Editor.controller.SegmentQualitiesBase'
+        'Editor.util.SegmentContent'
     ],
     mixins: ['Editor.util.DevelopmentTools',
              'Editor.util.Event',
@@ -50,7 +49,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
              'Editor.util.SegmentEditor',
              'Editor.plugins.SpellCheck.controller.UtilLanguageTool',
              'Editor.controller.SearchReplace',
-             'Editor.util.SearchReplaceUtils'],
+             'Editor.util.SearchReplaceUtils'
+    ],
     refs:[{
         ref: 'segmentGrid',
         selector:'#segmentgrid'
@@ -102,7 +102,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         CSS_CLASSNAME_MATCH: 't5quality',
         // CSS-Classes for error-types
         // Attributes for the spellcheck-Node
-        ATTRIBUTE_ACTIVEMATCHINDEX: 'data-quality-activeMatchIndex',
+        ATTRIBUTE_ACTIVEMATCHINDEX: 'data-spellCheck-activeMatchIndex',
         // In ToolTips
         CSS_CLASSNAME_TOOLTIP_HEADER:  'spellcheck-tooltip-header',
         CSS_CLASSNAME_REPLACEMENTLINK:  'spellcheck-replacement',
@@ -883,6 +883,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         activeMatchIndex = me.activeMatchNode.getAttribute(me.self.ATTRIBUTE_ACTIVEMATCHINDEX);
         activeMatch = me.allMatches[activeMatchIndex];
+
+        if( !activeMatch){
+            return false;
+        }
+
         message      = activeMatch.message;
         replacements = activeMatch.replacements;
         infoURLs     = activeMatch.infoURLs;
