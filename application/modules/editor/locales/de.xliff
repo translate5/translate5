@@ -8857,6 +8857,16 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
               <target>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</target>
             </trans-unit>
+            <trans-unit id='RGllIHp1IGzDtnNjaGVuZGUgU3ByYWNocmVzc291cmNlIHdpcmQgaW4gZGVuIGZvbGdlbmRlbiBBdWZnYWJlbiB2ZXJ3ZW5kZXQ6'>
+              <source>Die zu löschende Sprachressource wird in den folgenden Aufgaben verwendet:</source>
+              <target>Die zu löschende Sprachressource wird in den folgenden Aufgaben verwendet:</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBzaWUgZW50ZmVybnQgd2lyZCwgd2lyZCBkaWUgWnV3ZWlzdW5nIGRlciBTcHJhY2hyZXNzb3VyY2Ugdm9uIGFsbGVuIG9iZW4gZ2VuYW5udGVuIEF1ZmdhYmVuIGVudGZlcm50Lg0KTcO2Y2h0ZW4gU2llIGRpZSBadXdlaXN1bmdlbiBlbnRmZXJuZW4gdW5kIGRpZSBTcHJhY2hyZXNvdXJjZSBsw7ZzY2hlbj8='>
+              <source>Wenn sie entfernt wird, wird die Zuweisung der Sprachressource von allen oben genannten Aufgaben entfernt.
+            Möchten Sie die Zuweisungen entfernen und die Sprachresource löschen?</source>
+              <target>Wenn sie entfernt wird, wird die Zuweisung der Sprachressource von allen oben genannten Aufgaben entfernt.
+            Möchten Sie die Zuweisungen entfernen und die Sprachresource löschen?</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

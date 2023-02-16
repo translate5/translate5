@@ -9034,6 +9034,16 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
                 <target>Language resource of selected resource type can not be created in UI.</target>
             </trans-unit>
+            <trans-unit id='RGllIHp1IGzDtnNjaGVuZGUgU3ByYWNocmVzc291cmNlIHdpcmQgaW4gZGVuIGZvbGdlbmRlbiBBdWZnYWJlbiB2ZXJ3ZW5kZXQ6'>
+              <source>Die zu löschende Sprachressource wird in den folgenden Aufgaben verwendet:</source>
+              <target>The language resource to be deleted is used in the following tasks:</target>
+            </trans-unit>
+            <trans-unit id='V2VubiBzaWUgZW50ZmVybnQgd2lyZCwgd2lyZCBkaWUgWnV3ZWlzdW5nIGRlciBTcHJhY2hyZXNzb3VyY2Ugdm9uIGFsbGVuIG9iZW4gZ2VuYW5udGVuIEF1ZmdhYmVuIGVudGZlcm50Lg0KTcO2Y2h0ZW4gU2llIGRpZSBadXdlaXN1bmdlbiBlbnRmZXJuZW4gdW5kIGRpZSBTcHJhY2hyZXNvdXJjZSBsw7ZzY2hlbj8='>
+              <source>Wenn sie entfernt wird, wird die Zuweisung der Sprachressource von allen oben genannten Aufgaben entfernt.
+            Möchten Sie die Zuweisungen entfernen und die Sprachresource löschen?</source>
+              <target>If removed, the language resource assignment will be removed from all the above tasks.
+                      Do you want to remove the assignments and delete the language resource?</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
