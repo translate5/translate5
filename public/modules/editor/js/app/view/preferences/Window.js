@@ -50,7 +50,9 @@ Ext.define('Editor.view.preferences.Window', {
     initConfig: function(instanceConfig) {
       var me = this,
       config = {
-        title: me.title, //see EXT6UPD-9
+        bind: {
+          title: '{l10n.preferences.repetitions.title}',
+        },
         items: [
           {
             xtype: 'form',
@@ -60,9 +62,6 @@ Ext.define('Editor.view.preferences.Window', {
             items: [
               {
                 xtype: 'radiogroup',
-                bind: {
-                  fieldLabel: '{l10n.preferences.window.radiogroup}',
-                },
                 labelAlign: 'top',
                 columns: 1,
                 anchor: '100%',
@@ -72,7 +71,7 @@ Ext.define('Editor.view.preferences.Window', {
                     name: 'alikeBehaviour',
                     width: 426, //needed for long labels to wrap
                     bind: {
-                      boxLabel: '{l10n.preferences.window.alikeBehaviourAlways}',
+                      boxLabel: '{l10n.preferences.repetitions.alikeBehaviourAlways}',
                     },
                     inputValue: 'always'
                   },
@@ -82,7 +81,7 @@ Ext.define('Editor.view.preferences.Window', {
                     width: 426,
                     margin: '0 0 0 30',
                     bind: {
-                      boxLabel: '{l10n.preferences.window.repetitionTypeSource}',
+                      boxLabel: '{l10n.preferences.repetitions.repetitionTypeSource}',
                     },
                     inputValue: 'source'
                   },
@@ -92,7 +91,7 @@ Ext.define('Editor.view.preferences.Window', {
                     width: 426,
                     margin: '0 0 0 30',
                     bind: {
-                      boxLabel: '{l10n.preferences.window.repetitionTypeTarget}',
+                      boxLabel: '{l10n.preferences.repetitions.repetitionTypeTarget}',
                     },
                     inputValue: 'target'
                   },
@@ -102,7 +101,7 @@ Ext.define('Editor.view.preferences.Window', {
                     width: 426,
                     margin: '0 0 0 30',
                     bind: {
-                      boxLabel: '{l10n.preferences.window.repetitionTypeBothAnd}',
+                      boxLabel: '{l10n.preferences.repetitions.repetitionTypeBothAnd}',
                     },
                     inputValue: 'bothAnd'
                   },
@@ -112,7 +111,7 @@ Ext.define('Editor.view.preferences.Window', {
                     width: 426,
                     margin: '0 0 0 30',
                     bind: {
-                      boxLabel: '{l10n.preferences.window.repetitionTypeBothOr}',
+                      boxLabel: '{l10n.preferences.repetitions.repetitionTypeBothOr}',
                     },
                     inputValue: 'bothOr'
                   }, {
@@ -120,7 +119,7 @@ Ext.define('Editor.view.preferences.Window', {
                     name: 'sameContextOnly',
                     margin: '0 0 0 30',
                     bind: {
-                      boxLabel: '{l10n.preferences.window.sameContextOnly}',
+                      boxLabel: '{l10n.preferences.repetitions.sameContextOnly}',
                     },
                   },
                   {
@@ -128,7 +127,7 @@ Ext.define('Editor.view.preferences.Window', {
                     name: 'alikeBehaviour',
                     width: 426, //needed for long labels to wrap
                     bind: {
-                      boxLabel: '{l10n.preferences.window.alikeBehaviourIndividual}',
+                      boxLabel: '{l10n.preferences.repetitions.alikeBehaviourIndividual}',
                     },
                     inputValue: 'individual'
                   },
@@ -137,14 +136,14 @@ Ext.define('Editor.view.preferences.Window', {
                     name: 'alikeBehaviour',
                     width: 426, //needed for long labels to wrap
                     bind: {
-                      boxLabel: '{l10n.preferences.window.alikeBehaviourNever}',
+                      boxLabel: '{l10n.preferences.repetitions.alikeBehaviourNever}',
                     },
                     inputValue: 'never'
                   },{
             	    xtype:'checkbox',
             	    name:'showOnEmptyTarget',
                     bind: {
-                      boxLabel: '{l10n.preferences.window.showOnEmptyTarget}',
+                      boxLabel: '{l10n.preferences.repetitions.showOnEmptyTarget}',
                     },
             	    width: 426 //needed for long labels to wrap
                   }
@@ -168,14 +167,14 @@ Ext.define('Editor.view.preferences.Window', {
                 glyph: 'f00c@FontAwesome5FreeSolid',
                 itemId: 'saveBtn',
                 bind: {
-                  text: '{l10n.preferences.window.saveBtn}',
+                  text: '{l10n.preferences.repetitions.saveBtn}',
                 }
               },
               {
                 xtype: 'button',
                 glyph: 'f00d@FontAwesome5FreeSolid',
                 bind: {
-                  text: '{l10n.preferences.window.cancelBtn}',
+                  text: '{l10n.preferences.repetitions.cancelBtn}',
                 },
                 itemId: 'cancelBtn'
               }

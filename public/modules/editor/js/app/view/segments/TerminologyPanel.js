@@ -26,21 +26,17 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.plugins.TermTagger.view.TermPortletFieldset
+ * @class Editor.view.segments.TerminologyPanel
  */
-Ext.define('Editor.plugins.TermTagger.view.TermPortletFieldset', {
-    extend: 'Ext.form.FieldSet',
-    alias: 'widget.termPortalTermPortletFieldset',
-    requires: ['Editor.plugins.TermTagger.view.TermPortlet'],
-
-    itemId: 'metaTerms',
-    collapsible: true,
+Ext.define('Editor.view.segments.TerminologyPanel', {
+    alias: 'widget.terminologyPanel',
+    extend: 'Ext.panel.Panel',
+    bodyPadding: 10,
+    scrollable: 'y',
+    frameHeader: false,
     title: '#UT#Terminologie',
     bind: {
         title: '{l10n.TermTagger.termPortletFieldset.title}',
     },
-    anchor: '100%',
-    items: [{
-        xtype: 'termPortalTermPortlet'
-    }]
+    itemId: 'metaTerms'
 });

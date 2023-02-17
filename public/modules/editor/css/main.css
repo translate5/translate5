@@ -1095,3 +1095,26 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     border-bottom: 1px solid limegreen;
     padding-bottom: 2px;
 }
+dl {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.x-fieldset-header-default > .x-fieldset-header-text {
+    font-size: 15px;
+}
+#segment-metadata .x-fieldset > legend {
+    padding-bottom: 0;
+    padding-top: 0;
+}
+#segment-metadata .x-fieldset.segmentQualities {
+    margin-bottom: 8px;
+}
+#segment-metadata .x-fieldset.x-fieldset-collapsed.segmentQualities {
+    margin-bottom: 25px;
+}
+.x-menu-item-active .x-menu-item-text {
+    font-weight: 300;
+}
+#segment-grid .x-btn.x-item-disabled {
+    pointer-events: all;
+}

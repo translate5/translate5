@@ -16,7 +16,7 @@
     "bPreferenceAutomaticallyAcceptRevisions": "Versionierung automatisch übernehmen",
     "bPreferenceIgnoreSoftHyphenTag": "Bedingte Trennstriche ignorieren",
     "bPreferenceReplaceNoBreakHyphenTag": "Geschützte Bindestriche automatisch durch normale ersetzen",
-    "bExtractExternalHyperlinks": "Hyperling URLs übersetzen",
+    "bExtractExternalHyperlinks": "Hyperlinnk URLs übersetzen",
     "tsComplexFieldDefinitionsToExtract": "Übersetzbare Felder",
     "bInExcludeMode": "Stilangaben aus- oder einschließen",
     "bInExcludeModeTrue": "Ausschließen",

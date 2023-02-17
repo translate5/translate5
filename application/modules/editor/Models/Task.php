@@ -833,7 +833,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function isImporting() {
-        return $this->getState() == self::STATE_IMPORT;
+        return in_array($this->getState(), [self::STATE_IMPORT, self::STATE_PREPARATION]);
     }
 
 

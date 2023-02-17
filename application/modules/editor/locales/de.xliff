@@ -2905,10 +2905,7 @@
                     <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(STRG + ENTER)
                 </source>
-                <target>Speichern. 
-                    <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
-                    <br/>(STRG + ENTER)
-                </target>
+                <target>Speichern. Nächstes unbestätigtes, bearbeitbares Segment öffnen (STRG + ENTER)</target>
             </trans-unit>
             <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyDihpMp'>
                 <source>Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)</source>
@@ -2935,20 +2932,14 @@
                     <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(ALT + Bild ↓)
                 </source>
-                <target>Nicht speichern.
-                    <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
-                    <br/>(ALT + Bild ↓)
-                </target>
+                <target>Nicht speichern. Nächstes unbestätigtes, bearbeitbares Segment öffnen (ALT + Bild ↓)</target>
             </trans-unit>
             <trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+Vm9yaGVyaWdlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihBTFQgKyBCaWxkIOKGkSk='>
                 <source>Nicht speichern.
                     <br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(ALT + Bild ↑)
                 </source>
-                <target>Nicht speichern.
-                    <br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen
-                    <br/>(ALT + Bild ↑)
-                </target>
+                <target>Nicht speichern. Vorheriges unbestätigtes, bearbeitbares Segment öffnen (ALT + Bild ↑)</target>
             </trans-unit>
             <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
                 <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
@@ -5678,9 +5669,13 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Der referenzierte Kunde existiert nicht (mehr).</source>
                 <target>Der referenzierte Kunde existiert nicht (mehr).</target>
             </trans-unit>
-            <trans-unit id='QW5zaWNodA=='>
-                <source>Ansicht</source>
-                <target>Ansicht</target>
+            <trans-unit id='RWluc3RlbGx1bmdlbiAy'>
+                <source>Einstellungen 2</source>
+                <target>Einstellungen</target>
+            </trans-unit>
+            <trans-unit id='V2llZGVyaG9sdW5nc2VkaXRvcg=='>
+                <source>Wiederholungseditor</source>
+                <target>Wiederholungseditor</target>
             </trans-unit>
             <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='>
                 <source>Unbekannter Term Status</source>
@@ -7982,6 +7977,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id="U2VnbWVudCBzcGVycmVuIGJ6dy4gZW50c3BlcnJlbiAoU1RSRyArIEwp">
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
                 <target>Segment sperren bzw. entsperren (STRG + L)</target>
+            </trans-unit>
+            <trans-unit id="QWxsZQ==">
+                <source>Alle</source>
+                <target>Alle</target>
+            </trans-unit>
+            <trans-unit id="WmVpY2hlbg==">
+                <source>Zeichen</source>
+                <target>Zeichen</target>
             </trans-unit>
             <trans-unit id="U3ByaW5nZSB6dSBTZWdtZW50IG1pdCBOciAoU1RSRyArIEcp">
                 <source>Springe zu Segment mit Nr (STRG + G)</source>
