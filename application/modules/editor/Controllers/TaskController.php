@@ -1559,7 +1559,7 @@ class editor_TaskController extends ZfExtended_RestController {
                     Lock::taskUnlock($this->entity);
                 }catch (Throwable $exception){
                     Lock::taskUnlock($this->entity);
-                    $this->log->exception($exception,[
+                    $this->taskLog->exception($exception,[
                         'extra' => [
                             'task' => $this->entity
                         ]
