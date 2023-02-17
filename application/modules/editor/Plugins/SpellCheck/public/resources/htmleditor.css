@@ -26,6 +26,9 @@ END LICENSE AND COPYRIGHT
 */
 
 @CHARSET "UTF-8";
+/***
+* TODO: this should be refactored with the spellcheck refactoring. Currently because of css conflict classes, this code is duplicated in main.css
+*/
 
 .t5spellcheck {
     cursor: pointer;
