@@ -59,9 +59,8 @@ class Task extends Base
 
         throw ZfExtended_UnprocessableEntity::createResponse('E1473', [
             'errorMessages' => [
-                'Die zu löschende Sprachressource wird in den folgenden Aufgaben verwendet:',
-                'Wenn sie entfernt wird, wird die Zuweisung der Sprachressource von allen oben genannten Aufgaben entfernt.
-Möchten Sie die Zuweisungen entfernen und die Sprachresource löschen?'
+                'Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:',
+                'Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?'
             ]
         ], extraData: [
             'taskList' => $taskNames
