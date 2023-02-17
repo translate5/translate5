@@ -54,8 +54,8 @@ class Translate3108Test extends editor_Test_ImportTest {
         static::api()->getJson('editor/task/');
         $response = static::api()->getLastResponse();
         self::assertContains($response->getStatus(),[200],'Error on authentication with app token');
-        // the access-control header should be present
-        self::assertStringContainsString('Access-Control-Allow-Origin: *', $response->getHeadersAsString());
+        // the access-control header should be present ... why is camel-case name changed by the server ?
+        self::assertStringContainsString('access-control-allow-origin: *', strtolower($response->getHeadersAsString()));
     }
 
     public function testInvalidTokenAuthentication()
