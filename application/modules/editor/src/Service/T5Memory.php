@@ -40,13 +40,16 @@ final class T5Memory extends DockerServiceAbstract {
         'name' => 'runtimeOptions.LanguageResources.opentm2.server',
         'type' => 'list',
         'url' => 'http://t5memory.:4040/t5memory',
-        'healthcheck' => '_service/resources', // composes to "http://t5memory.:4040/t5memory_service/resources" requesting this resources url will retrieve a 200 status and the version
+        'healthcheck' => '/', // requesting the base url url will retrieve a 200 status and the version
         'additive' => true // TODO: is this neccessary ?
     ];
 
     protected function checkConfiguredHealthCheckUrl(string $url): bool
     {
-        // special healthcheck url also retrieves the version
+        $isT5Memory = (substr(rtrim($url, '/'), -8) === 't5memory'); // when openTM2 is out of use we can dsrop this switch
+        if($isT5Memory) {
+            $url = rtrim($url, '/') . '_service/resources'; // composes to "http://t5memory.:4040/t5memory_service/resources" requesting this resources url will retrieve a 200 status and the version
+        }
         try {
             $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
             $httpClient->setUri($url);
@@ -54,13 +57,19 @@ final class T5Memory extends DockerServiceAbstract {
             $response = $httpClient->request('GET');
             // the status request must return 200
             if($response->getStatus() === 200) {
-                // older revisions returned broken JSON so we have to try JSON and then a more hacky regex approach
-                $resources = json_decode($response->getBody());
-                $matches = [];
-                if($resources){
-                    $this->version = (property_exists($resources, 'Version')) ? $resources->Version : null;
-                } else if(preg_match('~"Version"\s*:\s*"([^"]+)"~', $response->getBody(), $matches) === 1){
-                    $this->version = (count($matches) > 0) ? $matches[1] : null;
+                // t5memory reveals the version in the resources-endpoint
+                if($isT5Memory){
+                    // older revisions returned broken JSON so we have to try JSON and then a more hacky regex approach
+                    $resources = json_decode($response->getBody());
+                    $matches = [];
+                    if($resources){
+                        $this->version = (property_exists($resources, 'Version')) ? $resources->Version : null;
+                    } else if(preg_match('~"Version"\s*:\s*"([^"]+)"~', $response->getBody(), $matches) === 1){
+                        $this->version = (count($matches) > 0) ? $matches[1] : null;
+                    }
+                } else {
+                    // there is no other version in existance anymore
+                    $this->version = 'OpenTM2-1.3.0';
                 }
                 return true;
             }
