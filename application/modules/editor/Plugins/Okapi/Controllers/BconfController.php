@@ -113,11 +113,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         }
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->import($postFile['tmp_name'], $name, $description, $customerId);
-        $ret->id = $bconf->getId();
-        $ret->success = !empty($ret->id);
 
-        Cors::sendResponseHeader();
-        echo json_encode($ret); // TODO FIXME: Can't we use a proper Response here ?
+        $this->view->success = !empty($bconf->getId());
+        $this->view->id = $bconf->getId();
     }
 
     /**
@@ -143,8 +141,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $returnData = $clone->toArray();
         $returnData['customExtensions'] = $clone->findCustomFilterExtensions(); // needed to match the grids data model
 
-        Cors::sendResponseHeader();
-        echo json_encode($returnData); // TODO FIXME: Can't we use a proper Response here ?
+        foreach($returnData as $key => $val){
+            $this->view->$key = $val;
+        }
     }
 
     /**
