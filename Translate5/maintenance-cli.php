@@ -87,6 +87,7 @@ use Translate5\MaintenanceCli\Command\{
     UserCreateCommand,
     UserInfoCommand,
     VisualConvertLegacyPdfReviewsCommand,
+    VisualImplantReflownWysiwyg,
     WorkerCleanCommand,
     WorkerListCommand,
     WorkerQueueCommand};
@@ -134,6 +135,7 @@ $commands = [
     new UserCreateCommand(),
     new UserInfoCommand(),
     new VisualConvertLegacyPdfReviewsCommand(),
+    new VisualImplantReflownWysiwyg(),
     new WorkerCleanCommand(),
     new WorkerListCommand(),
     new WorkerQueueCommand(),
