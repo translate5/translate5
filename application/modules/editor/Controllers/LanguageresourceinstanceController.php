@@ -863,7 +863,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
             // Set up headers
             Header::sendDownload(
-                rawurlencode($_['collectionId']['name']),
+                rawurlencode($_['collectionId']['name']).'.xlsx',
                 'text/xml',
                 'no-cache',
                 -1,
