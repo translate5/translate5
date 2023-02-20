@@ -8860,6 +8860,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
               <target>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</target>
             </trans-unit>
+            <trans-unit id='RGllIHp1IGzDtnNjaGVuZGUgU3ByYWNocmVzc291cmNlIHdpcmQgdm9uIGZvbGdlbmRlbiBBdWZnYWJlbiBiZW51dHp0Og=='>
+              <source>Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:</source>
+              <target>Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:</target>
+            </trans-unit>
+            <trans-unit id='QmVpbSBMw7ZzY2hlbiB3ZXJkZW4gZGllIFp1d2Vpc3VuZ2VuIGRlciBTcHJhY2hyZXNzb3VyY2UgenUgZGVuIEF1ZmdhYmVuIGViZW5mYWxscyBlbnRmZXJudC4gV29sbGVuIFNpZSB3aXJrbGljaCBkaWUgU3ByYWNocmVzc291cmNlIHVuZCBpaHJlIFp1d2Vpc3VuZ2VuIGzDtnNjaGVuPw=='>
+              <source>Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?</source>
+              <target>Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

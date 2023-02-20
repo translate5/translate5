@@ -136,9 +136,14 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
 
         Editor.app.mask(Ext.String.format(me.getViewModel().get('l10n.projectGrid.taskDestroy'), project.get('taskName')), project.get('taskName'));
 
-        // remove all project records from the store before the project is removed
-        // this will only remove the records locally
-        Ext.getStore('projectTasks').removeAll();
+        if( !Ext.getStore('projectTasks')){
+            // if the store is not available, log message and stack trace
+            Ext.log({ msg: 'The projectTasks store does not exist on deleteProject' , stack: true})
+        }else{
+            // Remove all project records from the store before the project is removed.
+            // This removes the records only locally
+            Ext.getStore('projectTasks').removeAll();
+        }
 
     	project.dropped = true; //doing the drop / erase manually
     	project.save({
