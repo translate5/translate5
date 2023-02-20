@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\ZfExtended\Cors;
+use MittagQI\ZfExtended\Controller\Response\Header;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -300,11 +300,11 @@ class editor_Models_Export_TaskHistoryExcel {
         if(!$this->exportAsFile('php://output')) {
             throw new ZfExtended_NoAccessException('Task is in use by another user!');
         }
-        // CORS header
-        Cors::sendResponseHeader();
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="'.$this->task->getTasknameForDownload('.xlsx').'"');
-        header('Cache-Control: max-age=0');
+        Header::sendDownload(
+            $this->task->getTasknameForDownload('.xlsx'),
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'max-age=0'
+        );
         exit;
     }
 }

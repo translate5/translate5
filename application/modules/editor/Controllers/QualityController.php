@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
-use MittagQI\ZfExtended\Cors;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 /**
  * The Main Quality Controller
@@ -78,11 +78,12 @@ class editor_QualityController extends ZfExtended_RestController {
         // the field name is unfortunately called "type" in the frontend code
         $field = $this->getRequest()->getParam('type');
         $statisticsProvider = new editor_Models_Quality_StatisticsView($task, $field);
-        // CORS header
-        Cors::sendResponseHeader();
-        header('Content-disposition: attachment; filename="'.$statisticsProvider->getDownloadName().'"');
-        header('Content-type: "text/xml"; charset="utf8"', TRUE);
-        
+
+        Header::sendDownload(
+            $statisticsProvider->getDownloadName(),
+            '"text/xml"; charset="utf8"'
+        );
+
         $this->view->text = $task->getTaskGuid();
         $this->view->children = $statisticsProvider->getTree();
     }

@@ -30,7 +30,7 @@ namespace MittagQI\Translate5\Task\Export\Package;
 
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Export\Exported\PackageWorker;
-use MittagQI\ZfExtended\Cors;
+use MittagQI\ZfExtended\Controller\Response\Header;
 use Zend_Session;
 use ZfExtended_Factory;
 
@@ -70,10 +70,10 @@ class Downloader
         $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
         $worker->queue($workerId);
 
-        // CORS header
-        Cors::sendResponseHeader();
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="' . $task->getTasknameForDownload('_exportPackage.zip') . '"');
+        Header::sendDownload(
+            $task->getTasknameForDownload('_exportPackage.zip'),
+            'application/zip'
+        );
         readfile($zipFile);
         unlink($zipFile);
     }

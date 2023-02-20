@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\ZfExtended\Cors;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 class editor_Models_LanguageResources_UsageExporter{
     
@@ -399,12 +399,12 @@ class editor_Models_LanguageResources_UsageExporter{
                 'path'=>$finalZip
             ]);
         }
-        // CORS header
-        Cors::sendResponseHeader();
-        header('Content-Type: application/zip', TRUE);
-        header('Content-Disposition: attachment; filename="'.$name.'"');
+        Header::sendDownload(
+            $name,
+            'application/zip'
+        );
         readfile($finalZip);
-        
+
         //clean files
         $this->cleanExportZip($path);
     }

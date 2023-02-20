@@ -26,7 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 
-use MittagQI\ZfExtended\Cors;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 /**
  * REST Endpoint Controller to serve the Bconf List for the Bconf-Management in the Preferences
@@ -81,12 +81,12 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      */
     public function downloadbconfAction() {
         $this->entityLoad();
-        // CORS header
-        Cors::sendResponseHeader();
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="'.$this->entity->getDownloadFilename());
-        header('Cache-Control: no-cache');
-        header('Content-Length: ' . filesize($this->entity->getPath()));
+        Header::sendDownload(
+            $this->entity->getDownloadFilename(),
+            'application/octet-stream',
+            'no-cache',
+            filesize($this->entity->getPath())
+        );
         readfile($this->entity->getPath());
         exit;
     }

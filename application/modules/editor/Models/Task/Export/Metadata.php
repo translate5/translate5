@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\ZfExtended\Cors;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 /**
  * Export given tasks, their filtering and their key performance indicators (KPI) as an Excel-file.
@@ -140,11 +140,11 @@ class editor_Models_Task_Export_Metadata {
         catch (Exception $e) {
             throw new editor_Models_Task_Excel_MetadataException('E1170',[],$e);
         }
-        // CORS header
-        Cors::sendResponseHeader();
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="'.$this->getFilenameForDownload().'"');
-        header('Cache-Control: max-age=0');
+        Header::sendDownload(
+            $this->getFilenameForDownload(),
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'max-age=0'
+        );
         exit;
     }
     

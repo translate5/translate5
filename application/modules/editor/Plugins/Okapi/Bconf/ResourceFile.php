@@ -26,7 +26,7 @@
  END LICENSE AND COPYRIGHT
  */
 
-use MittagQI\ZfExtended\Cors;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 /**
  * Class representing a UTF-8-text based resource file embedded into a bconf
@@ -145,12 +145,12 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
      * @param string $downloadFilename
      */
     public function download(string $downloadFilename) {
-        // CORS header
-        Cors::sendResponseHeader();
-        header('Content-Type: '.$this->getMimeType());
-        header('Content-Disposition: attachment; filename="' . $downloadFilename . '"');
-        header('Cache-Control: no-store');
-        header('Content-Length: '.$this->getContentLength());
+        Header::sendDownload(
+            $downloadFilename,
+            $this->getMimeType(),
+            'no-store',
+            $this->getContentLength()
+        );
         echo $this->getContent();
     }
 
@@ -158,11 +158,12 @@ abstract class editor_Plugins_Okapi_Bconf_ResourceFile {
      * Generates the output for get actions
      */
     public function output() {
-        // CORS header
-        Cors::sendResponseHeader();
-        header('Content-Type: '.$this->getMimeType());
-        header('Cache-Control: no-store');
-        header('Content-Length: '.$this->getContentLength());
+        Header::sendDownload(
+            null,
+            $this->getMimeType(),
+            'no-store',
+            $this->getContentLength()
+        );
         echo rtrim($this->getContent());
     }
 
