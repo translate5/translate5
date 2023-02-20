@@ -44,7 +44,6 @@
     <testsuite name="auth">
       <file>editorAPI/Translate3108Test.php</file>
       <file>editorAPI/SessionApiTest.php</file>
-      <file>editorAPI/Translate3108Test.php</file>
     </testsuite>
     <testsuite name="unit">
       <directory>Unit</directory>
