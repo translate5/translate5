@@ -7,7 +7,7 @@
  *
  * @type {number}
  */
-Error.stackTraceLimit = Infinity;
+Error.stackTraceLimit = 1000;
 
 /**
  * Setup a counter for browser tabs having opened t5 app, and return current value of that counter
