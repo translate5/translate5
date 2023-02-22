@@ -156,13 +156,15 @@ Ext.define('Editor.controller.ServerException', {
             if(response && Ext.isEmpty(response.getAllResponseHeaders()['x-translate5-version'])) {
                 text += '<br>Answer seems to come from a proxy!';
                 msg += ' - answer seems not to be from translate5 - x-translate5-version header is missing.'
-                if (operation) {
-                    msg += 'Request: ' + operation.getRequest().getMethod() + ' ' + operation.getRequest().getUrl() + ', ';
+                if (jslogger) {
+                    if (operation) {
+                        jslogger.addLogEntry({ type : 'info', message : 'Request: ' + operation.getRequest().getMethod() + ' ' + operation.getRequest().getUrl()});
+                    }
+                    jslogger.addLogEntry({type: 'info', message: 'status-arg: ' + _status.replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'statusText-arg: ' + statusText.toString().replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'Response headers: ' + JSON.stringify(response.getAllResponseHeaders()).replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'Response text: ' + respText.toString().replaceAll('"', '~')});;
                 }
-                msg += ' status-arg: ' + _status.replaceAll('"', '~') + ', ';
-                msg += ' statusText-arg: ' + statusText.toString().replaceAll('"', '~') + ', ';
-                msg += ' Response headers: ' + JSON.stringify(response.getAllResponseHeaders()).replaceAll('"', '~') + ', ';
-                msg += ' Response text: ' + respText.toString().replaceAll('"', '~');
             }
 
             Editor.MessageBox.addError(text);
