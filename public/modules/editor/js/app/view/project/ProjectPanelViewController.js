@@ -182,6 +182,14 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
         currentTask.load({
             callback:function (){
+                // After the task is loaded, check if the adminTaskTaskManagement is available/exist.
+                // In case the user opened different task for editing, and the call back is called after this, this
+                // component will not exist, since transalate5 will be in different view port (viewPortEditor)
+                taskManagement = Ext.ComponentQuery.query('adminTaskTaskManagement')[0];
+                if (!taskManagement){
+                    Ext.log({ msg: 'Task management panel is not found on updateProgress call.' , stack: true})
+                    return;
+                }
                 taskManagement.setCurrentTask(currentTask);
                 me.getView().down('adminTaskUserAssocGrid').getStore().load();
             }
