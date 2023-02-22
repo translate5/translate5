@@ -28,6 +28,10 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Service;
 
+use Throwable;
+use Zend_Http_Client;
+use ZfExtended_Factory;
+
 /**
  * Represents the dockerized T5-app itself
  */
@@ -37,6 +41,38 @@ final class Php extends DockerServiceAbstract {
         'name' => 'runtimeOptions.worker.server',
         'type' => 'string',
         'url' => 'http://php.:80',
+        'healthcheck' => '/editor/index/applicationstate',
         'optional' => true
     ];
+
+    protected function checkConfiguredHealthCheckUrl(string $url): bool
+    {
+        // composes to "http://php.:80/editor/index/applicationstate" requesting
+        // this resource url will retrieve a 200 status and the version
+        try {
+            $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
+            $httpClient->setUri($url);
+            $httpClient->setHeaders('Accept', 'application/json');
+            $response = $httpClient->request('GET');
+            // the status request must return 200
+            if ($response->getStatus() === 200) {
+                $state = json_decode($response->getBody());
+                if ($state) {
+                    $this->version = $state->version ?? null;
+                    if (!empty($state->branch)) {
+                        $this->version .= ' '.$state->branch;
+                    }
+                }
+
+                if (trim($response->getBody()) === 'null') {
+                   $this->warnings[] = 'Check config runtimeOptions.cronIP - may be configured wrong.';
+                }
+                return true;
+            }
+            return false;
+
+        } catch (Throwable) {
+            return false;
+        }
+    }
 }

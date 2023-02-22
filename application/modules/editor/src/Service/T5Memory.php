@@ -40,7 +40,7 @@ final class T5Memory extends DockerServiceAbstract {
         'name' => 'runtimeOptions.LanguageResources.opentm2.server',
         'type' => 'list',
         'url' => 'http://t5memory.:4040/t5memory',
-        'healthcheck' => '/', // requesting the base url url will retrieve a 200 status and the version
+        'healthcheck' => '/', // requesting the base url will retrieve a 200 status and the version
         'additive' => true // TODO: is this neccessary ?
     ];
 
