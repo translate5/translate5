@@ -71,6 +71,7 @@ final class Service extends DockerServiceAbstract
     }
 
     /**
+     * Differing from base version we check the existing configured URLs for validity and dismiss the ones not reachable
      * (non-PHPdoc)
      * @see DockerServiceAbstract::locate()
      */
