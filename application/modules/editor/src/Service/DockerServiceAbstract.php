@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Service;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Throwable;
 use Zend_Exception;
 use JsonException;
@@ -190,15 +191,11 @@ abstract class DockerServiceAbstract extends ServiceAbstract
      */
     protected function checkConfiguredServiceUrl(string $url): bool
     {
-        $host = parse_url($url, PHP_URL_HOST);
-        $port = parse_url($url, PHP_URL_PORT);
-        if (empty($host)) {
+        $urlParsed = $this->parseUrl($url);
+        if (empty($urlParsed['host'])) {
             return false;
         }
-        if (empty($port) || $port === false) {
-            $port = null;
-        }
-        return $this->isDnsSet($host, $port);
+        return $this->isDnsSet(... $urlParsed);
     }
 
     /**
@@ -211,14 +208,22 @@ abstract class DockerServiceAbstract extends ServiceAbstract
     protected function checkPotentialServiceUrl(string $label, string $url, SymfonyStyle $io = null): bool
     {
         $result = true;
-        $host = parse_url($url, PHP_URL_HOST);
-        $port = parse_url($url, PHP_URL_PORT);
-        if (!$this->isDnsSet($host, $port)) {
+        if (!$this->isDnsSet(... $this->parseUrl($url))) {
             $url = 'NONE (expected: ' . $url . ')';
             $result = false;
         }
         $this->output('Found "' . $label . '": ' . $url, $io, 'info');
         return $result;
+    }
+
+    #[ArrayShape(['host' => 'string', 'port' => 'int'])]
+    protected function parseUrl(string $url): array
+    {
+        return [
+            'host' => parse_url($url, PHP_URL_HOST),
+            // if port can not be parsed from given URL, use the default port from the default config:
+            'port' => parse_url($url, PHP_URL_PORT) ?: parse_url($this->configurationConfig['url'], PHP_URL_PORT),
+        ];
     }
 
     /**
