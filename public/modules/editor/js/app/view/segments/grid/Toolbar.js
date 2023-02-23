@@ -367,7 +367,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     xtype: 'button',
                     bind: {
-                        text: '{l10n.segmentGrid.toolbar.all}'
+                        text: '{l10n.segmentGrid.toolbar.currentSegment}'
                     },
                     menu: {
                         itemId: 'segmentActionMenu',
@@ -510,7 +510,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     }
                 }, {
                     xtype: 'button',
-                    glyph: 'f141@FontAwesome5FreeSolid',
                     itemId: 'batchOperations',
                     bind: {
                         text: '{l10n.segmentGrid.batchOperations.btnText}',
