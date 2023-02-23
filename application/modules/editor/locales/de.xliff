@@ -2957,6 +2957,10 @@
                 <source>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</source>
                 <target>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</target>
             </trans-unit>
+            <trans-unit id='SGluenVmw7xnZW4vRW50ZmVybmVuIHZvbiBTeW1ib2xlbiB6dXIvdm9uIGRlciBTeW1ib2xsZWlzdGU='>
+                <source>Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste</source>
+                <target>Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste</target>
+            </trans-unit>
             <trans-unit id='U2VnbWVudCBhdWYgTGVzZXplaWNoZW5saXN0ZSAoU1RSRyArIEQp'>
                 <source>Segment auf Lesezeichenliste (STRG + D)</source>
                 <target>Segment auf Lesezeichenliste (STRG + D)</target>

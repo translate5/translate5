@@ -378,7 +378,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         defaults: {
                             xtype: 'menucheckitem',
                             allowCheckChange: false,
-                            checkableDespiteDisabled: true
+                            checkableDespiteDisabled: true,
+                            bind: {
+                                checkboxTooltip: '{l10n.segmentGrid.toolbar.allMenuCheckTooltip}'
+                            }
                         },
                         items: [{
                             itemId: 'saveBtn',

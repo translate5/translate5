@@ -1459,6 +1459,10 @@
                 <source>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</source>
                 <target>Reset segment to initial content (ALT + DEL)</target>
             </trans-unit>
+            <trans-unit id='SGluenVmw7xnZW4vRW50ZmVybmVuIHZvbiBTeW1ib2xlbiB6dXIvdm9uIGRlciBTeW1ib2xsZWlzdGU='>
+                <source>Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste</source>
+                <target>Add/remove icon to/from toolbar</target>
+            </trans-unit>
             <trans-unit id='QWJicmVjaGVuIChFU0Mp'>
                 <source>Abbrechen (ESC)</source>
                 <target>Cancel (ESC)</target>
