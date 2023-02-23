@@ -108,7 +108,7 @@ final class Service extends DockerServiceAbstract
     }
 
     /**
-     * Unfortunately we vcannot fetch the version directly as older versions do not support the status.json
+     * Unfortunately we cannot fetch the version directly as older versions do not support the status.json
      * (non-PHPdoc)
      * @see DockerServiceAbstract::findVersionInRequestBody()
      */
