@@ -1189,33 +1189,22 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     public function deleteAction(){
-        //load the entity
+        //load the entity abd store a copy for later use.
         $this->entityLoad();
-
-        // clone the current entity, so it can be re-applied later again after the entity is removed fron the database.
-        // there may be some post-delete events where the deleted entity should be checked
         $clone = clone $this->entity;
-
-        // if the current entity is term collection, init the entity as term collection
-        if($this->entity->isTc()){
-            $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            /* @var $collection editor_Models_TermCollection_TermCollection */
-            $collection->init($this->entity->toArray());
-            $this->entity = $collection;
-        }
+        
+        // detect parameters
+        $forced = (bool)$this->getParam('forced',false);
+        $deleteInResource = !$this->getParam('deleteLocally', false);
+        
+        // check entity version
         $this->processClientReferenceVersion();
-
-        //encapsulate the deletion in a transaction to rollback if for example the real file based resource can not be deleted
-        $this->entity->db->getAdapter()->beginTransaction();
+        $this->checkOrCleanAssociation($forced,$this->entity->getCustomers() ?? []);
+        
+        // no try to remove the language-resource
         try {
-            $entity = clone $this->entity;
-
-            $clean = (bool)$this->getParam('forced',false);
-
-            $this->checkOrCleanAssociation($clean,$this->entity->getCustomers() ?? []);
-
-            //delete the entity in the DB
-            $this->entity->delete();
+            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [$this->entity]);
+            $remover->remove(forced: $forced, deleteInResource: $deleteInResource);
         }
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             //if there are associated tasks we can not delete the language resource
@@ -1224,22 +1213,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             ], 'editor.languageresources');
             throw new ZfExtended_Models_Entity_Conflict('E1158');
         }
-        try {
-            $manager = ZfExtended_Factory::get('editor_Services_Manager');
-            /* @var $manager editor_Services_Manager */
-            $connector = $manager->getConnector($entity);
-            $deleteInResource = !$this->getParam('deleteLocally', false);
-            //try to delete the resource via the connector
-            $deleteInResource && $connector->delete();
-            //if this is successfull we commit the DB delete
-            $this->entity->db->getAdapter()->commit();
-        }
-        catch (Exception $e) {
-            //if not we rollback and throw the original exception
-            $this->entity->db->getAdapter()->rollBack();
-            throw $e;
-        }
+        
+        // and restore the entity for later use in "afterDeleteAction" event-handler
         $this->entity = $clone;
+
     }
 
     /**
@@ -1499,6 +1476,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /**
      * Check of clean associations.
+     * @TODO: same function exists in LanguageResources/Remover.php !!!
      * @param bool $clean
      * @return void
      * @throws Zend_Db_Table_Exception

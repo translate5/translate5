@@ -206,10 +206,46 @@ class editor_Models_Task_Remover {
         
         $filesTable = ZfExtended_Factory::get('editor_Models_Db_Files');
         $filesTable->delete(array('taskGuid = ?' => $taskGuid));
-
-        $termcollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $termcollection editor_Models_TermCollection_TermCollection  */
-        $termcollection->checkAndRemoveTaskImported($this->task->getTaskGuid());
+    
+        // delete autocreatedOnImport LanguageResources
+        // so all languageresource entries in LEK_languageresources_taskassoc and LEK_languageresources_taskpivotassoc
+        // where field "autoCreatedOnImport" is set to 1 will be removed
+        $this->removeAutocreatedOnImportLanguageResources();
+        
+    }
+    
+    /**
+     * remove all "autoCreatedOnImport" language resource which are connected to this task.
+     * @return void
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    protected function removeAutocreatedOnImportLanguageResources() : void {
+        // first detect all IDs of the languageresources that need to be deleted
+        
+        $db = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\Db\TaskAssociation::class);
+        $taskAssocTable = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\Db\TaskAssociation::class);
+        $select = $taskAssocTable->select()->where('autoCreatedOnImport = 1 AND taskGuid = ?', $this->task->getTaskGuid());
+        $rowsTaskAssoc = $db->fetchAll($select)->toArray();
+    
+        $db = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation::class);
+        $taskPivotAssocTable = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation::class);
+        $select = $taskPivotAssocTable->select()->where('autoCreatedOnImport = 1 AND taskGuid = ?', $this->task->getTaskGuid());
+        $rowsTaskPivotAssoc = $db->fetchAll($select)->toArray();
+        
+        $allEntries = array_merge($rowsTaskAssoc, $rowsTaskPivotAssoc);
+        
+        // do nothing if no autocreatedOnImport resources where found.
+        if (empty($allEntries)) {
+            return;
+        }
+    
+        foreach($allEntries as $entry) {
+            $languageResourceId = (int) $entry['languageResourceId'];
+            $languageResource = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
+            $languageResource->load($languageResourceId);
+            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [$languageResource]);
+            $remover->remove(forced: true, deleteInResource: true);
+        }
         
     }
 }
