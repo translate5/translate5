@@ -61,6 +61,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     itemId: 'repetitionsBtn',
                     bind: {
                         text: '{l10n.segmentGrid.toolbar.repetitionBtn}',
+                        tooltip: '{isEditingSegment ? l10n.segmentGrid.toolbar.repetitionTooltip : ""}',
+                        disabled: '{isEditingSegment}',
                     }
                 }, '-', {
                     xtype: 'menuitem',
