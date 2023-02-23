@@ -56,7 +56,7 @@ final class Service extends ServiceAbstract {
         $adapter = $this->getAdapter($url);
         $version = null;
         $result = $adapter->testServerUrl($url, $version);
-        $this->version = (!empty($version)) ? strval($version) : null;
+        $this->addCheckResult($url, $version);
         return $result;
     }
 

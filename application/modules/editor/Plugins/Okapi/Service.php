@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\Plugins\Okapi;
 use editor_Utils;
 use MittagQI\Translate5\Service\DockerServiceAbstract;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Throwable;
 use Zend_Config;
 use Zend_Http_Client;
 use Zend_Http_Client_Exception;
@@ -61,11 +62,10 @@ final class Service extends DockerServiceAbstract
             return false;
         }
         $healthcheckUrl = rtrim($url, '/') . '/projects';
-        if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl)) {
+        if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url)) {
             $this->errors[] = 'A request on "' . $healthcheckUrl . '" did not bring the expected status "200" for entry "'.$serviceUsed.'".';
             return false;
         }
-        $this->version = $this->fetchVersion($url, 'before 1.40.0');
         $this->checkOtherConfiguredServers($services, $serviceUsed);
         return true;
     }
@@ -90,7 +90,7 @@ final class Service extends DockerServiceAbstract
             $newServers = [];
             if(!empty($this->config->runtimeOptions->plugins->Okapi->server)){
                 foreach($this->config->runtimeOptions->plugins->Okapi->server as $name => $otherUrl){
-                    if(!empty($otherUrl) && $otherUrl != $url && $this->checkConfiguredHealthCheckUrl(rtrim($otherUrl, '/') . '/projects')){
+                    if(!empty($otherUrl) && $otherUrl != $url && $this->checkConfiguredHealthCheckUrl(rtrim($otherUrl, '/') . '/projects', $otherUrl, false)){
                         $newServers[$name] = $otherUrl;
                     }
                 }
@@ -108,16 +108,13 @@ final class Service extends DockerServiceAbstract
     }
 
     /**
-     * Overwritten to properly show warnings with other configured endpoints
-     * @param string $seperator
-     * @return string
+     * Unfortunately we vcannot fetch the version directly as older versions do not support the status.json
+     * (non-PHPdoc)
+     * @see DockerServiceAbstract::findVersionInRequestBody()
      */
-    public function getWarning(string $seperator = "\n"): string
+    protected function findVersionInRequestBody(string $responseBody, string $serviceUrl): ?string
     {
-        return 'Service "' . $this->getName() . '", plugin "' . $this->pluginName . '"'
-            . ' has warnings:'
-            . $seperator . $seperator
-            . implode($seperator, $this->warnings);
+        return $this->fetchVersion($serviceUrl, 'unknown / before 1.40.0');
     }
 
     /**
@@ -127,18 +124,22 @@ final class Service extends DockerServiceAbstract
      * @return string|null
      * @throws Zend_Http_Client_Exception
      */
-    private function fetchVersion(string $okapiUrl, string $default = null): ?string
+    private function fetchVersion(string $okapiUrl, ?string $default): ?string
     {
-        $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
-        $httpClient->setUri(rtrim($okapiUrl, '/') . '/status.json');
-        $response = $httpClient->request('GET');
-        if ($response->getStatus() === 200) {
-            $status = json_decode($response->getBody());
-            if (property_exists($status, 'version')) {
-                return $status->version;
+        try {
+            $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
+            $httpClient->setUri(rtrim($okapiUrl, '/') . '/status.json');
+            $response = $httpClient->request('GET');
+            if ($response->getStatus() === 200) {
+                $status = json_decode($response->getBody());
+                if (property_exists($status, 'version')) {
+                    return $status->version;
+                }
             }
+            return $default;
+        } catch (Throwable) {
+            return $default;
         }
-        return $default;
     }
 
     /**
@@ -153,7 +154,7 @@ final class Service extends DockerServiceAbstract
                     $this->warnings[] = 'There is no URL configured for entry "'.$name.'.';
                 } else {
                     $healthcheckUrl = rtrim($url, '/') . '/projects';
-                    if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl)) {
+                    if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url, false)) {
                         $this->warnings[] = 'A request on "' . $healthcheckUrl . '" did not bring the expected status "200" for entry "'.$name.'.';
                     }
                 }
