@@ -194,7 +194,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
             $response = $httpClient->request('GET');
             // the status request must return 200
             if ($addResult && $response->getStatus() === 200) {
-                $this->addCheckResult($serviceUrl, $this->findVersionInRequestBody($response->getBody(), $serviceUrl));
+                $this->addCheckResult($serviceUrl, $this->findVersionInResponseBody($response->getBody(), $serviceUrl));
             }
             return ($response->getStatus() === 200);
         } catch (Throwable) {
@@ -240,7 +240,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
      * @param string $serviceUrl
      * @return string|null
      */
-    protected function findVersionInRequestBody(string $responseBody, string $serviceUrl): ?string
+    protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
         return null;
     }

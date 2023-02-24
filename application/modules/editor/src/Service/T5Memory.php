@@ -58,9 +58,9 @@ final class T5Memory extends DockerServiceAbstract {
     /**
      * We must distinguish between t5memory and the old OpenTM2, OpenTM2 will get a fixed version
      * (non-PHPdoc)
-     * @see DockerServiceAbstract::findVersionInRequestBody()
+     * @see DockerServiceAbstract::findVersionInResponseBody()
      */
-    protected function findVersionInRequestBody(string $responseBody, string $serviceUrl): ?string
+    protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
         if($this->isT5MemoryService($serviceUrl)){
             // older revisions returned broken JSON so we have to try JSON and then a more hacky regex approach

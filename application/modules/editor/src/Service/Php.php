@@ -46,7 +46,7 @@ final class Php extends DockerServiceAbstract {
         'optional' => true
     ];
 
-    protected function findVersionInRequestBody(string $responseBody, string $serviceUrl): ?string
+    protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
         // we add a warning if the result is no proper JSON, presumably the cron-IP is not properly set up then
         if (trim($responseBody) === 'null') {

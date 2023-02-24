@@ -110,9 +110,9 @@ final class Service extends DockerServiceAbstract
     /**
      * Unfortunately we cannot fetch the version directly as older versions do not support the status.json
      * (non-PHPdoc)
-     * @see DockerServiceAbstract::findVersionInRequestBody()
+     * @see DockerServiceAbstract::findVersionInResponseBody()
      */
-    protected function findVersionInRequestBody(string $responseBody, string $serviceUrl): ?string
+    protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
         return $this->fetchVersion($serviceUrl, 'unknown / before 1.40.0');
     }
