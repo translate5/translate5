@@ -90,8 +90,8 @@ final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
             $parts = explode('Version:', $version);
             $parts = (count($parts) > 1) ? explode('<br', $parts[1]) : [];
             $version = (count($parts) > 0) ? trim(strip_tags($parts[0])) : null;
-            $this->version = (!empty($version)) ? $version : null;
         }
+        $this->addCheckResult($url, $version);
         return $result;
     }
     

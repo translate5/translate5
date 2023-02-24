@@ -33,7 +33,6 @@ use editor_Models_Import_DataProvider_Exception;
 use editor_Models_Task;
 use FilesystemIterator;
 use MittagQI\Translate5\Task\Export\Package\Source\Task;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Zend_File_Transfer;
@@ -215,7 +214,7 @@ class ZipDataProvider extends DataProvider
 
                 // get the file extension and check if is it supported by segment processor
                 $extension = strtolower(pathinfo($zipFile['name'], PATHINFO_EXTENSION));
-                if (!in_array($extension, FileHandler::getSupportedFileTypes(), true)) {
+                if (!in_array($extension, FileparserRegistry::getInstance()->getSupportedFileTypes(), true)) {
                     $this->uploadErrors[] = 'The reimport zip package contains unsupported file for reimport. The file:' . $zipFile['name'] . ' is with invalid file extension';
                     continue;
                 }

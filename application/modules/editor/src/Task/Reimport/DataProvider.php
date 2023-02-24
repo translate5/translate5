@@ -33,11 +33,9 @@ use editor_Models_Import_Configuration;
 use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Import_DataProvider_Exception;
 use editor_Models_Task;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use Zend_Exception;
 use Zend_File_Transfer;
 use Zend_Registry;
-use ZfExtended_ErrorCodeException;
 use ZfExtended_EventManager;
 use ZfExtended_Factory;
 use ZfExtended_Utils;
@@ -181,7 +179,7 @@ class DataProvider extends editor_Models_Import_DataProvider_Abstract
     {
 
         $upload = new Zend_File_Transfer();
-        $upload->addValidator('Extension', false, FileHandler::getSupportedFileTypes());
+        $upload->addValidator('Extension', false, FileparserRegistry::getInstance()->getSupportedFileTypes());
         // Returns all known internal file information
         $files = $upload->getFileInfo();
         $validFiles = [];

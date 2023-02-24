@@ -34,11 +34,11 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\Applet\Dispatcher;
+use MittagQI\Translate5\Service\Services;
 use MittagQI\Translate5\Task\Current\NoAccessException;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
+use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Tools\CronIpFactory;
-use MittagQI\Translate5\Service\Services;
 
 /**
  * Dummy Index Controller
@@ -385,7 +385,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->view->Php2JsVars()->set('editor.segments.editorSpecialCharacters', $rop->editor->segments?->editorSpecialCharacters ?? '');
 
         // add the supported file extensions for task reimport as frontend variable
-        $this->view->Php2JsVars()->set('editor.task.reimport.supportedExtensions', FileHandler::getSupportedFileTypes());
+        $this->view->Php2JsVars()->set(
+            'editor.task.reimport.supportedExtensions',
+            FileparserRegistry::getInstance()->getSupportedFileTypes()
+        );
 
         $this->setJsAppData();
         $this->setQualityCheckJsVars();

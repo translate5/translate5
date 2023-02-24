@@ -58,6 +58,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
      * "additive": optional, if set to true, the configured value is added to the existing config if it does not exist
      * "optional": optional, if set to true, this will result in only a warning if the service is not configured
      * "healthcheck": optional, if set to a value like /status, this will be used to check the health of the service with a GET request that is expected to return status "200"
+     * "healthcheckIsJson": optional, if set to true, the helthcheck-url will be configured to fetch JSON via Accept header
      * @var array
      */
     protected array $configurationConfig;
@@ -67,7 +68,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
      * @param SymfonyStyle $io
      * @param mixed $url
      * @param bool $doSave
-     * @param array $config: optional to inject further dependencies
+     * @param array $config : optional to inject further dependencies
      * @return bool
      * @throws JsonException
      * @throws Zend_Db_Statement_Exception
@@ -81,7 +82,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
         $configName = $this->configurationConfig['name'];
         $configType = $this->configurationConfig['type'];
 
-        if(array_key_exists('remove', $config) && $config['remove'] === true){
+        if (array_key_exists('remove', $config) && $config['remove'] === true) {
             $this->updateConfigurationConfig($configName, $configType, [], $doSave, $io);
             return false;
         }
@@ -100,6 +101,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
     /**
      * Base implementation for simple docker-services
      * @return bool
+     * @throws ZfExtended_Exception
      */
     public function check(): bool
     {
@@ -117,24 +119,32 @@ abstract class DockerServiceAbstract extends ServiceAbstract
             $checked = false;
         } else {
             foreach ($urls as $url) {
-                if (empty($url)) {
-                    $this->errors[] = 'There is an empty URL set.';
+                if(!$this->checkUrl($url, $healthCheck)){
                     $checked = false;
-                } else if (empty($healthCheck)) {
-                    if (!$this->checkConfiguredServiceUrl($url)) {
-                        $this->errors[] = 'The configured URL "' . $url . '" is not reachable.';
-                        $checked = false;
-                    }
-                } else {
-                    $healthcheckUrl = rtrim($url, '/') . $healthCheck;
-                    if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl)) {
-                        $this->errors[] = 'A request on "' . $healthcheckUrl . '" did not bring the expected status "200".';
-                        $checked = false;
-                    }
                 }
             }
         }
         return $checked;
+    }
+
+    public function checkUrl(string $url, ?string $healthCheck): bool
+    {
+        if (empty($url)) {
+            $this->errors[] = 'There is an empty URL set.';
+            return false;
+        } else if (empty($healthCheck)) {
+            if (!$this->checkConfiguredServiceUrl($url)) {
+                $this->errors[] = 'The configured URL "' . $url . '" is not reachable.';
+                return false;
+            }
+        } else {
+            $healthcheckUrl = rtrim($url, '/') . $healthCheck;
+            if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url)) {
+                $this->errors[] = 'A request on "' . $healthcheckUrl . '" did not bring the expected status "200".';
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -167,19 +177,27 @@ abstract class DockerServiceAbstract extends ServiceAbstract
 
     /**
      * Checks a dedicated status-url on a service or an URL that could be used in such manner
-     * @param string $url
+     * @param string $healthcheckUrl
+     * @param string $serviceUrl
+     * @param bool $addResult : normally we want the result of a healthcheck to be part of the output
      * @return bool
      */
-    protected function checkConfiguredHealthCheckUrl(string $url): bool
+    protected function checkConfiguredHealthCheckUrl(string $healthcheckUrl, string $serviceUrl, bool $addResult = true): bool
     {
         try {
             $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
-            $httpClient->setUri($url);
+            $httpClient->setUri($healthcheckUrl);
+            // some endpoints need to be told to return JSON
+            if (array_key_exists('healthcheckIsJson', $this->configurationConfig) && $this->configurationConfig['healthcheckIsJson'] === true) {
+                $httpClient->setHeaders('Accept', 'application/json');
+            }
             $response = $httpClient->request('GET');
             // the status request must return 200
+            if ($addResult && $response->getStatus() === 200) {
+                $this->addCheckResult($serviceUrl, $this->findVersionInResponseBody($response->getBody(), $serviceUrl));
+            }
             return ($response->getStatus() === 200);
-
-        } catch (Throwable $e){
+        } catch (Throwable) {
             return false;
         }
     }
@@ -216,6 +234,17 @@ abstract class DockerServiceAbstract extends ServiceAbstract
         return $result;
     }
 
+    /**
+     * Can be implemented to retrieve the version-result out of the health-checks request-body
+     * @param string $responseBody
+     * @param string $serviceUrl
+     * @return string|null
+     */
+    protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
+    {
+        return null;
+    }
+
     #[ArrayShape(['host' => 'string', 'port' => 'int'])]
     protected function parseUrl(string $url): array
     {
@@ -231,7 +260,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
      * @param int $port
      * @return bool
      */
-    protected function isDnsSet(string $host, int $port = null): bool
+    protected function isDnsSet(string $host, int $port): bool
     {
         $connection = @fsockopen($host, $port);
         if (is_resource($connection)) {
@@ -353,7 +382,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
             case ZfExtended_DbConfig_Type_CoreTypes::TYPE_STRING:
             case ZfExtended_DbConfig_Type_CoreTypes::TYPE_FLOAT:
             case ZfExtended_DbConfig_Type_CoreTypes::TYPE_INTEGER:
-                if(is_array($value)){
+                if (is_array($value)) {
                     return (count($value) === 0) ? '' : strval($value[0]);
                 }
                 return strval($value);
@@ -362,8 +391,8 @@ abstract class DockerServiceAbstract extends ServiceAbstract
                 return ($value === true) ? '1' : '0';
 
             case ZfExtended_DbConfig_Type_CoreTypes::TYPE_LIST:
-                if(!is_array($value)){
-                    $value = [ $value ];
+                if (!is_array($value)) {
+                    $value = [$value];
                 }
                 return json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
 
