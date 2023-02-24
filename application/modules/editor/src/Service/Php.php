@@ -42,37 +42,25 @@ final class Php extends DockerServiceAbstract {
         'type' => 'string',
         'url' => 'http://php.:80',
         'healthcheck' => '/editor/index/applicationstate',
+        'healthcheckIsJson' => true,
         'optional' => true
     ];
 
-    protected function checkConfiguredHealthCheckUrl(string $url): bool
+    protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
-        // composes to "http://php.:80/editor/index/applicationstate" requesting
-        // this resource url will retrieve a 200 status and the version
-        try {
-            $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
-            $httpClient->setUri($url);
-            $httpClient->setHeaders('Accept', 'application/json');
-            $response = $httpClient->request('GET');
-            // the status request must return 200
-            if ($response->getStatus() === 200) {
-                $state = json_decode($response->getBody());
-                if ($state) {
-                    $this->version = $state->version ?? null;
-                    if (!empty($state->branch)) {
-                        $this->version .= ' '.$state->branch;
-                    }
-                }
-
-                if (trim($response->getBody()) === 'null') {
-                   $this->warnings[] = 'Check config runtimeOptions.cronIP - may be configured wrong.';
-                }
-                return true;
-            }
-            return false;
-
-        } catch (Throwable) {
-            return false;
+        // we add a warning if the result is no proper JSON, presumably the cron-IP is not properly set up then
+        if (trim($responseBody) === 'null') {
+            $this->warnings[] = 'Check config runtimeOptions.cronIP - may be configured wrong.';
+            return null;
         }
+        $state = json_decode($responseBody);
+        if ($state) {
+            $version = $state->version ?? null;
+            if (!empty($state->branch)) {
+                $version = ($version == null) ? $state->branch : $version.' '.$state->branch;
+            }
+            return $version;
+        }
+        return null;
     }
 }
