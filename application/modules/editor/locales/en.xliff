@@ -1396,7 +1396,7 @@
             </trans-unit>
             <trans-unit id='U2VnbWVudCBhdWYgTGVzZXplaWNoZW5saXN0ZSAoU1RSRyArIEQp'>
                 <source>Segment auf Lesezeichenliste (STRG + D)</source>
-                <target>bookmark segment (CTRL + D)</target>
+                <target>Bookmark segment (CTRL + D)</target>
             </trans-unit>
             <trans-unit id='U2VnbWVudCB2b24gTGVzZXplaWNoZW5saXN0ZSBlbnRmZXJuZW4gKFNUUkcgKyBEKQ=='>
                 <source>Segment von Lesezeichenliste entfernen (STRG + D)</source>
@@ -6120,9 +6120,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
                 <target>Lock / unlock the selected segment (CTRL + L)</target>
             </trans-unit>
-            <trans-unit id="QWt0dWVsbGVzIFNlZ21lbnQ=">
-                <source>Aktuelles Segment</source>
-                <target>Current segment</target>
+            <trans-unit id="QWt0LiBTZWc=">
+                <source>Akt. Seg</source>
+                <target>Cur. seg.</target>
             </trans-unit>
             <trans-unit id="WmVpY2hlbg==">
                 <source>Zeichen</source>
@@ -8437,9 +8437,9 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Aktionen</source>
                 <target>Actions</target>
             </trans-unit>
-            <trans-unit id="QWxsZSBTZWdtZW50ZQ==">
-                <source>Alle Segmente</source>
-                <target>All segments</target>
+            <trans-unit id="QWxsZSBTZWcu">
+                <source>Alle Seg.</source>
+                <target>All seg.</target>
             </trans-unit>
             <trans-unit id="RHVyY2hsYXVm">
                 <source>Durchlauf</source>

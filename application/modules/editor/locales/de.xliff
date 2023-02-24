@@ -952,9 +952,9 @@
                 <source>Aktionen</source>
                 <target>Aktionen</target>
             </trans-unit>
-            <trans-unit id='QWxsZSBTZWdtZW50ZQ=='>
-                <source>Alle Segmente</source>
-                <target>Alle Segmente</target>
+            <trans-unit id='QWxsZSBTZWcu'>
+                <source>Alle Seg.</source>
+                <target>Alle Seg.</target>
             </trans-unit>
             <trans-unit id='UXVlbGxzcHJhY2hl'>
                 <source>Quellsprache</source>
@@ -7986,9 +7986,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
                 <target>Segment sperren bzw. entsperren (STRG + L)</target>
             </trans-unit>
-            <trans-unit id="QWt0dWVsbGVzIFNlZ21lbnQ=">
-                <source>Aktuelles Segment</source>
-                <target>Aktuelles Segment</target>
+            <trans-unit id="QWt0LiBTZWc=">
+                <source>Akt. Seg</source>
+                <target>Akt. Seg</target>
             </trans-unit>
             <trans-unit id="WmVpY2hlbg==">
                 <source>Zeichen</source>
