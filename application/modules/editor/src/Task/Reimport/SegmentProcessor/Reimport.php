@@ -28,7 +28,6 @@
 
 namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor;
 
-use editor_Models_Export_DiffTagger_TrackChanges;
 use editor_Models_File;
 use editor_Models_Import_FileParser;
 use editor_Models_Import_SegmentProcessor;
@@ -38,8 +37,8 @@ use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use JsonException;
 use MittagQI\Translate5\Task\Reimport\Exception;
+use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\ContentDefault;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_Factory;
@@ -151,22 +150,19 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     protected function getContentClass(editor_Models_Import_FileParser $parser): ContentDefault
     {
-        $path_parts = pathinfo($this->fileName);
-        $ext = $path_parts['extension'];
-        $className = FileHandler::getClass($ext);
-        $args = [
+        $reimporter = FileparserRegistry::getInstance()->getReimporterInstance($parser, [
             $this->task,
             $parser->getFieldContents(),
             $this->user
-        ];
+        ]);
 
-        if (class_exists($className)) {
-            return ZfExtended_Factory::get($className, $args);
+        if (is_null($reimporter)) {
+            throw new Exception('E1441', [
+                'file' => basename($this->fileName)
+            ]);
         }
 
-        throw new Exception('E1441', [
-            'ext' => $ext
-        ]);
+        return $reimporter;
     }
 
     /**

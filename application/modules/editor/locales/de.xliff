@@ -952,6 +952,10 @@
                 <source>Aktionen</source>
                 <target>Aktionen</target>
             </trans-unit>
+            <trans-unit id='QWxsZSBTZWdtZW50ZQ=='>
+                <source>Alle Segmente</source>
+                <target>Alle Segmente</target>
+            </trans-unit>
             <trans-unit id='UXVlbGxzcHJhY2hl'>
                 <source>Quellsprache</source>
                 <target>Quellsprache</target>
@@ -2956,6 +2960,10 @@
             <trans-unit id='U2VnbWVudCBhdWYgaW5pdGlhbGVuIEluaGFsdCB6dXLDvGNrc2V0emVuIChBTFQgKyBFTlRGKQ=='>
                 <source>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</source>
                 <target>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</target>
+            </trans-unit>
+            <trans-unit id='SGluenVmw7xnZW4vRW50ZmVybmVuIHZvbiBTeW1ib2xlbiB6dXIvdm9uIGRlciBTeW1ib2xsZWlzdGU='>
+                <source>Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste</source>
+                <target>Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste</target>
             </trans-unit>
             <trans-unit id='U2VnbWVudCBhdWYgTGVzZXplaWNoZW5saXN0ZSAoU1RSRyArIEQp'>
                 <source>Segment auf Lesezeichenliste (STRG + D)</source>
@@ -7978,9 +7986,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
                 <target>Segment sperren bzw. entsperren (STRG + L)</target>
             </trans-unit>
-            <trans-unit id="QWxsZQ==">
-                <source>Alle</source>
-                <target>Alle</target>
+            <trans-unit id="QWt0dWVsbGVzIFNlZ21lbnQ=">
+                <source>Aktuelles Segment</source>
+                <target>Aktuelles Segment</target>
             </trans-unit>
             <trans-unit id="WmVpY2hlbg==">
                 <source>Zeichen</source>
@@ -8002,13 +8010,13 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Lesezeichen setzen</source>
                 <target>Lesezeichen setzen</target>
             </trans-unit>
-            <trans-unit id="ZW50c3BlcnJlbg==">
-                <source>entsperren</source>
-                <target>entsperren</target>
+            <trans-unit id="RW50c3BlcnJlbg==">
+                <source>Entsperren</source>
+                <target>Entsperren</target>
             </trans-unit>
-            <trans-unit id="c3BlcnJlbg==">
-                <source>sperren</source>
-                <target>sperren</target>
+            <trans-unit id="U3BlcnJlbg==">
+                <source>Sperren</source>
+                <target>Sperren</target>
             </trans-unit>
             <trans-unit id="U29sbCBkaWUgQWt0aW9uIHdpcmtsaWNoIGF1ZiBhbGxlIFNlZ21lbnRlIGFuZ2V3ZW5kZXQgd2VyZGVuPyBEYXMga2FubiBlaW5pZ2UgWmVpdCBpbiBBbnNwcnVjaCBuZWhtZW4u">
                 <source>Soll die Aktion wirklich auf alle Segmente angewendet werden? Das kann einige Zeit in Anspruch nehmen.</source>
@@ -8018,9 +8026,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Kein Segment Filter gesetzt</source>
                 <target>Kein Segment Filter gesetzt</target>
             </trans-unit>
-            <trans-unit id="QWxsZSBnZWZpbHRlcnRlbiBTZWdtZW50ZTo=">
-                <source>Alle gefilterten Segmente:</source>
-                <target>Alle gefilterten Segmente:</target>
+            <trans-unit id="V2VuZGVuIFNpZSBlaW5lIGRlciBmb2xnZW5kZW4gQWt0aW9uZW4gYXVmIGFsbGUgU2VnbWVudGUgaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcgYW46">
+                <source>Wenden Sie eine der folgenden Aktionen auf alle Segmente in der aktuellen Filterung an:</source>
+                <target>Wenden Sie eine der folgenden Aktionen auf alle Segmente in der aktuellen Filterung an:</target>
             </trans-unit>
             <trans-unit id="U2VnbWVudGUgd2VyZGVuIHZvbiBkZXIgRmF2b3JpdGVubGlzdGUgZW50ZmVybnQ=">
                 <source>Segmente werden von der Favoritenliste entfernt</source>

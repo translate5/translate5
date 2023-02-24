@@ -172,6 +172,35 @@ Ext.override(Ext.menu.Item, {
  */
 Ext.override(Ext.menu.CheckItem, {
     checkableDespiteDisabled: false,
+    checkboxTooltip: false,
+
+    /**
+     * Setter for checkboxTooltip-prop
+     *
+     * @param tooltip
+     */
+    setCheckboxTooltip: function(tip) {
+        if (tip) {
+            this.checkEl.dom.setAttribute('data-qtip', tip);
+        } else {
+            this.checkEl.dom.removeAttribute('data-qtip');
+        }
+        this.checkboxTooltip = tip;
+    },
+
+    /**
+     * Mare sure checkboxTooltip-config is respected
+     */
+    afterRender: function() {
+
+        // Call parent
+        this.callParent(arguments);
+
+        // Set checkboxTooltip, if configured
+        if (this.checkboxTooltip) {
+            this.setCheckboxTooltip(this.checkboxTooltip);
+        }
+    },
     onClick: function(e) {
         var me = this, isDisabled = null;
 

@@ -1459,6 +1459,10 @@
                 <source>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</source>
                 <target>Reset segment to initial content (ALT + DEL)</target>
             </trans-unit>
+            <trans-unit id='SGluenVmw7xnZW4vRW50ZmVybmVuIHZvbiBTeW1ib2xlbiB6dXIvdm9uIGRlciBTeW1ib2xsZWlzdGU='>
+                <source>Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste</source>
+                <target>Add/remove icon to/from toolbar</target>
+            </trans-unit>
             <trans-unit id='QWJicmVjaGVuIChFU0Mp'>
                 <source>Abbrechen (ESC)</source>
                 <target>Cancel (ESC)</target>
@@ -6116,9 +6120,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
                 <target>Lock / unlock the selected segment (CTRL + L)</target>
             </trans-unit>
-            <trans-unit id="QWxsZQ==">
-                <source>Alle</source>
-                <target>All</target>
+            <trans-unit id="QWt0dWVsbGVzIFNlZ21lbnQ=">
+                <source>Aktuelles Segment</source>
+                <target>Current segment</target>
             </trans-unit>
             <trans-unit id="WmVpY2hlbg==">
                 <source>Zeichen</source>
@@ -6134,19 +6138,19 @@ The following task was imported with errors / warnings / notices. Please take ca
             </trans-unit>
             <trans-unit id="TGVzZXplaWNoZW4gZW50ZmVybmVu">
                 <source>Lesezeichen entfernen</source>
-                <target>remove bookmark</target>
+                <target>Remove bookmark</target>
             </trans-unit>
             <trans-unit id="TGVzZXplaWNoZW4gc2V0emVu">
                 <source>Lesezeichen setzen</source>
-                <target>add bookmark</target>
+                <target>Add bookmark</target>
             </trans-unit>
-            <trans-unit id="ZW50c3BlcnJlbg==">
-                <source>entsperren</source>
-                <target>unlock</target>
+            <trans-unit id="RW50c3BlcnJlbg==">
+                <source>Entsperren</source>
+                <target>Unlock</target>
             </trans-unit>
-            <trans-unit id="c3BlcnJlbg==">
-                <source>sperren</source>
-                <target>lock</target>
+            <trans-unit id="U3BlcnJlbg==">
+                <source>Sperren</source>
+                <target>Lock</target>
             </trans-unit>
             <trans-unit id="U29sbCBkaWUgQWt0aW9uIHdpcmtsaWNoIGF1ZiBhbGxlIFNlZ21lbnRlIGFuZ2V3ZW5kZXQgd2VyZGVuPyBEYXMga2FubiBlaW5pZ2UgWmVpdCBpbiBBbnNwcnVjaCBuZWhtZW4u">
                 <source>Soll die Aktion wirklich auf alle Segmente angewendet werden? Das kann einige Zeit in Anspruch nehmen.</source>
@@ -6156,9 +6160,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Kein Segment Filter gesetzt</source>
                 <target>No segment filter set</target>
             </trans-unit>
-            <trans-unit id="QWxsZSBnZWZpbHRlcnRlbiBTZWdtZW50ZTo=">
-                <source>Alle gefilterten Segmente:</source>
-                <target>All filtered segments:</target>
+            <trans-unit id="V2VuZGVuIFNpZSBlaW5lIGRlciBmb2xnZW5kZW4gQWt0aW9uZW4gYXVmIGFsbGUgU2VnbWVudGUgaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcgYW46">
+                <source>Wenden Sie eine der folgenden Aktionen auf alle Segmente in der aktuellen Filterung an:</source>
+                <target>Apply one of the following actions to all segments in the current filtering:</target>
             </trans-unit>
             <trans-unit id="U2VnbWVudGUgd2VyZGVuIHZvbiBkZXIgRmF2b3JpdGVubGlzdGUgZW50ZmVybnQ=">
                 <source>Segmente werden von der Favoritenliste entfernt</source>
@@ -8432,6 +8436,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id="QWt0aW9uZW4=">
                 <source>Aktionen</source>
                 <target>Actions</target>
+            </trans-unit>
+            <trans-unit id="QWxsZSBTZWdtZW50ZQ==">
+                <source>Alle Segmente</source>
+                <target>All segments</target>
             </trans-unit>
             <trans-unit id="RHVyY2hsYXVm">
                 <source>Durchlauf</source>

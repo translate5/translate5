@@ -36,6 +36,8 @@ END LICENSE AND COPYRIGHT
  * entrypoint for the export
  */
 class editor_Models_Export {
+    const EXPORT_DEFAULT = 'DEFAULT'; //FIXME convert us to an enum
+    const EXPORT_PACKAGE = 'PACKAGE'; //FIXME convert us to an enum
     /**
      * @var editor_Models_Task
      */
@@ -75,8 +77,12 @@ class editor_Models_Export {
      * exports a task
      * @param string $exportRootFolder
      * @param int $workerId
+     * @param string $context
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
-    public function export(string $exportRootFolder, $workerId) {
+    public function export(string $exportRootFolder, int $workerId, string $context = self::EXPORT_DEFAULT) {
         umask(0); // needed for samba access
         if(is_dir($exportRootFolder)) {
             $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
@@ -100,7 +106,7 @@ class editor_Models_Export {
         
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
         /* @var $fileFilter editor_Models_File_FilterManager */
-        $fileFilter->initExport($this->task, $workerId);
+        $fileFilter->initExport($this->task, $workerId, $context);
         
         sort($dirPaths);
         foreach ($dirPaths as $path) {
@@ -133,7 +139,11 @@ class editor_Models_Export {
             if(count($faults) > 0) {
                 $faultySegments = array_merge($faultySegments, $faults);
             }
-            $fileFilter->applyExportFilters($path, $fileId);
+            $pathAfterFilter = $fileFilter->applyExportFilters($path, $fileId);
+            if ($pathAfterFilter !== $path) {
+                //apply the modified filename
+                rename($path, $pathAfterFilter);
+            }
         }
         /**
          * If there are segment tag errors we create a warning

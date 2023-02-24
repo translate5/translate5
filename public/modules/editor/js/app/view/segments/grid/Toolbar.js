@@ -61,6 +61,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     itemId: 'repetitionsBtn',
                     bind: {
                         text: '{l10n.segmentGrid.toolbar.repetitionBtn}',
+                        tooltip: '{isEditingSegment ? l10n.segmentGrid.toolbar.repetitionTooltip : ""}',
+                        disabled: '{isEditingSegment}',
                     }
                 }, '-', {
                     xtype: 'menuitem',
@@ -367,7 +369,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     xtype: 'button',
                     bind: {
-                        text: '{l10n.segmentGrid.toolbar.all}'
+                        text: '{l10n.segmentGrid.toolbar.currentSegment}'
                     },
                     menu: {
                         itemId: 'segmentActionMenu',
@@ -378,7 +380,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         defaults: {
                             xtype: 'menucheckitem',
                             allowCheckChange: false,
-                            checkableDespiteDisabled: true
+                            checkableDespiteDisabled: true,
+                            bind: {
+                                checkboxTooltip: '{l10n.segmentGrid.toolbar.allMenuCheckTooltip}'
+                            }
                         },
                         items: [{
                             itemId: 'saveBtn',
@@ -507,7 +512,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     }
                 }, {
                     xtype: 'button',
-                    glyph: 'f141@FontAwesome5FreeSolid',
                     itemId: 'batchOperations',
                     bind: {
                         text: '{l10n.segmentGrid.batchOperations.btnText}',

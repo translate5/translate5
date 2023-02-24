@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
-
+ 
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-
+  
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-
+  
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -26,43 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
-
 /**
- * List of file types and file type handler class for segment content processor
+ * Configuration passed to each file filter
  */
-class FileHandler
+class editor_Models_File_FilterConfig
 {
-
-    private static array $supportedFileTypes = [
-        'xlf' => Xlf::class,
-        'xliff' => Xliff::class
-    ];
+    /**
+     * The import config object
+     * @var editor_Models_Import_Configuration|null
+     */
+    public ?editor_Models_Import_Configuration $importConfig = null;
 
     /**
-     * @param string $fileType
-     * @param string $class
-     * @return void
+     * The import / export context
+     * FIXME convert to enum here, see also editor_Models_Export::EXPORT_*
+     * @var string|null
      */
-    public static function addFileHandler(string $fileType, string $class): void
-    {
-        self::$supportedFileTypes[$fileType] = $class;
-    }
+    public ?string $context = null;
 
     /**
-     * @return array|string[]
+     * contains the worker id of the parent worker
+     * @var int|null
      */
-    public static function getSupportedFileTypes(): array
-    {
-        return array_keys(self::$supportedFileTypes);
-    }
-
-    /***
-     * @param string $type
-     * @return mixed|string
-     */
-    public static function getClass(string $type)
-    {
-        return self::$supportedFileTypes[$type] ?? '';
-    }
+    public ?int $parentWorkerId = null;
 }
