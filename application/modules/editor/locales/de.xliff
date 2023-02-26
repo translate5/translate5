@@ -952,6 +952,10 @@
                 <source>Aktionen</source>
                 <target>Aktionen</target>
             </trans-unit>
+            <trans-unit id='U2NobGllw59lbiBTaWUgZGFzIGFrdHVlbGwgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGUgU2VnbWVudCwgdW0gZGllIEVpbnN0ZWxsdW5nZW4gZGVzIFdpZWRlcmhvbHVuZ3NlZGl0b3JzIHp1IGJlYXJiZWl0ZW4u'>
+                <source>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Einstellungen des Wiederholungseditors zu bearbeiten.</source>
+                <target>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Einstellungen des Wiederholungseditors zu bearbeiten.</target>
+            </trans-unit>
             <trans-unit id='QWxsZSBTZWcu'>
                 <source>Alle Seg.</source>
                 <target>Alle Seg.</target>
