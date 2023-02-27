@@ -118,7 +118,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             };
             
             //add the available translate5 translations
-            Ext.Object.each(Editor.data.translations, function(i, n) {
+            Ext.Object.each(Editor.data.l10n.translations, function(i, n) {
                 menu.items.push({
                     xtype: 'menucheckitem',
                     itemId: 'localeMenuItem' + i,
