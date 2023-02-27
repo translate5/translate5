@@ -101,8 +101,14 @@ class FileparserRegistry
      */
     public function getReimporterInstance(AbstractFileparser $fileparser, array $arguments): ?ContentBase
     {
-        if ($this->hasFileparser($fileparser::class)) {
-            return ZfExtended_Factory::get($this->fileparserReimporterMap[$fileparser::class], $arguments);
+        if ($this->isSupported($fileparser::class)) {
+            // check the class hierarchy of the current fileparser if one has as a reimporter configured.
+            $class = get_class($fileparser);
+            do {
+                if (isset($this->fileparserReimporterMap[$class])) {
+                    return ZfExtended_Factory::get($this->fileparserReimporterMap[$class], $arguments);
+                }
+            } while (($class = get_parent_class($class)) !== false);
         }
         return null;
     }
@@ -122,8 +128,21 @@ class FileparserRegistry
         }
     }
 
-    public function hasFileparser(string $fileparser): bool
+    /**
+     * returns true if the given file parser has re-import functionality
+     * @param string $fileparser
+     * @return bool
+     */
+    public function isSupported(string $fileparser): bool
     {
-        return ! empty($this->fileparserReimporterMap[$fileparser]);
+        return is_subclass_of($fileparser, AbstractFileparser::class) && $fileparser::IS_REIMPORTABLE;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRegisteredFileparsers(): array
+    {
+        return array_keys($this->fileparserReimporterMap);
     }
 }

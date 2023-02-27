@@ -77,10 +77,11 @@ class Task extends Base
 
 
         foreach ($files as $file) {
-            if (! FileparserRegistry::getInstance()->hasFileparser($file['fileParser'])) {
+            if (! FileparserRegistry::getInstance()->isSupported($file['fileParser'])) {
                 throw new Exception('E1452', [
-                    'supported' => FileparserRegistry::getInstance()->getSupportedFileTypes(),
-                    'actual' => $file['fileName'],
+                    'supported' => FileparserRegistry::getInstance()->getRegisteredFileparsers(),
+                    'file' => $file['fileName'],
+                    'current' => $file['fileParser'],
                     'task' => $this->task
                 ]);
             }
