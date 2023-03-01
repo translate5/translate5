@@ -59,7 +59,9 @@ class editor_Models_Import_Worker_Import {
      * @var ZfExtended_EventManager
      */
     protected $events;
-    
+
+    private editor_Models_Import_Configuration $importConfig;
+
     public function __construct() {
         $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
@@ -115,8 +117,7 @@ class editor_Models_Import_Worker_Import {
         $treeDb->setPathPrefix($this->importConfig->getFilesDirectory());
         $filelist = $treeDb->getPaths($this->task->getTaskGuid(),'file');
         
-        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
-        /* @var $fileFilter editor_Models_File_FilterManager */
+        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
         $fileFilter->initImport($this->task, $this->importConfig);
             
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
@@ -132,9 +133,9 @@ class editor_Models_Import_Worker_Import {
 
         $filesProcessedAtAll = 0;
         foreach ($filelist as $fileId => $path) {
-            $path = $fileFilter->applyImportFilters($path, $fileId, $filelist);
+            $filelist[$fileId] = $path = $fileFilter->applyImportFilters($path, $fileId);
             $filePath = $this->importConfig->importFolder.'/'.$path;
-            $parser = $parserHelper->getFileParser($fileId, $filePath);
+            $parser = $parserHelper->getFileParserByExtension($fileId, $filePath);
             if(!$parser) {
                 continue;
             }
@@ -216,7 +217,7 @@ class editor_Models_Import_Worker_Import {
 
         foreach ($relayFiles as $fileId => $path) {
             $filePath = $this->importConfig->importFolder.'/'.$path;
-            $parser = $parserHelper->getFileParser($fileId, $filePath);
+            $parser = $parserHelper->getFileParserByExtension($fileId, $filePath);
             if(!$parser) {
                 continue;
             }

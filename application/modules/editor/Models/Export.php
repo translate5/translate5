@@ -104,8 +104,7 @@ class editor_Models_Export {
             'LocalEncoded'
         );
         
-        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
-        /* @var $fileFilter editor_Models_File_FilterManager */
+        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
         $fileFilter->initExport($this->task, $workerId, $context);
         
         sort($dirPaths);

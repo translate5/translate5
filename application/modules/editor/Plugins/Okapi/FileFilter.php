@@ -48,7 +48,7 @@ class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter {
      */
     public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters): string
     {
-        //renames the original file to original.xlf so that our fileparsers can import them 
+        //renames the original file to original.xlf so that our fileparsers can import them, valid for all contexts!
         return $filePath.editor_Plugins_Okapi_Connector::OUTPUT_FILE_EXTENSION;
     }
     

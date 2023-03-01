@@ -134,6 +134,11 @@ abstract class editor_Models_Import_FileParser {
     protected bool $isReimport = false;
 
     /**
+     * Flag if the current file parser supports re-import functionality
+     */
+    const IS_REIMPORTABLE = false;
+
+    /**
      * returns the file extensions (in lower case) parsable by this fileparser
      * @return array;
      */

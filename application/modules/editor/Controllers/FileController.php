@@ -31,9 +31,10 @@ use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Lock;
-use MittagQI\Translate5\Task\Reimport\DataProvider;
+use MittagQI\Translate5\Task\Reimport\DataProvider\DataProvider;
+use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
+use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
 use MittagQI\Translate5\Task\Reimport\Worker;
-use MittagQI\Translate5\Task\Reimport\ZipDataProvider;
 use MittagQI\Translate5\Task\TaskContextTrait;
 
 /**
@@ -110,23 +111,24 @@ class editor_FileController extends ZfExtended_RestController
     private function taskReimport(int $fileId = null){
         $task = $this->getCurrentTask();
 
-        $dataProviderClass = $fileId ? DataProvider::class : ZipDataProvider::class;
+        $filesMetaData = $this->getTaskFilesMetaData($task);
 
-        $dataProvider = ZfExtended_Factory::get($dataProviderClass);
         if ($fileId){
-            $dataProvider->setFileId($fileId);
+            $dataProvider = ZfExtended_Factory::get(DataProvider::class, [$task, $filesMetaData, $fileId]);
+        } else {
+            $dataProvider = ZfExtended_Factory::get(ZipDataProvider::class, [$task, $filesMetaData]);
         }
-        $dataProvider->checkAndPrepare($task);
+        $dataProvider->checkAndPrepare();
 
         /** @var Worker $worker */
         $worker = ZfExtended_Factory::get(Worker::class);
 
         // init worker and queue it
         if (!$worker->init($task->getTaskGuid(), [
-            'files' => $dataProvider->getFiles(),// fileId => fileInfo mapping
+            'files' => $dataProvider->getFiles(),// fileId => FileDto mapping
             'userGuid' => ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
             'segmentTimestamp' => NOW_ISO,
-            'dataProviderClass' => $dataProviderClass
+            'dataProviderClass' => $dataProvider::class
         ])) {
             throw new ZfExtended_Exception('Task ReImport Error on worker init()');
         }
@@ -144,7 +146,7 @@ class editor_FileController extends ZfExtended_RestController
             $this->view->success = true;
         }catch (Throwable $exception){
             Lock::taskUnlock($task);
-            $dataProvider->cleanTempFolder();
+            $dataProvider->cleanup();
             throw  $exception;
         }
     }
@@ -173,5 +175,34 @@ class editor_FileController extends ZfExtended_RestController
             }
             $worker->queue();
         }
+    }
+
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
+     * @throws JsonException
+     * @return FileDto[]
+     */
+    private function getTaskFilesMetaData(editor_Models_Task $task): array
+    {
+        // load the original file tree and the files path
+        $file = ZfExtended_Factory::get(editor_Models_File::class);
+        $tree = ZfExtended_Factory::get(editor_Models_Foldertree::class);
+        $paths = $tree->getPaths($task->getTaskGuid(), editor_Models_Foldertree::TYPE_FILE);
+
+        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+        $fileFilter->initReImport($task, Worker::FILEFILTER_CONTEXT_EXISTING);
+
+        $filesMetaData = [];
+        foreach ($paths as $fileId => $filePath) {
+            $file->load($fileId);
+            $filesMetaData[$fileId] = new FileDto(
+                $fileId,
+                $file->getFileParser(),
+                $filePath,
+                $fileFilter->applyImportFilters($filePath, $fileId)
+            );
+        }
+        return $filesMetaData;
     }
 }

@@ -636,16 +636,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             return false;
         }
 
-        $infoMsg = '';
-        $parsers = $this->fileTypes->getParser($extension);
-        // loop over all registered parsers by the given extension
-        $fileObject = $fileinfo->openFile();
-        $fileHead = $fileObject->fread(512);
-        foreach($parsers as $parser) {
-            if($parser::isParsable($fileHead, $infoMsg)) {
-                // if one of the registered parsers may parse the file, then we don't need Okapi
-                return false;
-            }
+        $parser = $this->fileTypes->hasSupportedParser($extension, $fileinfo);
+        if (!is_null($parser)) {
+            // if one of the registered parsers may parse the file, then we don't need Okapi
+            return false;
         }
 
         //if there is a custom bconf, this bconf can contain "new" allowed file types.
