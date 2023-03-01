@@ -31,7 +31,6 @@ use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\Task\Current\Exception;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Lock;
-use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\DataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
@@ -192,7 +191,7 @@ class editor_FileController extends ZfExtended_RestController
         $paths = $tree->getPaths($task->getTaskGuid(), editor_Models_Foldertree::TYPE_FILE);
 
         $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
-        $fileFilter->initReImport($task, 'REIMPORT_CHECK'); //FIXME make a const
+        $fileFilter->initReImport($task, Worker::FILEFILTER_CONTEXT_EXISTING);
 
         $filesMetaData = [];
         foreach ($paths as $fileId => $filePath) {

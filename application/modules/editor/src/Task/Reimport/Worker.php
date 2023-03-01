@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,17 +28,16 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Reimport;
 
-use editor_Models_Loaders_Taskuserassoc;
-use editor_Models_Task;
+use editor_Models_Loaders_Taskuserassoc as JobLoader;
+use editor_Models_Task as Task;
 use editor_Models_TaskUserAssoc;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
-use MittagQI\Translate5\Task\Reimport\DataProvider\DataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Conflict;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 use ZfExtended_Worker_Abstract;
@@ -49,10 +48,15 @@ use ZfExtended_Worker_Abstract;
 class Worker extends ZfExtended_Worker_Abstract
 {
 
-    /***
-     * @var Reimport
+    /**
+     * context when applying the filters on the filenames of the already imported files in LEK_files
      */
-    private Reimport $segmentProcessor;
+    const FILEFILTER_CONTEXT_EXISTING = 'REIMPORT_CHECK_EXISTING';
+
+    /**
+     * context when applying the filters on uploaded re-import files
+     */
+    const FILEFILTER_CONTEXT_NEW = 'REIMPORT_CHECK_NEW';
 
     /**
      * (non-PHPdoc)
@@ -69,6 +73,12 @@ class Worker extends ZfExtended_Worker_Abstract
 
     /**
      * (non-PHPdoc)
+     * @return true
+     * @throws Exception
+     * @throws Zend_Acl_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \JsonException
+     * @throws ZfExtended_Models_Entity_Conflict
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work()
@@ -76,7 +86,7 @@ class Worker extends ZfExtended_Worker_Abstract
 
         $params = $this->workerModel->getParameters();
 
-        /** @var editor_Models_Task $task */
+        /** @var Task $task */
         $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($this->taskGuid);
 
@@ -118,16 +128,14 @@ class Worker extends ZfExtended_Worker_Abstract
 
     /**
      * prepares the isPmOverride taskUserAssoc if needed!
-     * @param editor_Models_Task $task
+     * @param Task $task
      * @param ZfExtended_Models_User $user
      * @return editor_Models_TaskUserAssoc
      * @throws Zend_Acl_Exception
      */
-    protected function prepareTaskUserAssociation(editor_Models_Task $task, ZfExtended_Models_User $user): editor_Models_TaskUserAssoc
+    protected function prepareTaskUserAssociation(Task $task, ZfExtended_Models_User $user): editor_Models_TaskUserAssoc
     {
-
-        $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var editor_Models_TaskUserAssoc $userTaskAssoc */
+        $userTaskAssoc = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
 
         try {
 
@@ -139,13 +147,13 @@ class Worker extends ZfExtended_Worker_Abstract
 
             //if the user is allowed to load all, use the default loader
             if ($isEditAllTasks) {
-                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($user->getUserGuid(), $task);
+                $userTaskAssoc = JobLoader::loadByTaskForceWorkflowRole($user->getUserGuid(), $task);
             } else {
-                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($user->getUserGuid(), $task);
+                $userTaskAssoc = JobLoader::loadByTask($user->getUserGuid(), $task);
             }
 
             $userTaskAssoc->getIsPmOverride();
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+        } catch (ZfExtended_Models_Entity_NotFoundException) {
 
             $userTaskAssoc->setUserGuid($user->getUserGuid());
             $userTaskAssoc->setTaskGuid($task->getTaskGuid());
@@ -164,11 +172,11 @@ class Worker extends ZfExtended_Worker_Abstract
 
     /***
      * Create new archive version after the reimport
-     * @param editor_Models_Task $task
+     * @param Task $task
      * @param FileDto[] $filesToUpdate
      * @return void
      */
-    private function archiveImportedData(editor_Models_Task $task, array $filesToUpdate): void
+    private function archiveImportedData(Task $task, array $filesToUpdate): void
     {
         $archiveUpdater = ZfExtended_Factory::get(TaskArchiveUpdater::class);
         if (! $archiveUpdater->updateFiles($task, $filesToUpdate)) {
@@ -184,10 +192,10 @@ class Worker extends ZfExtended_Worker_Abstract
     /**
      * Clean the temporary folders used for extracting zip archives.
      * @param string $dataProviderClass
-     * @param editor_Models_Task $task
+     * @param Task $task
      * @return void
      */
-    private function cleanupImportFolder(string $dataProviderClass, editor_Models_Task $task): void
+    private function cleanupImportFolder(string $dataProviderClass, Task $task): void
     {
         if (is_subclass_of($dataProviderClass, AbstractDataProvider::class)) {
             $dataProviderClass::getForCleanup($task)->cleanup();

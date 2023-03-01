@@ -28,10 +28,10 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Import\FileParser;
 
-use editor_Models_Import_FileParser;
+use editor_Models_Import_FileParser as FileParser;
 use editor_Models_Import_FileParser_NoParserException;
 use editor_Models_Import_SupportedFileTypes;
-use editor_Models_SegmentFieldManager;
+use editor_Models_SegmentFieldManager as SegmentFieldManager;
 use editor_Models_Task;
 use SplFileInfo;
 use Zend_Exception;
@@ -49,9 +49,9 @@ class Factory
 
     /**
      * @param editor_Models_Task $task
-     * @param editor_Models_SegmentFieldManager $segmentFieldManager
+     * @param SegmentFieldManager $segmentFieldManager
      */
-    public function __construct(private editor_Models_Task $task, private editor_Models_SegmentFieldManager $segmentFieldManager)
+    public function __construct(private editor_Models_Task $task, private SegmentFieldManager $segmentFieldManager)
     {
         $this->supportedFiles = ZfExtended_Factory::get(editor_Models_Import_SupportedFileTypes::class);
     }
@@ -60,26 +60,35 @@ class Factory
      * Get the file parser for given fileId and file path
      * @param int $fileId
      * @param string $filePath
-     * @return editor_Models_Import_FileParser|null
+     * @return FileParser|null
      * @throws Zend_Exception
      */
-    public function getFileParser(int $fileId, string $filePath): ?editor_Models_Import_FileParser
+    public function getFileParserByExtension(int $fileId, string $filePath): ?FileParser
     {
+        $file = new SplFileInfo($filePath);
+
         try {
-            $file = new SplFileInfo($filePath);
             $parserClass = $this->lookupFileParserCls($file->getExtension(), $file);
         } catch (editor_Models_Import_FileParser_NoParserException $e) {
             Zend_Registry::get('logger')->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
             return null;
         }
 
+        return $this->getFileParserInstance($parserClass, $fileId, $file);
+    }
+
+    public function getFileParserInstance(string $parserClass, int $fileId, SplFileInfo $file): ?FileParser
+    {
+        if (! is_subclass_of($parserClass, FileParser::class)) {
+            return null;
+        }
         $parser = ZfExtended_Factory::get($parserClass, [
             $file->getPathname(),
             $file->getBasename(),
             $fileId,
             $this->task
         ]);
-        /* var $parser editor_Models_Import_FileParser */
+        /* @var FileParser $parser */
         $parser->setSegmentFieldManager($this->segmentFieldManager);
         return $parser;
     }
@@ -93,20 +102,11 @@ class Factory
      */
     protected function lookupFileParserCls(string $extension, SplFileInfo $file): string
     {
-        $parserClasses = $this->supportedFiles->getParser($extension);
-        $errorMsg = '';
         $errorMessages = [];
+        $parserClass = $this->supportedFiles->hasSupportedParser($extension, $file, $errorMessages);
 
-        $fileObject = $file->openFile('r', false);
-        $fileHead = $fileObject->fread(512);
-        foreach ($parserClasses as $parserClass) {
-            if ($parserClass::isParsable($fileHead, $errorMsg)) {
-                // if the first found file parser to that extension may parse it, we use it
-                return $parserClass;
-            }
-            if (!empty($errorMsg)) {
-                $errorMessages[$parserClass] = $errorMsg;
-            }
+        if (!is_null($parserClass)) {
+            return $parserClass;
         }
 
         //'For the given fileextension no parser is registered.'

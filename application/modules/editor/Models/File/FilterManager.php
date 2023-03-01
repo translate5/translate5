@@ -62,7 +62,18 @@ class editor_Models_File_FilterManager
         //FIXME can we get the context from importConfig?
         $this->config->importConfig = $importConfig;
         $this->config->parentWorkerId = $importConfig->workerId;
-        $this->init($task, self::TYPE_IMPORT);
+        $this->loadFilters($task, self::TYPE_IMPORT);
+    }
+
+    /**
+     * loads all file filters for a given task
+     * @param editor_Models_Task $task
+     * @param string $context
+     */
+    public function initReImport(editor_Models_Task $task, string $context): void
+    {
+        $this->config->context = $context;
+        $this->loadFilters($task, self::TYPE_IMPORT);
     }
 
     /**
@@ -75,7 +86,7 @@ class editor_Models_File_FilterManager
     {
         $this->config->context = $context;
         $this->config->parentWorkerId = $workerId;
-        $this->init($task, self::TYPE_EXPORT);
+        $this->loadFilters($task, self::TYPE_EXPORT);
     }
     
     /**
@@ -83,7 +94,7 @@ class editor_Models_File_FilterManager
      * @param editor_Models_Task $task
      * @param string $type
      */
-    protected function init(editor_Models_Task $task, string $type): void
+    protected function loadFilters(editor_Models_Task $task, string $type): void
     {
         $this->task = $task;
         $filter = ZfExtended_Factory::get('editor_Models_File_Filter');
@@ -100,12 +111,11 @@ class editor_Models_File_FilterManager
      * returns the filename of the affected file (could be changed by the filters due conversion)
      * @param string $path
      * @param int $fileId
-     * @param array $filelist
      * @return string
      */
-    public function applyImportFilters(string $path, int $fileId, array &$filelist): string
+    public function applyImportFilters(string $path, int $fileId): string
     {
-        return $filelist[$fileId] = $this->applyFilters(self::TYPE_IMPORT, $path, $fileId);
+        return $this->applyFilters(self::TYPE_IMPORT, $path, $fileId);
     }
 
     /**

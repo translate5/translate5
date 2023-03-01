@@ -91,7 +91,7 @@ class FileparserRegistry
      */
     public function getSupportedFileTypes(): array
     {
-        return array_keys($this->supportedFileExtensions);
+        return $this->supportedFileExtensions;
     }
 
     /***
@@ -120,7 +120,7 @@ class FileparserRegistry
      */
     private function mergeSupportedExtensions(string $fileparser): void
     {
-        if (is_a($fileparser, AbstractFileparser::class)) {
+        if (is_a($fileparser, AbstractFileparser::class, true)) {
             $this->supportedFileExtensions = array_unique(array_merge(
                 $this->supportedFileExtensions,
                 $fileparser::getFileExtensions()
