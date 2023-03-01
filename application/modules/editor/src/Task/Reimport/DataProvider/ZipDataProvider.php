@@ -30,9 +30,7 @@ namespace MittagQI\Translate5\Task\Reimport\DataProvider;
 
 use editor_Models_Import_DataProvider_Exception;
 use editor_Models_Import_FileParser;
-use editor_Models_Task;
 use MittagQI\Translate5\Task\Export\Package\Source\Task;
-use Zend_File_Transfer;
 use ZipArchive;
 
 /***

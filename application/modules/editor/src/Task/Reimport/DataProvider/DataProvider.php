@@ -62,8 +62,9 @@ class DataProvider extends AbstractDataProvider
         // move uploaded file into upload target
         $this->targetFile = $this->getTempDir().'/reimport-'.$this->fileId;
         if (!move_uploaded_file($uploadedFile['tmp_name'], $this->targetFile)) {
-            throw new Exception('E1427', [
-                'file' => 'Unable to move the uploaded file to:' . $this->targetFile
+            throw new Exception('E1428', [
+                'file' => $this->targetFile,
+                'task' => $this->task,
             ]);
         }
     }

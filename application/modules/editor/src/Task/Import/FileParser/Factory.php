@@ -77,10 +77,19 @@ class Factory
         return $this->getFileParserInstance($parserClass, $fileId, $file);
     }
 
+    /**
+     * @throws editor_Models_Import_FileParser_NoParserException
+     */
     public function getFileParserInstance(string $parserClass, int $fileId, SplFileInfo $file): ?FileParser
     {
         if (! is_subclass_of($parserClass, FileParser::class)) {
-            return null;
+            //The stored fileparser class {fileparserCls} is no valid fileparser - stored for file {fileId} {file}
+            throw new editor_Models_Import_FileParser_NoParserException('E1433', [
+                'file' => $file->getPathname(),
+                'fileId' => $fileId,
+                'task' => $this->task,
+                'fileparserCls' => $parserClass,
+            ]);
         }
         $parser = ZfExtended_Factory::get($parserClass, [
             $file->getPathname(),

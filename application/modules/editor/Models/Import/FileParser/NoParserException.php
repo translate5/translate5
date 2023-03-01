@@ -39,5 +39,6 @@ class editor_Models_Import_FileParser_NoParserException extends editor_Models_Im
         'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.',
         'E1135' => 'There are no importable files in the Task. The following file extensions can be imported: {extensions}',
         'E1166' => 'Although there were importable files in the task, no files were imported. Investigate the log for preceeding errors.',
+        'E1433' => 'The stored fileparser class {fileparserCls} is no valid fileparser - stored for file {fileId} {file}',
     ];
 }

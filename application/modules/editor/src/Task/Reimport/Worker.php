@@ -111,6 +111,9 @@ class Worker extends editor_Models_Task_AbstractWorker
 
             foreach ($params['files'] as $fileId => $file) {
                 /* @var FileDto $file */
+                if (is_null($file->reimportFile)) {
+                    continue; //if there was no matching file, we can not process it
+                }
                 $reimportFile->import($fileId, $file->reimportFile, $params['segmentTimestamp']);
                 $this->logReimportedContent($reimportFile, $logger, $file);
             }

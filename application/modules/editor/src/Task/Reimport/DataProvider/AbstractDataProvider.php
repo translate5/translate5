@@ -49,7 +49,6 @@ abstract class AbstractDataProvider
     const UPLOAD_FILE_FIELD = 'fileReimport';
 
     const TEMP_DIR = '_tempReimport';
-    protected array $uploadErrors;
 
     public function __construct(protected editor_Models_Task $task, protected array $filesMetaData)
     {
@@ -74,13 +73,6 @@ abstract class AbstractDataProvider
     {
         $uploadFile = $this->getValidUploadedFile();
 
-        if (!empty($this->uploadErrors)) {
-            throw new Exception('E1427', [
-                'errors' => $this->uploadErrors,
-                'task' => $this->task
-            ]);
-        }
-
         if (empty($uploadFile)) {
             throw new Exception('E1429', [
                 'task' => $this->task
@@ -89,8 +81,8 @@ abstract class AbstractDataProvider
 
         $this->cleanup(); //clean up old re-imports
         if (!$this->makeReimportTempDir()) {
-            throw new Exception('E1429', [
-                'task' => $this->task   
+            throw new Exception('E1431', [
+                'task' => $this->task
             ]);
         }
 
@@ -102,6 +94,7 @@ abstract class AbstractDataProvider
      * by the segment processor
      * @return array
      * @throws Zend_File_Transfer_Exception
+     * @throws Exception
      */
     protected function getValidUploadedFile(): array
     {
@@ -113,14 +106,17 @@ abstract class AbstractDataProvider
         $file = reset($file); //we are only posting one file
 
         if (empty($file) || !$upload->isUploaded(self::UPLOAD_FILE_FIELD)) {
-            $this->uploadErrors[] = 'The file is not uploaded';
-            return [];
+            throw new Exception('E1427', [
+                'task' => $this->task,
+            ]);
         }
 
         // validators are ok ?
         if (!$upload->isValid(self::UPLOAD_FILE_FIELD)) {
-            $this->uploadErrors[] = 'The file:' . $file['name'] . ' is with invalid file extension';
-            return [];
+            throw new Exception('E1430', [
+                'task' => $this->task,
+                'file' => $file['name'],
+            ]);
         }
 
         return $file;

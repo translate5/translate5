@@ -79,13 +79,6 @@ class ReimportFile
         $parser = $parserHelper->getFileParserInstance($parserCls, $fileId, new SplFileInfo($filePath));
         /* @var editor_Models_Import_FileParser $parser */
 
-        if (is_null($parser)) {
-            throw new Exception('E1433', [
-                'file' => $fileId,
-                'task' => $this->task
-            ]);
-        }
-
         $parser->setIsReimport();
 
         $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class, [
