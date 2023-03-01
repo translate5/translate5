@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Task\Reimport\ZipDataProvider;
+use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
 use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\TermCollectionResource;
 

@@ -28,13 +28,14 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Reimport;
 
-use editor_Models_Import_DataProvider_Abstract;
 use editor_Models_Loaders_Taskuserassoc;
 use editor_Models_Task;
 use editor_Models_TaskUserAssoc;
 use MittagQI\Translate5\Task\Lock;
+use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
+use MittagQI\Translate5\Task\Reimport\DataProvider\DataProvider;
+use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
-use Throwable;
 use Zend_Acl_Exception;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
@@ -43,7 +44,7 @@ use ZfExtended_Models_User;
 use ZfExtended_Worker_Abstract;
 
 /**
- * Contains the Excel Reimport Worker
+ * Contains the Task Reimport Worker
  */
 class Worker extends ZfExtended_Worker_Abstract
 {
@@ -88,7 +89,6 @@ class Worker extends ZfExtended_Worker_Abstract
         $tua = $this->prepareTaskUserAssociation($task, $user);
 
         try {
-
             Lock::taskLock($task, $task::STATE_REIMPORT);
 
             $reimportFile = ZfExtended_Factory::get(ReimportFile::class, [
@@ -97,7 +97,8 @@ class Worker extends ZfExtended_Worker_Abstract
             ]);
 
             foreach ($params['files'] as $fileId => $file) {
-                $reimportFile->import($fileId, $file, $params['segmentTimestamp']);
+                /* @var FileDto $file */
+                $reimportFile->import($fileId, $file->reimportFile, $params['segmentTimestamp']);
                 $reimportFile->getSegmentProcessor()->log();
             }
         } finally {
@@ -106,7 +107,8 @@ class Worker extends ZfExtended_Worker_Abstract
                 $tua->delete();
             }
             Lock::taskUnlock($task);
-            $this->archiveImportedData($task);
+
+            $this->archiveImportedData($task, $params['files']); //FIXME archive is updated also in case of error?
             $this->cleanupImportFolder($params['dataProviderClass'], $task);
         }
 
@@ -163,16 +165,19 @@ class Worker extends ZfExtended_Worker_Abstract
     /***
      * Create new archive version after the reimport
      * @param editor_Models_Task $task
+     * @param FileDto[] $filesToUpdate
      * @return void
-     * @throws Exception
-     * @throws \editor_Models_Import_DataProvider_Exception
      */
-    private function archiveImportedData(editor_Models_Task $task)
+    private function archiveImportedData(editor_Models_Task $task, array $filesToUpdate): void
     {
-        /** @var DataProvider $dp */
-        $dp = ZfExtended_Factory::get(DataProvider::class);
-        $dp->setTaskPaths($task);
-        $dp->archiveImportedData();
+        $archiveUpdater = ZfExtended_Factory::get(TaskArchiveUpdater::class);
+        if (! $archiveUpdater->updateFiles($task, $filesToUpdate)) {
+            $this->log->warn(
+                'E1475',
+                'Re-Import: No ImportArchive backup created: Import Archive does not exist or folder is not writeable',
+                ['task' => $task]
+            );
+        }
     }
 
 
@@ -184,8 +189,8 @@ class Worker extends ZfExtended_Worker_Abstract
      */
     private function cleanupImportFolder(string $dataProviderClass, editor_Models_Task $task): void
     {
-        $dp = ZfExtended_Factory::get($dataProviderClass);
-        $dp->setTaskPaths($task);
-        $dp->cleanTempFolder();
+        if (is_subclass_of($dataProviderClass, AbstractDataProvider::class)) {
+            $dataProviderClass::getForCleanup($task)->cleanup();
+        }
     }
 }

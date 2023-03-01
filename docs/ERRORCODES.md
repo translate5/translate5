@@ -237,7 +237,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1136"></a>E1136  | Task Import | Some files could not be imported, since there is no parser available. For affected files see log details. | The user tried to import one or more files which can not be imported. Neither native by translate5, nor via a converter plug-in like [Okapi](https://confluence.translate5.net/display/CON/Okapi). See the log details for the affected files.
 | <a id="E1166"></a>E1166  | Task Import | Although there were importable files in the task, no files were imported. Investigate the log for preceeding errors. | There was at least one importable file in the package which can be imported, but the import process did not import any file. Probably there was another error before, for example with a file converter plug-in like [Okapi](https://confluence.translate5.net/display/CON/Okapi).
 | <a id="E1190"></a>E1190  | XLF 1.2 Fileparser | The XML of the XLF file "{fileName} (id {fileId})" is invalid! | The provided XLF file contains no valid XML.<br />See the task log, the concrete XML error should be logged there too.
-| <a id="E1191"></a>E1191  | XLF 1.2 Fileparser | The XLF file &quot;{fileName} (id {fileId})&quot; does not contain any translation relevant segments. | Since there are no importable segments in the file, omit the file in import.
+| <a id="E1191"></a>E1191  | XLF 1.2 Fileparser | The XLF file "{fileName} (id {fileId})" does not contain any translation relevant segments. | Since there are no importable segments in the file, omit the file in import.
 | <a id="E1193"></a>E1193  | Imported Matchrate Type | File &quot;{file}&quot; contains unknown matchrate types. See details. | In the mentioned file there are matchrate types not known to translate5.
 | <a id="E1241"></a>E1241  | DataProvider Zip | DataProvider Zip: zip file could not be opened: &quot;{zip}&quot; | Check if the uploaded file is a valid ZIP file.
 | <a id="E1242"></a>E1242  | DataProvider Zip | DataProvider Zip: content from zip file could not be extracted: &quot;{zip}&quot; | Check if the uploaded file is a valid ZIP file.
@@ -298,6 +298,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1441"></a>E1441 | Task reimport | Reimport Segment processor: No content parser found for the file {file}                                            | For the uploaded file there is not content parser available                                              |
 | <a id="E1461"></a>E1461 | Task reimport | Reimport ZipDataProvider: The provided file in the zip package can not be name-matched with any of the task files. | The zip package contains fails which can not be matched by name with the existing task files.            |
 | <a id="E1462"></a>E1462 | Task reimport | Reimport ZipDataProvider: Unable to replace the original file with the uploaded version                            | Error happen when trying to copy/replace the original file with the new version of the file on the disk. |
+| <a id="E1475"></a>E1462 | Task reimport | Re-Import: No ImportArchive backup created: Import Archive does not exist or folder is not writeable               | Error happen when trying to copy/replace the original file with the new version of the file on the disk. |
 
 ### Language Resources
 | EventCode        | Context       | EventMessage  | Description/Solution
