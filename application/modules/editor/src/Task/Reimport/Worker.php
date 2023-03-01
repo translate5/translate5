@@ -30,11 +30,16 @@ namespace MittagQI\Translate5\Task\Reimport;
 
 use editor_Models_Loaders_Taskuserassoc as JobLoader;
 use editor_Models_Task as Task;
+use editor_Models_Task_AbstractWorker;
 use editor_Models_TaskUserAssoc;
+use JsonException;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\Reimport\DataProvider\AbstractDataProvider;
 use MittagQI\Translate5\Task\Reimport\DataProvider\FileDto;
+use MittagQI\Translate5\Task\Reimport\SegmentProcessor\ReimportSegmentErrors;
 use Zend_Acl_Exception;
+use Zend_Exception;
+use Zend_Registry;
 use ZfExtended_Acl;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Conflict;
@@ -45,7 +50,7 @@ use ZfExtended_Worker_Abstract;
 /**
  * Contains the Task Reimport Worker
  */
-class Worker extends ZfExtended_Worker_Abstract
+class Worker extends editor_Models_Task_AbstractWorker
 {
 
     /**
@@ -75,10 +80,11 @@ class Worker extends ZfExtended_Worker_Abstract
      * (non-PHPdoc)
      * @return true
      * @throws Exception
+     * @throws JsonException
      * @throws Zend_Acl_Exception
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws \JsonException
      * @throws ZfExtended_Models_Entity_Conflict
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Zend_Exception
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work()
@@ -86,40 +92,37 @@ class Worker extends ZfExtended_Worker_Abstract
 
         $params = $this->workerModel->getParameters();
 
-        /** @var Task $task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        $task->loadByTaskGuid($this->taskGuid);
-
         /** @var ZfExtended_Models_User $user */
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $user->loadByGuid($params['userGuid']);
 
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
 
         //contains the TUA which is used to alter the segments
-        $tua = $this->prepareTaskUserAssociation($task, $user);
+        $tua = $this->prepareTaskUserAssociation($this->task, $user);
 
         try {
-            Lock::taskLock($task, $task::STATE_REIMPORT);
+            Lock::taskLock($this->task, $this->task::STATE_REIMPORT);
 
             $reimportFile = ZfExtended_Factory::get(ReimportFile::class, [
-                $task,
+                $this->task,
                 $user
             ]);
 
             foreach ($params['files'] as $fileId => $file) {
                 /* @var FileDto $file */
                 $reimportFile->import($fileId, $file->reimportFile, $params['segmentTimestamp']);
-                $reimportFile->getSegmentProcessor()->log();
+                $this->logReimportedContent($reimportFile, $logger, $file);
             }
         } finally {
             //if it was a PM override, delete it again
             if ($tua->getIsPmOverride()) {
                 $tua->delete();
             }
-            Lock::taskUnlock($task);
+            Lock::taskUnlock($this->task);
 
-            $this->archiveImportedData($task, $params['files']); //FIXME archive is updated also in case of error?
-            $this->cleanupImportFolder($params['dataProviderClass'], $task);
+            $this->archiveImportedData($this->task, $params['files']);
+            $this->cleanupImportFolder($params['dataProviderClass'], $this->task);
         }
 
         return true;
@@ -199,6 +202,39 @@ class Worker extends ZfExtended_Worker_Abstract
     {
         if (is_subclass_of($dataProviderClass, AbstractDataProvider::class)) {
             $dataProviderClass::getForCleanup($task)->cleanup();
+        }
+    }
+
+    /**
+     * @param ReimportFile $reimportFile
+     * @param $log
+     * @param FileDto $file
+     * @return void
+     * @throws JsonException
+     */
+    private function logReimportedContent(ReimportFile $reimportFile, $log, FileDto $file): void
+    {
+        $updatedSegments = $reimportFile->getSegmentProcessor()->getUpdatedSegments();
+        $log->info('E1440', 'Reimport for the file "{filename}" is finished. Total updated segments: {updateCount}.', [
+            'task' => $this->task,
+            'fileId' => $file->fileId,
+            'updateCount' => count($updatedSegments),
+            'segments' => implode(',', $updatedSegments),
+            'filename' => $file->filteredFilePath
+        ]);
+
+        foreach ($reimportFile->getSegmentProcessor()->getSegmentErrors() as $code => $codeErrors) {
+            $extra = [];
+            foreach ($codeErrors as $error) {
+                /* @var ReimportSegmentErrors $error */
+                $extra[] = $error->getData();
+            }
+            $log->warn($code, $codeErrors[0]->getMessage(), [
+                'task' => $this->task,
+                'fileId' => $file->fileId,
+                'filename' => $file->filteredFilePath,
+                'extra' => json_encode($extra, JSON_THROW_ON_ERROR)
+            ]);
         }
     }
 }

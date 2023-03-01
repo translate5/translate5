@@ -42,7 +42,6 @@ use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\ContentDef
 use Throwable;
 use Zend_Registry;
 use ZfExtended_Factory;
-use ZfExtended_Logger;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
@@ -51,11 +50,6 @@ use ZfExtended_Models_User;
  */
 class Reimport extends editor_Models_Import_SegmentProcessor
 {
-    /***
-     * @var ZfExtended_Logger $logger
-     */
-    protected ZfExtended_Logger $logger;
-
     /**
      * @var editor_Models_Segment_InternalTag
      */
@@ -85,7 +79,6 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     public function __construct(editor_Models_Task $task, private editor_Models_SegmentFieldManager $sfm, private ZfExtended_Models_User $user)
     {
         parent::__construct($task);
-        $this->logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
         $this->segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
 
@@ -190,49 +183,21 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     }
 
     /**
-     * Log reimport process information and errors
-     *
-     * @return void
-     * @throws JsonException
+     * get all updated segments in the task
+     * @return array
      */
-    public function log()
+    public function getUpdatedSegments(): array
     {
-        $this->logErrors();
-        $this->logUpdated();
-    }
-
-    /***
-     * Log all collected errors as warning
-     */
-    private function logErrors(): void
-    {
-        foreach ($this->segmentErrors as $code => $codeErrors) {
-            $extra = [];
-            foreach ($codeErrors as $error) {
-                /* @var ReimportSegmentErrors $error */
-                $extra[] = $error->getData();
-            }
-            $this->logger->warn($code, $codeErrors[0]->getMessage(), [
-                'task' => $this->task,
-                'fileId' => $this->fileId,
-                'extra' => json_encode($extra, JSON_THROW_ON_ERROR)
-            ]);
-        }
+        return $this->updatedSegments;
     }
 
     /**
-     * Log all updated segments in the task
-     * @return void
+     * get all segment errors
+     * @return array
      */
-    private function logUpdated(): void
+    public function getSegmentErrors(): array
     {
-        $this->logger->info('E1440', 'Reimport for the file "{filename}" is finished. Total updated segments: {updateCount}.', [
-            'task' => $this->task,
-            'fileId' => $this->fileId,
-            'updateCount' => count($this->updatedSegments),
-            'segments' => implode(',', $this->updatedSegments),
-            'filename' => $this->fileName
-        ]);
+        return $this->segmentErrors;
     }
 
     /**

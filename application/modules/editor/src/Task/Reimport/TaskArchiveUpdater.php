@@ -63,6 +63,9 @@ class TaskArchiveUpdater
         $zip->open($tempArchive);
 
         foreach ($fileToUpdate as $fileDto) {
+            if (is_null($fileDto->reimportFile)) {
+               continue; //if there is no matching file, we can not store it in archive
+            }
             $zipIndex = $zip->locateName($fileDto->filteredFilePath);
             if ($zipIndex === false) {
                 $zip->addFile($fileDto->reimportFile, $fileDto->filteredFilePath);
