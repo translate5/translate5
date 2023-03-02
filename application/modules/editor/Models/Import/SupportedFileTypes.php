@@ -228,7 +228,6 @@ class editor_Models_Import_SupportedFileTypes
     public function hasSupportedParserByContent(string $ext, string $fileHead, array & $errorMessages): mixed
     {
         $errorMsg = '';
-        $errorMessages = [];
         $parserClasses = $this->getParser($ext);
         foreach ($parserClasses as $parserClass) {
             if (is_subclass_of($parserClass, editor_Models_Import_FileParser::class)

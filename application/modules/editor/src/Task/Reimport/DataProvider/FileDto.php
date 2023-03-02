@@ -28,7 +28,9 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Task\Reimport\DataProvider;
 
-class FileDto {
+class FileDto
+{
+    protected array $errors = [];
     public function __construct(
         public int $fileId,
         public string $fileParser,
@@ -37,5 +39,15 @@ class FileDto {
         public ?string $reimportFile = null
     ) {
 
+    }
+
+    public function addError(string $error):void
+    {
+        $this->errors[] = $error;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 }

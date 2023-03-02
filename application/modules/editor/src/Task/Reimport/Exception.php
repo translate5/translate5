@@ -44,13 +44,14 @@ class Exception extends \ZfExtended_ErrorCodeException
     protected $domain = 'editor.task.reimport';
 
     protected static array $localErrorCodes = [
-        'E1426' => 'Reimport: Missing required request parameter fileId.',
         'E1427' => 'Reimport DataProvider: Error on file upload.',
-        'E1430' => 'Reimport DataProvider: This file type is not supported {file}',
-        'E1431' => 'Reimport DataProvider: Unable to create a temporary folder for the re-import',
         'E1428' => 'Reimport DataProvider: Unable to move the uploaded file to {file}',
         'E1429' => 'Reimport DataProvider: No upload files found for task reimport.',
+        'E1430' => 'Reimport DataProvider: This file type is not supported {file}',
+        'E1431' => 'Reimport DataProvider: Unable to create a temporary folder for the re-import',
         'E1434' => 'Reimport Segment processor: No matching segment was found for the given mid.',
         'E1441' => 'Reimport Segment processor: No content parser found for the file {file}',
+        'E1442' => 'Reimport Zip: zip file could not be opened: {zipError}',
+        'E1462' => 'Reimport Zip: The provided zip package did not contain any file matching the files in the task.',
     ];
 }
