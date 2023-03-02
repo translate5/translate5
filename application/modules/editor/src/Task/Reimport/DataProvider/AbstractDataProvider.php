@@ -59,9 +59,17 @@ abstract class AbstractDataProvider
         return ZfExtended_Factory::get(static::class, [$task, []]);
     }
 
+    abstract protected function handleUploads(array $uploadedFile): void;
+    abstract protected function getValidFileExtensions(): array;
+
     public function getFiles(): array
     {
         return $this->filesMetaData;
+    }
+
+    public function getCollectedErrors(): array
+    {
+        return [];
     }
 
     /**
@@ -122,8 +130,6 @@ abstract class AbstractDataProvider
         return $file;
     }
 
-    abstract protected function getValidFileExtensions(): array;
-
     public function cleanup(): void
     {
         $tempDir = $this->getTempDir();
@@ -146,5 +152,4 @@ abstract class AbstractDataProvider
         return mkdir((string)$tempDir) && is_dir((string)$tempDir);
     }
 
-    abstract protected function handleUploads(array $uploadedFile): void;
 }
