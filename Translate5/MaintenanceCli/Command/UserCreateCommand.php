@@ -84,6 +84,12 @@ class UserCreateCommand extends UserAbstractCommand
             InputOption::VALUE_REQUIRED,
             'The initial locale to be used, defaults to "en". Alternative is just "de" at the moment.',
             'en');
+
+        $this->addOption(
+            'password',
+            'p',
+            InputOption::VALUE_REQUIRED,
+            'Set an password for the user to create');
     }
 
     /**
@@ -127,6 +133,17 @@ class UserCreateCommand extends UserAbstractCommand
             $roles = $this->input->getOption('roles');
         }
 
+        $password = $this->input->getOption('password');
+        $passwordNotSet = true;
+        if(!empty('password')){
+            if(strlen($password) < 5){
+                $this->io->warning('The password is too short.');
+                return static::FAILURE;
+            }
+            $userModel->setPasswd(\ZfExtended_Authentication::getInstance()->createSecurePassword($password));
+            $passwordNotSet = false;
+        }
+
         $selectedRoles = array_intersect($roles, $this->allRoles);
         $acl = ZfExtended_Acl::getInstance();
         $userModel->setRoles($acl->mergeAutoSetRoles($selectedRoles, []));
@@ -141,9 +158,13 @@ class UserCreateCommand extends UserAbstractCommand
             }
             throw $e;
         }
-        $mailer = new \ZfExtended_TemplateBasedMail();
-        $mailer->setTemplate('userHandlepasswdmail.phtml');
-        $mailer->sendToUser($userModel);
+        // if no password was set, we send an email
+        if($passwordNotSet){
+            $mailer = new \ZfExtended_TemplateBasedMail();
+            $mailer->setTemplate('userHandlepasswdmail.phtml');
+            $mailer->sendToUser($userModel);
+        }
+
 
         $this->printOneUser($userModel->getDataObject());
 
