@@ -559,6 +559,8 @@ table.task-users td.username,
 table.task-users td.state {font-weight:bold;}
 table.task-users td.state {padding-right:0;}
 
+.x-check-group-alt .x-form-item-body {padding-left: 20px;}
+
 /*own check column*/
 .grid-ownchecker {
     background-color: transparent;
