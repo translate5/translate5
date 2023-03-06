@@ -725,8 +725,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         /* @var $file editor_Models_File */
         $config = $event->getParam('config');
         /* @var $config stdClass */
+        $context = $event->getParam('context');
 
-        if($this->wasImportedWithOkapi($task, $file->getId())) {
+        if ($this->wasImportedWithOkapi($task, $file->getId()) && $context !== editor_Models_Export::EXPORT_PACKAGE) {
             //files imported with okapi have always source to empty target on (TRANSLATE-2384)
             $config->options['sourcetoemptytarget'] = true;
         }
