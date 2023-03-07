@@ -52,30 +52,30 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
     
     protected $testData = array(
         'M',
-        '<n-o#5#1989>',
+        '<m-o#5#1989>',
         'it den Einstellungen UNIPOL./FIX.SETPT oder BIPO',
         '<c-o#1#1990>',
         'L./FIX.',
-        '<n-o#3#1991>',
+        '<m-o#3#1991>',
         'SETPT',
         '<c-o#10#1982>',
         ', kann ',
-        '<n-o#3#1992>',
+        '<m-o#3#1992>',
         'das ',
         '<c-o#6#1983>',
         'setpoint',
         '<c-c#5#1983>',
         ' au',
-        '<c-o#13#1986>',
+        '<i-o#13#1986>',
         'c',
         '<c-o#18#1987>',
         'h',
-        '<n-o#19#1988>',
+        '<m-o#19#1988>',
         ' ',
-        '<n-c#3#1992>',
+        '<m-c#3#1992>',
         '<c-o#16#1984>',
         'über',
-        '<c-c#10#1982>',
+        '<i-c#10#1982>',
         ' Anschlüssen',
         '<c-c#16#1984>',
         ' ausgew',
@@ -83,14 +83,14 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         'ählt werden (fest',
         '<c-c#18#1987>',
         'es se',
-        '<n-c#3#1991>',
+        '<m-c#3#1991>',
         '<c-c#1#1990>',
         'tpoi',
-        '<n-c#5#1989>',
-        '<n-o#8#1993>',
+        '<m-c#5#1989>',
+        '<m-o#8#1993>',
         'nt).',
-        '<n-c#19#1988>',
-        '<n-c#8#1993>',
+        '<m-c#19#1988>',
+        '<m-c#8#1993>',
     );
 
     protected static function setupImport(Config $config): void
@@ -146,10 +146,10 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
      */
     protected function compileMqmTags(array $data) {
         //replacing img tags for better readability!
-        $severity = array('c' => 'critical', 'n' => 'null');
+        $severity = array('c' => 'critical', 'm' => 'major', 'i' => 'minor');
         $tags = array('o' => 'open', 'c' => 'close');
         $dir = array('o' => 'left', 'c' => 'right');
-        
+
         return join('', array_map(function($tag) use ($severity, $tags, $dir){
             return preg_replace_callback('/<([a-z])-([a-z])#([0-9]+)#([0-9]+)>/', function ($hit) use ($severity, $tags, $dir) {
                 $type = $hit[3];
