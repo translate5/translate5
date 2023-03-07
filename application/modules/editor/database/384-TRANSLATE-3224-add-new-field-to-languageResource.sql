@@ -25,7 +25,14 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-SELECT @exists := IFNULL((SELECT count(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'LEK_languageresources' AND table_schema = database() AND column_name = 'writeSource'), 0);
-IF @exists = 0 THEN
-    ALTER TABLE `LEK_languageresources` ADD COLUMN `writeSource` TINYINT(2) NULL DEFAULT 0 AFTER `resourceType`;
-END IF;
+DELIMITER ;;
+CREATE PROCEDURE ADD_WRITESOURCE()
+BEGIN
+    SELECT @exists := IFNULL((SELECT count(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'LEK_languageresources' AND table_schema = database() AND column_name = 'writeSource'), 0);
+    IF @exists = 0 THEN
+        ALTER TABLE `LEK_languageresources` ADD COLUMN `writeSource` TINYINT(2) NULL DEFAULT 0 AFTER `resourceType`;
+    END IF;
+END;;
+DELIMITER ;
+CALL ADD_WRITESOURCE();
+DROP PROCEDURE ADD_WRITESOURCE;
