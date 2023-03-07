@@ -32,6 +32,7 @@ use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 /***
  * Language resource controller
@@ -612,9 +613,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         $data = $connector->getTm($validExportTypes[$type]);
-        header('Content-Type: '.$validExportTypes[$type], TRUE);
-        $type = '.'.strtolower($type);
-        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getName()).$type.'"');
+
+        Header::sendDownload(
+            rawurlencode($this->entity->getName()) . '.' . strtolower($type),
+            $validExportTypes[$type]
+        );
         echo $data;
         exit;
     }
@@ -858,14 +861,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             // Unset session's download flag
             unset($_SESSION['download']);
 
-            // Convert collection name to filename
-            $filename = rawurlencode($_['collectionId']['name']);
-
             // Set up headers
-            header('Cache-Control: no-cache');
-            header('X-Accel-Buffering: no');
-            header('Content-Type: text/xml');
-            header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '.xlsx; filename=' . $filename . '.xlsx');
+            Header::sendDownload(
+                rawurlencode($_['collectionId']['name']).'.xlsx',
+                'text/xml',
+                'no-cache',
+                -1,
+                [ 'X-Accel-Buffering' => 'no' ]
+            );
 
             // Flush the entire file
             readfile($file);

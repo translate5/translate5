@@ -30,6 +30,7 @@ use MittagQI\Translate5\Task\CurrentTask;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 /**
  *
@@ -1704,12 +1705,20 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-        header('Content-Description: File Transfer');
-        header('Content-Disposition: attachment; filename="'.$filenameExport.'"');
-        header('Content-Transfer-Encoding: binary');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Pragma: public');
+
+        Header::sendDownload(
+            $filenameExport,
+            null,
+            'no-cache',
+            -1,
+            [
+                'Content-Transfer-Encoding' => 'binary',
+                'Content-Description' => 'File Transfer',
+                'Expires' => '0',
+                'Pragma' => 'public'
+            ]
+        );
+
         readfile($translatedfile);
         $clean(); //remove export dir
     }
@@ -1723,8 +1732,12 @@ class editor_TaskController extends ZfExtended_RestController {
         // disable layout and view
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-        header('Content-Type: application/zip', TRUE);
-        header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($nameSuffix).'"');
+
+        Header::sendDownload(
+            $this->entity->getTasknameForDownload($nameSuffix),
+            'application/zip'
+        );
+
         readfile($zipFile);
     }
 

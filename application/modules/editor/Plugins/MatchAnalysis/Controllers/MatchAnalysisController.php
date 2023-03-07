@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\ZfExtended\Controller\Response\Header;
+
 /**
  */
 class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController
@@ -121,13 +123,14 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
 
                 $x = $exporter->generateXML($rows, $params['taskGuid']);
 
-                $fileName = $fileName.' '.date('- Y-m-d').'.xml';
-                
-                header("Content-Disposition: attachment; filename*=UTF-8''".rawurlencode($fileName));
-                header('Content-Type:text/xml');
-                // if you want to directly download then set expires time
-                header('Expires: 0');
-                
+                Header::sendDownload(
+                    rawurlencode($fileName.' '.date('- Y-m-d').'.xml'),
+                    'text/xml',
+                    'no-cache',
+                    -1,
+                    [ 'Expires' => '0' ]
+                );
+
                 //with XML formatting:
 //                 $dom = dom_import_simplexml($x)->ownerDocument;
 //                 $dom->formatOutput = true;

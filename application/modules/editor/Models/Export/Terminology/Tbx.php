@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\Controller\Response\Header;
+
 /**
  * FIXME: 1. code cleanup
  *        2. extract the file generation stream as separate classes. One for download, one for raw/file based export
@@ -582,10 +584,13 @@ class editor_Models_Export_Terminology_Tbx {
             $filename = is_string($overwrite) ? rawurlencode($overwrite) : 'export';
 
             // Set up headers
-            header('Cache-Control: no-cache');
-            header('X-Accel-Buffering: no');
-            header('Content-Type: text/xml');
-            header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '.tbx; filename=' . $filename . '.tbx');
+            Header::sendDownload(
+                $filename . '.tbx',
+                'text/xml',
+                'no-cache',
+                -1,
+                [ 'X-Accel-Buffering' => 'no' ]
+            );
 
             // Set up output buffering implicit flush mode
             ob_implicit_flush(true);
