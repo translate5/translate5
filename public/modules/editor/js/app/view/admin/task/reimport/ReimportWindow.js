@@ -38,6 +38,10 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
     layout:'fit',
     record: null,
     task: null,
+    supportedExtensions: Editor.data.editor.task.reimport.supportedExtensions,
+    bind:{
+        title:'{l10n.projectOverview.taskManagement.taskReimportWindow.title}'
+    },
     initConfig : function(instanceConfig) {
         var me = this,
             locales = Editor.data.l10n.projectOverview.taskManagement.taskReimportWindow,
@@ -46,9 +50,6 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
                 anchor: '100%'
             },
             config = {
-                bind:{
-                    title:'{l10n.projectOverview.taskManagement.taskReimportWindow.title}'
-                },
                 items : [{
                     xtype: 'form',
                     padding: 5,
@@ -62,7 +63,7 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
                         listeners:{
                             change:'onFileFieldChange'
                         },
-                        regexText: Ext.String.format(locales.fileUploadRegexText, Editor.data.editor.task.reimport.supportedExtensions.join(',')),
+                        regexText: Ext.String.format(locales.fileUploadRegexText, me.supportedExtensions.join(',')),
                         regex: me.getSupportedFilesRegex(),
                         labelWidth: 160,
                         anchor: '100%',
@@ -143,7 +144,7 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
      * @returns {string}
      */
     getSupportedFilesRegex: function (){
-        return new RegExp('('+Editor.data.editor.task.reimport.supportedExtensions.join('|')+')');
+        return new RegExp('('+this.supportedExtensions.join('|')+')');
     },
 
     getCustomerSaveToMemory: function (){

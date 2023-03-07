@@ -26,18 +26,21 @@ END LICENSE AND COPYRIGHT
 */
 
 @CHARSET "UTF-8";
+/***
+* TODO: this should be refactored with the spellcheck refactoring. Currently because of css conflict classes, this code is duplicated in main.css
+*/
 
-.t5quality {
+.t5spellcheck {
     cursor: pointer;
     z-index: 1;
     position: relative;
 }
 
-.t5quality.t5general, .t5quality.t5general .trackchanges,
-.t5quality.t5style, .t5quality.t5style .trackchanges,
-.t5quality.t5grammar, .t5quality.t5grammar .trackchanges,
-.t5quality.t5misspelling, .t5quality.t5misspelling .trackchanges,
-.t5quality.t5typographical, .t5quality.t5typographical .trackchanges {
+.t5spellcheck.t5general, .t5spellcheck.t5general .trackchanges,
+.t5spellcheck.t5style, .t5spellcheck.t5style .trackchanges,
+.t5spellcheck.t5grammar, .t5spellcheck.t5grammar .trackchanges,
+.t5spellcheck.t5misspelling, .t5spellcheck.t5misspelling .trackchanges,
+.t5spellcheck.t5typographical, .t5spellcheck.t5typographical .trackchanges {
     text-decoration-style: wavy;
     text-underline-offset: 1px;
     text-decoration-line: underline;
@@ -45,26 +48,31 @@ END LICENSE AND COPYRIGHT
 }
 
 /* gray */
-.t5quality.t5general, .t5quality.t5general .trackchanges {
+.t5spellcheck.t5general, .t5spellcheck.t5general .trackchanges {
     text-decoration-color: #808080;
 }
 
 /* blue */
-.t5quality.t5style, .t5quality.t5style .trackchanges {
+.t5spellcheck.t5style, .t5spellcheck.t5style .trackchanges {
     text-decoration-color: #458fe6;
 }
 
 /* dark yellow */
-.t5quality.t5grammar, .t5quality.t5grammar .trackchanges {
+.t5spellcheck.t5grammar, .t5spellcheck.t5grammar .trackchanges {
     text-decoration-color: #ab8906;
 }
 
 /* red-violet */
-.t5quality.t5misspelling, .t5quality.t5misspelling .trackchanges {
+.t5spellcheck.t5misspelling, .t5spellcheck.t5misspelling .trackchanges {
     text-decoration-color: #e645a8;
 }
 
 /* dark-purple */
-.t5quality.t5typographical, .t5quality.t5typographical .trackchanges {
+.t5spellcheck.t5typographical, .t5spellcheck.t5typographical .trackchanges {
     text-decoration-color: #4d004d;
+}
+
+.t5spellcheck[data-t5qfp="true"]{
+    border-bottom: 1px solid limegreen;
+    padding-bottom: 2px;
 }

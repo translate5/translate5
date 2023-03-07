@@ -436,6 +436,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param array $opener
      */
     public function handleGTagCloser($tag, $key, $opener) {
+        if ($opener['isSingle']) {
+            return; // the tag was already handled in the opener
+        }
         $openerKey = $opener['openerKey'];
         $openChunk = $this->xmlparser->getChunk($openerKey);
         $closeChunk = $this->xmlparser->getChunk($key);

@@ -122,8 +122,11 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $restContexts = new REST_Controller_Action_Helper_RestContexts();
         Zend_Controller_Action_HelperBroker::addHelper($restContexts);
     }
-    
-    
+
+    /**
+     * @return void
+     * @uses editor_FileController::packageAction()
+     */
     public function _initRestRoutes()
     {
         
@@ -167,6 +170,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'module' => 'editor',
                 'controller' => 'filetree',
                 'action' => 'root'
+            )
+        ));
+
+        $this->front->getRouter()->addRoute('editorFilePackagetRoute', new ZfExtended_Controller_RestLikeRoute(
+            'editor/file/package',
+            array(
+                'module' => 'editor',
+                'controller' => 'file',
+                'action' => 'package'
             )
         ));
         

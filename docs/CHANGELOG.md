@@ -15,6 +15,135 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.9.0] - 2023-03-07
+
+### Important Notes:
+#### [TRANSLATE-3204](https://jira.translate5.net/browse/TRANSLATE-3204)
+PMs are now also allowed to download the import archive of the imported task.
+
+#### [TRANSLATE-3192](https://jira.translate5.net/browse/TRANSLATE-3192)
+The system default of multi user mode for tasks changed to "Simultaneous" from "Cooperative".  If you want to keep it as it is, you need to set it back to its old value by hand. If it was set to "competitive" by you, the value will stay as it was before.
+
+#### [TRANSLATE-3117](https://jira.translate5.net/browse/TRANSLATE-3117)
+IMPORTANT: This enables the translator and the reviewer, to download a translator package or the translated (or un-translated) bilingual file. This was not possible previously. It does not change something regarding confidentiality, because also previously (of course) all segments and TM entries were available to the translator. As they have to be (otherwise he can not translate). Yet it makes it more easy now, to get them on your desktop.
+
+#### [TRANSLATE-3097](https://jira.translate5.net/browse/TRANSLATE-3097)
+The usability of the editor was enhanced very much for translators and reviewers in the normal and details view mode of the editor.
+The action icons to handle the currently open segment were moved to the top. Same for the special characters. Users can now select, what icons they want to have in the top toolbar and what in a drop-down list. The repetition editor settings were moved to the left into the "view modes" drop-down, which was renamed to "settings". 
+In the right panel the terminology was moved to its own tab and the segment meta data tab was renamed to "Quality assurance".
+As a result there is much more space for terminology and QA in the right panel.
+
+#### [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
+Before updating from a version < 5.8.0 see 
+https://confluence.translate5.net/x/BYAIG
+ 
+
+
+### Added
+**[TRANSLATE-3223](https://jira.translate5.net/browse/TRANSLATE-3223): Editor general - Create a new user role to force the editor only mode** <br>
+In editor-only-mode (leave application button instead back to tasklist) admins are now allowed to switch back to task list. 
+For other users an optional role (editor-only-override) is added. This enables a hybrid setup of editor only mode and default mode with task overview.
+
+**[TRANSLATE-3205](https://jira.translate5.net/browse/TRANSLATE-3205): API - Make T5 API ready for use via Browser (full CORS support)** <br>
+IMPROVEMENT: Full CORS support to enable API-usage via JS when authenticating with an App-Token 
+
+**[TRANSLATE-3188](https://jira.translate5.net/browse/TRANSLATE-3188): LanguageResources, MatchAnalysis & Pretranslation - Speed up internal fuzzy analysis by copying binary files** <br>
+Now during match analyzing translation memory is cloned using the new t5memory API endpoint instead of export/import, which significantly increases the speed of cloning.
+
+**[TRANSLATE-3117](https://jira.translate5.net/browse/TRANSLATE-3117): Import/Export - translator package** <br>
+Editor users are now able to download a zip package including everything needed to translate a job outside of translate5 and afterwards update the task with it.
+
+**[TRANSLATE-3097](https://jira.translate5.net/browse/TRANSLATE-3097): Editor general - Enhance editor menu usability** <br>
+Enhanced editor menu usability. For details please see "important release notes".
+
+**[TRANSLATE-2994](https://jira.translate5.net/browse/TRANSLATE-2994): LanguageResources, OpenTM2 integration - t5memory roll-out** <br>
+5.9.0: FIX: increase timeout
+5.7.13: Added new cli command for migrating OpenTM2 to t5memory.
+Check the usage of 
+./translate5.sh help otm2:migrate
+
+**[TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185): Installation & Update - Prepare translate5 for usage with docker** <br>
+5.9.0: Introduce service checks if the configured services are working
+5.8.1: Introducing the setup of translate5 and the used services as docker containers.
+
+
+### Changed
+**[TRANSLATE-3216](https://jira.translate5.net/browse/TRANSLATE-3216): VisualReview / VisualTranslation - Add Version Endpoint to PDF-Converter** <br>
+Added new endpoint to pdfconverter API which returns list of libraries versions.
+
+**[TRANSLATE-3204](https://jira.translate5.net/browse/TRANSLATE-3204): Export - PMs and PMlights should also be able to download the import archive** <br>
+PMs should also be allowed to download the import archive of the imported task. Previously only admins were allowed to do that.
+
+**[TRANSLATE-3192](https://jira.translate5.net/browse/TRANSLATE-3192): Task Management - Set default for multi usage mode to "Simultaneous"** <br>
+Change default value for task initial usage mode from "Cooperative" to "Simultaneous".
+
+**[TRANSLATE-3183](https://jira.translate5.net/browse/TRANSLATE-3183): API - Enable API-Usage via JS when using an App-Token** <br>
+IMPROVEMENT: Sending Access-Control header to allow API-usage via JS when authenticating with an App-Token
+
+**[TRANSLATE-3072](https://jira.translate5.net/browse/TRANSLATE-3072): file format settings - Usability enhancements for file format settings** <br>
+ENHANCEMENT: Improved usability of File format and segmentation settings UI: better localization, more tooltips, some bugfixes
+
+
+### Bugfixes
+**[TRANSLATE-3228](https://jira.translate5.net/browse/TRANSLATE-3228): Export - Doubled language code in filename of translate5 export zip** <br>
+Removed doubled language code in filename of translate5 export zip
+
+**[TRANSLATE-3224](https://jira.translate5.net/browse/TRANSLATE-3224): Editor general, InstantTranslate - Column not found error when creating a project on fresh Docker install** <br>
+Add missing column to LEK_languageresources table if installing without InstantTranslate.
+
+**[TRANSLATE-3219](https://jira.translate5.net/browse/TRANSLATE-3219): Workflows - Workflow notification json decode problems** <br>
+When using JSON based workflow notification parameters it might come to strange JSON syntax errors.
+
+**[TRANSLATE-3217](https://jira.translate5.net/browse/TRANSLATE-3217): Editor general - RootCause: Invalid JSON - answer seems not to be from translate5 - x-translate5-version header is missing** <br>
+In 5.9.0: added some debug code.
+
+**[TRANSLATE-3215](https://jira.translate5.net/browse/TRANSLATE-3215): TermPortal - RootCause: filter window error** <br>
+In 5.9.0: added some debug code.
+
+**[TRANSLATE-3214](https://jira.translate5.net/browse/TRANSLATE-3214): TermPortal - RootCause: locale change in attributes management** <br>
+FIXED: bug popping after GUI locale change in attributes management
+
+**[TRANSLATE-3209](https://jira.translate5.net/browse/TRANSLATE-3209): Editor general - RootCause error: vm is null** <br>
+Fix for UI error when task progress is refreshed but the user opens task for editing.
+
+**[TRANSLATE-3208](https://jira.translate5.net/browse/TRANSLATE-3208): Editor general - RootCause error: Cannot read properties of undefined (reading 'removeAll')** <br>
+Fix for UI error when removing project.
+
+**[TRANSLATE-3203](https://jira.translate5.net/browse/TRANSLATE-3203): SpellCheck (LanguageTool integration) - RootCause error: Cannot read properties of undefined (reading 'message')** <br>
+Fix for UI error when accepting or changing spell check recommendations
+
+**[TRANSLATE-3199](https://jira.translate5.net/browse/TRANSLATE-3199): Task Management - RootCause-error: rendered block refreshed at 0 rows** <br>
+FIXED: error unregularly/randomly popping on task import and/or initial projects grid load
+
+**[TRANSLATE-3195](https://jira.translate5.net/browse/TRANSLATE-3195): Editor general - RootCause-error: PageMap asked for range which it does not have** <br>
+Fixed segments grid error popping on attempt to scroll to some position while (re)loading is in process
+
+**[TRANSLATE-3194](https://jira.translate5.net/browse/TRANSLATE-3194): Editor general, OpenTM2 integration - Front-end error on empty translate5 memory status response** <br>
+Fix for front-end error on translate5 memory status check.
+
+**[TRANSLATE-3189](https://jira.translate5.net/browse/TRANSLATE-3189): MatchAnalysis & Pretranslation, Test framework - Reduce Match analysis test complexity** <br>
+Improve the Analysis and pre-translation tests.
+
+**[TRANSLATE-3185](https://jira.translate5.net/browse/TRANSLATE-3185): User Management - Error message for duplicate user login** <br>
+Improve failure error messages when creation or editing a user.
+
+**[TRANSLATE-3181](https://jira.translate5.net/browse/TRANSLATE-3181): Editor general - Pasted content inside concordance search is not used for searching** <br>
+Fix for a problem where concordance search was not triggered when pasting content in one of the search fields and then clicking on the search button.
+
+**[TRANSLATE-3062](https://jira.translate5.net/browse/TRANSLATE-3062): Installation & Update, Test framework - Test DB reset and removement of mysql CLI dependency** <br>
+5.9.0: database dump and cron invocation via CLI possible
+5.7.13: Removed the mysql CLI tool as dependency from translate5 PHP code.
+
+**[TRANSLATE-3052](https://jira.translate5.net/browse/TRANSLATE-3052): LanguageResources - Clean resource assignments after customer is removed** <br>
+5.9.0: Bugfix
+5.8.5: Removing customer from resource will be prevented in case this resource is used/assigned to a task.
+
+**[TRANSLATE-2063](https://jira.translate5.net/browse/TRANSLATE-2063): Import/Export - Enable parallele use of multiple okapi versions to fix Okapi bugs** <br>
+5.9.0: Added dedicated CLI commands to maintain Okapi config.
+5.7.6: Multiple okapi instances can be configured and used for task imports.
+
+
 ## [5.8.6] - 2023-02-01
 
 ### Important Notes:

@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\ZfExtended\Controller\Response\Header;
+
 /**
  * REST Endpoint Controller to serve the Bconf List for the Bconf-Management in the Preferences
  *
@@ -79,10 +81,12 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      */
     public function downloadbconfAction() {
         $this->entityLoad();
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="'.$this->entity->getDownloadFilename());
-        header('Cache-Control: no-cache');
-        header('Content-Length: ' . filesize($this->entity->getPath()));
+        Header::sendDownload(
+            $this->entity->getDownloadFilename(),
+            'application/octet-stream',
+            'no-cache',
+            filesize($this->entity->getPath())
+        );
         readfile($this->entity->getPath());
         exit;
     }
@@ -109,10 +113,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         }
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->import($postFile['tmp_name'], $name, $description, $customerId);
-        $ret->id = $bconf->getId();
-        $ret->success = !empty($ret->id);
 
-        echo json_encode($ret);
+        $this->view->success = !empty($bconf->getId());
+        $this->view->id = $bconf->getId();
     }
 
     /**
@@ -138,7 +141,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $returnData = $clone->toArray();
         $returnData['customExtensions'] = $clone->findCustomFilterExtensions(); // needed to match the grids data model
 
-        echo json_encode($returnData);
+        foreach($returnData as $key => $val){
+            $this->view->$key = $val;
+        }
     }
 
     /**
@@ -172,5 +177,16 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $field = $this->getParam('purpose');
         $segmentation = editor_Plugins_Okapi_Bconf_Segmentation::instance();
         $segmentation->processUpload($this->entity, $field, $_FILES['srx']['tmp_name'], basename($_FILES['srx']['name']));
+    }
+
+    /**
+     * Sets the non-customer/common default bconf
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function setdefaultAction(){
+        $this->entityLoad();
+        $this->view->oldId = $this->entity->setAsDefaultBconf();
     }
 }

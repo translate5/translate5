@@ -36,6 +36,8 @@ END LICENSE AND COPYRIGHT
  * entrypoint for the export
  */
 class editor_Models_Export {
+    const EXPORT_DEFAULT = 'DEFAULT'; //FIXME convert us to an enum
+    const EXPORT_PACKAGE = 'PACKAGE'; //FIXME convert us to an enum
     /**
      * @var editor_Models_Task
      */
@@ -75,8 +77,12 @@ class editor_Models_Export {
      * exports a task
      * @param string $exportRootFolder
      * @param int $workerId
+     * @param string $context
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      */
-    public function export(string $exportRootFolder, $workerId) {
+    public function export(string $exportRootFolder, int $workerId, string $context = self::EXPORT_DEFAULT) {
         umask(0); // needed for samba access
         if(is_dir($exportRootFolder)) {
             $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
@@ -98,9 +104,8 @@ class editor_Models_Export {
             'LocalEncoded'
         );
         
-        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
-        /* @var $fileFilter editor_Models_File_FilterManager */
-        $fileFilter->initExport($this->task, $workerId);
+        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+        $fileFilter->initExport($this->task, $workerId, $context);
         
         sort($dirPaths);
         foreach ($dirPaths as $path) {
@@ -118,7 +123,7 @@ class editor_Models_Export {
         foreach ($filePaths as $fileId => $relPath) {
             $path = $localEncoded->encode($relPath);
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
-            $parser = $this->getFileParser((int)$fileId, $path, $checkSegmentTags);
+            $parser = $this->getFileParser((int)$fileId, $path, $checkSegmentTags, $context);
             /* @var $parser editor_Models_Export_FileParser */
             if(empty($parser)) {
                 $log = Zend_Registry::get('logger')->cloneMe('editor.export');
@@ -133,7 +138,11 @@ class editor_Models_Export {
             if(count($faults) > 0) {
                 $faultySegments = array_merge($faultySegments, $faults);
             }
-            $fileFilter->applyExportFilters($path, $fileId);
+            $pathAfterFilter = $fileFilter->applyExportFilters($path, $fileId);
+            if ($pathAfterFilter !== $path) {
+                //apply the modified filename
+                rename($path, $pathAfterFilter);
+            }
         }
         /**
          * If there are segment tag errors we create a warning
@@ -152,18 +161,26 @@ class editor_Models_Export {
             ]);
         }
     }
-    
+
     /**
-     * decide regarding to the fileextension, which FileParser should be loaded and return it.
-     *  Returns null if no fileparser was stored to the file. This can happen on errors in preprocessing of files without a native file parser.
+     * decide regarding the fileextension, which FileParser should be loaded and return it.
+     *  Returns null if no fileparser was stored to the file. This can happen on errors in preprocessing
+     *  of files without a native file parser.
      *
      * @param int $fileId
      * @param string $path
      * @param bool $checkFaultySegmentTags
-     * @return editor_Models_Import_FileParser|null
+     * @param string $context
+     * @return editor_Models_Export_FileParser|null
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function getFileParser(int $fileId, string $path, bool $checkFaultySegmentTags){
+    protected function getFileParser(
+        int $fileId,
+        string $path,
+        bool $checkFaultySegmentTags,
+        string $context
+    ): ?editor_Models_Export_FileParser
+    {
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($fileId);
@@ -172,22 +189,27 @@ class editor_Models_Export {
         $importFileParser = $file->getFileParser();
         $exportParser = $importFileParser::getExportClass();
 
-        if(empty($exportParser) || !class_exists($exportParser)) {
+        if (empty($exportParser) || !class_exists($exportParser)) {
             return null;
         }
         
         //put the fileparser config into an object, so that it can be manipulated in the event handlers
         $fpConfig = new stdClass();
         $fpConfig->path = $path;
-        $fpConfig->options = ['diff' => $this->optionDiff, 'checkFaultySegments' => $checkFaultySegmentTags];
+        $fpConfig->options = [
+            'diff' => $this->optionDiff,
+            'checkFaultySegments' => $checkFaultySegmentTags
+        ];
+
         $fpConfig->exportParser = $exportParser;
         
         $this->events->trigger('exportFileParserConfiguration', $this, [
             'task' => $this->task,
             'file' => $file,
+            'context' => $context,
             'config' => $fpConfig,
         ]);
-        
+
         return ZfExtended_Factory::get($fpConfig->exportParser, [
             $this->task,
             $fileId,

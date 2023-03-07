@@ -59,11 +59,33 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
-                tbar:[{
-                    xtype: 'displayfield',
-                    width:'80%',
-                    hideLabel:true,
-                    value:'<i>' + Ext.String.format(Editor.data.l10n.projectOverview.taskManagement.taskReimport.topBarHeaderInfo,Editor.data.editor.task.reimport.supportedExtensions.join(','))+ '</i>'
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    layout: {
+                        type: 'column',
+                        columnCount: 2
+                    },
+                    items: [
+                        {
+                            xtype: 'button',
+                            itemId: 'exportTranslatorPackage',
+                            bind: {
+                                text:'{l10n.projectOverview.taskManagement.taskReimport.exportTranslatorPackage}'
+                            }
+                        },{
+                            xtype: 'button',
+                            itemId: 'importTranslatorPackage',
+                            bind: {
+                                text: '{l10n.projectOverview.taskManagement.taskReimport.importTranslatorPackage}'
+                            }
+                        },{
+                            xtype: 'displayfield',
+                            width:'80%',
+                            hideLabel:true,
+                            value:'<i>' + Ext.String.format(Editor.data.l10n.projectOverview.taskManagement.taskReimport.topBarHeaderInfo,Editor.data.editor.task.reimport.supportedExtensions.join(','))+ '</i>'
+                        }
+                    ]
                 }],
                 columns: [{
                     xtype: 'treecolumn',

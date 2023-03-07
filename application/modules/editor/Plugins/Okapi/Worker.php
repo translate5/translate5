@@ -134,13 +134,13 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector',[
                 $taskConfig
             ]);
-
             $okapiConfig = $taskConfig->runtimeOptions->plugins->Okapi;
             $serverUsed = $okapiConfig->serverUsed ?? 'not set';
             $this->logger->info('E1444', 'Okapi Plug-In: Task was imported with Okapi "{okapi}"', [
                 'task' => $this->task,
                 'okapi' => $serverUsed,
                 'okapiUrl' => $okapiConfig->server?->$serverUsed ?? 'server used not found',
+                'usedBconf' => $params['bconfName']
             ], ['tasklog', 'ecode']);
 
             /* @var $api editor_Plugins_Okapi_Connector */
@@ -170,34 +170,32 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         }
         return true;
     }
-    
+
     /**
      * @return boolean
+     * @throws editor_Models_ConfigException
+     * @throws editor_Plugins_Okapi_Exception
      */
-    protected function doExport() {
+    protected function doExport(): bool
+    {
         $params = $this->workerModel->getParameters();
         $fileId = $params['fileId'];
         $workFile = new SplFileInfo($params['file']);
         
         $manifestFile = new SplFileInfo($this->getDataDir().'/'.$this->getManifestFile($fileId));
 
-        $pm = Zend_Registry::get('PluginManager');
-        /* @var $pm ZfExtended_Plugin_Manager */
-        $plugin = $pm->get($pm->classToName(get_class($this)));
-        
-        $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector',[
+        $api = ZfExtended_Factory::get(editor_Plugins_Okapi_Connector::class, [
             $this->task->getConfig()
         ]);
-        /* @var $api editor_Plugins_Okapi_Connector */
-        
-        $language = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $language editor_Models_Languages */
-        
+
+        $language = ZfExtended_Factory::get(editor_Models_Languages::class);
+
         $sourceLang = $language->loadLangRfc5646($this->task->getSourceLang());
         $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
         $result = false;
-        
+
         try {
+            $plugin = $this->getOkapiPlugin();
             $api->createProject();
 
             $api->uploadOkapiConfig($plugin::getExportBconfPath($this->task));
@@ -209,15 +207,14 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             
             //if a file with source in empty targets exists, take that for okapi reconvertion
             $workfile2 = new SplFileInfo($workFile.editor_Models_Export_FileParser_Xlf::SOURCE_TO_EMPTY_TARGET_SUFFIX);
-            if($workfile2->isFile()) {
+            if ($workfile2->isFile()) {
                 $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workfile2);
-                if(!ZfExtended_Debug::hasLevel('plugin', 'OkapiKeepIntermediateFiles')){
+                if (! ZfExtended_Debug::hasLevel('plugin', 'OkapiKeepIntermediateFiles')) {
                     //we remove that file from the export, bad for debugging but keep things clean
                     unlink($workfile2);
                 }
                 //workfile (.xlf) is kept in export for further processing of the XLF
-            }
-            else {
+            } else {
                 $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workFile);
             }
             
@@ -227,36 +224,44 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             rename($workFile, $workFile.$api::OUTPUT_FILE_EXTENSION);
             $api->downloadMergedFile($originalFile, $workFile);
             
-            //TRANSLATE-2002: Currently Okapi can not reconvert PDF files, therefore it provides a txt file, so we have to rename the file though
-            if(strtolower($workFile->getExtension()) === 'pdf' && mime_content_type((string)$workFile) == 'text/plain') {
+            //TRANSLATE-2002: Currently Okapi can not reconvert PDF files,
+            // therefore it provides a txt file, so we have to rename the file though
+            if (strtolower($workFile->getExtension()) === 'pdf'
+                && mime_content_type((string)$workFile) == 'text/plain') {
                 rename($workFile, $workFile.'.txt');
             }
             
             $result = true;
-        } catch (Exception $e){
-            $this->handleException($e, $workFile, $fileId, false);
-            if(file_exists($workFile)) {
+        } catch (Exception $e) {
+            $event = $this->handleException($e, $workFile, $fileId, false);
+            if (file_exists($workFile)) {
                 //we add the XLF file suffix, since the workfile is now still a XLF file.
                 rename($workFile, $workFile.$api::OUTPUT_FILE_EXTENSION);
             }
-            //add a export-error file, pointing into the right direction
-            file_put_contents(dirname($workFile).'/export-error.txt', basename($workFile).': could not be exported due errors in Okapi. See task event log for more details.'."\n", FILE_APPEND);
+            //add an export-error file, pointing into the right direction
+            file_put_contents(
+                dirname($workFile).'/export-error.txt',
+                basename($workFile).': could not be exported due errors in Okapi.
+See task event log for more details.'."\n\n".(is_null($event) ? $e->getMessage() : $event->oneLine()),
+                FILE_APPEND
+            );
         } finally {
             $api->removeProject();
         }
         
         return $result;
     }
-    
+
     /**
      * Logs the occured exception
      * @param Exception $e
      * @param SplFileInfo $file
      * @param integer $fileId
      * @param boolean $import true on import, false on export
+     * @return ZfExtended_Logger_Event|null the resulting event of the thrown exception
      */
-    protected function handleException(Exception $e, SplFileInfo $file, $fileId, bool $import) {
-        $this->logger->exception($e, [
+    protected function handleException(Exception $e, SplFileInfo $file, $fileId, bool $import): ?ZfExtended_Logger_Event {
+        $event = $this->logger->exception($e, [
             'extra' => ['task' => $this->task],
             'level' => ZfExtended_Logger::LEVEL_DEBUG,
         ]);
@@ -284,6 +289,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             'file' => $relFile,
             'filePath' => $absFile,
         ]);
+
+        return $event;
     }
 
     /**
@@ -352,38 +359,60 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         //we copy the file and keep the original file via fileId addressable for export (TRANSLATE-1138)
         rename($realFile, $absRefFile);
     }
-    
+
     /**
      * returns the path to the okapi data dir
+     * @throws editor_Plugins_Okapi_Exception
      */
-    protected function getDataDir() {
+    protected function getDataDir(): SplFileInfo
+    {
         $okapiDataDir = new SplFileInfo($this->task->getAbsoluteTaskDataPath().'/'.self::OKAPI_REL_DATA_DIR);
-        if(!$okapiDataDir->isDir()) {
+        if (!$okapiDataDir->isDir()) {
             mkdir((string) $okapiDataDir, 0777, true);
         }
-        if(!$okapiDataDir->isWritable()) {
+        if (!$okapiDataDir->isWritable()) {
             //Okapi Plug-In: Data dir not writeable
             throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $okapiDataDir]);
         }
         return $okapiDataDir;
     }
-    
+
     /***
      * Is configured the original files to be attached as reference files.
      * When no config is provided the original will be attached as reference.
      * @return boolean
+     * @throws Zend_Exception
      */
-    protected function isAttachOriginalAsReference() {
-        return (boolean)Zend_Registry::get('config')->runtimeOptions->plugins->Okapi->import->fileconverters->attachOriginalFileAsReference;
+    protected function isAttachOriginalAsReference(): bool
+    {
+        return (boolean)Zend_Registry::get('config')->runtimeOptions
+            ->plugins->Okapi->import->fileconverters->attachOriginalFileAsReference;
     }
     
     /***
      * The batch worker takes approximately 5% of the import time
-     * 
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::getWeight()
      */
-    public function getWeight(): int {
+    public function getWeight(): int
+    {
         return 5;
+    }
+
+    /**
+     * @return editor_Plugins_Okapi_Init
+     * @throws Zend_Exception
+     * @throws ZfExtended_Plugin_Exception
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    private function getOkapiPlugin(): editor_Plugins_Okapi_Init
+    {
+        $pm = Zend_Registry::get('PluginManager');
+        /* @var $pm ZfExtended_Plugin_Manager */
+        $pluginName = $pm::getPluginNameByClass(get_class($this));
+        if (!$pm->isActive($pluginName) || is_null($plugin = $pm->get($pluginName))) {
+            throw new editor_Plugins_Okapi_Exception('E1474');
+        }
+        return $plugin;
     }
 }

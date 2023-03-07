@@ -299,7 +299,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         if($sysBconfRow == NULL){
             $sysBconfPath = editor_Plugins_Okapi_Init::getDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
             $sysBconfName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
-            $sysBconfDescription = 'The default .bconf used for file imports unless another one is configured';
+            $sysBconfDescription = 'The default set of file filters. Copy to customize filters. Or go to "Clients" and customize filters there.';
             $sysBconf = new editor_Plugins_Okapi_Bconf_Entity();
             $sysBconf->import($sysBconfPath, $sysBconfName, $sysBconfDescription, NULL);
             $sysBconf->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
@@ -579,6 +579,32 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
             return substr($name, 0, 50);
         }
         return $name;
+    }
+
+    /**
+     * API to make a bconf the base (non-customer) default bconf.
+     * Will reset any other non-customer default bconf
+     * Returns the ID of the former default (if any)
+     * @return int
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function setAsDefaultBconf(): int {
+        if($this->getCustomerId() !== null){
+            throw new ZfExtended_Exception('Only bconfs not bound to a customer can be set as default bconf');
+        }
+        $oldDefaultId = -1;
+        $oldDefaultRow = $this->db->fetchRow($this->db->select()->where('customerId IS NULL AND isDefault = 1'));
+        if($oldDefaultRow != null){
+            $oldDefaultId = $oldDefaultRow->id;
+            $oldDefaultRow->isDefault = 0;
+            $oldDefaultRow->save();
+        }
+        $this->db->update(['isDefault' => 0], 'customerId IS NULL AND isDefault = 1');
+        $this->setIsDefault(1);
+        $this->save();
+        return $oldDefaultId;
     }
 
     /**

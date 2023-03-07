@@ -55,12 +55,12 @@ use ZfExtended_Resource_DbConfig as DbConfig;
 class OpenTm2MigrationCommand extends Translate5AbstractCommand
 {
     private const ARGUMENT_TARGET_URL = 'targetUrl';
-    private const OPTION_SOURCE_URL = 'sourceUrl';
+    private const ARGUMENT_SOURCE_URL = 'sourceUrl';
     private const OPTION_DO_NOT_WAIT_IMPORT_FINISHED = 'doNotWaitImportFinish';
     private const OPTION_WAIT_TIMEOUT = 'wait-timeout';
     private const DATA_RELATIVE_PATH = '/../data/';
     private const EXPORT_FILE_EXTENSION = '.tmx';
-    private const DEFAULT_WAIT_TIME_SECONDS = 300;
+    private const DEFAULT_WAIT_TIME_SECONDS = 600;
     private const DEFAULT_WAIT_TICK_TIME_SECONDS = 5;
 
     protected static $defaultName = 't5memory:migrate';
@@ -72,8 +72,8 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $this
             ->setDescription('Migrates all existing OpenTM2 language resources to t5memory')
             ->setHelp('Tool exports OpenTM2 language resources one by one and imports data to the t5memory provided as endpoint argument')
-            ->addArgument(self::ARGUMENT_TARGET_URL, InputArgument::REQUIRED, 't5memory endpoint data to be imported to, e.g. http://t5memory.local/t5memory')
-            ->addOption(self::OPTION_SOURCE_URL, 's', InputOption::VALUE_OPTIONAL, 'Endpoint data is exported from, e.g. http://t5memory.local/t5memory')
+            ->addArgument(self::ARGUMENT_SOURCE_URL, InputArgument::REQUIRED, 'Endpoint data is exported from (source), e.g. http://t5memory.local/t5memory')
+            ->addArgument(self::ARGUMENT_TARGET_URL, InputArgument::REQUIRED, 't5memory endpoint data to be imported to (target), e.g. http://t5memory.local/t5memory')
             ->addOption(self::OPTION_DO_NOT_WAIT_IMPORT_FINISHED, 'd', InputOption::VALUE_NEGATABLE, 'Skips waiting for import to finish before processing next language resource', false)
             ->addOption(self::OPTION_WAIT_TIMEOUT, 't', InputOption::VALUE_OPTIONAL, 'Timeout in seconds for waiting for import to finish', self::DEFAULT_WAIT_TIME_SECONDS);
     }
@@ -174,13 +174,11 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
 
     private function getSourceResourceId(InputInterface $input, Service $service): ?string
     {
-        $sourceUrl = $input->getOption(self::OPTION_SOURCE_URL);
+        $sourceUrl = $input->getArgument(self::ARGUMENT_SOURCE_URL);
 
         $resourceId = null;
         foreach ($service->getResources() as $resource) {
-            if (($sourceUrl && $resource->getUrl() === $sourceUrl)
-                || str_contains($resource->getUrl(), 'otmmemoryservice')
-            ) {
+            if ($sourceUrl && $resource->getUrl() === $sourceUrl) {
                 $resourceId = $resource->getId();
 
                 break;
@@ -359,7 +357,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
             return;
         }
 
-        $this->io->text("\nWaiting until import finished");
+        $this->io->text("\nWaiting until import is finished");
 
         $timeElapsed = 0;
         $maxWaitTime = (int)$this->input->getOption(self::OPTION_WAIT_TIMEOUT);
@@ -378,6 +376,13 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
                 return;
             }
 
+            if ($status === \editor_Services_Connector_Abstract::STATUS_ERROR) {
+                $progressBar->finish();
+                $this->io->warning('Error occurred during importing');
+
+                throw new RuntimeException('Error occurred during importing');
+            }
+
             sleep($waitTimeBetweenChecks);
             $timeElapsed += $waitTimeBetweenChecks;
             $progressBar->advance($waitTimeBetweenChecks);
@@ -386,5 +391,7 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         $progressBar->finish();
 
         $this->io->warning('Import not finished after ' . $maxWaitTime . ' seconds');
+
+        throw new RuntimeException('Import not finished after ' . $maxWaitTime . ' seconds');
     }
 }

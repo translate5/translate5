@@ -427,7 +427,14 @@ Ext.define('Editor.view.segments.Grid', {
                     me.positionRowAfterScroll(rowindex, row, config);
                 }
             };
-        me.ensureVisible(rowindex, options);
+
+        // If ensureVisible() method is called during store is loading
+        // it leads to that 'PageMap asked for range which it does not have'-error is raised
+        // so it looks like that call changes some things internally regarding how bufferedStore
+        // is loaded and rendered
+        if (!me.getStore().isLoading()) {
+            me.ensureVisible(rowindex, options);
+        }
     },
     /**
      * positions the given row to the given target, for valid targets see scrollTo

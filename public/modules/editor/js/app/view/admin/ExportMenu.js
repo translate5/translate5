@@ -52,6 +52,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
         var task = this.initialConfig.task;
         return Editor.data.restpath + Ext.String.format(path, task.get('id'), task.get('taskGuid'), field);
     },
+
     initComponent: function () {
         var me = this,
             task = me.initialConfig.task;

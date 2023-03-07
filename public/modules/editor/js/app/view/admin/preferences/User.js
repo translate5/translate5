@@ -49,7 +49,7 @@ Ext.define('Editor.view.admin.preferences.User', {
             themes = [],
             translations = [];
 
-        Ext.Object.each(Editor.data.translations, function(i, n) {
+        Ext.Object.each(Editor.data.l10n.translations, function(i, n) {
             translations.push([i, n]);
         });
 

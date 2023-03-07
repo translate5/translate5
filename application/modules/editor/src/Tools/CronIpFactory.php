@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Tools;
 
 use Zend_Registry;
+use ZfExtended_RemoteAddress;
 
 class CronIpFactory
 {
@@ -38,6 +39,6 @@ class CronIpFactory
     {
         $config = Zend_Registry::get('config');
 
-        return new CronIp($config, new IpMatcher());
+        return new CronIp($config, new IpMatcher(), new ZfExtended_RemoteAddress());
     }
 }

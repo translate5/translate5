@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\Translate5\Tools\Cronjobs;
 
 /**
  * Cron Controller
@@ -49,11 +50,12 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
      */
     public function init() {
         $cronIp = CronIpFactory::create();
-        if(!$cronIp->isAllowed($_SERVER['REMOTE_ADDR'])) {
+        $clientIp = ZfExtended_Factory::get(ZfExtended_RemoteAddress::class)->getIpAddress();
+        if (! $cronIp->isAllowed($clientIp)) {
             $msg = "wrong IP to call cronjobs, must be the configured one.\n";
             http_response_code(503);
             echo $msg;
-            error_log($msg.' called by: '.$_SERVER['REMOTE_ADDR'].' allowed are: ' . implode(', ', $cronIp->getAllowedIps()));
+            error_log($msg.' called by: '.$clientIp.' allowed are: ' . implode(', ', $cronIp->getAllowedIps()));
             exit;
         }
     }
@@ -69,44 +71,22 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
     public function periodicalAction() {
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
-        $bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
-        /* @var $bootstrap Bootstrap */
-        $gc = $bootstrap->getPluginResource('ZfExtended_Resource_GarbageCollector');
-        /* @var $gc ZfExtended_Resource_GarbageCollector */
-        $gc->cleanUp($gc::ORIGIN_CRON);
-        $this->doCronWorkflow('doCronPeriodical');
+        ZfExtended_Factory::get(Cronjobs::class, [
+            Zend_Controller_Front::getInstance()->getParam('bootstrap')
+        ])->periodical();
         echo "OK";
     }
-    
+
     /**
      * triggers daily actions
      */
     public function dailyAction() {
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
-
-        $this->doCronWorkflow('doCronDaily');
-        
-        $summary = ZfExtended_Factory::get('ZfExtended_Logger_Summary');
-        /* @var $summary ZfExtended_Logger_Summary */
-        $summary->sendSummaryToAdmins();
+        ZfExtended_Factory::get(Cronjobs::class, [
+            Zend_Controller_Front::getInstance()->getParam('bootstrap')
+        ])->daily();
         echo "OK";
-    }
-    
-    /**
-     * call workflow action based on given name
-     * @param string $fn
-     */
-    protected function doCronWorkflow(string $fn){
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        $workflows = $wfm->getWorkflows();
-        foreach($workflows as $wfId) {
-            $workflow = $wfm->get($wfId);
-            /* @var $workflow editor_Workflow_Default */
-            $workflow->hookin()->$fn();
-           
-        }
     }
 }
 

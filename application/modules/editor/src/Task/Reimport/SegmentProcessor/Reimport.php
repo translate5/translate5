@@ -28,7 +28,6 @@
 
 namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor;
 
-use editor_Models_Export_DiffTagger_TrackChanges;
 use editor_Models_File;
 use editor_Models_Import_FileParser;
 use editor_Models_Import_SegmentProcessor;
@@ -38,12 +37,11 @@ use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use JsonException;
 use MittagQI\Translate5\Task\Reimport\Exception;
+use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\ContentDefault;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_Factory;
-use ZfExtended_Logger;
 use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
@@ -52,11 +50,6 @@ use ZfExtended_Models_User;
  */
 class Reimport extends editor_Models_Import_SegmentProcessor
 {
-    /***
-     * @var ZfExtended_Logger $logger
-     */
-    protected ZfExtended_Logger $logger;
-
     /**
      * @var editor_Models_Segment_InternalTag
      */
@@ -83,10 +76,9 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      * @param editor_Models_Task $task
      * @param editor_Models_SegmentFieldManager $sfm
      */
-    public function __construct(editor_Models_Task $task,private editor_Models_SegmentFieldManager $sfm, private ZfExtended_Models_User $user)
+    public function __construct(editor_Models_Task $task, private editor_Models_SegmentFieldManager $sfm, private ZfExtended_Models_User $user)
     {
         parent::__construct($task);
-        $this->logger = Zend_Registry::get('logger')->cloneMe('editor.task.reimport');
         $this->segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
 
@@ -107,9 +99,9 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         $mid = $parser->getMid();
         try {
             $segment->loadByFileidMid($this->fileId, $mid);
-        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             /** @var ReimportSegmentErrors $reimportError */
-            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class,[
+            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class, [
                 'E1434',
                 'Reimport Segment processor: No matching segment was found for the given mid.',
                 [
@@ -121,9 +113,9 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         }
 
         try {
-            $content->saveSegment($segment,$this->saveTimestamp);
+            $content->saveSegment($segment, $this->saveTimestamp);
 
-            if( $content->isUpdateSegment()){
+            if ($content->isUpdateSegment()) {
                 $this->updatedSegments[] = $segment->getSegmentNrInTask();
             }
 
@@ -131,7 +123,7 @@ class Reimport extends editor_Models_Import_SegmentProcessor
         } catch (Throwable $e) {
             // collect the errors in case the segment can not be saved
             /** @var ReimportSegmentErrors $reimportError */
-            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class,[
+            $reimportError = ZfExtended_Factory::get(ReimportSegmentErrors::class, [
                 'E1435',
                 'Reimport Segment processor: Unable to save the segment',
                 [
@@ -151,22 +143,19 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     protected function getContentClass(editor_Models_Import_FileParser $parser): ContentDefault
     {
-        $path_parts = pathinfo($this->fileName);
-        $ext = $path_parts['extension'];
-        $className =  FileHandler::getClass($ext);
-        $args = [
+        $reimporter = FileparserRegistry::getInstance()->getReimporterInstance($parser, [
             $this->task,
             $parser->getFieldContents(),
             $this->user
-        ];
+        ]);
 
-        if(class_exists($className)){
-            return ZfExtended_Factory::get($className,$args);
+        if (is_null($reimporter)) {
+            throw new Exception('E1441', [
+                'file' => basename($this->fileName)
+            ]);
         }
 
-        throw new Exception('E1441',[
-            'ext' => $ext
-        ]);
+        return $reimporter;
     }
 
     /**
@@ -194,46 +183,21 @@ class Reimport extends editor_Models_Import_SegmentProcessor
     }
 
     /**
-     * Log reimport process information and errors
-     *
-     * @return void
-     * @throws JsonException
+     * get all updated segments in the task
+     * @return array
      */
-    public function log(){
-        $this->logErrors();
-        $this->logUpdated();
-    }
-
-    /***
-     * Log all collected errors as warning
-     */
-    private function logErrors(): void
+    public function getUpdatedSegments(): array
     {
-        foreach ($this->segmentErrors as $code => $codeErrors){
-            $extra = [];
-            foreach ($codeErrors as $error) {
-                /* @var ReimportSegmentErrors $error */
-                $extra[] = $error->getData();
-            }
-            $this->logger->warn($code,$codeErrors[0]->getMessage(),[
-                'task' => $this->task,
-                'fileId' => $this->fileId,
-                'extra' => json_encode($extra, JSON_THROW_ON_ERROR)
-            ]);
-        }
+        return $this->updatedSegments;
     }
 
     /**
-     * Log all updated segments in the task
-     * @return void
+     * get all segment errors
+     * @return array
      */
-    private function logUpdated(): void
+    public function getSegmentErrors(): array
     {
-        $this->logger->info('E1440','File reimport finished.',[
-            'task' => $this->task,
-            'fileId' => $this->fileId,
-            'segments' => implode(',',$this->updatedSegments)
-        ]);
+        return $this->segmentErrors;
     }
 
     /**

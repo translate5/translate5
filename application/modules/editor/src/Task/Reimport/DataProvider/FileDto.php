@@ -1,3 +1,4 @@
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -8,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -25,22 +26,28 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.plugins.TermTagger.view.TermPortletFieldset
- */
-Ext.define('Editor.plugins.TermTagger.view.TermPortletFieldset', {
-    extend: 'Ext.form.FieldSet',
-    alias: 'widget.termPortalTermPortletFieldset',
-    requires: ['Editor.plugins.TermTagger.view.TermPortlet'],
+namespace MittagQI\Translate5\Task\Reimport\DataProvider;
 
-    itemId: 'metaTerms',
-    collapsible: true,
-    title: '#UT#Terminologie',
-    bind: {
-        title: '{l10n.TermTagger.termPortletFieldset.title}',
-    },
-    anchor: '100%',
-    items: [{
-        xtype: 'termPortalTermPortlet'
-    }]
-});
+class FileDto
+{
+    protected array $errors = [];
+    public function __construct(
+        public int $fileId,
+        public string $fileParser,
+        public string $filePath,
+        public ?string $filteredFilePath = null,
+        public ?string $reimportFile = null
+    ) {
+
+    }
+
+    public function addError(string $error):void
+    {
+        $this->errors[] = $error;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+}

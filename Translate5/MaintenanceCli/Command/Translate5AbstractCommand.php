@@ -30,6 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
@@ -41,23 +42,39 @@ abstract class Translate5AbstractCommand extends Command
     /**
      * @var InputInterface
      */
-    protected $input;
+    protected InputInterface $input;
     
     /**
      * @var OutputInterface
      */
-    protected $output;
+    protected OutputInterface $output;
     
     /**
      * @var SymfonyStyle
      */
-    protected $io;
+    protected SymfonyStyle $io;
     
     /**
      * @var Application
      */
-    protected $translate5;
-    
+    protected Application $translate5;
+
+    /**
+     * if true output should be machine-readable!
+     * @var bool
+     */
+    protected bool $isPorcelain = false;
+
+    public function __construct($name = null)
+    {
+        parent::__construct($name);
+        $this->addOption(
+            name: 'porcelain',
+            mode: InputOption::VALUE_NONE,
+            description: 'Return the output in a machine readable way - if implemented in the command.'
+        );
+    }
+
     /**
      * initializes io class variables
      * @param InputInterface $input
@@ -66,6 +83,10 @@ abstract class Translate5AbstractCommand extends Command
     protected function initInputOutput(InputInterface $input, OutputInterface $output) {
         $this->input = $input;
         $this->output = $output;
+        if ($input->getOption('porcelain')) {
+            $this->isPorcelain = true;
+            $output->setDecorated(false);
+        }
         $this->io = new SymfonyStyle($input, $output);
     }
     
@@ -123,7 +144,13 @@ EOF;
      * Shows a title and instance information. Should be used in each translate5 command.
      * @param string $title
      */
-    protected function writeTitle(string $title) {
+    protected function writeTitle(string $title): void
+    {
+        if ($this->isPorcelain) {
+            $this->output->write($this->translate5->getHostname().' ('.$this->translate5->getVersion().'): ');
+            return;
+        }
+
         $this->io->title($title);
         
         $this->output->writeln([

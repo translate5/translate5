@@ -146,30 +146,6 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
 
-    Ext.define("Editor.locale.view.segments.grid.Toolbar", {
-        override: "Editor.view.segments.grid.Toolbar",
-        item_viewModesMenu: '<?php echo $this->translate->_('Ansicht');?>',
-        item_editModeBtn: '<?php echo $this->translate->_('Zu Detailansicht zurücksetzen');?>',
-        item_ergonomicModeBtn: '<?php echo $this->translate->_('Zu normaler Ansicht zurücksetzen');?>',
-        item_hideTagBtn: '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>',
-        item_shortTagBtn: '<?php echo $this->translate->_('Tag-Kurzansicht');?>',
-        item_fullTagBtn: '<?php echo $this->translate->_('Tag-Vollansicht');?>',
-        item_optionsTagBtn: '<?php echo $this->translate->_('Einstellungen');?>',
-        item_zoomIn: '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>',
-        item_zoomOut: '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>',
-        item_clearSortAndFilterBtn: '<?php echo $this->translate->_('Tabelle zurücksetzen');?>',
-        item_clearSortAndFilterTooltip: '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
-        item_watchListFilterBtn: '<?php echo $this->translate->_('Lesezeichen');?>',
-        item_helpTooltip: '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>',
-        item_showBookmarkedSegments: '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>',
-        item_repeatedFilterBtn: '<?php echo $this->translate->_('Nur wiederholt');?>',
-        item_showRepeatedSegments: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>',
-        item_themeMenuConfigText: '<?php echo $this->translate->_('Layout');?>',
-        strings: {
-            interfaceTranslation: '<?php echo $this->translate->_('Oberfläche');?>'
-        }
-    });
-
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
 
@@ -276,8 +252,6 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
   	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
 
-  	Editor.view.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
-
   	Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('QS Statistik');?>';
   	Editor.view.quality.FilterPanel.prototype.strings = {
 		modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
@@ -329,34 +303,6 @@ Ext.define('Editor.controller.Localizer', {
         faultyTipText: '<?php echo $this->translate->_('Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern');?>',
         newAnalysis: '<?php echo $this->translate->_('Neu überprüfen');?>'
 	};
-
-    Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip_nokey = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen (ESC)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern (STRG + S)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_reset = '<?php echo $this->translate->_('Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)');?>';
-
-    Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ALT + ←)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren (STRG + ALT + →)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_next = '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)');?>';
-
-   Ext.define("Editor.locale.de.view.segments.MetaPanel", {
-        override: "Editor.view.segments.MetaPanel",
-        strings: {
-            title: '<?php echo $this->translate->_('Segment-Metadaten');?>',
-        }
-    });
 
     Ext.define("Editor.locale.de.view.segments.SpecialCharacters", {
         override: "Editor.view.segments.SpecialCharacters",
@@ -2010,6 +1956,10 @@ Ext.define('Editor.controller.Localizer', {
 
 //when all translations in the above way are converted to the JSON way, we can just create a set of JSON files, using the ordinary translation way
 Editor.data.l10n = {
+    translations: {
+        de: '<?php echo $this->translate->_('Deutsche');?>',
+        en: '<?php echo $this->translate->_('Englische');?>'
+    },
     tmOverview:{
         more: '<?php echo $this->translate->_('mehr');?>'
     },
@@ -2023,25 +1973,72 @@ Editor.data.l10n = {
             },
             warnAllTitle: '<?php echo $this->translate->_('Kein Segment Filter gesetzt');?>',
             warnAllText: '<?php echo $this->translate->_('Soll die Aktion wirklich auf alle Segmente angewendet werden? Das kann einige Zeit in Anspruch nehmen.');?>',
-            menuText: '<?php echo $this->translate->_('Alle gefilterten Segmente:');?>',
-            menuLock: '<?php echo $this->translate->_('sperren');?>',
-            menuUnlock: '<?php echo $this->translate->_('entsperren');?>',
+            menuText: '<?php echo $this->translate->_('Wenden Sie eine der folgenden Aktionen auf alle Segmente in der aktuellen Filterung an:');?>',
+            menuLock: '<?php echo $this->translate->_('Sperren');?>',
+            menuUnlock: '<?php echo $this->translate->_('Entsperren');?>',
             menuBookmark: '<?php echo $this->translate->_('Lesezeichen setzen');?>',
             menuUnbookmark: '<?php echo $this->translate->_('Lesezeichen entfernen');?>',
-            btnText: '<?php echo $this->translate->_('Aktionen');?>',
+            btnText: '<?php echo $this->translate->_('Alle Seg.');?>',
             btnTooltip: '<?php echo $this->translate->_('Auswahl an Aktionen die auf alle Segmente im aktuellen Filterset ausgeführt werden sollen');?>'
         },
         toolbar: {
+            settings: '<?php echo $this->translate->_('Einstellungen 2');?>',
+            editModeBtn: '<?php echo $this->translate->_('Zu Detailansicht zurücksetzen');?>',
+            ergonomicModeBtn: '<?php echo $this->translate->_('Zu normaler Ansicht zurücksetzen');?>',
+            hideTagBtn: '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>',
+            shortTagBtn: '<?php echo $this->translate->_('Tag-Kurzansicht');?>',
+            fullTagBtn: '<?php echo $this->translate->_('Tag-Vollansicht');?>',
+            repetitionBtn: '<?php echo $this->translate->_('Wiederholungseditor');?>',
+            repetitionTooltip: '<?php echo $this->translate->_('Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Einstellungen des Wiederholungseditors zu bearbeiten.');?>',
+            zoomIn: '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>',
+            zoomOut: '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>',
+            clearSortAndFilterBtn: '<?php echo $this->translate->_('Tabelle zurücksetzen');?>',
+            clearSortAndFilterTooltip: '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>',
+            watchListFilterBtn: '<?php echo $this->translate->_('Lesezeichen');?>',
+            helpTooltip: '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>',
+            showBookmarkedSegments: '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>',
+            showRepeatedSegments: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>',
+
+            themeMenuConfigText: '<?php echo $this->translate->_('Layout');?>',
+            strings: {
+                interfaceTranslation: '<?php echo $this->translate->_('Oberfläche');?>'
+            },
+
             btnScrollToSegment: '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>',
             btnJumpToSegment: '<?php echo $this->translate->_('Springe zu Segment mit Nr (STRG + G)');?>',
             segmentLockBtn: '<?php echo $this->translate->_('Segment sperren bzw. entsperren (STRG + L)');?>',
             bookmarkBtn: '<?php echo $this->translate->_('Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen (STRG + D)');?>',
             searchAndReplaceButtonTooltip: '<?php echo $this->translate->_('Suchen und Ersetzen anzeigen (STRG + F, STRG + H)');?>',
-            searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>'
+            searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>',
+            currentSegment:  '<?php echo $this->translate->_('Akt. Seg');?>',
+            allMenuCheckTooltip:  '<?php echo $this->translate->_('Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste');?>',
+            chars:  '<?php echo $this->translate->_('Zeichen');?>',
+            save: '<?php echo $this->translate->_('Speichern (STRG + S)');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen (ESC)');?>',
+            reset: '<?php echo $this->translate->_('Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)');?>',
+            startWatchingSegment: '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>',
+            stopWatchingSegment: '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>',
+
+            saveAndNext: '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>',
+            saveAndNextFiltered: '<?php echo $this->translate->_('Speichern. <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(STRG + ENTER)');?>',
+
+            saveAndPrevious: '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>',
+            alternateLeft: '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ALT + ←)');?>',
+            alternateRight: '<?php echo $this->translate->_('Nächste Spalte editieren (STRG + ALT + →)');?>',
+
+            next: '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)');?>',
+            nextFiltered: '<?php echo $this->translate->_('Nicht speichern.<br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↓)');?>',
+            prev: '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>',
+            prevFiltered: '<?php echo $this->translate->_('Nicht speichern.<br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen<br/>(ALT + Bild ↑)');?>',
         }
     },
     projectGrid:{
         taskDestroy: '<?php echo $this->translate->_('Projekt "{0}" wird gelöscht...');?>'
+    },
+    tasksGrid:{
+        exportMenu:{
+            packageExportItem: '<?php echo $this->translate->_('Übersetzerpaket herunterladen');?>'
+        }
     },
     synonymSearch: {
         searchSourceInfoText: '<?php echo $this->translate->_('Sucht in der Ausgangssprache');?>'
@@ -2062,8 +2059,8 @@ Editor.data.l10n = {
             changeUiLangaugeLabelText: '<?php echo $this->translate->_('Sprache ändern');?>',
             passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>'
         },
-        window: {
-            radiogroup: '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>',
+        repetitions: {
+            title: '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>',
             alikeBehaviourAlways: '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen, wenn');?>',
             alikeBehaviourIndividual: '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>',
             alikeBehaviourNever: '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>',
@@ -2087,6 +2084,12 @@ Editor.data.l10n = {
         targetMatchColumn: '<?php echo $this->translate->_('Ziel-Treffer');?>',
         sameContextColumn: '<?php echo $this->translate->_('Kontext-Treffer');?>'
     },
+    metaPanel: {
+        title: '<?php echo $this->translate->_('Qualitätssicherung');?>',
+        metaStates_title: '<?php echo $this->translate->_('Status');?>',
+        metaStates_tooltip: '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>',
+        metaStates_tooltip_nokey: '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>'
+    },
     falsePositives: {
         hover: '<?php echo $this->translate->_('Rechts klicken um als \'falsch erkannt\' zu markieren')?>',
         legend: {
@@ -2108,13 +2111,21 @@ Editor.data.l10n = {
     projectOverview:{
         taskManagement:{
             taskReimport:{
-                title:'<?php echo $this->translate->_('Dateien aktualisieren');?>',
+                title:'<?php echo $this->translate->_('Bilinguale Dateien');?>',
                 fileNameColumnText:'<?php echo $this->translate->_('Dateiname');?>',
                 actionColumnText:'<?php echo $this->translate->_('Aktionen');?>',
                 actionColumnTooltip:'<?php echo $this->translate->_('Neue Datei hochladen');?>',
                 actionColumnDisabledTooltip:'<?php echo $this->translate->_('Der Dateityp wird für die Aktualisierung nicht unterstützt.');?>',
                 taskNotAllowThisActionMessage:'<?php echo $this->translate->_('Der aktuelle Aufgabenstatus lässt diese Aktion nicht zu.');?>',
-                topBarHeaderInfo:'<?php echo $this->translate->_('Außerhalb von translate5 geänderte Ziel-Segmentinhalte sind nach dem Re-Import als Änderungsmarkierungen im Segment zu sehen. Änderungsmarkierungen in Segmenten von bevor dem Re-Import gehen verloren. Geänderte Quellsegmente werden ebenfalls aktualisiert. Neu hinzugefügte Segmente (z. B. durch einen Segment-Split) werden ignoriert. Derzeit können die folgenden bilingualen Dateien aktualisiert werden: {0}');?>'
+                topBarHeaderInfo:'<?php echo $this->translate->_('Außerhalb von translate5 geänderte Ziel-Segmentinhalte sind nach dem Re-Import als Änderungsmarkierungen im Segment zu sehen. Änderungsmarkierungen in Segmenten von bevor dem Re-Import gehen verloren. Geänderte Quellsegmente werden ebenfalls aktualisiert. Neu hinzugefügte Segmente (z. B. durch einen Segment-Split) werden ignoriert. Derzeit können die folgenden bilingualen Dateien aktualisiert werden: {0}');?>',
+                exportTranslatorPackage:'<?php echo $this->translate->_('Übersetzerpaket herunterladen');?>',
+                importTranslatorPackage:'<?php echo $this->translate->_('Übersetzerpaket re-importieren');?>'
+            },
+            referenceFiles:{
+                title:'<?php echo $this->translate->_('Referenzdateien');?>'
+            },
+            sourceFiles:{
+                title:'<?php echo $this->translate->_('Ausgangsdateien');?>'
             },
             taskReimportWindow:{
                 title:'<?php echo $this->translate->_('Neue Datei hochladen');?>',
@@ -2127,6 +2138,12 @@ Editor.data.l10n = {
                 fileReimportRunning:'<?php echo $this->translate->_('Reimport läuft');?>',
                 fileReimportFinishedWithErrors:'<?php echo $this->translate->_('Der Reimport wurde mit Fehlern abgeschlossen. Weitere Informationen finden Sie im Ergebnisprotokoll');?>',
                 nameDontMatchInfoLabel:'<?php echo $this->translate->_('Der Dateiname entspricht nicht der zu aktualisierenden Datei');?>'
+            },
+            taskReimportZipWindow:{
+                title:'<?php echo $this->translate->_('Übersetzerpaket re-importieren');?>',
+            },
+            taskManageFiles:{
+                title: '<?php echo $this->translate->_('Dateien verwalten');?>'
             }
         }
     },

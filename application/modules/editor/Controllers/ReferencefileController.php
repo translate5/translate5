@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 class Editor_ReferencefileController extends ZfExtended_RestController {
     use TaskContextTrait;
@@ -69,10 +70,13 @@ class Editor_ReferencefileController extends ZfExtended_RestController {
             throw new ZfExtended_NotFoundException();
         }
 
-        header("Content-Type: ".$this->getMime($file), TRUE);
-        header('Content-Disposition: attachment; filename="'.$file->getFilename().'"');
-        header('Cache-Control: no-cache');
-        header('Content-Length: ' . filesize($file));
+        Header::sendDownload(
+            $file->getFilename(),
+            $this->getMime($file),
+            'no-cache',
+            filesize($file)
+        );
+
         readfile($file);
         exit;
     }

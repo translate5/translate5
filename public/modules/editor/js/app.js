@@ -104,7 +104,8 @@ Ext.application({
         'Editor.util.TaskActions',
         'Editor.util.messageBus.MessageBus',
         'Editor.util.messageBus.EventDomain',
-        'Editor.util.HttpStateProvider'
+        'Editor.util.HttpStateProvider',
+        'Editor.util.HtmlClasses'
     ].concat(Editor.data.app.controllers.require),
     controllers: Editor.data.app.controllers.active,
     appFolder: Editor.data.appFolder,

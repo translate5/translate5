@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\Translate5\Tools\Cronjobs;
 
 /**
  * Hook In functions for the Default Workflow.
@@ -150,15 +151,14 @@ class editor_Workflow_Default_Hooks {
         $auth = ZfExtended_Authentication::getInstance();
         $this->authenticatedUser = $auth->getUser();
 
-        $cronIp = CronIpFactory::create();
         $isWorker = defined('ZFEXTENDED_IS_WORKER_THREAD');
 
-        if(is_null($this->authenticatedUser)){
+        if (is_null($this->authenticatedUser)) {
             //if cron or worker set session user data with system user
-            if(($cronIp->isAllowed($_SERVER['REMOTE_ADDR'] ?? null) || $isWorker) && $auth->authenticateByLogin(ZfExtended_Models_User::SYSTEM_LOGIN)) {
+            if ((Cronjobs::isRunning() || $isWorker)
+                && $auth->authenticateByLogin(ZfExtended_Models_User::SYSTEM_LOGIN)) {
                 $this->authenticatedUser = $auth->getUser();
-            }
-            else {
+            } else {
                 throw new ZfExtended_NotAuthenticatedException("Cannot authenticate the system user!");
             }
         }
@@ -330,10 +330,12 @@ class editor_Workflow_Default_Hooks {
         foreach($actions as $action) {
             $class = $action['actionClass'];
             $method = $action['action'];
-            $config->parameters = !empty($action['parameters']) ? json_decode($action['parameters']) : null;
+            //FIXME UGLY: The parameters are changing by reference! Must be removed again, and unified, see below FIXME
+            $config->parameters = $this->decodeParameters($config, $action);
             if(empty($instances[$class])) {
                 $instance = ZfExtended_Factory::get($class);
                 /* @var $instance editor_Workflow_Actions_Abstract */
+                //FIXME unify this callActions with AbstractHandler::callActions
                 $instance->init($config);
                 $instances[$class] = $instance;
             }
@@ -342,18 +344,28 @@ class editor_Workflow_Default_Hooks {
             }
             
             $this->actionDebugMessage($action, $debugData);
-            if(empty($action['parameters'])) {
+            if (is_null($config->parameters)) {
                 call_user_func([$instance, $method]);
-                continue;
-            }
-            call_user_func([$instance, $method], json_decode($action['parameters']));
-            if(json_last_error() != JSON_ERROR_NONE) {
-                $this->workflow->getLogger($this->newTask)->error('E1171', 'Workflow Action: JSON Parameters for workflow action call could not be parsed with message: {msg}', [
-                    'msg' => json_last_error_msg(),
-                    'action' => $action
-                ]);
+            } else {
+                call_user_func([$instance, $method], $config->parameters);
             }
         }
+    }
+
+    protected function decodeParameters(editor_Workflow_Actions_Config $config, array $action): ?stdClass
+    {
+        if (empty($action['parameters'])) {
+            return null;
+        }
+        try {
+            return json_decode($action['parameters'], flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            $config->workflow->getLogger($config->task)->error('E1171', 'Workflow Action: JSON Parameters for workflow action call could not be parsed with message: {msg}', [
+                'msg' => $e->getMessage(),
+                'action' => $action
+            ]);
+        }
+        return null;
     }
     
     /**

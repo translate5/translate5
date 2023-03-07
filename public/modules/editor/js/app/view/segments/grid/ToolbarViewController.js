@@ -38,9 +38,6 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
             },
             '#scrollToSegmentBtn': {
                 click: 'onBatchOperation'
-            },
-            'segmentsToolbar #bookmarkBtn': {
-                click: 'onToggleBookmarkBtn'
             }
         }
     },
@@ -98,11 +95,5 @@ Ext.define('Editor.view.segments.grid.ToolbarViewController', {
                 });
             }
         });
-    },
-    onToggleBookmarkBtn: function(button){
-        let vm = this.getSegmentGrid().getViewModel(),
-            /** @var {Editor.model.Segment} segment */
-            segment = vm.get('selectedSegment');
-        segment && segment.toogleBookmark();
     }
 });

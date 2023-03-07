@@ -36,47 +36,56 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
         title: '<?php echo $this->translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>',
         text_cols: {
             name: '<?php echo $this->translate->_('Name'); ?>',
-            extensions: '<?php echo $this->translate->_('Erweiterungen'); ?>',
+            extensions: '<?php echo $this->translate->_('Geänderte Filter'); ?>',
+            extensionsTooltip: '<?php echo $this->translate->_('Dateitypen, für die Filter angepasst wurden'); ?>',
             description: '<?php echo $this->translate->_('Beschreibung'); ?>',
+            standard: '<?php echo $this->translate->_('Standard'); ?>',
+            standardTooltip: '<?php echo $this->translate->_('Standardmäßig bei der Projekterstellung ausgewähltes Filterset insofern nicht auf Kundenebene überschrieben'); ?>',
+            customerStandard: '<?php echo $this->translate->_('Kundenstandard'); ?>',
+            customerStandardTooltip: '<?php echo $this->translate->_('Standardmäßig bei der Projekterstellung ausgewähltes Filterset für diesen Kunden'); ?>',
+            filters: '<?php echo $this->translate->_('Filter'); ?>',
+            filtersTooltip: '<?php echo $this->translate->_('Anpassen von Dateifiltern in diesem Filterset'); ?>',
             action: '<?php echo $this->translate->_('Aktionen'); ?>',
+            actionDelete: '<?php echo $this->translate->_('Filterset löschen'); ?>',
+            actionClone: '<?php echo $this->translate->_('Filterset klonen'); ?>',
+            actionDownload: '<?php echo $this->translate->_('Filterset als bconf-Datei herunterladen'); ?>',
+            sourceSrx: '<?php echo $this->translate->_('Source SRX'); ?>',
+            sourceSrxTooltip: '<?php echo $this->translate->_('SRX-Datei, die die Segmentierungsregeln für die Quelle enthält'); ?>',
+            sourceSrxUpTooltip: '<?php echo $this->translate->_('Quell SRX-Datei hochladen und SRX-Regeln dieses Filtersatzes ersetzen'); ?>',
+            sourceSrxDownTooltip: '<?php echo $this->translate->_('Laden Sie die Quell SRX-Datei herunter'); ?>',
+            targetSrx: '<?php echo $this->translate->_('Target SRX'); ?>',
+            targetSrxTooltip: '<?php echo $this->translate->_('SRX-Datei, die Segmentierungsregeln enthält, die zur weiteren Segmentierung des targets von xliff-Dateien verwendet werden können'); ?>',
+            targetSrxUpTooltip: '<?php echo $this->translate->_('Hochladen der target-SRX-Datei'); ?>',
+            targetSrxDownTooltip: '<?php echo $this->translate->_('Herunterladen der target-SRX-Datei'); ?>',
             uploadBconf: '<?php echo $this->translate->_('Bconf hochladen'); ?>',
             fileSuffix: '<?php echo $this->translate->_('-Datei'); ?>',
-            fileDlTemplate: '<?php echo $this->translate->_('{0}{1} herunterladen'); ?>',
-            fileUpTemplate: '<?php echo $this->translate->_('{0}{1} hochladen'); ?>',
-            filters: '<?php echo $this->translate->_('Filter'); ?>',
             srx: '<?php echo $this->translate->_('SRX-Datei'); ?>',
-            sourceSrx: '<?php echo $this->translate->_('Source SRX'); ?>',
-            targetSrx: '<?php echo $this->translate->_('Target SRX'); ?>',
-            pipeline: '<?php echo $this->translate->_('Pipeline'); ?>',
-            standard: '<?php echo $this->translate->_('Standard'); ?>',
-            customerStandard: '<?php echo $this->translate->_('Kundenstandard'); ?>'
+            pipeline: '<?php echo $this->translate->_('Pipeline'); ?>'
         },
         strings: {
             title: '<?php echo $this->translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>',
             addBconf: '<?php echo $this->translate->_('Bconf hinzufügen'); ?>',
             bconfRequired: '<?php echo $this->translate->_('wird benötigt'); ?>',
             browse: '<?php echo $this->translate->_('Durchsuchen...'); ?>',
+            supprtedFormats: '<?php echo $this->translate->_('Unterstützte Dateiformate'); ?>',
             confirmDeleteMessage: '<?php echo $this->translate->_('Möchten Sie diese Bconf-Datei wirklich löschen?'); ?>',
             confirmDeleteTitle: '<?php echo $this->translate->_('Bconf löschen'); ?>',
-            copy: '<?php echo $this->translate->_('Kopieren'); ?>',
             deleteSuccess: '<?php echo $this->translate->_('Bconf-Datei gelöscht'); ?>',
             edit: '<?php echo $this->translate->_('Bearbeiten'); ?>',
             editBconf: '<?php echo $this->translate->_('Bconf-Datei bearbeiten'); ?>',
             fileUploaded: '<?php echo $this->translate->_('{0}-Datei erfolgreich hochgeladen.'); ?>',
-            export: '<?php echo $this->translate->_('Exportieren'); ?>',
             invalidMsg: '<?php echo $this->translate->_('Die hochgeladene Datei ist keine gültige {0}-Datei.'); ?>',
             invalidTitle: '<?php echo $this->translate->_('Ungültige {0}-Datei'); ?>',
             name: '<?php echo $this->translate->_('Name'); ?>',
             nameExists: '<?php echo $this->translate->_('Dieser Name ist schon vergeben'); ?>',
             newBconf: '<?php echo $this->translate->_('Neue Bconf-Datei'); ?>',
             refresh: '<?php echo $this->translate->_('Aktualisieren'); ?>',
-            remove: '<?php echo $this->translate->_('Löschen'); ?>',
             searchEmptyText: '<?php echo $this->translate->_('Suchen'); ?>',
             titleLong: '<?php echo $this->translate->_('Dateiformat- und Segmentierungseinstellungen'); ?>',
             uniqueName: '<?php echo $this->translate->_('Eindeutiger Name'); ?>',
             upload: '<?php echo $this->translate->_('Hochladen'); ?>',
             uploadBconf: '<?php echo $this->translate->_('Bconf hochladen'); ?>',
-            configureFilters: '<?php echo $this->translate->_('Filter konfigurieren'); ?>'
+            supportetFormats: '<?php echo $this->translate->_('Unterstützte Dateiformate'); ?>'
         }
     });
     Ext.define('Editor.locale.plugins.Okapi.view.BconfFilterGrid', {
@@ -94,9 +103,12 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
             configuration: '<?php echo $this->translate->_('Filter konfigurieren'); ?>',
             showDefaultFilters: '<?php echo $this->translate->_('Standard Filter anzeigen'); ?>',
             hideDefaultFilters: '<?php echo $this->translate->_('Standard Filter verstecken'); ?>',
+            editTexts: '<?php echo $this->translate->_('Filternamen, zugehörige Dateierweiterungen, MIME-Typ und Beschreibung bearbeiten'); ?>',
+            editTextsRowTip: '<?php echo $this->translate->_('Doppelklicken zum bearbeiten'); ?>',
+            clone: '<?php echo $this->translate->_('Filter klonen'); ?>',
             refresh: '<?php echo $this->translate->_('Aktualisieren'); ?>',
             remove: '<?php echo $this->translate->_('Löschen'); ?>',
-            emptySearch: '<?php echo $this->translate->_('Suchen'); ?>',
+            emptySearch: '<?php echo $this->translate->_('Filter suchen'); ?>',
             uniqueName: '<?php echo $this->translate->_('Eindeutiger Name'); ?>'
         }
     });
@@ -115,8 +127,10 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
         strings: {
             title: '<?php echo $this->translate->_('Bearbeite Filter Typ {0} von Bconf {1}'); ?>',
             help: '<?php echo $this->translate->_('OKAPI Hilfe'); ?>',
+            helpTooltip: '<?php echo $this->translate->_('Das Okapi Framework wird auf der Serverseite für Dateikonvertierungen verwendet'); ?>',
             save: '<?php echo $this->translate->_('Speichern'); ?>',
             cancel: '<?php echo $this->translate->_('Abbrechen'); ?>',
+            reset: '<?php echo $this->translate->_('Änderungen zurücksetzen'); ?>',
             invalidTitle: '<?php echo $this->translate->_('Bearbeitung fehlerhaft'); ?>',
             invalidField: '<?php echo $this->translate->_('Feld "{0}" vom Typ "{1}" ist nicht valide'); ?>',
             float: '<?php echo $this->translate->_('Gleitkommazahl'); ?>',
@@ -124,7 +138,9 @@ Editor.controller.Localizer.addPluginInit('okapi', function(){
             integer : '<?php echo $this->translate->_('Ganzzahl'); ?>',
             validationFailed: '<?php echo $this->translate->_('Ihre Änderungen sind nicht valide'); ?>',
             changesInvalid: '<?php echo $this->translate->_('Ihre Änderungen sind nicht valide, daher konnte der Filter nicht gespeichert werden'); ?>',
-            successfullySaved: '<?php echo $this->translate->_('Filter wurde erfolgreich gespeichert'); ?>'
+            successfullySaved: '<?php echo $this->translate->_('Filter wurde erfolgreich gespeichert'); ?>',
+            yes: '<?php echo $this->translate->_('Ja'); ?>',
+            no: '<?php echo $this->translate->_('Nein'); ?>'
         }
     });
 });

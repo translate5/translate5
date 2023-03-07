@@ -31,12 +31,17 @@ declare(strict_types=1);
 namespace MittagQI\Translate5\Tools;
 
 use Zend_Config;
+use ZfExtended_RemoteAddress;
 
 class CronIp
 {
     private array $configuredIps = [];
 
-    public function __construct(Zend_Config $config, private IpMatcher $ipMatcher)
+    public function __construct(
+        Zend_Config $config,
+        private IpMatcher $ipMatcher,
+        private ZfExtended_RemoteAddress $remoteAddress
+    )
     {
         $configValue = explode(',', $config->runtimeOptions->cronIP);
 
@@ -46,14 +51,18 @@ class CronIp
     }
 
     /**
-     * Check if particular IP against configured list
+     * Check if particular IP against configured list, use the calculated remote address if omitted
      *
      * @param string|null $ip
      *
      * @return bool
      */
-    public function isAllowed(?string $ip): bool
+    public function isAllowed(?string $ip = null): bool
     {
+        if(is_null($ip)) {
+            $ip = $this->remoteAddress->getIpAddress();
+        }
+
         if (in_array($ip, $this->configuredIps, true)) {
             return true;
         }

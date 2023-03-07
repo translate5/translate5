@@ -168,6 +168,63 @@ Ext.override(Ext.menu.Item, {
 });
 
 /**
+ * Added support for checkableDespiteDisabled config
+ */
+Ext.override(Ext.menu.CheckItem, {
+    checkableDespiteDisabled: false,
+    checkboxTooltip: false,
+
+    /**
+     * Setter for checkboxTooltip-prop
+     *
+     * @param tooltip
+     */
+    setCheckboxTooltip: function(tip) {
+        if (tip) {
+            this.checkEl.dom.setAttribute('data-qtip', tip);
+        } else {
+            this.checkEl.dom.removeAttribute('data-qtip');
+        }
+        this.checkboxTooltip = tip;
+    },
+
+    /**
+     * Mare sure checkboxTooltip-config is respected
+     */
+    afterRender: function() {
+
+        // Call parent
+        this.callParent(arguments);
+
+        // Set checkboxTooltip, if configured
+        if (this.checkboxTooltip) {
+            this.setCheckboxTooltip(this.checkboxTooltip);
+        }
+    },
+    onClick: function(e) {
+        var me = this, isDisabled = null;
+
+        // If click was on checkbox of a disabled menu item but checkableDespiteDisabled-flag is true
+        if (me.checkEl.contains(e.target) && me.disabled) {
+
+            // Turn disabled-flag to false temporary
+            me.disabled = false;
+
+            // Remember that
+            isDisabled = true;
+        }
+
+        // Call parent
+        this.callParent([e]);
+
+        // Restore disabled-prop back to true
+        if (isDisabled) {
+            me.disabled = true;
+        }
+    }
+});
+
+/**
  * TRANSLATE-834: Triton Theme: Tooltip on columns is missing
  * All columns should have a tooltip with the same content as the title when nothing other is configured
  */
@@ -1319,6 +1376,25 @@ Ext.override(Ext.grid.column.Column, {
         if(state && state.activeTab) {
             this.setActiveTab(state.activeTab);
             delete state.activeTab;
+        }
+        this.callParent([state]);
+    }
+});
+
+/**
+ * Enabling the collapsed-config to be stateful, as otherwise
+ * it is applied too late, e.g after component is painted
+ */
+ Ext.override(Ext.form.FieldSet, {
+    getState: function() {
+        var me = this,
+            state = me.callParent();
+        return me.addPropertyToState(state, 'collapsed', me.collapsed);
+    },
+    applyState: function(state ) {
+        if(state && state.collapsed) {
+            this.setCollapsed(state.collapsed);
+            delete state.collapsed;
         }
         this.callParent([state]);
     }

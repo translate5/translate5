@@ -120,7 +120,9 @@
 		"league/flysystem": "^3.0",
 		"league/flysystem-sftp": "^3.0",
 		"symfony/yaml": "^6.0",
-		"symfony/lock": "^6.0"
+		"symfony/lock": "^6.0",
+		"cesargb/php-log-rotation": "^2.7",
+		"ifsnop/mysqldump-php": "^v2.9"
     },
 	"extra" : {
 		"merge-plugin" : {
