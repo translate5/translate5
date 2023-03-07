@@ -6352,6 +6352,10 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Pmlight</source>
                 <target>PM Light</target>
             </trans-unit>
+            <trans-unit id='RWRpdG9yLW9ubHktb3ZlcnJpZGU='>
+                <source>Editor-only-override</source>
+                <target>Enable task overview (Only in editor-only-mode)</target>
+            </trans-unit>
             <trans-unit id='SWhyZSBEYXRlaSBpc3QgZ3LDtsOfZXIgYWxzIGRhcyB6dWzDpHNzaWdlIE1heGltdW0gdm9uIHt1cGxvYWRfbWF4X2ZpbGVzaXplfSBNQi4gVW0gZ3LDtsOfZXJlIERhdGVpZW4gaG9jaGxhZGVuIHp1IGvDtm5uZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gdHJhbnNsYXRlNS1TdXBwb3J0Lg=='>
                 <source>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</source>
                 <target>Your file is larger than the allowed limit of {upload_max_filesize} MB. To be able to upload larger files, please contact the translate5 support.</target>

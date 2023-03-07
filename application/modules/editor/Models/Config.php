@@ -113,14 +113,11 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @param string $nameFilter optional config name filter, applied with like (% must be provided in $nameFilter as desired)
      * @return array
      */
-    public function loadAllMerged(string $nameFilter = null){
+    public function loadAllMerged(string $nameFilter = null): array
+    {
         
-        $userSession = new Zend_Session_Namespace('user');
-        
-        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->load($userSession->data->id);
-        
+        $user = ZfExtended_Authentication::getInstance()->getUser();
+
         //get all application config level for the user
         $userLevelStrings = $user->getApplicationConfigLevel();
         
