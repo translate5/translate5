@@ -1637,16 +1637,9 @@ class editor_TaskController extends ZfExtended_RestController {
         else {
             $suffix = '.zip';
         }
-        
-        $languages = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languages editor_Models_Languages */
-        $languages = $languages->loadAllKeyValueCustom('id','rfc5646');
-        
-        $downloadName = ['',$languages[$this->entity->getSourceLang()],$languages[$this->entity->getTargetLang()]];
-        $downloadName = implode('_', $downloadName).$suffix;
 
         $this->logInfo('Task exported', ['context' => $context, 'diff' => $diff]);
-        $this->provideZipDownload($zipFile, $downloadName);
+        $this->provideZipDownload($zipFile, $suffix);
 
         //rename file after usage to export.zip to keep backwards compatibility
         rename($zipFile, dirname($zipFile).DIRECTORY_SEPARATOR.'export.zip');
