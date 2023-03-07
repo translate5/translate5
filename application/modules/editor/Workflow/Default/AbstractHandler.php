@@ -64,7 +64,7 @@ abstract class editor_Workflow_Default_AbstractHandler {
         foreach($actions as $action) {
             $class = $action['actionClass'];
             $method = $action['action'];
-            $config->parameters = !empty($action['parameters']) ? json_decode($action['parameters']) : null;
+            $config->parameters = $this->decodeParameters($config, $action);
             if(empty($instances[$class])) {
                 $instance = ZfExtended_Factory::get($class);
                 /* @var $instance editor_Workflow_Actions_Abstract */
@@ -76,18 +76,28 @@ abstract class editor_Workflow_Default_AbstractHandler {
             }
             
             $this->actionDebugMessage($action, $debugData);
-            if(empty($action['parameters'])) {
+            if (is_null($config->parameters)) {
                 call_user_func([$instance, $method]);
-                continue;
-            }
-            call_user_func([$instance, $method], json_decode($action['parameters']));
-            if(json_last_error() != JSON_ERROR_NONE) {
-                $config->workflow->getLogger($config->task)->error('E1171', 'Workflow Action: JSON Parameters for workflow action call could not be parsed with message: {msg}', [
-                    'msg' => json_last_error_msg(),
-                    'action' => $action
-                ]);
+            } else {
+                call_user_func([$instance, $method], $config->parameters);
             }
         }
+    }
+
+    protected function decodeParameters(editor_Workflow_Actions_Config $config, array $action): ?stdClass
+    {
+        if (empty($action['parameters'])) {
+            return null;
+        }
+        try {
+            return json_decode($action['parameters'], flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            $config->workflow->getLogger($config->task)->error('E1171', 'Workflow Action: JSON Parameters for workflow action call could not be parsed with message: {msg}', [
+                'msg' => $e->getMessage(),
+                'action' => $action
+            ]);
+        }
+        return null;
     }
     
     /**
