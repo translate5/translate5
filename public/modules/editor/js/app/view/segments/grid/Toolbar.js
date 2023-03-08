@@ -118,13 +118,13 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             };
             
             //add the available translate5 translations
-            Ext.Object.each(Editor.data.l10n.translations, function(i, n) {
+            Ext.Object.each(Editor.data.l10n.segmentGrid.toolbar.interfaceTranslation, function(i, n) {
                 menu.items.push({
                     xtype: 'menucheckitem',
                     itemId: 'localeMenuItem' + i,
                     checked: Editor.data.locale == i,
                     bind: {
-                        text: n + ' {l10n.segmentGrid.toolbar.strings.interfaceTranslation}',
+                        text: '{l10n.segmentGrid.toolbar.interfaceTranslation.' + i + '}',
                     },
                     value: i,
                     tagMode: 'full',
