@@ -1957,8 +1957,8 @@ Ext.define('Editor.controller.Localizer', {
 //when all translations in the above way are converted to the JSON way, we can just create a set of JSON files, using the ordinary translation way
 Editor.data.l10n = {
     translations: {
-        de: '<?php echo $this->translate->_('Deutsche');?>',
-        en: '<?php echo $this->translate->_('Englische');?>'
+        de: '<?php echo $this->translate->_('Deutsch');?>',
+        en: '<?php echo $this->translate->_('Englisch');?>'
     },
     tmOverview:{
         more: '<?php echo $this->translate->_('mehr');?>'
@@ -2000,8 +2000,9 @@ Editor.data.l10n = {
             showRepeatedSegments: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>',
 
             themeMenuConfigText: '<?php echo $this->translate->_('Layout');?>',
-            strings: {
-                interfaceTranslation: '<?php echo $this->translate->_('Oberfläche');?>'
+            interfaceTranslation: {
+                de: '<?php echo $this->translate->_('Deutsche Oberfläche');?>',
+                en: '<?php echo $this->translate->_('Englische Oberfläche');?>'
             },
 
             btnScrollToSegment: '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>',
