@@ -519,10 +519,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $userData = (array) $userSession->data;
 
         // Trim TermPortal-roles if TermPortal plugin is disabled
-        if ($this->pluginManager->isActive('TermPortal')) {
+        if (! $this->pluginManager->isActive('TermPortal')) {
             foreach ($userData['roles'] as $idx => $role) {
                 if (str_starts_with($role, 'term')) {
                     unset($userData['roles'][$idx]);
+                    // FIXME should be implemented in termportal plugin!
                 }
             }
         }
