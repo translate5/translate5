@@ -131,25 +131,25 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
 
     /**
      * Cache for our extension mapping
-     * @var editor_Plugins_Okapi_Bconf_ExtensionMapping
+     * @var editor_Plugins_Okapi_Bconf_ExtensionMapping|null
      */
     private ?editor_Plugins_Okapi_Bconf_ExtensionMapping $extensionMapping = NULL;
 
     /**
      * Cache for our pipeline
-     * @var editor_Plugins_Okapi_Bconf_Pipeline
+     * @var editor_Plugins_Okapi_Bconf_Pipeline|null
      */
     private ?editor_Plugins_Okapi_Bconf_Pipeline $pipeline = NULL;
 
     /**
      * Cache for our content/TOC
-     * @var editor_Plugins_Okapi_Bconf_Content
+     * @var editor_Plugins_Okapi_Bconf_Content|null
      */
     private ?editor_Plugins_Okapi_Bconf_Content $content = NULL;
 
     /**
      * Cache for our related customer
-     * @var editor_Models_Customer_Customer
+     * @var editor_Models_Customer_Customer|null
      */
     private ?editor_Models_Customer_Customer $customer = NULL;
 
@@ -397,6 +397,23 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         } catch(ZfExtended_Models_Entity_NotFoundException){
         }
         // if not found, generate it and return it's id
+        return $this->importDefaultWhenNeeded();
+    }
+
+    /**
+     * Retrieves the system default bconf's ID
+     * This is NOT the bconf that is currently set as default but the initial one T5 is delivered with
+     * @return int
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getSystemDefaultBconfId(): int
+    {
+        $sysBconfRow = $this->db->fetchRow($this->db->select()->where(
+            'name = ?',
+            editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME));
+        if ($sysBconfRow != null) {
+            return $sysBconfRow->id;
+        }
         return $this->importDefaultWhenNeeded();
     }
 
