@@ -9,35 +9,31 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
-
-
-
-
-
-
-
 ## [5.9.0] - 2023-03-07
 
 ### Important Notes:
-#### [TRANSLATE-3204](https://jira.translate5.net/browse/TRANSLATE-3204)
+
+#### [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185) - SETUP
+Before updating from a version < 5.8.0 see https://confluence.translate5.net/x/BYAIG
+
+#### [TRANSLATE-3205](https://jira.translate5.net/browse/TRANSLATE-3205) - SETUP
+On-premise docker Installations: Update the php container with docker compose pull php too.
+On-premise legacy Installations: ensure that apache module mod_headers is enabled (s2enmod headers).
+
+#### [TRANSLATE-3204](https://jira.translate5.net/browse/TRANSLATE-3204) - changed behaviour
 PMs are now also allowed to download the import archive of the imported task.
 
-#### [TRANSLATE-3192](https://jira.translate5.net/browse/TRANSLATE-3192)
+#### [TRANSLATE-3192](https://jira.translate5.net/browse/TRANSLATE-3192) - changed behaviour
 The system default of multi user mode for tasks changed to "Simultaneous" from "Cooperative".  If you want to keep it as it is, you need to set it back to its old value by hand. If it was set to "competitive" by you, the value will stay as it was before.
 
-#### [TRANSLATE-3117](https://jira.translate5.net/browse/TRANSLATE-3117)
+#### [TRANSLATE-3117](https://jira.translate5.net/browse/TRANSLATE-3117) - changed behaviour
 IMPORTANT: This enables the translator and the reviewer, to download a translator package or the translated (or un-translated) bilingual file. This was not possible previously. It does not change something regarding confidentiality, because also previously (of course) all segments and TM entries were available to the translator. As they have to be (otherwise he can not translate). Yet it makes it more easy now, to get them on your desktop.
 
-#### [TRANSLATE-3097](https://jira.translate5.net/browse/TRANSLATE-3097)
+#### [TRANSLATE-3097](https://jira.translate5.net/browse/TRANSLATE-3097) - changed user interface
 The usability of the editor was enhanced very much for translators and reviewers in the normal and details view mode of the editor.
 The action icons to handle the currently open segment were moved to the top. Same for the special characters. Users can now select, what icons they want to have in the top toolbar and what in a drop-down list. The repetition editor settings were moved to the left into the "view modes" drop-down, which was renamed to "settings". 
 In the right panel the terminology was moved to its own tab and the segment meta data tab was renamed to "Quality assurance".
 As a result there is much more space for terminology and QA in the right panel.
-
-#### [TRANSLATE-2185](https://jira.translate5.net/browse/TRANSLATE-2185)
-Before updating from a version < 5.8.0 see 
-https://confluence.translate5.net/x/BYAIG
- 
 
 
 ### Added
