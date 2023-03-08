@@ -187,9 +187,10 @@ class LoginController extends ZfExtended_Controllers_Login {
                 $invalidLoginCounter = ZfExtended_Factory::get('ZfExtended_Models_Invalidlogin',array($user->getLogin()));
                 /* @var $invalidLoginCounter ZfExtended_Models_Invalidlogin */
                 $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
-                ZfExtended_Models_LoginLog::addSuccess($user, "openid");
 
-                Auth::getInstance()->authenticateUser($user);
+                $auth = Auth::getInstance();
+                $auth->authenticateUser($user);
+                ZfExtended_Models_LoginLog::addSuccess($auth, "openid");
 
                 ZfExtended_Session::updateSession(true,true);
 
