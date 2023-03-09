@@ -350,36 +350,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
         return $result;
     }
-
-    /***
-     * Check and remove the term collection if it is imported via task import
-     * @param string $taskGuid
-     */
-    public function checkAndRemoveTaskImported(string $taskGuid)
-    {
-        //since the reference assoc → langres is not cascade delete, we have to delete them manually
-        $taskAssocTable = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Db\TaskAssociation');
-        /* @var $taskAssocTable MittagQI\Translate5\LanguageResource\Db\TaskAssociation */
-        $s = $taskAssocTable->select()->where('autoCreatedOnImport = 1 AND taskGuid = ?', $taskGuid);
-        $rows = $this->db->fetchAll($s)->toArray();
-        $taskAssocTable->delete(['autoCreatedOnImport = 1 AND taskGuid = ?' => $taskGuid]);
-
-        if(empty($rows)){
-            return;
-        }
-        //remove the collection(s), should be normally only one
-        foreach($rows as $row) {
-            $this->load($row['languageResourceId']);
-            try {
-                $this->delete();
-            }
-            catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-                //do nothing in that case, that means the TermCollection can not be deleted, since it is in use by another task.
-                // So we just leave it then
-            }
-        }
-    }
-
+    
     public function delete()
     {
         // remove the termcollection tbx files from the disk
