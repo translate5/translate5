@@ -1209,7 +1209,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         // check entity version
         $this->processClientReferenceVersion();
-        $this->checkOrCleanAssociation($forced,$this->entity->getCustomers() ?? []);
         
         // no try to remove the language-resource
         try {
@@ -1486,7 +1485,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
     /**
      * Check of clean associations when customer is changed.
-     * @TODO: same function exists in LanguageResources/Remover.php !!!
      * @param bool $clean
      * @return void
      * @throws Zend_Db_Table_Exception
@@ -1501,21 +1499,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $clean ? $assocClean->cleanAssociation() : $assocClean->check();
     }
-
-    /**
-     * @param bool $clean
-     * @return void
-     * @throws Zend_Db_Table_Exception
-     * @throws ZfExtended_ErrorCodeException
-     */
-    private function checkOrCleanTaskAssociation(bool $clean){
-        $assocClean = ZfExtended_Factory::get(Task::class,[
-            $this->entity->getId()
-        ]);
-        $clean ? $assocClean->cleanAssociation() : $assocClean->check();
-    }
-
-
+    
     private function hasImportingAssociatedTasks(int $languageResourceId): bool
     {
         $taskAssociation = ZfExtended_Factory::get(TaskAssociation::class);

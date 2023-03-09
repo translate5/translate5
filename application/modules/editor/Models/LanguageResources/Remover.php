@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * So the function can be used from all places inside the application.
  */
 
-use MittagQI\Translate5\LanguageResource\CleanupAssociation;
+use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task;
 
 class editor_Models_LanguageResources_Remover {
     /**
@@ -63,7 +63,7 @@ class editor_Models_LanguageResources_Remover {
         $this->entity->db->getAdapter()->beginTransaction();
         try {
             $entity = clone $this->entity;
-            $this->checkOrCleanAssociation($forced, $this->entity->getCustomers() ?? []);
+            $this->checkOrCleanTaskAssociation($forced);
             //delete the entity in the DB
             $this->entity->delete();
             
@@ -90,19 +90,16 @@ class editor_Models_LanguageResources_Remover {
     }
     
     /**
-     * Check of clean associations when customer is changed.
-     * @TODO: same function exists in LanguageresourceinstanceController !!!
+     * clean or check Task-Association depending on $clean
      * @param bool $clean
      * @return void
      * @throws Zend_Db_Table_Exception
      * @throws ZfExtended_ErrorCodeException
      */
-    private function checkOrCleanAssociation(bool $clean, array $customerIds): void
-    {
-        $assocClean = ZfExtended_Factory::get(CleanupAssociation::class, [
-            $customerIds,
+    private function checkOrCleanTaskAssociation(bool $clean){
+        $assocClean = ZfExtended_Factory::get(Task::class,[
             $this->entity->getId()
         ]);
-        
         $clean ? $assocClean->cleanAssociation() : $assocClean->check();
-    }}
+    }
+}
