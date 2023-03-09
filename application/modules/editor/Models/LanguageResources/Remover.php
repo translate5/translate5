@@ -90,7 +90,7 @@ class editor_Models_LanguageResources_Remover {
     }
     
     /**
-     * Check of clean associations.
+     * Check of clean associations when customer is changed.
      * @TODO: same function exists in LanguageresourceinstanceController !!!
      * @param bool $clean
      * @return void

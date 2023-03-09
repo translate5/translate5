@@ -26,10 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\LanguageResource\CleanupAssociation;
+use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
+use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 /***
  * Language resource controller
@@ -523,14 +526,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     private function prepareTaskInfo($languageResourceids)
     {
         $assocs = ZfExtended_Factory::get(TaskAssociation::class);
-
         $tasksInfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
 
-        if(empty($tasksInfo)) {
-            return;
-        }
-        //group array by languageResourceid
-        $this->groupedTaskInfo = $this->convertTasknames($tasksInfo);
+        $assocs = ZfExtended_Factory::get(TaskPivotAssociation::class);
+        $tasksPivotInfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
+
+        $result = array_merge($tasksInfo,$tasksPivotInfo);
+        $result = $this->convertTasknames($result);
+        $this->groupedTaskInfo = $result;
     }
 
     /**
@@ -546,9 +549,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
 
             $taskToPrint = $taskInfo['taskName'];
+            $isPivot = str_contains(strtolower($taskInfo['tableName']),'pivot');
 
             if(!empty($taskInfo['taskNr'])) {
                 $taskToPrint .= ' ('.$taskInfo['taskNr'].')';
+            }
+
+            if($isPivot){
+                $taskToPrint .= ' (Pivot)';
             }
 
             if ($taskInfo['state'] === editor_Models_Task::STATE_IMPORT) {
@@ -605,9 +613,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         $data = $connector->getTm($validExportTypes[$type]);
-        header('Content-Type: '.$validExportTypes[$type], TRUE);
-        $type = '.'.strtolower($type);
-        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getName()).$type.'"');
+
+        Header::sendDownload(
+            rawurlencode($this->entity->getName()) . '.' . strtolower($type),
+            $validExportTypes[$type]
+        );
         echo $data;
         exit;
     }
@@ -716,7 +726,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
 
             if( (bool)$this->getParam('forced',false) === true){
-                $this->checkOrCleanAssociation(true, $this->getDataField('customerIds') ?? []);
+                $this->checkOrCleanCustomerAssociation(true, $this->getDataField('customerIds') ?? []);
             }
 
             // especially tests are not respecting the array format ...
@@ -851,14 +861,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             // Unset session's download flag
             unset($_SESSION['download']);
 
-            // Convert collection name to filename
-            $filename = rawurlencode($_['collectionId']['name']);
-
             // Set up headers
-            header('Cache-Control: no-cache');
-            header('X-Accel-Buffering: no');
-            header('Content-Type: text/xml');
-            header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '.xlsx; filename=' . $filename . '.xlsx');
+            Header::sendDownload(
+                rawurlencode($_['collectionId']['name']).'.xlsx',
+                'text/xml',
+                'no-cache',
+                -1,
+                [ 'X-Accel-Buffering' => 'no' ]
+            );
 
             // Flush the entire file
             readfile($file);
@@ -1471,26 +1481,40 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return;
         }
         // check for association to be cleaned only when it is put and the forced flag is not set
-        $this->checkOrCleanAssociation(false,$this->getDataField('customerIds') ?? []);
+        $this->checkOrCleanCustomerAssociation(false,$this->getDataField('customerIds') ?? []);
     }
 
     /**
-     * Check of clean associations.
+     * Check of clean associations when customer is changed.
      * @TODO: same function exists in LanguageResources/Remover.php !!!
      * @param bool $clean
      * @return void
      * @throws Zend_Db_Table_Exception
      * @throws ZfExtended_ErrorCodeException
      */
-    private function checkOrCleanAssociation(bool $clean, array $customerIds): void
+    private function checkOrCleanCustomerAssociation(bool $clean, array $customerIds): void
     {
-        $assocClean = ZfExtended_Factory::get(CleanupAssociation::class, [
-            $customerIds,
+        $assocClean = ZfExtended_Factory::get(Customer::class, [
             $this->entity->getId()
         ]);
+        $assocClean->setCustomersLeft($customerIds);
 
         $clean ? $assocClean->cleanAssociation() : $assocClean->check();
     }
+
+    /**
+     * @param bool $clean
+     * @return void
+     * @throws Zend_Db_Table_Exception
+     * @throws ZfExtended_ErrorCodeException
+     */
+    private function checkOrCleanTaskAssociation(bool $clean){
+        $assocClean = ZfExtended_Factory::get(Task::class,[
+            $this->entity->getId()
+        ]);
+        $clean ? $assocClean->cleanAssociation() : $assocClean->check();
+    }
+
 
     private function hasImportingAssociatedTasks(int $languageResourceId): bool
     {

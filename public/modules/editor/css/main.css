@@ -559,6 +559,8 @@ table.task-users td.username,
 table.task-users td.state {font-weight:bold;}
 table.task-users td.state {padding-right:0;}
 
+.x-check-group-alt .x-form-item-body {padding-left: 20px;}
+
 /*own check column*/
 .grid-ownchecker {
     background-color: transparent;
@@ -1117,4 +1119,55 @@ dl {
 }
 #segment-grid .x-btn.x-item-disabled {
     pointer-events: all;
+}
+
+/***
+* Define the quality/spellcheck classes accessible outside the plugin context.
+* TODO: this should be refactored with the spellcheck refactoring
+*/
+.t5quality {
+    cursor: pointer;
+    z-index: 1;
+    position: relative;
+}
+
+.t5quality.t5general, .t5quality.t5general .trackchanges,
+.t5quality.t5style, .t5quality.t5style .trackchanges,
+.t5quality.t5grammar, .t5quality.t5grammar .trackchanges,
+.t5quality.t5misspelling, .t5quality.t5misspelling .trackchanges,
+.t5quality.t5typographical, .t5quality.t5typographical .trackchanges {
+    text-decoration-style: wavy;
+    text-underline-offset: 1px;
+    text-decoration-line: underline;
+    padding-bottom: 2px;
+}
+
+/* gray */
+.t5quality.t5general, .t5quality.t5general .trackchanges {
+    text-decoration-color: #808080;
+}
+
+/* blue */
+.t5quality.t5style, .t5quality.t5style .trackchanges {
+    text-decoration-color: #458fe6;
+}
+
+/* dark yellow */
+.t5quality.t5grammar, .t5quality.t5grammar .trackchanges {
+    text-decoration-color: #ab8906;
+}
+
+/* red-violet */
+.t5quality.t5misspelling, .t5quality.t5misspelling .trackchanges {
+    text-decoration-color: #e645a8;
+}
+
+/* dark-purple */
+.t5quality.t5typographical, .t5quality.t5typographical .trackchanges {
+    text-decoration-color: #4d004d;
+}
+
+.t5quality[data-t5qfp="true"]{
+    border-bottom: 1px solid limegreen;
+    padding-bottom: 2px;
 }

@@ -25,15 +25,20 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+declare(strict_types=1);
 
 namespace MittagQI\Translate5\Task\Reimport;
 
+use editor_Models_File;
+use editor_Models_File_FilterManager;
 use editor_Models_Import_FileParser;
 use editor_Models_SegmentFieldManager;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Import\FileParser\Factory;
 use MittagQI\Translate5\Task\Reimport\SegmentProcessor\Reimport;
+use SplFileInfo;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 use ZfExtended_Models_User;
 
 /***
@@ -49,7 +54,11 @@ class ReimportFile
 
     }
 
-    public function import(int $fileId, string $filePath, string $segmentTimestamp)
+    /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws Exception
+     */
+    public function import(int $fileId, string $filePath, string $segmentTimestamp): void
     {
         $segmentFieldManager = ZfExtended_Factory::get(editor_Models_SegmentFieldManager::class);
         $segmentFieldManager->initFields($this->task->getTaskGuid());
@@ -59,20 +68,24 @@ class ReimportFile
             $segmentFieldManager
         ]);
 
-        // get the parser dynamically even of only xliff is supported
-        $parser = $parserHelper->getFileParser($fileId, $filePath);
-        /* @var editor_Models_Import_FileParser $parser */
+        $file = ZfExtended_Factory::get(editor_Models_File::class);
+        $file->load($fileId);
+        $parserCls = $file->getFileParser();
 
-        if (is_null($parser)) {
-            throw new \MittagQI\Translate5\Task\Reimport\Exception('E1433', [
-                'file' => $fileId,
-                'task' => $this->task
-            ]);
-        }
+        $fileFilter = ZfExtended_Factory::get(editor_Models_File_FilterManager::class);
+        $fileFilter->initReImport($this->task, Worker::FILEFILTER_CONTEXT_NEW);
+
+        // get the parser dynamically even of only xliff is supported
+        $parser = $parserHelper->getFileParserInstance($parserCls, $fileId, new SplFileInfo($filePath));
+        /* @var editor_Models_Import_FileParser $parser */
 
         $parser->setIsReimport();
 
-        $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class, [$this->task, $segmentFieldManager, $this->user]);
+        $this->segmentProcessor = ZfExtended_Factory::get(Reimport::class, [
+            $this->task,
+            $segmentFieldManager,
+            $this->user
+        ]);
         $this->segmentProcessor->setSegmentFile($fileId, $parser->getFileName());
         $this->segmentProcessor->setSaveTimestamp($segmentTimestamp);
 

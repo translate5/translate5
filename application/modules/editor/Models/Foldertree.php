@@ -42,6 +42,8 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
     const TYPE_DIR = 'dir';
     const TYPE_FILE = 'file';
 
+    const ALLOWED_TYPES = [self::TYPE_DIR, self::TYPE_FILE];
+
     protected $dbInstanceClass = 'editor_Models_Db_Foldertree';
 
     protected array|null $objectTree = null;
@@ -172,24 +174,28 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
     }
 
     /**
-     * liest die Dateipfade und ids aus dem Foldertree-Json-Objekt aus
+     * returns the fileIds mapped to file paths out of given foldertree JSON
      *
      * @param string $taskGuid
-     * @param string $type Erlaubte Werte: dir|file
+     * @param string $typeFilter allowed values dir|file
      * @return array array(id => 'filePath',...)
      *        Die Pfade sind in einer Reihenfolge, so dass in der Hierarchie höhere Verzeichnisse
      *        niedrigere Array-Indizes haben
      *        id ist für Verzeichnisse und Dateien eindeutig
+     * @throws JsonException
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getPaths(string $taskGuid, string $type)
+    public function getPaths(string $taskGuid, string $typeFilter): array
     {
-        $this->_paths = array();
-        if ($type !== self::TYPE_DIR and $type !== self::TYPE_FILE) {
-            throw new Zend_Exception('$type hatte den nicht erlaubten Wert ' . $type);
+        $this->_paths = [];
+        if (!in_array($typeFilter, self::ALLOWED_TYPES)) {
+            throw new LogicException('$typeFilter is '.$typeFilter.' but must be one of '
+                . join(', ', self::ALLOWED_TYPES));
         }
         $this->loadByTaskGuid($taskGuid);
         $this->getTree();
-        $nodeVisitor = 'get' . ucfirst($type) . 'PathsNodeVisitor';
+        $nodeVisitor = 'get' . ucfirst($typeFilter) . 'PathsNodeVisitor';
         $this->$nodeVisitor($this->objectTree);
         return $this->_paths;
     }
@@ -199,10 +205,13 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract
      *
      * @param string $taskGuid
      * @param int $fileId
-     * @return mixed|string
+     * @return string
+     * @throws JsonException
      * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function getFileIdPath(string $taskGuid, int $fileId){
+    public function getFileIdPath(string $taskGuid, int $fileId): string
+    {
         $this->getPaths($taskGuid,self::TYPE_FILE);
         return $this->_paths[$fileId] ?? '';
     }

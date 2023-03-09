@@ -89,7 +89,7 @@ Ext.define('Editor.controller.ServerException', {
         if(resp) {
             this.handleException(resp);
         } else {
-            this.handleFailedRequest(operation.error.status, operation.error.statusText, operation.error.response);
+            this.handleFailedRequest(operation.error.status, operation.error.statusText, operation.error.response, operation);
         }
         return false;
     },
@@ -108,8 +108,7 @@ Ext.define('Editor.controller.ServerException', {
      * @param {String} statusText
      * @param {Object} response
      */
-    handleFailedRequest: function(status, statusText, response) {
-        
+    handleFailedRequest: function(status, statusText, response, operation) {
         //FIXME refactor / clean up that function!
         //from bottom up, first remove all unneeded stuff at the bottom, then clean up the head.
         
@@ -157,6 +156,15 @@ Ext.define('Editor.controller.ServerException', {
             if(response && Ext.isEmpty(response.getAllResponseHeaders()['x-translate5-version'])) {
                 text += '<br>Answer seems to come from a proxy!';
                 msg += ' - answer seems not to be from translate5 - x-translate5-version header is missing.'
+                if (jslogger) {
+                    if (operation) {
+                        jslogger.addLogEntry({ type : 'info', message : 'Request: ' + operation.getRequest().getMethod() + ' ' + operation.getRequest().getUrl()});
+                    }
+                    jslogger.addLogEntry({type: 'info', message: 'status-arg: ' + _status.replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'statusText-arg: ' + statusText.toString().replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'Response headers: ' + JSON.stringify(response.getAllResponseHeaders()).replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'Response text: ' + respText.toString().replaceAll('"', '~')});;
+                }
             }
 
             Editor.MessageBox.addError(text);

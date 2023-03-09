@@ -34,7 +34,8 @@ use editor_Models_File;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Export\Package\Exception;
 use MittagQI\Translate5\Task\Export\Package\ExportSource;
-use MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent\FileHandler;
+use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
+use Zend_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Worker;
 
@@ -52,11 +53,13 @@ class Task extends Base
     public function __construct(editor_Models_Task $task, ExportSource $exportSource)
     {
         $this->fileName = self::TASK_FOLDER_NAME;
-        parent::__construct($task,$exportSource);
+        parent::__construct($task, $exportSource);
     }
 
     /**
      * @return void
+     * @throws Exception
+     * @throws editor_Models_Export_Exception
      */
     public function validate(): void
     {
@@ -71,12 +74,14 @@ class Task extends Base
         $files = ZfExtended_Factory::get('editor_Models_File');
         $files = $files->loadByTaskGuid($this->task->getTaskGuid());
 
-        foreach ($files as $file){
-            $pathInfo = pathinfo($file['fileName']);
-            if( !in_array($pathInfo['extension'], FileHandler::getSupportedFileTypes(), true)){
-                throw new Exception('E1452',[
-                    'supported' => FileHandler::getSupportedFileTypes(),
-                    'actual' => $file['fileName'],
+
+
+        foreach ($files as $file) {
+            if (! FileparserRegistry::getInstance()->isSupported($file['fileParser'])) {
+                throw new Exception('E1452', [
+                    'supported' => FileparserRegistry::getInstance()->getRegisteredFileparsers(),
+                    'file' => $file['fileName'],
+                    'current' => $file['fileParser'],
                     'task' => $this->task
                 ]);
             }
@@ -85,7 +90,9 @@ class Task extends Base
     }
 
     /**
+     * @param ZfExtended_Models_Worker|null $workerModel
      * @return void
+     * @throws Zend_Exception
      */
     public function export(?ZfExtended_Models_Worker $workerModel): void
     {
@@ -94,6 +101,6 @@ class Task extends Base
         $export = ZfExtended_Factory::get('editor_Models_Export');
         /* @var editor_Models_Export $export */
         $export->setTaskToExport($this->task, $params['diff']);
-        $export->export($this->getFolderPath(), $workerModel->getId());
+        $export->export($this->getFolderPath(), $workerModel->getId(), $export::EXPORT_PACKAGE);
     }
 }

@@ -28,6 +28,10 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Service;
 
+use Throwable;
+use Zend_Http_Client;
+use ZfExtended_Factory;
+
 /**
  * Represents the dockerized T5-app itself
  */
@@ -37,6 +41,26 @@ final class Php extends DockerServiceAbstract {
         'name' => 'runtimeOptions.worker.server',
         'type' => 'string',
         'url' => 'http://php.:80',
+        'healthcheck' => '/editor/index/applicationstate',
+        'healthcheckIsJson' => true,
         'optional' => true
     ];
+
+    protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
+    {
+        // we add a warning if the result is no proper JSON, presumably the cron-IP is not properly set up then
+        if (trim($responseBody) === 'null') {
+            $this->warnings[] = 'Check config runtimeOptions.cronIP - may be configured wrong.';
+            return null;
+        }
+        $state = json_decode($responseBody);
+        if ($state) {
+            $version = $state->version ?? null;
+            if (!empty($state->branch)) {
+                $version = ($version == null) ? $state->branch : $version.' '.$state->branch;
+            }
+            return $version;
+        }
+        return null;
+    }
 }

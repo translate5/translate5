@@ -38,6 +38,8 @@ use editor_Models_Import_FileParser_XmlParser as XmlParser;
  * Fileparsing for import of XLIFF 1.1 and 1.2 files
  */
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser {
+    const IS_REIMPORTABLE = true;
+
     const PREFIX_MRK = 'mrk-';
     const PREFIX_SUB = 'sub-';
     const MISSING_MRK = 'missing-mrk';

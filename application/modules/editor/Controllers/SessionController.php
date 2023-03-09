@@ -145,7 +145,8 @@ class editor_SessionController extends ZfExtended_SessionController {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskUserAssoc->getTaskGuid());
         
-        ZfExtended_Authentication::getInstance()->authenticateUser($user);
+        $auth = ZfExtended_Authentication::getInstance();
+        $auth->authenticateUser($user);
 
         $userSession = new Zend_Session_Namespace('user');
 
@@ -154,7 +155,7 @@ class editor_SessionController extends ZfExtended_SessionController {
         // remove the old session (if exist) for the auth-hash user
         $session->cleanForUser($userSession->data->id);
 
-        ZfExtended_Models_LoginLog::addSuccess($user, "authhash");
+        ZfExtended_Models_LoginLog::addSuccess($auth, "authhash");
         
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView */

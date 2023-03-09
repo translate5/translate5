@@ -61,6 +61,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     itemId: 'repetitionsBtn',
                     bind: {
                         text: '{l10n.segmentGrid.toolbar.repetitionBtn}',
+                        tooltip: '{isEditingSegment ? l10n.segmentGrid.toolbar.repetitionTooltip : ""}',
+                        disabled: '{isEditingSegment}',
                     }
                 }, '-', {
                     xtype: 'menuitem',
@@ -116,13 +118,13 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             };
             
             //add the available translate5 translations
-            Ext.Object.each(Editor.data.translations, function(i, n) {
+            Ext.Object.each(Editor.data.l10n.segmentGrid.toolbar.interfaceTranslation, function(i, n) {
                 menu.items.push({
                     xtype: 'menucheckitem',
                     itemId: 'localeMenuItem' + i,
                     checked: Editor.data.locale == i,
                     bind: {
-                        text: n + ' {l10n.segmentGrid.toolbar.strings.interfaceTranslation}',
+                        text: '{l10n.segmentGrid.toolbar.interfaceTranslation.' + i + '}',
                     },
                     value: i,
                     tagMode: 'full',
@@ -367,7 +369,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 }, {
                     xtype: 'button',
                     bind: {
-                        text: '{l10n.segmentGrid.toolbar.all}'
+                        text: '{l10n.segmentGrid.toolbar.currentSegment}'
                     },
                     menu: {
                         itemId: 'segmentActionMenu',
@@ -378,7 +380,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         defaults: {
                             xtype: 'menucheckitem',
                             allowCheckChange: false,
-                            checkableDespiteDisabled: true
+                            checkableDespiteDisabled: true,
+                            bind: {
+                                checkboxTooltip: '{l10n.segmentGrid.toolbar.allMenuCheckTooltip}'
+                            }
                         },
                         items: [{
                             itemId: 'saveBtn',
@@ -507,7 +512,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     }
                 }, {
                     xtype: 'button',
-                    glyph: 'f141@FontAwesome5FreeSolid',
                     itemId: 'batchOperations',
                     bind: {
                         text: '{l10n.segmentGrid.batchOperations.btnText}',

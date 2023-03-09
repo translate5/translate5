@@ -196,23 +196,6 @@ class TaskAssociation extends AssociationAbstract {
         return $this->db->fetchAll($s)->toArray();
     }
     
-    /**
-     * Returns join between taskassoc table and task table for languageResource's id list
-     * @param array $languageResourceids
-     */
-    public function getTaskInfoForLanguageResources($languageResourceids){
-        if(empty($languageResourceids)) {
-            return [];
-        }
-        $s = $this->db->select()
-        ->from(['assocs' => 'LEK_languageresources_taskassoc'], ['assocs.id','assocs.taskGuid','task.id as taskId', 'task.projectId', 'task.taskName','task.state','task.lockingUser','task.taskNr','assocs.languageResourceId'])
-        ->setIntegrityCheck(false)
-        ->join(['task' => 'LEK_task'],'assocs.taskGuid = task.taskGuid', '')
-        ->where('assocs.languageResourceId in (?)', $languageResourceids)
-        ->group('assocs.id');
-        return $this->db->fetchAll($s)->toArray();
-    }
-    
     /***
      * Get all available tmms for the language combination as in the provided task.
      * (Uses loadByAssociatedTaskAndLanguage() which is meant to be called only by rest call!)

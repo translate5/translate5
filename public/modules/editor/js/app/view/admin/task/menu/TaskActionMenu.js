@@ -203,8 +203,8 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                     sortIndex: 13
                 },{
                     itemId: 'packageExportItem',
-                    hidden: !Editor.app.authenticatedUser.isAllowed('editorPackageExport', task),
                     bind:{
+                        hidden:'{!isNotErrorImportPendingCustom}',
                         text:'{l10n.tasksGrid.exportMenu.packageExportItem}'
                     },
                     action: 'editorPackageExport',

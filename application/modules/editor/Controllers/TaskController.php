@@ -30,6 +30,7 @@ use MittagQI\Translate5\Task\CurrentTask;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 /**
  *
@@ -1559,7 +1560,7 @@ class editor_TaskController extends ZfExtended_RestController {
                     Lock::taskUnlock($this->entity);
                 }catch (Throwable $exception){
                     Lock::taskUnlock($this->entity);
-                    $this->log->exception($exception,[
+                    $this->taskLog->exception($exception,[
                         'extra' => [
                             'task' => $this->entity
                         ]
@@ -1636,16 +1637,9 @@ class editor_TaskController extends ZfExtended_RestController {
         else {
             $suffix = '.zip';
         }
-        
-        $languages = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languages editor_Models_Languages */
-        $languages = $languages->loadAllKeyValueCustom('id','rfc5646');
-        
-        $downloadName = ['',$languages[$this->entity->getSourceLang()],$languages[$this->entity->getTargetLang()]];
-        $downloadName = implode('_', $downloadName).$suffix;
 
         $this->logInfo('Task exported', ['context' => $context, 'diff' => $diff]);
-        $this->provideZipDownload($zipFile, $downloadName);
+        $this->provideZipDownload($zipFile, $suffix);
 
         //rename file after usage to export.zip to keep backwards compatibility
         rename($zipFile, dirname($zipFile).DIRECTORY_SEPARATOR.'export.zip');
@@ -1704,12 +1698,20 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-        header('Content-Description: File Transfer');
-        header('Content-Disposition: attachment; filename="'.$filenameExport.'"');
-        header('Content-Transfer-Encoding: binary');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Pragma: public');
+
+        Header::sendDownload(
+            $filenameExport,
+            null,
+            'no-cache',
+            -1,
+            [
+                'Content-Transfer-Encoding' => 'binary',
+                'Content-Description' => 'File Transfer',
+                'Expires' => '0',
+                'Pragma' => 'public'
+            ]
+        );
+
         readfile($translatedfile);
         $clean(); //remove export dir
     }
@@ -1723,8 +1725,12 @@ class editor_TaskController extends ZfExtended_RestController {
         // disable layout and view
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
-        header('Content-Type: application/zip', TRUE);
-        header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($nameSuffix).'"');
+
+        Header::sendDownload(
+            $this->entity->getTasknameForDownload($nameSuffix),
+            'application/zip'
+        );
+
         readfile($zipFile);
     }
 

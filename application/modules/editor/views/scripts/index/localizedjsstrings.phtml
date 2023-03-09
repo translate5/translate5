@@ -1956,6 +1956,10 @@ Ext.define('Editor.controller.Localizer', {
 
 //when all translations in the above way are converted to the JSON way, we can just create a set of JSON files, using the ordinary translation way
 Editor.data.l10n = {
+    translations: {
+        de: '<?php echo $this->translate->_('Deutsch');?>',
+        en: '<?php echo $this->translate->_('Englisch');?>'
+    },
     tmOverview:{
         more: '<?php echo $this->translate->_('mehr');?>'
     },
@@ -1969,12 +1973,12 @@ Editor.data.l10n = {
             },
             warnAllTitle: '<?php echo $this->translate->_('Kein Segment Filter gesetzt');?>',
             warnAllText: '<?php echo $this->translate->_('Soll die Aktion wirklich auf alle Segmente angewendet werden? Das kann einige Zeit in Anspruch nehmen.');?>',
-            menuText: '<?php echo $this->translate->_('Alle gefilterten Segmente:');?>',
-            menuLock: '<?php echo $this->translate->_('sperren');?>',
-            menuUnlock: '<?php echo $this->translate->_('entsperren');?>',
+            menuText: '<?php echo $this->translate->_('Wenden Sie eine der folgenden Aktionen auf alle Segmente in der aktuellen Filterung an:');?>',
+            menuLock: '<?php echo $this->translate->_('Sperren');?>',
+            menuUnlock: '<?php echo $this->translate->_('Entsperren');?>',
             menuBookmark: '<?php echo $this->translate->_('Lesezeichen setzen');?>',
             menuUnbookmark: '<?php echo $this->translate->_('Lesezeichen entfernen');?>',
-            btnText: '<?php echo $this->translate->_('Aktionen');?>',
+            btnText: '<?php echo $this->translate->_('Alle Seg.');?>',
             btnTooltip: '<?php echo $this->translate->_('Auswahl an Aktionen die auf alle Segmente im aktuellen Filterset ausgeführt werden sollen');?>'
         },
         toolbar: {
@@ -1985,6 +1989,7 @@ Editor.data.l10n = {
             shortTagBtn: '<?php echo $this->translate->_('Tag-Kurzansicht');?>',
             fullTagBtn: '<?php echo $this->translate->_('Tag-Vollansicht');?>',
             repetitionBtn: '<?php echo $this->translate->_('Wiederholungseditor');?>',
+            repetitionTooltip: '<?php echo $this->translate->_('Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Einstellungen des Wiederholungseditors zu bearbeiten.');?>',
             zoomIn: '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>',
             zoomOut: '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>',
             clearSortAndFilterBtn: '<?php echo $this->translate->_('Tabelle zurücksetzen');?>',
@@ -1995,8 +2000,9 @@ Editor.data.l10n = {
             showRepeatedSegments: '<?php echo $this->translate->_('Nur Segmente mit Wiederholungen anzeigen');?>',
 
             themeMenuConfigText: '<?php echo $this->translate->_('Layout');?>',
-            strings: {
-                interfaceTranslation: '<?php echo $this->translate->_('Oberfläche');?>'
+            interfaceTranslation: {
+                de: '<?php echo $this->translate->_('Deutsche Oberfläche');?>',
+                en: '<?php echo $this->translate->_('Englische Oberfläche');?>'
             },
 
             btnScrollToSegment: '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>',
@@ -2005,7 +2011,8 @@ Editor.data.l10n = {
             bookmarkBtn: '<?php echo $this->translate->_('Segment als Favorit (Bookmark) markieren bzw. Markierung entfernen (STRG + D)');?>',
             searchAndReplaceButtonTooltip: '<?php echo $this->translate->_('Suchen und Ersetzen anzeigen (STRG + F, STRG + H)');?>',
             searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>',
-            all:  '<?php echo $this->translate->_('Alle');?>',
+            currentSegment:  '<?php echo $this->translate->_('Akt. Seg');?>',
+            allMenuCheckTooltip:  '<?php echo $this->translate->_('Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste');?>',
             chars:  '<?php echo $this->translate->_('Zeichen');?>',
             save: '<?php echo $this->translate->_('Speichern (STRG + S)');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen (ESC)');?>',

@@ -106,7 +106,24 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
 
         return $this->processResponse($http->request());
     }
-    
+
+    /**
+     * This method clones memory
+     *
+     * @throws Zend_Exception
+     */
+    public function cloneMemory(string $targetMemory): bool
+    {
+        $data = [];
+        $data['newName'] = $this->addTmPrefix($targetMemory);
+
+        $http = $this->getHttpWithMemory('POST', 'clone');
+        $http->setConfig(['timeout' => 1200]);
+        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+
+        return $this->processResponse($http->request());
+    }
+
     /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the given REST URL Parts (ID + verbs)
      * @param string $httpMethod
@@ -123,6 +140,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
         $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $this->http->setConfig(['timeout' => 30]);
+
         return $this->http;
     }
     
