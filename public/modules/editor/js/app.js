@@ -658,10 +658,18 @@ Ext.application({
      *
      * {Boolean} returnRecord : the record will be returned instead of the record value
      */
-    getUserConfig: function (configName, returnRecord) {
+    getUserConfig: function (configName, returnRecord, callback) {
         var store = Ext.state.Manager.getProvider().store,
             pos = store.findExact('name', 'runtimeOptions.' + configName),
             row;
+
+        // If store is being loaded there is no data yet inside
+        if (store.isLoading() && callback) {
+
+            // So put a single-time callback
+            store.on('load', () => callback(this.getUserConfig(configName, returnRecord)), store, {single: true});
+        }
+
         if (pos < 0) {
             return null;
         }
