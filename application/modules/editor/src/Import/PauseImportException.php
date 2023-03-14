@@ -30,45 +30,16 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Import;
 
-/**
- * Base class for pause workers
- */
-abstract class PauseImportWorker extends \editor_Models_Task_AbstractWorker
+use ZfExtended_ErrorCodeException;
+
+class PauseImportException extends ZfExtended_ErrorCodeException
 {
-    public const PROCESSOR = 'processor';
-    
-    protected function validateParameters($parameters = []): bool
-    {
-        return isset($parameters[self::PROCESSOR])
-            && class_exists($parameters[self::PROCESSOR])
-            && in_array(PauseWorkerProcessorInterface::class, class_implements($parameters[self::PROCESSOR]), true);
-    }
-
     /**
-     * @return bool
-     *
-     * @throws PauseImportException
+     * @var string
      */
-    protected function work(): bool
-    {
-        $params = $this->workerModel->getParameters();
+    protected $domain = 'editor.import.pause';
 
-        /** @var PauseWorkerProcessorInterface $processor */
-        $processor = \ZfExtended_Factory::get($params[self::PROCESSOR]);
-
-        $sleepTime = $processor->getSleepTimeSeconds();
-        $maxTime = $processor->getMaxWaitTimeSeconds();
-        $elapsedTime = 0;
-
-        while ($elapsedTime < $maxTime) {
-            if (!$processor->shouldWait($this->task)) {
-                break;
-            }
-
-            $elapsedTime+= $sleepTime;
-            sleep($sleepTime);
-        }
-        
-        return true;
-    }
+    protected static array $localErrorCodes = [
+        'E1500' => 'After waiting for {waitTime} seconds, the language resource is still not available.'
+    ];
 }

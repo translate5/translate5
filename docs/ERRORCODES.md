@@ -500,6 +500,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1167"></a>E1167  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: task can not be locked for analysis and pre-translation. | The task was locked by another process, so no analysis and pre-translation is possible.
 | <a id="E1168"></a>E1168  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized. | <br />
 | <a id="E1239"></a>E1239  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: Language resource &quot;{name}&quot; has status &quot;{status}&quot; and is not available for match analysis and pre-translations. | There is a problem with the associated language resource to be used for analysis and pre-translation. Please check status and details of the problem.
+| <a id="E1500"></a>E1500  | Plug-In MatchAnalysis | After waiting for {waitTime} seconds, the language resource is still not available.                                                                       | Language resource that is used for match analysis and pre-translation is not available. Please check status and details of the problem.
 
 
 #### Plug-In NecTm
