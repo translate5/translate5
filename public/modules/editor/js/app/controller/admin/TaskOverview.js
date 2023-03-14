@@ -969,6 +969,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     },
 
     /***
+     * Reimport translator package action handler
+     * @param task
+     * @param event
+     */
+    editorPackageReimport: function (task, event) {
+        var win = Ext.widget('adminTaskReimportReimportZipWindow');
+        win.loadRecord(task);
+        win.show();
+    },
+
+    /***
      * Task action menu click handler
      */
     handleTaskMenu: function (selectedTask, event) {
