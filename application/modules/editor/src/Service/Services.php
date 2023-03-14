@@ -94,17 +94,39 @@ final class Services
     public static function getAllServices(Zend_Config $config, bool $loadPlugins=false): array
     {
         $services = self::getServices($config);
+        /* @var ZfExtended_Plugin_Manager $pluginManager */
         $pluginManager = Zend_Registry::get('PluginManager');
         if($loadPlugins){
             $pluginManager->bootstrap();
         }
-        /* @var $pluginManager ZfExtended_Plugin_Manager */
         foreach($pluginManager->getInstances() as $pluginInstance){
             foreach($pluginInstance->getServices($config) as $serviceName => $service){
                 if(array_key_exists($serviceName, $services)){
                     // all services must have unique names
                     throw new ZfExtended_Exception('Duplicate Service Name "'.$serviceName.'" in Plugin '.get_class($pluginInstance));
                 }
+                $services[$serviceName] = $service;
+            }
+        }
+        return $services;
+    }
+
+    /**
+     * Retrieves all global services and all available plugin services (of all plugins where the classes are available in the code)
+     * Returned will be an assoc array like $serviceName => $service
+     * @param Zend_Config $config
+     * @return ServiceAbstract[]
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Plugin_Exception
+     */
+    public static function getAllAvailableServices(Zend_Config $config): array
+    {
+        $services = self::getServices($config);
+        /* @var ZfExtended_Plugin_Manager $pluginManager */
+        $pluginManager = Zend_Registry::get('PluginManager');
+        foreach($pluginManager->getAvailable() as $pluginClass){
+            foreach($pluginClass::createAllServices($config) as $serviceName => $service){ /* @var $service ServiceAbstract */
                 $services[$serviceName] = $service;
             }
         }
