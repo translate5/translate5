@@ -9,6 +9,41 @@ Missing Versions are merged into in the next upper versions, so no extra section
 All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+
+## [5.9.1] - 2023-03-14
+
+### Changed
+**[TRANSLATE-3245](https://jira.translate5.net/browse/TRANSLATE-3245): VisualReview / VisualTranslation - Replace webserver in pdfconverter to nginx** <br>
+Fixed problem which caused pdfconverter container fail to start
+
+
+ 
+
+
+
+### Bugfixes
+**[TRANSLATE-3117](https://jira.translate5.net/browse/TRANSLATE-3117): Import/Export - translator package** <br>
+5.9.0: Editor users are now able to download a zip package including everything needed to translate a job outside of translate5 and afterwards update the task with it.
+5.9.1: Fix - enable reimport package for non pm users
+
+**[TRANSLATE-3242](https://jira.translate5.net/browse/TRANSLATE-3242): MatchAnalysis & Pretranslation - Fix match analysis on API usage** <br>
+- Task is now locked immediately after match analysis is scheduled.
+- PauseMatchAnalysis worker now returns an error in case after maximum wait time language resource is still not available.
+- Documentation updated
+
+**[TRANSLATE-3240](https://jira.translate5.net/browse/TRANSLATE-3240): TBX-Import, TermPortal - Re-create term portal disk images on re-import** <br>
+Images missing on disk are now recreated during tbx import
+
+**[TRANSLATE-3239](https://jira.translate5.net/browse/TRANSLATE-3239): Authentication - Unify HTTPS checks for usage behind proxy with ssl offloaded** <br>
+Fix that SSO and CLI auth:impersonate is working behind a proxy with SSL offloading.
+
+**[TRANSLATE-3237](https://jira.translate5.net/browse/TRANSLATE-3237): Configuration, Editor general - UI: User config requested before loaded** <br>
+Fixed bug popping sometimes if config store is not yet loaded
+
+**[TRANSLATE-3235](https://jira.translate5.net/browse/TRANSLATE-3235): Okapi integration, TermPortal - Internal term translations should always use the system default bconf** <br>
+System default bconf is now used for termtranslation-tasks
+
+
 ## [5.9.0] - 2023-03-07
 
 ### Important Notes:
