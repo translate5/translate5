@@ -33,8 +33,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Zend_Db_Statement_Exception;
 use Zend_Exception;
 use Zend_Registry;
+use ZfExtended_Exception;
+use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
+use ZfExtended_Plugin_Exception;
 use ZfExtended_Plugin_Manager;
 
 
@@ -122,6 +127,13 @@ using the default ports.')
         );
 
         $this->addOption(
+            'all-available',
+            'l',
+            InputOption::VALUE_NONE,
+            'Discover all available non-configured plugin services'
+        );
+
+        $this->addOption(
             'service',
             's',
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
@@ -145,6 +157,7 @@ using the default ports.')
         $services = [];
         $host = null;
         $doSave = (!$this->input->getOption('auto-set')) ? false : true;
+        $allAvailable = (!$this->input->getOption('all-available')) ? false : true;
 
         // evaluate services to update
         $optionServices = $this->input->getOption('service');
@@ -171,7 +184,7 @@ using the default ports.')
             }
         }
 
-        $this->setServices($services, $doSave, $host);
+        $this->setServices($services, $doSave, $allAvailable, $host);
 
         return self::SUCCESS;
     }
@@ -179,25 +192,30 @@ using the default ports.')
     /**
      * @param array $services
      * @param bool $doSave
+     * @param bool $allAvailableServices
      * @param string|null $host
      * @throws Zend_Exception
-     * @throws \Zend_Db_Statement_Exception
-     * @throws \ZfExtended_Exception
-     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     * @throws \ZfExtended_Plugin_Exception
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Plugin_Exception
      */
-    protected function setServices(array $services, bool $doSave, string $host = null)
+    protected function setServices(array $services, bool $doSave, bool $allAvailableServices = false, string $host = null)
     {
-        // get configured services
-        $this->pluginmanager = Zend_Registry::get('PluginManager');
-        $this->pluginmanager->bootstrap(); // load all configured plugins
-        $configuredServices = Services::getAllServices(Zend_Registry::get('config'));
+        if($allAvailableServices){
+            $allServices = Services::getAllAvailableServices(Zend_Registry::get('config'));
+        } else {
+            // get configured services
+            $this->pluginmanager = Zend_Registry::get('PluginManager');
+            $this->pluginmanager->bootstrap(); // load all configured plugins
+            $allServices = Services::getAllServices(Zend_Registry::get('config'));
+        }
 
         foreach ($services as $serviceName => $service) {
-            if (array_key_exists($serviceName, $configuredServices)) {
+            if (array_key_exists($serviceName, $allServices)) {
 
-                $configuredService = $configuredServices[$serviceName];
+                $configuredService = $allServices[$serviceName];
                 if(is_array($service['url'])){
 
                     $serviceUrl = $service['url'];
@@ -271,9 +289,9 @@ using the default ports.')
      * @param bool $active
      * @param bool $doSave
      * @return void
-     * @throws \Zend_Db_Statement_Exception
-     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws \ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
     protected function setPluginActive(string $plugin, bool $active = true, bool $doSave = false)
     {
