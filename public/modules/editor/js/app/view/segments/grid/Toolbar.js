@@ -138,6 +138,22 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 // add themes menu
                 menu.items.push(me.getThemeMenuConfig());
             }
+
+            menu.items.push( {
+                xtype:'menuseparator'
+            });
+            // add visibility of character counter under segment-editor
+            menu.items.push({
+                xtype: 'menucheckitem',
+                itemId: 'showHideCharCounter',
+                stateId: 'editor.showHideCharCounter',
+                checked: (Editor.app.getTaskConfig('editor.toolbar.showHideCharCounter') == 1), // the default can be set by config, overwritable on system & customer level
+                bind: {
+                    text: '{l10n.segmentGrid.toolbar.showCharacterCounter}',
+                    tooltip: '{l10n.segmentGrid.toolbar.showCharacterCounterTooltip}'
+                }
+            });
+
             var useHNavArrow = false,
                 userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
                 userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),

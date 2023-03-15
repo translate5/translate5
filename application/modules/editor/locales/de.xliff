@@ -410,6 +410,15 @@
                 <source>Tag-Vollansicht</source>
                 <target>Tag-Vollansicht</target>
             </trans-unit>
+            <trans-unit id='WmVpY2hlbnrDpGhsZXIgdW50ZXIgRWRpdG9yIGFuemVpZ2Vu'>
+                <source>Zeichenzähler unter Editor anzeigen</source>
+                <target>Zeichenzähler unter Editor anzeigen</target>
+            </trans-unit>
+            <trans-unit id='WmVpZ3Qgb2RlciB2ZXJzdGVja3QgZGVuIFplaWNoZW56w6RobGVyIHVudGVyIGRlbSBTZWdtZW50ZWRpdG9y'>
+                <source>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</source>
+                <target>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</target>
+            </trans-unit>
+            <!-- TODO COUNTER -->
             <trans-unit id='RWluc3RlbGx1bmdlbg=='>
                 <source>Einstellungen</source>
                 <target>Einstellungen</target>
