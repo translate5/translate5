@@ -132,7 +132,8 @@ Ext.define('Editor.model.admin.Task', {
                 }
                 return tasks;
             }
-        }
+        },
+        {name: 'reimportable', type: 'boolean'}
     ],
     hasMany: [{
         model: 'Editor.model.segment.Field',

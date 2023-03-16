@@ -132,6 +132,7 @@ class editor_Models_Import_Worker_Import {
         ]);
 
         $filesProcessedAtAll = 0;
+        $isReImportable = true;
         foreach ($filelist as $fileId => $path) {
             $filelist[$fileId] = $path = $fileFilter->applyImportFilters($path, $fileId);
             $filePath = $this->importConfig->importFolder.'/'.$path;
@@ -147,6 +148,11 @@ class editor_Models_Import_Worker_Import {
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
             $filesProcessedAtAll++;
+
+            // task is not reimportable if one of the files is not supported by the reimport parser
+            if($parser::IS_REIMPORTABLE === false){
+                $isReImportable = false;
+            }
         }
         
         if($filesProcessedAtAll === 0) {
@@ -159,6 +165,7 @@ class editor_Models_Import_Worker_Import {
         $mqmProc->handleErrors();
         
         $this->task->setReferenceFiles($this->filelist->hasReferenceFiles());
+        $this->task->setReimportable($isReImportable);
     }
     
     /**
