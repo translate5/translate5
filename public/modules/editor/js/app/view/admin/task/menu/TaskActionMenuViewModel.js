@@ -143,7 +143,16 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
             },
             bind: '{task}'
         },
-        
+
+        // shows if the translation package feature is available for the user. The user can export/reimport translation package only if:
+        // - the user is able to edit task
+        // - the task is reimportable. The task is reimportable if all of the task files are imported with xliff or
+        //   file parser which extends the xliff file parser
+        isTranslatorPackageAvailable: {
+            get: Editor.util.Util.isTranslatorPackageAvailable,
+            bind: '{task}'
+        },
+
         /***
          * On task change, reconfigure the export menu
          * The old menu will be destroyed by the owner component

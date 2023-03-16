@@ -204,7 +204,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                 },{
                     itemId: 'packageExportItem',
                     bind:{
-                        hidden:'{!isNotErrorImportPendingCustom}',
+                        hidden:'{!isTranslatorPackageAvailable}',
                         text:'{l10n.tasksGrid.exportMenu.packageExportItem}'
                     },
                     action: 'editorPackageExport',

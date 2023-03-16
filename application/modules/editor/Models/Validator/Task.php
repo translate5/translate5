@@ -26,52 +26,55 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Task Entity
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible
-    $this->addValidator('id', 'int');
-    $this->addValidator('taskGuid', 'guid');
-    $this->addValidator('taskNr', 'stringLength', array('min' => 0, 'max' => 120));
-    $this->addValidator('foreignId', 'stringLength', array('min' => 0, 'max' => 1024));
-    $this->addValidator('taskName', 'stringLength', array('min' => 0, 'max' => 255));
-    $this->addValidator('foreignName', 'stringLength', array('min' => 0, 'max' => 255));
-    $this->addValidator('sourceLang', 'int');
-    $this->addValidator('targetLang', 'int');
-    $this->addValidator('relaisLang', 'int');
-    $this->addDontValidateField('lockedInternalSessionUniqId');
-    $this->addValidator('locked', 'date', array('Y-m-d H:i:s'));
-    $this->addValidator('lockingUser', 'guid');
-    $this->addValidator('state', 'inArray', [[
-        editor_Models_Task::STATE_OPEN,
-        editor_Models_Task::STATE_END,
-        editor_Models_Task::STATE_UNCONFIRMED,
-        editor_Models_Task::STATE_ERROR, //to cancel import only, validated on usage
-    ]]);
-    $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-    /* @var $wfm editor_Workflow_Manager */
-    $this->addValidator('workflow', 'inArray', [$wfm->getWorkflows()]);
-    $this->addValidator('workflowStep', 'int');
-    $this->addValidator('pmGuid', 'guid');
-    $this->addValidator('pmName', 'stringLength', array('min' => 0, 'max' => 512));
-    $this->addValidator('wordCount', 'int');
-    $this->addValidator('orderdate', 'date', array('Y-m-d H:i:s'),true);
-    $this->addValidator('referenceFiles', 'int');
-    $this->addValidator('terminologie', 'int');
-    $this->addValidator('edit100PercentMatch', 'int');
-    $this->addValidator('lockLocked', 'int');
-    $this->addValidator('enableSourceEditing', 'int');
-    $this->addValidator('importAppVersion', 'stringLength', array('min' => 0, 'max' => 64));
-    $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 500));
-    $this->addValidator('customerId', 'int');
-    $this->addValidator('segmentCount', 'int');
-    $this->addValidator('segmentFinishCount', 'int');
-    $this->addValidator('taskType', 'inArray', [editor_Task_Type::getInstance()->getValidTypes()]);
-    $this->addValidator('usageMode', 'inArray', [[editor_Models_Task::USAGE_MODE_COMPETITIVE, editor_Models_Task::USAGE_MODE_COOPERATIVE, editor_Models_Task::USAGE_MODE_SIMULTANEOUS]]);
-    $this->addValidator('projectId', 'int');
-    $this->addValidator('diffExportUsable', 'int');
-  }
+class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract
+{
+
+    /**
+     * Validators for Task Entity
+     */
+    protected function defineValidators()
+    {
+        //comment = string, without length contrain. No validator needed / possible
+        $this->addValidator('id', 'int');
+        $this->addValidator('taskGuid', 'guid');
+        $this->addValidator('taskNr', 'stringLength', array('min' => 0, 'max' => 120));
+        $this->addValidator('foreignId', 'stringLength', array('min' => 0, 'max' => 1024));
+        $this->addValidator('taskName', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('foreignName', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('sourceLang', 'int');
+        $this->addValidator('targetLang', 'int');
+        $this->addValidator('relaisLang', 'int');
+        $this->addDontValidateField('lockedInternalSessionUniqId');
+        $this->addValidator('locked', 'date', array('Y-m-d H:i:s'));
+        $this->addValidator('lockingUser', 'guid');
+        $this->addValidator('state', 'inArray', [[
+            editor_Models_Task::STATE_OPEN,
+            editor_Models_Task::STATE_END,
+            editor_Models_Task::STATE_UNCONFIRMED,
+            editor_Models_Task::STATE_ERROR, //to cancel import only, validated on usage
+        ]]);
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $this->addValidator('workflow', 'inArray', [$wfm->getWorkflows()]);
+        $this->addValidator('workflowStep', 'int');
+        $this->addValidator('pmGuid', 'guid');
+        $this->addValidator('pmName', 'stringLength', array('min' => 0, 'max' => 512));
+        $this->addValidator('wordCount', 'int');
+        $this->addValidator('orderdate', 'date', array('Y-m-d H:i:s'), true);
+        $this->addValidator('referenceFiles', 'int');
+        $this->addValidator('terminologie', 'int');
+        $this->addValidator('edit100PercentMatch', 'int');
+        $this->addValidator('lockLocked', 'int');
+        $this->addValidator('enableSourceEditing', 'int');
+        $this->addValidator('importAppVersion', 'stringLength', array('min' => 0, 'max' => 64));
+        $this->addValidator('description', 'stringLength', array('min' => 0, 'max' => 500));
+        $this->addValidator('customerId', 'int');
+        $this->addValidator('segmentCount', 'int');
+        $this->addValidator('segmentFinishCount', 'int');
+        $this->addValidator('taskType', 'inArray', [editor_Task_Type::getInstance()->getValidTypes()]);
+        $this->addValidator('usageMode', 'inArray', [[editor_Models_Task::USAGE_MODE_COMPETITIVE, editor_Models_Task::USAGE_MODE_COOPERATIVE, editor_Models_Task::USAGE_MODE_SIMULTANEOUS]]);
+        $this->addValidator('projectId', 'int');
+        $this->addValidator('diffExportUsable', 'int');
+        $this->addValidator('reimportable', 'int');
+    }
 }
