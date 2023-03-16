@@ -78,6 +78,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'vrsz', 'vsdm', 'vsdx', 'wcml', 'wix', 'xlsm', 'xlsx', 'xltm', 'xltx', 'xml', 'yaml', 'yml'
     ];
 
+    const SUPPORTED_OKAPI_VERSION = [
+        'okapi-longhorn-037',
+        'okapi-longhorn-139',
+        'okapi-longhorn-141',
+        'okapi-longhorn-143',
+        'okapi-longhorn-144-snapshot',
+    ];
+
     /**
      * Retrieves the config-based path to the default export bconf
      * @param editor_Models_Task $task
