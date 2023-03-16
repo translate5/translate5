@@ -70,8 +70,13 @@ class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Expor
         // Load task
         $task->loadByTaskGuid($taskGuid);
 
-        // Create temporary file for writing zipped contents
-        $zipFile = tempnam($task->getAbsoluteTaskDataPath(), 'taskExport_');
+        if(isset($parameters['zipFileName'])){
+            $zipFile = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$parameters['zipFileName'];
+        }else{
+            // Create temporary file for writing zipped contents
+            $zipFile = tempnam($task->getAbsoluteTaskDataPath(), 'taskExport_');
+        }
+
 
         // Call parent
         $this->init($taskGuid, [

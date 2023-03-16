@@ -25,14 +25,111 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+?>
+<style>
+    body {
+        background-color: #f2f2f2;
+        font-family: Arial, sans-serif;
+    }
 
-// This will print the error message to the user in case errors happen during the package export.
-echo '<script>';
-if (isset($this->error)) {
-    echo '
-    var editor = window.opener ? window.opener.Editor : null;
-    if(editor){
-        editor.MessageBox.addError("' . $this->error . '");
-    }';
-}
-echo 'window.close();</script>';
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .logo {
+        max-width: 150px;
+        height: auto;
+    }
+
+    h1 {
+        font-size: 32px;
+        font-weight: bold;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 18px;
+        margin-top: 0;
+        margin-bottom: 40px;
+    }
+
+    .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100px;
+        background-image: url('/modules/editor/images/loading_ico.gif');
+        background-size: 25px;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<div class="container">
+    <div class="header">
+        <img class="logo" src="/images/translate5.png" alt="Company Logo">
+        <h1>Translator package export</h1>
+    </div>
+    <p class="export-running-message">Export is running. Please wait ...</p>
+    <div class="loading"></div>
+    <div class="result hidden">
+        <p>The file is available for download!</p>
+        <a href="#" class="btn download hidden">Download</a>
+    </div>
+    <div class="error hidden"></div>
+</div>
+
+<script>
+    var apiUrl = '/editor/taskid/<?php echo $this->taskId;?>/task/packagestatus?workerId=<?php echo $this->workerId;?>';
+    function checkFileAvailability() {
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.file_available) {
+                    document.querySelector('.loading').classList.add('hidden');
+                    document.querySelector('.result').classList.remove('hidden');
+                    const downloadLink = document.querySelector('.download');
+                    downloadLink.href = data.download_link;
+                    downloadLink.classList.remove('hidden');
+                } else {
+                    setTimeout(checkFileAvailability, 3000);
+                }
+            })
+            .catch(error => {
+                console.log('Error checking file availability:', error);
+                document.querySelector('.loading').classList.add('hidden');
+                document.querySelector('.export-running-message').classList.add('hidden');
+                document.querySelector('.error').textContent = 'Error checking file availability. Please try again later.';
+                document.querySelector('.error').classList.remove('hidden');
+            });
+    }
+
+    checkFileAvailability();
+</script>

@@ -44,9 +44,9 @@ class Downloader
     /**
      * @param editor_Models_Task $task
      * @param bool $diff
-     * @return void
+     * @return int
      */
-    public function downloadPackage(editor_Models_Task $task, bool $diff): void
+    public function downloadPackage(editor_Models_Task $task, bool $diff): int
     {
 
         // Turn off limitations?
@@ -63,19 +63,15 @@ class Downloader
 
         $contextParams = [
             'exportFolder' => $exportFolder,
+            'zipFileName' => $workerId,
             'cookie' => Zend_Session::getId()
         ];
-        $zipFile = $worker->setup($task->getTaskGuid(), $contextParams);
 
-        $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
-        $worker->queue($workerId);
+        $worker->setup($task->getTaskGuid(), $contextParams);
 
-        Header::sendDownload(
-            $task->getTasknameForDownload('_exportPackage.zip'),
-            'application/zip'
-        );
-        readfile($zipFile);
-        unlink($zipFile);
+        $packageWorkerId = $worker->queue($workerId);
+
+        return $packageWorkerId;
     }
 
 }
