@@ -77,8 +77,11 @@ function cleanupAttrA(array $attrA, $db, array $picklistA) {
     // Foreach attr having duplicates
     foreach ($attrA as $attrI) {
 
+        // Trim comma from older ids
+        $older = trim($attrI['older'], ',');
+
         // Delete all records of this attribute except the newer one
-        $db->query("DELETE FROM `terms_attributes` WHERE `id` IN ({$attrI['older']})");
+        $db->query("DELETE FROM `terms_attributes` WHERE `id` IN ($older)");
 
         // If this attribute is not a picklist
         if (!isset($picklistA[$attrI['dataTypeId']])) {
