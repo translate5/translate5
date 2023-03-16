@@ -212,7 +212,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                     glyph: 'f019@FontAwesome5FreeSolid'
                 },{
                     bind:{
-                        hidden:'{!isNotErrorImportPendingCustom}',
+                        hidden:'{!isTranslatorPackageAvailable}',
                         text: '{l10n.projectOverview.taskManagement.taskReimport.importTranslatorPackage}'
                     },
                     action: 'editorPackageReimport',
