@@ -9084,6 +9084,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='V2VpdGVyZSBJbmZvcm1hdGlvbmVuIGZpbmRlbiBTaWUgaW0gRXJnZWJuaXNwcm90b2tvbGwu'>
               <source>Weitere Informationen finden Sie im Ergebnisprotokoll.</source>
               <target>For more info check the result log.</target>
+			</trans-unit>
+            <trans-unit id='RGFzIERhdGVpZm9ybWF0IHdpcmQgdm9tIMOcYmVyc2V0emVycGFrZXQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+              <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
+              <target>File format not supported for translator package.</target>
             </trans-unit>
         </body>
     </file>

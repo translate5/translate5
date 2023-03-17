@@ -8907,6 +8907,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='V2VpdGVyZSBJbmZvcm1hdGlvbmVuIGZpbmRlbiBTaWUgaW0gRXJnZWJuaXNwcm90b2tvbGwu'>
               <source>Weitere Informationen finden Sie im Ergebnisprotokoll.</source>
               <target>Weitere Informationen finden Sie im Ergebnisprotokoll.</target>
+			</trans-unit>
+            <trans-unit id='RGFzIERhdGVpZm9ybWF0IHdpcmQgdm9tIMOcYmVyc2V0emVycGFrZXQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+              <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
+              <target>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</target>
             </trans-unit>
         </body>
     </file>
