@@ -1506,6 +1506,15 @@ class editor_TaskController extends ZfExtended_RestController {
         $remover->remove($forced);
     }
 
+    /***
+     * Check the status of the package export.
+     * @return void
+     * @throws Throwable
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\NoAccessException
+     */
     public function packagestatusAction(){
         $this->initCurrentTask(false);
         $task = $this->getCurrentTask();

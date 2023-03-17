@@ -108,10 +108,10 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     function checkFileAvailability() {
         fetch(apiUrl)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                if (response.ok) {
+                    return response.json();
                 }
-                return response.json();
+                return Promise.reject(response);
             })
             .then(data => {
                 if (data.file_available) {
@@ -130,7 +130,6 @@ $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
                 }
             })
             .catch(error => {
-                console.log('Error checking file availability:', error);
                 document.querySelector('.loading').classList.add('hidden');
                 document.querySelector('.export-running-message').classList.add('hidden');
                 document.querySelector('.error').textContent = '<?php echo $translate->_('Es ist ein Fehler aufgetreten!').' '; ?>';

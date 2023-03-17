@@ -37,6 +37,7 @@ use Zend_Exception;
 use Zend_Registry;
 use Zend_Session;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Conflict;
 use ZfExtended_Models_Entity_NotFoundException;
 
 /**
@@ -88,7 +89,11 @@ class Downloader
         $worker->load($workerId);
 
         if($worker->isDefunct()){
-            throw new Exception('Error on export. Check the error log for more info');
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            $task->loadByTaskGuid($worker->getTaskGuid());
+            throw new \MittagQI\Translate5\Task\Export\Package\Exception('E1501',[
+                'task' =>$task
+            ]);
         }
         return $worker->isDone();
     }
@@ -103,8 +108,9 @@ class Downloader
     {
         $zipFile = $this->getZipFile($task);
         if(is_file($zipFile) === false){
-            //TODO:
-            throw new Exception('The export package does not exist for the task.');
+            throw new \MittagQI\Translate5\Task\Export\Package\Exception('E1502',[
+                'task' =>$task
+            ]);
         }
 
         Header::sendDownload($task->getTasknameForDownload('_exportPackage.zip'),'application/zip');

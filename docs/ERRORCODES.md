@@ -261,29 +261,31 @@ https://confluence.translate5.net/display/TAD/EventCodes
 
 
 ### Export
-| EventCode        | Context       | EventMessage  | Description/Solution
-| :--------------- |:------------- | :------------ | :-------------------
-| <a id="E1398"></a>E1398  | Task Export | Export folder not found or not write able: {folder} | Contact the sys admin to check the folder access rights
-| <a id="E1085"></a>E1085  | Task Export | this-&gt;_classNameDifftagger must be defined in the child class. | This is a developer issue, contact the developers.
-| <a id="E1086"></a>E1086  | Task Export | Error in Export-Fileparsing. instead of a id=&quot;INT&quot; and a optional field=&quot;STRING&quot; attribute the following content was extracted: &quot;{content}&quot; | The parsing of the internal &lt;lekTargetSeg/&gt; placeholders in the skeleton data failed.
-| <a id="E1087"></a>E1087  | Task Export | See E1086 |
-| <a id="E1088"></a>E1088  | Task Export | Error in diff tagging of export. For details see the previous exception. | The export with enabled automatic diff of the content fails. The original message of the export should be attached.
+| EventCode        | Context               | EventMessage  | Description/Solution
+| :--------------- |:----------------------| :------------ | :-------------------
+| <a id="E1398"></a>E1398  | Task Export           | Export folder not found or not write able: {folder} | Contact the sys admin to check the folder access rights
+| <a id="E1085"></a>E1085  | Task Export           | this-&gt;_classNameDifftagger must be defined in the child class. | This is a developer issue, contact the developers.
+| <a id="E1086"></a>E1086  | Task Export           | Error in Export-Fileparsing. instead of a id=&quot;INT&quot; and a optional field=&quot;STRING&quot; attribute the following content was extracted: &quot;{content}&quot; | The parsing of the internal &lt;lekTargetSeg/&gt; placeholders in the skeleton data failed.
+| <a id="E1087"></a>E1087  | Task Export           | See E1086 |
+| <a id="E1088"></a>E1088  | Task Export           | Error in diff tagging of export. For details see the previous exception. | The export with enabled automatic diff of the content fails. The original message of the export should be attached.
 | <a id="E1089"></a>E1089  | Task Export with Diff | Tag syntax error in the segment content. No diff export is possible. The segment had been: &quot;{segment}&quot; | In this segment for one closing tag no corresponding opening tag exists - or the tagorder had been syntactically incorrect already before the import in the editor. Therefore it is not possible to create an export with sdl-change-marks in it. Try to export without change-marks.
 | <a id="E1090"></a>E1090  | Task Export with Diff | The number of opening and closing g-Tags had not been the same! The Segment had been: &quot;{segment}&quot; | Similar to E1089.
 | <a id="E1091"></a>E1091  | Task Export with Diff | See E1089 |
 | <a id="E1092"></a>E1092  | Task Export with Diff | See E1090 |
 | <a id="E1093"></a>E1093  | Task Export with Diff | See E1090 |
-| <a id="E1143"></a>E1143  | Task Export | ExportedWorker: No Parameter &quot;zipFile&quot; given for worker. | This is an implementantion error.
-| <a id="E1144"></a>E1144  | Task Export | ExportedWorker: No Parameter &quot;folderToBeZipped&quot; given for worker. | This is an implementantion error.
-| <a id="E1145"></a>E1145  | Task Export | Could not create export-zip. |
-| <a id="E1146"></a>E1146  | Task Export | The task export folder does not exist, no export ZIP file can be created. | The user has probably clicked multiple times on the export button while the first export was still running.
-| <a id="E1147"></a>E1147  | Task Export | The task export folder does not exist or is not writeable, no export ZIP file can be created. | See E1146.
-| <a id="E1149"></a>E1149  | Task Export | Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"]. | See error details for affected segments and details.
-| <a id="E1157"></a>E1157  | Task Export | Export: the file &quot;{file}&quot; could not be exported, since had possibly already errors on import. | See error details for affected file and details.
-| <a id="E1170"></a>E1170  | Task Metadata Export | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
-| <a id="E1452"></a>E1452  | Export package     | Export package: Task contains not supported files for package export | The exported task contains files which are not supported by the package export.
-| <a id="E1453"></a>E1453  | Export package     | Export package: Source package validation fail | The validation for one or multiple package sources failed. Check the event log for more info
-| <a id="E1454"></a>E1454  | Export package     | Export package: Unable to create resource export folder | There was a problem when creating the resources folders. For more info check the error log
+| <a id="E1143"></a>E1143  | Task Export           | ExportedWorker: No Parameter &quot;zipFile&quot; given for worker. | This is an implementantion error.
+| <a id="E1144"></a>E1144  | Task Export           | ExportedWorker: No Parameter &quot;folderToBeZipped&quot; given for worker. | This is an implementantion error.
+| <a id="E1145"></a>E1145  | Task Export           | Could not create export-zip. |
+| <a id="E1146"></a>E1146  | Task Export           | The task export folder does not exist, no export ZIP file can be created. | The user has probably clicked multiple times on the export button while the first export was still running.
+| <a id="E1147"></a>E1147  | Task Export           | The task export folder does not exist or is not writeable, no export ZIP file can be created. | See E1146.
+| <a id="E1149"></a>E1149  | Task Export           | Export: Some segments contain tag errors [Task {taskGuid} "{taskName}"]. | See error details for affected segments and details.
+| <a id="E1157"></a>E1157  | Task Export           | Export: the file &quot;{file}&quot; could not be exported, since had possibly already errors on import. | See error details for affected file and details.
+| <a id="E1170"></a>E1170  | Task Metadata Export  | The Metadata of the currently filtered tasks can not be exported as Excel-file. |
+| <a id="E1452"></a>E1452  | Export package        | Export package: Task contains not supported files for package export | The exported task contains files which are not supported by the package export.
+| <a id="E1453"></a>E1453  | Export package        | Export package: Source package validation fail | The validation for one or multiple package sources failed. Check the event log for more info
+| <a id="E1454"></a>E1454  | Export package        | Export package: Unable to create resource export folder | There was a problem when creating the resources folders. For more info check the error log
+| <a id="E1501"></a>E1501  | Export package        | Export package: General problem with package export. Check the error log for more info. | The export worker did not finish successfully. Check the previous errors for more info
+| <a id="E1502"></a>E1502  | Export package        | Export package: The export package does not exist anymore. | The requested translator package for download does not exist in the disk anymore.
 
 ### Task reimport
 | EventCode               | Context       | EventMessage                                                                                           | Description/Solution                                                                                              |
