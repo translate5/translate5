@@ -32,8 +32,6 @@ use editor_Models_Export_Exported_ZipDefaultWorker;
 use editor_Models_Task;
 use MittagQI\Translate5\Task\Export\Package\ExportSource;
 use SplFileInfo;
-use ZfExtended_Factory;
-use ZfExtended_Models_Worker;
 use ZfExtended_Utils;
 
 /**

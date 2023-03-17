@@ -29,24 +29,29 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Task\Export\Package;
 
 use editor_Models_Task;
+use Exception;
 use MittagQI\Translate5\Task\Export\Exported\PackageWorker;
+use MittagQI\Translate5\Task\Lock;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use Zend_Exception;
+use Zend_Registry;
 use Zend_Session;
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_NotFoundException;
 
 /**
  *
  */
 class Downloader
 {
-    public const TASK_PACKAGE_EXPORT_STATE = 'PackageExport';
+    public const PACKAGE_EXPORT = 'PackageExport';
 
     /**
      * @param editor_Models_Task $task
      * @param bool $diff
      * @return int
      */
-    public function downloadPackage(editor_Models_Task $task, bool $diff): int
+    public function run(editor_Models_Task $task, bool $diff): int
     {
 
         // Turn off limitations?
@@ -61,17 +66,79 @@ class Downloader
 
         $worker = ZfExtended_Factory::get(PackageWorker::class);
 
-        $contextParams = [
-            'exportFolder' => $exportFolder,
-            'zipFileName' => $workerId,
-            'cookie' => Zend_Session::getId()
-        ];
-
-        $worker->setup($task->getTaskGuid(), $contextParams);
+        $worker->init($task->getTaskGuid(), [
+            'folderToBeZipped' => $exportFolder,
+            'zipFile' => self::getZipFile($task)
+        ]);
 
         $packageWorkerId = $worker->queue($workerId);
 
         return $packageWorkerId;
+    }
+
+    /**
+     * Check if the export package is finished by checking if the last worker in the export package chain is finished
+     * @param int $workerId
+     * @return bool
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function isAvailable(int $workerId): bool
+    {
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        $worker->load($workerId);
+
+        if($worker->isDefunct()){
+            throw new Exception('Error on export. Check the error log for more info');
+        }
+        return $worker->isDone();
+    }
+
+    /**
+     * Download package for given task. In case the file does not exist, this will throw an exception
+     * @param editor_Models_Task $task
+     * @return void
+     * @throws Exception
+     */
+    public function download(editor_Models_Task $task): void
+    {
+        $zipFile = $this->getZipFile($task);
+        if(is_file($zipFile) === false){
+            //TODO:
+            throw new Exception('The export package does not exist for the task.');
+        }
+
+        Header::sendDownload($task->getTasknameForDownload('_exportPackage.zip'),'application/zip');
+
+        readfile($zipFile);
+        unlink($zipFile);
+    }
+
+    /**
+     * Get the package download link given task and worker id. The worker id is the id of the worker which will zip
+     * the exported package(the last worker in the export package chain).
+     * @param editor_Models_Task $task
+     * @param int $workerId
+     * @return string
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getDownloadLink(editor_Models_Task $task, int $workerId): string
+    {
+        $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
+
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        $worker->load($workerId);
+
+        return $restPath.'taskid/'.$task->getId().'/task/packagestatus?download=true&workerId='.$worker->getId();
+    }
+
+    /**
+     * @param editor_Models_Task $task
+     * @return string
+     */
+    protected function getZipFile(editor_Models_Task $task): string
+    {
+        return $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.self::PACKAGE_EXPORT;
     }
 
 }

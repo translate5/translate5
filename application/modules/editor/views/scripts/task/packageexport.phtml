@@ -25,6 +25,8 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
+$translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 ?>
 <style>
     body {
@@ -33,7 +35,7 @@ END LICENSE AND COPYRIGHT
     }
 
     .container {
-        max-width: 600px;
+        max-width: 650px;
         margin: 0 auto;
         padding: 40px;
         background-color: #fff;
@@ -90,13 +92,13 @@ END LICENSE AND COPYRIGHT
 <div class="container">
     <div class="header">
         <img class="logo" src="/images/translate5.png" alt="Company Logo">
-        <h1>Translator package export</h1>
+        <h1><?php echo $translate->_('Übersetzerpaket herunterladen'); ?></h1>
     </div>
-    <p class="export-running-message">Export is running. Please wait ...</p>
+    <p class="export-running-message"><?php echo $translate->_('Der Export wird ausgeführt. Bitte warten ...'); ?></p>
     <div class="loading"></div>
     <div class="result hidden">
-        <p>The file is available for download!</p>
-        <a href="#" class="btn download hidden">Download</a>
+        <p><?php echo $translate->_('Die Datei kann heruntergeladen werden!'); ?></p>
+        <a href="#" class="btn download hidden"><?php echo $translate->_('Herunterladen'); ?></a>
     </div>
     <div class="error hidden"></div>
 </div>
@@ -114,10 +116,15 @@ END LICENSE AND COPYRIGHT
             .then(data => {
                 if (data.file_available) {
                     document.querySelector('.loading').classList.add('hidden');
+                    document.querySelector('.export-running-message').classList.add('hidden');
                     document.querySelector('.result').classList.remove('hidden');
                     const downloadLink = document.querySelector('.download');
                     downloadLink.href = data.download_link;
                     downloadLink.classList.remove('hidden');
+                    downloadLink.target='_blank';
+                    downloadLink.addEventListener('click', () => {
+                        window.close();
+                    });
                 } else {
                     setTimeout(checkFileAvailability, 3000);
                 }
@@ -126,7 +133,8 @@ END LICENSE AND COPYRIGHT
                 console.log('Error checking file availability:', error);
                 document.querySelector('.loading').classList.add('hidden');
                 document.querySelector('.export-running-message').classList.add('hidden');
-                document.querySelector('.error').textContent = 'Error checking file availability. Please try again later.';
+                document.querySelector('.error').textContent = '<?php echo $translate->_('Es ist ein Fehler aufgetreten!').' '; ?>';
+                document.querySelector('.error').textContent += '<?php echo $translate->_('Weitere Informationen finden Sie im Ergebnisprotokoll.'); ?>';
                 document.querySelector('.error').classList.remove('hidden');
             });
     }
