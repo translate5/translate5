@@ -57,12 +57,14 @@ var editIdleTimer = null,
  */
 function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTranslate){
 
-    characterLimit = characterLimit;
-
     if(disableInstantTranslate){
         // dev-option may disables instant translation
         instantTranslationIsActive = false;
     }
+
+    $.ajaxSetup({
+        headers: { CsrfToken: Editor.data.csrfToken }
+    });
 
     $('#logout a').mouseover(function(){
         $(this).removeClass("ui-state-active");

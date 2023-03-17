@@ -171,7 +171,8 @@ Ext.application({
     init: function () {
         //enable json in our REST interface
         Ext.Ajax.setDefaultHeaders({
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'CsrfToken': Editor.data.csrfToken
         });
         //init the plugins namespace
         Ext.ns('Editor.plugins');

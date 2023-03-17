@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\CsrfProtection;
 /**
  * Bootstrapping the API tests
  */
@@ -75,12 +76,14 @@ ZfExtended_Test_ApiHelper::setup([
     'DATA_DIR' => $config->runtimeOptions->dir->taskData,
     'LOGOUT_PATH' => $config->runtimeOptions->loginUrl,
     'CAPTURE_MODE' => (getenv('DO_CAPTURE') === '1'),
+    'SKIP_PRETESTS' => (getenv('SKIP_PRETESTS') === '1'),
     'XDEBUG_ENABLE' => (getenv('XDEBUG_ENABLE') === '1'),
     'KEEP_DATA' => (getenv('KEEP_DATA') === '1'),
     'LEGACY_DATA' => (getenv('LEGACY_DATA') === '1'),
     'LEGACY_JSON' => (getenv('LEGACY_JSON') === '1'),
     'IS_SUITE' => (getenv('IS_SUITE') === '1'),
-    'ENVIRONMENT' => $ENVIRONMENT
+    'ENVIRONMENT' => $ENVIRONMENT,
+    'CSRF_TOKEN' => CsrfProtection::createApiTestToken()
 ]);
 
 //forcing cwd to testcases dir

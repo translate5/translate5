@@ -33,6 +33,7 @@ use MittagQI\Translate5\Tools\Cronjobs;
  * Cron Controller
  * This controller provides methods to be called regularly.
  * Each action should be called through wget by a crontjob
+ * Due to IP filtering there is no CSRF protection neccessary
  */
 class Editor_CronController extends ZfExtended_Controllers_Action {
     /**

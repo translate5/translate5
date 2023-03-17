@@ -26,6 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\ZfExtended\CsrfProtection;
+
+/**
+ * Provides the index-page of the TermPortal App
+ */
 class Editor_TermportalController extends ZfExtended_Controllers_Action
 {
     public function indexAction()
@@ -38,9 +43,11 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action
             return;
         }
 
+        // this initializes the CSRF token for the TermPortal Frontend
+        $this->view->csrfToken = CsrfProtection::getInstance()->getToken();
+
         // Get config's runtimeOptions
         $rop = Zend_Registry::get('config')->runtimeOptions;
-
         // Get enableJsLogger param
         $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
 

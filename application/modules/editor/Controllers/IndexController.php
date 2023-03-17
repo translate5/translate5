@@ -32,6 +32,7 @@ use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\ZfExtended\CsrfProtection;
 
 /**
  * Dummy Index Controller
@@ -109,7 +110,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     }
 
     /**
-     * load base page
+     * Serve application markup
      * @throws Zend_Exception
      */
     public function indexAction()
@@ -315,6 +316,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
 
         $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);
 
+        // this initializes the CSRF token for the Frontend
+        $this->view->Php2JsVars()->set('csrfToken', CsrfProtection::getInstance()->getToken());
         $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR . $rop->loginUrl);
         $this->view->Php2JsVars()->set('logoutOnWindowClose', $rop->logoutOnWindowClose);
 
@@ -689,6 +692,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
     }
 
     /**
+     * Applicationstate page, frontend: /application/modules/editor/views/scripts/index/applicationstate.phtml
+     * No CSRF protection needed
      * @throws Zend_Acl_Exception
      * @throws Zend_Exception
      */
@@ -705,12 +710,20 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         }
     }
 
+    /**
+     * Editor localization, frontend: /application/modules/editor/views/scripts/index/localizedjsstrings.phtml
+     * No CSRF protection needed
+     */
     public function localizedjsstringsAction()
     {
         $this->getResponse()->setHeader('Content-Type', 'text/javascript', true);
         $this->_helper->layout->disableLayout();
     }
 
+    /**
+     * Help-page for the ChangeAlike editor, frontend: /application/modules/editor/views/scripts/index/wdhelp.phtml
+     * No CSRF protection needed
+     */
     public function wdhehelpAction()
     {
         $this->_helper->layout->disableLayout();
@@ -821,6 +834,15 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         exit;
     }
 
+    /**
+     * Provides a smart interface to generate XLF fragments for the internal translation files.
+     *   Usage in the UI: Enter the german text in the form, a german XLF fragment is generated, existing
+     *   translations are searched for similar texts and a english XLF fragment is generated of that. Final translation
+     *   must be done manually then.
+     *
+     * No CSRF Protection needed: this method is protected by ACL rules and is only accessible on development machines
+     *  by adding ACL access manually!
+     */
     public function makexliffAction()
     {
         $input = $this->getParam('input', '');

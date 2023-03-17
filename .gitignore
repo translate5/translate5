@@ -37,4 +37,5 @@
 # Tests
 /test-requests/*.env.json
 /testdata/*
+/apitest-csrf.token
 
