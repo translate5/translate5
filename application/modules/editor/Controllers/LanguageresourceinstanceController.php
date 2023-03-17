@@ -724,18 +724,29 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         parent::putAction();
         if ($this->wasValid) {
 
-
-            if( (bool)$this->getParam('forced',false) === true){
-                $this->checkOrCleanCustomerAssociation(true, $this->getDataField('customerIds') ?? []);
-            }
-
             // especially tests are not respecting the array format ...
             editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
 
+            if ((bool)$this->getParam('forced', false) === true) {
+                $this->checkOrCleanCustomerAssociation(true, $this->getDataField('customerIds') ?? []);
+            }
+
             $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            $customerAssoc->updateAssocRequest($this->entity->getId(),$this->data);
+            $customerAssoc->updateAssocRequest($this->entity->getId(), $this->data);
 
             $this->addAssocData();
+        }
+    }
+
+    /**
+     * when new assocs have been sent non-forced with PUT, we need to validate them before saving
+     * @throws ZfExtended_ValidateException
+     */
+    protected function additionalValidations()
+    {
+        if ($this->getRequest()->isPut() && (bool)$this->getParam('forced', false) === false) {
+            // check for association to be cleaned only when it is put and the forced flag is not set
+            $this->checkOrCleanCustomerAssociation(false, $this->getDataField('customerIds') ?? []);
         }
     }
 
@@ -810,19 +821,19 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     public function exportAction() {
-        $proposals=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $proposals = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         /* @var $proposals editor_Models_Terminology_Models_TermModel */
 
-        $collectionIds=$this->getParam('collectionId');
-        if(is_string($collectionIds)){
-            $collectionIds=explode(',', $collectionIds);
+        $collectionIds = $this->getParam('collectionId');
+        if (is_string($collectionIds)) {
+            $collectionIds = explode(',', $collectionIds);
         }
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
         $allowedCollections = $termCollection->getCollectionForAuthenticatedUser();
         $rows = $proposals->loadProposalExportData(array_intersect($collectionIds, $allowedCollections), $this->getParam('exportDate'));
-        if(empty($rows)){
-            $this->view->message='No results where found.';
+        if (empty($rows)) {
+            $this->view->message = 'No results where found.';
             return;
         }
         $proposals->exportProposals($rows);
@@ -1209,11 +1220,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         // check entity version
         $this->processClientReferenceVersion();
-        $this->checkOrCleanAssociation($forced,$this->entity->getCustomers() ?? []);
-        
-        // no try to remove the language-resource
+
+        // now try to remove the language-resource associations, customer and task
         try {
-            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [$this->entity]);
+            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [ $this->entity ]);
             $remover->remove(forced: $forced, deleteInResource: $deleteInResource);
         }
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
@@ -1472,21 +1482,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /**
-     * The above injectors add additional error messages, which are evaluated here
-     * @throws ZfExtended_ValidateException
-     */
-    protected function additionalValidations() {
-
-        if( $this->getRequest()->isPut() === false || (bool)$this->getParam('forced',false) === true){
-            return;
-        }
-        // check for association to be cleaned only when it is put and the forced flag is not set
-        $this->checkOrCleanCustomerAssociation(false,$this->getDataField('customerIds') ?? []);
-    }
-
-    /**
-     * Check of clean associations when customer is changed.
-     * @TODO: same function exists in LanguageResources/Remover.php !!!
+     * Check or clean of customer associations
      * @param bool $clean
      * @return void
      * @throws Zend_Db_Table_Exception
@@ -1494,27 +1490,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     private function checkOrCleanCustomerAssociation(bool $clean, array $customerIds): void
     {
-        $assocClean = ZfExtended_Factory::get(Customer::class, [
-            $this->entity->getId()
-        ]);
-        $assocClean->setCustomersLeft($customerIds);
-
+        $assocClean = ZfExtended_Factory::get(Customer::class, [$this->entity->getId(), $customerIds]);
         $clean ? $assocClean->cleanAssociation() : $assocClean->check();
     }
-
-    /**
-     * @param bool $clean
-     * @return void
-     * @throws Zend_Db_Table_Exception
-     * @throws ZfExtended_ErrorCodeException
-     */
-    private function checkOrCleanTaskAssociation(bool $clean){
-        $assocClean = ZfExtended_Factory::get(Task::class,[
-            $this->entity->getId()
-        ]);
-        $clean ? $assocClean->cleanAssociation() : $assocClean->check();
-    }
-
 
     private function hasImportingAssociatedTasks(int $languageResourceId): bool
     {

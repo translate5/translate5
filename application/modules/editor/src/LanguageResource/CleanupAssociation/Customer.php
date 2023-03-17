@@ -39,8 +39,13 @@ use ZfExtended_Utils;
  */
 class Customer extends Base
 {
-
-    private array $customersLeft;
+    /**
+     * @param int $languageResourceId
+     * @param array $customersLeft: The customers that shall remain as assocs
+     */
+    public function __construct(protected int $languageResourceId, protected array $customersLeft)
+    {
+    }
 
     /***
      * Get the conflicting association by given entity class name (TaskAssociation or TaskPivotAssociation)
@@ -87,13 +92,5 @@ class Customer extends Base
         ], extraData: [
             'taskList' => $taskNames
         ]);
-    }
-
-    /**
-     * @param array $customersLeft
-     */
-    public function setCustomersLeft(array $customersLeft): void
-    {
-        $this->customersLeft = $customersLeft;
     }
 }

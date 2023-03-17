@@ -31,7 +31,8 @@ END LICENSE AND COPYRIGHT
  * So the function can be used from all places inside the application.
  */
 
-use MittagQI\Translate5\LanguageResource\CleanupAssociation;
+use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task as TaskAssocCleanup;
+use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer as CustomerAssocCleanup;
 
 class editor_Models_LanguageResources_Remover {
     /**
@@ -46,9 +47,14 @@ class editor_Models_LanguageResources_Remover {
     public function __construct(editor_Models_LanguageResources_LanguageResource $languageResource) {
         $this->entity = $languageResource;
     }
-    
+
     /**
      * Removes a languageResource completely
+     * @param false $forced
+     * @param false $deleteInResource
+     * @throws Zend_Db_Table_Exception
+     * @throws ZfExtended_ErrorCodeException
+     * @throws ZfExtended_Exception
      */
     public function remove($forced = false, $deleteInResource = false) {
         // if the current entity is term collection, init the entity as term collection
@@ -63,7 +69,9 @@ class editor_Models_LanguageResources_Remover {
         $this->entity->db->getAdapter()->beginTransaction();
         try {
             $entity = clone $this->entity;
-            $this->checkOrCleanAssociation($forced, $this->entity->getCustomers() ?? []);
+            // TODO CHECK: A languageResourcesRemover should remove the resource with all existing assocs and a check must take the existing assocs into account, correct ??
+            $customersLeft = ($forced) ? [] : $this->entity->getCustomers();
+            $this->checkOrCleanAssociations($forced, $customersLeft);
             //delete the entity in the DB
             $this->entity->delete();
             
@@ -88,21 +96,27 @@ class editor_Models_LanguageResources_Remover {
         $events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [__CLASS__]);
         $events->trigger('afterRemove', $this, ['entity' => $this->entity]);
     }
-    
+
     /**
-     * Check of clean associations when customer is changed.
-     * @TODO: same function exists in LanguageresourceinstanceController !!!
-     * @param bool $clean
-     * @return void
+     * @param bool $doClean
+     * @param array $customerIdsLeft
      * @throws Zend_Db_Table_Exception
      * @throws ZfExtended_ErrorCodeException
      */
-    private function checkOrCleanAssociation(bool $clean, array $customerIds): void
+    private function checkOrCleanAssociations(bool $doClean, array $customerIdsLeft): void
     {
-        $assocClean = ZfExtended_Factory::get(CleanupAssociation::class, [
-            $customerIds,
-            $this->entity->getId()
-        ]);
-        
-        $clean ? $assocClean->cleanAssociation() : $assocClean->check();
-    }}
+        $taskAssocCleanup = ZfExtended_Factory::get(TaskAssocCleanup::class, [$this->entity->getId()]);
+        $customerAssocCleanup = ZfExtended_Factory::get(CustomerAssocCleanup::class, [$this->entity->getId(), $customerIdsLeft]);
+
+        if ($doClean) {
+
+            $taskAssocCleanup->cleanAssociation();
+            $customerAssocCleanup->cleanAssociation();
+
+        } else {
+
+            $taskAssocCleanup->check();
+            $customerAssocCleanup->check();
+        }
+    }
+}

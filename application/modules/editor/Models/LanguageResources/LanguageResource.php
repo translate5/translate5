@@ -93,10 +93,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public $targetLangCode;
 
-    /***
+    /**
+     * Caches the customers of a language-resource
      * @var array
      */
-    protected array $customers;
+    protected array $customers = [];
 
     /***
      * Init the language resource instance for given editor_Models_LanguageResources_Resource
@@ -539,17 +540,16 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
 
     /***
-     * Get the customers of the current langauge resource
+     * Get the customer ids of the current langauge resource, cached
      * @return array
      */
     public function getCustomers(): array
     {
-        if(empty($this->customers)){
-            /** @var editor_Models_LanguageResources_CustomerAssoc $model */
-            $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            $this->customers = array_column($model->loadByLanguageResourceId($this->getId()),'customerId');
+        if(!array_key_exists($this->getId(), $this->customers)){
+            $model = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
+            $this->customers[$this->getId()] = array_column($model->loadByLanguageResourceId($this->getId()),'customerId');
         }
-        return $this->customers;
+        return $this->customers[$this->getId()];
     }
     
     /**
