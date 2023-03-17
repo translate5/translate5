@@ -26,28 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+declare(strict_types=1);
+
+namespace MittagQI\Translate5\Plugins\SpellCheck\Exception;
+
 /**
- * 
- * Tags the segments on task edit and will only be used sequentially via the run()-method
+ * Exception Class to get detailed information on SpellCheck-Error
  */
-class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTagger_Worker_Abstract {
-    
-    protected $resourcePool = 'gui';    
-    /**
-     * Deactivates maintenance for editor-save mode / non-threaded run
-     * {@inheritDoc}
-     * @see editor_Plugins_TermTagger_Worker_Abstract::init()
-     */
-    public function init($taskGuid = NULL, $parameters = array()) {
-        $this->behaviour->setConfig(['isMaintenanceScheduled' => false]);
-        return parent::init($taskGuid, $parameters);
-    }    
-    /***
-     * Term tagging takes approximately 15 % of the import time
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::getWeight()
-     */
-    public function getWeight(): int {
-        return 15;
-    }
+class DownException extends AbstractException
+{
 }

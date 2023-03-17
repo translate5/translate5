@@ -26,6 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Plugins\TermTagger\Configuration;
+use MittagQI\Translate5\Plugins\TermTagger\Processor\Tagger;
+use MittagQI\Translate5\Plugins\TermTagger\Service;
+use MittagQI\Translate5\Plugins\TermTagger\Worker;
+use MittagQI\Translate5\Segment\Db\Processing;
+use MittagQI\Translate5\Segment\Processing\State;
+
 /**
  * 
  * Provides the tagging when Importing Tasks and tagging edited segments which is integrated in the general quality management
@@ -65,69 +72,91 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return ($taskConfig->runtimeOptions->termTagger->enableAutoQA == 1);
     }
     
-    public function hasOperationWorker(string $processingMode, Zend_Config $taskConfig) : bool {
+    public function hasOperationWorker(string $processingMode, Zend_Config $qualityConfig) : bool {
         // we will run with any processing mode
         return true;
     }
     
     public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode, array $workerParams=[]) {
-        
-        // Crucial: add processing-mode to worker params
-        $workerParams['processingMode'] = $processingMode;
-        
-        // if no terminology is present we usually do not queue a worker, only a re-tag or analysis must cover the case we actually have to remove the terms !
-        /* @var $task editor_Models_Task */
-        if (!$task->getTerminologie()) {
-            if($processingMode == editor_Segment_Processing::ANALYSIS || $processingMode == editor_Segment_Processing::RETAG){
-                $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_Remove');
-                if(!$worker->init($task->getTaskGuid(), $workerParams)) {
-                    $this->log->error('E1128', 'TermTagger Remove Worker can not be initialized!', [ 'parameters' => $workerParams ]);
-                    return;
-                }
-                $worker->queue($parentWorkerId);
-            }
-            return;
-        }
+
         // if source & target language is similar, we simply do nothing, since the termtagger would crash in this case, see TRANSLATE-2373
         if($task->isSourceAndTargetLanguageSimilar()){
             return;
         }
-
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        // Create segments_meta-field 'termtagState' if not exists
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $meta editor_Models_Segment_Meta */
-        $meta->addMeta('termtagState', $meta::META_TYPE_STRING, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
-
-        //lock oversized segments and reset already tagged segments to untagged
-        $this->prepareSegments($task, $meta);
-        
-        // init worker and queue it
-        // QUIRK / FIXME: the "import" resourcePool is used for all Operations (import, analysis, retag)
-        $workerParams['resourcePool'] = 'import';
-        if (!$worker->init($task->getTaskGuid(), $workerParams)) {
-            $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [ 'parameters' => $workerParams ]);
+        // in case of an import and no terminology is applied, there needs to be no workers, nothing to do ...
+        if($processingMode === editor_Segment_Processing::IMPORT && !$task->getTerminologie()){
             return;
         }
+        // init worker and queue it
+        $worker = ZfExtended_Factory::get(Worker::class);
+        // Crucial: add processing-mode to worker params
+        $workerParams['processingMode'] = $processingMode;
+        $workerParams['resourcePool'] = 'import';
 
+        if (!$worker->init($task->getTaskGuid(), $workerParams)) {
+            $this->getLogger($processingMode)->error('E1128', 'TermTagger Worker can not be initialized!', [ 'parameters' => $workerParams ]);
+            return;
+        }
+        // NOTE: this worker (which usually is queued multiple times) will either remove or add the terminology. When removing it needs just to be a single instance as it uses no service and makes no requests
+        if(!$task->getTerminologie()){
+            $worker->setSingleThreaded();
+        }
         $worker->queue($parentWorkerId);
     }
 
-    public function finalizeOperation(editor_Models_Task $task, string $processingMode){
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
-        /* @var $db editor_Models_Db_SegmentMeta */
-        $sql = $db->select()
-            ->from($db, ['termtagState', 'cnt' => 'count(id)'])
-            ->where('taskGuid = ?', $task->getTaskGuid());
-        $segmentCounts = $db->fetchAll($sql)->toArray();
-        $data = array_column($segmentCounts, 'cnt', 'termtagState');
-        $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: %s", $k, $v); }, $data, array_keys($data)));
-        $logger = Zend_Registry::get('logger')->cloneMe(editor_Plugins_TermTagger_Configuration::getLoggerDomain($processingMode));
-        $logger->info('E1364', 'TermTagger overall run done - {segmentCounts}', [
-            'task' => $task,
-            'segmentCounts' => $data,
-        ]);
+    public function prepareOperation(editor_Models_Task $task, string $processingMode) {
+
+        // disable when source/target language similar, see TRANSLATE-2373
+        if($task->isSourceAndTargetLanguageSimilar()){
+            return;
+        }
+
+        // when we are an import and no terminology is bound, we simply set all states to processed ...
+        if(!$task->getTerminologie() && $processingMode === editor_Segment_Processing::IMPORT){
+            $processingTable = new Processing();
+            $processingTable->setTaskToState($task->getTaskGuid(), Service::SERVICE_ID, State::PROCESSED);
+            return;
+        }
+
+        // Find oversized segments, non-editable segments and mark them as unprocessable
+        $config = Zend_Registry::get('config');
+        $metaTable = ZfExtended_Factory::get(editor_Models_Db_SegmentMeta::class);
+        $where = $metaTable->select()
+            ->from($metaTable->getName(), ['segmentId'])
+            ->where('taskGuid = ?', $task->getTaskGuid())
+            ->where('sourceWordCount >= ?', $this->getOversizeWordCount($config));
+        $rows = $metaTable->fetchAll($where)->toArray();
+        $oversizedSegmentIds = array_column($rows, 'segmentId');
+        // find noneditable segments, which have to be excluded unless tagging non-editable segments is wanted
+        $noneditableSegmentIds = [];
+        if(!$config->runtimeOptions->termTagger->tagReadonlySegments){
+            $segmentsTable = ZfExtended_Factory::get(editor_Models_Db_Segments::class);
+            $noneditableSegmentIds = $segmentsTable->getAllIdsForTask($task->getTaskGuid(), false, ['editable = ?' => 0]);
+        }
+        if(!empty($oversizedSegmentIds) || !empty($noneditableSegmentIds)){
+            $processingTable = new Processing();
+            // set the oversized segments to toolong
+            $processingTable->setSegmentsToState($oversizedSegmentIds, Service::SERVICE_ID, State::TOOLONG);
+            // set the noneditable segments to ignore
+            $processingTable->setSegmentsToState($noneditableSegmentIds, Service::SERVICE_ID, State::IGNORED);
+        }
+    }
+
+    public function finalizeOperation(editor_Models_Task $task, string $processingMode, array $processingResult){
+
+        // disable when source/target language similar, see TRANSLATE-2373, also nothing to report when terminology was removed
+        if($task->isSourceAndTargetLanguageSimilar() || !$task->getTerminologie()){
+            return;
+        }
+        // the processing might excluded termtagging, we only add event when a result is available
+        if(array_key_exists(Service::SERVICE_ID, $processingResult)){
+            $this->getLogger($processingMode)->info('E1364', 'TermTagger overall run done - {segmentCounts}', [
+                'task' => $task,
+                'segmentCounts' => 'tagged '.$processingResult[Service::SERVICE_ID].' of '.$processingResult['segments'],
+            ]);
+        }
+        // we report any defect segments we found during processing
+        Tagger::reportDefectSegments($task, $processingMode);
     }
     
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
@@ -137,48 +166,41 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
             return $tags;
         }
 
-        if($processingMode == editor_Segment_Processing::ALIKE){
+        if($processingMode === editor_Segment_Processing::ALIKE){
             
             // when copying alike tags, we just save the qualities extracted from the tags (if active in config)
             if($task->getConfig()->runtimeOptions->termTagger->enableAutoQA){
                 
-                editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
+                Tagger::findAndAddQualitiesInTags($tags);
             }
             
-        } else if($processingMode == editor_Segment_Processing::EDIT){
-            
-            // editing process uses a worker to manage resource sharing of the termtagger
-            
+        } else if($processingMode === editor_Segment_Processing::EDIT){
+
+            // processing the segment editing
             $segment = $tags->getSegment();
             // no need to process if task has no terminologie or is not modified
             if (!$task->getTerminologie() || !$segment->isDataModified()) {
                 // we need to process the qualities, otherwise the existing wil simply be deleted
-                editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
+                Tagger::findAndAddQualitiesInTags($tags);
                 return $tags;
             }
+            $config = Zend_Registry::get('config');
             $messages = Zend_Registry::get('rest_messages');
             /* @var $messages ZfExtended_Models_Messages */
-            
-            if($segment->meta()->getTermtagState() == editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE) {
-                // we need to process the qualities, otherwise the existing wil simply be deleted
-                editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
+
+            // when the segment is oversized or shall be ignored due to not being editable we do not need to process it and just can return them
+            // the editing non-editable segments check is only for completeness here
+            if(($segment->meta()->getSourceWordCount() >= $this->getOversizeWordCount($config)) || (!$segment->getEditable() && !$config->runtimeOptions->termTagger->tagReadonlySegments)) {
+                // to keep potentially existing tags/qualities we need to process them, otherwise the existing will simply be deleted
+                Tagger::findAndAddQualitiesInTags($tags);
                 $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
                 return $tags;
             }
-            
-            $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
-            /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
-            
-            $params = ['resourcePool' => 'gui', 'processingMode' => $processingMode];
-            if (!$worker->init($task->getTaskGuid(), $params)) {
-                
-                $logger = Zend_Registry::get('logger')->cloneMe('editor.terminology');
-                $logger->error('E1128', 'TermTaggerImport Worker can not be initialized!', ['parameters' => $params]);
-
-            } else if(!$worker->runSegmentTagsProcessing($tags)){
-                
-                $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
-            }
+            // tag the terms in the segment
+            $service = editor_Plugins_TermTagger_Bootstrap::createService('termtagger'); /* @var Service $service */
+            $serviceUrl = $service->getPooledServiceUrl('gui');
+            $processor = new Tagger($task, $service, $processingMode, $serviceUrl, false);
+            $processor->process($tags, false);
         }
         return $tags;
     }
@@ -212,31 +234,37 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         // if the data says it's a term-tag or the class is 'term'
         return (($type == static::$type || in_array(static::$type, $classNames)) && editor_Plugins_TermTagger_Tag::hasNodeName($nodeName));
     }
-    /**
-     * Find oversized segments and mark them as oversized and sets tagged segments to untagged
-     * @param editor_Models_Task $task
-     * @param editor_Models_Segment_Meta $meta
-     */
-    private function prepareSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta) {
 
-        // disable when source/target language similar, see TRANSLATE-2373
-        if($task->isSourceAndTargetLanguageSimilar()){
-            return;
-        }
-        $config = Zend_Registry::get('config');
-        $maxWordCount = $config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150;
-        $meta->db->update([
-            'termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE
-        ],[
-            'taskGuid = ?' => $task->getTaskGuid(),
-            'sourceWordCount >= ?' => $maxWordCount,
-        ]);
-        $meta->db->update([
-            'termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED
-        ],[
-            'taskGuid = ?' => $task->getTaskGuid(),
-            // FIX failed operations: when workers crashed etc. segments will stay in state "inprogress" forever without this
-            'termtagState IN (?)' => [ editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_INPROGRESS ],
-        ]);
+    /**
+     * Adds Frontend-configurations for the quality types
+     * @return array{
+     *      field: string,
+     *      columnPostfixes: string[]
+     * }
+     */
+    public function getFrontendTypeDefinition() : array {
+        return [
+            'field' => 'termTagger',
+            'columnPostfixes' => ['Column'],
+        ];
+    }
+
+    /**
+     * @param string $processingMode
+     * @return ZfExtended_Logger
+     * @throws Zend_Exception
+     */
+    private function getLogger(string $processingMode): ZfExtended_Logger
+    {
+        return Zend_Registry::get('logger')->cloneMe(Configuration::getLoggerDomain($processingMode));
+    }
+
+    /**
+     * @param Zend_Config $config
+     * @return int
+     */
+    private function getOversizeWordCount(Zend_Config $config)
+    {
+        return ($config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150);
     }
 }

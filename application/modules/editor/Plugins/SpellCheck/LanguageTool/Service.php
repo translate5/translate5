@@ -28,10 +28,25 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\SpellCheck\LanguageTool;
 
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
 use MittagQI\Translate5\PooledService\ServiceAbstract;
-use editor_Plugins_SpellCheck_LanguageTool_Adapter;
+use Throwable;
 
-final class Service extends ServiceAbstract {
+final class Service extends ServiceAbstract
+{
+
+    /**
+     * Note, that here the service-id (used to store states in the DB) differs from the service-name!
+     */
+    const SERVICE_ID = 'spellcheck';
+
+    /**
+     * Caches the adapters per service
+     * Instantiating an adapter is costly as it fetches the DB for languages
+     * @var Adapter[]
+     */
+    private static array $adapters = [];
 
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.plugins.SpellCheck.languagetool.url.default',
@@ -51,22 +66,61 @@ final class Service extends ServiceAbstract {
         'url' => 'http://languagetool.:8010/v2'
     ];
 
-    protected function customServiceCheck(string $url): bool
+    /**
+     * @return string
+     */
+    public function getServiceId(): string
     {
-        $adapter = $this->getAdapter($url);
-        $version = null;
-        $result = $adapter->testServerUrl($url, $version);
-        $this->addCheckResult($url, $version);
-        return $result;
+        return self::SERVICE_ID;
     }
 
     /**
-     * Creates an SpellCheck Adapter
-     * @param string $serviceUrl
-     * @return editor_Plugins_SpellCheck_LanguageTool_Adapter
+     * Creates an LanguageTool Adapter, either for the passed URL or for a random URL out of the passed pool
+     * The adapters will be cached throughout an request
+     * @param string|null $serviceUrl
+     * @param string $servicePool
+     * @return Adapter
      */
-    public function getAdapter(string $serviceUrl): editor_Plugins_SpellCheck_LanguageTool_Adapter
+    public function getAdapter(string $serviceUrl = null, string $servicePool = 'gui'): Adapter
     {
-        return new editor_Plugins_SpellCheck_LanguageTool_Adapter($serviceUrl);
+        $url = empty($serviceUrl) ? $this->getPooledServiceUrl($servicePool) : $serviceUrl;
+        if(empty($url)){
+            throw new DownException('E1466');
+        }
+        if(!array_key_exists($url, static::$adapters)){
+            static::$adapters[$url] = new Adapter($url);
+        }
+        return static::$adapters[$url];
+    }
+
+    /**
+     * @param string $url
+     * @return array{
+     *     success: bool,
+     *     version: string|null
+     * }
+     */
+    /**
+     * @param string $url
+     * @return array
+     */
+    protected function checkServiceUrl(string $url): array
+    {
+        $result = ['success' => false, 'version' => null];
+        $adapter = $this->getAdapter($url);
+        // Try to check a simple phrase
+        try {
+            $response = $adapter->getMatches('a simple test', 'en-US');
+        } catch (TimeOutException $e) {
+            $result['success'] = true; // can not respond due it is processing data
+            return $result;
+        } catch (Throwable) {
+            return $result; // all other ecxceptione are regarded as service not functioning properly
+        }
+        if ($response) {
+            $result['success'] = ($adapter->getLastStatus() === 200);
+            $result['version'] = $response?->software?->version ?? null;
+        }
+        return $result;
     }
 }

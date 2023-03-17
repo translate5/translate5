@@ -26,137 +26,141 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\Processing\State;
 /**
  * Abstraction to bundle the segment's internal tags per field to have a model to be passed across the quality providers
- * 
+ *
  * TODO: The FieldTags are created with the additional params $additionalSaveTo and $termTaggerName: This is somehow dirty and should be avoided by enhancing Logic here and in the Termtagger
  */
-class editor_Segment_Tags implements JsonSerializable {
-    
-    /**
-     * 
-     * @param editor_Models_Task $task
-     * @param string $processingMode
-     * @param editor_Models_Segment[] $segments
-     * @param bool $useTagsModel: optional, enables the segment data being taken from the serialized data if available as neccessary in the import-process
-     * @return editor_Segment_Tags[]
-     */
-    public static function fromSegments(editor_Models_Task $task, string $processingMode, array $segments, bool $useTagsModel=true) : array {
-        $tags = [];
-        foreach($segments as $segment){
-            $tags[] = self::fromSegment($task, $processingMode, $segment, $useTagsModel);
-        }
-        return $tags;
-    }
+final class editor_Segment_Tags implements JsonSerializable {
+
     /**
      * Creates segment-tags from a segment.
-     * If the segment already has a tags-model saved, it is created by JSON, otherwise by the current segment data
-     * 
+     * When the tags-model is saved, it will be written to the segment directly
+     *
      * @param editor_Models_Task $task
      * @param string $processingMode
      * @param editor_Models_Segment $segment
-     * @param bool $useTagsModel. optional, enables the segment data being taken from the serialized data if available as neccessary in the import-process
      * @return editor_Segment_Tags
-     */
-    public static function fromSegment(editor_Models_Task $task, string $processingMode, editor_Models_Segment $segment, bool $useTagsModel=true) : editor_Segment_Tags {
-        if($useTagsModel && $segment->hasSegmentTagsJSON()){
-            return self::fromJson($task, $processingMode, $segment->getSegmentTagsJSON(), $segment);
-        }
-        return new editor_Segment_Tags($task, $processingMode, $segment);
-    }    
-    /**
-     * The counterpart to ::toJson: creates the tags from the serialized json data
-     * @param string $jsonString
      * @throws Exception
-     * @return editor_Segment_Tags
      */
-    public static function fromJson(editor_Models_Task $task, string $processingMode, string $jsonString, editor_Models_Segment $segment=NULL) : editor_Segment_Tags {
-        try {
-            $data = json_decode($jsonString);
-            if($data->taskGuid != $task->getTaskGuid()){
-                throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed because of task-guid mismatch: '.json_encode($data));
-            }
-            $tags = new editor_Segment_Tags($task, $processingMode, $segment, $data);
-            $tags->initFromJson($data);
-            return $tags;
-        } catch (Exception $e) {
-            throw new Exception('Could not deserialize editor_Segment_Tags from JSON-Object '.json_encode($data));
-        }
+    public static function fromSegment(editor_Models_Task $task, string $processingMode, editor_Models_Segment $segment) : editor_Segment_Tags {
+        return new editor_Segment_Tags($task, $processingMode, $segment);
     }
+
+    /**
+     * Instantiates a tags-model for use in a Segment Processor/Looper/Worker
+     * If there is no json data in the State model, it will be fetched from the segment instead
+     * The prosessed data will be saved to the State, not the segment !
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     * @param State $tagsState
+     * @return editor_Segment_Tags
+     * @throws Exception
+     */
+    public static function fromState(editor_Models_Task $task, string $processingMode, State $tagsState) : editor_Segment_Tags {
+        if($tagsState->hasTagsJson()){
+            return self::fromJson($task, $processingMode, $tagsState->getTagsJson(), $tagsState);
+        }
+        return new editor_Segment_Tags($task, $processingMode, $tagsState->getSegment(), null, $tagsState);
+    }
+
+    /**
+     * Creates the segment-tags from JSON
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     * @param string $jsonString
+     * @param State|null $tagsState
+     * @return editor_Segment_Tags
+     * @throws Exception
+     */
+    public static function fromJson(editor_Models_Task $task, string $processingMode, string $jsonString, State $tagsState = null) : editor_Segment_Tags {
+        $data = json_decode($jsonString);
+        if(empty($data)){
+            throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed, invalid JSON string.');
+        }
+        if($data->taskGuid != $task->getTaskGuid()){
+            throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed because of task-guid mismatch: '.$tagsState->getTagsJson());
+        }
+        return new editor_Segment_Tags($task, $processingMode, null, $data, $tagsState);
+    }
+
     /**
      *
-     * @var editor_Segment_FieldTags
+     * @var editor_Segment_FieldTags|null
      */
-    private $sourceOriginal = NULL;
+    private ?editor_Segment_FieldTags $sourceOriginal = null;
     /**
      *
-     * @var editor_Segment_FieldTags
+     * @var editor_Segment_FieldTags|null
      */
-    private $source = NULL;
+    private ?editor_Segment_FieldTags $source = null;
     /**
      *
      * @var editor_Segment_FieldTags[]
      */
-    private $targets;
+    private array $targets;
     /**
      * A read-only field that is only used as reference for some QA tests
-     * @var editor_Segment_FieldTags[]
+     * @var editor_Segment_FieldTags|null
      */
-    private $targetOriginal = NULL;
+    private ?editor_Segment_FieldTags $targetOriginal = null;
     /**
      *
      * @var int
      */
-    private $targetOriginalIdx = -1;
+    private int $targetOriginalIdx = -1;
     /**
      *
      * @var editor_Models_Task
      */
-    private $task;
+    private editor_Models_Task $task;
     /**
      * see modes in editor_Segment_Processing
      * @var string
      */
-    private $processingMode;
+    private string $processingMode;
     /**
      *
      * @var bool
      */
-    private $isImport;
+    private bool $isImport;
     /**
      *
      * @var int
      */
-    private $segmentId;
+    private int $segmentId;
     /**
      *
-     * @var editor_Models_Segment
+     * @var editor_Models_Segment|null
      */
-    private $segment = NULL;
+    private ?editor_Models_Segment $segment = null;
     /**
-     * 
-     * @var editor_Segment_Qualities
+     *
+     * @var editor_Segment_Qualities|null
      */
-    private $qualities = NULL;
+    private ?editor_Segment_Qualities $qualities = null;
     /**
-     * A flag used by the TermTagger
-     * @var boolean
+     *
+     * @var State|null
      */
-    public $termtaggerProcessed = false;
+    private ?State $processingState = null;
+
     /**
-     * 
      * @param editor_Models_Task $task
      * @param string $processingMode
-     * @param editor_Models_Segment $segment
-     * @param stdClass $serializedData
+     * @param editor_Models_Segment|null $segment
+     * @param stdClass|null $serializedData
+     * @param State|null $tagsState
      * @throws Exception
      */
-    public function __construct(editor_Models_Task $task, string $processingMode, editor_Models_Segment $segment=NULL, stdClass $serializedData=NULL) {
+    public function __construct(editor_Models_Task $task, string $processingMode, editor_Models_Segment $segment = null, stdClass $serializedData = null, State $tagsState = null) {
         $this->task = $task;
         $this->processingMode = $processingMode;
         $this->isImport = ($processingMode == editor_Segment_Processing::IMPORT);
         $this->segment = $segment;
-        if($serializedData != NULL){            
+        $this->processingState = $tagsState;
+        if($serializedData != NULL){
             $this->initFromJson($serializedData);
          } else if($segment != NULL){
             $this->segmentId = $segment->getId();
@@ -165,11 +169,10 @@ class editor_Segment_Tags implements JsonSerializable {
             throw new Exception('editor_Segment_Tags needs either a segment-instance with field manager or serialized data for instantiation');
         }
     }
-    /** 
+    /**
      * Initializes from scratch (used in the initial quality worker), creates the inital data structure
      * TODO: the ugly ttName-logic should be removed and instead add prop for the originationg field of the field-text should be added !!
-     * @param editor_Models_SegmentFieldManager $fieldManager
-     */ 
+     */
     private function init(){
         $fieldManager = editor_Models_SegmentFieldManager::getForTaskGuid($this->task->getTaskGuid());
         $sourceEditingEnabled = $this->task->getEnableSourceEditing();
@@ -190,9 +193,9 @@ class editor_Segment_Tags implements JsonSerializable {
             $this->source = new editor_Segment_FieldTags($this->task, $this->segmentId, $this->segment->get($sourceField), $sourceField, $sourceField, $additionalSaveTo);
         }
         $this->targets = [];
-        
+
         if($this->processingMode == editor_Segment_Processing::ALIKE){
-            
+
             // in a Alike copying process, only the first target will be processed.
             // TODO: this is not compliant with the multitarget tasks but can only be changed when the code in the AlikesegmentConroller is multifield capable
             $firstTarget = $fieldManager->getFirstTargetName();
@@ -201,9 +204,9 @@ class editor_Segment_Tags implements JsonSerializable {
             $this->targets[] = $target;
             $this->targetOriginal = $target;
             $this->targetOriginalIdx = 0;
-            
+
         } else {
-            
+
             foreach ($fieldManager->getFieldList() as $field) {
                 /* @var $field Zend_Db_Table_Row */
                 if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
@@ -232,42 +235,68 @@ class editor_Segment_Tags implements JsonSerializable {
             }
         }
     }
-    /**
-     * Saves all fields back to the segment when the import is finished or when editing segments
-     * @param boolean $flushQualities: whem set to true, the segment-qualities will be saved as well
-     */
-    public function flush(){
 
-        if($this->hasOriginalSource()){
-             // we do know that the original source just has a single save-to field
-             $this->getSegment()->set($this->sourceOriginal->getDataField(), $this->sourceOriginal->render());
+    /**
+     * Saves the current state to the segment-tags cache. This API is used while the threaded import
+     * @param bool $saveQualities: for special cases we may not want the saving of qualities
+     * @param bool $saveSegmentContent: for special cases we may not want the saving se segment-content, either to the segment or the processing-model during operations
+     */
+    public function save(bool $saveQualities = true, bool $saveSegmentContent = true)
+    {
+        // is the current processing saving directly back to the segment or the processing/state model ?
+        if ($this->isStateProcessing()) {
+            // we save to the temporary tags-model & set the processing-state to PROCESSED
+            if($saveSegmentContent){
+                $this->processingState->saveTagsJson($this->toJson());
+            } else {
+                $this->processingState->setProcessed();
+            }
+        } else {
+            // saving to the segment-table directly
+            if($saveSegmentContent){
+                $this->saveToSegment();
+            }
+        }
+        if($saveQualities){
+            $this->getQualities()->save();
+        }
+    }
+
+    /**
+     * Saves all fields back to the segment after an operation has finished or when processing segments directly (edit, alike)
+     * When using this, do not forget to handle the qualities seperately !
+     */
+    public function saveToSegment()
+    {
+        if ($this->hasOriginalSource()) {
+            // we do know that the original source just has a single save-to field
+            $this->getSegment()->set($this->sourceOriginal->getDataField(), $this->sourceOriginal->render());
         }
         // save source
-        if($this->hasSource()){
-            foreach($this->source->getSaveToFields() as $saveTo){
+        if ($this->hasSource()) {
+            foreach ($this->source->getSaveToFields() as $saveTo) {
                 $this->getSegment()->set($saveTo, $this->source->render());
             }
         }
-        foreach($this->targets as $target){
-            /* @var $target editor_Segment_FieldTags */
-            foreach($target->getSaveToFields() as $saveTo){
+        foreach ($this->targets as $target) {
+            foreach ($target->getSaveToFields() as $saveTo) {
                 $this->getSegment()->set($saveTo, $target->render());
             }
         }
         $this->getSegment()->save();
-        // save qualities
-        $this->getQualities()->save();
     }
+
     /**
-     * Saves the current state to the segment-tags cache. This API is used while the threaded import
-     * @param string $providerKey
+     * Retrieves, if the segment shall be saved to the segment table or to the processing model when calling save()
+     * @return bool
      */
-    public function save(string $providerKey){
-        $this->getSegment()->saveSegmentTagsJSON($this->toJson(), $providerKey);
-        $this->getQualities()->save();
+    public function isStateProcessing(): bool
+    {
+        return ($this->processingState !== null && editor_Segment_Processing::isStateProcessing($this->processingMode));
     }
+
     /**
-     * 
+     *
      * @return string
      */
     public function getProcessingMode() : string {
@@ -323,7 +352,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param boolean $edited
      * @return array
      */
-    private function getChangedTargetFields($edited) : array {
+    private function getChangedTargetFields(bool $edited) : array {
         $changedTargets = [];
         if($this->hasOriginalTarget()){
             // only internal tags will be allowed for the equation
@@ -340,22 +369,22 @@ class editor_Segment_Tags implements JsonSerializable {
         return $changedTargets;
     }
     /**
-     * 
-     * @return editor_Segment_FieldTags
+     *
+     * @return editor_Segment_FieldTags|null
      */
     public function getSource() : ?editor_Segment_FieldTags {
         return $this->source;
     }
     /**
-     * 
-     * @return editor_Segment_FieldTags
+     *
+     * @return editor_Segment_FieldTags|null
      */
     public function getOriginalSource() : ?editor_Segment_FieldTags {
         return $this->sourceOriginal;
     }
     /**
      * Retrieves the original source in case of an editable source or the source otherwise
-     * @return editor_Segment_FieldTags
+     * @return editor_Segment_FieldTags|null
      */
     public function getOriginalOrNormalSource() : ?editor_Segment_FieldTags {
         if($this->hasOriginalSource()){
@@ -364,15 +393,15 @@ class editor_Segment_Tags implements JsonSerializable {
         return $this->source;
     }
     /**
-     * 
+     *
      * @return editor_Segment_FieldTags[]
      */
-    public function getTargets(){
+    public function getTargets(): array {
         return $this->targets;
     }
     /**
      *
-     * @return editor_Segment_FieldTags
+     * @return editor_Segment_FieldTags|null
      */
     public function getOriginalTarget() : ?editor_Segment_FieldTags {
         return $this->targetOriginal;
@@ -391,7 +420,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * Retrieves ALL our field tags
      * @return editor_Segment_FieldTags[]
      */
-    private function getFieldTags(){
+    private function getFieldTags(): array {
         $tags = $this->getTargets();
         if($this->hasSource()){
             array_unshift($tags, $this->source);
@@ -405,7 +434,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * Retrieves all field tags that can be edited
      * @return editor_Segment_FieldTags[]
      */
-    private function getEditableFieldTags(){
+    private function getEditableFieldTags(): array {
         $tags = $this->getTargets();
         if($this->hasOriginalSource() && $this->hasSource()){
             array_unshift($tags, $this->source);
@@ -413,14 +442,14 @@ class editor_Segment_Tags implements JsonSerializable {
         return $tags;
     }
     /**
-     * 
+     *
      * @return int
      */
-    public function getSegmentId(){
+    public function getSegmentId(): int {
         return $this->segmentId;
     }
     /**
-     * 
+     *
      * @return editor_Models_Segment
      */
     public function getSegment() : editor_Models_Segment {
@@ -431,9 +460,9 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         return $this->segment;
     }
-    
+
     /* Internal Tags API */
-    
+
     /**
      * Removes the tags of the passed type in all our field tags
      * @param string $type
@@ -500,7 +529,7 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         return $result;
     }
-    
+
     /* SegmentQuality API */
 
     /**
@@ -513,7 +542,8 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param string $category
      * @param int $startIndex
      * @param int $endIndex
-     * @param stdClass|array|null $additionalData : a FLAT object with additional data needed for re-identification. Deeper nested objects will be ignored
+     * @param stdClass|array|null $additionalData
+     * @param bool $hidden
      */
     public function addQuality(
         string $field,
@@ -535,7 +565,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param string $category
      * @param int $startIndex
      * @param int $endIndex
-     * @param stdClass $additionalData: a FLAT object with additional data needed for re-identification. Deeper nested objects will be ignored
+     * @param stdClass|null $additionalData: a FLAT object with additional data needed for re-identification. Deeper nested objects will be ignored
      */
     public function dropQuality(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1, stdClass $additionalData=NULL){
         $this->getQualities()->drop($field, $type, $category, $startIndex, $endIndex, $additionalData);
@@ -543,7 +573,7 @@ class editor_Segment_Tags implements JsonSerializable {
     /**
      * Adds a quality entry by tag
      * @param editor_Segment_Tag $tag
-     * @param string $field
+     * @param string|null $field
      */
     public function addQualityByTag(editor_Segment_Tag $tag, string $field=NULL){
         $this->getQualities()->addByTag($tag, $field);
@@ -588,7 +618,7 @@ class editor_Segment_Tags implements JsonSerializable {
         return array_unique($fields);
     }
     /**
-     * 
+     *
      * @return editor_Models_Db_SegmentQualityRow[]
      */
     public function extractNewQualities() : array {
@@ -604,23 +634,23 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         return $this->qualities;
     }
-    
+
     /* Serialization API */
-    
+
     /**
      *
      * @return string
      */
-    public function toJson(){
+    public function toJson(): string {
         return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see JsonSerializable::jsonSerialize()
      */
-    public function jsonSerialize() : mixed {
-        $data = new stdClass(); 
+    public function jsonSerialize() : stdClass {
+        $data = new stdClass();
         $data->taskGuid = $this->task->getTaskGuid();
         $data->segmentId = $this->segmentId;
         $data->processingMode = $this->processingMode;
@@ -638,7 +668,7 @@ class editor_Segment_Tags implements JsonSerializable {
         return $data;
     }
     /**
-     * 
+     *
      * @param stdClass $data
      * @throws Exception
      */
@@ -663,21 +693,19 @@ class editor_Segment_Tags implements JsonSerializable {
             throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed because of invalid data: '.json_encode($data));
         }
     }
+
     /**
-     * 
-     * @return editor_Models_Db_SegmentQuality
+     * @return editor_Models_Task
      */
-    private function getQualityTable(){
-        if($this->qualityTable == NULL){
-            $this->qualityTable = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        }
-        return $this->qualityTable;
+    public function getTask(): editor_Models_Task {
+        return $this->task;
     }
+
     /**
      * Debug output
      * @return string
      */
-    public function debug(){
+    public function debug(): string {
         $debug = '';
         $newline = "\n";
         if($this->source != NULL){
@@ -691,15 +719,20 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         return $debug;
     }
+
     /**
      * Debug formatted JSON
      * @return string
      */
-    public function debugJson(){
-        return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    public function debugJson(): string {
+        return (string) json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     }
 
-    public function getTask() {
-        return $this->task;
+    /**
+     * Debug formatted JSON
+     * @return string
+     */
+    public function debugQualities(): string {
+        return $this->getQualities()->debug();
     }
 }

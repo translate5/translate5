@@ -26,16 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
-    
+final class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
+
+    /**
+     * Removes all qualities for a task
+     * If the type is given, it removes only for the given type
+     * @param string $taskGuid
+     * @param string|null $qualityType
+     */
+    public static function deleteForTask(string $taskGuid, string $qualityType = null){
+        $table = new self();
+        if(empty($qualityType)){
+            $table->removeByTaskGuid($taskGuid);
+        } else {
+            $table->removeByTaskGuidAndType($taskGuid, $qualityType);
+        }
+    }
     /**
      * Deletes all existing entries for the given segmentIds
      * @param array $segmentIds
      */
     public static function deleteForSegments(array $segmentIds){
         if(count($segmentIds) > 0){
-            $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-            /* @var $table editor_Models_Db_SegmentQuality */
+            $table = new self();
             $db = $table->getAdapter();
             $where = (count($segmentIds) > 1) ? $db->quoteInto('segmentId IN (?)', $segmentIds) : $db->quoteInto('segmentId = ?', $segmentIds[0]);
             $db->delete($table->getName(), $where);
@@ -47,8 +60,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      */
     public static function saveRows(array $rows){
         if(count($rows) > 1){
-            $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-            /* @var $table editor_Models_Db_SegmentQuality */
+            $table = new self();
             $db = $table->getAdapter();
             $cols = [];
             foreach($table->info(Zend_Db_Table_Abstract::COLS) as $col){
@@ -77,8 +89,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @return bool
      */
     public static function hasTypeCategoryForTask(string $taskGuid, string $type, string $category=NULL) : bool {
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $where = $table->select()
             ->from($table->getName(), ['id'])
             ->where('taskGuid = ?', $taskGuid)
@@ -95,8 +106,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @return int[]
      */
     public static function getSegmentIdsForQualityFilter(editor_Models_Quality_RequestState $state, string $taskGuid) : array {
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $adapter = $table->getAdapter();
         $select = $adapter->select();
         $select
@@ -146,8 +156,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @return array
      */
     public static function getFaultySegmentIds(string $taskGuid) : array {
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $adapter = $table->getAdapter();
         $select = $adapter->select();
         $select
@@ -174,8 +183,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         $result->success = false;
         $result->qualityId = null;
         $result->qualityRow = null;
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $category = editor_Segment_Qm_Provider::createCategoryVal($qmCategoryIndex);
         if($action == 'remove'){
             $rows = $table->fetchFiltered($task->getTaskGuid(), $segmentId, editor_Segment_Tag::TYPE_QM, false, $category);
@@ -186,8 +194,8 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
                 return $result;
             }
         } else {
+            /* @var editor_Models_Db_SegmentQualityRow $row */
             $row = $table->createRow();
-            /* @var $row editor_Models_Db_SegmentQualityRow */
             $row->segmentId = $segmentId;
             $row->taskGuid = $task->getTaskGuid();
             $row->type = editor_Segment_Tag::TYPE_QM;
@@ -212,8 +220,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         $result = new stdClass();
         $result->numQualities = 0;
         $result->numFaults = 0;
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $db = $table->getAdapter();
         $sql = $db->quoteInto('SELECT `type`, `category`, `falsePositive` FROM '.$db->quoteIdentifier($table->getName()).' WHERE taskGuid = ?', $taskGuid);
         foreach($db->fetchAll($sql, [], Zend_Db::FETCH_ASSOC) as $row){

@@ -28,19 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Plugins\SpellCheck\Base\Exception;
+namespace MittagQI\Translate5\Plugins\SpellCheck\Exception;
 
 /**
- * A timeout exception is not the same as a DOWN exception.
- * Timout means in the most cases that the LanguageTool is running but it is checking and therefore could not respond
+ * Exception Class to get detailed information on SpellCheck-Error.
  */
-class TimeOutException extends AbstractException
+class RequestException extends AbstractException
 {
-
-    /**
-     * Timeouts are just an info
-     *
-     * @var integer
-     */
-    protected $level = \ZfExtended_Logger::LEVEL_INFO;
 }

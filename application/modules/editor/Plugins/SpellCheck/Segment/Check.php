@@ -26,11 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Plugins\SpellCheck\Segment;
+
+use editor_Models_Segment;
 use editor_Models_Segment_Whitespace as Whitespace;
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\DownException;
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\MalfunctionException;
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\RequestException;
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\TimeOutException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\MalfunctionException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
+use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Adapter;
+use Zend_Exception;
 
 /**
  *
@@ -38,7 +43,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\TimeOutException;
  * This Check can only be done for all segments of a task at once
  *
  */
-class editor_Plugins_SpellCheck_Check {
+class Check {
 
     // Css classes
     const CSS_GROUP_GENERAL     = 't5general';
@@ -137,11 +142,9 @@ class editor_Plugins_SpellCheck_Check {
     private $states = [];
 
     /**
-     * editor_Plugins_SpellCheck_Check constructor.
-     *
      * @param editor_Models_Segment $segment
      * @param $targetField
-     * @param editor_Plugins_SpellCheck_LanguageTool_Adapter $connector
+     * @param Adapter $adapter
      * @param $spellCheckLang
      * @throws Zend_Exception
      * @throws DownException
@@ -149,8 +152,7 @@ class editor_Plugins_SpellCheck_Check {
      * @throws RequestException
      * @throws TimeOutException
      */
-    public function __construct(editor_Models_Segment $segment, $targetField,
-                                editor_Plugins_SpellCheck_LanguageTool_Adapter $connector, $spellCheckLang) {
+    public function __construct(editor_Models_Segment $segment, $targetField, Adapter $adapter, $spellCheckLang) {
 
         // Get target text, strip tags, replace htmlentities
         $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
@@ -165,7 +167,7 @@ class editor_Plugins_SpellCheck_Check {
         }
 
         // Get LanguageTool response
-        $data = $connector->getMatches($target, $spellCheckLang);
+        $data = $adapter->getMatches($target, $spellCheckLang);
 
         // Foreach match given by LanguageTool API response
         foreach ($data->matches as $index => $match) {
@@ -204,16 +206,16 @@ class editor_Plugins_SpellCheck_Check {
     /**
      * Retrieves the evaluated states
      *
-     * @return string[]
+     * @return string[][]
      */
-    public function getStates(){
+    public function getStates(): array {
         return $this->states;
     }
 
     /**
      * @return boolean
      */
-    public function hasStates() {
+    public function hasStates(): bool {
         return count($this->states) > 0;
     }
 }

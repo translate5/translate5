@@ -232,4 +232,12 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
             ? 0
             : (int) $this->getSimilarQualityStmt('qty')->fetchColumn();
     }
+
+    /**
+     * @return string
+     */
+    public function debug(): string
+    {
+        return 'qualityrow ' . $this->id . ': { type:' . $this->type . ', category:' . $this->category . ', start:' . $this->startIndex . ', end:' . $this->endIndex . ', falsePositive :' . $this->falsePositive . ', addData :' . $this->additionalData . '}';
+    }
 }

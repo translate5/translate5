@@ -28,11 +28,11 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Plugins\SpellCheck\Base\Exception;
+namespace MittagQI\Translate5\Plugins\SpellCheck\Exception;
 
 /**
  * Exception Class to get detailed information on SpellCheck-Error.
  */
-class RequestException extends AbstractException
+class MalfunctionException extends AbstractException
 {
 }

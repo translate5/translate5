@@ -26,13 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-declare(strict_types=1);
+namespace MittagQI\Translate5\Service;
 
-namespace MittagQI\Translate5\Plugins\SpellCheck\Base\Exception;
 
 /**
- * Exception Class to get detailed information on SpellCheck-Error
+ * This is a service that is represented by a single config-value and represents a external/non dockerized service
+ * Concrete Implementations must have a valid $configurationConfig
+ * [For now there is nothing implemented but that surely changes over time and it's better to distinguish from the start]
  */
-class DownException extends AbstractException
+abstract class ExternalServiceAbstract extends DockerServiceAbstract
 {
+
 }

@@ -29,8 +29,13 @@ END LICENSE AND COPYRIGHT
 namespace MittagQI\Translate5\Service;
 
 use MittagQI\ZfExtended\Service\ServiceAbstract;
+use Throwable;
+use Zend_Cache;
+use Zend_Cache_Core;
+use Zend_Cache_Exception;
 use Zend_Config;
 use Zend_Exception;
+use ZfExtended_Cache_MySQLMemoryBackend;
 use ZfExtended_Plugin_Exception;
 use ZfExtended_Plugin_Manager;
 use ZfExtended_Exception;
@@ -39,6 +44,10 @@ use Zend_Registry;
 
 final class Services
 {
+    /**
+     * @var Zend_Cache_Core|null
+     */
+    private static ?Zend_Cache_Core $memCache = null;
 
     /**
      * Represents the global/base services we have. They must be given in the format name => Service class name
@@ -60,10 +69,10 @@ final class Services
      */
     public static function getService(string $serviceName, Zend_Config $config=null): ServiceAbstract
     {
-        if(!array_key_exists($serviceName, static::$services)){
+        if(!array_key_exists($serviceName, self::$services)){
             throw new ZfExtended_Exception('Service "'.$serviceName.'" not configured in the global Services');
         }
-        return ZfExtended_Factory::get(static::$services[$serviceName], [ $serviceName, null, $config ]);
+        return ZfExtended_Factory::get(self::$services[$serviceName], [ $serviceName, null, $config ]);
     }
 
     /**
@@ -75,7 +84,7 @@ final class Services
     public static function getServices(Zend_Config $config): array
     {
         $services = [];
-        foreach(static::$services as $serviceName => $serviceClass){
+        foreach(self::$services as $serviceName => $serviceClass){
             $services[$serviceName] = ZfExtended_Factory::get($serviceClass, [ $serviceName, null, $config ]);
         }
         return $services;
@@ -172,5 +181,57 @@ final class Services
                 $results[$serviceName] = $service->systemCheck();
             }
         }
+    }
+
+    /**
+     * Retrieves the down-list for a service
+     * @param string $serviceId
+     * @return array
+     */
+    public static function getServiceDownList(string $serviceId): array
+    {
+        try{
+            $list = self::getMemCache()->load($serviceId . 'DownList');
+            return (is_array($list)) ? $list : [];
+        } catch(Throwable){
+            return [];
+        }
+    }
+
+    /**
+     * Saves the down-list for a service
+     * @param string $serviceId
+     * @param array $offlineUrls
+     */
+    public static function saveServiceDownList(string $serviceId, array $offlineUrls)
+    {
+        try{
+            self::getMemCache()->save($offlineUrls, $serviceId . 'DownList');
+        } catch(Throwable){
+        }
+    }
+
+    /**
+     * disables the given service URL via memcache.
+     * @param string $serviceId
+     * @param string $serviceUrl
+     */
+    public static function setServiceDown(string $serviceId, string $serviceUrl)
+    {
+        $list = self::getServiceDownList($serviceId);
+        $list[] = $serviceUrl;
+        self::saveServiceDownList($serviceId, $list);
+    }
+
+    /**
+     * @return Zend_Cache_Core
+     * @throws Zend_Cache_Exception
+     */
+    private static function getMemCache(): Zend_Cache_Core
+    {
+        if(self::$memCache == null){
+            self::$memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
+        }
+        return self::$memCache;
     }
 }

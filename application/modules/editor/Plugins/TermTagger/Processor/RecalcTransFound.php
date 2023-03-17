@@ -26,11 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Plugins\TermTagger\Processor;
+
+use editor_Models_Languages;
+use editor_Models_Task;
+use editor_Models_TermCollection_TermCollection;
+use editor_Models_Terminology_Models_TermModel;
+use PDO;
+use Zend_Cache_Exception;
+use Zend_Db_Statement_Exception;
+use Zend_Db_Table_Abstract;
+use Zend_Exception;
+use Zend_Registry;
+use ZfExtended_Factory;
+
 /**
  * encapsulates the MarkTransFound Logic:
  * Makes a recalculation of the transFound transNotFound and transNotDefined Information out of and in the given segment content
  */
-class editor_Plugins_TermTagger_RecalcTransFound {
+class RecalcTransFound {
 
     /**
      * @var editor_Models_Task
@@ -65,24 +79,19 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     protected array $trgTextA;
 
     /**
-     * Constructor
-     *
-     * editor_Plugins_TermTagger_RecalcTransFound constructor.
      * @param editor_Models_Task $task
      * @throws Zend_Cache_Exception
      */
     public function __construct(editor_Models_Task $task) {
         $this->task = $task;
-        $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $this->termModel = ZfExtended_Factory::get(editor_Models_Terminology_Models_TermModel::class);
 
-        /* @var $lang editor_Models_Languages */
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
+        $lang = ZfExtended_Factory::get(editor_Models_Languages::class);
         $this->targetFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getTargetLang(),'id',true);
         $this->sourceFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getSourceLang(),'id',true);
 
         // Lazy load collectionIds defined for current task
-        $this->collectionIds = $this->collectionIds ?? ZfExtended_Factory
-            ::get('editor_Models_TermCollection_TermCollection')
+        $this->collectionIds = $this->collectionIds ?? ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class)
             ->getCollectionsForTask($this->task->getTaskGuid());
     }
 
@@ -114,7 +123,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      * @param bool $isHomonym
      * @return string
      */
-    protected function getMarkByTbxId(string $srcId, $isHomonym = false) : string {
+    protected function getMarkByTbxId(string $srcId, bool $isHomonym = false) : string {
 
         // If $isHomonym arg is true, it means that $srcId arg contains termEntryTbxId of a homonym term for some source term
         // so that we set up $src variable for it to be an array containing termEntryTbxId-key for it to be possible to use for
@@ -371,7 +380,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
      * @param string $content
      * @return string
      */
-    protected function removeExistingFlags($content) : string {
+    protected function removeExistingFlags(string $content) : string {
 
         // List of TermTagger-assigned statuses to be stripped prior recalculation
         $strip = ['transFound', 'transNotFound', 'transNotDefined'];
@@ -407,7 +416,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             $replace = $matches[0];
 
             // If there is no class-attribute at all
-            if (strpos($replace, ' class=') === false) {
+            if (!str_contains($replace, ' class=')) {
 
                 // Append it, empty for now
                 $replace = str_replace('<div', '<div class=""', $replace);

@@ -127,11 +127,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      */
     const EMPTY_STRING_HASH = 'd41d8cd98f00b204e9800998ecf8427e';
 
-
-        public static function createSegmentTagsStatusColumn(string $providerKey) : string{
-        return 'status_'.$providerKey;
-    }
-    
     protected $dbInstanceClass          = 'editor_Models_Db_Segments';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
 
@@ -2069,51 +2064,5 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             return new editor_Segment_FieldTags($task, $this->getId(), $fieldText, $location['field'], $editField);
         }
         return NULL;
-    }
-    /**
-     *
-     * @return Zend_Db_Table_Row_Abstract
-     */
-    private function getTagsModel() : Zend_Db_Table_Row_Abstract {
-        // Crucial: as this model may loads multiple rows we have to make sure the id matches in case
-        if($this->tagsModel == null || $this->tagsModel->segmentId != $this->getId()){
-            $db = ZfExtended_Factory::get('editor_Models_Db_SegmentTags');
-            /* @var $db editor_Models_Db_SegmentTags */
-            $select = $db->select()->where('segmentId = ?', $this->getId());
-            $this->tagsModel = $db->fetchRow($select);
-            if($this->tagsModel == null){
-                $this->tagsModel = $db->createRow();
-                $this->tagsModel->segmentId = $this->getId();
-                $this->tagsModel->taskGuid = $this->getTaskGuid();
-                $this->tagsModel->tags = '';
-            }
-        }
-        return $this->tagsModel;
-    }
-    /**
-     *
-     * @return bool
-     */
-    public function hasSegmentTagsJSON() : bool {
-        return !empty($this->getTagsModel()->tags);
-    }
-    /**
-     *
-     * @return string
-     */
-    public function getSegmentTagsJSON() : string {
-        return $this->getTagsModel()->tags;
-    }
-    /**
-     * Saves the segment tags during an import and sets the status-flag for the given provider
-     * @param string $json
-     * @param string $providerKey
-     */
-    public function saveSegmentTagsJSON(string $json, string $providerKey){
-        $row = $this->getTagsModel();
-        $statusColumn = self::createSegmentTagsStatusColumn($providerKey);
-        $row->tags = $json;
-        $row->$statusColumn = 1;
-        $row->save();
     }
 }

@@ -442,9 +442,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             'editor.task.reimport.supportedExtensions',
             FileparserRegistry::getInstance()->getSupportedFileTypes()
         );
-
         $this->setJsAppData();
-        $this->setQualityCheckJsVars();
+        editor_Segment_Quality_Manager::instance()->addAppJsData($this->view->Php2JsVars());
     }
 
     /***
@@ -907,22 +906,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
             $this->view->noMatch = true;
             $this->view->enOut[] = ['text' => $localeTemplate($inputKey, $input, $input), 'matchrate' => 0];
         }
-    }
-
-    /**
-     * @throws Zend_Exception
-     */
-    private function setQualityCheckJsVars(): void
-    {
-        $vars = [];
-
-        foreach ($this->pluginManager->getActive() as $initClass) {
-            if (method_exists($initClass, 'getQualityVars')) {
-                $vars[] = $initClass::getQualityVars();
-            }
-        }
-
-        $this->view->Php2JsVars()->set('quality.types', $vars);
     }
 
     private function editorOnlyModeConfig(Zend_Config $rop)

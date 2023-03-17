@@ -57,12 +57,11 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
         
         $eventManager->attach('editor_Models_Import', 'afterImport', function(){
-            $worker = ZfExtended_Factory::get('ZfExtended_Worker_GarbageCleaner');
-            /* @var $worker ZfExtended_Worker_GarbageCleaner */
+            $worker = ZfExtended_Factory::get(ZfExtended_Worker_GarbageCleaner::class);
             $worker->init();
             $worker->queue(); // not parent ID here, since the GarbageCleaner should run without a parent relation
         }, 0);
-        
+
         $cleanUp = function(){
             // first clean up jobs
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
@@ -89,6 +88,16 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager->attach('editor_SessionController', 'afterDeleteAction', $cleanUp);
         $eventManager->attach('ZfExtended_Session', 'afterSessionCleanForUser', $cleanUp);
         $eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
+
+        // Binding the quality Worker queuing to the "afterDirectoryParsing" event of the filetree worker.
+        // some qualities have workers that depend on the imported files (e.g. TBX import).
+        // also this needs to be a point in the import-process after the languuege-resources in the wizard have been set
+        // and it should be as early as possible to ensure the progress-bar does not flutter
+        $eventManager->attach(editor_Models_Import_Worker_FileTree::class, 'afterDirectoryParsing', function(Zend_EventManager_Event $event){
+            $task = $event->getParam('task'); /* @var editor_Models_Task $task */
+            $parentId = (int) $event->getParam('workerParentId'); // this represents the id of the import worker, see editor_Models_Import::queueImportWorkers
+            editor_Segment_Quality_Manager::instance()->queueImport($task, $parentId);
+        });
     }
     
     public static function initModuleSpecific(){

@@ -220,17 +220,6 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     }
 
     /**
-     * Translate quality type tooltip
-     *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @return string|null
-     * @throws Zend_Exception
-     */
-    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
-        return '';
-    }
-
-    /**
      * Translate category
      *
      * @param ZfExtended_Zendoverwrites_Translate $translate
@@ -254,7 +243,7 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
      * @param editor_Models_Task $task
      * @return string|null
      */
-    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
+    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         switch($category){
             case editor_Segment_Consistent_Check::SOURCE: return $translate->_('Findet Segmente mit dem selben Ziel, aber unterschiedlicher Quelle (Tags werden ignoriert)');
             case editor_Segment_Consistent_Check::TARGET: return $translate->_('Findet Segmente mit der selben Quelle, aber unterschiedlichem Ziel (Tags werden ignoriert)');

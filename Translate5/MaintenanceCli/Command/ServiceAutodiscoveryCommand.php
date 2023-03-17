@@ -231,24 +231,32 @@ using the default ports.')
                 }
                 $serviceConfig = array_key_exists('config', $service) ? $service['config'] : [];
 
-                if ($configuredService->locate($this->io, $serviceUrl, $doSave, $serviceConfig)) {
+                if($configuredService->canBeLocated()){
 
-                    if ($configuredService->isPluginService()) {
-                        $this->setPluginActive($configuredService->getPluginName(), true, $doSave);
+                    if ($configuredService->locate($this->io, $serviceUrl, $doSave, $serviceConfig)) {
+
+                        if ($configuredService->isPluginService()) {
+                            $this->setPluginActive($configuredService->getPluginName(), true, $doSave);
+                        } else {
+                            $msg = ($doSave) ? 'Have configured service' : 'Would configure service';
+                            $this->io->info($msg . ' "' . $serviceName . '"');
+                        }
+
                     } else {
-                        $msg = ($doSave) ? 'Have configured service' : 'Would configure service';
-                        $this->io->info($msg . ' "' . $serviceName . '"');
-                    }
 
+                        if ($configuredService->isPluginService()) {
+                            $this->setPluginActive($configuredService->getPluginName(), false, $doSave);
+                        } else {
+                            $msg = ($doSave) ? 'Have NOT configured service' : 'Would NOT configure service';
+                            $this->io->note($msg . ' "' . $serviceName . '"');
+                        }
+                    }
                 } else {
 
-                    if ($configuredService->isPluginService()) {
-                        $this->setPluginActive($configuredService->getPluginName(), false, $doSave);
-                    } else {
-                        $msg = ($doSave) ? 'Have NOT configured service' : 'Would NOT configure service';
-                        $this->io->note($msg . ' "' . $serviceName . '"');
-                    }
+                    $this->io->warning('Service "' . $serviceName . '" is a service that can not be located programmatically.');
                 }
+
+
 
             } else {
 

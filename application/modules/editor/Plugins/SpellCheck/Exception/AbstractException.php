@@ -28,12 +28,15 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Plugins\SpellCheck\Base\Exception;
+namespace MittagQI\Translate5\Plugins\SpellCheck\Exception;
+
+use ZfExtended_ErrorCodeException;
+use ZfExtended_Logger;
 
 /**
  * Abstract Exception Class to get more details Information on SpellCheck-Error.
  */
-abstract class AbstractException extends \ZfExtended_ErrorCodeException
+abstract class AbstractException extends ZfExtended_ErrorCodeException
 {
 
     /**
@@ -46,11 +49,10 @@ abstract class AbstractException extends \ZfExtended_ErrorCodeException
      *
      * @var integer
      */
-    protected $level = \ZfExtended_Logger::LEVEL_WARN;
+    protected $level = ZfExtended_Logger::LEVEL_WARN;
 
     /**
      * Error codes for spellcheck messages
-     *
      * @var array
      */
     protected static array $localErrorCodes = [
@@ -62,6 +64,10 @@ abstract class AbstractException extends \ZfExtended_ErrorCodeException
         'E1465' => 'Some segments could not be checked by the spellchecker',
         'E1466' => 'SpellCheck DOWN: No LanguageTool instances are available, please enable them and reimport this task.',
         'E1467' => 'SpellCheck DOWN: The configured LanguageTool "{languageToolUrl}" is not reachable and is deactivated in translate5 temporary.',
-        'E1468' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.'
+        'E1468' => 'SpellCheck TIMEOUT: The configured LanguageTool "{languageToolUrl}" did not respond in an appropriate time.',
+        'E1476' => 'SpellCheck Worker can not be initialized!',
+        'E1477' => 'SpellCheck returns an error on checking segments.',
+        'E1478' => 'SpellCheck communication Error, probably crashing the SpellChecker instance.',
+        'E1479' => 'SpellCheck communication Error.'
     ];
 }

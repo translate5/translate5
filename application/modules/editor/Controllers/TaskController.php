@@ -755,7 +755,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
     }
     /**
-     * This Operation refreshes (recalculates / retags) all qualities
+     * This Operation refreshes (re-evaluates / retags) all qualities
      */
     public function autoqaOperation(){        
         editor_Segment_Quality_Manager::autoqaOperation($this->entity);
@@ -767,9 +767,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entityLoad();
 
         // run excel export
-        $exportExcel = ZfExtended_Factory::get('editor_Models_Export_Excel', [$this->entity]);
+        $exportExcel = ZfExtended_Factory::get(editor_Models_Export_Excel::class, [ $this->entity ]);
         $this->log->info('E1011', 'Task exported as excel file and locked for further processing.');
-        /* @var $exportExcel editor_Models_Export_Excel */
         $exportExcel->exportAsDownload();
     }
 
@@ -779,46 +778,41 @@ class editor_TaskController extends ZfExtended_RestController {
     public function excelreimportAction() {
         $this->getAction();
 
-        $worker = ZfExtended_Factory::get('editor_Models_Excel_Worker');
-        /* @var $worker editor_Models_Excel_Worker */
+        // do nothing if task is not in state "is Excel exported"
+        if ($this->entity->getState() != editor_Models_Task::STATE_EXCELEXPORTED) {
+            $this->view->success = false;
+            return;
+        }
 
         try {
-            $tempFilename = $worker->prepareImportFile($this->entity);
 
-            $worker->init($this->entity->getTaskGuid(), [
-                'filename' => $tempFilename,
-                'currentUserGuid' => $this->user->data->userGuid,
-            ]);
-            //TODO should be an asynchronous process (queue instead run)
-            // currently running import as direct run / synchronous process.
-            // Reason is just the feedback for the user, which the user should get directly in the browser
-            $worker->run();
-            $this->log->info('E1011', 'Task re-imported from excel file and unlocked for further processing.');
-        }
-        catch(editor_Models_Excel_ExImportException $e) {
-            $this->handleExcelreimportException($e);
-        }
-
-        if ($segmentErrors = $worker->getSegmentErrors()) {
-            $logger = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
-            /* @var $logger ZfExtended_Logger */
-
-            $msg = 'Error on excel reimport in the following segments. Please check the following segment(s):';
-            // log warning 'E1141' => 'Excel Reimport: at least one segment needs to be controlled.',
-            $logger->warn('E1142', $msg."\n{segments}", [
-                'task' => $this->entity,
-                'segments' => join("\n", array_map(function(excelExImportSegmentContainer $item) {
-                    return '#'.$item->nr.': '.$item->comment;
-                }, $segmentErrors)),
-            ]);
-            $msg = $this->translate->_('Die Excel-Datei konnte reimportiert werden, die nachfolgenden Segmente beinhalten aber Fehler und müssen korrigiert werden:');
-            $this->restMessages->addWarning($msg, $logger->getDomain(), null, array_map(function(excelExImportSegmentContainer $item) {
-                return ['type' => $item->nr, 'error' => $item->comment];
-            }, $segmentErrors));
-            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-            /* @var $user ZfExtended_Models_User */
+            $tempFilename = date('Y-m-d__H_i_s').'__'.rand().'.xslx';
+            $uploadTarget = $this->entity->getAbsoluteTaskDataPath().'/excelReimport/';
+            // create upload target directory /data/importedTasks/<taskGuid>/excelReimport/ (if not exist already)
+            if (!is_dir($uploadTarget)) {
+                mkdir($uploadTarget, 0755);
+            }
+            // move uploaded excel into upload target
+            if (!move_uploaded_file($_FILES['excelreimportUpload']['tmp_name'], $uploadTarget.$tempFilename)) {
+                // throw exception 'E1141' => 'Excel Reimport: upload failed.'
+                throw new editor_Models_Excel_ExImportException('E1141', [ 'task' => $this->entity ]);
+            }
+            $excelReimport = ZfExtended_Factory::get(
+                editor_Models_Import_Excel::class,
+                [
+                    $this->entity,
+                    $tempFilename,
+                    $this->user->data->userGuid
+                ]
+            );
+            $user = ZfExtended_Factory::get(ZfExtended_Models_User::class);
             $user->init((array) $this->user->data);
-            $worker->mailSegmentErrors($user);
+            // on error an editor_Models_Excel_ExImportException is thrown
+            $excelReimport->reimport($this->translate, $this->restMessages, $user);
+            $this->log->info('E1011', 'Task re-imported from excel file and unlocked for further processing.');
+
+        } catch(editor_Models_Excel_ExImportException $e) {
+            $this->handleExcelreimportException($e);
         }
         $this->view->success = true;
     }

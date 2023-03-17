@@ -26,10 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Plugins\TermTagger\Service;
+
+use editor_Models_Languages;
+use editor_Models_Task;
+use stdClass;
+use Zend_Registry;
+use ZfExtended_Factory;
+
 /**
  * Temporary model used for transforming segnments to usable data for the termtagger
  */
-class editor_Plugins_TermTagger_Service_Data {
+class ServiceData {
     
     /**
      * TBX file / hash
