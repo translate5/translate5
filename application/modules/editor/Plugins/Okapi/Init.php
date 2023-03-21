@@ -78,6 +78,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'vrsz', 'vsdm', 'vsdx', 'wcml', 'wix', 'xlsm', 'xlsx', 'xltm', 'xltx', 'xml', 'yaml', 'yml'
     ];
 
+    const SUPPORTED_OKAPI_VERSION = [
+        'okapi-longhorn-037',
+        'okapi-longhorn-139',
+        'okapi-longhorn-141',
+        'okapi-longhorn-143',
+        'okapi-longhorn-144-snapshot',
+    ];
+
     /**
      * Retrieves the config-based path to the default export bconf
      * @param editor_Models_Task $task
@@ -103,7 +111,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     public static function getImportBconf(editor_Models_Task $task) : editor_Plugins_Okapi_Bconf_Entity {
         $meta = $task->meta(true);
-        return self::getImportBconfById($task, $meta->getBconfId());
+
+        // If it's a termtranslation task - use system default bconfId, or pick bconfId from task meta otherwise
+        $bconfId = $task->getTaskType() == editor_Task_Type_TermTranslationTask::ID
+            ? ZfExtended_Factory::get(editor_Plugins_Okapi_Bconf_Entity::class)->getSystemDefaultBconfId()
+            : $meta->getBconfId();
+        return self::getImportBconfById($task, $bconfId);
     }
 
     /**

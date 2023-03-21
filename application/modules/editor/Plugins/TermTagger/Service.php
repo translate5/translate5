@@ -26,13 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Plugins\TermTagger;
+
+use editor_Plugins_TermTagger_Exception_Down;
+use editor_Plugins_TermTagger_Exception_Open;
+use editor_Plugins_TermTagger_Exception_Request;
+use editor_Plugins_TermTagger_Exception_TimeOut;
+use Exception;
+use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
 use MittagQI\Translate5\PooledService\ServiceAbstract;
+use stdClass;
+use Throwable;
+use Zend_Http_Client;
+use Zend_Http_Client_Exception;
+use Zend_Http_Response;
+use ZfExtended_Debug;
+use ZfExtended_Factory;
+use ZfExtended_Logger;
+use ZfExtended_Zendoverwrites_Http_Exception_Down;
+use ZfExtended_Zendoverwrites_Http_Exception_NoResponse;
+use ZfExtended_Zendoverwrites_Http_Exception_TimeOut;
 
 /**
  * Service Class of Plugin "TermTagger"
  */
-final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
+final class Service extends ServiceAbstract {
 
+    const SERVICE_ID = 'termtagger';
     /**
      * The timeout for connections is fix, the request timeout depends on the request type and comes from the config
      * @var integer
@@ -69,32 +89,46 @@ final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
     protected $lastStatus;
 
     /**
-     * returns the configured TermTagger URLs
-     * @return array
+     * @return string
      */
-    public function getConfiguredUrls() {
-        return $this->config->runtimeOptions->termTagger->url->toArray();
+    public function getServiceId(): string
+    {
+        return self::SERVICE_ID;
     }
 
     /**
-     * Wiring our testServerUrl-API to use for the general service check
      * @param string $url
-     * @return bool
+     * @return array{
+     *     success: bool,
+     *     version: string|null
+     * }
+     * @throws Zend_Http_Client_Exception
      */
-    protected function customServiceCheck(string $url): bool
+    protected function checkServiceUrl(string $url): array
     {
-        $version = null;
-        $result = $this->testServerUrl($url, $version);
-        if(!empty($version)){
-            // will be markup like <html> <title>TermTagger Version Information</title><body><h1>TermTagger Version Information</h1><h2>TermTagger REST Server</h2><b>Version:</b> 0.16<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.TermTaggerRestServer<br /><b>Compile Date: </b>Thu Jan 26 17:42:24 UTC 2023<hr><h2>TermTagger:</h2><b>Version:</b> 9.01<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.XliffTermTagger<br /><b>Compile Date: </b>Mon Jun 10 18:33:52 UTC 2019<hr><h2>OpenTMS Version: </h2>0.2.1</body></html>
-            $parts = explode('Version:', $version);
-            $parts = (count($parts) > 1) ? explode('<br', $parts[1]) : [];
-            $version = (count($parts) > 0) ? trim(strip_tags($parts[0])) : null;
+        $result = [ 'success' => false, 'version' => null ];
+        $httpClient = $this->getHttpClient(rtrim($url, '/') . '/termTagger');
+        $httpClient->setHeaders('accept', 'text/html');
+        try {
+            $response = $this->sendRequest($httpClient, $httpClient::GET);
         }
-        $this->addCheckResult($url, $version);
+        catch(editor_Plugins_TermTagger_Exception_TimeOut $e) {
+            $result['success'] = true; // the request URL is probably a termtagger which can not respond due it is processing data
+            return $result;
+        }
+        catch(Throwable) {
+            return $result; // all other ecxceptione are regarded as service not functioning properly
+        }
+        if($response){
+            $result['success'] = ($this->wasSuccessfull() && strpos($response->getBody(), 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer') !== false);
+            // will be markup like <html> <title>TermTagger Version Information</title><body><h1>TermTagger Version Information</h1><h2>TermTagger REST Server</h2><b>Version:</b> 0.16<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.TermTaggerRestServer<br /><b>Compile Date: </b>Thu Jan 26 17:42:24 UTC 2023<hr><h2>TermTagger:</h2><b>Version:</b> 9.01<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.XliffTermTagger<br /><b>Compile Date: </b>Mon Jun 10 18:33:52 UTC 2019<hr><h2>OpenTMS Version: </h2>0.2.1</body></html>
+            $parts = explode('Version:', $response->getBody());
+            $parts = (count($parts) > 1) ? explode('<br', $parts[1]) : [];
+            $result['version'] = (count($parts) > 0) ? trim(strip_tags($parts[0])) : null;
+        }
         return $result;
     }
-    
+
     /**
      * returns the HTTP Status of the last request
      * @return integer
@@ -111,34 +145,7 @@ final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
         $stat = $this->getLastStatus();
         return $stat >= 200 && $stat < 300;
     }
-    
-    /**
-     * @param string $url
-     * @param mixed|null $version
-     * @return bool: true if there is a TermTagger-Server behind $url
-     * @throws Zend_Http_Client_Exception
-     */
-    public function testServerUrl(string $url, &$version = null) {
-        $httpClient = $this->getHttpClient($url.'/termTagger');
-        $httpClient->setHeaders('accept', 'text/html');
-        try {
-            $response = $this->sendRequest($httpClient, $httpClient::GET);
-        }
-        catch(editor_Plugins_TermTagger_Exception_TimeOut $e) {
-            return true; // the request URL is probably a termtagger which can not respond due it is processing data
-        }
-        catch(editor_Plugins_TermTagger_Exception_Down $e) {
-            return false;
-        }
-        catch(editor_Plugins_TermTagger_Exception_Request $e) {
-            return false;
-        }
-        
-        $version = $response->getBody();
-        // $url is OK if status == 200 AND string 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer' is in the response-body
-        return $response && $this->wasSuccessfull() && strpos($response->getBody(), 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer') !== false;
-    }
-    
+
     /**
      * If no $tbxHash given, checks if the TermTagger-Sever behind $url is alive.
      * If $tbxHash is given, check if Server has loaded the tbx-file with the id $tbxHash.
@@ -187,7 +194,7 @@ final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/');
         $httpClient->setConfig([
             'timeout' => self::CONNECT_TIMEOUT,
-            'request_timeout' => editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT
+            'request_timeout' => Configuration::TIMEOUT_TBXIMPORT
         ]);
         $httpClient->setRawData(json_encode($serviceData), 'application/json');
         $response = $this->sendRequest($httpClient, $httpClient::POST);
@@ -210,14 +217,14 @@ final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
     /**
      * Requests the termtagger with the given service-url and the passed segment-data (wich has to be be encoded)
      * @param string $serviceUrl
-     * @param editor_Plugins_TermTagger_Service_Data $serviceData
+     * @param ServiceData $serviceData
      * @param ZfExtended_Logger $logger
      * @param int $requestTimeout
      * @return stdClass|null
      * @throws Zend_Http_Client_Exception
      * @throws editor_Plugins_TermTagger_Exception_Request
      */
-    public function tagTerms(string $serviceUrl, editor_Plugins_TermTagger_Service_Data $serviceData, ZfExtended_Logger $logger, int $requestTimeout): ?stdClass
+    public function tagTerms(string $serviceUrl, ServiceData $serviceData, ZfExtended_Logger $logger, int $requestTimeout): ?stdClass
     {
         //test term tagger errors, start a dummy netcat server in the commandline: nc -l -p 8080
         // if the request was received in the commandline, just kill nc to simulate a termtagger crash.
@@ -229,15 +236,14 @@ final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
             'timeout' => self::CONNECT_TIMEOUT,
             'request_timeout' => $requestTimeout
         ]);
-        $response = $this->sendRequest($httpClient, $httpClient::POST);
-
-        $response = $this->decodeServiceResult($logger, $response);
+        $httpResponse = $this->sendRequest($httpClient, $httpClient::POST);
+        $response = $this->decodeServiceResult($logger, $httpResponse);
         if (!$response) {
-            //processing tagterms TermTagger result could not be decoded.
+            //processing terms from the TermTagger result could not be decoded.
             throw new editor_Plugins_TermTagger_Exception_Request('E1121', [
                 'httpStatus' => $this->getLastStatus(),
                 'termTaggerUrl' => $httpClient->getUri(true),
-                'plainServerResponse' => print_r($response->getBody(), true),
+                'plainServerResponse' => $httpResponse->getBody(),
                 'requestedData' => $serviceData,
             ]);
         }
@@ -295,7 +301,7 @@ final class editor_Plugins_TermTagger_Service extends ServiceAbstract {
      * @return Zend_Http_Client
      */
     private function getHttpClient($uri) {
-        $client = ZfExtended_Factory::get('Zend_Http_Client');
+        $client = ZfExtended_Factory::get(Zend_Http_Client::class);
         $client->setUri($uri);
         return $client;
     }

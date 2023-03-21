@@ -183,6 +183,7 @@ class QualityCsvMqmTest extends editor_Test_JsonTest {
         static::api()->get($exportUrl);
 
         //get the exported file content
+        // TODO FIXME: write a Helper API to check the export, this code-sequence is used in several tests ...
         $path = static::api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);

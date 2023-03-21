@@ -9069,6 +9069,10 @@ E-Mail: service@MittagQI.com</pre>
               <source>Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?</source>
               <target>If removed, this language resource will unassigned from all of the tasks above. Do you want to remove this language resource and remove all assignments?</target>
             </trans-unit>
+            <trans-unit id='RGFzIERhdGVpZm9ybWF0IHdpcmQgdm9tIMOcYmVyc2V0emVycGFrZXQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+              <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
+              <target>File format not supported for translator package.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

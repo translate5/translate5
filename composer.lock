@@ -2346,12 +2346,12 @@
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/mittagqi/restful-zend-framework.git",
-                "reference": "e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2"
+                "reference": "08fc818a310032593a03d320751b9d7873826374"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/mittagqi/restful-zend-framework/get/e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2.zip",
-                "reference": "e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2",
+                "url": "https://bitbucket.org/mittagqi/restful-zend-framework/get/08fc818a310032593a03d320751b9d7873826374.zip",
+                "reference": "08fc818a310032593a03d320751b9d7873826374",
                 "shasum": ""
             },
             "default-branch": true,
@@ -2364,9 +2364,9 @@
             "description": "RESTful services with Zend Framework forked from https://github.com/codeinchaos/restful-zend-framework",
             "homepage": "https://bitbucket.org/mittagqi/restful-zend-framework",
             "support": {
-                "source": "https://bitbucket.org/mittagqi/restful-zend-framework/src/e54c80cc545c4ac4ca5bcd448ec4a256ac2132b2/?at=master"
+                "source": "https://bitbucket.org/mittagqi/restful-zend-framework/src/08fc818a310032593a03d320751b9d7873826374/?at=master"
             },
-            "time": "2022-10-24T14:40:38+00:00"
+            "time": "2023-03-07T12:31:34+00:00"
         },
         {
             "name": "monolog/monolog",

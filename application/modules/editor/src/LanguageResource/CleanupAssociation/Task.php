@@ -28,10 +28,8 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource\CleanupAssociation;
 
-use editor_Models_LanguageResources_CustomerAssoc;
 use ZfExtended_Factory;
 use ZfExtended_UnprocessableEntity;
-use ZfExtended_Utils;
 
 /**
  *

@@ -418,7 +418,25 @@ Ext.define('Editor.util.Util', {
         /** @link https://stackoverflow.com/questions/1026069 */
         ucfirst: function(s){
             return s.charAt(0).toUpperCase() + s.slice(1);
+        },
+
+        /***
+         * Is the import/reimport translator package available for given task
+         * @param task
+         * @returns {*|Boolean|boolean}
+         */
+        isTranslatorPackageAvailable: function (task){
+            if(!task){
+                return false;
+            }
+            // if the task is not reimportable, the export/import translator package is not available
+            if (!task.get('reimportable')){
+                return false;
+            }
+            // is allowed to edit a task
+            return Editor.app.authenticatedUser.isAllowed('editorEditTask',task) && task.isNotErrorImportPendingCustom();
         }
+
 
     }
 });

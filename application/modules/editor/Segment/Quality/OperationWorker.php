@@ -50,13 +50,6 @@ class editor_Segment_Quality_OperationWorker extends editor_Models_Task_Abstract
             return false;
         }
 
-        // Crucial: remove any existing segment tag models
-        editor_Models_Db_SegmentTags::removeByTaskGuid($this->taskGuid);
-        
-        // Also, we have to remove all existing qualities
-        $table = new editor_Models_Db_SegmentQuality();
-        $table->removeByTaskGuid($this->taskGuid);
-        
         // add the dependant workers
         editor_Segment_Quality_Manager::instance()->prepareOperation($this->processingMode, $this->task, $this->workerModel->getId());
         

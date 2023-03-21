@@ -44,6 +44,11 @@ abstract class PauseImportWorker extends \editor_Models_Task_AbstractWorker
             && in_array(PauseWorkerProcessorInterface::class, class_implements($parameters[self::PROCESSOR]), true);
     }
 
+    /**
+     * @return bool
+     *
+     * @throws PauseImportException
+     */
     protected function work(): bool
     {
         $params = $this->workerModel->getParameters();
@@ -63,7 +68,7 @@ abstract class PauseImportWorker extends \editor_Models_Task_AbstractWorker
             $elapsedTime+= $sleepTime;
             sleep($sleepTime);
         }
-
+        
         return true;
     }
 }

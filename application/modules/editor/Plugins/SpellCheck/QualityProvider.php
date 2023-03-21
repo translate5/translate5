@@ -32,8 +32,13 @@
  END LICENSE AND COPYRIGHT
  */
 
-use \editor_Plugins_SpellCheck_SegmentProcessor as SegmentProcessor;
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Enum\SegmentState;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
+use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
+use MittagQI\Translate5\Plugins\SpellCheck\Segment\Configuration;
+use MittagQI\Translate5\Plugins\SpellCheck\Segment\Processor;
+use MittagQI\Translate5\Plugins\SpellCheck\Worker;
+
 /**
  * The Quality provider 
  * This class just provides the translations for the filter backend
@@ -55,30 +60,9 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     protected static $hasCategories = true;
 
     /**
-     * SpellCheck segment processor instance
-     *
-     * @var SegmentProcessor
+     * @var Service|null
      */
-    protected static $_processor = null;
-
-    public function finalizeOperation(editor_Models_Task $task, string $processingMode){
-        /* @var $db editor_Models_Db_SegmentMeta */
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
-        // Get quantities-by-spellcheckState
-        $sql = $db->select()
-            ->from($db, ['spellcheckState', 'cnt' => 'count(id)'])
-            ->where('taskGuid = ?', $task->getTaskGuid());
-        $segmentCounts = $db->fetchAll($sql)->toArray();
-        $data = array_column($segmentCounts, 'cnt', 'spellcheckState');
-        // Convert to human-readable log format
-        $data = join(', ', array_map(function ($v, $k) { return sprintf("%s: %s", $k, $v); }, $data, array_keys($data)));
-        // Log we're done
-        $logger = Zend_Registry::get('logger')->cloneMe(editor_Plugins_SpellCheck_Configuration::getLoggerDomain($processingMode));
-        $logger->info('E1419', 'SpellCheck overall run done - {segmentCounts}', [
-            'task' => $task,
-            'segmentCounts' => $data,
-        ]);
-    }
+    private ?Service $languagetoolService = null;
 
     /**
      * Method to check whether this quality is turned On
@@ -92,25 +76,13 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     }
 
     /**
-     * Get SpellCheck segment processor instance
-     *
-     * @return SegmentProcessor
-     */
-    public function getProcessor(?string $spellcheckLang = null): SegmentProcessor
-    {
-        return self::$_processor ?? self::$_processor = ZfExtended_Factory::get(SegmentProcessor::class, [
-            'spellcheckLanguage' => $spellcheckLang,
-        ]);
-    }
-
-    /**
      * We will run with any processing mode if configured
      * @param string $processingMode
      * @param Zend_Config $taskConfig
      * @return bool
      */
-    public function hasOperationWorker(string $processingMode, Zend_Config $taskConfig) : bool {
-        return $taskConfig->enableSegmentSpellCheck;
+    public function hasOperationWorker(string $processingMode, Zend_Config $qualityConfig) : bool {
+        return $qualityConfig->enableSegmentSpellCheck == 1;
     }
 
     /**
@@ -122,48 +94,72 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      * @param array $workerParams
      */
     public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode, array $workerParams = []) {
+        $resourcePool = 'import';
+        // Get spellcheck-version of task's target language, applicable for use with LanguageTool, if supported (Theoretically different spellcheckers may support different language-sets, then the random 'import' url already is a problem!!)
+        $spellCheckLang = $this->getSpellcheckLanguage($task, $resourcePool);
 
-        // Get version of task's target language, applicable for use with LanguageTool, if supported
-        $spellCheckLang = $this->getProcessor()->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
+        // If task target language is not supported by LanguageTool we can skip adding workers as there is nothing to do
+        // HINT: the existing qualities will be removed in the prepeareOperation call anyway
+        if (!$spellCheckLang) {
+            // Log event
+            $this->getLogger($processingMode)->error('E1413', 'SpellCheck can not work when target language is not supported by LanguageTool.', [ 'task' => $task ]);
+            return;
+        }
 
-        // Crucial: add processing-mode to worker params
+        // Crucial: add processing-mode and spellcheck-lang to worker params
         $workerParams = [
             'processingMode' => $processingMode,
-            'resourcePool' => 'import',
+            'resourcePool' => $resourcePool,
             'spellCheckLang' => $spellCheckLang
         ] + $workerParams;
 
-        /* @var $worker editor_Plugins_SpellCheck_Worker_Import */
-        $worker = ZfExtended_Factory::get('editor_Plugins_SpellCheck_Worker_Import');
-
-        /* @var $meta editor_Models_Segment_Meta */
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-
-        // Reset already checked segments back to unchecked
-        $this->prepareSegments($task, $meta);
-
+        $worker = ZfExtended_Factory::get(Worker::class);
         // If worker init attempt failed - log error
         if (!$worker->init($task->getTaskGuid(), $workerParams)) {
-            $this->log->error('E1128', 'SpellCheckImport Worker can not be initialized!', [ 'parameters' => $workerParams ]);
+            $this->getLogger($processingMode)->error('E1476', 'SpellCheck Worker can not be initialized!', [ 'parameters' => $workerParams ]);
             return;
         }
-
-        // If task target language is not supported by LanguageTool
-        if (!$spellCheckLang) {
-            // Log event
-            $worker->getLogger()->error('E1413', 'SpellCheck can not work when target language is not supported by LanguageTool.', ['task' => $task]);
-            return;
-        }
-
-        // Add to queue
         $worker->queue($parentWorkerId);
     }
 
     /**
-     * Check segment against quality
-     *
-     * {@inheritDoc}
-     * @see editor_Segment_Quality_Provider::processSegment()
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     */
+    public function prepareOperation(editor_Models_Task $task, string $processingMode) {
+        // when spellchecking is done with workers all qualities that might exist have to be removed before
+        // they can not be re-identified with the  Qualities Object in the SegmentTags
+        $qualitiesTable = new editor_Models_Db_SegmentQuality();
+        $qualitiesTable->removeByTaskGuidAndType($task->getTaskGuid(), $this->getType());
+    }
+
+    /**
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     * @param array $processingResult
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     */
+    public function finalizeOperation(editor_Models_Task $task, string $processingMode, array $processingResult){
+        // the processing might excluded spellchecking, we only add an event when a result is available
+        // also we do not report when no spellchecking was done due to missing spellcheck-language
+        if(array_key_exists(Service::SERVICE_ID, $processingResult) && $this->getSpellcheckLanguage($task, 'import')){
+            $this->getLogger($processingMode)->info('E1419', 'SpellCheck overall run done - {segmentCounts}', [
+                'task' => $task,
+                'segmentCounts' => 'tagged '.$processingResult[Service::SERVICE_ID].' of '.$processingResult['segments'],
+            ]);
+        }
+        // we report any defect segments we found during processing
+        Processor::reportDefectSegments($task, $processingMode);
+    }
+
+    /**
+     * @param editor_Models_Task $task
+     * @param Zend_Config $qualityConfig
+     * @param editor_Segment_Tags $tags
+     * @param string $processingMode
+     * @return editor_Segment_Tags
+     * @throws ZfExtended_Exception
      */
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
 
@@ -172,15 +168,14 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
             return $tags;
         }
 
-        $processor = $this->getProcessor();
+        $service = $this->getLanguagetoolService();
+        $serviceUrl = $service->getPooledServiceUrl('gui');
+        $processor = new Processor($task, $service, $processingMode, $serviceUrl, false);
 
         // If current task's target lang is not supported by LanguageTool - return
-        if (!$spellCheckLang = $processor->getConnector()->getSpellCheckLangByTaskTargetLangId($task->getTargetLang())) {
+        if (!$processor->getSpellcheckLanguage()) {
             return $tags;
         }
-
-        $processor->setSpellcheckLanguage($spellCheckLang);
-
         // If processing mode is 'alike'
         if ($processingMode === editor_Segment_Processing::ALIKE){
 
@@ -189,8 +184,7 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
 
         } else if ($processingMode === editor_Segment_Processing::EDIT) {
 
-            // Do process
-            $processor->process([$tags]);
+            $processor->process($tags, false);
         }
 
         return $tags;
@@ -213,31 +207,31 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      * @param ZfExtended_Zendoverwrites_Translate $translate
      * @param string $category
      * @param editor_Models_Task $task
-     * @return string|null
+     * @return string
      */
-    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
+    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         switch ($category) {
-            case editor_Plugins_SpellCheck_Check::CHARACTERS              : return $translate->_('The text contains characters that are garbled or incorrect or that are not used in the language in which the content appears.');
-            case editor_Plugins_SpellCheck_Check::DUPLICATION             : return $translate->_('Content has been duplicated improperly.');
-            case editor_Plugins_SpellCheck_Check::INCONSISTENCY           : return $translate->_('The text is inconsistent with itself or is translated inconsistently (NB: not for use with terminology inconsistency).');
-            case editor_Plugins_SpellCheck_Check::LEGAL                   : return $translate->_('The text is legally problematic (e.g., it is specific to the wrong legal system).');
-            case editor_Plugins_SpellCheck_Check::UNCATEGORIZED           : return $translate->_('The issue either has not been categorized or cannot be categorized.');
+            case Check::CHARACTERS              : return $translate->_('The text contains characters that are garbled or incorrect or that are not used in the language in which the content appears.');
+            case Check::DUPLICATION             : return $translate->_('Content has been duplicated improperly.');
+            case Check::INCONSISTENCY           : return $translate->_('The text is inconsistent with itself or is translated inconsistently (NB: not for use with terminology inconsistency).');
+            case Check::LEGAL                   : return $translate->_('The text is legally problematic (e.g., it is specific to the wrong legal system).');
+            case Check::UNCATEGORIZED           : return $translate->_('The issue either has not been categorized or cannot be categorized.');
 
-            case editor_Plugins_SpellCheck_Check::REGISTER                : return $translate->_('The text is written in the wrong linguistic register of uses slang or other language variants inappropriate to the text.');
-            case editor_Plugins_SpellCheck_Check::LOCALE_SPECIFIC_CONTENT : return $translate->_('The localization contains content that does not apply to the locale for which it was prepared.');
-            case editor_Plugins_SpellCheck_Check::LOCALE_VIOLATION        : return $translate->_('Text violates norms for the intended locale.');
-            case editor_Plugins_SpellCheck_Check::GENERAL_STYLE           : return $translate->_('The text contains stylistic errors.');
-            case editor_Plugins_SpellCheck_Check::PATTERN_PROBLEM         : return $translate->_('The text fails to match a pattern that defines allowable content (or matches one that defines non-allowable content).');
-            case editor_Plugins_SpellCheck_Check::WHITESPACE              : return $translate->_('There is a mismatch in whitespace between source and target content or the text violates specific rules related to the use of whitespace.');
-            case editor_Plugins_SpellCheck_Check::TERMINOLOGY             : return $translate->_('An incorrect term or a term from the wrong domain was used or terms are used inconsistently.');
-            case editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION    : return $translate->_('There is an issue related to the internationalization of content.');
-            case editor_Plugins_SpellCheck_Check::NON_CONFORMANCE         : return $translate->_('Statistically detect wrong use of words that are easily confused');
+            case Check::REGISTER                : return $translate->_('The text is written in the wrong linguistic register of uses slang or other language variants inappropriate to the text.');
+            case Check::LOCALE_SPECIFIC_CONTENT : return $translate->_('The localization contains content that does not apply to the locale for which it was prepared.');
+            case Check::LOCALE_VIOLATION        : return $translate->_('Text violates norms for the intended locale.');
+            case Check::GENERAL_STYLE           : return $translate->_('The text contains stylistic errors.');
+            case Check::PATTERN_PROBLEM         : return $translate->_('The text fails to match a pattern that defines allowable content (or matches one that defines non-allowable content).');
+            case Check::WHITESPACE              : return $translate->_('There is a mismatch in whitespace between source and target content or the text violates specific rules related to the use of whitespace.');
+            case Check::TERMINOLOGY             : return $translate->_('An incorrect term or a term from the wrong domain was used or terms are used inconsistently.');
+            case Check::INTERNATIONALIZATION    : return $translate->_('There is an issue related to the internationalization of content.');
+            case Check::NON_CONFORMANCE         : return $translate->_('Statistically detect wrong use of words that are easily confused');
 
-            case editor_Plugins_SpellCheck_Check::GRAMMAR                 : return $translate->_('The text contains a grammatical error (including errors of syntax and morphology).');
-            case editor_Plugins_SpellCheck_Check::MISSPELLING             : return $translate->_('The text contains a misspelling.');
-            case editor_Plugins_SpellCheck_Check::TYPOGRAPHICAL           : return $translate->_('The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.');
+            case Check::GRAMMAR                 : return $translate->_('The text contains a grammatical error (including errors of syntax and morphology).');
+            case Check::MISSPELLING             : return $translate->_('The text contains a misspelling.');
+            case Check::TYPOGRAPHICAL           : return $translate->_('The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.');
         }
-        return NULL;
+        return '';
     }
 
     /**
@@ -250,27 +244,27 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      */
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         switch ($category) {
-            case editor_Plugins_SpellCheck_Check::GROUP_GENERAL           : return $translate->_('General');
-            case editor_Plugins_SpellCheck_Check::CHARACTERS              : return $translate->_('Characters');
-            case editor_Plugins_SpellCheck_Check::DUPLICATION             : return $translate->_('Duplication');
-            case editor_Plugins_SpellCheck_Check::INCONSISTENCY           : return $translate->_('Inconsistency');
-            case editor_Plugins_SpellCheck_Check::LEGAL                   : return $translate->_('Legal');
-            case editor_Plugins_SpellCheck_Check::UNCATEGORIZED           : return $translate->_('Uncategorized');
+            case Check::GROUP_GENERAL           : return $translate->_('General');
+            case Check::CHARACTERS              : return $translate->_('Characters');
+            case Check::DUPLICATION             : return $translate->_('Duplication');
+            case Check::INCONSISTENCY           : return $translate->_('Inconsistency');
+            case Check::LEGAL                   : return $translate->_('Legal');
+            case Check::UNCATEGORIZED           : return $translate->_('Uncategorized');
 
-            case editor_Plugins_SpellCheck_Check::GROUP_STYLE             : return $translate->_('Style');
-            case editor_Plugins_SpellCheck_Check::REGISTER                : return $translate->_('Register');
-            case editor_Plugins_SpellCheck_Check::LOCALE_SPECIFIC_CONTENT : return $translate->_('Locale-specific content');
-            case editor_Plugins_SpellCheck_Check::LOCALE_VIOLATION        : return $translate->_('Locale violation');
-            case editor_Plugins_SpellCheck_Check::GENERAL_STYLE           : return $translate->_('General style');
-            case editor_Plugins_SpellCheck_Check::PATTERN_PROBLEM         : return $translate->_('Pattern problem');
-            case editor_Plugins_SpellCheck_Check::WHITESPACE              : return $translate->_('Whitespace');
-            case editor_Plugins_SpellCheck_Check::TERMINOLOGY             : return $translate->_('Terminology');
-            case editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION    : return $translate->_('Internationalization');
-            case editor_Plugins_SpellCheck_Check::NON_CONFORMANCE         : return $translate->_('Non-conformance');
+            case Check::GROUP_STYLE             : return $translate->_('Style');
+            case Check::REGISTER                : return $translate->_('Register');
+            case Check::LOCALE_SPECIFIC_CONTENT : return $translate->_('Locale-specific content');
+            case Check::LOCALE_VIOLATION        : return $translate->_('Locale violation');
+            case Check::GENERAL_STYLE           : return $translate->_('General style');
+            case Check::PATTERN_PROBLEM         : return $translate->_('Pattern problem');
+            case Check::WHITESPACE              : return $translate->_('Whitespace');
+            case Check::TERMINOLOGY             : return $translate->_('Terminology');
+            case Check::INTERNATIONALIZATION    : return $translate->_('Internationalization');
+            case Check::NON_CONFORMANCE         : return $translate->_('Non-conformance');
 
-            case editor_Plugins_SpellCheck_Check::GRAMMAR                 : return $translate->_('Grammar');
-            case editor_Plugins_SpellCheck_Check::MISSPELLING             : return $translate->_('Spelling');
-            case editor_Plugins_SpellCheck_Check::TYPOGRAPHICAL           : return $translate->_('Typographical');
+            case Check::GRAMMAR                 : return $translate->_('Grammar');
+            case Check::MISSPELLING             : return $translate->_('Spelling');
+            case Check::TYPOGRAPHICAL           : return $translate->_('Typographical');
         }
         return NULL;
     }
@@ -283,44 +277,75 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      */
     public function getAllCategories(editor_Models_Task $task) : array {
         return [
-            editor_Plugins_SpellCheck_Check::GROUP_GENERAL => [
-                editor_Plugins_SpellCheck_Check::CHARACTERS,
-                editor_Plugins_SpellCheck_Check::DUPLICATION,
-                editor_Plugins_SpellCheck_Check::INCONSISTENCY,
-                editor_Plugins_SpellCheck_Check::LEGAL,
-                editor_Plugins_SpellCheck_Check::UNCATEGORIZED,
+            Check::GROUP_GENERAL => [
+                Check::CHARACTERS,
+                Check::DUPLICATION,
+                Check::INCONSISTENCY,
+                Check::LEGAL,
+                Check::UNCATEGORIZED,
             ],
-            editor_Plugins_SpellCheck_Check::GROUP_STYLE => [
-                editor_Plugins_SpellCheck_Check::REGISTER,
-                editor_Plugins_SpellCheck_Check::LOCALE_SPECIFIC_CONTENT,
-                editor_Plugins_SpellCheck_Check::LOCALE_VIOLATION,
-                editor_Plugins_SpellCheck_Check::GENERAL_STYLE,
-                editor_Plugins_SpellCheck_Check::PATTERN_PROBLEM,
-                editor_Plugins_SpellCheck_Check::WHITESPACE,
-                editor_Plugins_SpellCheck_Check::TERMINOLOGY,
-                editor_Plugins_SpellCheck_Check::INTERNATIONALIZATION,
-                editor_Plugins_SpellCheck_Check::NON_CONFORMANCE,
+            Check::GROUP_STYLE => [
+                Check::REGISTER,
+                Check::LOCALE_SPECIFIC_CONTENT,
+                Check::LOCALE_VIOLATION,
+                Check::GENERAL_STYLE,
+                Check::PATTERN_PROBLEM,
+                Check::WHITESPACE,
+                Check::TERMINOLOGY,
+                Check::INTERNATIONALIZATION,
+                Check::NON_CONFORMANCE,
             ],
-            editor_Plugins_SpellCheck_Check::GRAMMAR,
-            editor_Plugins_SpellCheck_Check::MISSPELLING,
-            editor_Plugins_SpellCheck_Check::TYPOGRAPHICAL,
+            Check::GRAMMAR,
+            Check::MISSPELLING,
+            Check::TYPOGRAPHICAL,
         ];
     }
 
     /**
-     * Reset already checked segments back to unchecked
-     *
-     * @param editor_Models_Task $task
-     * @param editor_Models_Segment_Meta $meta
+     * Adds Frontend-configurations for the quality types
+     * @return array{
+     *      field: string,
+     *      columnPostfixes: string[]
+     * }
      */
-    private function prepareSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta) {
+    public function getFrontendTypeDefinition() : array {
+        return [
+            'field' => 'spellCheck',
+            'columnPostfixes' => ['EditColumn'],
+        ];
+    }
 
-        // Reset status to unchecked for checked segments
-        $meta->db->update([
-            'spellcheckState' => SegmentState::SEGMENT_STATE_UNCHECKED
-        ],[
-            'taskGuid = ?' => $task->getTaskGuid(),
-            'spellcheckState = ?' => SegmentState::SEGMENT_STATE_CHECKED,
-        ]);
+    /**
+     * @param string $processingMode
+     * @return ZfExtended_Logger
+     * @throws Zend_Exception
+     */
+    private function getLogger(string $processingMode): ZfExtended_Logger
+    {
+        return Zend_Registry::get('logger')->cloneMe(Configuration::getLoggerDomain($processingMode));
+    }
+
+    /**
+     * @return Service
+     * @throws ZfExtended_Exception
+     */
+    private function getLanguagetoolService(): Service
+    {
+        if($this->languagetoolService === null){
+            $this->languagetoolService = editor_Plugins_SpellCheck_Init::createService('languagetool');
+        }
+        return $this->languagetoolService;
+    }
+
+    /**
+     * @param editor_Models_Task $task
+     * @param string $resourcePool
+     * @return string|false
+     * @throws ZfExtended_Exception
+     * @throws DownException
+     */
+    private function getSpellcheckLanguage(editor_Models_Task $task, string $resourcePool): string|false
+    {
+        return $this->getLanguagetoolService()->getAdapter(null, $resourcePool)->getSpellCheckLangByTaskTargetLangId($task->getTargetLang());
     }
 }

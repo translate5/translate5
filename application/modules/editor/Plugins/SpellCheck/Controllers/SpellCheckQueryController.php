@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Plugins\SpellCheck\LanguageTool\Service;
 /**
  * Controller for the Plugin SpellCheck
  */
@@ -60,10 +61,9 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
             $this->view->rows = false;
             return;
         }
-
-        $this->view->rows = ZfExtended_Factory
-            ::get(editor_Plugins_SpellCheck_LanguageTool_Adapter::class)
-            ->getSupportedLanguage($targetLangCode);
+        /* @var Service $service */
+        $service = editor_Plugins_SpellCheck_Init::createService('languagetool');
+        $this->view->rows = $service->getAdapter()->getSupportedLanguage($targetLangCode);
     }
 
     /**
@@ -77,9 +77,9 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
             $this->view->rows = "[]";
             return;
         }
-        
-        $connector = ZfExtended_Factory::get(editor_Plugins_SpellCheck_LanguageTool_Adapter::class);
-        $this->view->rows = $connector->getMatches($text,$language);
+        /* @var Service $service */
+        $service = editor_Plugins_SpellCheck_Init::createService('languagetool');
+        $this->view->rows = $service->getAdapter()->getMatches($text, $language);
     }
     
     public function getAction() {

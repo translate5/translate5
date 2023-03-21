@@ -71,10 +71,10 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /**
      * Retrieves if the provider has an own worker for the given processing type
      * @param string $processingMode
-     * @param Zend_Config $taskConfig
+     * @param Zend_Config $qualityConfig
      * @return bool
      */
-    public function hasOperationWorker(string $processingMode, Zend_Config $taskConfig) : bool {
+    public function hasOperationWorker(string $processingMode, Zend_Config $qualityConfig) : bool {
         return false;
     }
     /**
@@ -89,13 +89,25 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     }
 
     /**
-     * This method will be called for all Providers that have operation workers to finalize the operation
+     * This method will be called for all Providers that have operation workers after the (temporary) processing-model has been created
      * @param editor_Models_Task $task
      * @param string $processingMode
      */
-    public function finalizeOperation(editor_Models_Task $task, string $processingMode){
+    public function prepareOperation(editor_Models_Task $task, string $processingMode){
 
     }
+
+    /**
+     * This method will be called for all Providers that have operation workers to finalize the operation
+     * The param $processingResult will hold the number of processed items for all segments and each service
+     * @param editor_Models_Task $task
+     * @param string $processingMode
+     * @param array $processingResult
+     */
+    public function finalizeOperation(editor_Models_Task $task, string $processingMode, array $processingResult){
+
+    }
+
     /**
      * Processes the Segment and it's tags for the editing (which is unthreaded)
      * Note: the return value is used for further processing so it might even be possible to create a new tags-object though this is highly unwanted
@@ -138,7 +150,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /**
      * Returns a translation for the Provider itself
      * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @return string
+     * @return string|null
      */
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
         return NULL;
@@ -150,7 +162,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @param ZfExtended_Zendoverwrites_Translate $translate
      * @return string
      */
-    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
+    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : string {
         return '';
     }
     /**
@@ -159,7 +171,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @param ZfExtended_Zendoverwrites_Translate $translate
      * @param string $category
      * @param editor_Models_Task $task
-     * @return string
+     * @return string|null
      */
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
         return NULL;
@@ -169,10 +181,11 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * Translate quality category tooltip
      *
      * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @return string|null
-     * @throws Zend_Exception
+     * @param string $category
+     * @param editor_Models_Task $task
+     * @return string
      */
-    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
+    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         return '';
     }
 
@@ -181,6 +194,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /**
      * Retrieves, if the quality is configuered to be active
      * @param Zend_Config $qualityConfig
+     * @param Zend_Config $taskConfig
      * @return bool
      */
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
@@ -211,6 +225,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /**
      * Retrieves, if the Quality type is properly configured/checked (all configurations active) 
      * @param Zend_Config $qualityConfig
+     * @param Zend_Config $taskConfig
      * @return bool
      */
     public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
@@ -231,7 +246,18 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function getAllCategories(editor_Models_Task $task) : array {
         return [];
     }
-    
+
+    /**
+     * Adds Frontend-configurations for the quality types
+     * @return array{
+     *      field: string,
+     *      columnPostfixes: string[]
+     * }
+     */
+    public function getFrontendTypeDefinition() : array {
+        return [];
+    }
+
     /* *************** Tag provider API *************** */
     
     /**

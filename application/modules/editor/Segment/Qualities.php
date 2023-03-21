@@ -394,4 +394,21 @@ final class editor_Segment_Qualities {
     public function getExisting() {
         return $this->existing;
     }
+
+    /**
+     * @param string $newline
+     * @return string
+     */
+    public function debug($newline = "\n"): string
+    {
+        $text = 'Segment-qualities for segment ' . $this->segmentId . $newline . '  Existing qualities:';
+        foreach ($this->existing as $quality) {
+            $text .= $newline . '    ' . $quality->debug();
+        }
+        $text .= $newline . '  Added qualities:';
+        foreach ($this->added as $quality) {
+            $text .= $newline . '    ' . $quality->debug();
+        }
+        return $text;
+    }
 }

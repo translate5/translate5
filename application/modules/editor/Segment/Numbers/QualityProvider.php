@@ -135,17 +135,6 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
     }
 
     /**
-     * Translate quality type tooltip
-     *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @return string|null
-     * @throws Zend_Exception
-     */
-    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
-        return '';
-    }
-
-    /**
      * Translate category
      *
      * @param ZfExtended_Zendoverwrites_Translate $translate
@@ -205,7 +194,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      * @param editor_Models_Task $task
      * @return string|null
      */
-    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
+    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         switch($category){
             case editor_Segment_Numbers_Check::NUM13:
                 return $translate->_('Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.');

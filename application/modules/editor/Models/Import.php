@@ -251,35 +251,27 @@ class editor_Models_Import {
     protected function queueImportWorkers(editor_Models_Import_DataProvider_Abstract $dataProvider) {
         $taskGuid = $this->task->getTaskGuid();
         $params = ['config' => $this->importConfig];
-        /**
-         * Queue FileTree and RefFileTree Worker
-         */
+
+        // Queue Import Worker first as it provides the parent ID
+
+        $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');
+        /* @var $importWorker editor_Models_Import_Worker */
+        $importWorker->init($taskGuid, array_merge($params, [ 'dataProvider' => $dataProvider ]));
+        //prevent the importWorker to be started here.
+        $parentId = $importWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
+
+        // Queue FileTree and Reference FileTree Worker.
+        // NOTE: these will actually run BEFORE the Import worker but we queue them afterwards to have the import worker as parent
+
         $fileTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_FileTree');
         /* @var $fileTreeWorker editor_Models_Import_Worker_FileTree */
         $fileTreeWorker->init($taskGuid, $params);
-        $fileTreeWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
+        $fileTreeWorker->queue($parentId, ZfExtended_Models_Worker::STATE_PREPARE, false);
         
         $refTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_ReferenceFileTree');
         /* @var $refTreeWorker editor_Models_Import_Worker_ReferenceFileTree */
         $refTreeWorker->init($taskGuid, $params);
-        $refTreeWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
-        
-        /**
-         * Queue Import Worker
-         */
-        $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');
-        /* @var $importWorker editor_Models_Import_Worker */
-        $params['dataProvider'] = $dataProvider;
-        $importWorker->init($taskGuid, $params);
-
-        //prevent the importWorker to be started here. 
-        $parentId = $importWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
-
-        //since none of the above workers are started yet, we can safely update the fileTreeWorkers parentId
-        $fileTreeWorker->getModel()->setParentId($parentId);
-        $fileTreeWorker->getModel()->save();
-        $refTreeWorker->getModel()->setParentId($parentId);
-        $refTreeWorker->getModel()->save();
+        $refTreeWorker->queue($parentId, ZfExtended_Models_Worker::STATE_PREPARE, false);
 
         //sometimes it is not possbile for additional import workers to be invoked in afterImport, 
         // for that reason this event exists:
@@ -291,11 +283,7 @@ class editor_Models_Import {
         if($worker->init($taskGuid, ['config' => $this->importConfig])) {
             $worker->queue($parentId, null, false); 
         }
-        
-        // queueing the quality workers, which have a kind of "sub-plugin" systematic to trigger the dependant workers like termtaggers etc.
-        editor_Segment_Quality_Manager::instance()->queueImport($this->task, $parentId);
-        
-        // the worker finishing the import        
+        // the worker finishing the import
         $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_FinalStep');
         /* @var $worker editor_Models_Import_Worker_FinalStep */
         if($worker->init($taskGuid, ['config' => $this->importConfig])) {

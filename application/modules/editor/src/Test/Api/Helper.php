@@ -798,7 +798,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                 $name = 'runtimeOptions.' . $name;
             }
             $filter = array_merge([
-                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"like"}]',
+                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"eq"}]',
             ], $plainFilter);
             $config = $this->getJson('editor/config', $filter);
             $this->test::assertCount(1, $config, 'No Config entry for config "' . $name . '" found in instance config!');

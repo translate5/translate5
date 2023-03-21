@@ -89,15 +89,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
     protected function doWork()
     {
         $params = $this->workerModel->getParameters();
-        // lock the task dedicated for analysis
-        if ($this->task->lock(NOW_ISO, editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS)) {
-            // else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
-        } else if ($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
-            $this->log->error('E1167', 'MatchAnalysis Plug-In: task can not be locked for analysis and pre-translation.', [
-                'task' => $this->task
-            ]);
-            return false;
-        }
+
         $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc->setTaskGuid($this->task->getTaskGuid());

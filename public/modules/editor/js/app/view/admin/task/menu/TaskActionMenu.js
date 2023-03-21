@@ -204,19 +204,27 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                 },{
                     itemId: 'packageExportItem',
                     bind:{
-                        hidden:'{!isNotErrorImportPendingCustom}',
+                        hidden:'{!isTranslatorPackageAvailable}',
                         text:'{l10n.tasksGrid.exportMenu.packageExportItem}'
                     },
                     action: 'editorPackageExport',
                     sortIndex: 14,
-                    glyph: 'f56e@FontAwesome5FreeSolid'
+                    glyph: 'f019@FontAwesome5FreeSolid'
+                },{
+                    bind:{
+                        hidden:'{!isTranslatorPackageAvailable}',
+                        text: '{l10n.projectOverview.taskManagement.taskReimport.importTranslatorPackage}'
+                    },
+                    action: 'editorPackageReimport',
+                    sortIndex: 15,
+                    glyph: 'e4c7@FontAwesome5FreeSolid'
                 }, {
                     xtype: 'menuseparator',
                     hidden: true,
                     bind: {
                         hidden: '{!isMenuGroupVisible}'
                     },
-                    sortIndex: 15
+                    sortIndex: 16
                 }, {
                     text: me.messages.actionDelete,
                     action: 'editorDeleteTask',
@@ -225,14 +233,14 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                         hidden: '{!isEditorDeleteTask}'
                     },
                     glyph: 'f2ed@FontAwesome5FreeSolid',
-                    sortIndex: 16
+                    sortIndex: 17
                 }, {
                     xtype: 'menuseparator',
                     hidden: true,
                     bind: {
                         hidden: '{!isMenuGroupVisible}'
                     },
-                    sortIndex: 17
+                    sortIndex: 18
                 }]
             };
 

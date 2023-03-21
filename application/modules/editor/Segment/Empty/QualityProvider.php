@@ -133,7 +133,7 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
      * @return string|null
      * @throws Zend_Exception
      */
-    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
+    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : string {
         return $translate->_('Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.');
     }
 

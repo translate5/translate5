@@ -42,10 +42,12 @@ class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode
         'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
         'E1370' => 'Empty response from language resource {service}',
         'E1313' => 'The queried language resource {service} returns an error.',
+        'E1485' => 'Language resource {service} use not authorized',
+        'E1486' => 'Language resource {service} endpoint not found'
     ];
     
     protected function setDuplication() {
         parent::setDuplication();
-        ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312', 'E1370');
+        ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312', 'E1370', 'E1485', 'E1486');
     }
 }

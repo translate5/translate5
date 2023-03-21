@@ -26,12 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Plugins\TermTagger\Processor\RecalcTransFound;
+use MittagQI\Translate5\Plugins\TermTagger\Service;
+
 /**
  * Initial Class of Plugin "TermTagger"
  */
 class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
-
-    const TASK_STATE = 'termtagging';
 
     protected static string $description = 'Provides term-tagging';
     protected static bool $activateForTests = true;
@@ -41,7 +42,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @var string[]
      */
     protected static array $services = [
-        'termtagger' => editor_Plugins_TermTagger_Service::class
+        'termtagger' => Service::class
     ];
 
     /**
@@ -50,7 +51,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     protected $log;
 
     /**
-     * @var editor_Plugins_TermTagger_RecalcTransFound
+     * @var RecalcTransFound
      */
     private $markTransFound = null;
 
@@ -68,14 +69,13 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
             return false;
         }
 
+        // Adds our Quality Provider to the global Quality Manager
+        editor_Segment_Quality_Manager::registerProvider(editor_Plugins_TermTagger_QualityProvider::class);
+
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
 
-        // Adds our Quality Provider to the global Quality Manager
-        editor_Segment_Quality_Manager::registerProvider('editor_Plugins_TermTagger_QualityProvider');
-        
         // event-listeners
-        $this->eventManager->attach('editor_Models_Import_SegmentProcessor_Review', 'process', array($this, 'handleSegmentImportProcess'));
         $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
@@ -90,8 +90,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'handleTermTaggerCheck'));
 
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
-
-        $this->eventManager->attach('editor_TaskController', 'tagtermsOperation', [$this, 'handleTagtermsOperation']);
         $this->eventManager->attach('Editor_SegmentController', 'afterIndexAction', [$this, 'handleAfterSegmentIndex']);
     }
 
@@ -177,20 +175,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     }
 
     /**
-     * By default read only segments are not tagged, can be disabled via config
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleSegmentImportProcess(Zend_EventManager_Event $event) {
-        $attributes = $event->getParam('segmentAttributes');
-        $config = $event->getParam('config');
-        
-        /* @var $attributes editor_Models_Import_FileParser_SegmentAttributes */
-        if(!$attributes->editable && !$config->runtimeOptions->termTagger->tagReadonlySegments) {
-            $attributes->customMetaAttributes['termtagState'] = editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_IGNORE;
-        }
-    }
-    
-    /**
      * Invokes to the meta file parsing of task, adds TBX parsing
      * @param Zend_EventManager_Event $event
      */
@@ -267,58 +251,34 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         }
         return true;
     }
+
     /**
      * is called periodically to check the term tagger instances
      */
     public function handleTermTaggerCheck() {
-        $status = $this->termtaggerState();
-        $serverList = [];
-        $offline = [];
-        foreach($status->running as $url => $stat) {
-            $serverList[] = "\n".$url . ': '. ($stat ? 'ONLINE': 'OFFLINE!');
-            if(!$stat) {
-                $offline[] = $url;
+        $state = $this->getService('termtagger')->getServiceState();
+        if(!$state->runningAll) {
+            $serverList = [];
+            foreach($state->running as $url => $stat) {
+                $serverList[] = "\n".$url . ': '. ($stat ? 'ONLINE': 'OFFLINE!');
             }
-        }
-        editor_Plugins_TermTagger_Configuration::saveDownListToMemCache($offline);
-        if(!$status->runningAll) {
             $this->log->error('E1125', 'TermTagger DOWN: one or more configured TermTagger instances are not available: {serverList}', [
                 'serverList' => join('; ', $serverList),
-                'serverStatus' => $status,
+                'serverStatus' => $state,
             ]);
         }
     }
-    
+
+    /**
+     * Adds the termtagger state to the general state handler
+     * @param Zend_EventManager_Event $event
+     * @throws ZfExtended_Exception
+     */
     public function termtaggerStateHandler(Zend_EventManager_Event $event) {
         $applicationState = $event->getParam('applicationState');
-        $applicationState->termtagger = $this->termtaggerState();
+        $applicationState->termtagger = $this->getService('termtagger')->getServiceState(false);
     }
-    
-    /**
-     * Checks if the configured termtaggers are available and returns the result as stdClass
-     * @return stdClass
-     */
-    public function termtaggerState() {
 
-        $termtagger = new stdClass();
-        // create service
-        $ttService = $this->getService('termtagger');
-        /* @var $ttService editor_Plugins_TermTagger_Service */
-        $termtagger->configured = $ttService->getConfiguredUrls();
-        $allUrls = array_unique(call_user_func_array('array_merge', array_values((array) $termtagger->configured)));
-        $running = [];
-        $version = [];
-        $termtagger->runningAll = true;
-        foreach($allUrls as $url) {
-            $version[$url] = null;
-            $running[$url] = $ttService->testServerUrl($url, $version[$url]);
-            $termtagger->runningAll = $running[$url] && $termtagger->runningAll;
-        }
-        $termtagger->running = $running;
-        $termtagger->version = $version;
-        return $termtagger;
-    }
-    
     /**
      * When using change alikes, the transFound information in the source has to be changed.
      * This is done by this handler.
@@ -344,55 +304,13 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         //     this is done in the AlikeController
         //   - in the original only the transFound infor has to be updated, this is done here
         
-        //lazy instanciation of markTransFound
+        // lazy instanciation of markTransFound
         if(empty($this->markTransFound)) {
             $task = editor_ModelInstances::taskByGuid($masterSegment->getTaskGuid());
-            $this->markTransFound = ZfExtended_Factory::get('editor_Plugins_TermTagger_RecalcTransFound', array($task));
+            $this->markTransFound = new RecalcTransFound($task);
         }
         $sourceOrig = $alikeSegment->getSource();
         $targetEdit = $alikeSegment->getTargetEdit();
         $alikeSegment->setSource($this->markTransFound->recalc($sourceOrig, $targetEdit));
-    }
-
-    /**
-     * Operation action handler. Run termtagging specific for a task
-     *
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleTagtermsOperation(Zend_EventManager_Event $event){
-        $task = $event->getParam('entity');
-        /* @var $task editor_Models_Task */
-
-        // disable when source/target language similar, see TRANSLATE-2373
-        if($task->isSourceAndTargetLanguageSimilar()){
-            return;
-        }
-
-        $initialTaskState = $task->getState();
-        $task->checkStateAllowsActions();
-        if(!$task->lock(NOW_ISO, self::TASK_STATE)) {
-            return;
-        }
-        $task->setState(self::TASK_STATE);
-        $task->save();
-
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_SetTaskToOpen');
-        /* @var $worker editor_Plugins_TermTagger_Worker_SetTaskToOpen */
-        $worker->init($task->getTaskGuid(),['initialTaskState' => $initialTaskState]);
-        $parentId = $worker->queue(0, null, false);
-        editor_Segment_Quality_Manager::instance()->prepareTagTerms($task, $parentId);
-    }
-
-    /**
-     * Provides vars for frontend
-     *
-     * @return array
-     */
-    public static function getQualityVars(): array
-    {
-        return [
-            'field' => 'termTagger',
-            'columnPostfixes' => ['Column'],
-        ];
     }
 }

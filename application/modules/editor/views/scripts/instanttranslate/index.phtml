@@ -265,12 +265,11 @@ END LICENSE AND COPYRIGHT
 
     $(document).ready(function(){
         initGui(
-            '<?php echo $this->characterLimit;?>',
+            '<?php echo $this->characterLimit; ?>',
             <?php echo json_encode($this->allPretranslatedFiles); ?>,
             <?php echo json_encode($this->dateAsOf); ?>,
             <?php echo ($devPreventInstantTranslate) ? 'true' : 'false'; ?>
         );
-
     });
 
 </script>

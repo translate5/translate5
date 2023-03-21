@@ -77,8 +77,11 @@ function cleanupAttrA(array $attrA, $db, array $picklistA) {
     // Foreach attr having duplicates
     foreach ($attrA as $attrI) {
 
+        // Trim comma from older ids
+        $older = trim($attrI['older'], ',');
+
         // Delete all records of this attribute except the newer one
-        $db->query("DELETE FROM `terms_attributes` WHERE `id` IN ({$attrI['older']})");
+        $db->query("DELETE FROM `terms_attributes` WHERE `id` IN ($older)");
 
         // If this attribute is not a picklist
         if (!isset($picklistA[$attrI['dataTypeId']])) {
@@ -109,7 +112,7 @@ $selectFrom = "
 // Term-level: get duplicates
 $attrA = $db->query("$selectFrom
   WHERE NOT ISNULL(`termId`) AND $dataTypeId_NOT_IN
-  GROUP BY CONCAT(`termId`, '-', `dataTypeId`, '-', `type`)
+  GROUP BY CONCAT(`termId`, '-', `dataTypeId`, '-', IFNULL(`type`, 'null'))
   HAVING COUNT(`id`) > 1
 ")->fetchAll();
 
@@ -128,7 +131,7 @@ $db->query('
 // TermEntry-level: get duplicates
 $attrA = $db->query("$selectFrom
   WHERE ISNULL(`language`) AND $dataTypeId_NOT_IN
-  GROUP BY CONCAT(`termEntryId`, '-', `dataTypeId`, '-', `type`)
+  GROUP BY CONCAT(`termEntryId`, '-', `dataTypeId`, '-', IFNULL(`type`, 'null'))
   HAVING COUNT(`id`) > 1
 ")->fetchAll();
 
@@ -138,7 +141,7 @@ cleanupAttrA($attrA, $db, $picklistA);
 // Language-level: get duplicates
 $attrA = $db->query("$selectFrom
   WHERE NOT ISNULL(`language`) AND ISNULL(`termId`) AND $dataTypeId_NOT_IN
-  GROUP BY LOWER(CONCAT(`termEntryId`, '-', `language`, '-', `dataTypeId`, '-', `type`))
+  GROUP BY LOWER(CONCAT(`termEntryId`, '-', `language`, '-', `dataTypeId`, '-', IFNULL(`type`, 'null')))
   HAVING COUNT(`id`) > 1
 ")->fetchAll();
 

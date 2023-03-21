@@ -26,52 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Plugins\TermTagger;
+
+use editor_Segment_Processing;
+
 /**
  * Seperate Holder of certain configurations regarding the termtagging
- * to accompany editor_Plugins_TermTagger_SegmentProcessor and editor_Plugins_TermTagger_Worker_TermTaggerImport
+ * to accompany Tagger, Remover and editor_Plugins_TermTagger_Worker
  */
-class editor_Plugins_TermTagger_Configuration {
-    
+class Configuration
+{
+
     /**
-     * @var string
-     */
-    const SEGMENT_STATE_UNTAGGED = 'untagged';
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_INPROGRESS = 'inprogress';
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_TAGGED = 'tagged';
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_DEFECT = 'defect';
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_RETAG = 'retag';
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_OVERSIZE = 'oversized';
-    /**
-     * @var string
-     */
-    const SEGMENT_STATE_IGNORE = 'ignore';
-    
-    //const SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
-    /**
-     * Defines, how much segments can be processed in one worker call
+     * Defines, how much segments can be processed in one processor call
      * @var integer
      */
-    const IMPORT_SEGMENTS_PER_CALL = 5;
+    const OPERATION_BATCH_SIZE = 5;
+    /**
+     * Defines, how much tags can be removed in one processor call
+     * Be aware that this may affects the deadlock probability as other workers work on the same table at the same time
+     * @var integer
+     */
+    const REMOVAL_BATCH_SIZE = 10;
     /**
      * Defines the timeout in seconds how long a termtag call with multiple segments may need
      * @var integer
      */
-    const IMPORT_TIMEOUT_REQUEST = 300;
+    const OPERATION_TIMEOUT_REQUEST = 300;
     /**
      * Defines the timeout in seconds how long a single segment needs to be tagged
      * @var integer
@@ -97,28 +78,15 @@ class editor_Plugins_TermTagger_Configuration {
      * @var string
      */
     const ANALYSIS_LOGGER_DOMAIN = 'editor.terminology.analysis';
-    /**
-     * 
-     * @var string
-     */
-    const DOWN_CACHE_KEY = 'TermTaggerDownList';
-    
-    /**
-     * 
-     * @param array $offlineServers
-     */
-    public static function saveDownListToMemCache(array $offlineUrls) {
-        $memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
-        $memCache->save($offlineUrls, editor_Plugins_TermTagger_Configuration::DOWN_CACHE_KEY);
-    }
 
     /**
-     *
+     * Defines the logger-domain for all termtagger code
      * @param string $processingType
      * @return string
      */
-    public static function getLoggerDomain(string $processingType) : string {
-        switch($processingType){
+    public static function getLoggerDomain(string $processingType): string
+    {
+        switch ($processingType) {
 
             case editor_Segment_Processing::IMPORT:
                 return self::IMPORT_LOGGER_DOMAIN;
@@ -135,87 +103,15 @@ class editor_Plugins_TermTagger_Configuration {
     }
 
     /**
-     * @var editor_Models_Task
-     */
-    private $task;
-
-    /**
-     * @var Zend_Cache_Core
-     */
-    private $memCache;
-    
-    /**
-     * 
-     * @param editor_Models_Task $task
-     */
-    public function __construct(editor_Models_Task $task){
-        $this->task = $task;
-        $this->memCache = null;
-     }
-    /**
-     * 
-     * @param bool $isWorkerThread
+     * Retrieves the request timeouts for termtagger-service calls
+     * @param bool $isWorkerContext
      * @return int
      */
-     public function getRequestTimeout(bool $isWorkerThread) : int {
-         if($isWorkerThread){
-            return self::IMPORT_TIMEOUT_REQUEST;
+    public static function getRequestTimeout(bool $isWorkerContext): int
+    {
+        if ($isWorkerContext) {
+            return self::OPERATION_TIMEOUT_REQUEST;
         }
         return self::EDITOR_TIMEOUT_REQUEST;
-    }
-    /**
-     * 
-     * @return Zend_Cache_Core
-     */
-    public function getMemCache() : Zend_Cache_Core {
-        if($this->memCache == null){
-            $this->memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
-        }
-        return $this->memCache;
-    }
-    /**
-     *
-     * @return array
-     */
-    public function getAvailableResourceSlots($resourcePool) {
-        $config = Zend_Registry::get('config');
-        $url = $config->runtimeOptions->termTagger->url;
-        switch ($resourcePool) {
-            case 'gui':
-                $return = $url->gui->toArray();
-                break;
-                
-            case 'import':
-                $return = $url->import->toArray();
-                break;
-                
-            case 'default':
-            default:
-                $return = $url->default->toArray();
-                break;
-        }
-        //remove not available termtaggers from configured list
-        $downList = $this->getMemCache()->load(self::DOWN_CACHE_KEY);
-        if(!empty($downList) && is_array($downList)) {
-            $return = array_diff($return, $downList);
-        }
-        // no slots for this resourcePool defined
-        if (empty($return) && $resourcePool != 'default') {
-            // calculate slot from default resourcePool
-            return $this->getAvailableResourceSlots('default');
-        }
-        return $return;
-    }
-    /**
-     * disables the given slot (URL) via memcache.
-     * @param string $url
-     */
-    public function disableResourceSlot(string $url) : void {
-        $list = $this->getMemCache()->load(self::DOWN_CACHE_KEY);
-        if(!$list || !is_array($list)) {
-            $list = [];
-        }
-        $list[] = $url;
-        $this->getMemCache()->save($list, self::DOWN_CACHE_KEY);
     }
 }
