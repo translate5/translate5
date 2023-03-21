@@ -71,19 +71,32 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
                             xtype: 'button',
                             itemId: 'exportTranslatorPackage',
                             bind: {
-                                text:'{l10n.projectOverview.taskManagement.taskReimport.exportTranslatorPackage}'
+                                text:'{l10n.projectOverview.taskManagement.taskReimport.exportTranslatorPackage}',
+                                disabled: '{!isTranslatorPackageAvailable}'
                             }
                         },{
                             xtype: 'button',
                             itemId: 'importTranslatorPackage',
                             bind: {
-                                text: '{l10n.projectOverview.taskManagement.taskReimport.importTranslatorPackage}'
+                                text: '{l10n.projectOverview.taskManagement.taskReimport.importTranslatorPackage}',
+                                disabled: '{!isTranslatorPackageAvailable}'
                             }
                         },{
                             xtype: 'displayfield',
                             width:'80%',
                             hideLabel:true,
+                            bind:{
+                                hidden: '{!isTranslatorPackageAvailable}'
+                            },
                             value:'<i>' + Ext.String.format(Editor.data.l10n.projectOverview.taskManagement.taskReimport.topBarHeaderInfo,Editor.data.editor.task.reimport.supportedExtensions.join(','))+ '</i>'
+                        },{
+                            xtype: 'displayfield',
+                            width:'80%',
+                            hideLabel:true,
+                            bind:{
+                                value:'{l10n.projectOverview.taskManagement.taskReimport.translatorPackageDisabledTooltip}',
+                                hidden: '{isTranslatorPackageAvailable}'
+                            }
                         }
                     ]
                 }],
@@ -99,21 +112,26 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
                     flex: 0.5,
                     menuDisabled: true,
                     bind:{
-                        text: '{l10n.projectOverview.taskManagement.taskReimport.actionColumnText}',
+                        text: '{l10n.projectOverview.taskManagement.taskReimport.actionColumnText}'
                     },
                     align: 'center',
                     items:[{
                         glyph: 'f093@FontAwesome5FreeSolid',
                         isDisabled:function (view, rowIdx, colIdx, item, record){
-                            return me.isUploadDisabled(record);
+                            return me.isUploadDisabled(record) || !me.isPackageExportImportAllowed();
                         },
                         getClass: function (view, meta, record){
-                            if(me.isUploadDisabled(record)){
+                            if(me.isUploadDisabled(record) || !me.isPackageExportImportAllowed()){
                                 return 'disabledButtonTooltip';
                             }
                             return '';
                         },
                         getTip: function (view, meta, record){
+                            if(!me.isPackageExportImportAllowed()){
+                                // Do not show any tooltip in case the export package is not allowed.
+                                // We already show message in the dockedItems
+                                return '';
+                            }
                             if(me.isUploadDisabled(record) === false){
                                 return Editor.data.l10n.projectOverview.taskManagement.taskReimport.actionColumnTooltip;
                             }
@@ -138,6 +156,15 @@ Ext.define('Editor.view.admin.task.reimport.Reimport', {
         var isFolder = !record.get('leaf'),
             disabledByExtension = !Ext.Array.contains(Editor.data.editor.task.reimport.supportedExtensions,record.get('extension'));
         return isFolder || disabledByExtension;
+    },
+
+    /***
+     * Is the translator package feature available.
+     * It is not available whe the task is closed or not importable
+     * @returns {boolean}
+     */
+    isPackageExportImportAllowed:function (){
+        return this.lookupViewModel().get('isTranslatorPackageAvailable');
     },
 
     /***

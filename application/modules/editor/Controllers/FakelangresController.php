@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 use MittagQI\Translate5\Tools\CronIpFactory;
 
 /**
+ * Due to IP filtering there is no CSRF protection neccessary
  */
 class Editor_FakelangresController extends ZfExtended_Controllers_Action {
     /**

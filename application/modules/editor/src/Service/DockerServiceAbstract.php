@@ -45,11 +45,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * This is a service that is represented by a single config-value that either is a simple string or a list
- * Consrete Implementations must have a valid $configurationConfig!
+ * Concrete Implementations must have a valid $configurationConfig!
  */
 abstract class DockerServiceAbstract extends ServiceAbstract
 {
-
     /**
      * An assoc array that has to have at least 3 props:
      * "name": of the config
@@ -161,18 +160,66 @@ abstract class DockerServiceAbstract extends ServiceAbstract
     }
 
     /**
+     * Retrieves the configured service-url as array (or maybe there are several configured - not common though)
+     * @return array
+     * @throws ZfExtended_Exception
+     */
+    public function getServiceUrls(): array
+    {
+        return $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type'], true);
+    }
+
+    /**
      * Retrieves the service-url for a simple service
-     * In case of multiple configured this will be the first
+     * In case of multiple configured this will be a random one
      * @return string|null
      * @throws ZfExtended_Exception
      */
     public function getServiceUrl(): ?string
     {
-        $values = $this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type'], true);
-        if (count($values) > 0) {
-            return $values[0];
+        $urls = $this->getServiceUrls();
+        if (count($urls) === 1) {
+            return $urls[0];
+        }
+        if (count($urls) > 1) {
+            $max = count($urls) - 1;
+            return $urls[random_int(0, $max)];
         }
         return null;
+    }
+
+    /**
+     * Disables the given service URL via the Services memcache
+     * Returns true, if all Services are down, otherwise false
+     * @param string $serviceUrl
+     * @return bool
+     * @throws ZfExtended_Exception
+     */
+    public function setServiceUrlDown(string $serviceUrl): bool
+    {
+        $downList = Services::getServiceDownList($this->getServiceId());
+        $downList[] = $serviceUrl;
+        Services::saveServiceDownList($this->getServiceId(), $downList);
+        return (count($downList) >= count($this->getServiceUrls()));
+    }
+
+    /**
+     * Retrieves an ID for the service to use for all database-purposes where the service must be identified uniquely
+     * To have this seperate from ->getName() is purely for future developments
+     * @return string
+     */
+    public function getServiceId(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Retrieves, if the service works with different pools or manages load-balancing in the image
+     * @return bool
+     */
+    public function isPooled(): bool
+    {
+        return false;
     }
 
     /**
@@ -248,10 +295,17 @@ abstract class DockerServiceAbstract extends ServiceAbstract
     #[ArrayShape(['host' => 'string', 'port' => 'int'])]
     protected function parseUrl(string $url): array
     {
+        $port = parse_url($url, PHP_URL_PORT);
+        if(empty($port) && array_key_exists('url', $this->configurationConfig)){
+            $port = parse_url($this->configurationConfig['url'], PHP_URL_PORT);
+        }
+        if(empty($port)){
+            $port = 80; // questionable default but will fit in most cases
+        }
         return [
             'host' => parse_url($url, PHP_URL_HOST),
             // if port can not be parsed from given URL, use the default port from the default config:
-            'port' => parse_url($url, PHP_URL_PORT) ?: parse_url($this->configurationConfig['url'], PHP_URL_PORT),
+            'port' => $port,
         ];
     }
 
@@ -373,6 +427,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
      * @param string $type
      * @param mixed $value
      * @return string
+     * @throws JsonException
      * @throws ZfExtended_Exception
      */
     protected function createConfigurationUpdateValue(string $type, mixed $value): string

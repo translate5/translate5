@@ -26,16 +26,26 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\DownException;
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\MalfunctionException;
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\RequestException;
-use MittagQI\Translate5\Plugins\SpellCheck\Base\Exception\TimeOutException;
+namespace MittagQI\Translate5\Plugins\SpellCheck\LanguageTool;
+
+use editor_Models_Languages;
+use Exception;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\DownException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\MalfunctionException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\RequestException;
+use MittagQI\Translate5\Plugins\SpellCheck\Exception\TimeOutException;
+use Zend_Http_Client;
+use Zend_Http_Response;
+use ZfExtended_BadGateway;
+use ZfExtended_Factory;
+use ZfExtended_Zendoverwrites_Http_Exception_Down;
+use ZfExtended_Zendoverwrites_Http_Exception_NoResponse;
+use ZfExtended_Zendoverwrites_Http_Exception_TimeOut;
 
 /**
  * Connector to LanguageTool
- * https://languagetool.org/http-api/swagger-ui/#/default
  */
-class editor_Plugins_SpellCheck_LanguageTool_Adapter {
+final class Adapter {
     
     /**
      * LanguageTool
@@ -56,7 +66,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
      * Taken from Zf_configuration (example: "http://yourlanguagetooldomain:8081/v2")
      * @var string
      */
-    private $apiBaseUrl;
+    private $serviceUrl;
 
     /**
      * @var array
@@ -103,36 +113,8 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
     /**
      * 
      */
-    public function __construct($slot = null) {
-        $this->apiBaseUrl = $slot ?? Zend_Registry::get('config')->runtimeOptions->plugins->SpellCheck->languagetool->url->gui;
-    }
-
-    /**
-     * Checks if there is a LanguageTool-instance available behind $url.
-     *
-     * @param string $url url of the LanguageTool-instance
-     * @return boolean
-     */
-    public function testServerUrl(string $url, &$version = null) {
-
-        // Spoof value if $this->apiBaseUrl with value given by $url arg
-        $this->apiBaseUrl = $url;
-
-        // Try to check a simple phrase
-        try {
-            $response = $this->getMatches('a simple test', 'en-US');
-        }
-        catch (TimeOutException $e) {
-            return true; // can not respond due it is processing data
-        }
-        catch (DownException|MalfunctionException|RequestException $e) {
-            return false;
-        }
-
-        // Get version and assign into $version arg passed by reference
-        $version = $response->software->version;
-
-        return ($this->lastStatus === 200);
+    public function __construct($serviceUrl) {
+        $this->serviceUrl = $serviceUrl;
     }
 
     /**
@@ -144,30 +126,19 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
      */
     private function getHttpClient($path) {
 
-        /* @var $http Zend_Http_Client */
-        $http = ZfExtended_Factory::get('Zend_Http_Client');
-        $http->setUri($this->apiBaseUrl . $path);
-        $http->setConfig(['timeout'=>self::REQUEST_TIMEOUT_SECONDS]);
+        $http = ZfExtended_Factory::get(Zend_Http_Client::class);
+        $http->setUri($this->serviceUrl . $path);
+        $http->setConfig(['timeout' => self::REQUEST_TIMEOUT_SECONDS]);
 
         // Return http client with pre-configured request uri
         return $http;
     }
     
     /**
-     * Check for the status of the response. If the status is different than 200,
-     * ZfExtended_BadGateway exception is thrown.
-     * Also the function checks for the invalid decoded json.
-     * 
      * @param Zend_Http_Response $response
-     * @throws ZfExtended_BadGateway
-     * @throws ZfExtended_Exception
-     * @return stdClass|string
+     * @return mixed
      */
     private function processResponse(Zend_Http_Response $response){
-        $validStates = [200]; // not checked: 
-                              // - 201 Created (we don't create any resources)
-                              // - 401 Unauthorized (we don't use authentication)
-        
         return json_decode(trim($response->getBody()));
     }
     
@@ -195,18 +166,17 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
      * Pick contents of docs/LanguageTool.md and overwrite the list of supported languages there.
      * This method can be call from anywhere using the following:
      *
-     * ZfExtended_Factory
-     *     ::get('editor_Plugins_SpellCheck_SegmentProcessor')
-     *     ->getConnector()
-     *     ->renderSupportedLanguagesDoc();
+     * editor_Plugins_SpellCheck_Init::createService('languagetool')
+     *      ->getAdapter()
+     *      ->renderSupportedLanguagesDoc();
      *
      * @return array
      */
-    public function renderSupportedLanguagesDoc() {
-
+    public function renderSupportedLanguagesDoc()
+    {
         // Get all translate5 languages
         $langA = ZfExtended_Factory
-            ::get('editor_Models_Languages')
+            ::get(editor_Models_Languages::class)
             ->loadAllKeyValueCustom('rfc5646', 'langName');
 
         // Sort by rfc
@@ -298,18 +268,18 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
 
         // Catch no response
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $httpException) {
-            throw new RequestException('E1130', $extraData, $httpException);
+            throw new RequestException('E1478', $extraData, $httpException);
 
         // Others
         } catch (Exception $httpException) {
-            throw new RequestException('E1119', $extraData, $httpException);
+            throw new RequestException('E1479', $extraData, $httpException);
         }
 
         // If response http status is not between 200 and 300
         if (!$this->wasSuccessfull()) {
 
             // Throw malfunction exception
-            throw new MalfunctionException('E1120', [
+            throw new MalfunctionException('E1477', [
                 'httpStatus' => $this->getLastStatus(),
                 'languageToolUrl' => $http->getUri(true),
                 'plainServerResponse' => print_r($response->getBody(), true),
@@ -342,9 +312,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
 
         // Get supported languages
         $supportedLanguages = $this->getLanguages();
-
-        /* @var $languagesModel editor_Models_Languages */
-        $languagesModel = ZfExtended_Factory::get('editor_Models_Languages');
+        $languagesModel = ZfExtended_Factory::get(editor_Models_Languages::class);
 
         // Get main-language and sub-language
         $mainlanguage = $languagesModel->getMainlanguageByRfc5646($targetLangCode);
@@ -371,11 +339,10 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
     /**
      * Get target lang supported by LanguageTool by task's targetLangId-prop
      *
-     * @param $targetLangId
+     * @param int $targetLangId
      * @return string|false
      */
-    public function getSpellCheckLangByTaskTargetLangId($targetLangId) {
-
+    public function getSpellCheckLangByTaskTargetLangId(int $targetLangId) {
         // If self::$languages['argByLangId'] is non-null this means
         // that we've already checked whether current task's target language is
         // supported by LanguageTool, and this, in its turn, means that this variable
@@ -399,15 +366,6 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
     }
 
     /**
-     * Getter for $this->apiBaseUrl
-     *
-     * @return string|null
-     */
-    public function getApiBaseUrl() {
-        return $this->apiBaseUrl;
-    }
-
-    /**
      * Returns true if the last request HTTP status was 2**
      *
      * @return boolean
@@ -428,30 +386,5 @@ class editor_Plugins_SpellCheck_LanguageTool_Adapter {
      */
     public function getLastStatus() {
         return (int) $this->lastStatus;
-    }
-
-    /**
-     * Returns the configured LanguageTool URLs
-     *
-     * @return array
-     */
-    public function getConfiguredUrls() {
-
-        // Get urls grouped by resource pools
-        $groups = Zend_Registry::get('config')->runtimeOptions->plugins->SpellCheck->languagetool->url->toArray();
-
-        // Foreach group
-        foreach ($groups as &$group) {
-
-            // If some group is not an array
-            if (!is_array($group)) {
-
-                // Convert it into array
-                $group = [$group];
-            }
-        }
-
-        // Return groups
-        return $groups;
     }
 }

@@ -39,4 +39,12 @@ class editor_Models_Db_SegmentMeta extends Zend_Db_Table_Abstract {
     use ZfExtended_Models_Db_MetaTrait;
     protected $_name = 'LEK_segments_meta';
     public $_primary = 'id';
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->_name;
+    }
 }

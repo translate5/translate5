@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Stellt Methoden bereit, die translate5 grundsätzlich als Stand Alone-Anwendung verfügbar machen
+ * Since these shall be available externally, there is no CSRF protection active
  */
 class IndexController extends ZfExtended_Controllers_Action {
     
@@ -50,6 +51,10 @@ class IndexController extends ZfExtended_Controllers_Action {
         //the redirect to the editor module is done in the view script.
         // this default behaviour can then be overwritten in client-specific if needed
     }
+
+    /**
+     * Endpoint for T5 CLI system:check command to test the worker URL configuration based on the serverId stored in memcache
+     */
     public function testserverAction(){
         $id = Models_SystemRequirement_Modules_Configuration::MEMCACHE_ID;
         $memcache = new ZfExtended_Cache_MySQLMemoryBackend();
@@ -57,6 +62,7 @@ class IndexController extends ZfExtended_Controllers_Action {
         echo $memcache->load($id);
         exit;
     }
+    
     /**
      * Shows a simple info page to the user that IE 11 is not supported anymore
      */

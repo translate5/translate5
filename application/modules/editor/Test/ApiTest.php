@@ -36,8 +36,14 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class editor_Test_ApiTest extends TestCase
 {
+    /**
+     * To distinguish UNIT / API tests
+     */
     const TYPE = 'api';
 
+    /**
+     * Will be added to most generated resource-names in the DB
+     */
     const NAME_PREFIX = 'API Testing::';
 
     /**
@@ -270,8 +276,8 @@ abstract class editor_Test_ApiTest extends TestCase
             // internal method to setup more stuff in inheriting classes
             static::testSpecificSetup();
 
-            // log the user in that is setup as the needed test-user
-            if (static::api()->login(static::$setupUserLogin)) {
+            // log the user in that is setup as the needed test-user. Asserts the success if pretests shall not be skipped
+            if (static::api()->login(static::$setupUserLogin) && !static::$_api->doSkipPretests()) {
                 static::assertLogin(static::$setupUserLogin);
             }
             // this can be used in concrete tests as replacement for setUpBeforeClass()
@@ -336,12 +342,21 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     private static function testRunSetup(Helper $api)
     {
-        // evaluates the application state and checks basic prequesites
-        static::evaluateAppState($api);
-        // makes sure all test users are present in the DB & correctly configured
-        static::assertNeededUsers();
-        // makes sure the test customer is present in the DB and exposes it's id
-        static::assertTestCustomer();
+        // for dev-purposes it may be unwanted to have all the environment-tests before running the test
+        // this reduces the requests to a single request on the app-state and an initial login
+        if($api->doSkipPretests()){
+
+            static::$_appState = $api->getJson('editor/index/applicationstate');
+            unset(static::$_appState->worker);
+
+        } else {
+            // evaluates the application state and checks basic prequesites
+            static::evaluateAppState($api);
+            // makes sure all test users are present in the DB & correctly configured
+            static::assertNeededUsers();
+            // makes sure the test customer is present in the DB and exposes it's id
+            static::assertTestCustomer();
+        }
     }
 
     /**

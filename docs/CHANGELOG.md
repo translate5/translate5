@@ -10,6 +10,24 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.9.2] - 2023-03-16
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3248](https://jira.translate5.net/browse/TRANSLATE-3248): Authentication - Authentication for users with empty db password** <br>
+Fix a problem when error is produced on authentication for users with empty database password.
+
+**[TRANSLATE-3247](https://jira.translate5.net/browse/TRANSLATE-3247): TermPortal - Duplicated attributes cleanup problem** <br>
+A script to cleanup duplicated term attributes did not run successfully in some circumstances and was blocking the whole DB update procedure.
+
+**[TRANSLATE-3238](https://jira.translate5.net/browse/TRANSLATE-3238): Task Management - Not supported file format for translator package: Disable download button** <br>
+Translator package export/import buttons will be disabled in case the task does not allow or support export this.
+
+
 ## [5.9.1] - 2023-03-14
 
 ### Changed
