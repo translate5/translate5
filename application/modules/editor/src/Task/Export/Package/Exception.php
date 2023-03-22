@@ -49,5 +49,6 @@ class Exception extends \ZfExtended_ErrorCodeException
         'E1454' => 'Export package: Unable to create resource export folder',
         'E1501' => 'Export package: General problem with package export. Check the error log for more info.',
         'E1502' => 'Export package: The export package does not exist anymore.',
+        'E1504' => 'Export package: The provided download link is not valid.'
     ];
 }

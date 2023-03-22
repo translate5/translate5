@@ -286,6 +286,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1454"></a>E1454  | Export package        | Export package: Unable to create resource export folder | There was a problem when creating the resources folders. For more info check the error log
 | <a id="E1501"></a>E1501  | Export package        | Export package: General problem with package export. Check the error log for more info. | The export worker did not finish successfully. Check the previous errors for more info
 | <a id="E1502"></a>E1502  | Export package        | Export package: The export package does not exist anymore. | The requested translator package for download does not exist in the disk anymore.
+| <a id="E1504"></a>E1504  | Export package        | Export package: The provided download link is not valid. | The provided download link has invalid hash
 
 ### Task reimport
 | EventCode               | Context       | EventMessage                                                                                           | Description/Solution                                                                                              |

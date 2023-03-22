@@ -1524,8 +1524,10 @@ class editor_TaskController extends ZfExtended_RestController {
 
             $downloader = ZfExtended_Factory::get(Downloader::class);
 
-            if((bool)$this->getParam('download') === true){
-                $downloader->download($task);
+            $downloadLink = $this->getParam('download_link');
+
+            if(!empty($downloadLink)){
+                $downloader->download($task,$downloadLink);
                 exit;
             }
             $data['file_available'] = $downloader->isAvailable($this->getParam('workerId'));

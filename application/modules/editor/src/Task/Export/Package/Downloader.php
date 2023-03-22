@@ -69,7 +69,7 @@ class Downloader
 
         $worker->init($task->getTaskGuid(), [
             'folderToBeZipped' => $exportFolder,
-            'zipFile' => self::getZipFile($task)
+            'zipFile' => self::getZipFile($task) // Crate the zip file without any worker id suffix
         ]);
 
         $packageWorkerId = $worker->queue($workerId);
@@ -101,12 +101,23 @@ class Downloader
     /**
      * Download package for given task. In case the file does not exist, this will throw an exception
      * @param editor_Models_Task $task
+     * @param string $downloadLink - base64 encoded version of the worker id param
      * @return void
      * @throws Exception
      */
-    public function download(editor_Models_Task $task): void
+    public function download(editor_Models_Task $task,string $downloadLink): void
     {
-        $zipFile = $this->getZipFile($task);
+        $downloadLink = base64_decode($downloadLink);
+        $downloadLink = explode('=',$downloadLink);
+
+        if(empty($downloadLink) || $downloadLink[0] != 'workerId' || !is_numeric($downloadLink[1])){
+            throw new \MittagQI\Translate5\Task\Export\Package\Exception('E1504',[
+                'task' =>$task
+            ]);
+        }
+
+        // the final version of the zip file will have the PackageWorker id as suffix
+        $zipFile = $this->getZipFile($task,$downloadLink[1]);
         if(is_file($zipFile) === false){
             throw new \MittagQI\Translate5\Task\Export\Package\Exception('E1502',[
                 'task' =>$task
@@ -135,16 +146,19 @@ class Downloader
         $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         $worker->load($workerId);
 
-        return $restPath.'taskid/'.$task->getId().'/task/packagestatus?download=true&workerId='.$worker->getId();
+        $link = base64_encode('workerId='.$worker->getId());
+
+        return $restPath.'taskid/'.$task->getId().'/task/packagestatus?download_link='.$link;
     }
 
     /**
      * @param editor_Models_Task $task
+     * @param string $suffix
      * @return string
      */
-    protected function getZipFile(editor_Models_Task $task): string
+    protected function getZipFile(editor_Models_Task $task,string $suffix = ''): string
     {
-        return $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.self::PACKAGE_EXPORT;
+        return $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.self::PACKAGE_EXPORT.$suffix;
     }
 
 }
