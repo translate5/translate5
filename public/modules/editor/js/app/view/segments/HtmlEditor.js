@@ -1161,7 +1161,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       textLength = me.getLength(text, meta, me.currentSegment.get('fileId'));
       
       //only the segment length + the tag lengths:
-      me.lastSegmentLength = additionalLength + textLength;
+      me.lastSegmentLength = textLength;
 
       //add the length of the sibling segments (min max length is given for the whole transunit, not each mrk tag
       if(meta && meta.siblingData) {

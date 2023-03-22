@@ -390,10 +390,9 @@ table.message-box-data .error {}
 #segment-grid.comments-for-locked-segments .x-grid-item-selected .editing-disabled .comments-field img.add {
     display:block;
 }
-
 #segment-grid .segment-min-max div {
-    font-weight:bold;
-    padding:0.1em 0.3em;
+    font-weight: bold;
+    padding: 0.1em 0.3em;
 }
 #segment-grid .segment-min-max .warning {
     background-color: #ffba42;
@@ -404,6 +403,13 @@ table.message-box-data .error {}
 #segment-grid .segment-min-max .valid-length {
     background-color: #24f324;
 }
+#segment-grid .segment-min-max div.char-count {
+    font-weight: normal;
+}
+#segment-grid .segment-min-max div.char-count > strong {
+    font-size: 110%;
+}
+
 .ico-comment-add {background-image: url("../images/comment_add.png");}
 .ico-comment-edit {background-image: url("../images/comment_edit.png");background-repeat: no-repeat;}
 .ico-comment-delete {background-image: url("../images/comment_delete.png");background-repeat: no-repeat;}

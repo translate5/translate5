@@ -418,7 +418,10 @@
                 <source>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</source>
                 <target>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</target>
             </trans-unit>
-            <!-- TODO COUNTER -->
+            <trans-unit id='QW56YWhsIFplaWNoZW4='>
+                <source>Anzahl Zeichen</source>
+                <target>Anzahl Zeichen</target>
+            </trans-unit>
             <trans-unit id='RWluc3RlbGx1bmdlbg=='>
                 <source>Einstellungen</source>
                 <target>Einstellungen</target>
