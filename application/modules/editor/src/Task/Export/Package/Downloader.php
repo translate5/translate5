@@ -117,7 +117,7 @@ class Downloader
         }
 
         // the final version of the zip file will have the PackageWorker id as suffix
-        $zipFile = $this->getZipFile($task,$downloadLink[1]);
+        $zipFile = self::getZipFile($task,$downloadLink[1]);
         if(is_file($zipFile) === false){
             throw new \MittagQI\Translate5\Task\Export\Package\Exception('E1502',[
                 'task' =>$task
@@ -156,9 +156,18 @@ class Downloader
      * @param string $suffix
      * @return string
      */
-    protected function getZipFile(editor_Models_Task $task,string $suffix = ''): string
+    public static function getZipFile(editor_Models_Task $task,string $suffix = ''): string
     {
-        return $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.self::PACKAGE_EXPORT.$suffix;
+        return $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.self::getZipFileName($suffix);
+    }
+
+    /***
+     * @param string $sufix
+     * @return string
+     */
+    public static function getZipFileName(string $sufix = ''): string
+    {
+        return self::PACKAGE_EXPORT.$sufix.'.zip';
     }
 
 }

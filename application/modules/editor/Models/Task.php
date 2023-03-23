@@ -1302,4 +1302,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->faultySegmentsCache[$this->getId()];
     }
+
+    /***
+     * Return all active(not ended) reimportable tasks which are not ended
+     * @return array
+     */
+    public function getAllReimportable(): array
+    {
+        $s = $this->db->select()
+            ->where('reimportable = 1')
+            ->where('state NOT IN(?)',[self::STATE_END,self::STATE_ERROR])
+            ->where('taskType IN (?)', editor_Task_Type::getInstance()->getNonInternalTaskTypes());
+        return $this->db->fetchAll($s)->toArray();
+    }
 }
