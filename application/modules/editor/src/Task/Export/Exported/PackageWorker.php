@@ -33,11 +33,24 @@ use editor_Models_Task;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Export\Package\ExportSource;
 use SplFileInfo;
+use ZfExtended_Factory;
 use ZfExtended_Utils;
 
 /**
  */
 class PackageWorker extends editor_Models_Export_Exported_ZipDefaultWorker {
+
+    /**
+     * Inits the worker in a way to create an export.zip, returns the temp zip name
+     * @param string $taskGuid
+     * @param array $parameters
+     * @return string returns the temp name of the target zip file
+     */
+    public function setup($taskGuid = null, $parameters = []): string
+    {
+        // Return zipFile
+        return parent::setup($taskGuid,$parameters);
+    }
 
     /**
      * Create export zip file from the generate package directory

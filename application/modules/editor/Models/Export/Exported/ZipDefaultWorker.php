@@ -55,7 +55,34 @@ class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Expor
         // Return true
         return true;
     }
-    
+
+    /**
+     * Inits the worker in a way to create an export.zip, returns the temp zip name
+     * @param string $taskGuid
+     * @param array $parameters
+     * @return string returns the temp name of the target zip file
+     */
+    public function setup($taskGuid = null, $parameters = []) {
+
+        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+
+        // Load task
+        $task->loadByTaskGuid($taskGuid);
+
+        // Create temporary file for writing zipped contents
+        $zipFile = tempnam($task->getAbsoluteTaskDataPath(), 'taskExport_');
+
+        // Call parent
+        $this->init($taskGuid, [
+            'folderToBeZipped' => $parameters['exportFolder'],
+            'zipFile' => $zipFile,
+        ]);
+
+        // Return zipFile
+        return $zipFile;
+    }
+
     /**
      * Exports the task as zipfile export.zip in the taskData if configured
      *
