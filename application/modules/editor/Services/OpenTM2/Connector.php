@@ -454,7 +454,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
 
         if($this->api->status()) {
-            return $this->processImportStatus();
+            return $this->processImportStatus($this->api->getResult());
         }
         //down here the result contained an error, the json was invalid or HTTP Status was not 20X
 
@@ -481,32 +481,80 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
         return self::STATUS_ERROR;
     }
-    
+
     /**
      * processes the import state
+     * Please note, method made public for testing purposes only,
+     * should be changed to private after the class is refactored
+     *
+     * @param stdClass|null $apiResponse
+     *
      * @return string
      */
-    protected function processImportStatus() {
-        $status = $this->api->getResult() ? $this->api->getResult()->tmxImportStatus : '';
-        switch($status) {
+    public function processImportStatus(?stdClass $apiResponse): string
+    {
+        $status = $apiResponse ? ($apiResponse->status ?? '') : '';
+        $tmxImportStatus = $apiResponse ? ($apiResponse->tmxImportStatus ?? '') : '';
+
+        $lastStatusInfo = '';
+        $result = self::STATUS_UNKNOWN;
+
+        switch ($status) {
+            // TM not found at all
+            case 'not found':
+                // We have no status 'not found' at the moment, so we use 'error' instead
+                $result = self::STATUS_ERROR;
+
+                break;
+
+            // TM exists on a disk, but not loaded into memory
             case 'available':
-                if (isset($this->api->getResult()->importTime) && $this->api->getResult()->importTime === 'not finished') {
-                    return self::STATUS_IMPORT;
+                $result = self::STATUS_AVAILABLE;
+                // TODO change this to STATUS_NOT_LOADED after discussed with the team
+//                $result = self::STATUS_NOT_LOADED;
+                break;
+
+            // TM exists and is loaded into memory
+            case 'open':
+
+                switch ($tmxImportStatus) {
+                    case 'available':
+                        if (isset($apiResponse->importTime) && $apiResponse->importTime === 'not finished') {
+                            $result = self::STATUS_IMPORT;
+
+                            break;
+                        }
+
+                        $result = self::STATUS_AVAILABLE;
+
+                        break;
+
+                    case 'import':
+                        $lastStatusInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
+                        $result = self::STATUS_IMPORT;
+
+                        break;
+
+                    case 'error':
+                    case 'failed':
+                        $lastStatusInfo = $apiResponse->ErrorMsg;
+                        $result = self::STATUS_ERROR;
+
+                        break;
+
+                    default:
+                        break;
                 }
 
-                return self::STATUS_AVAILABLE;
-            case 'import':
-                $this->lastStatusInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
-                return self::STATUS_IMPORT;
-            case 'error':
-            case 'failed':
-                $this->lastStatusInfo = $this->api->getResult()->ErrorMsg;
-                return self::STATUS_ERROR;
+                break;
+
             default:
                 break;
         }
-        $this->lastStatusInfo = 'original OpenTM2 status '.$status;
-        return self::STATUS_UNKNOWN;
+
+        $this->lastStatusInfo = $lastStatusInfo !== '' ? $lastStatusInfo : 'original OpenTM2 status ' . $status;
+
+        return $result;
     }
     
     /***
