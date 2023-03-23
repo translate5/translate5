@@ -27,4 +27,4 @@
 
 INSERT IGNORE INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
 ('runtimeOptions.frontend.defaultState.editor.showHideCharCounter',1,'editor','system','{}','{}','','map','Default state configuration for the editor character counter visibility. If this field value is empty ({} is not an empty value!), no state will be applied/saved for this component.',32,'Editor character counter visibility configuration','Editor: UI layout & more',NULL),
-('runtimeOptions.editor.toolbar.showHideCharCounter',1,'editor','editor',1,1,'','integer','Default value for the visibility of the character counter below the segment editor',4,'Default visibility of character counter','Editor: UI layout & more',NULL);
+('runtimeOptions.editor.toolbar.showHideCharCounter',1,'editor','editor',0,0,'','integer','Default value for the visibility of the character counter below the segment editor',4,'Default visibility of character counter','Editor: UI layout & more',NULL);

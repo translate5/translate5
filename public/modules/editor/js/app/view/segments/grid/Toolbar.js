@@ -143,14 +143,36 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 xtype:'menuseparator'
             });
             // add visibility of character counter under segment-editor
+            // the state of the checkbox will be the default checked-state until the user changes the settings for the first time
             menu.items.push({
                 xtype: 'menucheckitem',
                 itemId: 'showHideCharCounter',
-                stateId: 'editor.showHideCharCounter',
                 checked: (Editor.app.getTaskConfig('editor.toolbar.showHideCharCounter') == 1), // the default can be set by config, overwritable on system & customer level
+                wasCheckedChanged: false,
                 bind: {
                     text: '{l10n.segmentGrid.toolbar.showCharacterCounter}',
                     tooltip: '{l10n.segmentGrid.toolbar.showCharacterCounterTooltip}'
+                },
+                listeners: {
+                    checkchange : function() {
+                        this.wasCheckedChanged = true;
+                        this.saveState();
+                    }
+                },
+                stateful: true,
+                stateId: 'editor.showHideCharCounter',
+                getState: function() {
+                    // we save a checked state only, if the state was user-initiated at one point
+                    if(this.wasCheckedChanged){
+                        return { checked: this.checked };
+                    }
+                    return {}; // by default, no checked-state will be saved
+                },
+                applyState: function(state) {
+                    if (state && state.hasOwnProperty('checked')) {
+                        this.wasCheckedChanged = true; // when a user-config was set, the state will be synced from then on
+                        this.checked = state.checked;
+                    }
                 }
             });
 
