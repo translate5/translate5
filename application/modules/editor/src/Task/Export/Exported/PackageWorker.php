@@ -30,10 +30,9 @@ namespace MittagQI\Translate5\Task\Export\Exported;
 use editor_Models_Export_Exception;
 use editor_Models_Export_Exported_ZipDefaultWorker;
 use editor_Models_Task;
+use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Export\Package\ExportSource;
 use SplFileInfo;
-use ZfExtended_Factory;
-use ZfExtended_Models_Worker;
 use ZfExtended_Utils;
 
 /**
@@ -50,5 +49,7 @@ class PackageWorker extends editor_Models_Export_Exported_ZipDefaultWorker {
         parent::doWork($task);
         $params = $this->workerModel->getParameters();
         ZfExtended_Utils::cleanZipPaths(new SplFileInfo($params['zipFile']), basename(ExportSource::PACKAGE_FOLDER_NAME));
+        // add the worker id as file suffix, so we can make difference between exports
+        rename($params['zipFile'],Downloader::getZipFile($task,$this->workerModel->getId()));
     }
 }

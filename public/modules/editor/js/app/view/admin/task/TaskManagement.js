@@ -96,7 +96,10 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
 
         if(auth.isAllowed('taskReimport')) {
             tabs.push({
-                xtype: 'taskManageFilesMain'
+                xtype: 'taskManageFilesMain',
+                bind:{
+                    disabled:'{disabledDuringTaskImport}'
+                }
             });
         }
         

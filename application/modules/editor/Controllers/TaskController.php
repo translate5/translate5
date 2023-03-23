@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task;
 use MittagQI\Translate5\Task\CurrentTask;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Lock;
@@ -1511,6 +1512,44 @@ class editor_TaskController extends ZfExtended_RestController {
         $remover->remove($forced);
     }
 
+    /***
+     * Check the status of the package export.
+     * @return void
+     * @throws Throwable
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws \MittagQI\Translate5\Task\Current\Exception
+     * @throws \MittagQI\Translate5\Task\Current\NoAccessException
+     */
+    public function packagestatusAction(){
+        $this->initCurrentTask(false);
+        $task = $this->getCurrentTask();
+
+        try {
+            $data = [];
+
+            $downloader = ZfExtended_Factory::get(Downloader::class);
+
+            $downloadLink = $this->getParam('download_link');
+
+            if(!empty($downloadLink)){
+                $downloader->download($task,$downloadLink);
+                exit;
+            }
+            $data['file_available'] = $downloader->isAvailable($this->getParam('workerId'));
+
+            if($data['file_available']){
+                $data['download_link'] = $downloader->getDownloadLink($task,$this->getParam('workerId'));
+                Lock::taskUnlock($task);
+            }
+
+            echo Zend_Json::encode($data);
+        }catch (Throwable $throwable){
+            Lock::taskUnlock($task);
+            throw $throwable;
+        }
+    }
+
     /**
      * does the export as zip file.
      */
@@ -1551,19 +1590,24 @@ class editor_TaskController extends ZfExtended_RestController {
                 break;
 
             case 'package':
+
                 if( $this->entity->isLocked($this->entity->getTaskGuid())){
                     $this->view->assign('error','Unable to export task package. The task is locked');
-                    echo $this->view->render('task/packageexport.phtml');
-                    exit;
+                    echo $this->view->render('task/packageexporterror.phtml');
                 }
+
                 try {
                     $this->entity->checkStateAllowsActions();
-                    Lock::taskLock($this->entity,Downloader::TASK_PACKAGE_EXPORT_STATE);
+                    Lock::taskLock($this->entity,Downloader::PACKAGE_EXPORT);
 
                     $packageDownloader = ZfExtended_Factory::get(Downloader::class);
-                    $packageDownloader->downloadPackage($this->entity,$diff);
-                    $this->logInfo('Task package exported', ['context' => $context, 'diff' => $diff]);
-                    Lock::taskUnlock($this->entity);
+                    $workerId = $packageDownloader->run($this->entity,$diff);
+
+                    $this->view->assign('taskId',$this->entity->getId());
+                    $this->view->assign('workerId',$workerId);
+
+                    echo $this->view->render('task/packageexport.phtml');
+
                 }catch (Throwable $exception){
                     Lock::taskUnlock($this->entity);
                     $this->taskLog->exception($exception,[
@@ -1571,8 +1615,8 @@ class editor_TaskController extends ZfExtended_RestController {
                             'task' => $this->entity
                         ]
                     ]);
-                    $this->view->assign('error','Error on task package export. For more info check the event log.');
-                    echo $this->view->render('task/packageexport.phtml');
+                    $this->view->assign('error',$exception->getMessage());
+                    echo $this->view->render('task/packageexporterror.phtml');
                 }
                 exit;
             case 'filetranslation':
