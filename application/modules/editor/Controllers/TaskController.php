@@ -627,8 +627,14 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->_helper->Api->convertLanguageParameters($target);
         }
 
-        // sort the languages alphabetically
-        $this->_helper->Api->sortLanguages($this->data['targetLang']);
+
+        // TODO: Remove the code bellow when frontend sorting is implemented. See: TRANSLATE-3254 Sort the target languages alphabetically on task creation
+        // sort the target langauges only when the translate5 wizard is used to create task. In api tasks, the order
+        // of the langauges, files and file types should be provided by the user and not changed
+        if((bool)$this->getParam('importWizardUsed',false) === true){
+            // sort the languages alphabetically
+            $this->_helper->Api->sortLanguages($this->data['targetLang']);
+        }
 
         //task is handled as a project (one source language, multiple target languages, each combo one own task)
         $targetLangCount = count($this->data['targetLang']);

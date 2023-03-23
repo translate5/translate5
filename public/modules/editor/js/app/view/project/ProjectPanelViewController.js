@@ -287,7 +287,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
         //search for the task store record index
         me.searchIndex(id,grid).then(function(index){
-            var store = grid.getStore();
+            var store = grid.getStore(),
+                view = grid.getView(),
+                rows = view.all;
+
             //do not scroll on empty store
             if(store.getTotalCount() === 0){
                 if(!store.hasPendingLoad()) {
@@ -295,6 +298,20 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 }
                 return;
             }
+
+            if(!rows || rows.getCount() < 1){
+                // No visible rows in the grid table view. If we call scroll to in that case, the application will crash
+                // This is the case when the first page is loaded from the buffered store, but all other pages are still
+                // loading. Because of that, extjs will wrongly calculate the viewSize of the table which results with
+                // This error: https://jira.translate5.net/browse/TRANSLATE-3199
+                // At the end we still will be able to focus/scroll the requested row since selectProjectRecord will once
+                // again call when the projectStore is loaded (the load event of the store is triggered after the store
+                // loads all pages)
+                // Currently no way to fix the wrongly calculate viewSite values because there is already existing fix
+                // for different bug in those places.
+                return;
+            }
+
             grid.scrollTo(index,{
                 callback:function(){
                     //no db index is found
