@@ -36,7 +36,7 @@ use stdClass;
 
 class ConnectorTest extends TestCase
 {
-    public function testProcessImportStatusNullApiResponse()
+    public function testProcessImportStatusNullApiResponse(): void
     {
         $apiResponse = null;
         $expectedResult = Connector::STATUS_UNKNOWN;
