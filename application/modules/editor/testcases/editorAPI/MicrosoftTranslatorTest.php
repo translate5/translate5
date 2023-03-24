@@ -44,6 +44,11 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
         'editor_Plugins_InstantTranslate_Init'
     ];
 
+    protected static array $requiredRuntimeOptions = [
+        'runtimeOptions.LanguageResources.microsoft.apiUrl' => null,//null checks for no concrete value but if not empty
+        'runtimeOptions.LanguageResources.microsoft.apiKey' => null//null checks for no concrete value but if not empty
+    ];
+
     protected static function setupImport(Config $config): void
     {
         if (!self::isMasterTest()) {
