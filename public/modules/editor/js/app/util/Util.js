@@ -224,6 +224,12 @@ Ext.define('Editor.util.Util', {
             });
         },
 
+        /**
+         * @deprecated
+         * TODO FIXME: Get rid of this and use "normal" download-links instead.
+         * @param {string} url
+         * @param {object} params
+         */
         download: function(url, params = null){
             var baseUrl = undefined;
             if(!url.startsWith('http')){
@@ -233,7 +239,9 @@ Ext.define('Editor.util.Util', {
             if(params){
                 var urlObj = new URL(url, baseUrl);
                 var searchParams = new URLSearchParams(urlObj.search);
-                for(const [param, value] of Object.entries(params)) searchParams.set(param, value);
+                for(const [param, value] of Object.entries(params)){
+                    searchParams.set(param, value);
+                }
                 urlObj.search = searchParams;
                 url = urlObj.toString();
             }
@@ -245,6 +253,7 @@ Ext.define('Editor.util.Util', {
         },
 
         /**
+         * @deprecated
          * A wrapper around fetch to return Ext.Ajax-like response objects to use with existing APIs
          * @param {string} url
          * @param {RequestInit} options - the fetch API options to use
@@ -283,12 +292,15 @@ Ext.define('Editor.util.Util', {
                     }
                     options.url = url;
                     ret.options = options;
-                    resolve(ret)
+                    resolve(ret);
                 };
 
                 var headers = options.headers || (options.headers = new Headers());
                 if(!headers.has('Accept')){
                     headers.append('Accept', 'application/json');
+                }
+                if(!headers.has('CsrfToken')){
+                    headers.append('CsrfToken', Editor.data.csrfToken);
                 }
                 if(options.formData){
                     var body = options.body = new FormData();
