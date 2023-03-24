@@ -76,7 +76,7 @@ class Translate1484Test extends editor_Test_JsonTest {
         // we need to order the results to avoid tests failing due to runtime-differences
         $this->sortExportResource($actualObject);
         $this->sortExportResource($expectedObject);
-        $this->assertEquals($expectedObject, $actualObject, "The expected file (exportResults) an the result file does not match.");
+        $this->assertEquals($expectedObject, $actualObject, 'The expected file (exportResults) an the result file does not match.');
     }
 
     /**
