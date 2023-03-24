@@ -28,6 +28,13 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Api;
 
+use stdClass;
+use Throwable;
+use Zend_Registry;
+use ZfExtended_Factory;
+use ZfExtended_Models_Worker;
+use ZfExtended_Plugin_Manager;
+
 /**
  * This class implements all direct calls to the DB the tests run on during the tests
  * Directly accessing the DB when in API-test generally is unwanted as this potentially causes trouble with file-writes, entity-versions, etc.
@@ -65,15 +72,15 @@ final class DbHelper
     {
         $success = true;
         try {
-            $pluginmanager = \Zend_Registry::get('PluginManager');
-            /* @var $pluginmanager \ZfExtended_Plugin_Manager */
+            $pluginmanager = Zend_Registry::get('PluginManager');
+            /* @var $pluginmanager ZfExtended_Plugin_Manager */
             foreach ($pluginClasses as $pluginClass) {
                 $plugin = $pluginmanager::getPluginNameByClass($pluginClass);
                 if (!$pluginmanager->setActive($plugin, $activate)) {
                     $success = false;
                 }
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $success = false;
         }
         return $success;
@@ -81,23 +88,27 @@ final class DbHelper
 
     /**
      * Checks the workers a test leaves in the DB for active ones. Cleans that up according the given params
-     * @param bool $forceRemoval
-     * @param bool $preventRemoval
-     * @return \stdClass
+     * @param bool $forceRemoval: if set, the worker-db will be cleaned even if no non-done workers remained
+     * @param bool $preventRemoval: if set, the worker-table will not be cleaned no matter what
+     * @param bool $addRemainingWorkerTypes: if set, the unique list of remaining worrkers will be added
+     * @return stdClass
      */
-    public static function cleanupWorkers(bool $forceRemoval = false, bool $preventRemoval = false): \stdClass
+    public static function cleanupWorkers(bool $forceRemoval = false, bool $preventRemoval = false, bool $addRemainingWorkerTypes = false): stdClass
     {
-        $result = new \stdClass();
+        $result = new stdClass();
         $result->cleanupNeccessary = false;
-        $worker = \ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker \ZfExtended_Models_Worker */
+        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
         $summary = $worker->getSummary();
         $numFaulty =
-            $summary[\ZfExtended_Models_Worker::STATE_SCHEDULED]
-            + $summary[\ZfExtended_Models_Worker::STATE_WAITING]
-            + $summary[\ZfExtended_Models_Worker::STATE_RUNNING]
-            + $summary[\ZfExtended_Models_Worker::STATE_DEFUNCT];
+            $summary[ZfExtended_Models_Worker::STATE_SCHEDULED]
+            + $summary[ZfExtended_Models_Worker::STATE_WAITING]
+            + $summary[ZfExtended_Models_Worker::STATE_RUNNING]
+            + $summary[ZfExtended_Models_Worker::STATE_DEFUNCT];
         $result->cleanupNeccessary = ($numFaulty > 0);
+
+        if($result->cleanupNeccessary && $addRemainingWorkerTypes){
+            $result->remainingWorkers = $worker->getRemainingWorkerInfo();
+        }
         if (!$preventRemoval && ($numFaulty > 0 || $forceRemoval)) {
             // for the following tests to function properly running or dead workers are unwanted
             $worker->db->delete('1 = 1');

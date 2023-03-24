@@ -320,9 +320,9 @@ abstract class editor_Test_ApiTest extends TestCase
         }
         // as a final step., we check if the test left workers in the DB
         $preventRemoval = !static::api()->isSuite() || !$doCleanup; // for single running tests or if no cleanup is wanted, we do not remove the workers after test has run
-        $state = DbHelper::cleanupWorkers(false, $preventRemoval);
+        $state = DbHelper::cleanupWorkers(false, $preventRemoval, true);
         if($state->cleanupNeccessary){
-            $errors[] = 'The test left running, waiting, scheduled or crashed worker\'s in the DB';
+            $errors[] = 'The test left running, waiting, scheduled or crashed worker\'s in the DB:'."\n  ".implode("\n  ", $state->remainingWorkers)."\n";
         }
         if(count($errors) > 0){
             static::fail(implode("\n", $errors));
