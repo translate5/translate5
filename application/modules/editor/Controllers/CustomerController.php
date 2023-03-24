@@ -37,6 +37,11 @@ class Editor_CustomerController extends ZfExtended_RestController {
      * @var editor_Models_Customer_Customer
      */
     protected $entity;
+
+    /**
+     * The download-actions need to be csrf unprotected!
+     */
+    protected array $_unprotectedActions = ['exportresource'];
     
     public function init() {
         parent::init();

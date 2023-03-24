@@ -42,6 +42,11 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
      */
     protected $entity;
 
+    /**
+     * The download-actions need to be csrf unprotected!
+     */
+    protected array $_unprotectedActions = ['export'];
+
     public function indexAction()
     {
         $taskGuid = $this->getParam('taskGuid', false);

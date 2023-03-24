@@ -91,11 +91,11 @@ class editor_TaskController extends ZfExtended_RestController {
      *  @var editor_Logger_Workflow
      */
     protected $log = false;
-    
+
     /**
-     * Flag if current indexAction request should deliver tasks or projects
+     * The download-actions need to be csrf unprotected!
      */
-    protected $projectRequest = false;
+    protected array $_unprotectedActions = ['export', 'excelexport', 'kpi'];
 
     public function init() {
 

@@ -34,11 +34,6 @@ use MittagQI\ZfExtended\Controller\Response\Header;
  * @property editor_Plugins_Okapi_Bconf_Entity $entity
  */
 class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
-    /***
-     * Should the data post/put param be decoded to associative array
-     * @var bool
-     */
-    protected bool $decodePutAssociative = true;
 
     /**
      * The param-name of the sent bconf
@@ -47,9 +42,20 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     const FILE_UPLOAD_NAME = 'bconffile';
 
     /**
+     * Should the data post/put param be decoded to associative array
+     * @var bool
+     */
+    protected bool $decodePutAssociative = true;
+
+    /**
      * @var string
      */
     protected $entityClass = 'editor_Plugins_Okapi_Bconf_Entity';
+
+    /**
+     * The download-actions need to be csrf unprotected!
+     */
+    protected array $_unprotectedActions = ['downloadbconf', 'downloadsrx'];
 
     /**
      * sends all bconfs as JSON

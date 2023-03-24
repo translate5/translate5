@@ -70,6 +70,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected $categories;
 
     /**
+     * The download-actions need to be csrf unprotected!
+     */
+    protected array $_unprotectedActions = ['download', 'export', 'xlsxexport', 'tbxexport', 'testexport'];
+
+    /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws NoAccessException
      * @throws \MittagQI\Translate5\Task\Current\Exception
