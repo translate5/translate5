@@ -9069,6 +9069,22 @@ E-Mail: service@MittagQI.com</pre>
               <source>Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?</source>
               <target>If removed, this language resource will unassigned from all of the tasks above. Do you want to remove this language resource and remove all assignments?</target>
             </trans-unit>
+            <trans-unit id='RGVyIEV4cG9ydCB3aXJkIGF1c2dlZsO8aHJ0LiBCaXR0ZSB3YXJ0ZW4gLi4u'>
+              <source>Der Export wird ausgeführt. Bitte warten ...</source>
+              <target>Export is running. Please wait ...</target>
+            </trans-unit>
+            <trans-unit id='RGllIERhdGVpIGthbm4gaGVydW50ZXJnZWxhZGVuIHdlcmRlbiE='>
+              <source>Die Datei kann heruntergeladen werden!</source>
+              <target>The file is available for download!</target>
+            </trans-unit>
+            <trans-unit id='SGVydW50ZXJsYWRlbg=='>
+              <source>Herunterladen</source>
+              <target>Download</target>
+            </trans-unit>
+            <trans-unit id='V2VpdGVyZSBJbmZvcm1hdGlvbmVuIGZpbmRlbiBTaWUgaW0gRXJnZWJuaXNwcm90b2tvbGwu'>
+              <source>Weitere Informationen finden Sie im Ergebnisprotokoll.</source>
+              <target>For more info check the result log.</target>
+			</trans-unit>
             <trans-unit id='RGFzIERhdGVpZm9ybWF0IHdpcmQgdm9tIMOcYmVyc2V0emVycGFrZXQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
               <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
               <target>File format not supported for translator package.</target>

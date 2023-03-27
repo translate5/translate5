@@ -190,6 +190,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'package'
             )
         ));
+
+        $this->front->getRouter()->addRoute('editorTaskPackagestatustRoute', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/packagestatus',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'packagestatus'
+            )
+        ));
         
         //FIXME convert to RestLikeRoute (remove echo json_encode in action then)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(

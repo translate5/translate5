@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Export\Package\Remover;
 use MittagQI\Translate5\Workflow\ArchiveTaskActions;
 
 /**
@@ -220,6 +221,12 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $taskActions->backupThenRemove();
         }
     }
+
+    public function cleanOldPackageExports(){
+        $remover = ZfExtended_Factory::get(Remover::class);
+        $remover->remove();
+    }
+
     
     /***
      * Remove old connector usage logs. How old the logs should be is defined in system configuration

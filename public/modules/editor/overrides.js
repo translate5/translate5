@@ -980,16 +980,12 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
             me.refreshSize();
         }
  
-        // If there are columns to trigger rendering, and the rendered block or not either the view size 
-        // or, if store count less than view size, the store count, set the view count to the rows count
-        if (view.getVisibleColumnManager().getColumns().length && rows.getCount() !== Math.min(me.store.getCount(), me.viewSize)) {
-            view.refresh();
-        }
-        
-        //<debug> 
+        //<debug>
         // If this is still the case, then there's a bug. 
         if (view.getVisibleColumnManager().getColumns().length && rows.getCount() !== Math.min(me.store.getCount(), me.viewSize)) {
-            Ext.raise('rendered block refreshed at ' + rows.getCount() + ' rows while BufferedRenderer view size is ' + me.viewSize);
+            // This will take no effect on the application if it is ignored. It will just produce rootcause errors for the
+            // users. For more info check the comment when scrolling is ignored in case no view rows nodes are existing
+            // Editor.view.project.ProjectPanelViewController->selectProjectRecord
         }
         //</debug> 
         
