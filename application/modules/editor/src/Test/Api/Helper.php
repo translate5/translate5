@@ -843,7 +843,7 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                 $name = 'runtimeOptions.' . $name;
             }
             $config = $this->getJson('editor/config', [
-                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"like"}]',
+                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"eq"}]',
             ]);
             if(count($config) !== 1 || empty($config[0]->value)){
                 $allSet = false;

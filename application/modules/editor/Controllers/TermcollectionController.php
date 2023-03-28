@@ -45,6 +45,11 @@ class editor_TermcollectionController extends ZfExtended_RestController
      */
     protected $uploadErrors = array();
 
+    /**
+     * The download-actions need to be csrf unprotected!
+     */
+    protected array $_unprotectedActions = ['export'];
+
     public function postAction()
     {
         $this->entity->init();

@@ -1,8 +1,0 @@
-{
-    "target": "Against the background of the concept of free software. Leads development at MittagQI. From translate5 as a community-based open source translation system.",
-    "matchrate": 70,
-    "source": "",
-    "languageResourceType": "mt",
-    "state": "loaded",
-    "metaData": null
-}

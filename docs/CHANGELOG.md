@@ -11,6 +11,26 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.9.3] - 2023-03-27
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3249](https://jira.translate5.net/browse/TRANSLATE-3249): LanguageResources - Add documentation about t5memory status request processing in t5** <br>
+Response from t5memory for the `status` API call was changed so t5memory connector has been modified to parse the status of the translation memory accordingly
+
+
+### Bugfixes
+**[TRANSLATE-3254](https://jira.translate5.net/browse/TRANSLATE-3254): Editor general - Sort the target languages alphabetically on task creation** <br>
+Sorting of the target languages will be only done when task is created via translate5 UI.
+
+**[TRANSLATE-3231](https://jira.translate5.net/browse/TRANSLATE-3231): Export - No download progress is shown for translator packages** <br>
+Waiting screen will be shown on package export.
+
+
 ## [5.9.2] - 2023-03-16
 
 ### Important Notes:

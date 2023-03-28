@@ -40,6 +40,11 @@ class Editor_ReferencefileController extends ZfExtended_RestController {
     protected $entity;
 
     /**
+     * The download-actions need to be csrf unprotected!
+     */
+    protected array $_unprotectedActions = ['get'];
+
+    /**
      * @throws ZfExtended_Models_Entity_NotFoundException
      * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws NoAccessException

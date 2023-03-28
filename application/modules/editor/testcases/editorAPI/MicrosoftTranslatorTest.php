@@ -44,6 +44,11 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
         'editor_Plugins_InstantTranslate_Init'
     ];
 
+    protected static array $requiredRuntimeOptions = [
+        'runtimeOptions.LanguageResources.microsoft.apiUrl' => null,//null checks for no concrete value but if not empty
+        'runtimeOptions.LanguageResources.microsoft.apiKey' => null//null checks for no concrete value but if not empty
+    ];
+
     protected static function setupImport(Config $config): void
     {
         if (!self::isMasterTest()) {
@@ -61,26 +66,30 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
     }
     
     public function testSearch(){
+        $this->simpleTextTranslation();
         $this->translateText('wagen','dictonary.txt');
-        $this->translateText('testwagen','regular.txt');
-        $this->translateText('Vor dem Hintergrund des Konzepts freier Software. Leitet MittagQI die Entwicklung. Von translate5 als community-basiertem Open Source Übersetzungssystem.','segmentation.txt');
     }
-    
+
+    /***
+     * This will search for single text just to test if the translator returns any translation data. This will not
+     * check if the translated data is correct since this can be different from time to time
+     * @return void
+     * @throws Zend_Http_Client_Exception
+     */
+    private function simpleTextTranslation(){
+        $filtered = $this->translateRequest('Tür');
+
+        $this->assertNotEmpty($filtered->target,'Empty translation.');
+    }
+
     /***
      * Translate text and test the results
      * @param string $text
      * @param string $fileName
      */
     private function translateText(string $text, string $fileName){
-        $result = static::api()->getJson('editor/instanttranslateapi/translate',[
-            'text' => $text,
-            'source' => self::$sourceLangRfc,
-            'target' => self::$targetLangRfc
-        ]);
-        $this->assertNotEmpty($result,'No results found for the search request. Search was:'.$text);
-        
         //filter only the microsoft results
-        $filtered = $this->filterResult($result);
+        $filtered = $this->translateRequest($text);
         
         //this is to recreate the file from the api response
         if(static::api()->isCapturing()){
@@ -92,10 +101,27 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
     }
 
+    /**
+     * @param string $text
+     * @return stdClass
+     * @throws Zend_Http_Client_Exception
+     */
+    private function translateRequest(string $text): stdClass
+    {
+        $result = static::api()->getJson('editor/instanttranslateapi/translate',[
+            'text' => $text,
+            'source' => self::$sourceLangRfc,
+            'target' => self::$targetLangRfc
+        ]);
+        $this->assertNotEmpty($result,'No results found for the search request. Search was:'.$text);
+
+        //filter only the microsoft results
+        return $this->filterResult($result);
+    }
+
     /***
      * Filter only the required fields for the test
      * @param mixed $result
-     * @return array
      */
     private function filterResult($result){
         //filter only microsoft service results

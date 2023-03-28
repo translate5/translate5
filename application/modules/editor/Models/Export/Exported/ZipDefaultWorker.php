@@ -55,7 +55,7 @@ class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Expor
         // Return true
         return true;
     }
-    
+
     /**
      * Inits the worker in a way to create an export.zip, returns the temp zip name
      * @param string $taskGuid
