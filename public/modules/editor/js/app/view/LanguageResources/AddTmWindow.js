@@ -97,6 +97,10 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     defaults: defaults,
                     scrollable: 'y',
                     items: [{
+                        xtype: 'hiddenfield',
+                        name: 'CsrfToken',
+                        value: Editor.data.csrfToken
+                    }, {
                         xtype: 'combo',
                         name: 'resourceId',
                         allowBlank: false,
