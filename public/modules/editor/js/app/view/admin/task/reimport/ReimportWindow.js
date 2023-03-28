@@ -56,6 +56,10 @@ Ext.define('Editor.view.admin.task.reimport.ReimportWindow', {
                     ui: 'default-frame',
                     defaults: defaults,
                     items: [{
+                        xtype: 'hiddenfield',
+                        name: 'CsrfToken',
+                        value: Editor.data.csrfToken
+                    },{
                         xtype: 'filefield',
                         bind:{
                             fieldLabel:'{l10n.projectOverview.taskManagement.taskReimportWindow.fileFieldLabel}',
