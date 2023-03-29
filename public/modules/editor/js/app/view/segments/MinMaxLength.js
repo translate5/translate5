@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * This component implements all features regarding minLength & maxLength & maxNumberLines for segments
+ * It either displays the min/max length state and props if min/max limits are set for the segment or a simple character counter in case the counter is active otherwise
  * IMPORTANT: When opening a segment for editing with a line-number restriction, linebreaks are automatically inserted at positions prone for a linebreak
  */
 Ext.define('Editor.view.segments.MinMaxLength', {
@@ -53,7 +54,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         lines: '#UT#Zeilen',
         current: '#UT#Aktuell',
         together: '#UT#insgesamt',
-        siblingSegments: '#UT#Seg.: {siblings}'
+        siblingSegments: '#UT#Seg.: {siblings}',
+        numberOfChars: '#UT#Anzahl Zeichen'
     },
     lengthstatus: {
         segmentLengthValid: 'segmentLengthValid',
@@ -167,6 +169,11 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     preventRecursion: null,
 
     /**
+     * flag that distinguishes between character-counter and min/max length mode
+     */
+    isWordCount: true,
+
+    /**
      * 
      */
     initComponent : function() {
@@ -241,23 +248,23 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     /***
      * Handler for html editor initializer, the function is called after the iframe is initialized
      */
-    onHtmlEditorInitialize:function(){
-        var me=this;
+    onHtmlEditorInitialize: function(){
+        var me = this;
         if(me.isVisible()){
-            me.updateLabelForEditor(me.editor.getTransunitLength(me.segmentRecord.get('targetEdit')));
+            me.updateDisplayText(false);
         }
 
         if(!Editor.controller.SearchReplace){
             return;
         }
 
-        var searchReplace=Editor.app.getController('SearchReplace');
+        var searchReplace = Editor.app.getController('SearchReplace');
 
         //listen to the editorTextReplaced evend from search and replace
         //so the character count is triggered when text is replaced with search and replace
         searchReplace.on({
-            editorTextReplaced:function(newInnerHtml){
-                me.onHtmlEditorChange(null,newInnerHtml);
+            editorTextReplaced: function(newInnerHtml){
+                me.onHtmlEditorChange(null, newInnerHtml);
             }
         });
     },
@@ -288,45 +295,58 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * and returns true or false if the minmax status strip should be visible.
      */
     updateSegment: function(record, fieldname){
-        var me=this,
+        var me = this,
             fields = Editor.data.task.segmentFields(),
             field = fields.getAt(fields.findExact('name', fieldname.replace(/Edit$/, ''))),
-            enabled = field && field.isTarget() && Editor.view.segments.MinMaxLength.useMinMaxWidth(record.get('metaCache'));
-        
-        me.setVisible(enabled);
+            minMaxEnabled = field && field.isTarget() && Editor.view.segments.MinMaxLength.useMinMaxWidth(record.get('metaCache')),
+            counterCheckBox = minMaxEnabled ? [] : Ext.ComponentQuery.query('#segmentgrid segmentsToolbar #showHideCharCounter');
+
+        me.isWordCount = (counterCheckBox.length > 0) && counterCheckBox[0].checked;
+        me.setVisible(minMaxEnabled || me.isWordCount);
         me.resetSegmentData();
 
-        if(enabled){
+        if(minMaxEnabled || me.isWordCount){
             me.setSegmentData(record);
             me.onHtmlEditorChange(me.editor, me.segmentRecord.get('target'), '');
-            me.updateLabelForEditor(me.editor.getTransunitLength(me.segmentRecord.get('target')));
         }
-        return enabled;
+        return (minMaxEnabled || me.isWordCount);
     },
 
     /**
      * Handler for html editor text change
      */
-    onHtmlEditorChange:function(){
-        var me = this;
-        if(!me.isVisible()){
+    onHtmlEditorChange: function(){
+        if(!this.isVisible()){
             return;
         }
         if(this.segmentRecord === null){
             return;
         }
-        me.handleMaxNumberOfLinesInEditor();
-        me.updateLabelForEditor();
+        this.updateDisplayText(true);
     },
 
     /**
      * Handler for html editor drag and drop change
      */
-    onHtmlEditorDragEnd:function(){
-        var me = this;
-        if(me.isVisible()){
+    onHtmlEditorDragEnd: function(){
+        if(this.isVisible()){
             // here without handleMaxNumberOfLinesInEditor: if the user has moved the linebreak intentionally, we don't touch that
-            me.updateLabelForEditor();
+            this.updateDisplayText(false);
+        }
+    },
+
+    /**
+     * initiates updating the view
+     * @param {boolean} updateMaxLines
+     */
+    updateDisplayText: function(updateMaxLines){
+        if(this.isWordCount){
+            this.updateNumCharsLabel();
+        } else {
+            if(updateMaxLines){
+                this.handleMaxNumberOfLinesInEditor();
+            }
+            this.updateMinMaxLabel();
         }
     },
     
@@ -472,7 +492,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     /**
      * Update the minmax status strip label
      */
-    updateLabelForEditor: function(){
+    updateMinMaxLabel: function(){
         var config = Editor.view.segments.MinMaxLength, // TODO: why do we use a reference to ourself here instead of me or this ? Why do we have static methods at all ??
             sizeUnit = config.getSizeUnit(this.segmentMeta),
             useLines = config.useMaxNumberOfLines(this.segmentMeta),
@@ -547,6 +567,15 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         }
         tplData.text = this.labelTpl.apply(labelData);
         this.update(tplData);
+    },
+
+    /**
+     * Updates the
+     */
+    updateNumCharsLabel: function(){
+        var editorMarkup = this.editor.getEditorBody().innerHTML,
+            numChars = this.editor.getLength(editorMarkup, {}, this.segmentFileId);
+        this.update({ cls: 'char-count x-grid-item-selected', tip: '', text: this.strings.numberOfChars + ': <strong>' + numChars + '</strong>'});
     },
     
     // ********************************************************************

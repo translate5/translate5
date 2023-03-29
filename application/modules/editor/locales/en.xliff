@@ -3274,6 +3274,18 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Tag-Vollansicht</source>
                 <target>Full tag view</target>
             </trans-unit>
+            <trans-unit id='WmVpY2hlbnrDpGhsZXIgdW50ZXIgRWRpdG9yIGFuemVpZ2Vu'>
+                <source>Zeichenzähler unter Editor anzeigen</source>
+                <target>Show character counter below editor</target>
+            </trans-unit>
+            <trans-unit id='WmVpZ3Qgb2RlciB2ZXJzdGVja3QgZGVuIFplaWNoZW56w6RobGVyIHVudGVyIGRlbSBTZWdtZW50ZWRpdG9y'>
+                <source>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</source>
+                <target>Shows oder hides the character counter below the segment editor</target>
+            </trans-unit>
+            <trans-unit id='QW56YWhsIFplaWNoZW4='>
+                <source>Anzahl Zeichen</source>
+                <target>Number of Characters</target>
+            </trans-unit>
             <trans-unit id='U3RhdHVzICJ7MH0iIGR1cmNoIGVpbmVuIGFuZGVyZW4gQmVudXR6ZXI='>
                 <source>Status "{0}" durch einen anderen Benutzer</source>
                 <target>status "{0}" by another user</target>

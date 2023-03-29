@@ -47,18 +47,19 @@ Ext.define('Editor.view.segments.StatusStrip', {
      * Html editor instance
      * @cfg {Editor.view.segments.HtmlEditor} htmlEditor
      */
-    htmlEditor:null,
+    htmlEditor: null,
 
     initConfig : function(instanceConfig) {
         var me = this,
-            config = {
-            },
+            config = {},
             configItems = [];
         
         //add the minmaxlength component if the config is provided
         configItems.push({
-            xtype:'segment.minmaxlength',
-            htmlEditor:instanceConfig.htmlEditor
+            xtype: 'segment.minmaxlength',
+            htmlEditor: instanceConfig.htmlEditor,
+            margin: '1 0 0 0',
+            width: '100%'
         });
         
         if (configItems.length > 0) {
