@@ -56,7 +56,6 @@ Ext.define('Editor.view.segments.column.IsWatched', {
     me.callParent(arguments);
   },
   filter: {
-      updateBuffer: 0,
       type: 'boolean'
   },
   

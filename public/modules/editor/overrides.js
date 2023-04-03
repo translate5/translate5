@@ -40,52 +40,8 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Ext.overrides.fixed.BufferedStore', {
     override: 'Ext.data.BufferedStore',
-    config: {
-        filterUpdateStoreDelay: 0
-    },
     contains: function(record) {
         return this.indexOf(record) > -1;
-    },
-
-    /**
-     * This method is the same as original, except that if filterUpdateStoreDelay-config is set
-     * then load() call will be made not directly, but via delayed task
-     */
-    onFilterEndUpdate: function() {
-        var me = this,
-            suppressNext = me.suppressNextFilter,
-            filters = me.getFilters(false);
-        // If the collection is not instantiated yet, it's because we are constructing.
-        if (!filters) {
-            return;
-        }
-        if (me.getRemoteFilter()) {
-            me.getFilters().each(function(filter) {
-                if (filter.getInitialConfig().filterFn) {
-                    Ext.raise('Unable to use a filtering function in conjunction with remote filtering.');
-                }
-            });
-            me.currentPage = 1;
-            if (!suppressNext) {
-                if (me.filterUpdateStoreDelay) {                                // +
-                    if (!me.task) {                                             // +
-                        me.task = new Ext.util.DelayedTask(me.load, me);        // +
-                    }                                                           // +
-                    me.task.delay(me.filterUpdateStoreDelay);                   // +
-                } else {                                                        // +
-                    me.load();
-                }                                                               // +
-            }
-        } else if (!suppressNext) {
-            me.fireEvent('datachanged', me);
-            me.fireEvent('refresh', me);
-        }
-        if (me.trackStateChanges) {
-            // We just mutated the filter collection so let's save stateful filters from this point forward.
-            me.saveStatefulFilters = true;
-        }
-        // This is not affected by suppressEvent.
-        me.fireEvent('filterchange', me, me.getFilters().getRange());
     }
 });
 
@@ -1623,5 +1579,23 @@ Ext.define('Translate5.override.Ext.grid.feature.RowBody', {
 
         // Call parent
         me.callParent(arguments);
+    }
+});
+
+Ext.define('Ext.overrides.grid.filters.filter.Base', {
+    override: 'Ext.grid.filters.filter.Base',
+    createMenu: function () {
+        var me = this;
+        me.setUpdateBuffer(2000);
+        me.callParent();
+    }
+});
+
+Ext.define('Ext.overrides.grid.filters.filter.Number', {
+    override: 'Ext.grid.filters.filter.Number',
+    createMenu: function () {
+        var me = this;
+        me.callParent();
+        me.setUpdateBuffer(0);
     }
 });
