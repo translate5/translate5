@@ -61,7 +61,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ]);
         
         //ZfExtended_Logger::addDuplicatesByMessage('E1314');
-        ZfExtended_Logger::addDuplicatesByEcode('E1333');
+        ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306');
         
         parent::__construct();
     }
