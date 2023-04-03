@@ -230,23 +230,28 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param fieldName {String}
    */
   setValueAndMarkup: function(value, segment, fieldName){
-      //check tag is needed for the checkplausibilityofput feature on server side 
+      //check tag is needed for the checkplausibilityofput feature on server side
       var me = this,
           segmentId = segment.get('id'),
-          checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
-      if (Ext.isGecko 
-              && (value === '' || value === checkTag) ) {
+          checkTag = me.getDuplicateCheckImg(segmentId, fieldName),
+          data = { value: value, segment: segment, fieldName: fieldName };
+      if (Ext.isGecko && (data.value === '' || data.value === checkTag)) {
+          // TODO new richtext editor: is this still needed ?
           // TRANSLATE-1042: Workaround Firefox
           // - add invisible placeholder, otherwise Firefox might not be able to detect selections correctly (= html instead of the body)
           // - will be removed on saving anyway (or even before during clean-up of the TrackChanges)
-          value = '&#8203;';
+          data.value = '&#8203;';
       }
-      me.currentSegment = segment;
-      me.setValue(me.markupForEditor(value)+checkTag);
-      me.statusStrip.updateSegment(segment, fieldName);
+
+      // gives plugin a chance to pre-process the markup to set. We want to keep the value manipulatable, so we create a temp obj.
+      me.fireEvent('beforeSetValueAndMarkup', data);
+
+      me.currentSegment = data.segment;
+      me.setValue(me.markupForEditor(data.value) + checkTag);
+      me.statusStrip.updateSegment(data.segment, fieldName);
       me.fireEvent('afterSetValueAndMarkup');
       if (Ext.isGecko) {
-          me.getFocusEl().focus(); // TRANSLATE-1042: Workaround Firefox
+          me.getFocusEl().focus(); // TRANSLATE-1042: Workaround Firefox TODO renewal of RichText editor: is this still needed ?
       }
   },
   /**

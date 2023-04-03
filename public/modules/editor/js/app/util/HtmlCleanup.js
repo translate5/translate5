@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * @class HtmlCleanup: Cleans Markup used by the Segment-Editor from invisible characters and injected special tags to retrieve markup for use outside of the editor
  * TODO: this Code has overlappings with Editor.util.SearchReplaceUtils
+ * TODO: all methods should become statics
  */
 Ext.define('Editor.util.HtmlCleanup', {
 	

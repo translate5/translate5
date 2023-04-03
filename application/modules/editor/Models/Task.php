@@ -652,7 +652,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function isSourceAndTargetLanguageSimilar() : bool {
         return ($this->isSourceAndTargetLanguageEqual()
-            || ($this->getCachedLanguage($this->getSourceLang())->getRfc5646() == $this->getCachedLanguage($this->getTargetLang())->getRfc5646()));
+            || ($this->getSourceLanguage()->getMajorRfc5646() == $this->getTargetLanguage()->getMajorRfc5646()));
     }
 
     /**
@@ -661,13 +661,34 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Languages
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function getCachedLanguage(int $id){
-        if(array_key_exists($id, $this->languageCache)){
+    protected function getCachedLanguage(int $id): editor_Models_Languages
+    {
+        if (array_key_exists($id, $this->languageCache)) {
             return $this->languageCache[$id];
         }
-        $this->languageCache[$id] = ZfExtended_Factory::get('editor_Models_Languages');
+        $this->languageCache[$id] = ZfExtended_Factory::get(editor_Models_Languages::class);
         $this->languageCache[$id]->load($id);
         return $this->languageCache[$id];
+    }
+
+    /**
+     * Retrieves the source lang as language-object
+     * @return editor_Models_Languages
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getSourceLanguage(): editor_Models_Languages
+    {
+        return $this->getCachedLanguage($this->getSourceLang());
+    }
+
+    /**
+     * Retrieves the target lang as language-object
+     * @return editor_Models_Languages
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getTargetLanguage(): editor_Models_Languages
+    {
+        return $this->getCachedLanguage($this->getTargetLang());
     }
 
     /**

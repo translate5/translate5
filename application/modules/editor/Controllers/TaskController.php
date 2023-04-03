@@ -1742,11 +1742,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $pathInfo = pathinfo($translatedfile);
         
         // where do we find what, what is named how.
-        $languages = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languages editor_Models_Languages */
-        $languages->load($this->entity->getTargetLang());
-        $targetLangRfc = $languages->getRfc5646();
-        
+        $targetLangRfc = $this->entity->getTargetLanguage()->getRfc5646();
         $filenameExport = $pathInfo['filename'] . '_' . $targetLangRfc;
         
         if(!empty('.' . $pathInfo['extension'])) {
