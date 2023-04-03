@@ -453,8 +453,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return self::STATUS_IMPORT;
         }
 
-        if($this->api->status()) {
-            return $this->processImportStatus($this->api->getResult());
+        if ($this->api->status()) {
+            $result = $this->api->getResult();
+
+            return $this->processImportStatus(is_object($result) ? $result : null);
         }
         //down here the result contained an error, the json was invalid or HTTP Status was not 20X
 
