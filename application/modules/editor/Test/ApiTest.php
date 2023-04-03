@@ -350,6 +350,8 @@ abstract class editor_Test_ApiTest extends TestCase
             unset(static::$_appState->worker);
 
         } else {
+            // cleanup before running the suite/test: removes any existing workers from the db
+            DbHelper::removeWorkers();
             // evaluates the application state and checks basic prequesites
             static::evaluateAppState($api);
             // makes sure all test users are present in the DB & correctly configured
