@@ -1593,6 +1593,8 @@ class editor_TaskController extends ZfExtended_RestController {
 
                 if( $this->entity->isLocked($this->entity->getTaskGuid())){
                     $this->view->assign('error','Unable to export task package. The task is locked');
+                    // in case the request is not from translate5 ui, json with the assigned view variables will be returned
+                    // check the view bellow for more info
                     echo $this->view->render('task/packageexporterror.phtml');
                 }
 
@@ -1606,6 +1608,8 @@ class editor_TaskController extends ZfExtended_RestController {
                     $this->view->assign('taskId',$this->entity->getId());
                     $this->view->assign('workerId',$workerId);
 
+                    // in case the request is not from translate5 ui, json with the assigned view variables will be returned
+                    // check the view bellow for more info
                     echo $this->view->render('task/packageexport.phtml');
 
                 }catch (Throwable $exception){
@@ -1616,6 +1620,8 @@ class editor_TaskController extends ZfExtended_RestController {
                         ]
                     ]);
                     $this->view->assign('error',$exception->getMessage());
+                    // in case the request is not from translate5 ui, json with the assigned view variables will be returned
+                    // check the view bellow for more info
                     echo $this->view->render('task/packageexporterror.phtml');
                 }
                 exit;

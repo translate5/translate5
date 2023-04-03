@@ -26,6 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+// return json in case the request is not for the transalte5 UI
+if(!isset($_REQUEST['t5ui'])){
+    echo json_encode([
+        'error' => $this->error ?? 'Unknown error',
+    ], JSON_THROW_ON_ERROR);
+    exit;
+}
+
 $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 ?>
 
