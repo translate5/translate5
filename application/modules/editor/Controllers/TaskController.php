@@ -616,7 +616,9 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function prepareLanguages(): int {
         if(!is_array($this->data['targetLang'])) {
-            $this->data['targetLang'] = [$this->data['targetLang']];
+            $lang = (string) $this->data['targetLang'];
+            // enable sending target lang as comma-seperated array
+            $this->data['targetLang'] = str_contains($lang, ',') ? explode(',', $lang) : [ $lang ];
         }
 
         $this->_helper->Api->convertLanguageParameters($this->data['sourceLang']);
