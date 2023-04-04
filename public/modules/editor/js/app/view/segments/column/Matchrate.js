@@ -62,7 +62,6 @@ Ext.define('Editor.view.segments.column.Matchrate', {
                     renderer: me.ownQuicktip(tdCls)
                 },
                 filter: {
-                    updateBuffer: 0,
                     type: 'numeric'
                 }
             };

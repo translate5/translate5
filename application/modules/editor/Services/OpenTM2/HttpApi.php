@@ -125,6 +125,29 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     }
 
     /**
+     * Generate name of the TM
+     * TODO move to a dedicated generator class
+     *
+     * @return string
+     *
+     * @throws Zend_Exception
+     */
+    public function getTmName(): string
+    {
+        $fileName = $this->languageResource->getSpecificData('fileName') ?? false;
+
+        if (empty($fileName)) {
+            // if filename would be empty, it would be possible to make a GET / to OpenTM2,
+            // which would list all TMs in an invalid JSON this invalid JSON would then be logged to all error
+            // receivers, this is something we do not want to!
+            // so we ensure that there is a path, although this would lead to an 404
+            $fileName = 'i/do/not/exist';
+        }
+
+        return $this->addTmPrefix($fileName);
+    }
+
+    /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the given REST URL Parts (ID + verbs)
      * @param string $httpMethod
      * @param string $urlSuffix
@@ -147,20 +170,16 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     
     /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the Memory Name + additional URL parts
-     * @param string $httpMethod
+     *
+     * @param string $method
      * @param string $urlSuffix
+     *
      * @return Zend_Http_Client
      */
-    protected function getHttpWithMemory($method, $urlSuffix = '') {
-        $fileName = $this->languageResource->getSpecificData('fileName') ?? false;
-        if(empty($fileName)){
-            // if filename would be empty, it would be possible to make a GET / to OpenTM2, which would list all TMs in an invalid JSON
-            // this invalid JSON would then be logged to all error receivers, this is something we do not want to!
-            // so we ensure that there is a path, although this would lead to an 404
-            $fileName = 'i/do/not/exist';
-        }
+    protected function getHttpWithMemory(string $method, string $urlSuffix = ''): Zend_Http_Client
+    {
+        $url = urlencode($this->getTmName()) . '/' . ltrim($urlSuffix, '/');
 
-        $url = urlencode($this->addTmPrefix($fileName)).'/'.ltrim($urlSuffix, '/');
         return $this->getHttp($method, $url);
     }
 
@@ -434,6 +453,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->addInfo = $json->documentName;
 
         $http->setRawData($this->jsonEncode($json), 'application/json; charset=utf-8');
+
+        return $this->processResponse($http->request());
+    }
+
+    public function reorganizeTm(): bool
+    {
+        $http = $this->getHttpWithMemory('GET', 'reorganize');
 
         return $this->processResponse($http->request());
     }

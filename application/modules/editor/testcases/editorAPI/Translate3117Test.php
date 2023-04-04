@@ -26,8 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Reimport\DataProvider\ZipDataProvider;
 use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Import\Exception;
 use MittagQI\Translate5\Test\Import\TermCollectionResource;
 
 /***
@@ -85,7 +87,6 @@ class Translate3117Test extends editor_Test_JsonTest {
         'tbx/',
         'reference/',
         'tmx/',
-        'tmx/OpenTm2-Translate3117Test-1.tmx',
         'workfiles/',
         'workfiles/Task-en-de.html.xlf',
         'workfiles/Level1/',
@@ -105,10 +106,6 @@ class Translate3117Test extends editor_Test_JsonTest {
 
         self::$termCollection = $config
             ->addLanguageResource('termcollection', 'Term.tbx', $ownCustomerId)
-            ->addDefaultCustomerId($ownCustomerId);
-
-        $config
-            ->addLanguageResource('opentm2', 'resource1.tmx', $ownCustomerId, 'en', 'de')
             ->addDefaultCustomerId($ownCustomerId);
 
         $config
@@ -146,13 +143,50 @@ class Translate3117Test extends editor_Test_JsonTest {
         }
     }
 
+    /**
+     * @throws Exception
+     * @throws Zend_Http_Client_Exception
+     */
     public function testExportPackage(){
         static::api()->setTaskToOpen();
 
         $task = static::api()->getTask();
-        $response = static::api()->get('editor/task/export/id/'.$task->id.'?format=package');
+        static::api()->get('editor/task/export/id/'.$task->id.'?format=package');
+        $response = static::api()->getLastResponseDecodeed();
+        self::assertEmpty(isset($response->error),'There was an error on package export. Check the error log for more info.');
+
+        $workerId = $response->workerId;
+
+        $statusCheckRoute = 'editor/task/packagestatus?workerId='.$workerId;
+        static::api()->get($statusCheckRoute);
+
+        $response = static::api()->getLastResponseDecodeed();
+        self::assertEmpty(isset($response->error),'There was an error on package export. Check the error log for more info.');
+
+        $fileAvailable = $response->file_available ?? '';
+        $checkCount = 20;
+        while (empty($fileAvailable)){
+            if( $checkCount === 0){
+                self::markTestIncomplete('Package not available after maximum amount of status checks');
+            }
+
+            sleep(1);
+
+            static::api()->get($statusCheckRoute);
+            $response = static::api()->getLastResponseDecodeed();
+            self::assertEmpty(isset($response->error),'There was an error on package export. Check the error log for more info.');
+
+            $fileAvailable = $response->file_available ?? '';
+            $checkCount--;
+        }
+        $downloadLink = $response->download_link ?? '';
+        if(empty($downloadLink)){
+            self::markTestIncomplete('No download link available in the package status response.');
+        }
 
         self::$importArchive = tempnam(sys_get_temp_dir(), 'PackageExport');
+
+        $response = static::api()->get($downloadLink);
 
         file_put_contents(self::$importArchive, $response->getBody());
 

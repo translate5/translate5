@@ -1920,18 +1920,25 @@ Ext.define('Editor.controller.Editor', {
      * Segments store load event handler
      */
     onSegmentsStoreLoad: function(store){
+        var me = this,
+            segmentsGrid = me.getSegmentGrid();
+
+        if(!segmentsGrid){
+            return;
+        }
+
         //check the content editable column visibility
-        this.handleNotEditableContentColumn();
+        me.handleNotEditableContentColumn();
         
         // if already selected from other load listener or nothing selectable, return
-        if(!store.getCount() || this.getSegmentGrid().selection) {
+        if(!store.getCount() || segmentsGrid.selection) {
             return;
         }
         var jumpToSegmentIndex = 
             Editor.app.parseSegmentIdFromTaskEditHash(true)
             || (store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex)
             || 1;
-        this.getSegmentGrid().focusSegment(jumpToSegmentIndex);
+        segmentsGrid.focusSegment(jumpToSegmentIndex);
     },
 
     /**

@@ -75,6 +75,25 @@ class editor_Services_Manager {
         }
         return $serviceResources;
     }
+
+    /**
+     * @param string $serviceName
+     *
+     * @return editor_Models_LanguageResources_Resource[]
+     *
+     * @throws ZfExtended_Exception
+     */
+    public function getAllResourcesOfType(string $serviceName): array
+    {
+        $resources = [];
+        foreach ($this->getAllResources() as $resource) {
+            if ($resource->getService() === $serviceName) {
+                $resources[] = $resource;
+            }
+        }
+
+        return $resources;
+    }
     
     /**
      * Returns all services (= their name and helppage) that are not configured

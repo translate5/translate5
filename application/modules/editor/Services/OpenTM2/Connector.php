@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Service\T5Memory\Enum\ReorganizeTm;
+
 /**
  * OpenTM2 Connector
  */
@@ -61,7 +63,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ]);
         
         //ZfExtended_Logger::addDuplicatesByMessage('E1314');
-        ZfExtended_Logger::addDuplicatesByEcode('E1333');
+        ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306');
         
         parent::__construct();
     }
@@ -216,46 +218,73 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::query()
+     * Fuzzy search
+     *
+     * {@inheritDoc}
      */
-    public function query(editor_Models_Segment $segment) {
+    public function query(editor_Models_Segment $segment): editor_Services_ServiceResult
+    {
         $fileName = $this->getFileName($segment);
         $queryString = $this->getQueryString($segment);
         
         //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
-        if(empty($queryString) && $queryString !== "0") {
+        if (empty($queryString) && $queryString !== '0') {
             return $this->resultList;
         }
         
         //Although we take the source fields from the OpenTM2 answer below
         // we have to set the default source here to fill the be added internal tags
         $this->resultList->setDefaultSource($queryString);
-        
-        if($this->api->lookup($segment, $this->tagHandler->prepareQuery($queryString), $fileName)){
-            $result = $this->api->getResult();
-            if((int)$result->NumOfFoundProposals === 0){
-                return $this->resultList;
-            }
-            foreach($result->results as $found) {
-                $target = $this->tagHandler->restoreInResult($found->target);
-                $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
-                
-                $source = $this->tagHandler->restoreInResult($found->source);
-                $hasSourceErrors = $this->tagHandler->hasRestoreErrors();
-                
-                if($hasTargetErrors || $hasSourceErrors) {
-                    //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
-                    $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
-                }
+        $query = $this->tagHandler->prepareQuery($queryString);
+        $successful = $this->api->lookup($segment, $query, $fileName);
 
-                $matchrate = $this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
-                $this->resultList->addResult($target, $matchrate, $this->getMetaData($found));
-                $this->resultList->setSource($source);
-            }
-            return $this->getResultListGrouped();
+        if (!$successful && $this->needsReorganizing($this->api->getError())) {
+            $this->logger->warn(
+                'E1314',
+                'The queried TM returned error which is configured for automatic TM reorganization',
+                [
+                    'task' => $segment->getTask(),
+                    'apiError' => $this->api->getError(),
+                ]
+            );
+
+            $this->reorganizeTm();
+            $successful = $this->api->lookup($segment, $query, $fileName);
         }
-        $this->throwBadGateway();
+
+        if (!$successful) {
+            $this->throwBadGateway();
+        }
+
+        $result = $this->api->getResult();
+
+        if ((int)$result->NumOfFoundProposals === 0) {
+            return $this->resultList;
+        }
+
+        foreach ($result->results as $found) {
+            $target = $this->tagHandler->restoreInResult($found->target);
+            $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
+
+            $source = $this->tagHandler->restoreInResult($found->source);
+            $hasSourceErrors = $this->tagHandler->hasRestoreErrors();
+
+            if ($hasTargetErrors || $hasSourceErrors) {
+                //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
+                $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
+            }
+
+            $matchrate = $this->calculateMatchRate(
+                $found->matchRate,
+                $this->getMetaData($found),
+                $segment,
+                $fileName
+            );
+            $this->resultList->addResult($target, $matchrate, $this->getMetaData($found));
+            $this->resultList->setSource($source);
+        }
+
+        return $this->getResultListGrouped();
     }
 
     /**
@@ -298,30 +327,50 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::search()
+     * Concordance search
+     *
+     * {@inheritDoc}
      */
-    public function search(string $searchString, $field = 'source', $offset = null) {
-        if($this->api->search($searchString, $field, $offset)){
-            $result = $this->api->getResult();
-            
-            if(empty($result) || empty($result->results)){
-                $this->resultList->setNextOffset(null);
-                return $this->resultList;
-            }
-            $this->resultList->setNextOffset($result->NewSearchPosition);
-            $results = $result->results;
-            
-            //$found->{$field}
-            //[NextSearchPosition] =>
-            foreach($results as $result) {
-                $this->resultList->addResult($this->highlight($searchString, $this->tagHandler->restoreInResult($result->target), $field == 'target'));
-                $this->resultList->setSource($this->highlight($searchString, $this->tagHandler->restoreInResult($result->source), $field == 'source'));
-            }
-            
+    public function search(string $searchString, $field = 'source', $offset = null): editor_Services_ServiceResult
+    {
+        $successful = $this->api->search($searchString, $field, $offset);
+
+        if (!$successful && $this->needsReorganizing($this->api->getError())) {
+            $this->reorganizeTm();
+            $successful = $this->api->search($searchString, $field, $offset);
+        }
+
+        if (!$successful) {
+            $this->throwBadGateway();
+        }
+
+        $result = $this->api->getResult();
+
+        if (empty($result) || empty($result->results)) {
+            $this->resultList->setNextOffset(null);
+
             return $this->resultList;
         }
-        $this->throwBadGateway();
+
+        $this->resultList->setNextOffset($result->NewSearchPosition);
+        $results = $result->results;
+
+        //$found->{$field}
+        //[NextSearchPosition] =>
+        foreach ($results as $result) {
+            $this->resultList->addResult($this->highlight(
+                $searchString,
+                $this->tagHandler->restoreInResult($result->target),
+                $field === 'target'
+            ));
+            $this->resultList->setSource($this->highlight(
+                $searchString,
+                $this->tagHandler->restoreInResult($result->source),
+                $field === 'source')
+            );
+        }
+
+        return $this->resultList;
     }
     
     /***
@@ -453,8 +502,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return self::STATUS_IMPORT;
         }
 
-        if($this->api->status()) {
-            return $this->processImportStatus($this->api->getResult());
+        if ($this->api->status()) {
+            $result = $this->api->getResult();
+
+            return $this->processImportStatus(is_object($result) ? $result : null);
         }
         //down here the result contained an error, the json was invalid or HTTP Status was not 20X
 
@@ -751,5 +802,70 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //reset higher matches than 100% to 100% match
         //if the matchrate is higher than 0, reduce it by $reducePercent %
         return max(0, min($matchrate, 100) - $reducePercent);
+    }
+
+    #region Reorganize TM
+    // Need to move this region to a dedicated class while refactoring connector
+    private function needsReorganizing(stdClass $error): bool
+    {
+        if ($this->api->isOpentm2()) {
+            return false;
+        }
+
+        $errorCodes = explode(
+            ',',
+            $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
+        );
+
+        // Check if error codes contains any of the values
+        return str_replace($errorCodes, '', $error->code) !== $error->code
+            && !$this->isReorganizingAtTheMoment()
+            && !$this->isReorganized();
+    }
+
+    public function reorganizeTm(): bool
+    {
+        if (!$this->isInternalFuzzy()) {
+            $this->languageResource->addSpecificData(ReorganizeTm::NAME, ReorganizeTm::IN_PROGRESS);
+            $this->languageResource->save();
+        }
+
+        $reorganized = $this->api->reorganizeTm();
+
+        if (!$this->isInternalFuzzy()) {
+            $this->languageResource->addSpecificData(
+                ReorganizeTm::NAME,
+                $reorganized ? ReorganizeTm::DONE : ReorganizeTm::FAILED
+            );
+            $this->languageResource->save();
+        }
+
+        return $reorganized;
+    }
+
+    public function isReorganizingAtTheMoment(): bool
+    {
+        return $this->languageResource->getSpecificData(ReorganizeTm::NAME) === ReorganizeTm::IN_PROGRESS;
+    }
+
+    public function isReorganized(): bool
+    {
+        return in_array(
+            $this->languageResource->getSpecificData(ReorganizeTm::NAME),
+            [ReorganizeTm::DONE, ReorganizeTm::FAILED],
+            true
+        );
+    }
+    #endregion Reorganize TM
+
+    /**
+     * This is forced to be public, because part of its functionality is used outside of this class
+     * Needs to be removed when refactoring connector
+     *
+     * @return editor_Services_OpenTM2_HttpApi
+     */
+    public function getApi(): editor_Services_OpenTM2_HttpApi
+    {
+        return $this->api;
     }
 }

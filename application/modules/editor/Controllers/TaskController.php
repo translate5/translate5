@@ -1589,6 +1589,8 @@ class editor_TaskController extends ZfExtended_RestController {
 
                 if( $this->entity->isLocked($this->entity->getTaskGuid())){
                     $this->view->assign('error','Unable to export task package. The task is locked');
+                    // in case the request is not from translate5 ui, json with the assigned view variables will be returned
+                    // check the view bellow for more info
                     echo $this->view->render('task/packageexporterror.phtml');
                 }
 
@@ -1602,6 +1604,8 @@ class editor_TaskController extends ZfExtended_RestController {
                     $this->view->assign('taskId',$this->entity->getId());
                     $this->view->assign('workerId',$workerId);
 
+                    // in case the request is not from translate5 ui, json with the assigned view variables will be returned
+                    // check the view bellow for more info
                     echo $this->view->render('task/packageexport.phtml');
 
                 }catch (Throwable $exception){
@@ -1612,6 +1616,8 @@ class editor_TaskController extends ZfExtended_RestController {
                         ]
                     ]);
                     $this->view->assign('error',$exception->getMessage());
+                    // in case the request is not from translate5 ui, json with the assigned view variables will be returned
+                    // check the view bellow for more info
                     echo $this->view->render('task/packageexporterror.phtml');
                 }
                 exit;
@@ -1732,11 +1738,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $pathInfo = pathinfo($translatedfile);
         
         // where do we find what, what is named how.
-        $languages = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languages editor_Models_Languages */
-        $languages->load($this->entity->getTargetLang());
-        $targetLangRfc = $languages->getRfc5646();
-        
+        $targetLangRfc = $this->entity->getTargetLanguage()->getRfc5646();
         $filenameExport = $pathInfo['filename'] . '_' . $targetLangRfc;
         
         if(!empty('.' . $pathInfo['extension'])) {
