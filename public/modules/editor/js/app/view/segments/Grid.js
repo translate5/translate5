@@ -82,7 +82,10 @@ Ext.define('Editor.view.segments.Grid', {
 
     /** @var Ext.data.Connection segInfoConn - Used for built in request management via autoAbort*/
     segInfoConn: new Ext.data.Connection({
-        defaultHeaders: {Accept: 'application/json'},
+        defaultHeaders: {
+            'Accept': 'application/json',
+            'CsrfToken': Editor.data.csrfToken
+        },
         id: 'segmentInfoConnection',
         autoAbort: true,
         listeners: {
