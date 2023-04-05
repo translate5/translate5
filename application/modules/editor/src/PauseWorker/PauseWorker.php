@@ -21,19 +21,22 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Import;
+namespace MittagQI\Translate5\PauseWorker;
+
+use editor_Models_Task_AbstractWorker;
+use ZfExtended_Factory;
 
 /**
  * Base class for pause workers
  */
-abstract class PauseImportWorker extends \editor_Models_Task_AbstractWorker
+abstract class PauseWorker extends editor_Models_Task_AbstractWorker
 {
     public const PROCESSOR = 'processor';
     
@@ -46,15 +49,13 @@ abstract class PauseImportWorker extends \editor_Models_Task_AbstractWorker
 
     /**
      * @return bool
-     *
-     * @throws PauseImportException
      */
     protected function work(): bool
     {
         $params = $this->workerModel->getParameters();
 
         /** @var PauseWorkerProcessorInterface $processor */
-        $processor = \ZfExtended_Factory::get($params[self::PROCESSOR]);
+        $processor = ZfExtended_Factory::get($params[self::PROCESSOR]);
 
         $sleepTime = $processor->getSleepTimeSeconds();
         $maxTime = $processor->getMaxWaitTimeSeconds();
