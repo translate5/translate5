@@ -744,6 +744,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /**
+     * The above injectors add additional error messages, which are evaluated here
+     * @throws ZfExtended_ValidateException
+     */
+    protected function additionalValidations()
+    {
+        if ($this->getRequest()->isPut() && (bool)$this->getParam('forced', false) === false) {
+            // check for association to be cleaned only when it is put and the forced flag is not set
+            $this->checkOrCleanCustomerAssociation(false, $this->getDataField('customerIds') ?? []);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
      * @return void
@@ -1472,19 +1484,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         return empty($return) ? '' : Zend_Json::encode($return);
-    }
-
-    /**
-     * The above injectors add additional error messages, which are evaluated here
-     * @throws ZfExtended_ValidateException
-     */
-    protected function additionalValidations() {
-
-        if( $this->getRequest()->isPut() === false || (bool)$this->getParam('forced',false) === true){
-            return;
-        }
-        // check for association to be cleaned only when it is put and the forced flag is not set
-        $this->checkOrCleanCustomerAssociation(false,$this->getDataField('customerIds') ?? []);
     }
 
     /**
