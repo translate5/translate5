@@ -357,9 +357,10 @@ final class editor_Segment_Quality_Manager {
                     $provider->postProcessTask($task, $qualityConfig, $processingMode);
                 }
             }
-            // removes all entries from the processing table
-            $processingTable->finishOperation($taskGuid);
-
+            // removes all entries from the processing table if the processing-model was used
+            if($processingTable){
+                $processingTable->finishOperation($taskGuid);
+            }
             $segmentTable->getAdapter()->commit();
         }
     }
