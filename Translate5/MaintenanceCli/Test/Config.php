@@ -101,7 +101,7 @@ class Config {
         'runtimeOptions.plugins.SpellCheck.languagetool.url.import' => null,
         'runtimeOptions.plugins.SpellCheck.languagetool.url.gui' => null,
         'runtimeOptions.plugins.VisualReview.googleCloudApiKey' => null,
-        'runtimeOptions.plugins.VisualReview.dockerizedHeadlessChromeUrl' => null,
+        'runtimeOptions.plugins.VisualReview.visualConverterUrl' => null,
         'runtimeOptions.plugins.VisualReview.pdfconverterUrl' => null,
         'runtimeOptions.plugins.VisualReview.shellCommandWget' => null
     ];
