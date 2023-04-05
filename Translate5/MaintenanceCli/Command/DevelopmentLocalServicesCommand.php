@@ -76,8 +76,8 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
         'pdfconverter' => [
             'url' => 'http://localhost:4786'
         ],
-        'visualbrowser' => [
-            'url' => 'ws://localhost:3000' // due to biderectional access, must work in "host" network mode so port cannot be virtualized
+        'visualconverter' => [
+            'url' => 'http://localhost:4700'
         ]
     ];
 

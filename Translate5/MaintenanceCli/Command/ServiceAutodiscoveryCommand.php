@@ -61,7 +61,7 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
      */
     protected array $services = [
         'php' => [
-            'url' => 'http://php.:80' // used to configure the worker-trigger & visualbrowser access
+            'url' => 'http://php.:80' // used to configure the worker-trigger access
         ],
         /*
         'proxy' => [
@@ -87,8 +87,8 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
         'pdfconverter' => [
             'url' => 'http://pdfconverter.:8086'
         ],
-        'visualbrowser' => [
-            'url' => 'ws://visualbrowser.:3000'
+        'visualconverter' => [
+            'url' => 'http://visualconverter.:80'
         ]
     ];
 
@@ -110,7 +110,7 @@ using the default ports.')
             frontendmessagebus: FrontEndMessage Bus, one instance
             okapi: Okapi, currently only one instance
             pdfconverter: the internal translate5 container, one instance
-            visualbrowser: the headless browser, one instance
+            visualconverter: the internal translate5 container, one instance
         ');
 
         $this->addArgument(

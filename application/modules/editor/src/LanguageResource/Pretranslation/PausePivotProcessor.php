@@ -21,28 +21,24 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Plugins\MatchAnalysis;
+namespace MittagQI\Translate5\LanguageResource\Pretranslation;
 
-use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
-use editor_Services_Manager as Manager;
 use MittagQI\Translate5\PauseWorker\PauseWorkerProcessorInterface;
+use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
 use MittagQI\Translate5\PauseWorker\AbstractLanguageResourcesProcessor;
 use Zend_Config;
 use Zend_Registry;
 use ZfExtended_Factory;
 
-/**
- * Processor that pauses the match analysis while t5memory (or opentm2) is importing a file
- */
-class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor implements PauseWorkerProcessorInterface
+class PausePivotProcessor extends AbstractLanguageResourcesProcessor implements PauseWorkerProcessorInterface
 {
     private Zend_Config $config;
 
@@ -55,10 +51,10 @@ class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor imp
 
     public function shouldWait(Task $task): bool
     {
+        $taskPivotAssoc = ZfExtended_Factory::get(TaskPivotAssociation::class);
         $languageResourceIds = array_column(
-            ZfExtended_Factory::get(LanguageResource::class)
-            ->loadByAssociatedTaskGuidListAndServiceTypes([$task->getTaskGuid()], [Manager::SERVICE_OPENTM2]),
-            'id'
+            $taskPivotAssoc->loadTaskAssociated($task->getTaskGuid()),
+            'languageResourceId'
         );
         $languageResourceIds = array_map('intval', $languageResourceIds);
 
@@ -67,12 +63,11 @@ class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor imp
 
     public function getMaxWaitTimeSeconds(): int
     {
-        return $this->config->runtimeOptions->worker->{PauseMatchAnalysisWorker::class}->maxPauseTime;
+        return $this->config->runtimeOptions->worker->{PausePivotWorker::class}->maxPauseTime;
     }
 
     public function getSleepTimeSeconds(): int
     {
-        // TODO Config?
         return 5;
     }
 }

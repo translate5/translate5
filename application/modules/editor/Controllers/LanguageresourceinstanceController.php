@@ -744,18 +744,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /**
-     * when new assocs have been sent non-forced with PUT, we need to validate them before saving
-     * @throws ZfExtended_ValidateException
-     */
-    protected function additionalValidations()
-    {
-        if ($this->getRequest()->isPut() && (bool)$this->getParam('forced', false) === false) {
-            // check for association to be cleaned only when it is put and the forced flag is not set
-            $this->checkOrCleanCustomerAssociation(false, $this->getDataField('customerIds') ?? []);
-        }
-    }
-
-    /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
      * @return void
@@ -1225,7 +1213,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         // check entity version
         $this->processClientReferenceVersion();
-
+        
         // now try to remove the language-resource associations, customer and task
         try {
             $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [ $this->entity ]);
@@ -1487,6 +1475,19 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /**
+     * The above injectors add additional error messages, which are evaluated here
+     * @throws ZfExtended_ValidateException
+     */
+    protected function additionalValidations() {
+
+        if( $this->getRequest()->isPut() === false || (bool)$this->getParam('forced',false) === true){
+            return;
+        }
+        // check for association to be cleaned only when it is put and the forced flag is not set
+        $this->checkOrCleanCustomerAssociation(false,$this->getDataField('customerIds') ?? []);
+    }
+
+    /**
      * Check or clean of customer associations
      * @param bool $clean
      * @return void
@@ -1498,7 +1499,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $assocClean = ZfExtended_Factory::get(Customer::class, [$this->entity->getId(), $customerIds]);
         $clean ? $assocClean->cleanAssociation() : $assocClean->check();
     }
-
+    
     private function hasImportingAssociatedTasks(int $languageResourceId): bool
     {
         $taskAssociation = ZfExtended_Factory::get(TaskAssociation::class);

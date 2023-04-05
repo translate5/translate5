@@ -24,10 +24,13 @@
 --
 -- END LICENSE AND COPYRIGHT
 -- */
+UPDATE Zf_configuration SET `value` = 300 WHERE `name` = 'runtimeOptions.worker.MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker.maxPauseTime' AND `value` = `default`;
+UPDATE Zf_configuration SET `default` = 300 WHERE `name` = 'runtimeOptions.worker.MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker.maxPauseTime';
 
-INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) VALUES
-    ('editor_Plugins_MatchAnalysis_Worker',  'MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker');
+UPDATE Zf_configuration
+SET `guiName` = 'How much time this worker can wait until released', `guiGroup` = 'System setup: Load balancing'
+WHERE `name` = 'runtimeOptions.worker.MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker.maxPauseTime';
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-    ('runtimeOptions.worker.MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker.maxParallelWorkers', '1', 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running pause workers'),
-    ('runtimeOptions.worker.MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker.maxPauseTime', '1', 'editor', 'worker', '300', '300', '', 'integer', 'Max wait time in seconds');
+UPDATE Zf_configuration
+SET `guiName` = 'How many workers of this type can run simultaneously', `guiGroup` = 'System setup: Load balancing'
+WHERE `name` = 'runtimeOptions.worker.MittagQI\\Translate5\\Plugins\\MatchAnalysis\\PauseMatchAnalysisWorker.maxParallelWorkers';

@@ -21,25 +21,42 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Import;
+namespace MittagQI\Translate5\PauseWorker;
 
-use ZfExtended_ErrorCodeException;
+use editor_Models_Task as Task;
 
-class PauseImportException extends ZfExtended_ErrorCodeException
+/**
+ * Should be implemented by processors that are executed by pause workers
+ */
+interface PauseWorkerProcessorInterface
 {
     /**
-     * @var string
+     * Shows if the worker should wait and then check again
+     * If false - the pause worker should be finished
+     *
+     * @param Task $task
+     * @return bool
      */
-    protected $domain = 'editor.import.pause';
+    public function shouldWait(Task $task): bool;
 
-    protected static array $localErrorCodes = [
-        'E1500' => 'After waiting for {waitTime} seconds, the language resource is still not available.'
-    ];
+    /**
+     * Shows maximum amount of time the worker should wait until finished
+     *
+     * @return int
+     */
+    public function getMaxWaitTimeSeconds(): int;
+
+    /**
+     * Shows how much time the worker should wait until the next check
+     *
+     * @return int
+     */
+    public function getSleepTimeSeconds(): int;
 }

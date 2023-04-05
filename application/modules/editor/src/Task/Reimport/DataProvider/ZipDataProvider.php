@@ -141,6 +141,12 @@ class ZipDataProvider extends AbstractDataProvider
         if (rtrim($name, '/') === Task::TASK_FOLDER_NAME) {
             return null;
         }
+
+        // ignore folders
+        if (str_ends_with($zipFile['name'],'/')){
+            return null;
+        }
+
         return $name;
     }
 
