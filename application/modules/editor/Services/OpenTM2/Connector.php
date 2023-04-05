@@ -9,24 +9,25 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Service\T5Memory\Enum\ReorganizeTm;
+use editor_Models_Task as Task;
 
 /**
  * OpenTM2 Connector
@@ -63,23 +64,30 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         ]);
         
         //ZfExtended_Logger::addDuplicatesByMessage('E1314');
-        ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306');
+        ZfExtended_Logger::addDuplicatesByEcode('E1333', 'E1306', 'E1314');
         
         parent::__construct();
     }
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
+    public function connectTo(
+        editor_Models_LanguageResources_LanguageResource $languageResource,
+        $sourceLang,
+        $targetLang
+    ): void {
         parent::connectTo($languageResource, $sourceLang, $targetLang);
         $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
         $this->api->setLanguageResource($languageResource);
 
         //t5 memory is not needing the OpenTM2 specific Xliff TagHandler, the default XLIFF TagHandler is sufficient
-        if(!$this->api->isOpenTM2() && $this->tagHandler instanceof editor_Services_Connector_TagHandler_OpenTM2Xliff) {
-            $this->tagHandler = ZfExtended_Factory::get('editor_Services_Connector_TagHandler_Xliff', [['gTagPairing' => false]]);
+        if (!$this->api->isOpenTM2()
+            && $this->tagHandler instanceof editor_Services_Connector_TagHandler_OpenTM2Xliff) {
+            $this->tagHandler = ZfExtended_Factory::get(
+                'editor_Services_Connector_TagHandler_Xliff',
+                [['gTagPairing' => false]]
+            );
         }
     }
 
@@ -136,24 +144,30 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::addAdditionalTm()
      */
-    public function addAdditionalTm(array $fileinfo = null,array $params=null){
+    public function addAdditionalTm(array $fileinfo = null, array $params = null): bool
+    {
         try {
-            if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
-                return true;
+            $successful = $this->api->importMemory(file_get_contents($fileinfo['tmp_name']));
+
+            if (!$successful && $this->needsReorganizing($this->api->getError())) {
+                $this->addReorganizeWarning();
+                $this->reorganizeTm();
             }
-        }
-        catch(editor_Models_Import_FileParser_InvalidXMLException $e) {
+
+            return $successful;
+        } catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
             $e->addExtraData([
                 'languageResource' => $this->languageResource,
             ]);
             $this->logger->exception($e);
         }
+
         $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
             'languageResource' => $this->languageResource,
             'apiError' => $this->api->getError(),
         ]);
+
         return false;
     }
     
@@ -190,20 +204,32 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->throwBadGateway();
     }
 
-    public function update(editor_Models_Segment $segment) {
+    public function update(editor_Models_Segment $segment): void
+    {
         $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
 
         $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
         $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
-        if($this->api->update($source, $target, $segment, $fileName)) {
-            return;
+
+        $successful = $this->api->update($source, $target, $segment, $fileName);
+
+        if (!$successful && $this->needsReorganizing($this->api->getError())) {
+            $this->addReorganizeWarning($segment->getTask());
+            $this->reorganizeTm();
+
+            $successful = $this->api->update($source, $target, $segment, $fileName);
+
+            if ($successful) {
+                return;
+            }
         }
         
         $error = $this->api->getError();
 
-        $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! <br />Gemeldete Fehler:';
+        $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren '
+            . 'Sie Ihren Administrator! <br />Gemeldete Fehler:';
         $messages->addError($msg, 'core', null, [$error]);
         
         $this->logger->error('E1306', 'OpenTM2: could not save segment to TM', [
@@ -239,15 +265,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $successful = $this->api->lookup($segment, $query, $fileName);
 
         if (!$successful && $this->needsReorganizing($this->api->getError())) {
-            $this->logger->warn(
-                'E1314',
-                'The queried TM returned error which is configured for automatic TM reorganization',
-                [
-                    'task' => $segment->getTask(),
-                    'apiError' => $this->api->getError(),
-                ]
-            );
-
+            $this->addReorganizeWarning($segment->getTask());
             $this->reorganizeTm();
             $successful = $this->api->lookup($segment, $query, $fileName);
         }
@@ -336,6 +354,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $successful = $this->api->search($searchString, $field, $offset);
 
         if (!$successful && $this->needsReorganizing($this->api->getError())) {
+            $this->addReorganizeWarning();
             $this->reorganizeTm();
             $successful = $this->api->search($searchString, $field, $offset);
         }
@@ -374,49 +393,62 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
     
     /***
-     * Search the resource for available translation. Where the source text is in resource source language and the received results
-     * are in the resource target language
+     * Search the resource for available translation. Where the source text is in
+     * resource source language and the received results are in the resource target language
+     *
      * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::translate()
      */
-    public function translate(string $searchString){
-
+    public function translate(string $searchString)
+    {
         //return empty result when no search string
-        if(empty($searchString) && $searchString !== "0") {
+        if (empty($searchString) && $searchString !== "0") {
             return $this->resultList;
         }
+
         $this->resultList->setDefaultSource($searchString);
-        
+
         //create dummy segment so we can use the lookup
-        $dummySegment=ZfExtended_Factory::get('editor_Models_Segment');
+        $dummySegment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $dummySegment editor_Models_Segment */
         $dummySegment->init();
 
         $query = $this->tagHandler->prepareQuery($searchString);
 
-        if($this->api->lookup($dummySegment, $query, 'source')){
+        $successful = $this->api->lookup($dummySegment, $query, 'source');
+
+        if (!$successful && $this->needsReorganizing($this->api->getError())) {
+            $this->addReorganizeWarning();
+            $this->reorganizeTm();
+            $successful = $this->api->lookup($dummySegment, $query, 'source');
+        }
+
+        if ($successful) {
             $result = $this->api->getResult();
-            if((int)$result->NumOfFoundProposals === 0){
+
+            if ((int)$result->NumOfFoundProposals === 0) {
                 return $this->resultList;
             }
-            foreach($result->results as $found) {
+
+            foreach ($result->results as $found) {
                 $found->target = $this->tagHandler->restoreInResult($found->target);
                 $hasTargetErrors = $this->tagHandler->hasRestoreErrors();
                 $found->source = $this->tagHandler->restoreInResult($found->source);
                 $hasSourceErrors = $this->tagHandler->hasRestoreErrors();
 
-                if($hasTargetErrors || $hasSourceErrors) {
+                if ($hasTargetErrors || $hasSourceErrors) {
                     //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
                     $found->matchRate = $this->reduceMatchrate($found->matchRate, 2);
                 }
-                
+
                 $calcMatchRate = $this->calculateMatchRate($found->matchRate, $this->getMetaData($found), $dummySegment, 'InstantTranslate');
-                
+
                 $this->resultList->addResult($found->target, $calcMatchRate, $this->getMetaData($found));
                 $this->resultList->setSource($found->source);
             }
+
             return $this->resultList;
         }
+
         $this->throwBadGateway();
     }
     
@@ -826,6 +858,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function reorganizeTm(): bool
     {
         if (!$this->isInternalFuzzy()) {
+            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
+            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
+            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
+            $this->languageResource->refresh();
             $this->languageResource->addSpecificData(ReorganizeTm::NAME, ReorganizeTm::IN_PROGRESS);
             $this->languageResource->save();
         }
@@ -854,6 +890,23 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->languageResource->getSpecificData(ReorganizeTm::NAME),
             [ReorganizeTm::DONE, ReorganizeTm::FAILED],
             true
+        );
+    }
+
+    private function addReorganizeWarning(Task $task = null): void
+    {
+        $params = [
+            'apiError' => $this->api->getError(),
+        ];
+
+        if (null !== $task) {
+            $params['task'] = $task;
+        }
+
+        $this->logger->warn(
+            'E1314',
+            'The queried TM returned error which is configured for automatic TM reorganization',
+            $params
         );
     }
     #endregion Reorganize TM
