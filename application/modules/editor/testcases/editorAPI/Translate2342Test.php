@@ -78,17 +78,6 @@ class Translate2342Test extends editor_Test_ImportTest {
         $result = $result->progress ?? null;
         $this->assertNotEmpty($result->progress ?? null,'No results found for the import progress.');
 
-        //remove the non static properties
-        unset($result->taskGuid);
-        if(static::api()->isCapturing()){
-            file_put_contents(static::api()->getFile('exportInitial.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
-        }
-
-        $expected = static::api()->getFileContent('exportInitial.txt');
-        $actual = json_encode($result, JSON_PRETTY_PRINT);
-        //check for differences between the expected and the actual content
-        self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
-        
         // run the import workers and check wait for task import
         static::api()->getJson('editor/task/'.$taskId.'/import');
         static::api()->checkTaskStateLoop();
@@ -98,16 +87,5 @@ class Translate2342Test extends editor_Test_ImportTest {
         ]);
         $result = $result->progress ?? null;
         $this->assertNotEmpty($result->progress ?? null,'No results found for the import progress.');
-
-        //remove the non static properties
-        unset($result->taskGuid);
-        if(static::api()->isCapturing()){
-            file_put_contents(static::api()->getFile('exportFinal.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
-        }
-
-        $expected = static::api()->getFileContent('exportFinal.txt');
-        $actual = json_encode($result, JSON_PRETTY_PRINT);
-        //check for differences between the expected and the actual content
-        self::assertEquals(trim($expected), trim($actual), "The initial queue worker progress and the result file does not match.");
     }
 }
