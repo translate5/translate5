@@ -296,6 +296,8 @@ class editor_Services_Manager {
         foreach($list as $one){
             /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
             $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            // TODO $assumeDatabase is skipped here which leads to that we can not manipulate language resourse
+            // inside of the connector. Need to check if we can normally load language resource from DB here.
             $languageResource->init($one);
             try {
                 $connector = $this->getConnector($languageResource,null,null,$task->getConfig());
