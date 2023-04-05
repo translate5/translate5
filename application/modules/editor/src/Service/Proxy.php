@@ -33,10 +33,15 @@ namespace MittagQI\Translate5\Service;
  */
 final class Proxy extends DockerServiceAbstract {
 
+    /**
+     * Service is relevant only for fully dockerized installations
+     * @var bool
+     */
+    protected bool $mandatory = false;
+
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.authentication.ipbased.useLocalProxy',
         'type' => 'list',
-        'url' => 'http://proxy.:80/',
-        'optional' => true
+        'url' => 'http://proxy.:80/'
     ];
 }

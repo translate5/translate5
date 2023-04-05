@@ -37,13 +37,18 @@ use ZfExtended_Factory;
  */
 final class Php extends DockerServiceAbstract {
 
+    /**
+     * Service is relevant only for fully dockerized installations
+     * @var bool
+     */
+    protected bool $mandatory = false;
+
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.worker.server',
         'type' => 'string',
         'url' => 'http://php.:80',
         'healthcheck' => '/editor/index/applicationstate',
-        'healthcheckIsJson' => true,
-        'optional' => true
+        'healthcheckIsJson' => true
     ];
 
     protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string

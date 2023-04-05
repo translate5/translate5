@@ -153,10 +153,7 @@ abstract class DockerServiceAbstract extends ServiceAbstract
      */
     public function isCheckSkipped(): bool
     {
-        return
-            array_key_exists('optional', $this->configurationConfig)
-            && $this->configurationConfig['optional'] === true
-            && empty($this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type']));
+        return !$this->mandatory && empty($this->getConfigValueFromName($this->configurationConfig['name'], $this->configurationConfig['type']));
     }
 
     /**
