@@ -116,4 +116,14 @@ final class DbHelper
         $result->worker = $summary;
         return $result;
     }
+
+    /**
+     * Removes all existing workers from the DB
+     * @return void
+     */
+    public static function removeWorkers()
+    {
+        $worker = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        $worker->db->delete('1 = 1');
+    }
 }

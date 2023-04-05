@@ -52,7 +52,6 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
     ],
     otherRenderers: null,
     filter: {
-        updateBuffer: 0,
         type: 'numeric'
     },
     initComponent: function() {

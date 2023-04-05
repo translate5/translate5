@@ -86,8 +86,8 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         'LEK_segments' => 'taskGuid',
         'LEK_segments_meta' => 'taskGuid',
         'LEK_segment_quality' => 'taskGuid',
-        // LEK_segment_tags is just a temorary datamodel during import
-        'LEK_segment_tags' => false,
+        // LEK_segment_processing is just a temporary datamodel during import
+        'LEK_segment_processing' => false,
         //not needed anymore, but keeping as reference how to to implement filters
         //'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
         'LEK_task' => 'taskGuid',

@@ -515,7 +515,7 @@ final class Task extends Resource
     private function upload(Helper $api)
     {
         if ($this->_uploadFolder !== null) {
-            $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder, 'testTask.zip');
+            $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder);
             // add/change a task-config.ini if we have configs
             if (count($this->_importConfigs) > 0){
                 $this->setTaskConfigsInZip($this->_cleanupZip);

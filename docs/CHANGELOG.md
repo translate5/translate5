@@ -12,6 +12,48 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.9.4] - 2023-04-03
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3249](https://jira.translate5.net/browse/TRANSLATE-3249): LanguageResources - Add documentation about t5memory status request processing in t5** <br>
+Response from t5memory for the `status` API call was changed so t5memory connector has been modified to parse the status of the translation memory accordingly.
+The documentation about the t5memory status processing is also added and can be found here:
+https://confluence.translate5.net/display/TAD/Status+response+parsing
+
+
+**[TRANSLATE-3241](https://jira.translate5.net/browse/TRANSLATE-3241): OpenTM2 integration - T5memory automatic reorganize and via CLI** <br>
+Added two new commands: 
+  - t5memory:reorganize for manually triggering translation memory reorganizing
+  - t5memory:list - for listing all translation memories with their statuses
+Add new config for setting up error codes from t5memory that should trigger automatic reorganizing
+Added automatic translation memory reorganizing if appropriate error appears in response from t5memory engine
+
+
+
+### Bugfixes
+**[TRANSLATE-3260](https://jira.translate5.net/browse/TRANSLATE-3260): TrackChanges - Disable TrackChanges for ja, ko, zh, vi completely to fix char input problems** <br>
+Added option to completely disable TrackChanges per language ('ko', 'ja', ...) to solve problems with character input in these languages
+
+**[TRANSLATE-3257](https://jira.translate5.net/browse/TRANSLATE-3257): GroupShare integration - Segments are not saved back to GS** <br>
+Segments could not be not saved back to GroupShare. Passing the optional configuration confirmationLevels: ['Unspecified'] did solve the problem.
+
+**[TRANSLATE-3255](https://jira.translate5.net/browse/TRANSLATE-3255): GroupShare integration - Fix segment updating also if segment has not tags in source but in target** <br>
+If the target text has tags but source not, the segment could not be saved to groupshare TM.
+
+**[TRANSLATE-3231](https://jira.translate5.net/browse/TRANSLATE-3231): Export - No download progress is shown for translator packages** <br>
+Waiting screen will be shown on package export.
+Fix for package export and re-import API responses.
+
+**[TRANSLATE-3111](https://jira.translate5.net/browse/TRANSLATE-3111): Editor general - Editor: matchrate filter search problem** <br>
+Fixed problem that segment filter was not applied if a range was set too quickly on a MatchRate-column's filter.
+Fix error produced by the filters when leaving the task.
+
+
 ## [5.9.3] - 2023-03-27
 
 ### Important Notes:

@@ -51,6 +51,12 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
         }
     },
 
+    statics: {
+        exportTask: function (taskId){
+            window.open(Editor.data.restpath + Ext.String.format('task/export/id/{0}?format=package&t5ui=true', taskId), '_blank');
+        }
+    },
+
     /***
      * On task reload, refresh the files grid for the currently selected task
      * @param params
@@ -101,7 +107,7 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
      * Check if the current task allows reimport action
      * @returns {boolean}
      */
-    isReimportAllowewd: function (){
+    isReimportAllowed: function (){
         var me = this,
             task = me.getView().task;
 
@@ -122,7 +128,7 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
     onUploadAction: function (grid, rowIndex, colIndex, actionItem, event, record, row){
         var me = this;
 
-        if( me.isReimportAllowewd() === false){
+        if( me.isReimportAllowed() === false){
             return;
         }
 
@@ -138,7 +144,8 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
         var me = this,
             task = me.getView().task;
         task.set('state','PackageExport');
-        window.open(Editor.data.restpath + Ext.String.format('task/export/id/{0}?format=package', task.get('id')), '_blank');
+
+        Editor.view.admin.task.reimport.ReimportViewController.exportTask(task.get('id'));
     },
 
     /***
@@ -147,7 +154,7 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
     onImportTranslatorPackageClick: function (){
         var me = this;
 
-        if( me.isReimportAllowewd() === false){
+        if(me.isReimportAllowed() === false){
             return;
         }
 

@@ -45,7 +45,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * This must be increased each time, a git-based fprm or srx is changed
      * @var int
      */
-    const BCONF_VERSION_INDEX = 2;
+    const BCONF_VERSION_INDEX = 3;
 
     /**
      * The filename of the system default import bconf

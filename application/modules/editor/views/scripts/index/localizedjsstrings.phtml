@@ -369,7 +369,8 @@ Ext.define('Editor.controller.Localizer', {
       		lines: '<?php echo $this->translate->_('Zeilen');?>',
       		current: '<?php echo $this->translate->_('Aktuell');?>',
       		together: '<?php echo $this->translate->_('insgesamt');?>',
-      		siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>'
+      		siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>',
+            numberOfChars: '<?php echo $this->translate->_('Anzahl Zeichen');?>'
         }
     });
 
@@ -2004,6 +2005,8 @@ Editor.data.l10n = {
                 de: '<?php echo $this->translate->_('Deutsche Oberfläche');?>',
                 en: '<?php echo $this->translate->_('Englische Oberfläche');?>'
             },
+            showCharacterCounter: '<?php echo $this->translate->_('Zeichenzähler unter Editor anzeigen');?>',
+            showCharacterCounterTooltip: '<?php echo $this->translate->_('Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor');?>',
 
             btnScrollToSegment: '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>',
             btnJumpToSegment: '<?php echo $this->translate->_('Springe zu Segment mit Nr (STRG + G)');?>',
