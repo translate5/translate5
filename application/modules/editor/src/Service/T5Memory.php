@@ -33,13 +33,19 @@ namespace MittagQI\Translate5\Service;
  */
 final class T5Memory extends DockerServiceAbstract {
 
+    /**
+     * It is possible to have an installation without having t5memory set up
+     * @var bool
+     */
+    protected bool $mandatory = false;
+
     protected array $configurationConfig = [
-        'name' => 'runtimeOptions.LanguageResources.opentm2.server',
+        'name' => 'runtimeOptions.LanguageResources.opentm2.server', // TODO: once OpenTM2 is not used anymore, this should be renamed
         'type' => 'list',
         'url' => 'http://t5memory.:4040/t5memory',
         'healthcheck' => '/', // requesting the base url will retrieve a 200 status and the version
         'healthcheckIsJson' => true,
-        'additive' => true // TODO: is this neccessary ?
+        'additive' => true // leads to new endpoints being added when using autodiscovery. TODO: remove once OpenTM2 is not used anymore
     ];
 
     /**
