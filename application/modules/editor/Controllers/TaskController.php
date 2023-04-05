@@ -96,7 +96,7 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * The download-actions need to be csrf unprotected!
      */
-    protected array $_unprotectedActions = ['export', 'excelexport', 'kpi'];
+    protected array $_unprotectedActions = ['export', 'excelexport', 'kpi', 'packagestatus'];
 
     public function init() {
 
