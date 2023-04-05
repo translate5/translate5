@@ -101,7 +101,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | :--------------- |:------------- | :------------ | :------------------- 
 | <a id="E1179"></a>E1179  | Category Assocs | Save category assocs: categories could not be JSON-decoded with message: {msg} | The given data for the categories is wrong; check this first.
 
-### Users &amp; Customers
+### Users & Customers
 | EventCode        | Context       | EventMessage  | Description/Solution
 | :--------------- |:------------- | :------------ | :------------------- 
 | <a id="E1047"></a>E1047  | Customer | A client cannot be deleted as long as tasks are assigned to this client. | Remove all tasks first from that customer.
@@ -114,7 +114,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1421"></a>E1421  | User    | Old password does not match | The provided old password on password change does not match.
 | <a id="E1420"></a>E1420  | User    | Old password is required | On password resset, the old password was not provided.
 
-### Task &amp; Workflow
+### Task & Workflow
 | EventCode        | Context       | EventMessage  | Description/Solution
 | :--------------- |:------------- | :------------ | :-------------------
 | <a id="E1011"></a>E1011  | Task; Workflow | Multi Purpose Code logging in the context of a task | Multi Purpose code for several info logs around a task.<br />Also important in Context of workflow.
@@ -686,8 +686,6 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1498"></a>E1498 | Plug-In Connect Worldserver | error while transfering data back to the WorldServer                                                                                                                                             |                                                                                                  |
 | <a id="E1499"></a>E1499 | Plug-In Connect Worldserver | error while completing the taskstep on the WorldServer                                                                                                                                           |                                                                                                  |
 | <a id="E1509"></a>E1509 | Plug-In Connect Worldserver | Request had no {header} header                                                                                                                                                                   |
-| <a id="E1511"></a>E1511  | TODO    | SET ME BY USING ME! {TEST} | TODO DESCRIPTION / SOLUTION
-
 
 
 ## EventCode Design rules / decisions
