@@ -443,6 +443,14 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1142"></a>E1142   | Segment | Excel Reimport: at least one segment needs to be controlled. | This is actually a warning. You have to control all segments in the given list. They may have an invalid tag-structure (eg. open a tag but not closing it) or something similar. This can lead to problems on further workflow steps.
 | <a id="E1148"></a>E1148   | Task | Task can not be locked for excel export, no excel export could be created. | That means the task is currently in use by another user / process.<br />This is logged as info, since this can happen if another reviewer&nbsp;is editing while another&nbsp;reviewer is finishing the task.
 
+### CSRF Protection
+| EventCode               | Context         | EventMessage                                                                     | Description/Solution |
+|:------------------------|:----------------|:---------------------------------------------------------------------------------|:---------------------|
+| <a id="E1505"></a>E1505 | CSRF Protection | The CSRF-token was empty                                                         |                      |
+| <a id="E1506"></a>E1506 | CSRF Protection | The sent CSRF test-token "{token}" does not match the stored token {storedToken} |                      |
+| <a id="E1507"></a>E1507 | CSRF Protection | The sent CSRF token "{token}" does not match the session token: "{storedToken}"  |                      |
+| <a id="E1508"></a>E1508 | CSRF Protection | The CSRF test-token-file "{tokenFile}" is missing or not readable                |                      |
+| <a id="E1509"></a>E1509 | CSRF Protection | The request had no {header} header                                               |                      |
 
 ### Plug-Ins
 | EventCode        | Context       | EventMessage  | Description/Solution
