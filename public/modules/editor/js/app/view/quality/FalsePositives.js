@@ -116,9 +116,8 @@ Ext.define('Editor.view.quality.FalsePositives', {
      * @param {Editor.model.quality.Segment[]} records
      */
     loadFalsifiable: function(records){
-        this.down('grid').getStore().setData(
-            Ext.Array.filter(records, rec => rec.get('falsifiable'))
-        );
+        var filteredRecords = (records && records.length) ? Ext.Array.filter(records, rec => rec.get('falsifiable')) : [];
+        this.down('grid').getStore().setData(filteredRecords);
     }
 });
 

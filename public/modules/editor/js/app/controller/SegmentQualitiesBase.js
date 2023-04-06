@@ -129,7 +129,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
     },
 
     applyCustomMatches: function (cellNode, matches, skipMindTags) {
-        if (!cellNode) {
+        if (!cellNode || !this.editor) {
             return;
         }
 
@@ -208,7 +208,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         for (let i = 0; i < tags.length; i++) {
 
             // Debug
-            if (debug) console.log('tag#', i, 'was index', tags[i].index);
+            if (debug) { console.log('tag#', i, 'was index', tags[i].index); }
 
             // Reduce current tag match index (offset position) by cutting off html stuff of previous tags to make
             // it possible to rely on that index (offset position) while spell check styles coords calculation
@@ -221,13 +221,13 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             }
 
             // Debug
-            if (debug) console.log('tag#', i, 'now index', tags[i].index, 'start is', start);
+            if (debug) {  console.log('tag#', i, 'now index', tags[i].index, 'start is', start); }
 
             // If current tag appears before the word having quality-error
             if (tags[i].index <= start) {
 
                 // Debug
-                if (debug) console.log('tag#', i, 'both start and end will be shifted');
+                if (debug) { console.log('tag#', i, 'both start and end will be shifted'); }
 
                 // If it's one of the whitespace-tags
                 if (tags[i][2] === undefined) {
@@ -244,7 +244,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
                 }
 
                 // Debug
-                if (debug) console.log('tag#', i, 'start was', start, 'start now', start + shift);
+                if (debug) { console.log('tag#', i, 'start was', start, 'start now', start + shift); }
 
                 // Do shift
                 start += shift;
@@ -255,7 +255,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
             } else if (tags[i].index <= end) {
 
                 // Debug
-                if (debug) console.log('tag#', i, 'end will be shifted only, end is', end);
+                if (debug) { console.log('tag#', i, 'end will be shifted only, end is', end); }
 
                 // If it's one of the whitespace-tags
                 if (tags[i][2] === undefined) {
@@ -272,7 +272,7 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
                 }
 
                 // Debug
-                if (debug) console.log('tag#', i, 'end was', end, 'end now', end + shift);
+                if (debug) { console.log('tag#', i, 'end was', end, 'end now', end + shift); }
 
                 // Do shift
                 end += shift;
@@ -280,14 +280,14 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         }
 
         // Debug
-        if (debug) console.log(html, 'was', [match.backup.start, match.backup.end], 'shifted by ', start - match.backup.start);
+        if (debug) { console.log(html, 'was', [match.backup.start, match.backup.end], 'shifted by ', start - match.backup.start); }
 
         // Update offsets
         match.range.start = start;
         match.range.end = end;
 
         // Debug
-        if (debug) console.log(html, 'now', [match.range.start, match.range.end]);
+        if (debug) { console.log(html, 'now', [match.range.start, match.range.end]); }
     },
 
     onEditableColumnRender: function (column) {
@@ -330,5 +330,6 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         return Ext.DomHelper.createDom(nodeElParams);
     },
 }, function() {
+    // TODO FIXME: make the target function static ... and get rid of the ugly "borrow"
     this.borrow(Editor.view.quality.FalsePositivesController, ['applyFalsePositiveStyle']);
 });
