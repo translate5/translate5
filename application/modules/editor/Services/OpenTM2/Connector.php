@@ -215,7 +215,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $successful = $this->api->update($source, $target, $segment, $fileName);
 
-        if (!$successful && $this->needsReorganizing($this->api->getError())) {
+        if ($successful) {
+            return;
+        }
+
+        if ($this->needsReorganizing($this->api->getError())) {
             $this->addReorganizeWarning($segment->getTask());
             $this->reorganizeTm();
 
