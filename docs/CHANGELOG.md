@@ -13,6 +13,86 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.0.0---CRSF] - 2023-04-06
+
+### Important Notes:
+#### [TRANSLATE-3259](https://jira.translate5.net/browse/TRANSLATE-3259)
+Please note that it will work properly only with the t5memory version >=0.4.36
+
+#### [TRANSLATE-3233](https://jira.translate5.net/browse/TRANSLATE-3233)
+IMPORTANT: update docker compose files to the new pdfconverter.
+
+#### [TRANSLATE-3048](https://jira.translate5.net/browse/TRANSLATE-3048)
+This Feature changes the way the T5-API can be accessed: An App-Token MUST be used from now on to request the API
+externally. t5connect must be setup to use App-Tokens !!
+ 
+
+
+### Added
+**[TRANSLATE-3234](https://jira.translate5.net/browse/TRANSLATE-3234): API - API Improvements for Figma** <br>
+The API endpoint for langauges (/language) now respects locale, targetLang can be sent as comma-separated array
+
+**[TRANSLATE-3233](https://jira.translate5.net/browse/TRANSLATE-3233): VisualReview / VisualTranslation - Replace visualbrowser container with our own Dockerized Headless Browser** <br>
+VisualReview plugin text reflow and text resize code moved to a separate repository. 
+Visualbrowser is replaced by translate5/visualconverter image.
+Config runtimeOptions.plugins.VisualReview.dockerizedHeadlessChromeUrl is now replaced by runtimeOptions.plugins.VisualReview.visualConverterUrl
+
+
+### Changed
+**[TRANSLATE-3267](https://jira.translate5.net/browse/TRANSLATE-3267): LanguageResources - Improve automatic memory reorganization** <br>
+Automatic reorganizing was introduced in TRANSLATE-3241
+
+What should be improved:
+
+  - if tm was reorganized successfully and error appears again need to trigger reorganization again
+
+  - add reorganize_tm_start field that should be a datetime of operation is triggered, will be used to trigger reorganize after some time even if reorganize_tm = in_progress (in case reorganize was triggered and field was not updated to 'done' somehow after)
+
+ 
+
+**[TRANSLATE-3252](https://jira.translate5.net/browse/TRANSLATE-3252): VisualReview / VisualTranslation - Add Info/Warning if Font's could not be parsed in a PDF based visual** <br>
+Add info/warning for fonts that could not be properly evaluated in the conversion of a PDF as source of the visual
+
+**[TRANSLATE-2933](https://jira.translate5.net/browse/TRANSLATE-2933): Auto-QA - Required changes in worker architecture to improve performance of multiple Request based AutoQA workers** <br>
+NO CHANGELOG: is in parent issue
+
+**[TRANSLATE-2460](https://jira.translate5.net/browse/TRANSLATE-2460): Main back-end mechanisms (Worker, Logging, etc.) - Own worker-type "Resource/Service Worker"** <br>
+NO CHANGELOG: is in the main issue
+
+
+### Bugfixes
+**[TRANSLATE-3270](https://jira.translate5.net/browse/TRANSLATE-3270): Editor general - Several rootcause fixes** <br>
+Fixed: Frontend error "me.editor is null" in Qualities Filter-Panel
+Fixed: Frontend error "Cannot read properties of null (reading 'filter')" in Qualities Filter-Panel
+Fixed: Frontend error "Cannot read properties of undefined (reading 'down')" when right-clicking segments
+
+**[TRANSLATE-3265](https://jira.translate5.net/browse/TRANSLATE-3265): Import/Export - Folder evaluated as file in zip data provider** <br>
+Fix a problem with Zip archive content validator.
+
+**[TRANSLATE-3260](https://jira.translate5.net/browse/TRANSLATE-3260): TrackChanges - Disable TrackChanges for ja, ko, zh, vi completely to fix char input problems** <br>
+Added option to completely disable TrackChanges per language ('ko', 'ja', ...) to solve problems with character input in these languages
+- FIX config-level for deactivating target languages
+
+**[TRANSLATE-3259](https://jira.translate5.net/browse/TRANSLATE-3259): MatchAnalysis & Pretranslation - Pivot pre-translation is not paused while tm is importing** <br>
+Pivot worker now has the pause mechanism which waits until all related t5memory language resources are available.
+This will work properly only with t5memory version greater then 0.4.36
+
+**[TRANSLATE-3258](https://jira.translate5.net/browse/TRANSLATE-3258): file format settings - T5 Segmentation Rules: Add rules for  "z. B." in parallel with "z.B."** <br>
+Added Segmentation rules to not break after "z. B." just like with "z.B."
+
+**[TRANSLATE-3058](https://jira.translate5.net/browse/TRANSLATE-3058): Main back-end mechanisms (Worker, Logging, etc.), SpellCheck (LanguageTool integration), TermTagger integration - Simplify termtagger and spellcheck workers** <br>
+Improvement: TermTagger Worker & SpellCheck Worker are not queued dynamically anymore but according to the configured slots & looping through segments. This reduces deadlocks & limits processes 
+
+**[TRANSLATE-3048](https://jira.translate5.net/browse/TRANSLATE-3048): Editor general - CSRF Protection for translate5** <br>
+CSRF (Cross Site Request Forgery) Protection for translate5 with a CSRF-token. Important info for translate5 API users: externally the translate5 - API can only be accessed with an App-Token from now on.
+
+**[TRANSLATE-2592](https://jira.translate5.net/browse/TRANSLATE-2592): TrackChanges - Reduce and by default hide use of TrackChanges in the translation step** <br>
+Regarding translation and track changes: changes are only recorded for pre-translated segments and changes are hidden by default for translators (and can be activated by the user in the view modes drop-down of the editor)
+
+
+
+
 ## [5.9.4] - 2023-04-03
 
 ### Important Notes:
