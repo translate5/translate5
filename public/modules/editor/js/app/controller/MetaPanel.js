@@ -211,8 +211,8 @@ Ext.define('Editor.controller.MetaPanel', {
                 bind: {
                     title: '{l10n.falsePositives.legend.float} <span class="x-fa fa-circle-xmark" title="{l10n.falsePositives.close}"></span>'
                 },
-                toggle: function(ev, dom, opts) {
-                    if (ev.getTarget('.x-fa')) opts.scope.hide();
+                toggle: function(ev, d, opts) {
+                    if (ev.getTarget('.x-fa')) { opts.scope.hide(); }
                 }
             });
         }
@@ -229,22 +229,24 @@ Ext.define('Editor.controller.MetaPanel', {
      * Load certain quality-record into grid opened on right-click on quality-tag inside some segment
      */
     loadSegmentRightClickGridRow: function(id) {
-        var me = this, data = [], rec;
+        var me = this,
+            data = [],
+            falPosPanel = this.getMetaFalPosPanel(),
+            record = (falPosPanel) ? falPosPanel.down('grid').getStore().getById(id) : null;
 
         // If record is already initialized within the store
-        if (rec = me.getMetaFalPosPanel().down('grid').getStore().getById(id)) {
+        if (record) {
 
             // Pick it's data
-            data.push(rec.getData());
+            data.push(record.getData());
+            // Set data
+            me.segmentRightClickGrid.down('grid').getStore().setData(data);
 
         } else {
 
             // Try again in 200ms
             Ext.defer(() => me.loadSegmentRightClickGridRow(id), 200);
         }
-
-        // Set data
-        me.segmentRightClickGrid.down('grid').getStore().setData(data);
     },
 
     handleSegmentSelectionChange: function(sm, selectedRecords) {
