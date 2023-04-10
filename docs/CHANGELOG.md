@@ -14,9 +14,13 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
-## [6.0.0---CRSF] - 2023-04-06
+
+## [6.0.0] - 2023-04-10
 
 ### Important Notes:
+#### [TRANSLATE-3268](https://jira.translate5.net/browse/TRANSLATE-3268)
+The translate5 system log is now purged to 6 weeks in the past each night.
+
 #### [TRANSLATE-3259](https://jira.translate5.net/browse/TRANSLATE-3259)
 Please note that it will work properly only with the t5memory version >=0.4.36
 
@@ -40,25 +44,8 @@ Config runtimeOptions.plugins.VisualReview.dockerizedHeadlessChromeUrl is now re
 
 
 ### Changed
-**[TRANSLATE-3267](https://jira.translate5.net/browse/TRANSLATE-3267): LanguageResources - Improve automatic memory reorganization** <br>
-Automatic reorganizing was introduced in TRANSLATE-3241
-
-What should be improved:
-
-  - if tm was reorganized successfully and error appears again need to trigger reorganization again
-
-  - add reorganize_tm_start field that should be a datetime of operation is triggered, will be used to trigger reorganize after some time even if reorganize_tm = in_progress (in case reorganize was triggered and field was not updated to 'done' somehow after)
-
- 
-
 **[TRANSLATE-3252](https://jira.translate5.net/browse/TRANSLATE-3252): VisualReview / VisualTranslation - Add Info/Warning if Font's could not be parsed in a PDF based visual** <br>
 Add info/warning for fonts that could not be properly evaluated in the conversion of a PDF as source of the visual
-
-**[TRANSLATE-2933](https://jira.translate5.net/browse/TRANSLATE-2933): Auto-QA - Required changes in worker architecture to improve performance of multiple Request based AutoQA workers** <br>
-NO CHANGELOG: is in parent issue
-
-**[TRANSLATE-2460](https://jira.translate5.net/browse/TRANSLATE-2460): Main back-end mechanisms (Worker, Logging, etc.) - Own worker-type "Resource/Service Worker"** <br>
-NO CHANGELOG: is in the main issue
 
 
 ### Bugfixes
@@ -66,6 +53,9 @@ NO CHANGELOG: is in the main issue
 Fixed: Frontend error "me.editor is null" in Qualities Filter-Panel
 Fixed: Frontend error "Cannot read properties of null (reading 'filter')" in Qualities Filter-Panel
 Fixed: Frontend error "Cannot read properties of undefined (reading 'down')" when right-clicking segments
+
+**[TRANSLATE-3268](https://jira.translate5.net/browse/TRANSLATE-3268): Main back-end mechanisms (Worker, Logging, etc.) - Automatic system log purge to a configurable amount of weeks in the past** <br>
+To reduce DB load the translate5 system log is now purged to 6 weeks in the past each night.
 
 **[TRANSLATE-3265](https://jira.translate5.net/browse/TRANSLATE-3265): Import/Export - Folder evaluated as file in zip data provider** <br>
 Fix a problem with Zip archive content validator.

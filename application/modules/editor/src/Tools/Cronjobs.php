@@ -81,6 +81,9 @@ class Cronjobs
         // + additional receivers, independant from sys admin users
         $summary = ZfExtended_Factory::get(ZfExtended_Logger_Summary::class);
         $summary->sendSummaryToAdmins();
+
+        $log = ZfExtended_Factory::get(\ZfExtended_Models_Log::class);
+        $log->purgeOlderAs(\Zend_Registry::get('config')->runtimeOptions?->logger?->keepWeeks ?? 6);
     }
 
     /**
