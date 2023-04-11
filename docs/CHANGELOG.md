@@ -15,6 +15,22 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.0.1] - 2023-04-11
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3274](https://jira.translate5.net/browse/TRANSLATE-3274): Authentication - Info that app token authentication was used is lost** <br>
+In some circumstances the info that a request was authenticated via app token is lost and therefore CRSF protection is blocking requests.
+
+**[TRANSLATE-3273](https://jira.translate5.net/browse/TRANSLATE-3273): Authentication - Security fixes against hacking translate5 for CSRF (Cross-site request forgery)** <br>
+CSRF protection was unintentionally blocking some live communication between browser and translate5 server. In detail: session re-sync endpoint needed for re-sync to MessageBus socket server after network reconnect. 
+An exception for that endpoint was added.
+
+
 ## [6.0.0] - 2023-04-10
 
 ### Important Notes:
