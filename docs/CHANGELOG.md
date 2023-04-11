@@ -15,6 +15,20 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.0.1] - 2023-04-11
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3273](https://jira.translate5.net/browse/TRANSLATE-3273): Authentication - CSRF fixes** <br>
+FIX: CSRF protection was blocking session resync endpoint needed for resync to MessageBus socket server after network reconnect. 
+An exception for that endpoint was added.
+
+
+
 ## [6.0.0] - 2023-04-10
 
 ### Important Notes:
