@@ -41,6 +41,12 @@ class editor_SessionController extends ZfExtended_SessionController {
     const AUTH_HASH_STATIC = 'static';
 
     /**
+     * We add our resync-operation to be CSRF unprotected
+     * @var string[]
+     */
+    protected array $_unprotectedActions = [ 'post', 'delete', 'get', 'resync' ];
+
+    /**
      * @throws \MittagQI\Translate5\Task\Current\Exception
      */
     public function resyncOperation() {
