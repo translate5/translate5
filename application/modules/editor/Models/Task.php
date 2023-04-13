@@ -557,17 +557,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(!$taskDataRoot->isWritable()) {
             throw new Zend_Exception('TaskData root Directory is not writeable: "'.$taskDataRoot->getPathname().'".');
         }
+
         $taskData = new SplFileInfo($taskDataRoot.DIRECTORY_SEPARATOR.$taskDataRel);
-        if($taskData->isDir()){
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError('Proceeding with already existing TaskData Directory: '.$taskData);
+        if (! $taskData->isDir() && ! mkdir($taskData)) {
+            throw new Zend_Exception('TaskData Directory could not be created, check parent folders:  "'.$taskData->getPathname().'".');
         }
-        else {
-            if(!mkdir($taskData)){
-                throw new Zend_Exception('TaskData Directory could not be created, check parent folders:  "'.$taskData->getPathname().'".');
-            }
-        }
+
         if($taskData->isWritable()){
         	return $this->taskDataPath = $taskData;
         }
