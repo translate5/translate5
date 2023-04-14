@@ -418,6 +418,10 @@
                 <source>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</source>
                 <target>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</target>
             </trans-unit>
+            <trans-unit id='U2NobGllw59lbiBTaWUgZGFzIGFrdHVlbGwgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGUgU2VnbWVudCwgdW0gZGllIFNpY2h0YmFya2VpdCBkZXMgWmVpY2hlbnrDpGhsZXJzIHp1IMOkbmRlcm4='>
+                <source>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Sichtbarkeit des Zeichenzählers zu ändern</source>
+                <target>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Sichtbarkeit des Zeichenzählers zu ändern</target>
+            </trans-unit>
             <trans-unit id='QW56YWhsIFplaWNoZW4='>
                 <source>Anzahl Zeichen</source>
                 <target>Anzahl Zeichen</target>

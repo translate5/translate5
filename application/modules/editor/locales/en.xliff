@@ -3282,6 +3282,10 @@ A task was associated to you in the task-portal {portalLink}.
                 <source>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</source>
                 <target>Shows oder hides the character counter below the segment editor</target>
             </trans-unit>
+            <trans-unit id='U2NobGllw59lbiBTaWUgZGFzIGFrdHVlbGwgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGUgU2VnbWVudCwgdW0gZGllIFNpY2h0YmFya2VpdCBkZXMgWmVpY2hlbnrDpGhsZXJzIHp1IMOkbmRlcm4='>
+                <source>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Sichtbarkeit des Zeichenzählers zu ändern</source>
+                <target>Close the segment currently open for editing to change the visibility of the character counter</target>
+            </trans-unit>
             <trans-unit id='QW56YWhsIFplaWNoZW4='>
                 <source>Anzahl Zeichen</source>
                 <target>Number of Characters</target>
