@@ -38,7 +38,7 @@ Ext.define('Editor.controller.Termportal', {
             'viewport > #adminMainSection > tabbar': {
                 afterrender: 'onMainSectionAfterRender'
             },
-            '#adminMainSection #btnTermPortal': {
+            '#adminMainSection #btnTermPortal, menuitem[name=btnTermPortal]': {
                 click: 'onTermPortalButtonClick'
             }
         }
@@ -62,6 +62,7 @@ Ext.define('Editor.controller.Termportal', {
             xtype: 'tab',
             closable: false,
             itemId: 'btnTermPortal',
+            name: 'btnTermPortal',
             glyph: 'xf002@FontAwesome5FreeSolid',
             text:me.strings.termPortal
         });

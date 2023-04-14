@@ -48,6 +48,7 @@ Ext.define('Editor.view.admin.system.StatusPanel', {
             dockedItems: [{
                 xtype: 'toolbar',
                 dock: 'top',
+                enableOverflow: true,
                 items: [{
                     xtype: 'button',
                     itemId: 'userPrefReload',

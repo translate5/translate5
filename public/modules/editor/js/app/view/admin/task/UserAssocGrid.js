@@ -150,6 +150,8 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
                 dockedItems: [{
                     xtype: 'toolbar',
                     dock: 'top',
+                    border: 0,
+                    enableOverflow: true,
                     items: [{
                         xtype: 'button',
                         glyph: 'f234@FontAwesome5FreeSolid',

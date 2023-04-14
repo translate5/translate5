@@ -75,7 +75,10 @@ Ext.define('Editor.view.ViewPort', {
                 tabBar: {
                     // turn off borders for classic theme.  neptune and crisp don't need this
                     // because they are borderless by default
-                    border: false
+                    border: false,
+                    layout: {
+                        overflowHandler: 'menu'
+                    }
                 },
 
                 defaults: {

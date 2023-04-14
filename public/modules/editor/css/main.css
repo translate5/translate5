@@ -1177,3 +1177,11 @@ dl {
     border-bottom: 1px solid limegreen;
     padding-bottom: 2px;
 }
+
+.x-tab-bar .x-box-menu-after {
+    top: -2px !important;
+    left: -4px;
+}
+.x-box-menu-after.x-btn-default-small .x-toolbar-more-icon {
+    color: white;
+}

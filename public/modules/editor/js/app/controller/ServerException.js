@@ -116,7 +116,6 @@ Ext.define('Editor.controller.ServerException', {
             str = me.strings,
             _status = status.toString(),
             text = str.text,
-            //FIXME here unknown error also in new JSON structure!
             respText = response && response.responseText || '{"errors": [{"_errorMessage": "unknown"}]}',
             json = null,
             tpl = new Ext.Template(str.serverMsg),
@@ -247,6 +246,15 @@ Ext.define('Editor.controller.ServerException', {
                     },
                     icon: Ext.MessageBox.WARNING
                 });
+                return;
+            case 423:
+                let msg423 = 'No access on job anymore';
+                if (response.request && response.request.options && response.request.options.url) {
+                    msg423 = msg423 + ': ' + response.request.options.url;
+                }
+                // call the new logger function
+                Editor.MessageBox.addError(appendServerMsg(str['403']));
+                jslogger && jslogger.logException(new Error(msg423));
                 return;
             case 409:
                 //Conflict: show message from server

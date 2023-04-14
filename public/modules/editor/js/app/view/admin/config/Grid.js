@@ -233,7 +233,27 @@ Ext.define('Editor.view.admin.config.Grid', {
                 dockedItems: [{
                     xtype: 'toolbar',
                     dock: 'top',
+                    enableOverflow: true,
                     items: [{
+                        xtype: 'textfield',
+                        name: 'searchField',
+                        itemId: 'searchField',
+                        emptyText: me.strings.toolbarFilter,
+                        checkChangeBuffer:500,
+                        hideLabel: true,
+                        width: 300,
+                        minWidth: 100,
+                        flex: 1,
+                    },{
+                        xtype: 'checkbox',
+                        name: 'showReadOnly',
+                        bind:{
+                            visible:'{hasReadOnly}'
+                        },
+                        checked:false,
+                        boxLabel: me.strings.readOnlyFilter,
+                        itemId: 'showReadOnly'
+                    },{
                         xtype: 'button', 
                         glyph: 'f2f1@FontAwesome5FreeSolid',
                         handler:function(){
@@ -251,27 +271,10 @@ Ext.define('Editor.view.admin.config.Grid', {
                         glyph: 'f067@FontAwesome5FreeSolid',
                         handler:'onExpandAll',
                         text: me.strings.expandAll
-                    },me.strings.toolbarFilter,{
-                        xtype: 'textfield',
-                        name: 'searchField',
-                        itemId: 'searchField',
-                        checkChangeBuffer:500,
-                        hideLabel: true,
-                        width: 200
-                    },{
-                        xtype: 'label',
-                        text:me.strings.readOnlyFilter,
-                        bind:{
-                            visible:'{hasReadOnly}'
-                        }
-                    },{
-                        xtype: 'checkbox',
-                        name: 'showReadOnly',
-                        bind:{
-                            visible:'{hasReadOnly}'
-                        },
-                        checked:false,
-                        itemId: 'showReadOnly'
+                    },
+                    {
+                        xtype: 'tbspacer',
+                        flex: 1.6,
                     }],
                 }]
             };

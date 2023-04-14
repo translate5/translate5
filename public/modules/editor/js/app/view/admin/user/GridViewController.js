@@ -49,6 +49,11 @@ Ext.define('Editor.view.admin.user.GridViewController', {
             },
             '#adminUserGrid actioncolumn': {
                 click: 'userActionDispatcher'
+            },
+            // This selector will select all menuitems inside toolbar's overflow-menu
+            // so that click event is triggered on toolbar's corresponding item
+            'button[iconCls="x-toolbar-more-icon"] > menu > menuitem': {
+                click: menuitem => menuitem.masterComponent.fireEvent('click')
             }
         }
     },

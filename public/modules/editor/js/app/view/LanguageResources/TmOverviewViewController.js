@@ -36,7 +36,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewViewController', {
     routes: {
         'languageresource': 'onTmOverviewRoute'
     },
-    
+    listen: {
+        component: {
+            // This selector will select all menuitems inside toolbar's overflow-menu
+            // so that click event is triggered on toolbar's corresponding item
+            'button[iconCls="x-toolbar-more-icon"] > menu > menuitem': {
+                click: menuitem => menuitem.masterComponent.fireEvent('click')
+            }
+        }
+    },
     onTmOverviewRoute: function() {
         Editor.app.openAdministrationSection(this.getView());
     }

@@ -126,24 +126,9 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                     xtype: 'toolbar',
                     itemId:'assocGridTopToolbar',
                     dock: 'top',
+                    border: 0,
                     enableOverflow: true,
                     items: [{
-                        xtype: 'button',
-                        glyph: 'f234@FontAwesome5FreeSolid',
-                        itemId: 'addAssocBtn',
-                        text: me.strings.addUser,
-                        tooltip: me.strings.addUserTip
-                    }, {
-                        xtype: 'button',
-                        glyph: 'f503@FontAwesome5FreeSolid',
-                        disabled: true,
-                        bind:{
-                            disabled: '{!selectedAssocRecord}'
-                        },
-                        itemId: 'deleteAssocBtn',
-                        text: me.strings.removeUser,
-                        tooltip: me.strings.removeUserTip
-                    }, '-' ,{
                         xtype: 'combo',
                         forceSelection: true,
                         queryMode: 'local',
@@ -162,6 +147,22 @@ Ext.define('Editor.view.admin.user.AssocGrid', {
                         glyph: 'f674@FontAwesome5FreeSolid',
                         fieldLabel: me.strings.notifyButtonText,
                         tooltip: me.strings.notifyButtonTooltip
+                    }, '-', {
+                        xtype: 'button',
+                        glyph: 'f234@FontAwesome5FreeSolid',
+                        itemId: 'addAssocBtn',
+                        text: me.strings.addUser,
+                        tooltip: me.strings.addUserTip
+                    }, {
+                        xtype: 'button',
+                        glyph: 'f503@FontAwesome5FreeSolid',
+                        disabled: true,
+                        bind:{
+                            disabled: '{!selectedAssocRecord}'
+                        },
+                        itemId: 'deleteAssocBtn',
+                        text: me.strings.removeUser,
+                        tooltip: me.strings.removeUserTip
                     }]
                 }]
             };
