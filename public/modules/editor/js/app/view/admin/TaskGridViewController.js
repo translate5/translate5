@@ -46,6 +46,13 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
                 triggerReload: 'onTriggerTaskReload',
                 updateProgress: 'onUpdateProgress'//INFO: the listener and the event handler are also defined in the ProjectGridViewController. To unify this we should use mixins, they are 2 different components and the scope is not the same.
             }
+        },
+        component: {
+            // This selector will select all menuitems inside toolbar's overflow-menu
+            // so that click event is triggered on toolbar's corresponding item
+            'button[iconCls="x-toolbar-more-icon"] > menu > menuitem': {
+                click: menuitem => menuitem.masterComponent.fireEvent('click')
+            }
         }
     },
     

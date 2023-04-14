@@ -93,13 +93,21 @@ Ext.define('Editor.view.LanguageResources.pivot.Assoc', {
                 enableGroupingMenu: true,
                 groupers:[{property:'serviceName'},{property:'targetLang'}]
             }],
-            bbar:[{
-                xtype: 'button',
-                itemId: 'startPivotPretranslation',
-                bind: {
-                    disabled: '{!pivotAssocStoreHasRecords}'
-                },
-                text:me.strings.startPretranslationButtonText
+            dockedItems: [{
+                xtype: 'toolbar',
+                enableOverflow: true,
+                dock: 'bottom',
+                ui: 'footer',
+                defaultButtonUI: false,
+                items: [{
+                    xtype: 'button',
+                    itemId: 'startPivotPretranslation',
+                    name: 'startPivotPretranslation',
+                    bind: {
+                        disabled: '{!pivotAssocStoreHasRecords}'
+                    },
+                    text:me.strings.startPretranslationButtonText
+                }]
             }],
             columns : [{
                 xtype : 'checkcolumn',

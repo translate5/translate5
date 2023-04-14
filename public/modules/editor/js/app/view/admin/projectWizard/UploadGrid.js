@@ -87,54 +87,59 @@ Ext.define('Editor.view.admin.projectWizard.UploadGrid', {
                 height: 300,
                 allowDeselect : true,
                 sortableColumns:false,
-                tbar: [{
-                    xtype: 'wizardFileButton',
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    text: me.strings.workFilesFilesButton,
-                    name:'workFilesFilesButton',
-                    tooltip:me.strings.fileMix,
-                    componentCls: 'disabledButtonTooltip',
-                    bind: {
-                        disabled: '{isZipUpload}'
-                    },
-                    listeners: {
-                        change: 'onManualAdd'
-                    }
-                },{
-                    xtype: 'wizardFileButton',
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    text: me.strings.pivotFilesFilesButton,
-                    name: 'pivotFilesFilesButton',
-                    tooltip: me.strings.fileMix,
-                    componentCls: 'disabledButtonTooltip',
-                    bind: {
-                        disabled: '{isZipUpload}'
-                    },
-                    listeners: {
-                        change: 'onManualAddPivot'
-                    }
-                },{
-                    xtype: 'wizardFileButton',
-                    glyph: 'f067@FontAwesome5FreeSolid',
-                    text: me.strings.referenceFilesFilesButton,
-                    name: 'referenceFilesFilesButton',
-                    tooltip: me.strings.fileMix,
-                    componentCls: 'disabledButtonTooltip',
-                    bind: {
-                        disabled: '{isZipUpload}'
-                    },
-                    listeners: {
-                        change: 'onManualAddReference'
-                    }
-                },{
-                    xtype: 'tbseparator'
-                },{
-                    xtype: 'button',
-                    text: me.strings.removeFilesFilesButton,
-                    handler: 'removeFiles',
-                    bind: {
-                        disabled: '{!uploadgrid.selection}'
-                    }
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    enableOverflow: true,
+                    items: [{
+                        xtype: 'wizardFileButton',
+                        glyph: 'f067@FontAwesome5FreeSolid',
+                        text: me.strings.workFilesFilesButton,
+                        name:'workFilesFilesButton',
+                        tooltip:me.strings.fileMix,
+                        componentCls: 'disabledButtonTooltip',
+                        bind: {
+                            disabled: '{isZipUpload}'
+                        },
+                        listeners: {
+                            change: 'onManualAdd'
+                        }
+                    },{
+                        xtype: 'wizardFileButton',
+                        glyph: 'f067@FontAwesome5FreeSolid',
+                        text: me.strings.pivotFilesFilesButton,
+                        name: 'pivotFilesFilesButton',
+                        tooltip: me.strings.fileMix,
+                        componentCls: 'disabledButtonTooltip',
+                        bind: {
+                            disabled: '{isZipUpload}'
+                        },
+                        listeners: {
+                            change: 'onManualAddPivot'
+                        }
+                    },{
+                        xtype: 'wizardFileButton',
+                        glyph: 'f067@FontAwesome5FreeSolid',
+                        text: me.strings.referenceFilesFilesButton,
+                        name: 'referenceFilesFilesButton',
+                        tooltip: me.strings.fileMix,
+                        componentCls: 'disabledButtonTooltip',
+                        bind: {
+                            disabled: '{isZipUpload}'
+                        },
+                        listeners: {
+                            change: 'onManualAddReference'
+                        }
+                    },{
+                        xtype: 'tbseparator'
+                    },{
+                        xtype: 'button',
+                        text: me.strings.removeFilesFilesButton,
+                        handler: 'removeFiles',
+                        bind: {
+                            disabled: '{!uploadgrid.selection}'
+                        }
+                    }]
                 }],
                 viewConfig: {
                     emptyText: me.strings.gridEmptyText,

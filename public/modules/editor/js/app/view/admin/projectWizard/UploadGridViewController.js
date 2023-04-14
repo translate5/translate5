@@ -50,6 +50,22 @@ Ext.define('Editor.view.admin.projectWizard.UploadGridViewController', {
         workfileAdded:'onWorkfileAdded',
         workfilesRemoved:'onWorkfilesRemoved'
     },
+    control: {
+        // This selector will select all menuitems inside toolbar's overflow-menu
+        // having same names as toolbar's corresponding file-buttons
+        'menuitem[name/="(work|pivot|reference)FilesFilesButton"]': {
+            click: 'onMenuItemForFileButtonClick'
+        }
+    },
+
+    /**
+     * Mare sure that click is passed to the underlying fileupload-button
+     *
+     * @param menuitem
+     */
+    onMenuItemForFileButtonClick: function(menuitem) {
+        menuitem.down('^ toolbar [name=' + menuitem.name + ']').el.down('input[type=file]').dom.click();
+    },
 
     onManualAdd: function(btn) {
         this.addFilesToStore(btn.fileInputEl.dom.files, Editor.model.admin.projectWizard.File.TYPE_WORKFILES);

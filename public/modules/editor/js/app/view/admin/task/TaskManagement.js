@@ -142,7 +142,12 @@ Ext.define('Editor.view.admin.task.TaskManagement', {
                 xtype: 'tabpanel',
                 itemId: 'taskManagementTabPanel',
                 activeTab: 0,
-                items: tabs
+                items: tabs,
+                tabBar: {
+                    layout: {
+                        overflowHandler: 'menu'
+                    }
+                }
             }]
         };
 

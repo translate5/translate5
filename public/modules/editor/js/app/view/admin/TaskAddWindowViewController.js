@@ -38,6 +38,9 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
         component: {
             '#taskMainCard combobox#customerId': {
                 change: 'onCustomerChange'
+            },
+            'tabpanel': {
+                tabchange: tabpanel => tabpanel.updateLayout()
             }
         }
     },

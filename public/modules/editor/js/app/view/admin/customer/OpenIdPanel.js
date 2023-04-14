@@ -82,6 +82,7 @@ Ext.define('Editor.view.admin.customer.OpenIdPanel', {
                     flex: 1,
                     dock: 'bottom',
                     ui: 'footer',
+                    enableOverflow: true,
                     layout: {
                         pack: 'start',
                         type: 'hbox'

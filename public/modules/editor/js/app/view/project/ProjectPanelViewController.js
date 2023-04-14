@@ -55,6 +55,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         component:{
             '#reloadProjectbtn':{
                 click:'onReloadProjectBtnClick'
+            },
+            '#projectToolbar menuitem': {
+                click: menuitem => menuitem.masterComponent.fireEvent('click')
             }
         },
         controller: {
