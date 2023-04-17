@@ -49,6 +49,61 @@ final class Service extends DockerServiceAbstract
 
     const HEALTH_CHECK_PATH = '/projects';
 
+    /**
+     * Creates the corresponding key for a OKAPI-Url
+     * @param string $version
+     * @return string
+     */
+    public static function createServerKey(string $version): string
+    {
+        $suffix = '';
+        $parts = explode('-', $version);
+        // capture cases like "1.4.4.0-snapshot"
+        if (count($parts) > 1) {
+            $suffix = substr($version, strlen($parts[0]));
+            $version = $parts[0];
+        }
+        if (str_ends_with($version, '.0')) {
+            $version = substr($version, 0, -2);
+        }
+        $version = $version . $suffix;
+        if (empty($version)) {
+            return 'okapi-longhorn';
+        }
+        return 'okapi-longhorn-' . editor_Utils::secureFilename(str_replace('.', '', $version));
+    }
+
+    /**
+     * Retrieves the OKAPI version. This API is only available since OKAPI 1.40.0
+     * Older version will be keyed as before-140 (-> so only one server before 140 can be added - acceptable quirk)
+     * A return-value of NULL points to a non-reachable url
+     * @param string $okapiUrl
+     * @return string|null
+     */
+    public static function fetchServerVersion(string $okapiUrl): ?string
+    {
+        try {
+            $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
+            $httpClient->setUri(rtrim($okapiUrl, '/') . '/status.json');
+            $response = $httpClient->request('GET');
+            if ($response->getStatus() === 200) {
+                $status = json_decode($response->getBody());
+                if (property_exists($status, 'version')) {
+                    return $status->version;
+                }
+                return 'before-140'; // case can not happen
+            }
+            $httpClient->setUri(rtrim($okapiUrl, '/') . self::HEALTH_CHECK_PATH);
+            $response = $httpClient->request('GET');
+            if ($response->getStatus() === 200) {
+                return 'before-140'; // okapi-versions without /status endpoint must be 1.40.0 or lower ...
+            }
+            return null;
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.plugins.Okapi.server',
         'type' => 'string',
@@ -113,18 +168,14 @@ final class Service extends DockerServiceAbstract
             $newServers = $this->getNewServers($url);
             // add new entry by its version as name-suffix (note: we will overwrite other entries like
             // 'okapi-longhorn-xxx' without further notice) ... we use a scheme that is common on the existing instances
-            $version = $this->fetchVersion($url, '');
-            $version = str_ends_with($version, '.0') ? substr($version, 0, -2) : $version;
-            $newName = (empty($version)) ? 'okapi-longhorn' : 'okapi-longhorn-'
-                . editor_Utils::secureFilename(str_replace('.', '', $version));
-
+            $version = self::fetchServerVersion($url);
+            $newName = self::createServerKey($version);
             $foundVersions = $this->getOkapiVersions($url);
 
             if (empty($foundVersions)) {
                 $newServers[$newName] = $url;
             } else {
                 $newServers = array_merge($newServers, $foundVersions);
-                print_r($newServers);
                 $names = array_keys($newServers);
                 $newName = end($names);
             }
@@ -162,31 +213,7 @@ final class Service extends DockerServiceAbstract
      */
     protected function findVersionInResponseBody(string $responseBody, string $serviceUrl): ?string
     {
-        return $this->fetchVersion($serviceUrl, 'unknown / before 1.40.0');
-    }
-
-    /**
-     * Retrieves the OKAPI version. This API is only available since OKAPI 1.40.0
-     * @param string $okapiUrl
-     * @param string|null $default
-     * @return string|null
-     */
-    private function fetchVersion(string $okapiUrl, ?string $default): ?string
-    {
-        try {
-            $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
-            $httpClient->setUri(rtrim($okapiUrl, '/') . '/status.json');
-            $response = $httpClient->request('GET');
-            if ($response->getStatus() === 200) {
-                $status = json_decode($response->getBody());
-                if (property_exists($status, 'version')) {
-                    return $status->version;
-                }
-            }
-            return $default;
-        } catch (Throwable) {
-            return $default;
-        }
+        return self::fetchServerVersion($serviceUrl);
     }
 
     /**
@@ -258,7 +285,13 @@ final class Service extends DockerServiceAbstract
                         $otherUrl,
                         false
                     )) {
-                    $newServers[$name] = $otherUrl;
+                    // make sure, the server-key follows our required naming-scheme
+                    if(!in_array($name, editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION)){
+                        $version = self::fetchServerVersion($otherUrl);
+                        $newServers[self::createServerKey($version)] = $otherUrl;
+                    } else {
+                        $newServers[$name] = $otherUrl;
+                    }
                 }
             }
         }

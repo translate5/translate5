@@ -37,6 +37,8 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfigViewController', {
 
     record: null,
 
+    newRecordCounter: 0,
+
     /**
      * get the record
      */
@@ -79,17 +81,7 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfigViewController', {
      * on remove click button
      */
     onRemove: function() {
-        var win = this.getView(),
-            grid = win.down('grid'),
-            selMod = grid.getSelectionModel();
-
-        grid.findPlugin('rowediting').cancelEdit();
-
-        grid.store.remove(selMod.getSelection());
-
-        if (grid.store.getCount() > 0) {
-            selMod.select(0);
-        }
+        this.removeSelectedRow(true);
     },
     /**
      * on add click
@@ -104,9 +96,35 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfigViewController', {
             url: null
         })[0];
         //we set the values after creation, so that the record looks dirty
-        rec.set('id', '');
-        rec.set('url', '');
+        rec.set('id', (this.newRecordCounter === 0 ? 'NEW INSTANCE' : 'NEW INSTANCE ' + (this.newRecordCounter + 1)));
+        rec.set('url', 'https://');
 
-        grid.getPlugin('urlConfigRowEditor').startEdit(rec);
+        grid.getPlugin('urlConfigRowEditor').startEdit(rec, 1);
+        this.newRecordCounter++;
+    },
+    /**
+     * called when the user cancels an added row in the row-editor
+     * @param {Ext.grid.plugin.Editing} editor
+     * @param {Object} context
+     */
+    onAddRowCancel: function(editor, context) {
+        if(context.record && context.record.get('id') && context.record.get('id').startsWith('NEW INSTANCE')){
+            this.removeSelectedRow(false);
+        }
+    },
+    /**
+     * removes the selected row and optionally selects the next
+     * @param {Boolean} doSelectNext
+     */
+    removeSelectedRow: function(doSelectNext) {
+        var win = this.getView(),
+            grid = win.down('grid'),
+            selMod = grid.getSelectionModel();
+        grid.findPlugin('rowediting').cancelEdit();
+        grid.store.remove(selMod.getSelection());
+
+        if (doSelectNext && grid.store.getCount() > 0) {
+            selMod.select(0);
+        }
     }
 });
