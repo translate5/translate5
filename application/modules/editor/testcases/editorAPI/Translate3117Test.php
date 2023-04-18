@@ -114,8 +114,9 @@ class Translate3117Test extends editor_Test_JsonTest {
     }
 
     /**
+     * @throws \MittagQI\Translate5\Test\Api\Exception|Zend_Http_Client_Exception
      */
-    public function testReimport()
+    public function testReimport(): void
     {
         $importSegments = static::api()->getSegmentsWithBasicData();
 
@@ -125,12 +126,16 @@ class Translate3117Test extends editor_Test_JsonTest {
             self::assertEquals($expected,$segment['targetEditToSort'],'Segment does not match the expected import value');
         }
 
-        $taskId = static::api()->reloadTask()->id;
+        $task = static::api()->reloadTask();
+
+        $taskId = $task->id;
 
         static::api()->setTaskToOpen();
 
         static::api()->addFile(ZipDataProvider::UPLOAD_FILE_FIELD, static::api()->getFile('Reimport.zip'), 'application/data');
         static::api()->post('editor/taskid/'.$taskId.'/file/package');
+
+        static::api()->waitForTaskImported($task);
 
         static::api()->setTaskToEdit();
 
