@@ -451,7 +451,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1506"></a>E1506 | CSRF Protection | The sent CSRF test-token "{token}" does not match the stored token {storedToken} |                      |
 | <a id="E1507"></a>E1507 | CSRF Protection | The sent CSRF token "{token}" does not match the session token: "{storedToken}"  |                      |
 | <a id="E1508"></a>E1508 | CSRF Protection | The CSRF test-token-file "{tokenFile}" is missing or not readable                |                      |
-| <a id="E1509"></a>E1509 | CSRF Protection | The request had no {header} header                                               |                      |
+| <a id="E1509"></a>E1509 | CSRF Protection | CSRF Protection failed: The request had no {header} header                       |                      |
 
 ### Plug-Ins
 | EventCode        | Context       | EventMessage  | Description/Solution
