@@ -245,7 +245,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1433"></a>E1433  | Task Import | The stored fileparser class {fileparserCls} is no valid fileparser - stored for file {fileId} {file}                                                  | Probably the task was imported with a now not existing plugin - check the stored fileparser class in the file DB table |
 | <a id="E1190"></a>E1190  | XLF 1.2 Fileparser | The XML of the XLF file "{fileName} (id {fileId})" is invalid! | The provided XLF file contains no valid XML.<br />See the task log, the concrete XML error should be logged there too.
 | <a id="E1191"></a>E1191  | XLF 1.2 Fileparser | The XLF file "{fileName} (id {fileId})" does not contain any translation relevant segments. | Since there are no importable segments in the file, omit the file in import.
-| <a id="E1193"></a>E1193  | Imported Matchrate Type | File &quot;{file}&quot; contains unknown matchrate types. See details. | In the mentioned file there are matchrate types not known to translate5.
+| <a id="E1193"></a>E1193  | Imported Matchrate Type | File "{file}" contains unknown matchrate types. See details.           | In the mentioned file there are matchrate types not known to translate5.
 | <a id="E1241"></a>E1241  | DataProvider Zip | DataProvider Zip: zip file could not be opened: &quot;{zip}&quot; | Check if the uploaded file is a valid ZIP file.
 | <a id="E1242"></a>E1242  | DataProvider Zip | DataProvider Zip: content from zip file could not be extracted: &quot;{zip}&quot; | Check if the uploaded file is a valid ZIP file.
 | <a id="E1243"></a>E1243  | DataProvider Zip | DataProvider Zip: TaskData Import Archive Zip already exists: &quot;{target}&quot; | Remove the Archive ZIP manually.
