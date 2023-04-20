@@ -211,6 +211,10 @@ Ext.define('Editor.controller.MetaPanel', {
                 bind: {
                     title: '{l10n.falsePositives.legend.float} <span class="x-fa fa-circle-xmark" title="{l10n.falsePositives.close}"></span>'
                 },
+                hide: function() {
+                    delete me.segmentRightClickGrid;
+                    this.destroy();
+                },
                 toggle: function(ev, d, opts) {
                     if (ev.getTarget('.x-fa')) { opts.scope.hide(); }
                 }
