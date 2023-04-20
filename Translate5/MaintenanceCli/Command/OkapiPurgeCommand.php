@@ -75,28 +75,7 @@ class OkapiPurgeCommand extends Translate5AbstractCommand
 
         $config = new ConfigMaintenance();
         $summary = $config->getSummary();
-
-        if (empty($keep)) {
-            $keys = array_keys($summary);
-            $keep = end($keys);
-        }
-
-        if (isset($summary[$keep])) {
-            //we just set a value here to keep the entry
-            $summary[$keep]['taskUsageCount'] = 1;
-        }
-
-        $serverList = array_map(
-            function ($item) {
-                return $item['url'];
-            },
-            array_filter($summary, function ($data) {
-                return ($data['taskUsageCount'] ?? 0) > 0 && !empty($data['url']);
-            })
-        );
-
-        $config->setServerList($serverList);
-        $config->cleanUpNotUsed($serverList);
+        $serverList = $config->purge($summary, $keep);
 
         foreach ($summary as $name => $data) {
             if (empty($serverList[$name])) {

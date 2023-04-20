@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\Applet\AppletAbstract;
+use MittagQI\Translate5\Service\SystemCheck;
 
 /**
  * Klasse zur Portalinitialisierung
@@ -101,6 +102,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     }
     
     public static function initModuleSpecific(){
+
+        ZfExtended_Models_SystemRequirement_Validator::addModule('servicecheck', SystemCheck::class);
 
         // add the default applet editor, if this will change move the register into editor bootstrap
         \MittagQI\Translate5\Applet\Dispatcher::getInstance()->registerApplet('editor', new class extends AppletAbstract {

@@ -39,6 +39,7 @@ use Zend_Db_Statement_Exception;
 use Zend_Exception;
 use Zend_Http_Client;
 use Zend_Http_Client_Exception;
+use Zend_Uri_Exception;
 use ZfExtended_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Exceptions_IntegrityConstraint;
@@ -107,7 +108,7 @@ final class Service extends DockerServiceAbstract
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.plugins.Okapi.server',
         'type' => 'string',
-        'url' => 'http://okapi.:8080/okapi-longhorn/',
+        'url' => 'http://okapi.:8080/', //path part with version is added automatically on locate call
         'healthcheck' => self::HEALTH_CHECK_PATH
     ];
 
@@ -119,21 +120,27 @@ final class Service extends DockerServiceAbstract
      */
     public function check(): bool
     {
+        $result = true;
         $services = $this->config->runtimeOptions->plugins->Okapi->server;
         $serviceUsed = $this->config->runtimeOptions->plugins->Okapi->serverUsed;
         $url = (!empty($services) && !empty($serviceUsed)) ? ($services->$serviceUsed ?? null) : null;
         if (empty($url)) {
             $this->errors[] = 'There is no URL configured for entry "'.$serviceUsed.'".';
-            return false;
+            $result = false;
+        } else {
+            $healthcheckUrl = rtrim($url, '/') . self::HEALTH_CHECK_PATH;
+            if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url)) {
+                $this->errors[] = 'A request on "' . $healthcheckUrl .
+                    '" did not bring the expected status "200" for entry "'.$serviceUsed.'".';
+                $result = false;
+            }
         }
-        $healthcheckUrl = rtrim($url, '/') . self::HEALTH_CHECK_PATH;
-        if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url)) {
-            $this->errors[] = 'A request on "' . $healthcheckUrl .
-                '" did not bring the expected status "200" for entry "'.$serviceUsed.'".';
-            return false;
+        $this->checkOtherConfiguredServers($services, $serviceUsed, $result);
+        if ($this->hasWarnings() || $this->hasErrors()) {
+            $this->badSummary[] = 'Use "t5 okapi:[list|purge|update]" commands to fix the okapi setup '.
+                'or setup the missing servers!';
         }
-        $this->checkOtherConfiguredServers($services, $serviceUsed);
-        return true;
+        return $result;
     }
 
     /**
@@ -168,36 +175,28 @@ final class Service extends DockerServiceAbstract
             $newServers = $this->getNewServers($url);
             // add new entry by its version as name-suffix (note: we will overwrite other entries like
             // 'okapi-longhorn-xxx' without further notice) ... we use a scheme that is common on the existing instances
-            $version = self::fetchServerVersion($url);
-            $newName = self::createServerKey($version);
             $foundVersions = $this->getOkapiVersions($url);
 
             if (empty($foundVersions)) {
-                $newServers[$newName] = $url;
+                $url = $this->singleOkapiInstanceFallback($url);
+                $version = self::fetchServerVersion($url);
+                if (is_null($version)) {
+                    return false; //if no version returned here, we can not proceed
+                }
+                $newServers[self::createServerKey($version)] = $url;
             } else {
                 $newServers = array_merge($newServers, $foundVersions);
-                $names = array_keys($newServers);
-                $newName = end($names);
             }
 
-            $this->updateConfigurationConfig(
-                'runtimeOptions.plugins.Okapi.server',
-                'string',
-                json_encode($newServers, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-                $doSave,
-                $io
-            );
+            $okapiServerConfig = new ConfigMaintenance();
+            foreach ($newServers as $name => $url) {
+                //add update the found new servers
+                $okapiServerConfig->addServer($url, $name);
+            }
 
-            $this->updateConfigurationConfig(
-                'runtimeOptions.plugins.Okapi.serverUsed',
-                'string',
-                $newName,
-                $doSave,
-                $io
-            );
+            //purge the unused ones, sort by version so that latest is kept also unused
+            $okapiServerConfig->purge($okapiServerConfig->getSummary(), sortByVersion: true);
 
-            $config = new ConfigMaintenance();
-            $config->updateServerUsedDefaults($config->getServerList());
             return true;
         }
         return false;
@@ -220,19 +219,27 @@ final class Service extends DockerServiceAbstract
      * @param Zend_Config $services
      * @param string $serviceUsed
      */
-    private function checkOtherConfiguredServers(Zend_Config $services, string $serviceUsed)
+    private function checkOtherConfiguredServers(Zend_Config $services, string $serviceUsed, bool $mainServiceSuccess)
     {
         foreach ($services as $name => $url) {
-            if ($name !== $serviceUsed) {
-                if (empty($url)) {
-                    $this->warnings[] = 'There is no URL configured for entry "'.$name.'.';
-                } else {
-                    $healthcheckUrl = rtrim($url, '/') . self::HEALTH_CHECK_PATH;
-                    if (!$this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url, false)) {
-                        $this->warnings[] = 'A request on "' . $healthcheckUrl .
-                            '" did not bring the expected status "200" for entry "'.$name.'.';
-                    }
+            if ($name === $serviceUsed) {
+                continue;
+            }
+            if (empty($url)) {
+                $this->warnings[] = 'There is no URL configured for entry "'.$name.'.';
+                continue;
+            }
+            $healthcheckUrl = rtrim($url, '/') . self::HEALTH_CHECK_PATH;
+            if ($this->checkConfiguredHealthCheckUrl($healthcheckUrl, $url, false)) {
+                if (! $mainServiceSuccess) {
+                    $this->warnings[] = '';
+                    $this->warnings[] = 'A request on "' . $healthcheckUrl . ' for entry "' . $name .
+                        '" was successful but it is not set as default okapi service.';
+                    $this->warnings[] = '';
                 }
+            } else {
+                $this->warnings[] = 'A request on "' . $healthcheckUrl .
+                    '" did not bring the expected status "200" for entry "'.$name.'.';
             }
         }
     }
@@ -243,10 +250,12 @@ final class Service extends DockerServiceAbstract
      *
      * @param mixed $url
      * @return array
+     * @throws Zend_Uri_Exception
      */
     private function getOkapiVersions(mixed $url): array
     {
-        $url = dirname($url);
+        $url = \Zend_Uri_Http::fromString($url);
+        $url->setPath(''); //clean path if given to get okapi root server
         $result = [];
         try {
             $httpClient = ZfExtended_Factory::get(Zend_Http_Client::class);
@@ -286,7 +295,7 @@ final class Service extends DockerServiceAbstract
                         false
                     )) {
                     // make sure, the server-key follows our required naming-scheme
-                    if(!in_array($name, editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION)){
+                    if (!in_array($name, editor_Plugins_Okapi_Init::SUPPORTED_OKAPI_VERSION)) {
                         $version = self::fetchServerVersion($otherUrl);
                         $newServers[self::createServerKey($version)] = $otherUrl;
                     } else {
@@ -296,5 +305,22 @@ final class Service extends DockerServiceAbstract
             }
         }
         return $newServers;
+    }
+
+    /**
+     * re-add the version-less okapi-longhorn path for containers with only one okapi version
+     * @param string $url
+     * @return string
+     * @throws Zend_Uri_Exception
+     */
+    private function singleOkapiInstanceFallback(string $url): string
+    {
+        $uri = \Zend_Uri_Http::fromString($url);
+        if (!str_contains($uri->getPath(), 'okapi-longhorn')) {
+            // if just the okapi server was passed here, we assume a server with one okapi version installed,
+            // so path to okapi itself must be added
+            $uri->setPath('/okapi-longhorn');
+        }
+        return $uri->getUri();
     }
 }
