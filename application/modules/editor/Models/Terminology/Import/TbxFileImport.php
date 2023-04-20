@@ -670,7 +670,29 @@ $memLog('Loaded terms:        ');
         $attributes = [];
         /** @var SimpleXMLElement $value */
         foreach ($element as $key => $value) {
-            $attributes[] = $this->createAndAddAttribute($parentNode, $key, (string)$value->attributes()->{'type'}, (string)$value->attributes()->{'target'}, (string) $value, $isDescripGrp);
+
+            // Get type
+            $type = (string) $value->attributes()->{'type'};
+
+            // If no 'type'-attr on node and node-name is not 'note'
+            // Note: '0'-value of $type is also considered as empty
+            // because it's a falsy value and proceeding with that may
+            // lead to problems with the other parts of the application
+            if (!$type && $key !== 'note') {
+
+                // Skip that
+                continue;
+            }
+
+            // Create attribute
+            $attributes[] = $this->createAndAddAttribute(
+                $parentNode,
+                $key,
+                $type,
+                (string) $value->attributes()->{'target'},
+                (string) $value,
+                $isDescripGrp
+            );
         }
 
         return $attributes;
