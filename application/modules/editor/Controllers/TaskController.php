@@ -1517,7 +1517,8 @@ class editor_TaskController extends ZfExtended_RestController {
      * @throws \MittagQI\Translate5\Task\Current\Exception
      * @throws \MittagQI\Translate5\Task\Current\NoAccessException
      */
-    public function packagestatusAction(){
+    public function packagestatusAction(): void
+    {
         $this->initCurrentTask(false);
         $task = $this->getCurrentTask();
 
@@ -1536,12 +1537,15 @@ class editor_TaskController extends ZfExtended_RestController {
 
             if($data['file_available']){
                 $data['download_link'] = $downloader->getDownloadLink($task,$this->getParam('workerId'));
+
                 Lock::taskUnlock($task);
             }
 
             echo Zend_Json::encode($data);
         }catch (Throwable $throwable){
+
             Lock::taskUnlock($task);
+
             throw $throwable;
         }
     }
@@ -1587,36 +1591,41 @@ class editor_TaskController extends ZfExtended_RestController {
 
             case 'package':
 
-                if( $this->entity->isLocked($this->entity->getTaskGuid())){
+                if ($this->entity->isLocked($this->entity->getTaskGuid()))
+                {
                     $this->view->assign('error','Unable to export task package. The task is locked');
-                    // in case the request is not from translate5 ui, json with the assigned view variables will be returned
+                    // in case the request is not from translate5 ui,
+                    // json with the assigned view variables will be returned
                     // check the view bellow for more info
                     echo $this->view->render('task/packageexporterror.phtml');
                 }
 
                 try {
                     $this->entity->checkStateAllowsActions();
-                    Lock::taskLock($this->entity,Downloader::PACKAGE_EXPORT);
 
                     $packageDownloader = ZfExtended_Factory::get(Downloader::class);
-                    $workerId = $packageDownloader->run($this->entity,$diff);
+                    $workerId = $packageDownloader->run($this->entity, $diff);
 
-                    $this->view->assign('taskId',$this->entity->getId());
-                    $this->view->assign('workerId',$workerId);
+                    $this->view->assign('taskId', $this->entity->getId());
+                    $this->view->assign('workerId', $workerId);
 
-                    // in case the request is not from translate5 ui, json with the assigned view variables will be returned
+                    // in case the request is not from translate5 ui,
+                    // json with the assigned view variables will be returned
                     // check the view bellow for more info
                     echo $this->view->render('task/packageexport.phtml');
 
                 }catch (Throwable $exception){
+
                     Lock::taskUnlock($this->entity);
-                    $this->taskLog->exception($exception,[
+
+                    $this->taskLog->exception($exception, [
                         'extra' => [
                             'task' => $this->entity
                         ]
                     ]);
-                    $this->view->assign('error',$exception->getMessage());
-                    // in case the request is not from translate5 ui, json with the assigned view variables will be returned
+                    $this->view->assign('error', $exception->getMessage());
+                    // in case the request is not from translate5 ui,
+                    // json with the assigned view variables will be returned
                     // check the view bellow for more info
                     echo $this->view->render('task/packageexporterror.phtml');
                 }
