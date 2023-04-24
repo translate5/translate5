@@ -166,7 +166,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         $this->_helper->layout->disableLayout();
         $validator = new ZfExtended_Models_SystemRequirement_Validator(false);
         $results = $validator->validate();
-        Services::addServiceChecksAsSystemChecks($results, false);
         $this->view->validationResults = $results;
     }
 

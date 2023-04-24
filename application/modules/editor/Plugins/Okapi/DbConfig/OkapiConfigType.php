@@ -23,6 +23,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Plugins\Okapi\ConfigMaintenance;
+use MittagQI\Translate5\Plugins\Okapi\Service;
 
 /**
  * Contains the config handler for core types
@@ -49,25 +50,46 @@ class editor_Plugins_Okapi_DbConfig_OkapiConfigType extends ZfExtended_DbConfig_
         if (!$rawType) {
             return false;
         }
-
         $okapiConfig = ZfExtended_Factory::get(ConfigMaintenance::class);
         $newServerList = $okapiConfig->serverListFromJson($newvalue);
         $oldServerList = $okapiConfig->serverListFromJson($config->getValue());
-        $removedServers = array_diff(array_keys($oldServerList), array_keys($newServerList));
+        $serverList = [];
+
+        // validate the sent servers
+        foreach($newServerList as $serverKey => $serverUrl){
+            // if an entry is not identically in the old list is has changed
+            if(array_key_exists($serverKey, $oldServerList) && $oldServerList[$serverKey] === $serverUrl){
+                // unchanged keys will be accepted
+                $serverList[$serverKey] = $serverUrl;
+            } else {
+                // new entries will be checked. If the version cannot be fetched, the service is not reachable ...
+                $versionString = Service::fetchServerVersion($serverUrl);
+                if ($versionString === null) {
+                    $errorStr .= ' Url "' . $serverUrl . '" of entry "' . $serverKey . '" is not valid.';
+                    return false;
+                }
+                $serverList[Service::createServerKey($versionString)] = $serverUrl;
+            }
+        }
+
+        $removedServers = array_diff(array_keys($oldServerList), array_keys($serverList));
 
         if (($count = $okapiConfig->countTaskUsageSum($removedServers)) > 0) {
-            $errorStr.= 'Unable to remove the server. It is already used by '.$count.' task(s).';
+            $errorStr .= ' Unable to remove the server. It is already used by '.$count.' task(s).';
             return false;
         }
 
         try {
-            $okapiConfig->updateServerUsedDefaults($newServerList);
-            $okapiConfig->cleanUpNotUsed($newServerList);
+            $okapiConfig->updateServerUsedDefaults($serverList);
+            $okapiConfig->cleanUpNotUsed($serverList);
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint | Zend_Db_Statement_Exception) {
             return false; //if config could not be updated, assume false here
         } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
             //do nothing, and return below true since all is fine, if config exists already
         }
+
+        // crucial: the new value must be overwritten in the reference
+        $newvalue = json_encode($serverList);
 
         return true;
     }

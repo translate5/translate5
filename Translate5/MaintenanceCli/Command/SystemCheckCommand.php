@@ -31,10 +31,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
-use MittagQI\Translate5\Service\Services;
 
 
 class SystemCheckCommand extends Translate5AbstractCommand
+//FIXME make a system:clean command or improve the check command to find and clean files not belonging to the installation
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'system:check';
@@ -89,11 +89,6 @@ class SystemCheckCommand extends Translate5AbstractCommand
         $validator = new \ZfExtended_Models_SystemRequirement_Validator($isInstallation);
         /* @var $validator \ZfExtended_Models_SystemRequirement_Validator */
         $results = $validator->validate($module);
-
-        // add the service checks as system checks when checking a setup installation
-        if(!$isInstallation){
-            Services::addServiceChecksAsSystemChecks($results, true);
-        }
 
         foreach($results as $module => $oneResult) {
             /* @var $oneResult \ZfExtended_Models_SystemRequirement_Result */

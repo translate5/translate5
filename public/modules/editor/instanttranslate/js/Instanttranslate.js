@@ -713,13 +713,16 @@ function translateText(textToTranslate, translationInProgressID){
             if (translationInProgressID !== latestTranslationInProgressID) {
                 return;
             }
+
+            clearAllErrorMessages(false);
+
             if (result.errors !== undefined && result.errors !== '') {
-                showTargetError(result.errors);
-            } else {
-                clearAllErrorMessages(false);
-                translateTextResponse = result.rows;
-                fillTranslation();
+                showTargetError(result.errors.join('<br/>'));
             }
+
+            translateTextResponse = result.rows;
+            fillTranslation();
+
             stopLoadingSign();
             currentRequest = null;
         },
@@ -1196,6 +1199,7 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
                 }
                 break;
         }
+
         $htmlFile += '<div class="box box__result__header '+$headerClassAddition+' font-size-big marginTop">';
             $htmlFile += $headerContent;
         $htmlFile += '</div>';
@@ -1203,6 +1207,13 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
         $htmlFile += '<div class="box box__result__content">';
             $htmlFile += '<p>'+$innerContent+'</p>';
         $htmlFile += '</div>';
+
+        if (taskData.errors.length > 0) {
+            $htmlFile += '<div class="box box__result__content">';
+            $htmlFile += '<a href="#" class="error toggle">' + Editor.data.languageresource.translatedStrings.errorOccurredDuringTranslation + ':</a><p class="toggle-body">' +
+                taskData.errors.join('<br />') + '</p>';
+            $htmlFile += '</div>';
+        }
 
         pretranslatedFiles.push($htmlFile);
     });
@@ -1212,6 +1223,7 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
     }
     
     $('#pretranslatedfiles').html(html);
+    setupErrorToggles();
     
     //for each pretranslated files task, update the progress bar
     //this will be done only if the task is in status import
@@ -1353,13 +1365,16 @@ function hideTranslations() {
 function showLanguageResourceSelectorError(errorMode) {
     $('#languageResourceSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
 }
+
 /***
  * Show the given error in the targetError container.
- * @param string error
+ *
+ * @param {String} errorText
  */
 function showTargetError(errorText) {
-    $('#targetError').html(errorText).show();
+    $('#targetError').append('<br />' + errorText).show();
 }
+
 function hideTargetError() {
     $('#targetError').html('').hide();
 }
@@ -1628,6 +1643,16 @@ function checkInstantTranslation() {
     }
     // Start translation:
     startTimerForInstantTranslation();
+}
+
+function setupErrorToggles() {
+    $('.box__result__content .toggle-body').hide();
+    $('.box__result__content .toggle').off('click').on('click', (event) => {
+        event.stopPropagation();
+        $(event.currentTarget).next().toggle();
+
+        return false;
+    });
 }
 
 // If we're not within an iframe

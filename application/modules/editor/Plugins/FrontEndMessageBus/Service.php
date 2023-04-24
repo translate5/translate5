@@ -60,7 +60,8 @@ final class Service extends DockerServiceAbstract
             $this->errors[] = 'There is no URL configured.';
             $checked = false;
         } else if (!$this->checkConfiguredServiceUrl($socketServerUrl)) {
-            $this->errors[] = 'The configured socket-server URL "' . $socketServerUrl . '" is not reachable.';
+            $this->warnings[] = 'The configured socket-server URL "' . $socketServerUrl . '" is not reachable';
+            $this->warnings[] = 'Can be ignored if the UI is working properly!';
             $checked = false;
         }
         return $checked;
