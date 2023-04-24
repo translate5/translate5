@@ -113,6 +113,36 @@ class editor_Models_Terminology_Models_TermModel extends editor_Models_Terminolo
         self::STAT_SUPERSEDED => 3,
         self::STAT_NOT_FOUND => 99,
     ];
+
+    /**
+     * If term's `processStatus` was changed to 'rejected',
+     * normativeAuthorization-attribute is set to 'deprecatedTerm' (it's created if not existed so far)
+     * so this property contains terms_attributes-record's data for that attribute
+     *
+     * @var array|null
+     */
+    protected ?array $normativeAuthorization = null;
+
+    /**
+     * Get normativeAuthorization-attribute's model instance if term's processStatus-prop was changed to 'rejected'
+     *
+     * @return editor_Models_Terminology_Models_AttributeModel|null
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getNormativeAuthorizationIfTermWasRejected() : ?editor_Models_Terminology_Models_AttributeModel {
+
+        // If record data for that attribute was previously set
+        if ($this->normativeAuthorization) {
+
+            // Load and return model instance
+            $na = ZfExtended_Factory::get(editor_Models_Terminology_Models_AttributeModel::class);
+            $na->load($this->normativeAuthorization['id']);
+            return $na;
+        }
+
+        return null;
+    }
+
     /**
      * editor_Models_Terms_Term constructor.
      */
