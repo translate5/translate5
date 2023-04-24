@@ -48,7 +48,7 @@ div.x-container.x-container-default { position: initial; }
 .event-log-grid .x-grid-row .x-grid-cell .x-grid-cell-inner,
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
 	color:#000000;
-  	white-space: normal;
+  	white-space: pre-wrap;
 }
 
 .mono {
