@@ -50,15 +50,18 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
         $this->result->name = 'Configuration';
         
         $this->checkServerName();
+        $this->checkServerAccessibility();
         // TODO how to test APPLICATION_RUNDIR??? (not easy since configured in apache)
         return $this->result;
     }
-    
+
     /**
      * The php and the mysql timezone must be set to the same value, otherwise we will get problems, see TRANSLATE-2030
-     * @param Zend_Db_Adapter_Abstract $db
+     * @throws Zend_Cache_Exception
+     * @throws Zend_Exception
      */
-    protected function checkServerName() {
+    protected function checkServerAccessibility(): void
+    {
         $config = Zend_Registry::get('config');
         $path = '/index/testserver';
         $url = ZfExtended_ApiClient::getServerBaseURL() . $path;
@@ -71,7 +74,7 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
         $curlErrorWorker = '';
         $output = $this->callUrl($url, $curlError);
         $hasWorkerUrl = !empty($config->runtimeOptions->worker->server);
-        if($hasWorkerUrl) {
+        if ($hasWorkerUrl) {
             $outputWorker = $this->callUrl($config->runtimeOptions->worker->server.$path, $curlErrorWorker);
         }
         
@@ -84,20 +87,21 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
             $error .= '  this could be a networking error,'.PHP_EOL;
             $error .= '  or a misconfiguration of server.protocol and server.name,'.PHP_EOL;
             $error .= '  or a misconfiguration of the webserver itself. '.PHP_EOL;
-            $error .= 'For SSL errors mostly an intermediate certificate is missing or use worker.server config if behind a SSL Proxy.'.PHP_EOL;
+            $error .= 'For SSL errors mostly an intermediate certificate is missing or use ';
+            $error .= 'worker.server config if behind a SSL Proxy.'.PHP_EOL;
             $error .= 'If your configured public server.name is not available from a internal connection'.PHP_EOL;
-            $error .= 'due network configuration reasons, consider to set the internal used worker.server configuration.'.PHP_EOL;
-            if($hasWorkerUrl) {
+            $error .= 'due network configuration reasons, consider to set the internal ';
+            $error .= 'used worker.server configuration.'.PHP_EOL;
+            if ($hasWorkerUrl) {
                 $this->result->warning[] = $error;
                 $output = $outputWorker;
-            }
-            else {
+            } else {
                 $this->result->error[] = $error;
                 return;
             }
         }
         
-        if($hasWorkerUrl && $outputWorker === false) {
+        if ($hasWorkerUrl && $outputWorker === false) {
             $error = 'The internal connection to Translate5 via the configured worker.server '.PHP_EOL;
             $error .= 'can not be established: URL '.$url.PHP_EOL.PHP_EOL;
             $error .= 'Connection error message: '.$curlErrorWorker.PHP_EOL.PHP_EOL;
@@ -112,15 +116,18 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
         
         $noMemCacheId = empty($output[0]) || $output[0] != Models_SystemRequirement_Modules_Configuration::MEMCACHE_ID;
         $noServerIdMatch = empty($output[1]) || $output[1] != $serverId;
-        if($noMemCacheId || $noServerIdMatch) {
+        if ($noMemCacheId || $noServerIdMatch) {
             $error = 'An internal connection to a Translate5 instance could be established: URL '.$url.PHP_EOL;
-            $error .= 'but it seems that this is not the translate5 instance from where the check-command was started!'.PHP_EOL;
-            $error .= ' this could be a misconfiguration of server.protocol and server.name (or worker.server if set)'.PHP_EOL;
+            $error .= 'but it seems that this is not the translate5 instance from where the check-command was started!';
+            $error .= PHP_EOL;
+            $error .= ' this could be a misconfiguration of server.protocol and server.name (or worker.server if set)';
+            $error .= PHP_EOL;
             $this->result->error[] = $error;
         }
     }
     
-    protected function callUrl(string $url, string &$curlError) {
+    protected function callUrl(string $url, string &$curlError): bool|string
+    {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_FAILONERROR, true);
@@ -133,10 +140,23 @@ class Models_SystemRequirement_Modules_Configuration extends ZfExtended_Models_S
         curl_setopt($curl, CURLOPT_TIMEOUT, 2);
         
         $result = curl_exec($curl);
-        if($result === false) {
+        if ($result === false) {
             $curlError = curl_error($curl);
             return false;
         }
         return $result;
+    }
+
+    private function checkServerName()
+    {
+        $config = Zend_Registry::get('config');
+        $configuredHost = $config->runtimeOptions->server->name;
+        $apphost = getenv('APP_HOST');
+        if (is_string($apphost) && $apphost != $configuredHost) {
+            $this->result->error[] = 'Configured hostname in runtimeOptions.server.name is: '.$configuredHost.
+                PHP_EOL.'and differs to the configured APP_HOST in your docker environment: '.$apphost;
+            $this->result->badSummary[] = 'Usually APP_HOST was changed after installation, so please call: '.
+                ' t5 config runtimeOptions.server.name "'.$apphost.'"';
+        }
     }
 }
