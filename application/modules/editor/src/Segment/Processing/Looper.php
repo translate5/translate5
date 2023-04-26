@@ -149,7 +149,6 @@ final class Looper
      */
     public function setUnprocessedStates(array $problematicStates, int $errorState, bool $doDebug = false)
     {
-        $this->state->beginTransaction();
         foreach ($problematicStates as $state) {
             if ($state->getState() != State::PROCESSED) {
                 $state->setState($errorState);
@@ -158,7 +157,6 @@ final class Looper
                 }
             }
         }
-        $this->state->commitTransaction();
     }
 
     /**
