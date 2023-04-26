@@ -150,8 +150,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 checked: (Editor.app.getTaskConfig('editor.toolbar.showHideCharCounter') == 1), // the default can be set by config, overwritable on system & customer level
                 wasCheckedChanged: false,
                 bind: {
+                    disabled: '{isEditingSegment}',
                     text: '{l10n.segmentGrid.toolbar.showCharacterCounter}',
-                    tooltip: '{l10n.segmentGrid.toolbar.showCharacterCounterTooltip}'
+                    tooltip: '{isEditingSegment ? l10n.segmentGrid.toolbar.showCharacterCounterEditingTooltip : l10n.segmentGrid.toolbar.showCharacterCounterTooltip}'
                 },
                 listeners: {
                     checkchange : function() {

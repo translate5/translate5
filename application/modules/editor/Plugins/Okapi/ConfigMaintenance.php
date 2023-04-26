@@ -256,7 +256,7 @@ class ConfigMaintenance
      * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      */
-    public function setServerList(array $serverList): void
+    private function setServerList(array $serverList): void
     {
         $this->config->loadByName(self::CONFIG_SERVER);
         $this->config->setValue($this->toJson($serverList));
@@ -271,5 +271,45 @@ class ConfigMaintenance
     {
         $this->config->loadByName(self::CONFIG_SERVER);
         return $this->fromJson($this->config->getValue());
+    }
+
+    /**
+     * Purges the unused okapi config entries. Keeps either the latest one (by version) or the one given by name
+     * @param array $summary the current summary of configured Okapi instances
+     * @param string|null $nameToKeep if omitted keep the latest one (by version)
+     * @param bool $sortByVersion
+     * @return array returns the serverlist to be used after purging
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function purge(array $summary, string $nameToKeep = null, bool $sortByVersion = false): array
+    {
+        if ($sortByVersion) {
+            ksort($summary, SORT_NATURAL);
+        }
+
+        if (empty($nameToKeep)) {
+            $keys = array_keys($summary);
+            $nameToKeep = end($keys);
+        }
+
+        if (isset($summary[$nameToKeep])) {
+            //we just set a value here to keep the entry
+            $summary[$nameToKeep]['taskUsageCount'] = 1;
+        }
+
+        $serverList = array_map(
+            function ($item) {
+                return $item['url'];
+            },
+            array_filter($summary, function ($data) {
+                return ($data['taskUsageCount'] ?? 0) > 0 && !empty($data['url']);
+            })
+        );
+
+        $this->setServerList($serverList);
+        $this->cleanUpNotUsed($serverList);
+        return $serverList;
     }
 }

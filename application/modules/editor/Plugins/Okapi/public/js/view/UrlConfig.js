@@ -44,8 +44,8 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfig', {
     strings: {
         title: 'Edit Okapi instances',
         start: 'Start',
-        name:'Name',
-        url:'Url',
+        name: 'Name',
+        url: 'Url',
         add: 'add',
         save: 'Save',
         cancel: 'Cancel',
@@ -65,7 +65,7 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfig', {
         renderer: function(value) {
             var res = [];
             Ext.Object.each(value, function(key, item){
-                res.push(key+'('+item+')');
+                res.push(key + ' ('+item+')');
             });
             return res.join('<br/>');
         }
@@ -100,7 +100,10 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfig', {
                 plugins: [{
                     ptype: 'rowediting',
                     pluginId: 'urlConfigRowEditor',
-                    clicksToEdit: 2
+                    clicksToEdit: 2,
+                    listeners: {
+                        canceledit: 'onAddRowCancel'
+                    }
                 }],
                 border: false,
                 tbar: [{
@@ -117,18 +120,29 @@ Ext.define('Editor.plugins.Okapi.view.UrlConfig', {
                 columns: [{
                     header: me.strings.name,
                     dataIndex: 'id',
-                    flex:0.5,
+                    flex: 0.5,
                     editor: {
                         xtype: 'textfield',
+                        emptyText: 'NEW INSTANCE',
+                        editable: false,
                         itemId: 'id'
                     }
                 },{
                     header: me.strings.url,
                     dataIndex: 'url',
-                    flex:0.5,
+                    flex: 0.5,
                     editor: {
                         xtype: 'textfield',
-                        itemId: 'url'
+                        itemId: 'url',
+                        allowBlank: false,
+                        allowOnlyWhitespace: false,
+                        emptyText: 'https://',
+                        validator: function(url){
+                            if((url.startsWith('http://') || url.startsWith('https://')) && /\s/.test(url) === false){
+                                return true;
+                            }
+                            return 'No valid url';
+                        }
                     }
                 }],
                 store: Ext.create('Ext.data.ArrayStore', {

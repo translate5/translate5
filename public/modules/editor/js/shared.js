@@ -77,3 +77,21 @@ function logoutOnWindowClose() {
         //document.cookie = document.cookie.replace(rex, '; ').replace(/^; |; $/, '');
     }
 }
+
+/**
+ * Return `then` if $if == true, or return $else arg otherwise
+ *
+ * Usages:
+ * rif(123, 'Price is $1')                         will return 'Price is 123'
+ * rif(0, 'Price is $1')                           will return '' (empty string)
+ * rif(0, 'Price is $1', 'This is free item!')     will return 'This is free item!'
+ *
+ * @param $if
+ * @param then You can use '$1' expr as a reference to $if arg, so if,
+ *        for example $if arg is a string, it can be used as replacement for '$1' if in `then` arg
+ * @param $else
+ * @return {*}
+ */
+function rif($if, then, $else) {
+    return $if ? then.replace('$1', $if) : (arguments.length > 2 ? $else : '');
+}

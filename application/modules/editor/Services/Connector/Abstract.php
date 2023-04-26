@@ -545,4 +545,21 @@ abstract class editor_Services_Connector_Abstract {
         $langModel->load($this->targetLang);
         return $langModel->getRfc5646();
     }
+
+    protected function getServiceNameDisplayedInLog(): string
+    {
+        $showLanguageResourceName = (bool) $this->getConfig()
+            ->get('runtimeOptions')->LanguageResources->showNameInErrors;
+
+        if ($showLanguageResourceName && $this->languageResource) {
+            return 'Language resource ' . $this->languageResource->getName();
+        }
+
+        return $this->getResourceName();
+    }
+
+    protected function getResourceName(): string
+    {
+        return $this->getResource()->getName();
+    }
 }

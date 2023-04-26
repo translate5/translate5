@@ -39,6 +39,12 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
         }
     },
 
+    control: {
+        '#pricingPresetId': {
+            change: 'onPricingPresetChange'
+        }
+    },
+
     init : function() {
         var me=this;
         Ext.on({
@@ -57,7 +63,14 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
             return;
         }
         var view = this.getView();
-        view && view.setTask(newTask);
+        if (view) {
+
+            view.down('#unitType').suspendEvent('change');
+            view.down('#unitType').setValue(newTask.get('presetUnitType'));
+            view.down('#unitType').resumeEvent('change');
+            view.setTask(newTask);
+            view.down('#pricingPresetId').getStore().clearFilter();
+        }
     },
 
     /***
@@ -70,7 +83,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
             task = me.getView().task;
 
         params.taskGuid = task.get('taskGuid');
-        params.type = type.itemId;
+        params.type = type.xtype === 'menuitem' ? type.masterComponent.itemId : type.itemId;
         params.unitType = me.getView().down('#unitType').getValue();
         window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
     },
@@ -78,13 +91,18 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
     /***
      * On match analysis record is loaded in the store
      */
-    onAnalysisRecordLoad:function(store) {
+    onAnalysisRecordLoad:function(store, records, success, operation) {
         var me=this,
         	view=me.getView(),
             vm = view.getViewModel(),
             task = view.task,
         	record=store.getAt(0),
-            hasData = !!record;
+            hasData = !!record,
+            customerId = task.get('customerId'),
+            pricingPresetId = operation.getResultSet().getMetadata().pricingPresetId,
+            currency = operation.getResultSet().getMetadata().currency,
+            noPricing = operation.getResultSet().getMetadata().noPricing,
+            pricingPresetCombo = view.down('#pricingPresetId');
 
         vm.set('hasAnalysisData', hasData);
 
@@ -95,6 +113,40 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
             editFullMatch: task && task.get('edit100PercentMatch'),
             strings: view.strings
         });
+
+        // Update preset store and make certain preset to be selected, if need
+        if (!pricingPresetCombo.getStore() || customerId !== vm.get('customerId')) {
+            vm.set('customerId', customerId);
+            pricingPresetCombo.setStore(
+                Ext.getStore('pricingPresetStore').createImportWizardSelectionData(customerId)
+            );
+        }
+        pricingPresetCombo.suspendEvent('change');
+        pricingPresetCombo.setValue(pricingPresetId);
+        pricingPresetCombo.resumeEvent('change');
+
+        // Get preset
+        var preset = pricingPresetCombo.getSelection();
+        pricingPresetCombo.setDisabled(!preset);
+
+        // Set price adjustment and final amount
+        if (preset) {
+            vm.set({
+                priceAdjustment: preset.get('priceAdjustment'),
+                finalAmount: Ext.util.Format.number(
+                    preset.get('priceAdjustment') +
+                    (store.last()?.get('unitCountTotal') || 0), '0.00'),
+                currency: currency,
+                noPricing: noPricing
+            });
+        } else {
+            vm.set({
+                priceAdjustment: 0,
+                finalAmount: '0.00',
+                currency: '',
+                noPricing: true
+            });
+        }
     },
 
     /***
@@ -139,11 +191,60 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGridViewController', {
     /***
      * Unit type combo box select - event handler
      */
-    onUnitTypeSelect: function (){
+    onUnitTypeSelect: function (combo, type){
         var me = this,
             view = me.getView(),
-            store = view && view.getStore();
+            store = view && view.getStore(),
+            presetCombo = view.down('#pricingPresetId'),
+            presetStore = presetCombo.getStore(),
+            presetValueWas = presetCombo.getValue(),
+            presetValueNow = 0;
 
-        store && store.load();
+        presetStore.clearFilter();
+        presetStore.filterBy(function(record){
+            if (record.get('unitType') === type.get('id')) {
+                if (!presetValueNow) {
+                    presetValueNow = record.get('id');
+                }
+                return true;
+            }
+        });
+
+        if (presetValueWas === presetValueNow) {
+            store && store.load();
+        } else {
+            presetCombo.setValue(presetValueNow).setDisabled(!presetValueNow);
+            if (!presetValueNow) {
+                store && store.load();
+            }
+        }
+    },
+
+    onPricingPresetChange: function (combo, value) {
+        var me = this,
+            view = me.getView(),
+            task = view.task,
+            preset = combo.getSelection();
+
+        // If no preset - do nothing
+        if (!value) return;
+
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'taskmeta',
+            method: 'PUT',
+            params: {
+                id: task.get('taskGuid'),
+                data: Ext.encode({
+                    pricingPresetId: value
+                })
+            },
+            success: xhr => {
+                if (preset) {
+                    task.set('presetId', preset.get('id'));
+                    task.set('presetUnitType', preset.get('unitType'));
+                }
+                view.setTask(task)
+            }
+        });
     }
 });

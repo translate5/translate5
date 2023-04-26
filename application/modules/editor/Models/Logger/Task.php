@@ -144,4 +144,23 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract {
         $item['message'] = htmlspecialchars($item['message']);
         return $item;
     }
+
+    public function getErrorsByTaskGuidAndDomain(string $taskGuid, string $domain): array
+    {
+        $s = $this->db->select();
+        $s->where('taskGuid = ?', $taskGuid);
+        $s->where('domain = ?', $domain);
+        $s->where('level in (?)', [
+            ZfExtended_Logger::LEVEL_FATAL,
+            ZfExtended_Logger::LEVEL_ERROR,
+            ZfExtended_Logger::LEVEL_WARN
+        ]);
+
+        return array_map(
+            static function ($item) {
+                return htmlspecialchars($item['message']);
+            },
+            $this->loadFilterdCustom($s)
+        );
+    }
 }
