@@ -306,17 +306,23 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.previousRecord = rec;
         return true;
     },
-    
+
+    /**
+     * loads the record to edit into the HtmlEditor
+     * @param {Editor.model.Segment} record
+     */
     loadRecord: function(record) {
         var me = this;
         me.callParent(arguments);
-        
+
         me.setColumnToEdit(me.context.column);
+
         me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record, me.columnToEdit);
-        
-        //init internal markup table for tag check, but only if a translation task
+
+        // init the HtmlEditor's internal markup table for tag check, but only for a translation task
+        // we do not remove the ones already existing in the target what also will not overwrite existing ones
         if(Editor.data.task.get('emptyTargets')) {
-            me.mainEditor.insertMarkup(record.get('source'), true);
+            me.mainEditor.setMarkupImages(record.get('source'), true);
         }
     },
     

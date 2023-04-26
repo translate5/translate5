@@ -323,27 +323,29 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparision
     return result.join('');
   },
+
   /**
-   * Inserts the given string (containing div/span internal tags) at the cursor position in the editor
-   * If second parameter is true, the content is not set in the editor, only the internal tags are stored in an internal markup table (for missing tag check for example)
-   * @param {String} value
-   * @param {Boolean} initMarkupMapOnly optional, default false/omitted
+   * Fills the markupImages cache with the tags from the passed markup
+   * @param value {String}
+   * @param complementExisting {Boolean}
    */
-  insertMarkup: function(value, initMarkupMapOnly) {
-      if(initMarkupMapOnly) {
-          //reset markup table, we want to keep only the ones given here
+  setMarkupImages: function(value, complementExisting){
+      if(!complementExisting){
           this.markupImages = {};
       }
+      this.markup(value, [], complementExisting);
+  },
+
+  /**
+   * Inserts the given string (containing div/span internal tags) at the cursor position in the editor
+   * @param value {String}
+   */
+  insertMarkup: function(value) {
       var html = this.markup(value).join(''),
           doc = this.getDoc(),
           sel, range, frag, node, el, lastNode, rangeForNode,
           termTags, termTageNode, arrLength, i;
-      
-      //if that parameter is true, no html is inserted into the target column
-      if(initMarkupMapOnly) {
-          return;
-      }
-      
+
       if (!window.getSelection) {
           //FIXME Not supported by your browser message!
           return;
@@ -400,11 +402,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * Each call adds the found internal tags to the markupImages map.
    * @param value {String}
    * @param plainContent {Array} optional, needed for markupForEditor only
+   * @param complementExisting {Boolean} optional, leads to not oeverwriting existing image-map entries
    */
-  markup: function(value, plainContent) {
+  markup: function(value, plainContent, complementExisting) {
     var me = this,
-        tempNode = document.createElement('DIV'), // TODO: is using the main windows document OK here ?
-        plainContent = plainContent || [];
+        tempNode = document.createElement('DIV'); // TODO: is using the main windows document OK here ?
+    if(!plainContent){
+        plainContent = [];
+    }
 
     me.createRuler();
     me.result = [];
@@ -412,7 +417,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     value = value.replace(/ </g, Editor.TRANSTILDE+'<');
     value = value.replace(/> /g, '>'+Editor.TRANSTILDE);
     Ext.fly(tempNode).update(value);
-    me.replaceTagToImage(tempNode, plainContent);
+    me.replaceTagToImage(tempNode, plainContent, complementExisting);
     Ext.destroy(me.measure);
     me.destroyRuler();
     return me.result;
@@ -423,7 +428,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           shortPath: Editor.data.segments.shortTagPath
       };
   },
-  replaceTagToImage: function(rootnode, plainContent) {
+  replaceTagToImage: function(rootnode, plainContent, complementExisting) {
     var me = this,
         data = me.getInitialData();
     
@@ -449,16 +454,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                   // Keep nodes from TrackChanges, but run replaceTagToImage for them as well
                   me.result.push(openingTag);
                   plainContent.push(openingTag);
-                  me.replaceTagToImage(item, plainContent);
+                  me.replaceTagToImage(item, plainContent, complementExisting);
                   me.result.push(closingTag);
                   plainContent.push(closingTag);
                   break;
               case /(^|[\s])tmMatchGridResultTooltip([\s]|$)/.test(item.className):
                   // diffTagger-markups in Fuzzy Matches: keep the text from ins-Tags, remove del-Tags completely
                   if (item.tagName.toLowerCase() === 'ins') {
-                  	text = item.textContent.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
-                    me.result.push(Ext.htmlEncode(text));
-                    plainContent.push(Ext.htmlEncode(text));
+                  	var replacedText = item.textContent.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
+                    me.result.push(Ext.htmlEncode(replacedText));
+                    plainContent.push(Ext.htmlEncode(replacedText));
                   }
                   if (item.tagName.toLowerCase() === 'del') {
                   	// -
@@ -483,7 +488,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                 termdata.className = termdata.className.replace(/(transFound|transNotFound|transNotDefined)/, replacement);
             }
             me.result.push(me.applyTemplate('termspan', termdata));
-            me.replaceTagToImage(item, plainContent);
+            me.replaceTagToImage(item, plainContent, complementExisting);
             me.result.push('</span>');
             return;
       }
@@ -495,7 +500,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(item.tagName != 'DIV' || !/(^|[\s])internal-tag([\s]|$)/.test(item.className)){
           return;
       }
-      data = me.getData(item, data); 
+      data = me.getData(item, data, complementExisting);
       
       if(me.viewModesController.isFullTag() || data.whitespaceTag) {
           data.path = me.getSvg(data.text, data.fullWidth);
@@ -530,11 +535,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   
   /**
    * daten aus den tags holen
+   * TODO FIXME: this method should not be called "getData" as this has a common meaning in ExtJS and is misleading. For the Richtext editor rework, rename to "evaluateImageData"
    */
-  getData: function (item, data) {
+  getData: function (item, data, complementExisting) {
       var me = this,
           divItem, spanFull, spanShort, split,
-          sp, fp, //[short|full]Path shortcuts;
           shortTagContent;
       divItem = Ext.fly(item);
       spanFull = divItem.down('span.full');
@@ -568,16 +573,18 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       // get the dimensions of the inner spans
       this.measure(data);
-      //cache the data to be rendered via svg and the html for unmarkup
-      me.markupImages[data.key] = {
-          shortTag: data.shortTag,
-          fullTag: data.text,
-          fullWidth: data.fullWidth,
-          shortWidth: data.shortWidth,
-          whitespaceTag: data.whitespaceTag,
-          html: me.renderInternalTags(item.className, data)
-      };
 
+      //cache the data to be rendered via svg and the html for unmarkup
+      if(!complementExisting || !(data.key in me.markupImages)){
+          me.markupImages[data.key] = {
+              shortTag: data.shortTag,
+              fullTag: data.text,
+              fullWidth: data.fullWidth,
+              shortWidth: data.shortWidth,
+              whitespaceTag: data.whitespaceTag,
+              html: me.renderInternalTags(item.className, data)
+          };
+      }
       return data;
   },
   /**

@@ -178,7 +178,8 @@ Ext.define('Editor.controller.LanguageResources', {
           me.fireEvent('prepareCompleteReplace',matchRecord.get('target'),false); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
           editor.mainEditor.setValueAndMarkup(me.languageResourceValueForEditor, rec, editor.columnToEdit);
           if(Editor.data.task.get('emptyTargets')) {
-        	  editor.mainEditor.insertMarkup(rec.get('source'), true);
+              // this replaces the markupImages map already evaluated with the one from the source
+              editor.mainEditor.setMarkupImages(rec.get('source'), false);
     	  }
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
