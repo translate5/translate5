@@ -8928,6 +8928,26 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
               <target>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</target>
             </trans-unit>
+            <trans-unit id='QmVhcmJlaXRlbg=='>
+                <source>Bearbeiten</source>
+                <target>Bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='TMO2c2NoZW4='>
+                <source>Löschen</source>
+                <target>Löschen</target>
+            </trans-unit>
+            <trans-unit id='TmV1IGFubGVnZW4='>
+                <source>Neu anlegen</source>
+                <target>Neu anlegen</target>
+            </trans-unit>
+            <trans-unit id='S2xvbmVu'>
+                <source>Klonen</source>
+                <target>Klonen</target>
+            </trans-unit>
+            <trans-unit id='VW1iZW5lbm5lbg=='>
+                <source>Umbenennen</source>
+                <target>Umbenennen</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

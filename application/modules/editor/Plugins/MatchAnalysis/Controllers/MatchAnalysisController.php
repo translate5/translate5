@@ -79,20 +79,28 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
             'name' => 'created',
         ],[
             'name' => 'unitCountTotal',
-            'type' => 'int'
+            'type' => 'number'
         ]];
         foreach($this->entity->getFuzzyRanges() as $begin => $end) {
             $fieldConfig[] = [
                 'name' => (string) $begin,
                 'begin' => (string) $begin, //we just deliver begin and end in the field config to be used by the grid in the GUI then
                 'end' => (string) $end,
-                'type' => 'int',
+                'type' => 'number',
             ];
         }
 
+        // Get pricingPresetId
+        $meta = ZfExtended_Factory::get(editor_Models_Task_Meta::class);
+        $meta->loadByTaskGuid($taskGuid);
+        $pricingPresetId = $meta->getPricingPresetId();
+
         //the columns information is calculated from the field data in the GUI
         $this->view->metaData = [
-            "fields" => $fieldConfig
+            "fields" => $fieldConfig,
+            "pricingPresetId" => $pricingPresetId,
+            "currency" => $this->entity->getPricing()['currency'],
+            'noPricing' => $this->entity->getPricing()['noPricing']
         ];
     }
 
@@ -102,7 +110,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $params = $this->getAllParams();
 
         /* @var $task editor_Models_Task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task = ZfExtended_Factory::get(editor_Models_Task::class);
         $task->loadByTaskGuid($params['taskGuid']);
 
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -114,20 +122,40 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
 
         switch ($params["type"]) {
             case "exportExcel":
-                $rows = $this->entity->loadByBestMatchRate($params['taskGuid'],unitType: $this->getParam('unitType'));
-                $exporter = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_ExportExcel');
-                /* @var $exporter editor_Plugins_MatchAnalysis_Export_ExportExcel */
-                $exporter->generateExcelAndProvideDownload($task, $rows, $fileName);
+
+                // Get rows
+                $rows = $this->entity->loadByBestMatchRate(
+                    $params['taskGuid'],
+                    unitType: $this->getParam('unitType')
+                );
+
+                // Do export and download result file
+                ZfExtended_Factory
+                    ::get(editor_Plugins_MatchAnalysis_Export_ExportExcel::class)
+                    ->generateExcelAndProvideDownload($task, $rows, $fileName);
+
                 break;
             case "exportXml":
-                $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], false, $this->getParam('unitType'));
-                $exporter = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Export_Xml', [$task]);
-                /* @var $exporter editor_Plugins_MatchAnalysis_Export_Xml */
 
+                // Get rows
+                $rows = $this->entity->loadByBestMatchRate(
+                    $params['taskGuid'],
+                    false,
+                    $this->getParam('unitType')
+                );
+
+                // Get xml exported instance
+                /* @var $exporter editor_Plugins_MatchAnalysis_Export_Xml */
+                $exporter = ZfExtended_Factory::get(
+                    editor_Plugins_MatchAnalysis_Export_Xml::class,
+                    [$task, $this->entity->getFuzzyRanges()]
+                );
                 $exporter->setIsCharacterBased($this->getParam('unitType') === 'character');
 
+                // Do export
                 $x = $exporter->generateXML($rows, $params['taskGuid']);
 
+                // Download result
                 Header::sendDownload(
                     rawurlencode($fileName.' '.date('- Y-m-d').'.xml'),
                     'text/xml',
@@ -135,14 +163,14 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                     -1,
                     [ 'Expires' => '0' ]
                 );
+                echo $x->asXML();
 
                 //with XML formatting:
 //                 $dom = dom_import_simplexml($x)->ownerDocument;
 //                 $dom->formatOutput = true;
 //                 echo $dom->saveXML();
 //                 break;
-                
-                echo $x->asXML();
+
 
                 break;
             default :

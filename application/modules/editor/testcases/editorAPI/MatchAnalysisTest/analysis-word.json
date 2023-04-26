@@ -70,5 +70,43 @@
         "60": 0,
         "50": 0,
         "noMatch": 0
+    },
+    {
+        "resourceName": "Summary",
+        "resourceColor": "",
+        "resourceType": "",
+        "internalFuzzy": "",
+        "unitCountTotal": 114,
+        "104": 2,
+        "103": 0,
+        "102": 41,
+        "101": 17,
+        "100": 0,
+        "90": 30,
+        "80": 20,
+        "70": 0,
+        "60": 4,
+        "50": 0,
+        "noMatch": ""
+    },
+    {
+        "resourceName": "Amount",
+        "resourceColor": 0,
+        "resourceType": 0,
+        "internalFuzzy": 0,
+        "104": 0,
+        "103": 0,
+        "102": 0,
+        "101": 0,
+        "100": 0,
+        "90": 0,
+        "80": 0,
+        "70": 0,
+        "60": 0,
+        "50": 0,
+        "noMatch": 0,
+        "unitCountTotal": 0,
+        "priceAdjustment": 0,
+        "finalAmount": 0
     }
 ]

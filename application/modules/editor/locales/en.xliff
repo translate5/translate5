@@ -9105,6 +9105,26 @@ E-Mail: service@MittagQI.com</pre>
               <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
               <target>File format not supported for translator package.</target>
             </trans-unit>
+            <trans-unit id='QmVhcmJlaXRlbg=='>
+                <source>Bearbeiten</source>
+                <target>Edit</target>
+            </trans-unit>
+            <trans-unit id='TMO2c2NoZW4='>
+                <source>Löschen</source>
+                <target>Delete</target>
+            </trans-unit>
+            <trans-unit id='TmV1IGFubGVnZW4='>
+                <source>Neu anlegen</source>
+                <target>Create</target>
+            </trans-unit>
+            <trans-unit id='S2xvbmVu'>
+                <source>Klonen</source>
+                <target>Clone</target>
+            </trans-unit>
+            <trans-unit id='VW1iZW5lbm5lbg=='>
+                <source>Umbenennen</source>
+                <target>Rename</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

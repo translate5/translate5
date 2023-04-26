@@ -66,7 +66,10 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E2004"></a>E2004 | Validation | Value "{0}" of param "{1}" - is not in the list of allowed values    | There is the list of allowed values, but given value is <strong>not in</strong> that list            |
 | <a id="E2005"></a>E2005 | Validation | Value "{0}" of param "{1}" - is in the list of disabled values       | There is the list of disabled values, but given value is <strong>in</strong> that list               |
 | <a id="E2006"></a>E2006 | Validation | Value "{0}" of param "{1}" - is not unique. It should be unique.     | The given value already exists within certain column of certain database table                       |
-| <a id="E2007"></a>E2007 | Validation | Extension "{0}" of file "{1}" - is not in the list of allowed values | The file type uploaded in the termportal is not allowed                                              |
+| <a id="E2007"></a>E2007 | Validation | Extension "{0}" of file "{1}" - is not in the list of allowed values | The file type uploaded is not allowed                                              |
+| <a id="E2008"></a>E2008 | Validation | Object of type "{0}" already exists having key "{1}"                 | Given key should not be in use by any of existing records so far                                         |
+| <a id="E2009"></a>E2009 | Validation | Value "{0}" of param "{1}" should be minimum "{2}"                   | Greater value must be specified                                                                      |
+| <a id="E2009"></a>E2010 | Validation | Value "{0}" of param "{1}" should be maximum "{2}"                   | Less value must be specified                                                                         |
 
 
 ### Authentication
@@ -520,6 +523,8 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1168"></a>E1168  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized. | <br />
 | <a id="E1239"></a>E1239  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: Language resource &quot;{name}&quot; has status &quot;{status}&quot; and is not available for match analysis and pre-translations. | There is a problem with the associated language resource to be used for analysis and pre-translation. Please check status and details of the problem.
 | <a id="E1500"></a>E1500  | Plug-In MatchAnalysis | After waiting for {waitTime} seconds, the language resource is still not available.                                                                       | Language resource that is used for match analysis and pre-translation is not available. Please check status and details of the problem.
+| <a id="E1513"></a>E1513  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: Can't edit/delete system default pricing preset | Clone system default pricing preset instead, and then edit the cloned one
+| <a id="E1514"></a>E1514  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: You can't delete ranges from more than 1 preset per once | Make sure all ranges you're going to delete belong to single certain preset
 
 
 #### Plug-In NecTm

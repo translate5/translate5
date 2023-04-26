@@ -1126,6 +1126,10 @@ dl {
 #segment-grid .x-btn.x-item-disabled {
     pointer-events: all;
 }
+.fa-money-check-dollar:before {
+    font-family: FontAwesome5FreeSolid !important;
+    content: "\f53d" !important;
+}
 
 /***
 * Define the quality/spellcheck classes accessible outside the plugin context.
@@ -1178,6 +1182,9 @@ dl {
     padding-bottom: 2px;
 }
 
+.x-grid-row-editor [id^=numberfield] {
+    text-align: right;
+}
 .x-tab-bar .x-box-menu-after {
     top: -2px !important;
     left: -4px;
