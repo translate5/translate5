@@ -84,7 +84,7 @@ class Lock
         $log->debug('E0000', 'Task unlock: task unlock success', [
             'task' => $task
         ]);
-        return false;
+        return true;
     }
 
 }

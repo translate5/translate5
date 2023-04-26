@@ -294,6 +294,11 @@ Ext.define('Editor.controller.SegmentQualitiesBase', {
         let me = this;
         column.renderer = function (value, meta, record, rowIndex, colIndex, store) {
             setTimeout(function () {
+                // in case no segments grid exist, ignore the logic below.
+                // this can happen i the user leaves the task, and the timeout callback kicks in
+                if(!me.getSegmentGrid()){
+                    return;
+                }
                 if (me.getSegmentGrid().editingPlugin.context) {
                     return;
                 }

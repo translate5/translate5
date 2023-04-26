@@ -34,6 +34,20 @@ END LICENSE AND COPYRIGHT
  */
 
 /**
+ * Add the tabid to the request URL for debugging purposes
+ */
+Ext.define('Ext.overrides.data.proxy.Server', {
+    override: 'Ext.data.proxy.Server',
+    buildUrl: function(request) {
+        let url = this.callParent([request]);
+        if (window.tabQty) {
+            return Ext.String.urlAppend(url, 'tab=' + (window._tabId ?? 0));
+        }
+        return url;
+    }
+});
+
+/**
  * Fixing missing contains method for bufferedstores
  * needed for ext-6.0.0
  * recheck on update

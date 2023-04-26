@@ -30,6 +30,7 @@ namespace MittagQI\Translate5\Task\Export\Package;
 
 use editor_Models_Export_Worker;
 use editor_Models_Task;
+use MittagQI\Translate5\Task\Lock;
 use Throwable;
 use Zend_Registry;
 use ZfExtended_Authentication;
@@ -93,7 +94,7 @@ class Worker extends editor_Models_Export_Worker
 
     /**
      * inits a export to a given directory
-     * @param string $taskGuid
+     * @param editor_Models_Task $task
      * @param bool $diff
      * @param string $exportFolder
      * @return string the folder which receives the exported data
@@ -129,6 +130,9 @@ class Worker extends editor_Models_Export_Worker
         }
 
         try {
+
+            Lock::taskLock($this->task, Downloader::PACKAGE_EXPORT);
+
             $this->exportSource = ZfExtended_Factory::get(ExportSource::class, [
                 $this->task
             ]);
@@ -141,6 +145,9 @@ class Worker extends editor_Models_Export_Worker
                     'task' => $this->task
                 ]
             ]);
+
+            Lock::taskUnlock($this->task);
+
             throw $throwable;
         }
         return true;

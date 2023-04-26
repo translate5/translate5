@@ -16,6 +16,70 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.0.2] - 2023-04-20
+
+### Important Notes:
+#### [TRANSLATE-3048](https://jira.translate5.net/browse/TRANSLATE-3048)
+This Feature changes the way the T5-API can be accessed: An App-Token MUST be used from now on to request the API
+externally. t5connect must be setup to use App-Tokens !!
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3285](https://jira.translate5.net/browse/TRANSLATE-3285): Export - Lock task on export translator package** <br>
+Improve task locking when exporting translator package.
+
+**[TRANSLATE-3282](https://jira.translate5.net/browse/TRANSLATE-3282): TermPortal - Terms are not marked on imports with termcollection auto association** <br>
+Instances with default term collections associated it might happen that terms were not checked automatically after import.
+
+**[TRANSLATE-3281](https://jira.translate5.net/browse/TRANSLATE-3281): LanguageResources - Wildcard escape in collection search** <br>
+Mysql wildcards will be escaped when searching terms in term collection.
+
+**[TRANSLATE-3280](https://jira.translate5.net/browse/TRANSLATE-3280): Editor general - Fixing UI errors** <br>
+- Fix for error when switching customer in add task window and quickly closing the window with esc key. (me.selectedCustomersConfigStore is null)
+- Fix for error when "segment qualities" are still loading but the user already left/close the task. (this.getMetaFalPosPanel() is undefined)
+- Right clicking on disabled segment with spelling error leads to an error. (c is null_in_quality_context.json)
+- Applying delayed quality styles to segment can lead to an error in case the user left the task before the callback/response is evaluated.
+
+**[TRANSLATE-3279](https://jira.translate5.net/browse/TRANSLATE-3279): TermPortal - Logic of camelCase detection needs to be fixed** <br>
+Fixed the way of how picklist values are shown in GUI
+
+**[TRANSLATE-3277](https://jira.translate5.net/browse/TRANSLATE-3277): Main back-end mechanisms (Worker, Logging, etc.) - Division by zero error when calculating progress** <br>
+Solves problem with workers crash when calculating progress.
+
+**[TRANSLATE-3275](https://jira.translate5.net/browse/TRANSLATE-3275): Editor general - Improve logging for no access errors on opened tasks** <br>
+The user will get sometimes no access error when task is being opened for editing.  For that reason, the front-end error logging is improved.
+
+**[TRANSLATE-3256](https://jira.translate5.net/browse/TRANSLATE-3256): Editor general - False positive menu option stays visible on leaving the task** <br>
+Fixed floating FalsePositives-panel problem
+
+**[TRANSLATE-3227](https://jira.translate5.net/browse/TRANSLATE-3227): Task Management - Horizontal scrollbar in project wizard pop-up is missing** <br>
+Overflow menu is now turned On for most toolbars and tab-bars, including project wizard
+
+**[TRANSLATE-3061](https://jira.translate5.net/browse/TRANSLATE-3061): Test framework - FIX API Tests** <br>
+translate5 - 5.7.13
+ - Code refactoring for the testing environment. Improvements and fixes for API test cases.
+translate5 - 6.0.2
+ - Fixed config loading level in testing environment 
+
+
+**[TRANSLATE-3048](https://jira.translate5.net/browse/TRANSLATE-3048): Editor general - CSRF Protection for translate5** <br>
+translate5 - 6.0.0
+- CSRF (Cross Site Request Forgery) Protection for translate5 with a CSRF-token. Important info for translate5 API users: externally the translate5 - API can only be accessed with an App-Token from now on.
+
+translate5 - 6.0.2
+- remove CSRF protection for automated cron calls
+
+**[TRANSLATE-2993](https://jira.translate5.net/browse/TRANSLATE-2993): LanguageResources, TermPortal - Invalid TBX causes TermPortal to crash** <br>
+Empty termEntry/language/term attribute-nodes are now skipped if found in TBX-files
+
+**[TRANSLATE-2396](https://jira.translate5.net/browse/TRANSLATE-2396): Installation & Update - Diverged GUI and Backend version after update** <br>
+translate5 - 5.1.1 - The user gets an error message if the version of the GUI is older as the backend - which may happen after an update in certain circumstances. Normally this is handled due the usage of the maintenance mode.
+
+translate5 - 6.0.2 - Fixed missing version header on error handling. Additional fix: Return JSON on rest based exceptions instead just a string
+
+
 ## [6.0.1] - 2023-04-11
 
 ### Important Notes:
