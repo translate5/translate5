@@ -4,6 +4,10 @@
     <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
     <file original='php-sourcecode' source-language='ha' target-language='de' datatype='php' xml:space='preserve'>
         <body>
+            <trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='>
+                <source>{LinkConsortium}</source>
+                <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
+            </trans-unit>
             <trans-unit id='UnVzc2lzY2g='>
                 <source>Russisch</source>
                 <target>Russisch</target>
@@ -8923,6 +8927,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='RGFzIERhdGVpZm9ybWF0IHdpcmQgdm9tIMOcYmVyc2V0emVycGFrZXQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
               <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
               <target>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</target>
+            </trans-unit>
+            <trans-unit id='V2FybnVuZzogQml0dGUgdmVyd2VuZGVuIFNpZSBLRUlORSBTZWdtZW50enVzYW1tZW5mw7xocnVuZyBvZGVyIC1hdWZ0ZWlsdW5nIGluIGVpbmVtIGFuZGVyZW4gw5xiZXJzZXR6dW5nc3Rvb2wgbWl0IGRlbSBoZXJ1bnRlcmdlbGFkZW5lbiBQYWtldC4gVHJhbnNsYXRlNSB1bnRlcnN0w7x0enQga2VpbmUgU2VnbWVudHp1c2FtbWVuZsO8aHJ1bmcvLWF1ZnRlaWx1bmcgdW5kIHNvbGNoZSBTZWdtZW50ZSB3ZXJkZW4gYmVpbSBSZS1JbXBvcnQgaWdub3JpZXJ0Lg=='>
+              <source>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</source>
+              <target>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</target>
             </trans-unit>
         </body>
     </file>

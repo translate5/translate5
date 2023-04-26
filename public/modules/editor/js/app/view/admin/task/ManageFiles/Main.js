@@ -41,6 +41,11 @@ Ext.define('Editor.view.admin.task.ManageFiles.Main', {
                     title:'{l10n.projectOverview.taskManagement.taskManageFiles.title}',
                     disabled:'{disabledDuringTaskImport}'
                 },
+                tabBar: {
+                    layout: {
+                        overflowHandler: 'menu'
+                    }
+                },
                 items: [{
                     xtype: 'adminTaskReimportReimport',
                     bind: {

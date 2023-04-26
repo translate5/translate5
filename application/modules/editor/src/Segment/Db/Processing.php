@@ -80,7 +80,16 @@ final class Processing extends Zend_Db_Table_Abstract
         $tableName = $db->quoteIdentifier($this->_name);
         $column = $db->quoteIdentifier(State::createColumnName($serviceId));
         $row = $db->fetchRow('SELECT count(1) as overallSegs, SUM(IF(' . $column . ' > 2, 1, 0)) as processedSegs FROM ' . $tableName . ' WHERE `taskGuid` = ?', $taskGuid);
-        return intval($row['processedSegs']) / intval($row['overallSegs']);
+
+        $overallSegs = (int)$row['overallSegs'];
+        $processedSegs = (int)$row['processedSegs'];
+
+        // fix for ERROR in core: E9999 - Division by zero
+        if ($overallSegs === 0) {
+            return 1;
+        }
+
+        return $processedSegs / $overallSegs;
     }
 
     /**

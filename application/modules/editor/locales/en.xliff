@@ -4,6 +4,10 @@
     <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
     <file original="php-sourcecode" source-language="ha" target-language="en" datatype="php">
         <body>
+            <trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='>
+                <source>{LinkConsortium}</source>
+                <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
+            </trans-unit>
             <trans-unit id="w5xiZXJzZXR6dA==">
                 <source>&#xDC;bersetzt</source>
                 <target>Translated</target>
@@ -9100,6 +9104,10 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id='RGFzIERhdGVpZm9ybWF0IHdpcmQgdm9tIMOcYmVyc2V0emVycGFrZXQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
               <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
               <target>File format not supported for translator package.</target>
+            </trans-unit>
+            <trans-unit id='V2FybnVuZzogQml0dGUgdmVyd2VuZGVuIFNpZSBLRUlORSBTZWdtZW50enVzYW1tZW5mw7xocnVuZyBvZGVyIC1hdWZ0ZWlsdW5nIGluIGVpbmVtIGFuZGVyZW4gw5xiZXJzZXR6dW5nc3Rvb2wgbWl0IGRlbSBoZXJ1bnRlcmdlbGFkZW5lbiBQYWtldC4gVHJhbnNsYXRlNSB1bnRlcnN0w7x0enQga2VpbmUgU2VnbWVudHp1c2FtbWVuZsO8aHJ1bmcvLWF1ZnRlaWx1bmcgdW5kIHNvbGNoZSBTZWdtZW50ZSB3ZXJkZW4gYmVpbSBSZS1JbXBvcnQgaWdub3JpZXJ0Lg=='>
+              <source>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</source>
+              <target>Warning: Please do NOT use segment merge or splitting in another translation tool with the downloaded package. Translate5 does not support segment merge/split and such segments will be ignored on re-import.</target>
             </trans-unit>
         </body>
     </file>

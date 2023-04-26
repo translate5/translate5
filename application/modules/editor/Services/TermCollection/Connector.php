@@ -26,9 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Terminology\SearchCollection;
+
 /**
  */
-class editor_Services_TermCollection_Connector extends editor_Services_Connector_FilebasedAbstract {
+class editor_Services_TermCollection_Connector extends editor_Services_Connector_FilebasedAbstract
+{
 
     /**
      * If the query for the term had tags, the match rate must be less then 100% so that the user has to fix the tags
@@ -36,7 +39,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      */
     const TERMCOLLECTION_TAG_MATCH_VALUE = 99;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         //the translations from the term collections are with high priority, that is why 104 (this is the highest matchrate in translate5)
         $this->defaultMatchRate = self::TERMCOLLECTION_MATCH_VALUE;
@@ -46,9 +50,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(array $fileinfo = null,array $params=null): bool
+    public function addTm(array $fileinfo = null, array $params = null): bool
     {
-        if(empty($fileinfo)){
+        if (empty($fileinfo)) {
             //empty term collection
             return true;
         }
@@ -56,21 +60,21 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         // check and prepare the import files (handle the zip)
         $fileinfo = $this->prepareImportFiles($fileinfo);
 
-        if(empty($fileinfo)){
+        if (empty($fileinfo)) {
 
             return false;
         }
 
-        $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
+        $import = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $import editor_Models_Import_TermListParser_Tbx */
 
-        $import->mergeTerms=isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
+        $import->mergeTerms = isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
 
-        $userGuid=$params['userGuid'] ?? editor_User::instance()->getGuid();
+        $userGuid = $params['userGuid'] ?? editor_User::instance()->getGuid();
         $import->loadUser($userGuid);
 
         //import the term collection
-        if(!$import->parseTbxFile($fileinfo,$this->languageResource->getId())){
+        if (!$import->parseTbxFile($fileinfo, $this->languageResource->getId())) {
             $this->logger->error('E1321', 'Term Collection Import: Errors on parsing the TBX, the file could not be imported.');
             return false;
         }
@@ -85,7 +89,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * (non-PHPdoc)
      * @see editor_Services_Connector_Abstract::query()
      */
-    public function query(editor_Models_Segment $segment) {
+    public function query(editor_Models_Segment $segment)
+    {
         $qs = $this->getQueryStringAndSetAsDefault($segment);
         return $this->queryCollectionResults($this->tagHandler->prepareQuery($qs), true);
     }
@@ -94,9 +99,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * (non-PHPdoc)
      * @see editor_Services_Connector_Abstract::search()
      */
-    public function search(string $searchString, $field = 'source', $offset = null) {
-        $searchString='%'.$searchString.'%';
-        return $this->queryCollectionResults($searchString,false,$field);
+    public function search(string $searchString, $field = SearchCollection::SEARCH_SOURCE, $offset = null)
+    {
+        return $this->queryCollectionResults($searchString, false, $field, true);
     }
 
     /***
@@ -105,59 +110,86 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::translate()
      */
-    public function translate(string $searchString){
+    public function translate(string $searchString)
+    {
         return $this->queryCollectionResults($searchString);
     }
 
     /***
      * Search the terms in the term collection with the given query string
      * @param string $queryString
-     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
+     * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @param string $field optional, the field where the search will be performed
      * @return editor_Services_ServiceResult
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function queryCollectionResults($queryString, $reimportWhitespace = false,$field='source'){
-        if(empty($queryString) && $queryString !== "0") {
+    protected function queryCollectionResults(
+        string $queryString,
+        bool   $reimportWhitespace = false,
+        string $field = SearchCollection::SEARCH_SOURCE,
+        bool   $useWildcards = false
+    )
+    {
+
+        if (empty($queryString) && $queryString !== '0') {
             return $this->resultList;
         }
-        $entity=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $entity editor_Models_TermCollection_TermCollection */
+        $entity = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
         $entity->load($this->languageResource->getId());
 
-        $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang,$field);
+        /***
+         * Search the current term collection with given query string. All fuzzy languages will be included in the
+         * search.('en' as search language will result with search using 'en','en-US','en-GB' etc.)
+         * Result will be listed only if there is matching term in the opposite language:
+         * Example if there is a match for term in source(de), and in the same term entry,
+         * there is term in the opposite language(en), than this
+         */
+        $searchCollection = ZfExtended_Factory::get(SearchCollection::class, [
+            $entity->getId(),
+            $this->sourceLang,
+            $this->targetLang
+        ]);
+        $searchCollection->setSearchField($field);
+        $results = $searchCollection->search($queryString,$useWildcards);
 
         //load all available languages, so we can set the term rfc value to the frontend
-        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $langModel editor_Models_Languages */
-        $lngs=$langModel->loadAllKeyValueCustom('id','rfc5646');
+        $lngs = $langModel->loadAllKeyValueCustom('id', 'rfc5646');
 
-        $groupids=array_column($results, 'termEntryId');
-        $groupids=array_unique($groupids);
-
-        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Terminology_Models_TermModel */
-        $definitions=$term->getDeffinitionsByEntryIds($groupids);
+        $groupids = array_column($results, 'termEntryId');
+        $groupids = array_unique($groupids);
 
         $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         /* @var $term editor_Models_Terminology_Models_TermModel */
-        $groups=$term->sortTerms([$results]);
-        foreach ($groups as $group){
-            foreach ($group as $res){
+        $definitions = $term->getDeffinitionsByEntryIds($groupids);
+
+        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $term editor_Models_Terminology_Models_TermModel */
+        $groups = $term->sortTerms([$results]);
+        foreach ($groups as $group) {
+            foreach ($group as $res) {
                 //add all available definitions from the term termEntry
-                if(isset($definitions[$res['termEntryId']])){
-                    $res['definitions']=$definitions[$res['termEntryId']];
+                if (isset($definitions[$res['termEntryId']])) {
+                    $res['definitions'] = $definitions[$res['termEntryId']];
                 }
                 //convert back to array
-                $matchRate = ($this->tagHandler->getRealTagCount() > 0) ? self::TERMCOLLECTION_TAG_MATCH_VALUE : $this->defaultMatchRate;
-                if($reimportWhitespace) {
+                $matchRate = ($this->tagHandler->getRealTagCount() > 0) ?
+                    self::TERMCOLLECTION_TAG_MATCH_VALUE : $this->defaultMatchRate;
+                if ($reimportWhitespace) {
                     $res['term'] = $this->tagHandler->restoreInResult($res['term']);
                 }
-                if(isset($res['language'])){
+                if (isset($res['language'])) {
                     $res['languageRfc'] = $lngs[$res['languageId']] ?? null;
                 }
-                //set the default source and the result depending of where the search is triggered
-                $this->resultList->setDefaultSource($field == 'source' ? $res['default'.$field] : $res['term']);
-                $this->resultList->addResult($field == 'source' ? $res['term'] : $res['default'.$field],$matchRate,$res);
+                //set the default source and the result depending on where the search is triggered
+                $this->resultList->setDefaultSource($field === SearchCollection::SEARCH_SOURCE
+                    ? $res['default' . $field] : $res['term']);
+
+                $this->resultList->addResult(
+                    $field === SearchCollection::SEARCH_SOURCE ? $res['term'] : $res['default' . $field],
+                    $matchRate,
+                    $res);
             }
         }
 
@@ -168,13 +200,14 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource){
-        if(!isset($this->languageResource)){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource)
+    {
+        if (!isset($this->languageResource)) {
             //this should come from the resource status check in the resources api request
             return self::STATUS_AVAILABLE;
         }
         $status = $this->languageResource->getSpecificData('status');
-        if(empty($status)){
+        if (empty($status)) {
             return self::STATUS_AVAILABLE;
         }
         return $status;
@@ -184,19 +217,20 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * Run post import functions.
      * @param array $params
      */
-    protected function doAfterImport(array $params){
+    protected function doAfterImport(array $params)
+    {
 
-        $termModel=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         /* @var $termModel editor_Models_Terminology_Models_TermModel */
-        $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
         $validator = new Zend_Validate_Date();
         $validator->setFormat('Y-m-d H:i:s');
 
         //delete collection term entries older than the parameter date
-        if(isset($params['deleteTermsLastTouchedOlderThan']) && !empty($params['deleteTermsLastTouchedOlderThan'])){
+        if (isset($params['deleteTermsLastTouchedOlderThan']) && !empty($params['deleteTermsLastTouchedOlderThan'])) {
 
-            if(!$validator->isValid($params['deleteTermsLastTouchedOlderThan'])){
+            if (!$validator->isValid($params['deleteTermsLastTouchedOlderThan'])) {
                 $params['deleteTermsLastTouchedOlderThan'] = date('Y-m-d H:i:s', strtotime($params['deleteTermsLastTouchedOlderThan']));
             }
             $termModel->removeOldTerms([$this->languageResource->getId()], $params['deleteTermsLastTouchedOlderThan']);
@@ -204,29 +238,29 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime($params['deleteTermsLastTouchedOlderThan']));
         }
 
-        $deleteOlderThanCurrentImport=isset($params['deleteTermsOlderThanCurrentImport']) && filter_var($params['deleteTermsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
+        $deleteOlderThanCurrentImport = isset($params['deleteTermsOlderThanCurrentImport']) && filter_var($params['deleteTermsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
         //delete termcollection terms older then current import date
-        if($deleteOlderThanCurrentImport){
+        if ($deleteOlderThanCurrentImport) {
             $termModel->removeOldTerms([$this->languageResource->getId()], NOW_ISO);
             //clean the old tbx files from the disc
             $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime(NOW_ISO));
         }
 
         //check if the delete proposal older than date is set
-        $deleteProposalsDate=null;
-        if(!empty($params['deleteProposalsLastTouchedOlderThan']) && !$validator->isValid($params['deleteProposalsLastTouchedOlderThan'])){
+        $deleteProposalsDate = null;
+        if (!empty($params['deleteProposalsLastTouchedOlderThan']) && !$validator->isValid($params['deleteProposalsLastTouchedOlderThan'])) {
             //the date is set but it is not in the required format
             $deleteProposalsDate = date('Y-m-d H:i:s', strtotime($params['deleteProposalsLastTouchedOlderThan']));
         }
 
         //the delet proposals older than the current import is set, use the now_iso as reference date
-        $deleteProposalsOlderThanCurrentImport=isset($params['deleteProposalsOlderThanCurrentImport']) && filter_var($params['deleteProposalsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
-        if(empty($deleteProposalsDate) && $deleteProposalsOlderThanCurrentImport){
-            $deleteProposalsDate=NOW_ISO;
+        $deleteProposalsOlderThanCurrentImport = isset($params['deleteProposalsOlderThanCurrentImport']) && filter_var($params['deleteProposalsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
+        if (empty($deleteProposalsDate) && $deleteProposalsOlderThanCurrentImport) {
+            $deleteProposalsDate = NOW_ISO;
         }
 
         //delete term proposals
-        if(!empty($deleteProposalsDate)){
+        if (!empty($deleteProposalsDate)) {
 
             // Remove term proposals
             $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
@@ -236,11 +270,11 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             // Remove attribute proposals
             $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
             /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
-            $attribute->removeProposalsOlderThan([$this->languageResource->getId()],$deleteProposalsDate);
+            $attribute->removeProposalsOlderThan([$this->languageResource->getId()], $deleteProposalsDate);
         }
 
         //remove all empty term entries from the same term collection
-        $termEntry=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        $termEntry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
         /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
         $termEntry->removeEmptyFromCollection([$this->languageResource->getId()]);
     }
@@ -253,21 +287,21 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     protected function prepareImportFiles(array $fileInfo): array
     {
         $validator = new Zend_Validate_File_IsCompressed();
-        if(!$validator->isValid($fileInfo['tmp_name'])){
+        if (!$validator->isValid($fileInfo['tmp_name'])) {
             return [$fileInfo];
         }
 
         $zip = new ZipArchive();
-        if (! $zip->open($fileInfo['tmp_name'])) {
+        if (!$zip->open($fileInfo['tmp_name'])) {
             // Zip file could not be opened
-            $this->logger->error('E1358', 'Term Collection Import: Unable to open zip file from file-path:'.$fileInfo['tmp_name']);
+            $this->logger->error('E1358', 'Term Collection Import: Unable to open zip file from file-path:' . $fileInfo['tmp_name']);
             return [];
         }
 
         $filename = pathinfo($fileInfo['name'], PATHINFO_FILENAME);
 
-        $newPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.$filename;
-        if (! $zip->extractTo($newPath)) {
+        $newPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
+        if (!$zip->extractTo($newPath)) {
             //Content from zip file could not be extracted
             $this->logger->error('E1359', 'Term Collection Import: Content from zip file could not be extracted.');
             return [];
@@ -275,7 +309,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $zip->close();
 
         // list all extracted tbx files from the location
-        $list = glob($newPath.DIRECTORY_SEPARATOR."*.tbx");
+        $list = glob($newPath . DIRECTORY_SEPARATOR . "*.tbx");
 
         $newFileInfo = [];
 
@@ -292,10 +326,11 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
      */
-    public function getValidFiletypes() {
+    public function getValidFiletypes()
+    {
         return [
             'ZIP' => ['application/zip'],
-            'TBX' => ['application/xml','text/xml'],
+            'TBX' => ['application/xml', 'text/xml'],
         ];
     }
 
@@ -317,11 +352,13 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addAdditionalTm()
      */
-    public function addAdditionalTm(array $fileinfo = null,array $params=null){
-        return $this->addTm($fileinfo,$params);
+    public function addAdditionalTm(array $fileinfo = null, array $params = null)
+    {
+        return $this->addTm($fileinfo, $params);
     }
 
-    public function getTm($mime){
+    public function getTm($mime)
+    {
 
     }
 }

@@ -179,7 +179,9 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                 dockedItems: [{
                     xtype: 'toolbar',
                     dock: 'bottom',
+                    enableOverflow: true,
                     ui: 'footer',
+                    defaultButtonUI: false,
                     itemId: 'analysisToolbar',
                     items: [{
                         xtype: 'button',

@@ -48,7 +48,7 @@ div.x-container.x-container-default { position: initial; }
 .event-log-grid .x-grid-row .x-grid-cell .x-grid-cell-inner,
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
 	color:#000000;
-  	white-space: normal;
+  	white-space: pre-wrap;
 }
 
 .mono {
@@ -1176,4 +1176,12 @@ dl {
 .t5quality[data-t5qfp="true"]{
     border-bottom: 1px solid limegreen;
     padding-bottom: 2px;
+}
+
+.x-tab-bar .x-box-menu-after {
+    top: -2px !important;
+    left: -4px;
+}
+.x-box-menu-after.x-btn-default-small .x-toolbar-more-icon {
+    color: white;
 }

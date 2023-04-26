@@ -188,6 +188,9 @@ Ext.define('Editor.view.project.ProjectGrid', {
         		dockedItems: [{
         	        xtype: 'toolbar',
         	        dock: 'top',
+                    border: 0,
+                    itemId: 'projectToolbar',
+                    enableOverflow: true,
         	        items: [{
         	            xtype: 'button',
         	            glyph: 'f2f1@FontAwesome5FreeSolid',

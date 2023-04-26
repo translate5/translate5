@@ -145,6 +145,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                     xtype: 'toolbar',
                     dock: 'bottom',
                     ui: 'footer',
+                    enableOverflow: true,
                     items: [{
                         xtype: 'button',
                         glyph: 'f1c3@FontAwesome5FreeSolid',

@@ -68,7 +68,7 @@ class Application {
     public function init(string $applicationEnvironment = 'application') {
         $cwd = getcwd();
         
-        $_SERVER['REQUEST_URI'] = '/database/forceimportall';
+        $_SERVER['REQUEST_URI'] = '/editor/index';
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['HTTP_HOST'] = 'localhost';
         defined('APPLICATION_PATH') || define('APPLICATION_PATH', $cwd.DIRECTORY_SEPARATOR.'application');

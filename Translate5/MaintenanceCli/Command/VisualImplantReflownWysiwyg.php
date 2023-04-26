@@ -74,10 +74,17 @@ class VisualImplantReflownWysiwyg extends Translate5AbstractCommand
         );
 
         $this->addOption(
-            name: 'overwrite',
+            name: 'overwrite-wysiwyg',
             shortcut: 'o',
             mode: InputOption::VALUE_NONE,
             description: 'If set, an existing reflown visual will be overwritten, otherwise the attempt to overweite creates an error'
+        );
+
+        $this->addOption(
+            name: 'overwrite-splitfile',
+            shortcut: 's',
+            mode: InputOption::VALUE_NONE,
+            description: 'If set, an existing split visual will be overwritten, otherwise the former solitary main visual is taken/renamed'
         );
     }
 
@@ -101,7 +108,8 @@ class VisualImplantReflownWysiwyg extends Translate5AbstractCommand
 
         $sourceTaskId = $this->input->getArgument('sourceid');
         $targetTaskIds = explode(',', str_replace(' ', '', $this->input->getArgument('targetids')));
-        $overwriteTarget = (bool)$this->input->getOption('overwrite');
+        $overwriteWysiwyg = (bool)$this->input->getOption('overwrite-wysiwyg');
+        $overwriteSplitfile = (bool)$this->input->getOption('overwrite-splitfile');
 
         if (empty($sourceTaskId) || empty($targetTaskIds)) {
             $this->io->error('Arguments missing');
@@ -112,28 +120,43 @@ class VisualImplantReflownWysiwyg extends Translate5AbstractCommand
             $sourceVisual = $this->fetchFirstVisualSourceFile(intval($sourceTaskId), null);
             $targetVisuals = [];
             foreach ($targetTaskIds as $taskId) {
-                $targetVisuals[] = $this->fetchFirstVisualSourceFile(intval($taskId), $sourceVisual->getSource(), $overwriteTarget);
+                $targetVisuals[] = $this->fetchFirstVisualSourceFile(intval($taskId), $sourceVisual->getSource(), $overwriteWysiwyg);
             }
         } catch (Throwable $e) {
             $this->io->error('There was a problem with the given task-id\'s: ' . $e->getMessage());
+            return static::FAILURE;
+        }
+        if(!$sourceVisual->hasSplitFile()){
+            $this->io->error('The source visual does not have a WYSIWYG');
             return static::FAILURE;
         }
         // copy the visuals, adjust the file-entities
         $sourcePath = $sourceVisual->getFile(true);
         foreach ($targetVisuals as $targetVisual) {
             $targetPath = $targetVisual->getFile(true);
-            if (!$targetVisual->hasSplitFile()) {
+            $targetHasSplit = $targetVisual->hasSplitFile();
+            if (!$targetHasSplit || $overwriteSplitfile) {
                 // create split & copy main file as split file
                 $splitFileName = $targetVisual->generateSplitFileName();
                 $targetVisual->setSplitFileName($splitFileName);
                 $targetVisual->setGenerator('reflow');
                 $targetVisual->save();
-                // make main to split file
-                rename($targetPath, $targetVisual->getSplitFile(true));
+                // implant the split file, either by renaming or overwriting
+                if($targetHasSplit){
+                    // overwrite
+                    copy($sourceVisual->getSplitFile(true), $targetVisual->getSplitFile(true));
+                    unlink($targetPath);
+                    $splitSuccess = 'implanted split file from "' . $sourceVisual->getSplitFile(true) . '" to "' . $targetVisual->getSplitFile(true) . '"';
+                } else {
+                    // make main to split file
+                    rename($targetPath, $targetVisual->getSplitFile(true));
+                    $splitSuccess = 'renamed main file to split file';
+                }
                 // implant main file, correct file-rights
                 copy($sourcePath, $targetPath);
                 $this->correctFileRights($targetPath, $sourcePath);
-                $this->io->success('Implanted wysiwyg-visual from "' . $sourcePath . '" to "' . $targetPath . '".');
+                $this->io->success('Implanted wysiwyg-visual from "' . $sourcePath . '" to "' . $targetPath . '", ' . $splitSuccess . '.');
+                
             } else {
                 // just overwrite main/wysiwyg file
                 @unlink($targetPath);
@@ -152,7 +175,7 @@ class VisualImplantReflownWysiwyg extends Translate5AbstractCommand
      * @throws Exception
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    private function fetchFirstVisualSourceFile(int $taskId, string $sourcePdf = null, bool $overwriteTarget = false): editor_Plugins_VisualReview_Source_FileEntity
+    private function fetchFirstVisualSourceFile(int $taskId, string $sourcePdf = null, bool $overwriteWysiwyg = false): editor_Plugins_VisualReview_Source_FileEntity
     {
         $task = new editor_Models_Task();
         $task->load($taskId);
@@ -175,7 +198,7 @@ class VisualImplantReflownWysiwyg extends Translate5AbstractCommand
             if ($sourceFile->getSource() !== $sourcePdf) {
                 throw new Exception('Target visual for task ' . $taskId . ', visual file ' . $sourceFileId . ', has a different source-PDF "' . $sourceFile->getSource() . '", expected "' . $sourcePdf . '"');
             }
-            if (!$overwriteTarget && ($sourceFile->hasSplitFile() || $sourceFile->getGenerator() !== 'pdf2html')) {
+            if (!$overwriteWysiwyg && ($sourceFile->hasSplitFile() || $sourceFile->getGenerator() !== 'pdf2html')) {
                 throw new Exception('Target visual for task ' . $taskId . ', visual file ' . $sourceFileId . ', already has a split file or has the wrong generator');
             }
         }

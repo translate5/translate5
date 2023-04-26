@@ -36,6 +36,11 @@ Ext.define('Editor.view.admin.projectWizard.UploadTabPanel', {
     ],
 
     layout:'fit',
+    tabBar: {
+        layout: {
+            overflowHandler: 'menu'
+        }
+    },
 
     initConfig: function(instanceConfig) {
         var me = this,

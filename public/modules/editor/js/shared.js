@@ -21,6 +21,9 @@ function tabQty(diff) {
         ls = localStorage,
         qty = parseInt(ls.getItem(key) || 0);
 
+    // Prevent negative from being return value
+    if (diff && qty + diff < 0) qty = 1;
+
     // Update qty if need
     if (diff) {
 
@@ -38,13 +41,8 @@ function tabQty(diff) {
 function logoutOnWindowClose() {
     var me = this;
 
-    // If logoutOnWindowClose-config is turned Off - do nothing
-    if (!Editor.data.logoutOnWindowClose) {
-        return;
-    }
-
     // Increment t5 app tabs qty
-    me.tabQty(+1);
+    window._tabId = me.tabQty(+1);
 
     // Bind handler on window beforeunload-event
     onbeforeunload = () => {
@@ -54,7 +52,7 @@ function logoutOnWindowClose() {
             return;
         }
 
-        // If logoutOnWindowClose-config is temporarily turned Off - do nothing
+        // If logoutOnWindowClose-config is (temporarily) turned Off - do nothing
         if (!Editor.data.logoutOnWindowClose) {
             return;
         }

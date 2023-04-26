@@ -131,7 +131,8 @@ trait TaskContextTrait
         //TODO if it turns out, that the checking of the jobs to find out if the user is allowed to access the taskid is to error prone,
         // then change to a taskid list of opened tasks in the session
         if (is_null($this->_currentJob)) {
-            throw new NoAccessException(); //ensures that no segments for example can be loaded if task was not opened properly
+            //ensures that no segments for example can be loaded if task was not opened properly
+            throw new NoAccessException(code: 423); //423 code to distinguish in UI and trigger logger there
         }
     }
 

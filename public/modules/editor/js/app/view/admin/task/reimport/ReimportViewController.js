@@ -52,7 +52,9 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
     },
 
     statics: {
-        exportTask: function (taskId){
+        exportTask: function (task){
+            var taskId = task.get('id');
+            task.set('state','PackageExport');
             window.open(Editor.data.restpath + Ext.String.format('task/export/id/{0}?format=package&t5ui=true', taskId), '_blank');
         }
     },
@@ -143,9 +145,8 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
     onExportTranslatorPackageClick: function (){
         var me = this,
             task = me.getView().task;
-        task.set('state','PackageExport');
 
-        Editor.view.admin.task.reimport.ReimportViewController.exportTask(task.get('id'));
+        Editor.view.admin.task.reimport.ReimportViewController.exportTask(task);
     },
 
     /***

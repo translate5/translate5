@@ -314,7 +314,29 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
         config.dockedItems = [{
             xtype: 'toolbar',
             dock: 'top',
+            enableOverflow: true,
             items: [
+                {
+                    xtype: 'textfield',
+                    width: 300,
+                    minWidth: 100,
+                    flex: 1,
+                    emptyText: me.strings.searchEmptyText,
+                    triggers: {
+                        clear: {
+                            cls: Ext.baseCSSPrefix + 'form-clear-trigger',
+                            handler: function(field){
+                                field.setValue(null);
+                                field.focus();
+                            },
+                            hidden: true
+                        }
+                    },
+                    listeners: {
+                        change: 'filterByText',
+                        buffer: 150
+                    }
+                },
                 {
                     xtype: 'button',
                     glyph: 'f093@FontAwesome5FreeSolid',
@@ -332,26 +354,6 @@ Ext.define('Editor.plugins.Okapi.view.BconfGrid', {
                     text: me.strings.refresh,
                     handler: function(btn){
                         btn.up('grid').getStore().getSource().reload();
-                    }
-                },
-                {
-                    xtype: 'textfield',
-                    width: 300,
-                    flex: 1,
-                    emptyText: me.strings.searchEmptyText,
-                    triggers: {
-                        clear: {
-                            cls: Ext.baseCSSPrefix + 'form-clear-trigger',
-                            handler: function(field){
-                                field.setValue(null);
-                                field.focus();
-                            },
-                            hidden: true
-                        }
-                    },
-                    listeners: {
-                        change: 'filterByText',
-                        buffer: 150
                     }
                 },
                 {
