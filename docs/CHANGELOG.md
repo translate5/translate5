@@ -17,6 +17,85 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.1.0] - 2023-04-26
+
+### Important Notes:
+#### [TRANSLATE-2991](https://jira.translate5.net/browse/TRANSLATE-2991)
+The "match rate boundaries" configuration in the system configuration and the clients overwrites is removed.
+If you changed the default configuration on system level or for certain clients, you need to manually redo the configuration in the new "Pricing match rates" configuration on system and/or client level.
+ 
+
+
+### Added
+**[TRANSLATE-3182](https://jira.translate5.net/browse/TRANSLATE-3182): Editor general - Show optionally character count for current open segment** <br>
+Added optional character counter for the segment-editor. By default it is invisible - unless the runtimeOptions.editor.toolbar.showHideCharCounter config is set to active. The counter can be activated by the user  in the segment grid settings menu
+
+**[TRANSLATE-2991](https://jira.translate5.net/browse/TRANSLATE-2991): Configuration, MatchAnalysis & Pretranslation - Pricing & match rate presets** <br>
+Sophisticated config options for calculating prices and defining custom match ranges are introduced.
+
+
+### Changed
+**[TRANSLATE-3246](https://jira.translate5.net/browse/TRANSLATE-3246): file format settings - Fixed naming scheme for OKAPI config entries** <br>
+Fixed naming scheme for Okapi Service Configuration Entries. In the frontend, no name must be defined anymore
+
+**[TRANSLATE-3225](https://jira.translate5.net/browse/TRANSLATE-3225): InstantTranslate - DeepL at times simply not answers requests leading to errors in T5 that suggest the app is malfunctioning** <br>
+Instant translate UI now shows errors happening with language resources during translation
+
+
+### Bugfixes
+**[TRANSLATE-3302](https://jira.translate5.net/browse/TRANSLATE-3302): Translate5 CLI - Notification mails are not translated when starting cron via CLI** <br>
+Internal translations were missing when calling cron via CLI.
+
+**[TRANSLATE-3298](https://jira.translate5.net/browse/TRANSLATE-3298): Main back-end mechanisms (Worker, Logging, etc.) - Version conflict when using multiple tabs** <br>
+Improve logging when translate5 is opened in multiple tabs and reduce log entries when a version conflict pops up.
+
+**[TRANSLATE-3297](https://jira.translate5.net/browse/TRANSLATE-3297): Import/Export - Corrupt skeleton file on reimport** <br>
+Fix for corrupted skeleton files after translator package was re-imported into a task.
+
+**[TRANSLATE-3296](https://jira.translate5.net/browse/TRANSLATE-3296): SpellCheck (LanguageTool integration) - Add config to prevent spellchecking non-editable / locked segments on import** <br>
+Enhancement: Add configuration to skip spellchecking for read-only segments on import
+
+**[TRANSLATE-3295](https://jira.translate5.net/browse/TRANSLATE-3295): TermTagger integration - Terms in Source are not identified in target and therefore falsly are flagged "not found"** <br>
+FIX: Terms in the segment source may have been falsely flagged as "not found in target"
+
+**[TRANSLATE-3294](https://jira.translate5.net/browse/TRANSLATE-3294): Editor general - Increase systemstatus timeout** <br>
+The system-check under preferences may run into a timeout if some services do not respond in a reasonable amount of time, therefore the timeout in the UI is increased and a proper error message is shown.
+
+
+**[TRANSLATE-3293](https://jira.translate5.net/browse/TRANSLATE-3293): Editor general - Stop trimming leading/trailing whitespaces on segment save** <br>
+Leading/trailing whitespaces will no longer be trimmed from the segment on save.
+
+**[TRANSLATE-3287](https://jira.translate5.net/browse/TRANSLATE-3287): Editor general - Protected spaces are being removed automatically, when saving** <br>
+FIX: protected spaces may be removed when saving a translated segment in the review
+
+**[TRANSLATE-3286](https://jira.translate5.net/browse/TRANSLATE-3286): Editor general - Error on trying to insert duplicate entry to DB** <br>
+Fixed throwing duplicate entry exception in ZfExtended/Models/Entity/Abstract
+
+**[TRANSLATE-3283](https://jira.translate5.net/browse/TRANSLATE-3283): TermPortal - Set for rejected term automatically the term attribute normativeAuthorization "deprecatedTerm"** <br>
+Fix for the problem where for a rejected term automatically the term attribute "normativeAuthorization" was not set to "deprecatedTerm".
+
+**[TRANSLATE-3278](https://jira.translate5.net/browse/TRANSLATE-3278): VisualReview / VisualTranslation - VisualReview sym link clean up** <br>
+Visual (code quality improvement): 
+- symbolic links are created as relative paths to simplify moving the data or application directory
+- improve cleanup of symbolic link
+
+**[TRANSLATE-3250](https://jira.translate5.net/browse/TRANSLATE-3250): TermPortal - Term translation project creation fails silently** <br>
+TermTranslation-project creation was just failing silently, if the PM user which was set as default PM for TermTranslation-projects was deleted before. 
+
+**[TRANSLATE-3058](https://jira.translate5.net/browse/TRANSLATE-3058): Main back-end mechanisms (Worker, Logging, etc.), SpellCheck (LanguageTool integration), TermTagger integration - Simplify termtagger and spellcheck workers** <br>
+translate5 - 6.0.0: 
+Improvement: TermTagger Worker & SpellCheck Worker are not queued dynamically anymore but according to the configured slots & looping through segments. This reduces deadlocks & limits processes 
+translate5 - 6.1.0:
+Improve behavior of Processing-State queries regarding deadlocks
+
+**[TRANSLATE-2063](https://jira.translate5.net/browse/TRANSLATE-2063): Import/Export - Enable parallele use of multiple okapi versions to fix Okapi bugs** <br>
+NEXT: Fixed docker autodiscovery not to overwrite existing config.
+5.9.0: Added dedicated CLI commands to maintain Okapi config.
+5.7.6: Multiple okapi instances can be configured and used for task imports.
+6.1.0: Enhancement: Fixed naming scheme for the keys of the Okapi Server Configuration entries
+
+
 ## [6.0.2] - 2023-04-20
 
 ### Important Notes:
