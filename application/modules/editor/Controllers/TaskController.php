@@ -1493,18 +1493,17 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->rows->workflowProgressSummary = $this->_helper->TaskStatistics->getWorkflowProgressSummary($this->entity);
     }
 
-    public function deleteAction() {
+    public function deleteAction()
+    {
         $forced = $this->getParam('force', false) && $this->isAllowed('backend', 'taskForceDelete');
         $this->entityLoad();
-
-        $this->checkStateDelete($this->entity,$forced);
+        $this->checkStateDelete($this->entity, $forced);
 
         //we enable task deletion for importing task
-        $forced=$forced || $this->entity->isImporting() || $this->entity->isProject();
+        $forced = $forced || $this->entity->isImporting() || $this->entity->isProject();
 
         $this->processClientReferenceVersion();
-        $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
-        /* @var $remover editor_Models_Task_Remover */
+        $remover = ZfExtended_Factory::get(editor_Models_Task_Remover::class, array($this->entity));
         $remover->remove($forced);
     }
 
