@@ -27,15 +27,19 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 use ZfExtended_Acl;
+
+
+
 use ZfExtended_Factory;
+use ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey;
 use ZfExtended_Models_User;
 use ZfExtended_Utils;
 
@@ -97,11 +101,8 @@ class UserCreateCommand extends UserAbstractCommand
      * {@inheritDoc}
      * @see \Symfony\Component\Console\Command\Command::execute()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->initInputOutput($input, $output);
-        $this->initTranslate5();
-
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         $this->allRoles = array_diff($acl->getAllRoles(), self::ROLES_FIXED);
@@ -110,7 +111,7 @@ class UserCreateCommand extends UserAbstractCommand
         $email = $this->input->getArgument('email');
         $this->writeTitle('Create user "'.$login.'"');
         
-        if(filter_var($login, FILTER_VALIDATE_EMAIL)) {
+        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
             $email = $login;
         }
         
@@ -124,50 +125,49 @@ class UserCreateCommand extends UserAbstractCommand
         $userModel->setGender($userModel::GENDER_NONE);
         $userModel->setLocale($this->input->getOption('locale'));
 
-        if($this->input->getOption('choose-roles')) {
-             $askRoles = new ChoiceQuestion('Choose one or more roles (comma separated, auto-completion with tab)', $this->allRoles, 'editor');
-             $askRoles->setMultiselect(true);
-             $roles = $this->io->askQuestion($askRoles);
-        }
-        else {
-            $roles = $this->input->getOption('roles');
-        }
-
-        $password = $this->input->getOption('password');
-        $passwordNotSet = true;
-        if(!empty('password')){
-            if(strlen($password) < 5){
-                $this->io->warning('The password is too short.');
-                return static::FAILURE;
-            }
-            $userModel->setPasswd(\ZfExtended_Authentication::getInstance()->createSecurePassword($password));
-            $passwordNotSet = false;
-        }
+        $roles = $this->input->getOption('choose-roles')
+            ? $this->askRoles('editor')
+            : $this->input->getOption('roles');
 
         $selectedRoles = array_intersect($roles, $this->allRoles);
         $acl = ZfExtended_Acl::getInstance();
         $userModel->setRoles($acl->mergeAutoSetRoles($selectedRoles, []));
 
-        $userModel->validate();
+        try {
+            $passwordNotSet = !$this->setUserPassword($userModel);
+
+            $userModel->validate();
+        } catch (Exception $e) {
+            $this->io->error($e->getMessage());
+
+            return static::FAILURE;
+        }
+
         try {
             $userModel->save();
-        }
-        catch(\ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-            if($e->isInMessage("for key 'login'")) {
-                throw new RuntimeException('login "'.OutputFormatter::escape($login).'" is in use already and can not be used again!');
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+            if ($e->isInMessage("for key 'login'")) {
+                throw new RuntimeException(
+                    'login "'.OutputFormatter::escape($login).'" is in use already and can not be used again!'
+                );
             }
+
             throw $e;
         }
         // if no password was set, we send an email
-        if($passwordNotSet){
+        if ($passwordNotSet) {
             $mailer = new \ZfExtended_TemplateBasedMail();
             $mailer->setTemplate('userHandlepasswdmail.phtml');
             $mailer->sendToUser($userModel);
         }
 
-
         $this->printOneUser($userModel->getDataObject());
 
-        return 0;
+        return static::SUCCESS;
+    }
+
+    protected function allRoles(): array
+    {
+        return $this->allRoles;
     }
 }
