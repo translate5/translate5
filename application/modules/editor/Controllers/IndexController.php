@@ -474,15 +474,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
                 editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED
         ]);
 
-        //find all service names and set it to frontend var
-        $services = ZfExtended_Factory::get(editor_Services_Manager::class);
-        $allServices = $services->getAll();
-        $serviceNames = [];
-        foreach ($allServices as $s) {
-            $sm = ZfExtended_Factory::get($s . '_Service');
-            $serviceNames[] = $sm->getName();
-        }
-        $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $serviceNames);
+        $serviceManager = ZfExtended_Factory::get(editor_Services_Manager::class);
+
+        $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $serviceManager->getAllNames());
     }
 
     /**
