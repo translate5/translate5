@@ -64,7 +64,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             view=me.getView(),
             serviceName=field.getSelection() && field.getSelection().get('serviceName'),
             resourceType=field.getSelection() && field.getSelection().get('resourceType'),
-            engines = field.getSelection() && field.getSelection().get('engines'),
+            engineBased = field.getSelection() && field.getSelection().get('engineBased'),
             helppage = field.getSelection() && field.getSelection().get('helppage'),
             vm=view.getViewModel(),
             engineCombo=view.down('#engine');
@@ -75,18 +75,22 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         
         vm.set('serviceName',serviceName);
         vm.set('resourceType',resourceType);
-        vm.set('engines', engines);
+        vm.set('engineBased', engineBased);
 
         // upload field has different tooltip and label based on the selected resource
         me.updateUploadFieldConfig();
 
         let record = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(resource);
 
-        if (me.isEngineResource(record)) {
+        if (me.isEngineBasedResource(record)) {
             engineCombo.getStore().clearFilter();
             engineCombo.getStore().setProxy({
                 type: 'ajax',
                 url: Editor.data.restpath + 'languageresourceresource/' + record.get('serviceName') + '/engines',
+                reader : {
+                    rootProperty: 'rows',
+                    type : 'json'
+                },
             });
             engineCombo.getStore().load();
 
@@ -257,8 +261,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     /**
      * Is the current selected resource uses engines conception
      */
-    isEngineResource: function (resourceType) {
-        return resourceType.get('engines');
+    isEngineBasedResource: function (resourceType) {
+        return resourceType.get('engineBased');
     },
 
     /***

@@ -37,7 +37,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         serviceName: false,
         resourceType: false,
         uploadLabel:null,
-        engines: null,
+        engineBased: null,
     },
     stores: {
         customers: {
@@ -74,8 +74,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         }
     },
     formulas: {
-        isEngineResource: function (get) {
-            return get('engines');
+        isEngineBasedResource: function (get) {
+            return get('engineBased');
         },
         isTermCollectionResource: function (get) {
             return get('serviceName') === Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;

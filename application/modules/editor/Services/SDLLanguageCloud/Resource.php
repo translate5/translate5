@@ -36,7 +36,7 @@ class editor_Services_SDLLanguageCloud_Resource extends editor_Models_LanguageRe
         $this->analysable=true;//is used by match analysis
         $this->searchable = false; //forced to be non searchable (concordance search)
         $this->type = editor_Models_Segment_MatchRateType::TYPE_MT;
-        $this->engines = true;
+        $this->engineBased = true;
     }
 
     public function getConnector(): Connector

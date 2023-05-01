@@ -120,8 +120,8 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                         itemId: 'engine',
                         name: 'engines',
                         bind: {
-                            hidden: '{!isEngineResource}',
-                            disabled: '{!isEngineResource}'
+                            hidden: '{!isEngineBasedResource}',
+                            disabled: '{!isEngineBasedResource}'
                         },
                         allowBlank: false,
                         listeners: {
