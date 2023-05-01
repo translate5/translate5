@@ -91,6 +91,7 @@ class editor_Models_LanguageResources_Resource {
             'writable' => 'writable',
             'defaultColor' => 'defaultColor',
             'creatable' => 'creatable',
+            'engines' => 'engines'
     );
     
     /**
@@ -111,6 +112,8 @@ class editor_Models_LanguageResources_Resource {
      * @var bool
      */
     protected bool $creatable = true;
+
+    protected bool $engines = false;
     
     public function __construct($id, $name, $url) {
         $this->id = $id;
@@ -317,5 +320,10 @@ class editor_Models_LanguageResources_Resource {
     public function getCreatable(): bool
     {
         return $this->creatable;
+    }
+
+    public function getEngines(): bool
+    {
+        return $this->engines;
     }
 }

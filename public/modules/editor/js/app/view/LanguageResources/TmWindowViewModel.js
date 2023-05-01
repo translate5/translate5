@@ -36,7 +36,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     data: {
         serviceName: false,
         resourceType: false,
-        uploadLabel:null
+        uploadLabel:null,
+        engines: null,
     },
     stores: {
         customers: {
@@ -73,13 +74,13 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
         }
     },
     formulas: {
-        isSdlResource: function(get){
-            return get('serviceName') === Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
+        isEngineResource: function (get) {
+            return get('engines');
         },
-        isTermCollectionResource:function(get){
+        isTermCollectionResource: function (get) {
             return get('serviceName') === Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
         },
-        isTmResourceType:function(get){
+        isTmResourceType: function (get) {
             return get('resourceType') === Editor.util.LanguageResources.resourceType.TM;
         }
     }

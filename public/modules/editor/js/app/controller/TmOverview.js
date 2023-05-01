@@ -53,7 +53,7 @@ Ext.define('Editor.controller.TmOverview', {
     stores: [
         'Editor.store.LanguageResources.Resources',
         'Editor.store.LanguageResources.LanguageResource',
-        'Editor.store.LanguageResources.SdlEngine',
+        'Editor.store.LanguageResources.Engine',
         'Editor.store.LanguageResources.Logs'
     ],
     strings: {
@@ -616,13 +616,13 @@ Ext.define('Editor.controller.TmOverview', {
      * Set the labelText(domainCode) when engine with domain code is selected
      */
     handleEngineSelect: function (form) {
-        var sdlEngine = form.down('#sdlEngine').getSelection();
+        var engine = form.down('#engine').getSelection();
 
         //set the labelText field with the domain code if exist
-        if (sdlEngine) {
+        if (engine) {
             form.getForm().findField('specificData').setValue(JSON.stringify({
-                domainCode: sdlEngine.get('domainCode'),
-                engineName: sdlEngine.get('name')
+                domainCode: engine.get('domainCode'),
+                engineName: engine.get('name')
             }));
         }
 
