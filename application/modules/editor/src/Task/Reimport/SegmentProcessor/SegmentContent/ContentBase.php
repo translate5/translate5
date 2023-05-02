@@ -77,14 +77,27 @@ abstract class ContentBase
      * @param editor_Models_Task $task
      * @param ZfExtended_Models_User $user
      */
-    public function __construct(protected editor_Models_Task $task, protected array $segmentData, protected ZfExtended_Models_User $user)
+    public function __construct(
+        protected editor_Models_Task     $task,
+        protected array                  $segmentData,
+        protected ZfExtended_Models_User $user)
     {
         $this->sfm = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->sfm->initFields($this->task->getTaskGuid());
 
-        $this->segmentUpdater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$this->task, $this->user->getUserGuid()]);
-        $this->segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->diffTagger = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_TrackChanges', [$this->task, $this->user]);
+        $this->segmentUpdater = ZfExtended_Factory::get(
+            editor_Models_Segment_Updater::class,
+            [
+                $this->task, $this->user->getUserGuid()
+            ]
+        );
+        $this->segmentTagger = ZfExtended_Factory::get(editor_Models_Segment_InternalTag::class);
+        $this->diffTagger = ZfExtended_Factory::get(
+            editor_Models_Export_DiffTagger_TrackChanges::class,
+            [
+                $this->task, $this->user
+            ]
+        );
 
     }
 

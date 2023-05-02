@@ -30,6 +30,8 @@ namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
 
 use editor_Models_Segment;
 use editor_Models_Segment_AutoStates;
+use editor_Models_Segment_InternalTag;
+use ZfExtended_Factory;
 
 /**
  *
@@ -44,6 +46,9 @@ class ContentDefault extends ContentBase
     private bool $updateSegment = false;
 
     /**
+     * Save the collected content to the given segment. The segment will be updated/saved only if the new content
+     * is different from the current segment content.
+     *
      * @param editor_Models_Segment $segment
      * @return void
      */
@@ -64,11 +69,16 @@ class ContentDefault extends ContentBase
         $newSource = $this->getDataSource();
         if (!is_null($newSource) &&
             !$this->isContentEqual($this->segment->getFieldOriginal($this->sfm->getFirstSourceName()), $newSource)) {
+
             $this->updateSource($this->getDataSource());
             $this->updateSegment = true;
         }
 
-        if (!$this->isContentEqual($this->segment->getFieldEdited($this->sfm->getFirstTargetName()), $this->getDataTarget())) {
+        if (!$this->isContentEqual(
+            $this->segment->getFieldEdited(
+                $this->sfm->getFirstTargetName()),
+            $this->getDataTarget())) {
+
             $this->updateTarget($this->getDataTarget());
             $this->updateSegment = true;
         }
@@ -92,20 +102,24 @@ class ContentDefault extends ContentBase
     }
 
     /**
+     * Updates the segment target with the given content. In case of incorrect tag count, this will stil update
+     * the segment(the autoqa tag check should find this problem)
      * @param string $target
      * @return void
      */
     protected function updateTarget(string $target): void
     {
-        // restore org. tags; detect tag-map from t5 SOURCE segment. Only there all original tags are present.
-        $this->segmentTagger->protect($this->segment->getSource());
-        $newTarget = $this->segmentTagger->reapply2dMap($this->normalizeContent($target), $this->segmentTagger->getOriginalTags());
-
-        if ($this->isTrackChangesActive()) {
-            $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
-        }
-
-        $this->update($newTarget, $this->sfm->getFirstTargetName(), $this->sfm->getFirstTargetNameEdit());
+        $this->segmentTagger->updateSegmentContent($this->segment->getSource(), $target, function ($original, $target) {
+            if ($this->isTrackChangesActive()) {
+                $fieldOriginal = $this->segment->getFieldOriginal($this->sfm->getFirstTargetName());
+                $target = $this->diffTagger->diffSegment(
+                    $fieldOriginal,
+                    $target,
+                    date(NOW_ISO),
+                    $this->user->getUserName());
+            }
+            $this->update($target, $this->sfm->getFirstTargetName(), $this->sfm->getFirstTargetNameEdit());
+        },true,true);
     }
 
     /**
