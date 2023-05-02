@@ -71,23 +71,18 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         $this->view->rows = $result;
         $this->view->total = count($result);
     }
-    
+
     /**
-     * (non-PHPdoc)
-     * @see ZfExtended_RestController::postAction()
+     * {@inheritDoc}
      */
-    public function postAction(){
+    public function postAction(): void
+    {
         try {
             parent::postAction();
-            $this->fireAfterAssocChangeEvent('post' ,$this->entity);
-        }
-        catch(Zend_Db_Statement_Exception $e){
-            $m = $e->getMessage();
+            $this->fireAfterAssocChangeEvent('post', $this->entity);
+        } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
             //duplicate entries are OK, since the user tried to create it
-            if(strpos($m,'SQLSTATE') !== 0 || stripos($m,'Duplicate entry') === false) {
-                throw $e;
-            }
-            //but we have to load and return the already existing duplicate 
+            //but we have to load and return the already existing duplicate
             $this->entity->loadByTaskGuidAndTm($this->data->taskGuid, $this->data->languageResourceId);
             $this->view->rows = $this->entity->getDataObject();
         }
