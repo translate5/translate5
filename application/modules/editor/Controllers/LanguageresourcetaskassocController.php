@@ -133,7 +133,9 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         catch(ZfExtended_NotFoundException $e) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
                 'languageResourceId' => 'Die gewünschte Sprachressource gibt es nicht!'
-            ],['languageresourceId' => $this->data->languageResourceId]);
+            ],[
+                'languageresourceId' => $this->data->languageResourceId
+            ]);
         }
         $resource = $languageresource->getResource();
         
