@@ -1028,20 +1028,28 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return $this->db->fetchAll($s)->toArray();
     }
 
-    /***
-     * Update the terminologie flag based on if there is a term collection assigned as language resource to the task.
+    /**
+     * Update the terminology flag based on if there is a term collection assigned as language resource to the task.
      * @param string $taskGuid
-     * @param array $ignoreAssocs: the provided languageresources taskassoc ids will be ignored
+     * @param array $ignoreAssocs : the provided languageresources taskassoc ids will be ignored
      */
-    public function updateIsTerminologieFlag($taskGuid,$ignoreAssocs=array()){
-        $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
-        /* @var $service editor_Services_TermCollection_Service */
-        $assoc=ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
-        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
-        $result=$assoc->loadAssocByServiceName($taskGuid, $service->getName(),$ignoreAssocs);
-        $this->loadByTaskGuid($taskGuid);
-        $this->setTerminologie(!empty($result));
-        $this->save();
+    public function updateIsTerminologieFlag(string $taskGuid, array $ignoreAssocs = []): void
+    {
+        $service = ZfExtended_Factory::get(editor_Services_TermCollection_Service::class);
+        $assoc = ZfExtended_Factory::get(MittagQI\Translate5\LanguageResource\TaskAssociation::class);
+        $result = $assoc->loadAssocByServiceName($taskGuid, $service->getName(), $ignoreAssocs);
+        $hasTerminology = !empty($result);
+        //update DB directly
+        $this->db->update([
+            'terminologie' => $hasTerminology
+        ], [
+            'taskGuid = ?' => $taskGuid,
+        ]);
+
+        //if current instance holds that task, update that too
+        if ($this->getTaskGuid() === $taskGuid) {
+            $this->setTerminologie($hasTerminology);
+        }
     }
 
     /**

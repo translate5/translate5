@@ -25,7 +25,9 @@
 
  END LICENSE AND COPYRIGHT
  */
-
+use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetPrices;
+use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\PresetRange;
+use ZfExtended_Factory as Factory;
 /**
  * MatchAnalysis Entity Object
  *
@@ -91,6 +93,11 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      */
     protected array $fuzzyRanges = [];
 
+    /**
+     * Pricing info for current task's target language
+     */
+    protected array $pricing = [];
+
     /***
      * Load the result by best match rate. The results will be grouped in the followed groups:
      * Real groups:        103%, 102%, 101%, 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
@@ -106,27 +113,28 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      */
     public function loadByBestMatchRate(string $taskGuid, bool $groupData = true, ?string $unitType = null): array
     {
+        /* @var $task editor_Models_Task */
+        $task = Factory::get('editor_Models_Task');
+        $task->loadByTaskGuid($taskGuid);
+        $this->loadFuzzyBoundaries($task);
+
         //load the latest analysis for the given taskGuid
         /** @var editor_Plugins_MatchAnalysis_Models_TaskAssoc $analysisAssoc */
-        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        $analysisAssoc = Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($taskGuid);
         if (empty($analysisAssoc)) {
             return [];
         }
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        $this->loadFuzzyBoundaries($task);
 
         if(is_null($unitType) || $unitType === 'word'){
-            $unitType = self::UNIT_COUNT_WORD;
+            $unitTypeCol = self::UNIT_COUNT_WORD;
         }else if($unitType === 'character'){
-            $unitType = self::UNIT_COUNT_CHARACTER;
+            $unitTypeCol = self::UNIT_COUNT_CHARACTER;
         }else{
-            $unitType = self::UNIT_COUNT_WORD;
+            $unitTypeCol = self::UNIT_COUNT_WORD;
         }
 
-        $sqlV3 = 'SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.'.$unitType.') unitCount, SUM(bestRates.segCount) segCount
+        $sqlV3 = 'SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.'.$unitTypeCol.') unitCount, SUM(bestRates.segCount) segCount
                   FROM (
                     SELECT t1.*, 1 as segCount
                     FROM LEK_match_analysis AS t1
@@ -152,13 +160,78 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             ]];
         }
         if($groupData) {
-            return $this->groupByMatchrate($resultArray, $analysisAssoc);
+
+            // Get grouped data
+            $rows = $this->groupByMatchrate($resultArray, $analysisAssoc);
+
+            // Calculate and append summary row
+            $summary = [];
+            foreach ($rows as $row) {
+                foreach ($row as $prop => $value) {
+                    if (is_numeric($prop) || $prop == 'unitCountTotal' || $prop == 'noMatch') {
+                        $summary[$prop] = ($summary[$prop] ?? 0) + $value;
+                    } else if ($prop == 'resourceName'){
+                        $summary[$prop] = 'summary';
+                    } else {
+                        $summary[$prop] = '';
+                    }
+                }
+            }
+            $rows []= $summary;
+
+            // If requested unitType equals to current preset's unitType
+            // it means at least one preset exists having such unitType,
+            // so we add pricing row
+            if ($unitType == $this->pricing['unitType']) {
+
+                // Pricing row
+                $pricing = [];
+
+                // Calculate values for pricing row
+                foreach ($summary as $prop => $value) {
+                    if (is_numeric($prop)) {
+                        $pricing[$prop] = ($pricing[$prop] ?? 0) + round($value * $this->pricing['prices'][$prop], 2);
+                    } else if ($prop == 'noMatch') {
+                        $pricing[$prop] = ($pricing[$prop] ?? 0) + round($value * $this->pricing['noMatch'], 2);
+                    } else if ($prop == 'unitCountTotal') {
+                        // Skip that prop
+                    } else if ($prop == 'resourceName'){
+                        $pricing[$prop] = 'amount';
+                    } else {
+                        $pricing[$prop] = 0;
+                    }
+                }
+
+                // Get total, price adjustment and final amount
+                $pricing['unitCountTotal']  = round(array_sum($pricing), 2);
+                $pricing['priceAdjustment'] = (int) $this->pricing['priceAdjustment'];
+                $pricing['finalAmount'] = round($pricing['unitCountTotal'] + $pricing['priceAdjustment'], 2);
+
+                // Append pricing-row
+                $rows []= $pricing;
+            }
+
+            // Return
+            return $rows;
         }
         return $this->addLanguageResourceInfos($resultArray);
     }
 
     protected function loadFuzzyBoundaries(editor_Models_Task $task) {
-        $ranges = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->fuzzyBoundaries->toArray();
+
+        // Get pricing preset id for current task
+        $presetId = $ranges = $task->meta()->getPricingPresetId();
+
+        // Get ranges
+        $ranges = Factory::get(PresetRange::class)->getPairsByPresetId($presetId);
+
+        // Get pricing
+        $this->pricing = Factory::get(PresetPrices::class)->getPricesFor(
+            $presetId,
+            $task->getSourceLang(),
+            $task->getTargetLang()
+        );
+
         ksort($ranges);
         $this->fuzzyRanges = array_reverse($ranges, true);
         $this->fuzzyRanges['noMatch'] = 'noMatch';
@@ -173,7 +246,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     public function loadLastByTaskGuid(string $taskGuid)
     {
         //load the latest analysis for the given taskGuid
-        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        $analysisAssoc = Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($taskGuid);
         $s = $this->db->select()
@@ -252,7 +325,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     //protected function initResultArray($taskGuid,$internalFuzzy){
     protected function initResultArray(array $analysisData): array
     {
-        $taskAssoc = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
+        $taskAssoc = Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
         /* @var $taskAssoc MittagQI\Translate5\LanguageResource\TaskAssociation */
         $langResTaskAssocs = $taskAssoc->loadByTaskGuids([$analysisData['taskGuid']]);
 
@@ -288,7 +361,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
         $initGroups = [];
 
-        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $task = Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($analysisData['taskGuid']);
 
@@ -348,7 +421,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      */
     protected function getLanguageResourceCached(int $id): ?editor_Models_LanguageResources_LanguageResource {
         if(!array_key_exists($id, self::$languageResourceCache)) {
-            $lr = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            $lr = Factory::get('editor_Models_LanguageResources_LanguageResource');
             /* @var $lr editor_Models_LanguageResources_LanguageResource */
             try {
                 $lr->load($id);
@@ -362,9 +435,24 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 
     /**
      * returns the defined match rate ranges, from highest to lowest
+     *
+     * @param editor_Models_Task|null $task
      * @return array
      */
-    public function getFuzzyRanges(): array {
+    public function getFuzzyRanges(editor_Models_Task $task = null): array {
+
+        // If $task is given - load ranges according to task's pricing preset id
+        if ($task) {
+            $this->loadFuzzyBoundaries($task);
+        }
+
         return $this->fuzzyRanges;
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getPricing() {
+        return $this->pricing;
     }
 }

@@ -194,10 +194,13 @@ abstract class DockerServiceAbstract extends ServiceAbstract
      */
     public function setServiceUrlDown(string $serviceUrl): bool
     {
+        $allServices = $this->getServiceUrls();
         $downList = Services::getServiceDownList($this->getServiceId());
+        // make sure, the down list contains just configured entries
+        $downList = array_values(array_intersect($allServices, $downList));
         $downList[] = $serviceUrl;
         Services::saveServiceDownList($this->getServiceId(), $downList);
-        return (count($downList) >= count($this->getServiceUrls()));
+        return (count($downList) >= count($allServices));
     }
 
     /**

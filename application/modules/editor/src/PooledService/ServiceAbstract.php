@@ -230,16 +230,16 @@ abstract class ServiceAbstract extends DockerServiceAbstract
             }
             // detecting the url's to use
             $types = array_keys($pooledUrls);
+
+            //check the base host first
+            $this->updateUrlPool($pooledUrls, 'default', $host, $port, $path);
+
             for ($i = 1; $i <= $autodetect; $i++) {
                 $potentialHost = $host . '_' . $i . '.';
-                if ($this->isDnsSet($potentialHost, $port)) {
-                    $pooledUrls['default'][] = 'http://' . $potentialHost . ':' . $port . $path;
-                }
+                $this->updateUrlPool($pooledUrls, 'default', $potentialHost, $port, $path);
                 foreach ($types as $type) {
                     $potentialHost = $host . '_' . $type . '_' . $i . '.';
-                    if ($this->isDnsSet($potentialHost, $port)) {
-                        $pooledUrls[$type][] = 'http://' . $potentialHost . ':' . $port . $path;
-                    }
+                    $this->updateUrlPool($pooledUrls, $type, $potentialHost, $port, $path);
                 }
             }
             if (empty($pooledUrls['default'])) {
@@ -353,6 +353,30 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     private function filterDownedServiceUrls(array $serviceUrls): array
     {
-        return array_diff($serviceUrls, Services::getServiceDownList($this->getServiceId()));
+        return array_values(array_diff($serviceUrls, Services::getServiceDownList($this->getServiceId())));
+    }
+
+    /**
+     * Update the given URL pool
+     * @param array $urlPool
+     * @param string $type
+     * @param string $potentialHost
+     * @param string $port
+     * @param string $path
+     * @return bool
+     */
+    private function updateUrlPool(
+        array & $urlPool,
+        string $type,
+        string $potentialHost,
+        string $port,
+        string $path
+    ): bool
+    {
+        if ($this->isDnsSet($potentialHost, $port)) {
+            $urlPool[$type][] = 'http://' . $potentialHost . ':' . $port . $path;
+            return true;
+        }
+        return false;
     }
 }

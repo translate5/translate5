@@ -35,11 +35,11 @@ END LICENSE AND COPYRIGHT
 /**
  * Task Remover - on task deletion several things should happen, this is all encapsulated in this class
  */
-class editor_Models_Task_Remover {
-    /**
-     * @var editor_Models_Task
-     */
-    protected $task;
+final class editor_Models_Task_Remover {
+
+    private editor_Models_Task $task;
+
+    private ZfExtended_EventManager $eventManager;
     
     /**
      * Sets the task to be removed from system
@@ -47,6 +47,7 @@ class editor_Models_Task_Remover {
      */
     public function __construct(editor_Models_Task $task) {
         $this->task = $task;
+        $this->eventManager = ZfExtended_Factory::get(ZfExtended_EventManager::class, array(self::class));
     }
     
     /**
@@ -54,45 +55,20 @@ class editor_Models_Task_Remover {
      */
     public function remove($forced = false) {
         $taskGuid = $this->task->getTaskGuid();
-        $projectId = $this->task->getProjectId();
+        $projectId = (int) $this->task->getProjectId();
         $isProject = $this->task->isProject();
         if(empty($taskGuid)) {
             return false;
         }
         if($isProject && $projectId > 0){
-            $this->removeProject($projectId,$forced,true);
-        }else{
+            $this->removeProjectWithTasks($projectId, $forced, true);
+        } else {
             $this->removeTask($forced);
         }
 
-        // on import error project may not be created:
-        if(!is_null($projectId)) {
-            $this->cleanupProject($projectId);
-        }
-    }
-    
-    /**
-     * Removes a task from translate5 regardless of its task and locking state
-     * @param bool $removeFiles optional, per default true, data directory is removed, if false data directory remains on disk
-     */
-    public function removeForced($removeFiles = true) {
-        $taskGuid = $this->task->getTaskGuid();
-        $projectId = $this->task->getProjectId();
-        $isProject = $this->task->isProject();
-        if(empty($taskGuid)) {
-            return false;
-        }
-        //tries to lock the task, but delete it regardless if could be locked or not.
-        $this->task->lock(NOW_ISO);
-
-        if(!$isProject){
-            $this->removeTask(true,$removeFiles);
-        }else{
-            $this->removeProject($projectId,true,$removeFiles);
-        }
-
-        // on import error project may not be created:
-        if(!is_null($projectId)) {
+        // on import error project may not be created
+        // TODO FIXME: why is that called ? It seems this case can not happen as everything is removed already with the code above ...
+        if($projectId > 0) {
             $this->cleanupProject($projectId);
         }
     }
@@ -104,15 +80,26 @@ class editor_Models_Task_Remover {
      * @throws ZfExtended_ErrorCodeException
      * @throws ZfExtended_Models_Entity_Conflict
      */
-    protected function removeTask(bool $forced = false, bool $removeFiles = true){
+    private function removeTask(bool $forced = false, bool $removeFiles = true){
         if(!$forced) {
             $this->checkRemovable();
         }
+
+        $triggerData = [
+            'taskId' => $this->task->getId(),
+            'taskGuid' => $this->task->getTaskGuid(),
+            'taskName' => $this->task->getTaskName(),
+            'isProject' => $this->task->isProject(),
+        ];
+
         if($removeFiles){
             $this->removeDataDirectory();
         }
         $this->removeRelatedDbData();
         $this->task->delete();
+
+        // give plugins a chance to clean up task data
+        $this->eventManager->trigger('afterTaskRemoval', $this, $triggerData);
     }
 
     /***
@@ -123,14 +110,13 @@ class editor_Models_Task_Remover {
      * @throws ZfExtended_ErrorCodeException
      * @throws ZfExtended_Models_Entity_Conflict
      */
-    protected function removeProject(int $projectId, bool $forced,bool $removeFiles){
-        $model=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $model editor_Models_Task */
-        $tasks=$model->loadProjectTasks($projectId);
+    private function removeProjectWithTasks(int $projectId, bool $forced, bool $removeFiles){
+        $model = ZfExtended_Factory::get(editor_Models_Task::class);
+        $tasks = $model->loadProjectTasks($projectId);
         $tasks = array_reverse($tasks);
         foreach ($tasks as $projectTask){
             $this->task->init($projectTask);
-            $this->removeTask($forced,$removeFiles);
+            $this->removeTask($forced, $removeFiles);
         }
     }
 
@@ -138,11 +124,10 @@ class editor_Models_Task_Remover {
      * Remove the project if there are no tasks in the project
      * @param int $projectId
      */
-    protected function cleanupProject(int $projectId) {
-        $model=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $model editor_Models_Task */
-        $tasks=$model->loadProjectTasks($projectId);
-        if(count($tasks)>1 || empty($tasks)){
+    private function cleanupProject(int $projectId) {
+        $model = ZfExtended_Factory::get(editor_Models_Task::class);
+        $tasks = $model->loadProjectTasks($projectId);
+        if(count($tasks) > 1 || empty($tasks)){
             return;
         }
         $this->task->load($projectId);
@@ -152,7 +137,7 @@ class editor_Models_Task_Remover {
     /**
      * removes the tasks data directory from filesystem
      */
-    protected function removeDataDirectory() {
+    private function removeDataDirectory() {
         //also delete files on default delete
         $taskPath = (string)$this->task->getAbsoluteTaskDataPath();
         if(is_dir($taskPath)){
@@ -163,7 +148,7 @@ class editor_Models_Task_Remover {
     /**
      * internal function with stuff to be excecuted before deleting a task
      */
-    protected function checkRemovable() {
+    private function checkRemovable() {
         $taskGuid = $this->task->getTaskGuid();
         
         ZfExtended_Models_Entity_Conflict::addCodes([
@@ -197,7 +182,7 @@ class editor_Models_Task_Remover {
      * data is deleted directly instead of relying on referential integrity.
      * Also removes the task related term collection
      */
-    protected function removeRelatedDbData() {
+    private function removeRelatedDbData() {
         $this->task->dropMaterializedView();
         $taskGuid = $this->task->getTaskGuid();
         
@@ -219,7 +204,7 @@ class editor_Models_Task_Remover {
      * @return void
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function removeAutocreatedOnImportLanguageResources() : void {
+    private function removeAutocreatedOnImportLanguageResources() : void {
         // first detect all IDs of the languageresources that need to be deleted
         
         $db = ZfExtended_Factory::get(\MittagQI\Translate5\LanguageResource\Db\TaskAssociation::class);

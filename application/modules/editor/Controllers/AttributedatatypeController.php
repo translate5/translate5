@@ -34,7 +34,7 @@ class editor_AttributedatatypeController extends ZfExtended_RestController
     /**
      * Use termportal trait
      */
-    use editor_Controllers_Traits_TermportalTrait;
+    use editor_Controllers_Traits_ControllerTrait;
 
     /**
      * @var string

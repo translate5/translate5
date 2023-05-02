@@ -100,6 +100,9 @@ Ext.define('Editor.view.segments.Grid', {
     }),
     onDestroy: function() {
         this.segInfoConn.abortAll(); // do not destroy, this is still the same in the next opened task
+
+        // Hide falsePositives floating panel, if any
+        Ext.first('falsePositives[floating=true]')?.hide();
     },
 
     currentSegmentSize: null,

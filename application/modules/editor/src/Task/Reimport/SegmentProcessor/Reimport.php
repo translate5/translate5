@@ -165,11 +165,6 @@ class Reimport extends editor_Models_Import_SegmentProcessor
      */
     public function postParseHandler(editor_Models_Import_FileParser $parser)
     {
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        /* @var editor_Models_File $file */
-        $file->load($this->fileId);
-        $file->saveSkeletonToDisk($parser->getSkeletonFile(), $this->task);
-
         $this->saveFieldWidth($parser);
     }
 

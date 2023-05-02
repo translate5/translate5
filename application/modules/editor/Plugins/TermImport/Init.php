@@ -49,6 +49,8 @@ class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
     
     /**
      * defines all URL routes of this plug-in
+     * @uses editor_Plugins_TermImport_TermImportController::crossapiAction()
+     * @uses editor_Plugins_TermImport_TermImportController::filesystemAction()
      */
     protected function initRoutes() {
         $f = Zend_Registry::get('frontController');

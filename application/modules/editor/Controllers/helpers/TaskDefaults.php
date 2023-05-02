@@ -61,6 +61,7 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             }
             $taskAssoc->save();
         });
+        $task->updateIsTerminologieFlag($task->getTaskGuid());
     }
 
     /***

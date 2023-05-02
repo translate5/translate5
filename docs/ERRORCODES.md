@@ -66,7 +66,10 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E2004"></a>E2004 | Validation | Value "{0}" of param "{1}" - is not in the list of allowed values    | There is the list of allowed values, but given value is <strong>not in</strong> that list            |
 | <a id="E2005"></a>E2005 | Validation | Value "{0}" of param "{1}" - is in the list of disabled values       | There is the list of disabled values, but given value is <strong>in</strong> that list               |
 | <a id="E2006"></a>E2006 | Validation | Value "{0}" of param "{1}" - is not unique. It should be unique.     | The given value already exists within certain column of certain database table                       |
-| <a id="E2007"></a>E2007 | Validation | Extension "{0}" of file "{1}" - is not in the list of allowed values | The file type uploaded in the termportal is not allowed                                              |
+| <a id="E2007"></a>E2007 | Validation | Extension "{0}" of file "{1}" - is not in the list of allowed values | The file type uploaded is not allowed                                              |
+| <a id="E2008"></a>E2008 | Validation | Object of type "{0}" already exists having key "{1}"                 | Given key should not be in use by any of existing records so far                                         |
+| <a id="E2009"></a>E2009 | Validation | Value "{0}" of param "{1}" should be minimum "{2}"                   | Greater value must be specified                                                                      |
+| <a id="E2009"></a>E2010 | Validation | Value "{0}" of param "{1}" should be maximum "{2}"                   | Less value must be specified                                                                         |
 
 
 ### Authentication
@@ -494,18 +497,18 @@ https://confluence.translate5.net/display/TAD/EventCodes
 
 
 #### Plug-In InstantTranslate
-| EventCode        | Context       | EventMessage  | Description/Solution
-| :--------------- |:------------- | :------------ | :-------------------
-| <a id="E1207"></a>E1207  | Plug-In InstantTranslate | InstantTranslate: Response status&nbsp;&quot;{status}&quot; in indicates failure in communication with the API. | Check the error log for further information.
-| <a id="E1208"></a>E1208  | Plug-In InstantTranslate | InstantTranslate: parse error in JSON response, the error was: &quot;{msg}&quot; | Check the error log for further information.
-| <a id="E1209"></a>E1209  | Plug-In InstantTranslate | InstantTranslate: empty JSON response. | Check the error log for further information.
-| <a id="E1211"></a>E1211  | Plug-In InstantTranslate | InstantTranslate: Filetranslation failed. &quot;{msg}&quot; | Check the error log for further information.
-| <a id="E1212"></a>E1212  | Plug-In InstantTranslate | InstantTranslate: Parameter is not valid. &quot;{msg}&quot; | Check the error log for further information.
-| <a id="E1213"></a>E1213  | Plug-In InstantTranslate | InstantTranslate: Error in config or roles. &quot;{msg}&quot; | Throws an error due to configuration-issues. Check the error log for further information.
-| <a id="E1233"></a>E1233  | Plug-In InstantTranslate | InstantTranslate:&nbsp;Please check your configuration for pretranslationTaskLifetimeDays. &quot; | Adds an entry in the error-log due to configuration-issues, but doesn't stop the application. Solution: Check if pretranslationTaskLifetimeDays is set in the configuration.
-| <a id="E1287"></a>E1287  | Plug-In InstantTranslate | InstantTranslate: &quot;0&quot; as upload field name is deprecated. Use &quot;file&quot; as upload field name instead. | Temporary warning for &quot;0&quot; the file upload api field name. The correct file upload field name for files pre-translations should be &quot;file&quot;.
-| <a id="E1376"></a>E1376  | Plug-In InstantTranslate | InstantTranslate: Not all required parameters are provided when writing to instant-translate memory | Missing parameters where found in the write to instant translate memory request.
-| <a id="E1383"></a>E1383  | Plug-In InstantTranslate | InstantTranslate: The sent text contains invalid markup | Invalid markup was submitted via the API that therefore could not be translated
+| EventCode                | Context                  | EventMessage                                                                                                           | Description/Solution                                                                                                                                                         |
+| :----------------------- |:------------------------ | :--------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <a id="E1207"></a>E1207  | Plug-In InstantTranslate | InstantTranslate: Response status "{status}" in indicates failure in communication with the API.                       | Check the error log for further information.                                                                                                                                 |
+| <a id="E1208"></a>E1208  | Plug-In InstantTranslate | InstantTranslate: parse error in JSON response, the error was: &quot;{msg}&quot;                                       | Check the error log for further information.                                                                                                                                 |
+| <a id="E1209"></a>E1209  | Plug-In InstantTranslate | InstantTranslate: empty JSON response.                                                                                 | Check the error log for further information.                                                                                                                                 |
+| <a id="E1211"></a>E1211  | Plug-In InstantTranslate | InstantTranslate: Filetranslation failed. &quot;{msg}&quot;                                                            | Check the error log for further information.                                                                                                                                 |
+| <a id="E1212"></a>E1212  | Plug-In InstantTranslate | InstantTranslate: Parameter is not valid. &quot;{msg}&quot;                                                            | Check the error log for further information.                                                                                                                                 |
+| <a id="E1213"></a>E1213  | Plug-In InstantTranslate | InstantTranslate: Error in config or roles. &quot;{msg}&quot;                                                          | Throws an error due to configuration-issues. Check the error log for further information.                                                                                    |
+| <a id="E1233"></a>E1233  | Plug-In InstantTranslate | InstantTranslate:&nbsp;Please check your configuration for pretranslationTaskLifetimeDays. &quot;                      | Adds an entry in the error-log due to configuration-issues, but doesn't stop the application. Solution: Check if pretranslationTaskLifetimeDays is set in the configuration. |
+| <a id="E1287"></a>E1287  | Plug-In InstantTranslate | InstantTranslate: &quot;0&quot; as upload field name is deprecated. Use &quot;file&quot; as upload field name instead. | Temporary warning for &quot;0&quot; the file upload api field name. The correct file upload field name for files pre-translations should be &quot;file&quot;.                |
+| <a id="E1376"></a>E1376  | Plug-In InstantTranslate | InstantTranslate: Not all required parameters are provided when writing to instant-translate memory                    | Missing parameters where found in the write to instant translate memory request.                                                                                             |
+| <a id="E1383"></a>E1383  | Plug-In InstantTranslate | InstantTranslate: The sent text contains invalid markup                                                                | Invalid markup was submitted via the API that therefore could not be translated                                                                                              |
 
 
 #### Plug-In MatchAnalysis
@@ -520,6 +523,8 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1168"></a>E1168  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized. | <br />
 | <a id="E1239"></a>E1239  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: Language resource &quot;{name}&quot; has status &quot;{status}&quot; and is not available for match analysis and pre-translations. | There is a problem with the associated language resource to be used for analysis and pre-translation. Please check status and details of the problem.
 | <a id="E1500"></a>E1500  | Plug-In MatchAnalysis | After waiting for {waitTime} seconds, the language resource is still not available.                                                                       | Language resource that is used for match analysis and pre-translation is not available. Please check status and details of the problem.
+| <a id="E1513"></a>E1513  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: Can't edit/delete system default pricing preset | Clone system default pricing preset instead, and then edit the cloned one
+| <a id="E1514"></a>E1514  | Plug-In MatchAnalysis | MatchAnalysis Plug-In: You can't delete ranges from more than 1 preset per once | Make sure all ranges you're going to delete belong to single certain preset
 
 
 #### Plug-In NecTm
@@ -627,6 +632,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1365"></a>E1365 | Plug-In VisualReview | Visual Review: The Google Cloud Vision API is not properly configured: {reason}                                                             | The API Key for the Google Vision API is not configured, not present, invalid or outdated                                                                                                 |
 | <a id="E1366"></a>E1366 | Plug-In VisualReview | Visual Review Image Import: There have been errors converting the image: {reason}                                                           | An Imported Image could not be converted with ImageMagick. Presumably the Image-File is corrupt.                                                                                          |
 | <a id="E1367"></a>E1367 | Plug-In VisualReview | Visual Review Image Import: There have been errors analyzing the image: {reason}                                                            | An Imported Image could not be analyzed with OCR                                                                                                                                          |
+| <a id="E1511"></a>E1511 | Plug-In VisualReview | Visual Review Image Import: There have been problems analyzing the image: {reason}                                                          | An Imported Image created problems when being analyzed with OCR                                                                                                                           |
 | <a id="E1368"></a>E1368 | Plug-In VisualReview | Visual Review Headless Conversion: There have been errors during the conversion: {reason}                                                   | The generated Review File caused problems in the Headless Browser                                                                                                                         |
 | <a id="E1373"></a>E1373 | Plug-In VisualReview | Visual Review Video Import: There have been errors importing the video: {reason}                                                            | There have been problems importing the Video, usually due to wrong Codec, too big, faulte metadata, etc.                                                                                  |
 | <a id="E1374"></a>E1374 | Plug-In VisualReview | Visual Review Video Import: There have been errors parsing the video spreadsheet: {reason}                                                  | The Spreadsheet had the wrong format (more than 3 columns etc.) or the Timecodes in the Spreadsheet had the wrong format                                                                  |
@@ -668,6 +674,11 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1458"></a>E1458 | Plug-In TermImport | Across TBX Export: Error on communication with Across              | Check with additional data what the problem is. |
 | <a id="E1459"></a>E1459 | Plug-In TermImport | Across TBX Export: Can not create temporary filestream             | Check with additional data what the problem is. |
 | <a id="E1460"></a>E1460 | Plug-In TermImport | Across TBX Export: Can not read from file with fileguid {fileGuid} | Check with additional data what the problem is. |
+
+#### Plug-In TermPortal
+| EventCode               | Context            | EventMessage                                                                 | Description/Solution                                                                                           |
+|:------------------------|:-------------------|:-----------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------|
+| <a id="E1516"></a>E1516 | Plug-In TermPortal | Default user to be assigned as PM for TermTranslation-projects - was deleted | Change runtimeOptions.plugins.TermPortal.termsTransferDefaultPM to one of existing users in system preferences |
 
 #### Plug-In Connect Worldserver
 | EventCode               | Context                     | EventMessage                                                                                                                                                                                     | Description/Solution                                                                             |

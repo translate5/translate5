@@ -34,6 +34,20 @@ END LICENSE AND COPYRIGHT
  */
 
 /**
+ * Add the tabid to the request URL for debugging purposes
+ */
+Ext.define('Ext.overrides.data.proxy.Server', {
+    override: 'Ext.data.proxy.Server',
+    buildUrl: function(request) {
+        let url = this.callParent([request]);
+        if (window.tabQty) {
+            return Ext.String.urlAppend(url, 'tab=' + (window._tabId ?? 0));
+        }
+        return url;
+    }
+});
+
+/**
  * Fixing missing contains method for bufferedstores
  * needed for ext-6.0.0
  * recheck on update
@@ -1582,6 +1596,160 @@ Ext.define('Translate5.override.Ext.grid.feature.RowBody', {
     }
 });
 
+Ext.define('Translate5.override.window.MessageBox', {
+    override: 'Ext.window.MessageBox',
+    isValid: function() {
+
+        // Initial value
+        var isValid = true;
+
+        // Check validity of fields inside msgbox
+        this.query('field[hidden=false]').forEach(field => isValid = field.isValid() && isValid);
+
+        // Disable ok-button if isValid is false
+        this.msgButtons.ok?.setDisabled(!isValid);
+
+        // Return isValid flag
+        return isValid;
+    },
+
+    /**
+     * Add custom items (e.g. fields) to Ext.Msg.promptContainer
+     * and get simple object containing [itemId => value] pairs for
+     * the previously added custom items, if any
+     *
+     * So, in most cases this method can be called twice:
+     * 1.First call is to add fields to promptContainer and hide Ext.Msg's self {xtype: textfield, ...}
+     * 2.Second call is to get values of custom fields with Ext.Msg state reverted back (e.g custom fields destroyed, self textfield shown back)
+     *
+     * This behaviour is similar to Ext.Msg 'reconfigure'-behaviour,
+     * so each call adds items from scratch as if there is nothing previously added so far
+     *
+     * @param items
+     */
+    customFields: function(items) {
+        var params = {};
+
+        // Foreach custom field, that was previously added, if any
+        this.query('[isCustomField]').forEach(customField => {
+
+            // Get value
+            var value = customField.getValue();
+
+            // If value is array (for tagfield-fields, for example) - convert to comma-separated string
+            if (Ext.isArray(value)) value = value.join(',');
+
+            // Add to object
+            params[customField.itemId] = value;
+
+            // Delete custom field
+            customField.destroy();
+        });
+
+        // Reset Ext.Msg singleton to initial state
+        this.down('textfield').show();
+
+        // If items arg is given
+        if (items) {
+
+            // Hide textfield
+            this.down('textfield').hide();
+
+            // Apply isCustomField-flag for each item
+            items.forEach(item => item.isCustomField = true);
+
+            // Add items to prompt container
+            this.promptContainer.add(items);
+
+            // Bring in front of other windows, if any
+            Ext.Msg.toFront();
+        }
+
+        // Return [itemId => value] pairs for the previously added fields
+        return params;
+    },
+    onShow: function() {
+
+        // Call parent
+        this.callParent();
+
+        // Re-enable ok-button
+        this.msgButtons.ok?.setDisabled(false);
+    }
+});
+Ext.define('Translate5.override.data.request.Ajax', {
+    override: 'Ext.data.request.Ajax',
+
+    /**
+     *
+     * @param xhr
+     */
+    createResponse: function(xhr) {
+
+        // Call parent
+        var response = this.callParent(arguments);
+
+        if (~[401, 403].indexOf(response.status)) location = '/login' + location.hash;
+
+        // Parse response and show msgbox if need
+        this.parseResponse(response, this.options);
+
+        // Return
+        return response;
+    },
+
+    /**
+     * Check whether response's message should be shown, and if so do show
+     */
+    parseResponse: function(response, options) {
+        var json = response.responseJson || Ext.JSON.decode(response.responseText, true);
+
+        if (Ext.isObject(json)) {
+
+            // Set responseJson prop on response arg
+            response.responseJson = json;
+
+            // If both `success` and `msg` props are set - show alert
+            if ('success' in json && 'msg' in json) {
+                Ext.Msg.show({
+                    title: '',
+                    header: false,
+                    closable: false,
+                    icon: json.success ? 'x-message-box-info' : 'x-message-box-warning',
+                    message: json.msg,
+                    buttons: Ext.MessageBox.OK,
+                    modal: true,
+                    fn: function(){
+                        Ext.Msg.setUserCls();
+                    }
+                });
+
+            // Else if `confirm` prop is set - show confirmation dialog
+            } else if ('confirm' in json) {
+                Ext.Msg.show({
+                    title: '',
+                    header: false,
+                    closable: false,
+                    message: json.msg,
+                    buttons: Ext.MessageBox[json.buttons || 'OKCANCEL'],
+                    icon: Ext.MessageBox.QUESTION,
+                    modal: true,
+                    fn: function(answer) {
+
+                        var answerIdx = json.confirm === true ? '' : json.confirm;
+
+                        // Append new answer param
+                        options.url = options.url.split('?')[0] + '?answer' + answerIdx + '=' + answer
+                            + rif(options.url.split('?')[1], '&$1');
+
+                        // Make new request
+                        Ext.Ajax.request(options);
+                    }
+                });
+            }
+        }
+    }
+});
 Ext.define('Ext.overrides.grid.filters.filter.Base', {
     override: 'Ext.grid.filters.filter.Base',
     createMenu: function () {
