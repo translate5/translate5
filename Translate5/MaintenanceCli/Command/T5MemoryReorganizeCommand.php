@@ -46,7 +46,7 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
 
     protected function configure(): void
     {
-        $this->setDescription('Reorganizes the memory tables to reduce the size of the memory tables');
+        $this->setDescription('Reorganizes particular TM');
         $this->addArgument(
             self::ARGUMENT_UUID,
             InputArgument::REQUIRED,
@@ -95,13 +95,8 @@ final class T5MemoryReorganizeCommand extends Translate5AbstractCommand
             }
         }
 
-        if ($connector->isReorganized()) {
-            $this->io->text(sprintf(
-                "Memory is already reorganized with status %s.\n Clearing status and reorganizing again.",
-                $connector->getLanguageResource()->getSpecificData(ReorganizeTm::NAME)
-            ));
-
-            $connector->getLanguageResource()->removeSpecificData(ReorganizeTm::NAME);
+        if ($connector->isReorganizeFailed()) {
+            $this->io->text('There was already an attempt to reorganize this memory, but it was failed.');
         }
 
         return $connector->reorganizeTm();

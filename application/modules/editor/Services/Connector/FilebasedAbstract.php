@@ -73,12 +73,6 @@ abstract class editor_Services_Connector_FilebasedAbstract extends editor_Servic
     const TERMCOLLECTION_MATCH_VALUE = 104;
     
     /**
-     * @var string
-     */
-    const STATUS_IMPORT = 'import';
-    
-    
-    /**
      * Adds the given file to the underlying system on TM creation
      * @param array $fileinfo as given from upload (tmp_name, name, type, size)
      * @return boolean

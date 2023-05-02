@@ -30,6 +30,7 @@ use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
 use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
@@ -159,7 +160,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
 
             if(empty($resource)) {
-                $languageresource['status'] = editor_Services_Connector_Abstract::STATUS_ERROR;
+                $languageresource['status'] = LanguageResourceStatus::ERROR;
                 $languageresource['statusInfo'] = $t->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
             }
             else {
@@ -289,7 +290,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         /* @var $resource editor_Models_LanguageResources_Resource */
         if(empty($resource)) {
-            $this->view->rows->status = editor_Services_Connector_Abstract::STATUS_NOCONNECTION;
+            $this->view->rows->status = LanguageResourceStatus::NOCONNECTION;
             $this->view->rows->statusInfo = $t->_('Keine Verbindung zur Ressource oder Ressource nicht gefunden.');
             return;
         }
@@ -1164,7 +1165,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         //set the language resource status to importing
-        $this->entity->addSpecificData('status',editor_Services_Connector_FilebasedAbstract::STATUS_IMPORT);
+        $this->entity->setStatus(LanguageResourceStatus::IMPORT);
         $this->entity->save();
 
         $workerId = $worker->queue();
