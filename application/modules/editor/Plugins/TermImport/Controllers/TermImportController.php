@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\Translate5\Cronjob\CronIpFactory;
 
 /**
  */
