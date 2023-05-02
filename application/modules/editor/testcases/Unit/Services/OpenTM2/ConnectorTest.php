@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\Services\Connector\TagHandler;
 
+use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
 use PHPUnit\Framework\TestCase;
 use editor_Services_OpenTM2_Connector as Connector;
 use stdClass;
@@ -39,7 +40,7 @@ class ConnectorTest extends TestCase
     public function testProcessImportStatusNullApiResponse(): void
     {
         $apiResponse = null;
-        $expectedResult = Connector::STATUS_UNKNOWN;
+        $expectedResult = LanguageResourceStatus::UNKNOWN;
 
         $myClass = new Connector();
         $result = $myClass->processImportStatus($apiResponse);
@@ -54,55 +55,55 @@ class ConnectorTest extends TestCase
                 'status' => 'not found',
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => Connector::STATUS_ERROR
+                'expectedResult' => LanguageResourceStatus::ERROR
             ],
             'Available' => [
                 'status' => 'available',
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => Connector::STATUS_AVAILABLE
+                'expectedResult' => LanguageResourceStatus::AVAILABLE
             ],
             'Additional file import not finished' => [
                 'status' => "open",
                 'tmxImportStatus' => "available",
                 'importTime' => "not finished",
-                'expectedResult' => Connector::STATUS_IMPORT
+                'expectedResult' => LanguageResourceStatus::IMPORT
             ],
             'Primary file import not finished' => [
                 'status' => "open",
                 'tmxImportStatus' => "import",
                 'importTime' => null,
-                'expectedResult' => Connector::STATUS_IMPORT
+                'expectedResult' => LanguageResourceStatus::IMPORT
             ],
             'Import finished successfully' => [
                 'status' => "open",
                 'tmxImportStatus' => "available",
                 'importTime' => 'finished',
-                'expectedResult' => Connector::STATUS_AVAILABLE
+                'expectedResult' => LanguageResourceStatus::AVAILABLE
             ],
             'Import finished with error' => [
                 'status' => "open",
                 'tmxImportStatus' => "error",
                 'importTime' => null,
-                'expectedResult' => Connector::STATUS_ERROR
+                'expectedResult' => LanguageResourceStatus::ERROR
             ],
             'Import failed' => [
                 'status' => "open",
                 'tmxImportStatus' => "failed",
                 'importTime' => null,
-                'expectedResult' => Connector::STATUS_ERROR
+                'expectedResult' => LanguageResourceStatus::ERROR
             ],
             'Unknown status' => [
                 'status' => bin2hex(random_bytes(10)),
                 'tmxImportStatus' => null,
                 'importTime' => null,
-                'expectedResult' => Connector::STATUS_UNKNOWN
+                'expectedResult' => LanguageResourceStatus::UNKNOWN
             ],
             'Unknown tmxImportStatus' => [
                 'status' => 'open',
                 'tmxImportStatus' => bin2hex(random_bytes(10)),
                 'importTime' => null,
-                'expectedResult' => Connector::STATUS_UNKNOWN
+                'expectedResult' => LanguageResourceStatus::UNKNOWN
             ],
         ];
     }

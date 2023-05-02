@@ -206,7 +206,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             //this should come from the resource status check in the resources api request
             return self::STATUS_AVAILABLE;
         }
-        $status = $this->languageResource->getSpecificData('status');
+        $status = $this->languageResource->getStatus();
         if (empty($status)) {
             return self::STATUS_AVAILABLE;
         }

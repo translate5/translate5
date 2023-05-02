@@ -53,7 +53,9 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {
     use editor_Models_Entity_SpecificDataTrait;
-    
+
+    private const SPECIFIC_DATA_STATUS = 'status';
+
     /***
      * set as match rate type when match-rate was changed
      */
@@ -682,4 +684,19 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
                 ->onTermCollectionInsert($this->getId());
         }
     }
+
+    #region status change
+
+    public function setStatus(string $status): void
+    {
+        // Do we need validation here?
+        $this->addSpecificData(self::SPECIFIC_DATA_STATUS, $status);
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->getSpecificData(self::SPECIFIC_DATA_STATUS);
+    }
+
+    #endregion status change
 }
