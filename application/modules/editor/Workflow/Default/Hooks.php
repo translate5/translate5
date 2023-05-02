@@ -26,8 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Tools\CronIpFactory;
-use MittagQI\Translate5\Tools\Cronjobs;
+use MittagQI\Translate5\Cronjob\Cronjobs;
 
 /**
  * Hook In functions for the Default Workflow.

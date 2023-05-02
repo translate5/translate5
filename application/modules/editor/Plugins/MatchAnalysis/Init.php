@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Cronjob\CronEventTrigger;
+use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\PauseWorker\PauseWorker;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
@@ -81,23 +83,48 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     /**
      * define all event listener
      */
-    protected function initEvents() {
-        //$this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleOnAfterImport'));
-        //$this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'startTestCode'));
-        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
-        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
-        
-        $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleOnAnalysisOperation'));
-        $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'addPresetInfo'));
-        $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleOnPretranslationOperation'));
-        $this->eventManager->attach('Editor_CronController', 'afterDailyAction', array($this, 'handleAfterDailyAction'));
+    protected function initEvents(): void
+    {
+        $this->eventManager->attach(
+            Editor_IndexController::class,
+            'afterLocalizedjsstringsAction',
+            [$this, 'initJsTranslations']
+        );
+        $this->eventManager->attach(Editor_IndexController::class, 'afterIndexAction', [$this, 'injectFrontendConfig']);
+        $this->eventManager->attach(
+            editor_TaskController::class,
+            'analysisOperation',
+            [$this, 'handleOnAnalysisOperation']
+        );
+        $this->eventManager->attach(editor_TaskController::class, 'afterIndexAction', [$this, 'addPresetInfo']);
+        $this->eventManager->attach(
+            editor_TaskController::class,
+            'pretranslationOperation',
+            [$this, 'handleOnPretranslationOperation']
+        );
+        $this->eventManager->attach(
+            CronEventTrigger::class,
+            CronEventTrigger::DAILY,
+            [$this, 'handleAfterDailyAction']
+        );
+        $this->eventManager->attach(
+            'MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuerPivotQueuer',
+            'beforePivotPreTranslationQueue',
+            [$this, 'handleBeforePivotPreTranslationQueue']
+        );
 
         // Adds the pricingPresetId to the task-meta
-        $this->eventManager->attach('editor_TaskController', 'beforeProcessUploadedFile', [$this, 'handleBeforeProcessUploadedFile']);
+        $this->eventManager->attach(
+            editor_TaskController::class,
+            'beforeProcessUploadedFile',
+            [$this, 'handleBeforeProcessUploadedFile']
+        );
 
-        $this->eventManager->attach('MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuerPivotQueuer', 'beforePivotPreTranslationQueue', array($this, 'handleBeforePivotPreTranslationQueue'));
-        $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'handleCustomerAfterIndex']);
-
+        $this->eventManager->attach(
+            Editor_CustomerController::class,
+            'afterIndexAction',
+            [$this, 'handleCustomerAfterIndex']
+        );
     }
 
     /**
