@@ -127,13 +127,12 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         
         $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-        try{
+        try {
             $languageresource->load($this->data->languageResourceId);
-        }
-        catch(ZfExtended_NotFoundException $e) {
+        } catch (ZfExtended_NotFoundException) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
                 'languageResourceId' => 'Die gewünschte Sprachressource gibt es nicht!'
-            ],[
+            ], [
                 'languageresourceId' => $this->data->languageResourceId
             ]);
         }
