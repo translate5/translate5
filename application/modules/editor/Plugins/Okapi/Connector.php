@@ -179,14 +179,15 @@ class editor_Plugins_Okapi_Connector {
     }
 
     /**
-     * Upload the bconf file
      * @param string $bconfPath
+     * @param bool $forImport
+     * @return void
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_BadGateway
      * @throws ZfExtended_Exception
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function uploadOkapiConfig(string $bconfPath){
+    public function uploadOkapiConfig(string $bconfPath, bool $forImport){
         if(empty($bconfPath) || !file_exists($bconfPath)) {
              // 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
              throw new editor_Plugins_Okapi_Exception('E1055', ['bconfFile' => $bconfPath]);
@@ -199,15 +200,22 @@ class editor_Plugins_Okapi_Connector {
         try {
             $this->processResponse($response);
         } catch (ZfExtended_BadGateway $e) {
+            // to improve support we add the name of the bconf as used in the Frontend (if possible) for import bconf's
             $msg = $e->getMessage();
-            $bconfId = (int)basename(dirname($bconfPath));
-            $bconf = new editor_Plugins_Okapi_Bconf_Entity();
-            $bconf->load($bconfId);
-            $bconfName = $bconf->getName();
-            // TODO Include link. Beware: $msg is escaped, no html possible as is
-            $msg .= " \nBconf used was '$bconfName.bconf' (id $bconfId)";
-            $e->setMessage($msg);
-            throw new ZfExtended_BadGateway($msg, 500);
+            if($forImport){
+                try {
+                    $bconfId = (int) basename(dirname($bconfPath));
+                    $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+                    $bconf->load($bconfId);
+                    $bconfName = $bconf->getName();
+                    $e->setMessage($msg . " \n" . 'Import-bconf used was \'' . $bconfName . '\' (id ' . $bconfId . ')');
+                } catch(Throwable){
+                    $e->setMessage($msg . " \n".'Import-bconf used was \''.basename($bconfPath).'\'');
+                }
+            } else {
+                $e->setMessage($msg . " \n".'Export-bconf used was \''.basename($bconfPath).'\'');
+            }
+            throw $e;
         }
     }
     
