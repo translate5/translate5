@@ -28,7 +28,9 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
-use MittagQI\Translate5\Tools\Cronjobs;
+use Editor_CronController;
+use MittagQI\Translate5\Cronjob\CronEventTrigger;
+use MittagQI\Translate5\Cronjob\Cronjobs;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -65,12 +67,12 @@ class CronCommand extends Translate5AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
         $cron = ZfExtended_Factory::get(Cronjobs::class, [
-            Zend_Registry::get('bootstrap')
+            Zend_Registry::get('bootstrap'),
+            new CronEventTrigger(),
         ]);
         if ($input->getOption('daily')) {
             $this->io->success('Daily jobs triggered!');
@@ -79,7 +81,6 @@ class CronCommand extends Translate5AbstractCommand
             $cron->periodical();
             $this->io->success('Periodical jobs triggered!');
         }
-
 
         return self::SUCCESS;
     }

@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Tools;
+namespace MittagQI\Translate5\Cronjob;
 
 use Bootstrap;
 use editor_Workflow_Exception;
@@ -40,10 +40,9 @@ use ZfExtended_Resource_GarbageCollector;
 
 class Cronjobs
 {
-
     private static bool $running = false;
 
-    public function __construct(private Bootstrap $bootstrap)
+    public function __construct(private Bootstrap $bootstrap, private CronEventTrigger $eventTrigger)
     {
     }
 
@@ -67,6 +66,7 @@ class Cronjobs
         $gc = $this->bootstrap->getPluginResource(ZfExtended_Resource_GarbageCollector::class);
         $gc->cleanUp($gc::ORIGIN_CRON);
         $this->doCronWorkflow('doCronPeriodical');
+        $this->eventTrigger->triggerPeriodical();
     }
 
     /**
@@ -84,6 +84,7 @@ class Cronjobs
 
         $log = ZfExtended_Factory::get(\ZfExtended_Models_Log::class);
         $log->purgeOlderAs(\Zend_Registry::get('config')->runtimeOptions?->logger?->keepWeeks ?? 6);
+        $this->eventTrigger->triggerDaily();
     }
 
     /**

@@ -253,7 +253,7 @@ Ext.application({
 
         //Logs the users userAgent and screen size for usability improvements:
         Ext.Ajax.request({
-            url: Editor.data.restpath + 'index/logbrowsertype',
+            url: Editor.data.restpath + 'index/logbrowsertype?tab=' + (window._tabId ?? 0),
             method: 'post',
             params: {
                 appVersion: navigator.appVersion,

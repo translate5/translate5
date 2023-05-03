@@ -34,6 +34,8 @@ END LICENSE AND COPYRIGHT
  * @method void setCustomerId() setCustomerId(integer $id)
  * @method integer getDefaultBconfId() getDefaultBconfId()
  * @method void setDefaultBconfId() setDefaultBconfId(integer $id)
+ * @method integer getDefaultPricingPresetId() getDefaultPricingPresetId()
+ * @method void setDefaultPricingPresetId() setDefaultPricingPresetId(integer $id)
  */
 class editor_Models_Customer_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_CustomerMeta';

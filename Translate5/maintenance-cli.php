@@ -27,7 +27,8 @@
  END LICENSE AND COPYRIGHT
  */
 
-require_once __DIR__.'/../vendor/autoload.php';
+chdir(__DIR__.'/../'); //otherwise vendor below and ZfExtended implicit could not be found.
+require_once 'vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use Translate5\MaintenanceCli\Command\{
@@ -88,6 +89,7 @@ use Translate5\MaintenanceCli\Command\{
     T5MemoryReorganizeCommand,
     UserCreateCommand,
     UserInfoCommand,
+    UserUpdateCommand,
     VisualConvertLegacyPdfReviewsCommand,
     VisualImplantReflownWysiwyg,
     WorkerCleanCommand,
@@ -137,6 +139,7 @@ $commands = [
     new T5memoryTmListCommand(),
     new T5MemoryReorganizeCommand(),
     new UserCreateCommand(),
+    new UserUpdateCommand(),
     new UserInfoCommand(),
     new VisualConvertLegacyPdfReviewsCommand(),
     new VisualImplantReflownWysiwyg(),

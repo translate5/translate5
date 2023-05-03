@@ -38,6 +38,8 @@ class editor_Plugins_MatchAnalysis_Exception extends ZfExtended_ErrorCodeExcepti
     static protected $localErrorCodes = [
         'E1103' => 'MatchAnalysis Plug-In: tried to load analysis data without providing a valid taskGuid',
         'E1239' => 'MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',
-        'E1100' => 'MatchAnalysis Plug-In: The associated language resource can not be used for analysis.'
+        'E1100' => 'MatchAnalysis Plug-In: The associated language resource can not be used for analysis.',
+        'E1513' => "MatchAnalysis Plug-In: Can't edit/delete system default pricing preset",
+        'E1514' => "MatchAnalysis Plug-In: You can't delete ranges from more than 1 preset per once",
     ];
 }

@@ -119,7 +119,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         }
 
         // Find oversized segments, non-editable segments and mark them as unprocessable
-        $config = Zend_Registry::get('config');
+        $config = $task->getConfig();
         $metaTable = ZfExtended_Factory::get(editor_Models_Db_SegmentMeta::class);
         $where = $metaTable->select()
             ->from($metaTable->getName(), ['segmentId'])
@@ -184,7 +184,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
                 Tagger::findAndAddQualitiesInTags($tags);
                 return $tags;
             }
-            $config = Zend_Registry::get('config');
+            $config = $task->getConfig();
             $messages = Zend_Registry::get('rest_messages');
             /* @var $messages ZfExtended_Models_Messages */
 

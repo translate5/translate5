@@ -102,14 +102,13 @@ class editor_Plugins_MatchAnalysis_Export_Xml
     /**
      * @throws editor_Models_ConfigException
      */
-    public function __construct(editor_Models_Task $task) {
+    public function __construct(editor_Models_Task $task, array $fuzzyRanges) {
 
         $this->useInContextExact = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->xmlInContextUsage ?? false;
 
         //for XML export we may
-        $configuredFuzzies = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->fuzzyBoundaries;
         $this->fuzzyRanges = [];
-        foreach($configuredFuzzies->toArray() as $begin => $end) {
+        foreach($fuzzyRanges as $begin => $end) {
             if((int) $begin >= 100) {
                 continue;
             }
@@ -169,7 +168,10 @@ class editor_Plugins_MatchAnalysis_Export_Xml
         $usedLanguageResources = [];
         
         $hasInternalFuzzy = false;
-        
+
+        unset ($this->fuzzyRanges['noMatch']);
+        $this->fuzzyRanges = array_reverse($this->fuzzyRanges, true);
+
         $this->addEmptyFuzzyNodes();
 
         //llop over data and categorize it

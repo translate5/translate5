@@ -159,6 +159,162 @@
           <source>Basiert auf</source>
           <target>Based on</target>
         </trans-unit>
+		<trans-unit id='U3VtbWU='>
+		    <source>Summe</source>
+		    <target>Total</target>
+		</trans-unit>
+		<trans-unit id='QmV0cmFn'>
+		    <source>Betrag</source>
+		    <target>Amount</target>
+		</trans-unit>
+		<trans-unit id='UHJlaXNhbnBhc3N1bmc='>
+		    <source>Preisanpassung</source>
+		    <target>Price adjustment</target>
+		</trans-unit>
+		<trans-unit id='RW5kZ8O8bHRpZ2VyIEJldHJhZw=='>
+		    <source>Endgültiger Betrag</source>
+		    <target>Final amount</target>
+		</trans-unit>
+		<trans-unit id='S2VpbiBQcmVpcyBmw7xyIGRpZSBLb21iaW5hdGlvbiB2b24gQXVzZ2FuZ3MtIHVuZCBaaWVsc3ByYWNoZSBmZXN0Z2VsZWd0'>
+		    <source>Kein Preis für die Kombination von Ausgangs- und Zielsprache festgelegt</source>
+		    <target>No pricing defined for combination of source and target language</target>
+		</trans-unit>
+		<trans-unit id='TWF0Y2gtQmVyZWljaGUgJmFtcDsgUHJlaXNl'>
+		    <source>Match-Bereiche &amp; Preise</source>
+		    <target>Match ranges &amp; pricing</target>
+		</trans-unit>
+		<trans-unit id='Vm9ybGFnZW5uYW1l'>
+		    <source>Vorlagenname</source>
+		    <target>Preset name</target>
+		</trans-unit>
+		<trans-unit id='VHlw'>
+		    <source>Typ</source>
+		    <target>Type</target>
+		</trans-unit>
+		<trans-unit id='QmVzY2hyZWlidW5n'>
+		    <source>Beschreibung</source>
+		    <target>Description</target>
+		</trans-unit>
+		<trans-unit id='U3RhbmRhcmQ='>
+		    <source>Standard</source>
+		    <target>Default</target>
+		</trans-unit>
+        <trans-unit id='QWt0aW9uZW4='>
+		    <source>Aktionen</source>
+		    <target>Actions</target>
+		</trans-unit>
+		<trans-unit id='TWF0Y2gtQmVyZWljaGUgJmFtcDsgUHJlaXNlIGtvbmZpZ3VyaWVyZW4='>
+		    <source>Match-Bereiche &amp; Preise konfigurieren</source>
+		    <target>Configure match ranges &amp; prices</target>
+		</trans-unit>
+		<trans-unit id='TmV1ZSBWb3JsYWdlIGVyc3RlbGxlbg=='>
+		    <source>Neue Vorlage erstellen</source>
+		    <target>Create new preset</target>
+		</trans-unit>
+		<trans-unit id='U3VjaGU='>
+		    <source>Suche</source>
+		    <target>Search</target>
+		</trans-unit>
+		<trans-unit id='QWt0dWFsaXNpZXJlbg=='>
+		    <source>Aktualisieren</source>
+		    <target>Refresh</target>
+		</trans-unit>
+		<trans-unit id='TWF0Y2gtQmVyZWljaGUgJmFtcDsgUHJlaXNlIGluIFZvcmxhZ2U='>
+		    <source>Match-Bereiche &amp; Preise in Vorlage</source>
+		    <target>Match ranges &amp; prices in preset</target>
+		</trans-unit>
+		<trans-unit id='UHJlaXNlIGbDvHIgbmV1ZSBTcHJhY2hrb21iaW5hdGlvbmVuIGFubGVnZW4='>
+		    <source>Preise für neue Sprachkombinationen anlegen</source>
+		    <target>Create prices for new language combination</target>
+		</trans-unit>
+		<trans-unit id='TmFjaCBQcmVpcyBvZGVyIFNwcmFjaGUgc3VjaGVu'>
+		    <source>Nach Preis oder Sprache suchen</source>
+		    <target>Search for price or language</target>
+		</trans-unit>
+		<trans-unit id='TmV1ZW4gQmVyZWljaCBhbmxlZ2Vu'>
+		    <source>Neuen Bereich anlegen</source>
+		    <target>Create new range</target>
+		</trans-unit>
+		<trans-unit id='QmVyZWljaGUgbMO2c2NoZW4='>
+		    <source>Bereiche löschen</source>
+		    <target>Delete ranges</target>
+		</trans-unit>
+		<trans-unit id='UXVlbGxzcHJhY2hl'>
+		    <source>Quellsprache</source>
+		    <target>Source language</target>
+		</trans-unit>
+		<trans-unit id='WmllbHNwcmFjaGU='>
+		    <source>Zielsprache</source>
+		    <target>Target language</target>
+		</trans-unit>
+		<trans-unit id='V8OkaHJ1bmc='>
+		    <source>Währung</source>
+		    <target>Currency</target>
+		</trans-unit>
+		<trans-unit id='S3VuZGVuc3RhbmRhcmQ='>
+		    <source>Kundenstandard</source>
+		    <target>Client default</target>
+		</trans-unit>
+		<trans-unit id='U3RhbmRhcmRtw6TDn2lnIGbDvHIgZGllc2VuIEt1bmRlbiBiZWkgZGVyIFByb2pla3RhbmxhZ2UgYXVzZ2V3w6RobHRlIFZvcmxhZ2U='>
+		    <source>Standardmäßig für diesen Kunden bei der Projektanlage ausgewählte Vorlage</source>
+		    <target>Pricing preset selected by default on project creation for this client</target>
+		</trans-unit>
+		<trans-unit id='U3RhbmRhcmRtw6TDn2lnIGJlaSBkZXIgUHJvamVrdGFubGFnZSBhdXNnZXfDpGhsdGUgVm9ybGFnZSwgZmFsbHMgbmljaHQgYXVmIEt1bmRlbmViZW5lIMO8YmVyc2NocmllYmVu'>
+		    <source>Standardmäßig bei der Projektanlage ausgewählte Vorlage, falls nicht auf Kundenebene überschrieben</source>
+		    <target>Pricing preset selected by default on project creation if not overwritten on client-level</target>
+		</trans-unit>
+		<trans-unit id='S2xvbmVuIGRlciBQcmVpc2UgZsO8cg=='>
+		    <source>Klonen der Preise für</source>
+		    <target>Clone prices for</target>
+		</trans-unit>
+		<trans-unit id='TmV1IEFubGVnZW4gZGVyIFByZWlzZSBmw7xy'>
+		    <source>Neu Anlegen der Preise für</source>
+		    <target>Create prices for</target>
+		</trans-unit>
+		<trans-unit id='UXVlbGxzcHJhY2hlIGF1c3fDpGhsZW4='>
+		    <source>Quellsprache auswählen</source>
+		    <target>Select source languages</target>
+		</trans-unit>
+		<trans-unit id='WmllbHNwcmFjaGUgYXVzd8OkaGxlbg=='>
+		    <source>Zielsprache auswählen</source>
+		    <target>Select target languages</target>
+		</trans-unit>
+		<trans-unit id='Qml0dGUgenUgbMO2c2NoZW5kZW4gQmVyZWljaCBhdXN3w6RobGVu'>
+		    <source>Bitte zu löschenden Bereich auswählen</source>
+		    <target>Select ranges to be deleted</target>
+		</trans-unit>
+		<trans-unit id='WnVtIEJlYXJiZWl0ZW4gZGVyIE1hdGNoLUJlcmVpY2hlIGtsaWNrZW4gU2llIGF1ZiBkaWUgU3BhbHRlbsO8YmVyc2NocmlmdGVu'>
+		    <source>Zum Bearbeiten der Match-Bereiche klicken Sie auf die Spaltenüberschriften</source>
+		    <target>For editing the match rate ranges - click on their column headings</target>
+		</trans-unit>
+		<trans-unit id='QmVyZWljaCBlZGl0aWVyZW4='>
+		    <source>Bereich editieren</source>
+		    <target>Edit range</target>
+		</trans-unit>
+		<trans-unit id='RGVyIFN0YXJ0d2VydCBtdXNzIGtsZWluZXIgb2RlciBnbGVpY2ggZGVtIEVuZHdlcnQgc2VpbiE='>
+		    <source>Der Startwert muss kleiner oder gleich dem Endwert sein!</source>
+		    <target>Start value must be lesser or equal to end value!</target>
+		</trans-unit>
+		<trans-unit id='RGVyIEVuZHdlcnQgbXVzcyBncsO2w59lciBvZGVyIGdsZWljaCBkZW0gU3RhcnR3ZXJ0IHNlaW4h'>
+		    <source>Der Endwert muss größer oder gleich dem Startwert sein!</source>
+		    <target>End value must be bigger or equal to start value!</target>
+		</trans-unit>
+		<trans-unit id='RGllc2VyIFdlcnQgw7xiZXJsYXBwdCBkZW4gQmVyZWljaA=='>
+		    <source>Dieser Wert überlappt den Bereich</source>
+		    <target>This value overlaps range</target>
+		</trans-unit>
+		<trans-unit id='Vm9u'>
+		    <source>Von</source>
+		    <target>From</target>
+		</trans-unit>
+		<trans-unit id='Qmlz'>
+		    <source>Bis</source>
+		    <target>Till</target>
+		</trans-unit>
+		<trans-unit id='UHJlaXN2b3JsYWdl'>
+		    <source>Preisvorlage</source>
+		    <target>Pricing preset</target>
+		</trans-unit>
     </body>
   </file>
 </xliff>

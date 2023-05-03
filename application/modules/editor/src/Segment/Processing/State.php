@@ -34,9 +34,11 @@ use editor_Segment_Tags;
 use Exception;
 use MittagQI\Translate5\Segment\Db\Processing;
 use Zend_Db_Exception;
-use Zend_Db_Statement_Exception;
+use Zend_Db_Select;
 use Zend_Db_Table_Row_Abstract;
+use Zend_Exception;
 use ZfExtended_Factory;
+use ZfExtended_Models_Db_DeadLockHandlerTrait;
 use ZfExtended_Models_Db_Exceptions_DeadLockHandler;
 
 
@@ -47,6 +49,8 @@ use ZfExtended_Models_Db_Exceptions_DeadLockHandler;
  */
 class State
 {
+    use ZfExtended_Models_Db_DeadLockHandlerTrait;
+
     /**
      * A segment was not yet processed
      */
@@ -271,22 +275,6 @@ class State
     }
 
     /**
-     * Starts a transaction on our Processing table
-     */
-    public function beginTransaction()
-    {
-        static::$table->getAdapter()->beginTransaction();
-    }
-
-    /**
-     * Commit a transaction on our Processing table
-     */
-    public function commitTransaction()
-    {
-        static::$table->getAdapter()->commit();
-    }
-
-    /**
      * Retrieves the next states to process and sets their state to INPROGRESS
      * In this transaction deadlocks may occur so we have a deadlock-catching/retrying implemented
      * @param int $state
@@ -295,63 +283,35 @@ class State
      * @param int $limit
      * @return State[]
      * @throws Zend_Db_Exception
-     * @throws Zend_Db_Statement_Exception
      * @throws ZfExtended_Models_Db_Exceptions_DeadLockHandler
+     * @throws Zend_Exception
      */
     public function fetchNextStates(int $state, string $taskGuid, bool $fromTheTop, int $limit = 1): array
     {
-        $retries = 1;
-        while ($retries <= self::DEADLOCK_MAXRETRIES) {
-            try {
-                return $this->fetchNextFromDb($state, $taskGuid, $fromTheTop, $limit);
-            } catch (Zend_Db_Exception | Zend_Db_Statement_Exception $dbException) {
-                $isDeadlockException = $this->isDeadlockException($dbException);
-                if ($isDeadlockException && $retries === self::DEADLOCK_MAXRETRIES) {
-                    throw new ZfExtended_Models_Db_Exceptions_DeadLockHandler('E1201', ['retries' => $retries], $dbException);
-                } else if (!$isDeadlockException) {
-                    throw $dbException;
-                }
-                error_log('Deadlock when fetching next states from ' . static::$table->getName() . ', attempt ' . $retries . ': ' . $dbException->getMessage());
-                $retries++;
-                usleep(self::DEADLOCK_WAITINGTIME);
+        // wrap query in the deadlock-retry helper since this table is potentially fetched by multiple workers/loopers at the same time ...
+        return $this->retryOnDeadlock(function() use ($state, $taskGuid, $fromTheTop, $limit){
+            $states = [];
+            $segmentIds = [];
+            $column = $this->getColumnName();
+            $where = static::$table->select()
+                ->forUpdate(Zend_Db_Select::FU_MODE_SKIP)
+                ->where('`taskGuid` = ?', $taskGuid)
+                ->where(static::$table->getAdapter()->quoteIdentifier($column) . ' = ?', $state)
+                ->order('segmentId ' . ($fromTheTop ? 'ASC' : 'DESC'))
+                ->limit($limit);
+            foreach (static::$table->fetchAll($where) as $row) {
+                $segmentIds[] = $row->segmentId;
+                $states[] = new static($this->serviceId, $row);
             }
-        }
-        return []; // only to avoid PHPstorm warnings, the code never will get here ...
-    }
-
-    /**
-     * Internal method to fetch next states from the DB
-     * @param int $state
-     * @param string $taskGuid
-     * @param bool $fromTheTop
-     * @param int $limit
-     * @return State[]
-     */
-    private function fetchNextFromDb(int $state, string $taskGuid, bool $fromTheTop, int $limit): array
-    {
-        $states = [];
-        $segmentIds = [];
-        $column = $this->getColumnName();
-        static::$table->getAdapter()->beginTransaction();
-        $where = static::$table->select()
-            ->forUpdate(true)
-            ->where('`taskGuid` = ?', $taskGuid)
-            ->where(static::$table->getAdapter()->quoteIdentifier($column) . ' = ?', $state)
-            ->order('segmentId ' . ($fromTheTop ? 'ASC' : 'DESC'))
-            ->limit($limit);
-        foreach (static::$table->fetchAll($where) as $row) {
-            $segmentIds[] = $row->segmentId;
-            $states[] = new static($this->serviceId, $row);
-        }
-        if (count($segmentIds) > 1) {
-            static::$table->update([$column => self::INPROGRESS], ['segmentId IN (?)' => $segmentIds]);
-        } else if (count($segmentIds) === 1) {
-            // first row of foreach loop
-            $row->$column = self::INPROGRESS;
-            $row->save();
-        }
-        static::$table->getAdapter()->commit();
-        return $states;
+            if (count($segmentIds) > 1) {
+                static::$table->update([$column => self::INPROGRESS], ['segmentId IN (?)' => $segmentIds]);
+            } else if (count($segmentIds) === 1) {
+                // first row of foreach loop
+                $row->$column = self::INPROGRESS;
+                $row->save();
+            }
+            return $states;
+        });
     }
 
     /**

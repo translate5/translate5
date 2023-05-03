@@ -38,16 +38,20 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Services_Connector_Abstract {
     
     use editor_Services_UsageLogerTrait;
-    
-    const STATUS_NOTCHECKED = 'notchecked';
-    const STATUS_ERROR = 'error';
-    const STATUS_AVAILABLE = 'available';
-    const STATUS_UNKNOWN = 'unknown';
-    const STATUS_NOCONNECTION = 'noconnection';
-    const STATUS_NOVALIDLICENSE = 'novalidlicense';
-    const STATUS_NOT_LOADED = 'notloaded';
-    const STATUS_QUOTA_EXCEEDED = 'quotaexceeded';
-    
+
+    /** @deprecated Moved to LanguageResourceStatus */
+    public const STATUS_ERROR = 'error';
+    /** @deprecated Moved to LanguageResourceStatus */
+    public const STATUS_AVAILABLE = 'available';
+    /** @deprecated Moved to LanguageResourceStatus */
+    public const STATUS_NOCONNECTION = 'noconnection';
+    /** @deprecated Moved to LanguageResourceStatus */
+    public const STATUS_NOVALIDLICENSE = 'novalidlicense';
+    /** @deprecated Moved to LanguageResourceStatus */
+    public const STATUS_NOT_LOADED = 'notloaded';
+    /** @deprecated Moved to LanguageResourceStatus */
+    public const STATUS_QUOTA_EXCEEDED = 'quotaexceeded';
+
     const FUZZY_SUFFIX = '-fuzzy-';
     
     /***

@@ -31,7 +31,7 @@ use MittagQI\Translate5\Service\Services;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
 use MittagQI\Translate5\Task\TaskContextTrait;
-use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\Translate5\Cronjob\CronIpFactory;
 use MittagQI\ZfExtended\CsrfProtection;
 
 /**

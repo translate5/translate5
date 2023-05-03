@@ -41,6 +41,12 @@
       <file>editorAPI/XlfSegmentLinesPixelLengthTest.php</file>
       <file>editorAPI/XlfSegmentPixelLengthTest.php</file>
     </testsuite>
+    <testsuite name="termportal">
+      <file>editorAPI/TermProposalTest.php</file>
+      <file>editorAPI/Translate2491Test.php</file>
+      <file>editorAPI/Translate3013Test.php</file>
+      <file>editorAPI/TbxSpecialcharsTest.php</file>
+    </testsuite>
     <testsuite name="auth">
       <file>editorAPI/Translate3108Test.php</file>
       <file>editorAPI/SessionApiTest.php</file>

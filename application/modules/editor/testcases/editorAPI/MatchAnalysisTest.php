@@ -181,7 +181,7 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
      */
     private function filterTaskAnalysis(array &$data) : array {
         // remove the created timestamp since is not relevant for the test
-        foreach ($data as &$a){
+        foreach ($data as $a){
             unset($a->created,$a->id,$a->taskGuid,$a->segmentId);
         }
         usort($data, function($a, $b){ return strcmp($a->resourceName, $b->resourceName); });
@@ -195,7 +195,7 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
     private function filterUngroupedAnalysis(array &$data): array
     {
         // remove some unneeded columns
-        foreach ($data as &$a){
+        foreach ($data as $a){
             unset($a->id, $a->taskGuid, $a->analysisId, $a->segmentId, $a->languageResourceid);
         }
         return $data;

@@ -26,8 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Tools\CronIpFactory;
-use MittagQI\Translate5\Tools\Cronjobs;
+use MittagQI\Translate5\Cronjob\Cronjobs;
 
 /**
  * Hook In functions for the Default Workflow.
@@ -313,6 +312,9 @@ class editor_Workflow_Default_Hooks {
      * @param string $step can be empty
      * @param string $role can be empty
      * @param string $state can be empty
+     *
+     * FIXME add the other usages too
+     * @uses editor_Workflow_Notification::notifyAllFinishOfARole()
      */
     protected function callActions($trigger, $step = null, $role = null, $state = null) {
         $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
