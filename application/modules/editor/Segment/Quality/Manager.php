@@ -262,7 +262,6 @@ final class editor_Segment_Quality_Manager {
 
                 // create entries for all segmentIds
                 $table = new Processing();
-                $table->getAdapter()->beginTransaction();
                 $table->prepareOperation($task->getTaskGuid());
 
                 // maybe some workers need to prepare additional entries by setting custom States
@@ -272,7 +271,6 @@ final class editor_Segment_Quality_Manager {
                         $provider->prepareOperation($task, $processingMode);
                     }
                 }
-                $table->getAdapter()->commit();
             }
         }
     }
@@ -295,7 +293,6 @@ final class editor_Segment_Quality_Manager {
                 return;
             }
             $segmentTable = ZfExtended_Factory::get(editor_Models_Db_Segments::class);
-            $segmentTable->getAdapter()->beginTransaction();
             $segmentIds = $segmentTable->getAllIdsForTask($taskGuid, true);
             $segment = ZfExtended_Factory::get(editor_Models_Segment::class);
             // when we had workers we have to use the Processing-table to fetch the segments. Currently, this always will be the case but who knows ...
@@ -361,7 +358,6 @@ final class editor_Segment_Quality_Manager {
             if($processingTable){
                 $processingTable->finishOperation($taskGuid);
             }
-            $segmentTable->getAdapter()->commit();
         }
     }
 
