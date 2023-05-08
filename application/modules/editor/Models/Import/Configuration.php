@@ -53,6 +53,11 @@ class editor_Models_Import_Configuration {
     CONST RELAIS_FILES_DIRECTORY = 'relais';
 
     /**
+     * The max number of segments allowed in a trans-unit, if exceeded, the import will be rejected
+     */
+    CONST MAX_SEGMENTS_PER_TRANSUNIT = 100;
+
+    /**
      * @var editor_Models_Languages language entity instance
      */
     public $sourceLang;
