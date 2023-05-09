@@ -33,6 +33,7 @@ use editor_Models_Config;
 use Exception;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
+use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
 use RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -369,14 +370,14 @@ class OpenTm2MigrationCommand extends Translate5AbstractCommand
         while ($timeElapsed < $maxWaitTime) {
             $status = $connector->getStatus($connector->getResource());
 
-            if ($status === \editor_Services_Connector_Abstract::STATUS_AVAILABLE) {
+            if ($status === LanguageResourceStatus::AVAILABLE) {
                 $this->io->success('Import finished');
                 $progressBar->finish();
 
                 return;
             }
 
-            if ($status === \editor_Services_Connector_Abstract::STATUS_ERROR) {
+            if ($status === LanguageResourceStatus::ERROR) {
                 $progressBar->finish();
                 $this->io->warning('Error occurred during importing');
 

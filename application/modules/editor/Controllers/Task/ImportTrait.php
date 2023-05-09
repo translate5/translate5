@@ -145,10 +145,14 @@ trait editor_Controllers_Task_ImportTrait {
         try {
             $import->import($dp, $this->data);
         } catch (ZfExtended_ErrorCodeException $e){
-            // in case there is task, remove it
-            $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', [$task]);
-            /* @var $remover editor_Models_Task_Remover */
-            $remover->remove(true);
+
+            // in case there is a task, remove it. To not blur the original Exception, we just try it
+            try {
+                $remover = ZfExtended_Factory::get(editor_Models_Task_Remover::class, [ $task ]);
+                $remover->remove(true);
+            } catch(Throwable){
+
+            }
 
             if($e instanceof editor_Models_Import_ConfigurationException){
                 $this->handleConfigurationException($e);

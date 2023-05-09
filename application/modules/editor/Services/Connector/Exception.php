@@ -46,11 +46,12 @@ class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode
         'E1370' => 'Empty response from {service}',
         'E1313' => 'The queried {service} returns an error.',
         'E1485' => '{service} use not authorized',
-        'E1486' => '{service} endpoint not found'
+        'E1486' => '{service} endpoint not found',
+        'E1512' => 'The TM is being reorganized at the moment. Please try again later.',
     ];
     
     protected function setDuplication() {
         parent::setDuplication();
-        ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312', 'E1370', 'E1485', 'E1486');
+        ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312', 'E1370', 'E1485', 'E1486', 'E1512');
     }
 }

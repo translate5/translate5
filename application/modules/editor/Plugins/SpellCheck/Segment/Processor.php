@@ -142,6 +142,29 @@ class Processor extends AbstractProcessor
      */
     public function processBatch(array $segmentsTags)
     {
+        // Cleanup batch data from previous run, if any
+        Check::purgeBatch();
+
+        // Foreach segment tags
+        foreach ($segmentsTags as $tags) {
+
+            // Fetch segment
+            $segment = $tags->getSegment();
+
+            // Foreach target
+            foreach ($tags->getTargets() as $target) {
+
+                // Add targetField's value to the list of to be processed
+                Check::addBatchTarget($segment, $target->getField());
+
+                // Prevent other target-columns from being processed as this is not fully supported yet
+                break;
+            }
+        }
+
+        // Make single LanguageTool-request and split response by segments
+        Check::runBatchAndSplitResults($this->adapter, $this->language);
+
         foreach ($segmentsTags as $tags) {
             $this->process($tags);
         }
