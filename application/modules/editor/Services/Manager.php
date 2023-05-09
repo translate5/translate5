@@ -124,26 +124,30 @@ class editor_Services_Manager {
             /* @var $service editor_Services_ServiceAbstract */
             $service = ZfExtended_Factory::get($this->getServiceClassName($serviceName));
 
-            $resource = $service->getResources()[0] ?? false;
-
-            if (!$service->isConfigured() || empty($resource)) {
+            if (!$service->isConfigured() || empty($service->getResources())) {
                 $serviceNames[] = (object)[
-                    'name' => '[' . $service->getName() . ']', 'serviceName' => $service->getName(),
+                    'name' => '[' . $service->getName() . ']',
+                    'serviceName' => $service->getName(),
                     'helppage' => urldecode($service->getHelppage())
                 ];
 
                 continue;
             }
 
-            $connector = ZfExtended_Factory::get('editor_Services_Connector');
+            foreach ($service->getResources() as $resource) {
+                $connector = ZfExtended_Factory::get('editor_Services_Connector');
 
-            //the service is also not available when connection cannot be established
-            if ($connector && !$connector->ping($resource)) {
-                $serviceNames[] = (object)[
-                    'id' => $resource->getid(), 'name' => '[' . $service->getName() . ']',
-                    'serviceName' => $service->getName(), 'helppage' => urldecode($service->getHelppage())
-                ];
+                //the service is also not available when connection cannot be established
+                if ($connector && $connector->ping($resource)) {
+                    continue 2;
+                }
             }
+
+            $serviceNames[] = (object)[
+                'name' => '[' . $service->getName() . ']',
+                'serviceName' => $service->getName(),
+                'helppage' => urldecode($service->getHelppage())
+            ];
         }
 
         return $serviceNames;
