@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.LanguageResources.SdlEngine', {
+Ext.define('Editor.store.LanguageResources.Engine', {
   extend : 'Ext.data.ArrayStore',
   fields: [
     {name: 'id', type: 'string'},
@@ -37,5 +37,5 @@ Ext.define('Editor.store.LanguageResources.SdlEngine', {
     {name: 'targetIso', type: 'string'},
     {name: 'domainCode', type: 'string'},
   ],
-  storeId:'sdlEngine'
+  storeId:'engine'
 });
