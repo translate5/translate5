@@ -306,6 +306,7 @@ class Preset extends ZfExtended_Models_Entity_Abstract {
                 'targetLanguageId' => $pricesI['targetLanguageId'],
                 'currency'         => $pricesI['currency'],
                 'pricesByRangeIds' => json_encode($pricesByRangeIds),
+                'noMatch'          => $pricesI['noMatch'],
             ]);
 
             // Save it

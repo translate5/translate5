@@ -509,14 +509,16 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * parse the given transunit and saves the segments
      *
      * @param string $transUnit
-     * @return string contains the teplacement-Tags <lekTargetSeg id=""/> instead the content, where id is the DB segment ID
+     * @return string contains the replacement-Tags <lekTargetSeg id=""/> instead the content, where id is the DB segment ID
      */
     protected function extractSegment($transUnit, array $groupCxtIds) {
         $this->segmentData = array();
-        $result = $this->transunitParser->parse('<trans-unit'.$transUnit, function($mid, $source, $target, $comments) use ($groupCxtIds) {
+        $numSegmentsInTransUnit = 0;
+        $result = $this->transunitParser->parse('<trans-unit'.$transUnit, function($mid, $source, $target, $comments) use ($groupCxtIds, &$numSegmentsInTransUnit) {
             if(strlen(trim(strip_tags($source))) === 0 && strlen(trim(strip_tags($target))) === 0){
                 return null;
             }
+            $numSegmentsInTransUnit++;
             $sourceName = $this->segmentFieldManager->getFirstSourceName();
             $targetName = $this->segmentFieldManager->getFirstTargetName();
             $this->setMid($mid);
@@ -532,6 +534,15 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $this->saveComments($segmentId, $comments);
             return $this->getFieldPlaceholder($segmentId, $targetName);
         });
+
+        // we have to limit the number of segments per tarns-unit as this might compromises further processing (-> sibling-data)
+        if($numSegmentsInTransUnit > editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT){
+            throw new editor_Models_Import_FileParser_Exception('E1523', [
+                'max' => editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT,
+                'transunitId' => $this->transunitParser->getTransunitId(),
+                'task' => $this->task
+            ]);
+        }
 
         // add leading <trans-unit for parsing, then strip it again (we got the $transUnit without it, so we return it without it)
         return substr($result, 11);
