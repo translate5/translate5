@@ -6,4 +6,3 @@ resources.db.params.dbname = "DBNAME"
 
 resources.mail.defaultFrom.name = Service MittagQI
 resources.mail.defaultFrom.email = yourEmailAdress@mittagqi.com
-

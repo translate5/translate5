@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -26,24 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use editor_Services_SDLLanguageCloud_Connector as Connector;
+declare(strict_types=1);
 
-class editor_Services_SDLLanguageCloud_Resource extends editor_Models_LanguageResources_Resource {
-    public function __construct(string $id, string $name, string $url) {
-        parent::__construct($id, $name, $url);
-        $this->filebased = false; //forced to be no filebased
-        $this->writable = false; //forced to be non writeable
-        $this->analysable=true;//is used by match analysis
-        $this->searchable = false; //forced to be non searchable (concordance search)
-        $this->type = editor_Models_Segment_MatchRateType::TYPE_MT;
-        $this->engineBased = true;
-    }
+namespace MittagQI\Translate5\LanguageResource\Adapter;
 
-    public function getConnector(): Connector
-    {
-        $connector = new Connector();
-        $connector->setResource($this);
-
-        return $connector;
-    }
+interface EnginesBasedApiAdapterInterface
+{
+    public function getEngines(): EnginesList;
 }

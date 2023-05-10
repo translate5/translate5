@@ -31,11 +31,11 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.LanguageResources.EngineCombo', {
     extend: 'Ext.form.field.ComboBox',
-    alias: 'widget.sdlenginecombo',
+    alias: 'widget.enginecombo',
     fieldLabel:'Engine',
     displayField: 'name',
     valueField: 'id',
-    store:'sdlEngine',
+    store:'engine',
     queryMode: 'local',
     selectOnFocus:true
 });

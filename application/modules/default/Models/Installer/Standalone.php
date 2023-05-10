@@ -79,6 +79,7 @@ class Models_Installer_Standalone {
             'username' => 'root',
             'password' => '',
             'dbname' => 'translate5',
+            'port' => '3306',
     ];
     
     protected string $hostname;
@@ -613,6 +614,7 @@ class Models_Installer_Standalone {
         $content[] = 'resources.db.params.username = "'.$this->dbCredentials['username'].'"';
         $content[] = 'resources.db.params.password = "'.$this->dbCredentials['password'].'"';
         $content[] = 'resources.db.params.dbname = "'.$this->dbCredentials['dbname'].'"';
+        $content[] = 'resources.db.params.port = "'.$this->dbCredentials['port'].'"';
         $content[] = '';
         $content[] = '; secret for encryption of the user passwords';
         $content[] = '; WHEN YOU CHANGE THAT ALL PASSWORDS WILL BE INVALID!';
@@ -852,7 +854,13 @@ class Models_Installer_Standalone {
     private function boostrapInstallationIni(): void
     {
         $o = $this->options;
-        if (!is_array($o) || empty($o['db::host']) || empty($o['db::username']) || empty($o['db::password']) || empty($o['db::database'])) {
+        if (!is_array($o)
+            || empty($o['db::host'])
+            || empty($o['db::username'])
+            || empty($o['db::password'])
+            || empty($o['db::database'])
+            || empty($o['db::port'])
+        ) {
             while (!$this->promptDbCredentials()) {
             };
         } else {
@@ -860,6 +868,7 @@ class Models_Installer_Standalone {
             $this->dbCredentials['username'] = $o['db::username'];
             $this->dbCredentials['password'] = $o['db::password'];
             $this->dbCredentials['dbname'] = $o['db::database'];
+            $this->dbCredentials['port'] = $o['db::port'];
         }
 
         if (empty($o['timezone'])) {
@@ -889,6 +898,7 @@ class Models_Installer_Standalone {
                         'username' => $this->dbCredentials['username'],
                         'password' => $this->dbCredentials['password'],
                         'dbname' => $this->dbCredentials['dbname'],
+                        'port' => $this->dbCredentials['port'],
                     ])
                 ])
             ])
