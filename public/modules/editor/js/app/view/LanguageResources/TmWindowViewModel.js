@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -36,40 +35,40 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     data: {
         serviceName: false,
         resourceType: false,
-        uploadLabel:null,
+        uploadLabel: null,
         engineBased: null,
     },
     stores: {
         customers: {
             model: 'Editor.model.admin.Customer',
-            pageSize:0,
-            autoLoad:true
+            pageSize: 0,
+            autoLoad: true
         },
         customersDefaultRead: {
             source: '{customers}',
-            pageSize:0,
-            filters : {
-                property : 'id',
-                operator : "in",
-                value : '{resourcesCustomers.value}'
+            pageSize: 0,
+            filters: {
+                property: 'id',
+                operator: "in",
+                value: '{resourcesCustomers.value}'
             }
         },
         customersDefaultWrite: {
             source: '{customersDefaultRead}',
-            pageSize:0,
-            filters : {
-                property : 'id',
-                operator : "in",
-                value : '{useAsDefault.value}'
+            pageSize: 0,
+            filters: {
+                property: 'id',
+                operator: "in",
+                value: '{useAsDefault.value}'
             }
         },
         customersDefaultPivot: {
             source: '{customers}',
-            pageSize:0,
-            filters : {
-                property : 'id',
-                operator : "in",
-                value : '{resourcesCustomers.value}'
+            pageSize: 0,
+            filters: {
+                property: 'id',
+                operator: "in",
+                value: '{resourcesCustomers.value}'
             }
         }
     },
