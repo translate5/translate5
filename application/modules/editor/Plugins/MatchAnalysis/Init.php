@@ -26,10 +26,13 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Cronjob\CronEventTrigger;
+use MittagQI\Translate5\LanguageResource\Pretranslation\BatchResult;
 use MittagQI\Translate5\PauseWorker\PauseWorker;
 use MittagQI\Translate5\LanguageResource\Pretranslation\BatchCleanupWorker;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker;
+use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides the match-analysis and pre-translation against language-resources.';
@@ -40,7 +43,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginMatchAnalysisMatchAnalysis' => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis'
+        'pluginMatchAnalysisMatchAnalysis' => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
+        'pluginMatchAnalysisPricingPreset' => 'Editor.plugins.MatchAnalysis.controller.admin.PricingPreset'
     );
     
     protected $localePath = 'locales';
@@ -69,6 +73,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     public function init() {
         $this->addController('MatchAnalysisController');
+        $this->addController('PricingpresetController');
+        $this->addController('PricingpresetrangeController');
+        $this->addController('PricingpresetpricesController');
         $this->initEvents();
         $this->initRoutes();
     }
@@ -76,26 +83,130 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     /**
      * define all event listener
      */
-    protected function initEvents() {
-        //$this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleOnAfterImport'));
-        //$this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'startTestCode'));
-        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
-        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
-        
-        $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleOnAnalysisOperation'));
-        $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleOnPretranslationOperation'));
-        $this->eventManager->attach('Editor_CronController', 'afterDailyAction', array($this, 'handleAfterDailyAction'));
+    protected function initEvents(): void
+    {
+        $this->eventManager->attach(
+            Editor_IndexController::class,
+            'afterLocalizedjsstringsAction',
+            [$this, 'initJsTranslations']
+        );
+        $this->eventManager->attach(Editor_IndexController::class, 'afterIndexAction', [$this, 'injectFrontendConfig']);
+        $this->eventManager->attach(
+            editor_TaskController::class,
+            'analysisOperation',
+            [$this, 'handleOnAnalysisOperation']
+        );
+        $this->eventManager->attach(editor_TaskController::class, 'afterIndexAction', [$this, 'addPresetInfo']);
+        $this->eventManager->attach(
+            editor_TaskController::class,
+            'pretranslationOperation',
+            [$this, 'handleOnPretranslationOperation']
+        );
+        $this->eventManager->attach(
+            CronEventTrigger::class,
+            CronEventTrigger::DAILY,
+            [$this, 'handleAfterDailyAction']
+        );
+        $this->eventManager->attach(
+            'MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuerPivotQueuer',
+            'beforePivotPreTranslationQueue',
+            [$this, 'handleBeforePivotPreTranslationQueue']
+        );
 
-        $this->eventManager->attach('MittagQI\Translate5\LanguageResource\Pretranslation\PivotQueuerPivotQueuer', 'beforePivotPreTranslationQueue', array($this, 'handleBeforePivotPreTranslationQueue'));
+        // Adds the pricingPresetId to the task-meta
+        $this->eventManager->attach(
+            editor_TaskController::class,
+            'beforeProcessUploadedFile',
+            [$this, 'handleBeforeProcessUploadedFile']
+        );
 
+        $this->eventManager->attach(
+            Editor_CustomerController::class,
+            'afterIndexAction',
+            [$this, 'handleCustomerAfterIndex']
+        );
     }
-    
+
+    /**
+     * Hook that adds the pricingPresetId sent by the Import wizard to the task-meta
+     *
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleBeforeProcessUploadedFile(Zend_EventManager_Event $event){
+
+        /* @var $meta editor_Models_Task_Meta */
+        $meta = $event->getParam('meta');
+
+        /* @var $requestData array */
+        $requestData = $event->getParam('data');
+
+        // Get pricingPresetId: either given within request, or default for the customer, or system default
+        $pricingPresetId = $requestData['pricingPresetId']
+            ?? ZfExtended_Factory::get(Preset::class)
+                ->getDefaultPresetId($requestData['customerId'] ?? null);
+
+        // Save to meta
+        $meta->setPricingPresetId($pricingPresetId);
+    }
+
+    /**
+     * Add presetId and presetUnitType props to each row
+     *
+     * @param Zend_EventManager_Event $event
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function addPresetInfo(Zend_EventManager_Event $event) {
+
+        /** @var editor_TaskController $controller */
+        $controller = $event->getParam('controller');
+
+        // If current request has projectsOnly-param - return
+        if ($controller->hasParam('projectsOnly')) {
+            return;
+        }
+
+        // If current request has no filter-param - return
+        if (!$filter = $controller->getParam('filter')) {
+            return;
+        }
+
+        // If there is no projectId-filter among current request's filter-param - return
+        if (!in_array('projectId', array_column(json_decode($filter), 'property'))) {
+            return;
+        }
+
+        // Get task and preset models
+        $task = $event->getParam('entity');
+        $preset = ZfExtended_Factory::get(Preset::class);
+
+        // Foreach task inside the project
+        foreach ($event->getParam('view')->rows as &$row) {
+
+            // Load task
+            $task->load($row['id']);
+
+            // Load preset
+            $presetId = $task->meta()->getPricingPresetId();
+            $preset->load($presetId);
+
+            // Add props
+            $row['presetId'] = $preset->getId();
+            $row['presetUnitType'] = $preset->getUnitType();
+        }
+    }
+
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         /* @var $view Zend_View_Interface */
         $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
         $config = $this->getConfig();
         $view->Php2JsVars()->set('plugins.MatchAnalysis.calculateBasedOn', $config->calculateBasedOn);
+
+        // Add system default pricing preset info
+        $pricing = ZfExtended_Factory::get(Preset::class);
+        $view->Php2JsVars()->set('plugins.MatchAnalysis.pricing.systemDefaultPresetId', $pricing->getDefaultPresetId());
+        $view->Php2JsVars()->set('plugins.MatchAnalysis.pricing.systemDefaultPresetName', Preset::PRESET_SYSDEFAULT_NAME);
+
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
@@ -514,13 +625,16 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $f = Zend_Registry::get('frontController');
         /* @var $f Zend_Controller_Front */
         $r = $f->getRouter();
-        
-        $restRoute = new Zend_Rest_Route($f, array(), array(
-                'editor' => array('plugins_matchanalysis_matchanalysis',
-                ),
-        ));
-        $r->addRoute('plugins_matchanalysis_restdefault', $restRoute);
-        
+
+        $r->addRoute('plugins_matchanalysis_restdefault', new Zend_Rest_Route($f, [], [
+            'editor' => [
+                'plugins_matchanalysis_matchanalysis',
+                'plugins_matchanalysis_pricingpreset',
+                'plugins_matchanalysis_pricingpresetprices',
+                'plugins_matchanalysis_pricingpresetrange',
+            ],
+        ]));
+
         $exportAnalysis = new ZfExtended_Controller_RestLikeRoute(
                 'editor/plugins_matchanalysis_matchanalysis/export',
                 array(
@@ -529,6 +643,27 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
                         'action' => 'export'
                 ));
         $r->addRoute('plugins_matchanalysis_export', $exportAnalysis);
+
+        $r->addRoute('presetClone', new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_matchanalysis_pricingpreset/clone/*', [
+            'module' => 'editor',
+            'controller' => 'plugins_matchanalysis_pricingpreset',
+            'action' => 'clone'
+        ]));
+
+        $r->addRoute('presetDefault', new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_matchanalysis_pricingpreset/setdefault/*', [
+            'module' => 'editor',
+            'controller' => 'plugins_matchanalysis_pricingpreset',
+            'action' => 'setdefault'
+        ]));
+
+        $r->addRoute('presetpricesClone', new ZfExtended_Controller_RestLikeRoute(
+            'editor/plugins_matchanalysis_pricingpresetprices/clone/*', [
+            'module' => 'editor',
+            'controller' => 'plugins_matchanalysis_pricingpresetprices',
+            'action' => 'clone'
+        ]));
     }
     
     /***
@@ -541,5 +676,22 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $extra['task']=$task;
         $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
         $logger->warn('E1100',$message,$extra);
+    }
+
+    /**
+     * @param Zend_EventManager_Event $event
+     * @see ZfExtended_RestController::afterActionEvent
+     */
+    public function handleCustomerAfterIndex(Zend_EventManager_Event $event) {
+        $meta = ZfExtended_Factory::get(editor_Models_Db_CustomerMeta::class);
+        $metas = $meta->fetchAll('defaultPricingPresetId IS NOT NULL')->toArray();
+        $pricingPresetIds = array_column($metas, 'defaultPricingPresetId', 'customerId');
+        foreach ($event->getParam('view')->rows as &$customer) {
+            if (array_key_exists($customer['id'], $pricingPresetIds)) {
+                $customer['defaultPricingPresetId'] = (int) $pricingPresetIds[$customer['id']];
+            } else {
+                $customer['defaultPricingPresetId'] = null;
+            }
+        }
     }
 }

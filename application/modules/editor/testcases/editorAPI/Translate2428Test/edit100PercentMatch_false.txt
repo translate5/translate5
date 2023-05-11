@@ -52,5 +52,23 @@
         "60": 0,
         "50": 0,
         "noMatch": 0
+    },
+    {
+        "resourceName": "summary",
+        "resourceColor": "",
+        "resourceType": "",
+        "internalFuzzy": "",
+        "unitCountTotal": 66,
+        "104": 0,
+        "103": 0,
+        "102": 0,
+        "101": 0,
+        "100": 0,
+        "90": 0,
+        "80": 0,
+        "70": 66,
+        "60": 0,
+        "50": 0,
+        "noMatch": 0
     }
 ]

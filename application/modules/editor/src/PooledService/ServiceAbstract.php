@@ -353,7 +353,7 @@ abstract class ServiceAbstract extends DockerServiceAbstract
      */
     private function filterDownedServiceUrls(array $serviceUrls): array
     {
-        return array_diff($serviceUrls, Services::getServiceDownList($this->getServiceId()));
+        return array_values(array_diff($serviceUrls, Services::getServiceDownList($this->getServiceId())));
     }
 
     /**

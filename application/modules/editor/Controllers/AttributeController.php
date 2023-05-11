@@ -970,8 +970,11 @@ class editor_AttributeController extends ZfExtended_RestController
         /* @var $termNoteStatus editor_Models_Terminology_TermStatus */
         $termNoteStatus = ZfExtended_Factory::get('editor_Models_Terminology_TermStatus');
 
+        // Use normativeAuthorization-attribute as $updatedAttribute arg, if it was updated
+        $updatedAttribute = $termM->getNormativeAuthorizationIfTermWasRejected() ?? $attrM;
+
         $others = [];
-        $status = $termNoteStatus->getStatusForUpdatedAttribute($attrM, $others);
+        $status = $termNoteStatus->getStatusForUpdatedAttribute($updatedAttribute, $others);
 
         //update the other attributes with the new value
         foreach($others as $id => $other) {

@@ -146,7 +146,7 @@ class RecalcTransFound {
             return 'transNotDefined';
 
         // Else if at least one of target terms is a translation for the current source term
-        } else if ($transTermId = array_intersect($transIdA, $this->trgIdA)[0] ?? 0) {
+        } else if ($transTermId = array_values(array_intersect($transIdA, $this->trgIdA))[0] ?? 0) {
 
             // Remove first found tbxId from $trgIdA
             unset($this->trgIdA[array_search($transTermId, $this->trgIdA)]);
@@ -290,6 +290,10 @@ class RecalcTransFound {
         $this->preload($srcIdA);
 
         // Get [termTbxId => [mark1, mark2, ...]] pairs for all terms detected in segment source text
+        // As you can see at the line above it can be, for example, 3 occurrences of the same term
+        // in segment source, and only 2 translations for tha term in segment target, so that would mean
+        // translations for first two - are found, but for the 3rd one - not found.
+        // So 'mark1, mark2, ...' above are to indicate status for each occurrence of a term in segment source
         $markA = $this->getMarkBySrcIdA($srcIdA);
 
         // Recalc transNotFound/transNotDefined/transFound marks

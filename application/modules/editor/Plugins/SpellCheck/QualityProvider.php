@@ -38,6 +38,8 @@ use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Configuration;
 use MittagQI\Translate5\Plugins\SpellCheck\Segment\Processor;
 use MittagQI\Translate5\Plugins\SpellCheck\Worker;
+use MittagQI\Translate5\Segment\Db\Processing;
+use MittagQI\Translate5\Segment\Processing\State;
 
 /**
  * The Quality provider 
@@ -131,6 +133,16 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
         // they can not be re-identified with the  Qualities Object in the SegmentTags
         $qualitiesTable = new editor_Models_Db_SegmentQuality();
         $qualitiesTable->removeByTaskGuidAndType($task->getTaskGuid(), $this->getType());
+        // find non-editable segments and mark them as unprocessable if not configured to do so
+        if(!$task->getConfig()->runtimeOptions->plugins->SpellCheck->checkReadonlySegments){
+            $segmentsTable = ZfExtended_Factory::get(editor_Models_Db_Segments::class);
+            $noneditableSegmentIds = $segmentsTable->getAllIdsForTask($task->getTaskGuid(), false, ['editable = ?' => 0]);
+            if(!empty($noneditableSegmentIds)){
+                $processingTable = new Processing();
+                // set the noneditable segments to ignore
+                $processingTable->setSegmentsToState($noneditableSegmentIds, Service::SERVICE_ID, State::IGNORED);
+            }
+        }
     }
 
     /**
@@ -184,7 +196,10 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
 
         } else if ($processingMode === editor_Segment_Processing::EDIT) {
 
-            $processor->process($tags, false);
+            // process just editable segments unless configured otherwise
+            if($tags->getSegment()->getEditable() || $task->getConfig()->runtimeOptions->plugins->SpellCheck->checkReadonlySegments){
+                $processor->process($tags, false);
+            }
         }
 
         return $tags;

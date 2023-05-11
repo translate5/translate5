@@ -965,7 +965,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @param {Editor.model.admin.Task} task
      */
     editorPackageExport: function (task, event) {
-        Editor.view.admin.task.reimport.ReimportViewController.exportTask(task.get('id'));
+        Editor.view.admin.task.reimport.ReimportViewController.exportTask(task);
     },
 
     /***

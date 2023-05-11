@@ -51,6 +51,7 @@ class Downloader
      * @param editor_Models_Task $task
      * @param bool $diff
      * @return int
+     * @throws Exception
      */
     public function run(editor_Models_Task $task, bool $diff): int
     {

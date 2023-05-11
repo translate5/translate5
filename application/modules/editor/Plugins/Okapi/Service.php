@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Plugins\Okapi;
 
+use editor_Plugins_Okapi_Exception;
 use editor_Plugins_Okapi_Init;
 use editor_Utils;
 use JsonException;
@@ -141,6 +142,57 @@ final class Service extends DockerServiceAbstract
                 'or setup the missing servers!';
         }
         return $result;
+    }
+
+    /**
+     * Retrieves the default service URL. Keep in Mind, this is only the configured URL on system level!
+     * @return string|null
+     */
+    public function getServiceUrl(): ?string
+    {
+        return $this->getConfiguredServiceUrl(null, false);
+    }
+
+    /**
+     * Retrieves the configured okapi server URL, either the default or for the passed key
+     * @param string|null $serverToUse: if given, the server to use can be selected
+     * @param bool $throwExceptionOnError: if set to false, instead of throwing an exception "null" is returned
+     * @return string|null
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public function getConfiguredServiceUrl(string $serverToUse = null, bool $throwExceptionOnError = true): ?string
+    {
+        $services = $this->config->runtimeOptions->plugins->Okapi->server; /* @var Zend_Config $services */
+        $serviceUsed = (empty($serverToUse)) ? $this->config->runtimeOptions->plugins->Okapi->serverUsed : $serverToUse; /* @var ?string $serviceUsed */
+
+        if (!empty($services)) {
+            if (!empty($serviceUsed)) {
+                if ($services->__isset($serviceUsed)) {
+                    if (!empty($services->$serviceUsed)) {
+                        // we normalize the configured URL to have no slash at the end
+                        return rtrim($services->$serviceUsed, '/');
+                    } else if ($throwExceptionOnError) {
+                        // configured value is empty
+                        throw new editor_Plugins_Okapi_Exception('E1059');
+                    }
+                } else if ($throwExceptionOnError) {
+                    // configured value does not exist in the list
+                    throw new editor_Plugins_Okapi_Exception('E1412', [
+                        'servers' => $services,
+                        'serverUsed' => $serviceUsed
+                    ]);
+                }
+            } else if ($throwExceptionOnError) {
+                // no service to use is set
+                throw new editor_Plugins_Okapi_Exception('E1411', [
+                    'serverUsed' => $serviceUsed
+                ]);
+            }
+        } else if ($throwExceptionOnError) {
+            // list of services is empty
+            throw new editor_Plugins_Okapi_Exception('E1410');
+        }
+        return null;
     }
 
     /**

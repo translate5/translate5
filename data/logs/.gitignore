@@ -1,0 +1,9 @@
+# The line '/data/logs/*' was removed from the root directory's .gitignore-file because now
+# we do need logs-directory to be surely existing (because php.log is now there),
+# but still we need all files there to be ignored
+
+# So, ignore everything
+*
+
+# Except .gitignore itself
+!.gitignore

@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Service\T5Memory\Enum\ReorganizeTm;
 use editor_Models_Task as Task;
+use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
 
 /**
  * OpenTM2 Connector
@@ -206,8 +206,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function update(editor_Models_Segment $segment): void
     {
-        $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
+        $messages = Zend_Registry::get('rest_messages');
+
+        if ($this->isReorganizingAtTheMoment()) {
+            throw new editor_Services_Connector_Exception('E1512', [
+                'service' => $this->getResource()->getName(),
+                'languageResource' => $this->languageResource,
+            ]);
+        }
 
         $fileName = $this->getFileName($segment);
         $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
@@ -512,30 +519,41 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(editor_Models_LanguageResources_Resource $resource){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource): string
+    {
         $this->lastStatusInfo = '';
-        if(empty($this->languageResource)) {
+
+        if (empty($this->languageResource)) {
             //ping call
             $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
             $this->api->setResource($resource);
+
             return $this->api->status();
         }
         
         $name = $this->languageResource->getSpecificData('fileName');
-        if(empty($name)) {
+
+        if (empty($name)) {
             $this->lastStatusInfo = 'The internal stored filename is invalid';
-            return self::STATUS_NOCONNECTION;
+
+            return LanguageResourceStatus::NOCONNECTION;
         }
 
-        //lets check the internal state before calling API for status as import worker may be running
-        $status = $this->languageResource->getSpecificData('status') ?? '';
-        if($status === self::STATUS_IMPORT) {
+        // let's check the internal state before calling API for status as import worker may be running
+        $status = $this->languageResource->getStatus();
+
+        if ($status === LanguageResourceStatus::IMPORT) {
             $this->lastStatusInfo = 'TM wird noch importiert und ist daher auch noch nicht nutzbar.';
             // FIXME thats not 100% correct here, since when it was crashed while the import it may stay on status import
             // need to add status reset if it hanged up
-            return self::STATUS_IMPORT;
+            return LanguageResourceStatus::IMPORT;
+        }
+
+        // TODO remove after reorganize status is implemented in status query on t5memory side
+        if ($this->isReorganizingAtTheMoment()) {
+            // Status import to prevent any other queries to TM to be performed
+            return LanguageResourceStatus::IMPORT;
         }
 
         if ($this->api->status()) {
@@ -550,23 +568,29 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // - OpenTM2 is online
         // - the requested TM is currently not loaded, so there is no info about the existence
         // - So we display the STATUS_NOT_LOADED instead
-        if($this->api->getResponse()->getStatus() == 404) {
-            if($status == self::STATUS_ERROR) {
+        if ($this->api->getResponse()->getStatus() === 404) {
+            if ($status === LanguageResourceStatus::ERROR) {
                 $this->lastStatusInfo = 'Es gab einen Fehler beim Import, bitte prüfen Sie das Fehlerlog.';
-                return self::STATUS_ERROR;
+
+                return LanguageResourceStatus::ERROR;
             }
-            $this->lastStatusInfo = 'Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
-            return self::STATUS_NOT_LOADED;
+
+            $this->lastStatusInfo = 'Die Ressource ist generell verfügbar, '
+                . 'stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
+
+            // This will be not needed after migration to t5memory completed
+            return LanguageResourceStatus::NOT_LOADED;
         }
         
         $error = $this->api->getError();
-        if(empty($error->type)) {
+
+        if (empty($error->type)) {
             $this->lastStatusInfo = $error->error;
+        } else {
+            $this->lastStatusInfo = $error->type . ': ' . $error->error;
         }
-        else {
-            $this->lastStatusInfo = $error->type.': '.$error->error;
-        }
-        return self::STATUS_ERROR;
+
+        return LanguageResourceStatus::ERROR;
     }
 
     /**
@@ -584,19 +608,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $tmxImportStatus = $apiResponse ? ($apiResponse->tmxImportStatus ?? '') : '';
 
         $lastStatusInfo = '';
-        $result = self::STATUS_UNKNOWN;
+        $result = LanguageResourceStatus::UNKNOWN;
 
         switch ($status) {
             // TM not found at all
             case 'not found':
                 // We have no status 'not found' at the moment, so we use 'error' instead
-                $result = self::STATUS_ERROR;
+                $result = LanguageResourceStatus::ERROR;
 
                 break;
 
             // TM exists on a disk, but not loaded into memory
             case 'available':
-                $result = self::STATUS_AVAILABLE;
+                $result = LanguageResourceStatus::AVAILABLE;
                 // TODO change this to STATUS_NOT_LOADED after discussed with the team
 //                $result = self::STATUS_NOT_LOADED;
                 break;
@@ -607,25 +631,25 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 switch ($tmxImportStatus) {
                     case 'available':
                         if (isset($apiResponse->importTime) && $apiResponse->importTime === 'not finished') {
-                            $result = self::STATUS_IMPORT;
+                            $result = LanguageResourceStatus::IMPORT;
 
                             break;
                         }
 
-                        $result = self::STATUS_AVAILABLE;
+                        $result = LanguageResourceStatus::AVAILABLE;
 
                         break;
 
                     case 'import':
                         $lastStatusInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
-                        $result = self::STATUS_IMPORT;
+                        $result = LanguageResourceStatus::IMPORT;
 
                         break;
 
                     case 'error':
                     case 'failed':
                         $lastStatusInfo = $apiResponse->ErrorMsg;
-                        $result = self::STATUS_ERROR;
+                        $result = LanguageResourceStatus::ERROR;
 
                         break;
 
@@ -842,6 +866,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     #region Reorganize TM
     // Need to move this region to a dedicated class while refactoring connector
+    private const REORGANIZE_STARTED_AT = 'reorganize_started_at';
+    private const MAX_REORGANIZE_TIME_MINUTES = 30;
+
     private function needsReorganizing(stdClass $error): bool
     {
         if ($this->api->isOpentm2()) {
@@ -856,7 +883,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // Check if error codes contains any of the values
         return str_replace($errorCodes, '', $error->code) !== $error->code
             && !$this->isReorganizingAtTheMoment()
-            && !$this->isReorganized();
+            && !$this->isReorganizeFailed();
     }
 
     public function reorganizeTm(): bool
@@ -866,16 +893,19 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             // without refreshing from DB, which leads th that here it is tried to be inserted as new one
             // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
             $this->languageResource->refresh();
-            $this->languageResource->addSpecificData(ReorganizeTm::NAME, ReorganizeTm::IN_PROGRESS);
+            $this->languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
+            $this->languageResource->addSpecificData(
+                self::REORGANIZE_STARTED_AT,
+                date(DateTimeInterface::RFC3339)
+            );
             $this->languageResource->save();
         }
 
         $reorganized = $this->api->reorganizeTm();
 
         if (!$this->isInternalFuzzy()) {
-            $this->languageResource->addSpecificData(
-                ReorganizeTm::NAME,
-                $reorganized ? ReorganizeTm::DONE : ReorganizeTm::FAILED
+            $this->languageResource->setStatus(
+                $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
             );
             $this->languageResource->save();
         }
@@ -885,16 +915,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function isReorganizingAtTheMoment(): bool
     {
-        return $this->languageResource->getSpecificData(ReorganizeTm::NAME) === ReorganizeTm::IN_PROGRESS;
+        $this->resetReorganizingIfNeeded();
+
+        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
     }
 
-    public function isReorganized(): bool
+    public function isReorganizeFailed(): bool
     {
-        return in_array(
-            $this->languageResource->getSpecificData(ReorganizeTm::NAME),
-            [ReorganizeTm::DONE, ReorganizeTm::FAILED],
-            true
-        );
+        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_FAILED;
     }
 
     private function addReorganizeWarning(Task $task = null): void
@@ -912,6 +940,27 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'The queried TM returned error which is configured for automatic TM reorganization',
             $params
         );
+    }
+
+    private function resetReorganizingIfNeeded(): void
+    {
+        $reorganizeStartedAt = $this->languageResource->getSpecificData(self::REORGANIZE_STARTED_AT);
+
+        if (null === $reorganizeStartedAt || $this->isInternalFuzzy()) {
+            return;
+        }
+
+        if ((new DateTimeImmutable($reorganizeStartedAt))
+                ->modify(sprintf('+%d minutes', self::MAX_REORGANIZE_TIME_MINUTES)) < new DateTimeImmutable()
+        ) {
+            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
+            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
+            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
+            $this->languageResource->refresh();
+            $this->languageResource->removeSpecificData(self::REORGANIZE_STARTED_AT);
+            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
+            $this->languageResource->save();
+        }
     }
     #endregion Reorganize TM
 

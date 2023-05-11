@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -26,49 +26,62 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\Translate5\Cronjob\CronIpFactory;
 
 /**
  */
-class editor_Plugins_TermImport_TermImportController extends ZfExtended_RestController {
+class editor_Plugins_TermImport_TermImportController extends ZfExtended_RestController
+{
     
-    
+
+    protected array $_unprotectedActions = [
+        'filesystem',
+        'crossapi'
+    ];
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::init()
      *
      * copied the init method, parent can not be used, since no real entity is used here
      */
-    public function init() {
+    public function init()
+    {
         $this->initRestControllerSpecific();
     }
-    
+
+    /**
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     */
     public function filesystemAction(): void
     {
         $cronIp = CronIpFactory::create();
         if (!$cronIp->isAllowed()) {
-            throw new ZfExtended_Models_Entity_NoAccessException('Wrong IP to call this action! Configure cronIP accordingly!');
+            throw new ZfExtended_Models_Entity_NoAccessException(
+                'Wrong IP to call this action! Configure cronIP accordingly!'
+            );
         }
 
-        $import=ZfExtended_Factory::get('editor_Plugins_TermImport_Services_Import');
-        /* @var $import editor_Plugins_TermImport_Services_Import */
-
-        $message=$import->handleFileSystemImport();
-        $this->view->messages=$message;
+        $import = ZfExtended_Factory::get(editor_Plugins_TermImport_Services_Import::class);
+        $message = $import->handleFileSystemImport();
+        $this->view->messages = $message;
     }
 
 
+    /**
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     */
     public function crossapiAction(): void
     {
         $cronIp = CronIpFactory::create();
-        if(!$cronIp->isAllowed()) {
-            throw new ZfExtended_Models_Entity_NoAccessException('Wrong IP to call this action! Configure cronIP accordingly!');
+        if (!$cronIp->isAllowed()) {
+            throw new ZfExtended_Models_Entity_NoAccessException(
+                'Wrong IP to call this action! Configure cronIP accordingly!'
+            );
         }
 
-        $import=ZfExtended_Factory::get('editor_Plugins_TermImport_Services_Import');
-        /* @var $import editor_Plugins_TermImport_Services_Import */
-        
-        $message=$import->handleAccrossApiImport();
-        $this->view->messages=$message;
+        $import = ZfExtended_Factory::get(editor_Plugins_TermImport_Services_Import::class);
+        $message = $import->handleAccrossApiImport();
+        $this->view->messages = $message;
     }
 }

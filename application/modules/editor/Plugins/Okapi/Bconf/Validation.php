@@ -151,7 +151,7 @@ class editor_Plugins_Okapi_Bconf_Validation {
         /* @var $language editor_Models_Languages */
         try {
             $api->createProject();
-            $api->uploadOkapiConfig($this->bconf->getPath());
+            $api->uploadOkapiConfig($this->bconf->getPath(), true);
             $api->uploadInputFile($testfile, new SplFileInfo($testfilePath));
             $api->executeTask(self::SOURCE_LANGUAGE, self::TARGET_LANGUAGE);
             $convertedFile = $api->downloadFile($testfile, $manifestFile, new SplFileInfo($testDir));

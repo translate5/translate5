@@ -57,7 +57,7 @@ class DevelopmentLocalServicesCommand extends ServiceAutodiscoveryCommand
             'config' => ['socketServer' => 'ws://localhost:4756/translate5'] // special host/port for local-dev
         ],
         'okapi' => [
-            'url' => 'http://localhost:4780/okapi-longhorn/'
+            'url' => 'http://localhost:4780/'
         ],
         'languagetool' => [
             'url' => [

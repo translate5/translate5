@@ -37,7 +37,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         'Editor.plugins.MatchAnalysis.view.AnalysisPanel',
         'Editor.plugins.MatchAnalysis.view.LanguageResources',
         'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig',
-        'Editor.plugins.MatchAnalysis.view.AnalysisWindow'
+        'Editor.plugins.MatchAnalysis.view.AnalysisWindow',
+        'Editor.plugins.MatchAnalysis.store.admin.pricing.PresetStore'
     ],
     
     models: ['Editor.plugins.MatchAnalysis.model.MatchAnalysis'],
@@ -132,6 +133,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 scope:me
             }
         });
+    },
+
+    onLaunch: function(){
+
+        // Create preset store
+        Ext.create('Editor.plugins.MatchAnalysis.store.admin.pricing.PresetStore');
     },
 
     /***
