@@ -203,8 +203,6 @@ class MatchAnalysisTest extends editor_Test_ImportTest {
 
     public static function afterTests(): void
     {
-        parent::afterTests();
-
         foreach (self::$changedConfigs as $c){
             static::api()->putJson('editor/config/',[
                 'value' => $c->value,
