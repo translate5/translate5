@@ -22,7 +22,7 @@
         "noMatch": 0
     },
     {
-        "resourceName": "Summary",
+        "resourceName": "summary",
         "resourceColor": "",
         "resourceType": "",
         "internalFuzzy": "",
@@ -30,10 +30,10 @@
         "80": 41,
         "56": 199,
         "0": 0,
-        "noMatch": ""
+        "noMatch": 0
     },
     {
-        "resourceName": "Amount",
+        "resourceName": "amount",
         "resourceColor": 0,
         "resourceType": 0,
         "internalFuzzy": 0,
