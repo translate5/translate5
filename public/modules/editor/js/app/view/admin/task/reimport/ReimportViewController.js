@@ -91,12 +91,16 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
             scope: this,
             success: function(response){
                 var resp = Ext.util.JSON.decode(response.responseText),
+                    view = me.getView(),
                     result = resp['rows'];
-                // even if the root is disabled, adding root node is the only way to display the data !
-                me.getView().setRootNode({
-                    expanded:true,
-                    children:result
-                });
+
+                if (view){
+                    // even if the root is disabled, adding root node is the only way to display the data !
+                    view.setRootNode({
+                        expanded:true,
+                        children:result
+                    });
+                }
 
             },
             failure: function(response){

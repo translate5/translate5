@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Adapter\EnginesBasedApiAdapterInterface;
+
 /**#@+
  * Resources are no valid Models/Entitys, we support only a generated Resource listing
  * One Resource is one available configured connector, Languages and Title can be customized in the TM Overview List
@@ -117,6 +119,27 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
 
     public function postAction() {
         throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
+    }
+
+    public function enginesAction(): void
+    {
+        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        $resourcesOfType = $serviceManager->getAllResourcesOfType($this->getRequest()->get('resourceType'));
+
+        if (empty($resourcesOfType)) {
+            return;
+        }
+
+        /** @var editor_Models_LanguageResources_Resource $resourceType */
+        $resourceType = current($resourcesOfType);
+
+        $connector = $resourceType->getConnector();
+
+        if (!$connector instanceof EnginesBasedApiAdapterInterface) {
+            return;
+        }
+
+        $this->view->rows = $connector->getEngines()->toArray();
     }
     
     /***

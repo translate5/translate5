@@ -85,6 +85,18 @@ class Cronjobs
         $log = ZfExtended_Factory::get(\ZfExtended_Models_Log::class);
         $log->purgeOlderAs(\Zend_Registry::get('config')->runtimeOptions?->logger?->keepWeeks ?? 6);
         $this->eventTrigger->triggerDaily();
+
+        // Rotate logs
+        $this->rotateLogs();
+    }
+
+    /**
+     * Rotate logs
+     */
+    public function rotateLogs() {
+
+        // Rotate php log
+        \MittagQI\Translate5\Logging\Rotation::rotate('php.log');
     }
 
     /**
