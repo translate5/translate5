@@ -47,17 +47,11 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     /**
      * On add new tm window render handler
      */
-    onTmWindowRender:function(){
-        var me=this,
-            view=me.getView(),
-            sdlStore=Ext.StoreManager.get('sdlEngine');
+    onTmWindowRender: function () {
+        var me = this,
+            view = me.getView();
 
-        if(sdlStore){
-            //set the data to the sdl language store
-            sdlStore.setData(Editor.data.LanguageResources.sdlEngines);
-        }
-        
-        view.getViewModel().set('uploadLabel',view.strings.file);
+        view.getViewModel().set('uploadLabel', view.strings.file);
     },
 
     labelTooltipInstance:null,
@@ -70,9 +64,10 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             view=me.getView(),
             serviceName=field.getSelection() && field.getSelection().get('serviceName'),
             resourceType=field.getSelection() && field.getSelection().get('resourceType'),
+            engineBased = field.getSelection() && field.getSelection().get('engineBased'),
             helppage = field.getSelection() && field.getSelection().get('helppage'),
             vm=view.getViewModel(),
-            sdlEngineCombo=view.down('#sdlEngine');
+            engineCombo=view.down('#engine');
 
         if (!me.isValidService(serviceName, helppage)) {
             return false;
@@ -80,20 +75,30 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         
         vm.set('serviceName',serviceName);
         vm.set('resourceType',resourceType);
+        vm.set('engineBased', engineBased);
 
         // upload field has different tooltip and label based on the selected resource
         me.updateUploadFieldConfig();
 
-        //is visible when sdl as resource is selected
-        //sdlEngineCombo.setVisible(isSdl);
-        //sdlEngineCombo.setDisabled(!isSdl);
-        if(me.isSdlResource()){
-            sdlEngineCombo.getStore().clearFilter();
+        let record = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(resource);
+
+        if (me.isEngineBasedResource(record)) {
+            engineCombo.getStore().clearFilter();
+            engineCombo.getStore().setProxy({
+                type: 'ajax',
+                url: Editor.data.restpath + 'languageresourceresource/' + record.get('serviceName') + '/engines',
+                reader : {
+                    rootProperty: 'rows',
+                    type : 'json'
+                },
+            });
+            engineCombo.getStore().load();
+
             return;
         }
+
         //for non engine type resource load the resource languages
-        var record = Ext.StoreManager.get('Editor.store.LanguageResources.Resources').getById(resource),
-            sourceField=view.down('combo[name="sourceLang"]'),
+        let sourceField=view.down('combo[name="sourceLang"]'),
             targetField=view.down('combo[name="targetLang"]'),
             sourceData = record ? record.get('sourceLanguages') : [],
             targetData = record ? record.get('targetLanguages') : [];
@@ -254,11 +259,10 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     },
 
     /**
-     * Is the current selected resource of sdl cloud type
+     * Is the current selected resource uses engines conception
      */
-    isSdlResource:function(){
-        var vm=this.getView().getViewModel();
-        return vm.get('serviceName')==Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
+    isEngineBasedResource: function (resourceType) {
+        return resourceType.get('engineBased');
     },
 
     /***

@@ -80,6 +80,15 @@ abstract class editor_Test_ImportTest extends editor_Test_ApiTest
     }
 
     /**
+     * Resets the config as it points to stuff from the last test in the setup phase
+     * @return void
+     */
+    protected static function testSpecificInit()
+    {
+        static::$_config = null;
+    }
+
+    /**
      * internal setup for the base-classes
      * Do not override in concrete test-classes, use beforeTests there
      */

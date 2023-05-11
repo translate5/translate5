@@ -270,7 +270,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * checks the status of a language resource (if set), or just of the server (if no concrete language resource is given)
      * @return boolean
      */
-    public function status() {
+    public function status(): bool {
         if(empty($this->languageResource)) {
             $this->getHttp('GET', '/');
         }

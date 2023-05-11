@@ -85,12 +85,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      */
     protected \stdClass $customer;
 
-    /**
-     * Collection of language resources created from addResources method
-     * @var array
-     */
-    protected static array $resources = []; //TODO: remove from memory ?
-
     protected static array $testusers = array(
         'testmanager' => '{00000000-0000-0000-C100-CCDDEE000001}',
         'testlector' => '{00000000-0000-0000-C100-CCDDEE000002}',
@@ -673,9 +667,6 @@ final class Helper extends \ZfExtended_Test_ApiHelper
             $resource = $this->decodeJsonResponse($response);
         }
         $this->test::assertEquals($params['name'], $resource->name);
-
-        //collect the created resource
-        self::$resources[] = $resource;
 
         error_log("Language resources created. " . $resource->name);
 

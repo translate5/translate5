@@ -1,5 +1,4 @@
 # User data dirs
-/data/logs/*
 /data/ConnectWorldserver*
 /data/editor*
 /data/purchaseOrderPdfs*

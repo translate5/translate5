@@ -54,7 +54,13 @@ final class Adapter {
     const PATH_MATCHES = '/check';
     const METHOD_LANGUAGES = 'GET';
     const METHOD_MATCHES = 'POST';
-    
+
+    /**
+     * Special separator-tag, used to distinguish between text chunks for
+     * being able to pass multiple texts within single LanguageTool request
+     */
+    const BATCH_SEPARATOR = '<separator/>';
+
     /**
      * Request timeout for the api
      * @var integer
@@ -233,8 +239,20 @@ final class Adapter {
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
 
-        // Set params
-        $http->setParameterPost('text', $text);
+        // If $text arg is an array, assume we're in the batch-mode
+        if (is_array($text)) {
+
+            // Prepare a structure described in LanguageTool docs
+            $annotation = [];
+            foreach ($text as $item) {
+                $annotation []= ['text' => $item];
+                $annotation []= ['markup' => self::BATCH_SEPARATOR, 'interpretAs' => "\n\n"];
+            }
+            $data = json_encode(['annotation' => $annotation]);
+            $http->setParameterPost('data', $data);
+        } else {
+            $http->setParameterPost('text', $text);
+        }
         $http->setParameterPost('language', $language);
 
         // Reset $this->lastStatus

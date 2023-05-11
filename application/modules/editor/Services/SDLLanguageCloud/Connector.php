@@ -26,9 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Adapter\EngineDTO;
+use MittagQI\Translate5\LanguageResource\Adapter\EnginesBasedApiAdapterInterface;
+use MittagQI\Translate5\LanguageResource\Adapter\EnginesList;
+
 /**
  */
-class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connector_Abstract {
+class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connector_Abstract implements EnginesBasedApiAdapterInterface
+{
 
     /**
      * @var editor_Services_SDLLanguageCloud_HttpApi
@@ -114,5 +119,32 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         }, $this->api->getErrors()));
             
         return self::STATUS_NOCONNECTION;
+    }
+
+    public function getEngines(): EnginesList
+    {
+        $engineModel = ZfExtended_Factory::get(editor_Models_LanguageResources_SdlResources::class);
+
+        $enginesList = new EnginesList();
+
+        try {
+            $engines = $engineModel->getAllEngines();
+
+            foreach ($engines as $engine) {
+                $enginesList->add(new EngineDTO(
+                    $engine['id'],
+                    $engine['name'],
+                    $engine['source'],
+                    $engine['sourceIso'],
+                    $engine['target'],
+                    $engine['targetIso'],
+                    $engine['domainCode'],
+                ));
+            }
+        } catch (Exception) {
+            return new EnginesList();
+        }
+
+        return $enginesList;
     }
 }

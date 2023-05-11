@@ -28,13 +28,24 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Service\T5Memory\Enum;
+namespace MittagQI\Translate5\LanguageResource\Adapter;
 
-// Change this to be enum after migrate to PHP 8.1
-class ReorganizeTm
+class EnginesList
 {
-    public const NAME = 'reorganize_tm';
-    public const IN_PROGRESS = 'in_progress';
-    public const DONE = 'done';
-    public const FAILED = 'failed';
+    private array $engines = [];
+
+    public function add(EngineDTO $engineDTO): void
+    {
+        $this->engines[] = $engineDTO;
+    }
+
+    public function toArray(): array
+    {
+        return array_map(
+            static function (EngineDTO $engineDTO) {
+                return $engineDTO->toArray();
+            },
+            $this->engines
+        );
+    }
 }
