@@ -19,6 +19,18 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.2.1] - 2023-05-11
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3327](https://jira.translate5.net/browse/TRANSLATE-3327): LanguageResources - Problem with unconfigured language resources** <br>
+Removed configuration from language resource services leads to an error
+
+
 ## [6.2.0] - 2023-05-11
 
 ### Important Notes:

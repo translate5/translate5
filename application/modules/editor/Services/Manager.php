@@ -196,15 +196,17 @@ class editor_Services_Manager {
      * @param string $serviceType
      * @param string $id
      *
-     * @return editor_Models_LanguageResources_Resource
+     * @return editor_Models_LanguageResources_Resource|null
      *
      * @throws ZfExtended_Exception
      */
-    public function getResourceById(string $serviceType, string $id): editor_Models_LanguageResources_Resource
+    public function getResourceById(string $serviceType, string $id): ?editor_Models_LanguageResources_Resource
     {
         $this->checkService($serviceType);
 
-        return ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getResourceById($id);
+        $resource = ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getResourceById($id);
+
+        return $resource ?? null;
     }
 
     /***
