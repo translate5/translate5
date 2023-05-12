@@ -47,7 +47,7 @@
         <trans-unit id="NFDBB2FB9-tu3" xml:space="preserve">
             <source xml:lang="de-DE">Das Haus ist blau. <g ctype="underlined" equiv-text="&lt;run1&gt;" id="1">Und das Dach <x id="1"/>ist rot.</g></source>
             <seg-source>Das <mrk mtype="seg" mid="0">Haus ist blau.</mrk> Oder Gelb.<g ctype="underlined" equiv-text="&lt;run1&gt;" id="1"><mrk mtype="seg" mid="1">Und das Dach <x id="1"/>ist rot.</mrk></g></seg-source>
-            <target xml:lang="en-GB">The - edited<mrk mtype="seg" mid="0">house is blue. - edited</mrk>Or yellow.<g ctype="underlined" equiv-text="&lt;run1&gt;" id="1"> - edited<mrk mtype="seg" mid="1">And the roof <x id="1"/>is red. - edited</mrk></g></target>
+            <target xml:lang="en-GB">The - edited<mrk mtype="seg" mid="0">house is blue. - edited</mrk> Or yellow.<g ctype="underlined" equiv-text="&lt;run1&gt;" id="1"> - edited<mrk mtype="seg" mid="1">And the roof <x id="1"/>is red. - edited</mrk></g></target>
         </trans-unit>
     </body>
   </file>
