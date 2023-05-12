@@ -1,0 +1,18 @@
+image: atlassian/default-image:2
+
+
+options:
+    docker: true
+
+
+pipelines:
+    branches:
+        feature/*:
+            -step:
+                name: run tests on feature-branch
+                script:
+                    # 1.start up the whole bunch of containers, including t5 itself and related services
+                    #   if images are missing they will be pulled from dockerhub
+                    # 2.file 'docker-compose.pavel-test.yml' should be placed right here in the root of
+                    # translate5-repo (or better placed in https://bitbucket.org/mittagqi/docker repo and copied from there to here?)
+                    - docker compose -f docker-compose.pavel-test.yml up -d
