@@ -246,8 +246,11 @@ final class Service extends DockerServiceAbstract
                 $okapiServerConfig->addServer($url, $name);
             }
 
-            //purge the unused ones, sort by version so that latest is kept also unused
-            $okapiServerConfig->purge($okapiServerConfig->getSummary(), sortByVersion: true);
+            // if not set in the locate configuration we purge all unused servers
+            if(!array_key_exists('keepAll', $config) || !$config['keepAll']){
+                //purge the unused ones, sort by version so that latest is kept also unused
+                $okapiServerConfig->purge($okapiServerConfig->getSummary(), sortByVersion: true);
+            }
 
             return true;
         }
