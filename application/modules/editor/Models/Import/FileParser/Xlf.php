@@ -756,6 +756,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         if(count($this->sourceProcessOrder) >  editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT){
             throw new editor_Models_Import_FileParser_Exception('E1523', [
                 'max' => editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT,
+                'amount' => count($this->sourceProcessOrder),
                 'transunitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
                 'task' => $this->task
             ]);

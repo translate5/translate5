@@ -539,6 +539,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if($numSegmentsInTransUnit > editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT){
             throw new editor_Models_Import_FileParser_Exception('E1523', [
                 'max' => editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT,
+                'amount' => $numSegmentsInTransUnit,
                 'transunitId' => $this->transunitParser->getTransunitId(),
                 'task' => $this->task
             ]);
