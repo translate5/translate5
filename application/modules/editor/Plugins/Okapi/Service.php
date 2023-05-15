@@ -109,7 +109,7 @@ final class Service extends DockerServiceAbstract
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.plugins.Okapi.server',
         'type' => 'string',
-        'url' => 'http://okapi.:8080/', //path part with version is added automatically on locate call
+        'url' => 'http://okapi.:8080', //path part with version is added automatically on locate call
         'healthcheck' => self::HEALTH_CHECK_PATH
     ];
 
