@@ -109,7 +109,7 @@ final class Service extends DockerServiceAbstract
     protected array $configurationConfig = [
         'name' => 'runtimeOptions.plugins.Okapi.server',
         'type' => 'string',
-        'url' => 'http://okapi.:8080/', //path part with version is added automatically on locate call
+        'url' => 'http://okapi.:8080', //path part with version is added automatically on locate call
         'healthcheck' => self::HEALTH_CHECK_PATH
     ];
 
@@ -246,8 +246,11 @@ final class Service extends DockerServiceAbstract
                 $okapiServerConfig->addServer($url, $name);
             }
 
-            //purge the unused ones, sort by version so that latest is kept also unused
-            $okapiServerConfig->purge($okapiServerConfig->getSummary(), sortByVersion: true);
+            // if not set in the locate configuration we purge all unused servers
+            if(!array_key_exists('keepAll', $config) || !$config['keepAll']){
+                //purge the unused ones, sort by version so that latest is kept also unused
+                $okapiServerConfig->purge($okapiServerConfig->getSummary(), sortByVersion: true);
+            }
 
             return true;
         }

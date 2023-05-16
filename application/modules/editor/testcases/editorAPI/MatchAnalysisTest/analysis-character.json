@@ -72,7 +72,7 @@
         "noMatch": 0
     },
     {
-        "resourceName": "Summary",
+        "resourceName": "summary",
         "resourceColor": "",
         "resourceType": "",
         "internalFuzzy": "",
@@ -87,6 +87,6 @@
         "70": 0,
         "60": 20,
         "50": 0,
-        "noMatch": ""
+        "noMatch": 0
     }
 ]

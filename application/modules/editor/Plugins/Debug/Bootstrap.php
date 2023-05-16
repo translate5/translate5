@@ -39,6 +39,10 @@ class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'));
         $this->eventManager->attach('editor_Models_Export_Exported_Worker', 'exportCompleted', array($this, 'handleExportCompleted'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
+
+        // allow PMs to read the user assoc auth hashes for clicking user associations to log in as that user
+        $acl = ZfExtended_Acl::getInstance();
+        $acl->allow('pm', 'readAuthHash');
     }
     
     public function handleAfterIndexAction(Zend_EventManager_Event $event) {

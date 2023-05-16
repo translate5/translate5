@@ -516,9 +516,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //original not allowed string list:
         //return str_replace("\\/:?*|<>", '_', $name);
     }
-    
+
     /**
      * {@inheritDoc}
+     * @throws editor_Services_Exceptions_InvalidResponse
      */
     public function getStatus(editor_Models_LanguageResources_Resource $resource): string
     {
@@ -529,7 +530,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
             $this->api->setResource($resource);
 
-            return $this->api->status();
+            return $this->api->status() ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::ERROR;
         }
         
         $name = $this->languageResource->getSpecificData('fileName');
