@@ -43,6 +43,12 @@ class CleanupCollection
      * File older than months
      */
     public const FILE_OLDER_THAN_MONTHS = 3;
+
+    /***
+     * How many files should be kept in term collection
+     */
+    public const KEEP_FILES_COUNT = 3;
+
     /**
      * @param editor_Models_TermCollection_TermCollection $collection
      */
@@ -58,10 +64,10 @@ class CleanupCollection
     public function checkAndClean(): void
     {
         $files = $this->getFilesSorted();
-        $files = array_slice($files,3);
+        $files = array_slice($files,self::KEEP_FILES_COUNT);
 
         // Calculate the timestamp for 3 months ago
-        $threeMonthsAgo = strtotime('-3 months');
+        $threeMonthsAgo = strtotime('-'.self::FILE_OLDER_THAN_MONTHS.' months');
 
         foreach ($files as $path => $fileTimestamp){
             // Check if the file is older than 3 months
