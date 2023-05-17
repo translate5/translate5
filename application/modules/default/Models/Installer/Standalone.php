@@ -813,6 +813,7 @@ class Models_Installer_Standalone {
         $conf['dropIfExists'] = true;
 
         $this->waitForDatabase(function () use ($dbupdater, $conf) {
+            unset($conf['port']);
             $dbupdater->createDatabase(... $conf);
             $this->log('Initial database created.');
         });
