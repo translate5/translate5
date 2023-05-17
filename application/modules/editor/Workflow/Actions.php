@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Task\Export\Package\Remover;
+use MittagQI\Translate5\Terminology\CleanupCollection;
 use MittagQI\Translate5\Workflow\ArchiveTaskActions;
 
 /**
@@ -295,5 +296,22 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
                 'result' => $response->getBody(),
             ]);
         }
+    }
+
+    /***
+     * Cleans old collection files daily.
+     */
+    public function clenUpCollection(): void
+    {
+        $collectionModel = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+        $collections = $collectionModel->loadAllEntities();
+
+        foreach ($collections as $collection){
+            $cleanup = ZfExtended_Factory::get(CleanupCollection::class,[
+                $collection
+            ]);
+            $cleanup->checkAndClean();
+        }
+
     }
 }
