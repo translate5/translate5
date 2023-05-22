@@ -59,7 +59,12 @@ class Editor_Controller_Helper_TaskDefaults extends Zend_Controller_Action_Helpe
             if(!empty($assocRow['writeAsDefault'])){
                 $taskAssoc->setSegmentsUpdateable(1);
             }
-            $taskAssoc->save();
+
+            try {
+                $taskAssoc->save();
+            } catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey) {
+                //ignore, association already exists
+            }
         });
         $task->updateIsTerminologieFlag($task->getTaskGuid());
     }
