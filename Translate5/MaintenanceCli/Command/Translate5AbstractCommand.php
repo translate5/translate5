@@ -115,7 +115,9 @@ abstract class Translate5AbstractCommand extends Command
             $environment = ($answer === 't' || $answer === 'test') ? 'test' : 'application';
             $this->initTranslate5($environment);
             $config = \Zend_Registry::get('config');
-            $this->io->info('Using database "'.$config->resources->db->params->dbname.'"');
+            if (!$this->isPorcelain) {
+                $this->io->info('Using database "'.$config->resources->db->params->dbname.'"');
+            }
         } else {
             $this->initTranslate5();
         }

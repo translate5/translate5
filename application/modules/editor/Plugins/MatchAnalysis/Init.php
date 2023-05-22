@@ -38,6 +38,7 @@ use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 {
     protected static string $description = 'Provides the match-analysis and pre-translation against language-resources.';
+    protected static bool $enabledByDefault = true;
     protected static bool $activateForTests = true;
 
     /**

@@ -88,6 +88,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'okapi-longhorn-144-snapshot',
     ];
 
+    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
+    protected static bool $activateForTests = true;
+    protected static bool $enabledByDefault = true;
+
     /**
      * Retrieves the config-based path to the default export bconf
      * @param editor_Models_Task $task
@@ -185,9 +189,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         sort($extensions);
         return $extensions;
     }
-
-    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
-    protected static bool $activateForTests = true;
 
     /**
      * The services we use

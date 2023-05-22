@@ -38,6 +38,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     const CLIENT_VERSION = '1.1';
     
     protected static string $description = 'Provides the MessageBus (WebSocket) functionality for multi-user usage and other functions improving the user experience.';
+    protected static bool $enabledByDefault = true;
     protected static bool $activateForTests = true;
 
     /**

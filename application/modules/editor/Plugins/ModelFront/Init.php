@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides the risk prediction functionality, as offered by ModelFront.';
+    protected static bool $enabledByDefault = true;
     protected static bool $activateForTests = true;
 
     /***
