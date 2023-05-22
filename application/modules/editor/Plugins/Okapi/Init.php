@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
+
 /**
  * OKAPI file converter and segmenter plugin
  *
@@ -377,45 +379,90 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $r->addRoute('plugins_okapi_bconfdefaultfilter_setextensions', $route);
     }
 
-    public function getFrontendControllers(): array {
+    public function getFrontendControllers(): array
+    {
         return $this->getFrontendControllersFromAcl();
     }
 
-    protected function initEvents() {
-
+    protected function initEvents(): void
+    {
         // plugin basics
-        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', [$this, 'handleAfterIndex']);
-        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', [$this, 'handleJsTranslations']);
+        $this->eventManager->attach(
+            Editor_IndexController::class,
+            'afterIndexAction',
+            [$this, 'handleAfterIndex']
+        );
+        $this->eventManager->attach(
+            Editor_IndexController::class,
+            'afterLocalizedjsstringsAction',
+            [$this, 'handleJsTranslations']
+        );
 
-        // adds the used bconf to the import-archive. At this point, the task is not yet saved and the bconfId sent by request has to be used
-        $this->eventManager->attach('editor_Models_Import', 'afterUploadPreparation', [$this, 'handleAfterUploadPreparation']);
+        // adds the used bconf to the import-archive. At this point,
+        // the task is not yet saved and the bconfId sent by request has to be used
+        $this->eventManager->attach(
+            ImportEventTrigger::class,
+            ImportEventTrigger::AFTER_UPLOAD_PREPARATION,
+            [$this, 'handleAfterUploadPreparation']
+        );
 
         // adds the bconfId to the task-meta
-        $this->eventManager->attach('editor_TaskController', 'beforeProcessUploadedFile', [$this, 'handleBeforeProcessUploadedFile']);
+        $this->eventManager->attach(
+            ImportEventTrigger::class,
+            ImportEventTrigger::BEFORE_PROCESS_UPLOADED_FILE,
+            [$this, 'handleBeforeProcessUploadedFile']
+        );
 
         //checks if import contains files for okapi:
-        $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'beforeDirectoryParsing', [$this, 'handleBeforeDirectoryParsing']);
-        $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', [$this, 'handleAfterDirectoryParsing']);
+        $this->eventManager->attach(
+            editor_Models_Import_Worker_FileTree::class,
+            'beforeDirectoryParsing',
+            [$this, 'handleBeforeDirectoryParsing']
+        );
+        $this->eventManager->attach(
+            editor_Models_Import_Worker_FileTree::class,
+            'afterDirectoryParsing',
+            [$this, 'handleAfterDirectoryParsing']
+        );
 
         //invokes in the handleFile method of the relais filename match check.
         // Needed since relais files are bilingual (ending on .xlf) and the
         // imported files for Okapi are in the source format and do not end on .xlf.
-        // Therefore the filenames do not match, this is corrected here.
-        $this->eventManager->attach('editor_Models_RelaisFoldertree', 'customHandleFile', [$this, 'handleCustomHandleFileForRelais']);
+        // Therefor the filenames do not match, this is corrected here.
+        $this->eventManager->attach(
+            editor_Models_RelaisFoldertree::class,
+            'customHandleFile',
+            [$this, 'handleCustomHandleFileForRelais']
+        );
 
         //Archives the temporary data folder again after converting the files with okapi:
-        $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', [$this, 'handleAfterImport']);
+        $this->eventManager->attach(
+            editor_Models_Import_Worker_Import::class,
+            'importCleanup',
+            [$this, 'handleAfterImport']
+        );
 
         //allows the manipulation of the export fileparser configuration
-        $this->eventManager->attach('editor_Models_Export', 'exportFileParserConfiguration', [$this, 'handleExportFileparserConfig']);
+        $this->eventManager->attach(
+            editor_Models_Export::class,
+            'exportFileParserConfiguration',
+            [$this, 'handleExportFileparserConfig']
+        );
 
         //returns information if the configured okapi is alive / reachable
-        $this->eventManager->attach('ZfExtended_Debug', 'applicationState', [$this, 'handleApplicationState']);
+        $this->eventManager->attach(ZfExtended_Debug::class, 'applicationState', [$this, 'handleApplicationState']);
 
         //attach to the config after index to check the config values
-        $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
-        $this->eventManager->attach('Editor_CustomerController', 'afterIndexAction', [$this, 'handleCustomerAfterIndex']);
-
+        $this->eventManager->attach(
+            editor_ConfigController::class,
+            'afterIndexAction',
+            [$this, 'handleAfterConfigIndexAction']
+        );
+        $this->eventManager->attach(
+            Editor_CustomerController::class,
+            'afterIndexAction',
+            [$this, 'handleCustomerAfterIndex']
+        );
     }
 
     /**
@@ -423,7 +470,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      * @throws ZfExtended_Exception
      */
-    public function handleAfterIndex(Zend_EventManager_Event $event) {
+    public function handleAfterIndex(Zend_EventManager_Event $event): void
+    {
         $view = $event->getParam('view');
         /** @var $view ZfExtended_View */
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
