@@ -37,6 +37,8 @@ use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
  * @method setPricingPresetId(int $pricingPresetId)
  * @method string getMappingType() getMappingType()
  * @method setMappingType(string $mappingType)
+ * @method bool getPerTaskExport()
+ * @method setPerTaskExport(bool $perTaskExport)
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';

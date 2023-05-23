@@ -208,6 +208,22 @@ class editor_Models_Customer_Customer extends ZfExtended_Models_Entity_Abstract 
     }
 
     /**
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function loadByName(string $name): void
+    {
+        $s = $this->db->select();
+        $s->where('name = ?', $name);
+        $row = $this->db->fetchRow($s);
+
+        if (empty($row)) {
+            throw new ZfExtended_Models_Entity_NotFoundException();
+        }
+
+        $this->row = $row;
+    }
+
+    /**
      * convenient method to get the customer meta data
      * @param bool $reinit if true reinits the internal meta object completely (after adding a field for example)
      * @return editor_Models_customer_Meta
