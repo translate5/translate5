@@ -426,6 +426,34 @@ class editor_Plugins_Okapi_Bconf_ExtensionMapping {
     }
 
     /**
+     * Merges all Translate5 specific extensions in
+     * Usually, this will only be applied to the T5 default bconf ...
+     * @return bool: If the mapping was changed due to the sync
+     * @throws ZfExtended_Exception
+     */
+    public function complementTranslate5Extensions() : bool
+    {
+        $translate5Mapping = editor_Plugins_Okapi_Bconf_Filter_Translate5::instance()->getExtensionMappingEntries();
+        // DEBUG
+        if($this->doDebug){ error_log('ExtensionMapping syncTranslate5Extensions: '.print_r($translate5Mapping, true)); }
+
+        $changed = false;
+        foreach($translate5Mapping as $extension => $identifier){
+            if(!array_key_exists($extension, $this->map) || $this->map[$extension] != $identifier){
+                $this->map[$extension] = $identifier;
+                $changed = true;
+            }
+        }
+        if($changed){
+            $this->flush();
+            $this->updateBconfContent();
+            // DEBUG
+            if($this->doDebug){ error_log('ExtensionMapping syncTranslate5Extensions: mapping has been changed: '."\n".print_r($this->map, 1)); }
+        }
+        return $changed;
+    }
+
+    /**
      * Adds a filter with it's extensions
      * Also updates the related content-file
      * @param string $identifier
