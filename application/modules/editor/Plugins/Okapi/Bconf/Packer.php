@@ -58,11 +58,13 @@ final class editor_Plugins_Okapi_Bconf_Packer {
 
     /**
      * @param bool $isOutdatedRepack
+     * @param bool $isSystemDefault
+     * @return void
      * @throws ZfExtended_Exception
-     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Bconf_InvalidException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function process(bool $isOutdatedRepack): void {
+    public function process(bool $isOutdatedRepack, bool $isSystemDefault = false): void {
         // we must catch all exceptions of the RandomAccessFile to be able to release the file-pointer properly!
         try {
             // DEBUG
@@ -94,6 +96,11 @@ final class editor_Plugins_Okapi_Bconf_Packer {
 
             // instantiate the extension mapping and evaluate the additional default okapi and translate5 filter files (this needs to know the "real" custom filters
             $extensionMapping = $this->bconf->getExtensionMapping();
+
+            // special: for system default bconfs we add all extension-mapping entries defined for translate5 that are not yet in the mapping. This enables updating mappings to the default system bconf (which will be the template for most customized ones)
+            if($isSystemDefault){
+                $extensionMapping->complementTranslate5Extensions();
+            }
             $extensionMapData = $extensionMapping->getMapForPacking($customIdentifiers);
             $defaultFilterFiles = $extensionMapping->getOkapiDefaultFprmsForPacking($customIdentifiers); // retrieves an array of pathes !
 

@@ -103,4 +103,23 @@ final class editor_Plugins_Okapi_Bconf_Filter_Translate5 extends editor_Plugins_
         }
         return $result;
     }
+
+    /**
+     * This generates an extension-mapping for all translate-5 extensions defined in our store
+     * This is used to re-pack outdated system-bconf's
+     * @return array
+     */
+    public function getExtensionMappingEntries(): array
+    {
+        $extensionMapping = [];
+        foreach($this->inventory as $item){
+            if(!empty($item->extensions)){
+                $identifier = $this->createFprmFilename($item);
+                foreach($item->extensions as $extension){
+                    $extensionMapping[$extension] = $identifier;
+                }
+            }
+        }
+        return $extensionMapping;
+    }
 }
