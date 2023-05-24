@@ -245,11 +245,9 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             //get all application config level for the user
             $levels = [];
             // important: the frontend shall just see levels above system level no matter what ACLs might exist
-            // UGLY: for tests we have to weaken this and expose all levels. The test-API is using the endpoint to check if configs are set ..
-            $minLevel = (defined('APPLICATION_APITEST') && APPLICATION_APITEST === true) ? self::CONFIG_LEVEL_SYSTEM : self::CONFIG_LEVEL_INSTANCE;
             foreach ($user->getApplicationConfigLevel() as $appConfigLevel) {
                 $level = $this->convertStringLevelToInt($appConfigLevel);
-                if ($level >= $minLevel) {
+                if ($level >= self::CONFIG_LEVEL_INSTANCE) {
                     $levels[] = $level;
                 }
             }

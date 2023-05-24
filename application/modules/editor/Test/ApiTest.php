@@ -219,14 +219,14 @@ abstract class editor_Test_ApiTest extends TestCase
 
     /**
      * checks for task-specific configs
-     * can be provided like [ 'autoQA.enableInternalTagCheck' => 1, ... ], "runtimeOptions." will be added automatically if not present
+     * can be provided like [ 'autoQA.enableInternalTagCheck' => 1, ... ],
+     * "runtimeOptions." will be added automatically if not present
      * @param string $taskGuid
      * @param array $configs
      */
-    public static function assertTaskConfigs(string $taskGuid, array $configs)
+    public static function assertTaskConfigs(string $taskGuid, array $configs): void
     {
-        $plainFilter = ($taskGuid === null) ? [] : ['taskGuid' => $taskGuid];
-        static::api()->testConfig($configs, $plainFilter);
+        static::api()->testConfig($configs, $taskGuid);
     }
 
     /**
