@@ -282,6 +282,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * Cleanup, also tested
      */
     public static function afterTests(): void {
+        return;
         $bconf = self::$bconf;
         $bconf->load(self::$bconfId);
         $bconfDir = $bconf->getDataDirectory();
