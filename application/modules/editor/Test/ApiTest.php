@@ -312,40 +312,43 @@ abstract class editor_Test_ApiTest extends TestCase
         try {
             // this can be used in concrete tests as replacement for tearDownAfterClass()
             static::afterTests();
-        } catch (\Throwable $e){
+        } catch (\Throwable $e) {
             $errors[] = $e->getMessage();
         }
         try {
             // internal method to clean up stuff in inheriting classes
             static::testSpecificTeardown($doCleanup);
-        } catch (\Throwable $e){
+        } catch (\Throwable $e) {
             $errors[] = $e->getMessage();
         }
         if (static::$setupOwnCustomer && $doCleanup) {
             try {
-                if($customerId = static::getOwnCustomerId()) {
+                if ($customerId = static::getOwnCustomerId()) {
                     static::api()->deleteCustomer($customerId);
                 }
-            } catch (\Throwable $e){
+            } catch (\Throwable $e) {
                 $errors[] = $e->getMessage();
             }
         }
-        if(count(static::$_addedPlugins) > 0){
-            if(!DbHelper::deactivatePlugins(static::$_addedPlugins)){
-                $errors[] = 'One or more of the following neccessary Plugins could not be deactivated: \''.implode("', '", static::$_addedPlugins)."'";
+        if (count(static::$_addedPlugins) > 0) {
+            if (!DbHelper::deactivatePlugins(static::$_addedPlugins)) {
+                $errors[] = 'One or more of the following neccessary Plugins could not be deactivated: \''
+                    . implode("', '", static::$_addedPlugins) . "'";
             }
             static::$_addedPlugins = [];
         }
         // as a final step., we check if the test left workers in the DB
-        $preventRemoval = !static::api()->isSuite() || !$doCleanup; // for single running tests or if no cleanup is wanted, we do not remove the workers after test has run
+        // for single running tests or if no cleanup is wanted, we do not remove the workers after test has run
+        $preventRemoval = !static::api()->isSuite() || !$doCleanup;
         $state = DbHelper::cleanupWorkers(false, $preventRemoval, true);
-        if($state->cleanupNeccessary){
+        if ($state->cleanupNeccessary) {
             $task = static::api()->getTask();
-            $errors[] = 'The test left running, waiting, scheduled or crashed worker\'s in the DB:'."\n  ".implode("\n  ", $state->remainingWorkers)."\n";
-            $errors[] = 'The current task is:'.$task ?? $task->taskGuid;
+            $errors[] = 'The test left running, waiting, scheduled or crashed worker\'s in the DB:' . PHP_EOL
+                . implode(PHP_EOL, $state->remainingWorkers) . PHP_EOL;
+            $errors[] = 'The current task is:' . ($task ? $task->taskGuid : 'none');
         }
-        if(count($errors) > 0){
-            static::fail(implode("\n", $errors));
+        if (!empty($errors)) {
+            static::fail(implode(PHP_EOL, $errors));
         }
     }
 

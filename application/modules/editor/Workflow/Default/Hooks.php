@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Cronjob\Cronjobs;
 
 /**
@@ -98,43 +99,60 @@ class editor_Workflow_Default_Hooks {
         'notifyAllUsersAboutTaskAssociation',
     ];
     
-    public function __construct(editor_Workflow_Default $workflow) {
+    public function __construct(editor_Workflow_Default $workflow)
+    {
         $this->workflow = $workflow;
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $this->events->addIdentifiers(get_class($workflow));
 
         $events = Zend_EventManager_StaticEventManager::getInstance();
-        $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
-            $tua = $event->getParam('entity');
-            //if entity could not be saved no ID was given, so check for it
-            if($tua->getId() > 0) {
-                $this->newTaskUserAssoc = $tua;
-                $jobHandler = ZfExtended_Factory::get('editor_Workflow_Default_JobHandler');
-                /* @var $jobHandler editor_Workflow_Default_JobHandler */
-                $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_ADD));
-                $this->workflow->getStepRecalculation()->recalculateWorkflowStep($tua);
+        $events->attach(
+            Editor_TaskuserassocController::class,
+            'afterPostAction',
+            function (Zend_EventManager_Event $event) {
+                $tua = $event->getParam('entity');
+                //if entity could not be saved no ID was given, so check for it
+                if ($tua->getId() > 0) {
+                    $this->newTaskUserAssoc = $tua;
+                    $jobHandler = ZfExtended_Factory::get(editor_Workflow_Default_JobHandler::class);
+                    /* @var $jobHandler editor_Workflow_Default_JobHandler */
+                    $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_ADD));
+                    $this->workflow->getStepRecalculation()->recalculateWorkflowStep($tua);
+                }
             }
-        });
+        );
 
-        $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
-            $this->newTaskUserAssoc = $event->getParam('entity');
-            $jobHandler = ZfExtended_Factory::get('editor_Workflow_Default_JobHandler');
-            /* @var $jobHandler editor_Workflow_Default_JobHandler */
-            $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_DELETE));
-            $this->workflow->getStepRecalculation()->recalculateWorkflowStep($this->newTaskUserAssoc);
-        });
+        $events->attach(
+            Editor_TaskuserassocController::class,
+            'afterDeleteAction',
+            function (Zend_EventManager_Event $event) {
+                $this->newTaskUserAssoc = $event->getParam('entity');
+                $jobHandler = ZfExtended_Factory::get(editor_Workflow_Default_JobHandler::class);
+                /* @var $jobHandler editor_Workflow_Default_JobHandler */
+                $jobHandler->execute($this->getActionConfig($jobHandler::HANDLE_JOB_DELETE));
+                $this->workflow->getStepRecalculation()->recalculateWorkflowStep($this->newTaskUserAssoc);
+            }
+        );
 
-        $events->attach('editor_Models_Import', 'beforeImport', function(Zend_EventManager_Event $event){
-            $this->newTask = $event->getParam('task');
-            $this->handleBeforeImport();
-        });
+        $events->attach(
+            ImportEventTrigger::class,
+            ImportEventTrigger::BEFORE_IMPORT,
+            function (Zend_EventManager_Event $event) {
+                $this->newTask = $event->getParam('task');
+                $this->handleBeforeImport();
+            }
+        );
 
-        $events->attach('editor_Models_Import_Worker_FinalStep', 'importCompleted', function(Zend_EventManager_Event $event){
-            $this->newTask = $event->getParam('task');
-            $this->importConfig = $event->getParam('importConfig');
-            $this->handleImportCompleted();
-        });
+        $events->attach(
+            editor_Models_Import_Worker_FinalStep::class,
+            'importCompleted',
+            function (Zend_EventManager_Event $event) {
+                $this->newTask = $event->getParam('task');
+                $this->importConfig = $event->getParam('importConfig');
+                $this->handleImportCompleted();
+            }
+        );
     }
 
     /**

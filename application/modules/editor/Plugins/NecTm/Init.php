@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * @deprecated the whole plugin is deprecated
+ */
 class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides the Nec-TM connector. ATTENTION: A NEC-TM Server URL is needed!';
     

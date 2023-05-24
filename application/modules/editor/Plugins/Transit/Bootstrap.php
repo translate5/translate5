@@ -44,6 +44,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides transit import';
+    protected static bool $enabledByDefault = true;
     protected static bool $activateForTests = true;
 
     /**

@@ -35,6 +35,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
  */
 class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides the languagetool spell-checker.';
+    protected static bool $enabledByDefault = true;
     protected static bool $activateForTests = true;
     
     /**

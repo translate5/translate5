@@ -34,6 +34,8 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\Applet\AppletAbstract;
+use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Service\SystemCheck;
 
 /**
@@ -49,56 +51,53 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 {
     protected $front;
 
-    public function __construct($application) {
+    public function __construct($application)
+    {
         parent::__construct($application);
         
         //Binding the worker clean up to the after import event, since import
         // is currently the main use case for workers
-        /** @var Zend_EventManager_StaticEventManager $eventManager */
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
         
-        $eventManager->attach('editor_Models_Import', 'afterImport', function(){
+        $eventManager->attach(ImportEventTrigger::class, ImportEventTrigger::AFTER_IMPORT, function () {
             $worker = ZfExtended_Factory::get(ZfExtended_Worker_GarbageCleaner::class);
             $worker->init();
             $worker->queue(); // not parent ID here, since the GarbageCleaner should run without a parent relation
         }, 0);
 
-        $cleanUp = function(){
+        $cleanUp = function () {
             // first clean up jobs
-            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            /* @var $tua editor_Models_TaskUserAssoc */
-            $tua->cleanupLocked();
+            ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class)->cleanupLocked();
 
             // second clean up tasks, jobs must be before in order to clean also not used multiuser tasks anymore
-            /** @var editor_Models_Task $task */
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            $task->cleanupLockedJobs();
+            ZfExtended_Factory::get(editor_Models_Task::class)->cleanupLockedJobs();
 
-            //clean up dangling (hanging) imports
-            $import = ZfExtended_Factory::get('editor_Models_Import');
-            /** @var editor_Models_Import $import */
-            $import->cleanupDanglingImports();
+            (new DanglingImportsCleaner())->cleanup();
 
-            $config = ZfExtended_Factory::get('editor_Models_UserConfig');
-            /* @var $config editor_Models_UserConfig */
-            $config->cleanUpThemeTemporary();
+            ZfExtended_Factory::get(editor_Models_UserConfig::class)->cleanUpThemeTemporary();
         };
         
-        $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', $cleanUp);
-        $eventManager->attach('LoginController', 'afterLogoutAction', $cleanUp);
-        $eventManager->attach('editor_SessionController', 'afterDeleteAction', $cleanUp);
-        $eventManager->attach('ZfExtended_Session', 'afterSessionCleanForUser', $cleanUp);
-        $eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
+        $eventManager->attach(ZfExtended_Resource_GarbageCollector::class, 'cleanUp', $cleanUp);
+        $eventManager->attach(LoginController::class, 'afterLogoutAction', $cleanUp);
+        $eventManager->attach(editor_SessionController::class, 'afterDeleteAction', $cleanUp);
+        $eventManager->attach(ZfExtended_Session::class, 'afterSessionCleanForUser', $cleanUp);
+        $eventManager->attach(ZfExtended_Debug::class, 'applicationState', [$this, 'handleApplicationState']);
 
         // Binding the quality Worker queuing to the "afterDirectoryParsing" event of the filetree worker.
         // some qualities have workers that depend on the imported files (e.g. TBX import).
         // also this needs to be a point in the import-process after the languuege-resources in the wizard have been set
         // and it should be as early as possible to ensure the progress-bar does not flutter
-        $eventManager->attach(editor_Models_Import_Worker_FileTree::class, 'afterDirectoryParsing', function(Zend_EventManager_Event $event){
-            $task = $event->getParam('task'); /* @var editor_Models_Task $task */
-            $parentId = (int) $event->getParam('workerParentId'); // this represents the id of the import worker, see editor_Models_Import::queueImportWorkers
-            editor_Segment_Quality_Manager::instance()->queueImport($task, $parentId);
-        });
+        $eventManager->attach(
+            editor_Models_Import_Worker_FileTree::class,
+            'afterDirectoryParsing',
+            function (Zend_EventManager_Event $event) {
+                /* @var editor_Models_Task $task */
+                $task = $event->getParam('task');
+                // this represents the id of the import worker, see ProjectWorkersHandler::queueImportWorkers
+                $parentId = (int) $event->getParam('workerParentId');
+                editor_Segment_Quality_Manager::instance()->queueImport($task, $parentId);
+            }
+        );
     }
     
     public static function initModuleSpecific(){
