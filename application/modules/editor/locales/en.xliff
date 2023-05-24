@@ -1238,6 +1238,32 @@
                     <br/>Alternatively use the help button and look for keyboard shortcuts to enter the  missing tags from the source.
                 </target>
             </trans-unit>
+            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIFF1ZWxsc3ByYWNoZToKPGJyLz4KPHVsPgogICAgPGxpPnswfTwvbGk+CjwvdWw+U28gZW50ZmVybmVuIFNpZSBkZW4gRmVobGVyOgo8YnIvPgo8dWw+CiAgICA8bGk+S2xpY2tlbiBTaWUgYXVmIE9LLCB1bSBkaWVzZSBOYWNocmljaHQgenUgZW50ZmVybmVuPC9saT4KICAgIDxsaT5EcsO8Y2tlbiBTaWUgRVNDLCB1bSBkYXMgU2VnbWVudCBvaG5lIFNwZWljaGVybiB6dSB2ZXJsYXNzZW48L2xpPgogICAgPGxpPsOWZmZuZW4gU2llIGRhcyBTZWdtZW50IGVybmV1dDwvbGk+CjwvdWw+V2llZGVyaG9sZW4gU2llIGpldHp0IElocmUgw4RuZGVydW5nZW4u'>
+                <source>Die folgenden Tags existieren nicht in der Quellsprache:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                </source>
+                <target>The following tags do not exist in source:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>To remove the error:
+                    <br/>
+                    <ul>
+                        <li>Click OK to remove this message</li>
+                        <li>Press ESC to leave the segment without saving</li>
+                        <li>Open the segment again</li>
+                    </ul>Now redo your edits.
+                </target>
+            </trans-unit>
             <trans-unit id='RmVobGVyIGJlaGViZW4='>
                 <source>Fehler beheben</source>
                 <target>Correct errors</target>

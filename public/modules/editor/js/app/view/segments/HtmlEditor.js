@@ -70,6 +70,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     isRtl: false,
     missingContentTags: [],
     duplicatedContentTags: [],
+    excessContentTags: [],
     contentEdited: false, //is set to true if text content or content tags were modified
     disableErrorCheck: false,
     segmentLengthStatus: ['segmentLengthValid'], // see Editor.view.segments.MinMaxLength.lengthstatus
@@ -81,6 +82,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
         tagMissingText: '#UT#Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.',
         tagDuplicatedText: '#UT#Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:{0}',
+        tagExcessText: '#UT#Die folgenden Tags existieren nicht in der Quellsprache:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.',
         tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
         cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
     },
@@ -262,7 +264,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         me.currentSegment = data.segment;
 
         this.markupForEditor(segment.get(referenceFieldName));
-        this.tagsCheck = new TagsCheck(this.markupImages);
+        this.tagsCheck = new TagsCheck(this.markupImages, this.idPrefix);
 
         me.setValue(me.markupForEditor(data.value) + checkTag);
         me.statusStrip.updateSegment(data.segment, fieldName);
@@ -283,31 +285,33 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         }
     },
 
-    // /**
-    //  * Fixing focus issues EXT6UPD-105
-    //  */
-    // pushValue: function () {
-    //     this.callParent();
-    //     //do toggle on off not only on gecko, but also on IE
-    //     if (!Ext.isGecko && Ext.isIE11) {
-    //         this.setDesignMode(false);  //toggle off first
-    //         this.setDesignMode(true);
-    //     }
-    // },
+    /**
+     * Fixing focus issues EXT6UPD-105
+     */
+    pushValue: function () {
+        this.callParent();
+        //do toggle on off not only on gecko, but also on IE
+        if (!Ext.isGecko && Ext.isIE11) {
+            this.setDesignMode(false);  //toggle off first
+            this.setDesignMode(true);
+        }
+    },
 
     /**
      * Holt Daten aus dem HtmlEditor und entfernt das markup
      * @return String
      */
     getValueAndUnMarkup: function () {
-        var me = this,
-            result, length,
-            body = me.getEditorBody();
+        let result,
+            body = this.getEditorBody();
 
-        me.checkTags(body);
-        me.checkSegmentLength(body.innerHTML || "");
-        result = me.unMarkup(body);
-        me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
+        this.checkTags(body);
+
+        this.checkSegmentLength(body.innerHTML || "");
+
+        result = this.unMarkup(body);
+
+        this.contentEdited = this.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
 
         return result;
     },
@@ -509,7 +513,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                 return;
             }
 
-            if (item.tagName == 'IMG' && !me.isDuplicateSaveTag(item)) {
+            if (item.tagName == 'IMG' && !me.tagsCheck.isDuplicateSaveTag(item)) {
                 me.result.push(me.imgNodeToString(item, true));
                 return;
             }
@@ -788,7 +792,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
     unmarkImage: function (item) {
         var me = this;
-        if (me.isDuplicateSaveTag(item)) {
+        if (me.tagsCheck.isDuplicateSaveTag(item)) {
             img = Ext.fly(item);
             return me.getDuplicateCheckImg(img.getAttribute('data-segmentid'), img.getAttribute('data-fieldname'));
         } else if (markupImage = me.getMarkupImage(item.id)) {
@@ -834,15 +838,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     },
 
     /**
-     * returns true if given html node is a duplicatesavecheck img tag
-     * @param {HtmlNode} img
-     * @return {Boolean}
-     */
-    isDuplicateSaveTag: function (img) {
-        return img.tagName == 'IMG' && img.className && /duplicatesavecheck/.test(img.className);
-    },
-
-    /**
      * disables the hasAndDisplayErrors method on its next call, used for save and ignore the tag checks
      */
     disableContentErrorCheckOnce: function () {
@@ -880,9 +875,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             return true;
         }
 
-        if (me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0) {
+        if (me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0 || me.excessContentTags.length > 0) {
             //first item the field to check, second item: the error text:
-            var todo = [['missingContentTags', 'tagMissingText'], ['duplicatedContentTags', 'tagDuplicatedText']],
+            var todo = [
+                    ['missingContentTags', 'tagMissingText'],
+                    ['duplicatedContentTags', 'tagDuplicatedText'],
+                    ['excessContentTags', 'tagExcessText']
+                ],
                 missingSvg = '';
 
             for (var i = 0; i < todo.length; i++) {
@@ -912,94 +911,29 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * @param node
      */
     checkTags: function (node) {
-        var nodelist = node.getElementsByTagName('img');
-        this.fixDuplicateImgIds(nodelist);
-        if (!this.checkContentTags(nodelist)) {
-            // if there are content tag errors, and we are in save anyway mode, we remove orphaned tags then
-            this.disableErrorCheck && this.removeOrphanedTags(nodelist);
-            return; //no more checks if missing tags found
+        let nodeList = node.getElementsByTagName('img');
+
+        this.fixDuplicateImgIds(nodeList);
+
+        let result = this.tagsCheck.checkContentTags(nodeList, this.markupImages);
+
+        if (!result.isSuccessful()) {
+            this.missingContentTags = result.missingTags;
+            this.duplicatedContentTags = result.duplicatedTags;
+            this.excessContentTags = result.excessTags;
+
+            if (this.disableErrorCheck) {
+                // if there are content tag errors, and we are in "save anyway" mode, we remove orphaned tags then
+                this.removeOrphanedTags(nodeList);
+            }
+
+            //no more checks if missing tags found
+            return;
         }
-        this.removeOrphanedTags(nodelist);
-        this.checkTagOrder(nodelist);
-    },
 
-    /**
-     * returns true if all tags are OK
-     * @param {Array} nodelist
-     * @return {Boolean}
-     */
-    checkContentTags: function (nodelist) {
-        var me = this,
-            foundIds = [],
-            ignoreWhitespace = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags');
-        me.missingContentTags = [];
-        me.duplicatedContentTags = [];
+        this.removeOrphanedTags(nodeList);
 
-        Ext.each(nodelist, function (img) {
-            //ignore whitespace and nodes without ids
-            if (ignoreWhitespace && /whitespace/.test(img.className) || /^\s*$/.test(img.id)) {
-                return;
-            }
-            if (Ext.Array.contains(foundIds, img.id) && img.parentNode.nodeName.toLowerCase() !== "del") {
-                me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^' + me.idPrefix), '')]);
-            } else {
-                if (img.parentNode.nodeName.toLowerCase() !== "del") {
-                    foundIds.push(img.id);
-                }
-            }
-        });
-        Ext.Object.each(this.markupImages, function (key, item) {
-            if (ignoreWhitespace && item.whitespaceTag) {
-                return;
-            }
-            if (!Ext.Array.contains(foundIds, me.idPrefix + key)) {
-                me.missingContentTags.push(item);
-            }
-        });
-        return (me.missingContentTags.length === 0 && me.duplicatedContentTags.length === 0);
-    },
-
-    /**
-     * Tag Order Check (MQM and content tags)
-     * assumes that img tag contains an id with substring "-open" or "-close"
-     * ids starting with "remove" are ignored, because they are marked to be removed by removeOrphanedTags
-     * @param {Array} nodelist
-     */
-    checkTagOrder: function (nodelist) {
-        var me = this, open = {}, clean = true;
-        Ext.each(nodelist, function (img) {
-            // crucial: for the tag-order, we only have to check tags that are not already deleted
-            if (!me.isDeletedTag(img)) {
-                if (me.isDuplicateSaveTag(img) || /^remove/.test(img.id) || /(-single|-whitespace)/.test(img.id)) {
-                    //ignore tags marked to remove
-                    return;
-                }
-                if (/-open/.test(img.id)) {
-                    open[img.id] = true;
-                    return;
-                }
-                var o = img.id.replace(/-close/, '-open');
-                if (!open[o]) {
-                    clean = false;
-                    return false; //break each
-                }
-            }
-        });
-        this.isTagOrderClean = clean;
-    },
-
-    /**
-     * Checks if a tag is inside a del-tag and thus can be regarded as a deleted tag
-     * @param {Node} node
-     */
-    isDeletedTag: function (node) {
-        while (node.parentElement && node.parentElement.tagName.toLowerCase() != 'body') {
-            if (node.parentElement.tagName.toLowerCase() == 'del') {
-                return true;
-            }
-            node = node.parentElement;
-        }
-        return false;
+        this.isTagOrderClean = this.tagsCheck.checkTagOrder(nodeList);
     },
 
     /**
@@ -1026,77 +960,90 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * after fixing:
      * This [X 1]is[/X 1] the [X 2]testtext[/X 2].
      *
-     * @param {Array} nodelist
+     * @param {Array} nodeList
      */
-    fixDuplicateImgIds: function (nodelist) {
-        var me = this,
-            ids = {},
+    fixDuplicateImgIds: function(nodeList) {
+        let ids = {},
             stackList = {},
             updateId = function (img, newQid, oldQid) {
-                //dieses img mit der neuen seq versorgen.
                 img.id = img.id.replace(new RegExp(oldQid + '$'), newQid);
                 img.setAttribute('data-t5qid', newQid);
             };
-        //duplicate id fix vor removeOrphanedLogik, da diese auf eindeutigkeit der IDs baut
-        //dupl id fix benötigt checkTagOrder, welcher sich aber mit removeOrphanedLogik beißt
-        Ext.each(nodelist, function (img) {
-            var newQid, oldQid = me.getElementsQualityId(img), id = img.id, pid, open;
-            if (!id || me.isDuplicateSaveTag(img)) {
-                return;
-            }
-            if (!ids[id]) {
-                //id noch nicht vorhanden, dann ist sie nicht doppelt => raus
-                ids[id] = true;
-                return;
+
+        for (let img of nodeList) {
+            let newQid,
+                oldQid = this.getElementsQualityId(img),
+                id = img.id;
+
+            if (!id || this.tagsCheck.isDuplicateSaveTag(img)) {
+                continue;
             }
 
-            //gibt es einen Stack mit inhalten für meine ID, dann hole die Seq vom Stack und verwende diese
+            if (!ids[id]) {
+                //id does not yet exist, then it is not duplicated => out
+                ids[id] = true;
+
+                continue;
+            }
+
             if (stackList[id] && stackList[id].length > 0) {
                 newQid = stackList[id].shift();
                 updateId(img, newQid, oldQid);
-                return;
+
+                continue;
             }
-            //wenn nein, dann:
-            //partner id erzeugen
-            open = new RegExp("-open");
+
+            let open = new RegExp("-open");
+
+            let pid;
+
             if (open.test(id)) {
                 pid = id.replace(open, '-close');
             } else {
                 pid = id.replace(/-close/, '-open');
             }
-            //bei bedarf partner stack erzeugen
+
             if (!stackList[pid]) {
                 stackList[pid] = [];
             }
+
             newQid = Ext.id();
-            //die neue seq auf den Stack der PartnerId legen
             stackList[pid].push(newQid);
+
             updateId(img, newQid, oldQid);
-        });
+        }
     },
 
     /**
      * removes orphaned tags (MQM only)
      * assuming same id for open and close tag. Each Tag ID contains the string "-open" or "-close"
      * prepends "remove-" to the id of an orphaned tag
-     * @see fixDuplicateImgIds
      * @param {Array} nodelist
      */
-    removeOrphanedTags: function (nodelist) {
-        var me = this, openers = {}, closers = {}, hasRemoves = false;
-        Ext.each(nodelist, function (img) {
-            if (me.isDuplicateSaveTag(img)) {
+
+    removeOrphanedTags: function (nodeList) {
+        let me = this,
+            openers = {},
+            closers = {},
+            hasRemoves = false;
+
+        for (let img of nodeList) {
+            if (me.tagsCheck.isDuplicateSaveTag(img)) {
                 return;
             }
+
             if (/-open/.test(img.id)) {
                 openers[img.id] = img;
             }
+
             if (/-close/.test(img.id)) {
                 closers[img.id] = img;
             }
-        });
-        Ext.iterate(openers, function (id, img) {
-            var closeId = img.id.replace(/-open/, '-close');
+        }
+
+        for (const [id, img] of Object.entries(openers)) {
+            let closeId = img.id.replace(/-open/, '-close');
+
             if (closers[closeId]) {
                 //closer zum opener => aus "closer entfern" liste raus
                 delete closers[closeId];
@@ -1105,12 +1052,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                 hasRemoves = true;
                 img.id = 'remove-' + img.id;
             }
-        });
-        Ext.iterate(closers, function (id, img) {
+        }
+
+        for (const [id, img] of Object.entries(closers)) {
             hasRemoves = true;
             img.id = 'remove-' + img.id;
-        });
+        }
+
         if (hasRemoves) {
+            // TODO fix this
             Editor.MessageBox.addInfo(this.strings.tagRemovedText);
         }
     },
