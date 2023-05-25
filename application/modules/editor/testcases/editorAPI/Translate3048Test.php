@@ -51,10 +51,13 @@ class Translate3048Test extends editor_Test_ApiTest {
      */
     public function testInvalidToken()
     {
-        Helper::setCsrfToken('InvalidToken');
+        $this->switchToRealToken('InvalidToken');
+
         $result = static::api()->getJson('editor/task/', [], null, true);
         $this->assertEquals(401, $result->status);
         $this->assertTrue((str_contains($result->data, 'Nicht authentifiziert') || str_contains($result->error, 'Unauthenticated')));
+
+        $this->switchToTestToken();
     }
 
     /**
@@ -63,25 +66,22 @@ class Translate3048Test extends editor_Test_ApiTest {
      */
     public function testEmptyToken()
     {
-        Helper::setCsrfToken(null); // null will lead to token not being sent
+        $this->switchToRealToken(null);
+
         $result = static::api()->getJson('editor/task/', [], null, true);
         $this->assertEquals(401, $result->status);
         $this->assertTrue((str_contains($result->data, 'Nicht authentifiziert') || str_contains($result->error, 'Unauthenticated')));
+
+        $this->switchToTestToken();
     }
 
     /**
      * This test checks the API with a real CSRF token extracted from the App's markup
      * @throws Zend_Http_Client_Exception
      */
-    public function testRealToken()
+    public function testFrontendToken()
     {
-        // logout & destroy session & use normal app origin
-        static::api()->logout();
-        Helper::activateOriginHeader(false);
-        Helper::setCsrfToken(null);
-
-        // Login to generate a proper session token
-        static::api()->login('testmanager');
+        $this->switchToRealToken();
 
         // retrieve App's index-page
         $authCookie = Helper::getAuthCookie();
@@ -97,15 +97,9 @@ class Translate3048Test extends editor_Test_ApiTest {
         // fetch the user endpoint with the extracted token, validate the result to contain the testmanager
         Helper::setCsrfToken($csrfToken);
         $this->fetchAndAssertUsers();
-        static::api()->logout();
 
-        // restore original state
-        Helper::activateOriginHeader(true);
-        Helper::setCsrfToken(static::$apitestToken);
-        static::api()->login('testmanager');
+        $this->switchToTestToken();
     }
-
-
 
     /**
      * Tests if a API-call with an App-Token can be made successfully
@@ -137,7 +131,7 @@ class Translate3048Test extends editor_Test_ApiTest {
 
 
     /**
-     * Fetches the /user endpoint and validates the result as an example for a API-call
+     * Fetches the /user endpoint and validates the result as an example for an API-call
      * @throws Zend_Http_Client_Exception
      */
     private function fetchAndAssertUsers(){
@@ -150,6 +144,32 @@ class Translate3048Test extends editor_Test_ApiTest {
             }
         }
         static::assertTrue($testmanagerFound, 'The Users-List did not contain a user with login "testmanager"');
+    }
+
+    /**
+     * @param string|null $token
+     * @return void
+     */
+    private function switchToRealToken(string $token = null)
+    {
+        // logout & destroy session & use normal app origin
+        static::api()->logout();
+        Helper::activateOriginHeader(false);
+        Helper::setCsrfToken($token);
+        // Login to generate a proper session token
+        static::api()->login('testmanager');
+    }
+
+    /**
+     * @return void
+     */
+    private function switchToTestToken()
+    {
+        // restore original state
+        static::api()->logout();
+        Helper::activateOriginHeader(true);
+        Helper::setCsrfToken(static::$apitestToken);
+        static::api()->login('testmanager');
     }
 
     public static function afterTests(): void
