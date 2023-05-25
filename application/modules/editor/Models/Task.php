@@ -954,18 +954,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * Explicitly creates a new meta entity to mark the beginnig of its lifecycle.
-     * @param array $data
-     * @return editor_Models_Task_Meta
-     */
-    public function createMeta(array $data = []): editor_Models_Task_Meta {
-        $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
-        $data['taskGuid'] = $this->getTaskGuid();
-        $this->meta->init($data);
-        return $this->meta;
-    }
-
-    /**
      * convenient method to get the task meta data
      * @param bool $reinit if true reinits the internal meta object completely (after adding a field for example)
      * @return editor_Models_Task_Meta
