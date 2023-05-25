@@ -68,9 +68,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     enableFont: false,
     isTagOrderClean: true,
     isRtl: false,
-    missingContentTags: [],
-    duplicatedContentTags: [],
-    excessContentTags: [],
+    tagsCheckResult: null,
     contentEdited: false, //is set to true if text content or content tags were modified
     disableErrorCheck: false,
     segmentLengthStatus: ['segmentLengthValid'], // see Editor.view.segments.MinMaxLength.lengthstatus
@@ -849,7 +847,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * @return {Boolean}
      */
     hasAndDisplayErrors: function () {
-        var me = this,
+        let me = this,
             msg = '',
             meta = me.currentSegment.get('metaCache');
 
@@ -858,6 +856,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             //fire the event, and get the message from the segmentminmaxlength component
             msg = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].renderErrorMessage(me.segmentLengthStatus, meta);
             me.fireEvent('contentErrors', me, msg, false);
+
             return true;
         }
 
@@ -866,43 +865,54 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         if (me.disableErrorCheck) {
             me.fireEvent('contentErrors', me, null, true);
             me.disableErrorCheck = false;
+
             return false;
         }
 
         //since this error can't be handled somehow, we don't fire an event but show the message and stop immediatelly
         if (Editor.data.task.get('notEditContent') && me.contentEdited) {
             Editor.MessageBox.addError(me.strings.cantEditContents);
+
             return true;
         }
 
-        if (me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0 || me.excessContentTags.length > 0) {
+        if (!this.tagsCheckResult.isSuccessful()) {
             //first item the field to check, second item: the error text:
-            var todo = [
-                    ['missingContentTags', 'tagMissingText'],
-                    ['duplicatedContentTags', 'tagDuplicatedText'],
-                    ['excessContentTags', 'tagExcessText']
-                ],
-                missingSvg = '';
+            let todo = [
+                    ['missingTags', 'tagMissingText'],
+                    ['duplicatedTags', 'tagDuplicatedText'],
+                    ['excessTags', 'tagExcessText']
+                ];
 
-            for (var i = 0; i < todo.length; i++) {
-                if (me[todo[i][0]].length > 0) {
+            for (let i = 0; i < todo.length; i++) {
+                let missingSvg = '';
+
+                if (this.tagsCheckResult[todo[i][0]].length > 0) {
                     msg += me.strings[todo[i][1]];
-                    Ext.each(me[todo[i][0]], function (tag) {
+
+                    Ext.each(me.tagsCheckResult[todo[i][0]], function (tag) {
                         missingSvg += '<img src="' + me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth) + '"> ';
                         //msg += '<img src="'+me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth)+'"> ';
                     });
+
                     msg = Ext.String.format(msg, missingSvg);
                     msg += '<br /><br />';
                 }
             }
+
             me.fireEvent('contentErrors', me, msg, true);
+
             return true;
         }
+
         if (!me.isTagOrderClean) {
             me.fireEvent('contentErrors', me, me.strings.tagOrderErrorText, true);
+
             return true;
         }
+
         me.fireEvent('contentErrors', me, null, true);
+
         return false;
     },
 
@@ -910,18 +920,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * check and fix tags
      * @param node
      */
-    checkTags: function (node) {
+    checkTags: function (node)  {
         let nodeList = node.getElementsByTagName('img');
 
         this.fixDuplicateImgIds(nodeList);
 
-        let result = this.tagsCheck.checkContentTags(nodeList, this.markupImages);
+        this.tagsCheckResult = this.tagsCheck.checkContentTags(nodeList, this.markupImages);
 
-        if (!result.isSuccessful()) {
-            this.missingContentTags = result.missingTags;
-            this.duplicatedContentTags = result.duplicatedTags;
-            this.excessContentTags = result.excessTags;
-
+        if (!this.tagsCheckResult.isSuccessful()) {
             if (this.disableErrorCheck) {
                 // if there are content tag errors, and we are in "save anyway" mode, we remove orphaned tags then
                 this.removeOrphanedTags(nodeList);
