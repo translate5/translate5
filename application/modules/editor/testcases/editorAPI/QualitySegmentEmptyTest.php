@@ -45,6 +45,7 @@ class QualitySegmentEmptyTest extends editor_Test_JsonTest {
     {
         $config->addTask('en', 'de')
             ->addUploadFile('testfiles/TRANSLATE-2540-en-de.xlf')
+            ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '0')
             ->setToEditAfterImport();
     }
 
