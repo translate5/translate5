@@ -79,7 +79,7 @@ class OkapiCleanBconfsCommand extends Translate5AbstractCommand
 
         // if data dir is not readable nor writable, general rights are wrong, and we terminate
         if (!is_dir($userDataDir) || !is_readable($userDataDir) || !is_writable($userDataDir)) {
-            $this->io->error('The bconf user-data directory "' . $userDataDir . '" does not exist or is not readable!');
+            $this->io->error('The bconf user-data directory "' . $userDataDir . '" does not exist or is not readable/writable!');
             return self::FAILURE;
         }
 
