@@ -130,7 +130,7 @@ trait editor_Controllers_Task_ImportTrait {
      */
     protected function processUploadedFile(editor_Models_Task $task, editor_Models_Import_DataProvider_Abstract $dp) {
         /* @see editor_Models_Import::import Saves $meta after task */
-        $meta = $task->createMeta();
+        $meta = $task->meta();
         $this->events->trigger('beforeProcessUploadedFile', $this, [
             'task' => $task,
             'meta' => $meta,
