@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 749,
-    "qtotal": 749,
+    "qcount": 498,
+    "qtotal": 498,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "746",
+                    "qid": "1739",
                     "qtype": "consistent",
                     "qcount": 2,
                     "qcomplete": true,
@@ -131,239 +131,6 @@
         },
         {
             "qid": -1,
-            "qtype": "spellcheck",
-            "qcount": 251,
-            "qcomplete": true,
-            "children": [
-                {
-                    "qid": -1,
-                    "qtype": "spellcheck",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "grammar",
-                    "text": "Grammar",
-                    "qtooltip": "The text contains a grammatical error (including errors of syntax and morphology).",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "1",
-                    "qtype": "spellcheck",
-                    "qcount": 209,
-                    "qcomplete": true,
-                    "qcategory": "misspelling",
-                    "qcatidx": "-1",
-                    "text": "Spelling",
-                    "qtooltip": "The text contains a misspelling.",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "36",
-                    "qtype": "spellcheck",
-                    "qcount": 14,
-                    "qcomplete": true,
-                    "qcategory": "typographical",
-                    "qcatidx": "-1",
-                    "text": "Typographical",
-                    "qtooltip": "The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "spellcheck",
-                    "qcount": 20,
-                    "qcomplete": true,
-                    "children": [
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "characters",
-                            "text": "Characters",
-                            "qtooltip": "The text contains characters that are garbled or incorrect or that are not used in the language in which the content appears.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": "77",
-                            "qtype": "spellcheck",
-                            "qcount": 1,
-                            "qcomplete": true,
-                            "qcategory": "duplication",
-                            "qcatidx": "-1",
-                            "text": "Duplication",
-                            "qtooltip": "Content has been duplicated improperly.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "inconsistency",
-                            "text": "Inconsistency",
-                            "qtooltip": "The text is inconsistent with itself or is translated inconsistently (NB: not for use with terminology inconsistency).",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "legal",
-                            "text": "Legal",
-                            "qtooltip": "The text is legally problematic (e.g., it is specific to the wrong legal system).",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": "41",
-                            "qtype": "spellcheck",
-                            "qcount": 19,
-                            "qcomplete": true,
-                            "qcategory": "uncategorized",
-                            "qcatidx": "-1",
-                            "text": "Uncategorized",
-                            "qtooltip": "The issue either has not been categorized or cannot be categorized.",
-                            "leaf": true,
-                            "checked": false
-                        }
-                    ],
-                    "qcategory": "group-general",
-                    "text": "General",
-                    "qtooltip": null,
-                    "expanded": false,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "spellcheck",
-                    "qcount": 8,
-                    "qcomplete": true,
-                    "children": [
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "register",
-                            "text": "Register",
-                            "qtooltip": "The text is written in the wrong linguistic register of uses slang or other language variants inappropriate to the text.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "locale-specific-content",
-                            "text": "Locale-specific content",
-                            "qtooltip": "The localization contains content that does not apply to the locale for which it was prepared.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "locale-violation",
-                            "text": "Locale violation",
-                            "qtooltip": "Text violates norms for the intended locale.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": "94",
-                            "qtype": "spellcheck",
-                            "qcount": 3,
-                            "qcomplete": true,
-                            "qcategory": "style",
-                            "qcatidx": "-1",
-                            "text": "General style",
-                            "qtooltip": "The text contains stylistic errors.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "pattern-problem",
-                            "text": "Pattern problem",
-                            "qtooltip": "The text fails to match a pattern that defines allowable content (or matches one that defines non-allowable content).",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": "188",
-                            "qtype": "spellcheck",
-                            "qcount": 5,
-                            "qcomplete": true,
-                            "qcategory": "whitespace",
-                            "qcatidx": "-1",
-                            "text": "Whitespace",
-                            "qtooltip": "There is a mismatch in whitespace between source and target content or the text violates specific rules related to the use of whitespace.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "terminology",
-                            "text": "Terminology",
-                            "qtooltip": "An incorrect term or a term from the wrong domain was used or terms are used inconsistently.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "internationalization",
-                            "text": "Internationalization",
-                            "qtooltip": "There is an issue related to the internationalization of content.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "non-conformance",
-                            "text": "Non-conformance",
-                            "qtooltip": "Statistically detect wrong use of words that are easily confused",
-                            "leaf": true,
-                            "checked": false
-                        }
-                    ],
-                    "qcategory": "group-style",
-                    "text": "Style",
-                    "qtooltip": null,
-                    "expanded": false,
-                    "checked": false
-                }
-            ],
-            "qcategory": null,
-            "qtooltip": "",
-            "text": "LanguageTool",
-            "qtotal": 251,
-            "expanded": true,
-            "checked": false
-        },
-        {
-            "qid": -1,
             "qtype": "length",
             "qcount": 0,
             "qcomplete": true,
@@ -427,7 +194,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "749",
+                    "qid": "1742",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
@@ -450,7 +217,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "750",
+                    "qid": "1743",
                     "qtype": "qm",
                     "qcount": 1,
                     "qcomplete": true,
@@ -504,7 +271,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "513",
+                            "qid": "1282",
                             "qtype": "mqm",
                             "qcount": 171,
                             "qcomplete": true,
@@ -516,7 +283,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "514",
+                            "qid": "1292",
                             "qtype": "mqm",
                             "qcount": 105,
                             "qcomplete": true,
@@ -528,7 +295,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "581",
+                            "qid": "1574",
                             "qtype": "mqm",
                             "qcount": 12,
                             "qcomplete": true,
@@ -540,7 +307,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "263",
+                            "qid": "1564",
                             "qtype": "mqm",
                             "qcount": 3,
                             "qcomplete": true,
@@ -552,7 +319,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "512",
+                            "qid": "1552",
                             "qtype": "mqm",
                             "qcount": 13,
                             "qcomplete": true,
@@ -578,7 +345,7 @@
                     "qcomplete": true,
                     "children": [
                         {
-                            "qid": "256",
+                            "qid": "1558",
                             "qtype": "mqm",
                             "qcount": 21,
                             "qcomplete": true,
@@ -590,13 +357,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "393",
+                            "qid": "1386",
                             "qtype": "mqm",
                             "qcount": 6,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "268",
+                                    "qid": "1281",
                                     "qtype": "mqm",
                                     "qcount": 12,
                                     "qcomplete": true,
@@ -616,13 +383,13 @@
                             "checked": false
                         },
                         {
-                            "qid": "287",
+                            "qid": "1280",
                             "qtype": "mqm",
                             "qcount": 2,
                             "qcomplete": true,
                             "children": [
                                 {
-                                    "qid": "300",
+                                    "qid": "1293",
                                     "qtype": "mqm",
                                     "qcount": 4,
                                     "qcomplete": true,
@@ -642,7 +409,7 @@
                             "checked": false
                         },
                         {
-                            "qid": "517",
+                            "qid": "1302",
                             "qtype": "mqm",
                             "qcount": 10,
                             "qcomplete": true,
@@ -672,7 +439,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "257",
+                                    "qid": "1543",
                                     "qtype": "mqm",
                                     "qcount": 32,
                                     "qcomplete": true,
@@ -684,7 +451,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "271",
+                                    "qid": "1286",
                                     "qtype": "mqm",
                                     "qcount": 28,
                                     "qcomplete": true,
@@ -696,7 +463,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "262",
+                                    "qid": "1536",
                                     "qtype": "mqm",
                                     "qcount": 51,
                                     "qcomplete": true,
@@ -708,7 +475,7 @@
                                     "checked": false
                                 },
                                 {
-                                    "qid": "540",
+                                    "qid": "1578",
                                     "qtype": "mqm",
                                     "qcount": 17,
                                     "qcomplete": true,
@@ -762,7 +529,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "742",
+                    "qid": "1735",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -785,7 +552,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "739",
+                    "qid": "1732",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -797,7 +564,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "743",
+                    "qid": "1736",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -842,7 +609,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "740",
+                    "qid": "1733",
                     "qtype": "numbers",
                     "qcount": 2,
                     "qcomplete": true,
@@ -865,7 +632,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "741",
+                    "qid": "1734",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,

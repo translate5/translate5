@@ -59,6 +59,8 @@ class QualityBaseTest extends editor_Test_JsonTest {
     {
         $config
             ->addTask('en', 'de', -1, 'csv-with-mqm-en-de.zip')
+            // IMPORTANT: we disable the spellcheck qualities as these highly depend on the version. They are only tested with the explicit spellcheck-test
+            ->addTaskConfig('runtimeOptions.autoQA.enableSegmentSpellCheck', '0')
             ->setToEditAfterImport();
     }
 
