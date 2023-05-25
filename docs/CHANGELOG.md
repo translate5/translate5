@@ -20,6 +20,34 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.2.2] - 2023-05-25
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-3172](https://jira.translate5.net/browse/TRANSLATE-3172): file format settings - XML File Filter Settings for Figma** <br>
+Assigned "*.figma" file -extension for the figma file-filter setting
+
+
+### Bugfixes
+**[TRANSLATE-3344](https://jira.translate5.net/browse/TRANSLATE-3344): VisualReview / VisualTranslation - FIX symlink creation in visual for invalid symlinks** <br>
+Symlink creation in visual might not refresh outdated symlinks
+
+**[TRANSLATE-3339](https://jira.translate5.net/browse/TRANSLATE-3339): Editor general - HOTFIX: several smaller fixes** <br>
+ENHANCEMENT: improved event-msg of the "too many segments per trans-unit" exception
+FIX: increased max segments per transunit to 250
+ENHANCEMENT: Add all OKAPI versions when using the autodiscovery for development
+
+**[TRANSLATE-3338](https://jira.translate5.net/browse/TRANSLATE-3338): SNC - Clean SNC numbers check debug output** <br>
+Clean the debug output in SNC numbers check library.
+
+**[TRANSLATE-3337](https://jira.translate5.net/browse/TRANSLATE-3337): API - Plugin ConnectWorldserver: wrong attribut for Visual** <br>
+Plugin ConnectWordserver: changed attribute for visual from "layout_source_translate5" to new name "translate5_layout_source"
+
+
 ## [6.2.1] - 2023-05-11
 
 ### Important Notes:

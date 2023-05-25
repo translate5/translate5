@@ -41,10 +41,11 @@ class editor_SessionController extends ZfExtended_SessionController {
     const AUTH_HASH_STATIC = 'static';
 
     /**
-     * We add our resync-operation to be CSRF unprotected
+     * The session-controller is almost entirely unprotected
+     * The 'index' action is used to redirect for the "Single Click Authentication", see https://confluence.translate5.net/display/TAD/Single+Click+Authentication
      * @var string[]
      */
-    protected array $_unprotectedActions = [ 'post', 'delete', 'get', 'resync' ];
+    protected array $_unprotectedActions = [ 'index', 'post', 'delete', 'get', 'resync' ];
 
     /**
      * @throws \MittagQI\Translate5\Task\Current\Exception
