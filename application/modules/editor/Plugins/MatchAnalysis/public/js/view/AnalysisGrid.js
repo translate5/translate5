@@ -64,7 +64,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
         analysisDate: '#UT#Datum',
         languageResourceName: '#UT#Name',
         repetitions: '#UT#Wiederholungen:',
-        totalSum: '#UT#Summe',
         internalFuzzy: "#UT#Interne Fuzzy verwendet",
         matchRate: "#UT#Match-Rate",
         edit100PercentMatchDisabledMessage: '#UT#Gesperrte 100%-Matches sind nicht Teil der Analyse.',
@@ -87,13 +86,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                     loading: '{isAnalysisRunning}',
                     disabled: '{!enablePanel}'
                 },
-                features: [{
-                    ftype: 'summary'
-                }],
                 columns: me.getColumnConfig(),
                 dockedItems: [{
                     dock: 'top',
                     xtype: 'panel',
+                    border: 0,
                     bodyPadding: 10,
                     itemId: 'infoPanel',
                     cls: 'matchAnalysisInfoBox',
@@ -117,36 +114,77 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                         forceSelection : true,
                         disableKeyFilter : true,
                         fieldLabel: me.strings.basedOn,
-                        store: Ext.create('Ext.data.ArrayStore',{
-                        fields: ['id', 'type'],
-                        data : [
-                            ['word',me.strings.wordBased],
-                            ['character',me.strings.characterBased]
-                        ]
+                        store: Ext.create('Ext.data.ArrayStore', {
+                            fields: ['id', 'type'],
+                            data : [
+                                ['word',me.strings.wordBased],
+                                ['character',me.strings.characterBased]
+                            ]
                         }),
                         listeners: {
                             select: 'onUnitTypeSelect'
                         },
                         queryMode: 'local',
                         displayField: 'type',
-                        value: Editor.data.plugins.MatchAnalysis.calculateBasedOn,
                         valueField: 'id'
+                    }, {
+                        xtype: 'combobox',
+                        queryMode: 'local',
+                        forceSelection: true,
+                        displayField: 'name',
+                        itemId: 'pricingPresetId',
+                        name: 'pricingPresetId',
+                        valueField: 'id',
+                        disabled: true,
+                        value: Editor.data.plugins.MatchAnalysis.pricing.systemDefaultPresetId,
+                        bind: {
+                            fieldLabel: '{l10n.MatchAnalysis.pricing.preset.combo}'
+                        },
+                        tpl: Ext.create('Ext.XTemplate',
+                            '<ul class="x-list-plain t5leveledList"><tpl for=".">',
+                            '<li role="option" class="{[values.cid == 0 ? "x-boundlist-item t5level1" : "x-boundlist-item"]}" title="{description}">{name}</li>',
+                            '</tpl></ul>'
+                        )
+                    }, {
+                        xtype: 'image',
+                        src: '/modules/editor/images/information.png',
+                        listeners: {
+                            render: img => img.el.dom.setAttribute('data-qtip', me.getTooltip())
+                        }
                     }]
-                },{
-                    xtype: 'container',
-                    dock: 'bottom',
-                    html: '<ul><li>'+[
-                        Editor.util.LanguageResources.getMatchrateTooltip(101),
-                        Editor.util.LanguageResources.getMatchrateTooltip(102),
-                        Editor.util.LanguageResources.getMatchrateTooltip(103),
-                        Editor.util.LanguageResources.getMatchrateTooltip(104)
-                    ].join('</li><li>')+'</li></ul>'
                 },{
                     xtype: 'toolbar',
                     dock: 'bottom',
                     ui: 'footer',
                     enableOverflow: true,
+                    defaultButtonUI: false,
                     items: [{
+                        xtype: 'textfield',
+                        readOnly: true,
+                        itemId: 'priceAdjustment',
+                        bind: {
+                            fieldLabel: '{l10n.MatchAnalysis.pricing.preset.priceAdjustment}',
+                            value: '{priceAdjustment} {currency}'
+                        },
+                        labelWidth: 110,
+                        width: 220,
+                    }, {
+                        xtype: 'textfield',
+                        readOnly: true,
+                        itemId: 'finalAmount',
+                        bind: {
+                            fieldLabel: '{l10n.MatchAnalysis.analysisWindow.finalAmount}',
+                            value: '{finalAmount} {currency}'
+                        },
+                        labelWidth: 90,
+                        width: 190,
+                    }, {
+                        xtype: 'tbtext',
+                        bind: {
+                            hidden: '{!noPricing}',
+                            html: '{l10n.MatchAnalysis.analysisWindow.notDefined}'
+                        }
+                    }, '->', {
                         xtype: 'button',
                         glyph: 'f1c3@FontAwesome5FreeSolid',
                         itemId: 'exportExcel',
@@ -155,7 +193,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                             disabled: '{!hasAnalysisData}'
                         },
                         listeners: {
-                            click: {fn: 'exportAction', extraArg: 'excel'}
+                            click: 'exportAction'
                         }
                     }, {
                         xtype: 'button',
@@ -166,7 +204,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
                             disabled: '{!hasAnalysisData}'
                         },
                         listeners: {
-                            click: {fn: 'exportAction', extraArg: 'xml'}
+                            click: 'exportAction'
                         }
                     }]
                 }]
@@ -199,16 +237,29 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
         store.load();
     },
 
+    getTooltip: function() {
+        return '<ul><li>' + [
+            Editor.util.LanguageResources.getMatchrateTooltip(101),
+            Editor.util.LanguageResources.getMatchrateTooltip(102),
+            Editor.util.LanguageResources.getMatchrateTooltip(103),
+            Editor.util.LanguageResources.getMatchrateTooltip(104)
+        ].join('</li><li>') + '</li></ul>';
+    },
+
     /***
      *
      * @param customRanges
      */
     getColumnConfig: function(customRanges) {
         var me = this,
-            columnRenderer = function (val) {
-                return val ? val : 0;
+            columnRenderer = function (val, m, r) {
+                return r.get('resourceName') === 'Amount' ? Ext.util.Format.number(val, '0.00') : val;
             },
-            columns;
+            columns,
+            metrics = Ext.create('Ext.util.TextMetrics'),
+            paddings = 25,
+            tooltip = me.getTooltip(),
+            vm = this.getViewModel();
 
         customRanges = customRanges || [];
 
@@ -218,15 +269,24 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
             renderer: function (value, metaData, record) {
                 if (!value) {
                     return me.strings.repetitions;
+                } else if (value === 'summary' || value === 'amount') {
+                    return vm.get('l10n.MatchAnalysis.analysisWindow.' + value) + ':';
                 }
                 return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #' + record.get('resourceColor') + ';"></div>' + value;
             },
-            summaryRenderer: function () {
-                return me.strings.totalSum;
-            },
             dataIndex: 'resourceName',
-            flex: 5,
+            minWidth: 200,
+            flex: 1,
             sortable: true
+        }, {
+            xtype: 'gridcolumn',
+            dataIndex: 'unitCountTotal',
+            align: 'end',
+            cellWrap: true,
+            renderer: columnRenderer,
+            menuDisabled: true,
+            text: me.strings.matchCount,
+            width: metrics.getWidth(me.strings.matchCount) + paddings
         }];
 
         Ext.Array.each(customRanges, function(item){
@@ -241,27 +301,18 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisGrid', {
             else {
                 label = item.end+'%-'+item.begin+'%';
             }
+            var text = isNoMatch ? me.strings.noMatch : label;
             columns.push({
                 xtype: 'gridcolumn',
-                flex: isNoMatch ? 3 : 2,
                 dataIndex: item.begin,
+                tooltip: tooltip,
+                align: 'end',
                 cellWrap: true,
-                text: isNoMatch ? me.strings.noMatch : label,
-                summaryType: 'sum',
+                menuDisabled: true,
+                text: text,
+                width: metrics.getWidth(text) + paddings,
                 renderer: columnRenderer
             });
-        });
-
-        columns.push({
-            xtype: 'gridcolumn',
-            flex: 4,
-            dataIndex: 'unitCountTotal',
-            cellWrap: true,
-            summaryType: 'sum',
-            summaryRenderer: function (value) {
-                return value;
-            },
-            text: me.strings.matchCount
         });
 
         return columns;

@@ -38,7 +38,8 @@ class editor_Models_Import_FileParser_Exception extends editor_Models_Import_Exc
     static protected $localErrorCodes = [
         'E1083' => 'The encoding of the file "{fileName}" is none of the encodings utf-8, iso-8859-1 and win-1252.',
         'E1084' => 'Given MID was to long (max 1000 chars), MID: "{mid}".',
-        'E1325' => 'Something went wrong when loading task config template with name: {filename}. The error was:{errorMessage}',
+        'E1325' => 'Something went wrong when loading task config template with name: {filename}. The error was: {errorMessage}',
         'E1327' => 'The config value {name} given in the task-config.ini does not exist in the main configuration and is ignored therefore.',
+        'E1523' => 'The maximum number of segments / "mrk"-tags per transunit ({max}) was exceeded ({amount}).'
     ];
 }

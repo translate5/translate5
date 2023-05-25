@@ -422,6 +422,10 @@
                 <source>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</source>
                 <target>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</target>
             </trans-unit>
+            <trans-unit id='U2NobGllw59lbiBTaWUgZGFzIGFrdHVlbGwgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGUgU2VnbWVudCwgdW0gZGllIFNpY2h0YmFya2VpdCBkZXMgWmVpY2hlbnrDpGhsZXJzIHp1IMOkbmRlcm4='>
+                <source>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Sichtbarkeit des Zeichenzählers zu ändern</source>
+                <target>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Sichtbarkeit des Zeichenzählers zu ändern</target>
+            </trans-unit>
             <trans-unit id='QW56YWhsIFplaWNoZW4='>
                 <source>Anzahl Zeichen</source>
                 <target>Anzahl Zeichen</target>
@@ -8927,6 +8931,26 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='RGFzIERhdGVpZm9ybWF0IHdpcmQgdm9tIMOcYmVyc2V0emVycGFrZXQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
               <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
               <target>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</target>
+            </trans-unit>
+            <trans-unit id='QmVhcmJlaXRlbg=='>
+                <source>Bearbeiten</source>
+                <target>Bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='TMO2c2NoZW4='>
+                <source>Löschen</source>
+                <target>Löschen</target>
+            </trans-unit>
+            <trans-unit id='TmV1IGFubGVnZW4='>
+                <source>Neu anlegen</source>
+                <target>Neu anlegen</target>
+            </trans-unit>
+            <trans-unit id='S2xvbmVu'>
+                <source>Klonen</source>
+                <target>Klonen</target>
+            </trans-unit>
+            <trans-unit id='VW1iZW5lbm5lbg=='>
+                <source>Umbenennen</source>
+                <target>Umbenennen</target>
             </trans-unit>
             <trans-unit id='V2FybnVuZzogQml0dGUgdmVyd2VuZGVuIFNpZSBLRUlORSBTZWdtZW50enVzYW1tZW5mw7xocnVuZyBvZGVyIC1hdWZ0ZWlsdW5nIGluIGVpbmVtIGFuZGVyZW4gw5xiZXJzZXR6dW5nc3Rvb2wgbWl0IGRlbSBoZXJ1bnRlcmdlbGFkZW5lbiBQYWtldC4gVHJhbnNsYXRlNSB1bnRlcnN0w7x0enQga2VpbmUgU2VnbWVudHp1c2FtbWVuZsO8aHJ1bmcvLWF1ZnRlaWx1bmcgdW5kIHNvbGNoZSBTZWdtZW50ZSB3ZXJkZW4gYmVpbSBSZS1JbXBvcnQgaWdub3JpZXJ0Lg=='>
               <source>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</source>

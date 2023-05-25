@@ -1667,9 +1667,11 @@ function subCheck_zahlen_normalizeSegs($checkSeg, $dateInfo, $monthInfo, $data, 
         // in Ch schauen ob <währung><num> enthalten
         // <num> beschränken auf \d{1,3}\.\d{2}
         if (preg_match_all("!(EURO?|€|CHF|Fr\.|\$|£)?\p{Zs}?(\d{1,3},\d{2})\p{Zs}?(EURO?|€|CHF|Fr\.|\$|£)?!iu", $checkSeg[1], $m)) {
-            echo "MID: $mid\n";
-            print_r($m);
 
+            if($debug){
+                echo "MID: $mid\n";
+                print_r($m);
+            }
             foreach ($m[2] as $key => $num) {
                 if (empty($m[1][$key]) && empty($m[3][$key])) {
                     continue;
@@ -1704,8 +1706,10 @@ function subCheck_zahlen_normalizeSegs($checkSeg, $dateInfo, $monthInfo, $data, 
         // in Ch schauen ob <währung><num> enthalten
         // <num> beschränken auf \d{1,3}\.\d{2}
         if (preg_match_all("!(EURO?|€|CHF|Fr\.|\$|£)?\p{Zs}?(\d{1,3}\.\d{2})\p{Zs}?(EURO?|€|CHF|Fr\.|\$|£)?!iu", $checkSeg[1], $m)) {
-            echo "MID: $mid\n";
-            print_r($m);
+            if($debug){
+                echo "MID: $mid\n";
+                print_r($m);
+            }
 
             foreach ($m[2] as $key => $num) {
                 if (empty($m[1][$key]) && empty($m[3][$key])) {

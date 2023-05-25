@@ -34,7 +34,7 @@ class editor_TermController extends ZfExtended_RestController
     /**
      * Use termportal trait
      */
-    use editor_Controllers_Traits_TermportalTrait;
+    use editor_Controllers_Traits_ControllerTrait;
 
     /**
      * @var string
@@ -503,7 +503,7 @@ class editor_TermController extends ZfExtended_RestController
             'targetLang' => [
                 'req' => true,
                 'rex' => 'int11list',
-                'key' => 'LEK_languages*'
+                'key' => 'LEK_languages+'
             ],
             'terms' => [
                 'req' => true,
@@ -529,7 +529,7 @@ class editor_TermController extends ZfExtended_RestController
         if ($this->getParam('terms') == 'none') {
 
             // Load terms data by ids list, given in except-param
-            $_ += $this->jcheck(['except' => ['key' => 'terms_term*']]);
+            $_ += $this->jcheck(['except' => ['key' => 'terms_term+']]);
 
             // Get distinct language-values and trim sublanguage-values from them
             foreach(array_unique(array_column($_['except'], 'language')) as $language) {

@@ -28,8 +28,9 @@ END LICENSE AND COPYRIGHT
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Tools;
+namespace MittagQI\Translate5\Cronjob;
 
+use MittagQI\Translate5\Tools\IpMatcher;
 use Zend_Config;
 use ZfExtended_RemoteAddress;
 

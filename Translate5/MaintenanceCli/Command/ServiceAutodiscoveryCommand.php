@@ -75,7 +75,7 @@ class ServiceAutodiscoveryCommand extends Translate5AbstractCommand
             'url' => 'http://frontendmessagebus.:9057'
         ],
         'okapi' => [
-            'url' => 'http://okapi.:8080/okapi-longhorn/'
+            'url' => 'http://okapi.:8080' //path part with version is added automatically on locate call
         ],
         'languagetool' => [
             'url' => ['default' => ['http://languagetool.:8010/v2'], 'gui' => ['http://languagetool.:8010/v2'], 'import' => ['http://languagetool.:8010/v2']] // pooled service, needs at least 3 entries

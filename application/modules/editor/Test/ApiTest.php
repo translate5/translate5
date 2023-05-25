@@ -176,6 +176,16 @@ abstract class editor_Test_ApiTest extends TestCase
     }
 
     /**
+     * Just an init function that runs as the first thing in the (unfortunately static) test setup
+     * Here static props can be reset to avoid leftovers from previous tests
+     * @return void
+     */
+    protected static function testSpecificInit()
+    {
+
+    }
+
+    /**
      * internal setup for the inheriting testcase-classes
      * Do not override in concrete test-classes, use beforeTests there
      */
@@ -259,6 +269,8 @@ abstract class editor_Test_ApiTest extends TestCase
     final public static function setUpBeforeClass(): void
     {
         try {
+            static::testSpecificInit();
+
             // each test gets an own api-object, the instance of the current test is for code-completion and does not hurt, since the constructor does nothing
             static::$_api = new Helper(static::class, new static);
 
@@ -328,7 +340,9 @@ abstract class editor_Test_ApiTest extends TestCase
         $preventRemoval = !static::api()->isSuite() || !$doCleanup; // for single running tests or if no cleanup is wanted, we do not remove the workers after test has run
         $state = DbHelper::cleanupWorkers(false, $preventRemoval, true);
         if($state->cleanupNeccessary){
+            $task = static::api()->getTask();
             $errors[] = 'The test left running, waiting, scheduled or crashed worker\'s in the DB:'."\n  ".implode("\n  ", $state->remainingWorkers)."\n";
+            $errors[] = 'The current task is:'.($task ?? $task->taskGuid);
         }
         if(count($errors) > 0){
             static::fail(implode("\n", $errors));

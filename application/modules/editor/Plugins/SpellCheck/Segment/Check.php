@@ -142,32 +142,53 @@ class Check {
     private $states = [];
 
     /**
+     * If we're in batch mode, this array will contain keys 'target' and 'result'
+     *
+     * @var array
+     */
+    private static $batch = [];
+
+    /**
      * @param editor_Models_Segment $segment
      * @param $targetField
      * @param Adapter $adapter
-     * @param $spellCheckLang
+     * @param string $spellCheckLang
      * @throws Zend_Exception
      * @throws DownException
      * @throws MalfunctionException
      * @throws RequestException
      * @throws TimeOutException
      */
-    public function __construct(editor_Models_Segment $segment, $targetField, Adapter $adapter, $spellCheckLang) {
+    public function __construct(editor_Models_Segment $segment, $targetField, Adapter $adapter, string $spellCheckLang) {
 
-        // Get target text, strip tags, replace htmlentities
-        $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
-        $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
+        // If we're in batch-mode
+        if (self::$batch) {
 
-        // Replace whitespace-placeholders with the actual characters they represent
-        $target = Whitespace::replaceLabelledCharacters($target);
+            // If matches were detected for the current segment
+            if ($matches = self::$batch['result'][$segment->getSegmentNrInTask()] ?? 0) {
 
-        // If empty target - return
-        if (strlen($target) === 0) {
-            return;
+                // Prepare $data stdClass instance having those pre-detected matches
+                $data = new \stdClass();
+                $data->matches = $matches;
+
+            } else {
+                return;
+            }
+
+        // Else if we're not in batch-mode
+        } else {
+
+            // Prepare target
+            $target = self::prepareTarget($segment, $targetField);
+
+            // If empty target - return
+            if (strlen($target) === 0) {
+                return;
+            }
+
+            // Get LanguageTool response
+            $data = $adapter->getMatches($target, $spellCheckLang);
         }
-
-        // Get LanguageTool response
-        $data = $adapter->getMatches($target, $spellCheckLang);
 
         // Foreach match given by LanguageTool API response
         foreach ($data->matches as $index => $match) {
@@ -217,5 +238,92 @@ class Check {
      */
     public function hasStates(): bool {
         return count($this->states) > 0;
+    }
+
+    /**
+     * Clear batch-data
+     */
+    public static function purgeBatch() {
+        self::$batch = [
+            'target' => [],
+            'result' => []
+        ];
+    }
+
+    /**
+     * Append the value of $segment's $targetField to the list of to be processed
+     *
+     * @param editor_Models_Segment $segment
+     * @param string $targetField
+     */
+    public static function addBatchTarget(editor_Models_Segment $segment, string $targetField) {
+        self::$batch['target'][$segment->getSegmentNrInTask()] = self::prepareTarget($segment, $targetField);
+    }
+
+    /**
+     * Get value of $segment's $targetField applicable to be sent to LanguageTool
+     *
+     * @param editor_Models_Segment $segment
+     * @param string $targetField
+     * @return string
+     */
+    public static function prepareTarget(editor_Models_Segment $segment, string $targetField) : string {
+
+        // Get target text, strip tags, replace htmlentities
+        $target = $segment->{'get' . ucfirst($targetField) . 'EditToSort'}();
+        $target = str_replace(['&lt;', '&gt;'], ['<', '>'], $target);
+
+        // Replace whitespace-placeholders with the actual characters they represent
+        $target = Whitespace::replaceLabelledCharacters($target);
+
+        // Return string applicable to be sent to LanguageTool
+        return $target;
+    }
+
+    /**
+     * @param Adapter $adapter
+     * @param string $spellCheckLang
+     * @throws DownException
+     * @throws MalfunctionException
+     * @throws RequestException
+     * @throws TimeOutException
+     */
+    public static function runBatchAndSplitResults(Adapter $adapter, string $spellCheckLang) {
+
+        // Separator
+        $separator = Adapter::BATCH_SEPARATOR;
+
+        // Sort by segmentNrInTask (keys)
+        ksort(self::$batch['target']);
+
+        // Get LanguageTool response
+        $data = $adapter->getMatches(self::$batch['target'], $spellCheckLang);
+
+        // Get whole text contents sent for spellchecking
+        $whole = join($separator, self::$batch['target']);
+
+        // Get array of [batch-index => segmentNrInTask] pairs
+        $segmentNrByIndex = array_keys(self::$batch['target']);
+
+        // Foreach match given by LanguageTool API response
+        foreach ($data->matches as $index => $match) {
+
+            // Get text from the beginning and up to the reported word/phrase, inclusively
+            $text = mb_substr($whole, 0, $match->offset + $match->length);
+
+            // Get segment index as quantity of occurrences of separator in that text
+            $segmentIdx = preg_match_all("~$separator~", $text);
+
+            // Get quantity of characters that we should shift originally reported offset by
+            $shiftOffsetBy = mb_strrpos($text, $separator) + ($segmentIdx ? strlen($separator) : 0);
+
+            // Amend props for them to relate to certain segment only
+            $match->context->text = explode($separator, $whole)[$segmentIdx];
+            $match->context->offset -= $shiftOffsetBy;
+            $match->offset          -= $shiftOffsetBy;
+
+            // Append to the list of problems for the certain segment
+            self::$batch['result'][ $segmentNrByIndex[$segmentIdx] ] []= $match;
+        }
     }
 }

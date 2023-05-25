@@ -98,7 +98,6 @@
     {
         "segmentNrInTask": "7",
         "internalFuzzy": "0",
-        "languageResourceid": "0",
         "matchRate": "102",
         "wordCount": "12",
         "characterCount": "74",
@@ -123,7 +122,6 @@
     {
         "segmentNrInTask": "9",
         "internalFuzzy": "0",
-        "languageResourceid": "0",
         "matchRate": "102",
         "wordCount": "12",
         "characterCount": "74",
@@ -132,7 +130,6 @@
     {
         "segmentNrInTask": "10",
         "internalFuzzy": "0",
-        "languageResourceid": "0",
         "matchRate": "102",
         "wordCount": "17",
         "characterCount": "120",

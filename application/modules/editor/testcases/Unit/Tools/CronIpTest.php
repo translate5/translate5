@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\Tools;
 
-use MittagQI\Translate5\Tools\CronIp;
+use MittagQI\Translate5\Cronjob\CronIp;
 use MittagQI\Translate5\Tools\IpMatcher;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

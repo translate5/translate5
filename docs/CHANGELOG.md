@@ -17,6 +17,179 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+
+## [6.2.1] - 2023-05-11
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3327](https://jira.translate5.net/browse/TRANSLATE-3327): LanguageResources - Problem with unconfigured language resources** <br>
+Removed configuration from language resource services leads to an error
+
+
+## [6.2.0] - 2023-05-11
+
+### Important Notes:
+#### [TRANSLATE-3313](https://jira.translate5.net/browse/TRANSLATE-3313)
+PHP error_log location moved to translate5 installation root folder /data/logs/ directory, with logs rotation enabled, if needed elsewhere overwrite the location in installation.ini
+ 
+
+
+### Added
+**[TRANSLATE-3322](https://jira.translate5.net/browse/TRANSLATE-3322): Editor general - Integrate Tilde MT in translate5** <br>
+Added new plugin which integrates Tilde Machine Translation into Translate5.
+
+
+### Changed
+**[TRANSLATE-3317](https://jira.translate5.net/browse/TRANSLATE-3317): Editor general - Add port to be configurable** <br>
+Custom database port can be set when installing new translate5 instance using the translate5 installer. This can be done with setting the new environment variable T5_INSTALL_DB_PORT while installing Translate5.
+
+**[TRANSLATE-3313](https://jira.translate5.net/browse/TRANSLATE-3313): Main back-end mechanisms (Worker, Logging, etc.) - place php.log under data log and use log rotation** <br>
+PHP error_log moved to translate5 installation root folder /data/logs/ directory, with logs rotation enabled, if needed elsewhere overwrite the location in installation.ini
+
+**[TRANSLATE-3299](https://jira.translate5.net/browse/TRANSLATE-3299): Auto-QA - Enable Segment Batches in Spellchecker Request** <br>
+Enabled batch-processing of segments in the Spellcheck during import.
+
+**[TRANSLATE-3267](https://jira.translate5.net/browse/TRANSLATE-3267): LanguageResources - Improve automatic memory reorganization** <br>
+translate5 - 6.0.0
+    - Language resource while reorganizing TM is happening is now treated as importing to restrict any other operation on it.
+    - Update now is also disabled while reorganizing TM is in progress.
+
+translate5 - 6.2.0
+    - Reformating of the error codes list
+
+**[TRANSLATE-3241](https://jira.translate5.net/browse/TRANSLATE-3241): OpenTM2 integration - T5memory automatic reorganize and via CLI** <br>
+translate - 5.9.4
+Added two new commands: 
+  - t5memory:reorganize for manually triggering translation memory reorganizing
+  - t5memory:list - for listing all translation memories with their statuses
+Add new config for setting up error codes from t5memory that should trigger automatic reorganizing
+Added automatic translation memory reorganizing if appropriate error appears in response from t5memory engine
+
+translate - 6.2.0
+ -  Fix the status check for GroupShare language resources
+
+
+### Bugfixes
+**[TRANSLATE-3323](https://jira.translate5.net/browse/TRANSLATE-3323): InstantTranslate, t5memory - t5memory translations not available in instant translate** <br>
+Fix for a problem where t5memory results where not listed in instant-translate.
+
+**[TRANSLATE-3318](https://jira.translate5.net/browse/TRANSLATE-3318): MatchAnalysis & Pretranslation - Cloning of pricing template does not clone prices in no-matches column** <br>
+FIXED: Price for 'No match' column not cloned during pricing preset cloning
+
+**[TRANSLATE-3310](https://jira.translate5.net/browse/TRANSLATE-3310): Main back-end mechanisms (Worker, Logging, etc.) - Maintenance display text localization** <br>
+Enable custom maintenance text and text localization.
+
+**[TRANSLATE-3307](https://jira.translate5.net/browse/TRANSLATE-3307): Translate5 CLI - Cron events are not triggered on CLI usage** <br>
+translate5 command line tool fix for cron commands. In details: cron did not trigger the cron related events.
+
+**[TRANSLATE-3306](https://jira.translate5.net/browse/TRANSLATE-3306): Editor general - Error occurred when trying to assign language resource to task** <br>
+The translate5 will no longer raise error in case for duplicate user assignment.
+
+**[TRANSLATE-3280](https://jira.translate5.net/browse/TRANSLATE-3280): Editor general - Fixing UI errors** <br>
+translate - 6.0.2
+- Fix for error when switching customer in add task window and quickly closing the window with esc key. (me.selectedCustomersConfigStore is null)
+- Fix for error when "segment qualities" are still loading but the user already left/close the task. (this.getMetaFalPosPanel() is undefined)
+- Right clicking on disabled segment with spelling error leads to an error. (c is null_in_quality_context.json)
+- Applying delayed quality styles to segment can lead to an error in case the user left the task before the callback/response is evaluated.
+
+translate - 6.2.0
+ - Fix for UI error : setRootNode is undefined
+
+**[TRANSLATE-3262](https://jira.translate5.net/browse/TRANSLATE-3262): Import/Export - Protected non breaking spaces are not respected on reimport** <br>
+On re-import, the protected tags (white spaces, line breaks etc)  from the incoming content will no longer be ignored.
+
+**[TRANSLATE-3061](https://jira.translate5.net/browse/TRANSLATE-3061): Test framework - FIX API Tests** <br>
+translate5 - 5.7.13
+ - Code refactoring for the testing environment. Improvements and fixes for API test cases.
+translate5 - 6.0.2
+ - Fixed config loading level in testing environment 
+translate5 - 6.2.0
+ - general improvement in API test cases
+
+
+## [6.1.0] - 2023-04-26
+
+### Important Notes:
+#### [TRANSLATE-2991](https://jira.translate5.net/browse/TRANSLATE-2991)
+The "match rate boundaries" configuration in the system configuration and the clients overwrites is removed.
+If you changed the default configuration on system level or for certain clients, you need to manually redo the configuration in the new "Pricing match rates" configuration on system and/or client level.
+ 
+
+
+### Added
+**[TRANSLATE-3182](https://jira.translate5.net/browse/TRANSLATE-3182): Editor general - Show optionally character count for current open segment** <br>
+Added optional character counter for the segment-editor. By default it is invisible - unless the runtimeOptions.editor.toolbar.showHideCharCounter config is set to active. The counter can be activated by the user  in the segment grid settings menu
+
+**[TRANSLATE-2991](https://jira.translate5.net/browse/TRANSLATE-2991): Configuration, MatchAnalysis & Pretranslation - Pricing & match rate presets** <br>
+Sophisticated config options for calculating prices and defining custom match ranges are introduced.
+
+
+### Changed
+**[TRANSLATE-3246](https://jira.translate5.net/browse/TRANSLATE-3246): file format settings - Fixed naming scheme for OKAPI config entries** <br>
+Fixed naming scheme for Okapi Service Configuration Entries. In the frontend, no name must be defined anymore
+
+**[TRANSLATE-3225](https://jira.translate5.net/browse/TRANSLATE-3225): InstantTranslate - DeepL at times simply not answers requests leading to errors in T5 that suggest the app is malfunctioning** <br>
+Instant translate UI now shows errors happening with language resources during translation
+
+
+### Bugfixes
+**[TRANSLATE-3302](https://jira.translate5.net/browse/TRANSLATE-3302): Translate5 CLI - Notification mails are not translated when starting cron via CLI** <br>
+Internal translations were missing when calling cron via CLI.
+
+**[TRANSLATE-3298](https://jira.translate5.net/browse/TRANSLATE-3298): Main back-end mechanisms (Worker, Logging, etc.) - Version conflict when using multiple tabs** <br>
+Improve logging when translate5 is opened in multiple tabs and reduce log entries when a version conflict pops up.
+
+**[TRANSLATE-3297](https://jira.translate5.net/browse/TRANSLATE-3297): Import/Export - Corrupt skeleton file on reimport** <br>
+Fix for corrupted skeleton files after translator package was re-imported into a task.
+
+**[TRANSLATE-3296](https://jira.translate5.net/browse/TRANSLATE-3296): SpellCheck (LanguageTool integration) - Add config to prevent spellchecking non-editable / locked segments on import** <br>
+Enhancement: Add configuration to skip spellchecking for read-only segments on import
+
+**[TRANSLATE-3295](https://jira.translate5.net/browse/TRANSLATE-3295): TermTagger integration - Terms in Source are not identified in target and therefore falsly are flagged "not found"** <br>
+FIX: Terms in the segment source may have been falsely flagged as "not found in target"
+
+**[TRANSLATE-3294](https://jira.translate5.net/browse/TRANSLATE-3294): Editor general - Increase systemstatus timeout** <br>
+The system-check under preferences may run into a timeout if some services do not respond in a reasonable amount of time, therefore the timeout in the UI is increased and a proper error message is shown.
+
+
+**[TRANSLATE-3293](https://jira.translate5.net/browse/TRANSLATE-3293): Editor general - Stop trimming leading/trailing whitespaces on segment save** <br>
+Leading/trailing whitespaces will no longer be trimmed from the segment on save.
+
+**[TRANSLATE-3287](https://jira.translate5.net/browse/TRANSLATE-3287): Editor general - Protected spaces are being removed automatically, when saving** <br>
+FIX: protected spaces may be removed when saving a translated segment in the review
+
+**[TRANSLATE-3286](https://jira.translate5.net/browse/TRANSLATE-3286): Editor general - Error on trying to insert duplicate entry to DB** <br>
+Fixed throwing duplicate entry exception in ZfExtended/Models/Entity/Abstract
+
+**[TRANSLATE-3283](https://jira.translate5.net/browse/TRANSLATE-3283): TermPortal - Set for rejected term automatically the term attribute normativeAuthorization "deprecatedTerm"** <br>
+Fix for the problem where for a rejected term automatically the term attribute "normativeAuthorization" was not set to "deprecatedTerm".
+
+**[TRANSLATE-3278](https://jira.translate5.net/browse/TRANSLATE-3278): VisualReview / VisualTranslation - VisualReview sym link clean up** <br>
+Visual (code quality improvement): 
+- symbolic links are created as relative paths to simplify moving the data or application directory
+- improve cleanup of symbolic link
+
+**[TRANSLATE-3250](https://jira.translate5.net/browse/TRANSLATE-3250): TermPortal - Term translation project creation fails silently** <br>
+TermTranslation-project creation was just failing silently, if the PM user which was set as default PM for TermTranslation-projects was deleted before. 
+
+**[TRANSLATE-3058](https://jira.translate5.net/browse/TRANSLATE-3058): Main back-end mechanisms (Worker, Logging, etc.), SpellCheck (LanguageTool integration), TermTagger integration - Simplify termtagger and spellcheck workers** <br>
+translate5 - 6.0.0: 
+Improvement: TermTagger Worker & SpellCheck Worker are not queued dynamically anymore but according to the configured slots & looping through segments. This reduces deadlocks & limits processes 
+translate5 - 6.1.0:
+Improve behavior of Processing-State queries regarding deadlocks
+
+**[TRANSLATE-2063](https://jira.translate5.net/browse/TRANSLATE-2063): Import/Export - Enable parallele use of multiple okapi versions to fix Okapi bugs** <br>
+NEXT: Fixed docker autodiscovery not to overwrite existing config.
+5.9.0: Added dedicated CLI commands to maintain Okapi config.
+5.7.6: Multiple okapi instances can be configured and used for task imports.
+6.1.0: Enhancement: Fixed naming scheme for the keys of the Okapi Server Configuration entries
+
+
 ## [6.0.2] - 2023-04-20
 
 ### Important Notes:

@@ -21,24 +21,31 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Tools;
+namespace MittagQI\Translate5\LanguageResource\Adapter;
 
-use Zend_Registry;
-use ZfExtended_RemoteAddress;
-
-class CronIpFactory
+class EnginesList
 {
-    public static function create(): CronIp
-    {
-        $config = Zend_Registry::get('config');
+    private array $engines = [];
 
-        return new CronIp($config, new IpMatcher(), new ZfExtended_RemoteAddress());
+    public function add(EngineDTO $engineDTO): void
+    {
+        $this->engines[] = $engineDTO;
+    }
+
+    public function toArray(): array
+    {
+        return array_map(
+            static function (EngineDTO $engineDTO) {
+                return $engineDTO->toArray();
+            },
+            $this->engines
+        );
     }
 }

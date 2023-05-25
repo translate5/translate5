@@ -34,7 +34,32 @@ Ext.define('Editor.view.admin.system.StatusPanel', {
     },
     loader: {
         url: Editor.data.restpath + 'index/systemstatus',
-        autoLoad: true
+        loadOnRender: true,
+        loadMask: 'loading... (timeout after 120 seconds)',
+        ajaxOptions: {
+            timeout: 120000 //after 120 seconds the result should be there
+        },
+        failure: function(loader, response, options) {
+            if(response.status > 0) {
+                Editor.app.getController('ServerException').handleException(response);
+            }
+
+            if(response.timedout) {
+                response.statusText += ' - TIMEOUT'
+            }
+
+            if(loader && loader.target) {
+                let msg = [
+                    '<div style="margin: 20px;"><h2 style="color:red;">Error on loading system-check data: <i>'+response.statusText+'</i></h2>',
+                    'Please press re-check button.',
+                    '',
+                    'If you get a timeout, the check of some services may need to long.',
+                    'In that case please re-check <a href="https://confluence.translate5.net/x/AwAzGg" target="_blank">directly on the server via CLI</a>',
+                    '</div>'
+                ];
+                loader.target.update(msg.join('<br>'));
+            }
+        }
     },
     initConfig: function(instanceConfig) {
         let me = this,

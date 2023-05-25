@@ -26,8 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Tools\CronIpFactory;
-use MittagQI\Translate5\Tools\Cronjobs;
+use MittagQI\Translate5\Cronjob\CronEventTrigger;
+use MittagQI\Translate5\Cronjob\CronIpFactory;
+use MittagQI\Translate5\Cronjob\Cronjobs;
 
 /**
  * Cron Controller
@@ -35,7 +36,8 @@ use MittagQI\Translate5\Tools\Cronjobs;
  * Each action should be called through wget by a crontjob
  * Due to IP filtering there is no CSRF protection neccessary
  */
-class Editor_CronController extends ZfExtended_Controllers_Action {
+class Editor_CronController extends ZfExtended_Controllers_Action
+{
     /**
      * @var Zend_Session_Namespace
      */
@@ -49,7 +51,8 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
      * simple method to secure that controller is only called by the same server (wget)
      * @see ZfExtended_Controllers_Action::init()
      */
-    public function init() {
+    public function init(): void
+    {
         $cronIp = CronIpFactory::create();
         $clientIp = ZfExtended_Factory::get(ZfExtended_RemoteAddress::class)->getIpAddress();
         if (! $cronIp->isAllowed($clientIp)) {
@@ -64,16 +67,20 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
     /**
      * Empty index, does nothing
      */
-    public function indexAction() {}
+    public function indexAction()
+    {
+    }
     
     /**
      * This action should be called periodically between every 5 to 15 minutes, depending on the traffic on the installation.
      */
-    public function periodicalAction() {
+    public function periodicalAction(): void
+    {
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
         ZfExtended_Factory::get(Cronjobs::class, [
-            Zend_Controller_Front::getInstance()->getParam('bootstrap')
+            Zend_Controller_Front::getInstance()->getParam('bootstrap'),
+            new CronEventTrigger(),
         ])->periodical();
         echo "OK";
     }
@@ -81,11 +88,13 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
     /**
      * triggers daily actions
      */
-    public function dailyAction() {
+    public function dailyAction(): void
+    {
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
         ZfExtended_Factory::get(Cronjobs::class, [
-            Zend_Controller_Front::getInstance()->getParam('bootstrap')
+            Zend_Controller_Front::getInstance()->getParam('bootstrap'),
+            new CronEventTrigger(),
         ])->daily();
         echo "OK";
     }

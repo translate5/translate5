@@ -73,6 +73,8 @@ class editor_Models_Export_Exported_ZipDefaultWorker extends editor_Models_Expor
         // Create temporary file for writing zipped contents
         $zipFile = tempnam($task->getAbsoluteTaskDataPath(), 'taskExport_');
 
+        chmod($zipFile,0777);
+
         // Call parent
         $this->init($taskGuid, [
             'folderToBeZipped' => $parameters['exportFolder'],

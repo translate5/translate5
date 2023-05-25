@@ -36,6 +36,7 @@ use editor_Services_OpenTM2_Connector as OpenTm2Connector;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Services_Connector_FilebasedAbstract as AbstractConnector;
 use Exception;
+use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
 use Throwable;
 use ZfExtended_Factory;
 
@@ -71,7 +72,7 @@ abstract class AbstractLanguageResourcesProcessor
                     $task->getConfig()
                 );
 
-                if (AbstractConnector::STATUS_IMPORT === $connector->getStatus($resource)) {
+                if (LanguageResourceStatus::IMPORT === $connector->getStatus($resource)) {
                     return true;
                 }
 

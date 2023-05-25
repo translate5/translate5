@@ -42,7 +42,8 @@ class Models_SystemRequirement_Modules_PhpExtensions extends ZfExtended_Models_S
      * {@inheritDoc}
      * @see ZfExtended_Models_SystemRequirement_Modules_Abstract::validate()
      */
-    function validate(): ZfExtended_Models_SystemRequirement_Result {
+    public function validate(): ZfExtended_Models_SystemRequirement_Result
+    {
         $this->result->id = 'phpmodules';
         $this->result->name = 'PHP Extensions';
         $this->checkPhpExtensions();

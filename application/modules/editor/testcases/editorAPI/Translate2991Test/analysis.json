@@ -1,0 +1,48 @@
+[
+    {
+        "resourceName": "API Testing::ZDemoMT_Translate2991",
+        "resourceColor": null,
+        "resourceType": "mt",
+        "internalFuzzy": "Yes",
+        "unitCountTotal": 199,
+        "80": 0,
+        "56": 199,
+        "0": 0,
+        "noMatch": 0
+    },
+    {
+        "resourceName": "",
+        "resourceColor": "",
+        "resourceType": "auto-propagated",
+        "internalFuzzy": "Yes",
+        "unitCountTotal": 41,
+        "80": 41,
+        "56": 0,
+        "0": 0,
+        "noMatch": 0
+    },
+    {
+        "resourceName": "summary",
+        "resourceColor": "",
+        "resourceType": "",
+        "internalFuzzy": "",
+        "unitCountTotal": 240,
+        "80": 41,
+        "56": 199,
+        "0": 0,
+        "noMatch": 0
+    },
+    {
+        "resourceName": "amount",
+        "resourceColor": 0,
+        "resourceType": 0,
+        "internalFuzzy": 0,
+        "80": 2.87,
+        "56": 11.94,
+        "0": 0,
+        "noMatch": 0,
+        "unitCountTotal": 14.81,
+        "priceAdjustment": 5,
+        "finalAmount": 19.81
+    }
+]

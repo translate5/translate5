@@ -39,7 +39,8 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
      * {@inheritDoc}
      * @see ZfExtended_Models_SystemRequirement_Modules_Abstract::validate()
      */
-    function validate(): ZfExtended_Models_SystemRequirement_Result {
+    public function validate(): ZfExtended_Models_SystemRequirement_Result
+    {
         $this->result->id = 'database';
         $this->result->name = 'Database';
         $this->result->badSummary = [
