@@ -147,6 +147,8 @@ class OkapiCleanBconfsCommand extends Translate5AbstractCommand
                 $allBconfIds[] = $id;
             }
         }
+
+        // clean orphaned data dirs, this can be done even when not deleting bconf's
         $dirHandle = opendir($userDataDir);
         while (false !== ($file = readdir($dirHandle))) {
             if ($file == '.' || $file == '..') {
