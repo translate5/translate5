@@ -342,7 +342,7 @@ abstract class editor_Test_ApiTest extends TestCase
         if($state->cleanupNeccessary){
             $task = static::api()->getTask();
             $errors[] = 'The test left running, waiting, scheduled or crashed worker\'s in the DB:'."\n  ".implode("\n  ", $state->remainingWorkers)."\n";
-            $errors[] = 'The current task is:'.$task ?? $task->taskGuid;
+            $errors[] = 'The current task is:'.($task ?? $task->taskGuid);
         }
         if(count($errors) > 0){
             static::fail(implode("\n", $errors));
