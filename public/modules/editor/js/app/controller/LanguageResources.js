@@ -181,11 +181,6 @@ Ext.define('Editor.controller.LanguageResources', {
           let referenceField = Editor.data.task.get('emptyTargets') ? 'source' : 'target';
           editor.mainEditor.setValueAndMarkup(me.languageResourceValueForEditor, rec, editor.columnToEdit, referenceField);
 
-          // if(Editor.data.task.get('emptyTargets')) {
-          //     // this replaces the markupImages map already evaluated with the one from the source
-          //     editor.mainEditor.setMarkupImages(rec.get('source'), false);
-    	  // }
-
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);

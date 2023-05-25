@@ -6,7 +6,7 @@ class TagsCheck {
 
     checkContentTags(nodeList, markupImagesCache) {
         let foundIds = [],
-            ignoreWhitespace = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags');
+            ignoreWhitespace = this.shouldIgnoreWhitespaceTags();
 
         let duplicatedTags = [];
         let excessTags = [];
@@ -14,12 +14,20 @@ class TagsCheck {
         for (let node of nodeList) {
             let id = node.id.replace(new RegExp('^' + this.idPrefix), '');
 
+            let isWhitespaceTag = /whitespace/.test(node.className);
+
             //ignore whitespace and nodes without ids
-            if (ignoreWhitespace && /whitespace/.test(node.className) || /^\s*$/.test(node.id)) {
+            if ((isWhitespaceTag && ignoreWhitespace)
+                || /^\s*$/.test(node.id)
+            ) {
                 continue;
             }
 
             if (!this.referenceTags.hasOwnProperty(id)) {
+                if (isWhitespaceTag && this.isAllowedAddingWhitespaceTags()) {
+                    continue;
+                }
+
                 excessTags.push(markupImagesCache[id]);
             }
 
@@ -101,5 +109,19 @@ class TagsCheck {
      */
     isDuplicateSaveTag(img) {
         return img.tagName === 'IMG' && img.className && /duplicatesavecheck/.test(img.className);
+    }
+
+    /**
+     * @returns {Boolean}
+     */
+    shouldIgnoreWhitespaceTags() {
+        return !!Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags');
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    isAllowedAddingWhitespaceTags() {
+        return !!Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags');
     }
 }

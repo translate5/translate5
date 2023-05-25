@@ -687,22 +687,24 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * Insert whitespace; we use the ("internal-tag"-)divs here, because insertMarkup()
      * will render ("internal-tag"-)divs to the ("tag-image"-)images we finally need.
      * For titles etc, see also whitespaceTagReplacer() in editor_Models_Segment_Whitespace
-     * @param string whitespaceType ('nbsp'|'newline'|'tab')
-     * @param number tagNr
+     * @param {String} whitespaceType ('nbsp'|'newline'|'tab')
+     * @param {integer} tagNr
      */
     insertWhitespaceInEditor: function (whitespaceType, tagNr) {
         var me = this,
-            userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
-            userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
+            userCanInsertWhitespaceTags = this.tagsCheck.isAllowedAddingWhitespaceTags(),
             classNameForTagType,
             data,
             className,
             html;
-        if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
+
+        if (!userCanInsertWhitespaceTags) {
             return;
         }
+
         data = me.getInitialData();
         data.nr = tagNr;
+
         switch (whitespaceType) {
             case 'nbsp':
                 classNameForTagType = 'single 636861722074733d226332613022206c656e6774683d2231222f nbsp';
@@ -727,6 +729,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                 data.text = '→';
                 break;
         }
+
         className = classNameForTagType + ' internal-tag ownttip';
         data = me.renderTagTypeInData(className, data);
         html = me.renderInternalTags(className, data);
