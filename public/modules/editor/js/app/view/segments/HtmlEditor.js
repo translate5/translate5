@@ -230,12 +230,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
     /**
      * Setzt Daten im HtmlEditor und fügt markup hinzu
-     * @param value {String}
-     * @param segment {Editor.models.Segment}
-     * @param fieldName {String}
-     * @param referenceFieldName {String}
+     * @param {String} value
+     * @param {Editor.models.Segment} segment
+     * @param {String} fieldName
+     * @param {String} referenceFieldName
      */
-    setValueAndMarkup: function (value, segment, fieldName, referenceFieldName) {
+    setValueAndMarkup: function (
+        value,
+        segment,
+        fieldName,
+        referenceFieldName
+    ) {
         //check tag is needed for the checkplausibilityofput feature on server side
         var me = this,
             segmentId = segment.get('id'),
@@ -261,11 +266,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
         me.currentSegment = data.segment;
 
-        this.markupForEditor(segment.get(referenceFieldName));
-        this.tagsCheck = new TagsCheck(this.markupImages, this.idPrefix);
+        if (referenceFieldName) {
+            this.markupForEditor(segment.get(referenceFieldName));
+            this.tagsCheck = new TagsCheck(this.markupImages, this.idPrefix);
+        }
 
         me.setValue(me.markupForEditor(data.value) + checkTag);
         me.statusStrip.updateSegment(data.segment, fieldName);
+
+        if (!referenceFieldName) {
+            this.tagsCheck = new TagsCheck(this.markupImages, this.idPrefix);
+        }
 
         me.fireEvent('afterSetValueAndMarkup');
 
@@ -449,7 +460,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         value = value.replace(/> /g, '>' + Editor.TRANSTILDE);
         Ext.fly(tempNode).update(value);
 
-        me.replaceTagToImage(tempNode, plainContent, complementExisting);
+        me.replaceTagsToImages(tempNode, plainContent, complementExisting);
 
         Ext.destroy(me.measure);
         me.destroyRuler();
@@ -464,7 +475,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         };
     },
 
-    replaceTagToImage: function (rootnode, plainContent, complementExisting) {
+    replaceTagsToImages: function (rootnode, plainContent, complementExisting) {
         var me = this,
             data = me.getInitialData();
 
@@ -489,10 +500,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                     closingTag = item.outerHTML.match(regExClosing)[0];
                 switch (true) {
                     case /(^|[\s])trackchanges([\s]|$)/.test(item.className):
-                        // Keep nodes from TrackChanges, but run replaceTagToImage for them as well
+                        // Keep nodes from TrackChanges, but run replaceTagsToImages for them as well
                         me.result.push(openingTag);
                         plainContent.push(openingTag);
-                        me.replaceTagToImage(item, plainContent, complementExisting);
+                        me.replaceTagsToImages(item, plainContent, complementExisting);
                         me.result.push(closingTag);
                         plainContent.push(closingTag);
                         break;
@@ -528,7 +539,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                     termdata.className = termdata.className.replace(/(transFound|transNotFound|transNotDefined)/, replacement);
                 }
                 me.result.push(me.applyTemplate('termspan', termdata));
-                me.replaceTagToImage(item, plainContent, complementExisting);
+                me.replaceTagsToImages(item, plainContent, complementExisting);
                 me.result.push('</span>');
                 return;
             }
