@@ -75,6 +75,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     lastSegmentLength: null,
     currentSegment: null,
     statusStrip: null,
+    tagsFromReferenceFieldOnly: false,
 
     strings: {
         tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
@@ -234,12 +235,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * @param {Editor.models.Segment} segment
      * @param {String} fieldName
      * @param {String} referenceFieldName
+     * @param {Boolean} tagsFromReferenceFieldOnly
      */
     setValueAndMarkup: function (
         value,
         segment,
         fieldName,
-        referenceFieldName
+        referenceFieldName = '',
+        tagsFromReferenceFieldOnly = false
     ) {
         //check tag is needed for the checkplausibilityofput feature on server side
         var me = this,
@@ -271,7 +274,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             this.tagsCheck = new TagsCheck(this.markupImages, this.idPrefix);
         }
 
-        me.setValue(me.markupForEditor(data.value) + checkTag);
+        me.setValue(me.markupForEditor(data.value, tagsFromReferenceFieldOnly) + checkTag);
         me.statusStrip.updateSegment(data.segment, fieldName);
 
         if (!referenceFieldName) {
@@ -350,30 +353,18 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * @param value {String}
      * @returns {String}
      */
-    markupForEditor: function (value) {
+    markupForEditor: function (value, tagsFromReferenceFieldOnly = false) {
         var me = this,
             plainContent = [],
             result;
         me.contentEdited = false;
         me.markupImages = {};
 
-        result = me.markup(value, plainContent);
+        result = me.markup(value, plainContent, false, tagsFromReferenceFieldOnly);
         me.plainContent = plainContent; //stores only the text content and content tags for "original content has changed" comparision
 
         return result.join('');
     },
-
-    // /**
-    //  * Fills the markupImages cache with the tags from the passed markup
-    //  * @param value {String}
-    //  * @param complementExisting {Boolean}
-    //  */
-    // setMarkupImages: function (value, complementExisting) {
-    //     if (!complementExisting) {
-    //         this.markupImages = {};
-    //     }
-    //     this.markup(value, [], complementExisting);
-    // },
 
     /**
      * Inserts the given string (containing div/span internal tags) at the cursor position in the editor
@@ -445,7 +436,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * @param plainContent {Array} optional, needed for markupForEditor only
      * @param complementExisting {Boolean} optional, leads to not oeverwriting existing image-map entries
      */
-    markup: function (value, plainContent, complementExisting) {
+    markup: function (
+        value,
+        plainContent,
+        complementExisting,
+        tagsFromReferenceFieldOnly = false
+    ) {
         var me = this,
             tempNode = document.createElement('DIV'); // TODO: is using the main windows document OK here ?
 
@@ -460,7 +456,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         value = value.replace(/> /g, '>' + Editor.TRANSTILDE);
         Ext.fly(tempNode).update(value);
 
-        me.replaceTagsToImages(tempNode, plainContent, complementExisting);
+        me.replaceTagsToImages(tempNode, plainContent, complementExisting, tagsFromReferenceFieldOnly);
 
         Ext.destroy(me.measure);
         me.destroyRuler();
@@ -475,9 +471,18 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         };
     },
 
-    replaceTagsToImages: function (rootnode, plainContent, complementExisting) {
-        var me = this,
-            data = me.getInitialData();
+    replaceTagsToImages: function (
+        rootnode,
+        plainContent,
+        complementExisting,
+        tagsFromReferenceFieldOnly = false
+    ) {
+        var me = this;
+
+        let openTagNumber = 0;
+        let closeTagNumber = 0;
+        let whitespaceTagNumber = 0;
+        let singleTagNumber = 0;
 
         Ext.each(rootnode.childNodes, function (item) {
             if (Ext.isTextNode(item)) {
@@ -554,7 +559,48 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                 return;
             }
 
-            data = me.getData(item, data, complementExisting);
+            let data = me.getData(item, me.getInitialData());
+
+            if (tagsFromReferenceFieldOnly) {
+                switch (data.type) {
+                    case 'open':
+                        openTagNumber++;
+                        data = me.tagsCheck.getOpeningReferenceTagAtIndex(openTagNumber).data;
+                        break;
+
+                    case 'close':
+                        closeTagNumber++;
+                        data = me.tagsCheck.getClosingReferenceTagAtIndex(closeTagNumber).data;
+
+                        break;
+
+                    case 'whitespace':
+                        whitespaceTagNumber++;
+                        data = me.tagsCheck.getWhitespaceReferenceTagAtIndex(whitespaceTagNumber).data;
+
+                        break;
+
+                    case 'single':
+                        singleTagNumber++;
+                        data = me.tagsCheck.getSingleReferenceTagAtIndex(singleTagNumber).data;
+
+                        break;
+                }
+            }
+
+            //cache the data to be rendered via svg and the html for unmarkup
+            if (!complementExisting || !(data.key in me.markupImages)) {
+                me.markupImages[data.key] = {
+                    type: data.type,
+                    shortTag: data.shortTag,
+                    fullTag: data.text,
+                    fullWidth: data.fullWidth,
+                    shortWidth: data.shortWidth,
+                    whitespaceTag: data.whitespaceTag,
+                    html: me.renderInternalTags(item.className, data),
+                    data: data
+                };
+            }
 
             if (me.viewModesController.isFullTag() || data.whitespaceTag) {
                 data.path = me.getSvg(data.text, data.fullWidth);
@@ -592,7 +638,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
      * daten aus den tags holen
      * TODO FIXME: this method should not be called "getData" as this has a common meaning in ExtJS and is misleading. For the Richtext editor rework, rename to "evaluateImageData"
      */
-    getData: function (item, data, complementExisting) {
+    getData: function (item, data) {
         var me = this,
             divItem, spanFull, spanShort, split,
             shortTagContent;
@@ -604,6 +650,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data.qualityId = me.getElementsQualityId(divItem);
         data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
         data.length = spanFull.getAttribute('data-length');
+        data.originalItem = item;
 
         //old way is to use only the id attribute, new way is to use separate data fields
         // both way are currently used!
@@ -628,58 +675,68 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         // get the dimensions of the inner spans
         this.measure(data);
 
-        //cache the data to be rendered via svg and the html for unmarkup
-        if (!complementExisting || !(data.key in me.markupImages)) {
-            me.markupImages[data.key] = {
-                shortTag: data.shortTag,
-                fullTag: data.text,
-                fullWidth: data.fullWidth,
-                shortWidth: data.shortWidth,
-                whitespaceTag: data.whitespaceTag,
-                html: me.renderInternalTags(item.className, data)
-            };
-        }
         return data;
     },
 
     /**
      * Add type etc. to data according to tag-type.
-     * @param string className
-     * @param object data
+     * @param {String} className
+     * @param {object} data
      * @return object data
      */
     renderTagTypeInData: function (className, data) {
-        //Fallunterscheidung Tag Typ
-        switch (true) {
-            case /open/.test(className):
-                data.type = 'open';
-                data.suffix = '-left';
-                data.shortTag = data.nr;
-                break;
-            case /close/.test(className):
-                data.type = 'close';
-                data.suffix = '-right';
-                data.shortTag = '/' + data.nr;
-                break;
-            case /single/.test(className):
-                data.type = 'single';
-                data.suffix = '-single';
-                data.shortTag = data.nr + '/';
-                break;
-        }
+        data = {...data, ...this.getTagType(className, data.nr)};
+
         data.key = data.type + data.nr;
         data.shortTag = '&lt;' + data.shortTag + '&gt;';
         data.whitespaceTag = /nbsp|tab|space|newline|char/.test(className);
+
         if (data.whitespaceTag) {
             data.type += ' whitespace';
+
             if (/newline/.test(className)) {
                 data.type += ' newline';
             }
+
             data.key = 'whitespace' + data.nr;
         } else {
             data.key = data.type + data.nr;
         }
+
         return data;
+    },
+
+    /**
+     * Get the tag type (open, close, single) and the short tag (e.g. "1" or "/1")
+     * @param className
+     * @param nr
+     * @returns {{shortTag: string, type: string, suffix: string}|{}|{shortTag, type: string, suffix: string}}
+     */
+    getTagType: function (className, nr) {
+        switch (true) {
+            case /open/.test(className):
+                return {
+                    type: 'open',
+                    suffix: '-left',
+                    shortTag: nr
+                };
+
+            case /close/.test(className):
+                return {
+                    type: 'close',
+                    suffix: '-right',
+                    shortTag: '/' + nr
+                };
+
+            case /single/.test(className):
+                return {
+                    type: 'single',
+                    suffix: '-single',
+                    shortTag: nr + '/',
+                };
+        }
+
+        return {};
     },
 
     /**

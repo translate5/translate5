@@ -179,7 +179,13 @@ Ext.define('Editor.controller.LanguageResources', {
 
           // TODO move to somewhere to avoid duplicates
           let referenceField = Editor.data.task.get('emptyTargets') ? 'source' : 'target';
-          editor.mainEditor.setValueAndMarkup(me.languageResourceValueForEditor, rec, editor.columnToEdit, referenceField);
+          editor.mainEditor.setValueAndMarkup(
+              me.languageResourceValueForEditor,
+              rec,
+              editor.columnToEdit,
+              referenceField,
+              true
+          );
 
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {

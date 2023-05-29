@@ -124,4 +124,30 @@ class TagsCheck {
     isAllowedAddingWhitespaceTags() {
         return !!Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags');
     }
+
+    getReferenceTagAtIndex(type, index) {
+        let key = type + index;
+
+        if (this.referenceTags.hasOwnProperty(key)) {
+            return this.referenceTags[key];
+        }
+
+        return null;
+    }
+
+    getOpeningReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('open', index);
+    }
+
+    getClosingReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('close', index);
+    }
+
+    getSingleReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('single', index);
+    }
+
+    getWhitespaceReferenceTagAtIndex(index) {
+        return this.getReferenceTagAtIndex('whitespace', index);
+    }
 }
