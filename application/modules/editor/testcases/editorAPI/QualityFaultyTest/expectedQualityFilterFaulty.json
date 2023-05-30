@@ -1,8 +1,8 @@
 {
     "qid": -1,
     "qtype": "root",
-    "qcount": 31,
-    "qtotal": 31,
+    "qcount": 16,
+    "qtotal": 16,
     "qcategory": null,
     "qcomplete": true,
     "expanded": true,
@@ -17,7 +17,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2233",
+                    "qid": "603",
                     "qtype": "consistent",
                     "qcount": 3,
                     "qcomplete": true,
@@ -66,7 +66,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2218",
+                    "qid": "601",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -90,7 +90,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "2230",
+                    "qid": "602",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -128,224 +128,6 @@
             "qtooltip": "",
             "text": "Internal tags",
             "qtotal": 2,
-            "expanded": true,
-            "checked": false
-        },
-        {
-            "qid": -1,
-            "qtype": "spellcheck",
-            "qcount": 15,
-            "qcomplete": true,
-            "children": [
-                {
-                    "qid": -1,
-                    "qtype": "spellcheck",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "grammar",
-                    "text": "Grammar",
-                    "qtooltip": "The text contains a grammatical error (including errors of syntax and morphology).",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": "2194",
-                    "qtype": "spellcheck",
-                    "qcount": 14,
-                    "qcomplete": true,
-                    "qcategory": "misspelling",
-                    "qcatidx": "-1",
-                    "text": "Spelling",
-                    "qtooltip": "The text contains a misspelling.",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "spellcheck",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "qcategory": "typographical",
-                    "text": "Typographical",
-                    "qtooltip": "The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.",
-                    "leaf": true,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "spellcheck",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "children": [
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "characters",
-                            "text": "Characters",
-                            "qtooltip": "The text contains characters that are garbled or incorrect or that are not used in the language in which the content appears.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "duplication",
-                            "text": "Duplication",
-                            "qtooltip": "Content has been duplicated improperly.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "inconsistency",
-                            "text": "Inconsistency",
-                            "qtooltip": "The text is inconsistent with itself or is translated inconsistently (NB: not for use with terminology inconsistency).",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "legal",
-                            "text": "Legal",
-                            "qtooltip": "The text is legally problematic (e.g., it is specific to the wrong legal system).",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": "2209",
-                            "qtype": "spellcheck",
-                            "qcount": 1,
-                            "qcomplete": true,
-                            "qcategory": "uncategorized",
-                            "qcatidx": "-1",
-                            "text": "Uncategorized",
-                            "qtooltip": "The issue either has not been categorized or cannot be categorized.",
-                            "leaf": true,
-                            "checked": false
-                        }
-                    ],
-                    "qcategory": "group-general",
-                    "text": "General",
-                    "qtooltip": null,
-                    "expanded": false,
-                    "checked": false
-                },
-                {
-                    "qid": -1,
-                    "qtype": "spellcheck",
-                    "qcount": 0,
-                    "qcomplete": true,
-                    "children": [
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "register",
-                            "text": "Register",
-                            "qtooltip": "The text is written in the wrong linguistic register of uses slang or other language variants inappropriate to the text.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "locale-specific-content",
-                            "text": "Locale-specific content",
-                            "qtooltip": "The localization contains content that does not apply to the locale for which it was prepared.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "locale-violation",
-                            "text": "Locale violation",
-                            "qtooltip": "Text violates norms for the intended locale.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "style",
-                            "text": "General style",
-                            "qtooltip": "The text contains stylistic errors.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "pattern-problem",
-                            "text": "Pattern problem",
-                            "qtooltip": "The text fails to match a pattern that defines allowable content (or matches one that defines non-allowable content).",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "whitespace",
-                            "text": "Whitespace",
-                            "qtooltip": "There is a mismatch in whitespace between source and target content or the text violates specific rules related to the use of whitespace.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "terminology",
-                            "text": "Terminology",
-                            "qtooltip": "An incorrect term or a term from the wrong domain was used or terms are used inconsistently.",
-                            "leaf": true,
-                            "checked": false
-                        },
-                        {
-                            "qid": -1,
-                            "qtype": "spellcheck",
-                            "qcount": 0,
-                            "qcomplete": true,
-                            "qcategory": "internationalization",
-                            "text": "Internationalization",
-                            "qtooltip": "There is an issue related to the internationalization of content.",
-                            "leaf": true,
-                            "checked": false
-                        }
-                    ],
-                    "qcategory": "group-style",
-                    "text": "Style",
-                    "qtooltip": null,
-                    "expanded": false,
-                    "checked": false
-                }
-            ],
-            "qcategory": null,
-            "qtooltip": "",
-            "text": "LanguageTool",
-            "qtotal": 15,
             "expanded": true,
             "checked": false
         },
@@ -759,7 +541,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2217",
+                    "qid": "600",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -928,7 +710,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "2187",
+                    "qid": "593",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -940,7 +722,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "2183",
+                    "qid": "589",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -952,7 +734,7 @@
                     "checked": false
                 },
                 {
-                    "qid": "2189",
+                    "qid": "595",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
