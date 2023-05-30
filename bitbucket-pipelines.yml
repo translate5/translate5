@@ -17,6 +17,9 @@ pipelines:
                 allowed-values:
                  - develop
                  - master
+              - name: GIT_TMP_USER
+                default: pavelperminov23
+              - name: GIT_TMP_PASS
           - step:
                   script:
                       - export APP_HOST=localhost
@@ -32,7 +35,7 @@ pipelines:
                       #- export GIT_TOKEN=$GIT_TOKEN_MAINTENANCE
                       - echo "Branch is $GIT_BRANCH, base branch is $GIT_BRANCH_BASE"
                       - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
-                      - git clone https://bitbucket.org/mittagqi/docker.git
+                      - git clone https://$GIT_TMP_USER:$GIT_TMP_PASS@bitbucket.org/mittagqi/docker.git
                       - ls
                       - cd docker
                       #- docker-compose -f docker-compose.runtests.yml up --exit-code-from php
