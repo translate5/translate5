@@ -276,7 +276,7 @@ using the default ports.')
     }
 
     /**
-     * Replaces the host if a custom host is given or unterminate the domains if wanted
+     * Replaces the host if a custom host is given or unterminates the url-host if wanted
      * @param string|array $url
      * @param string|null $host
      * @param bool $unterminateDomains
