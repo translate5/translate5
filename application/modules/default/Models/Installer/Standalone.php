@@ -809,12 +809,14 @@ class Models_Installer_Standalone {
     private function recreateDatabase(): void
     {
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
-        $conf = $this->dbCredentials;
-        $conf['dropIfExists'] = true;
 
-        $this->waitForDatabase(function () use ($dbupdater, $conf) {
-            unset($conf['port']);
-            $dbupdater->createDatabase(... $conf);
+        // Get DbConfig instance
+        $dbConfig = \ZfExtended_Factory
+            ::get('ZfExtended_Models_Installer_DbConfig')
+            ->initFromArray($this->dbCredentials);
+
+        $this->waitForDatabase(function () use ($dbupdater, $dbConfig) {
+            $dbupdater->createDatabase($dbConfig, true);
             $this->log('Initial database created.');
         });
     }

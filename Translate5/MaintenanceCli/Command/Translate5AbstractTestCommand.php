@@ -486,7 +486,18 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         $updater = new \ZfExtended_Models_Installer_DbUpdater();
 
         try {
-            $updater->createDatabase($host, $username, $password, $dbname, $exists);
+
+            // Get DbConfig instance
+            $dbConfig = \ZfExtended_Factory
+                ::get('ZfExtended_Models_Installer_DbConfig')
+                ->initFromArray([
+                    'host' => $host,
+                    'username' => $username,
+                    'password' => $password,
+                    'dbname' => $dbname
+                ]);
+
+            $updater->createDatabase($dbConfig, $exists);
             if ($exists) {
                 $this->io->note('Dropped database ' . $dbname);
             }
