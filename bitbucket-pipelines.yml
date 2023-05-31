@@ -44,9 +44,6 @@ pipelines:
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
             - cd docker
 
-            # Remove this line once this branch is merged to main branch (e.g in docker repo)
-            - git checkout feature/TRANSLATE-3329-testing-certain-branch-in
-
             # We need to login to dockerhub as private images are invoked
             - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
 
