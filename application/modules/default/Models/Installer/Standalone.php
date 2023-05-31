@@ -808,13 +808,18 @@ class Models_Installer_Standalone {
 
     private function recreateDatabase(): void
     {
+        print_r([
+            class_exists('ZfExtended_Factory'),
+            class_exists('ZfExtended_Models_Installer_DbUpdater'),
+            class_exists('ZfExtended_Models_Installer_DbConfig'),
+        ]);
+
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
 
         // Get DbConfig instance
-        class_exists('ZfExtended_Models_Installer_DbConfig');
         echo getcwd() . PHP_EOL;
         print_r($files = glob('library/ZfExtended/Models/Installer/*'));
-        echo substr(file_get_contents($files[0]), 100);
+        echo substr(file_get_contents($files[0]), 100) . PHP_EOL;
         $dbConfig = new ZfExtended_Models_Installer_DbConfig();
         $dbConfig->initFromArray($this->dbCredentials);
 
