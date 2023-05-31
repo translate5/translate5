@@ -819,7 +819,7 @@ class Models_Installer_Standalone {
         // Get DbConfig instance
         echo getcwd() . PHP_EOL;
         print_r($files = glob('library/ZfExtended/Models/Installer/*'));
-        echo substr(file_get_contents($files[0]), 100) . PHP_EOL;
+        echo substr(file_get_contents($files[0]), 0, 100) . PHP_EOL;
         $dbConfig = new ZfExtended_Models_Installer_DbConfig();
         $dbConfig->initFromArray($this->dbCredentials);
 
