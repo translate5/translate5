@@ -37,6 +37,7 @@ pipelines:
             - export MESSAGEBUS_PORT=9057
             - export LANGUAGETOOL_HOST=languagetool
             - export GIT_BRANCH=$BITBUCKET_BRANCH
+            - export SPECIFIC_TEST_OR_SUITE=$SPECIFIC_TEST_OR_SUITE
 
             # Clone docker-repo as we need compose-file from there
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
