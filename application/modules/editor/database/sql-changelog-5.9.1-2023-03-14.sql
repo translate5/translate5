@@ -31,8 +31,6 @@
 INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2023-03-14', 'TRANSLATE-3117', 'feature', 'Import/Export - translator package', '5.9.0: Editor users are now able to download a zip package including everything needed to translate a job outside of translate5 and afterwards update the task with it.
 5.9.1: Fix - enable reimport package for non pm users', '15'),
 ('2023-03-14', 'TRANSLATE-3245', 'change', 'VisualReview / VisualTranslation - Replace webserver in pdfconverter to nginx', 'Fixed problem which caused pdfconverter container fail to start', '15'),
-
-', '15'),
 ('2023-03-14', 'TRANSLATE-3242', 'bugfix', 'MatchAnalysis & Pretranslation - Fix match analysis on API usage', '- Task is now locked immediately after match analysis is scheduled.
 - PauseMatchAnalysis worker now returns an error in case after maximum wait time language resource is still not available.
 - Documentation updated', '15'),
