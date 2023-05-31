@@ -3068,10 +3068,6 @@ Import progress bar in instant translate file translation and in the task overvi
 
 ### Changed
 
-
-
-FIX: Newlines may have been rendered twice in case of internal tags representing newlines
-
 **[TRANSLATE-2446](https://jira.translate5.net/browse/TRANSLATE-2446): Fonts Management for Visual: Add search capabilities by name / taskname** <br>
 ENHANCEMENT: Added search-field to search for fonts by task name in the font management
 

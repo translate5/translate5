@@ -31,9 +31,6 @@
 INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2021-03-31', 'TRANSLATE-2412', 'feature', 'Create a shortcut to directly get into the concordance search bar', 'New editor shortcut (F3) to get the cursor in "concordance search" source field.', '15'),
 ('2021-03-31', 'TRANSLATE-2375', 'feature', 'Set default deadline per workflow step in configuration', 'Define default deadline date for task-user association', '15'),
 ('2021-03-31', 'TRANSLATE-2342', 'feature', 'Show progress of document translation', 'Import progress bar in instant translate file translation and in the task overview.', '15'),
-
-
-FIX: Newlines may have been rendered twice in case of internal tags representing newlines', '15'),
 ('2021-03-31', 'TRANSLATE-2446', 'change', 'Fonts Management for Visual: Add search capabilities by name / taskname', 'ENHANCEMENT: Added search-field to search for fonts by task name in the font management', '15'),
 ('2021-03-31', 'TRANSLATE-2440', 'change', 'Project task backend tests', 'Implement API tests testing the import of multiple tasks bundled in a project (one source language, multiple target languages).', '15'),
 ('2021-03-31', 'TRANSLATE-2424', 'change', 'Add Language as label under Language Flag image', 'TermPortal - added language label to language flag to display RFC language.', '15'),
