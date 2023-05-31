@@ -139,6 +139,13 @@ using the default ports.')
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
             'Specify the service to configure'
         );
+
+        $this->addOption(
+            'unterminated-domains',
+            'u',
+            InputOption::VALUE_NONE,
+            'Do not use terminated domains, so instead of "http://service.:1234" use "http://service:1234"'
+        );
     }
 
     /**
@@ -158,6 +165,7 @@ using the default ports.')
         $host = null;
         $doSave = (!$this->input->getOption('auto-set')) ? false : true;
         $allAvailable = (!$this->input->getOption('all-available')) ? false : true;
+        $useUnterminatedDomains = (!$this->input->getOption('unterminated-domains')) ? false : true;
 
         // evaluate services to update
         $optionServices = $this->input->getOption('service');
@@ -184,7 +192,7 @@ using the default ports.')
             }
         }
 
-        $this->setServices($services, $doSave, $allAvailable, $host);
+        $this->setServices($services, $doSave, $allAvailable, $useUnterminatedDomains, $host);
 
         return self::SUCCESS;
     }
@@ -193,15 +201,17 @@ using the default ports.')
      * @param array $services
      * @param bool $doSave
      * @param bool $allAvailableServices
+     * @param bool $useUnterminatedDomains
      * @param string|null $host
-     * @throws Zend_Exception
+     * @return void
      * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
      * @throws ZfExtended_Exception
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
      * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      * @throws ZfExtended_Plugin_Exception
      */
-    protected function setServices(array $services, bool $doSave, bool $allAvailableServices = false, string $host = null)
+    protected function setServices(array $services, bool $doSave, bool $allAvailableServices = false, bool $useUnterminatedDomains = false, string $host = null)
     {
         if($allAvailableServices){
             $allServices = Services::getAllAvailableServices(Zend_Registry::get('config'));
@@ -222,12 +232,12 @@ using the default ports.')
                     if(!array_key_exists('default', $serviceUrl) || !array_key_exists('gui', $serviceUrl) || !array_key_exists('import', $serviceUrl)){
                         throw new Zend_Exception('Service "'.$serviceName.'" pooled URLs are not properly defined');
                     }
-                    $serviceUrl['default'] = $this->createServiceUrl($serviceUrl['default'], $host, true);
-                    $serviceUrl['gui'] = $this->createServiceUrl($serviceUrl['gui'], $host, true);
-                    $serviceUrl['import'] = $this->createServiceUrl($serviceUrl['import'], $host, true);
+                    $serviceUrl['default'] = $this->createServiceUrl($serviceUrl['default'], $host, $useUnterminatedDomains, true);
+                    $serviceUrl['gui'] = $this->createServiceUrl($serviceUrl['gui'], $host, $useUnterminatedDomains, true);
+                    $serviceUrl['import'] = $this->createServiceUrl($serviceUrl['import'], $host, $useUnterminatedDomains, true);
 
                 } else {
-                    $serviceUrl = $this->createServiceUrl($service['url'], $host);
+                    $serviceUrl = $this->createServiceUrl($service['url'], $host, $useUnterminatedDomains);
                 }
                 $serviceConfig = array_key_exists('config', $service) ? $service['config'] : [];
 
@@ -266,21 +276,26 @@ using the default ports.')
     }
 
     /**
-     * Replaces the host if a custom host is given
-     * @param string|array $url
+     * Replaces the host if a custom host is given or unterminate the domains if wanted
+     * @param mixed $url
      * @param string|null $host
-     * @param bool $forceArray;
-     * @return string|array
+     * @param bool $unterminateDomains
+     * @param bool $forceArray
+     * @return mixed
      */
-    protected function createServiceUrl(mixed $url, string $host = null, bool $forceArray = false): mixed
+    protected function createServiceUrl(mixed $url, string $host = null, bool $unterminateDomains = false, bool $forceArray = false): mixed
     {
-        if (!empty($host)) {
-            if(is_array($url)){
-                $newUrls = [];
-                foreach($url as $newUrl){
-                    $newUrls[] = $this->createServiceUrl($newUrl, $host);
-                }
-                return $newUrls;
+        if(is_array($url)){
+            $newUrls = [];
+            foreach($url as $newUrl){
+                $newUrls[] = $this->createServiceUrl($newUrl, $host, $unterminateDomains);
+            }
+            return $newUrls;
+        }
+        if (!empty($host) || $unterminateDomains) {
+            $host = !empty($host) ? $host : parse_url($url, PHP_URL_HOST);
+            if($unterminateDomains){
+                $host = trim($host, '.');
             }
             $url =
                 parse_url($url, PHP_URL_SCHEME)
