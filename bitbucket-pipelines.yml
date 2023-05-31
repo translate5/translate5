@@ -8,7 +8,7 @@ options:
 definitions:
   services:
     docker:
-      memory: 3072
+      memory: 7128
 
 pipelines:
   custom:
@@ -24,6 +24,7 @@ pipelines:
           # Prompt for the specific test or suite to run, if specific
           - name: SPECIFIC_TEST_OR_SUITE
       - step:
+          size: 2x
           script:
 
             # Prepare env variables
@@ -42,6 +43,9 @@ pipelines:
             # Clone docker-repo as we need compose-file from there
             - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
             - cd docker
+
+            # Remove this line once this branch is merged to main branch (e.g in docker repo)
+            - git checkout feature/TRANSLATE-3329-testing-certain-branch-in
 
             # We need to login to dockerhub as private images are invoked
             - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
