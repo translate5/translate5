@@ -223,7 +223,7 @@ class ImportService
         array $data,
         ZfExtended_Models_User $user
     ): void {
-        $task->createMeta();
+        $task->meta();
         $this->eventTrigger->triggerBeforeProcessUploadedFile($task, $data);
 
         try {
