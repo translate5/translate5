@@ -21,6 +21,8 @@ pipelines:
             allowed-values:
               - develop
               - master
+          # Prompt for the specific test or suite to run, if specific
+          - name: SPECIFIC_TEST_OR_SUITE
       - step:
           script:
 
