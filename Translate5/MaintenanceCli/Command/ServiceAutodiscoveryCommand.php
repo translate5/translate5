@@ -277,11 +277,11 @@ using the default ports.')
 
     /**
      * Replaces the host if a custom host is given or unterminate the domains if wanted
-     * @param mixed $url
+     * @param string|array $url
      * @param string|null $host
      * @param bool $unterminateDomains
      * @param bool $forceArray
-     * @return mixed
+     * @return string|array
      */
     protected function createServiceUrl(mixed $url, string $host = null, bool $unterminateDomains = false, bool $forceArray = false): mixed
     {
