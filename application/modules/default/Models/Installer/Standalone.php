@@ -811,9 +811,8 @@ class Models_Installer_Standalone {
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater();
 
         // Get DbConfig instance
-        $dbConfig = \ZfExtended_Factory
-            ::get('ZfExtended_Models_Installer_DbConfig')
-            ->initFromArray($this->dbCredentials);
+        $dbConfig = new ZfExtended_Models_Installer_DbConfig();
+        $dbConfig->initFromArray($this->dbCredentials);
 
         $this->waitForDatabase(function () use ($dbupdater, $dbConfig) {
             $dbupdater->createDatabase($dbConfig, true);
