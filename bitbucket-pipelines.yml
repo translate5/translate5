@@ -1,45 +1,50 @@
 image: atlassian/default-image:2
 
 options:
-    docker: true
+  docker: true
 
+# Increase memory from default 1024 to 3072 mb as otherwise run of
+# the pipeline fails with error "Container 'docker' exceeded memory limit"
 definitions:
-    services:
-        docker:
-            memory: 3072
+  services:
+    docker:
+      memory: 3072
 
 pipelines:
-    custom:
-        test:
-          - variables:
-              - name: GIT_BRANCH_BASE
-                default: develop
-                allowed-values:
-                 - develop
-                 - master
-              - name: GIT_TMP_USER
-                default: pavelperminov23
-              - name: GIT_TMP_PASS
-          - step:
-                  script:
-                      - export APP_HOST=localhost
-                      - export MYSQL_USERNAME=translate5
-                      - export MYSQL_PASSWORD=translate5
-                      - export MYSQL_DATABASE=translate5
-                      - export MYSQL_ROOT_PASSWORD=r00t
-                      - export MYSQL_PORT=3306
-                      - export MESSAGEBUS_HOST=frontendmessagebus
-                      - export MESSAGEBUS_PORT=9057
-                      - export LANGUAGETOOL_HOST=languagetool
-                      - export GIT_BRANCH=$BITBUCKET_BRANCH
-                      - export GIT_USER=$GIT_TMP_USER
-                      - export GIT_TOKEN=$GIT_TMP_PASS
-                      - echo "Branch is $GIT_BRANCH, base branch is $GIT_BRANCH_BASE"
-                      - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
-                      - git clone https://$GIT_TMP_USER:$GIT_TMP_PASS@bitbucket.org/mittagqi/docker.git   
-                      - cd docker
-                      
-                      # to be removed once this branch is merged to main
-                      - git checkout feature/TRANSLATE-3329-testing-certain-branch-in 
-                      
-                      - docker-compose -f docker-compose.runtests.yml up --exit-code-from php
+  custom:
+    test:
+      - variables:
+
+          # Prompt for the branch to be checked out if there is no branch we're going to test in any of other repos
+          - name: GIT_BRANCH_FALLBACK
+            default: develop
+            allowed-values:
+              - develop
+              - master
+      - step:
+          script:
+
+            # Prepare env variables
+            - export APP_HOST=localhost
+            - export MYSQL_USERNAME=translate5
+            - export MYSQL_PASSWORD=translate5
+            - export MYSQL_DATABASE=translate5
+            - export MYSQL_ROOT_PASSWORD=r00t
+            - export MYSQL_PORT=3306
+            - export MESSAGEBUS_HOST=frontendmessagebus
+            - export MESSAGEBUS_PORT=9057
+            - export LANGUAGETOOL_HOST=languagetool
+            - export GIT_BRANCH=$BITBUCKET_BRANCH
+
+            # Clone docker-repo as we need compose-file from there
+            - git clone https://$GIT_USER:$GIT_TOKEN@bitbucket.org/mittagqi/docker.git
+            - cd docker
+
+            # Remove this line once this branch is merged to main branch (e.g in docker repo)
+            - git checkout feature/TRANSLATE-3329-testing-certain-branch-in
+
+            # We need to login to dockerhub as private images are invoked
+            - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+
+            # Run bunch of containers
+            - docker-compose -f docker-compose.runtests.yml up --exit-code-from php
