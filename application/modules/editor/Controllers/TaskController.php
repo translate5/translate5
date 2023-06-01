@@ -32,6 +32,7 @@ use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
 use MittagQI\ZfExtended\Controller\Response\Header;
+use PhpOffice\PhpSpreadsheet\Writer\Exception;
 
 /**
  *
@@ -1551,18 +1552,29 @@ class editor_TaskController extends ZfExtended_RestController {
 
     /**
      * does the export as zip file.
+     * @throws ZfExtended_Models_Entity_Conflict
+     * @throws ZfExtended_NoAccessException
+     * @throws Exception
+     * @throws Zend_Exception
      */
-    public function exportAction() {
+    public function exportAction(): void
+    {
+
         if($this->isMaintenanceLoginLock(30)) {
             //since file is fetched for download we simply print out that text without decoration.
             echo 'Maintenance is scheduled, exports are not possible at the moment.';
             exit;
         }
 
+        // Info: only 1 task export per task is allowed. In case user trys to export task which has already running
+        // exports, the user will get error message. This is checked by checkExportAllowed and this function must be
+        // used if other export types are implemented in future
+
+        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+
         $this->getAction();
 
         $diff = (boolean)$this->getRequest()->getParam('diff');
-        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
 
         switch ($context) {
             case 'importArchive':
@@ -1571,7 +1583,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 return;
 
             case 'excelhistory':
-                if(!$this->isAllowed('frontend', 'editorExportExcelhistory')) {
+                if (!$this->isAllowed('frontend', 'editorExportExcelhistory')) {
                     throw new ZfExtended_NoAccessException();
                 }
                 // run history excel export
@@ -1581,10 +1593,13 @@ class editor_TaskController extends ZfExtended_RestController {
                 return;
 
             case 'xliff2':
-                $this->entity->checkStateAllowsActions();
+                $finalExportWorker = editor_Models_Export_Exported_Worker::factory($context);
+
+                $this->entity->checkExportAllowed($finalExportWorker::class);
+
                 $worker = ZfExtended_Factory::get('editor_Models_Export_Xliff2Worker');
                 $diff = false;
-                /* @var $worker editor_Models_Export_Xliff2Worker */
+                /* @var editor_Models_Export_Xliff2Worker $worker */
                 $exportFolder = $worker->initExport($this->entity);
                 break;
 
@@ -1632,29 +1647,21 @@ class editor_TaskController extends ZfExtended_RestController {
             case 'filetranslation':
             case 'transfer':
             default:
-                $this->entity->checkStateAllowsActions();
+                /* @var editor_Models_Export_Exported_Worker $finalExportWorker */
+                $finalExportWorker = editor_Models_Export_Exported_Worker::factory($context);
+
+                $this->entity->checkExportAllowed($finalExportWorker::class);
+
                 $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
                 $exportFolder = $worker->initExport($this->entity, $diff);
                 break;
         }
 
-        //FIXME multiple problems here with the export worker
-        // it is possible that we get the following in DB (implicit ordererd by ID here):
-        //      Export_Worker for ExportReq1
-        //      Export_Worker for ExportReq2 → overwrites the tempExportDir of ExportReq1
-        //      Export_ExportedWorker for ExportReq2
-        //      Export_ExportedWorker for ExportReq1 → works then with tempExportDir of ExportReq1 instead!
-        //
-        // If we implement in future export workers which need to work on the temp export data,
-        // we have to ensure that each export worker get its own export directory.
         $workerId = $worker->queue();
 
-        // Get worker
-        /* @var $worker editor_Models_Export_Exported_Worker */
-        $worker = editor_Models_Export_Exported_Worker::factory($context);
 
         // Setup worker. 'cookie' in 2nd arg is important only if $context is 'transfer'
-        $inited = $worker->setup($this->entity->getTaskGuid(), [
+        $inited = $finalExportWorker->setup($this->entity->getTaskGuid(), [
             'exportFolder' => $exportFolder,
             'cookie' => Zend_Session::getId()
         ]);
@@ -1666,35 +1673,34 @@ class editor_TaskController extends ZfExtended_RestController {
 
         //TODO for the API usage of translate5 blocking on export makes no sense
         // better would be a URL to fetch the latest export or so (perhaps using state 202?)
-        $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
-        $worker->queue($workerId);
+        $finalExportWorker->setBlocking(); //we have to wait for the underlying worker to provide the download
+        $finalExportWorker->queue($workerId);
 
-        if ($context == 'transfer') {
+        if ($context === 'transfer') {
             $this->logInfo('Task exported. reimport started', ['context' => $context, 'diff' => $diff]);
             echo $this->view->render('task/ontransfer.phtml');
             exit;
         }
 
-        if($context == 'filetranslation') {
+        if ($context === 'filetranslation') {
             $this->provideFiletranslationDownload($exportFolder);
             exit;
         }
 
         $taskguiddirectory = $this->getParam('taskguiddirectory');
-        if(is_null($taskguiddirectory)) {
+        if (is_null($taskguiddirectory)) {
             $taskguiddirectory = $this->config->runtimeOptions->editor->export->taskguiddirectory;
         }
         // remove the taskGuid from root folder name in the exported package
-        if ($context == 'xliff2' || !$taskguiddirectory) {
+        if ($context === 'xliff2' || !$taskguiddirectory) {
             ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
         }
 
-        if($diff) {
+        if ($diff) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-            /* @var $translate ZfExtended_Zendoverwrites_Translate */
+            /* @var ZfExtended_Zendoverwrites_Translate $translate */
             $suffix = $translate->_(' - mit Aenderungen nachverfolgen.zip');
-        }
-        else {
+        }else {
             $suffix = '.zip';
         }
 
