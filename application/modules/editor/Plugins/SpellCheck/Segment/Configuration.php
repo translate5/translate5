@@ -40,7 +40,7 @@ class Configuration
      *
      * @var integer
      */
-    const OPERATION_BATCH_SIZE = 5;
+    const OPERATION_BATCH_SIZE = 300;
 
     /**
      * Defines the timeout in seconds how long a spell-check call with multiple segments may need
