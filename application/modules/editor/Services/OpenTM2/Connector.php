@@ -882,7 +882,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         );
 
         // Check if error codes contains any of the values
-        return $error->code !== null && str_replace($errorCodes, '', $error->code) !== $error->code
+        return isset($error->code)
+            && str_replace($errorCodes, '', $error->code) !== $error->code
             && !$this->isReorganizingAtTheMoment()
             && !$this->isReorganizeFailed();
     }
