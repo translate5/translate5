@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Task\Export\Package\Remover;
-use MittagQI\Translate5\Terminology\CleanupCollection;
 use MittagQI\Translate5\Workflow\ArchiveTaskActions;
 
 /**
