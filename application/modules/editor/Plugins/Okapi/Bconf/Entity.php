@@ -783,7 +783,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     public function pack(bool $isOutdatedRepack=false): void {
         try {
             $packer = new editor_Plugins_Okapi_Bconf_Packer($this);
-            $packer->process($isOutdatedRepack);
+            $packer->process($isOutdatedRepack, $this->isSystemDefault());
         } catch(editor_Plugins_Okapi_Bconf_InvalidException $e){
             // in case of a editor_Plugins_Okapi_Bconf_InvalidException, the exception came from the packer
             $name = $this->getName();
