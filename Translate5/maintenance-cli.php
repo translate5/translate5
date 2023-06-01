@@ -30,6 +30,8 @@
 chdir(__DIR__.'/../'); //otherwise vendor below and ZfExtended implicit could not be found.
 require_once 'vendor/autoload.php';
 
+const TRANSLATE5_CLI = true;
+
 use Symfony\Component\Console\Application;
 use Translate5\MaintenanceCli\Command\{
     AuthTokenCommand,
