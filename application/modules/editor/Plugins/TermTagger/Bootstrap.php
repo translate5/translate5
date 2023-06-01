@@ -26,8 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Cronjob\CronEventTrigger;
 use MittagQI\Translate5\Plugins\TermTagger\Processor\RecalcTransFound;
 use MittagQI\Translate5\Plugins\TermTagger\Service;
+use MittagQI\Translate5\Terminology\CleanupCollection;
 
 /**
  * Initial Class of Plugin "TermTagger"
@@ -89,6 +91,29 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
         $this->eventManager->attach('Editor_SegmentController', 'afterIndexAction', [$this, 'handleAfterSegmentIndex']);
+
+        $this->eventManager->attach(
+            CronEventTrigger::class,
+            CronEventTrigger::DAILY,
+            [$this, 'handleAfterDailyAction']
+        );
+    }
+
+    /***
+     * Cron controller daily action
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterDailyAction(Zend_EventManager_Event $event): void
+    {
+        $collectionModel = ZfExtended_Factory::get(editor_Models_TermCollection_TermCollection::class);
+        $collections = $collectionModel->loadAllEntities();
+
+        foreach ($collections as $collection){
+            $cleanup = ZfExtended_Factory::get(CleanupCollection::class,[
+                $collection
+            ]);
+            $cleanup->checkAndClean();
+        }
     }
 
     /***
