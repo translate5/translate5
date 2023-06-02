@@ -317,13 +317,9 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
 
         me.setColumnToEdit(me.context.column);
 
-        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record, me.columnToEdit);
-
-        // init the HtmlEditor's internal markup table for tag check, but only for a translation task
-        // we do not remove the ones already existing in the target what also will not overwrite existing ones
-        if(Editor.data.task.get('emptyTargets')) {
-            me.mainEditor.setMarkupImages(record.get('source'), true);
-        }
+        // TODO move to somewhere to avoid duplicates
+        let referenceField = Editor.data.task.get('emptyTargets') ? 'source' : 'target';
+        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record, me.columnToEdit, referenceField);
     },
     
     /**
