@@ -271,14 +271,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
         if (referenceFieldName) {
             this.markupForEditor(segment.get(referenceFieldName));
-            this.tagsCheck = new TagsCheck(this.markupImages, this.idPrefix);
+            this.tagsCheck = new TagCheck(this.markupImages, this.idPrefix);
         }
 
         me.setValue(me.markupForEditor(data.value, tagsFromReferenceFieldOnly) + checkTag);
         me.statusStrip.updateSegment(data.segment, fieldName);
 
         if (!referenceFieldName) {
-            this.tagsCheck = new TagsCheck(this.markupImages, this.idPrefix);
+            this.tagsCheck = new TagCheck(this.markupImages, this.idPrefix);
         }
 
         me.fireEvent('afterSetValueAndMarkup');

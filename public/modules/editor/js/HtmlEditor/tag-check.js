@@ -1,4 +1,4 @@
-class TagsCheck {
+class TagCheck {
     constructor(referenceTags, idPrefix) {
         this.referenceTags = referenceTags;
         this.idPrefix = idPrefix;
