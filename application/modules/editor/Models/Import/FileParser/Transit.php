@@ -315,7 +315,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             $tagText = htmlspecialchars($tagText, ENT_QUOTES | ENT_XML1);
         }
 
-        $tagObj = new editor_Models_Import_FileParser_Tag();
+        $tagObj = new editor_Models_Import_FileParser_Tag($tagType);
         $tagObj->originalContent = $tag;
         $tagObj->tagNr = $shortTagIdent;;
         $tagObj->id = $tagName;
