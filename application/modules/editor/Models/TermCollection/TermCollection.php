@@ -341,6 +341,26 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         return $this->db->fetchAll($s)->toArray();
     }
 
+    /***
+     * Load all collection entities
+     * @return editor_Models_TermCollection_TermCollection[]
+     */
+    public function loadAllEntities(): array
+    {
+        $entities = [];
+        $service = ZfExtended_Factory::get(editor_Services_TermCollection_Service::class);
+
+        $select = $this->db->select()->where('serviceType = ?',$service->getServiceNamespace());
+
+        foreach($this->db->fetchAll($select) as $row){
+            $entity = new static();
+            $entity->initByRow($row);
+            $entities[] = $entity;
+        }
+
+        return $entities;
+    }
+
 
     /***
      * Get term translations (source/target) for given term collection and source/target language.
@@ -458,15 +478,17 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
 
     /***
-     * Remove collection tbx files from the tbx-import directory where the file modification date is older than the given one
+     * Remove collection tbx files from the tbx-import directory where
+     * the file modification date is older than the given one
      * @param int $collectionId
-     * @param int $olderThan: this is unix timestamp
+     * @param int $olderThan unix timestamp
+     * @return void
      */
-    public function removeOldCollectionTbxFiles(int $collectionId, int $olderThan)
+    public function removeOldCollectionTbxFiles(int $collectionId, int $olderThan): void
     {
         $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;
         if (is_dir($collectionPath)) {
-            /* @var $recursiveDirCleaner ZfExtended_Controller_Helper_Recursivedircleaner */
+            /* @var ZfExtended_Controller_Helper_Recursivedircleaner $recursiveDirCleaner */
             $recursiveDirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
                 'Recursivedircleaner'
                 );
