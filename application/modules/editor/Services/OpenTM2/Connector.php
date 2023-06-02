@@ -206,9 +206,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function update(editor_Models_Segment $segment): void
     {
-        /* @var $messages ZfExtended_Models_Messages */
-        $messages = Zend_Registry::get('rest_messages');
-
         if ($this->isReorganizingAtTheMoment()) {
             throw new editor_Services_Connector_Exception('E1512', [
                 'service' => $this->getResource()->getName(),
@@ -241,6 +238,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren '
             . 'Sie Ihren Administrator! <br />Gemeldete Fehler:';
+
+        /* @var $messages ZfExtended_Models_Messages */
+        $messages = Zend_Registry::get('rest_messages');
         $messages->addError($msg, 'core', null, [$error]);
         
         $this->logger->error('E1306', 'OpenTM2: could not save segment to TM', [
@@ -882,7 +882,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         );
 
         // Check if error codes contains any of the values
-        return str_replace($errorCodes, '', $error->code) !== $error->code
+        return $error->code !== null && str_replace($errorCodes, '', $error->code) !== $error->code
             && !$this->isReorganizingAtTheMoment()
             && !$this->isReorganizeFailed();
     }
