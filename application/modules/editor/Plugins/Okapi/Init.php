@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Plugins\Okapi\ImportFilter;
+
 /**
  * OKAPI file converter and segmenter plugin
  *
@@ -71,7 +73,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     const DEFAULT_EXTENSIONS = [
         //'csv' => ['text/csv'], disabled due our own importer
-        'c', 'catkeys', 'cpp', 'dita', 'ditamap', 'docm', 'docx', 'dotm', 'dotx', 'dtd', 'h', 'htm', 'html',
+        'c', 'catkeys', 'cpp', 'dita', 'ditamap', 'docm', 'docx', 'dotm', 'dotx', 'dtd', 'figma', 'h', 'htm', 'html',
         'idml', 'json', 'lang', 'md', 'mif', 'odg', 'odp', 'ods', 'odt', 'otg', 'otp', 'ots', 'ott',
         'pdf', 'pentm', 'php', 'po', 'potm', 'potx', 'ppsm', 'ppsx', 'pptm', 'pptx', 'properties',
         'rdf', 'resx', 'rkm', 'rtf', 'srt', 'strings', 'tbx', 'tmx', 'ts', 'tsv', 'ttx', 'txml', 'txp', 'txt',
@@ -211,17 +213,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'xsl',
         'xslt'
     );
-    /**
-     * Internal flag if custom bconf files were provided or not. In the latter case the internal default bconf is used.
-     * @var bool
-     */
-    private bool $useCustomBconf = true;
 
     /**
-     * Compatibility Code: support defining the import bconf via ZIP
-     * @var string|null
+     * Holdes the file-filter used during import
+     * @var ImportFilter
      */
-    private $bconfInZip = NULL;
+    private ImportFilter $importFilter;
 
     /**
      * @var editor_Models_Task
@@ -239,10 +236,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var editor_Models_Import_SupportedFileTypes
      */
     protected editor_Models_Import_SupportedFileTypes $fileTypes;
+
+    private string $lastStep = 'NOT SET';
+
     #region Plugin Init
     public function init() {
-        $this->fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
-        /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
+        // add the default extensions // TODO REMOVE
+        $this->fileTypes = ZfExtended_Factory::get(editor_Models_Import_SupportedFileTypes::class);
         foreach (self::DEFAULT_EXTENSIONS as $ext) {
             $this->fileTypes->register($ext);
         }
@@ -443,7 +443,29 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     #endregion
 
     /**
+     * Hook that adds the bconfId sent by the Import wizard to the task-meta
+     * Called in the same request as ::handleAfterUploadPreparation
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleBeforeProcessUploadedFile(Zend_EventManager_Event $event){
+
+        /* @var $meta editor_Models_Task_Meta */
+        $meta = $event->getParam('meta');
+        /* @var $requestData array */
+        $requestData = $event->getParam('data');
+        $bconfId = array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : NULL;
+        $customerId = array_key_exists('customerId', $requestData) ? $requestData['customerId'] : NULL;
+        // empty makes sense here since we anly accept an bconf-id > 0
+        if(empty($bconfId)){
+            $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+            $bconfId = $bconf->getDefaultBconfId($customerId);
+        }
+        $meta->setBconfId($bconfId);
+    }
+
+    /**
      * Hook that adds the used bconf to the ImportArchive as a long-term reference which bconf was used
+     * Called in the same request as ::handleBeforeProcessUploadedFile
      *
      * @param Zend_EventManager_Event $event
      * @throws Zend_Exception
@@ -453,6 +475,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @throws editor_Plugins_Okapi_Exception
      */
     public function handleAfterUploadPreparation(Zend_EventManager_Event $event) {
+
         /* @var $dataProvider editor_Models_Import_DataProvider_Abstract */
         $dataProvider = $event->getParam('dataProvider');
         // UGLY: this replicates the logic in ::handleBeforeDirectoryParsing. But it's too late to add sth. to the archive there
@@ -472,63 +495,52 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
 
     /**
-     * Hook that adds the bconfId sent by the Import wizard to the task-meta
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleBeforeProcessUploadedFile(Zend_EventManager_Event $event){
-        /* @var $meta editor_Models_Task_Meta */
-        $meta = $event->getParam('meta');
-        /* @var $requestData array */
-        $requestData = $event->getParam('data');
-        $bconfId = array_key_exists('bconfId', $requestData) ? $requestData['bconfId'] : NULL;
-        $customerId = array_key_exists('customerId', $requestData) ? $requestData['customerId'] : NULL;
-        // empty makes sense here since we anly accept an bconf-id > 0
-        if(empty($bconfId)){
-            $bconf = new editor_Plugins_Okapi_Bconf_Entity();
-            $bconfId = $bconf->getDefaultBconfId($customerId);
-        }
-        $meta->setBconfId($bconfId);
-    }
-
-    /**
      * Hook on the before import event and check the import files
+     * Called in the same request as ::handleAfterDirectoryParsing
      *
      * @param Zend_EventManager_Event $event
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
     public function handleBeforeDirectoryParsing(Zend_EventManager_Event $event) {
+
         /* @var $config editor_Models_Import_Configuration */
         $config = $event->getParam('importConfig');
+        /* @var $task editor_Models_Task */
+        $task = $event->getParam('task');
         // DEPRECATED compatibility code: enabling import BCONF to be supplied via import folder
-        $this->bconfInZip = self::findImportBconfFileinDir($event->getParam('importFolder'));
-        if($this->bconfInZip != NULL){
-            // DEPRECATED import of BCONF via ZIP
-            $this->useCustomBconf = true;
-            // create a warning about using the deprecated API
-            /* @var $task editor_Models_Task */
-            $task = $event->getParam('task');
+        $bconfInZip = self::findImportBconfFileinDir($event->getParam('importFolder'));
+        if($bconfInZip != NULL){
+            // DEPRECATED import of BCONF via ZIP: create a warning about using the deprecated API
             $task->logger('editor.task.okapi')->warn('E1387', 'Okapi Plug-In: Providing the BCONF to use in the import ZIP is deprecated', [
-                'bconf' => basename($this->bconfInZip),
+                'bconf' => basename($bconfInZip),
             ]);
+            $this->importFilter = new ImportFilter(null, $bconfInZip);
+            // TODO FIXME: why is this done ??
+            $config->ignoredUncheckedExtensions = implode(',', $this->okapiCustomBconfIgnoredFileTypes);
+
         } else {
             // the normal behaviour: bconf is defined via task and set in import wizard
-            $this->useCustomBconf = false;
+            $bconfId = $task->meta()->getBconfId();
+            $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+            $bconf->load($bconfId);
+            $this->importFilter = new ImportFilter($bconf, null);
         }
-        if($this->useCustomBconf){
-            $config->checkFileType = false;
-            $config->ignoredUncheckedExtensions = implode(',', $this->okapiCustomBconfIgnoredFileTypes);
-        } else {
-            $config->checkFileType = true;
+        // register only the import file-types defined by Okapi
+        $this->fileTypes->unregisterAll();
+        foreach($this->importFilter->getSupportedExtensions() as $extension){
+            $this->fileTypes->register($extension);
         }
     }
 
     /**
      * Hook on the before import event and check the import files
+     * Called in the same request as ::handleBeforeDirectoryParsing
      *
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterDirectoryParsing(Zend_EventManager_Event $event) {
+
         $params = $event->getParams();
         $filelist = $params['filelist'];
         $importFolder = $params['importFolder'];
@@ -555,6 +567,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @throws Zend_Exception
      */
     public function handleCustomHandleFileForRelais(Zend_EventManager_Event $event) {
+
         $suffix = '.xlf'; //TODO should come from the worker. there the suffix is determined from the okapi output
         $child = $event->getParam('fileChild'); //children stdClass, containing several information about the file to be parsed
         $fullpath = $event->getParam('fullPath'); //absolute path to the relais file to be parsed
@@ -600,6 +613,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @throws editor_Models_Import_DataProvider_Exception
      */
     public function handleAfterImport(Zend_EventManager_Event $event) {
+
+        // TODO REMOVE
+        error_log('OKAPI INIT: handleAfterImport: '.$this->lastStep);
+        $this->lastStep = 'handleAfterImport';
+
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         $config = $event->getParam('importConfig');
@@ -619,7 +637,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         catch(ZfExtended_Models_Entity_NotFoundException) {
             //no okapi worker -> do nothing
         }
-
     }
 
     /***
@@ -640,10 +657,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     /**
      * Checks if the given file should be processed by okapi
+     * Called when importFilter is set
      * @param SplFileInfo $fileinfo
      * @return boolean
      */
     protected function isProcessableFile(SplFileInfo $fileinfo, editor_Models_Task $task): bool {
+
         $extension = strtolower($fileinfo->getExtension());
         if(!$fileinfo->isFile()){
             return false;
@@ -654,26 +673,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             // if one of the registered parsers may parse the file, then we don't need Okapi
             return false;
         }
-
-        //if there is a custom bconf, this bconf can contain "new" allowed file types.
-        // Since we currently can not get the information from the bconf which additional types are allowed,
-        // we just pass all filetypes (expect the ones with a native fileparser) to be parsed via Okapi
-        // If the user uploads invalid files, they are ignored and listed in the event log
-        if($this->useCustomBconf) {
-            if(in_array($extension, $this->okapiCustomBconfIgnoredFileTypes)){
-                return false;
-            }
-            if(!$this->fileTypes->hasParser($extension)){
-                return true;
-            }
-        }
-        // by default we check the real extensions the current import bconf supports
-        return static::getImportBconf($task)->hasSupportFor($extension);
+        // is the extension is supported by the used bconf ?
+        return $this->importFilter->isExtensionSupported($extension);
     }
 
     /**
-     * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the
-     * result
+     * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the result
+     * Called when importFilter is set
      *
      * @param int $fileId
      * @param SplFileInfo $file
@@ -685,25 +691,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         /** @var editor_Models_Task $task */
         $task = $params['task'];
         $workerParentId = $params['workerParentId'];
-        // retrieving the bconf to use
-        if(empty($this->bconfInZip)){
-            // the normal way: retrieve the bconf to use from the task meta
-            $bconf = static::getImportBconf($task);
-            $bconfFilePath = $bconf->getPath();
-            $bconfName = $bconf->getName().' (id: '.$bconf->getId().')';
-        } else {
-            // COMPATIBILITY: we use the bconf from the ZIP file here if there was one bypassing the bconf management
-            $bconfFilePath = $this->bconfInZip;
-            $bconfName = basename($this->bconfInZip).' (from Import-ZIP)';
-        }
+
         $params = [
             'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
             'fileId' => $fileId,
             'file' => (string) $file,
             'importFolder' => $importFolder,
             'importConfig' => $params['importConfig'],
-            'bconfFilePath' => $bconfFilePath,
-            'bconfName' => $bconfName
+            'bconfFilePath' => $this->importFilter->getBconfPath(),
+            'bconfName' => $this->importFilter->getBconfDisplayName()
         ];
 
         // init worker and queue it

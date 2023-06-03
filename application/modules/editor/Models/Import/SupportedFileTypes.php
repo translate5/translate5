@@ -89,6 +89,15 @@ class editor_Models_Import_SupportedFileTypes
     }
 
     /**
+     * resets all regisetered file-extensions
+     * @return void
+     */
+    public function unregisterAll()
+    {
+        self::$extensionsSupported = [];
+    }
+
+    /**
      * Registers the given file type to be ignored by translate5,
      *  useful if file is needed by the fileparser as additional data source, but should not be listed in file list
      * @param string $extension

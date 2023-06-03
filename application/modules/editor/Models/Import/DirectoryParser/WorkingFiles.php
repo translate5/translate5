@@ -98,7 +98,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles
         if (!empty($this->supportedFiles) && !self::$filesFound) {
             // 'E1135' => 'There are no importable files in the Task. The following file extensions can be imported: {extensions}',
             throw new editor_Models_Import_FileParser_NoParserException('E1135', [
-                'extensions' => join(', .', $this->supportedFiles->getSupportedExtensions()),
+                'extensions' => '.' . join(', .', $this->supportedFiles->getSupportedExtensions()),
                 'task' => $task,
             ]);
         }
