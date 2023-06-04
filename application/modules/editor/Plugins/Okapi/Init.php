@@ -111,7 +111,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     public static function getSystemDefaultBconf(): editor_Plugins_Okapi_Bconf_Entity
     {
-        if(static::$systemDefaultBconf != null){
+        if(static::$systemDefaultBconf == null){
             static::$systemDefaultBconf = new editor_Plugins_Okapi_Bconf_Entity();
             static::$systemDefaultBconf->loadSystemDefault();
             static::$systemDefaultBconf->repackIfOutdated();
