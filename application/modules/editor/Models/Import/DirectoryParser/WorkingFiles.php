@@ -50,7 +50,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles
      * Datei- oder Verzeichnisnamen in dieser Liste werden ignoriert. 100% match.
      * @var array
      */
-    protected $ignoreList = array('.svn');
+    protected $ignoreList = ['.svn', '.git'];
     /**
      * if is null, no supported file check is done
      * @var editor_Models_Import_SupportedFileTypes

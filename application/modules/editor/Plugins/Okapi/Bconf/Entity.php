@@ -371,9 +371,9 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception|Zend_Exception
      */
-    public function getDefaultBconfId($customerId = null): int {
+    public function getDefaultBconfId(int $customerId = null): int {
         // if customer given, try to load customer-specific default bconf
-        if($customerId){
+        if($customerId != null){
             $customerMeta = new editor_Models_Customer_Meta();
             try {
                 $customerMeta->loadByCustomerId($customerId);
@@ -401,20 +401,24 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
-     * Retrieves the system default bconf's ID
-     * This is NOT the bconf that is currently set as default but the initial one T5 is delivered with
-     * @return int
+     * Loads the system default bconf
+     * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getSystemDefaultBconfId(): int
+    public function loadSystemDefault(): void
     {
-        $sysBconfRow = $this->db->fetchRow($this->db->select()->where(
-            'name = ?',
-            editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME));
-        if ($sysBconfRow != null) {
-            return $sysBconfRow->id;
+        try {
+            $this->loadRow('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
+        } catch(ZfExtended_Models_Entity_NotFoundException $e){
+            $defaultId = $this->importDefaultWhenNeeded();
+            $this->load($defaultId);
         }
-        return $this->importDefaultWhenNeeded();
     }
 
     /**

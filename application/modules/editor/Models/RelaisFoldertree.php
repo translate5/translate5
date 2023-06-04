@@ -128,7 +128,7 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
             'fullPath' => $fullpath,
             'filePath' => $filepath,
             'taskGuid' => $this->getTaskGuid(),
-            'importConfig' => $this->importConfig//INFO:(TRANSLATE-1596)Afte we remove the depricate support for proofRead this can be removed
+            'importConfig' => $this->importConfig//INFO:(TRANSLATE-1596)Afte we remove the deprecated support for proofRead this can be removed
         ));
         // update the $filepath since it can be changed in customHandleFile event handlers
         $filepath = $path.$child->filename;
