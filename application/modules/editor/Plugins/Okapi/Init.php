@@ -378,7 +378,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_TaskController', 'beforeValidateUploads', [$this, 'handleBeforeValidateUploads']);
         // adds the bconfId to the task-meta
         $this->eventManager->attach('editor_TaskController', 'beforeProcessUploadedFile', [$this, 'handleBeforeProcessUploadedFile']);
-        
+
         //checks if import contains files for okapi:
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'beforeDirectoryParsing', [$this, 'handleBeforeDirectoryParsing']);
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', [$this, 'handleAfterDirectoryParsing']);
@@ -808,7 +808,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     private function isProcessableFile(SplFileInfo $fileinfo): bool
     {
-
         $extension = strtolower($fileinfo->getExtension());
         if(!$fileinfo->isFile()){
             return false;
@@ -822,6 +821,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         return $this->importFilter->isExtensionSupported($extension);
     }
 
+    /**
+     * @return editor_Models_Import_SupportedFileTypes
+     */
     private function getFileTypes(): editor_Models_Import_SupportedFileTypes
     {
         if(!isset($this->fileTypes)){

@@ -100,14 +100,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             grid.setSelection(toSelect);
         }
     },
-
-    deleteBconf2: function(view, rowIndex, colIndex, item, e, record){
-        /** @param {Editor.plugins.Okapi.store.BconfFilterStore} store */
-        var store = Ext.getStore('bconfStore');
-        view.select();
-        record.drop(/* cascade */ false);
-        store.sync();
-    },
+    
     /**
      * Delete button handler
      * @param {Editor.plugins.Okapi.view.BconfGrid} view
