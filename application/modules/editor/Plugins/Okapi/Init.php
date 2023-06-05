@@ -451,7 +451,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         );
 
         //returns information if the configured okapi is alive / reachable
-        $this->eventManager->attach(ZfExtended_Debug::class, 'applicationState', [$this, 'handleApplicationState']);
+        $this->eventManager->attach(
+            ZfExtended_Debug::class,
+            'applicationState',
+            [$this, 'handleApplicationState']
+        );
 
         //attach to the config after index to check the config values
         $this->eventManager->attach(
