@@ -130,6 +130,28 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     }
 
     /**
+     * Loads the system default bconf
+     * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws Zend_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @throws editor_Models_ConfigException
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    public static function getSystemDefaultBconf(): editor_Plugins_Okapi_Bconf_Entity
+    {
+        $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        try {
+            $bconf->loadRow('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
+            return $bconf;
+        } catch(ZfExtended_Models_Entity_NotFoundException $e){
+            return $bconf->importSystemDefault();
+        }
+    }
+
+    /**
      * Cache for our extension mapping
      * @var editor_Plugins_Okapi_Bconf_ExtensionMapping|null
      */
@@ -296,23 +318,40 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
     public function importDefaultWhenNeeded() : int {
         $sysBconfRow = $this->db->fetchRow($this->db->select()->where('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME));
         // when the system default bconf does not exist we have to generate it
-        if($sysBconfRow == NULL){
-            $sysBconfPath = editor_Plugins_Okapi_Init::getDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
-            $sysBconfName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
-            $sysBconfDescription = 'The default set of file filters. Copy to customize filters. Or go to "Clients" and customize filters there.';
-            $sysBconf = new editor_Plugins_Okapi_Bconf_Entity();
-            $sysBconf->import($sysBconfPath, $sysBconfName, $sysBconfDescription, NULL);
-            $sysBconf->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
-            if(!$this->db->fetchRow(['isDefault = 1'])){
-                $sysBconf->setIsDefault(1);
-            }
-            $sysBconf->save();
-            // DEBUG
-            if($this->doDebug){ error_log('BCONF: Imported sys default bconf '.$sysBconfName.' when needed'); }
-
+        if($sysBconfRow === null){
+            $sysBconf = $this->importSystemDefault();
             return $sysBconf->getId();
         }
         return $sysBconfRow->id;
+    }
+
+    /**
+     * Imports the system default bconf
+     * It must be certain, it does not already exists
+     * @return editor_Plugins_Okapi_Bconf_Entity
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_NoAccessException
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    private function importSystemDefault(): editor_Plugins_Okapi_Bconf_Entity
+    {
+        $sysBconfPath = editor_Plugins_Okapi_Init::getDataDir() . editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT;
+        $sysBconfName = editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME;
+        $sysBconfDescription = 'The default set of file filters. Copy to customize filters. Or go to "Clients" and customize filters there.';
+        $sysBconf = new editor_Plugins_Okapi_Bconf_Entity();
+        $sysBconf->import($sysBconfPath, $sysBconfName, $sysBconfDescription, NULL);
+        $sysBconf->setVersionIdx(editor_Plugins_Okapi_Init::BCONF_VERSION_INDEX);
+        if(!$this->db->fetchRow(['isDefault = 1'])){
+            $sysBconf->setIsDefault(1);
+        }
+        $sysBconf->save();
+        // DEBUG
+        if($this->doDebug){ error_log('BCONF: Imported sys default bconf: '.$sysBconfName); }
+
+        return $sysBconf;
     }
 
     /**
@@ -398,27 +437,6 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         }
         // if not found, generate it and return it's id
         return $this->importDefaultWhenNeeded();
-    }
-
-    /**
-     * Loads the system default bconf
-     * @return void
-     * @throws Zend_Db_Statement_Exception
-     * @throws Zend_Exception
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
-     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
-     * @throws ZfExtended_Models_Entity_NotFoundException
-     * @throws editor_Models_ConfigException
-     * @throws editor_Plugins_Okapi_Exception
-     */
-    public function loadSystemDefault(): void
-    {
-        try {
-            $this->loadRow('name = ?', editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT_NAME);
-        } catch(ZfExtended_Models_Entity_NotFoundException $e){
-            $defaultId = $this->importDefaultWhenNeeded();
-            $this->load($defaultId);
-        }
     }
 
     /**
@@ -731,7 +749,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
      * @throws editor_Plugins_Okapi_Exception
      */
     private function removeFiles(int $id){
-        $dir = self::getUserDataDir().'/'.strval($id);
+        $dir = self::getUserDataDir().'/'.$id;
         if(is_dir($dir)){ // just to be safe
             ZfExtended_Utils::recursiveDelete($dir);
         }

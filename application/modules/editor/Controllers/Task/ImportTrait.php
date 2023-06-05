@@ -2,6 +2,7 @@
 
 /***
  * Here ale place all task import related functions just to split them from the main controller
+ * TODO FIXME: This should NOT be a trait but parts of the import-process should better be encapsulated in classes ... a trait must not use props of the class using it
  */
 trait editor_Controllers_Task_ImportTrait {
     
@@ -74,7 +75,7 @@ trait editor_Controllers_Task_ImportTrait {
         $this->entity->initTaskDataDirectory();
 
         // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
-        $this->events->trigger("afterUploadPreparation", $this, array(
+        $this->events->trigger('afterUploadPreparation', $this, array(
             'task' => $this->entity,
             'dataProvider' => $dp,
             'requestData' => $this->data
@@ -129,6 +130,7 @@ trait editor_Controllers_Task_ImportTrait {
      * @throws Exception
      */
     protected function processUploadedFile(editor_Models_Task $task, editor_Models_Import_DataProvider_Abstract $dp) {
+
         /* @see editor_Models_Import::import Saves $meta after task */
         $meta = $task->meta();
         $this->events->trigger('beforeProcessUploadedFile', $this, [
@@ -136,6 +138,7 @@ trait editor_Controllers_Task_ImportTrait {
             'meta' => $meta,
             'data' => $this->data,
         ]);
+
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);

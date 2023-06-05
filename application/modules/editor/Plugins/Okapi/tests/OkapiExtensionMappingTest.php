@@ -30,7 +30,7 @@ use MittagQI\Translate5\Test\Import\Config;
 use MittagQI\Translate5\Test\Import\Bconf;
 
 /**
- * Tests Bconfs defining new file-extensions, either via an uploaded bconf or as embedded bconf in the ZIP
+ * Test for Bconfs defining new file-extensions, either via an uploaded bconf or as embedded bconf in the ZIP
  */
 class OkapiExtensionMappingTest extends editor_Test_JsonTest
 {

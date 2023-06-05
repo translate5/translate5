@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Test\Import\Config;
+use MittagQI\Translate5\Test\Import\Bconf;
+use MittagQI\Translate5\Plugins\Okapi\Service;
+
 /**
  * Testcase for TRANSLATE-2266 Custom file filter configuration with GUI / BCONF Management
  * For details see the issue.
@@ -36,55 +40,55 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         'editor_Plugins_Okapi_Init'
     ];
 
+    private static Bconf $testBconf;
+
     private static editor_Plugins_Okapi_Bconf_Entity $bconf;
 
-    private static int $bconfId = 0;
-
-    private static Zend_Config $okapiConf;
-
-    public const OKAPI_CONFIG = 'runtimeOptions.plugins.Okapi';
-
-    public static function beforeTests(): void {
-
-        // Needed for localized error messages in Unit Test like ZfExtended_NoAccessException
+    /**
+     * Just imports a bconf to test with
+     * @param Config $config
+     * @return void
+     */
+    protected static function setupImport(Config $config): void
+    {
         if(!Zend_Registry::isRegistered('Zend_Locale')){
             Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
         }
 
-        // Test essential configs
-        $okapiConf = self::$okapiConf = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
+        static::$testBconf = $config->addBconf('OkapiBconfTest', 'minimal/batchConfiguration.t5.bconf');
+    }
 
-        /** @var editor_Plugins_Okapi_Connector $okapiApi */
-        $okapiApi = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+    public function test10_ConfigurationAndApi()
+    {
+        $conf = Zend_Registry::get('config');
+        $okapiConf = $conf->runtimeOptions->plugins->Okapi;
+        /* @var Service $service */
+        $service = editor_Plugins_Okapi_Init::createService('okapi', $conf);
 
-        self::assertNotEmpty($okapiConf->dataDir, self::OKAPI_CONFIG . ".dataDir not set");
-        self::assertNotEmpty($okapiApi->getApiUrl(), self::OKAPI_CONFIG . ".api.url not set");
+        self::assertNotEmpty($okapiConf->dataDir, 'runtimeOptions.plugins.Okapi.dataDir not set');
+        self::assertNotEmpty($service->getConfiguredServiceUrl($okapiConf->serverToUse, false), 'runtimeOptions.plugins.Okapi.api.url not set');
 
         $t5defaultImportBconf = editor_Utils::joinPath(editor_Plugins_Okapi_Init::getDataDir(), editor_Plugins_Okapi_Init::BCONF_SYSDEFAULT_IMPORT);
         self::assertFileExists($t5defaultImportBconf,
             "File '$t5defaultImportBconf' missing. As the Translate5 provided default import .bconf file for Okapi Task Imports it must exist!");
 
-        $input = new SplFileInfo(static::api()->getFile('minimal/batchConfiguration.t5.bconf'));
-        $bconfName = 'OkapiBconfTest' . microtime() . '.bconf';
-        static::api()->addFile('bconffile', $input->getPathname(), 'application/octet-stream');
-        // Run as api test that if case runtimeOptions.plugins.Okapi.dataDir is missing it's created as webserver user
-        $res = static::api()->postJson('editor/plugins_okapi_bconf/uploadbconf', [ 'name' => $bconfName ], null, false);
-        self::assertEquals(true, $res?->success, 'uploadbconf did not respond with success:true for bconf '.$bconfName);
-        self::$bconfId = $res->id;
-        self::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
-        self::$bconf->load(self::$bconfId);
-        self::assertEquals(self::$bconf->getName(), $bconfName, "Imported bconf's name is not '$bconfName' but '" . self::$bconf->getName() . "'");
-        $output = self::$bconf->getPath();
+        static::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
+        static::$bconf->load(static::$testBconf->getId());
+        self::assertEquals(static::$bconf->getName(), 'OkapiBconfTest', "Imported bconf's name is not 'OkapiBconfTest' but '" . static::$bconf->getName() . "'");
 
+        $input = static::api()->getFile('minimal/batchConfiguration.t5.bconf');
+        $output = static::$bconf->getPath();
         $failureMsg = "Original and repackaged Bconfs do not match\nInput was '$input', Output was '$output";
         self::assertFileEquals($input, $output, $failureMsg);
+
+        self::assertTrue($service->check());
     }
 
     /**
      * Test if new srx files are packed into bconf.
      */
     public function test20_SrxUpload() {
-        $bconf = self::$bconf;
+        $bconf = static::$bconf;
         $id = $bconf->getId();
 
         // Upload sourceSRX
@@ -118,7 +122,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
             self::markTestSkipped('runs only in master test to not mess with important default bconf.');
             return;
         }
-        $bconf = self::$bconf;
+        $bconf = static::$bconf;
         $bconf->importDefaultWhenNeeded();
 
         $systemBconf = new editor_Plugins_Okapi_Bconf_Entity();
@@ -182,17 +186,6 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
      */
     public function test40_OkapiTaskImport() {
-        try {
-            /** @var editor_Plugins_Okapi_Connector $okapiApi */
-            $okapiApi = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
-
-            $msg = "Okapi Longhorn not reachable.\nCan't GET HTTP Status 200 under '" . $okapiApi->getApiUrl() . "' (per {" . self::OKAPI_CONFIG . "}.api.url)";
-            $longHornResponse = (new Zend_Http_Client($okapiApi->getApiUrl()))->request();
-            self::assertTrue($longHornResponse->getStatus() === 200, $msg);
-        } catch(Exception $e){
-            self::fail($msg . "\n" . $e->getMessage());
-        }
-
         $config = static::getConfig();
         $config->import(
             $config
@@ -211,14 +204,11 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         $config->import(
             $config
                 ->addTask('de', 'en')
+                ->setImportBconfId(static::$bconf->getDefaultBconfId())
                 ->addUploadFiles([
                     'workfiles/TRANSLATE-2266-de-en.txt',
                     'workfiles/TRANSLATE-2266-de-en-2.txt'
                 ])
-                ->addProperty(
-                    'bconfId',
-                    self::$bconf->getDefaultBconfId()
-                )
         );
     }
 
@@ -276,16 +266,5 @@ class OkapiBconfTest extends editor_Test_JsonTest {
                 throw $outerEx;
             }
         }
-    }
-
-    /**
-     * Cleanup, also tested
-     */
-    public static function afterTests(): void {
-        $bconf = self::$bconf;
-        $bconf->load(self::$bconfId);
-        $bconfDir = $bconf->getDataDirectory();
-        $bconf->delete(); // delete record, which deletes directory as well
-        self::assertDirectoryDoesNotExist($bconfDir);
     }
 }

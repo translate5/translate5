@@ -90,7 +90,7 @@ class editor_Models_Import {
                 editor_Models_Languages::LANG_TYPE_ID);
 
             // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
-            $this->events->trigger("afterUploadPreparation", $this, array(
+            $this->events->trigger('afterUploadPreparation', $this, array(
                 'task' => $this->task,
                 'dataProvider' => $dataProvider,
                 'requestData' => $requestData
