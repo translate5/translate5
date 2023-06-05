@@ -1643,14 +1643,15 @@ Ext.define('Editor.controller.Editor', {
 
     insertWhitespace: function(key,e,whitespaceType) {
         var me = this,
-            userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
             userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
             tagNr,
             plug,
             editor;
-        if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
+
+        if (!userCanInsertWhitespaceTags) {
             return;
         }
+
         tagNr = me.getNextWhitespaceTagNumber();
         plug = me.getEditPlugin();
         editor = plug.editor.mainEditor;

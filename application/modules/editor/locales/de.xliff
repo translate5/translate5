@@ -2932,6 +2932,32 @@
                     <br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.
                 </target>
             </trans-unit>
+            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIFF1ZWxsc3ByYWNoZTo8YnIvPjx1bD48bGk+ezB9PC9saT48L3VsPlNvIGVudGZlcm5lbiBTaWUgZGVuIEZlaGxlcjo8YnIvPjx1bD48bGk+S2xpY2tlbiBTaWUgYXVmIE9LLCB1bSBkaWVzZSBOYWNocmljaHQgenUgZW50ZmVybmVuPC9saT48bGk+RHLDvGNrZW4gU2llIEVTQywgdW0gZGFzIFNlZ21lbnQgb2huZSBTcGVpY2hlcm4genUgdmVybGFzc2VuPC9saT48bGk+w5ZmZm5lbiBTaWUgZGFzIFNlZ21lbnQgZXJuZXV0PC9saT48L3VsPldpZWRlcmhvbGVuIFNpZSBqZXR6dCBJaHJlIMOEbmRlcnVuZ2VuLg=='>
+                <source>Die folgenden Tags existieren nicht in der Quellsprache:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                </source>
+                <target>Die folgenden Tags existieren nicht in der Quellsprache:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                </target>
+            </trans-unit>
             <trans-unit id='QUNIVFVORzogRWluIHdlaXRlcmVyIEZpbHRlciBpc3QgZ2VzZXR6dC4gRXMgaXN0IGRhaGVyIG3DtmdsaWNoLCBkYXNzIG5pY2h0IGFsbGUgU2VnbWVudGUgZGVyIExlc2V6ZWljaGVubGlzdGUgc2ljaHRiYXIgc2luZA=='>
                 <source>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind</source>
                 <target>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind</target>

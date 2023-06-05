@@ -25,6 +25,7 @@
       <file>../Plugins/Okapi/tests/OkapiBconfTest.php</file>
       <file>../Plugins/Okapi/tests/OkapiBconfFilterTest.php</file>
       <file>../Plugins/Okapi/tests/OkapiExportTest.php</file>
+      <file>../Plugins/Okapi/tests/OkapiExtensionMappingTest.php</file>
     </testsuite>
     <testsuite name="visual">
       <file>../Plugins/VisualReview/tests/VisualHtmlTest.php</file>
