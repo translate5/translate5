@@ -77,7 +77,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     ];
 
     protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
+
     protected static bool $activateForTests = true;
+
     protected static bool $enabledByDefault = true;
 
     /**
@@ -197,10 +199,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         return null;
     }
-
-    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
-
-    protected static bool $activateForTests = true;
 
     /**
      * The services we use
