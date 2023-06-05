@@ -207,6 +207,17 @@ final class Task extends Resource
     }
 
     /**
+     * Adds a bconf-id to the task to be used when importing
+     * @param int $bconfId
+     * @return $this
+     */
+    public function setImportBconfId(int $bconfId): Task
+    {
+        $this->bconfId = $bconfId;
+        return $this;
+    }
+
+    /**
      * Removes an added configuration e.g. a default configuration (can not be used to remove configs from task-config.ini files!)
      * @param string $configName
      * @return $this

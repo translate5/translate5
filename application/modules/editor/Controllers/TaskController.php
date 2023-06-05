@@ -574,9 +574,15 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $this->initWorkflow();
 
+        $this->events->trigger('beforeValidateUploads', $this, [
+            'task' => $this->entity,
+            'data' => $this->data,
+            'action' => $this->_request->getActionName()
+        ]);
+
         if($singleTask){
             $tasks = $this->handleTaskImport();
-        }else{
+        } else {
             $tasks = $this->handleProjectUpload();
         }
 
@@ -884,6 +890,13 @@ class editor_TaskController extends ZfExtended_RestController {
             foreach($metaData as $field => $value){
                 $this->data[$field] = $value;
             }
+
+            $this->events->trigger('beforeValidateUploads', $this, [
+                'task' => $this->entity,
+                'data' => $this->data,
+                'action' => $this->_request->getActionName()
+            ]);
+
             $this->processUploadedFile($this->entity, $dataProvider); //creates task_meta via editor_Models_Import::import
             $cloner->cloneDependencies();
             $this->startImportWorkers();

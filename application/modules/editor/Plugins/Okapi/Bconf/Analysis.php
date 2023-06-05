@@ -27,18 +27,23 @@
  */
 
 /**
- * Unpacks/Disassembles a bconf
- * This will create the necessary parts/files of the passed bconf when processing
+ * Unpacks/Disassembles a bconf for the purpose of analysis
+ * This does not write any files !
  */
-final class editor_Plugins_Okapi_Bconf_Unpacker extends editor_Plugins_Okapi_Bconf_Parser_Bconf {
+final class editor_Plugins_Okapi_Bconf_Analysis extends editor_Plugins_Okapi_Bconf_Parser_Bconf {
 
-    public function __construct(editor_Plugins_Okapi_Bconf_Entity $bconf){
-        $this->bconf = $bconf;
-        $this->folder = $this->bconf->getDataDirectory();
-        $this->bconfName = empty($this->bconf->getName()) ?
-            'Unnamed Bconf ' . $this->bconf->getId()
-            : $this->bconf->getName();
-        $this->hasBconf = true;
+    /**
+     * @param string $absoluteBconfPath
+     * @throws Zend_Exception
+     * @throws ZfExtended_Exception
+     * @throws editor_Plugins_Okapi_Bconf_InvalidException
+     */
+    public function __construct(string $absoluteBconfPath){
+        $this->folder = dirname($absoluteBconfPath);
+        $this->bconfName = basename($absoluteBconfPath);
+        $this->hasBconf = false;
         $this->doDebug = ZfExtended_Debug::hasLevel('plugin', 'OkapiBconfPackUnpack');
+        // the analyser analyses on creation
+        $this->process($absoluteBconfPath);
     }
 }
