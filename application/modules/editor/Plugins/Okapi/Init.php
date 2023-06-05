@@ -374,11 +374,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         // adds the used bconf to the import-archive. At this point, the task is not yet saved and the bconfId sent by request has to be used
         $this->eventManager->attach('editor_Models_Import', 'afterUploadPreparation', [$this, 'handleAfterUploadPreparation']);
 
-        // adds the bconfId to the task-meta
-        $this->eventManager->attach('editor_TaskController', 'beforeProcessUploadedFile', [$this, 'handleBeforeProcessUploadedFile']);
         // sets the correct supported file-types
         $this->eventManager->attach('editor_TaskController', 'beforeValidateUploads', [$this, 'handleBeforeValidateUploads']);
-
+        // adds the bconfId to the task-meta
+        $this->eventManager->attach('editor_TaskController', 'beforeProcessUploadedFile', [$this, 'handleBeforeProcessUploadedFile']);
+        
         //checks if import contains files for okapi:
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'beforeDirectoryParsing', [$this, 'handleBeforeDirectoryParsing']);
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', [$this, 'handleAfterDirectoryParsing']);
