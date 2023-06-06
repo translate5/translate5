@@ -123,7 +123,8 @@
 		"symfony/yaml": "^6.0",
 		"symfony/lock": "^6.0",
 		"cesargb/php-log-rotation": "^2.7",
-		"ifsnop/mysqldump-php": "^v2.9"
+		"ifsnop/mysqldump-php": "^v2.9",
+		"symfony/finder": "^6.0"
     },
 	"extra" : {
 		"merge-plugin" : {
@@ -164,6 +165,7 @@
 	],
 	"license" : "AGPL-3.0-only",
 	"require-dev" : {
-		"brainmaestro/composer-git-hooks" : "^2.8"
+		"brainmaestro/composer-git-hooks" : "^2.8",
+		"symfony/var-dumper": "^6.0"
 	}
 }
