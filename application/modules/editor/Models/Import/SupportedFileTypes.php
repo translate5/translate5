@@ -67,7 +67,7 @@ class editor_Models_Import_SupportedFileTypes
         $this->registerCoreFileParsers();
 
         // TODO trigger an event here, so that plugins can register file parsers.
-        // Since this class is used at severalplaces we have to do it that way!
+        // Since this class is used at several places we have to do it that way!
 
         //ZIP is not provided by a specific fileparser, but is supported by the core as container format
         // same for testcases
@@ -147,6 +147,15 @@ class editor_Models_Import_SupportedFileTypes
     {
         //array_values needed for later JSON encode (with array_unique there may be gaps in the index, which results in objects instead arrays
         return array_values(array_unique(array_merge(array_keys(self::$extensionsWithParser), self::$extensionsSupported)));
+    }
+
+    /**
+     * Resets the supported extensions
+     * @return array
+     */
+    public function resetSupportedExtensions(): array
+    {
+        self::$extensionsSupported = [];
     }
 
     /**

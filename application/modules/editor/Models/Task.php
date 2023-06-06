@@ -975,10 +975,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * Check if the current task status allows this action
      * @param array $allow additional states to be handled non exclusive
-     * @throws ZfExtended_Models_Entity_Conflict
+     * @throws ZfExtended_Models_Entity_Conflict|Zend_Exception
      */
-    public function checkStateAllowsActions(array $allow = []) {
-        if($this->isErroneous() || $this->isExclusiveState($allow) && $this->isLocked($this->getTaskGuid())) {
+    public function checkStateAllowsActions(array $allow = []): void
+    {
+        if($this->isErroneous() || ($this->isExclusiveState($allow) && $this->isLocked($this->getTaskGuid()))) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1046' => 'The current task status does not allow that action.',
             ]);
@@ -991,6 +992,32 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                 'isExclusiveState' => $this->isExclusiveState(),
             ]);
         }
+    }
+
+    /**
+     * Check and throw exception if the task export is not allowed.
+     * It is not allowed when the task is in not allowed state or if task export is already running
+     * @throws ZfExtended_Models_Entity_Conflict
+     * @throws Zend_Exception
+     */
+    public function checkExportAllowed(string $exportClass): void
+    {
+        // first check if disabled by state
+        $this->checkStateAllowsActions();
+        
+        $model = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        // check if there are running exports
+        if ($model->isExportRunning($this->getTaskGuid(), $exportClass)) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1538' => 'Task export: the task already contains running or pending exports. Try again later',
+            ]);
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1538', [
+                'Task export: the task already contains running or pending exports. Try again later'
+            ], [
+                'task' => $this
+            ]);
+        }
+
     }
 
     /**

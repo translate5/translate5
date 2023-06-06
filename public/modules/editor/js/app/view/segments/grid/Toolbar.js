@@ -594,7 +594,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                 },{
                     xtype: 'button',
                     itemId: 'specialChars',
-                    hidden: !(userCanModifyWhitespaceTags && userCanInsertWhitespaceTags),
+                    hidden: !userCanModifyWhitespaceTags && !userCanInsertWhitespaceTags,
                     bind: {
                         text: '{l10n.segmentGrid.toolbar.chars}',
                         disabled: '{!isEditingSegment}',

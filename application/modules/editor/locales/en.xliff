@@ -1246,6 +1246,32 @@
                     <br/>Alternatively use the help button and look for keyboard shortcuts to enter the  missing tags from the source.
                 </target>
             </trans-unit>
+            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIFF1ZWxsc3ByYWNoZTo8YnIvPjx1bD48bGk+ezB9PC9saT48L3VsPlNvIGVudGZlcm5lbiBTaWUgZGVuIEZlaGxlcjo8YnIvPjx1bD48bGk+S2xpY2tlbiBTaWUgYXVmIE9LLCB1bSBkaWVzZSBOYWNocmljaHQgenUgZW50ZmVybmVuPC9saT48bGk+RHLDvGNrZW4gU2llIEVTQywgdW0gZGFzIFNlZ21lbnQgb2huZSBTcGVpY2hlcm4genUgdmVybGFzc2VuPC9saT48bGk+w5ZmZm5lbiBTaWUgZGFzIFNlZ21lbnQgZXJuZXV0PC9saT48L3VsPldpZWRlcmhvbGVuIFNpZSBqZXR6dCBJaHJlIMOEbmRlcnVuZ2VuLg=='>
+                <source>Die folgenden Tags existieren nicht in der Quellsprache:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                </source>
+                <target>The following tags do not exist in source:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>To remove the error:
+                    <br/>
+                    <ul>
+                        <li>Click OK to remove this message</li>
+                        <li>Press ESC to leave the segment without saving</li>
+                        <li>Open the segment again</li>
+                    </ul>Now redo your edits.
+                </target>
+            </trans-unit>
             <trans-unit id='RmVobGVyIGJlaGViZW4='>
                 <source>Fehler beheben</source>
                 <target>Correct errors</target>

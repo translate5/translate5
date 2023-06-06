@@ -100,25 +100,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             grid.setSelection(toSelect);
         }
     },
+    
     /**
      * Delete button handler
      * @param {Editor.plugins.Okapi.view.BconfGrid} view
      * @param {int} rowIndex
+     * ...
+     * @param {Editor.plugins.Okapi.model.BconfModel} record
      */
-    deleteBconf: function(view, rowIndex){
-        view.select(rowIndex); // we need a selected row
-        var me = this;
-        // UGLY/FIXME: it seems the row selection events interfere with the prompt, which is immediately closed when clicking on a delete-icon of an unselected row.
-        Ext.defer(function(){ me.doDeleteBconf(view); }, 50, me);
-    },
-    /**
-     *
-     * @param view
-     */
-    doDeleteBconf: function(view){
-        Ext.Msg.confirm(view.grid.strings.confirmDeleteTitle + `: <i>"${view.selection.get('name')}"</i>`, view.grid.strings.confirmDeleteMessage, function(btnId){
+    deleteBconf: function(view, rowIndex, colIndex, item, e, record){
+        Ext.Msg.confirm(view.grid.strings.confirmDeleteTitle + `: <i>"${record.get('name')}"</i>`, view.grid.strings.confirmDeleteMessage, function(btnId){
             if(btnId === 'yes'){
-                view.selection.drop();
+                record.drop(/* cascade */ false);
             }
         });
     },
@@ -133,6 +126,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         // UGLY/FIXME: it seems the row selection events interfere with the prompt, which is immediately closed when clicking on a clone-icon of an unselected row.
         Ext.defer(function(){ me.doCloneBconf(view); }, 50, me);
     },
+
     doCloneBconf: async function(view){
         var name,
             rec = view.selection;
