@@ -2,5 +2,5 @@
 <!-- See ITS specification at: http://www.w3.org/TR/its/ -->
  <its:translateRule selector="//*" translate="no"/>
  <its:translateRule selector="//string" translate="yes"/>
- <its:withinTextRule selector="//color|//font|//decor|//size|//br|//lists|//lnhgt|//space|//fstyl|//tstyl" withinText="yes"/>
+ <its:withinTextRule selector="//color|//font|//decor|//size|//br|//lists|//lnhgt|//space|//fstyl|//tstyl|//hyper" withinText="yes"/>
 </its:rules>
