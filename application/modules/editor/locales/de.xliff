@@ -7800,9 +7800,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
                 <target>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</target>
             </trans-unit>
-            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgaW4gYW5kZXJlbiBTZWdtZW50ZW4gZWJlbmZhbGxzIMOkbmRlcm4u'>
-                <source>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</source>
-                <target>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</target>
+            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgZWJlbmZhbGxzIGFscyBmYWxzY2hlIEZlaGxlciBtYXJraWVyZW4u'>
+                <source>Alle identischen Fehler ebenfalls als falsche Fehler markieren.</source>
+                <target>Alle identischen Fehler ebenfalls als falsche Fehler markieren.</target>
             </trans-unit>
             <trans-unit id='SmE='>
                 <source>Ja</source>

@@ -1192,3 +1192,16 @@ dl {
 .x-box-menu-after.x-btn-default-small .x-toolbar-more-icon {
     color: white;
 }
+.x-fieldset.segmentQualities .x-column-header-text-wrapper {
+    vertical-align: bottom;
+}
+.x-fieldset.segmentQualities .x-column-header-text {
+    text-overflow: clip;
+}
+.x-fieldset.segmentQualities .x-grid-header-ct {
+    border-top-width: 1px !important;
+}
+.x-fieldset.segmentQualities .x-panel-header {
+    background: none;
+    box-shadow: none;
+}
