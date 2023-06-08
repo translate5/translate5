@@ -48,7 +48,7 @@ class OkapiExtensionMappingTest extends editor_Test_JsonTest
      */
     protected static function setupImport(Config $config): void
     {
-        static::$testBconf = $config->addBconf('TestBconf', 'Extensions-xdrts-nzttdst.bconf');
+        static::$testBconf = $config->addBconf('ExtensionMappingTestBconf', 'Extensions-xdrts-nzttdst.bconf');
     }
 
     /**
