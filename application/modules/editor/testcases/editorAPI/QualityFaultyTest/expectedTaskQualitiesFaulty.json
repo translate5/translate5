@@ -1,5 +1,5 @@
 {
-    "text": "{4262696b-51f6-41fd-84f4-c9c00bf311c6}",
+    "text": "{cf3fd4f7-3287-4f70-971a-f2465a4039b1}",
     "children": [
         {
             "qid": -1,
@@ -8,7 +8,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2233",
+                    "qid": "603",
                     "qtype": "consistent",
                     "qcount": 3,
                     "qcomplete": true,
@@ -46,7 +46,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2218",
+                    "qid": "601",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -59,7 +59,7 @@
                     "qfaulty": true
                 },
                 {
-                    "qid": "2230",
+                    "qid": "602",
                     "qtype": "internal",
                     "qcount": 1,
                     "qcomplete": true,
@@ -76,44 +76,6 @@
             "qcountfp": 0,
             "text": "Internal tags",
             "qtotal": 2,
-            "expanded": false
-        },
-        {
-            "qid": -1,
-            "qtype": "spellcheck",
-            "qcount": 15,
-            "qcomplete": true,
-            "children": [
-                {
-                    "qid": "2194",
-                    "qtype": "spellcheck",
-                    "qcount": 14,
-                    "qcomplete": true,
-                    "qcategory": "misspelling",
-                    "qcatidx": "-1",
-                    "qcountfp": 0,
-                    "text": "Spelling",
-                    "qtooltip": "The text contains a misspelling.",
-                    "leaf": true
-                },
-                {
-                    "qid": "2209",
-                    "qtype": "spellcheck",
-                    "qcount": 1,
-                    "qcomplete": true,
-                    "qcategory": "uncategorized",
-                    "qcatidx": "-1",
-                    "qcountfp": 0,
-                    "text": "Uncategorized",
-                    "qtooltip": "The issue either has not been categorized or cannot be categorized.",
-                    "leaf": true
-                }
-            ],
-            "qcategory": null,
-            "qtooltip": "",
-            "qcountfp": 0,
-            "text": "LanguageTool",
-            "qtotal": 15,
             "expanded": false
         },
         {
@@ -159,7 +121,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2217",
+                    "qid": "600",
                     "qtype": "numbers",
                     "qcount": 1,
                     "qcomplete": true,
@@ -185,7 +147,7 @@
             "qcomplete": true,
             "children": [
                 {
-                    "qid": "2187",
+                    "qid": "593",
                     "qtype": "term",
                     "qcount": 2,
                     "qcomplete": true,
@@ -197,7 +159,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "2183",
+                    "qid": "589",
                     "qtype": "term",
                     "qcount": 7,
                     "qcomplete": true,
@@ -209,7 +171,7 @@
                     "leaf": true
                 },
                 {
-                    "qid": "2189",
+                    "qid": "595",
                     "qtype": "term",
                     "qcount": 1,
                     "qcomplete": true,
@@ -254,7 +216,7 @@
         }
     ],
     "metaData": {
-        "numSegments": 31,
+        "numSegments": 16,
         "hasFaultyInternalTags": true
     }
 }
