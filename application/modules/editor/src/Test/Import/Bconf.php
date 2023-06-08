@@ -39,7 +39,11 @@ final class Bconf extends Resource
 
     public ?int $customerId = null;
 
-    protected string $_uploadFile;
+    private string $_uploadFile;
+
+    private bool $_failOnError = true;
+
+    private bool $_uploadFailed = false;
 
     /**
      * @param string $testClass
@@ -52,6 +56,25 @@ final class Bconf extends Resource
         parent::__construct($testClass, $index);
         $this->name = $name;
         $this->_uploadFile = $bconfFileName;
+    }
+
+    /**
+     * Special API to not fail on error during import. Can be used e.g. to test expected failures
+     * @return $this
+     */
+    public function setNotToFailOnError(): Bconf
+    {
+        $this->_failOnError = false;
+        return $this;
+    }
+
+    /**
+     * When an Bconf was imported with ::setNotToFailOnError() called, this retrieves if the upload really failed
+     * @return bool
+     */
+    public function hasUploadFailed(): bool
+    {
+        return $this->_uploadFailed;
     }
 
     /**
@@ -72,8 +95,14 @@ final class Bconf extends Resource
         if(empty($params['customerId'])){
             unset($params['customerId']);
         }
-        $bconf = $api->postJson('editor/plugins_okapi_bconf/uploadbconf', $params, null, false);
-        $this->validateResult($bconf, $api);
+        $result = $api->postJson('editor/plugins_okapi_bconf/uploadbconf', $params, null, false, !$this->_failOnError);
+        // in case we want the bonf to fail we simply apply the result without validation
+        if(!$this->_failOnError && is_object($result) && !property_exists($result, 'id')){
+            $this->applyResult($result);
+            $this->_uploadFailed = true;
+        } else {
+            $this->validateResult($result, $api);
+        }
     }
 
     /**
@@ -82,7 +111,7 @@ final class Bconf extends Resource
      */
     public function cleanup(Helper $api, Config $config): void
     {
-        if($this->_requested){
+        if($this->_requested && !$this->_uploadFailed){
             $api->delete('editor/plugins_okapi_bconf/' . $this->getId());
         }
     }

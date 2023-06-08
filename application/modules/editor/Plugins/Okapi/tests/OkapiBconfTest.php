@@ -51,11 +51,12 @@ class OkapiBconfTest extends editor_Test_JsonTest {
      */
     protected static function setupImport(Config $config): void
     {
+        // TODO FIXME: still neccessary ?
         if(!Zend_Registry::isRegistered('Zend_Locale')){
             Zend_Registry::set('Zend_Locale', new Zend_Locale('en'));
         }
 
-        static::$testBconf = $config->addBconf('OkapiBconfTest', 'minimal/batchConfiguration.t5.bconf');
+        static::$testBconf = $config->addBconf('TestBconfMinimal', 'minimal/batchConfiguration.t5.bconf');
     }
 
     public function test10_ConfigurationAndApi()
@@ -74,7 +75,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
         static::$bconf = new editor_Plugins_Okapi_Bconf_Entity();
         static::$bconf->load(static::$testBconf->getId());
-        self::assertEquals(static::$bconf->getName(), 'OkapiBconfTest', "Imported bconf's name is not 'OkapiBconfTest' but '" . static::$bconf->getName() . "'");
+        static::assertStringStartsWith('TestBconfMinimal', static::$bconf->getName(), 'Imported bconf\'s name is not like ' . 'TestBconfMinimal' . ' but ' . static::$bconf->getName());
 
         $input = static::api()->getFile('minimal/batchConfiguration.t5.bconf');
         $output = static::$bconf->getPath();
@@ -86,6 +87,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
     /**
      * Test if new srx files are packed into bconf.
+     * @depends test10_ConfigurationAndApi
      */
     public function test20_SrxUpload() {
         $bconf = static::$bconf;
@@ -117,6 +119,9 @@ class OkapiBconfTest extends editor_Test_JsonTest {
         self::assertStringContainsString($targetSrx, $bconfString, "targetSrx update failed for bconf #$id");
     }
 
+    /**
+     * @depends test10_ConfigurationAndApi
+     */
     public function test30_AutoImportAndVersionUpdate() {
         if(!self::isMasterTest()){
             self::markTestSkipped('runs only in master test to not mess with important default bconf.');
@@ -196,6 +201,7 @@ class OkapiBconfTest extends editor_Test_JsonTest {
 
     /***
      * Verify Task Import using Okapi is working with the LEK_okapi_bconf based Bconf management
+     * @depends test10_ConfigurationAndApi
      * @depends test40_OkapiTaskImport
      */
     public function test50_OkapiTaskImportWithBconfIdAndMultipleFiles() {

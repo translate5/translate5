@@ -35,6 +35,7 @@ use MittagQI\Translate5\Test\Api\Helper;
  */
 final class Config
 {
+    private static int $counter = 0;
     /**
      * @var Helper
      */
@@ -132,7 +133,7 @@ final class Config
         foreach ($this->otherResources as $resource) {
             $this->cleanupResource($resource, $errors);
         }
-        if(count($errors) > 0){
+        if (count($errors) > 0) {
             throw new Exception(implode("\n", $errors));
         }
     }
@@ -255,8 +256,9 @@ final class Config
     public function addBconf(string $name, string $bconfFileName, int $customerId = -1): Bconf
     {
         $next = count($this->otherResources);
-        $bconf = new Bconf($this->testClass, $next, $name, $bconfFileName);
-        if($customerId > 0){
+        // HINT: in the bconf-DB the name must be unique. So we add the counter also to the DB-name to guarantee unique names for th ewhole testsuite
+        $bconf = new Bconf($this->testClass, $next, $name . '-' . $this->getUniqueIndex(), $bconfFileName);
+        if ($customerId > 0) {
             $bconf->customerId = $customerId;
         }
         $this->otherResources[] = $bconf;
@@ -382,5 +384,15 @@ final class Config
             default:
                 throw new Exception('Unknown language-resource type "' . $type . '"');
         }
+    }
+
+    /**
+     * Helper to create unique indices across the whole test-suite
+     * @return int
+     */
+    private function getUniqueIndex(): int
+    {
+        static::$counter++;
+        return static::$counter;
     }
 }
