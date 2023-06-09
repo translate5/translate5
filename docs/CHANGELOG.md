@@ -21,6 +21,60 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.2.3] - 2023-06-09
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3365](https://jira.translate5.net/browse/TRANSLATE-3365): Test framework - Improvement on testing framework** <br>
+Improvement in translate5 testing framework.
+
+**[TRANSLATE-3349](https://jira.translate5.net/browse/TRANSLATE-3349): LanguageResources - HOTFIX: DeepL API changes regarding formality** <br>
+HOTFIX: API-changes with DeepL (formality) lead to pretranslation/analysis fails for certain target languages
+
+**[TRANSLATE-3329](https://jira.translate5.net/browse/TRANSLATE-3329): Test framework - Testing certain branch in the cloud accessible for developers** <br>
+Cloud based testing Implementation.
+
+
+### Bugfixes
+**[TRANSLATE-3367](https://jira.translate5.net/browse/TRANSLATE-3367): VisualReview / VisualTranslation - Visual can not be created due to failing CSS processing** <br>
+FIX: In very rare cases the CSS processing of the Visual Markup failed preventing the Visual to be created
+
+**[TRANSLATE-3358](https://jira.translate5.net/browse/TRANSLATE-3358): LanguageResources - TildeMT update translation does not work** <br>
+Updating translations was not possible because of wrong API parameter name.
+
+**[TRANSLATE-3356](https://jira.translate5.net/browse/TRANSLATE-3356): file format settings - OKAPI import: Available extensions of used bconf not used for processing files** <br>
+FIX: Added extensions in custom file-format-settings may have been rejected nevertheless when trying to import files with this extension
+FIX: In the Client Panels freshly added file-filter-settings created an error when deleted immediately after creation
+
+**[TRANSLATE-3353](https://jira.translate5.net/browse/TRANSLATE-3353): Translate5 CLI - HOTFIX: qautodiscovery-command does not work properly in self-hosted dockerized instances** <br>
+FIX: improved service:autodiscovery command when used in self-hosted instances
+
+**[TRANSLATE-3352](https://jira.translate5.net/browse/TRANSLATE-3352): VisualReview / VisualTranslation - Increase timeout for communication with visualconverter and pdfconverter** <br>
+Communication timeouts between T5 and visualconverter/pdfconverter were increased to 30 seconds
+
+**[TRANSLATE-3350](https://jira.translate5.net/browse/TRANSLATE-3350): Export - Error when task is exported multiple times** <br>
+Exporting task multiple times lead to an error. Now the users will no longer be able to export a task if there is already running export for the same task.
+
+**[TRANSLATE-3347](https://jira.translate5.net/browse/TRANSLATE-3347): Import/Export - Race condition in creating task meta data on import** <br>
+When there is a longer time gap between steps in the import it may happen that the import crashes due race-conditions in saving the task meta table.
+
+**[TRANSLATE-3341](https://jira.translate5.net/browse/TRANSLATE-3341): TBX-Import - TBX files are kept on disk on updating term-collections** <br>
+On updating TermCollections all TBX files are kept on disk: this is reduced to 3 months in the past for debugging purposes.
+
+**[TRANSLATE-3335](https://jira.translate5.net/browse/TRANSLATE-3335): t5memory - Reimport stops, if one segment can not be saved because of segment length** <br>
+Fixed an error that might cause t5memory reorganizing when it was not actually needed
+
+**[TRANSLATE-3320](https://jira.translate5.net/browse/TRANSLATE-3320): LanguageResources - FIX Tag check and tag handling for LanguageResource matches** <br>
+FIX: Solve Problems with additional whitespace tags from accepted TM matches not being saved / stripped on saving
+
+**[TRANSLATE-3319](https://jira.translate5.net/browse/TRANSLATE-3319): Import/Export - FIX tag-handling in Transit Plugin** <br>
+Fixed bug with tag parsing in Transit plugin
+
+
 ## [6.2.2] - 2023-05-25
 
 ### Important Notes:
