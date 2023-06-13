@@ -45,11 +45,14 @@ Ext.define('Editor.view.quality.FalsePositives', {
         xtype: 'grid',
         userCls: 't5falsePositivesGrid',
         border: 0,
-        width: 277,
+        width: '100%',
         height: 'auto',
         store: {
             type: 'json',
             data: []
+        },
+        header: {
+            height: 10
         },
         columns: [{
             width: 35,

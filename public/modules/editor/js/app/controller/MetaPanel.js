@@ -209,6 +209,7 @@ Ext.define('Editor.controller.MetaPanel', {
 
         me.segmentRightClickGrid = Ext.create({
             xtype: 'falsePositives',
+            width: 277,
             shadow: false,
             floating: true,
             draggable: true,
