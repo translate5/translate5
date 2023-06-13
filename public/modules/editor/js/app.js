@@ -93,7 +93,7 @@ if(Ext.browser.is.IE) {
 Ext.application({
     name: 'Editor',
     models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
-    stores: ['Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig', 'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault'],
+    stores: ['Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig', 'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault','admin.WizardTasks'],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
@@ -105,7 +105,8 @@ Ext.application({
         'Editor.util.messageBus.MessageBus',
         'Editor.util.messageBus.EventDomain',
         'Editor.util.HttpStateProvider',
-        'Editor.util.HtmlClasses'
+        'Editor.util.HtmlClasses',
+        'Editor.util.ImportWizard'
     ].concat(Editor.data.app.controllers.require),
     controllers: Editor.data.app.controllers.active,
     appFolder: Editor.data.appFolder,

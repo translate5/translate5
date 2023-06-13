@@ -6074,9 +6074,9 @@ The following task was imported with errors / warnings / notices. Please take ca
                 <source>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
                 <target>Quantity of other occurrences of such [quality - content] pair found in this task</target>
             </trans-unit>
-            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgaW4gYW5kZXJlbiBTZWdtZW50ZW4gZWJlbmZhbGxzIMOkbmRlcm4u'>
-                <source>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</source>
-                <target>Change all identical errors in other segments also.</target>
+            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgZWJlbmZhbGxzIGFscyBmYWxzY2hlIEZlaGxlciBtYXJraWVyZW4u'>
+                <source>Alle identischen Fehler ebenfalls als falsche Fehler markieren.</source>
+                <target>Mark all identical errors as false errors as well.</target>
             </trans-unit>
             <trans-unit id='SmE='>
                 <source>Ja</source>

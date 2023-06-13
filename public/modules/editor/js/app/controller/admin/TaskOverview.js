@@ -1322,9 +1322,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     notifyTaskCreated:function (task, callback){
         var me = this;
 
-        // reload the task store so the new tasks are included inside.
-        // in the import wizard, fresh tasks are required
-        me.getAdminTasksStore().load({
+
+        // Reload the task wizard store, so we have fresh tasks in the import wizard
+        Editor.util.ImportWizard.reloadTasksStore({
             callback:function (){
 
                 // update the project route based on the current task
