@@ -556,9 +556,8 @@ class editor_TaskController extends ZfExtended_RestController
         if ($customer) {
             $c = $customer->getConfig();
         }
-
         // check if the relasiLang field is provided. If it is not provided, check and set default value from config.
-        if (false === $this->data['relaisLang'] ?? false) {
+        if (false === ($this->data['relaisLang'] ?? false)) {
             // check and set the default pivot language is configured
             $this->defaults->setDefaultPivotForProject($this->entity, $customer);
         }

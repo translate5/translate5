@@ -128,9 +128,8 @@ abstract class editor_Test_Termtagger_Abstract extends \editor_Test_UnitTest {
      */
     protected static $targetLangEntity;
 
-    public static function setUpBeforeClass(): void {
+    public static function beforeTests(): void {
         self::$testTask = ZfExtended_Factory::get('editor_Models_Task');
-        parent::setUpBeforeClass();
     }
 
     public static function init(SplFileInfo $file) {

@@ -33,7 +33,7 @@ class AllTablesEventCodesTest extends \editor_Test_UnitTest {
     
     protected static $appRoot;
     
-    public static function setUpBeforeClass(): void {
+    public static function beforeTests(): void {
         self::$appRoot = explode('/', getcwd());
         self::$appRoot = join('/', array_splice(self::$appRoot, 0, -4));
     }
