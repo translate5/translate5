@@ -28,6 +28,11 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Api;
 
+use editor_Models_Config;
+use editor_Models_TaskConfig;
+use Zend_Db_Statement_Exception;
+use ZfExtended_Factory;
+
 /**
  * API Helper the provides general functions to test the translate5 API
  */
@@ -781,10 +786,10 @@ final class Helper extends \ZfExtended_Test_ApiHelper
      * If the given value to the config is null,
      * the config value is just checked for existence and if the configured value is not empty
      */
-    public function testConfig(array $configsToTest, ?string $taskGuid = null): void
+    public function testConfigs(array $configsToTest, ?string $taskGuid = null): void
     {
-        $config = \ZfExtended_Factory::get(\editor_Models_Config::class);
-        $taskConfig = \ZfExtended_Factory::get(\editor_Models_TaskConfig::class);
+        $config = ZfExtended_Factory::get(editor_Models_Config::class);
+        $taskConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
 
         foreach ($configsToTest as $name => $value) {
             if (!str_starts_with($name, 'runtimeOptions.')) {
@@ -807,6 +812,30 @@ final class Helper extends \ZfExtended_Test_ApiHelper
                 );
             }
         }
+    }
+
+    /**
+     * Checks, if the passed configs are set / set to the wanted value
+     * @param array $configsToTest
+     * @return bool
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function checkConfigs(array $configsToTest): bool
+    {
+        $config = ZfExtended_Factory::get(editor_Models_Config::class);
+
+        foreach ($configsToTest as $name => $value) {
+            if (!str_starts_with($name, 'runtimeOptions.')) {
+                $name = 'runtimeOptions.' . $name;
+            }
+            $configValue = $config->getCurrentValue($name);
+            if (is_null($value) && (empty($configValue) && $configValue !== 0 && $configValue !== '0')) {
+                return false;
+            } else if(!is_null($value) && $configValue !== $value){
+                return false;
+            }
+        }
+        return true;
     }
 
     /***

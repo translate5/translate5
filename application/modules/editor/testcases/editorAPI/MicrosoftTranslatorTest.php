@@ -49,6 +49,8 @@ class MicrosoftTranslatorTest extends editor_Test_ImportTest {
         'runtimeOptions.LanguageResources.microsoft.apiKey' => null//null checks for no concrete value but if not empty
     ];
 
+    protected static bool $skipIfOptionsMissing = true; // we skip the tests if the neccessary configs are not there ...
+
     protected static function setupImport(Config $config): void
     {
         if (!self::isMasterTest()) {
