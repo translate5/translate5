@@ -88,12 +88,19 @@ abstract class editor_Test_ApiTest extends TestCase
     protected static array $forbiddenPlugins = [];
 
     /**
-     * Hods an array of configs that must have the given value to run the test
+     * Holds an array of configs that must have the given value to run the test
      * Can be provided like [ 'autoQA.enableInternalTagCheck' => 1, ... ], "runtimeOptions." will be added automatically if not present
      * These will be checked automatically in the test setup BEFORE tasks are imported (so don't check configs set by task-config files)
      * @var array
      */
     protected static array $requiredRuntimeOptions = [];
+
+    /**
+     * If the required runtimeOptions (defined with $requiredRuntimeOptions) are missing,
+     * this decides if the test will be executed anyway (the default behaviour, leading to errors) or will be skipped
+     * @var bool
+     */
+    protected static bool $skipIfOptionsMissing = false;
 
     /**
      * The user that will be logged in in the base setup. This is the user logged in when ::beforeTests is called
@@ -226,7 +233,7 @@ abstract class editor_Test_ApiTest extends TestCase
      */
     public static function assertTaskConfigs(string $taskGuid, array $configs): void
     {
-        static::api()->testConfig($configs, $taskGuid);
+        static::api()->testConfigs($configs, $taskGuid);
     }
 
     /**
@@ -278,29 +285,36 @@ abstract class editor_Test_ApiTest extends TestCase
             if (static::$_appState === null) {
                 self::testRunSetup(static::$_api);
             }
-            // checks for the plugin & config dependencies that have been defined for this test
-            static::assertAppState();
 
-            // add a test-customer if setup-option set
-            if (static::$setupOwnCustomer) {
-                static::$ownCustomer = static::api()->addCustomer('API Testing::' . static::class);
-            }
-            // internal method to setup more stuff in inheriting classes
-            static::testSpecificSetup();
+            if(static::$skipIfOptionsMissing && !static::api()->checkConfigs(static::$requiredRuntimeOptions)){
 
-            // log the user in that is setup as the needed test-user. Asserts the success if pretests shall not be skipped
-            if (static::api()->login(static::$setupUserLogin) && !static::$_api->doSkipPretests()) {
-                static::assertLogin(static::$setupUserLogin);
+                static::markTestSkipped('Skipped test "' . static::class . '" because neccessary configs are not set or missing.');
+
+            } else {
+
+                // checks for the plugin & config dependencies that have been defined for this test
+                static::assertAppState();
+
+                // add a test-customer if setup-option set
+                if (static::$setupOwnCustomer) {
+                    static::$ownCustomer = static::api()->addCustomer('API Testing::' . static::class);
+                }
+                // internal method to setup more stuff in inheriting classes
+                static::testSpecificSetup();
+
+                // log the user in that is setup as the needed test-user. Asserts the success if pretests shall not be skipped
+                if (static::api()->login(static::$setupUserLogin) && !static::$_api->doSkipPretests()) {
+                    static::assertLogin(static::$setupUserLogin);
+                }
+                // this can be used in concrete tests as replacement for setUpBeforeClass()
+                static::beforeTests();
             }
-            // this can be used in concrete tests as replacement for setUpBeforeClass()
-            static::beforeTests();
 
         } catch(Throwable $e){
 
             static::tearDownAfterClass();
             throw $e;
         }
-
     }
 
     final public static function tearDownAfterClass(): void
@@ -446,9 +460,9 @@ abstract class editor_Test_ApiTest extends TestCase
                 static::fail('One or more of the following neccessary Plugins could not be activated: \''.implode("', '", static::$_addedPlugins)."'");
             }
         }
-        // test the required runtimeOptions
-        if (count(static::$requiredRuntimeOptions) > 0) {
-            static::api()->testConfig(static::$requiredRuntimeOptions);
+        // test the required runtimeOptions (these must already be checked if static::$skipIfOptionsMissing is set ...)
+        if (!static::$skipIfOptionsMissing && count(static::$requiredRuntimeOptions) > 0) {
+            static::api()->testConfigs(static::$requiredRuntimeOptions);
         }
     }
 

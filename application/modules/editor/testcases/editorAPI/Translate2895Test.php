@@ -34,7 +34,7 @@ class Translate2895Test extends \editor_Test_UnitTest {
 
     private static editor_Models_Import_FileParser_XmlParser $xmlParser;
 
-    public static function setUpBeforeClass(): void
+    public static function beforeTests(): void
     {
         self::$xmlParser = new editor_Models_Import_FileParser_XmlParser();
     }

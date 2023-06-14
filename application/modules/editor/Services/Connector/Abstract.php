@@ -39,17 +39,17 @@ abstract class editor_Services_Connector_Abstract {
     
     use editor_Services_UsageLogerTrait;
 
-    /** @deprecated Moved to LanguageResourceStatus */
+    /** @deprecated Moved to MittagQI\Translate5\LanguageResource\Status */
     public const STATUS_ERROR = 'error';
-    /** @deprecated Moved to LanguageResourceStatus */
+    /** @deprecated Moved to MittagQI\Translate5\LanguageResource\Status */
     public const STATUS_AVAILABLE = 'available';
-    /** @deprecated Moved to LanguageResourceStatus */
+    /** @deprecated Moved to MittagQI\Translate5\LanguageResource\Status */
     public const STATUS_NOCONNECTION = 'noconnection';
-    /** @deprecated Moved to LanguageResourceStatus */
+    /** @deprecated Moved to MittagQI\Translate5\LanguageResource\Status */
     public const STATUS_NOVALIDLICENSE = 'novalidlicense';
-    /** @deprecated Moved to LanguageResourceStatus */
+    /** @deprecated Moved to MittagQI\Translate5\LanguageResource\Status */
     public const STATUS_NOT_LOADED = 'notloaded';
-    /** @deprecated Moved to LanguageResourceStatus */
+    /** @deprecated Moved to MittagQI\Translate5\LanguageResource\Status */
     public const STATUS_QUOTA_EXCEEDED = 'quotaexceeded';
 
     const FUZZY_SUFFIX = '-fuzzy-';
@@ -190,10 +190,10 @@ abstract class editor_Services_Connector_Abstract {
         $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
-        $this->setServiceLanguages($sourceLang,$targetLang);
+        $this->setServiceLanguages($sourceLang, $targetLang);
         if($languageResource->getId() !== null){
-            $this->languageResource->sourceLangCode=$this->languageResource->getSourceLangCode();
-            $this->languageResource->targetLangCode=$this->languageResource->getTargetLangCode();
+            $this->languageResource->sourceLangCode = $this->languageResource->getSourceLangCode();
+            $this->languageResource->targetLangCode = $this->languageResource->getTargetLangCode();
         }
         $this->logger = $this->logger->cloneMe('editor.languageresource.'.strtolower($this->resource->getService()).'.connector');
     }
@@ -313,7 +313,7 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * makes a tm / mt / file query to find a match / translation
      * returns an array with stdObjects, each stdObject contains the fields:
-     *
+     *languageResource
      * @param editor_Models_Segment $segment
      * @return editor_Services_ServiceResult
      */

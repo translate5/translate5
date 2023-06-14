@@ -32,6 +32,14 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abstract {
     
     protected static string $description = 'Provides the Globalese pre-translation';
+
+    /**
+     * The configs that needed to be set/copied for tests TODO FIXME: these should come from a proper ExternalService
+     * @var array[]
+     */
+    protected static array $testConfigs = [
+        'runtimeOptions.plugins.GlobalesePreTranslation.api.url' => null
+    ];
     
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH

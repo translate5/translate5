@@ -34,9 +34,8 @@ use editor_Models_Task as Task;
 use editor_Services_Manager as Manager;
 use editor_Services_OpenTM2_Connector as OpenTm2Connector;
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
-use editor_Services_Connector_FilebasedAbstract as AbstractConnector;
 use Exception;
-use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
+use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use Throwable;
 use ZfExtended_Factory;
 

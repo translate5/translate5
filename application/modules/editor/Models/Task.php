@@ -106,6 +106,7 @@ END LICENSE AND COPYRIGHT
  * @method void setDiffExportUsable() setDiffExportUsable(bool $flag)
  * @method boolean getReimportable() getReimportable()
  * @method void setReimportable() setReimportable(bool $reimportable)
+ * @method string getCreated() getCreated()
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';

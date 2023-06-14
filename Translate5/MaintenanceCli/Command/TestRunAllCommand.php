@@ -30,7 +30,6 @@ namespace Translate5\MaintenanceCli\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\Test\Config;
 
 class TestRunAllCommand extends Translate5AbstractTestCommand
 {

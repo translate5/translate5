@@ -32,6 +32,15 @@ class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
     protected static bool $enabledByDefault = true;
 
     /**
+     * The configs that needed to be set/copied for tests TODO FIXME: these should come from a proper ExternalService
+     * @var array[]
+     */
+    protected static array $testConfigs = [
+        'runtimeOptions.plugins.PangeaMt.server' => null,
+        'runtimeOptions.plugins.PangeaMt.apikey' => null
+    ];
+
+    /**
      * @var editor_Plugins_PangeaMt_Service
      */
     protected editor_Plugins_PangeaMt_Service $service;

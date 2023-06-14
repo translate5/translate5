@@ -30,7 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\Test\Config;
+use MittagQI\Translate5\Test\TestConfiguration;
 
 class TestAddIniSectionCommand extends Translate5AbstractTestCommand
 {
@@ -101,7 +101,7 @@ class TestAddIniSectionCommand extends Translate5AbstractTestCommand
         // retrieve application db-name
         $baseIndex = \ZfExtended_BaseIndex::getInstance();
         $config = $baseIndex->initApplication()->getOption('resources');
-        $testDbname = Config::createTestDatabaseName($config['db']['params']['dbname']);
+        $testDbname = TestConfiguration::createTestDatabaseName($config['db']['params']['dbname']);
         // add seperator and base configurations
         $installationIni .= "\n\n\n".$section."\n";
         // create test-db-name with a fixed scheme

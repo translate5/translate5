@@ -55,17 +55,12 @@ class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
      * {@inheritDoc}
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
-    public function isConfigured() {
-        if (!isset($this->config->runtimeOptions->plugins->NecTm->server) || empty($this->config->runtimeOptions->plugins->NecTm->server)) {
-            return false;
-        }
-        if (!isset($this->config->runtimeOptions->plugins->NecTm->credentials) || empty($this->config->runtimeOptions->plugins->NecTm->credentials)) {
-            return false;
-        }
-        if (!isset($this->config->runtimeOptions->plugins->NecTm->topLevelCategoriesIds) || empty($this->config->runtimeOptions->plugins->NecTm->topLevelCategoriesIds)) {
-            return false;
-        }
-        return true;
+    public function isConfigured(): bool
+    {
+        return
+            $this->isConfigSet($this->config->runtimeOptions->plugins->NecTm->server)
+            && $this->isConfigSet($this->config->runtimeOptions->plugins->NecTm->credentials)
+            && $this->isConfigSet($this->config->runtimeOptions->plugins->NecTm->topLevelCategoriesIds);
     }
     
     /**

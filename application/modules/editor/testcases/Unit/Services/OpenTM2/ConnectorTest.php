@@ -30,7 +30,7 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\Test\Unit\Services\Connector\TagHandler;
 
-use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
+use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use PHPUnit\Framework\TestCase;
 use editor_Services_OpenTM2_Connector as Connector;
 use stdClass;

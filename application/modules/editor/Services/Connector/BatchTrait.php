@@ -213,7 +213,7 @@ trait editor_Services_Connector_BatchTrait {
             return;
         }
         
-        $results = $this->api->getResult();
+        $results = $this->getResponseData();
         if(empty($results)) {
             return;
         }
@@ -264,15 +264,21 @@ trait editor_Services_Connector_BatchTrait {
      * @param mixed $segmentResults
      */
     abstract protected function processBatchResult($segmentResults);
+
+    /**
+     * Retrieves the Json-Response of the last request
+     * @return mixed
+     */
+    abstract protected function getResponseData() : mixed;
     
     /**
      * @param int $segmentId
      */
     protected function saveBatchResults(int $segmentId) {
         Zend_Db_Table::getDefaultAdapter()->insert('LEK_languageresources_batchresults', [
-            'languageResource' =>$this->languageResource->getId(),
-            'segmentId'=>$segmentId,
-            'result'=>serialize($this->resultList)
+            'languageResource' => $this->languageResource->getId(),
+            'segmentId' => $segmentId,
+            'result' => serialize($this->resultList)
         ]);
     }
     

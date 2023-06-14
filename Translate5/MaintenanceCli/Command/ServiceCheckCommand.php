@@ -28,9 +28,9 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use MittagQI\Translate5\Service\Services;
 use Zend_Exception;
 
@@ -51,11 +51,10 @@ class ServiceCheckCommand extends Translate5AbstractCommand
             // the "--help" option
             ->setHelp('Checks all configured services (base & plugins) if they are setup & working correctly');
 
-        $this->addOption(
+        $this->addArgument(
             'service',
-            's',
-            InputOption::VALUE_REQUIRED,
-            'Specify the service to check'
+            InputArgument::OPTIONAL,
+            'Specify the service to check. By default all services will be checked.'
         );
     }
 
@@ -77,7 +76,7 @@ class ServiceCheckCommand extends Translate5AbstractCommand
 
         $this->writeTitle('Translate5 service check');
 
-        $serviceName = $input->getOption('service');
+        $serviceName = $input->getArgument('service');
 
         if(empty($serviceName)){
             foreach(Services::getAllServices($config) as $service){

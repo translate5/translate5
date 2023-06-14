@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,15 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-namespace MittagQI\Translate5\Service;
-
-
-/**
- * This is a service that is represented by a single config-value and represents a external/non dockerized service
- * Concrete Implementations must have a valid $configurationConfig
- * [For now there is nothing implemented but that surely changes over time and it's better to distinguish from the start]
+/***
+ * Utils class providing methods which should only be used in ImportWizard context
  */
-abstract class ExternalServiceAbstract extends DockerServiceAbstract
-{
+Ext.define('Editor.util.ImportWizard', {
+    statics: {
+        /***
+         * Returns the task store wich should be used in wizard context
+         * @returns {*}
+         */
+        getTasksStore: function() {
+            return Ext.StoreManager.get('admin.WizardTasks');
+        },
 
-}
+        /***
+         * Reloads the tasks store used wizard
+         * @param config
+         */
+        reloadTasksStore: function (config){
+            Ext.StoreManager.get('admin.WizardTasks').load(config)
+        }
+
+    }
+
+});

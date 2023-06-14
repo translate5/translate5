@@ -66,6 +66,13 @@ final class Service extends ServiceAbstract
         'url' => 'http://languagetool.:8010/v2'
     ];
 
+    protected array $testConfigs = [
+        // this leads to the application-db configs being copied to the test-DB
+        'runtimeOptions.plugins.SpellCheck.languagetool.url.default' => null,
+        'runtimeOptions.plugins.SpellCheck.languagetool.url.import' => null,
+        'runtimeOptions.plugins.SpellCheck.languagetool.url.gui' => null
+    ];
+
     /**
      * @return string
      */

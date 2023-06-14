@@ -114,6 +114,14 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
     protected function queryApi($searchString, &$useDictionary = false): bool{
         return $this->api->search($searchString, $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode(), $useDictionary);
     }
+
+    /**
+     * @return mixed
+     */
+    protected function getResponseData(): mixed
+    {
+        return $this->api->getResult();
+    }
     
     /**
      * {@inheritDoc}

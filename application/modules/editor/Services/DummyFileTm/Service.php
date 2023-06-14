@@ -40,7 +40,8 @@ class editor_Services_DummyFileTm_Service extends editor_Services_ServiceAbstrac
     
     protected $resourceClass = 'editor_Services_DummyFileTm_Resource';
     
-    public function isConfigured() {
+    public function isConfigured(): bool
+    {
         return true;
     }
     

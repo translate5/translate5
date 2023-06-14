@@ -48,6 +48,12 @@ final class T5Memory extends DockerServiceAbstract {
         'additive' => true // leads to new endpoints being added when using autodiscovery. TODO: remove once OpenTM2 is not used anymore
     ];
 
+    protected array $testConfigs = [
+        // this leads to the application-db configs being copied to the test-DB
+        'runtimeOptions.LanguageResources.opentm2.server' => null,
+        'runtimeOptions.LanguageResources.opentm2.tmprefix' => null
+    ];
+
     /**
      * We must distinguish between t5memory and the old OpenTM2 to provide different service URLs
      * (non-PHPdoc)

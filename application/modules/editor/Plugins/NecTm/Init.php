@@ -41,22 +41,7 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
      * @var editor_Plugins_NecTm_Service
      */
     protected $service;
-    
-    /**
-     * @var string
-     */
-    protected $serviceType;
-    
-    /**
-     * @var string
-     */
-    protected $serviceName;
-    
-    /**
-     * @var string
-     */
-    protected $serviceColor;
-    
+
     /**
      * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
      * @var array
@@ -95,16 +80,7 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         $view = $event->getParam('view');
         $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
-    
-    /**
-     * This init code may throw exceptions which are then handled by the calling place
-     */
-    protected function initThrowable() {
-        $this->serviceType         = $this->service->getServiceNamespace();
-        $this->serviceName         = $this->service->getName();
-        $this->serviceColor        = $this->service->getDefaultColor();
-    }
-    
+
     protected function validateConfig() {
         $config = $this->getConfig()->toArray();
         $logger = Zend_Registry::get('logger');

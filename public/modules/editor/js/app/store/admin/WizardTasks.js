@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,42 +26,19 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * This store is used and should be used only in import wizard context.
+ * @class Editor.store.admin.WizardTasks
+ * @extends Ext.data.Store
  */
-class editor_Plugins_ZDemoMT_Service extends editor_Services_ServiceAbstract {
-    
-    const DEFAULT_COLOR = '#cdcdcd';
-    
-    /**
-     * URL to confluence-page
-     * @var string
-     */
-    protected static $helpPage = "https://confluence.translate5.net/display/CON/PangeaMT";
-    
-    protected $resourceClass = 'editor_Plugins_ZDemoMT_Resource';
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Services_ServiceAbstract::isConfigured()
-     */
-    public function isConfigured(): bool
-    {
-        return true;
-    }
-    
-    /**
-     *
-     * {@inheritDoc}
-     * @see editor_Services_ServiceAbstract::embedService()
-     */
-    protected function embedService() {
-        $this->addResource([$this->getName(), $this->getName(), 'internal']);
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_ServiceAbstract::getName()
-     */
-    public function getName() {
-        return 'ZDemoMT';
-    }
-}
+Ext.define('Editor.store.admin.WizardTasks', {
+    extend: 'Ext.data.Store',
+    model: 'Editor.model.admin.Task',
+    remoteSort: true,
+    remoteFilter: true,
+    autoLoad: true,
+    sorters: [{
+        property: 'id',
+        direction: 'desc'
+    }],
+    pageSize: 200
+});

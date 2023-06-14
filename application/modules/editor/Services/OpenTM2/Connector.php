@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use editor_Models_Task as Task;
-use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
+use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 
 /**
  * OpenTM2 Connector
