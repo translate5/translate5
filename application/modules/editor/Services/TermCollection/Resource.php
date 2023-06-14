@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
+use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 
 class editor_Services_TermCollection_Resource extends editor_Models_LanguageResources_Resource {
     public function __construct(string $id, string $name) {

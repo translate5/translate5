@@ -51,17 +51,12 @@ class editor_Services_LucyLT_Service extends editor_Services_ServiceAbstract {
      * {@inheritDoc}
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
-    public function isConfigured() {
-        if (!isset($this->config->runtimeOptions->LanguageResources->lucylt->server) || empty($this->config->runtimeOptions->LanguageResources->lucylt->server)) {
-            return false;
-        }
-        if (!isset($this->config->runtimeOptions->LanguageResources->lucylt->credentials) || empty($this->config->runtimeOptions->LanguageResources->lucylt->credentials)) {
-            return false;
-        }
-        if (!isset($this->config->runtimeOptions->LanguageResources->lucylt->matchrate) || empty($this->config->runtimeOptions->LanguageResources->lucylt->matchrate)) {
-            return false;
-        }
-        return true;
+    public function isConfigured(): bool
+    {
+        return
+            $this->isConfigSet($this->config->runtimeOptions->LanguageResources->lucylt->server)
+            && $this->isConfigSet($this->config->runtimeOptions->LanguageResources->lucylt->credentials)
+            && $this->isConfigSet($this->config->runtimeOptions->LanguageResources->lucylt->matchrate);
     }
     
     /**

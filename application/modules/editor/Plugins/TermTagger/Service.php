@@ -82,6 +82,13 @@ final class Service extends ServiceAbstract {
         'url' => 'http://termtagger.:9001'
     ];
 
+    protected array $testConfigs = [
+        // this leads to the application-db configs being copied to the test-DB
+        'runtimeOptions.termTagger.url.gui' => null,
+        'runtimeOptions.termTagger.url.import' => null,
+        'runtimeOptions.termTagger.url.default' => null
+    ];
+
     /**
      * contains the HTTP status of the last request
      * @var integer

@@ -71,7 +71,7 @@ abstract class editor_Services_ServiceAbstract {
      * (Does NOT check if the service is running = if the user-data is correct etc.)
      * @return bool
      */
-    abstract public function isConfigured();
+    abstract public function isConfigured(): bool;
     
     /**
      * Embed the service.
@@ -83,7 +83,16 @@ abstract class editor_Services_ServiceAbstract {
      * @return string
      */
     abstract public function getName();
-    
+
+    /**
+     * Ugly little helper to unify already outdated code
+     * @param mixed $configValue
+     * @return bool
+     */
+    protected function isConfigSet(mixed $configValue): bool
+    {
+        return !empty($configValue);
+    }
     /**
      * Creates a new Resource instance and adds it to the internal list
      * the given arguments are given as construct parameters to the configured resourceClass

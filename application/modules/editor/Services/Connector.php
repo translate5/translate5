@@ -276,13 +276,13 @@ class editor_Services_Connector
             // conclusion: the connectors themself have to convert the Http exceptions to editor_Services_Connector_Exception exceptions
             // with the below error codes (best directly in the abstract HttpApi)
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
-                //'E1311' => 'Could not connect to language resource {service}: server not reachable',
+                //'E1311' => 'Could not connect to {service}: server not reachable',
                 $ecode = 'E1311';
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $e) {
-                //'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
+                //'E1312' => 'Could not connect to {service}: timeout on connection to server',
                 $ecode = 'E1312';
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $e) {
-                //'E1370' => 'Empty response from language resource {service}',
+                //'E1370' => 'Empty response from {service}',
                 $ecode = 'E1370';
         }
         if(isset($ecode) && isset($e)) {

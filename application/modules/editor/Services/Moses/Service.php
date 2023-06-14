@@ -51,14 +51,11 @@ class editor_Services_Moses_Service extends editor_Services_ServiceAbstract {
      * {@inheritDoc}
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
-    public function isConfigured() {
-        if (!isset($this->config->runtimeOptions->LanguageResources->moses->server) || empty($this->config->runtimeOptions->LanguageResources->moses->server)) {
-            return false;
-        }
-        if (!isset($this->config->runtimeOptions->LanguageResources->moses->matchrate) || empty($this->config->runtimeOptions->LanguageResources->moses->matchrate)) {
-            return false;
-        }
-        return true;
+    public function isConfigured(): bool
+    {
+        return
+            $this->isConfigSet($this->config->runtimeOptions->LanguageResources->moses->server)
+            && $this->isConfigSet($this->config->runtimeOptions->LanguageResources->moses->matchrate);
     }
     
     /**

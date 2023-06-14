@@ -50,15 +50,9 @@ class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract
      */
     public function isConfigured(): bool
     {
-        if (!isset($this->config->runtimeOptions->LanguageResources->opentm2->server)
-            || empty($this->config->runtimeOptions->LanguageResources->opentm2->server)
-        ) {
-            return false;
-        }
-
         // since tmprefix and showMultiple100PercentMatches have workable defaults
         // (which evaulates to empty) there is no need to test them
-        return true;
+        return $this->isConfigSet($this->config->runtimeOptions->LanguageResources->opentm2->server);
     }
 
     /**

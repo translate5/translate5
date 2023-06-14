@@ -44,7 +44,8 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
      * {@inheritDoc}
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
-    public function isConfigured() {
+    public function isConfigured(): bool
+    {
         return true;
     }
     
@@ -62,7 +63,7 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
      * @see editor_Services_ServiceAbstract::getName()
      */
     public function getName() {
-        return "TermCollection";
+        return 'TermCollection';
     }
 
 }

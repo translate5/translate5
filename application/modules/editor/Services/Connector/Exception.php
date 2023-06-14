@@ -43,11 +43,14 @@ class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode
         'E1288' => 'The language code [{languageCode}] from resource [{resourceName}] is not valid or does not exist in the translate5 language code collection.',
         'E1311' => 'Could not connect to {service}: server not reachable',
         'E1312' => 'Could not connect to {service}: timeout on connection to server',
-        'E1370' => 'Empty response from {service}',
         'E1313' => 'The queried {service} returns an error.',
+        'E1370' => 'Empty response from {service}',
+        'E1315' => 'JSON decode error: {errorMsg}',
         'E1485' => '{service} use not authorized',
         'E1486' => '{service} endpoint not found',
         'E1512' => 'The TM is being reorganized at the moment. Please try again later.',
+        'E1536' => 'Request to service {service}: Parameter {paramname} missing.',
+        'E1537' => 'Request to service {service}: Invalid response.',
     ];
     
     protected function setDuplication() {
