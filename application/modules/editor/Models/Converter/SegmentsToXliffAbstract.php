@@ -349,8 +349,9 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($fileId);
-        $exportParser = str_replace('_Import_', '_Export_', $file->getFileParser());
-        return ZfExtended_Factory::get($exportParser, [$this->task, 0, $filename]);
+        $importParser = $file->getFileParser();
+        /* @uses editor_Models_Import_FileParser::getExportClass() */
+        return ZfExtended_Factory::get($importParser::getExportClass(), [$this->task, 0, $filename]);
     }
     
     /**
