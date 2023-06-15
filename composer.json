@@ -54,7 +54,7 @@
 				}
 			}
 		}, {
-			"type" : "vcs",
+			"type" : "git",
 			"url" : "https://bitbucket.org/mittagqi/restful-zend-framework/"
 		}, {
 			"type" : "git",
