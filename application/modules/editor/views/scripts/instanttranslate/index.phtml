@@ -151,8 +151,8 @@ $languageSelector[] = '</form>';
                 $getParamSource = $this->source;
                 if (!is_null($getParamSource)) {
                     $sourceLangSelected = $getParamSource;
-                } elseif (!empty($this->sourceSearchLanguagePreselectionLocale)) {
-                    $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocale;
+                } elseif (!empty($this->sourceSearchLanguagePreselectionLocaleText)) {
+                    $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocaleText;
                 }
                 $sourceLangSelected = strtolower($sourceLangSelected);
 
@@ -175,6 +175,9 @@ $languageSelector[] = '</form>';
             </select>
             <select id="sourceLocaleFile" class="selectSourceTarget" name="sourceLocaleFile">
                 <?php
+                if (!empty($this->sourceSearchLanguagePreselectionLocaleFile)) {
+                    $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocaleFile;
+                }
                 foreach ($this->allSourceLanguageLocales as $sourceLangLocale => $displayLanguage) {
                     $selected = ($sourceLangSelected !== false && $sourceLangSelected == strtolower($sourceLangLocale))
                         ? 'selected="selected"'
