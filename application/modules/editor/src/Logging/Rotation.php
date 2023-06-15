@@ -83,8 +83,8 @@ class Rotation {
             // Optional, are rotated when they grow bigger than 1024 bytes. Default 0
             'min-size' => 1024 * 1024 * 100,
 
-            // Optional, truncate the original log file in place after creating a copy, instead of moving the old log file.
-            'truncate' => true,
+            // must be false, since copy and truncate might lock the log file to long
+            'truncate' => false,
 
             // Optional, to catch a exception in rotating
             'catch' => function (RotationFailed $exception) {
