@@ -394,7 +394,8 @@ Ext.define('Editor.controller.Localizer', {
             help: <?php echo json_encode($this->translate->_('Hilfe:'));?>,
             segmentData: <?php echo json_encode('{edited}{addition}'); ?>,
             overwriteSource: '<?php echo $this->translate->_('<b><i>Überschreibe Quelltext mit:</i></b> ');?>',
-            overwriteTarget: '<?php echo $this->translate->_('<b><i>Überschreibe Zieltext mit:</i></b> ');?>'
+            overwriteTarget: '<?php echo $this->translate->_('<b><i>Überschreibe Zieltext mit:</i></b> ');?>',
+            disableWindowTip: '<?php echo $this->translate->_('Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle');?>'
         }
     });
 

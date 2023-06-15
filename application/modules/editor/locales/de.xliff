@@ -8982,6 +8982,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</source>
               <target>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</target>
             </trans-unit>
+            <trans-unit id='VGlwcDogRGVha3RpdmllcmVuL0tvbmZpZ3VyaWVyZW4gU2llIGRpZXNlcyBGZW5zdGVyIGluIGRlbiBFZGl0b3JlaW5zdGVsbHVuZ2VuIGxpbmtzIG9iZXJoYWxiIGRlciBTZWdtZW50dGFiZWxsZQ=='>
+              <source>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</source>
+              <target>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

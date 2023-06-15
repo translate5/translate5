@@ -9159,6 +9159,10 @@ E-Mail: service@MittagQI.com</pre>
               <source>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</source>
               <target>Warning: Please do NOT use segment merge or splitting in another translation tool with the downloaded package. Translate5 does not support segment merge/split and such segments will be ignored on re-import.</target>
             </trans-unit>
+            <trans-unit id='VGlwcDogRGVha3RpdmllcmVuL0tvbmZpZ3VyaWVyZW4gU2llIGRpZXNlcyBGZW5zdGVyIGluIGRlbiBFZGl0b3JlaW5zdGVsbHVuZ2VuIGxpbmtzIG9iZXJoYWxiIGRlciBTZWdtZW50dGFiZWxsZQ=='>
+              <source>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</source>
+              <target>Tip: Disable/configure this window in the editor settings on the left above the segment table</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
