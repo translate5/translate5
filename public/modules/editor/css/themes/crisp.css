@@ -27,3 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /* This css will be applied when this theme is active. */
+#segment-metadata .x-fieldset.segmentQualities > legend {
+    padding: 0 3px;
+    margin-left: 10px;
+}

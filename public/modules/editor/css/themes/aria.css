@@ -75,3 +75,14 @@ tr.import td div {
 .t5noselectionGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected.x-grid-item-alt { background-color: #1a232b; }
 .t5noselectionGrid .x-grid-view.x-grid-with-row-lines .x-grid-item.x-grid-item-selected { border-style: solid; border-color: #ededed; }
 .t5noselectionGrid .x-grid-view.x-grid-with-row-lines .x-grid-item-selected + .x-grid-item { border-top-style: solid; border-top-color: #ededed; }
+#segment-metadata .x-fieldset.segmentQualities > legend {
+    margin-left: 9px;
+}
+.x-fieldset.x-layer.segmentQualities .x-panel-header,
+.x-fieldset.x-layer.segmentQualities > legend {
+    background: #3a4155;
+}
+.x-fieldset.segmentQualities .x-grid .x-column-header[id^=checkcolumn] .x-column-header-inner {
+    padding-right: 5px;
+    padding-left: 4px;
+}
