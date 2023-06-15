@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -93,6 +94,10 @@ class TestRunCommand extends Translate5AbstractTestCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
+
+        if($this->checkCliUsageAsRoot()){
+            return Command::FAILURE;
+        }
 
         $test = trim($this->input->getArgument('test'), '.');
         $testPath = null;
