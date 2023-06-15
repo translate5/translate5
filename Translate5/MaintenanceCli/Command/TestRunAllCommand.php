@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -66,6 +67,10 @@ class TestRunAllCommand extends Translate5AbstractTestCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
+
+        if($this->checkCliUsageAsRoot()){
+            return Command::FAILURE;
+        }
 
         // this command will work other than the other two test:run: the db-recreation is the default
         $forceRecreation = true;

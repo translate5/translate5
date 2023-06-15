@@ -95,6 +95,10 @@ class TestApplicationRunCommand extends Translate5AbstractTestCommand
             return Command::FAILURE;
         }
 
+        if($this->checkCliUsageAsRoot()){
+            return Command::FAILURE;
+        }
+
         $testOrSuite = $this->input->getArgument('testorsuite');
         $extension = empty($testOrSuite) ? '' : strtolower(pathinfo($testOrSuite, PATHINFO_EXTENSION));
         $testPath = ($extension === 'php') ? $this->normalizeSingleTestPath($testOrSuite) : null;

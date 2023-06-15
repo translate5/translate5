@@ -98,6 +98,7 @@
       	"ext-zip": "*",
       	"ext-fileinfo": "*",
       	"ext-curl": "*",
+		"ext-posix": "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
 		"symfony/console" : "^5.0",
