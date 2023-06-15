@@ -88,12 +88,8 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         
         $session = new \Zend_Session_Namespace();
         $locale = $auth->getUser()->getLocale();
-        if(\Zend_Locale::isLocale($locale)){
-            $session->locale = $locale;
-        } else {
-            $session->locale = \Zend_Registry::get('config')->runtimeOptions->defaultLanguage;
-        }
-        
+        $session->locale = \ZfExtended_Utils::getLocale($locale);
+
         $sessionDb = \ZfExtended_Factory::get('ZfExtended_Models_Db_Session');
         $sessionId = session_id();
         $token = $sessionDb->updateAuthToken($sessionId);

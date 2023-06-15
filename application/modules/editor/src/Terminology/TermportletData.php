@@ -70,9 +70,12 @@ class TermportletData
     }
 
     /**
+     * @param Segment $segment
+     * @param string $locale
+     * @return array
      * @throws Zend_Exception
      */
-    public function generate(Segment $segment): array
+    public function generate(Segment $segment, string $locale): array
     {
         $this->result = [
             'locales' => [],
@@ -94,7 +97,7 @@ class TermportletData
         }
 
         if (!empty($termEntryIds)) {
-            $this->result['attributeGroups'] = $this->getAttributesGroups(array_filter($termEntryIds));
+            $this->result['attributeGroups'] = $this->getAttributesGroups(array_filter($termEntryIds), $locale);
         }
 
         $this->result['flags'] = $this->allUsedLanguages;
@@ -245,10 +248,11 @@ class TermportletData
     /**
      * Get all attributes for given term entries grouped by attribute type (language, entry and term)
      * @param array $termEntries
+     * @param string $locale
      * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    private function getAttributesGroups(array $termEntries): array
+    private function getAttributesGroups(array $termEntries, string $locale): array
     {
         $sql = $this->termModel->db->getAdapter()->select()
             ->from(['t1' =>'terms_attributes'], ['t1.*'])
@@ -263,7 +267,7 @@ class TermportletData
         $template['term'] = [];
 
         $dataTypeLocale = ZfExtended_Factory::get(AttributeDataType::class);
-        $locales = $dataTypeLocale->loadAllWithTranslations();
+        $locales = $dataTypeLocale->loadAllWithTranslations($locale);
 
         $images = ZfExtended_Factory::get(ImagesModel::class);
 
