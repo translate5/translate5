@@ -171,6 +171,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $data = $this->row->toArray();
         unset($data['id']);
         unset($data['taskGuid']);
+        //resetting meta is crucial here - we are cloning the task object not its subsequent data in DB too!
+        $this->meta = null;
         //before all other operations make a new row object
         $this->init($data);
         $this->createTaskGuidIfNeeded();
