@@ -33,7 +33,7 @@ use editor_Models_Config;
 use Exception;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
-use MittagQI\Translate5\Service\Enum\LanguageResourceStatus;
+use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;

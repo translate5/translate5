@@ -26,10 +26,62 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Base Class for all Unit Tests
+ * Adds capabilities to save/resore the global Zend_Config to enable overwriting the config for a test
  */
-abstract class editor_Test_UnitTest extends \PHPUnit\Framework\TestCase
+abstract class editor_Test_UnitTest extends TestCase
 {
     const TYPE = 'unit';
+
+    private static Zend_Config $_config;
+
+    final public static function setUpBeforeClass(): void
+    {
+        try {
+            static::$_config = Zend_Registry::get('config');
+            static::beforeTests();
+
+        } catch (Throwable $e) {
+
+            Zend_Registry::set('config', static::$_config);
+            static::afterTests();
+            throw $e;
+        }
+    }
+
+    final public static function tearDownAfterClass(): void
+    {
+        Zend_Registry::set('config', static::$_config);
+        static::afterTests();
+    }
+
+    /**
+     * This API can be used overwrite the config for the lifespan of the test
+     * @param stdClass $config
+     * @return void
+     */
+    final public static function setConfig(stdClass $config): void
+    {
+        Zend_Registry::set('config', $config);
+    }
+
+    /**
+     * Use this method to add setting up additional stuff before the tests are performed
+     */
+    public static function beforeTests(): void
+    {
+
+    }
+
+    /**
+     * Use this method to clean up additional stuff after the tests have been performed
+     */
+    public static function afterTests(): void
+    {
+
+    }
+
 }

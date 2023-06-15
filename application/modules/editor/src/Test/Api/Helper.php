@@ -28,6 +28,11 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\Test\Api;
 
+use editor_Models_Config;
+use editor_Models_TaskConfig;
+use Zend_Db_Statement_Exception;
+use ZfExtended_Factory;
+
 /**
  * API Helper the provides general functions to test the translate5 API
  */
@@ -774,31 +779,63 @@ final class Helper extends \ZfExtended_Test_ApiHelper
 
     //endregion
     //region Config API
-    /******************************************************* CONFIG/RUNTIMEOPTIONS API *******************************************************/
+    /******************************************* CONFIG/RUNTIMEOPTIONS API *******************************************/
 
     /**
      * tests the config names and values in the given associated array against the REST accessible application config
-     * If the given value to the config is null, the config value is just checked for existence and if the configured value is not empty
-     * @param array $configsToTest
-     * @param array $filter provide an array with several filtering guids. Key taskGuid or userGuid or customerId, value the according value
+     * If the given value to the config is null,
+     * the config value is just checked for existence and if the configured value is not empty
      */
-    public function testConfig(array $configsToTest, array $plainFilter = [])
+    public function testConfigs(array $configsToTest, ?string $taskGuid = null): void
     {
+        $config = ZfExtended_Factory::get(editor_Models_Config::class);
+        $taskConfig = ZfExtended_Factory::get(editor_Models_TaskConfig::class);
+
         foreach ($configsToTest as $name => $value) {
             if (!str_starts_with($name, 'runtimeOptions.')) {
                 $name = 'runtimeOptions.' . $name;
             }
-            $filter = array_merge([
-                'filter' => '[{"type":"string","value":"' . $name . '","property":"name","operator":"eq"}]',
-            ], $plainFilter);
-            $config = $this->getJson('editor/config', $filter);
-            $this->test::assertCount(1, $config, 'No Config entry for config "' . $name . '" found in instance config!');
+
+            $configValue = $taskGuid ? $taskConfig->getCurrentValue($taskGuid, $name) : $config->getCurrentValue($name);
+            $configPlace = $taskGuid ? 'task' : 'instance';
+
             if (is_null($value)) {
-                $this->test::assertNotEmpty($config[0]->value, 'Config ' . $name . ' in instance is empty but should be set with a value!');
+                $this->test::assertNotEmpty(
+                    $configValue,
+                    "Config $name in $configPlace is empty but should be set with a value!"
+                );
             } else {
-                $this->test::assertEquals($value, $config[0]->value, 'Config ' . $name . ' in instance config is not as expected: ');
+                $this->test::assertEquals(
+                    $value,
+                    $configValue,
+                    "Config $name in $configPlace config is not as expected: "
+                );
             }
         }
+    }
+
+    /**
+     * Checks, if the passed configs are set / set to the wanted value
+     * @param array $configsToTest
+     * @return bool
+     * @throws Zend_Db_Statement_Exception
+     */
+    public function checkConfigs(array $configsToTest): bool
+    {
+        $config = ZfExtended_Factory::get(editor_Models_Config::class);
+
+        foreach ($configsToTest as $name => $value) {
+            if (!str_starts_with($name, 'runtimeOptions.')) {
+                $name = 'runtimeOptions.' . $name;
+            }
+            $configValue = $config->getCurrentValue($name);
+            if (is_null($value) && (empty($configValue) && $configValue !== 0 && $configValue !== '0')) {
+                return false;
+            } else if(!is_null($value) && $configValue !== $value){
+                return false;
+            }
+        }
+        return true;
     }
 
     /***

@@ -22,6 +22,85 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.3.0] - 2023-06-15
+
+### Important Notes:
+#### [TRANSLATE-2551](https://jira.translate5.net/browse/TRANSLATE-2551)
+Changements in "/editor/file" API endpoint - normally there was no practical use case to access it via external API - though we want to mention here that the API endpoint file was renamed to /editor/filetree.
+ 
+
+
+### Added
+**[TRANSLATE-3218](https://jira.translate5.net/browse/TRANSLATE-3218): API - Hotfolder-based connector solution, that mimics Across hotfolder** <br>
+New AcrossHotfolder plugin that watches hotfolders for tasks, that should be created in translate5 - and re-exported to the hotfolder, once they are ready
+
+**[TRANSLATE-2551](https://jira.translate5.net/browse/TRANSLATE-2551): Import/Export - Update Task with xliff** <br>
+5.7.14
+Enable existing file to be replaced and with this the segments will be updated in the task.
+6.3.0
+Fix for getting the correct export class when changed segments are collected for e-mail.
+
+
+### Changed
+**[TRANSLATE-3372](https://jira.translate5.net/browse/TRANSLATE-3372): Client management - Prevent TEST calls with root-rights** <br>
+ENHANCEMENT: prevent calling the API-test CLI-command to be used with root-rights
+
+**[TRANSLATE-3346](https://jira.translate5.net/browse/TRANSLATE-3346): file format settings - Add cleanup command for invalid BCONF entries** <br>
+ENHANCEMENT: Add CLI command to clean and fix invalid BCONF entries
+
+**[TRANSLATE-3331](https://jira.translate5.net/browse/TRANSLATE-3331): Test framework - Base-architecture to provide test-configs from plugins (especially private plugins), Improved Service Architecture** <br>
+ENHANCEMENT: add test-config provider from plugins and plugin-services
+
+
+### Bugfixes
+**[TRANSLATE-3368](https://jira.translate5.net/browse/TRANSLATE-3368): VisualReview / VisualTranslation - Pdfconverter fail to process pdf** <br>
+  - PDFconverter command was changed to be run by watchman for immediate conversion and by cron for periodical
+  - PDFconverter command now has capability to be run miltiple times, max amount of parallel runs is configurable via MAX_PARALLEL_PROCESSES environment variable of the pdfconverter container
+
+**[TRANSLATE-3366](https://jira.translate5.net/browse/TRANSLATE-3366): file format settings - Add the internal tag "hyper" to the figma file format settings** <br>
+Improved FIGMA file-format settings to support "hyper" attributes in figma-files
+
+**[TRANSLATE-3355](https://jira.translate5.net/browse/TRANSLATE-3355): InstantTranslate - Auto-deletion of instant-translate pre-translated tasks is not correct** <br>
+Replace order date with created date when fetching InstantTranslate pre-translated tasks to remove
+
+**[TRANSLATE-3348](https://jira.translate5.net/browse/TRANSLATE-3348): Import/Export - Plugin-ConnectWorldserver error on import** <br>
+6.2.2
+improved download files from Worldserver and error-, notification-handling
+6.3.0
+Fix error on task import.
+
+**[TRANSLATE-3345](https://jira.translate5.net/browse/TRANSLATE-3345): Configuration - Wrong or non existing config type class error** <br>
+Not found config class for configuration will be logged as warnings
+
+**[TRANSLATE-3336](https://jira.translate5.net/browse/TRANSLATE-3336): Auto-QA - False positive pop-up and tooltip need readjustment for grey theme** <br>
+FIXED: false positives style problem in Gray and Neptune themes
+
+**[TRANSLATE-3312](https://jira.translate5.net/browse/TRANSLATE-3312): Editor general - Active project grid filter leads to an error in task add window** <br>
+Filtered tasks grid lead to an error when creating new project.
+
+**[TRANSLATE-3311](https://jira.translate5.net/browse/TRANSLATE-3311): I10N - Add Bengali for Bangladesh and India to LEK_languages** <br>
+- Bengali `bn` set as main language
+- Added two sublanguages for Bengali: India and Bangladesh
+- Added locale translations for sublanguage names
+
+**[TRANSLATE-3309](https://jira.translate5.net/browse/TRANSLATE-3309): Main back-end mechanisms (Worker, Logging, etc.) - Consolidate session lifetime configuration** <br>
+Consolidate session configuration and make it accessible over the UI.
+
+**[TRANSLATE-3308](https://jira.translate5.net/browse/TRANSLATE-3308): TermTagger integration - Missing locale causes sql error** <br>
+FIXED: error on missing user locale
+
+**[TRANSLATE-2992](https://jira.translate5.net/browse/TRANSLATE-2992): Main back-end mechanisms (Worker, Logging, etc.) - PHP's setlocale has different default values** <br>
+5.7.4
+The PHP's system locale was not correctly set. This is due a strange behaviour setting the default locale randomly.
+6.3.0
+Some small code improvements
+
+**[TRANSLATE-2190](https://jira.translate5.net/browse/TRANSLATE-2190): Main back-end mechanisms (Worker, Logging, etc.) - PHP ERROR in core: E9999 - Cannot refresh row as parent is missing - fixed in DbDeadLockHandling context** <br>
+6.3.0
+Fix for back-end workers error.
+
+
 ## [6.2.3] - 2023-06-09
 
 ### Important Notes:

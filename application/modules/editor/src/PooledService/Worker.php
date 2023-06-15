@@ -116,7 +116,7 @@ abstract class Worker extends editor_Models_Task_AbstractWorker
     /**
      * Must be implemented to create the service
      * This function is also used in a static context and must not use internal dependencis
-     * @return DockerServiceAbstract|ServiceAbstract - TODO services should be refactored to be of the same interface
+     * @return DockerServiceAbstract|ServiceAbstract
      */
     abstract protected function createService(): DockerServiceAbstract|ServiceAbstract;
 

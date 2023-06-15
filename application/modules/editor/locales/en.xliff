@@ -654,6 +654,14 @@
                 <source>Bengalisch</source>
                 <target>Bengali</target>
             </trans-unit>
+            <trans-unit id='QmVuZ2FsaXNjaCAoQmFuZ2xhZGVzaCk='>
+                <source>Bengalisch (Bangladesh)</source>
+                <target>Bengali (Bangladesh)</target>
+            </trans-unit>
+            <trans-unit id='QmVuZ2FsaXNjaCAoSW5kaWVuKQ=='>
+                <source>Bengalisch (Indien)</source>
+                <target>Bengali (India)</target>
+            </trans-unit>
             <trans-unit id="Qm9zbmlzY2g=">
                 <source>Bosnisch</source>
                 <target>Bosnian</target>

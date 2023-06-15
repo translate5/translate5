@@ -115,7 +115,9 @@ abstract class Translate5AbstractCommand extends Command
             $environment = ($answer === 't' || $answer === 'test') ? 'test' : 'application';
             $this->initTranslate5($environment);
             $config = \Zend_Registry::get('config');
-            $this->io->info('Using database "'.$config->resources->db->params->dbname.'"');
+            if (!$this->isPorcelain) {
+                $this->io->info('Using database "'.$config->resources->db->params->dbname.'"');
+            }
         } else {
             $this->initTranslate5();
         }
@@ -184,7 +186,6 @@ EOF;
         $this->io->table($headers, $data);
     }
 
-    
     /***
      * Translate5 licence text to be reused in each command
      * @return string
@@ -219,5 +220,35 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */'
 ;
+    }
+
+    /**
+     * Checks, if the command is being called with root-rights or the T5 /data directory is not writable/readable
+     * Displays errors, if so, and then returns true
+     * @return bool
+     */
+    protected function checkCliUsageAsRoot(): bool
+    {
+        // this cannot be checked on windows machines ....
+        if (PHP_OS_FAMILY === 'Windows') {
+            return false;
+        }
+        // prevent root usage
+        $username = posix_getpwuid(posix_geteuid())['name'];
+        if (strtolower($username) === 'root') {
+            $this->io->error('You must not run this command as "' . $username . '"');
+            return true;
+        }
+        // We check if the data-dir is readable & writable (if it exists)
+        $dataDir = realpath(__DIR__ . '/../../../data');
+        if ($dataDir && is_dir($dataDir) && (!is_readable($dataDir) || !is_writable($dataDir))) {
+            $this->io->error('The data-directory "' . $dataDir . '" is not readable/writable for user "' . $username . '"');
+            return true;
+        }
+        // just an info if running with uncommon user-rights
+        if (!in_array(strtolower($username), ['apache', 'apache2', 'dev', 'developer', 'http', 'httpd', 'www-data'])) {
+            $this->io->note('You\'re running the command as user "' . $username . '"');
+        }
+        return false;
     }
 }

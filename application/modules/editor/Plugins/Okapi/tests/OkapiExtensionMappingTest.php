@@ -31,6 +31,7 @@ use MittagQI\Translate5\Test\Import\Bconf;
 
 /**
  * Test for Bconfs defining new file-extensions, either via an uploaded bconf or as embedded bconf in the ZIP
+ * This test imlicitly also tests the FIGMA file-filter / fprm
  */
 class OkapiExtensionMappingTest extends editor_Test_JsonTest
 {

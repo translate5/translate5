@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides the possibility to authenticate InstantTranslate and TermSearch roles only by IP address (must be configured).';
+    protected static bool $enabledByDefault = true;
     protected static bool $activateForTests = true;
     
     public function init() {

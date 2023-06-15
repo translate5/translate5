@@ -28,9 +28,12 @@
 
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\Translate5\Test\TestConfiguration;
 use Symfony\Component\Console\Input\InputOption;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
-use Translate5\MaintenanceCli\Test\Config;
+use Zend_Registry;
+use ZfExtended_Models_Installer_DbUpdater;
+use ZfExtended_Plugin_Manager;
 
 abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
 {
@@ -123,6 +126,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         } else {
             // for running tests on the app database
             $this->initTranslate5();
+            return $this->checkApiTestsAllowed();
         }
         return true;
     }
@@ -134,9 +138,9 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     protected function checkApiTestsAllowed(): bool
     {
         try {
-            $config = \Zend_Registry::get('config');
+            $config = Zend_Registry::get('config');
             if ($config?->testSettings?->testsAllowed !== 1) {
-                $this->io->error('This installation seems not to be set up for API tests.');
+                $this->io->error('This installation seems not to be set up for API tests [].');
                 return false;
             }
             return true;
@@ -311,7 +315,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             if (str_contains($e->getMessage(), 'Unknown database')) {
                 $testDbExists = false;
                 // we must make sure here es well, that this instance is set up as a test-system
-                $config = \Zend_Registry::get('config');
+                $config = Zend_Registry::get('config');
                 if ($config?->testSettings?->testsAllowed !== 1) {
                     $this->io->error('This installation seems not to be set up for API tests.');
                     return false;
@@ -323,7 +327,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
             }
         }
         // in some cases it's only wanted to create the DB if it does not exist
-        $config = \Zend_Registry::get('config');
+        $config = Zend_Registry::get('config');
         if ($testDbExists && !$forceRecreation) {
             $this->io->note('Database \'' . $config->resources->db->params->dbname . '\' already exists');
             return true;
@@ -352,23 +356,23 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
                 $this->io->error('The configured test database in installation.ini must not be the application database!');
                 return false;
             }
-            $testDbName = Config::createTestDatabaseName($applicationDbName);
+            $testDbName = TestConfiguration::createTestDatabaseName($applicationDbName);
             if ($config['dbname'] !== $testDbName) {
                 $this->io->error('The configured test database in installation.ini [test:application] must be \'' . $testDbName . '\'!');
                 return false;
             }
 
             // retrieve the needed configs from the application DB
-            $configs = $this->getApplicationConfiguration($applicationDbName, $config['host'], $config['username'], $config['password']);
+            $appConfigs = $this->getApplicationConfiguration($applicationDbName, $config['host'], $config['username'], $config['password']);
 
             // delete (if needed) and recreate DB. recreate tables
             if (
             $this->recreateDatabase($config['host'], $config['username'], $config['password'], $config['dbname'], $testDbExists)
-                && $this->recreateTables($configs, 'test')
+                && $this->recreateTables($appConfigs, 'test')
             ) {
                 $this->io->note('Successfully recreated database \'' . $config['dbname'] . '\'');
                 // cleanup/reinitialize the test data dirs
-                $this->reInitDataDirectory(Config::DATA_DIRECTORY);
+                $this->reInitDataDirectory(TestConfiguration::DATA_DIRECTORY);
                 return true;
             }
         } catch (\Throwable $e) {
@@ -436,7 +440,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
                 chgrp($dataDirectory, $info->group);
             }
         }
-        foreach (Config::getUserDataFolders() as $folder) {
+        foreach (TestConfiguration::getUserDataFolders() as $folder) {
             $userDir = $dataDirectory . '/' . $folder;
             if (is_dir($userDir)) {
                 \ZfExtended_Utils::recursiveDelete($userDir, ['gitignore'], true, false);
@@ -483,7 +487,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function recreateDatabase(string $host, string $username, string $password, string $dbname, bool $exists = false): bool
     {
-        $updater = new \ZfExtended_Models_Installer_DbUpdater();
+        $updater = new ZfExtended_Models_Installer_DbUpdater();
 
         try {
 
@@ -520,7 +524,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     private function recreateTables(array $configs, string $environment): bool
     {
         // Create the tables from scratch
-        $updater = new \ZfExtended_Models_Installer_DbUpdater();
+        $updater = new ZfExtended_Models_Installer_DbUpdater();
         //add the test SQL path
         $updater->addAdditonalSqlPath(APPLICATION_PATH . '/modules/editor/testcases/database/');
         // init DB
@@ -571,7 +575,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     {
         $this->io->note('Copying config-values from database \'' . $applicationDbName . '\'');
         $pdo = new \PDO('mysql:host=' . $host . ';dbname=' . $applicationDbName, $username, $password);
-        $neededConfigs = Config::getTestConfigs();
+        $neededConfigs = TestConfiguration::getTestConfigs();
         foreach ($neededConfigs as $name => $value) {
             if ($value === null) { // value should be taken from application DB
                 $query = 'SELECT `value` FROM `Zf_configuration` WHERE `name` = ?';
@@ -595,7 +599,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
     {
         $this->io->note('Copying config-values from current database');
         $configModel = new \editor_Models_Config();
-        $neededConfigs = Config::getApplicationConfigs();
+        $neededConfigs = TestConfiguration::getApplicationConfigs();
         foreach ($neededConfigs as $name => $value) {
             if ($value === null) { // value should be taken from current application DB
                 $neededConfigs[$name] = $configModel->getCurrentValue($name);
@@ -610,8 +614,8 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
      */
     private function initPlugins(): void
     {
-        /** @var \ZfExtended_Plugin_Manager $pluginmanager */
-        $pluginmanager = \Zend_Registry::get('PluginManager');
+        /** @var ZfExtended_Plugin_Manager $pluginmanager */
+        $pluginmanager = Zend_Registry::get('PluginManager');
         $pluginmanager->activateTestRelevantOnly();
     }
 
@@ -627,7 +631,7 @@ abstract class Translate5AbstractTestCommand extends Translate5AbstractCommand
         $missing = 0;
         // now write the values from the DB to the installation.ini
         $config = new \editor_Models_Config();
-        foreach (Config::CONFIGS as $name => $value) {
+        foreach (TestConfiguration::CONFIGS as $name => $value) {
             if ($value === null) { // value should be taken from existing config
                 $dbValue = $config->getCurrentValue($name);
                 if ($dbValue === null || $dbValue === '') {

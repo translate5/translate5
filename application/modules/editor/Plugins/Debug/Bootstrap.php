@@ -26,75 +26,113 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
+
 /**
  * Plugin Bootstrap for Debug Plugin
  */
-class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract {
+class editor_Plugins_Debug_Bootstrap extends ZfExtended_Plugin_Abstract
+{
     protected static string $description = 'Provides debug information in the GUI - for development';
-    
-    public function init() {
-        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndexAction'));
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterImport'));
-        $this->eventManager->attach('editor_Models_Import_Worker_SetTaskToOpen', 'importCompleted', array($this, 'handleImportCompleted'));
-        $this->eventManager->attach('editor_Models_Export', 'afterExport', array($this, 'handleAfterExport'));
-        $this->eventManager->attach('editor_Models_Export_Exported_Worker', 'exportCompleted', array($this, 'handleExportCompleted'));
-        $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
+
+    public function init(): void
+    {
+        $this->eventManager->attach(
+            Editor_IndexController::class,
+            'afterIndexAction',
+            [$this, 'handleAfterIndexAction']
+        );
+        $this->eventManager->attach(
+            ImportEventTrigger::class,
+            ImportEventTrigger::AFTER_IMPORT,
+            [$this, 'handleAfterImport']
+        );
+        $this->eventManager->attach(
+            editor_Models_Import_Worker_SetTaskToOpen::class,
+            'importCompleted',
+            [$this, 'handleImportCompleted']
+        );
+        $this->eventManager->attach(
+            editor_Models_Export::class,
+            'afterExport',
+            [$this, 'handleAfterExport']
+        );
+        $this->eventManager->attach(
+            editor_Models_Export_Exported_Worker::class,
+            'exportCompleted',
+            [$this, 'handleExportCompleted']
+        );
+        $this->eventManager->attach(
+            editor_TaskController::class,
+            'afterTaskOpen',
+            [$this, 'handleAfterTaskOpen']
+        );
+
+        // allow PMs to read the user assoc auth hashes for clicking user associations to log in as that user
+        $acl = ZfExtended_Acl::getInstance();
+        $acl->allow('pm', 'readAuthHash');
     }
-    
-    public function handleAfterIndexAction(Zend_EventManager_Event $event) {
+
+    public function handleAfterIndexAction(Zend_EventManager_Event $event)
+    {
         $view = $event->getParam('view');
         $view->Php2JsVars()->set('debug.showTaskGuid', '1'); //shows taskGuid in GUI
     }
-    
+
     /**
      * handler for event: editor_Models_Import#afterImport
      * @param $event Zend_EventManager_Event
      */
-    public function handleAfterImport(Zend_EventManager_Event $event) {
+    public function handleAfterImport(Zend_EventManager_Event $event)
+    {
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($task->getTaskGuid()));
-        error_log("Task imported: ".$task->getTaskName().' '.$task->getTaskGuid().' ('.$mv->getName().')');
+        error_log("Task imported: " . $task->getTaskName() . ' ' . $task->getTaskGuid() . ' (' . $mv->getName() . ')');
     }
-    
+
     /**
      * handler for event: editor_Models_Import#afterImport
      * @param $event Zend_EventManager_Event
      */
-    public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
+    public function handleAfterTaskOpen(Zend_EventManager_Event $event)
+    {
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($task->getTaskGuid()));
-        error_log("Task opened: ".$task->getTaskName().' '.$task->getTaskGuid().' ('.$mv->getName().')');
+        error_log("Task opened: " . $task->getTaskName() . ' ' . $task->getTaskGuid() . ' (' . $mv->getName() . ')');
     }
-    
+
     /**
      * handler for event: editor_Models_Import_Worker_SetTaskToOpen#importCompleted
      * @param $event Zend_EventManager_Event
      */
-    public function handleImportCompleted(Zend_EventManager_Event $event) {
+    public function handleImportCompleted(Zend_EventManager_Event $event)
+    {
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
-        error_log("Task reopened after import: ".$task->getTaskName().' '.$task->getTaskGuid());
+        error_log("Task reopened after import: " . $task->getTaskName() . ' ' . $task->getTaskGuid());
     }
-    
+
     /**
      * handler for event: editor_Models_Export#afterExport
      * @param $event Zend_EventManager_Event
      */
-    public function handleAfterExport(Zend_EventManager_Event $event) {
+    public function handleAfterExport(Zend_EventManager_Event $event)
+    {
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
-        error_log("Task data exported: ".$task->getTaskName().' '.$task->getTaskGuid());
+        error_log("Task data exported: " . $task->getTaskName() . ' ' . $task->getTaskGuid());
     }
-    
+
     /**
      * handler for event: editor_Models_Export_Exported_Worker#exportCompleted
      * @param $event Zend_EventManager_Event
      */
-    public function handleExportCompleted(Zend_EventManager_Event $event) {
+    public function handleExportCompleted(Zend_EventManager_Event $event)
+    {
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
-        error_log("Task exported completly: ".$task->getTaskName().' '.$task->getTaskGuid());
+        error_log("Task exported completly: " . $task->getTaskName() . ' ' . $task->getTaskGuid());
     }
 }

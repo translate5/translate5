@@ -45,7 +45,7 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
  * @method void setServiceType() setServiceType(string $type)
  * @method string getServiceName() getServiceName() The speakable name of the service as configured in the resource
  * @method void setServiceName() setServiceName(string $resName)
- * @method string getResourceType() getResourceType()  tm or mt
+ * @method string getResourceType() getResourceType()  "tm" or "mt" or "termcollection"
  * @method void setResourceType() setResourceType(string $resourceType)
  * @method bool getWriteSource() getWriteSource()
  * @method void setWriteSource() setWriteSource(bool $writeSource)
@@ -644,7 +644,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return boolean
      */
     public function isMt() {
-        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_MT;
+        return $this->getResourceType() === editor_Models_Segment_MatchRateType::TYPE_MT;
     }
     
     /***
@@ -652,7 +652,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return boolean
      */
     public function isTm() {
-        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM;
+        return $this->getResourceType() === editor_Models_Segment_MatchRateType::TYPE_TM;
     }
     
     /***
@@ -660,7 +660,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return boolean
      */
     public function isTc() {
-        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
+        return $this->getResourceType() === editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
     }
 
     /**

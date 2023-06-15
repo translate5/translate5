@@ -44,7 +44,7 @@ class editor_Services_Manager {
     public const SERVICE_OPENTM2 = 'editor_Services_OpenTM2';
     
     /**
-     * The services provided with this plugin are hardcoded:
+     * The registered services are currently hardcoded
      * @var array
      */
     static protected $registeredServices = array(

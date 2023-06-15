@@ -153,4 +153,12 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
         }
         return self::STATUS_NOCONNECTION;
     }
+
+    /**
+     * @return mixed
+     */
+    protected function getResponseData(): mixed
+    {
+        return $this->api->getResult();
+    }
 }

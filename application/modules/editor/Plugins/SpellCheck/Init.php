@@ -35,6 +35,7 @@ use MittagQI\Translate5\Plugins\SpellCheck\Segment\Check;
  */
 class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
     protected static string $description = 'Provides the languagetool spell-checker.';
+    protected static bool $enabledByDefault = true;
     protected static bool $activateForTests = true;
     
     /**
@@ -51,6 +52,14 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
      */
     protected static array $services = [
         'languagetool' => Service::class
+    ];
+
+    /**
+     * The configs that needed to be set/copied for tests
+     * @var array[]
+     */
+    protected static array $testConfigs = [
+        'runtimeOptions.plugins.SpellCheck.liveCheckOnEditing' => 1
     ];
     
     protected $localePath = 'locales';

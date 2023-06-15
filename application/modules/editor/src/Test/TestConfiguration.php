@@ -25,20 +25,28 @@
  
  END LICENSE AND COPYRIGHT
  */
-namespace Translate5\MaintenanceCli\Test;
+namespace MittagQI\Translate5\Test;
+
+use Zend_Exception;
+use Zend_Registry;
+use ZfExtended_Exception;
+use ZfExtended_Factory;
+use ZfExtended_Plugin_Manager;
+use MittagQI\Translate5\Service\Services;
 
 /**
  * Holds important configs that need to be set up for the API-tests
+ * These Configs are either defined here (value NOT NULL) or copied from the application DB to the test DB (value IS NULL)
  */
-class Config {
+final class TestConfiguration {
 
     /**
-     * The folder task-specific data etc. will be stored
+     * The folder task-specific data etc. will be stored when using the test-DB
      */
     const DATA_DIRECTORY = 'testdata';
 
     /**
-     * The configs that define USERDATA pathes
+     * The configs that define USERDATA pathes//null checks for no concrete value but if not empty
      */
     const DATA_CONFIGS = [
 
@@ -66,9 +74,6 @@ class Config {
         'runtimeOptions.import.enableSourceEditing' => 1,
         'runtimeOptions.import.sdlxliff.importComments' => 1,
         'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-        'runtimeOptions.InstantTranslate.minMatchRateBorder' => 70,
-        'runtimeOptions.plugins.SpellCheck.liveCheckOnEditing' => 1,
-        'runtimeOptions.plugins.VisualReview.directPublicAccess' => 1,
         'runtimeOptions.tbx.termLabelMap' => '{"legalTerm": "permitted", "admittedTerm": "permitted", "preferredTerm": "preferred", "regulatedTerm": "permitted", "deprecatedTerm": "forbidden", "supersededTerm": "forbidden", "standardizedTerm": "permitted"}',
 
         /* Configs that need to be taken from the application database */
@@ -76,46 +81,22 @@ class Config {
         'runtimeOptions.server.name' => null,
         'runtimeOptions.server.protocol' => null,
         'runtimeOptions.errorCodesUrl' => null,
-
-        'runtimeOptions.LanguageResources.opentm2.server' => null,
-        'runtimeOptions.LanguageResources.opentm2.tmprefix' => null,
-        'runtimeOptions.LanguageResources.moses.server' => null,
-        'runtimeOptions.LanguageResources.sdllanguagecloud.server' => null,
-
-        'runtimeOptions.termTagger.url.gui' => null,
-        'runtimeOptions.termTagger.url.import' => null,
-        'runtimeOptions.termTagger.url.default' => null,
-
-        'runtimeOptions.plugins.DeepL.authkey' => null,
-        'runtimeOptions.plugins.DeepL.server' => null,
-        'runtimeOptions.plugins.FrontEndMessageBus.socketServer.route' => null,
-        'runtimeOptions.plugins.FrontEndMessageBus.socketServer.port' => null,
-        'runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost' => null,
-        'runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema' => null,
-        'runtimeOptions.plugins.FrontEndMessageBus.messageBusURI' => null,
-        'runtimeOptions.plugins.GlobalesePreTranslation.api.url' => null,
-        'runtimeOptions.plugins.Okapi.server' => null,
-        'runtimeOptions.plugins.Okapi.serverUsed' => null,
-        'runtimeOptions.plugins.PangeaMt.server' => null,
-        'runtimeOptions.plugins.SpellCheck.languagetool.url.default' => null,
-        'runtimeOptions.plugins.SpellCheck.languagetool.url.import' => null,
-        'runtimeOptions.plugins.SpellCheck.languagetool.url.gui' => null,
-        'runtimeOptions.plugins.VisualReview.googleCloudApiKey' => null,
-        'runtimeOptions.plugins.VisualReview.visualConverterUrl' => null,
-        'runtimeOptions.plugins.VisualReview.pdfconverterUrl' => null,
-        'runtimeOptions.plugins.VisualReview.shellCommandWget' => null
+        'runtimeOptions.LanguageResources.moses.server' => null, // TODO FIXME: this should come from a proper ExternalService
+        'runtimeOptions.LanguageResources.sdllanguagecloud.server' => null, // TODO FIXME: this should come from a proper ExternalService
+        'runtimeOptions.LanguageResources.microsoft.apiUrl' => null, // TODO FIXME: this should come from a proper ExternalService
+        'runtimeOptions.LanguageResources.microsoft.apiKey' => null, // TODO FIXME: this should come from a proper ExternalService
     ];
 
     /**
      * The name of the test-db will follow a fixed scheme
      * @param string $applicationDatabaseName
      * @return string
-     * @throws \ZfExtended_Exception
+     * @throws ZfExtended_Exception
      */
     public static function createTestDatabaseName(string $applicationDatabaseName) : string{
         // we have to be really picky here ...
         if(empty($applicationDatabaseName)){
-            throw new \ZfExtended_Exception('Empty applicationDatabaseName provided!');
+            throw new ZfExtended_Exception('Empty applicationDatabaseName provided!');
         }
         // trying to respect camel-case vs underscore naming-schemes here, of course just an attempt
         if(strtolower($applicationDatabaseName) === $applicationDatabaseName){
@@ -129,7 +110,7 @@ class Config {
      * @return array
      */
     public static function getTestConfigs() : array {
-        return array_merge(self::DATA_CONFIGS, self::CONFIGS);
+        return array_merge(self::DATA_CONFIGS, self::CONFIGS, Services::getTestConfigs(), self::getPluginConfigs());
     }
 
     /**
@@ -142,11 +123,11 @@ class Config {
         foreach(self::DATA_CONFIGS as $name => $value){
             $configs[$name] = str_replace('/'.self::DATA_DIRECTORY.'/', '/'.$dataFolder.'/', $value);
         }
-        return array_merge($configs, self::CONFIGS);
+        return array_merge($configs, self::CONFIGS, Services::getTestConfigs(), self::getPluginConfigs());
     }
 
     /**
-     * Retrieves the folders inside the USERDATA directory that needs to be cleaned when the database is recrteated
+     * Retrieves the folders inside the USERDATA directory that needs to be cleaned when the database is recreated
      * @return string[]
      */
     public static function getUserDataFolders() : array {
@@ -156,5 +137,19 @@ class Config {
             $folders[] = array_pop($parts);
         }
         return $folders;
+    }
+
+    /**
+     * Retrieves the configs coming from plugins
+     * @return array
+     */
+    /**
+     * @return array
+     * @throws Zend_Exception
+     */
+    private static function getPluginConfigs(): array
+    {
+        $pluginmanager = ZfExtended_Factory::get(ZfExtended_Plugin_Manager::class);
+        return $pluginmanager->getTestConfigs();
     }
 }

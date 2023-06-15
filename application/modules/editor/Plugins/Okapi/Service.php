@@ -113,6 +113,12 @@ final class Service extends DockerServiceAbstract
         'healthcheck' => self::HEALTH_CHECK_PATH
     ];
 
+    protected array $testConfigs = [
+        // this leads to the application-db configs being copied to the test-DB
+        'runtimeOptions.plugins.Okapi.server' => null,
+        'runtimeOptions.plugins.Okapi.serverUsed' => null
+    ];
+
     /**
      * Differing from the base-implementation we add checking the other configured
      * okapi-services here, not just the used one

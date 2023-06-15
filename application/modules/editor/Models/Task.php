@@ -46,6 +46,8 @@ END LICENSE AND COPYRIGHT
  * @method void setTaskName() setTaskName(string $name)
  * @method string getForeignName() getForeignName()
  * @method void setForeignName() setForeignName(string $name)
+ * @method string getForeignName() getDescription()
+ * @method void setForeignName() setDescription(string $description)
  * @method integer getSourceLang() getSourceLang()
  * @method void setSourceLang() setSourceLang(int $id)
  * @method integer getTargetLang() getTargetLang()
@@ -98,12 +100,13 @@ END LICENSE AND COPYRIGHT
  * @method integer getSegmentFinishCount() getSegmentFinishCount()
  * @method void setSegmentFinishCount() setSegmentFinishCount(int $segmentFinishCount)
  * @method void setTaskType() setTaskType(string $taskType)
- * @method int getProjectId() getProjectId()
+ * @method string getProjectId() getProjectId()
  * @method void setProjectId() setProjectId(int $projectId)
  * @method boolean getDiffExportUsable() getDiffExportUsable()
  * @method void setDiffExportUsable() setDiffExportUsable(bool $flag)
  * @method boolean getReimportable() getReimportable()
  * @method void setReimportable() setReimportable(bool $reimportable)
+ * @method string getCreated() getCreated()
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -168,6 +171,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $data = $this->row->toArray();
         unset($data['id']);
         unset($data['taskGuid']);
+        //resetting meta is crucial here - we are cloning the task object not its subsequent data in DB too!
+        $this->meta = null;
         //before all other operations make a new row object
         $this->init($data);
         $this->createTaskGuidIfNeeded();

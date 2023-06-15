@@ -40,6 +40,15 @@ final class Service extends DockerServiceAbstract
         'url' => 'http://frontendmessagebus.:9057'
     ];
 
+    protected array $testConfigs = [
+        // this leads to the application-db configs being copied to the test-DB
+        'runtimeOptions.plugins.FrontEndMessageBus.socketServer.route' => null,
+        'runtimeOptions.plugins.FrontEndMessageBus.socketServer.port' => null,
+        'runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost' => null,
+        'runtimeOptions.plugins.FrontEndMessageBus.socketServer.schema' => null,
+        'runtimeOptions.plugins.FrontEndMessageBus.messageBusURI' => null
+    ];
+
     public function check(): bool
     {
         $checked = true;

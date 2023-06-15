@@ -143,6 +143,19 @@ final class Services
     }
 
     /**
+     * Retrieve the service configs from all base services, that need to be copied or added to the test-DB
+     * @return array
+     */
+    public static function getTestConfigs(): array
+    {
+        $testConfigs = [];
+        foreach(self::getServices(Zend_Registry::get('config')) as $service){
+            $testConfigs[] = $service->getTestConfigs();
+        }
+        return array_merge(...$testConfigs);
+    }
+
+    /**
      * Retrieves the global service with the given name or null if it does not exist FOR THE CURRENTLY CONFIGURED PLUGINS
      * @param Zend_Config $config
      * @param string $serviceName

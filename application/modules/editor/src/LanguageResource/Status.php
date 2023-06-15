@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MittagQI\Translate5\Service\Enum;
+namespace MittagQI\Translate5\LanguageResource;
 
-class LanguageResourceStatus
+class Status
 {
     public const NOTCHECKED = 'notchecked';
     public const ERROR = 'error';

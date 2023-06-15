@@ -28,6 +28,7 @@
 
 use MittagQI\Translate5\Plugins\Okapi\ImportFilter;
 use MittagQI\Translate5\Plugins\Okapi\Service;
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 
 /**
  * OKAPI file converter and segmenter plugin
@@ -74,6 +75,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'okapi-longhorn-143',
         'okapi-longhorn-144-snapshot',
     ];
+
+    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
+
+    protected static bool $activateForTests = true;
+
+    protected static bool $enabledByDefault = true;
 
     /**
      * Retrieves the config-based path to the default export bconf
@@ -192,10 +199,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         return null;
     }
-
-    protected static string $description = 'Provides Okapi pre-convertion and import of non bilingual data formats.';
-
-    protected static bool $activateForTests = true;
 
     /**
      * The services we use
@@ -360,7 +363,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $r->addRoute('plugins_okapi_bconfdefaultfilter_setextensions', $route);
     }
 
-    public function getFrontendControllers(): array {
+    public function getFrontendControllers(): array
+    {
         return $this->getFrontendControllersFromAcl();
     }
 
@@ -383,10 +387,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             [$this, 'handleJsTranslations']
         );
 
-        // adds the used bconf to the import-archive. At this point, the task is not yet saved and the bconfId sent by request has to be used
+        // adds the used bconf to the import-archive. At this point,
+        // the task is not yet saved and the bconfId sent by request has to be used
         $this->eventManager->attach(
-            editor_Models_Import::class,
-            'afterUploadPreparation',
+            ImportEventTrigger::class,
+            ImportEventTrigger::AFTER_UPLOAD_PREPARATION,
             [$this, 'handleAfterUploadPreparation']
         );
 
@@ -398,9 +403,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         );
         // adds the bconfId to the task-meta
         $this->eventManager->attach(
-            editor_TaskController::class,
-            'beforeProcessUploadedFile',
-            [$this, 'handleBeforeProcessUploadedFile']);
+            ImportEventTrigger::class,
+            ImportEventTrigger::BEFORE_PROCESS_UPLOADED_FILE,
+            [$this, 'handleBeforeProcessUploadedFile']
+        );
 
         //checks if import contains files for okapi:
         $this->eventManager->attach(
@@ -484,7 +490,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @throws editor_Models_ConfigException
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function handleAfterIndex(Zend_EventManager_Event $event) {
+    public function handleAfterIndex(Zend_EventManager_Event $event): void
+    {
         $view = $event->getParam('view');
         /** @var $view ZfExtended_View */
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();

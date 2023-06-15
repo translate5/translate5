@@ -37,6 +37,7 @@ use MittagQI\Translate5\Terminology\CleanupCollection;
 class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
 
     protected static string $description = 'Provides term-tagging';
+    protected static bool $enabledByDefault = true;
     protected static bool $activateForTests = true;
 
     /**
