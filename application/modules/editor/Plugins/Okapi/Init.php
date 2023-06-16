@@ -370,12 +370,21 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
     protected function initEvents(): void
     {
-        // plugin basics
+        // plugin basics: add supported filetypes to Main App
+        // TODO FIXME: This is the wrong event-direction, the consuming code should ask for "The list of filetypes we camn process"
         $this->eventManager->attach(
             Editor_IndexController::class,
             'beforeIndexAction',
             [$this, 'handleBeforeIndex']
         );
+        // plugin basics: add supported filetypes to InstantTranslate APP
+        // TODO FIXME: This is the wrong event-direction, the consuming code should ask for "The list of filetypes we camn process" 
+        $this->eventManager->attach(
+            Editor_InstanttranslateController::class,
+            'beforeIndexAction',
+            [$this, 'handleBeforeIndex']
+        );
+
         $this->eventManager->attach(
             Editor_IndexController::class,
             'afterIndexAction',

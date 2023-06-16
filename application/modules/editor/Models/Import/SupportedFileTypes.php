@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Helper Class which provides information about the allowed file types in translate5
  * Instanced once, the class tracks internally (static) the allowed values.
+ * TODO FIXME: this class should not have "Import" in name, that is highly misleading!
  */
 class editor_Models_Import_SupportedFileTypes
 {
