@@ -797,11 +797,14 @@ class Editor_SegmentController extends ZfExtended_RestController
         $segment = \ZfExtended_Factory::get(editor_Models_Segment::class);
         $segment->load((int) $this->_getParam('id'));
 
+        // Get locale
+        $locale = ZfExtended_Utils::getLocale($this->getRequest()->getParam('locale'));
+
         //generate portlet data
         $data = (new TermportletData(
             $this->getCurrentTask(),
             $this->isAllowed('editor_termportal') && !empty($plugin)
-        ))->generate($segment);
+        ))->generate($segment, $locale);
 
         //add translations
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
