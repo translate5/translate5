@@ -150,6 +150,11 @@ final class Processing extends Zend_Db_Table_Abstract
         $segmentsTable = ZfExtended_Factory::get(editor_Models_Db_Segments::class);
         $segmentIds = $segmentsTable->getAllIdsForTask($taskGuid, false);
 
+        // in case the task has no segments, do not try to insert rows
+        if(empty($segmentIds)){
+            return;
+        }
+
         foreach ($segmentIds as $id) {
             $rowvals[] = '(' . $id . ', \'' . $taskGuid . '\')';
         }
