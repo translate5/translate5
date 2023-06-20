@@ -48,16 +48,10 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
      */
     protected array $fileTypes = [];
 
-    /***
-     * @var editor_Models_Import_SupportedFileTypes|mixed
-     */
-    protected editor_Models_Import_SupportedFileTypes $supportedFiles;
-
     public function __construct(array $files, array $langauges, array $types){
         $this->files = $files;
         $this->fileLanguages = $langauges;
         $this->fileTypes = $types;
-        $this->supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         $this->validate();
     }
 
@@ -295,11 +289,11 @@ class editor_Models_Import_DataProvider_Project  extends editor_Models_Import_Da
         }
         $ext = pathinfo($workFile,PATHINFO_EXTENSION);
         // if the workFile has native parser and the files are not matched by name then those files have different name
-        if($this->supportedFiles->hasParser($ext)){
+        if($this->task->getFileTypeSupport()->hasParser($ext)){
             return false;
         }
         // if the extension is supported, this file will be processed by okapi
-        $supported = in_array($ext,$this->supportedFiles->getSupportedExtensions());
+        $supported = in_array($ext, $this->task->getFileTypeSupport()->getSupportedExtensions());
         return $supported && ($workFile.'.xlf' === $pivotFile);
     }
 

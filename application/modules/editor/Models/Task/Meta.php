@@ -27,13 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 /**
- * Entity Model for segment meta data
+ * Entity Model for task meta data
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method int getBconfId() getBconfId()
  * @method setBconfId(int $bconfId)
+ * @method string getBconfInZip() getBconfInZip()
+ * @method setBconfInZip(string $bconfInZip)
  * @method setPricingPresetId(int $pricingPresetId)
  * @method string getMappingType() getMappingType()
  * @method setMappingType(string $mappingType)

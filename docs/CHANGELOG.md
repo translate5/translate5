@@ -23,6 +23,48 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.3.1] - 2023-06-20
+
+### Important Notes:
+ 
+
+
+### Changed
+**[TRANSLATE-3384](https://jira.translate5.net/browse/TRANSLATE-3384): ConnectWorldserver - Plugin ConnectWorldserver unusable due merge-conflicts** <br>
+Repair ConnectWorldserver plug-in which was unusable since the code base was on the development state and not on a releasable state.
+
+**[TRANSLATE-3382](https://jira.translate5.net/browse/TRANSLATE-3382): Editor general - Fix TextShuttle plugin** <br>
+TextShuttle plugin structure fixed
+
+
+**[TRANSLATE-3357](https://jira.translate5.net/browse/TRANSLATE-3357): LanguageResources - Make Tilde config data overwriteable on client level** <br>
+TildeMT API configuration parameters can now be overwritten on client level
+
+**[TRANSLATE-3354](https://jira.translate5.net/browse/TRANSLATE-3354): LanguageResources - API Keys for Textshuttle via GUI, overwritable on client level** <br>
+Some API configurations for TextShuttle plugin can now be overwritten on client level
+
+
+### Bugfixes
+**[TRANSLATE-3388](https://jira.translate5.net/browse/TRANSLATE-3388): Editor general - Fix and improve architecture to evaluate the supported file formats** <br>
+Improve evaluation of supported file types/formats, fix wrong filetype-evalution in frontend when task specific file filters were set.
+
+**[TRANSLATE-3387](https://jira.translate5.net/browse/TRANSLATE-3387): Editor general - Unable to change UI langauge** <br>
+Fix problem where the UI language was unable to be changed
+
+**[TRANSLATE-3383](https://jira.translate5.net/browse/TRANSLATE-3383): Editor general - Newline visualization in internal-tags / segments** <br>
+FIX: Newlines in tags may appear as newlines in translate5 internal tags leading to defect tags in the frontend. Now they are converted to visual newlines instead.
+
+**[TRANSLATE-3379](https://jira.translate5.net/browse/TRANSLATE-3379): Import/Export - Missing workflow user preferences leads to errors in the UI** <br>
+Error in the UI when the task has no workflow preferences entries which can happen if the task can not be imported.
+
+**[TRANSLATE-3343](https://jira.translate5.net/browse/TRANSLATE-3343): Main back-end mechanisms (Worker, Logging, etc.) - Stop PdfToHtmlWorker if pdfconverter failed to create a job** <br>
+PdfToHtmlWorker now finishes immediately if the conversion job failed to create or there is an error occurred while retrieving the conversion job result. So now the error on task import appears faster without waiting for the maximum pdfconverter timeout to exceed.
+
+**[TRANSLATE-3186](https://jira.translate5.net/browse/TRANSLATE-3186): Import/Export - Import is interrupted because of files with no segments** <br>
+If an import contains some files containing no translatable content will no longer set the whole task to status error.
+
+
 ## [6.3.0] - 2023-06-15
 
 ### Important Notes:

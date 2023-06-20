@@ -573,17 +573,11 @@ class editor_TaskController extends ZfExtended_RestController
             // we have to prevent attached events, since when we get here the task is not created,
             // which would lead to task not found errors, but we want to result the validation error
             $event = Zend_EventManager_StaticEventManager::getInstance();
-            $event->clearListeners(get_class($this), "afterPostAction");
+            $event->clearListeners(get_class($this), 'afterPostAction');
             return;
         }
 
         $this->initWorkflow();
-
-        $this->events->trigger('beforeValidateUploads', $this, [
-            'task' => $this->entity,
-            'data' => $this->data,
-            'action' => $this->_request->getActionName()
-        ]);
 
         try {
             $tasks = $this->importService->importViaAPI(
@@ -879,12 +873,6 @@ class editor_TaskController extends ZfExtended_RestController
             foreach ($metaData as $field => $value) {
                 $this->data[$field] = $value;
             }
-
-            $this->events->trigger('beforeValidateUploads', $this, [
-                'task' => $this->entity,
-                'data' => $this->data,
-                'action' => $this->_request->getActionName()
-            ]);
 
             try {
                 $this->importService->processUploadedFile(

@@ -73,9 +73,12 @@ class editor_Models_Import_FileList {
      * returns a file list with files to be imported
      */
     public function processReviewedFiles() {
-        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles', [$this->importConfig->checkFileType, $this->importConfig->ignoredUncheckedExtensions]);
-        /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
-        $tree = $parser->parse($this->importConfig->getWorkfileDir(), $this->task);
+        $parser = ZfExtended_Factory::get(editor_Models_Import_DirectoryParser_WorkingFiles::class, [
+            $this->task,
+            $this->importConfig->checkFileType,
+            $this->importConfig->ignoredUncheckedExtensions
+        ]);
+        $tree = $parser->parse($this->importConfig->getWorkfileDir());
         $notImportedFiles = $parser->getNotImportedFiles();
         if(!empty($notImportedFiles)) {
             $logger = Zend_Registry::get('logger');
@@ -130,9 +133,8 @@ class editor_Models_Import_FileList {
         $refAbsDir = $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir;
         $refTarget = $this->task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$refDir;
         ZfExtended_Utils::recursiveCopy($refAbsDir, $refTarget);
-        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_ReferenceFiles');
-        /* @var $parser editor_Models_Import_DirectoryParser_ReferenceFiles */
-        return $parser->parse($refTarget, $this->task);
+        $parser = ZfExtended_Factory::get(editor_Models_Import_DirectoryParser_ReferenceFiles::class, [ $this->task ]);
+        return $parser->parse($refTarget);
     }
 
     public function processRelaisFiles() {

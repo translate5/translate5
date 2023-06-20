@@ -66,14 +66,27 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
 
     public function init() {
         // event-listeners
-        $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'beforeDirectoryParsing', array($this, 'handleTransitImportPreparation'));
-        $this->eventManager->attach('editor_Models_Import_Worker', 'beforeWork', array($this, 'handleBeforeImport'));
-        $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleTransitImportCleanup'), -10);
+        $this->eventManager->attach(
+            editor_Models_Import_Worker_FileTree::class,
+            'beforeDirectoryParsing',
+            [$this, 'handleTransitImportPreparation']
+        );
+        $this->eventManager->attach(
+            editor_Models_Import_Worker::class,
+            'beforeWork',
+            [$this, 'handleBeforeImport']
+        );
+        $this->eventManager->attach(
+            editor_Models_Import_Worker_Import::class,
+            'importCleanup',
+            [$this, 'handleTransitImportCleanup'],
+            -10
+        );
         // end of event-listeners
 
         $this->reviewDirName = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $meta editor_Models_Segment_Meta */
+        // TODO FIXME: this is deprecated !
+        $meta = ZfExtended_Factory::get(editor_Models_Segment_Meta::class);
         $meta->addMeta('transitLockedForRefMat', $meta::META_TYPE_BOOLEAN, false, 'Is set to true if segment is locked for reference material in transit file');
     }
     
@@ -81,16 +94,17 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleBeforeImport(Zend_EventManager_Event $event) {
+
+        /* @var editor_Models_Import_Worker $worker */
         $worker = $event->getParam('worker');
-        /* @var $worker editor_Models_Import_Worker */
         $params = $worker->getModel()->getParameters();
-        
+        /* @var editor_Models_Import_Configuration $importConfig */
         $importConfig = $params['config'];
-        /* @var $importConfig editor_Models_Import_Configuration */
+
         $this->importFolder = $importConfig->importFolder;
         $this->reviewDirName = $importConfig->getFilesDirectory();
         
-        $this->initTransitConfig();
+        $this->initTransitConfig($worker->getTask());
     }
     
     /**
@@ -98,26 +112,28 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleTransitImportPreparation(Zend_EventManager_Event $event) {
-        $params = $event->getParams();
-        $this->importFolder = $params['importFolder'];
-        $importConfig = $params['importConfig'];
-        /* @var $importConfig editor_Models_Import_Configuration */
+        /* @var editor_Models_Task $task */
+        $task = $event->getParam('task');
+        $this->importFolder = $event->getParam('importFolder');
+        /* @var editor_Models_Import_Configuration $importConfig */
+        $importConfig = $event->getParam('importConfig');
         $this->reviewDirName = $importConfig->getFilesDirectory();
-        if($this->initTransitConfig()) {
+        if($this->initTransitConfig($task)) {
             $this->renameTargetFiles('preparation');
         }
     }
     
     /**
      * inits the transit config
-     * @return boolean returns false if there is no or an invalid transitConfig
+     * @param editor_Models_Task $task
+     * @return bool:  returns false if there is no or an invalid transitConfig
      */
-    protected function initTransitConfig() {
+    protected function initTransitConfig(editor_Models_Task $task) {
         $transitConfig = $this->getTransitConfigFile();
         if(is_bool($transitConfig)){
             return false;
         }
-        $this->setTransitLangInfo($transitConfig);
+        $this->setTransitLangInfo($transitConfig, $task);
         return true;
     }
     
@@ -160,9 +176,11 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
     /**
      * sets transitLangInfo in ZendRegistry transitLangInfo
      * sets $this->langInfo to associative array(source=>lang,target=>lang)
-     * @param \SplFileInfo
+     * @param SplFileInfo $transitConfig
+     * @param editor_Models_Task $task
+     * @return false|void
      */
-    protected function setTransitLangInfo(\SplFileInfo $transitConfig) {
+    protected function setTransitLangInfo(SplFileInfo $transitConfig, editor_Models_Task $task) {
         $langInfo = explode('-',preg_replace('"\.'.$transitConfig->getExtension().'$"i','',$transitConfig->getBasename()));
         if(count($langInfo)!==2 ||strlen($langInfo[0])!==3||strlen($langInfo[1])!==3){
             trigger_error('transitConfig-file does not contain valid language infos. ImportFolder: '.$this->importFolder);
@@ -170,9 +188,8 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
         }
         $langInfo['source'] = $langInfo[0] = strtoupper($langInfo[0]);
         $langInfo['target'] = $langInfo[1] = strtoupper($langInfo[1]);
-        
-        $supportedTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
-        $supportedTypes->registerIgnored(strtolower($langInfo['source']));
+
+        $task->getFileTypeSupport()->registerIgnored($langInfo['source']);
         
         Zend_Registry::set('transitLangInfo', $langInfo);
         $this->langInfo = $langInfo;

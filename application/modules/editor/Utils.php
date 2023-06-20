@@ -396,6 +396,22 @@ class editor_Utils {
     }
 
     /**
+     * Turns "real" newlines to purely visual ones "↵"
+     * Note, that this method changes the string!!
+     * @param string $text
+     * @return string
+     */
+    public static function visualizeNewlines(string $text): string
+    {
+        // normalize newlines
+        $text = str_replace("\r\n", "\n", $text);
+        // replace orphan carriage returns
+        $text = str_replace("\r", "\n", $text);
+        // visualize them
+        return str_replace("\n", '↵', $text);
+    }
+
+    /**
      * Ensures the definedfields are arrays in the given assoc data
      * This will convert a string to an array, an empty string to an empty array, a missing param to an empty array (set force to false to avoid this)
      * Note, that types other than array/string will also result in an empty array

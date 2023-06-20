@@ -26,13 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
 /**
  * Klasse zum Parsen und Importieren von Dateistrukturen
  */
@@ -51,16 +44,13 @@ class editor_Models_Import_DirectoryParser_WorkingFiles
      * @var array
      */
     protected $ignoreList = ['.svn', '.git'];
-    /**
-     * if is null, no supported file check is done
-     * @var editor_Models_Import_SupportedFileTypes
-     */
-    protected $supportedFiles = null;
+
     /**
      * This List of ignored extensions will be applied if supportedFiles is not set. Defined by constructor
      * @var array
      */
     protected $ignoreExtensionsList = [];
+
     /**
      * RootNode Container
      * @var StdClass
@@ -68,16 +58,14 @@ class editor_Models_Import_DirectoryParser_WorkingFiles
     protected $rootNode;
 
     /**
-     *
-     * @param bool $checkFileTypes
+     * @param editor_Models_Task $task
+     * @param bool $doCheckFileTypes
      * @param string $ignoredUncheckedExtensions : comma seperated list of extensions to ignore if $checkFileTypes is false
      */
-    public function __construct(bool $checkFileTypes, string $ignoredUncheckedExtensions = '')
+    public function __construct(protected editor_Models_Task $task, protected bool $doCheckFileTypes, string $ignoredUncheckedExtensions = '')
     {
-        if ($checkFileTypes) {
-            //if supportedFiles is null, no filter is set and all files are imported
-            $this->supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
-        } else if (!empty($ignoredUncheckedExtensions)) {
+        // if no check shall be done, no filter is set and all files are imported
+        if (!$this->doCheckFileTypes && !empty($ignoredUncheckedExtensions)) {
             // in case of an unchecked import there may be a extension blacklist defined
             $this->ignoreExtensionsList = explode(',', $ignoredUncheckedExtensions);
         }
@@ -86,20 +74,19 @@ class editor_Models_Import_DirectoryParser_WorkingFiles
     /**
      * parses the given directory and returns a Object tree ready for output as JSON
      * @param string $directoryPath
-     * @param editor_Models_Task $task
      * @return object Directory Object Tree
      */
-    public function parse($directoryPath, editor_Models_Task $task)
+    public function parse($directoryPath)
     {
         self::$notImportedFiles = [];
         $rootNode = $this->getInitialRootNode();
         self::$filesFound = false;
         $this->iterateThrough($rootNode, $directoryPath);
-        if (!empty($this->supportedFiles) && !self::$filesFound) {
+        if ($this->doCheckFileTypes && !self::$filesFound) {
             // 'E1135' => 'There are no importable files in the Task. The following file extensions can be imported: {extensions}',
             throw new editor_Models_Import_FileParser_NoParserException('E1135', [
-                'extensions' => '.' . join(', .', $this->supportedFiles->getSupportedExtensions()),
-                'task' => $task,
+                'extensions' => '.' . join(', .', $this->task->getFileTypeSupport()->getSupportedExtensions()),
+                'task' => $this->task,
             ]);
         }
         return $rootNode->children;
@@ -176,18 +163,18 @@ class editor_Models_Import_DirectoryParser_WorkingFiles
         if (is_dir($directoryPath . DIRECTORY_SEPARATOR . $file)) {
             return false;
         }
-        if (empty($this->supportedFiles) && in_array(strtolower($file->getExtension()), $this->ignoreExtensionsList)) {
+        if (!$this->doCheckFileTypes && in_array(strtolower($file->getExtension()), $this->ignoreExtensionsList)) {
             self::$notImportedFiles[] = $file->getFilename();
             return true;
         }
         //no extension filter set: pass all files
-        if (empty($this->supportedFiles)) {
+        if (!$this->doCheckFileTypes) {
             return false;
         }
-        $extensions = $this->supportedFiles->getRegisteredExtensions();
+        $extensions = $this->task->getFileTypeSupport()->getRegisteredExtensions();
         foreach ($extensions as $ext) {
             if (preg_match('"\.' . $ext . '$"i', $file)) {
-                return $this->supportedFiles->isIgnored($ext);
+                return $this->task->getFileTypeSupport()->isIgnored($ext);
             }
         }
 
@@ -235,11 +222,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles
     {
         $node = $this->getDirectoryNode($directory);
 
-        //we init the iteration instance always with false,
-        // but we set the supportedFiles instance afterwards directly (so we don't create multiple instances)
-        $iteration = new static(false);
-        $iteration->supportedFiles = $this->supportedFiles;
-
+        $iteration = new static($this->task, $this->doCheckFileTypes);
         $iteration->iterateThrough($node, $path);
         return $node;
     }

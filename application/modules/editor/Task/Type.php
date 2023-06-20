@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Encapsulates all task types and task type tests
  */
-class editor_Task_Type {
+final class editor_Task_Type {
     /**
      * Singleton instance
      * @var editor_Task_Type $instance

@@ -36,6 +36,7 @@ END LICENSE AND COPYRIGHT
  * Contains Methods for Fileparsing on the Import
  *
  * - Child Classes must implement and use the abstract methods
+ * - Every ChildClass in /FileParsers must be registered in MittagQI\Translate5\Task\FileTypeSupport::coreParsers
  */
 abstract class editor_Models_Import_FileParser {
     /**

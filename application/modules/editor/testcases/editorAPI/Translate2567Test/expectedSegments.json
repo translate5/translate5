@@ -1,6 +1,6 @@
 [
     {
-        "source": "Text mit <div class=\"open 62 internal-tag ownttip\"><span class=\"short\" title=\"&lt;b&gt;\">&lt;1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;b&gt;<\/span><\/div>0<div class=\"close 2f62 internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/b&gt;\">&lt;\/1&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;\/b&gt;<\/span><\/div> in tags gab Probleme.",
+        "source": "Text mit <div class=\"open 62 internal-tag ownttip\"><span class=\"short\" title=\"&lt;b&gt;\">&lt;1&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;b&gt;</span></div>0<div class=\"close 2f62 internal-tag ownttip\"><span class=\"short\" title=\"&lt;/b&gt;\">&lt;/1&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;/b&gt;</span></div> in tags gab Probleme.",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -30,7 +30,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "Invalides XML <div class=\"single 696d67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;img&gt;<\/span><\/div> mit <div class=\"single 7370616e20646174612d746578743d2262c3b673650a5a65696c656e0a556d6272c3bc63686522 internal-tag ownttip\"><span class=\"short\" title=\"&lt;span data-text=&quot;b\u00f6se Zeilen Umbr\u00fcche&quot;&gt;\">&lt;2\/&gt;<\/span><span class=\"full\" data-originalid=\"2\" data-length=\"-1\">&lt;span data-text=&quot;b\u00f6se\nZeilen\nUmbr\u00fcche&quot;&gt;<\/span><\/div><div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span class=\"short\" title=\"&lt;3\/&gt;: Newline\">&lt;3\/&gt;<\/span><span class=\"full\" data-originalid=\"softReturn\" data-length=\"1\">\u21b5<\/span><\/div>Umbr\u00fcchen <div class=\"single 2f7370616e internal-tag ownttip\"><span class=\"short\" title=\"&lt;\/span&gt;\">&lt;4\/&gt;<\/span><span class=\"full\" data-originalid=\"3\" data-length=\"-1\">&lt;\/span&gt;<\/span><\/div> im Attribut gab Probleme.",
+        "source": "Invalides XML <div class=\"single 696d67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;img&gt;</span></div> mit <div class=\"single 7370616e20646174612d746578743d2262c3b673650a5a65696c656e0a556d6272c3bc63686522 internal-tag ownttip\"><span class=\"short\" title=\"&lt;span data-text=&quot;böse↵Zeilen↵Umbrüche&quot;&gt;\">&lt;2/&gt;</span><span class=\"full\" data-originalid=\"2\" data-length=\"-1\">&lt;span data-text=&quot;böse↵Zeilen↵Umbrüche&quot;&gt;</span></div><div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span class=\"short\" title=\"&lt;3/&gt;: Newline\">&lt;3/&gt;</span><span class=\"full\" data-originalid=\"softReturn\" data-length=\"1\">↵</span></div>Umbrüchen <div class=\"single 2f7370616e internal-tag ownttip\"><span class=\"short\" title=\"&lt;/span&gt;\">&lt;4/&gt;</span><span class=\"full\" data-originalid=\"3\" data-length=\"-1\">&lt;/span&gt;</span></div> im Attribut gab Probleme.",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -50,7 +50,7 @@
         "workflowStep": null,
         "isRepeated": "0",
         "sourceMd5": "c5135d9d75903577d4c9c4d4655e5c64",
-        "sourceToSort": "Invalides XML  mit \u21b5Umbr\u00fcchen  im Attribut gab Probleme.",
+        "sourceToSort": "Invalides XML  mit ↵Umbrüchen  im Attribut gab Probleme.",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
         "targetEditToSort": "",
@@ -60,7 +60,7 @@
         "isFirstofFile": null
     },
     {
-        "source": "Invalides XML <div class=\"single 696d67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img&gt;\">&lt;1\/&gt;<\/span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;img&gt;<\/span><\/div> mit invaliden &lt;donotexist&gt;HTML Tags&lt;\/donotexist&gt; m\u00fcssen encodiert sein!",
+        "source": "Invalides XML <div class=\"single 696d67 internal-tag ownttip\"><span class=\"short\" title=\"&lt;img&gt;\">&lt;1/&gt;</span><span class=\"full\" data-originalid=\"1\" data-length=\"-1\">&lt;img&gt;</span></div> mit invaliden &lt;donotexist&gt;HTML Tags&lt;/donotexist&gt; müssen encodiert sein!",
         "sourceEdit": null,
         "target": "",
         "targetEdit": "",
@@ -80,7 +80,7 @@
         "workflowStep": null,
         "isRepeated": "0",
         "sourceMd5": "ade377f700a9230867553c5ba78d0b0b",
-        "sourceToSort": "Invalides XML  mit invaliden &lt;donotexist&gt;HTML Tags&lt;\/donotexist&gt; m\u00fcssen encodiert sein!",
+        "sourceToSort": "Invalides XML  mit invaliden &lt;donotexist&gt;HTML Tags&lt;/donotexist&gt; müssen encodiert sein!",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
         "targetEditToSort": "",
