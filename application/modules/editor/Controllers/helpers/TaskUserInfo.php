@@ -132,52 +132,77 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
             $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser'],$taskguid));
         }
         
-        $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
-        /* @var $fields editor_Models_SegmentField */
-        
-        $userPref = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
-        /* @var $userPref editor_Models_Workflow_Userpref */
-        
+        $fields = ZfExtended_Factory::get(editor_Models_SegmentField::class);
+
+        $userPref = ZfExtended_Factory::get(editor_Models_Workflow_Userpref::class);
+
         //we load alls fields, if we are in taskOverview and are allowed to edit all
         // or we have no userStep to filter / search by.
         // No userStep means indirectly that we do not have a TUA (pmCheck)
         // task in state import means in some point there will be no user pref record in the database
-        if(!$this->isInTaskContext && $isEditAll || empty($row['userStep']) || $row['state'] === editor_Models_Task::STATE_IMPORT) {
-            $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
+        if ((!$this->isInTaskContext && $isEditAll) ||
+            empty($row['userStep']) ||
+            $row['state'] === editor_Models_Task::STATE_IMPORT) {
+
+            try {
+                $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
+            }catch (ZfExtended_Models_Entity_NotFoundException $exception) {
+                $row['segmentFields'] = [];
+            }
+
             //the pm sees all, so fix userprefs
             $userPref->setNotEditContent(false);
             $userPref->setAnonymousCols(false);
             $userPref->setVisibility($userPref::VIS_SHOW);
-            $allFields = array_map(function($item) {
+            $allFields = array_map(function ($item) {
                 return $item['name'];
             }, $row['segmentFields']);
             $userPref->setFields(join(',', $allFields));
+
         } else {
-            $user = new Zend_Session_Namespace('user');
-            $userPref->loadByTaskUserAndStep($taskguid, $this->workflow->getName(), $user->data->userGuid, $row['userStep']);
-            $row['segmentFields'] = $fields->loadByUserPref($userPref);
+
+            try {
+                $userPref->loadByTaskUserAndStep(
+                    $taskguid,
+                    $this->workflow->getName(),
+                    ZfExtended_Authentication::getInstance()->getUser()->getUserGuid(),
+                    $row['userStep']
+                );
+
+                $row['segmentFields'] = $fields->loadByUserPref($userPref);
+            }catch (ZfExtended_Models_Entity_NotFoundException $throwable){
+                $row['segmentFields'] = [];
+            }
         }
-        
-        $row['userPrefs'] = array($userPref->getDataObject());
-        $row['notEditContent'] = (bool)$row['userPrefs'][0]->notEditContent;
-        
+
+        $row['userPrefs'] = $userPref->hasRow() ? array($userPref->getDataObject()) : [];
+
+        $row['notEditContent'] = empty($row['userPrefs']) || $row['userPrefs'][0]->notEditContent;
+
         $config = Zend_Registry::get('config');
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        foreach($row['segmentFields'] as &$field) {
+
+        foreach ($row['segmentFields'] as &$field) {
             //TRANSLATE-318: replacing of a subpart of the column name is a client specific feature
             $needle = $config->runtimeOptions->segments->fieldMetaIdentifier;
-            if(!empty($needle)) {
+            if (!empty($needle)) {
                 $field['label'] = str_replace($needle, '', $field['label']);
             }
             $field['label'] = $translate->_($field['label']);
         }
-        if(empty($this->segmentFieldManager)) {
+
+        if (empty($this->segmentFieldManager)) {
             $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         }
         //sets the information if this task has default segment field layout or not
-        $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(array_map(function($field){
-            return $field['name'];
-        }, $row['segmentFields']));
+        $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(
+            array_map(
+                function ($field) {
+                    return $field['name'];
+                },
+                $row['segmentFields']
+            )
+        );
             
         $this->handleUserTracking($row);
     }
