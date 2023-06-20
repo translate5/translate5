@@ -47,6 +47,14 @@ abstract class editor_ImageTag {
      * @return string
      */
     public function getHtmlTag(array $parameters) {
+        // CRUCIAL: Newlines in internal tags will break frontend-functionality. Therefore we turn all newlines in the content & title to "↵"
+        // the export/back-conversion will be done with the base64-encoded data thus this replacing otherwise will do no harm
+        if(isset($parameters['text'])){
+            $parameters['text'] = editor_Utils::visualizeNewlines($parameters['text']);
+        }
+        if(isset($parameters['title'])){
+            $parameters['title'] = editor_Utils::visualizeNewlines($parameters['title']);
+        }
         if(! isset($parameters['length'])) {
             $parameters['length'] = -1;
         }

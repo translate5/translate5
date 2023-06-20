@@ -30,7 +30,6 @@ namespace MittagQI\Translate5\Task\Import\FileParser;
 
 use editor_Models_Import_FileParser as FileParser;
 use editor_Models_Import_FileParser_NoParserException;
-use editor_Models_Import_SupportedFileTypes;
 use editor_Models_SegmentFieldManager as SegmentFieldManager;
 use editor_Models_Task;
 use SplFileInfo;
@@ -44,16 +43,12 @@ use ZfExtended_Logger;
  */
 class Factory
 {
-
-    private editor_Models_Import_SupportedFileTypes $supportedFiles;
-
     /**
      * @param editor_Models_Task $task
      * @param SegmentFieldManager $segmentFieldManager
      */
     public function __construct(private editor_Models_Task $task, private SegmentFieldManager $segmentFieldManager)
     {
-        $this->supportedFiles = ZfExtended_Factory::get(editor_Models_Import_SupportedFileTypes::class);
     }
 
     /***
@@ -112,7 +107,7 @@ class Factory
     protected function lookupFileParserCls(string $extension, SplFileInfo $file): string
     {
         $errorMessages = [];
-        $parserClass = $this->supportedFiles->hasSupportedParser($extension, $file, $errorMessages);
+        $parserClass = $this->task->getFileTypeSupport()->hasSupportedParser($extension, $file, $errorMessages);
 
         if (!is_null($parserClass)) {
             return $parserClass;
@@ -124,7 +119,7 @@ class Factory
             'task' => $this->task,
             'extension' => $extension,
             'errorMessages' => $errorMessages,
-            'availableParsers' => $this->supportedFiles->getSupportedExtensions(),
+            'availableParsers' => $this->task->getFileTypeSupport()->getSupportedExtensions(),
         ]);
     }
 }

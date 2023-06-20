@@ -382,7 +382,7 @@ function isAvailableLocale(localeToCheck, allLocalesAvailable) {
  * @returns array
  */
 function setAllowedFileTypes() {
-    fileTypesAllowed = Editor.data.languageresource.fileExtension;
+    fileTypesAllowed = Editor.data.supportedFileExtensions;
 }
 /**
  * Is the given fileType allowed?

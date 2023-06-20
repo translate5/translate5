@@ -26,12 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
+use MittagQI\Translate5\Task\FileTypeSupport;
+
 /**
  * Task Object Instance as needed in the application
  * @method integer getId() getId()
@@ -900,14 +896,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * returns a Zend_Config Object with task specific settings
-     * @deprecated must be changed with TRANSLATE-471
-     * @return Zend_Config
+     * Retrieves the file-type-support for a task.
+     * Can only be used for saved tasks
+     * @return FileTypeSupport
+     * @throws ZfExtended_Exception
      */
-    public function getAsConfig() {
-        return new Zend_Config(array(
-            'enableSourceEditing' => (bool)$this->getEnableSourceEditing()
-        ));
+    public function getFileTypeSupport(): FileTypeSupport
+    {
+        return FileTypeSupport::taskInstance($this);
     }
 
     /**

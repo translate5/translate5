@@ -28,6 +28,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_Validator_TaskMeta extends ZfExtended_Models_Validator_Abstract {
     protected function defineValidators() {
+        // TODO FIXME: validators seem to be unmaintained, check & add
+        // $this->addValidator('mappingType', 'inArray', ['source', 'target', null]);
+        $this->addValidator('bconfInZip', 'stringLength', ['min' => 5, 'max' => 255]);
         $this->addValidator('pricingPresetId', 'int');
     }
 }

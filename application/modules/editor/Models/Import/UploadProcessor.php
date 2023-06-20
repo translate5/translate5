@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Processes uploaded files on task creation and prepares a data provider for further processing
  */
-class editor_Models_Import_UploadProcessor {
+final class editor_Models_Import_UploadProcessor {
     const TYPE_ZIP = 'zip';
 
     /**
@@ -42,6 +42,44 @@ class editor_Models_Import_UploadProcessor {
     const ERROR_INVALID_FILE = 'noValidUploadFile';
     const ERROR_EMPTY_FILE = 'emptyUploadFile';
     const ERROR_NO_WORKFILES = 'fileUploadErrorIniSize';
+
+    /**
+     * Holds a processor for each processed task
+     * This is handled here and not in the task-entity as this is only relevant in the import-phase
+     * @var editor_Models_Import_UploadProcessor[]
+     */
+    private static array $_instances = [];
+    /**
+     * Extendable list of single upload processors
+     * These are shared for all task-imports in a request
+     * @var [editor_Models_Import_UploadProcessor_GenericUpload]
+     */
+    protected static $singleUploadProcessors = [];
+
+    /**
+     * Adds Upload-Processors
+     * Plugins need to do that in the bootsrapping-phase
+     * @param editor_Models_Import_UploadProcessor_GenericUpload $up
+     * @return void
+     */
+    public static function addUploadProcessor(editor_Models_Import_UploadProcessor_GenericUpload $up)
+    {
+        self::$singleUploadProcessors[$up->getFieldName()] = $up;
+    }
+
+    /**
+     * Retrieves the instance for the current task.
+     * @param editor_Models_Task $task
+     * @return editor_Models_Import_UploadProcessor
+     */
+    public static function taskInstance(editor_Models_Task $task): editor_Models_Import_UploadProcessor
+    {
+        $taskIdentifier = trim($task->getTaskGuid(), '{}');
+        if(!array_key_exists($taskIdentifier, self::$_instances)){
+            self::$_instances[$taskIdentifier] = new self($task);
+        }
+        return self::$_instances[$taskIdentifier];
+    }
 
     /**
      * Is set to true if there are some unknown upload errors (mostly POST size exceed ini size, which must be handled by the admin)
@@ -67,28 +105,19 @@ class editor_Models_Import_UploadProcessor {
      */
     protected $mainUpload;
 
-    /**
-     * Extendable list of single upload processors
-     * @var [editor_Models_Import_UploadProcessor_GenericUpload]
-     */
-    protected static $singleUploadProcessors = [];
+    private function __construct(editor_Models_Task $task) {
 
-    public static function addUploadProcessor(editor_Models_Import_UploadProcessor_GenericUpload $up) {
-        self::$singleUploadProcessors[$up->getFieldName()] = $up;
-    }
-
-    public function __construct() {
         $this->upload = new Zend_File_Transfer_Adapter_Http();
 
         //add the processor for the default mandatory import file:
-        $this->mainUpload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor_ImportUpload');
+        $this->mainUpload = ZfExtended_Factory::get(editor_Models_Import_UploadProcessor_ImportUpload::class, [$task]);
         self::addUploadProcessor($this->mainUpload);
 
         //add the optional TBX file
-        self::addUploadProcessor(ZfExtended_Factory::get('editor_Models_Import_UploadProcessor_GenericUpload', [self::FIELD_TBX]));
+        self::addUploadProcessor(ZfExtended_Factory::get(editor_Models_Import_UploadProcessor_GenericUpload::class, [self::FIELD_TBX]));
         
         //add the optional Task Config File
-        self::addUploadProcessor(ZfExtended_Factory::get('editor_Models_Import_UploadProcessor_GenericUpload', [self::FIELD_CONFIG]));
+        self::addUploadProcessor(ZfExtended_Factory::get(editor_Models_Import_UploadProcessor_GenericUpload::class, [self::FIELD_CONFIG]));
 
         //examples for adding relais and reference files to single upload too
         //$config = Zend_Registry::get('config')->runtimeOptions->import;
@@ -111,7 +140,7 @@ class editor_Models_Import_UploadProcessor {
             /* @var $up editor_Models_Import_UploadProcessor_GenericUpload */
             $up->initAndValidate($this->upload, function(array $errors) use ($up){
                 foreach($errors as $type => $error) {
-                    $this->addUploadError($up->getFieldName(),$type, $error);
+                    $this->addUploadError($up->getFieldName(), $type, $error);
                 }
             });
         }
@@ -151,7 +180,10 @@ class editor_Models_Import_UploadProcessor {
     /**
      * Adds an upload error
      * @see editor_Models_Import_UploadProcessor::throwOnUploadError
+     * @param string $fileField
      * @param string $errorType
+     * @param string|null $msg
+     * @return void
      */
     protected function addUploadError(string $fileField, string $errorType, string $msg = null) {
         if(!isset($this->uploadErrors[$fileField])) {

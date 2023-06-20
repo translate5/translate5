@@ -48,7 +48,7 @@ class OkapiExtensionMappingTest extends editor_Test_JsonTest
      */
     protected static function setupImport(Config $config): void
     {
-        static::$testBconf = $config->addBconf('ExtensionMappingTestBconf', 'Extensions-xdrts-nzttdst.bconf');
+        static::$testBconf = $config->addBconf('ExtensionMappingTestBconf', 'extensions-uvw-xyz.bconf');
     }
 
     /**
@@ -57,12 +57,12 @@ class OkapiExtensionMappingTest extends editor_Test_JsonTest
     public function testAddedExtensions() {
         $config = static::getConfig();
         $task = $config
-            ->addTask('en', 'de', -1, 'Extensions-xdrts-nzttdst-en-de.zip')
+            ->addTask('en', 'de', -1, 'textfiles-uvw-xyz-en-de.zip')
             ->setImportBconfId(static::$testBconf->getId())
             ->setToEditAfterImport();
         $config->import($task);
         $segments = static::api()->getSegments();
-        $this->assertSegmentsEqualsJsonFile('Extensions-xdrts-nzttdst-en-de.json', $segments, 'There was an error importing Extensions-xdrts-nzttdst-en-de.zip', false);
+        $this->assertSegmentsEqualsJsonFile('textfiles-uvw-xyz-en-de.json', $segments, 'There was an error importing textfiles-uvw-xyz-en-de.zip', false);
     }
 
     /**
@@ -71,11 +71,11 @@ class OkapiExtensionMappingTest extends editor_Test_JsonTest
     public function testEmbeddedExtensions() {
         $config = static::getConfig();
         $task = $config
-            ->addTask('en', 'de', -1, 'Extensions-xdrts-nzttdst-embedded-bconf-en-de.zip')
+            ->addTask('en', 'de', -1, 'extensions-embedded-matching-en-de.zip')
             ->setToEditAfterImport();
         $config->import($task);
         $segments = static::api()->getSegments();
-        $this->assertSegmentsEqualsJsonFile('Extensions-xdrts-nzttdst-embedded-bconf-en-de.json', $segments, 'There was an error importing Extensions-xdrts-nzttdst-embedded-bconf-en-de.zip', false);
+        $this->assertSegmentsEqualsJsonFile('extensions-embedded-matching-en-de.json', $segments, 'There was an error importing extensions-embedded-matching-en-de.zip', false);
     }
 
     /**
@@ -85,7 +85,7 @@ class OkapiExtensionMappingTest extends editor_Test_JsonTest
     {
         $config = static::getConfig();
         $task = $config
-            ->addTask('en', 'de', -1, 'Extensions-not-matching-en-de.zip')
+            ->addTask('en', 'de', -1, 'textfiles-txt-en-de.zip')
             ->setImportBconfId(static::$testBconf->getId())
             ->setNotToFailOnError();
         $config->import($task);
@@ -96,8 +96,8 @@ class OkapiExtensionMappingTest extends editor_Test_JsonTest
 
         static::assertStringContainsString('E1135', $eventsString, $message);
         static::assertStringContainsString('There are no importable files in the Task', $eventsString, $message);
-        static::assertStringContainsString('.xdrts', $eventsString, $message);
-        static::assertStringContainsString('.nzttdst', $eventsString, $message);
+        static::assertStringContainsString('.uvw', $eventsString, $message);
+        static::assertStringContainsString('.xyz', $eventsString, $message);
     }
 
     /**
@@ -107,7 +107,7 @@ class OkapiExtensionMappingTest extends editor_Test_JsonTest
     {
         $config = static::getConfig();
         $task = $config
-            ->addTask('en', 'de', -1, 'Extensions-not-matching-embedded-en-de.zip')
+            ->addTask('en', 'de', -1, 'extensions-embedded-not-matching-en-de.zip')
             ->setNotToFailOnError();
         $config->import($task);
 
@@ -117,7 +117,6 @@ class OkapiExtensionMappingTest extends editor_Test_JsonTest
 
         static::assertStringContainsString('E1135', $eventsString, $message);
         static::assertStringContainsString('There are no importable files in the Task', $eventsString, $message);
-        static::assertStringContainsString('.abcdef', $eventsString, $message);
-        static::assertStringContainsString('.ghijkl', $eventsString, $message);
+        static::assertStringContainsString('.txt', $eventsString, $message);
     }
 }
