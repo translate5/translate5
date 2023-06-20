@@ -236,10 +236,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         });
     },
     isDeleteDisabled: function(view, rowIndex, colIndex, item, record){
-        return record.get('isDefault') || view.grid.isCustomerGrid && !record.get('customerId') || record.get('name') === Editor.data.plugins.Okapi.systemStandardBconfName;
+        return record.get('isDefault') || view.grid.isCustomerGrid && !record.get('customerId') || record.get('name') === Editor.data.plugins.Okapi.systemDefaultBconfName;
     },
     isEditDisabled: function(view, rowIndex, colIndex, item, record){
-        return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemStandardBconfName));
+        return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemDefaultBconfName));
     },
 
     filterByText: function(field, searchString){
@@ -391,7 +391,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         var grid = this.getView(),
             {name, customerId} = cellContext.record.getData();
         grid.view.select(cellContext.record);
-        if(name === Editor.data.plugins.Okapi.systemStandardBconfName || grid.isCustomerGrid && !customerId){
+        if(name === Editor.data.plugins.Okapi.systemDefaultBconfName || grid.isCustomerGrid && !customerId){
             return false; // Can't change system default and globals bconfs in customer view
         }
         if(cellContext.field === 'name'){
@@ -452,7 +452,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
                 var result = Ext.JSON.decode(xhr.responseText, true);
                 record.set('isDefault', true, { dirty: false, commit: false, silent: false });
                 gridView.refreshNode(record);
-                Editor.data.plugins.Okapi.systemDefaultBconfId = record.getId(); // Crucial: the default-id is a global that must be updated!
+                Editor.data.plugins.Okapi.defaultBconfId = record.getId(); // Crucial: the default-id is a global that must be updated!
                 if(result.oldId && result.oldId > 0){
                     var store = gridView.ownerGrid.getStore(),
                         oldRrecord = store.getById(result.oldId);

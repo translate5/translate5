@@ -130,4 +130,14 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
     {
         return 1;
     }
+
+    /**
+     * Retrieves the task this worker is bound to
+     * Can only be called after ::init()
+     * @return editor_Models_Task
+     */
+    public function getTask(): editor_Models_Task
+    {
+        return $this->task;
+    }
 }

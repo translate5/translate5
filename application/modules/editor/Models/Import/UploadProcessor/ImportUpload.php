@@ -30,14 +30,12 @@ END LICENSE AND COPYRIGHT
  * process the importUpload field
  */
 class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Import_UploadProcessor_GenericUpload {
-    /**
-     * @var string
-     */
+
     protected $fieldName = 'importUpload';
     
     protected $optional = false;
-    
-    public function __construct() {
+
+    public function __construct(protected editor_Models_Task $task) {
         $this->targetDirectory = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
     }
     
@@ -70,12 +68,10 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
     {
         $errors = [];
 
-        $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
-        /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
-        $allValidExtensions = $supportedFiles->getSupportedExtensions();
+        $allValidExtensions = $this->task->getFileTypeSupport()->getSupportedExtensions();
 
-        $log = Zend_Registry::get('logger');
-        /* @var $log ZfExtended_Logger */
+        /* @var ZfExtended_Logger $logger */
+        $logger = Zend_Registry::get('logger');
 
         $fileIndex = 0;
         foreach ($files as $file){
@@ -91,8 +87,7 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
                     'ext' => $ext,
                     'filename' => $file,
                 ];
-
-                $log->info('E1031', 'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.', $data);
+                $logger->info('E1031', 'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.', $data);
                 $errors[] = editor_Models_Import_UploadProcessor::ERROR_INVALID_FILE;
             }
             $fileIndex++;

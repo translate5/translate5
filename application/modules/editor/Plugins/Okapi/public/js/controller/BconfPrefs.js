@@ -155,7 +155,7 @@ Ext.define('Editor.plugins.Okapi.controller.BconfPrefs', {
             name: 'bconfId',
             valueField: 'id',
             disabled: true,
-            value: Editor.data.plugins.Okapi.systemDefaultBconfId,
+            value: Editor.data.plugins.Okapi.defaultBconfId,
             fieldLabel: Editor.plugins.Okapi.view.BconfGrid.prototype.strings.titleLong,
             tpl: Ext.create('Ext.XTemplate',
                 '<ul class="x-list-plain t5leveledList"><tpl for=".">',
