@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Segment\Db\Processing;
+use MittagQI\ZfExtended\Worker\Queue;
 
 /**
  * The central Quality Manager
@@ -59,7 +60,7 @@ final class editor_Segment_Quality_Manager {
         // queues the operation workers
         self::instance()->queueOperation(editor_Segment_Processing::RETAG, $task, $parentId);
         // triggers the worker-queue
-        $workerQueue = ZfExtended_Factory::get(ZfExtended_Worker_Queue::class);
+        $workerQueue = ZfExtended_Factory::get(Queue::class);
         $workerQueue->trigger();
     }
 
@@ -81,7 +82,7 @@ final class editor_Segment_Quality_Manager {
         // queues the operation workers
         self::instance()->queueOperation(editor_Segment_Processing::TAGTERMS, $task, $parentId);
         // trigger the workers to work
-        $wq = ZfExtended_Factory::get(ZfExtended_Worker_Queue::class);
+        $wq = ZfExtended_Factory::get(Queue::class);
         $wq->trigger();
     }
 
