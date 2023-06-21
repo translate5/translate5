@@ -164,7 +164,7 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
 
         $this->io->text($out);
         if(!$data->editable) {
-            $this->io->warning('User is not editable!');
+            $this->io->warning('User is not editable in the UI!');
         }
     }
 

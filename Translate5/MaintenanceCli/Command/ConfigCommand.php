@@ -80,6 +80,13 @@ Modified values are shown bold in the simple listing.');
             'c',
             InputOption::VALUE_REQUIRED,
             'Add a comment for this config value');
+
+        $this->addOption(
+            'force-system-level',
+            null,
+            InputOption::VALUE_NONE,
+            'Resets ON UPDATING THE VALUE the level to system level - for security / demo purposes for example'
+        );
     }
 
     /**
@@ -205,7 +212,13 @@ Modified values are shown bold in the simple listing.');
         if(!is_null($comment)) {
             $exactConfig['comment'] = $comment;
         }
-        $config->update($exactConfig['name'], $exactConfig['value'], $this->input->getOption('comment'));
+        $forceSystemLevel = (bool) $this->input->getOption('force-system-level');
+        $config->update(
+            $exactConfig['name'],
+            $exactConfig['value'],
+            $this->input->getOption('comment'),
+            $forceSystemLevel
+        );
         $this->showDetail($exactConfig, $config);
         if(array_key_exists('overwritten', $exactConfig)) {
             $this->io->warning($msg.' (in the DB only - change/remove it manually in/from the installation.ini)');

@@ -94,6 +94,13 @@ class UserCreateCommand extends UserAbstractCommand
             'p',
             InputOption::VALUE_REQUIRED,
             'Set an password for the user to create');
+
+        $this->addOption(
+            'read-only',
+            null,
+            InputOption::VALUE_NONE,
+            'Creates the user non editable from the UI.'
+        );
     }
 
     /**
@@ -124,6 +131,10 @@ class UserCreateCommand extends UserAbstractCommand
         $userModel->setUserGuid(ZfExtended_Utils::guid(true));
         $userModel->setGender($userModel::GENDER_NONE);
         $userModel->setLocale($this->input->getOption('locale'));
+
+        if ($this->input->getOption('read-only')) {
+            $userModel->setEditable(false);
+        }
 
         $roles = $this->input->getOption('choose-roles')
             ? $this->askRoles('editor')
