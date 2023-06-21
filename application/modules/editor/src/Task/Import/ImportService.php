@@ -97,7 +97,7 @@ class ImportService
             );
         }
 
-        $upload = ZfExtended_Factory::get(editor_Models_Import_UploadProcessor::class);
+        $upload = editor_Models_Import_UploadProcessor::taskInstance($project);
         $upload->initAndValidate();
 
         $dpFactory = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
@@ -123,7 +123,7 @@ class ImportService
         bool $importWizardUsed
     ): array {
         //gets and validates the uploaded zip file
-        $upload = ZfExtended_Factory::get(editor_Models_Import_UploadProcessor::class);
+        $upload = editor_Models_Import_UploadProcessor::taskInstance($task);
         $dpFactory = ZfExtended_Factory::get(editor_Models_Import_DataProvider_Factory::class);
         $upload->initAndValidate();
         $dp = $dpFactory->createFromUpload($upload, $data);
@@ -207,7 +207,7 @@ class ImportService
             $projectTasks[] = $task->getDataObject();
         }
 
-        $project->setState($task::STATE_PROJECT);
+        $project->setState(editor_Models_Task::STATE_PROJECT);
         $project->save();
 
         return $projectTasks;
@@ -223,6 +223,7 @@ class ImportService
         array $data,
         ZfExtended_Models_User $user
     ): void {
+
         $task->meta();
         $this->eventTrigger->triggerBeforeProcessUploadedFile($task, $data);
 

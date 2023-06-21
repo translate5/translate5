@@ -252,8 +252,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         
         if ($this->segmentCount === 0) {
-            //'E1191' => 'The XLF file "{fileName} (id {fileId})" does not contain any translation relevant segments.',
-            throw new editor_Models_Import_FileParser_Xlf_Exception('E1191', [
+            // processing files with no segments should only log a warning.
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.xlf');
+            $logger->warn('E1191', 'The XLF file "{fileName} (id {fileId})" does not contain any translation relevant segments.', [
                 'task' => $this->task,
                 'fileName' => $this->_fileName,
                 'fileId' => $this->_fileId,

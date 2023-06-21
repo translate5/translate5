@@ -167,7 +167,7 @@ END LICENSE AND COPYRIGHT
                 <?= $translate->_('Drag and Drop oder anklicken zum hochladen einer Datei'); ?>
             </div>
             <?php // the following input type="file" must be outside of the <div class="dropSourceFile.. else we have a JS problem and Drag'nDrop will not work ?>
-            <input id="sourceFile" name="sourceFile" type="file" class="hide" accept=".<?= implode(',.', $this->Php2JsVars()->get('languageresource')->fileExtension); ?>" />
+            <input id="sourceFile" name="sourceFile" type="file" class="hide" accept=".<?= implode(',.', $this->Php2JsVars()->get('supportedFileExtensions')); ?>" />
             
             <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="translationSubmit marginTop click-starts-translation ui-corner-all ui-button ui-widget"/>
             

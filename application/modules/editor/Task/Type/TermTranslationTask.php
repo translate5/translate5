@@ -38,6 +38,8 @@ class editor_Task_Type_TermTranslationTask extends editor_Task_Type_ProjectTask 
      */
     const ID = 'termtranslationTask';
 
+    protected bool $useSysDefaultFileFormatSettings = true;
+
     /**
      * @param bool $multiTarget
      * @param string $projectType

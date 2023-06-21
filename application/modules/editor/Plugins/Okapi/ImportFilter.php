@@ -42,14 +42,15 @@ final class ImportFilter
 
     public function __construct(private ?editor_Plugins_Okapi_Bconf_Entity $bconf = null, private ?string $bconfInZip = null)
     {
-        if ($bconf !== null) {
-
-            $this->supportedExtensions = $bconf->getSupportedExtensions();
-
-        } else if ($bconfInZip !== null) {
+        if ($bconfInZip !== null) {
 
             $analysis = new editor_Plugins_Okapi_Bconf_Analysis($bconfInZip);
             $this->supportedExtensions = $analysis->getExtensionMapping()->getAllExtensions();
+            $this->bconf = null;
+
+        } else if ($bconf !== null) {
+
+            $this->supportedExtensions = $bconf->getSupportedExtensions();
 
         } else {
 
@@ -91,7 +92,7 @@ final class ImportFilter
      */
     public function hasEmbeddedBconf(): bool
     {
-        return ($this->bconf === null && $this->bconfInZip !== null);
+        return ($this->bconfInZip !== null);
     }
 
     /**
@@ -130,5 +131,4 @@ final class ImportFilter
             return basename($this->bconfInZip) . ' (from Import-ZIP)';
         }
     }
-
 }

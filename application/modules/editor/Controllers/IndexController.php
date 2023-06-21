@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Applet\Dispatcher;
+use MittagQI\Translate5\Task\FileTypeSupport;
 use MittagQI\Translate5\Service\Services;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\Reimport\FileparserRegistry;
@@ -331,14 +332,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action
         // whole feature (Checkbox at Import).
         $this->view->Php2JsVars()->set('enableSourceEditing', (bool)$rop->import->enableSourceEditing);
 
-        $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
-        /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
-        $this->view->Php2JsVars()->set('import.validExtensions', $supportedFiles->getSupportedExtensions());
+        // set supported extensions
+        $this->view->Php2JsVars()->set('import.validExtensions', FileTypeSupport::defaultInstance()->getSupportedExtensions());
         $this->view->Php2JsVars()->set(
             'import.forbiddenReferenceExtensions',
             editor_Models_Import_DirectoryParser_ReferenceFiles::FORBIDDEN_EXTENSIONS
         );
-        $this->view->Php2JsVars()->set('import.nativeParserExtensions', $supportedFiles->getNativeParserExtensions());
+        $this->view->Php2JsVars()->set('import.nativeParserExtensions', FileTypeSupport::defaultInstance()->getNativeParserExtensions());
 
         $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
         $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (int)$rop->editor->columns->widthOffsetEditable);
