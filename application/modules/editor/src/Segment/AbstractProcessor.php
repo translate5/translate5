@@ -30,7 +30,7 @@ namespace MittagQI\Translate5\Segment;
 
 use editor_Models_Task;
 use editor_Segment_Tags;
-use MittagQI\Translate5\Service\DockerServiceAbstract;
+use MittagQI\Translate5\Service\AbstractHttpService;
 use ZfExtended_Exception;
 
 abstract class AbstractProcessor
@@ -47,9 +47,9 @@ abstract class AbstractProcessor
     protected editor_Models_Task $task;
 
     /**
-     * @var DockerServiceAbstract
+     * @var AbstractHttpService
      */
-    protected DockerServiceAbstract $service;
+    protected AbstractHttpService $service;
 
     /**
      * @var string
@@ -68,14 +68,19 @@ abstract class AbstractProcessor
 
     /**
      * @param editor_Models_Task $task
-     * @param DockerServiceAbstract $service
+     * @param AbstractHttpService $service
      * @param string $processingMode
      * @param string|null $serviceUrl
      * @param bool $isWorkerContext
      * @throws ZfExtended_Exception
      */
-    public function __construct(editor_Models_Task $task, DockerServiceAbstract $service, string $processingMode, string $serviceUrl = null, bool $isWorkerContext = false)
-    {
+    public function __construct(
+        editor_Models_Task $task,
+        AbstractHttpService $service,
+        string $processingMode,
+        string $serviceUrl = null,
+        bool $isWorkerContext = false
+    ) {
         $this->task = $task;
         $this->service = $service;
         $this->processingMode = $processingMode;
