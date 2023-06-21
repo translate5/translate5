@@ -92,13 +92,18 @@ final class T5memoryTmListCommand extends Translate5AbstractCommand
             }
 
             $languageResource->load($languageResourceData['id']);
-            $connector->connectTo(
-                $languageResource,
-                $languageResource->getSourceLang(),
-                $languageResource->getTargetLang()
-            );
 
-            $status = $connector->getStatus($languageResource->getResource());
+            try {
+                $connector->connectTo(
+                    $languageResource,
+                    $languageResource->getSourceLang(),
+                    $languageResource->getTargetLang()
+                );
+
+                $status = $connector->getStatus($languageResource->getResource());
+            } catch (\Throwable) {
+                $status = 'Language resource service is not available';
+            }
 
             $tmName = $connector->getApi()->getTmName();
             $url = rtrim($languageResource->getResource()->getUrl(), '/') . '/';
