@@ -136,9 +136,11 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
             ]);
             $okapiConfig = $taskConfig->runtimeOptions->plugins->Okapi;
             $serverUsed = $okapiConfig->serverUsed ?? 'not set';
-            $this->logger->info('E1444', 'Okapi Plug-In: Task was imported with Okapi "{okapi}"', [
+            $this->logger->info('E1444', 'Okapi Plug-In: File "{fileName}" (id: {fileId}) was imported with Okapi "{okapi}"', [
                 'task' => $this->task,
                 'okapi' => $serverUsed,
+                'fileId' => $fileId,
+                'fileName' => $file->getBasename(),
                 'okapiUrl' => $okapiConfig->server?->$serverUsed ?? 'server used not found',
                 'usedBconf' => $params['bconfName']
             ], ['tasklog', 'ecode']);
