@@ -104,7 +104,7 @@ class editor_ConfigController extends ZfExtended_RestController {
 
         $userGuid = $this->data->userGuid ?? null;
         if(!empty($userGuid)){
-            $this->checkUserGuid($userGuid);
+            editor_Models_Config::checkUserGuid($userGuid);
             $level = $this->entity::CONFIG_LEVEL_USER;
         }
         
@@ -240,18 +240,6 @@ class editor_ConfigController extends ZfExtended_RestController {
     public function deleteAction() {
         throw new ZfExtended_BadMethodCallException(__CLASS__.'->'.__FUNCTION__);
     }
-    
-    /***
-     * Validate if the current user config load is for the current user
-     * @param string $userGuid
-     * @throws editor_Models_ConfigException
-     */
-    protected function checkUserGuid(string $userGuid){
-        $userSession = new Zend_Session_Namespace('user');
-        if($userSession->data->userGuid !=$userGuid){
-            throw new editor_Models_ConfigException('E1299');
-        }
-    }
 
     /**
      * Check if the current user is allowed to update config with $level
@@ -331,10 +319,10 @@ class editor_ConfigController extends ZfExtended_RestController {
         }
         $userGuid = $this->getParam('userGuid');
         if(!empty($userGuid)){
-            $this->checkUserGuid($userGuid);
+            editor_Models_Config::checkUserGuid($userGuid);
             return array_values($this->entity->mergeUserValues($userGuid));
         }
-        
+
         return array_values($this->entity->mergeInstanceValue());
     }
 }

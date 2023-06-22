@@ -104,19 +104,24 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
         return $translate->_('Nutzung von TM-Treffern');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch($category){
-            case editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH:
-                return $translate->_('Unbearbeiteter Fuzzy');
-                
-            case editor_Segment_MatchRate_Provider::EDITED_100PERCENT_MATCH:
-                return $translate->_('Bearbeiteter 100% Match');
-        }
-        return NULL;
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        return match ($category) {
+            editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH => $translate->_('Unbearbeiteter Fuzzy'),
+            editor_Segment_MatchRate_Provider::EDITED_100PERCENT_MATCH => $translate->_('Bearbeiteter 100% Match'),
+            default => null,
+        };
     }
     
-    public function getAllCategories(editor_Models_Task $task) : array {
-        return [ editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH, editor_Segment_MatchRate_Provider::EDITED_100PERCENT_MATCH ];
+    public function getAllCategories(?editor_Models_Task $task) : array
+    {
+        return [
+            editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH,
+            editor_Segment_MatchRate_Provider::EDITED_100PERCENT_MATCH
+        ];
     }
     
     public function isFullyChecked(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {

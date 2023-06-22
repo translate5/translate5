@@ -205,6 +205,7 @@ class editor_QualityController extends ZfExtended_RestController {
         $toolTip = new editor_Models_Quality_TaskTooltip($task, true);
         echo $toolTip->getMarkup();
     }
+
     /**
      *
      * @throws ZfExtended_Models_Entity_NotFoundException

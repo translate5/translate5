@@ -137,18 +137,11 @@ class editor_Segment_Empty_QualityProvider extends editor_Segment_Quality_Provid
         return $translate->_('Das Ziel enthält nur Tags, Leerzeichen oder Interpunktion, die Quelle jedoch nicht.');
     }
 
-    /**
-     * Translate category: nothing to translate for this quality
-     *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @param string $category
-     * @param editor_Models_Task $task
-     * @return string|null
-     */
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        if($category == static::$type){
-            return $this->translateType($translate);
-        }
-        return NULL;
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        return $category == static::$type ? $this->translateType($translate) : null;
     }
 }

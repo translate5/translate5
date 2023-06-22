@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\QualityService;
 use MittagQI\Translate5\Task\Export\Package\Downloader;
 use MittagQI\Translate5\Task\Import\ImportService;
 use MittagQI\Translate5\Task\Import\ProjectWorkersService;
@@ -103,6 +104,7 @@ class editor_TaskController extends ZfExtended_RestController
     protected ProjectWorkersService $workersHandler;
     protected editor_Workflow_Default $workflow;
     protected editor_Workflow_Manager $workflowManager;
+    private QualityService $qualityService;
 
     public function init(): void
     {
@@ -166,6 +168,7 @@ class editor_TaskController extends ZfExtended_RestController
         );
         $this->importService = new ImportService();
         $this->workersHandler = new ProjectWorkersService();
+        $this->qualityService = new QualityService();
 
         //create a new logger instance writing only to the configured taskLogger
         $this->taskLog = ZfExtended_Factory::get(ZfExtended_Logger::class, [[
@@ -336,28 +339,25 @@ class editor_TaskController extends ZfExtended_RestController
      * returns all (filtered) tasks with added user data and quality data
      * uses $this->entity->loadAll
      */
-    protected function loadAllForTaskOverview() {
+    protected function loadAllForTaskOverview(): array
+    {
         $rows = $this->loadAll();
-        $taskGuids = array_map(function($item){
-            return $item['taskGuid'];
-        },$rows);
+        $taskGuids = array_map(fn ($item) => $item['taskGuid'], $rows);
 
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        /* @var $file editor_Models_File */
+        $file = ZfExtended_Factory::get(editor_Models_File::class);
         $fileCount = $file->getFileCountPerTasks($taskGuids);
         $isTransfer = $file->getTransfersPerTasks($taskGuids);
 
         $this->_helper->TaskUserInfo->initUserAssocInfos($rows);
 
         //load the task assocs
-        $languageResourcemodel = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /*@var $languageResourcemodel editor_Models_LanguageResources_LanguageResource */
+        $languageResourcemodel = ZfExtended_Factory::get(editor_Models_LanguageResources_LanguageResource::class);
         $resultlist = $languageResourcemodel->loadByAssociatedTaskGuidList($taskGuids);
 
         //group all assoc by taskguid
         $taskassocs = array();
-        foreach ($resultlist as $res){
-            if(!isset($taskassocs[$res['taskGuid']])){
+        foreach ($resultlist as $res) {
+            if (!isset($taskassocs[$res['taskGuid']])) {
                 $taskassocs[$res['taskGuid']] = array();
             }
             array_push($taskassocs[$res['taskGuid']], $res);
@@ -368,11 +368,12 @@ class editor_TaskController extends ZfExtended_RestController
 
         $customerData = $this->getCustomersForRendering($rows);
 
-        if($isMailTo){
+        if ($isMailTo) {
             $userData = $this->getUsersForRendering($rows);
         }
 
         foreach ($rows as &$row) {
+            $row['hasCriticalErrors'] = $this->qualityService->taskHasCriticalErrors($row['taskGuid']);
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
     
@@ -387,15 +388,15 @@ class editor_TaskController extends ZfExtended_RestController
             $row['isTransfer'] = isset($isTransfer[$row['taskGuid']]);
 
             //add task assoc if exist
-            if(isset($taskassocs[$row['taskGuid']])){
+            if (isset($taskassocs[$row['taskGuid']])) {
                 $row['taskassocs'] = $taskassocs[$row['taskGuid']];
             }
 
-            if($isMailTo) {
+            if ($isMailTo) {
                 $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
             }
             
-            if(empty($this->entity->getTaskGuid())){
+            if (empty($this->entity->getTaskGuid())) {
                 $this->entity->init($row);
             }
             // add quality related stuff
@@ -404,19 +405,24 @@ class editor_TaskController extends ZfExtended_RestController
             $this->addMissingSegmentrangesToResult($row);
         }
         // sorting of qualityErrorCount can only be done after QS data is attached
-        if($this->entity->getFilter()->hasSort('qualityErrorCount')){
+        if ($this->entity->getFilter()->hasSort('qualityErrorCount')) {
             $direction = SORT_ASC;
-            foreach($this->entity->getFilter()->getSort() as $sort){
-                if($sort->property == 'qualityErrorCount' && $sort->direction === 'DESC'){
+
+            foreach ($this->entity->getFilter()->getSort() as $sort) {
+                if ($sort->property == 'qualityErrorCount' && $sort->direction === 'DESC') {
                     $direction = SORT_DESC;
+
                     break;
                 }
             }
+
             $columns = array_column($rows, 'qualityErrorCount');
             array_multisort($columns, $direction, $rows);
         }
+
         return $rows;
     }
+
     /**
      * Adds the quality related props to the task model for the task overview (not project overview)
      * @param array $row
