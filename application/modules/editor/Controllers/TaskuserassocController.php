@@ -82,18 +82,17 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $this->entity->loadProjectWithUserInfo($projectId,$workflow);
     }
 
-    public function postDispatch() {
-        $acl = ZfExtended_Acl::getInstance();
-        if($acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'readAuthHash')) {
+    public function postDispatch()
+    {
+        if ($this->isAllowed('readAuthHash')) {
             parent::postDispatch();
             return;
         }
-        if(is_array($this->view->rows)) {
-            foreach($this->view->rows as &$row) {
+        if (is_array($this->view->rows)) {
+            foreach ($this->view->rows as &$row) {
                 unset($row['staticAuthHash']);
             }
-        }
-        elseif(is_object($this->view->rows)) {
+        } elseif (is_object($this->view->rows)) {
             unset($this->view->rows->staticAuthHash);
         }
         parent::postDispatch();
