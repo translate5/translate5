@@ -65,11 +65,10 @@ final class T5memoryTmListCommand extends Translate5AbstractCommand
 
         $table = $this->io->createTable();
         $table->setHeaders(['Tm name', 'Tm UUID', 'Status']);
-        $table->render();
-
         foreach ($this->getLocalTms() as $item) {
-            $table->appendRow([$item['name'], $item['uuid'], $item['status']]);
+            $table->addRow([$item['name'], $item['uuid'], $item['status']]);
         }
+        $table->render();
 
         // TODO add remote tms that do not exist locally after tm list query is fixed on t5memory side
 
