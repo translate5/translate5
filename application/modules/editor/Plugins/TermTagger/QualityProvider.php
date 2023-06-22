@@ -209,25 +209,28 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return $translate->_('Terminologie');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch($category){
-            case editor_Plugins_TermTagger_QualityProvider::NOT_FOUND_IN_TARGET:
-                return $translate->_('Nicht gefunden in Ziel');
-                
-            case editor_Plugins_TermTagger_QualityProvider::NOT_DEFINED_IN_TARGET:
-                return $translate->_('Nicht definiert in zielsprachl. Terminologie');
-                
-            case editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_TARGET:
-                return $translate->_('Verboten in Ziel');
-                
-            case editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_SOURCE:
-                return $translate->_('Verboten in Quelle');
-        }
-        return NULL;
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        return match ($category) {
+            self::NOT_FOUND_IN_TARGET => $translate->_('Nicht gefunden in Ziel'),
+            self::NOT_DEFINED_IN_TARGET => $translate->_('Nicht definiert in zielsprachl. Terminologie'),
+            self::FORBIDDEN_IN_TARGET => $translate->_('Verboten in Ziel'),
+            self::FORBIDDEN_IN_SOURCE => $translate->_('Verboten in Quelle'),
+            default => null,
+        };
     }
     
-    public function getAllCategories(editor_Models_Task $task) : array {
-        return [ editor_Plugins_TermTagger_QualityProvider::NOT_FOUND_IN_TARGET, editor_Plugins_TermTagger_QualityProvider::NOT_DEFINED_IN_TARGET, editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_TARGET, editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_SOURCE ];
+    public function getAllCategories(?editor_Models_Task $task) : array
+    {
+        return [
+            self::NOT_FOUND_IN_TARGET,
+            self::NOT_DEFINED_IN_TARGET,
+            self::FORBIDDEN_IN_TARGET,
+            self::FORBIDDEN_IN_SOURCE
+        ];
     }
 
     public function isSegmentTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {

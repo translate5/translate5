@@ -54,7 +54,19 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         self::CONFIG_LEVEL_TASK     => 'task',
         self::CONFIG_LEVEL_USER     => 'user'
     ];
-    
+
+    /**
+     * Validate if the current user config load is for the current user
+     * @throws editor_Models_ConfigException
+     */
+    public static function checkUserGuid(string $userGuid): void
+    {
+        $userSession = new Zend_Session_Namespace('user');
+        if ($userSession->data->userGuid != $userGuid) {
+            throw new editor_Models_ConfigException('E1299');
+        }
+    }
+
     /***
      * Load configs fron the database by given level
      * @param mixed $level

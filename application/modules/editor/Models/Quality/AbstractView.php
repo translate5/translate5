@@ -82,7 +82,7 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $rows = [];
     /**
-     * @var stdClass[]
+     * @var stdClass[]|stdClass[][]
      */
     protected $rowsByType = [];
     /**
@@ -116,7 +116,7 @@ abstract class editor_Models_Quality_AbstractView {
     /**
      * Configurable option set by inheritance: If set, all categories will be collapsed
      * @var boolean
-     */    
+     */
     protected $allCategoriesCollapsed = false;
     /**
      * Configurable option set by inheritance: If set, the mqm are shown flat, otherwise as a deeper nested tree
@@ -143,22 +143,22 @@ abstract class editor_Models_Quality_AbstractView {
      * May be set by request and holds the list of checked tree nodes
      * @var array
      */
-    protected $checkedQualities = NULL;
+    protected $checkedQualities = null;
     /**
      * May be set by request and holds the list of collapsed tree nodes
      * @var array
      */
-    protected $collapsedQualities = NULL;
+    protected $collapsedQualities = null;
     /**
-     * The current restriction for the falsePositive column. NULL means no restriction
+     * The current restriction for the falsePositive column. null means no restriction
      * @var int
      */
-    protected $falsePositiveRestriction = NULL;
+    protected $falsePositiveRestriction = null;
     /**
      * The restriction for the current user
      * @var string
      */
-    protected $segmentNrRestriction = NULL;
+    protected $segmentNrRestriction = null;
     /**
      * 
      * @param editor_Models_Task $task
@@ -167,14 +167,20 @@ abstract class editor_Models_Quality_AbstractView {
      * @param bool $excludeMQM: only needed for Statistics view
      * @param string $field: optional to limit the fetched qualities to a certain field
      */
-    public function __construct(editor_Models_Task $task, bool $onlyFilterTypes=false, string $currentState=NULL, bool $excludeMQM=false, string $field=NULL){
+    public function __construct(
+        editor_Models_Task $task,
+        bool $onlyFilterTypes = false,
+        string $currentState = null,
+        bool $excludeMQM = false,
+        string $field = null
+    ) {
         $this->task = $task;
         $this->taskConfig = $this->task->getConfig();
         $this->manager = editor_Segment_Quality_Manager::instance();
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->excludeMQM = $excludeMQM;
         // generate hashtable of filtered qualities and respect filter mode if the current state was sent
-        if($currentState !== NULL){
+        if ($currentState !== null) {
             $requestState = new editor_Models_Quality_RequestState($currentState, $this->task);
             $this->checkedQualities = $requestState->getCheckedList();
             $this->collapsedQualities = $requestState->getCollapsedList();
@@ -182,18 +188,18 @@ abstract class editor_Models_Quality_AbstractView {
             // The qualities may have to be limited to the visible segment-nrs for the current editor
             $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs();
             
-        } else if($this->isTree){
+        } elseif ($this->isTree) {
             // In tree mode we need the user-restriction of the state also when no filtered state was send
             $requestState = new editor_Models_Quality_RequestState('', $this->task);
             $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs();
         }
         $blacklist = ($onlyFilterTypes) ? $this->manager->getFilterTypeBlacklist() : [];
-        if($excludeMQM){
-            if(!in_array(editor_Segment_Tag::TYPE_MQM, $blacklist)){
+        if ($excludeMQM) {
+            if (!in_array(editor_Segment_Tag::TYPE_MQM, $blacklist)) {
                 $blacklist[] = editor_Segment_Tag::TYPE_MQM;
             }
         }
-        $this->create($task->getTaskGuid(), $blacklist, $field);
+        $this->create($blacklist, $field);
     }
     /**
      * Retrieves the root node for the quality filter store wrapped in an array
@@ -242,134 +248,193 @@ abstract class editor_Models_Quality_AbstractView {
     }
     /**
      * Fetches the rows from the DB and creates the internal row model
-     * @param string $taskGuid
-     * @param array $blacklist
-     * @param string $field
      */
-    protected function create(string $taskGuid, array $typeBlacklist=NULL, string $field=NULL){
+    protected function create(array $typeBlacklist, string $field = null): void
+    {
         // create ordered rubrics
         $rubrics = [];
         $hasNonEditableInternalTagFaults = false;
-        foreach($this->manager->getAllFilterableTypes($this->task) as $type){
-            if(!$this->excludeMQM || $type != editor_Segment_Tag::TYPE_MQM){
+        foreach ($this->manager->getAllFilterableTypes($this->task) as $type) {
+            if (!$this->excludeMQM || $type != editor_Segment_Tag::TYPE_MQM) {
                 $rubrics[] = $this->createRubricRow($type);
             }
         }
         usort($rubrics, 'editor_Models_Quality_AbstractView::compareByTitle');
         // create intermediate model
-        foreach($rubrics as $rubric){
+        foreach ($rubrics as $rubric) {
             $this->rowsByType[$rubric->qtype] = [];
             $this->rowsByType[$rubric->qtype][self::RUBRIC] = $rubric;
         }
         // fetch the data and add to the intermediate model
         $table = new editor_Models_Db_SegmentQuality();
-        foreach($table->fetchForFrontend($taskGuid, $typeBlacklist, $this->segmentNrRestriction, $this->falsePositiveRestriction, $field) as $row){
-            /* @var $row array */
-            $type = $row['type'];
+        $qualities = $table->fetchForFrontend(
+            $this->task->getTaskGuid(),
+            $typeBlacklist,
+            $this->segmentNrRestriction,
+            $this->falsePositiveRestriction,
+            $field
+        );
+
+        foreach ($qualities as $quality) {
+            /* @var $quality array */
+            $type = $quality['type'];
+
             // for non-editable segments that have structural internal tag-errors we create a special virtual category
-            if($row['editable'] == 0 && $type == editor_Segment_Tag::TYPE_INTERNAL && $row['category'] == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY){
-                $row['category'] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE;
+            if (
+                $quality['editable'] == 0
+                && $type == editor_Segment_Tag::TYPE_INTERNAL
+                && $quality['category'] == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY
+            ) {
+                $quality['category'] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE;
                 $hasNonEditableInternalTagFaults = true;
             }
-            if(array_key_exists($type, $this->rowsByType)){
+
+            $isFaultyInternalTagType = $this->manager->isFaultyInternalTagType($quality['type'], $quality['category']);
+
+            if (array_key_exists($type, $this->rowsByType)) {
                 $this->rowsByType[$type][self::RUBRIC]->qcount++;
-                if($this->hasNumFalsePositives && $row['falsePositive'] == 1){
+                if ($this->isFalsePositive($quality)) {
                     $this->rowsByType[$type][self::RUBRIC]->qcountfp++;
                 }
-                if($this->isTree){
-                    if(!array_key_exists($row['category'], $this->rowsByType[$type])){
-                        $this->rowsByType[$type][$row['category']] = $this->createCategoryRow($row, false);
+
+                if ($this->isTree) {
+                    if (!array_key_exists($quality['category'], $this->rowsByType[$type])) {
+                        $this->rowsByType[$type][$quality['category']] = $this->createCategoryRow($quality);
                     }
-                    $this->rowsByType[$type][$row['category']]->qcount++;
-                    if($this->hasNumFalsePositives && $row['falsePositive'] == 1){
-                        $this->rowsByType[$type][$row['category']]->qcountfp++;
+
+                    $this->rowsByType[$type][$quality['category']]->qcount++;
+                    if ($this->isFalsePositive($quality)) {
+                        $this->rowsByType[$type][$quality['category']]->qcountfp++;
                     }
                 }
+
                 $this->numQualities++;
             }
-            // for evaluating if we hav internal tag faults we need to check the category from DB
-            if($row['type'] == editor_Segment_Tag::TYPE_INTERNAL && editor_Segment_Internal_TagComparision::isFault($row['type'], $row['category'])){
+
+            // for evaluating if we have internal tag faults we need to check the category from DB
+            if ($isFaultyInternalTagType) {
                 $this->hasFaultyInternalTags = true;
             }
         }
         // create result rows
         $this->createRows($rubrics, $hasNonEditableInternalTagFaults);
     }
+
+    private function processRubricTree(object $rubric, bool $hasNonEditableInternalTagFaults): void
+    {
+        $rubric->qtotal = $rubric->qcount;
+
+        if ($rubric->qtype == editor_Segment_Tag::TYPE_MQM) {
+            // create mqm-subtree if we have mqms
+            if ($rubric->qcount > 0 || $this->hasEmptyCategories) {
+                $this->addMqmRows($rubric, $this->rowsByType[$rubric->qtype]);
+            }
+
+            return;
+        }
+
+        $rubric->children = [];
+        $qualityProvider = $this->manager->getProvider($rubric->qtype);
+        $rubricCats = ($this->hasEmptyCategories)
+            ? $qualityProvider->getAllCategories($this->task)
+            : array_keys($this->rowsByType[$rubric->qtype]);
+
+        // important: when we use the predefined categories and have internal tag faults
+        // of non-editable segments we need to make sure this virtual category is there
+        if (
+            $hasNonEditableInternalTagFaults
+            && $rubric->qtype == editor_Segment_Tag::TYPE_INTERNAL
+            && !in_array(
+                editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE,
+                $rubricCats
+            )
+        ) {
+            $rubricCats[] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE;
+        }
+
+        // Sort but maintain indexes
+        asort($rubricCats);
+
+        // Foreach category
+        foreach ($rubricCats as $key => $value) {
+
+            // If $value is an array it means we have subcategories
+            $subCategories = is_array($value) ? $value : [];
+
+            // And if so, category is the $key
+            $category = $subCategories ? $key : $value;
+
+            if ($category === self::RUBRIC) {
+                continue;
+            }
+
+            // Create category row for extjs tree store
+            $row = array_key_exists($category, $this->rowsByType[$rubric->qtype])
+                ? $this->rowsByType[$rubric->qtype][$category]
+                : $this->createNonDbRow(
+                    $qualityProvider->translateCategory($this->translate, $category, $this->task),
+                    $rubric->qtype,
+                    $category
+                );
+
+            // Setup tooltip for category row
+            $row->qtooltip = $qualityProvider->translateCategoryTooltip(
+                $this->translate,
+                $category,
+                $this->task
+            );
+            $row->mustBeZeroErrors = false;
+
+            $this->processSubcategories($subCategories, $rubric, $qualityProvider, $row, $category);
+
+            $row->mustBeZeroErrors = $row->mustBeZeroErrors || $this->mustBeZeroErrors($rubric->qtype, $category);
+
+            if ($row->mustBeZeroErrors) {
+                $this->rowsByType[$rubric->qtype][self::RUBRIC]->mustBeZeroErrors = true;
+                $row->qtooltipCriticalSuffix = $qualityProvider->translateCategoryTooltipCriticalSuffix(
+                    $this->translate,
+                    $category,
+                    $this->task
+                );
+            }
+
+            // Append category row into quality row's children list
+            $rubric->children[] = $row;
+        }
+    }
+
+    private function mustBeZeroErrors(string $type, string $category): bool
+    {
+        return $this->manager->mustBeZeroErrors($type, $category, $this->task);
+    }
+
+    private function isFaultyInternalTagType(string $type, string $category): bool
+    {
+        return editor_Segment_Tag::TYPE_INTERNAL === $type
+            && editor_Segment_Internal_TagComparision::isFault($type, $category);
+    }
+
     /**
      * Create the resulting view out of the database data
      * @param stdClass[] $rubrics
      */
-    protected function createRows(array $rubrics, bool $hasNonEditableInternalTagFaults){
-        foreach($rubrics as $rubric){
-            if($this->isTree){
-                $rubric->qtotal = $rubric->qcount;
-                if($rubric->qtype == editor_Segment_Tag::TYPE_MQM){
-                    // create mqm-subtree if we have mqms
-                    if($rubric->qcount > 0 || $this->hasEmptyCategories){
-                        $this->addMqmRows($rubric, $this->rowsByType[$rubric->qtype]);
-                    }
-                } else {
-                    $rubric->children = [];
-                    $qualityProvider = $this->manager->getProvider($rubric->qtype);
-                    $rubricCats = ($this->hasEmptyCategories) ? $qualityProvider->getAllCategories($this->task) : array_keys($this->rowsByType[$rubric->qtype]);
-                    // important: when we use the predefined categories and have internal tag faults of non-editable segments we need to make sure this virtual category is there
-                    if($hasNonEditableInternalTagFaults && $rubric->qtype == editor_Segment_Tag::TYPE_INTERNAL && !in_array(editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE, $rubricCats)){
-                        $rubricCats[] = editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE;
-                    }
-
-                    // Sort but maintain indexes
-                    asort($rubricCats);
-
-                    // Foreach category
-                    foreach ($rubricCats as $key => $value){
-
-                        // If $value is an array it means we have subcategories
-                        $subCategories = is_array($value) ? $value : [];
-
-                        // And if so, category is the $key
-                        $category = $subCategories ? $key : $value;
-
-                        //
-                        if ($category != self::RUBRIC) {
-
-                            // Create category row for extjs tree store
-                            $row = array_key_exists($category, $this->rowsByType[$rubric->qtype])
-                                ? $this->rowsByType[$rubric->qtype][$category]
-                                : $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $category, $this->task) , $rubric->qtype, $category);
-
-                            // Setup tooltip for category row
-                            $row->qtooltip = $qualityProvider->translateCategoryTooltip($this->translate, $category, $this->task);
-
-                            // If have subcategories, for each do
-                            foreach ($subCategories as $subCategory) {
-
-                                // Create subcategory row for extjs categories tree store's category row
-                                $subrow = array_key_exists($subCategory, $this->rowsByType[$rubric->qtype])
-                                    ? $this->rowsByType[$rubric->qtype][$subCategory]
-                                    : $this->createNonDbRow($qualityProvider->translateCategory($this->translate, $subCategory, $this->task), $rubric->qtype, $subCategory);
-
-                                // Setup tooltip for subcategory row
-                                $subrow->qtooltip = $qualityProvider->translateCategoryTooltip($this->translate, $subCategory, $this->task);
-
-                                // Sum qualities quantity
-                                $row->qcount += $subrow->qcount;
-
-                                // Append subcategory row into category row's childrens list
-                                $row->children [] = $subrow;
-                            }
-
-                            // Append category row into quality row's children list
-                            $rubric->children[] = $row;
-                        }
-                    }
-                } 
+    protected function createRows(array $rubrics, bool $hasNonEditableInternalTagFaults)
+    {
+        foreach ($rubrics as $rubric) {
+            if ($this->isTree) {
+                $this->processRubricTree($rubric, $hasNonEditableInternalTagFaults);
                 $this->finalizeTree($rubric);
             } else {
-                if($rubric->qtype == editor_Segment_Tag::TYPE_INTERNAL){
-                    if(self::EMULATE_PROBLEMS){
+                $rubric->mustBeZeroErrors = $this->manager->typeHasMustBeZeroErrorsCategories(
+                    $rubric->qtype,
+                    $this->task
+                );
+
+                if ($rubric->qtype == editor_Segment_Tag::TYPE_INTERNAL) {
+                    if (self::EMULATE_PROBLEMS) {
                         $rubric->qcomplete = false;
                         $rubric->qfaulty = true;
-                    } else if($this->hasFaultyInternalTags){
+                    } elseif ($this->hasFaultyInternalTags) {
                         $rubric->qfaulty = true;
                     }
                 }
@@ -414,7 +479,7 @@ abstract class editor_Models_Quality_AbstractView {
         // To easily test the incomplete & faulty configs in the frontend
         if(self::EMULATE_PROBLEMS){
             if($row->qtype == editor_Segment_Tag::TYPE_INTERNAL){
-                if($row->qcategory == NULL){
+                if($row->qcategory == null){
                     $row->qcomplete = false;
                 } else {
                     $row->qfaulty = true;
@@ -427,7 +492,8 @@ abstract class editor_Models_Quality_AbstractView {
      * @param string $type
      * @return stdClass
      */
-    protected function createRubricRow(string $type) : stdClass {
+    protected function createRubricRow(string $type) : stdClass
+    {
         $row = new stdClass();
         $row->qid = -1;
         $row->qtype = $type;
@@ -435,15 +501,18 @@ abstract class editor_Models_Quality_AbstractView {
         // TODO AUTOQA: When the re-check/re-analysis is implemented the buttons need to be activated here
         // $row->qcomplete = $this->manager->isFullyCheckedType($type, $this->taskConfig);
         $row->qcomplete = true;
-        if($this->isTree){
+        if ($this->isTree) {
             $row->children = [];
-            $row->qcategory = NULL;
+            $row->qcategory = null;
             $row->qtooltip = $this->manager->translateQualityTypeTooltip($type);
+            $row->qtooltipCriticalSuffix = $this->manager->translateQualityTypeTooltipCriticalSuffix($type);
+            $row->mustBeZeroErrors = $this->mustBeZeroErrors($type, $type);
         }
-        if($this->hasNumFalsePositives){
+        if ($this->hasNumFalsePositives) {
             $row->qcountfp = 0;
         }
         $row->text = $this->manager->translateQualityType($type);
+
         return $row;
     }
     /**
@@ -475,7 +544,7 @@ abstract class editor_Models_Quality_AbstractView {
      * @param string $category
      * @return stdClass
      */
-    protected function createNonDbRow(string $text, string $type, string $category=NULL) : stdClass {
+    protected function createNonDbRow(string $text, string $type, string $category=null) : stdClass {
         $row = new stdClass();
         $row->qid = -1;
         $row->qtype = $type;
@@ -597,6 +666,60 @@ abstract class editor_Models_Quality_AbstractView {
             if(isset($mqmNode->children) && is_array($mqmNode->children) && count($mqmNode->children) > 0){
                 $this->addMqmRowsFromNode($rubric, $mqmNode->children);
             }
+        }
+    }
+
+    private function isFalsePositive(array $row): bool
+    {
+        return $this->hasNumFalsePositives && $row['falsePositive'] == 1;
+    }
+
+    public function processSubcategories(
+        array $subCategories,
+        object $rubric,
+        ?editor_Segment_Quality_Provider $qualityProvider,
+        object $row,
+        string $category
+    ): void {
+        foreach ($subCategories as $subCategory) {
+            // Create subcategory row for extjs categories tree store's category row
+            $subrow = array_key_exists($subCategory, $this->rowsByType[$rubric->qtype])
+                ? $this->rowsByType[$rubric->qtype][$subCategory]
+                : $this->createNonDbRow(
+                    $qualityProvider->translateCategory(
+                        $this->translate,
+                        $subCategory,
+                        $this->task
+                    ),
+                    $rubric->qtype,
+                    $subCategory
+                );
+
+            // Setup tooltip for subcategory row
+            $subrow->qtooltip = $qualityProvider->translateCategoryTooltip(
+                $this->translate,
+                $subCategory,
+                $this->task
+            );
+
+            $subrow->mustBeZeroErrors = $this->mustBeZeroErrors($rubric->qtype, $subCategory);
+
+            if ($subrow->mustBeZeroErrors) {
+                $row->mustBeZeroErrors = true;
+                $this->rowsByType[$rubric->qtype][self::RUBRIC]->mustBeZeroErrors = true;
+
+                $subrow->qtooltipCriticalSuffix = $qualityProvider->translateCategoryTooltipCriticalSuffix(
+                    $this->translate,
+                    $category,
+                    $this->task
+                );
+            }
+
+            // Sum qualities quantity
+            $row->qcount += $subrow->qcount;
+
+            // Append subcategory row into category row's children list
+            $row->children [] = $subrow;
         }
     }
 }
