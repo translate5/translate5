@@ -56,5 +56,7 @@ use editor_Models_Languages;
 
 interface CanDetectLanguageInterface
 {
+    public function getServiceId(): string;
+
     public function detectLanguage(string $textSample, bool $isInstantTranslate): ?editor_Models_Languages;
 }
