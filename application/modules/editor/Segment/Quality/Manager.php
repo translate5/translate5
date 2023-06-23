@@ -36,7 +36,9 @@ use MittagQI\ZfExtended\Worker\Queue;
  * The first use of the Quality manager instance will lock the registry thus registration of providers in a later phase will lead to exceptions
  *
  */
-final class editor_Segment_Quality_Manager {
+final class editor_Segment_Quality_Manager
+{
+    public const CONFIG_MUST_BE_ZERO_QUALITY_ERRORS = 'runtimeOptions.autoQA.mustBeZeroErrorsQualities';
 
     /**
      * This can be used to disable the AutoQA processing completely. This does not disable the frontend
@@ -531,6 +533,14 @@ final class editor_Segment_Quality_Manager {
         throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityTypeTooltip: provider of type "'.$type.'" not present.');
     }
 
+    public function translateQualityTypeTooltipCriticalSuffix(string $type) : string
+    {
+        if ($this->hasProvider($type)) {
+            return $this->getProvider($type)->translateTypeTooltipCriticalSuffix($this->getTranslate());
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQualityTypeTooltip: provider of type "'.$type.'" not present.');
+    }
+
     /**
      * Translates a Segment Quality Category tooltip
      * @param string $type
@@ -654,6 +664,61 @@ final class editor_Segment_Quality_Manager {
         }
         return $types;
     }
+
+    public function getActiveTypeToCategoryMap(?editor_Models_Task $task, Zend_Config $config): iterable
+    {
+        $qualityConfig = $config->runtimeOptions->autoQA;
+
+        $translate = $this->getTranslate();
+
+        foreach ($this->registry as $provider) {
+            if (!$provider->isActive($qualityConfig, $config) && $provider->isFilterableType()) {
+                continue;
+            }
+
+            $typeLabel = $provider->translateType($translate);
+
+            if (!$provider->hasCategories()) {
+                yield "{$provider->getType()}:{$provider->getType()}" => $typeLabel;
+
+                continue;
+            }
+
+            foreach ($provider->getAllCategories($task) as $category) {
+                if (!is_array($category)) {
+                    $key = "{$provider->getType()}:{$category}";
+
+                    yield $key => "$typeLabel: {$provider->translateCategory($translate, $category, $task)}";
+
+                    continue;
+                }
+
+                foreach ($category as $subCategory) {
+                    $key = "{$provider->getType()}:{$subCategory}";
+
+                    yield $key => "$typeLabel: {$provider->translateCategory($translate, $subCategory, $task)}";
+                }
+            }
+        }
+    }
+
+    public function mustBeZeroErrors(string $type, string $category, editor_Models_Task $task): bool
+    {
+        return $this->isFaultyInternalTagType($type, $category)
+            || $this->getProvider($type)?->mustBeZeroErrors($type, $category, $task->getConfig());
+    }
+
+    public function typeHasMustBeZeroErrorsCategories(string $type, editor_Models_Task $task): bool
+    {
+        return $this->getProvider($type)?->typeHasMustBeZeroErrorsCategories($type, $task->getConfig());
+    }
+
+    public function isFaultyInternalTagType(string $type, string $category): bool
+    {
+        return editor_Segment_Tag::TYPE_INTERNAL === $type
+            && editor_Segment_Internal_TagComparision::isFault($type, $category);
+    }
+
     /**
      * Retrieves the types of qualities that should not show up in the quality panel & quality task views
      * @return string[]

@@ -881,9 +881,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
         );
 
+        $errorSupposesReorganizing = (isset($error->code)
+                && str_replace($errorCodes, '', $error->code) !== $error->code
+            )
+            || (isset($error->error) && $error->error === 500);
+
         // Check if error codes contains any of the values
-        return isset($error->code)
-            && str_replace($errorCodes, '', $error->code) !== $error->code
+        return $errorSupposesReorganizing
             && !$this->isReorganizingAtTheMoment()
             && !$this->isReorganizeFailed();
     }

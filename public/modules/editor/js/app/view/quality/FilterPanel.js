@@ -82,8 +82,8 @@ Ext.define('Editor.view.quality.FilterPanel', {
                     if(record.isEmpty()){
                         meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-check-disabled');
                     }
-                    if(record.isFaulty()){
-                        meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-faulty');
+                    if(record.hasCriticalErrors()){
+                        meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-has-error');
                     }
                     var symbol = '';
                     // special for rubrics: add icon for incompletely tagged quality types
@@ -101,8 +101,14 @@ Ext.define('Editor.view.quality.FilterPanel', {
                         symbol += '<img class="x-tree-symbol qmflag qmflag-' + record.get('qcatidx') + '" src="' 
                             + Editor.data.segments.subSegment.tagPath + 'qmsubsegment-' + record.get('qcatidx') + '-left.png"> ';
                     }
-                    if (record.get('qtooltip')) {
-                        meta.tdAttr = 'data-qtip="' + record.get('qtooltip') + '"';
+
+                    if (record.get('qtooltip') || record.hasCriticalErrors()) {
+                        let tooltip = record.get('qtooltip');
+                        if (record.hasCriticalErrors()) {
+                            tooltip = tooltip ? tooltip + '</br>' : '';
+                            tooltip += record.get('qtooltipCriticalSuffix');
+                        }
+                        meta.tdAttr = 'data-qtip="' + tooltip + '"';
                     }
                     return symbol + text + ' ('+record.get('qcount')+')';
                 },

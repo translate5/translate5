@@ -55,13 +55,6 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
     protected static $type = 'spellcheck';
 
     /**
-     * Flag indicating whether this quality has categories
-     *
-     * @var bool
-     */
-    protected static $hasCategories = true;
-
-    /**
      * @var Service|null
      */
     private ?Service $languagetoolService = null;
@@ -225,72 +218,61 @@ class editor_Plugins_SpellCheck_QualityProvider extends editor_Segment_Quality_P
      * @return string
      */
     public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
-        switch ($category) {
-            case Check::CHARACTERS              : return $translate->_('The text contains characters that are garbled or incorrect or that are not used in the language in which the content appears.');
-            case Check::DUPLICATION             : return $translate->_('Content has been duplicated improperly.');
-            case Check::INCONSISTENCY           : return $translate->_('The text is inconsistent with itself or is translated inconsistently (NB: not for use with terminology inconsistency).');
-            case Check::LEGAL                   : return $translate->_('The text is legally problematic (e.g., it is specific to the wrong legal system).');
-            case Check::UNCATEGORIZED           : return $translate->_('The issue either has not been categorized or cannot be categorized.');
-
-            case Check::REGISTER                : return $translate->_('The text is written in the wrong linguistic register of uses slang or other language variants inappropriate to the text.');
-            case Check::LOCALE_SPECIFIC_CONTENT : return $translate->_('The localization contains content that does not apply to the locale for which it was prepared.');
-            case Check::LOCALE_VIOLATION        : return $translate->_('Text violates norms for the intended locale.');
-            case Check::GENERAL_STYLE           : return $translate->_('The text contains stylistic errors.');
-            case Check::PATTERN_PROBLEM         : return $translate->_('The text fails to match a pattern that defines allowable content (or matches one that defines non-allowable content).');
-            case Check::WHITESPACE              : return $translate->_('There is a mismatch in whitespace between source and target content or the text violates specific rules related to the use of whitespace.');
-            case Check::TERMINOLOGY             : return $translate->_('An incorrect term or a term from the wrong domain was used or terms are used inconsistently.');
-            case Check::INTERNATIONALIZATION    : return $translate->_('There is an issue related to the internationalization of content.');
-            case Check::NON_CONFORMANCE         : return $translate->_('Statistically detect wrong use of words that are easily confused');
-
-            case Check::GRAMMAR                 : return $translate->_('The text contains a grammatical error (including errors of syntax and morphology).');
-            case Check::MISSPELLING             : return $translate->_('The text contains a misspelling.');
-            case Check::TYPOGRAPHICAL           : return $translate->_('The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.');
-        }
-        return '';
+        return match ($category) {
+            Check::CHARACTERS => $translate->_('The text contains characters that are garbled or incorrect or that are not used in the language in which the content appears.'),
+            Check::DUPLICATION => $translate->_('Content has been duplicated improperly.'),
+            Check::INCONSISTENCY => $translate->_('The text is inconsistent with itself or is translated inconsistently (NB: not for use with terminology inconsistency).'),
+            Check::LEGAL => $translate->_('The text is legally problematic (e.g., it is specific to the wrong legal system).'),
+            Check::UNCATEGORIZED => $translate->_('The issue either has not been categorized or cannot be categorized.'),
+            Check::REGISTER => $translate->_('The text is written in the wrong linguistic register of uses slang or other language variants inappropriate to the text.'),
+            Check::LOCALE_SPECIFIC_CONTENT => $translate->_('The localization contains content that does not apply to the locale for which it was prepared.'),
+            Check::LOCALE_VIOLATION => $translate->_('Text violates norms for the intended locale.'),
+            Check::GENERAL_STYLE => $translate->_('The text contains stylistic errors.'),
+            Check::PATTERN_PROBLEM => $translate->_('The text fails to match a pattern that defines allowable content (or matches one that defines non-allowable content).'),
+            Check::WHITESPACE => $translate->_('There is a mismatch in whitespace between source and target content or the text violates specific rules related to the use of whitespace.'),
+            Check::TERMINOLOGY => $translate->_('An incorrect term or a term from the wrong domain was used or terms are used inconsistently.'),
+            Check::INTERNATIONALIZATION => $translate->_('There is an issue related to the internationalization of content.'),
+            Check::NON_CONFORMANCE => $translate->_('Statistically detect wrong use of words that are easily confused'),
+            Check::GRAMMAR => $translate->_('The text contains a grammatical error (including errors of syntax and morphology).'),
+            Check::MISSPELLING => $translate->_('The text contains a misspelling.'),
+            Check::TYPOGRAPHICAL => $translate->_('The text has typographical errors such as omitted/incorrect punctuation, incorrect capitalization, etc.'),
+            default => '',
+        };
     }
 
-    /**
-     * Translate category
-     *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @param string $category
-     * @param editor_Models_Task $task
-     * @return string|null
-     */
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch ($category) {
-            case Check::GROUP_GENERAL           : return $translate->_('General');
-            case Check::CHARACTERS              : return $translate->_('Characters');
-            case Check::DUPLICATION             : return $translate->_('Duplication');
-            case Check::INCONSISTENCY           : return $translate->_('Inconsistency');
-            case Check::LEGAL                   : return $translate->_('Legal');
-            case Check::UNCATEGORIZED           : return $translate->_('Uncategorized');
-
-            case Check::GROUP_STYLE             : return $translate->_('Style');
-            case Check::REGISTER                : return $translate->_('Register');
-            case Check::LOCALE_SPECIFIC_CONTENT : return $translate->_('Locale-specific content');
-            case Check::LOCALE_VIOLATION        : return $translate->_('Locale violation');
-            case Check::GENERAL_STYLE           : return $translate->_('General style');
-            case Check::PATTERN_PROBLEM         : return $translate->_('Pattern problem');
-            case Check::WHITESPACE              : return $translate->_('Whitespace');
-            case Check::TERMINOLOGY             : return $translate->_('Terminology');
-            case Check::INTERNATIONALIZATION    : return $translate->_('Internationalization');
-            case Check::NON_CONFORMANCE         : return $translate->_('Non-conformance');
-
-            case Check::GRAMMAR                 : return $translate->_('Grammar');
-            case Check::MISSPELLING             : return $translate->_('Spelling');
-            case Check::TYPOGRAPHICAL           : return $translate->_('Typographical');
-        }
-        return NULL;
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        return match ($category) {
+            Check::GROUP_GENERAL => $translate->_('General'),
+            Check::CHARACTERS => $translate->_('Characters'),
+            Check::DUPLICATION => $translate->_('Duplication'),
+            Check::INCONSISTENCY => $translate->_('Inconsistency'),
+            Check::LEGAL => $translate->_('Legal'),
+            Check::UNCATEGORIZED => $translate->_('Uncategorized'),
+            Check::GROUP_STYLE => $translate->_('Style'),
+            Check::REGISTER => $translate->_('Register'),
+            Check::LOCALE_SPECIFIC_CONTENT => $translate->_('Locale-specific content'),
+            Check::LOCALE_VIOLATION => $translate->_('Locale violation'),
+            Check::GENERAL_STYLE => $translate->_('General style'),
+            Check::PATTERN_PROBLEM => $translate->_('Pattern problem'),
+            Check::WHITESPACE => $translate->_('Whitespace'),
+            Check::TERMINOLOGY => $translate->_('Terminology'),
+            Check::INTERNATIONALIZATION => $translate->_('Internationalization'),
+            Check::NON_CONFORMANCE => $translate->_('Non-conformance'),
+            Check::GRAMMAR => $translate->_('Grammar'),
+            Check::MISSPELLING => $translate->_('Spelling'),
+            Check::TYPOGRAPHICAL => $translate->_('Typographical'),
+            default => null,
+        };
     }
 
     /**
      * Categories in this quality
-     *
-     * @param editor_Models_Task $task
-     * @return array
      */
-    public function getAllCategories(editor_Models_Task $task) : array {
+    public function getAllCategories(?editor_Models_Task $task) : array {
         return [
             Check::GROUP_GENERAL => [
                 Check::CHARACTERS,

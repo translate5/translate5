@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\Applet\AppletAbstract;
+use MittagQI\Translate5\DbConfig\ActionsEventHandler;
 use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Service\SystemCheck;
@@ -97,6 +98,19 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 $parentId = (int) $event->getParam('workerParentId');
                 editor_Segment_Quality_Manager::instance()->queueImport($task, $parentId);
             }
+        );
+
+        $handler = new ActionsEventHandler();
+
+        $eventManager->attach(
+            editor_ConfigController::class,
+            'afterIndexAction',
+            $handler->addDefaultsForNonZeroQualityErrorsSettingOnIndexAction()
+        );
+        $eventManager->attach(
+            editor_ConfigController::class,
+            'afterPutAction',
+            $handler->addDefaultsForNonZeroQualityErrorsSettingOnPutAction()
         );
     }
     

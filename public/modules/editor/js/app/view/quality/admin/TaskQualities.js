@@ -108,7 +108,7 @@ Ext.define('Editor.view.quality.admin.TaskQualities', {
                     reserveScrollbar: true,
                     viewConfig: {
                         getRowClass: function(record){
-                            return (record.isFaulty() || record.hasFaultyChildren()) ? 'x-tree-faulty' : '';
+                            return (record.hasCriticalErrors() || record.hasCriticalErrorsInChildren()) ? 'x-tree-has-error' : '';
                         }
                     },
                     columns: [{

@@ -8990,6 +8990,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</source>
               <target>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</target>
             </trans-unit>
+            <trans-unit id="Qml0dGUgbMO2c2VuIFNpZSBhbGxlIEZlaGxlciBkZXIgZm9sZ2VuZGVuIEthdGVnb3JpZSBPREVSIHNldHplbiBTaWUgc2llIGF1ZiDigJxmYWxzY2hlciBGZWhsZXLigJ0=">
+              <source>Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”</source>
+              <target>Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”</target>
+            </trans-unit>
+            <trans-unit id="QWxsZSBGZWhsZXIgZGVyIGZvbGdlbmRlbiBHcnVwcGUgT0RFUiBzZXR6ZW4gU2llIHNpZSBhdWYg4oCcZmFsc2NoZXIgRmVobGVy4oCd">
+              <source>Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”</source>
+              <target>Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”</target>
+            </trans-unit>
             <trans-unit id='VGlwcDogRGVha3RpdmllcmVuL0tvbmZpZ3VyaWVyZW4gU2llIGRpZXNlcyBGZW5zdGVyIGluIGRlbiBFZGl0b3JlaW5zdGVsbHVuZ2VuIGxpbmtzIG9iZXJoYWxiIGRlciBTZWdtZW50dGFiZWxsZQ=='>
               <source>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</source>
               <target>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</target>

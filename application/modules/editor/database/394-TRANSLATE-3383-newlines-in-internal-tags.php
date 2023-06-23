@@ -130,7 +130,7 @@ class FixTranslate3383_ContentConverter
      * @param string $segment
      * @return string
      */
-    private function processSegmentField(string $segment): string
+    private function processSegmentField(?string $segment): string
     {
         return preg_replace_callback(
             editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS,

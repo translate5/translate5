@@ -65,11 +65,10 @@ final class T5memoryTmListCommand extends Translate5AbstractCommand
 
         $table = $this->io->createTable();
         $table->setHeaders(['Tm name', 'Tm UUID', 'Status']);
-        $table->render();
-
         foreach ($this->getLocalTms() as $item) {
-            $table->appendRow([$item['name'], $item['uuid'], $item['status']]);
+            $table->addRow([$item['name'], $item['uuid'], $item['status']]);
         }
+        $table->render();
 
         // TODO add remote tms that do not exist locally after tm list query is fixed on t5memory side
 
@@ -92,13 +91,18 @@ final class T5memoryTmListCommand extends Translate5AbstractCommand
             }
 
             $languageResource->load($languageResourceData['id']);
-            $connector->connectTo(
-                $languageResource,
-                $languageResource->getSourceLang(),
-                $languageResource->getTargetLang()
-            );
 
-            $status = $connector->getStatus($languageResource->getResource());
+            try {
+                $connector->connectTo(
+                    $languageResource,
+                    $languageResource->getSourceLang(),
+                    $languageResource->getTargetLang()
+                );
+
+                $status = $connector->getStatus($languageResource->getResource());
+            } catch (\Throwable) {
+                $status = 'Language resource service is not available';
+            }
 
             $tmName = $connector->getApi()->getTmName();
             $url = rtrim($languageResource->getResource()->getUrl(), '/') . '/';

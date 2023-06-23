@@ -165,16 +165,23 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : string {
         return '';
     }
+
+    public function translateTypeTooltipCriticalSuffix(ZfExtended_Zendoverwrites_Translate $translate) : string
+    {
+        return $translate->_('Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf &ldquo;falscher Fehler&rdquo;');
+    }
+
     /**
-     * Returns a translation for a Quality. These Codes are stored in the category column of the LEK_segment_quality model
+     * Returns a translation for a Quality.
+     * These Codes are stored in the category column of the LEK_segment_quality model
      * Because MQM translations are task-specific, the task is needed
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @param string $category
-     * @param editor_Models_Task $task
-     * @return string|null
      */
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        return NULL;
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        return null;
     }
 
     /**
@@ -189,6 +196,14 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         return '';
     }
 
+    public function translateCategoryTooltipCriticalSuffix(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        editor_Models_Task $task
+    ) : string {
+        return $translate->_('Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”');
+    }
+
     /* *************** REST view API *************** */
     
     /**
@@ -200,6 +215,37 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function isActive(Zend_Config $qualityConfig, Zend_Config $taskConfig) : bool {
         return true;
     }
+
+    public function mustBeZeroErrors(string $type, ?string $category, Zend_Config $taskConfig): bool
+    {
+        $mustBeZeroErrorsQualities = $taskConfig->runtimeOptions->autoQA->mustBeZeroErrorsQualities ?? null;
+        $mustBeZeroErrorsQualities = $mustBeZeroErrorsQualities ? $mustBeZeroErrorsQualities->toArray() : [];
+
+        if (empty($mustBeZeroErrorsQualities)) {
+            return false;
+        }
+
+        return in_array("$type:$category", $mustBeZeroErrorsQualities, true);
+    }
+
+    public function typeHasMustBeZeroErrorsCategories(string $type, Zend_Config $taskConfig): bool
+    {
+        $mustBeZeroErrorsQualities = $taskConfig->runtimeOptions->autoQA->mustBeZeroErrorsQualities ?? null;
+        $mustBeZeroErrorsQualities = $mustBeZeroErrorsQualities ? $mustBeZeroErrorsQualities->toArray() : [];
+
+        if (empty($mustBeZeroErrorsQualities)) {
+            return false;
+        }
+
+        foreach ($mustBeZeroErrorsQualities as $quality) {
+            if (str_contains($quality, "$type:")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Retrieves, if the Quality has tags in the segment texts present
      * @return bool
@@ -240,10 +286,11 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     }
     /**
      * Retrieves all Categories a quality can have
-     * @param editor_Models_Task $task
+     *
      * @return string[]
      */
-    public function getAllCategories(editor_Models_Task $task) : array {
+    public function getAllCategories(?editor_Models_Task $task) : array
+    {
         return [];
     }
 
