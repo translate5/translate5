@@ -735,7 +735,6 @@ function translateText(textToTranslate, translationInProgressID){
         },
         fail: function(){
             currentRequest = null;
-            debugger;
         }
     });
 }
