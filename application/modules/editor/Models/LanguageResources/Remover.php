@@ -64,17 +64,19 @@ class editor_Models_LanguageResources_Remover {
             $collection->init($this->entity->toArray());
             $this->entity = $collection;
         }
-    
+
         //encapsulate the deletion in a transaction to rollback if for example the real file based resource can not be deleted
         $this->entity->db->getAdapter()->beginTransaction();
         try {
             $entity = clone $this->entity;
+
             // TODO CHECK: A languageResourcesRemover should remove the resource with all existing assocs and a check must take the existing assocs into account, correct ??
             $customersLeft = ($forced) ? [] : $this->entity->getCustomers();
             $this->checkOrCleanAssociations($forced, $customersLeft);
             //delete the entity in the DB
             $this->entity->delete();
-            
+            // prevent nonsens
+            $entity->lockRow();
             // if there are any services connected to this language-resource, they also must be deleted.
             $manager = ZfExtended_Factory::get('editor_Services_Manager');
             /* @var $manager editor_Services_Manager */
@@ -94,7 +96,7 @@ class editor_Models_LanguageResources_Remover {
         // will this remover can also be called somewhere in the code OUTSIDE a controller,
         // we have to send an event which informs about the removing / deleting of the languageResource.
         $events = ZfExtended_Factory::get(ZfExtended_EventManager::class, [__CLASS__]);
-        $events->trigger('afterRemove', $this, ['entity' => $this->entity]);
+        $events->trigger('afterRemove', $this, ['languageResource' => $entity]);
     }
 
     /**
