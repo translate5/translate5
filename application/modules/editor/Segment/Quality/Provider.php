@@ -168,7 +168,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
 
     public function translateTypeTooltipCriticalSuffix(ZfExtended_Zendoverwrites_Translate $translate) : string
     {
-        return $translate->_('Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf &ldquo;falscher Fehler&rdquo;');
+        return $translate->_('Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”');
     }
 
     /**
