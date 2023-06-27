@@ -83,6 +83,7 @@ $this->translations = array(
         'OpenTM2' => $translate->_("OpenTM2"),
         'GroupShare' => $translate->_("GroupShare"),
     ],
+    "languagesAreSame" => $translate->_("<b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden."),
 );
 $this->Php2JsVars()->set('logoutOnWindowClose', Zend_Registry::get('config')->runtimeOptions->logoutOnWindowClose);
 $this->Php2JsVars()->set('languageresource.translatedStrings', $this->translations);
@@ -194,9 +195,7 @@ $languageSelector[] = '</form>';
                     name="sourceText"
                     wrap="SOFT"
                     placeholder="<?= $translate->_("Geben Sie Text ein") ?>"
-                >
-                    <?= htmlspecialchars($this->text) ?>
-                </textarea>
+                ><?= htmlspecialchars($this->text) ?></textarea>
                 <svg
                     class="icon icon-t5_close clearTextinput clearable-clear"
                     title="<?= $this->translations["clearText"] ?>"
