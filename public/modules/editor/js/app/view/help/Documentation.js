@@ -38,6 +38,27 @@ Ext.define('Editor.view.help.Documentation', {
         btnOpenInBrowserText:'#UT#In neuem Browser-Tab öffnen'
     },
 
+    /***
+     * TODO:
+     * Flag if the configured documentation url is the old link which points to the German PDF on the disk
+     * (/help/editordocumentation/?lang={0}) . Because currently we dont have English confluence pate, we must do this
+     * custom implementation. When we have English confluence docu, we can use te dockumentationUrl and remove this
+     * implementation
+     */
+    isOldDefaultGermanPdf: false,
+
+    listeners:{
+        render:function (){
+            if( this.isOldDefaultGermanPdf){
+                // TODO: In case the configured documentation url is the old pdf documentation, we show the
+                // new confluence documentation as separate tab. When we have 2 confluence documentations, we should
+                // remove this logic and go via runtimeOptions.frontend.helpWindow.editor.documentationUrl
+                window.open('https://confluence.translate5.net/display/BUS/Editor');
+                return false;
+            }
+        }
+    },
+
     initConfig: function(instanceConfig) {
         var me = this,
             url = Ext.String.format(me.getDocumentationUrl(), Editor.data.locale),
@@ -53,6 +74,10 @@ Ext.define('Editor.view.help.Documentation', {
                     }
                 }]
             };
+
+        me.isOldDefaultGermanPdf = me.isOldGermanPdfDocu(url);
+
+        if(me.isOldDefaultGermanPdf === false){
             //if the url is remote url, load the content inside an iframe
             //also this prevents from iframe in iframe(in the views, also iframe can be defined)
             if(isRemote){
@@ -66,6 +91,8 @@ Ext.define('Editor.view.help.Documentation', {
                     scripts: true
                 };
             }
+        }
+
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
@@ -78,6 +105,16 @@ Ext.define('Editor.view.help.Documentation', {
     getDocumentationUrl:function(){
         var sectionConfig=Editor.data.frontend.helpWindow[Editor.data.helpSection];
         return sectionConfig.documentationUrl;
+    },
+
+    /***
+     * Check if the url is the old pdf german documentation.
+     * TODO: this is temporary until we have also English confluence docu
+     * @param url
+     * @returns {*}
+     */
+    isOldGermanPdfDocu: function (url){
+        return url === '/help/editordocumentation/?lang=de';
     }
 
 });
