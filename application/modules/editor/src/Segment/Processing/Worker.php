@@ -172,10 +172,13 @@ abstract class Worker extends PooledServiceWorker
                 }
                 $flag = $this->onLooperException($processingException, $this->looper->getProcessedStates(), $this->looper->isReprocessingLoop());
                 if ($flag > 0) {
-                    $isFinished = $this->looper->run($this->processingMode, $this->fromTheTop, $this->doDebug);
+                    // let the loop to continue processing the next segments and retrying the failed segment later on (if the exception-handling is correctly implemented)
+                    $isFinished = false;
                 } else if ($flag === 0) {
+                    // this finishes the loop and the whole processing without an exception
                     $isFinished = true;
                 } else {
+                    // exception should be bubbled up (presumably terminating the operation/import
                     throw $processingException;
                 }
             }
