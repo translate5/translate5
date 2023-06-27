@@ -519,9 +519,11 @@ function updateLocalesSelectLists(el) {
  * @returns {Boolean}
  */
 function hasEnginesForLanguageCombination() {
-    const
-        sourceLocale = $('#sourceLocaleFile').selectmenu('widget').is(":hidden") ? $("#sourceLocaleText").val() : $("#sourceLocaleFile").val(),
-        targetLocale = $("#targetLocale").val();
+    const sourceLocale = getSourceLanguage(), targetLocale = getTargetLanguage();
+
+    if (sourceLocale === targetLocale) {
+        return false;
+    }
 
 	//the button is disabled when for the target as source there is no source as target
     if (!isSourceTargetAvailable(targetLocale, sourceLocale)) {
@@ -531,6 +533,16 @@ function hasEnginesForLanguageCombination() {
     }
 
     return isSourceTargetAvailable(sourceLocale, targetLocale);
+}
+
+function getSourceLanguage() {
+    return  $('#sourceLocaleFile').selectmenu('widget').is(":hidden")
+        ? $("#sourceLocaleText").val()
+        : $("#sourceLocaleFile").val();
+}
+
+function getTargetLanguage() {
+    return $("#targetLocale").val();
 }
 
 /***
@@ -1493,6 +1505,12 @@ function toggleSource($source) {
 }
 
 function changeLanguage(){
+    if (getSourceLanguage() === getTargetLanguage()) {
+        showTargetError(Editor.data.languageresource.translatedStrings.languagesAreSame);
+
+        return;
+    }
+
     if(chosenSourceIsText){
         checkInstantTranslation();
         startTranslation(false);

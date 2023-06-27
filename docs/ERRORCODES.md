@@ -516,6 +516,7 @@ https://confluence.translate5.net/display/TAD/EventCodes
 | <a id="E1376"></a>E1376 | Plug-In InstantTranslate | InstantTranslate: Not all required parameters are provided when writing to instant-translate memory                    | Missing parameters where found in the write to instant translate memory request.                                                                                             |
 | <a id="E1383"></a>E1383 | Plug-In InstantTranslate | InstantTranslate: The sent text contains invalid markup                                                                | Invalid markup was submitted via the API that therefore could not be translated                                                                                              |
 | <a id="E1541"></a>E1541 | Plug-In InstantTranslate | InstantTranslate: Can not detect source language                                                                       | Any of existent detect engines wasn't able to guess language of provided text sample (check error log as there may be an issue with engine settings)                         |
+| <a id="E1543"></a>E1543 | Plug-In InstantTranslate | InstantTranslate: Detected language equals target language                                                             | The detected language equals the selected target language, therefore your text can not be translated. Please enter more text to improve the detection.                       |
 
 
 #### Plug-In MatchAnalysis
