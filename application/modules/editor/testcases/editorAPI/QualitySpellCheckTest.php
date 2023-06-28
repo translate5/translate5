@@ -62,7 +62,7 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
         $checkResult = (count($matches) > 0) ? 'Version: ' . trim($matches[1]) : 'UNKNOWN VERSION';
 
         $expectedSegmentQuantity = 10;
-        $expectedResult = static::api()->getFileContent('languagetool-version', $checkResult);
+        $expectedResult = static::api()->getFileContent('languagetool-version.txt', $checkResult);
         $this->assertEquals($expectedResult, $checkResult);
 
         // Get segments and check their quantity
