@@ -24,6 +24,60 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.4.0] - 2023-06-28
+
+### Important Notes:
+#### [TRANSLATE-3397](https://jira.translate5.net/browse/TRANSLATE-3397)
+The languatetool live check on editing is enabled now by default - also on instances where it was disabled with purpose. If you don't want the live check please disable it again: configuration SpellCheck.liveCheckOnEditing
+
+#### [TRANSLATE-3375](https://jira.translate5.net/browse/TRANSLATE-3375)
+The warning for the translator about "editing an 100% matches" in the editor GUI is disabled by default with this release on system level. Client level settings will stay. If you want to have this enabled on system level in the future, you will need to reactivate it.
+ 
+
+
+### Added
+**[TRANSLATE-3360](https://jira.translate5.net/browse/TRANSLATE-3360): Auto-QA, Editor general - AutoQA must be 0 errors to finish task** <br>
+It is now configurable for the PM to create a list of qualities on system, client, import and task level, for which AutoQA check 0 errors is required to finish the task. Errors that are set to false positive are allowed and do not count.
+
+**[TRANSLATE-3321](https://jira.translate5.net/browse/TRANSLATE-3321): InstantTranslate - InstantTranslate with DeepL: Detect source language automatically** <br>
+ENHANCEMENT: InstantTranslate now supports auto-detection of the source language
+
+**[TRANSLATE-3218](https://jira.translate5.net/browse/TRANSLATE-3218): API - Hotfolder-based connector solution, that mimics Across hotfolder** <br>
+6.4.0: Several fixes, introducing an API endpoint to trigger the hotfolder check manually
+6.3.1: New AcrossHotfolder plugin that watches hotfolders for tasks, that should be created in translate5 - and re-exported to the hotfolder, once they are ready
+
+
+### Changed
+**[TRANSLATE-3393](https://jira.translate5.net/browse/TRANSLATE-3393): Editor general - Include new German editor documentation in translate5** <br>
+The new German documentation about the translate5 editor has been linked in the help section of the editor
+
+**[TRANSLATE-3391](https://jira.translate5.net/browse/TRANSLATE-3391): t5memory - Add 500 status code to automatically trigger reorganize TM** <br>
+Add t5memory 500 error to trigger TM reorganization automatically.
+
+**[TRANSLATE-3381](https://jira.translate5.net/browse/TRANSLATE-3381): Main back-end mechanisms (Worker, Logging, etc.) - Start workers as plain processes instead using HTTP requests** <br>
+6.4.0: The current approach of triggering workers via HTTP is hard to debug and has a big overhead due the HTTP connections. Now the worker invocation can be switched to use raw processes - which is still under development and disabled by default but can be enabled for testing purposes in production.
+
+**[TRANSLATE-3377](https://jira.translate5.net/browse/TRANSLATE-3377): Editor general, Repetition editor - Repetition editor window is annoying** <br>
+New info message how to disable the repetition editor is added to the repetition editor pop-up.
+
+**[TRANSLATE-3375](https://jira.translate5.net/browse/TRANSLATE-3375): Configuration, Editor general - Warning about editing a 100%-Match: Disable it by default** <br>
+The warning about editing 100% matches will be disabled by default on system level.
+
+
+### Bugfixes
+**[TRANSLATE-3397](https://jira.translate5.net/browse/TRANSLATE-3397): Configuration - Correct configuration default values** <br>
+The default value of some configurations was changed in the past, but the comparator (for the is changed check) in the DB was not updated. This is fixed now.
+
+**[TRANSLATE-3394](https://jira.translate5.net/browse/TRANSLATE-3394): Main back-end mechanisms (Worker, Logging, etc.) - Bug in exception handling in looped workers leads to exceptions that should have been retried** <br>
+FIX: Looped processing workers may threw exceptions when the request should have been retried 
+
+**[TRANSLATE-2101](https://jira.translate5.net/browse/TRANSLATE-2101): Main back-end mechanisms (Worker, Logging, etc.) - Disable automated translation xliff creation from notFountTranslation xliff in production instances** <br>
+translate5 - 6.4.0: Disabling the not found translation log writer for production instances.
+
+translate5 - 5.0.3: Deactivating a logging facility for missing internal UI translations in production and clean the huge log files. Also enable caching for UI translations in production instances only.
+
+
 ## [6.3.1] - 2023-06-20
 
 ### Important Notes:
