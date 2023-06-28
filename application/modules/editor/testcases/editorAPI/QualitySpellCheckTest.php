@@ -63,7 +63,7 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
 
         $expectedSegmentQuantity = 10;
         $expectedResult = static::api()->getFileContent('languagetool-version.txt', $checkResult);
-        $this->assertEquals($expectedResult, $checkResult);
+        $this->assertEquals($expectedResult, $checkResult, 'The language-tool differs to what the testdata was created with, this certainly leads to a failing test.');
 
         // Get segments and check their quantity
         $factQty = count(static::api()->getSegments(null, 10));
