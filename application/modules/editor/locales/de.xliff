@@ -3077,7 +3077,7 @@
             </trans-unit>
             <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZHVyY2ggZWluZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+IGFiZ2VzY2hsb3NzZW46PGJyIC8+'>
                 <source>Im Projektportal {portalLink} wurde die Aufgabe 
-                    <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle 
+                    <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle
                     <i>{currentRole}</i> abgeschlossen:
                     <br />
                 </source>
@@ -8990,9 +8990,21 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</source>
               <target>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</target>
             </trans-unit>
+            <trans-unit id="Qml0dGUgbMO2c2VuIFNpZSBhbGxlIEZlaGxlciBkZXIgZm9sZ2VuZGVuIEthdGVnb3JpZSBPREVSIHNldHplbiBTaWUgc2llIGF1ZiDigJxmYWxzY2hlciBGZWhsZXLigJ0=">
+              <source>Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”</source>
+              <target>Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”</target>
+            </trans-unit>
+            <trans-unit id="QWxsZSBGZWhsZXIgZGVyIGZvbGdlbmRlbiBHcnVwcGUgT0RFUiBzZXR6ZW4gU2llIHNpZSBhdWYg4oCcZmFsc2NoZXIgRmVobGVy4oCd">
+              <source>Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”</source>
+              <target>Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”</target>
+            </trans-unit>
             <trans-unit id='VGlwcDogRGVha3RpdmllcmVuL0tvbmZpZ3VyaWVyZW4gU2llIGRpZXNlcyBGZW5zdGVyIGluIGRlbiBFZGl0b3JlaW5zdGVsbHVuZ2VuIGxpbmtzIG9iZXJoYWxiIGRlciBTZWdtZW50dGFiZWxsZQ=='>
               <source>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</source>
               <target>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</target>
+            </trans-unit>
+            <trans-unit id='PGI+UXVlbGxzcHJhY2hlIGlzdCBkaWUgWmllbHNwcmFjaGU8L2I+PGJyLz5RdWVsbHNwcmFjaGUgZ2xlaWNodCBkZXIgWmllbHNwcmFjaGUsIGRlc3dlZ2VuIGthbm4gZGVyIGVpbmdlZ2ViZW5lIFRleHQgbmljaHQgw7xiZXJzZXR6dCB3ZXJkZW4u'>
+                <source><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</source>
+                <target><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</target>
             </trans-unit>
         </body>
     </file>

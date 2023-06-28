@@ -30,6 +30,8 @@ END LICENSE AND COPYRIGHT
  * Checks Internal tags in the edited Segments for validity (all tags present, structure correct (closing tags following opening tags without interleaves)
  *
  */
+
+use editor_Segment_Internal_TagComparision as TagComparision;
 class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
 
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
@@ -66,30 +68,26 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
         return $translate->_('Interne Tags');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch($category){
-            case editor_Segment_Internal_TagComparision::TAGS_MISSING:
-                return $translate->_('Interne Tags fehlen');
-                
-            case editor_Segment_Internal_TagComparision::TAGS_ADDED:
-                return $translate->_('Interne Tags wurden hinzugefügt');
-            
-            case editor_Segment_Internal_TagComparision::WHITESPACE_MISSING:
-                return $translate->_('Whitespace wurde entfernt');
-                
-            case editor_Segment_Internal_TagComparision::WHITESPACE_ADDED:
-                return $translate->_('Whitespace wurde hinzugefügt');
-
-            case editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY:
-                return $translate->_('Interne Tags haben eine ungültige Struktur');
-            // this is a virtual category that con not be found in the database  
-            case editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE:
-                return $translate->_('Interne Tags nicht editierbarer Segmente haben eine ungültige Struktur');
-        }
-        return NULL;
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        return match ($category) {
+            TagComparision::TAGS_MISSING => $translate->_('Interne Tags fehlen'),
+            TagComparision::TAGS_ADDED => $translate->_('Interne Tags wurden hinzugefügt'),
+            TagComparision::WHITESPACE_MISSING => $translate->_('Whitespace wurde entfernt'),
+            TagComparision::WHITESPACE_ADDED => $translate->_('Whitespace wurde hinzugefügt'),
+            TagComparision::TAG_STRUCTURE_FAULTY => $translate->_('Interne Tags haben eine ungültige Struktur'),
+            TagComparision::TAG_STRUCTURE_FAULTY_NONEDITABLE => $translate->_(
+                'Interne Tags nicht editierbarer Segmente haben eine ungültige Struktur'
+            ),
+            default => null,
+        };
     }
     
-    public function getAllCategories(editor_Models_Task $task) : array {
+    public function getAllCategories(?editor_Models_Task $task): array
+    {
         return [
             editor_Segment_Internal_TagComparision::TAGS_MISSING,
             editor_Segment_Internal_TagComparision::TAGS_ADDED,

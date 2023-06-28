@@ -50,12 +50,31 @@ Ext.define('Editor.model.quality.Task', {
     isFaulty: function(){
         return (this.get('qfaulty') == true);
     },
+    hasCriticalErrors: function(){
+        if (!this.get('mustBeZeroErrors')) {
+            return false;
+        }
+
+        if (!this.childNodes.length) {
+            return (!!this.get('qcount') && !this.get('qcountfp')) || (this.get('qcount') !== this.get('qcountfp'));
+        }
+
+        return this.hasCriticalErrorsInChildren();
+    },
     /**
      * Helper to decorate the rows: a faulty rubric should be marked when it contains a faulty category
      */
     hasFaultyChildren: function(){
         for(var i=0; i < this.childNodes.length; i++){
             if(this.childNodes[i].isFaulty()){
+                return true;
+            }
+        }
+        return false;
+    },
+    hasCriticalErrorsInChildren: function(){
+        for(var i=0; i < this.childNodes.length; i++){
+            if(this.childNodes[i].hasCriticalErrors()){
                 return true;
             }
         }

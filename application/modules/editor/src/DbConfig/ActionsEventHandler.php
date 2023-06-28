@@ -52,8 +52,17 @@ declare(strict_types=1);
 
 namespace MittagQI\Translate5\DbConfig;
 
+use editor_Models_Config;
+use editor_Models_Customer_Customer;
+use editor_Models_Task;
+use editor_Segment_Quality_Manager;
 use MittagQI\Translate5\Repository\UserRepository;
+use Zend_Config;
+use Zend_Controller_Request_Abstract;
 use Zend_EventManager_Event;
+use Zend_Registry;
+use ZfExtended_Factory;
+use ZfExtended_Models_User;
 
 class ActionsEventHandler
 {
@@ -90,6 +99,82 @@ class ActionsEventHandler
 
             $event->getParam('view')->rows[$index]['defaults'] = $this->getPmUsers();
         };
+    }
+
+    public function addDefaultsForNonZeroQualityErrorsSettingOnIndexAction(): callable
+    {
+        return function (Zend_EventManager_Event $event) {
+            if (!$rows = $event->getParam('view')->rows ?? []) {
+                return;
+            }
+
+            // Config index
+            $index = array_search(
+                editor_Segment_Quality_Manager::CONFIG_MUST_BE_ZERO_QUALITY_ERRORS,
+                array_column($rows, 'name')
+            );
+
+            if (false === $index) {
+                return;
+            }
+
+            $event->getParam('view')
+                ->rows[$index]['defaults'] = $this->getDefaultsForNonZeroQualityErrorsSetting(
+                    $event->getParam('request')
+            );
+        };
+    }
+
+    public function addDefaultsForNonZeroQualityErrorsSettingOnPutAction(): callable
+    {
+        return function (Zend_EventManager_Event $event) {
+            $request = $event->getParam('request');
+            $id = $request->getParam('id');
+            if (editor_Segment_Quality_Manager::CONFIG_MUST_BE_ZERO_QUALITY_ERRORS !== $id) {
+                return;
+            }
+
+            $event->getParam('view')->rows['defaults'] = $this->getDefaultsForNonZeroQualityErrorsSetting($request);
+        };
+    }
+
+    private function getDefaultsForNonZeroQualityErrorsSetting(Zend_Controller_Request_Abstract $request): string
+    {
+        $taskGuid = $request->getParam('taskGuid');
+
+        $task = null;
+        if (!empty($taskGuid)) {
+            $task = ZfExtended_Factory::get(editor_Models_Task::class);
+            $task->loadByTaskGuid($taskGuid);
+        }
+
+        $config = $this->getConfig($request, $task);
+
+        $defaults = [];
+        $manager = editor_Segment_Quality_Manager::instance();
+
+        foreach ($manager->getActiveTypeToCategoryMap($task, $config) as $key => $label) {
+            $defaults[$key] = $label;
+        }
+
+        return json_encode($defaults);
+    }
+
+    private function getConfig(Zend_Controller_Request_Abstract $request, ?editor_Models_Task $task): Zend_Config
+    {
+        if ($task) {
+            return $task->getConfig();
+        }
+
+        $customerId = $request->getParam('customerId');
+        if (is_numeric($customerId)) {
+            $customer = ZfExtended_Factory::get(editor_Models_Customer_Customer::class);
+            $customer->load($customerId);
+
+            return $customer->getConfig();
+        }
+
+        return Zend_Registry::get('config');
     }
 
     private function getPmUsers(): string

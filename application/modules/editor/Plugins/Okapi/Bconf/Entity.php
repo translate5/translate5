@@ -102,8 +102,10 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
                 $errorMsg = $e->__toString();
             } finally {
                 if($errorMsg || empty($userDataDir)){
-                    throw new editor_Plugins_Okapi_Exception('E1057',
-                        ['okapiDataDir' => $errorMsg . "\n(checking runtimeOptions.plugins.Okapi.dataDir)"]);
+                    $okapiDataDir = empty($userDataDir) ?
+                        'runtimeOptions.plugins.Okapi.dataDir NOT CONFIGURED'
+                        : ($errorMsg ? $userDataDir . ' (' . $errorMsg . ')' : $userDataDir);
+                    throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $okapiDataDir]);
                 } else {
                     self::$userDataDir = $userDataDir;
                 }
@@ -224,8 +226,7 @@ class editor_Plugins_Okapi_Bconf_Entity extends ZfExtended_Models_Entity_Abstrac
         $dir = $this->getDataDirectory();
         if(self::checkDirectory($dir) != '' && !mkdir($dir, 0777, true)){
             $this->delete();
-            $errorMsg = "Could not create directory for bconf (in runtimeOptions.plugins.Okapi.dataDir)";
-            throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $errorMsg]);
+            throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $dir]);
         }
         // when exceptions occur during unpacking/packing this flag ensures, the entity is removed from DB
         $this->isNew = true;

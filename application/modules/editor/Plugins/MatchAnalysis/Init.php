@@ -34,6 +34,7 @@ use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisProcessor;
 use MittagQI\Translate5\Plugins\MatchAnalysis\PauseMatchAnalysisWorker;
 use MittagQI\Translate5\Task\Import\ImportEventTrigger;
 use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
+use MittagQI\ZfExtended\Worker\Queue;
 
 class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
 {
@@ -323,7 +324,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract
             $this->queueAnalysis($taskGuid, $params);
         }
 
-        ZfExtended_Factory::get(ZfExtended_Worker_Queue::class)->trigger();
+        ZfExtended_Factory::get(Queue::class)->trigger();
     }
 
     /***

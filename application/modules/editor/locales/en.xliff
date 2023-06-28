@@ -9167,9 +9167,21 @@ E-Mail: service@MittagQI.com</pre>
               <source>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</source>
               <target>Warning: Please do NOT use segment merge or splitting in another translation tool with the downloaded package. Translate5 does not support segment merge/split and such segments will be ignored on re-import.</target>
             </trans-unit>
+            <trans-unit id="Qml0dGUgbMO2c2VuIFNpZSBhbGxlIEZlaGxlciBkZXIgZm9sZ2VuZGVuIEthdGVnb3JpZSBPREVSIHNldHplbiBTaWUgc2llIGF1ZiDigJxmYWxzY2hlciBGZWhsZXLigJ0=">
+              <source>Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”</source>
+              <target>Please solve all errors of the following category OR set them to “false positive”</target>
+            </trans-unit>
+            <trans-unit id="QWxsZSBGZWhsZXIgZGVyIGZvbGdlbmRlbiBHcnVwcGUgT0RFUiBzZXR6ZW4gU2llIHNpZSBhdWYg4oCcZmFsc2NoZXIgRmVobGVy4oCd">
+              <source>Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”</source>
+              <target>All errors of the following category OR set them to “false positive”</target>
+            </trans-unit>
             <trans-unit id='VGlwcDogRGVha3RpdmllcmVuL0tvbmZpZ3VyaWVyZW4gU2llIGRpZXNlcyBGZW5zdGVyIGluIGRlbiBFZGl0b3JlaW5zdGVsbHVuZ2VuIGxpbmtzIG9iZXJoYWxiIGRlciBTZWdtZW50dGFiZWxsZQ=='>
               <source>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</source>
               <target>Tip: Disable/configure this window in the editor settings on the left above the segment table</target>
+            </trans-unit>
+            <trans-unit id='PGI+UXVlbGxzcHJhY2hlIGlzdCBkaWUgWmllbHNwcmFjaGU8L2I+PGJyLz5RdWVsbHNwcmFjaGUgZ2xlaWNodCBkZXIgWmllbHNwcmFjaGUsIGRlc3dlZ2VuIGthbm4gZGVyIGVpbmdlZ2ViZW5lIFRleHQgbmljaHQgw7xiZXJzZXR6dCB3ZXJkZW4u'>
+                <source><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</source>
+                <target><b>Source language equals target language</b><br/>Source language equals the selected target language, therefore your text can not be translated.</target>
             </trans-unit>
         </body>
     </file>

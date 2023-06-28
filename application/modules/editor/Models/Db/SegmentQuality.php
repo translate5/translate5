@@ -289,7 +289,8 @@ final class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     }
     /**
      * The main selection of qualities for frontend purposes
-     * In the frontend, qualities for non-editable segments will not be shown. Only structural internal tag errors must be shown even for non-editable segments
+     * In the frontend, qualities for non-editable segments will not be shown.
+     * Only structural internal tag errors must be shown even for non-editable segments
      * @param string $taskGuid
      * @param array $typesBlacklist
      * @param array $segmentNrRestriction
@@ -297,19 +298,32 @@ final class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param string $field
      * @return array: array of assoc array with all columns of LEK_segment_quality plus a key "editable"
      */
-    public function fetchForFrontend(string $taskGuid=NULL, array $typesBlacklist=NULL, array $segmentNrRestriction=NULL, bool $falsePositiveRestriction=NULL, string $field=NULL) : array {
+    public function fetchForFrontend(
+        ?string $taskGuid,
+        array $typesBlacklist,
+        ?array $segmentNrRestriction = null,
+        ?bool $falsePositiveRestriction = null,
+        ?string $field = null
+    ) : iterable {
         $select = $this->getAdapter()->select();
         $select
             ->from(['qualities' => $this->getName()], 'qualities.*')
-            ->from(['segments' => 'LEK_segments'], 'segments.editable') // we need the editable prop for assigning structural faults of non-editable segments a virtual category
+            // we need the editable prop for assigning structural faults of non-editable segments a virtual category
+            ->from(['segments' => 'LEK_segments'], 'segments.editable')
             ->where('qualities.segmentId = segments.id')
             ->where('qualities.hidden = 0')
             // we want qualities from editable segments, only exception are structural internal tag errors
             // as usual, Zend Selects do not provide proper bracketing, so we're crating this manually here
-            ->where('segments.editable = 1 OR (qualities.type = \''.editor_Segment_Tag::TYPE_INTERNAL.'\' AND qualities.category = \''.editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY.'\')');
-        if($segmentNrRestriction !== NULL){
-            if(count($segmentNrRestriction) > 0){
-                if(count($segmentNrRestriction) > 1){
+            ->where(
+                'segments.editable = 1 OR (
+                    qualities.type = \''.editor_Segment_Tag::TYPE_INTERNAL.'\'
+                    AND qualities.category = \''.editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY.'\'
+                )'
+            );
+
+        if (null !== $segmentNrRestriction) {
+            if (!empty($segmentNrRestriction)) {
+                if (count($segmentNrRestriction) > 1) {
                     $select->where('segments.segmentNrInTask IN (?)', $segmentNrRestriction);
                 } else {
                     $select->where('segments.segmentNrInTask = ?', $segmentNrRestriction[0]);
@@ -319,28 +333,35 @@ final class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
                 $select->where('0 = 1');
             }
         }
-        if(!empty($taskGuid)){
+
+        if (!empty($taskGuid)) {
             $select->where('qualities.taskGuid = ?', $taskGuid);
         }
-        if($field != NULL){
+
+        if ($field) {
             // a quality with no field set applies for all fields !
             $select->where('qualities.field = ? OR '.'qualities.field = \'\'', $field);
         }
-        if(!empty($typesBlacklist)){ // $typesBlacklist can not be "0"...
-            if(is_array($typesBlacklist) && count($typesBlacklist) > 1){
+
+        if (!empty($typesBlacklist)) { // $typesBlacklist can not be "0"...
+            if (count($typesBlacklist) > 1) {
                 $select->where('qualities.type NOT IN (?)', $typesBlacklist);
             } else {
                 $type = is_array($typesBlacklist) ? $typesBlacklist[0] : $typesBlacklist;
                 $select->where('qualities.type != ?', $type);
             }
         }
-        if($falsePositiveRestriction !== NULL){
+        if ($falsePositiveRestriction !== null) {
             $select->where('qualities.falsePositive = ?', $falsePositiveRestriction, Zend_Db::INT_TYPE);
         }
         $select->order([ 'qualities.type ASC', 'qualities.category ASC' ]);
         // DEBUG
         // error_log('FETCH QUALITIES FOR FRONTEND: '.$select->__toString());
-        return $this->getAdapter()->fetchAll($select, [], Zend_Db::FETCH_ASSOC);
+        $stmt = $this->getAdapter()->query($select);
+
+        while ($row = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
+            yield $row;
+        }
     }
     /**
      * Deletes quality-entries by their ID

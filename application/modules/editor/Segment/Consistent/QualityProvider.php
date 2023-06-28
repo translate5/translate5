@@ -47,13 +47,6 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
     protected static $type = 'consistent';
 
     /**
-     * Flag indicating whether this quality has categories
-     *
-     * @var bool
-     */
-    protected static $hasCategories = true;
-
-    /**
      * Cache of all task's qualities active before segment save
      *
      * @var array
@@ -219,20 +212,16 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
         return $translate->_('Einheitlichkeit');
     }
 
-    /**
-     * Translate category
-     *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @param string $category
-     * @param editor_Models_Task $task
-     * @return string|null
-     */
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch($category){
-            case editor_Segment_Consistent_Check::SOURCE: return $translate->_('Uneinheitliche Quelle');
-            case editor_Segment_Consistent_Check::TARGET: return $translate->_('Uneinheitliches Ziel');
-        }
-        return NULL;
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ): ?string {
+        return match ($category) {
+            editor_Segment_Consistent_Check::SOURCE => $translate->_('Uneinheitliche Quelle'),
+            editor_Segment_Consistent_Check::TARGET => $translate->_('Uneinheitliches Ziel'),
+            default => null,
+        };
     }
 
     /**
@@ -253,11 +242,9 @@ class editor_Segment_Consistent_QualityProvider extends editor_Segment_Quality_P
 
     /**
      * Categories in this quality
-     *
-     * @param editor_Models_Task $task
-     * @return array
      */
-    public function getAllCategories(editor_Models_Task $task) : array {
+    public function getAllCategories(?editor_Models_Task $task): array
+    {
         return [
             editor_Segment_Consistent_Check::SOURCE,
             editor_Segment_Consistent_Check::TARGET,

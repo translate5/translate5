@@ -275,6 +275,9 @@ Ext.define('Editor.model.admin.Task', {
         }
         return me.modified && me.modified.userState === unconfirmed || me.get('userState') === unconfirmed;
     },
+    hasCriticalErrors: function () {
+        return !!this.get('hasCriticalErrors');
+    },
     /**
      * returns if task had errors while import
      * @returns {Boolean}

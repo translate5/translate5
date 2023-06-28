@@ -58,21 +58,34 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
         return $translate->_('Manuelle QS (im Segment)');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        $mqmIndex = intval(str_replace(editor_Segment_Tag::TYPE_MQM.'_', '', $category)); // see editor_Segment_Mqm_Tag::createCategoryVal how we evaluate the index from the category
-        $mqmConfig = editor_Segment_Mqm_Configuration::instance($task);
-        $mqmType = $mqmConfig->getMqmTypeForId($mqmIndex);
-        if($mqmType != NULL){
-            // currently, there are no translations for the usually english names. To change, use: return $translate->_($mqmType);
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        // see editor_Segment_Mqm_Tag::createCategoryVal how we evaluate the index from the category
+        $mqmIndex = intval(str_replace(editor_Segment_Tag::TYPE_MQM.'_', '', $category));
+        $mqmType = $task ? editor_Segment_Mqm_Configuration::instance($task)->getMqmTypeForId($mqmIndex) : null;
+
+        if (null !== $mqmType) {
+            // currently, there are no translations for the usually english names.
+            // To change, use: return $translate->_($mqmType);
             return $mqmType;
         }
         // not worth an exception, should not happen if configuration correct
-        return 'UNKNOWN MQM-TYPE-ID '.$mqmIndex;
+        return 'UNKNOWN MQM-TYPE-ID ' . $mqmIndex;
     }
     
-    public function getAllCategories(editor_Models_Task $task) : array {
-        $mqmConfig = editor_Segment_Mqm_Configuration::instance($task);
-        return array_map(function ($id){ return editor_Segment_Mqm_Tag::createCategoryVal($id); }, $mqmConfig->getAllIds());
+    public function getAllCategories(?editor_Models_Task $task) : array
+    {
+        if (null === $task) {
+            return [];
+        }
+
+        return array_map(
+            fn ($id) => editor_Segment_Mqm_Tag::createCategoryVal($id),
+            editor_Segment_Mqm_Configuration::instance($task)->getAllIds()
+        );
     }
     
     public function isExportedTag() : bool {

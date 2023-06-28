@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Segment\QualityService;
+
 /**
  * Controller for the User Task Associations
  * Since PMs see all Task and Users, the indexAction has not to be constrained to show a subset of associations for security reasons
@@ -82,18 +84,17 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $this->entity->loadProjectWithUserInfo($projectId,$workflow);
     }
 
-    public function postDispatch() {
-        $acl = ZfExtended_Acl::getInstance();
-        if($acl->isInAllowedRoles(ZfExtended_Authentication::getInstance()->getRoles(), 'readAuthHash')) {
+    public function postDispatch()
+    {
+        if ($this->isAllowed('readAuthHash')) {
             parent::postDispatch();
             return;
         }
-        if(is_array($this->view->rows)) {
-            foreach($this->view->rows as &$row) {
+        if (is_array($this->view->rows)) {
+            foreach ($this->view->rows as &$row) {
                 unset($row['staticAuthHash']);
             }
-        }
-        elseif(is_object($this->view->rows)) {
+        } elseif (is_object($this->view->rows)) {
             unset($this->view->rows->staticAuthHash);
         }
         parent::postDispatch();
@@ -213,21 +214,25 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         /* @var $workflow editor_Workflow_Default */
         
         //here checks the isWritable if the tua is already in editing mode... Not as intended.
-        if(!empty($this->entity->getUsedState()) && $workflow->isWriteable($this->entity, true)) {
+        if (!empty($this->entity->getUsedState()) && $workflow->isWriteable($this->entity, true)) {
             // the following check on preventing changing Jobs which are used, prevents the following problems:
             // competitive tasks:
-            //   a task can not confirmed by user A if user A could not get a lock on the task,
+            //   a task can not be confirmed by user A if user A could not get a lock on the task,
             //   because user B has opened the task for editing (and locked it), before User B was set to unconfirmed.
-            //   This is prevented now, since the PM gets an error when he wants to set User B to unconfirmed while B is editing already.
+            //   This is prevented now, since the PM gets an error when he wants
+            //   to set User B to unconfirmed while B is editing already.
             //  another prevented problem:
             //    User B have opened the task for editing, after that his job is set to unconfirmed
             //    User B does not notice this and edits more segments, although he should be unconfirmed or waiting.
-            //  Throwing the following exception do not kick out the user, but the PM knows now that he fucked up the task.
+            //  Throwing the following exception do not kick out the user,
+            //  but the PM knows now that he fucked up the task.
             ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1161' => "The job can not be modified, since the user has already opened the task for editing. You are to late.",
+                'E1161' => "The job can not be modified, since the user has already opened the task for editing."
+                         . " You are to late.",
             ]);
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1161', [
-                'id' => 'Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.',
+                'id' => 'Sie können den Job zur Zeit nicht bearbeiten,'
+                      . ' der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.',
             ]);
         }
         $oldEntity = clone $this->entity;
@@ -251,33 +256,56 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             /* @var $tua editor_Models_TaskUserAssoc */
 
             //get all usigned segments, but ignore the current assoc.
-            $assignedSegments = $tua->getNotForUserAssignedSegments($this->entity->getTaskGuid(), $this->entity->getRole(),$this->entity->getUserGuid());
+            $assignedSegments = $tua->getNotForUserAssignedSegments(
+                $this->entity->getTaskGuid(),
+                $this->entity->getRole(),
+                $this->entity->getUserGuid()
+            );
             
             if (!$segmentrangeModel->validateSemantics($this->data->segmentrange, $assignedSegments)) {
                 ZfExtended_UnprocessableEntity::addCodes([
                     'E1281' => "The content of the segmentrange that is assigned to the user is not valid."
                 ]);
                 throw ZfExtended_UnprocessableEntity::createResponse('E1280', [
-                    'id' => 'Der Inhalt für die editierbaren Segmente ist nicht valide. Die Zahlen müssen in der richtigen Reihenfolge angegeben sein und dürfen nicht überlappen, weder innerhalb der Eingabe noch mit anderen Usern von derselben Rolle.',
+                    'id' => 'Der Inhalt für die editierbaren Segmente ist nicht valide.'
+                        . ' Die Zahlen müssen in der richtigen Reihenfolge angegeben sein und dürfen nicht überlappen,'
+                        . ' weder innerhalb der Eingabe noch mit anderen Usern von derselben Rolle.',
                 ]);
             }
+        }
+
+        if (
+            isset($this->data->state)
+            && editor_Workflow_Default::STATE_FINISH != $this->data->state
+            && (new QualityService())->taskHasCriticalErrors($this->entity->getTaskGuid())
+        ) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1542' => 'Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”'
+            ]);
+
+            throw ZfExtended_Models_Entity_Conflict::createResponse(
+                'E1542',
+                ['Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”'],
+                ['task' => $this->entity]
+            );
         }
         
         $this->entity->validate();
 
-        $workflow->hookin()->doWithUserAssoc($oldEntity, $this->entity, function() {
+        $workflow->hookin()->doWithUserAssoc($oldEntity, $this->entity, function () {
             $this->entity->save();
         });
 
         $this->view->rows = $this->entity->getDataObject();
         $this->addUserInfoToResult();
-        if(isset($this->data->state) && $oldEntity->getState() != $this->data->state){
+        if (isset($this->data->state) && $oldEntity->getState() != $this->data->state) {
             $this->log->info('E1012', 'job status changed from {oldState} to {newState}', [
                 'tua' => $this->entity->getSanitizedEntityForLog(),
                 'oldState' => $oldEntity->getState(),
                 'newState' => $this->data->state,
             ]);
         }
+
         $this->applyEditableAndDeletable();
     }
     
