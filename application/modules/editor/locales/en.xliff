@@ -9179,6 +9179,10 @@ E-Mail: service@MittagQI.com</pre>
               <source>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</source>
               <target>Tip: Disable/configure this window in the editor settings on the left above the segment table</target>
             </trans-unit>
+            <trans-unit id='PGI+UXVlbGxzcHJhY2hlIGlzdCBkaWUgWmllbHNwcmFjaGU8L2I+PGJyLz5RdWVsbHNwcmFjaGUgZ2xlaWNodCBkZXIgWmllbHNwcmFjaGUsIGRlc3dlZ2VuIGthbm4gZGVyIGVpbmdlZ2ViZW5lIFRleHQgbmljaHQgw7xiZXJzZXR6dCB3ZXJkZW4u'>
+                <source><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</source>
+                <target><b>Source language equals target language</b><br/>Source language equals the selected target language, therefore your text can not be translated.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

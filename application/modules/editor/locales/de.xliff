@@ -3077,7 +3077,7 @@
             </trans-unit>
             <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZHVyY2ggZWluZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+IGFiZ2VzY2hsb3NzZW46PGJyIC8+'>
                 <source>Im Projektportal {portalLink} wurde die Aufgabe 
-                    <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle 
+                    <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle
                     <i>{currentRole}</i> abgeschlossen:
                     <br />
                 </source>
@@ -9001,6 +9001,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='VGlwcDogRGVha3RpdmllcmVuL0tvbmZpZ3VyaWVyZW4gU2llIGRpZXNlcyBGZW5zdGVyIGluIGRlbiBFZGl0b3JlaW5zdGVsbHVuZ2VuIGxpbmtzIG9iZXJoYWxiIGRlciBTZWdtZW50dGFiZWxsZQ=='>
               <source>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</source>
               <target>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</target>
+            </trans-unit>
+            <trans-unit id='PGI+UXVlbGxzcHJhY2hlIGlzdCBkaWUgWmllbHNwcmFjaGU8L2I+PGJyLz5RdWVsbHNwcmFjaGUgZ2xlaWNodCBkZXIgWmllbHNwcmFjaGUsIGRlc3dlZ2VuIGthbm4gZGVyIGVpbmdlZ2ViZW5lIFRleHQgbmljaHQgw7xiZXJzZXR6dCB3ZXJkZW4u'>
+                <source><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</source>
+                <target><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</target>
             </trans-unit>
         </body>
     </file>

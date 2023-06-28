@@ -165,6 +165,7 @@
 	],
 	"license" : "AGPL-3.0-only",
 	"require-dev" : {
-		"brainmaestro/composer-git-hooks" : "^2.8"
+		"brainmaestro/composer-git-hooks" : "^2.8",
+		"symfony/var-dumper": "^6.0"
 	}
 }

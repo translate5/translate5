@@ -38,6 +38,8 @@ END LICENSE AND COPYRIGHT
  * @method void setTargetLangDefault() setTargetLangDefault(int $targetLangDefault)
  * @method string getLastUsedApp() getLastUsedApp()
  * @method void setLastUsedApp() setLastUsedApp(string $lastUsedApp)
+ * @method string getSourceIsAutoDetected()
+ * @method void setSourceIsAutoDetected(bool $sourceIsAutoDetected)
  */
 
 class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract {
@@ -70,17 +72,17 @@ class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Save the default languages for the given user.
-     * When the record for the user exist, it will be update with the new values.
-     * 
-     * @param int $userId
-     * @param int $source
-     * @param int $target
+     * When the record for the user exist, it will be updated with the new values.
+     *
      * @return mixed|array
      */
-    public function saveDefaultLanguages($userId,$source,$target){
+    public function saveDefaultLanguages(int $userId, int $source, int $target, bool $sourceIsAutoDetected = false)
+    {
         $this->loadOrSet($userId);
         $this->setSourceLangDefault($source);
         $this->setTargetLangDefault($target);
+        $this->setSourceIsAutoDetected($sourceIsAutoDetected);
+
         return $this->save();
     }
     
