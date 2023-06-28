@@ -52,7 +52,18 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
 
     public function testSpellCheck()
     {
+        // extract the language-tool version out of the service-check
+        // this way at least the maintainer of the test can easily see, that the error originates from a different languagetool-version
+        $service = editor_Plugins_SpellCheck_Init::createService('languagetool');
+        $service->check();
+        $checkResult = $service->createServiceMsg('', ',', false, true);
+        $matches = [];
+        preg_match('~Versions?:([^,]+)~', $checkResult, $matches);
+        $checkResult = (count($matches) > 0) ? 'Version: ' . trim($matches[1]) : 'UNKNOWN VERSION';
+
         $expectedSegmentQuantity = 10;
+        $expectedResult = static::api()->getFileContent('languagetool-version', $checkResult);
+        $this->assertEquals($expectedResult, $checkResult);
 
         // Get segments and check their quantity
         $factQty = count(static::api()->getSegments(null, 10));
