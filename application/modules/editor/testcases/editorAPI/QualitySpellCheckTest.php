@@ -52,9 +52,19 @@ class QualitySpellCheckTest extends editor_Test_JsonTest {
 
     public function testSpellCheck()
     {
-        $expectedSegmentQuantity = 10;
+        // extract the language-tool version out of the service-check
+        // this way at least the maintainer of the test can easily see, that the error originates from a different languagetool-version
+        $service = editor_Plugins_SpellCheck_Init::createService('languagetool');
+        $service->check();
+        $checkResult = $service->createServiceMsg('', ',', false, true);
+        $matches = [];
+        preg_match('~Versions?:([^,]+)~', $checkResult, $matches);
+        $checkResult = (count($matches) > 0) ? 'Version: ' . trim($matches[1]) : 'UNKNOWN VERSION';
+        $expectedResult = static::api()->getFileContent('languagetool-version.txt', $checkResult);
+        $this->assertEquals($expectedResult, $checkResult, 'The language-tool differs to what the testdata was created with, this certainly leads to a failing test.');
 
         // Get segments and check their quantity
+        $expectedSegmentQuantity = 10;
         $factQty = count(static::api()->getSegments(null, 10));
         static::assertEquals($factQty, $expectedSegmentQuantity, 'Not enough segments in the imported task');
 

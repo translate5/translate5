@@ -539,7 +539,7 @@ final class Task extends Resource
                 $file = $api->getFile($this->_uploadFiles[0]);
                 // add/change a task-config.ini if we have configs. We must use a temporary zip then to not overwrite the original ZIP
                 if ($mime === 'application/zip' && count($this->_importConfigs) > 0){
-                    $this->_cleanupZip = dirname($file).'/tmp-'.basename($file);
+                    $this->_cleanupZip = APPLICATION_DATA . '/tmp-' . basename($file);
                     copy($file, $this->_cleanupZip);
                     $this->setTaskConfigsInZip($this->_cleanupZip);
                     $file = $this->_cleanupZip;
