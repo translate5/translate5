@@ -62,10 +62,10 @@ class editor_Models_Quality_TaskTooltip extends editor_Models_Quality_AbstractVi
             $addCriticalErrorsComment = $addCriticalErrorsComment || $hasCriticalErrors;
 
             $html .=
-                "<tr>
-                    <td>{$row->text}:</td>
-                    <td>{$row->qcount}</td>
-                <td>";
+                '<tr>'
+                . '<td>' . $row->text . ':</td>'
+                . '<td>' . $row->qcount . '</td>'
+                . '<td>';
 
             if (property_exists($row, 'qcomplete') && !$row->qcomplete) {
                 $html .= ' ' . $this->getStatusSymbol('incomplete');
