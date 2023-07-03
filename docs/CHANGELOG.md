@@ -25,6 +25,24 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.4.1] - 2023-07-03
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3411](https://jira.translate5.net/browse/TRANSLATE-3411): Auto-QA, Main back-end mechanisms (Worker, Logging, etc.) - UI JS error and to much php log data** <br>
+Fixing some UI JS errors coming from TRANSLATE-3360 and remove some unnecessary log entries flooding the php.log file (resulting from TRANSLATE-2101)
+
+**[TRANSLATE-3410](https://jira.translate5.net/browse/TRANSLATE-3410): I10N - Missing locale logic for login page** <br>
+FIXED: wrong/missing locale logic for login page
+
+**[TRANSLATE-3405](https://jira.translate5.net/browse/TRANSLATE-3405): Auto-QA - Fix Quality Tests** <br>
+Adjust Quality-tests for current features, fix small file-handling quirk
+
+
 ## [6.4.0] - 2023-06-28
 
 ### Important Notes:
