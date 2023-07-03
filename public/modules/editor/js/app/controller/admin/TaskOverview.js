@@ -959,6 +959,26 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         });
     },
 
+    /**
+     * Clones the task
+     * TODO: this should be fixed with the export issue. One export url generator for all exports (as idea for implementation)
+     * @param {Editor.model.admin.Task} task
+     */
+    editorPackageExport: function (task, event) {
+        Editor.view.admin.task.reimport.ReimportViewController.exportTask(task);
+    },
+
+    /***
+     * Reimport translator package action handler
+     * @param task
+     * @param event
+     */
+    editorPackageReimport: function (task, event) {
+        var win = Ext.widget('adminTaskReimportReimportZipWindow');
+        win.loadRecord(task);
+        win.show();
+    },
+
     /***
      * Task action menu click handler
      */
@@ -1302,9 +1322,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     notifyTaskCreated:function (task, callback){
         var me = this;
 
-        // reload the task store so the new tasks are included inside.
-        // in the import wizard, fresh tasks are required
-        me.getAdminTasksStore().load({
+
+        // Reload the task wizard store, so we have fresh tasks in the import wizard
+        Editor.util.ImportWizard.reloadTasksStore({
             callback:function (){
 
                 // update the project route based on the current task

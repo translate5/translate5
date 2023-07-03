@@ -35,9 +35,11 @@ class MaintenanceDisableCommand extends MaintenanceCommand {
     
         // the name of the command (the part after "bin/console")
     protected static $defaultName = 'maintenance:disable';
-    
+
     protected function configure()
     {
+        $this->setAliases(['maintenance:end']);
+
         $this
         // the short description shown while running "php bin/console list"
         ->setDescription('Disable the maintenance mode.')

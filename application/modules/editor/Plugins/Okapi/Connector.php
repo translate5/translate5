@@ -26,6 +26,8 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\Translate5\Plugins\Okapi\Service;
+
 /**
  * Upload/download file to okapi server, and converting it to xlf
  * One Connector Instance can contain one Okapi Project
@@ -52,14 +54,7 @@ class editor_Plugins_Okapi_Connector {
     const INPUT_TYPE_DEFAULT = ''; //needed for importing all files, export: the manifest.rkm
     const INPUT_TYPE_ORIGINAL = 'original'; //needed for export, place for the original (html) files
     const INPUT_TYPE_WORK = 'work';  //needed for export, place for the work (xlf) files
-    
-    /**
-     * The url for connecting the Okapi api
-     * 
-     * @var string
-     */
-    private $apiUrl;
-    
+
     /**
      * The url for the current  active project
      * @var string
@@ -67,54 +62,34 @@ class editor_Plugins_Okapi_Connector {
     private $projectUrl;
 
     /**
-     * Zf config for Okapi
-     * @var Zend_Config
+     * Server to use (what can be configured on task & customer level)
+     * @var string|null
      */
-    private $okapiConfig;
-    
+    private ?string $serverToUse;
+
     /**
-     * The file which need to be converted
-     * @var string
+     * The OKAPI service
+     * @var Service
      */
-    private $inputFile;
+    private Service $service;
 
     /**
      * @param Zend_Config|null $config
      * @throws Zend_Exception
      */
     public function __construct(Zend_Config $config = null) {
-
-        $this->okapiConfig = !is_null($config) ? $config->runtimeOptions->plugins->Okapi : Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
-
-        $this->apiUrl = $this->getApiUrl();
+        $this->serverToUse = is_null($config) ? Zend_Registry::get('config')->runtimeOptions->plugins->Okapi->serverUsed : $config->runtimeOptions->plugins->Okapi->serverUsed;
+        $this->service = editor_Plugins_Okapi_Init::createService('okapi');
     }
 
     /**
      * Get the okapi api url from the configured servers and server used
-     * @return mixed
+     * @return string
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function getApiUrl(){
-
-        $servers = $this->okapiConfig->server;
-        if(empty($servers)){
-            throw new editor_Plugins_Okapi_Exception('E1410', ['servers' => $servers]);
-        }
-
-        $serverUsed = $this->okapiConfig->serverUsed;
-        if(empty($serverUsed)){
-            throw new editor_Plugins_Okapi_Exception('E1411', ['serverUsed' => $serverUsed]);
-        }
-
-        $apiUrl = $servers->$serverUsed ?? null;
-        if(empty($apiUrl)){
-            throw new editor_Plugins_Okapi_Exception('E1412', [
-                'servers' => $servers,
-                'serverUsed' => $serverUsed
-            ]);
-        }
-
-        return $apiUrl;
+    public function getApiUrl(): string
+    {
+        return $this->service->getConfiguredServiceUrl($this->serverToUse) . '/';
     }
 
     /**
@@ -156,10 +131,7 @@ class editor_Plugins_Okapi_Connector {
      * Create the project on Okapi server.
      */
     public function createProject() {
-        if(empty($this->apiUrl)) {
-            throw new editor_Plugins_Okapi_Exception('E1059');
-        }
-        $http = $this->getHttpClient($this->apiUrl.'projects/new');
+        $http = $this->getHttpClient($this->getApiUrl().'projects/new');
         $response = $http->request('POST');
         $this->processResponse($response);
         $url=$response->getHeader('Location');
@@ -179,14 +151,15 @@ class editor_Plugins_Okapi_Connector {
     }
 
     /**
-     * Upload the bconf file
      * @param string $bconfPath
+     * @param bool $forImport
+     * @return void
      * @throws Zend_Http_Client_Exception
      * @throws ZfExtended_BadGateway
      * @throws ZfExtended_Exception
      * @throws editor_Plugins_Okapi_Exception
      */
-    public function uploadOkapiConfig(string $bconfPath){
+    public function uploadOkapiConfig(string $bconfPath, bool $forImport){
         if(empty($bconfPath) || !file_exists($bconfPath)) {
              // 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
              throw new editor_Plugins_Okapi_Exception('E1055', ['bconfFile' => $bconfPath]);
@@ -199,15 +172,22 @@ class editor_Plugins_Okapi_Connector {
         try {
             $this->processResponse($response);
         } catch (ZfExtended_BadGateway $e) {
+            // to improve support we add the name of the bconf as used in the Frontend (if possible) for import bconf's
             $msg = $e->getMessage();
-            $bconfId = (int)basename(dirname($bconfPath));
-            $bconf = new editor_Plugins_Okapi_Bconf_Entity();
-            $bconf->load($bconfId);
-            $bconfName = $bconf->getName();
-            // TODO Include link. Beware: $msg is escaped, no html possible as is
-            $msg .= " \nBconf used was '$bconfName.bconf' (id $bconfId)";
-            $e->setMessage($msg);
-            throw new ZfExtended_BadGateway($msg, 500);
+            if($forImport){
+                try {
+                    $bconfId = (int) basename(dirname($bconfPath));
+                    $bconf = new editor_Plugins_Okapi_Bconf_Entity();
+                    $bconf->load($bconfId);
+                    $bconfName = $bconf->getName();
+                    $e->setMessage($msg . " \n" . 'Import-bconf used was \'' . $bconfName . '\' (id ' . $bconfId . ')');
+                } catch(Throwable){
+                    $e->setMessage($msg . " \n".'Import-bconf used was \''.basename($bconfPath).'\'');
+                }
+            } else {
+                $e->setMessage($msg . " \n".'Export-bconf used was \''.basename($bconfPath).'\'');
+            }
+            throw $e;
         }
     }
     
@@ -252,7 +232,7 @@ class editor_Plugins_Okapi_Connector {
             //add the upload type to the URL
             $fileName = $type.'/'.$fileName;
         }
-        $url=$this->projectUrl.'/inputFiles/'.$fileName;
+        $url = $this->projectUrl.'/inputFiles/'.$fileName;
         $http = $this->getHttpClient($url);
         $http->setFileUpload($realFilePath,'inputFile');
         $response = $http->request('PUT');
@@ -263,17 +243,18 @@ class editor_Plugins_Okapi_Connector {
      * Run the file conversion. For each uploaded files converted file will be created
      */
     public function executeTask($source, $target){
-        $url=$this->projectUrl.'/tasks/execute/'.$source.'/'.$target;
+        $url = $this->projectUrl.'/tasks/execute/'.$source.'/'.$target;
         $http = $this->getHttpClient($url);
         $response = $http->request('POST');
         $this->processResponse($response);
     }
     
     /**
-     * Run the file conversion. For each uploaded files converted file will be created
+     * Checks the default configured /system level) Okapi Service
+     * TODO FIXME: this should be implemented in MittagQI\Translate5\Plugins\Okapi\Service ...
      */
     public function ping(){
-        $url = $this->apiUrl;
+        $url = $this->service->getServiceUrl();
         if(empty($url)) {
             return 'Okapi NOT configured!';
         }

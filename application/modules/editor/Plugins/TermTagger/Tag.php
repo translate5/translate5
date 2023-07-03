@@ -36,11 +36,47 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
      * @var string
      */
     const TYPE = 'term';
+
     /**
      * Our related term-id
      * @var string
      */
     const DATA_NAME_TBXID = 'tbxid';
+
+    /**
+     * Filters a quality state out of an array of term tag css-classes (=states)
+     * Returns an empty string if any found
+     * @param array $cssClasses
+     * @param bool $isSourceField
+     * @return string
+     */
+    public static function getQualityState(array $cssClasses, bool $isSourceField): string
+    {
+        foreach ($cssClasses as $cssClass) {
+            switch ($cssClass) {
+                case editor_Models_Terminology_Models_TermModel::TRANSSTAT_NOT_FOUND:
+                    if ($isSourceField) {
+                        return editor_Plugins_TermTagger_QualityProvider::NOT_FOUND_IN_TARGET;
+                    }
+                    break;
+
+                case editor_Models_Terminology_Models_TermModel::TRANSSTAT_NOT_DEFINED:
+                    if ($isSourceField) {
+                        return editor_Plugins_TermTagger_QualityProvider::NOT_DEFINED_IN_TARGET;
+                    }
+                    break;
+
+                case editor_Models_Terminology_Models_TermModel::STAT_SUPERSEDED:
+                case editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED:
+                    if ($isSourceField) {
+                        return editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_SOURCE;
+                    } else {
+                        return editor_Plugins_TermTagger_QualityProvider::FORBIDDEN_IN_TARGET;
+                    }
+            }
+        }
+        return '';
+    }
     /**
      * The central unique type amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_QualityProvider::$type
      * @var string
@@ -69,7 +105,7 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
      * @see editor_Segment_Tag::finalize()
      */
     public function finalize(editor_TagSequence $tags, editor_Models_task $task){
-        $this->category = editor_Plugins_TermTagger_SegmentProcessor::getQualityState($this->classes, $tags->isSourceField());
+        $this->category = static::getQualityState($this->classes, $tags->isSourceField());
     }
     /**
      * Compares the TBX Id instead of the content

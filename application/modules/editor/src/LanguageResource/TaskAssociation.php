@@ -31,6 +31,7 @@ namespace MittagQI\Translate5\LanguageResource;
 use Zend_Db_Expr;
 use Zend_Db_Table_Abstract;
 use Zend_Db_Table_Row_Abstract;
+use ZfExtended_Exception;
 use ZfExtended_Factory;
 use ZfExtended_Models_Entity_Abstract;
 
@@ -195,29 +196,13 @@ class TaskAssociation extends AssociationAbstract {
         }
         return $this->db->fetchAll($s)->toArray();
     }
-    
-    /**
-     * Returns join between taskassoc table and task table for languageResource's id list
-     * @param array $languageResourceids
-     */
-    public function getTaskInfoForLanguageResources($languageResourceids){
-        if(empty($languageResourceids)) {
-            return [];
-        }
-        $s = $this->db->select()
-        ->from(['assocs' => 'LEK_languageresources_taskassoc'], ['assocs.id','assocs.taskGuid','task.id as taskId', 'task.projectId', 'task.taskName','task.state','task.lockingUser','task.taskNr','assocs.languageResourceId'])
-        ->setIntegrityCheck(false)
-        ->join(['task' => 'LEK_task'],'assocs.taskGuid = task.taskGuid', '')
-        ->where('assocs.languageResourceId in (?)', $languageResourceids)
-        ->group('assocs.id');
-        return $this->db->fetchAll($s)->toArray();
-    }
-    
+
     /***
      * Get all available tmms for the language combination as in the provided task.
      * (Uses loadByAssociatedTaskAndLanguage() which is meant to be called only by rest call!)
      * @param string $taskGuid
      * @return array
+     * @throws ZfExtended_Exception
      */
     public function getAssocTasksWithResources($taskGuid){
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
@@ -229,19 +214,26 @@ class TaskAssociation extends AssociationAbstract {
             if (!empty($resources[$id])) {
                 return $resources[$id];
             }
-            return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
+            $tmpResource = $serviceManager->getResourceById($serviceType, $id);
+            if($tmpResource === null){
+                return null;
+            }
+            return $resources[$id] = $tmpResource;
         };
         
         $result = $this->loadByAssociatedTaskAndLanguage($taskGuid);
-        
-        foreach($result as &$languageresource) {
-            $resource =$getResource($languageresource['serviceType'], $languageresource['resourceId']);
-            if(!empty($resource)) {
+
+        $available = [];
+
+        foreach ($result as $languageresource) {
+            $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
+            if (!empty($resource)) {
                 $languageresource = array_merge($languageresource, $resource->getMetaData());
+                $available[] = $languageresource;
             }
         }
         
-        return $result;
+        return $available;
     }
     
     /***

@@ -243,7 +243,6 @@ trait editor_Models_Export_FileParser_MQMTrait {
     	    $classes = array_map('trim', explode(' ', $this->_getImgTagAttr($img, 'class')));
     	    $data['class'] = implode(' ', $classes);
             $data['comment'] = $this->_getImgTagAttr($img, 'data-comment', false, false);
-            $data['severity'] = preg_replace('"^\s*([^ ]+) .*$"', '\\1', $data['class']);
             $data['severity'] = editor_Segment_Mqm_Configuration::instance($this->_task)->findMqmSeverity($classes);
             $this->_checkImageTag('severity', $data['severity'], $data['class']);
             $data['issueId'] = preg_replace('"^.*qmflag-(\d+).*$"', '\\1', $data['class']);

@@ -34,6 +34,10 @@ END LICENSE AND COPYRIGHT
  */
 
 use MittagQI\Translate5\Applet\AppletAbstract;
+use MittagQI\Translate5\DbConfig\ActionsEventHandler;
+use MittagQI\Translate5\Task\Import\DanglingImportsCleaner;
+use MittagQI\Translate5\Task\Import\ImportEventTrigger;
+use MittagQI\Translate5\Service\SystemCheck;
 
 /**
  * Klasse zur Portalinitialisierung
@@ -48,50 +52,71 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
 {
     protected $front;
 
-    public function __construct($application) {
+    public function __construct($application)
+    {
         parent::__construct($application);
         
         //Binding the worker clean up to the after import event, since import
         // is currently the main use case for workers
-        /** @var Zend_EventManager_StaticEventManager $eventManager */
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
         
-        $eventManager->attach('editor_Models_Import', 'afterImport', function(){
-            $worker = ZfExtended_Factory::get('ZfExtended_Worker_GarbageCleaner');
-            /* @var $worker ZfExtended_Worker_GarbageCleaner */
+        $eventManager->attach(ImportEventTrigger::class, ImportEventTrigger::AFTER_IMPORT, function () {
+            $worker = ZfExtended_Factory::get(ZfExtended_Worker_GarbageCleaner::class);
             $worker->init();
             $worker->queue(); // not parent ID here, since the GarbageCleaner should run without a parent relation
         }, 0);
-        
-        $cleanUp = function(){
+
+        $cleanUp = function () {
             // first clean up jobs
-            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            /* @var $tua editor_Models_TaskUserAssoc */
-            $tua->cleanupLocked();
+            ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class)->cleanupLocked();
 
             // second clean up tasks, jobs must be before in order to clean also not used multiuser tasks anymore
-            /** @var editor_Models_Task $task */
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            $task->cleanupLockedJobs();
+            ZfExtended_Factory::get(editor_Models_Task::class)->cleanupLockedJobs();
 
-            //clean up dangling (hanging) imports
-            $import = ZfExtended_Factory::get('editor_Models_Import');
-            /** @var editor_Models_Import $import */
-            $import->cleanupDanglingImports();
+            (new DanglingImportsCleaner())->cleanup();
 
-            $config = ZfExtended_Factory::get('editor_Models_UserConfig');
-            /* @var $config editor_Models_UserConfig */
-            $config->cleanUpThemeTemporary();
+            ZfExtended_Factory::get(editor_Models_UserConfig::class)->cleanUpThemeTemporary();
         };
         
-        $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', $cleanUp);
-        $eventManager->attach('LoginController', 'afterLogoutAction', $cleanUp);
-        $eventManager->attach('editor_SessionController', 'afterDeleteAction', $cleanUp);
-        $eventManager->attach('ZfExtended_Session', 'afterSessionCleanForUser', $cleanUp);
-        $eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
+        $eventManager->attach(ZfExtended_Resource_GarbageCollector::class, 'cleanUp', $cleanUp);
+        $eventManager->attach(LoginController::class, 'afterLogoutAction', $cleanUp);
+        $eventManager->attach(editor_SessionController::class, 'afterDeleteAction', $cleanUp);
+        $eventManager->attach(ZfExtended_Session::class, 'afterSessionCleanForUser', $cleanUp);
+        $eventManager->attach(ZfExtended_Debug::class, 'applicationState', [$this, 'handleApplicationState']);
+
+        // Binding the quality Worker queuing to the "afterDirectoryParsing" event of the filetree worker.
+        // some qualities have workers that depend on the imported files (e.g. TBX import).
+        // also this needs to be a point in the import-process after the languuege-resources in the wizard have been set
+        // and it should be as early as possible to ensure the progress-bar does not flutter
+        $eventManager->attach(
+            editor_Models_Import_Worker_FileTree::class,
+            'afterDirectoryParsing',
+            function (Zend_EventManager_Event $event) {
+                /* @var editor_Models_Task $task */
+                $task = $event->getParam('task');
+                // this represents the id of the import worker, see ProjectWorkersHandler::queueImportWorkers
+                $parentId = (int) $event->getParam('workerParentId');
+                editor_Segment_Quality_Manager::instance()->queueImport($task, $parentId);
+            }
+        );
+
+        $handler = new ActionsEventHandler();
+
+        $eventManager->attach(
+            editor_ConfigController::class,
+            'afterIndexAction',
+            $handler->addDefaultsForNonZeroQualityErrorsSettingOnIndexAction()
+        );
+        $eventManager->attach(
+            editor_ConfigController::class,
+            'afterPutAction',
+            $handler->addDefaultsForNonZeroQualityErrorsSettingOnPutAction()
+        );
     }
     
     public static function initModuleSpecific(){
+
+        ZfExtended_Models_SystemRequirement_Validator::addModule('servicecheck', SystemCheck::class);
 
         // add the default applet editor, if this will change move the register into editor bootstrap
         \MittagQI\Translate5\Applet\Dispatcher::getInstance()->registerApplet('editor', new class extends AppletAbstract {
@@ -122,8 +147,11 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $restContexts = new REST_Controller_Action_Helper_RestContexts();
         Zend_Controller_Action_HelperBroker::addHelper($restContexts);
     }
-    
-    
+
+    /**
+     * @return void
+     * @uses editor_FileController::packageAction()
+     */
     public function _initRestRoutes()
     {
         
@@ -167,6 +195,24 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'module' => 'editor',
                 'controller' => 'filetree',
                 'action' => 'root'
+            )
+        ));
+
+        $this->front->getRouter()->addRoute('editorFilePackagetRoute', new ZfExtended_Controller_RestLikeRoute(
+            'editor/file/package',
+            array(
+                'module' => 'editor',
+                'controller' => 'file',
+                'action' => 'package'
+            )
+        ));
+
+        $this->front->getRouter()->addRoute('editorTaskPackagestatustRoute', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/packagestatus',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'packagestatus'
             )
         ));
 
@@ -496,7 +542,16 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'tasks'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tasks', $queryRoute);
-        
+
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceresource/:resourceType/engines',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceresource',
+                'action' => 'engines'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceresource_esngines', $queryRoute);
+
 
         $this->front->getRouter()->addRoute('editorLanguageResourcesEvents', new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/events',

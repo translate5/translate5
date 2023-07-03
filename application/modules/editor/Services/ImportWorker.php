@@ -9,22 +9,24 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
+
+use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 
 /***
  * Imports the language resource file into the language resource.
@@ -97,18 +99,24 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
         
         return $return;
     }
-    
+
     /**
-     * Update language reources status so the resource is available again
+     * Update language resources status so the resource is available again
+     *
      * @param bool $success
+     *
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
      */
-    protected function updateLanguageResourceStatus($success) {
-        if($success) {
-            $this->languageResource->addSpecificData('status', editor_Services_Connector_FilebasedAbstract::STATUS_AVAILABLE);
+    protected function updateLanguageResourceStatus(bool $success): void
+    {
+        if ($success) {
+            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
+        } else {
+            $this->languageResource->setStatus(LanguageResourceStatus::ERROR);
         }
-        else {
-            $this->languageResource->addSpecificData('status', editor_Services_Connector_FilebasedAbstract::STATUS_ERROR);
-        }
+
         $this->languageResource->save();
     }
     

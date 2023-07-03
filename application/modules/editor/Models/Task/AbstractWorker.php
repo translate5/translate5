@@ -49,9 +49,8 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
      */
     protected $behaviour;
     
-    public function init($taskGuid = NULL, $parameters = array()) {
-        $this->task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $ class */
+    public function init($taskGuid = NULL, $parameters = []) {
+        $this->task = ZfExtended_Factory::get(editor_Models_Task::class);
         $this->task->loadByTaskGuid($taskGuid);
         $this->initBehaviour($parameters['workerBehaviour'] ?? null);
         if(!$this->task->isErroneous()) {
@@ -130,5 +129,15 @@ abstract class editor_Models_Task_AbstractWorker extends ZfExtended_Worker_Abstr
     public function getWeight(): int
     {
         return 1;
+    }
+
+    /**
+     * Retrieves the task this worker is bound to
+     * Can only be called after ::init()
+     * @return editor_Models_Task
+     */
+    public function getTask(): editor_Models_Task
+    {
+        return $this->task;
     }
 }

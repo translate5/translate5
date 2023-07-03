@@ -176,10 +176,17 @@ Ext.define('Editor.controller.LanguageResources', {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           me.setValueForEditor(matchRecord.get('target'));
           me.fireEvent('prepareCompleteReplace',matchRecord.get('target'),false); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
-          editor.mainEditor.setValueAndMarkup(me.languageResourceValueForEditor, rec, editor.columnToEdit);
-          if(Editor.data.task.get('emptyTargets')) {
-        	  editor.mainEditor.insertMarkup(rec.get('source'), true);
-    	  }
+
+          // TODO move to somewhere to avoid duplicates
+          let referenceField = Editor.data.task.get('emptyTargets') ? 'source' : 'target';
+          editor.mainEditor.setValueAndMarkup(
+              me.languageResourceValueForEditor,
+              rec,
+              editor.columnToEdit,
+              referenceField,
+              true
+          );
+
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);

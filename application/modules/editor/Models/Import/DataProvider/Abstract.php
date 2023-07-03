@@ -48,7 +48,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     const TASK_ARCHIV_ZIP_NAME = 'ImportArchiv.zip';
     const TASK_TEMP_IMPORT = '_tempImport';
 
-    protected $task;
+    protected editor_Models_Task $task;
     protected $taskPath;
     protected $importFolder;
     /**

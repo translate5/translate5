@@ -93,7 +93,7 @@ if(Ext.browser.is.IE) {
 Ext.application({
     name: 'Editor',
     models: ['File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field', 'Config', 'TaskConfig', 'CustomerConfig', 'admin.UserAssocDefault'],
-    stores: ['Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig', 'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault'],
+    stores: ['Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages', 'UserConfig', 'admin.Config', 'admin.CustomerConfig', 'admin.task.Config', 'admin.UserAssocDefault','admin.WizardTasks'],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
@@ -104,7 +104,9 @@ Ext.application({
         'Editor.util.TaskActions',
         'Editor.util.messageBus.MessageBus',
         'Editor.util.messageBus.EventDomain',
-        'Editor.util.HttpStateProvider'
+        'Editor.util.HttpStateProvider',
+        'Editor.util.HtmlClasses',
+        'Editor.util.ImportWizard'
     ].concat(Editor.data.app.controllers.require),
     controllers: Editor.data.app.controllers.active,
     appFolder: Editor.data.appFolder,
@@ -170,7 +172,8 @@ Ext.application({
     init: function () {
         //enable json in our REST interface
         Ext.Ajax.setDefaultHeaders({
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'CsrfToken': Editor.data.csrfToken
         });
         //init the plugins namespace
         Ext.ns('Editor.plugins');
@@ -251,7 +254,7 @@ Ext.application({
 
         //Logs the users userAgent and screen size for usability improvements:
         Ext.Ajax.request({
-            url: Editor.data.restpath + 'index/logbrowsertype',
+            url: Editor.data.restpath + 'index/logbrowsertype?tab=' + (window._tabId ?? 0),
             method: 'post',
             params: {
                 appVersion: navigator.appVersion,
@@ -657,10 +660,18 @@ Ext.application({
      *
      * {Boolean} returnRecord : the record will be returned instead of the record value
      */
-    getUserConfig: function (configName, returnRecord) {
+    getUserConfig: function (configName, returnRecord, callback) {
         var store = Ext.state.Manager.getProvider().store,
             pos = store.findExact('name', 'runtimeOptions.' + configName),
             row;
+
+        // If store is being loaded there is no data yet inside
+        if (store.isLoading() && callback) {
+
+            // So put a single-time callback
+            store.on('load', () => callback(this.getUserConfig(configName, returnRecord)), store, {single: true});
+        }
+
         if (pos < 0) {
             return null;
         }

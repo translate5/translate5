@@ -77,8 +77,11 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
      * @param int $index
      * @param string $message
      */
-    public function assertVisualHtmlContains(string $text, bool $isSplitFile=false, int $index=0, string $message=''){
+    public function assertVisualHtmlContains(string $text, bool $isSplitFile=false, bool $doStripTags=false, int $index=0, string $message=''){
         $html = $this->getVisualHtmlFile($isSplitFile, $index);
+        if($doStripTags){
+            $html = strip_tags($html);
+        }
         if(empty($html)){
             $this->assertTrue(!empty($html), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' was not found or had no contents]');
         } else {
@@ -93,8 +96,11 @@ abstract class editor_Test_VisualTest extends editor_Test_JsonTest
      * @param int $index
      * @param string $message
      */
-    public function assertVisualHtmlNotContains(string $text, bool $isSplitFile=false, int $index=0, string $message=''){
+    public function assertVisualHtmlNotContains(string $text, bool $isSplitFile=false, bool $doStripTags=false, int $index=0, string $message=''){
         $html = $this->getVisualHtmlFile($isSplitFile, $index);
+        if($doStripTags){
+            $html = strip_tags($html);
+        }
         if(empty($html)){
             $this->assertTrue(!empty($html), $message.' [File '.$this->getVisualHtmlFileName($isSplitFile, $index).' was not found or had no contents]');
         } else {

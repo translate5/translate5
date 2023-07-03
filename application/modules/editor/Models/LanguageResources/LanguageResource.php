@@ -45,7 +45,7 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
  * @method void setServiceType() setServiceType(string $type)
  * @method string getServiceName() getServiceName() The speakable name of the service as configured in the resource
  * @method void setServiceName() setServiceName(string $resName)
- * @method string getResourceType() getResourceType()  tm or mt
+ * @method string getResourceType() getResourceType()  "tm" or "mt" or "termcollection"
  * @method void setResourceType() setResourceType(string $resourceType)
  * @method bool getWriteSource() getWriteSource()
  * @method void setWriteSource() setWriteSource(bool $writeSource)
@@ -53,7 +53,9 @@ use editor_Models_Terminology_Models_CollectionAttributeDataType as CollectionAt
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {
     use editor_Models_Entity_SpecificDataTrait;
-    
+
+    private const SPECIFIC_DATA_STATUS = 'status';
+
     /***
      * set as match rate type when match-rate was changed
      */
@@ -93,10 +95,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public $targetLangCode;
 
-    /***
+    /**
+     * Caches the customers of a language-resource
      * @var array
      */
-    protected array $customers;
+    protected array $customers = [];
 
     /***
      * Init the language resource instance for given editor_Models_LanguageResources_Resource
@@ -553,17 +556,16 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
 
     /***
-     * Get the customers of the current langauge resource
+     * Get the customer ids of the current langauge resource, cached
      * @return array
      */
     public function getCustomers(): array
     {
-        if(empty($this->customers)){
-            /** @var editor_Models_LanguageResources_CustomerAssoc $model */
-            $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            $this->customers = array_column($model->loadByLanguageResourceId($this->getId()),'customerId');
+        if(!array_key_exists($this->getId(), $this->customers)){
+            $model = ZfExtended_Factory::get(editor_Models_LanguageResources_CustomerAssoc::class);
+            $this->customers[$this->getId()] = array_column($model->loadByLanguageResourceId($this->getId()),'customerId');
         }
-        return $this->customers;
+        return $this->customers[$this->getId()];
     }
     
     /**
@@ -656,7 +658,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return boolean
      */
     public function isMt() {
-        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_MT;
+        return $this->getResourceType() === editor_Models_Segment_MatchRateType::TYPE_MT;
     }
     
     /***
@@ -664,7 +666,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return boolean
      */
     public function isTm() {
-        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM;
+        return $this->getResourceType() === editor_Models_Segment_MatchRateType::TYPE_TM;
     }
     
     /***
@@ -672,7 +674,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return boolean
      */
     public function isTc() {
-        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
+        return $this->getResourceType() === editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
     }
 
     /**
@@ -696,4 +698,19 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
                 ->onTermCollectionInsert($this->getId());
         }
     }
+
+    #region status change
+
+    public function setStatus(string $status): void
+    {
+        // Do we need validation here?
+        $this->addSpecificData(self::SPECIFIC_DATA_STATUS, $status);
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->getSpecificData(self::SPECIFIC_DATA_STATUS);
+    }
+
+    #endregion status change
 }

@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE martif>
+<martif type="TBX" xml:lang="en">
+	<martifHeader>
+		<fileDesc>
+			<sourceDesc>
+				<p>TBX export</p>
+			</sourceDesc>
+		</fileDesc>
+	</martifHeader>
+	<text>
+		<body>
+			<termEntry id="9f7a1227-eb7d-491e-ace1-4ab859a92c2a" cid="628586">
+				<descrip type="thesaurusDescriptor" target="ff506136-f259-4f49-9205-22f5a0af80eb">$2222.0 Initial Version$</descrip>
+				<transacGrp>
+					<transac>creation</transac>
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Aleksandar Mitrev $2222.0 Initial Version$</transacNote>
+				</transacGrp>
+				<transacGrp>
+					<transac>modification</transac>
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Aleksandar Mitrev $2222.0 Initial Version$</transacNote>
+				</transacGrp>
+				<langSet xml:lang="de-de">
+					<descripGrp>
+						<descrip type="definition" xml:lang="de-de">#007.0 Initial Version# Das ist die Definition auf Eintragsebene.</descrip>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">#007.0 Initial Version# Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">#007.0 Initial Version# Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<tig>
+						<term id="37705a81-e0df-4209-9a12-eaddc93674e0">Schreibtisch #new2#</term>
+						<termNote type="processStatus">finalized change</termNote>
+						<termNote type="across_userdef_textfield_Quelle">Informationen zur Quelle des Terms. </termNote>
+						<termNote type="across_userdef_textfield_Zusatzinformationen">Weitere Zusatzinformationen zum Term. </termNote>
+						<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde **MittagQi**</admin>
+						<admin type="projectSubset" target="4f759a7a-8b4e-4dae-aeed-a332dba4b0f7">Test Änderungsverfolgung </admin>
+						<admin type="projectSubset" target="3b9a499d-7264-40df-a26e-60a9555efc8f">18-00056_Gravitrax_12x </admin>
+						<admin type="projectSubset" target="aabea2bc-2e34-4a24-81cc-6366b35826f4">Testprojekt_DXF </admin>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</tig>
+					<tig>
+						<term id="fb1b8aca-bbc9-4e94-9469-c19f0b310074">Schmierplatz #new2#</term>
+						<termNote type="processStatus">provisionallyProcessed</termNote>
+						<termNote type="across_userdef_picklist_Verwendung">Unwort</termNote>
+						<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde **MittagQi**</admin>					
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</tig>
+				</langSet>
+				<langSet xml:lang="en-us">
+					<tig>
+						<term id="462bed50-6779-4cb1-be6b-223e78b54f26">Desk #new3#</term>
+						<termNote type="processStatus">finalized</termNote>
+						<termNote type="across_userdef_textfield_Quelle">Informationen zur Quelle des Terms.</termNote>
+						<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde **MittagQi**</admin>
+						<admin type="projectSubset" target="3b9a499d-7264-40df-a26e-60a9555efc8f">18-00056_Gravitrax_12x</admin>
+						<admin type="projectSubset" target="aabea2bc-2e34-4a24-81cc-6366b35826f4">Testprojekt_DXF</admin>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</tig>
+				</langSet>
+			</termEntry>
+			<termEntry id="626a86ec-4979-43e5-8293-6bb6532b7cf5" cid="628587">
+				<descrip type="thesaurusDescriptor" target="ff506136-f259-4f49-9205-22f5a0af80eb">Testkunde **MittagQi**</descrip>
+				<transacGrp>
+					<transac>creation</transac>
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+				</transacGrp>
+				<transacGrp>
+					<transac>modification</transac>
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+				</transacGrp>
+				<langSet xml:lang="de-de">
+					<tig>
+
+							<term id="9eaaafc9-e256-4bce-a2e5-ce848c0b7cd9">Fahrrad</term>
+							<termNote type="processStatus">provisionallyProcessed</termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde **MittagQi**</admin>
+
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</tig>
+					<tig>
+						<term id="9eaaafc9-e256-4bce-a2e5-ce848c0b7cd9-alexnewterm">Rad</term>
+						<termNote type="processStatus">provisionallyProcessed</termNote>
+						<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</tig>
+				</langSet>
+				<langSet xml:lang="en-us">
+					<tig>
+
+							<term id="add5dad8-61cd-4830-9c6e-1ceaff00c8c1">Bike #new2#</term>
+							<termNote type="processStatus">provisionallyProcessed</termNote>
+							<termNote type="across_userdef_picklist_Verwendung">Empfohlen</termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde **MittagQi**</admin>
+
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</tig>
+					<tig>
+
+							<term id="a2301cd4-6be8-469d-95b4-62946571aa2e">Bicycle #new2#</term>
+							<termNote type="processStatus">provisionallyProcessed</termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde **MittagQi**</admin>
+
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</tig>
+				</langSet>
+				<langSet xml:lang="fr-fr">
+					<tig>
+
+							<term id="d3a56ef0-2e6c-49c6-80a5-88b54819a733">Vélo #new2#</term>
+							<termNote type="processStatus">provisionallyProcessed</termNote>
+
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
+						</transacGrp>
+					</tig>
+				</langSet>
+			</termEntry>
+			<termEntry id="eid-0">
+				<langSet xml:lang="de-de">
+					<descripGrp>
+						<descrip type="Definition">Test the mapping of custom descrip values to the administrative status</descrip>
+					</descripGrp>
+					<tig>
+						<term id="tid-0-de-3">Term erlaubt</term>
+						<descripGrp>
+							<descrip type="CaseSense">Near</descrip>
+						</descripGrp>
+						<descripGrp>
+							<descrip type="xBool_Forbidden">False</descrip>
+						</descripGrp>
+						<descripGrp>
+							<descrip type="PartialTreshold">Half</descrip>
+						</descripGrp>
+					</tig>
+					<tig>
+						<term id="tid-0-de-4">Term verboten</term>
+						<descripGrp>
+							<descrip type="CaseSense">Near</descrip>
+						</descripGrp>
+						<descripGrp>
+							<descrip type="xBool_Forbidden">True</descrip>
+						</descripGrp>
+						<descripGrp>
+							<descrip type="PartialTreshold">Half</descrip>
+						</descripGrp>
+					</tig>
+				</langSet>
+				<langSet xml:lang="en-us">
+					<descripGrp>
+						<descrip type="Definition">Test the mapping of custom termNote values to the administrative status</descrip>
+					</descripGrp>
+					<tig>
+						<term id="tid-1-en-2">Term allowed</term>
+						<termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+					</tig>
+					<tig>
+						<term id="tid-1-en-3">Term preferred</term>
+						<termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+					</tig>
+					<tig>
+						<term id="tid-1-en-4">Term forbidden</term>
+						<termNote type="across_ISO_picklist_Usage">do not use</termNote>
+					</tig>
+				</langSet>
+			</termEntry>
+		</body>
+		<back>
+			<refObjectList type="projectSet">
+				<refObject id="4f759a7a-8b4e-4dae-aeed-a332dba4b0f7">
+					<item type="projectName">Test Änderungsverfolgung</item>
+				</refObject>
+				<refObject id="3b9a499d-7264-40df-a26e-60a9555efc8f">
+					<item type="projectName">Project uniqe name</item>
+				</refObject>
+				<refObject id="aabea2bc-2e34-4a24-81cc-6366b35826f4">
+					<item type="projectName">Testprojekt_DXF</item>
+				</refObject>
+			</refObjectList>
+			<refObjectList type="customerSet">
+				<refObject id="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">
+					<item type="customerName">Testkunde</item>
+				</refObject>
+			</refObjectList>
+			<refObjectList type="thesaurusDescrip">
+				<refObject id="ff506136-f259-4f49-9205-22f5a0af80eb">
+					<item type="thesaurusName">Testkunde</item>
+					<item type="thesaurusDescription"></item>
+					<item type="thesaurusSys">DictionaryUnknown</item>
+					<item type="thesaurusImage">XXXX</item>
+					<item type="thesaurusOwner">27EF9546-1575-4E44-96AE-5F75B9DE305B</item>
+				</refObject>
+			</refObjectList>
+		</back>
+	</text>
+</martif>

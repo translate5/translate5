@@ -474,6 +474,14 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         }
         return self::STATUS_NOCONNECTION;
     }
+
+    /**
+     * @return mixed
+     */
+    protected function getResponseData(): mixed
+    {
+        return $this->api->getResult();
+    }
     
     /***
      *

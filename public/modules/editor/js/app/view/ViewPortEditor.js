@@ -45,8 +45,8 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.fileorder.Tree',
         'Editor.view.fileorder.ReferenceTree',
         'Editor.view.segments.Grid',
-        'Editor.view.segments.MetaPanelNavi',
         'Editor.view.segments.MetaPanel',
+        'Editor.view.segments.TerminologyPanel',
         'Editor.view.quality.FilterPanel',
         'Editor.view.comments.Navigation',
         'Editor.view.Filepanel'
@@ -140,11 +140,12 @@ Ext.define('Editor.view.ViewPortEditor', {
                 border:0,
                 itemId: 'metapanel',
                 layout: { type:'accordion' },
-                dockedItems: [{
-                    xtype: 'metapanelNavi',
-                    dock: 'top'
-                }],
                 items: [{
+                    xtype: 'terminologyPanel',
+                    stateId: 'editor.eastPanelSegmentsTerminology',
+                    stateEvents: ['collapse', 'expand'],
+                    stateful:true
+                },{
                     xtype: 'segmentsMetapanel',
                     stateId: 'editor.eastPanelSegmentsMetapanel',
                     stateEvents: ['collapse', 'expand'],

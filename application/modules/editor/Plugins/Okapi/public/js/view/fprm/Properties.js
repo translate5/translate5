@@ -49,7 +49,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     /**
      * Hashtable of our default controls
      * These will be instantiated for the given data-type
-     * HINT: "valueDefault" can not be called "defaultValue" since the later has a meaning in ExtJS
+     * HINT: "valueDefault" can not be called "defaultValue" since the latter has a meaning in ExtJS
      * @var {object}
      */
     fieldDefaults: {
@@ -136,8 +136,12 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
                 dependentDisabled = (this.transformedData.hasOwnProperty(id) && this.transformedData[id] === false);
             checkbox.dependentControls = this.addHolderChildren(data.children, holder, dependentDisabled); // adds a prop to the checkbox with all dependent fields
             checkbox.on('change', this.onBoolsetChanged, this); // add the handler, that will enable/disable the dependent fields
-        } else if(data.type === 'radio' && data.children && config.valueType === 'integer'){
-            this.addRadio(id, name, config, data.children, holder);
+        } else if(data.type === 'radio' && ((config.valueType === 'integer' && data.children) || config.valueType === 'boolean')){
+            if(config.valueType === 'integer'){
+                this.addRadio(id, name, config, data.children, holder);
+            } else {
+                this.addBoolRadio(id, name, config, holder);
+            }
         } else if(this.statics().FIELD_TYPES.indexOf(data.type) === -1){
             config.customFieldType = data.type; // add a marker so custom field types can be detected during validation
             this.addCustomFieldControl(data, id, name, config, holder, disabled);
@@ -201,6 +205,39 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             });
             count++;
         }
+        return holder.add(radio);
+    },
+
+    /**
+     * Adds a radio-button group for boolean values, which adds it's selected option as bool to the main property
+     * The localitation is fixed to name + "True" and name + "False" and defaults to "Yes" / "No"
+     * @param {string} id
+     * @param {string} name
+     * @param {object} config
+     * @param {Ext.panel.Panel} holder
+     */
+    addBoolRadio: function(id, name, config, holder){
+        var value = this.getFieldValue(id, false, config.valueType, false);
+        var radio = {
+            xtype: 'radiogroup',
+            fieldLabel: this.getFieldCaption(id, config),
+            columns: 2,
+            name: name,
+            value: (value) ? 'true' : 'false',
+            valueType: config.valueType,
+            items: [
+                {
+                    boxLabel: this.getFieldCaption(id + 'True', { translationDefault: this.strings.yes }),
+                    inputValue: 'true',
+                    margin: '0 30 0 0',
+                    checked: value
+                },{
+                    boxLabel: this.getFieldCaption(id + 'False', { translationDefault: this.strings.no }),
+                    inputValue: 'false',
+                    checked: !value
+                }
+            ]
+        };
         return holder.add(radio);
     },
     /**
@@ -295,6 +332,10 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
             }
             return this.translations[id];
         }
+        // internally used to avoid having a third argument
+        if(config.hasOwnProperty('translationDefault')){
+            return config.translationDefault;
+        }
         return 'TRANSLATION MISSING';
     },
     /**
@@ -364,7 +405,7 @@ Ext.define('Editor.plugins.Okapi.view.fprm.Properties', {
     parseTypedValue: function(type, value){
         switch(type){
             case 'boolean':
-                return (value === true) ? true : false;
+                return (value === true || value === 'true' || (Number.isInteger(value) && value >= 1)) ? true : false;
             case 'integer':
                 return Number.isInteger(value) ? value : parseInt(value);
             case 'float':

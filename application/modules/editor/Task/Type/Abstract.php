@@ -67,6 +67,12 @@ abstract class editor_Task_Type_Abstract {
     protected bool $exportUsage;
 
     /**
+     * Forces the system default file-format-settings to be used on import
+     * @var bool
+     */
+    protected bool $useSysDefaultFileFormatSettings = false;
+
+    /**
      * Returns true if usage of term tagging is disabled for that type
      * @return bool
      */
@@ -117,6 +123,15 @@ abstract class editor_Task_Type_Abstract {
         return $this->exportUsage;
     }
 
+    /**
+     * Returns if the task must be imported using the system default file-format settings
+     * @return bool
+     */
+    public function useSystemDefaultFileFormatSettings(): bool
+    {
+        return $this->useSysDefaultFileFormatSettings;
+    }
+
     public function id(): string {
         return $this::ID;
     }
@@ -133,5 +148,4 @@ abstract class editor_Task_Type_Abstract {
     {
         return $this->id();
     }
-
 }

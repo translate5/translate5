@@ -51,9 +51,10 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
 
     public function generateExcelAndProvideDownload(editor_Models_Task $task, $rows, $filename){
         $this->task = $task;
-        $this->fuzzyRanges = $task->getConfig()->runtimeOptions->plugins->MatchAnalysis->fuzzyBoundaries->toArray();
-        $this->fuzzyRanges = array_reverse($this->fuzzyRanges, true);
-        $this->fuzzyRanges['noMatch'] = 'noMatch'; //here we need noMatch as group too
+
+        // Set up ranges
+        $ma = ZfExtended_Factory::get(editor_Plugins_MatchAnalysis_Models_MatchAnalysis::class);
+        $this->fuzzyRanges = $ma->getFuzzyRanges($this->task);
 
         $data = $this->prepareDataArray($rows);
 
@@ -71,15 +72,13 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
 
         $sheet=$spreadsheet->getSpreadsheet()->getActiveSheet();
 
-        $sheet->setCellValue("A".$sumRowIndex,$this->translate->_("Summe"));
+        $sheet->setCellValue("A" .  $sumRowIndex     , $this->translate->_("Price adjustment"));
+        $sheet->setCellValue("A" . ($sumRowIndex + 1), $this->translate->_("Final amount"));
 
-        //loop over all columns containing a summable value
-        $col = "B";
-        $rangeCount = count($this->fuzzyRanges) + 1; //we have to add one for the sum of sum columns
-        for ($i = 0; $i < $rangeCount; $i++) {
-            $sheet->setCellValue($col.$sumRowIndex, '=SUM('.$col.'2:'.$col.($sumRowIndex-1).")");
-            $col++; //increment the column characters
-        }
+        $sheet->setCellValue("B" . $sumRowIndex      ,$ma->getPricing()['priceAdjustment']);
+        $sheet->setCellValue("B" . ($sumRowIndex + 1),$ma->getPricing()['priceAdjustment'] + end($rows)['unitCountTotal']);
+        $sheet->setCellValue("C" . $sumRowIndex      ,$ma->getPricing()['currency']);
+        $sheet->setCellValue("C" . ($sumRowIndex + 1),$ma->getPricing()['currency']);
 
         //set the cell autosize
         $spreadsheet->simpleArrayToExcel($data,function($phpSpreadsheet){
@@ -107,11 +106,11 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
         //add to all groups 'Group' sufix, php excel does not handle integer keys
         $result = [];
         foreach ($rows as $row){
-            $unitCountTotal = 0;
 
             //the order in the newRows array defines the result order in the spreadsheet
             $newRow = [
-                'resourceName' => empty($row['resourceName']) ? $this->translate->_("Repetitions") : $row['resourceName']
+                'resourceName' => empty($row['resourceName']) ? $this->translate->_("Repetitions") : $row['resourceName'],
+                'unitCountTotal' => $row['unitCountTotal']
             ];
 
             //loop over the fuzzy ranges and get the corresponding content
@@ -120,13 +119,11 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
                     //change the key to $key+Group, since the Excel export does not accept numerical keys
                     $key = is_numeric($begin) ? $begin.'Group' : $begin;
                     $newRow[$key] = $row[$begin];
-                    $unitCountTotal += $row[$begin];
                 }
             }
 
-            $newRow['unitCountTotal'] = $unitCountTotal;
-            $newRow['internalFuzzy'] = $row['internalFuzzy'];
-            $newRow['created'] = $row['created'];
+            $newRow['internalFuzzy'] = $row['resourceName'] == 'Amount' ? '' : $row['internalFuzzy'];
+            $newRow['created']       = $row['resourceName'] == 'Amount' ? '' : $row['created'];
 
             $result[] = $newRow;
         }
@@ -147,7 +144,7 @@ class editor_Plugins_MatchAnalysis_Export_ExportExcel {
                 //just keep $begin as it is
                 $label = $noMatchEnd.'%-0%';
             }
-            elseif($begin === $end) { //must come after noMatch if, since on noMatch is begin == end too
+            elseif($begin === (int) $end) { //must come after noMatch if, since on noMatch is begin == end too
                 //if the range is a single element range, some of the special texts may be used:
                 $label = $this->getSingleElementRangeLabel($begin);
                 $begin .= 'Group';

@@ -27,7 +27,10 @@
  END LICENSE AND COPYRIGHT
  */
 
-require_once __DIR__.'/../vendor/autoload.php';
+chdir(__DIR__.'/../'); //otherwise vendor below and ZfExtended implicit could not be found.
+require_once 'vendor/autoload.php';
+
+const TRANSLATE5_CLI = true;
 
 use Symfony\Component\Console\Application;
 use Translate5\MaintenanceCli\Command\{
@@ -35,6 +38,9 @@ use Translate5\MaintenanceCli\Command\{
     CachePurgeCommand,
     ChangelogCommand,
     ConfigCommand,
+    CronCommand,
+    DatabaseBackupCommand,
+    DatabaseStatCommand,
     DatabaseUpdateCommand,
     DevelopmentCreatetestCommand,
     DevelopmentEcodeCommand,
@@ -52,12 +58,18 @@ use Translate5\MaintenanceCli\Command\{
     MaintenanceDisableCommand,
     MaintenanceMessageCommand,
     MaintenanceSetCommand,
+    OkapiAddCommand,
+    OkapiListCommand,
+    OkapiPurgeCommand,
+    OkapiUpdateCommand,
+    OkapiCleanBconfsCommand,
     OpenTm2MigrationCommand,
     PluginDisableCommand,
     PluginEnableCommand,
     PluginListCommand,
     ReleaseNotesCommand,
     ServiceAutodiscoveryCommand,
+    ServiceCheckCommand,
     DevelopmentLocalServicesCommand,
     SessionImpersonateCommand,
     StatusCommand,
@@ -76,9 +88,13 @@ use Translate5\MaintenanceCli\Command\{
     TestAddIniSectionCommand,
     TestCleanupCommand,
     TestCreateFaultySegmentCommand,
+    T5memoryTmListCommand,
+    T5MemoryReorganizeCommand,
     UserCreateCommand,
     UserInfoCommand,
+    UserUpdateCommand,
     VisualConvertLegacyPdfReviewsCommand,
+    VisualImplantReflownWysiwyg,
     WorkerCleanCommand,
     WorkerListCommand,
     WorkerQueueCommand};
@@ -90,6 +106,9 @@ $commands = [
     new CachePurgeCommand(),
     new ChangelogCommand(),
     new ConfigCommand(),
+    new CronCommand(),
+    new DatabaseBackupCommand(),
+    new DatabaseStatCommand(),
     new DatabaseUpdateCommand(),
     new LogCommand(),
     new L10nAddCommand(),
@@ -101,11 +120,17 @@ $commands = [
     new MaintenanceMessageCommand(),
     new MaintenanceSetCommand(),
     new OpenTm2MigrationCommand(),
+    new OkapiAddCommand(),
+    new OkapiListCommand(),
+    new OkapiPurgeCommand(),
+    new OkapiUpdateCommand(),
+    new OkapiCleanBconfsCommand(),
     new PluginDisableCommand(),
     new PluginEnableCommand(),
     new PluginListCommand(),
     new SegmentHistoryCommand(),
     new ServiceAutodiscoveryCommand(),
+    new ServiceCheckCommand(),
     new SessionImpersonateCommand(),
     new StatusCommand(),
     new SystemCheckCommand(),
@@ -115,9 +140,13 @@ $commands = [
     new TaskSkeletonfileCommand(),
     new TermportalReindexCommand(),
     new TermportalDatatypecheckCommand(),
+    new T5memoryTmListCommand(),
+    new T5MemoryReorganizeCommand(),
     new UserCreateCommand(),
+    new UserUpdateCommand(),
     new UserInfoCommand(),
     new VisualConvertLegacyPdfReviewsCommand(),
+    new VisualImplantReflownWysiwyg(),
     new WorkerCleanCommand(),
     new WorkerListCommand(),
     new WorkerQueueCommand(),

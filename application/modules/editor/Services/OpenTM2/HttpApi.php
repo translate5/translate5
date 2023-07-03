@@ -107,10 +107,50 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $http = $this->getHttpWithMemory('POST', '/import');
         $http->setConfig(['timeout' => 1200]);
         $http->setRawData($this->jsonEncode($data), self::REQUEST_ENCTYPE);
-        
+
         return $this->processResponse($http->request());
     }
-    
+
+    /**
+     * This method clones memory
+     *
+     * @throws Zend_Exception
+     */
+    public function cloneMemory(string $targetMemory): bool
+    {
+        $data = [];
+        $data['newName'] = $this->addTmPrefix($targetMemory);
+
+        $http = $this->getHttpWithMemory('POST', 'clone');
+        $http->setConfig(['timeout' => 1200]);
+        $http->setRawData($this->jsonEncode($data), 'application/json; charset=utf-8');
+
+        return $this->processResponse($http->request());
+    }
+
+    /**
+     * Generate name of the TM
+     * TODO move to a dedicated generator class
+     *
+     * @return string
+     *
+     * @throws Zend_Exception
+     */
+    public function getTmName(): string
+    {
+        $fileName = $this->languageResource->getSpecificData('fileName') ?? false;
+
+        if (empty($fileName)) {
+            // if filename would be empty, it would be possible to make a GET / to OpenTM2,
+            // which would list all TMs in an invalid JSON this invalid JSON would then be logged to all error
+            // receivers, this is something we do not want to!
+            // so we ensure that there is a path, although this would lead to an 404
+            $fileName = 'i/do/not/exist';
+        }
+
+        return $this->addTmPrefix($fileName);
+    }
+
     /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the given REST URL Parts (ID + verbs)
      * @param string $httpMethod
@@ -127,25 +167,23 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
         $this->http->setHeaders('Accept', self::REQUEST_ENCTYPE);
+        $this->http->setConfig(['timeout' => 30]);
+
         return $this->http;
     }
     
     /**
      * prepares a Zend_Http_Client, prefilled with the configured URL + the Memory Name + additional URL parts
-     * @param string $httpMethod
+     *
+     * @param string $method
      * @param string $urlSuffix
+     *
      * @return Zend_Http_Client
      */
-    protected function getHttpWithMemory($method, $urlSuffix = '') {
-        $fileName = $this->languageResource->getSpecificData('fileName') ?? false;
-        if(empty($fileName)){
-            // if filename would be empty, it would be possible to make a GET / to OpenTM2, which would list all TMs in an invalid JSON
-            // this invalid JSON would then be logged to all error receivers, this is something we do not want to!
-            // so we ensure that there is a path, although this would lead to an 404
-            $fileName = 'i/do/not/exist';
-        }
+    protected function getHttpWithMemory(string $method, string $urlSuffix = ''): Zend_Http_Client
+    {
+        $url = urlencode($this->getTmName()) . '/' . ltrim($urlSuffix, '/');
 
-        $url = urlencode($this->addTmPrefix($fileName)).'/'.ltrim($urlSuffix, '/');
         return $this->getHttp($method, $url);
     }
 
@@ -236,7 +274,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      * checks the status of a language resource (if set), or just of the server (if no concrete language resource is given)
      * @return boolean
      */
-    public function status() {
+    public function status(): bool {
         if(empty($this->languageResource)) {
             $this->getHttp('GET', '/');
         }
@@ -467,6 +505,13 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $this->processResponse($http->request());
     }
 
+    public function reorganizeTm(): bool
+    {
+        $http = $this->getHttpWithMemory('GET', 'reorganize');
+
+        return $this->processResponse($http->request());
+    }
+
     /***
      * Get the default update memory json
      * @param string $function
@@ -526,7 +571,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             $this->error = new stdClass();
             $this->error->method = $this->httpMethod;
             $this->error->url = $this->http->getUri(true);
-            $this->error->code = 'Error Nr. '.$this->result->ReturnValue;
+            $this->error->code = 'Error Nr. ' . ($this->result->ReturnValue ?? '');
             $this->error->error = $this->result->ErrorMsg;
         }
         

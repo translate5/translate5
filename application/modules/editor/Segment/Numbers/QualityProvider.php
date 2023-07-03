@@ -134,67 +134,27 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
         return $translate->_('Zahlen');
     }
 
-    /**
-     * Translate quality type tooltip
-     *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @return string|null
-     * @throws Zend_Exception
-     */
-    public function translateTypeTooltip(ZfExtended_Zendoverwrites_Translate $translate) : ?string {
-        return '';
-    }
-
-    /**
-     * Translate category
-     *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @param string $category
-     * @param editor_Models_Task $task
-     * @return string|null
-     */
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch($category){
-            case editor_Segment_Numbers_Check::NUM1:
-                return $translate->_('Zahlen Quelle ≠ Ziel');
-
-            case editor_Segment_Numbers_Check::NUM2:
-                return $translate->_('Alphanumerische Zeichenfolgen: Unterschiede');
-
-            case editor_Segment_Numbers_Check::NUM3:
-                return $translate->_('Formatänderung (Datumsangaben u.ä.)');
-
-            case editor_Segment_Numbers_Check::NUM4:
-                return $translate->_('Trenner nicht lokalisiert');
-
-            case editor_Segment_Numbers_Check::NUM5:
-                return $translate->_('Formatierung 1000er-Zahl geändert');
-
-            case editor_Segment_Numbers_Check::NUM6:
-                return $translate->_('Unterschiedliche Minuszeichen');
-
-            case editor_Segment_Numbers_Check::NUM7:
-                return $translate->_('Trenner aus Quelle geändert');
-
-            case editor_Segment_Numbers_Check::NUM8:
-                return $translate->_('Zahlwort aus Quelle als Zahl in Ziel gefunden');
-
-            case editor_Segment_Numbers_Check::NUM9:
-                return $translate->_('Zahl aus Quelle als Zahlwort in Ziel gefunden');
-
-            case editor_Segment_Numbers_Check::NUM10:
-                return $translate->_('Formatänderung (Ordinalzahlen, führende Null u.ä.)');
-
-            case editor_Segment_Numbers_Check::NUM11:
-                return $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall');
-
-            case editor_Segment_Numbers_Check::NUM12:
-                return $translate->_('1000er-Trenner nicht erlaubt');
-
-            case editor_Segment_Numbers_Check::NUM13:
-                return $translate->_('Dubiose Zahl aus Quelle unverändert in Ziel');
-        }
-        return NULL;
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        return match ($category) {
+            editor_Segment_Numbers_Check::NUM1 => $translate->_('Zahlen Quelle ≠ Ziel'),
+            editor_Segment_Numbers_Check::NUM2 => $translate->_('Alphanumerische Zeichenfolgen: Unterschiede'),
+            editor_Segment_Numbers_Check::NUM3 => $translate->_('Formatänderung (Datumsangaben u.ä.)'),
+            editor_Segment_Numbers_Check::NUM4 => $translate->_('Trenner nicht lokalisiert'),
+            editor_Segment_Numbers_Check::NUM5 => $translate->_('Formatierung 1000er-Zahl geändert'),
+            editor_Segment_Numbers_Check::NUM6 => $translate->_('Unterschiedliche Minuszeichen'),
+            editor_Segment_Numbers_Check::NUM7 => $translate->_('Trenner aus Quelle geändert'),
+            editor_Segment_Numbers_Check::NUM8 => $translate->_('Zahlwort aus Quelle als Zahl in Ziel gefunden'),
+            editor_Segment_Numbers_Check::NUM9 => $translate->_('Zahl aus Quelle als Zahlwort in Ziel gefunden'),
+            editor_Segment_Numbers_Check::NUM10 => $translate->_('Formatänderung (Ordinalzahlen, führende Null u.ä.)'),
+            editor_Segment_Numbers_Check::NUM11 => $translate->_('Untersch. Zeichen/Formatierung für Zahlen-Intervall'),
+            editor_Segment_Numbers_Check::NUM12 => $translate->_('1000er-Trenner nicht erlaubt'),
+            editor_Segment_Numbers_Check::NUM13 => $translate->_('Dubiose Zahl aus Quelle unverändert in Ziel'),
+            default => null,
+        };
     }
 
     /**
@@ -205,7 +165,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      * @param editor_Models_Task $task
      * @return string|null
      */
-    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
+    public function translateCategoryTooltip(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         switch($category){
             case editor_Segment_Numbers_Check::NUM13:
                 return $translate->_('Falls es sich dabei um keine Dezimalzahl, sondern eine  Liste mit fehlenden Leerzeichen zwischen Listenelementen handelt, bitte im Ziel Leerzeichen zwischen Listenelementen einfügen. Bei falsch verwendetem Dezimaltrenner in der Quelle bitte Meldung ignorieren.');
@@ -219,7 +179,8 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
      * @param editor_Models_Task $task
      * @return array
      */
-    public function getAllCategories(editor_Models_Task $task) : array {
+    public function getAllCategories(?editor_Models_Task $task) : array
+    {
         return [
             editor_Segment_Numbers_Check::NUM1,
             editor_Segment_Numbers_Check::NUM2,

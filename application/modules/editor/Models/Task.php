@@ -26,12 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
+use MittagQI\Translate5\Task\FileTypeSupport;
+
 /**
  * Task Object Instance as needed in the application
  * @method integer getId() getId()
@@ -46,6 +42,8 @@ END LICENSE AND COPYRIGHT
  * @method void setTaskName() setTaskName(string $name)
  * @method string getForeignName() getForeignName()
  * @method void setForeignName() setForeignName(string $name)
+ * @method string getForeignName() getDescription()
+ * @method void setForeignName() setDescription(string $description)
  * @method integer getSourceLang() getSourceLang()
  * @method void setSourceLang() setSourceLang(int $id)
  * @method integer getTargetLang() getTargetLang()
@@ -98,11 +96,13 @@ END LICENSE AND COPYRIGHT
  * @method integer getSegmentFinishCount() getSegmentFinishCount()
  * @method void setSegmentFinishCount() setSegmentFinishCount(int $segmentFinishCount)
  * @method void setTaskType() setTaskType(string $taskType)
- * @method int getProjectId() getProjectId()
+ * @method string getProjectId() getProjectId()
  * @method void setProjectId() setProjectId(int $projectId)
  * @method boolean getDiffExportUsable() getDiffExportUsable()
  * @method void setDiffExportUsable() setDiffExportUsable(bool $flag)
- *
+ * @method boolean getReimportable() getReimportable()
+ * @method void setReimportable() setReimportable(bool $reimportable)
+ * @method string getCreated() getCreated()
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -167,6 +167,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $data = $this->row->toArray();
         unset($data['id']);
         unset($data['taskGuid']);
+        //resetting meta is crucial here - we are cloning the task object not its subsequent data in DB too!
+        $this->meta = null;
         //before all other operations make a new row object
         $this->init($data);
         $this->createTaskGuidIfNeeded();
@@ -556,17 +558,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(!$taskDataRoot->isWritable()) {
             throw new Zend_Exception('TaskData root Directory is not writeable: "'.$taskDataRoot->getPathname().'".');
         }
+
         $taskData = new SplFileInfo($taskDataRoot.DIRECTORY_SEPARATOR.$taskDataRel);
-        if($taskData->isDir()){
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError('Proceeding with already existing TaskData Directory: '.$taskData);
+        if (! $taskData->isDir() && ! mkdir($taskData)) {
+            throw new Zend_Exception('TaskData Directory could not be created, check parent folders:  "'.$taskData->getPathname().'".');
         }
-        else {
-            if(!mkdir($taskData)){
-                throw new Zend_Exception('TaskData Directory could not be created, check parent folders:  "'.$taskData->getPathname().'".');
-            }
-        }
+
         if($taskData->isWritable()){
         	return $this->taskDataPath = $taskData;
         }
@@ -651,7 +648,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function isSourceAndTargetLanguageSimilar() : bool {
         return ($this->isSourceAndTargetLanguageEqual()
-            || ($this->getCachedLanguage($this->getSourceLang())->getRfc5646() == $this->getCachedLanguage($this->getTargetLang())->getRfc5646()));
+            || ($this->getSourceLanguage()->getMajorRfc5646() == $this->getTargetLanguage()->getMajorRfc5646()));
     }
 
     /**
@@ -660,13 +657,34 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Languages
      * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    protected function getCachedLanguage(int $id){
-        if(array_key_exists($id, $this->languageCache)){
+    protected function getCachedLanguage(int $id): editor_Models_Languages
+    {
+        if (array_key_exists($id, $this->languageCache)) {
             return $this->languageCache[$id];
         }
-        $this->languageCache[$id] = ZfExtended_Factory::get('editor_Models_Languages');
+        $this->languageCache[$id] = ZfExtended_Factory::get(editor_Models_Languages::class);
         $this->languageCache[$id]->load($id);
         return $this->languageCache[$id];
+    }
+
+    /**
+     * Retrieves the source lang as language-object
+     * @return editor_Models_Languages
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getSourceLanguage(): editor_Models_Languages
+    {
+        return $this->getCachedLanguage($this->getSourceLang());
+    }
+
+    /**
+     * Retrieves the target lang as language-object
+     * @return editor_Models_Languages
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     */
+    public function getTargetLanguage(): editor_Models_Languages
+    {
+        return $this->getCachedLanguage($this->getTargetLang());
     }
 
     /**
@@ -833,7 +851,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function isImporting() {
-        return $this->getState() == self::STATE_IMPORT;
+        return in_array($this->getState(), [self::STATE_IMPORT, self::STATE_PREPARATION]);
     }
 
 
@@ -878,14 +896,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * returns a Zend_Config Object with task specific settings
-     * @deprecated must be changed with TRANSLATE-471
-     * @return Zend_Config
+     * Retrieves the file-type-support for a task.
+     * Can only be used for saved tasks
+     * @return FileTypeSupport
+     * @throws ZfExtended_Exception
      */
-    public function getAsConfig() {
-        return new Zend_Config(array(
-            'enableSourceEditing' => (bool)$this->getEnableSourceEditing()
-        ));
+    public function getFileTypeSupport(): FileTypeSupport
+    {
+        return FileTypeSupport::taskInstance($this);
     }
 
     /**
@@ -935,18 +953,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * Explicitly creates a new meta entity to mark the beginnig of its lifecycle.
-     * @param array $data
-     * @return editor_Models_Task_Meta
-     */
-    public function createMeta(array $data = []): editor_Models_Task_Meta {
-        $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
-        $data['taskGuid'] = $this->getTaskGuid();
-        $this->meta->init($data);
-        return $this->meta;
-    }
-
-    /**
      * convenient method to get the task meta data
      * @param bool $reinit if true reinits the internal meta object completely (after adding a field for example)
      * @return editor_Models_Task_Meta
@@ -967,10 +973,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * Check if the current task status allows this action
      * @param array $allow additional states to be handled non exclusive
-     * @throws ZfExtended_Models_Entity_Conflict
+     * @throws ZfExtended_Models_Entity_Conflict|Zend_Exception
      */
-    public function checkStateAllowsActions(array $allow = []) {
-        if($this->isErroneous() || $this->isExclusiveState($allow) && $this->isLocked($this->getTaskGuid())) {
+    public function checkStateAllowsActions(array $allow = []): void
+    {
+        if($this->isErroneous() || ($this->isExclusiveState($allow) && $this->isLocked($this->getTaskGuid()))) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1046' => 'The current task status does not allow that action.',
             ]);
@@ -983,6 +990,32 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                 'isExclusiveState' => $this->isExclusiveState(),
             ]);
         }
+    }
+
+    /**
+     * Check and throw exception if the task export is not allowed.
+     * It is not allowed when the task is in not allowed state or if task export is already running
+     * @throws ZfExtended_Models_Entity_Conflict
+     * @throws Zend_Exception
+     */
+    public function checkExportAllowed(string $exportClass): void
+    {
+        // first check if disabled by state
+        $this->checkStateAllowsActions();
+        
+        $model = ZfExtended_Factory::get(ZfExtended_Models_Worker::class);
+        // check if there are running exports
+        if ($model->isExportRunning($this->getTaskGuid(), $exportClass)) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1538' => 'Task export: the task already contains running or pending exports. Try again later',
+            ]);
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1538', [
+                'Task export: the task already contains running or pending exports. Try again later'
+            ], [
+                'task' => $this
+            ]);
+        }
+
     }
 
     /**
@@ -1011,20 +1044,28 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return $this->db->fetchAll($s)->toArray();
     }
 
-    /***
-     * Update the terminologie flag based on if there is a term collection assigned as language resource to the task.
+    /**
+     * Update the terminology flag based on if there is a term collection assigned as language resource to the task.
      * @param string $taskGuid
-     * @param array $ignoreAssocs: the provided languageresources taskassoc ids will be ignored
+     * @param array $ignoreAssocs : the provided languageresources taskassoc ids will be ignored
      */
-    public function updateIsTerminologieFlag($taskGuid,$ignoreAssocs=array()){
-        $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
-        /* @var $service editor_Services_TermCollection_Service */
-        $assoc=ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\TaskAssociation');
-        /* @var $assoc MittagQI\Translate5\LanguageResource\TaskAssociation */
-        $result=$assoc->loadAssocByServiceName($taskGuid, $service->getName(),$ignoreAssocs);
-        $this->loadByTaskGuid($taskGuid);
-        $this->setTerminologie(!empty($result));
-        $this->save();
+    public function updateIsTerminologieFlag(string $taskGuid, array $ignoreAssocs = []): void
+    {
+        $service = ZfExtended_Factory::get(editor_Services_TermCollection_Service::class);
+        $assoc = ZfExtended_Factory::get(MittagQI\Translate5\LanguageResource\TaskAssociation::class);
+        $result = $assoc->loadAssocByServiceName($taskGuid, $service->getName(), $ignoreAssocs);
+        $hasTerminology = !empty($result);
+        //update DB directly
+        $this->db->update([
+            'terminologie' => $hasTerminology
+        ], [
+            'taskGuid = ?' => $taskGuid,
+        ]);
+
+        //if current instance holds that task, update that too
+        if ($this->getTaskGuid() === $taskGuid) {
+            $this->setTerminologie($hasTerminology);
+        }
     }
 
     /**
@@ -1300,5 +1341,18 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $this->faultySegmentsCache[$this->getId()] = editor_Models_Db_SegmentQuality::getFaultySegmentIds($this->getTaskGuid());
         }
         return $this->faultySegmentsCache[$this->getId()];
+    }
+
+    /***
+     * Return all active(not ended) reimportable tasks which are not ended
+     * @return array
+     */
+    public function getAllReimportable(): array
+    {
+        $s = $this->db->select()
+            ->where('reimportable = 1')
+            ->where('state NOT IN(?)',[self::STATE_END,self::STATE_ERROR])
+            ->where('taskType IN (?)', editor_Task_Type::getInstance()->getNonInternalTaskTypes());
+        return $this->db->fetchAll($s)->toArray();
     }
 }

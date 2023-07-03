@@ -96,76 +96,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
 
     /***
-     * Search from term matches the current term collections with the given query string.
-     * All fuzzy languages will be included in the search.('en' as search language will result with search using 'en','en-US','en-GB' etc)
-     * Result will be listed only if there is matching term in the opposite language:
-     * Example if there is a match for term in source(de), and in the same term entry, there is term in the opposite language(en), than this
-     * will be listed as result
-     * @param string $queryString
-     * @param integer $sourceLang
-     * @param integer $targetLang
-     * @param string $field
-     * @return array
-     */
-    public function searchCollection(string $queryString, int $sourceLang, int $targetLang, string $field): array
-    {
-        // set the default value for the $field, it can be also passed as null
-        if (empty($field)) {
-            $field = 'source';
-        }
-        $languageModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $languageModel editor_Models_Languages */
-
-        // get source and target language fuzzies
-        $sourceLangs = $languageModel->getFuzzyLanguages($sourceLang,'id',true);
-        $targetLangs = $languageModel->getFuzzyLanguages($targetLang,'id',true);
-
-        $s = $this->db->select()
-            ->setIntegrityCheck(false)
-            ->from('terms_term')
-            ->where('lower(term) like lower(?) COLLATE utf8mb4_bin', $queryString)
-            ->where('collectionId = ?', $this->getId())
-            ->where('languageId IN(?)',$field === 'source' ? $sourceLangs : $targetLangs)
-            ->group('termEntryTbxId');
-        $rows = $this->db->fetchAll($s)->toArray();
-
-        if (empty($rows)) {
-            return [];
-        }
-
-        $termEntryTbxId = [];
-        $termEntryTbxIdSearch = [];
-        foreach ($rows as $res) {
-            $termEntryTbxId[] = $res['termEntryTbxId'];
-            //collect the searched terms, so thy are merged with the results
-            if (!isset($termEntryTbxIdSearch[$res['termEntryTbxId']])) {
-                $termEntryTbxIdSearch[$res['termEntryTbxId']] = [];
-            }
-            array_push($termEntryTbxIdSearch[$res['termEntryTbxId']], $res['term']);
-        }
-
-        // fill all terms in the opposite field of the matched term results
-        $s = $this->db->select()
-            ->setIntegrityCheck(false)
-            ->from(['t' => 'terms_term'])
-            ->joinLeft(['ta' => 'terms_attributes'], 'ta.termId = t.id AND ta.type = "processStatus"', ['ta.type AS processStatusAttribute', 'ta.value AS processStatusAttributeValue'])
-            ->where('t.termEntryTbxId IN(?)', $termEntryTbxId)
-            ->where('t.languageId IN(?)',$field === 'source' ? $targetLangs : $sourceLangs)
-            ->where('t.collectionId = ?', $this->getId());
-        $targetResults = $this->db->fetchAll($s)->toArray();
-
-        //merge the searched terms with the result
-        foreach ($targetResults as &$single){
-            $single['default'.$field] = '';
-            if (!empty($termEntryTbxIdSearch[$single['termEntryTbxId']])) {
-                $single['default'.$field] = $termEntryTbxIdSearch[$single['termEntryTbxId']][0];
-            }
-        }
-
-        return $targetResults;
-    }
-
-    /***
      * Get all collection associated with the task
      * @param string $taskGuid
      * @return array
@@ -350,36 +280,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
         return $result;
     }
-
-    /***
-     * Check and remove the term collection if it is imported via task import
-     * @param string $taskGuid
-     */
-    public function checkAndRemoveTaskImported(string $taskGuid)
-    {
-        //since the reference assoc → langres is not cascade delete, we have to delete them manually
-        $taskAssocTable = ZfExtended_Factory::get('MittagQI\Translate5\LanguageResource\Db\TaskAssociation');
-        /* @var $taskAssocTable MittagQI\Translate5\LanguageResource\Db\TaskAssociation */
-        $s = $taskAssocTable->select()->where('autoCreatedOnImport = 1 AND taskGuid = ?', $taskGuid);
-        $rows = $this->db->fetchAll($s)->toArray();
-        $taskAssocTable->delete(['autoCreatedOnImport = 1 AND taskGuid = ?' => $taskGuid]);
-
-        if(empty($rows)){
-            return;
-        }
-        //remove the collection(s), should be normally only one
-        foreach($rows as $row) {
-            $this->load($row['languageResourceId']);
-            try {
-                $this->delete();
-            }
-            catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-                //do nothing in that case, that means the TermCollection can not be deleted, since it is in use by another task.
-                // So we just leave it then
-            }
-        }
-    }
-
+    
     public function delete()
     {
         // remove the termcollection tbx files from the disk
@@ -438,6 +339,26 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         ->where('serviceType = ?',$serviceType);
 
         return $this->db->fetchAll($s)->toArray();
+    }
+
+    /***
+     * Load all collection entities
+     * @return editor_Models_TermCollection_TermCollection[]
+     */
+    public function loadAllEntities(): array
+    {
+        $entities = [];
+        $service = ZfExtended_Factory::get(editor_Services_TermCollection_Service::class);
+
+        $select = $this->db->select()->where('serviceType = ?',$service->getServiceNamespace());
+
+        foreach($this->db->fetchAll($select) as $row){
+            $entity = new static();
+            $entity->initByRow($row);
+            $entities[] = $entity;
+        }
+
+        return $entities;
     }
 
 
@@ -557,15 +478,17 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
 
     /***
-     * Remove collection tbx files from the tbx-import directory where the file modification date is older than the given one
+     * Remove collection tbx files from the tbx-import directory where
+     * the file modification date is older than the given one
      * @param int $collectionId
-     * @param int $olderThan: this is unix timestamp
+     * @param int $olderThan unix timestamp
+     * @return void
      */
-    public function removeOldCollectionTbxFiles(int $collectionId, int $olderThan)
+    public function removeOldCollectionTbxFiles(int $collectionId, int $olderThan): void
     {
         $collectionPath = editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;
         if (is_dir($collectionPath)) {
-            /* @var $recursiveDirCleaner ZfExtended_Controller_Helper_Recursivedircleaner */
+            /* @var ZfExtended_Controller_Helper_Recursivedircleaner $recursiveDirCleaner */
             $recursiveDirCleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
                 'Recursivedircleaner'
                 );

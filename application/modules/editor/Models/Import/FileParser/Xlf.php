@@ -38,6 +38,8 @@ use editor_Models_Import_FileParser_XmlParser as XmlParser;
  * Fileparsing for import of XLIFF 1.1 and 1.2 files
  */
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser {
+    const IS_REIMPORTABLE = true;
+
     const PREFIX_MRK = 'mrk-';
     const PREFIX_SUB = 'sub-';
     const MISSING_MRK = 'missing-mrk';
@@ -250,8 +252,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         
         if ($this->segmentCount === 0) {
-            //'E1191' => 'The XLF file "{fileName} (id {fileId})" does not contain any translation relevant segments.',
-            throw new editor_Models_Import_FileParser_Xlf_Exception('E1191', [
+            // processing files with no segments should only log a warning.
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.xlf');
+            $logger->warn('E1191', 'The XLF file "{fileName} (id {fileId})" does not contain any translation relevant segments.', [
                 'task' => $this->task,
                 'fileName' => $this->_fileName,
                 'fileId' => $this->_fileId,
@@ -749,6 +752,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->padSourceMrkTags();
         //find mrk mids missing in target and add them marked as missing
         $this->padTargetMrkTags();
+
+        // we have to limit the number of segments per tarns-unit as this might compromises further processing (-> sibling-data)
+        if(count($this->sourceProcessOrder) >  editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT){
+            throw new editor_Models_Import_FileParser_Exception('E1523', [
+                'max' => editor_Models_Import_Configuration::MAX_SEGMENTS_PER_TRANSUNIT,
+                'amount' => count($this->sourceProcessOrder),
+                'transunitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
+                'task' => $this->task
+            ]);
+        }
 
 
         $createdSegmentIds = [];

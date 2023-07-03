@@ -45,11 +45,17 @@ Ext.define('Editor.view.admin.preferences.User', {
 
     initConfig: function (instanceConfig) {
         var me = this,
-            uiThemesRecord = Editor.app.getUserConfig('extJs.theme',true),
+            uiTheme,
             themes = [],
             translations = [];
 
-        Ext.Object.each(Editor.data.translations, function(i, n) {
+        uiTheme = Editor.app.getUserConfig('extJs.theme',false, value => {
+            me.down('combo#uiTheme').suspendEvent('change');
+            me.down('combo#uiTheme').setValue(value);
+            me.down('combo#uiTheme').resumeEvent('change');
+        });
+
+        Ext.Object.each(Editor.data.l10n.translations, function(i, n) {
             translations.push([i, n]);
         });
 
@@ -133,7 +139,7 @@ Ext.define('Editor.view.admin.preferences.User', {
                     xtype: 'combo',
                     width: 200,
                     itemId: 'uiTheme',
-                    value: uiThemesRecord.get('value'),
+                    value: uiTheme || '',
                     store: themes,
                     forceSelection: true,
                     hidden: !Editor.data.frontend.changeUserThemeVisible,

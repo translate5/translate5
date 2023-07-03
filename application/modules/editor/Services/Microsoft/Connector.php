@@ -66,9 +66,9 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         $this->batchQueryBuffer = 30;
         
         editor_Services_Connector_Exception::addCodes([
-            'E1344' => 'Microsoft Translator returns an error: {errorNr} - {message}',
-            'E1345' => 'Could not authorize to Microsoft Translator, check your configured credentials.',
-            'E1346' => 'Microsoft Translator quota exceeded. A limit has been reached.',
+            'E1344' => '{service} returns an error: {errorNr} - {message}',
+            'E1345' => 'Could not authorize to {service}, check your configured credentials.',
+            'E1346' => '{service} quota exceeded. A limit has been reached.',
         ]);
         
         ZfExtended_Logger::addDuplicatesByMessage('E1345', 'E1346');
@@ -113,6 +113,14 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      */
     protected function queryApi($searchString, &$useDictionary = false): bool{
         return $this->api->search($searchString, $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode(), $useDictionary);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getResponseData(): mixed
+    {
+        return $this->api->getResult();
     }
     
     /**
@@ -299,5 +307,10 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         $data['error'] = $error;
         
         return new editor_Services_Connector_Exception($ecode, $data);
+    }
+
+    protected function getResourceName(): string
+    {
+        return 'Microsoft Translator';
     }
 }

@@ -61,8 +61,8 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         
         
         editor_Services_Connector_Exception::addCodes([
-            'E1319' => 'Google Translate authorization failed. Please supply a valid API Key.',
-            'E1320' => 'Google Translate daily limit exceeded.',
+            'E1319' => '{service} authorization failed. Please supply a valid API Key.',
+            'E1320' => '{service} daily limit exceeded.',
         ]);
         
         ZfExtended_Logger::addDuplicatesByMessage('E1319', 'E1320');
@@ -154,6 +154,14 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
             $this->defaultMatchRate
         );
     }
+
+    /**
+     * @return mixed
+     */
+    protected function getResponseData(): mixed
+    {
+        return $this->api->getResult();
+    }
     
     /**
      * {@inheritDoc}
@@ -201,7 +209,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
             $ecode = 'E1311'; //server not reachable
         }
         else {
-            $ecode = 'E1313'; //'The queried language resource {service} returns an error.'
+            $ecode = 'E1313'; //'The queried {service} returns an error.'
         }
         $data = [
             'service' => $this->getResource()->getName(),
@@ -210,5 +218,10 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         ];
         
         return new editor_Services_Connector_Exception($ecode, $data, $badRequestException);
+    }
+
+    protected function getResourceName(): string
+    {
+        return 'Google Translate';
     }
 }

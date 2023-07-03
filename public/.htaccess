@@ -16,6 +16,15 @@ RewriteCond %{REQUEST_URI} editor/referencefile/
 RewriteCond %{HTTP_REFERER} editor/referencefile/.*\.html$ 
 RewriteRule ^.*$ - [NC,L]
 
+# CORS Headers to be set on OPTIONS request only, other requests are handled by T5 itself
+Header always add Access-Control-Max-Age "86400" env=preflight
+Header always add Access-Control-Allow-Methods "GET,POST,PUT,DELETE,OPTIONS" env=preflight
+Header always add Access-Control-Allow-Headers "Authorization,Content-Type,Accept,Origin,Translate5AuthToken" env=preflight
+Header always add Access-Control-Allow-Origin "*" env=preflight
+# Handling CORS OPTIONS Request
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [E=preflight:1,L,R=204]
+
 # Add trailing slash on editor
 RewriteRule ^((.*/)?editor)$ /$1/ [L,R]
 

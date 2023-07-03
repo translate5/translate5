@@ -26,110 +26,116 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+namespace MittagQI\Translate5\Plugins\TermTagger;
+
+use editor_Plugins_TermTagger_Exception_Down;
+use editor_Plugins_TermTagger_Exception_Open;
+use editor_Plugins_TermTagger_Exception_Request;
+use editor_Plugins_TermTagger_Exception_TimeOut;
+use Exception;
+use MittagQI\Translate5\Plugins\TermTagger\Service\ServiceData;
+use MittagQI\Translate5\PooledService\ServiceAbstract;
+use stdClass;
+use Throwable;
+use Zend_Http_Client;
+use Zend_Http_Client_Exception;
+use Zend_Http_Response;
+use ZfExtended_Debug;
+use ZfExtended_Factory;
+use ZfExtended_Logger;
+use ZfExtended_Zendoverwrites_Http_Exception_Down;
+use ZfExtended_Zendoverwrites_Http_Exception_NoResponse;
+use ZfExtended_Zendoverwrites_Http_Exception_TimeOut;
+
 /**
  * Service Class of Plugin "TermTagger"
- * TODO: the whole tag-merging/stripping/restoring (also in editor_Models_Segment_TrackChangeTag) could be done much more reliably with the Object Oriented FieldTags
  */
-class editor_Plugins_TermTagger_Service {
+final class Service extends ServiceAbstract {
+
+    const SERVICE_ID = 'termtagger';
     /**
      * The timeout for connections is fix, the request timeout depends on the request type and comes from the config
      * @var integer
      */
     const CONNECT_TIMEOUT = 10;
-    
+
     /**
-     * @var ZfExtended_Logger
+     * Timeout used for test-pings
      */
-    protected $log;
-    
+    const DEFAULT_TAG_TIMEOUT = 10;
+
+    protected array $configurationConfig = [
+        'name' => 'runtimeOptions.termTagger.url.default',
+        'type' => 'list',
+        'url' => 'http://termtagger.:9001'
+    ];
+
+    protected array $guiConfigurationConfig = [
+        'name' => 'runtimeOptions.termTagger.url.gui',
+        'type' => 'list',
+        'url' => 'http://termtagger.:9001'
+    ];
+
+    protected array $importConfigurationConfig = [
+        'name' => 'runtimeOptions.termTagger.url.import',
+        'type' => 'list',
+        'url' => 'http://termtagger.:9001'
+    ];
+
+    protected array $testConfigs = [
+        // this leads to the application-db configs being copied to the test-DB
+        'runtimeOptions.termTagger.url.gui' => null,
+        'runtimeOptions.termTagger.url.import' => null,
+        'runtimeOptions.termTagger.url.default' => null
+    ];
+
     /**
      * contains the HTTP status of the last request
      * @var integer
      */
     protected $lastStatus;
-    
+
     /**
-     *
-     * @var Zend_Config
+     * @return string
      */
-    protected $config;
-    
-    /**
-     * @var editor_Models_Segment_TermTag
-     */
-    protected $termTagHelper;
-    
-    /**
-     * @var editor_Models_Segment_TermTagTrackChange
-     */
-    protected $termTagTrackChangeHelper;
-    
-    /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $internalTagHelper;
-    
-    /**
-     * @var editor_Models_Segment_TrackChangeTag
-     */
-    protected $generalTrackChangesHelper;
-    
-    /**
-     * @var integer
-     */
-    protected $openTimeout;
-    
-    /**
-     * @var integer
-     */
-    protected $tagTimeout;
-    
-    /**
-     * Two corresponding array to hold replaced tags.
-     * Tags must be replaced in every text-element before send to the TermTagger-Server,
-     * because TermTagger can not handle with already TermTagged-text.
-     */
-    private $replacedTagsNeedles = array();
-    private $replacedTagsReplacements = array();
-    
-    /**
-     * Container for segment data needed before and after tagging
-     * @var array
-     */
-    private $segments = array();
-    
-    /**
-     * Holds a counter for replacedTags to make needles unic
-     * @var integer
-    */
-    private $replaceCounter = 1;
-    
-    
-    /**
-     * @param string $logDomain the domain to be used for the internal logger instance
-     * @param integer $tagTimeout the timeout to be used for tagging
-     * @param integer $openTbxTimeout the timeout to be used for opening a TBX
-     */
-    public function __construct(string $logDomain, int $tagTimeout, int $openTbxTimeout) {
-        $this->tagTimeout = $tagTimeout;
-        $this->openTimeout = $openTbxTimeout;
-        $this->log = Zend_Registry::get('logger')->cloneMe($logDomain);
-        $config = Zend_Registry::get('config');
-        $this->config = $config->runtimeOptions->termTagger;
-        $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
-        $this->internalTagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->termTagTrackChangeHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTagTrackChange');
-        $this->generalTrackChangesHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+    public function getServiceId(): string
+    {
+        return self::SERVICE_ID;
     }
-    
+
     /**
-     * returns the configured TermTagger URLs
-     * @return array
+     * @param string $url
+     * @return array{
+     *     success: bool,
+     *     version: string|null
+     * }
+     * @throws Zend_Http_Client_Exception
      */
-    public function getConfiguredUrls() {
-        return $this->config->url->toArray();
+    protected function checkServiceUrl(string $url): array
+    {
+        $result = [ 'success' => false, 'version' => null ];
+        $httpClient = $this->getHttpClient(rtrim($url, '/') . '/termTagger');
+        $httpClient->setHeaders('accept', 'text/html');
+        try {
+            $response = $this->sendRequest($httpClient, $httpClient::GET);
+        }
+        catch(editor_Plugins_TermTagger_Exception_TimeOut $e) {
+            $result['success'] = true; // the request URL is probably a termtagger which can not respond due it is processing data
+            return $result;
+        }
+        catch(Throwable) {
+            return $result; // all other ecxceptione are regarded as service not functioning properly
+        }
+        if($response){
+            $result['success'] = ($this->wasSuccessfull() && strpos($response->getBody(), 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer') !== false);
+            // will be markup like <html> <title>TermTagger Version Information</title><body><h1>TermTagger Version Information</h1><h2>TermTagger REST Server</h2><b>Version:</b> 0.16<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.TermTaggerRestServer<br /><b>Compile Date: </b>Thu Jan 26 17:42:24 UTC 2023<hr><h2>TermTagger:</h2><b>Version:</b> 9.01<br /><b>Class: </b>de.folt.models.applicationmodel.termtagger.XliffTermTagger<br /><b>Compile Date: </b>Mon Jun 10 18:33:52 UTC 2019<hr><h2>OpenTMS Version: </h2>0.2.1</body></html>
+            $parts = explode('Version:', $response->getBody());
+            $parts = (count($parts) > 1) ? explode('<br', $parts[1]) : [];
+            $result['version'] = (count($parts) > 0) ? trim(strip_tags($parts[0])) : null;
+        }
+        return $result;
     }
-    
+
     /**
      * returns the HTTP Status of the last request
      * @return integer
@@ -146,33 +152,7 @@ class editor_Plugins_TermTagger_Service {
         $stat = $this->getLastStatus();
         return $stat >= 200 && $stat < 300;
     }
-    
-    /**
-     * Checks if there is a TermTagger-server behind $url.
-     * @param string $url url of the TermTagger-Server
-     * @return boolean true if there is a TermTagger-Server behind $url
-     */
-    public function testServerUrl(string $url, &$version = null) {
-        $httpClient = $this->getHttpClient($url.'/termTagger');
-        $httpClient->setHeaders('accept', 'text/html');
-        try {
-            $response = $this->sendRequest($httpClient, $httpClient::GET);
-        }
-        catch(editor_Plugins_TermTagger_Exception_TimeOut $e) {
-            return true; // the request URL is probably a termtagger which can not respond due it is processing data
-        }
-        catch(editor_Plugins_TermTagger_Exception_Down $e) {
-            return false;
-        }
-        catch(editor_Plugins_TermTagger_Exception_Request $e) {
-            return false;
-        }
-        
-        $version = $response->getBody();
-        // $url is OK if status == 200 AND string 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer' is in the response-body
-        return $response && $this->wasSuccessfull() && strpos($response->getBody(), 'de.folt.models.applicationmodel.termtagger.TermTaggerRestServer') !== false;
-    }
-    
+
     /**
      * If no $tbxHash given, checks if the TermTagger-Sever behind $url is alive.
      * If $tbxHash is given, check if Server has loaded the tbx-file with the id $tbxHash.
@@ -186,7 +166,7 @@ class editor_Plugins_TermTagger_Service {
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/'.$tbxHash);
         $httpClient->setConfig([
             'timeout' => self::CONNECT_TIMEOUT,
-            'request_timeout' => $this->tagTimeout //for pinging we just the same timeout as for tagging
+            'request_timeout' => self::DEFAULT_TAG_TIMEOUT
         ]);
         $response = $this->sendRequest($httpClient, $httpClient::HEAD);
         return ($response && (($tbxHash !== false && $this->wasSuccessfull()) || ($tbxHash === false && $this->getLastStatus() == 404)));
@@ -195,15 +175,16 @@ class editor_Plugins_TermTagger_Service {
     
     /**
      * Load a tbx-file $tbxFilePath into the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file
-     *
-     * @param string $url url of the TermTagger-Server
-     * @param string $tbxHash TBX hash
-     * @param string $tbxData TBX data
+     * @param string $url
+     * @param string $tbxHash
+     * @param string $tbxData
+     * @param ZfExtended_Logger $logger
+     * @return stdClass|null
+     * @throws Zend_Http_Client_Exception
      * @throws editor_Plugins_TermTagger_Exception_Open
      * @throws editor_Plugins_TermTagger_Exception_Request
-     * @return Zend_Http_Response
      */
-    public function open(string $url, string $tbxHash, string $tbxData) {
+    public function loadTBX(string $url, string $tbxHash, string $tbxData, ZfExtended_Logger $logger) {
         if(empty($tbxHash)) {
             //Could not load TBX into TermTagger: TBX hash is empty.
             throw new editor_Plugins_TermTagger_Exception_Open('E1116', [
@@ -212,32 +193,68 @@ class editor_Plugins_TermTagger_Service {
         }
         
         // get default- and additional- (if any) -options for server-communication
-        $serverCommunication = new stdClass();
-        $serverCommunication->tbxFile = $tbxHash;
-        $serverCommunication->tbxdata = $tbxData;
+        $serviceData = new stdClass();
+        $serviceData->tbxFile = $tbxHash;
+        $serviceData->tbxdata = $tbxData;
         
         // send request to TermTagger-server
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/');
         $httpClient->setConfig([
             'timeout' => self::CONNECT_TIMEOUT,
-            'request_timeout' => $this->openTimeout
+            'request_timeout' => Configuration::TIMEOUT_TBXIMPORT
         ]);
-        $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
+        $httpClient->setRawData(json_encode($serviceData), 'application/json');
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         $success = $this->wasSuccessfull();
-        if($success && $response = $this->decodeServiceResult($response)) {
+        if($success && $response = $this->decodeServiceResult($logger, $response)) {
             return $response;
         }
         $data = [
             'httpStatus' => $this->getLastStatus(),
             'termTaggerUrl' => $httpClient->getUri(true),
             'plainServerResponse' => print_r($response, true),
-            'requestedData' => $serverCommunication,
+            'requestedData' => $serviceData,
         ];
         $errorCode = $success ? 'E1118' : 'E1117';
         //E1117: Could not load TBX into TermTagger: TermTagger HTTP result was not successful!
         //E1118: Could not load TBX into TermTagger: TermTagger HTTP result could not be decoded!'
         throw new editor_Plugins_TermTagger_Exception_Open($errorCode, $data);
+    }
+
+    /**
+     * Requests the termtagger with the given service-url and the passed segment-data (wich has to be be encoded)
+     * @param string $serviceUrl
+     * @param ServiceData $serviceData
+     * @param ZfExtended_Logger $logger
+     * @param int $requestTimeout
+     * @return stdClass|null
+     * @throws Zend_Http_Client_Exception
+     * @throws editor_Plugins_TermTagger_Exception_Request
+     */
+    public function tagTerms(string $serviceUrl, ServiceData $serviceData, ZfExtended_Logger $logger, int $requestTimeout): ?stdClass
+    {
+        //test term tagger errors, start a dummy netcat server in the commandline: nc -l -p 8080
+        // if the request was received in the commandline, just kill nc to simulate a termtagger crash.
+        //$serviceUrl = 'http://michgibtesdefinitivnichtalsdomain.com:8080'; // this is the nc dummy URL then.
+        //$serviceUrl = 'http://localhost:8080'; // this is the nc dummy URL then.
+        $httpClient = $this->getHttpClient($serviceUrl.'/termTagger/termTag/');
+        $httpClient->setRawData(json_encode($serviceData), 'application/json');
+        $httpClient->setConfig([
+            'timeout' => self::CONNECT_TIMEOUT,
+            'request_timeout' => $requestTimeout
+        ]);
+        $httpResponse = $this->sendRequest($httpClient, $httpClient::POST);
+        $response = $this->decodeServiceResult($logger, $httpResponse);
+        if (!$response) {
+            //processing terms from the TermTagger result could not be decoded.
+            throw new editor_Plugins_TermTagger_Exception_Request('E1121', [
+                'httpStatus' => $this->getLastStatus(),
+                'termTaggerUrl' => $httpClient->getUri(true),
+                'plainServerResponse' => $httpResponse->getBody(),
+                'requestedData' => $serviceData,
+            ]);
+        }
+        return $response;
     }
     
     /**
@@ -247,7 +264,7 @@ class editor_Plugins_TermTagger_Service {
      * @throws editor_Plugins_TermTagger_Exception_Request
      * @return Zend_Http_Response
      */
-    protected function sendRequest(Zend_Http_Client $client, $method) {
+    private function sendRequest(Zend_Http_Client $client, $method) {
         $this->lastStatus = false;
         $start = microtime(true);
         try {
@@ -290,194 +307,37 @@ class editor_Plugins_TermTagger_Service {
      * @param string $uri
      * @return Zend_Http_Client
      */
-    protected function getHttpClient($uri) {
-        $client = ZfExtended_Factory::get('Zend_Http_Client');
+    private function getHttpClient($uri) {
+        $client = ZfExtended_Factory::get(Zend_Http_Client::class);
         $client->setUri($uri);
         return $client;
     }
-    
-    /**
-     * TermTaggs segment-text(s) in $data on TermTagger-server $url
-     *
-     * @param string $url
-     * @param editor_Plugins_TermTagger_Service_ServerCommunication $data
-     *
-     * @return Zend_Http_Response or null on error
-     */
-    public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
 
-        $data = $this->encodeSegments($data);
-    
-        //test term tagger errors, start a dummy netcat server in the commandline: nc -l -p 8080
-        // if the request was received in the commandline, just kill nc to simulate a termtagger crash.
-        //$url = 'http://michgibtesdefinitivnichtalsdomain.com:8080'; // this is the nc dummy URL then.
-        //$url = 'http://localhost:8080'; // this is the nc dummy URL then.
-        $httpClient = $this->getHttpClient($url.'/termTagger/termTag/');
-        
-        $httpClient->setRawData(json_encode($data), 'application/json');
-        $httpClient->setConfig([
-            'timeout' => self::CONNECT_TIMEOUT,
-            'request_timeout' => $this->tagTimeout
-        ]);
-        $response = $this->sendRequest($httpClient, $httpClient::POST);
-        
-        if(!$this->wasSuccessfull()) {
-            //TermTagger returns an error on tagging segments.
-            throw new editor_Plugins_TermTagger_Exception_Malfunction('E1120', [
-                'httpStatus' => $this->getLastStatus(),
-                'termTaggerUrl' => $httpClient->getUri(true),
-                'plainServerResponse' => print_r($response->getBody(), true),
-                'requestedData' => $data,
-            ]);
-        }
-        $response = $this->decodeServiceResult($response);
-        if (!$response) {
-            //processing tagterms TermTagger result could not be decoded.
-            throw new editor_Plugins_TermTagger_Exception_Request('E1121', [
-                'httpStatus' => $this->getLastStatus(),
-                'termTaggerUrl' => $httpClient->getUri(true),
-                'plainServerResponse' => print_r($response->getBody(), true),
-                'requestedData' => $data,
-            ]);
-        }
-        return $this->decodeSegments($response, $data);
-    }
-    
-    /**
-     * replaces our internal tags with a img place holder, since the termtagger can not deal with our tags, but with imgs
-     * @param editor_Plugins_TermTagger_Service_ServerCommunication $data
-     * @return editor_Plugins_TermTagger_Service_ServerCommunication
-     */
-    private function encodeSegments(editor_Plugins_TermTagger_Service_ServerCommunication $data) {
-        foreach ($data->segments as & $segment) {
-            $segment->source = $this->encodeSegment($segment, 'source');
-            $segment->target = $this->encodeSegment($segment, 'target');
-        }
-        return $data;
-    }
-
-    /**
-     * restores our internal tags from the delivered img tags
-     *
-     * @param stdClass $data
-     * @param editor_Plugins_TermTagger_Service_ServerCommunication $requests
-     * @return stdClass
-     */
-    private function decodeSegments(stdClass $data, editor_Plugins_TermTagger_Service_ServerCommunication $request) {
-        foreach ($data->segments as & $segment) {
-            $segment->source = $this->decodeSegment($segment, 'source', $request);
-            $segment->target = $this->decodeSegment($segment, 'target', $request);
-        }
-        return $data;
-    }
-    
-    private function encodeSegment($segment, $field) {
-
-        $trackChangeTag = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        /* @var $trackChangeTag editor_Models_Segment_TrackChangeTag */
-        
-        $text = $segment->$field;
-        $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
-        $tempMatches = [];
-        preg_match_all($matchContentRegExp, $text, $tempMatches);
-        
-        foreach ($tempMatches[0] as $match) {
-            $needle = '<img class="content-tag" src="'.$this->replaceCounter++.'" alt="TaggingError" />';
-            $this->replacedTagsNeedles[] = $needle;
-            $this->replacedTagsReplacements[] = $match;
-            
-            $text = str_replace($match, $needle, $text);
-        }
-        $text = preg_replace('/<div[^>]+>/is', '', $text);
-        $text = preg_replace('/<\/div>/', '', $text);
-        
-        //protecting trackChanges del tags
-        $text = $trackChangeTag->protect($text);
-        //store the text with track changes
-        $trackChangeTag->textWithTrackChanges = $text;
-        $this->segments[$this->createUniqueKey($segment, $field)] = $trackChangeTag; //we have to store one instance per segment since it contains specific data for recreation
-
-        // Now remove the stored TrackChange-Nodes from the text for termtagging (with the general helper to keep the original tags inside the specific instance)
-        return $this->generalTrackChangesHelper->removeTrackChanges($text);
-    }
-    
-    private function decodeSegment($segment, $field, editor_Plugins_TermTagger_Service_ServerCommunication $request) {
-        $text = $segment->$field;
-        if(empty($text) && $text !== '0') {
-            return $text;
-        }
-        //fix TRANSLATE-713
-        $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
-
-        $trackChangeTag = $this->segments[$this->createUniqueKey($segment, $field)];
-        /* @var $trackChangeTag editor_Models_Segment_TrackChangeTag */
-        
-        // remerge trackchanges and terms - don't do it if there were no INS/DEL!
-        // TODO FIXME: if you do the above there are problems with trackchanges tags getting lost ...
-        // if($trackChangeTag->hasOriginalTags()){
-        if(true){
-            $text = $this->termTagTrackChangeHelper->mergeTermsAndTrackChanges($text, $trackChangeTag->textWithTrackChanges);
-            //check if content is valid XML, or if textual content has changed
-            $oldFlagValue = libxml_use_internal_errors(true);
-            // delete tags and internal tags are masked, thats ok for the check here
-            $invalidXml = ! @simplexml_load_string('<container>'.$text.'</container>');
-            libxml_use_internal_errors($oldFlagValue);
-            $textNotEqual = strip_tags($text) !== strip_tags($segment->$field);
-            if($invalidXml || $textNotEqual) {
-                $this->log->warn('E1132', 'Conflict in merging terminology and track changes: "{type}".', [
-                    'type' => ($invalidXml?'Invalid XML,':'').($textNotEqual?' text changed by merge':''),
-                    'task' => $request->task,
-                    'segmentId' => $segment->id,
-                    'inputFromBrowser' => $trackChangeTag->unprotect($trackChangeTag->textWithTrackChanges),
-                    'termTaggerResult' => $segment->$field,
-                    'mergedResult' => $text,
-                ]);
-            }
-            $text = $trackChangeTag->unprotect($text);
-        }
-        if (empty($this->replacedTagsNeedles)) {
-            return $text;
-        }
-        $text = preg_replace('"&lt;img class=&quot;content-tag&quot; src=&quot;(\d+)&quot; alt=&quot;TaggingError&quot; /&gt;"', '<img class="content-tag" src="\\1" alt="TaggingError" />', $text);
-        $text = str_replace($this->replacedTagsNeedles, $this->replacedTagsReplacements, $text);
-        
-        return $text;
-    }
-    
     /**
      * decodes the TermTagger JSON and logs an error if data can not be processed
-     * @param Zend_Http_Response $result
-     * @return stdClass or null on error
+     * @param ZfExtended_Logger $logger
+     * @param Zend_Http_Response|null $result
+     * @return stdClass|null
      */
-    private function decodeServiceResult(Zend_Http_Response $result = null) {
+    private function decodeServiceResult(ZfExtended_Logger $logger, Zend_Http_Response $result = null): ?stdClass
+    {
         if(empty($result)) {
             return null;
         }
-    
         $data = json_decode($result->getBody());
         if(!empty($data)) {
             if(!empty($data->error)) {
-                $this->log->error('E1133', 'TermTagger reports error "{error}".', [
+                $logger->error('E1133', 'TermTagger reports error "{error}".', [
                     'error' => print_r($data,1),
                 ]);
             }
             return $data;
         }
-        $this->log->error('E1134', 'TermTagger produces invalid JSON: "{jsonError}".', [
+        $logger->error('E1134', 'TermTagger produces invalid JSON: "{jsonError}".', [
             'jsonError' => json_last_error_msg(),
             'jsonBody' => $result->getBody(),
         ]);
         return null;
     }
-    /**
-     * Creates a unique key to use as an array key to identify an encoded segment
-     * @param stdClass $segment
-     * @param string $field
-     * @return string
-     */
-    private function createUniqueKey(stdClass $segment, string $field) : string {
-        return $segment->field.'-'.$segment->id.'-'.$field;
-    }
-    
 }
 

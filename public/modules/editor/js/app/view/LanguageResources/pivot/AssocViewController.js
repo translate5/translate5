@@ -45,7 +45,7 @@ Ext.define('Editor.view.LanguageResources.pivot.AssocViewController', {
             '#languageResourcePivotAssoc checkcolumn[dataIndex="checked"]': {
                 checkchange: 'handleAssocCheckChange'
             },
-            '#startPivotPretranslation':{
+            '#startPivotPretranslation, menuitem[name=startPivotPretranslation]':{
                 click:'onStartPivotPretranslationClick'
             }
         }

@@ -35,6 +35,7 @@ use MittagQI\Translate5\Test\Api\Helper;
  */
 final class Config
 {
+    private static int $counter = 0;
     /**
      * @var Helper
      */
@@ -66,6 +67,11 @@ final class Config
     private array $termCollections = [];
 
     /**
+     * @var Resource[]
+     */
+    private array $otherResources = [];
+
+    /**
      * @var Operation|null
      */
     private ?Operation $taskOperation = null;
@@ -85,7 +91,11 @@ final class Config
      */
     public function setup(): void
     {
-        // first import the language resources
+        // first other resources
+        foreach ($this->otherResources as $resource) {
+            $resource->import($this->api, $this);
+        }
+        // then import the language resources
         foreach ($this->langResources as $resource) {
             $resource->import($this->api, $this);
         }
@@ -93,7 +103,7 @@ final class Config
         foreach ($this->termCollections as $termCollection) {
             $termCollection->import($this->api, $this);
         }
-        // then the tasks
+        // lastly the tasks
         foreach ($this->tasks as $task) {
             $task->import($this->api, $this);
         }
@@ -119,7 +129,11 @@ final class Config
         foreach ($this->langResources as $resource) {
             $this->cleanupResource($resource, $errors);
         }
-        if(count($errors) > 0){
+        // lastly other resources
+        foreach ($this->otherResources as $resource) {
+            $this->cleanupResource($resource, $errors);
+        }
+        if (count($errors) > 0) {
             throw new Exception(implode("\n", $errors));
         }
     }
@@ -237,6 +251,18 @@ final class Config
     {
         $this->taskOperation = new PivotBatchPretranslation($this->testClass, 0);
         return $this->taskOperation;
+    }
+
+    public function addBconf(string $name, string $bconfFileName, int $customerId = -1): Bconf
+    {
+        $next = count($this->otherResources);
+        // HINT: in the bconf-DB the name must be unique. So we add the counter also to the DB-name to guarantee unique names for th ewhole testsuite
+        $bconf = new Bconf($this->testClass, $next, $name . '-' . $this->getUniqueIndex(), $bconfFileName);
+        if ($customerId > 0) {
+            $bconf->customerId = $customerId;
+        }
+        $this->otherResources[] = $bconf;
+        return $bconf;
     }
 
     /**
@@ -358,5 +384,15 @@ final class Config
             default:
                 throw new Exception('Unknown language-resource type "' . $type . '"');
         }
+    }
+
+    /**
+     * Helper to create unique indices across the whole test-suite
+     * @return int
+     */
+    private function getUniqueIndex(): int
+    {
+        static::$counter++;
+        return static::$counter;
     }
 }

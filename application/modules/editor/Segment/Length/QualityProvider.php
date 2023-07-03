@@ -100,18 +100,33 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
         return $translate->_('Längen Prüfung');
     }
 
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch($category){
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        switch ($category) {
             
             case editor_Segment_Length_Check::TOO_LONG:
                 return $translate->_('Segment ist länger als erlaubt');
                 
             case editor_Segment_Length_Check::NOT_LONG_ENOUGH:
-                $translation = $translate->_('Segment ist relevant kürzer als erlaubt (mehr als {0}% oder min. {1} Pixel oder min. {2} Zeichen zu kurz)');
+                $translation = $translate->_(
+                    'Segment ist relevant kürzer als erlaubt (mehr als {0}% oder min. {1} Pixel oder min. {2} Zeichen zu kurz)'
+                );
                 // ugly: we need the task-config to evaluate the translation
-                $taskConfig = $task->getConfig();
+                $taskConfig = $task ? $task->getConfig() : Zend_Registry::get('config');
                 $restriction = static::getRestriction($taskConfig->runtimeOptions->autoQA, $taskConfig);
-                return str_replace('{0}', strval($restriction->maxLengthMinPercent), str_replace('{1}', strval($restriction->maxLengthMinPixel), str_replace('{2}', strval($restriction->maxLengthMinChars), $translation)));
+
+                return str_replace(
+                    '{0}',
+                    strval($restriction->maxLengthMinPercent),
+                    str_replace(
+                        '{1}',
+                        strval($restriction->maxLengthMinPixel),
+                        str_replace('{2}', strval($restriction->maxLengthMinChars), $translation)
+                    )
+                );
                 
             case editor_Segment_Length_Check::TOO_SHORT:
                 return $translate->_('Segment ist kürzer als erlaubt');
@@ -119,10 +134,12 @@ class editor_Segment_Length_QualityProvider extends editor_Segment_Quality_Provi
             case editor_Segment_Length_Check::TOO_MANY_LINES:
                 return $translate->_('Zu viele Zeilenumbrüche im Segment');
         }
-        return NULL;
+
+        return null;
     }
     
-    public function getAllCategories(editor_Models_Task $task) : array {
+    public function getAllCategories(?editor_Models_Task $task) : array
+    {
         return [
             editor_Segment_Length_Check::TOO_SHORT,
             editor_Segment_Length_Check::NOT_LONG_ENOUGH,

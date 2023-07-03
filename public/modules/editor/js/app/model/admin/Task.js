@@ -132,7 +132,8 @@ Ext.define('Editor.model.admin.Task', {
                 }
                 return tasks;
             }
-        }
+        },
+        {name: 'reimportable', type: 'boolean'}
     ],
     hasMany: [{
         model: 'Editor.model.segment.Field',
@@ -273,6 +274,9 @@ Ext.define('Editor.model.admin.Task', {
             return true;
         }
         return me.modified && me.modified.userState === unconfirmed || me.get('userState') === unconfirmed;
+    },
+    hasCriticalErrors: function () {
+        return !!this.get('hasCriticalErrors');
     },
     /**
      * returns if task had errors while import

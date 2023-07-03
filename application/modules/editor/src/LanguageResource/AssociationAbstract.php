@@ -28,11 +28,41 @@ END LICENSE AND COPYRIGHT
 
 namespace MittagQI\Translate5\LanguageResource;
 
+use Zend_Db_Expr;
 use Zend_Db_Table_Abstract;
 use ZfExtended_Models_Entity_Abstract;
 
 class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
 {
+
+    /**
+     * Returns join between taskassoc table and task table for languageResource's id list
+     * @param array $languageResourceids
+     */
+    public function getTaskInfoForLanguageResources($languageResourceids){
+        if(empty($languageResourceids)) {
+            return [];
+        }
+
+        $s = $this->db->select()
+            ->from(['assocs' => $this->tableName], [
+                'assocs.id',
+                'assocs.taskGuid',
+                'task.id as taskId',
+                'task.projectId',
+                'task.taskName',
+                'task.state',
+                'task.lockingUser',
+                'task.taskNr',
+                'assocs.languageResourceId',
+                new Zend_Db_Expr($this->db->getAdapter()->quote($this->tableName).' as tableName')
+            ])
+            ->setIntegrityCheck(false)
+            ->join(['task' => 'LEK_task'],'assocs.taskGuid = task.taskGuid', '')
+            ->where('assocs.languageResourceId in (?)', $languageResourceids)
+            ->group('assocs.id');
+        return $this->db->fetchAll($s)->toArray();
+    }
 
     /***
      * @param string $taskGuid
@@ -42,6 +72,20 @@ class AssociationAbstract extends ZfExtended_Models_Entity_Abstract
     {
         $s = $this->db->select()
             ->where('taskGuid = ?',$taskGuid);
+        return $this->db->getAdapter()->fetchAll($s);
+    }
+
+    /***
+     * Load all association by given language resource id
+     * @param int $languageResourceId
+     * @return array|null
+     */
+    public function getAssociatedByResource(int $languageResourceId): ?array{
+        $s = $this->db->select()
+            ->from(['ta' => $this->db->info(Zend_Db_Table_Abstract::NAME)],['ta.*'])
+            ->setIntegrityCheck(false)
+            ->join(['t' => 'LEK_task'], 'ta.taskGuid = t.taskGuid',['t.taskName as taskName'])
+            ->where('ta.languageResourceId = ?',$languageResourceId);
         return $this->db->getAdapter()->fetchAll($s);
     }
 

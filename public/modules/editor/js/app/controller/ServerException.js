@@ -89,7 +89,7 @@ Ext.define('Editor.controller.ServerException', {
         if(resp) {
             this.handleException(resp);
         } else {
-            this.handleFailedRequest(operation.error.status, operation.error.statusText, operation.error.response);
+            this.handleFailedRequest(operation.error.status, operation.error.statusText, operation.error.response, operation);
         }
         return false;
     },
@@ -108,8 +108,7 @@ Ext.define('Editor.controller.ServerException', {
      * @param {String} statusText
      * @param {Object} response
      */
-    handleFailedRequest: function(status, statusText, response) {
-        
+    handleFailedRequest: function(status, statusText, response, operation) {
         //FIXME refactor / clean up that function!
         //from bottom up, first remove all unneeded stuff at the bottom, then clean up the head.
         
@@ -117,7 +116,6 @@ Ext.define('Editor.controller.ServerException', {
             str = me.strings,
             _status = status.toString(),
             text = str.text,
-            //FIXME here unknown error also in new JSON structure!
             respText = response && response.responseText || '{"errors": [{"_errorMessage": "unknown"}]}',
             json = null,
             tpl = new Ext.Template(str.serverMsg),
@@ -157,6 +155,15 @@ Ext.define('Editor.controller.ServerException', {
             if(response && Ext.isEmpty(response.getAllResponseHeaders()['x-translate5-version'])) {
                 text += '<br>Answer seems to come from a proxy!';
                 msg += ' - answer seems not to be from translate5 - x-translate5-version header is missing.'
+                if (jslogger) {
+                    if (operation) {
+                        jslogger.addLogEntry({ type : 'info', message : 'Request: ' + operation.getRequest().getMethod() + ' ' + operation.getRequest().getUrl()});
+                    }
+                    jslogger.addLogEntry({type: 'info', message: 'status-arg: ' + _status.replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'statusText-arg: ' + statusText.toString().replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'Response headers: ' + JSON.stringify(response.getAllResponseHeaders()).replaceAll('"', '~')});;
+                    jslogger.addLogEntry({type: 'info', message: 'Response text: ' + respText.toString().replaceAll('"', '~')});;
+                }
             }
 
             Editor.MessageBox.addError(text);
@@ -239,6 +246,15 @@ Ext.define('Editor.controller.ServerException', {
                     },
                     icon: Ext.MessageBox.WARNING
                 });
+                return;
+            case 423:
+                let msg423 = 'No access on job anymore';
+                if (response.request && response.request.options && response.request.options.url) {
+                    msg423 = msg423 + ': ' + response.request.options.url;
+                }
+                // call the new logger function
+                Editor.MessageBox.addError(appendServerMsg(str['403']));
+                jslogger && jslogger.logException(new Error(msg423));
                 return;
             case 409:
                 //Conflict: show message from server

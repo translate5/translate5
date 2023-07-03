@@ -54,7 +54,19 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         self::CONFIG_LEVEL_TASK     => 'task',
         self::CONFIG_LEVEL_USER     => 'user'
     ];
-    
+
+    /**
+     * Validate if the current user config load is for the current user
+     * @throws editor_Models_ConfigException
+     */
+    public static function checkUserGuid(string $userGuid): void
+    {
+        $userSession = new Zend_Session_Namespace('user');
+        if ($userSession->data->userGuid != $userGuid) {
+            throw new editor_Models_ConfigException('E1299');
+        }
+    }
+
     /***
      * Load configs fron the database by given level
      * @param mixed $level
@@ -113,14 +125,11 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @param string $nameFilter optional config name filter, applied with like (% must be provided in $nameFilter as desired)
      * @return array
      */
-    public function loadAllMerged(string $nameFilter = null){
+    public function loadAllMerged(string $nameFilter = null): array
+    {
         
-        $userSession = new Zend_Session_Namespace('user');
-        
-        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->load($userSession->data->id);
-        
+        $user = ZfExtended_Authentication::getInstance()->getUser();
+
         //get all application config level for the user
         $userLevelStrings = $user->getApplicationConfigLevel();
         
@@ -238,18 +247,26 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @param array $dbResults
      * @return array
      */
-    public function mergeInstanceValue(array $dbResults=[]):array {
-        if(empty($dbResults)){
+    public function mergeInstanceValue(array $dbResults = []): array
+    {
+        if (empty($dbResults)) {
             $userSession = new Zend_Session_Namespace('user');
-            $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
             /* @var $user ZfExtended_Models_User */
             $user->load($userSession->data->id);
             //get all application config level for the user
-            $userLevelStrings = $user->getApplicationConfigLevel();
-            $levels = array_map([$this, 'convertStringLevelToInt'], $userLevelStrings);
-            //do not load all map config types (usualy default state) since no config editor for the frontend
-            //is available for now
-            $dbResults = $this->loadByLevel($levels,[ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP]);
+            $levels = [];
+            // important: the frontend shall just see levels above system level no matter what ACLs might exist
+            foreach ($user->getApplicationConfigLevel() as $appConfigLevel) {
+                $level = $this->convertStringLevelToInt($appConfigLevel);
+                if ($level >= self::CONFIG_LEVEL_INSTANCE) {
+                    $levels[] = $level;
+                }
+            }
+            $levels = array_unique($levels);
+            // do not load all map config types (usualy default state) since no config editor for the frontend
+            // is available for all types
+            $dbResults = $this->loadByLevel($levels, [ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP]);
         }
         return $this->mergeConfig([], $dbResults, self::CONFIG_LEVEL_SYSTEM);
     }

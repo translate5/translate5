@@ -41,14 +41,14 @@ END LICENSE AND COPYRIGHT
 }
 
 /* T5DEV-161: visual review requres this to be set to 'initial' and not to 'relative' else the review file will not be displayed! */
-div.x-container.x-container-default {position: initial;}
+div.x-container.x-container-default { position: initial; }
 
 
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
 .event-log-grid .x-grid-row .x-grid-cell .x-grid-cell-inner,
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
 	color:#000000;
-  	white-space: normal;
+  	white-space: pre-wrap;
 }
 
 .mono {
@@ -390,10 +390,9 @@ table.message-box-data .error {}
 #segment-grid.comments-for-locked-segments .x-grid-item-selected .editing-disabled .comments-field img.add {
     display:block;
 }
-
 #segment-grid .segment-min-max div {
-    font-weight:bold;
-    padding:0.1em 0.3em;
+    font-weight: bold;
+    padding: 0.1em 0.3em;
 }
 #segment-grid .segment-min-max .warning {
     background-color: #ffba42;
@@ -404,6 +403,13 @@ table.message-box-data .error {}
 #segment-grid .segment-min-max .valid-length {
     background-color: #24f324;
 }
+#segment-grid .segment-min-max div.char-count {
+    font-weight: normal;
+}
+#segment-grid .segment-min-max div.char-count > strong {
+    font-size: 110%;
+}
+
 .ico-comment-add {background-image: url("../images/comment_add.png");}
 .ico-comment-edit {background-image: url("../images/comment_edit.png");background-repeat: no-repeat;}
 .ico-comment-delete {background-image: url("../images/comment_delete.png");background-repeat: no-repeat;}
@@ -558,6 +564,8 @@ table.task-users td {padding-right:10px;white-space: nowrap;}
 table.task-users td.username, 
 table.task-users td.state {font-weight:bold;}
 table.task-users td.state {padding-right:0;}
+
+.x-check-group-alt .x-form-item-body {padding-left: 20px;}
 
 /*own check column*/
 .grid-ownchecker {
@@ -857,7 +865,9 @@ span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { col
 .qualityFilterPanel .x-grid-cell-inner { display:flex; white-space:normal; }
 .qualityFilterPanel .x-grid-cell-inner > div { flex:none; }
 .qualityFilterPanel .x-grid-cell-inner .x-tree-node-text { padding-left:0; white-space:normal; }
-.qualityFilterPanel .x-tree-faulty .x-tree-node-text, .taskQualities .x-tree-faulty .x-tree-node-text { color:#ee0000; }
+.qualityFilterPanel .x-tree-view .x-grid-item .x-tree-has-error,
+.taskQualities .x-tree-has-error,
+.taskQualities .x-tree-view .x-grid-item .x-tree-has-error td { background-color: rgba(238, 0, 0, 0.19); }
 
 /**
  * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color
@@ -940,22 +950,22 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
     pointer-events: auto !important;
 }
 
-
-.t5actionColumnGrid .x-action-col-icon { margin: 5px; }
+/* BCONF management*/
+.t5noselectionGrid .x-grid-with-row-lines .x-grid-item.x-grid-item-selected { border-style: inherit; border-color: inherit; }
+.t5noselectionGrid .x-grid-with-row-lines .x-grid-item-selected + .x-grid-item { border-top-style: inherit; border-top-color: inherit; }
+.t5noselectionGrid .x-grid-item-selected { color: inherit; background-color: inherit; }
 .t5leveledGrid .t5level0 { background-color: rgba(255, 239, 187, .3); }
 .t5leveledGrid.t5noLevels .t5level0 { background-color: transparent; }
-.t5chosenDefault, .t5leveledGrid .t5level0.t5chosenDefault, .t5leveledGrid.t5noLevels .t5level0.t5chosenDefault { background-color: rgba(0, 0, 0, .15); }
-.t5leveledGrid .t5level1.t5chosenDefault { background-color: rgba(0, 0, 0, .10); }
 .t5leveledGrid .t5level1 .x-grid-item,
 .t5leveledGrid .t5level1 .x-grid-item-selected,
 .t5leveledGrid .t5level1 .x-grid-checkcolumn-checked::after,
 .t5leveledGrid .t5level1 .x-grid-hd-checker-on .x-column-header-checkbox::after,
 .t5leveledGrid .t5level1 .x-action-col-icon { opacity: 0.7; }
 .t5leveledGrid .t5level1 .x-action-col-cell .x-item-disabled { opacity: 0.3; }
+.t5leveledList .t5level1 { font-style: italic; opacity:0.85; }
+.t5actionColumnGrid .x-action-col-icon { margin: 5px; }
 #bconfFprmEditor textarea.mono { background-color: rgba(160, 160, 160, 0.35); }
 #bconfFprmEditor .x-form-form-item.x-form-item-no-label::before { content:''; display:none; }
-.t5leveledList .t5level1 { font-style: italic; opacity:0.85; }
-
 
 .t5alikeGrid .x-grid-header-ct .t5source-match > div {background:url("../images/sourceLanguage.png") no-repeat 10px 9px;}
 .t5alikeGrid .x-grid-header-ct .t5target-match > div {background:url("../images/targetLanguage.png") no-repeat 10px 9px;}
@@ -1094,4 +1104,106 @@ tr.x-grid-row.pointer > td[class*="x-grid-cell-gridcolumn-"]{
 .segment-tag-container.type-source div.transNotFound[data-t5qfp="true"] {
     border-bottom: 1px solid limegreen;
     padding-bottom: 2px;
+}
+dl {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.x-fieldset-header-default > .x-fieldset-header-text {
+    font-size: 15px;
+}
+#segment-metadata .x-fieldset > legend {
+    padding-bottom: 0;
+    padding-top: 0;
+}
+#segment-metadata .x-fieldset.segmentQualities {
+    margin-bottom: 8px;
+}
+#segment-metadata .x-fieldset.x-fieldset-collapsed.segmentQualities {
+    margin-bottom: 25px;
+}
+.x-menu-item-active .x-menu-item-text {
+    font-weight: 300;
+}
+#segment-grid .x-btn.x-item-disabled {
+    pointer-events: all;
+}
+.fa-money-check-dollar:before {
+    font-family: FontAwesome5FreeSolid !important;
+    content: "\f53d" !important;
+}
+
+/***
+* Define the quality/spellcheck classes accessible outside the plugin context.
+* TODO: this should be refactored with the spellcheck refactoring
+*/
+.t5quality {
+    cursor: pointer;
+    z-index: 1;
+    position: relative;
+}
+
+.t5quality.t5general, .t5quality.t5general .trackchanges,
+.t5quality.t5style, .t5quality.t5style .trackchanges,
+.t5quality.t5grammar, .t5quality.t5grammar .trackchanges,
+.t5quality.t5misspelling, .t5quality.t5misspelling .trackchanges,
+.t5quality.t5typographical, .t5quality.t5typographical .trackchanges {
+    text-decoration-style: wavy;
+    text-underline-offset: 1px;
+    text-decoration-line: underline;
+    padding-bottom: 2px;
+}
+
+/* gray */
+.t5quality.t5general, .t5quality.t5general .trackchanges {
+    text-decoration-color: #808080;
+}
+
+/* blue */
+.t5quality.t5style, .t5quality.t5style .trackchanges {
+    text-decoration-color: #458fe6;
+}
+
+/* dark yellow */
+.t5quality.t5grammar, .t5quality.t5grammar .trackchanges {
+    text-decoration-color: #ab8906;
+}
+
+/* red-violet */
+.t5quality.t5misspelling, .t5quality.t5misspelling .trackchanges {
+    text-decoration-color: #e645a8;
+}
+
+/* dark-purple */
+.t5quality.t5typographical, .t5quality.t5typographical .trackchanges {
+    text-decoration-color: #4d004d;
+}
+
+.t5quality[data-t5qfp="true"]{
+    border-bottom: 1px solid limegreen;
+    padding-bottom: 2px;
+}
+
+.x-grid-row-editor [id^=numberfield] {
+    text-align: right;
+}
+.x-tab-bar .x-box-menu-after {
+    top: -2px !important;
+    left: -4px;
+}
+.x-box-menu-after.x-btn-default-small .x-toolbar-more-icon {
+    color: white;
+}
+.x-fieldset.segmentQualities .x-column-header-text-wrapper {
+    vertical-align: bottom;
+}
+.x-fieldset.segmentQualities .x-column-header-text {
+    text-overflow: clip;
+}
+.x-fieldset.segmentQualities .x-grid-header-ct {
+    border-top-width: 1px !important;
+}
+.x-fieldset.segmentQualities .x-panel-header {
+    background: none;
+    box-shadow: none;
 }

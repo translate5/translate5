@@ -114,7 +114,6 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
         config.filter = {
             type: 'list',
             labelField: 'label',
-            updateBuffer: 0,
             store: new Ext.data.Store({
                 fields: [{
                     name: 'id',

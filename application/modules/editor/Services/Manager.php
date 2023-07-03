@@ -9,19 +9,19 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -44,7 +44,7 @@ class editor_Services_Manager {
     public const SERVICE_OPENTM2 = 'editor_Services_OpenTM2';
     
     /**
-     * The services provided with this plugin are hardcoded:
+     * The registered services are currently hardcoded
      * @var array
      */
     static protected $registeredServices = array(
@@ -62,49 +62,94 @@ class editor_Services_Manager {
         return self::$registeredServices;
     }
 
+    public function getAllNames(): array
+    {
+        $names = [];
+
+        foreach ($this->getAll() as $serviceName) {
+            $names[] = ZfExtended_Factory::get($this->getServiceClassName($serviceName))->getName();
+        }
+
+        return $names;
+    }
+
     /**
      * Creates all configured connector resources.
+     *
      * @return array
      */
-    public function getAllResources() {
+    public function getAllResources(): array
+    {
         $serviceResources = array();
-        foreach(self::$registeredServices as $service) {
-            $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
-            /* @var $service editor_Services_ServiceAbstract */
+
+        foreach (self::$registeredServices as $serviceName) {
+            $service = ZfExtended_Factory::get($this->getServiceClassName($serviceName));
             $serviceResources = array_merge($serviceResources, $service->getResources());
         }
+
         return $serviceResources;
+    }
+
+    /**
+     * @param string $serviceName
+     *
+     * @return editor_Models_LanguageResources_Resource[]
+     *
+     * @throws ZfExtended_Exception
+     */
+    public function getAllResourcesOfType(string $serviceName): array
+    {
+        $resources = [];
+        foreach ($this->getAllResources() as $resource) {
+            if ($resource->getService() === $serviceName) {
+                $resources[] = $resource;
+            }
+        }
+
+        return $resources;
     }
     
     /**
      * Returns all services (= their name and helppage) that are not configured
      * or that don't have any resources embedded. (If the configuration is set,
      * but wrong, then no resources might be embedded although the service is configured.)
+     *
      * @return array
      */
-    public function getAllUnconfiguredServices() {
+    public function getAllUnconfiguredServices(): array
+    {
         $serviceNames = [];
-        foreach(self::$registeredServices as $service) {
-            $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
+
+        foreach (self::$registeredServices as $serviceName) {
             /* @var $service editor_Services_ServiceAbstract */
-            
-            $resource = $service->getResources()[0] ?? false;
-            if (!$service->isConfigured() || empty($resource)) {
-                $serviceNames[] = (object) ['name' => '['.$service->getName().']', 'serviceName' => $service->getName(), 'helppage' => urldecode($service->getHelppage())];
+            $service = ZfExtended_Factory::get($this->getServiceClassName($serviceName));
+
+            if (!$service->isConfigured() || empty($service->getResources())) {
+                $serviceNames[] = (object)[
+                    'name' => '[' . $service->getName() . ']',
+                    'serviceName' => $service->getName(),
+                    'helppage' => urldecode($service->getHelppage())
+                ];
+
                 continue;
             }
 
-            //for the resource check the connection
-            if(!empty($resource)){
+            foreach ($service->getResources() as $resource) {
                 $connector = ZfExtended_Factory::get('editor_Services_Connector');
-                /* @var $connector editor_Services_Connector */
-                
+
                 //the service is also not available when connection cannot be established
-                if($connector && !$connector->ping($resource)){
-                    $serviceNames[] = (object) ['id'=>$resource->getid(),'name' => '['.$service->getName().']', 'serviceName' => $service->getName(), 'helppage' => urldecode($service->getHelppage())];
+                if ($connector && $connector->ping($resource)) {
+                    continue 2;
                 }
             }
+
+            $serviceNames[] = (object)[
+                'name' => '[' . $service->getName() . ']',
+                'serviceName' => $service->getName(),
+                'helppage' => urldecode($service->getHelppage())
+            ];
         }
+
         return $serviceNames;
     }
     
@@ -146,17 +191,22 @@ class editor_Services_Manager {
     public function getResource(editor_Models_LanguageResources_LanguageResource $languageResource) {
         return $this->getResourceById($languageResource->getServiceType(), $languageResource->getResourceId());
     }
-    
+
     /**
      * @param string $serviceType
      * @param string $id
-     * @return editor_Models_LanguageResources_Resource
+     *
+     * @return editor_Models_LanguageResources_Resource|null
+     *
+     * @throws ZfExtended_Exception
      */
-    public function getResourceById(string $serviceType, string $id) {
+    public function getResourceById(string $serviceType, string $id): ?editor_Models_LanguageResources_Resource
+    {
         $this->checkService($serviceType);
-        $resources = ZfExtended_Factory::get($serviceType.self::CLS_SERVICE);
-        /* @var $resources editor_Services_ServiceAbstract */
-        return $resources->getResourceById($id);
+
+        $resource = ZfExtended_Factory::get($this->getServiceClassName($serviceType))->getResourceById($id);
+
+        return $resource ?? null;
     }
 
     /***
@@ -277,6 +327,8 @@ class editor_Services_Manager {
         foreach($list as $one){
             /** @var editor_Models_LanguageResources_LanguageResource $languageResource */
             $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            // TODO $assumeDatabase is skipped here which leads to that we can not manipulate language resourse
+            // inside of the connector. Need to check if we can normally load language resource from DB here.
             $languageResource->init($one);
             try {
                 $connector = $this->getConnector($languageResource,null,null,$task->getConfig());
@@ -306,5 +358,20 @@ class editor_Services_Manager {
                 continue;
             }
         }
+    }
+
+    private function getServiceClassName(string $namePart): string
+    {
+        $className = $namePart . self::CLS_SERVICE;
+
+        if (!class_exists($className)) {
+            $className = $namePart . '\ResourceConfig';
+        }
+
+        if (!class_exists($className)) {
+            $className = $namePart;
+        }
+
+        return $className;
     }
 }

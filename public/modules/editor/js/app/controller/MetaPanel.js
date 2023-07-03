@@ -64,13 +64,10 @@ Ext.define('Editor.controller.MetaPanel', {
         selector: '#metapanel segmentsMetapanel'
     }, {
         ref: 'leftBtn',
-        selector: '#metapanel #goAlternateLeftBtn'
+        selector: 'menu #goAlternateLeftBtn'
     }, {
         ref: 'rightBtn',
-        selector: '#metapanel #goAlternateRightBtn'
-    }, {
-        ref: 'navi',
-        selector: '#metapanel #naviToolbar'
+        selector: 'menu #goAlternateRightBtn'
     }, {
         ref: 'segmentGrid',
         selector: '#segmentgrid'
@@ -142,21 +139,9 @@ Ext.define('Editor.controller.MetaPanel', {
      * @param {Object} editingPlugin
      */
     startEdit: function (editingPlugin, context) {
-        var me = this,
-            record = context.record,
-            isWatched = Boolean(record.get('isWatched')),
-            navi = me.getNavi(),
-            but = Ext.getCmp('watchSegmentBtn'),
-            tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
+        var me = this;
         me.editingMode = 'edit';
-        but.toggle(isWatched, true);
         me.toggleOnEdit(true);
-        but.setTooltip({
-            dismissDelay: 0,
-            text: tooltip
-        });
-        navi.show();
-        navi.enable();
         me.getSegmentMeta().show();
     },
 
@@ -215,22 +200,31 @@ Ext.define('Editor.controller.MetaPanel', {
         // Prevent native content menu from being shown
         event.preventDefault();
 
-        // If no segment right-click grid created yet - create
-        if (!me.segmentRightClickGrid) {
-            me.segmentRightClickGrid = Ext.create({
-                xtype: 'falsePositives',
-                shadow: false,
-                floating: true,
-                draggable: true,
-                collapsible: true, // collapse/expand tool is hidden by css
-                bind: {
-                    title: '{l10n.falsePositives.legend.float} <span class="x-fa fa-circle-xmark" title="{l10n.falsePositives.close}"></span>'
-                },
-                toggle: function(ev, dom, opts) {
-                    if (ev.getTarget('.x-fa')) opts.scope.hide();
-                }
-            });
+        // In case there is grid, destroy it. Bellow new one will be created.
+        // In case the same grid is reused, multiple javascript error can occur.
+        // Ex: 3 point in: https://jira.translate5.net/browse/TRANSLATE-3280
+        if (me.segmentRightClickGrid) {
+            me.segmentRightClickGrid.destroy();
         }
+
+        me.segmentRightClickGrid = Ext.create({
+            xtype: 'falsePositives',
+            width: 277,
+            shadow: false,
+            floating: true,
+            draggable: true,
+            collapsible: true, // collapse/expand tool is hidden by css
+            bind: {
+                title: '{l10n.falsePositives.legend.float} <span class="x-fa fa-circle-xmark" title="{l10n.falsePositives.close}"></span>'
+            },
+            hide: function() {
+                delete me.segmentRightClickGrid;
+                this.destroy();
+            },
+            toggle: function(ev, d, opts) {
+                if (ev.getTarget('.x-fa')) { opts.scope.hide(); }
+            }
+        });
 
         // Show grid
         me.segmentRightClickGrid.down('grid').setEmptyText(Editor.data.l10n.falsePositives.grid.emptyText);
@@ -244,22 +238,25 @@ Ext.define('Editor.controller.MetaPanel', {
      * Load certain quality-record into grid opened on right-click on quality-tag inside some segment
      */
     loadSegmentRightClickGridRow: function(id) {
-        var me = this, data = [], rec;
+        var me = this,
+            data = [],
+            falPosPanel = this.getMetaFalPosPanel(),
+            record = (falPosPanel) ? falPosPanel.down('grid').getStore().getById(id) : null,
+            store = me.segmentRightClickGrid?.down('grid')?.getStore()
 
         // If record is already initialized within the store
-        if (rec = me.getMetaFalPosPanel().down('grid').getStore().getById(id)) {
+        if (record) {
 
-            // Pick it's data
-            data.push(rec.getData());
+            if(store){
+                store.removeAll();
+                store.add(record);
+            }
 
         } else {
 
             // Try again in 200ms
             Ext.defer(() => me.loadSegmentRightClickGridRow(id), 200);
         }
-
-        // Set data
-        me.segmentRightClickGrid.down('grid').getStore().setData(data);
     },
 
     handleSegmentSelectionChange: function(sm, selectedRecords) {
@@ -289,7 +286,16 @@ Ext.define('Editor.controller.MetaPanel', {
      * Starts the creation of the segment's quality related GUIs
      */
     handleQualitiesLoaded: function (store, records) {
-        this.getMetaFalPosPanel().loadFalsifiable(records);
+        var me = this,
+            metaFalPosPanel = me.getMetaFalPosPanel();
+
+        // in case there is no meta panel, ignore the logic below
+        if(!metaFalPosPanel){
+            return;
+        }
+
+        metaFalPosPanel.loadFalsifiable(records);
+
         var segmentId = this.record.get('id');
         this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
     },
@@ -304,7 +310,6 @@ Ext.define('Editor.controller.MetaPanel', {
         me.record = record;
         me.getSegmentMeta().hide();
         mp.enable();
-        me.getNavi().hide();
     },
     /**
      * lädt die konkreten record ins Meta Panel

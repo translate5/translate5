@@ -90,6 +90,8 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 {
                     xtype: 'toolbar',
                     dock: 'bottom',
+                    enableOverflow: true,
+                    defaultButtonUI: false,
                     ui: 'footer',
                     items: [
                         {

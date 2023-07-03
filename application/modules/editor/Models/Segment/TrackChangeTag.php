@@ -113,6 +113,12 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * @var string
      */
     public $attributeWorkflowstep;
+
+    /**
+     * Used in the termtagging process to bind related data
+     * @var string
+     */
+    public $textWithTrackChanges;
     
     
     public function __construct(){

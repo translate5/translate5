@@ -70,6 +70,11 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
                     layout: 'anchor',
                     items: [
                         {
+                            xtype: 'hiddenfield',
+                            name: 'CsrfToken',
+                            value: Editor.data.csrfToken
+                        },
+                        {
                             anchor: '100%',
                             xtype: 'filefield',
                             name: 'excelreimportUpload',

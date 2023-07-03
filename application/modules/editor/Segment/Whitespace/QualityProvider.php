@@ -37,6 +37,9 @@
  * The Quality provider 
  * This class just provides the translations for the filter backend
  */
+
+use editor_Segment_Whitespace_Check as Check;
+
 class editor_Segment_Whitespace_QualityProvider extends editor_Segment_Quality_Provider {
 
     /**
@@ -123,62 +126,41 @@ class editor_Segment_Whitespace_QualityProvider extends editor_Segment_Quality_P
         return $translate->_('Leerraum am Anfang/Ende');
     }
 
-    /**
-     * Translate category
-     *
-     * @param ZfExtended_Zendoverwrites_Translate $translate
-     * @param string $category
-     * @param editor_Models_Task $task
-     * @return string|null
-     */
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : ?string {
-        switch($category){
-            case editor_Segment_Whitespace_Check::TAG_SPACE_BEG:
-                return $translate->_('Segment beginnt mit einem Tag gefolgt von Leerzeichen');
-            case editor_Segment_Whitespace_Check::NBSP_BEG:
-                return $translate->_('Geschützes Leerzeichen am Anfang');
-            case editor_Segment_Whitespace_Check::TAB_BEG:
-                return $translate->_('Tab am Anfang');
-            case editor_Segment_Whitespace_Check::LNBR_BEG:
-                return $translate->_('Umbruch am Anfang');
-
-            case editor_Segment_Whitespace_Check::SPACE_TAG_END:
-                return $translate->_('Segment endet mit einem Leerzeichen gefolgt von einem Tag');
-            case editor_Segment_Whitespace_Check::NBSP_END:
-                return $translate->_('Geschützes Leerzeichen am Ende');
-            case editor_Segment_Whitespace_Check::TAB_END:
-                return $translate->_('Tab am Ende');
-            case editor_Segment_Whitespace_Check::LNBR_END:
-                return $translate->_('Umbruch am Ende');
-
-            case editor_Segment_Whitespace_Check::SPACE_LNBR:
-                return $translate->_('Leerzeichen vor Zeilenumbruch');
-            case editor_Segment_Whitespace_Check::LNBR_SPACE:
-                return $translate->_('Leerzeichen nach Zeilenumbruch');
-        }
-        return NULL;
+    public function translateCategory(
+        ZfExtended_Zendoverwrites_Translate $translate,
+        string $category,
+        ?editor_Models_Task $task
+    ) : ?string {
+        return match ($category) {
+            Check::TAG_SPACE_BEG => $translate->_('Segment beginnt mit einem Tag gefolgt von Leerzeichen'),
+            Check::NBSP_BEG => $translate->_('Geschützes Leerzeichen am Anfang'),
+            Check::TAB_BEG => $translate->_('Tab am Anfang'),
+            Check::LNBR_BEG => $translate->_('Umbruch am Anfang'),
+            Check::SPACE_TAG_END => $translate->_('Segment endet mit einem Leerzeichen gefolgt von einem Tag'),
+            Check::NBSP_END => $translate->_('Geschützes Leerzeichen am Ende'),
+            Check::TAB_END => $translate->_('Tab am Ende'),
+            Check::LNBR_END => $translate->_('Umbruch am Ende'),
+            Check::SPACE_LNBR => $translate->_('Leerzeichen vor Zeilenumbruch'),
+            Check::LNBR_SPACE => $translate->_('Leerzeichen nach Zeilenumbruch'),
+            default => null,
+        };
     }
 
-    /**
-     * Categories in this quality
-     *
-     * @param editor_Models_Task $task
-     * @return array
-     */
-    public function getAllCategories(editor_Models_Task $task) : array {
+    public function getAllCategories(?editor_Models_Task $task): array
+    {
         return [
-            editor_Segment_Whitespace_Check::TAG_SPACE_BEG,
-            editor_Segment_Whitespace_Check::NBSP_BEG,
-            editor_Segment_Whitespace_Check::TAB_BEG,
-            editor_Segment_Whitespace_Check::LNBR_BEG,
+            Check::TAG_SPACE_BEG,
+            Check::NBSP_BEG,
+            Check::TAB_BEG,
+            Check::LNBR_BEG,
 
-            editor_Segment_Whitespace_Check::SPACE_TAG_END,
-            editor_Segment_Whitespace_Check::NBSP_END,
-            editor_Segment_Whitespace_Check::TAB_END,
-            editor_Segment_Whitespace_Check::LNBR_END,
+            Check::SPACE_TAG_END,
+            Check::NBSP_END,
+            Check::TAB_END,
+            Check::LNBR_END,
 
-            editor_Segment_Whitespace_Check::SPACE_LNBR,
-            editor_Segment_Whitespace_Check::LNBR_SPACE,
+            Check::SPACE_LNBR,
+            Check::LNBR_SPACE,
         ];
     }
 }

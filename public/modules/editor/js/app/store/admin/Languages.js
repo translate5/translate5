@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.store.admin.Languages', {
     extend: 'Ext.data.ArrayStore',
     fields: ['id', 'label', {name: 'rtl', type: 'boolean'}, 'rfc5646'],
+    alias: 'store.languagestore',
     data: Editor.data.languages,
 
     /***
@@ -57,10 +58,20 @@ Ext.define('Editor.store.admin.Languages', {
     /***
      * Return rfc value of a language by given langauge id
      * @param id
-     * @returns {string|null}
+     * @returns {string}
      */
     getRfcById: function (id){
         var rec = this.getById(id);
         return rec !== null ? rec.get('rfc5646') : '-';
+    },
+
+    /**
+     * Return major rfc value of a language by given langauge id
+     * @param id
+     * @returns {string}
+     */
+    getMajorRfcById: function (id){
+        var rfc = this.getRfcById(id).toLowerCase();
+        return (rfc !== '-' && rfc.includes('-')) ? rfc.split('-')[0] : rfc;
     }
 });

@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use MittagQI\ZfExtended\Worker\Queue;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -61,8 +62,7 @@ class WorkerQueueCommand extends Translate5AbstractCommand
         
         $this->writeTitle('trigger worker queue');
         
-        $workerQueue = \ZfExtended_Factory::get('ZfExtended_Worker_Queue');
-        /* @var $workerQueue \ZfExtended_Worker_Queue */
+        $workerQueue = \ZfExtended_Factory::get(Queue::class);
         $workerQueue->process();
         $this->io->text('scheduling workers...');
         sleep(4);

@@ -47,21 +47,6 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'dev:newmodel';
     
-    /**
-     * @var InputInterface
-     */
-    protected $input;
-    
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-    
-    /**
-     * @var SymfonyStyle
-     */
-    protected $io;
-    
     /***
      * Class name prefix used in generate files. For plugins this will be defferent
      * @var string

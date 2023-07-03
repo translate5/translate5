@@ -45,7 +45,6 @@ Ext.define('Editor.view.segments.column.WorkflowStep', {
     tdCls: 'workflowStep-field',
     showInMetaTooltip: true,
     filter: {
-        updateBuffer: 0,
         type: 'workflowStep'
     },
     hidden: true,

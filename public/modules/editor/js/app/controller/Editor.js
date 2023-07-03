@@ -69,9 +69,6 @@ Ext.define('Editor.controller.Editor', {
         ref : 'segmentGrid',
         selector : '#segmentgrid'
     },{
-        ref : 'navi',
-        selector : '#metapanel #naviToolbar'
-    },{
         ref:'filepanel',
         selector:'#filepanel'
     },{
@@ -115,8 +112,13 @@ Ext.define('Editor.controller.Editor', {
             }
         },
         component: {
-            '#metapanel metapanelNavi button' : {
+            'segmentsToolbar [dispatcher]' : {
                 click : 'buttonClickDispatcher'
+            },
+            '#segmentActionMenu menucheckitem': {
+                beforecheckchange: item => item.allowCheckChange,
+                click: 'onSegmentActionMenuItemClick',
+                checkchange: 'onSegmentActionMenuItemToggle'
             },
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
@@ -135,9 +137,6 @@ Ext.define('Editor.controller.Editor', {
                 select:'onSegmentGridSelect',
                 segmentSizeChanged:'onSegmentGridSegmentsSizeChanged'
             },
-            '#segmentgrid segmentsToolbar #scrollToSegmentBtn': {
-                click: 'focusSegmentShortcut'
-            },
             '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
             },
@@ -149,20 +148,23 @@ Ext.define('Editor.controller.Editor', {
             'taskConfirmationWindow button': {
                 click:'taskConfirm'
             },
-            '#naviToolbar #btnInsertWhitespaceNbsp': {
+            'segmentsToolbar #btnInsertWhitespaceNbsp': {
                 click: 'insertWhitespaceNbsp'
             },
-            '#naviToolbar #btnInsertWhitespaceNewline': {
+            'segmentsToolbar #btnInsertWhitespaceNewline': {
                 click: 'insertWhitespaceNewline'
             },
-            '#naviToolbar #btnInsertWhitespaceTab': {
+            'segmentsToolbar #btnInsertWhitespaceTab': {
                 click: 'insertWhitespaceTab'
             },
-            '#naviToolbar specialCharactersButton': {
+            'segmentsToolbar specialCharactersButton': {
                 click: 'insertSpecialCharacter'
             },
             '#segmentMinMaxLength': {
                 insertNewline: 'insertWhitespaceNewline'
+            },
+            'segmentsToolbar #specialChars': {
+                disable: btn => btn.hideMenu()
             }
         },
         store:{
@@ -1641,14 +1643,15 @@ Ext.define('Editor.controller.Editor', {
 
     insertWhitespace: function(key,e,whitespaceType) {
         var me = this,
-            userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
             userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
             tagNr,
             plug,
             editor;
-        if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
+
+        if (!userCanInsertWhitespaceTags) {
             return;
         }
+
         tagNr = me.getNextWhitespaceTagNumber();
         plug = me.getEditPlugin();
         editor = plug.editor.mainEditor;
@@ -1793,37 +1796,29 @@ Ext.define('Editor.controller.Editor', {
     },
     /**
      * Handler for watchSegmentBtn
-     * @param {Ext.button.Button} button
      */
     watchSegment: function() {
-        if(!this.isEditing){
-            let segment = this.getSegmentGrid()?.getViewModel()?.get('selectedSegment');
-            /** @var {Editor.model.Segment} segment */
-            segment && segment.toogleBookmark();
-            return;
-        }
         var me = this,
             ed = me.getEditPlugin(),
-            record = ed.context.record,
-            isWatched = Boolean(record.get('isWatched')),
-            navi = me.getNavi(),
-            startText = navi.item_startWatchingSegment,
-            stopText = navi.item_stopWatchingSegment,
-            but = navi.down('#watchSegmentBtn'),
-            success = function() {
-                var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
-                    autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
-                but.setTooltip(isWatched ? startText : stopText);
-                but.toggle(!isWatched, true);
-                //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
-                autoStateCell && displayfield.setValue(autoStateCell.getHtml());
-            },
-            failure = function() {
-                but.setTooltip(isWatched ? stopText : startText);
-                but.toggle(isWatched, true);
-            };
+            edited = ed.context?.record,
+            selected = this.getSegmentGrid()?.getViewModel()?.get('selectedSegment');
 
-        record.toogleBookmark(success, failure);
+        // If we're not editing segment, or we are, but grid selection moved to another segment
+        if (!me.isEditing || (selected && selected.get('id') !== edited.get('id'))) {
+
+            // Toggle bookmark for the segment which is currently selected and is not the one that is being edited
+            return selected?.toogleBookmark();
+        }
+
+        // Toggle bookmark for the segment that is currently being edited
+        edited.toogleBookmark(() => {
+            var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
+                autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
+
+            // Update autostate displayfield, since the displayfields are getting the rendered content,
+            // we have to fetch it here from rendered HTML too
+            autoStateCell && displayfield.setValue(autoStateCell.getHtml());
+        });
     },
 
     /**
@@ -1926,18 +1921,25 @@ Ext.define('Editor.controller.Editor', {
      * Segments store load event handler
      */
     onSegmentsStoreLoad: function(store){
+        var me = this,
+            segmentsGrid = me.getSegmentGrid();
+
+        if(!segmentsGrid){
+            return;
+        }
+
         //check the content editable column visibility
-        this.handleNotEditableContentColumn();
+        me.handleNotEditableContentColumn();
         
         // if already selected from other load listener or nothing selectable, return
-        if(!store.getCount() || this.getSegmentGrid().selection) {
+        if(!store.getCount() || segmentsGrid.selection) {
             return;
         }
         var jumpToSegmentIndex = 
             Editor.app.parseSegmentIdFromTaskEditHash(true)
             || (store.proxy.reader.metaData && store.proxy.reader.metaData.jumpToSegmentIndex)
             || 1;
-        this.getSegmentGrid().focusSegment(jumpToSegmentIndex);
+        segmentsGrid.focusSegment(jumpToSegmentIndex);
     },
 
     /**
@@ -2006,5 +2008,43 @@ Ext.define('Editor.controller.Editor', {
             return '';
         }
         return rangeForSelection.text();
+    },
+
+    /**
+     * Distinguish between menu item itself click and menu item checkbox click
+     *
+     * @param item
+     * @param event
+     */
+    onSegmentActionMenuItemClick: function(item, event) {
+        if (event.getTarget('.x-menu-item-checkbox')) {
+            item.allowCheckChange = true;
+            item.setChecked(!item.checked);
+            item.allowCheckChange = false;
+        } else {
+            var button = this.getSegmentGrid().down('segmentsToolbar #' + item.itemId);
+            if (button.dispatcher) {
+                this.buttonClickDispatcher(item);
+            } else {
+                button.click();
+            }
+        }
+    },
+
+    /**
+     * Toggle corresponding segment action button in the toolbar
+     *
+     * @param item
+     */
+    onSegmentActionMenuItemToggle: function(item) {
+
+        // Update comma-separated itemIds of checked items within menu's stateful checkedItems-prop
+        item.up().checkedItems = Ext.Array.pluck(item.up().query('[checked]'), 'itemId').join(',');
+
+        // Save state
+        item.up().saveState();
+
+        // Toggle button visibility
+        item.up('toolbar').down('#' + item.itemId).setVisible(item.checked);
     }
 });

@@ -50,10 +50,10 @@ Ext.define('Editor.model.segment.Field', {
       listSort: function(fieldList) {
           return Ext.Array.sort(fieldList, function(one, two) {
               //sort the fieldList array first by type
-              var typeA = one.typeSortOrder[one.get('type')];
+              var typeA = one.typeSortOrder[one.get('type')],
                   typeB = two.typeSortOrder[two.get('type')];
               //for same type sort by import order (id)
-              if(typeA == typeB) {
+              if(typeA === typeB) {
                   return one.get('id') - two.get('id');
               }
               return typeA - typeB;

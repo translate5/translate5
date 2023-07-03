@@ -26,7 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
+/**
+ * @deprecated
+ * see https://jira.translate5.net/browse/TRANSLATE-3162
+ * TODO FIXME: Implement as User-Config
  */
 class Editor_AppsController extends ZfExtended_Controllers_Action {
 

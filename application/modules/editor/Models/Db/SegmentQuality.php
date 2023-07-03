@@ -26,16 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
-    
+final class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
+
+    /**
+     * Removes all qualities for a task
+     * If the type is given, it removes only for the given type
+     * @param string $taskGuid
+     * @param string|null $qualityType
+     */
+    public static function deleteForTask(string $taskGuid, string $qualityType = null){
+        $table = new self();
+        if(empty($qualityType)){
+            $table->removeByTaskGuid($taskGuid);
+        } else {
+            $table->removeByTaskGuidAndType($taskGuid, $qualityType);
+        }
+    }
     /**
      * Deletes all existing entries for the given segmentIds
      * @param array $segmentIds
      */
     public static function deleteForSegments(array $segmentIds){
         if(count($segmentIds) > 0){
-            $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-            /* @var $table editor_Models_Db_SegmentQuality */
+            $table = new self();
             $db = $table->getAdapter();
             $where = (count($segmentIds) > 1) ? $db->quoteInto('segmentId IN (?)', $segmentIds) : $db->quoteInto('segmentId = ?', $segmentIds[0]);
             $db->delete($table->getName(), $where);
@@ -47,8 +60,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      */
     public static function saveRows(array $rows){
         if(count($rows) > 1){
-            $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-            /* @var $table editor_Models_Db_SegmentQuality */
+            $table = new self();
             $db = $table->getAdapter();
             $cols = [];
             foreach($table->info(Zend_Db_Table_Abstract::COLS) as $col){
@@ -77,8 +89,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @return bool
      */
     public static function hasTypeCategoryForTask(string $taskGuid, string $type, string $category=NULL) : bool {
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $where = $table->select()
             ->from($table->getName(), ['id'])
             ->where('taskGuid = ?', $taskGuid)
@@ -95,8 +106,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @return int[]
      */
     public static function getSegmentIdsForQualityFilter(editor_Models_Quality_RequestState $state, string $taskGuid) : array {
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $adapter = $table->getAdapter();
         $select = $adapter->select();
         $select
@@ -146,8 +156,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @return array
      */
     public static function getFaultySegmentIds(string $taskGuid) : array {
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $adapter = $table->getAdapter();
         $select = $adapter->select();
         $select
@@ -174,8 +183,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         $result->success = false;
         $result->qualityId = null;
         $result->qualityRow = null;
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $category = editor_Segment_Qm_Provider::createCategoryVal($qmCategoryIndex);
         if($action == 'remove'){
             $rows = $table->fetchFiltered($task->getTaskGuid(), $segmentId, editor_Segment_Tag::TYPE_QM, false, $category);
@@ -186,8 +194,8 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
                 return $result;
             }
         } else {
+            /* @var editor_Models_Db_SegmentQualityRow $row */
             $row = $table->createRow();
-            /* @var $row editor_Models_Db_SegmentQualityRow */
             $row->segmentId = $segmentId;
             $row->taskGuid = $task->getTaskGuid();
             $row->type = editor_Segment_Tag::TYPE_QM;
@@ -212,8 +220,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         $result = new stdClass();
         $result->numQualities = 0;
         $result->numFaults = 0;
-        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        /* @var $table editor_Models_Db_SegmentQuality */
+        $table = new self();
         $db = $table->getAdapter();
         $sql = $db->quoteInto('SELECT `type`, `category`, `falsePositive` FROM '.$db->quoteIdentifier($table->getName()).' WHERE taskGuid = ?', $taskGuid);
         foreach($db->fetchAll($sql, [], Zend_Db::FETCH_ASSOC) as $row){
@@ -282,7 +289,8 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     }
     /**
      * The main selection of qualities for frontend purposes
-     * In the frontend, qualities for non-editable segments will not be shown. Only structural internal tag errors must be shown even for non-editable segments
+     * In the frontend, qualities for non-editable segments will not be shown.
+     * Only structural internal tag errors must be shown even for non-editable segments
      * @param string $taskGuid
      * @param array $typesBlacklist
      * @param array $segmentNrRestriction
@@ -290,19 +298,32 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param string $field
      * @return array: array of assoc array with all columns of LEK_segment_quality plus a key "editable"
      */
-    public function fetchForFrontend(string $taskGuid=NULL, array $typesBlacklist=NULL, array $segmentNrRestriction=NULL, bool $falsePositiveRestriction=NULL, string $field=NULL) : array {
+    public function fetchForFrontend(
+        ?string $taskGuid,
+        array $typesBlacklist,
+        ?array $segmentNrRestriction = null,
+        ?bool $falsePositiveRestriction = null,
+        ?string $field = null
+    ) : iterable {
         $select = $this->getAdapter()->select();
         $select
             ->from(['qualities' => $this->getName()], 'qualities.*')
-            ->from(['segments' => 'LEK_segments'], 'segments.editable') // we need the editable prop for assigning structural faults of non-editable segments a virtual category
+            // we need the editable prop for assigning structural faults of non-editable segments a virtual category
+            ->from(['segments' => 'LEK_segments'], 'segments.editable')
             ->where('qualities.segmentId = segments.id')
             ->where('qualities.hidden = 0')
             // we want qualities from editable segments, only exception are structural internal tag errors
             // as usual, Zend Selects do not provide proper bracketing, so we're crating this manually here
-            ->where('segments.editable = 1 OR (qualities.type = \''.editor_Segment_Tag::TYPE_INTERNAL.'\' AND qualities.category = \''.editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY.'\')');
-        if($segmentNrRestriction !== NULL){
-            if(count($segmentNrRestriction) > 0){
-                if(count($segmentNrRestriction) > 1){
+            ->where(
+                'segments.editable = 1 OR (
+                    qualities.type = \''.editor_Segment_Tag::TYPE_INTERNAL.'\'
+                    AND qualities.category = \''.editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY.'\'
+                )'
+            );
+
+        if (null !== $segmentNrRestriction) {
+            if (!empty($segmentNrRestriction)) {
+                if (count($segmentNrRestriction) > 1) {
                     $select->where('segments.segmentNrInTask IN (?)', $segmentNrRestriction);
                 } else {
                     $select->where('segments.segmentNrInTask = ?', $segmentNrRestriction[0]);
@@ -312,28 +333,35 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
                 $select->where('0 = 1');
             }
         }
-        if(!empty($taskGuid)){
+
+        if (!empty($taskGuid)) {
             $select->where('qualities.taskGuid = ?', $taskGuid);
         }
-        if($field != NULL){
+
+        if ($field) {
             // a quality with no field set applies for all fields !
             $select->where('qualities.field = ? OR '.'qualities.field = \'\'', $field);
         }
-        if(!empty($typesBlacklist)){ // $typesBlacklist can not be "0"...
-            if(is_array($typesBlacklist) && count($typesBlacklist) > 1){
+
+        if (!empty($typesBlacklist)) { // $typesBlacklist can not be "0"...
+            if (count($typesBlacklist) > 1) {
                 $select->where('qualities.type NOT IN (?)', $typesBlacklist);
             } else {
                 $type = is_array($typesBlacklist) ? $typesBlacklist[0] : $typesBlacklist;
                 $select->where('qualities.type != ?', $type);
             }
         }
-        if($falsePositiveRestriction !== NULL){
+        if ($falsePositiveRestriction !== null) {
             $select->where('qualities.falsePositive = ?', $falsePositiveRestriction, Zend_Db::INT_TYPE);
         }
         $select->order([ 'qualities.type ASC', 'qualities.category ASC' ]);
         // DEBUG
         // error_log('FETCH QUALITIES FOR FRONTEND: '.$select->__toString());
-        return $this->getAdapter()->fetchAll($select, [], Zend_Db::FETCH_ASSOC);
+        $stmt = $this->getAdapter()->query($select);
+
+        while ($row = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
+            yield $row;
+        }
     }
     /**
      * Deletes quality-entries by their ID

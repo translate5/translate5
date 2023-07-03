@@ -159,7 +159,9 @@ abstract class LanguageResource extends Resource
     public function cleanup(Helper $api, Config $config): void
     {
         if ($this->_requested) {
-            $api->delete($this->_deleteRoute . $this->getId());
+            // use forced flag to remove all task assignments. In case forced flag is NOT used, this will throw an
+            // exception if there are still task assignments connected to this resource
+            $api->delete($this->_deleteRoute . $this->getId() . '?forced=true');
         }
     }
 }

@@ -4,6 +4,10 @@
     <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
     <file original='php-sourcecode' source-language='ha' target-language='de' datatype='php' xml:space='preserve'>
         <body>
+            <trans-unit id='e0xpbmtDb25zb3J0aXVtfQ=='>
+                <source>{LinkConsortium}</source>
+                <target>https://www.translate5.net/wer-steckt-dahinter-die-community-von-translate5</target>
+            </trans-unit>
             <trans-unit id='UnVzc2lzY2g='>
                 <source>Russisch</source>
                 <target>Russisch</target>
@@ -15,6 +19,14 @@
             <trans-unit id='RW5nbGlzY2g='>
                 <source>Englisch</source>
                 <target>Englisch</target>
+            </trans-unit>
+            <trans-unit id='RGV1dHNjaGUgT2JlcmZsw6RjaGU='>
+                <source>Deutsche Oberfläche</source>
+                <target>Deutsche Oberfläche</target>
+            </trans-unit>
+            <trans-unit id='RW5nbGlzY2hlIE9iZXJmbMOkY2hl'>
+                <source>Englische Oberfläche</source>
+                <target>Englische Oberfläche</target>
             </trans-unit>
             <trans-unit id='VHNjaGVjaGlzY2g='>
                 <source>Tschechisch</source>
@@ -401,6 +413,22 @@
             <trans-unit id='VGFnLVZvbGxhbnNpY2h0'>
                 <source>Tag-Vollansicht</source>
                 <target>Tag-Vollansicht</target>
+            </trans-unit>
+            <trans-unit id='WmVpY2hlbnrDpGhsZXIgdW50ZXIgRWRpdG9yIGFuemVpZ2Vu'>
+                <source>Zeichenzähler unter Editor anzeigen</source>
+                <target>Zeichenzähler unter Editor anzeigen</target>
+            </trans-unit>
+            <trans-unit id='WmVpZ3Qgb2RlciB2ZXJzdGVja3QgZGVuIFplaWNoZW56w6RobGVyIHVudGVyIGRlbSBTZWdtZW50ZWRpdG9y'>
+                <source>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</source>
+                <target>Zeigt oder versteckt den Zeichenzähler unter dem Segmenteditor</target>
+            </trans-unit>
+            <trans-unit id='U2NobGllw59lbiBTaWUgZGFzIGFrdHVlbGwgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGUgU2VnbWVudCwgdW0gZGllIFNpY2h0YmFya2VpdCBkZXMgWmVpY2hlbnrDpGhsZXJzIHp1IMOkbmRlcm4='>
+                <source>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Sichtbarkeit des Zeichenzählers zu ändern</source>
+                <target>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Sichtbarkeit des Zeichenzählers zu ändern</target>
+            </trans-unit>
+            <trans-unit id='QW56YWhsIFplaWNoZW4='>
+                <source>Anzahl Zeichen</source>
+                <target>Anzahl Zeichen</target>
             </trans-unit>
             <trans-unit id='RWluc3RlbGx1bmdlbg=='>
                 <source>Einstellungen</source>
@@ -951,6 +979,14 @@
             <trans-unit id='QWt0aW9uZW4='>
                 <source>Aktionen</source>
                 <target>Aktionen</target>
+            </trans-unit>
+            <trans-unit id='U2NobGllw59lbiBTaWUgZGFzIGFrdHVlbGwgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldGUgU2VnbWVudCwgdW0gZGllIEVpbnN0ZWxsdW5nZW4gZGVzIFdpZWRlcmhvbHVuZ3NlZGl0b3JzIHp1IGJlYXJiZWl0ZW4u'>
+                <source>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Einstellungen des Wiederholungseditors zu bearbeiten.</source>
+                <target>Schließen Sie das aktuell zur Bearbeitung geöffnete Segment, um die Einstellungen des Wiederholungseditors zu bearbeiten.</target>
+            </trans-unit>
+            <trans-unit id='QWxsZSBTZWcu'>
+                <source>Alle Seg.</source>
+                <target>Alle Seg.</target>
             </trans-unit>
             <trans-unit id='UXVlbGxzcHJhY2hl'>
                 <source>Quellsprache</source>
@@ -1907,6 +1943,14 @@
             <trans-unit id='QmVuZ2FsaXNjaA=='>
                 <source>Bengalisch</source>
                 <target>Bengalisch</target>
+            </trans-unit>
+            <trans-unit id='QmVuZ2FsaXNjaCAoQmFuZ2xhZGVzaCk='>
+                <source>Bengalisch (Bangladesh)</source>
+                <target>Bengalisch (Bangladesh)</target>
+            </trans-unit>
+            <trans-unit id='QmVuZ2FsaXNjaCAoSW5kaWVuKQ=='>
+                <source>Bengalisch (Indien)</source>
+                <target>Bengalisch (Indien)</target>
             </trans-unit>
             <trans-unit id='Qm9zbmlzY2g='>
                 <source>Bosnisch</source>
@@ -2888,6 +2932,32 @@
                     <br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.
                 </target>
             </trans-unit>
+            <trans-unit id='RGllIGZvbGdlbmRlbiBUYWdzIGV4aXN0aWVyZW4gbmljaHQgaW4gZGVyIFF1ZWxsc3ByYWNoZTo8YnIvPjx1bD48bGk+ezB9PC9saT48L3VsPlNvIGVudGZlcm5lbiBTaWUgZGVuIEZlaGxlcjo8YnIvPjx1bD48bGk+S2xpY2tlbiBTaWUgYXVmIE9LLCB1bSBkaWVzZSBOYWNocmljaHQgenUgZW50ZmVybmVuPC9saT48bGk+RHLDvGNrZW4gU2llIEVTQywgdW0gZGFzIFNlZ21lbnQgb2huZSBTcGVpY2hlcm4genUgdmVybGFzc2VuPC9saT48bGk+w5ZmZm5lbiBTaWUgZGFzIFNlZ21lbnQgZXJuZXV0PC9saT48L3VsPldpZWRlcmhvbGVuIFNpZSBqZXR6dCBJaHJlIMOEbmRlcnVuZ2VuLg=='>
+                <source>Die folgenden Tags existieren nicht in der Quellsprache:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                </source>
+                <target>Die folgenden Tags existieren nicht in der Quellsprache:
+                    <br/>
+                    <ul>
+                        <li>{0}</li>
+                    </ul>So entfernen Sie den Fehler:
+                    <br/>
+                    <ul>
+                        <li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li>
+                        <li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li>
+                        <li>Öffnen Sie das Segment erneut</li>
+                    </ul>Wiederholen Sie jetzt Ihre Änderungen.
+                </target>
+            </trans-unit>
             <trans-unit id='QUNIVFVORzogRWluIHdlaXRlcmVyIEZpbHRlciBpc3QgZ2VzZXR6dC4gRXMgaXN0IGRhaGVyIG3DtmdsaWNoLCBkYXNzIG5pY2h0IGFsbGUgU2VnbWVudGUgZGVyIExlc2V6ZWljaGVubGlzdGUgc2ljaHRiYXIgc2luZA=='>
                 <source>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind</source>
                 <target>ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind</target>
@@ -2905,10 +2975,7 @@
                     <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(STRG + ENTER)
                 </source>
-                <target>Speichern. 
-                    <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
-                    <br/>(STRG + ENTER)
-                </target>
+                <target>Speichern. Nächstes unbestätigtes, bearbeitbares Segment öffnen (STRG + ENTER)</target>
             </trans-unit>
             <trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyDihpMp'>
                 <source>Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)</source>
@@ -2935,20 +3002,14 @@
                     <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(ALT + Bild ↓)
                 </source>
-                <target>Nicht speichern.
-                    <br/>Nächstes unbestätigtes, bearbeitbares Segment öffnen
-                    <br/>(ALT + Bild ↓)
-                </target>
+                <target>Nicht speichern. Nächstes unbestätigtes, bearbeitbares Segment öffnen (ALT + Bild ↓)</target>
             </trans-unit>
             <trans-unit id='TmljaHQgc3BlaWNoZXJuLjxici8+Vm9yaGVyaWdlcyB1bmJlc3TDpHRpZ3RlcywgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW48YnIvPihBTFQgKyBCaWxkIOKGkSk='>
                 <source>Nicht speichern.
                     <br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen
                     <br/>(ALT + Bild ↑)
                 </source>
-                <target>Nicht speichern.
-                    <br/>Vorheriges unbestätigtes, bearbeitbares Segment öffnen
-                    <br/>(ALT + Bild ↑)
-                </target>
+                <target>Nicht speichern. Vorheriges unbestätigtes, bearbeitbares Segment öffnen (ALT + Bild ↑)</target>
             </trans-unit>
             <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
                 <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
@@ -2965,6 +3026,10 @@
             <trans-unit id='U2VnbWVudCBhdWYgaW5pdGlhbGVuIEluaGFsdCB6dXLDvGNrc2V0emVuIChBTFQgKyBFTlRGKQ=='>
                 <source>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</source>
                 <target>Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)</target>
+            </trans-unit>
+            <trans-unit id='SGluenVmw7xnZW4vRW50ZmVybmVuIHZvbiBTeW1ib2xlbiB6dXIvdm9uIGRlciBTeW1ib2xsZWlzdGU='>
+                <source>Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste</source>
+                <target>Hinzufügen/Entfernen von Symbolen zur/von der Symbolleiste</target>
             </trans-unit>
             <trans-unit id='U2VnbWVudCBhdWYgTGVzZXplaWNoZW5saXN0ZSAoU1RSRyArIEQp'>
                 <source>Segment auf Lesezeichenliste (STRG + D)</source>
@@ -3012,7 +3077,7 @@
             </trans-unit>
             <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZHVyY2ggZWluZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+IGFiZ2VzY2hsb3NzZW46PGJyIC8+'>
                 <source>Im Projektportal {portalLink} wurde die Aufgabe 
-                    <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle 
+                    <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle
                     <i>{currentRole}</i> abgeschlossen:
                     <br />
                 </source>
@@ -5678,9 +5743,13 @@ Im Projektportal {portalLink} wurde die Aufgabe
                 <source>Der referenzierte Kunde existiert nicht (mehr).</source>
                 <target>Der referenzierte Kunde existiert nicht (mehr).</target>
             </trans-unit>
-            <trans-unit id='QW5zaWNodA=='>
-                <source>Ansicht</source>
-                <target>Ansicht</target>
+            <trans-unit id='RWluc3RlbGx1bmdlbiAy'>
+                <source>Einstellungen 2</source>
+                <target>Einstellungen</target>
+            </trans-unit>
+            <trans-unit id='V2llZGVyaG9sdW5nc2VkaXRvcg=='>
+                <source>Wiederholungseditor</source>
+                <target>Wiederholungseditor</target>
             </trans-unit>
             <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='>
                 <source>Unbekannter Term Status</source>
@@ -7739,9 +7808,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</source>
                 <target>Anzahl anderer Vorkommen eines solchen Paares [Qualität - Inhalt], die in dieser Aufgabe gefunden wurden</target>
             </trans-unit>
-            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgaW4gYW5kZXJlbiBTZWdtZW50ZW4gZWJlbmZhbGxzIMOkbmRlcm4u'>
-                <source>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</source>
-                <target>Alle identischen Fehler in anderen Segmenten ebenfalls ändern.</target>
+            <trans-unit id='QWxsZSBpZGVudGlzY2hlbiBGZWhsZXIgZWJlbmZhbGxzIGFscyBmYWxzY2hlIEZlaGxlciBtYXJraWVyZW4u'>
+                <source>Alle identischen Fehler ebenfalls als falsche Fehler markieren.</source>
+                <target>Alle identischen Fehler ebenfalls als falsche Fehler markieren.</target>
             </trans-unit>
             <trans-unit id='SmE='>
                 <source>Ja</source>
@@ -7983,6 +8052,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Segment sperren bzw. entsperren (STRG + L)</source>
                 <target>Segment sperren bzw. entsperren (STRG + L)</target>
             </trans-unit>
+            <trans-unit id="QWt0LiBTZWc=">
+                <source>Akt. Seg</source>
+                <target>Akt. Seg</target>
+            </trans-unit>
+            <trans-unit id="WmVpY2hlbg==">
+                <source>Zeichen</source>
+                <target>Zeichen</target>
+            </trans-unit>
             <trans-unit id="U3ByaW5nZSB6dSBTZWdtZW50IG1pdCBOciAoU1RSRyArIEcp">
                 <source>Springe zu Segment mit Nr (STRG + G)</source>
                 <target>Springe zu Segment mit Nr (STRG + G)</target>
@@ -7999,13 +8076,13 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Lesezeichen setzen</source>
                 <target>Lesezeichen setzen</target>
             </trans-unit>
-            <trans-unit id="ZW50c3BlcnJlbg==">
-                <source>entsperren</source>
-                <target>entsperren</target>
+            <trans-unit id="RW50c3BlcnJlbg==">
+                <source>Entsperren</source>
+                <target>Entsperren</target>
             </trans-unit>
-            <trans-unit id="c3BlcnJlbg==">
-                <source>sperren</source>
-                <target>sperren</target>
+            <trans-unit id="U3BlcnJlbg==">
+                <source>Sperren</source>
+                <target>Sperren</target>
             </trans-unit>
             <trans-unit id="U29sbCBkaWUgQWt0aW9uIHdpcmtsaWNoIGF1ZiBhbGxlIFNlZ21lbnRlIGFuZ2V3ZW5kZXQgd2VyZGVuPyBEYXMga2FubiBlaW5pZ2UgWmVpdCBpbiBBbnNwcnVjaCBuZWhtZW4u">
                 <source>Soll die Aktion wirklich auf alle Segmente angewendet werden? Das kann einige Zeit in Anspruch nehmen.</source>
@@ -8015,9 +8092,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Kein Segment Filter gesetzt</source>
                 <target>Kein Segment Filter gesetzt</target>
             </trans-unit>
-            <trans-unit id="QWxsZSBnZWZpbHRlcnRlbiBTZWdtZW50ZTo=">
-                <source>Alle gefilterten Segmente:</source>
-                <target>Alle gefilterten Segmente:</target>
+            <trans-unit id="V2VuZGVuIFNpZSBlaW5lIGRlciBmb2xnZW5kZW4gQWt0aW9uZW4gYXVmIGFsbGUgU2VnbWVudGUgaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcgYW46">
+                <source>Wenden Sie eine der folgenden Aktionen auf alle Segmente in der aktuellen Filterung an:</source>
+                <target>Wenden Sie eine der folgenden Aktionen auf alle Segmente in der aktuellen Filterung an:</target>
             </trans-unit>
             <trans-unit id="U2VnbWVudGUgd2VyZGVuIHZvbiBkZXIgRmF2b3JpdGVubGlzdGUgZW50ZmVybnQ=">
                 <source>Segmente werden von der Favoritenliste entfernt</source>
@@ -8159,6 +8236,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>Pmlight</source>
                 <target>PM Light</target>
             </trans-unit>
+            <trans-unit id='RWRpdG9yLW9ubHktb3ZlcnJpZGU='>
+                <source>Editor-only-override</source>
+                <target>Taskübersicht anzeigen (nur im Editor only mode)</target>
+            </trans-unit>
             <trans-unit id='SWhyZSBEYXRlaSBpc3QgZ3LDtsOfZXIgYWxzIGRhcyB6dWzDpHNzaWdlIE1heGltdW0gdm9uIHt1cGxvYWRfbWF4X2ZpbGVzaXplfSBNQi4gVW0gZ3LDtsOfZXJlIERhdGVpZW4gaG9jaGxhZGVuIHp1IGvDtm5uZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gdHJhbnNsYXRlNS1TdXBwb3J0Lg=='>
                 <source>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</source>
                 <target>Ihre Datei ist größer als das zulässige Maximum von {upload_max_filesize} MB. Um größere Dateien hochladen zu können, wenden Sie sich bitte an den translate5-Support.</target>
@@ -8287,9 +8368,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
                 <source>triton</source>
                 <target>Standard Layout (Triton)</target>
             </trans-unit>
-            <trans-unit id='UERGIERva3VtZW50YXRpb24='>
-                <source>PDF Dokumentation</source>
-                <target>PDF Dokumentation</target>
+            <trans-unit id='RG9rdW1lbnRhdGlvbg=='>
+                <source>Dokumentation</source>
+                <target>Dokumentation</target>
             </trans-unit>
             <trans-unit id='SW4gbmV1ZW0gQnJvd3Nlci1UYWIgw7ZmZm5lbg=='>
                 <source>In neuem Browser-Tab öffnen</source>
@@ -8785,6 +8866,30 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
               <source>Dateiname</source>
               <target>Dateiname</target>
             </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCBoZXJ1bnRlcmxhZGVu'>
+              <source>Übersetzerpaket herunterladen</source>
+              <target>Übersetzerpaket herunterladen</target>
+            </trans-unit>
+            <trans-unit id='RGF0ZWllbiB2ZXJ3YWx0ZW4='>
+              <source>Dateien verwalten</source>
+              <target>Dateien verwalten</target>
+            </trans-unit>
+            <trans-unit id='QmlsaW5ndWFsZSBEYXRlaWVu'>
+              <source>Bilinguale Dateien</source>
+              <target>Bilinguale Dateien</target>
+            </trans-unit>
+            <trans-unit id='QXVzZ2FuZ3NkYXRlaWVu'>
+              <source>Ausgangsdateien</source>
+              <target>Ausgangsdateien</target>
+            </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCBoZXJ1bnRlcmxhZGVu'>
+              <source>Übersetzerpaket herunterladen</source>
+              <target>Übersetzerpaket herunterladen</target>
+            </trans-unit>
+            <trans-unit id='w5xiZXJzZXR6ZXJwYWtldCByZS1pbXBvcnRpZXJlbg=='>
+              <source>Übersetzerpaket re-importieren</source>
+              <target>Übersetzerpaket re-importieren</target>
+			</trans-unit>
             <trans-unit id='S29uZmxpa3QgaGluc2ljaHRsaWNoIHp1Z2V3aWVzZW5lciBBdWZnYWJlbg=='>
               <source>Konflikt hinsichtlich zugewiesener Aufgaben</source>
               <target>Konflikt hinsichtlich zugewiesener Aufgaben</target>
@@ -8832,6 +8937,74 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
             <trans-unit id='U3ByYWNocmVzc291cmNlIGRlcyBhdXNnZXfDpGhsdGVuIFJlc3NvdXJjZW50eXBzIGthbm4gaW4gZGVyIEJlbnV0emVyb2JlcmZsw6RjaGUgbmljaHQgZXJzdGVsbHQgd2VyZGVuLg=='>
               <source>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</source>
               <target>Sprachressource des ausgewählten Ressourcentyps kann in der Benutzeroberfläche nicht erstellt werden.</target>
+            </trans-unit>
+            <trans-unit id='RGllIHp1IGzDtnNjaGVuZGUgU3ByYWNocmVzc291cmNlIHdpcmQgdm9uIGZvbGdlbmRlbiBBdWZnYWJlbiBiZW51dHp0Og=='>
+              <source>Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:</source>
+              <target>Die zu löschende Sprachressource wird von folgenden Aufgaben benutzt:</target>
+            </trans-unit>
+            <trans-unit id='QmVpbSBMw7ZzY2hlbiB3ZXJkZW4gZGllIFp1d2Vpc3VuZ2VuIGRlciBTcHJhY2hyZXNzb3VyY2UgenUgZGVuIEF1ZmdhYmVuIGViZW5mYWxscyBlbnRmZXJudC4gV29sbGVuIFNpZSB3aXJrbGljaCBkaWUgU3ByYWNocmVzc291cmNlIHVuZCBpaHJlIFp1d2Vpc3VuZ2VuIGzDtnNjaGVuPw=='>
+              <source>Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?</source>
+              <target>Beim Löschen werden die Zuweisungen der Sprachressource zu den Aufgaben ebenfalls entfernt. Wollen Sie wirklich die Sprachressource und ihre Zuweisungen löschen?</target>
+            </trans-unit>
+            <trans-unit id='RGVyIEV4cG9ydCB3aXJkIGF1c2dlZsO8aHJ0LiBCaXR0ZSB3YXJ0ZW4gLi4u'>
+              <source>Der Export wird ausgeführt. Bitte warten ...</source>
+              <target>Der Export wird ausgeführt. Bitte warten ...</target>
+            </trans-unit>
+            <trans-unit id='RGllIERhdGVpIGthbm4gaGVydW50ZXJnZWxhZGVuIHdlcmRlbiE='>
+              <source>Die Datei kann heruntergeladen werden!</source>
+              <target>Die Datei kann heruntergeladen werden!</target>
+            </trans-unit>
+            <trans-unit id='SGVydW50ZXJsYWRlbg=='>
+              <source>Herunterladen</source>
+              <target>Herunterladen</target>
+            </trans-unit>
+            <trans-unit id='V2VpdGVyZSBJbmZvcm1hdGlvbmVuIGZpbmRlbiBTaWUgaW0gRXJnZWJuaXNwcm90b2tvbGwu'>
+              <source>Weitere Informationen finden Sie im Ergebnisprotokoll.</source>
+              <target>Weitere Informationen finden Sie im Ergebnisprotokoll.</target>
+			</trans-unit>
+            <trans-unit id='RGFzIERhdGVpZm9ybWF0IHdpcmQgdm9tIMOcYmVyc2V0emVycGFrZXQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+              <source>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</source>
+              <target>Das Dateiformat wird vom Übersetzerpaket nicht unterstützt.</target>
+            </trans-unit>
+            <trans-unit id='QmVhcmJlaXRlbg=='>
+                <source>Bearbeiten</source>
+                <target>Bearbeiten</target>
+            </trans-unit>
+            <trans-unit id='TMO2c2NoZW4='>
+                <source>Löschen</source>
+                <target>Löschen</target>
+            </trans-unit>
+            <trans-unit id='TmV1IGFubGVnZW4='>
+                <source>Neu anlegen</source>
+                <target>Neu anlegen</target>
+            </trans-unit>
+            <trans-unit id='S2xvbmVu'>
+                <source>Klonen</source>
+                <target>Klonen</target>
+            </trans-unit>
+            <trans-unit id='VW1iZW5lbm5lbg=='>
+                <source>Umbenennen</source>
+                <target>Umbenennen</target>
+            </trans-unit>
+            <trans-unit id='V2FybnVuZzogQml0dGUgdmVyd2VuZGVuIFNpZSBLRUlORSBTZWdtZW50enVzYW1tZW5mw7xocnVuZyBvZGVyIC1hdWZ0ZWlsdW5nIGluIGVpbmVtIGFuZGVyZW4gw5xiZXJzZXR6dW5nc3Rvb2wgbWl0IGRlbSBoZXJ1bnRlcmdlbGFkZW5lbiBQYWtldC4gVHJhbnNsYXRlNSB1bnRlcnN0w7x0enQga2VpbmUgU2VnbWVudHp1c2FtbWVuZsO8aHJ1bmcvLWF1ZnRlaWx1bmcgdW5kIHNvbGNoZSBTZWdtZW50ZSB3ZXJkZW4gYmVpbSBSZS1JbXBvcnQgaWdub3JpZXJ0Lg=='>
+              <source>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</source>
+              <target>Warnung: Bitte verwenden Sie KEINE Segmentzusammenführung oder -aufteilung in einem anderen Übersetzungstool mit dem heruntergeladenen Paket. Translate5 unterstützt keine Segmentzusammenführung/-aufteilung und solche Segmente werden beim Re-Import ignoriert.</target>
+            </trans-unit>
+            <trans-unit id="Qml0dGUgbMO2c2VuIFNpZSBhbGxlIEZlaGxlciBkZXIgZm9sZ2VuZGVuIEthdGVnb3JpZSBPREVSIHNldHplbiBTaWUgc2llIGF1ZiDigJxmYWxzY2hlciBGZWhsZXLigJ0=">
+              <source>Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”</source>
+              <target>Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”</target>
+            </trans-unit>
+            <trans-unit id="QWxsZSBGZWhsZXIgZGVyIGZvbGdlbmRlbiBHcnVwcGUgT0RFUiBzZXR6ZW4gU2llIHNpZSBhdWYg4oCcZmFsc2NoZXIgRmVobGVy4oCd">
+              <source>Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”</source>
+              <target>Alle Fehler der folgenden Gruppe ODER setzen Sie sie auf “falscher Fehler”</target>
+            </trans-unit>
+            <trans-unit id='VGlwcDogRGVha3RpdmllcmVuL0tvbmZpZ3VyaWVyZW4gU2llIGRpZXNlcyBGZW5zdGVyIGluIGRlbiBFZGl0b3JlaW5zdGVsbHVuZ2VuIGxpbmtzIG9iZXJoYWxiIGRlciBTZWdtZW50dGFiZWxsZQ=='>
+              <source>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</source>
+              <target>Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle</target>
+            </trans-unit>
+            <trans-unit id='PGI+UXVlbGxzcHJhY2hlIGlzdCBkaWUgWmllbHNwcmFjaGU8L2I+PGJyLz5RdWVsbHNwcmFjaGUgZ2xlaWNodCBkZXIgWmllbHNwcmFjaGUsIGRlc3dlZ2VuIGthbm4gZGVyIGVpbmdlZ2ViZW5lIFRleHQgbmljaHQgw7xiZXJzZXR6dCB3ZXJkZW4u'>
+                <source><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</source>
+                <target><b>Quellsprache ist die Zielsprache</b><br/>Quellsprache gleicht der Zielsprache, deswegen kann der eingegebene Text nicht übersetzt werden.</target>
             </trans-unit>
         </body>
     </file>

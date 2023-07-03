@@ -43,7 +43,6 @@ Ext.define('Editor.view.segments.column.UserName', {
   mixins: ['Editor.view.segments.column.BaseMixin'],
   showInMetaTooltip: true,
   filter: {
-      updateBuffer: 0,
       type: 'string'
   },
 

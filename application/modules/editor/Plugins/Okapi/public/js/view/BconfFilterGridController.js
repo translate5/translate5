@@ -151,7 +151,17 @@ Ext.define('Editor.plugins.Okapi.view.BconfFilterGridController', {
         }).show();
     },
 
-    /** @method
+    /**
+     * @param {integer} rowIndex
+     * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
+     */
+    editTexts: function(view, rowIndex, colIndex, item, e, record){
+        var rowEditor = view.grid.findPlugin('bconffilterrowediting');
+        view.select(rowIndex);
+        rowEditor.startEdit(record);
+    },
+
+    /**
      * @param {Editor.plugins.Okapi.model.BconfFilterModel} record
      */
     cloneFilter: function(view, rowIndex, colIndex, item, e, record){

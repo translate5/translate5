@@ -181,7 +181,13 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         bind:{
                             disabled : '{!record}'
                         },
-                        items:[{
+                        tabBar: {
+                            layout: {
+                                overflowHandler: 'menu'
+                            }
+                        },
+                        items:[
+                            {
                             xtype: 'form',
                             itemId:'customersForm',
                             reference: 'form',
@@ -203,6 +209,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 bind:{
                                     disabled:'{!record}'
                                 },
+                                enableOverflow: true,
                                 items:[{
                                     xtype: 'button',
                                     formBind:true,
@@ -297,6 +304,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                 dockedItems: [
                     {
                         xtype: 'toolbar',
+                        enableOverflow: true,
                         dock: 'top',
                         items: [
                             {

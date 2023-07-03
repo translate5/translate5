@@ -26,9 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\Tools\CronIpFactory;
+use MittagQI\Translate5\Cronjob\CronIpFactory;
 
 /**
+ * Due to IP filtering there is no CSRF protection neccessary
  */
 class Editor_FakelangresController extends ZfExtended_Controllers_Action {
     /**
@@ -37,7 +38,7 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
      */
     public function init() {
         $cronIp = CronIpFactory::create();
-        if(!$cronIp->isAllowed($_SERVER['REMOTE_ADDR'])) {
+        if(!$cronIp->isAllowed()) {
             throw new ZfExtended_Models_Entity_NoAccessException('Wrong IP to call fake language resources! Configure cronIP accordingly!');
         }
         $this->_helper->layout->disableLayout();

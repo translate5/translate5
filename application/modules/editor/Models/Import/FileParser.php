@@ -36,6 +36,7 @@ END LICENSE AND COPYRIGHT
  * Contains Methods for Fileparsing on the Import
  *
  * - Child Classes must implement and use the abstract methods
+ * - Every ChildClass in /FileParsers must be registered in MittagQI\Translate5\Task\FileTypeSupport::coreParsers
  */
 abstract class editor_Models_Import_FileParser {
     /**
@@ -132,6 +133,11 @@ abstract class editor_Models_Import_FileParser {
     protected int $shortTagIdent = 1;
 
     protected bool $isReimport = false;
+
+    /**
+     * Flag if the current file parser supports re-import functionality
+     */
+    const IS_REIMPORTABLE = false;
 
     /**
      * returns the file extensions (in lower case) parsable by this fileparser

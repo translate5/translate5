@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * @class HtmlCleanup: Cleans Markup used by the Segment-Editor from invisible characters and injected special tags to retrieve markup for use outside of the editor
  * TODO: this Code has overlappings with Editor.util.SearchReplaceUtils
+ * TODO: all methods should become statics
  */
 Ext.define('Editor.util.HtmlCleanup', {
 	
@@ -165,7 +166,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 	
 	cleanSpellcheckTags: function(html){
 		// removes any spellchecker tags
-		return this.cleanByTagAndClassKeepContent(html, 'span', 't5spellcheck');
+		return this.cleanByTagAndClassKeepContent(html, 'span', Editor.util.HtmlClasses.CSS_CLASSNAME_SPELLCHECK);
 	},
 
 	cleanTermTags: function(html){

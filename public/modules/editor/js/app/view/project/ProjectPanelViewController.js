@@ -55,6 +55,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         component:{
             '#reloadProjectbtn':{
                 click:'onReloadProjectBtnClick'
+            },
+            '#projectToolbar menuitem': {
+                click: menuitem => menuitem.masterComponent.fireEvent('click')
             }
         },
         controller: {
@@ -182,6 +185,14 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
         currentTask.load({
             callback:function (){
+                // After the task is loaded, check if the adminTaskTaskManagement is available/exist.
+                // In case the user opened different task for editing, and the call back is called after this, this
+                // component will not exist, since transalate5 will be in different view port (viewPortEditor)
+                taskManagement = Ext.ComponentQuery.query('adminTaskTaskManagement')[0];
+                if (!taskManagement){
+                    Ext.log({ msg: 'Task management panel is not found on updateProgress call.' , stack: true})
+                    return;
+                }
                 taskManagement.setCurrentTask(currentTask);
                 me.getView().down('adminTaskUserAssocGrid').getStore().load();
             }
@@ -279,7 +290,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
         //search for the task store record index
         me.searchIndex(id,grid).then(function(index){
-            var store = grid.getStore();
+            var store = grid.getStore(),
+                view = grid.getView(),
+                rows = view.all;
+
             //do not scroll on empty store
             if(store.getTotalCount() === 0){
                 if(!store.hasPendingLoad()) {
@@ -287,6 +301,20 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 }
                 return;
             }
+
+            if(!rows || rows.getCount() < 1){
+                // No visible rows in the grid table view. If we call scroll to in that case, the application will crash
+                // This is the case when the first page is loaded from the buffered store, but all other pages are still
+                // loading. Because of that, extjs will wrongly calculate the viewSize of the table which results with
+                // This error: https://jira.translate5.net/browse/TRANSLATE-3199
+                // At the end we still will be able to focus/scroll the requested row since selectProjectRecord will once
+                // again call when the projectStore is loaded (the load event of the store is triggered after the store
+                // loads all pages)
+                // Currently no way to fix the wrongly calculate viewSite values because there is already existing fix
+                // for different bug in those places.
+                return;
+            }
+
             grid.scrollTo(index,{
                 callback:function(){
                     //no db index is found

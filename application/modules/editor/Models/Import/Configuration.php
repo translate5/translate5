@@ -43,14 +43,23 @@ class editor_Models_Import_Configuration {
      * Constant for the import directory folder name
      * @var string
      */
-    const WORK_FILES_DIRECTORY = 'workfiles';
+    public const WORK_FILES_DIRECTORY = 'workfiles';
 
 
     /***
      * Constant for the relais folder name in the import directory
      * @var string
      */
-    CONST RELAIS_FILES_DIRECTORY = 'relais';
+    public const RELAIS_FILES_DIRECTORY = 'relais';
+
+    public const REFERENCE_FILES_DIRECTORY = 'referenceFiles';
+
+    public const VISUAL_FILES_DIRECTORY = 'visual';
+
+    /**
+     * The max number of segments allowed in a trans-unit, if exceeded, the import will be rejected
+     */
+    CONST MAX_SEGMENTS_PER_TRANSUNIT = 250;
 
     /**
      * @var editor_Models_Languages language entity instance

@@ -27,19 +27,32 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Closure;
+use RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\WebAppBridge\Application;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
+use ZfExtended_Authentication;
+use ZfExtended_Models_User;
+use ZfExtended_PasswordCheck;
 
 
 abstract class UserAbstractCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'user:info';
-    
+
+    public function initialize(InputInterface $input, OutputInterface $output)
+    {
+        parent::initialize($input, $output);
+
+        $this->initInputOutput($input, $output);
+        $this->initTranslate5();
+    }
+
     protected function configure()
     {
         $this
@@ -60,41 +73,46 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->initInputOutput($input, $output);
-        $this->initTranslate5();
         $identifier = $this->input->getArgument('identifier');
-        
+
         $uuid = new \ZfExtended_Validate_Uuid();
         $guid = new \ZfExtended_Validate_Guid();
-        
+
         $userModel = \ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel \ZfExtended_Models_User */
         
-        if(is_numeric($identifier)) {
+        if (is_numeric($identifier)) {
             $this->writeTitle('Searching one user with ID "'.$identifier.'"');
             $userModel->load($identifier);
             $this->printOneUser($userModel->getDataObject());
+
             return 0;
         }
         
-        if($uuid->isValid($identifier)){
+        if ($uuid->isValid($identifier)) {
             $identifier = '{'.$identifier.'}';
             $this->writeTitle('Searching one user with GUID "'.$identifier.'"');
             $userModel->loadByGuid($identifier);
             $this->printOneUser($userModel->getDataObject());
+
             return 0;
         }
-        if($guid->isValid($identifier)){
+
+        if ($guid->isValid($identifier)) {
             $this->writeTitle('Searching one user with GUID "'.$identifier.'"');
             $userModel->loadByGuid($identifier);
             $this->printOneUser($userModel->getDataObject());
+
             return 0;
         }
+
         $this->writeTitle('Searching users with login or e-mail "'.$identifier.'"');
         $users = $userModel->loadAllByLoginPartOrEMail($identifier);
-        foreach($users as $user) {
+
+        foreach ($users as $user) {
             $this->printOneUser((object) $user);
         }
+
         return 0;
     }
 
@@ -146,7 +164,65 @@ abstract class UserAbstractCommand extends Translate5AbstractCommand
 
         $this->io->text($out);
         if(!$data->editable) {
-            $this->io->warning('User is not editable!');
+            $this->io->warning('User is not editable in the UI!');
         }
+    }
+
+    protected function askPassword(callable $validator): string
+    {
+        $rules = [];
+        ZfExtended_PasswordCheck::isValid('', $rules);
+        $passwordQuestion = new Question(
+            'Enter password. Password should contain:' . PHP_EOL . implode(PHP_EOL, $rules)
+        );
+        $passwordQuestion->setValidator($validator);
+        $passwordQuestion->setHidden(true);
+        $passwordQuestion->setHiddenFallback(false);
+
+        return $this->io->askQuestion($passwordQuestion);
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    protected function setUserPassword(ZfExtended_Models_User $userModel): bool
+    {
+        if (!$this->input->hasParameterOption('-p') && !$this->input->hasParameterOption('--password')) {
+            return false;
+        }
+
+        $validator = function (string $password): string {
+            $errors = [];
+            if (ZfExtended_PasswordCheck::isValid($password, $errors)) {
+                return $password;
+            }
+
+            throw new RuntimeException(
+                'Invalid password provided. Broken rules:' . PHP_EOL . implode(PHP_EOL, $errors)
+            );
+        };
+
+        $password = $this->input->getOption('password') ?: $this->askPassword($validator);
+
+        $userModel->setPasswd(ZfExtended_Authentication::getInstance()->createSecurePassword($validator($password)));
+
+        return true;
+    }
+
+    protected function askRoles(?string $default = null): mixed
+    {
+        $askRoles = new ChoiceQuestion(
+            'Choose one or more roles (comma separated, auto-completion with tab)',
+            $this->allRoles(),
+            $default
+        );
+        $askRoles->setMultiselect(true);
+
+        return $this->io->askQuestion($askRoles->setMultiselect(true));
+    }
+
+    protected function allRoles(): array
+    {
+        return [];
     }
 }

@@ -275,13 +275,12 @@ class editor_Models_Segment_Updater {
      */
     public function sanitizeEditedContent(string &$content): bool {
         $nbsp = json_decode('"\u00a0"');
-        
+
         //some browsers create nbsp instead of normal whitespaces, since nbsp are removed by the protectWhitespace code below
         // we convert it to usual whitespaces. If there are multiple ones, they are reduced to one then.
         // This is so far the desired behavior. No characters escaped as tag by the import should be addable through the editor.
-        // Empty spaces at the very beginning/end are only allowed during editing and now removed for saving.
-        $content = trim(str_replace($nbsp, ' ', $content));
-        
+        $content = str_replace($nbsp, ' ', $content);
+
         //if there are tags to be ignored, we remove them here
         $oldContent = $content = $this->utilities->internalTag->removeIgnoredTags($content);
         

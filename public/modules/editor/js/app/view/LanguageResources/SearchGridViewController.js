@@ -42,10 +42,12 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
     listen: {
         component: {
             '#searchGridPanel textfield[name=source]': {
-                keypress:'textFieldTextChange'
+                keypress:'textFieldTextChange',
+                change: 'onTextFieldChange'
             },
             '#searchGridPanel textfield[name=target]': {
-                keypress:'textFieldTextChange'
+                keypress:'textFieldTextChange',
+                change: 'onTextFieldChange'
             },
             '#searchGridPanel button[name=btnSubmit]': {
                 click:'handleSearchAll'
@@ -102,6 +104,10 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         }
         me.lastActiveField = field;
     },
+    onTextFieldChange: function (field){
+        var me = this;
+        me.lastActiveField = field;
+    },
     handleSearchAll:function(){
         var me=this;
         if(me.lastActiveField && me.lastActiveField.value!=""){
@@ -114,7 +120,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
     handleSearchSingle: function(menuitem) {
         var me=this;
         if(me.lastActiveField && me.lastActiveField.value!=""){
-            me.startSearch(me.lastActiveField.value, me.lastActiveField.name, menuitem.service.get('id'));
+            me.startSearch(me.lastActiveField.value, me.lastActiveField.name, menuitem.service.get('languageResourceId'));
         }
     },
     /**

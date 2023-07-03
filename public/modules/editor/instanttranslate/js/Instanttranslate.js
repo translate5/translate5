@@ -57,12 +57,14 @@ var editIdleTimer = null,
  */
 function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTranslate){
 
-    characterLimit = characterLimit;
-
     if(disableInstantTranslate){
         // dev-option may disables instant translation
         instantTranslationIsActive = false;
     }
+
+    $.ajaxSetup({
+        headers: { CsrfToken: Editor.data.csrfToken }
+    });
 
     $('#logout a').mouseover(function(){
         $(this).removeClass("ui-state-active");
@@ -88,15 +90,33 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
         }
     });
 
-    $('#sourceLocale').selectmenu({
+    $('#sourceLocaleText').selectmenu({
         appendTo: "#source",
         open: function() {
             updateLocalesSelectLists($(this));
         },
         change: function() {
             changeLanguage();
+            $("#sourceLocaleFile").val($("#sourceLocaleText").val());
         }
-    }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    })
+        .selectmenu("menuWidget")
+        .addClass("overflow localesSelectList");
+
+    $('#sourceLocaleFile').selectmenu({
+        appendTo: "#source",
+        open: function() {
+            updateLocalesSelectLists($(this));
+        },
+        change: function() {
+            changeLanguage();
+            $("#sourceLocaleText").val($("#sourceLocaleFile").val());
+        }
+    })
+        .selectmenu("menuWidget")
+        .addClass("overflow localesSelectList");
+    $('#sourceLocaleFile').selectmenu('widget').hide();
+
     $('#targetLocale').selectmenu({
         appendTo: "#target",
         open: function() {
@@ -132,13 +152,16 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
     });
 
     //check if the source and the target are the same
-    if($('#sourceLocale').val() === $('#targetLocale').val()){
-        setTargetFirstAvailable($('#sourceLocale').val());
+    if($('#sourceLocaleText').val() === $('#targetLocale').val()){
+        setTargetFirstAvailable($('#sourceLocaleText').val());
     }
     $("#sourceText").attr('maxlength', characterLimit);
 
     // press the button to swap source-/target-language
     $('.switchSourceTarget').on("click", function() {
+        if ($(this).hasClass('switchSourceTargetDisabled')) {
+            return;
+        }
         swapLanguages();
     });
 
@@ -175,7 +198,7 @@ function initGui(characterLimit, pretranslatedFiles, dateAsOf, disableInstantTra
 
     $(document).on('click', '.term-proposal' , function() {
         var text = getInputTextValueTrim(),
-            lang = $("#sourceLocale").val(),
+            lang = $('#sourceLocaleFile').selectmenu('widget').is(":hidden") ? $("#sourceLocaleText").val() : $("#sourceLocaleFile").val(),
             textProposal = $(this).attr('data-term'),
             langProposal = $("#targetLocale").val(),
             isMT = $(this).parents('.copyable').find('.translation-result').data('languageresource-type') === 'mt';
@@ -380,7 +403,7 @@ function isAvailableLocale(localeToCheck, allLocalesAvailable) {
  * @returns array
  */
 function setAllowedFileTypes() {
-    fileTypesAllowed = Editor.data.languageresource.fileExtension;
+    fileTypesAllowed = Editor.data.supportedFileExtensions;
 }
 /**
  * Is the given fileType allowed?
@@ -436,7 +459,7 @@ function setfileUploadLanguageCombinationsAvailable() {
  * @returns boolean
  */
 function isFileUploadAvailable() {
-    var langComb = $('#sourceLocale').val() + '|' + $('#targetLocale').val();
+    var langComb = $('#sourceLocaleFile').val() + '|' + $('#targetLocale').val();
     return $.inArray(langComb, fileUploadLanguageCombinationsAvailable) !== -1 && Editor.data.apps.instanttranslate.fileTranslation;
 }
 /***
@@ -496,16 +519,30 @@ function updateLocalesSelectLists(el) {
  * @returns {Boolean}
  */
 function hasEnginesForLanguageCombination() {
-	var returnValue = isSourceTargetAvailable($("#sourceLocale").val(), $("#targetLocale").val()),
-		isDisableButton = !isSourceTargetAvailable($("#targetLocale").val(), $("#sourceLocale").val()); //switch source and target so the other way arround is checked
-	//the button is disabled when for the target as source there is no source as target
-	$("#switchSourceTarget").prop("disabled", isDisableButton);
-    if(isDisableButton){
-        $("#switchSourceTarget").addClass( "switchSourceTargetDisabled" );
-    } else {
-        $("#switchSourceTarget").removeClass( "switchSourceTargetDisabled" );
+    const sourceLocale = getSourceLanguage(), targetLocale = getTargetLanguage();
+
+    if (sourceLocale === targetLocale) {
+        return false;
     }
-    return returnValue;
+
+	//the button is disabled when for the target as source there is no source as target
+    if (!isSourceTargetAvailable(targetLocale, sourceLocale)) {
+        $(".switchSourceTarget").addClass( "switchSourceTargetDisabled" );
+    } else {
+        $(".switchSourceTarget").removeClass( "switchSourceTargetDisabled" );
+    }
+
+    return isSourceTargetAvailable(sourceLocale, targetLocale);
+}
+
+function getSourceLanguage() {
+    return  $('#sourceLocaleFile').selectmenu('widget').is(":hidden")
+        ? $("#sourceLocaleText").val()
+        : $("#sourceLocaleFile").val();
+}
+
+function getTargetLanguage() {
+    return $("#targetLocale").val();
 }
 
 /***
@@ -514,21 +551,28 @@ function hasEnginesForLanguageCombination() {
  * @param targetRfc
  * @returns {Boolean}
  */
-function isSourceTargetAvailable(sourceRfc,targetRfc){
-    var targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc),
-        useSub = Editor.data.instanttranslate.showSublanguages,
-        hasLang = false;
-    if(useSub){
+function isSourceTargetAvailable(sourceRfc, targetRfc){
+    if ('auto' === sourceRfc || 'auto' === targetRfc) {
+        return 'auto' === sourceRfc;
+    }
+
+    const targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc),
+        useSub = Editor.data.instanttranslate.showSublanguages;
+    let hasLang = false;
+
+    if (useSub) {
         return targetLocalesAvailable.indexOf(targetRfc) !== -1;
     }
     // when no sublangauges are used, use fuzzy matching on localeToCheck, since in the backend fuzzy latching will be used as well
     $.each(targetLocalesAvailable, function(index) {
-        var locale = targetLocalesAvailable[index];
+        let locale = targetLocalesAvailable[index];
         hasLang = targetRfc === locale.split('-')[0];
-        if(hasLang){
+
+        if (hasLang) {
             return false;
         }
     });
+
     return hasLang;
 }
 
@@ -701,7 +745,7 @@ function translateText(textToTranslate, translationInProgressID){
         dataType: "json",
         type: "POST",
         data: {
-            'source': $("#sourceLocale").val(),
+            'source': $("#sourceLocaleText").val(),
             'target': $("#targetLocale").val(),
             'text': textToTranslate,
             'escape': 1,
@@ -711,13 +755,16 @@ function translateText(textToTranslate, translationInProgressID){
             if (translationInProgressID !== latestTranslationInProgressID) {
                 return;
             }
+
+            clearAllErrorMessages(false);
+
             if (result.errors !== undefined && result.errors !== '') {
-                showTargetError(result.errors);
-            } else {
-                clearAllErrorMessages(false);
-                translateTextResponse = result.rows;
-                fillTranslation();
+                showTargetError(result.errors.join('<br/>'));
             }
+
+            translateTextResponse = result.rows;
+            fillTranslation();
+
             stopLoadingSign();
             currentRequest = null;
         },
@@ -730,7 +777,6 @@ function translateText(textToTranslate, translationInProgressID){
         },
         fail: function(){
             currentRequest = null;
-            debugger;
         }
     });
 }
@@ -1085,7 +1131,7 @@ function requestFileTranslate(){
         data.append('file', uploadedFiles[0]);
     }
     
-    data.append('source', $('#sourceLocale').val());
+    data.append('source', $('#sourceLocaleFile').val());
     data.append('target', $('#targetLocale').val());
 
     $.ajax({
@@ -1194,6 +1240,7 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
                 }
                 break;
         }
+
         $htmlFile += '<div class="box box__result__header '+$headerClassAddition+' font-size-big marginTop">';
             $htmlFile += $headerContent;
         $htmlFile += '</div>';
@@ -1201,6 +1248,13 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
         $htmlFile += '<div class="box box__result__content">';
             $htmlFile += '<p>'+$innerContent+'</p>';
         $htmlFile += '</div>';
+
+        if (taskData.errors.length > 0) {
+            $htmlFile += '<div class="box box__result__content">';
+            $htmlFile += '<a href="#" class="error toggle">' + Editor.data.languageresource.translatedStrings.errorOccurredDuringTranslation + ':</a><p class="toggle-body">' +
+                taskData.errors.join('<br />') + '</p>';
+            $htmlFile += '</div>';
+        }
 
         pretranslatedFiles.push($htmlFile);
     });
@@ -1210,6 +1264,7 @@ function showDownloads(allPretranslatedFiles, dateAsOf){
     }
     
     $('#pretranslatedfiles').html(html);
+    setupErrorToggles();
     
     //for each pretranslated files task, update the progress bar
     //this will be done only if the task is in status import
@@ -1351,13 +1406,16 @@ function hideTranslations() {
 function showLanguageResourceSelectorError(errorMode) {
     $('#languageResourceSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
 }
+
 /***
  * Show the given error in the targetError container.
- * @param string error
+ *
+ * @param {String} errorText
  */
 function showTargetError(errorText) {
-    $('#targetError').html(errorText).show();
+    $('#targetError').append('<br />' + errorText).show();
 }
+
 function hideTargetError() {
     $('#targetError').html('').hide();
 }
@@ -1447,6 +1505,12 @@ function toggleSource($source) {
 }
 
 function changeLanguage(){
+    if (getSourceLanguage() === getTargetLanguage()) {
+        showTargetError(Editor.data.languageresource.translatedStrings.languagesAreSame);
+
+        return;
+    }
+
     if(chosenSourceIsText){
         checkInstantTranslation();
         startTranslation(false);
@@ -1456,17 +1520,18 @@ function changeLanguage(){
 }
 
 function swapLanguages(){
+    const sourceLangIdSelector = $('#sourceLocaleFile').selectmenu('widget').is(":hidden") ? "#sourceLocaleText" : "#sourceLocaleFile";
     // detect old languages
-    var $oldSourceLang = $('#sourceLocale').val(),
+    var $oldSourceLang = $(sourceLangIdSelector).val(),
         $oldTargetLang = $('#targetLocale').val(),
-        allSourceLangs = $.map($("#sourceLocale option[value]"), function(option) {
+        allSourceLangs = $.map($(sourceLangIdSelector + " option[value]"), function(option) {
             return $(option).attr("value");
         }),
         allTargetLangs = $.map($("#targetLocale option[value]"), function(option) {
             return $(option).attr("value");
         });
-        
-    //check if oldLangs are missing in other language, if yes try fuzzying, 
+
+    //check if oldLangs are missing in other language, if yes try fuzzying,
     // if still nothing found keep logic as it was (use the last one of the select)
     
     if($.inArray($oldSourceLang, allTargetLangs) < 0) {
@@ -1506,11 +1571,14 @@ function swapLanguages(){
         return;
     }
 
+
     // now swap the language selections
-    $("#sourceLocale").val($oldTargetLang);
+    $("#sourceLocaleText").val($oldTargetLang);
+    $("#sourceLocaleFile").val($oldTargetLang);
     $("#targetLocale").val($oldSourceLang);
     
-    $("#sourceLocale").selectmenu("refresh");
+    $("#sourceLocaleText").selectmenu("refresh");
+    $("#sourceLocaleFile").selectmenu("refresh");
     $("#targetLocale").selectmenu("refresh");
 
     // renew the results, if there are any
@@ -1556,7 +1624,9 @@ function showGui(){
  */
 function showSourceIsText(){
     $('.show-if-source-is-text').show();
+    $('#sourceLocaleText').selectmenu('widget').show();
     $('.show-if-source-is-file').hide();
+    $('#sourceLocaleFile').selectmenu('widget').hide();
     $('#translations').show();
     $("#sourceIsText").removeClass('source-text-error');
     $('#sourceText').focus();
@@ -1575,7 +1645,9 @@ function showSourceIsText(){
 function showSourceIsFile(){
     hideSourceError();
     $('.show-if-source-is-text').hide();
+    $('#sourceLocaleText').selectmenu('widget').hide();
     $('.show-if-source-is-file').show();
+    $('#sourceLocaleFile').selectmenu('widget').show();
     $('#translations').hide();
     $('body').removeClass('sourceIsText');
     $('body').addClass('sourceIsFile');
@@ -1626,6 +1698,16 @@ function checkInstantTranslation() {
     }
     // Start translation:
     startTimerForInstantTranslation();
+}
+
+function setupErrorToggles() {
+    $('.box__result__content .toggle-body').hide();
+    $('.box__result__content .toggle').off('click').on('click', (event) => {
+        event.stopPropagation();
+        $(event.currentTarget).next().toggle();
+
+        return false;
+    });
 }
 
 // If we're not within an iframe

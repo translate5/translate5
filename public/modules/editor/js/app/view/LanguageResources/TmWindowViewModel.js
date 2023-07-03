@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -36,50 +35,51 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     data: {
         serviceName: false,
         resourceType: false,
-        uploadLabel:null
+        uploadLabel: null,
+        engineBased: null,
     },
     stores: {
         customers: {
             model: 'Editor.model.admin.Customer',
-            pageSize:0,
-            autoLoad:true
+            pageSize: 0,
+            autoLoad: true
         },
         customersDefaultRead: {
             source: '{customers}',
-            pageSize:0,
-            filters : {
-                property : 'id',
-                operator : "in",
-                value : '{resourcesCustomers.value}'
+            pageSize: 0,
+            filters: {
+                property: 'id',
+                operator: "in",
+                value: '{resourcesCustomers.value}'
             }
         },
         customersDefaultWrite: {
             source: '{customersDefaultRead}',
-            pageSize:0,
-            filters : {
-                property : 'id',
-                operator : "in",
-                value : '{useAsDefault.value}'
+            pageSize: 0,
+            filters: {
+                property: 'id',
+                operator: "in",
+                value: '{useAsDefault.value}'
             }
         },
         customersDefaultPivot: {
             source: '{customers}',
-            pageSize:0,
-            filters : {
-                property : 'id',
-                operator : "in",
-                value : '{resourcesCustomers.value}'
+            pageSize: 0,
+            filters: {
+                property: 'id',
+                operator: "in",
+                value: '{resourcesCustomers.value}'
             }
         }
     },
     formulas: {
-        isSdlResource: function(get){
-            return get('serviceName') === Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
+        isEngineBasedResource: function (get) {
+            return get('engineBased');
         },
-        isTermCollectionResource:function(get){
+        isTermCollectionResource: function (get) {
             return get('serviceName') === Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
         },
-        isTmResourceType:function(get){
+        isTmResourceType: function (get) {
             return get('resourceType') === Editor.util.LanguageResources.resourceType.TM;
         }
     }

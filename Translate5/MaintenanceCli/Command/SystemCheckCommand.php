@@ -29,13 +29,12 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\WebAppBridge\Application;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 
 
 class SystemCheckCommand extends Translate5AbstractCommand
+//FIXME make a system:clean command or improve the check command to find and clean files not belonging to the installation
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'system:check';
@@ -78,12 +77,10 @@ class SystemCheckCommand extends Translate5AbstractCommand
         if($isInstallation) {
             if(empty($module)) {
                 $this->io->title('Translate5 pre-installation check');
-            }
-            else {
+            } else {
                 $this->io->title('Translate5 installation check - module '.$module);
             }
-        }
-        else {
+        } else {
             $this->initTranslate5();
             $this->writeTitle('Translate5 system health check');
         }
@@ -92,15 +89,14 @@ class SystemCheckCommand extends Translate5AbstractCommand
         $validator = new \ZfExtended_Models_SystemRequirement_Validator($isInstallation);
         /* @var $validator \ZfExtended_Models_SystemRequirement_Validator */
         $results = $validator->validate($module);
+
         foreach($results as $module => $oneResult) {
-            /* @var $validator \ZfExtended_Models_SystemRequirement_Result */
+            /* @var $oneResult \ZfExtended_Models_SystemRequirement_Result */
             if($oneResult->hasError()) {
                 $shortResult = '<fg=red;options=bold>problematic</>';
-            }
-            elseif($oneResult->hasWarning()) {
+            } else if($oneResult->hasWarning()) {
                 $shortResult = '<fg=yellow;options=bold>not optimal</>';
-            }
-            else {
+            } else {
                 $shortResult = '<fg=green;options=bold>all ok</>';
             }
             $this->io->text(str_pad($oneResult->name, 30, ' ', STR_PAD_RIGHT).': '.$shortResult);
@@ -120,7 +116,6 @@ class SystemCheckCommand extends Translate5AbstractCommand
                 $this->io->writeln('');
             }
         }
-        
         return $result;
     }
 }

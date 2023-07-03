@@ -61,9 +61,13 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
      * @param SimpleXMLElement $refObjectList
      * @throws editor_Models_Terminology_Import_Exception
      */
-    public function import(editor_Models_TermCollection_TermCollection $collection, SimpleXMLElement $refObjectList)
+    public function import(editor_Models_TermCollection_TermCollection $collection, SimpleXMLElement $refObjectList) : array
     {
         $collectionId = $collection->getId();
+
+        // Quantities will be here under 'created', 'unchanged' and 'recreated' keys
+        // See editor_Models_Terminology_Import_TbxFileImport->imageQty docs for explanations
+        $imageQty = [];
 
         /** @var $imagesModel editor_Models_Terminology_Models_ImagesModel */
         $imagesModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_ImagesModel');
@@ -78,14 +82,38 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
             //ON INSERT and UPDATE ONLY, on UPDATE delete the existing one
             $image['uniqueName'] = $imagesModel->createUniqueName($image['name']);
 
-            $hashInDB = $tbxImagesCollection[$image['targetId']]['contentMd5hash'] ?? null;
-            if($hashInDB === $image['contentMd5hash']) {
-                //if the image with the same target id and content hash is already in DB, do not save it
+            $dbImg = $tbxImagesCollection[$image['targetId']] ?? null;
+            $hashInDB = $dbImg['contentMd5hash'] ?? null;
+
+            // If the image with the same target id and content hash is already in DB
+            if ($hashInDB === $image['contentMd5hash']) {
+
+                // Get the absolute path to image
+                $abs = $imagesModel->getImagePath($collectionId, $dbImg['uniqueName']);
+
+                // If image does not really exists on disk
+                if (!file_exists($abs)) {
+
+                    // Recreate on disk
+                    $imagesModel->saveImageToDisk($collectionId, $dbImg['uniqueName'], $image['data']);
+
+                    // Count that
+                    $imageQty['recreated'] ++;
+
+                // Else increment unchanged-counter
+                } else {
+                    $imageQty['unchanged'] ++;
+                }
+
+                // Skip that image, as we do already have equal one
                 continue;
             }
 
             $imagesModel->saveImageToDisk($collectionId, $image['uniqueName'], $image['data']);
             unset($image['data']);
+
+            // Increment qty of images newly created on disk
+            $imageQty['created'] ++;
 
             if(empty($image['id'])) {
                 $image['id'] = $imagesModel->db->insert($image);
@@ -106,6 +134,12 @@ class editor_Models_Terminology_Import_TbxBinaryDataImport
                 'missingFiles' => $missingFiles
             ]);
         }
+
+        // Get total count
+        $imageQty['totalCount'] = array_sum($imageQty);
+
+        // Return stats
+        return $imageQty;
     }
 
     /**

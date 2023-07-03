@@ -188,6 +188,9 @@ Ext.define('Editor.view.project.ProjectGrid', {
         		dockedItems: [{
         	        xtype: 'toolbar',
         	        dock: 'top',
+                    border: 0,
+                    itemId: 'projectToolbar',
+                    enableOverflow: true,
         	        items: [{
         	            xtype: 'button',
         	            glyph: 'f2f1@FontAwesome5FreeSolid',
@@ -231,7 +234,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
      * @param {Object} config
      */
     scrollTo: function(rowindex, config) {
-        if(rowindex < 0) {
+        if(rowindex < 0 || this.getStore().isLoading()) {
             return;
         }
         if(!config){

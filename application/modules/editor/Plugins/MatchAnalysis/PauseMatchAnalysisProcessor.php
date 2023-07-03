@@ -32,48 +32,37 @@ namespace MittagQI\Translate5\Plugins\MatchAnalysis;
 
 use editor_Models_LanguageResources_LanguageResource as LanguageResource;
 use editor_Models_Task as Task;
-use editor_Services_Connector_FilebasedAbstract as AbstractConnector;
 use editor_Services_Manager as Manager;
-use editor_Services_OpenTM2_Connector as OpenTm2Connector;
-use Exception;
-use MittagQI\Translate5\Import\PauseWorkerProcessorInterface;
+use MittagQI\Translate5\PauseWorker\PauseWorkerProcessorInterface;
+use MittagQI\Translate5\PauseWorker\AbstractLanguageResourcesProcessor;
+use Zend_Config;
+use Zend_Registry;
 use ZfExtended_Factory;
 
 /**
  * Processor that pauses the match analysis while t5memory (or opentm2) is importing a file
  */
-class PauseMatchAnalysisProcessor implements PauseWorkerProcessorInterface
+class PauseMatchAnalysisProcessor extends AbstractLanguageResourcesProcessor implements PauseWorkerProcessorInterface
 {
-    private $config;
+    private Zend_Config $config;
 
     public function __construct()
     {
-        $this->config = \Zend_Registry::get('config');
+        parent::__construct();
+
+        $this->config = Zend_Registry::get('config');
     }
 
     public function shouldWait(Task $task): bool
     {
-        $manager = ZfExtended_Factory::get(Manager::class);
-        $languageResourcesData = ZfExtended_Factory::get(LanguageResource::class)
-            ->loadByAssociatedTaskGuidListAndServiceTypes([$task->getTaskGuid()], [Manager::SERVICE_OPENTM2]);
+        $languageResourceIds = array_column(
+            ZfExtended_Factory::get(LanguageResource::class)
+            ->loadByAssociatedTaskGuidListAndServiceTypes([$task->getTaskGuid()], [Manager::SERVICE_OPENTM2]),
+            'id'
+        );
+        $languageResourceIds = array_map('intval', $languageResourceIds);
 
-        foreach ($languageResourcesData as $languageResourceData) {
-            $languageResource = ZfExtended_Factory::get(LanguageResource::class);
-            $languageResource->load($languageResourceData['id']);
-
-            $resource = $manager->getResource($languageResource);
-
-            try {
-                /** @var OpenTm2Connector $connector */
-                $connector = $manager->getConnector($languageResource, (int)$task->getSourceLang(), (int)$task->getTargetLang(), $task->getConfig());
-
-                return AbstractConnector::STATUS_IMPORT === $connector->getStatus($resource);
-
-            } catch (Exception $exception) {
-            }
-        }
-
-        return false;
+        return $this->areStillImporting($task, ...$languageResourceIds);
     }
 
     public function getMaxWaitTimeSeconds(): int

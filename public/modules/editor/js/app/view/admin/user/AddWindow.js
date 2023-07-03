@@ -115,7 +115,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                 handler: me.roleCheckChange
             });
         });
-        Ext.Object.each(Editor.data.translations, function(id,value) {
+        Ext.Object.each(Editor.data.l10n.translations, function(id,value) {
             translations.push([id,value]);
         });
         config = {
@@ -221,6 +221,7 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                                 itemId: 'rolesGroup',
                                 cls: 'x-check-group-alt',
                                 fieldLabel: me.strings.rolesLabel + ' &#8505;',
+                                labelAlign: 'top',
                                 items: roles,
                                 columns: 2,
                                 autoEl: {

@@ -162,7 +162,7 @@ Ext.define('Editor.model.admin.User', {
               }
               break;
           case 'editorFinishTask':
-              if(!isJobInStepChain || task.isWaiting() || task.isFinished() || task.isEnded() || task.isUnconfirmed()) {
+              if(!isJobInStepChain || task.hasCriticalErrors() || task.isWaiting() || task.isFinished() || task.isEnded() || task.isUnconfirmed()) {
                   return false;
               }
               break;

@@ -37,14 +37,22 @@ class editor_Task_Operation {
      * @var string
      */
     const MATCHANALYSIS = 'matchanalysis';
+
     /**
      * @var string
      */
     const AUTOQA = 'autoqa';
+
+    /**
+     * @var string
+     */
+    const TAGTERMS = 'tagterms';
+
     /**
      * @var string
      */
     const PIVOT_PRE_TRANSLATION = 'pivotpretranslation';
+
     /**
      * 
      * @param string $operationType: must be a constant of this class
@@ -61,13 +69,11 @@ class editor_Task_Operation {
         if($taskState === editor_Models_Task::STATE_EXCELEXPORTED){
             throw new editor_Task_Operation_Exception('E1395', ['taskstate' => $taskState, 'operation' => $operationType]);
         }
-        $worker = ZfExtended_Factory::get('editor_Task_Operation_StartingWorker');
-        /* @var $worker editor_Task_Operation_StartingWorker */
+        $worker = ZfExtended_Factory::get(editor_Task_Operation_StartingWorker::class);
         if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType ])) {
             $parentId = $worker->queue(0, null, false);
             // add finishing worker
-            $worker = ZfExtended_Factory::get('editor_Task_Operation_FinishingWorker');
-            /* @var $worker editor_Task_Operation_FinishingWorker */
+            $worker = ZfExtended_Factory::get(editor_Task_Operation_FinishingWorker::class);
             if($worker->init($task->getTaskGuid(), [ 'operationType' => $operationType, 'taskInitialState' => $taskState ])) {
                 $worker->queue($parentId, null, false);
                 return $parentId;

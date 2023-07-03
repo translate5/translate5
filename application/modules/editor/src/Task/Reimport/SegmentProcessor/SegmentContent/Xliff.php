@@ -28,38 +28,24 @@
 
 namespace MittagQI\Translate5\Task\Reimport\SegmentProcessor\SegmentContent;
 
+use editor_Models_Segment_InternalTag;
+use ZfExtended_Factory;
+
 /**
  *
  */
 class Xliff extends ContentDefault
 {
 
-    /**
-     * @param string $target
-     * @return void
-     */
-    protected function updateTarget(string $target): void
-    {
-        $tempMap = [];
-        // restore org. tags; detect tag-map from t5 SOURCE segment. Only there all original tags are present.
-        $this->segmentTagger->toXliff($this->segment->getSource(), replaceMap: $tempMap);
-        $newTarget = $this->segmentTagger->reapply2dMap($this->normalizeContent($target), $tempMap);
-
-        if( $this->isTrackChangesActive()){
-            $newTarget = $this->diffTagger->diffSegment($this->segment->getFieldOriginal($this->sfm->getFirstTargetName()), $newTarget, date(NOW_ISO), $this->user->getUserName());
-        }
-
-        $this->update($newTarget,$this->sfm->getFirstTargetName(),$this->sfm->getFirstTargetNameEdit());
-    }
-
-    /**
+    /***
+     * Normalize the given content with converting the internal tags to xlif tags. Such normalized content can be used
+     * to compare the contents.
      * @param string $content
      * @param array $tagMap
      * @return string
      */
     protected function normalizeContent(string $content, array &$tagMap = []): string
     {
-        return $this->segmentTagger->toXliff($content,replaceMap: $tagMap);
+        return $this->segmentTagger->toXliff($content, replaceMap: $tagMap);
     }
-
 }

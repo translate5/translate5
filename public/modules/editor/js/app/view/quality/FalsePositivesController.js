@@ -105,6 +105,9 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
                         otherRec.commit();
                     }
                 }
+
+                // Reload left panel's qualities tree
+                Ext.ComponentQuery.query('qualityFilterPanel').pop()?.getStore()?.reload();
             },
             failure: (response) => {
 

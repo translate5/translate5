@@ -332,9 +332,8 @@ Ext.define('Editor.controller.SearchReplace', {
             xtype: 'button',
             itemId: 'searchReplaceToolbarBtn',
             cls: 'searchReplaceToolbarBtn',
-            icon: Editor.data.moduleFolder+'images/magnifier.png',
+            icon: Editor.data.moduleFolder + 'images/magnifier.png',
             bind: {
-                text: '{l10n.segmentGrid.toolbar.searchReplaceToolbarBtn}',
                 tooltip: '{l10n.segmentGrid.toolbar.searchAndReplaceButtonTooltip}'
             },
             handler:function(){

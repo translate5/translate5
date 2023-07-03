@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
  * Import the whole task from an earlier exported Excel-file
  */
 class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
+
     /**
      * @var editor_Models_Excel_ExImport
      */
@@ -66,7 +67,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
      *
      * @var array
      */
-    protected $segmentError = [];
+    protected $segmentErrors = [];
     
     /**
      * reimport $filename xls into $task.
@@ -102,11 +103,12 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
         // - load tag structure checker
         $this->tagStructureChecker = ZfExtended_Factory::get('editor_Models_Excel_TagStructureChecker');
     }
-        
-    public function run() : bool {
-        //contains the TUA which is used to alter the segments
+
+    public function reimport(ZfExtended_Zendoverwrites_Translate $translate, ZfExtended_Models_Messages $restMessages, ZfExtended_Models_User $user)
+    {
+        $this->segmentErrors = [];
+        // contains the TUA which is used to alter the segments
         $tua = $this->prepareTaskUserAssociation();
-        
         try {
             // now handle each segment from the excel
             $this->loopOverExcelSegments();
@@ -117,10 +119,43 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
                 $tua->delete();
             }
         }
-        
-        return TRUE;
+
+        // unlock task and set state to 'open'
+        $this->taskUnlock($this->task);
+
+        if (!empty($this->segmentErrors)) {
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
+            /* @var $logger ZfExtended_Logger */
+
+            $msg = 'Error on excel reimport in the following segments. Please check the following segment(s):';
+            // log warning 'E1141' => 'Excel Reimport: at least one segment needs to be controlled.',
+            $logger->warn('E1142', $msg."\n{segments}", [
+                'task' => $this->task,
+                'segments' => join("\n", array_map(function(excelExImportSegmentContainer $item) {
+                    return '#'.$item->nr.': '.$item->comment;
+                }, $this->segmentErrors)),
+            ]);
+            $msg = $translate->_('Die Excel-Datei konnte reimportiert werden, die nachfolgenden Segmente beinhalten aber Fehler und müssen korrigiert werden:');
+            $restMessages->addWarning($msg, $logger->getDomain(), null, array_map(function(excelExImportSegmentContainer $item) {
+                return ['type' => $item->nr, 'error' => $item->comment];
+            }, $this->segmentErrors));
+
+            // send mails
+            $mailer = ZfExtended_Factory::get(ZfExtended_TemplateBasedMail::class);
+            /* @var $mailer ZfExtended_TemplateBasedMail */
+            $mailer->setParameters([
+                'segmentErrors' => $this->segmentErrors,
+                'task' => $this->task,
+            ]);
+            $pm = ZfExtended_Factory::get(ZfExtended_Models_User::class);
+            /* @var $pm ZfExtended_Models_User */
+            $pm->loadByGuid($this->task->getPmGuid());
+            $mailer->setReplyTo($pm->getEmail(), $pm->getUserName());
+            $mailer->setTemplate('workflow/pm/notifyExcelReimportErrors.phtml');
+            $mailer->sendToUser($user);
+        }
     }
-    
+
     /**
      * Loops over each Excel segment and saves it back into translate5 if necessary
      */
@@ -346,15 +381,6 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
         $error = new excelExImportSegmentContainer();
         $error->nr = $segmentNr;
         $error->comment = $hint;
-        $this->segmentError[] = $error;
-    }
-    
-    /**
-     * get the list of internal segment errors (as formatet string).
-     * if there where no error FALSE will be returned
-     * @return excelExImportSegmentContainer[]
-     */
-    public function getSegmentErrors() : array {
-        return $this->segmentError;
+        $this->segmentErrors[] = $error;
     }
 }

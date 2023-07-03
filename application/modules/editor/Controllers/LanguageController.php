@@ -31,7 +31,16 @@ END LICENSE AND COPYRIGHT
  */
 class editor_LanguageController extends ZfExtended_RestController {
     protected $entityClass = 'editor_Models_Languages';
-    
+
+    public function indexAction()
+    {
+        parent::indexAction();
+        $translate= ZfExtended_Zendoverwrites_Translate::getInstance();
+        // add a localized name for each language. To not disturb existing usage we add it as new prop
+        foreach($this->view->rows as $index => $row){
+            $this->view->rows[$index]['localizedName'] = $translate->_($row['langName']);
+        }
+    }
     /**
      * Instance of the Entity
      * @var editor_Models_Languages

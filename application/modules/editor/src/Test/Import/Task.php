@@ -207,6 +207,17 @@ final class Task extends Resource
     }
 
     /**
+     * Adds a bconf-id to the task to be used when importing
+     * @param int $bconfId
+     * @return $this
+     */
+    public function setImportBconfId(int $bconfId): Task
+    {
+        $this->bconfId = $bconfId;
+        return $this;
+    }
+
+    /**
      * Removes an added configuration e.g. a default configuration (can not be used to remove configs from task-config.ini files!)
      * @param string $configName
      * @return $this
@@ -515,7 +526,7 @@ final class Task extends Resource
     private function upload(Helper $api)
     {
         if ($this->_uploadFolder !== null) {
-            $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder, 'testTask.zip');
+            $this->_cleanupZip = $api->zipTestFiles($this->_uploadFolder);
             // add/change a task-config.ini if we have configs
             if (count($this->_importConfigs) > 0){
                 $this->setTaskConfigsInZip($this->_cleanupZip);
@@ -528,7 +539,7 @@ final class Task extends Resource
                 $file = $api->getFile($this->_uploadFiles[0]);
                 // add/change a task-config.ini if we have configs. We must use a temporary zip then to not overwrite the original ZIP
                 if ($mime === 'application/zip' && count($this->_importConfigs) > 0){
-                    $this->_cleanupZip = dirname($file).'/tmp-'.basename($file);
+                    $this->_cleanupZip = APPLICATION_DATA . '/tmp-' . basename($file);
                     copy($file, $this->_cleanupZip);
                     $this->setTaskConfigsInZip($this->_cleanupZip);
                     $file = $this->_cleanupZip;

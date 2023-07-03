@@ -47,7 +47,6 @@ class editor_Models_Db_Segments extends Zend_Db_Table_Abstract {
      */
     public function __construct(array $config = array(), $tableName = 'LEK_segments')
     {
-        
         $this->_name = $tableName;
         parent::__construct($config);
     }
@@ -58,6 +57,31 @@ class editor_Models_Db_Segments extends Zend_Db_Table_Abstract {
     public function __toString() {
         return $this->_name;
     }
+
+    /**
+     * Retrieves all segment-id's for a task
+     * @param string $taskGuid
+     * @param bool $forUpdate
+     * @param array $additionalConditions: can be used to add additional restrictions, format is the Zend-typical 'column = ?' => 'columnValue'
+     * @return int[]
+     */
+    public function getAllIdsForTask(string $taskGuid, bool $forUpdate = false, array $additionalConditions = []): array
+    {
+        $where = $this->select()
+            ->from($this->_name, ['id'])
+            ->where('taskGuid = ?', $taskGuid)
+            ->order('id');
+        if(!empty($additionalConditions)){
+            foreach($additionalConditions as $condition => $value){
+                $where->where($condition, $value);
+            }
+        }
+        if ($forUpdate) {
+            $where->forUpdate(true);
+        }
+        $rows = $this->fetchAll($where)->toArray();
+        return array_column($rows, 'id');
+    }
     
     /**
      * Is entity a materialized view
@@ -65,6 +89,6 @@ class editor_Models_Db_Segments extends Zend_Db_Table_Abstract {
      * @return boolean
      */
     public function isView() {
-        return $this->_name!="LEK_segments";
+        return $this->_name !== 'LEK_segments';
     }
 }

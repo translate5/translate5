@@ -43,6 +43,14 @@ Ext.define('Editor.view.admin.task.TaskManagementViewModel', {
                 return !task || task.isImporting();
             },
             bind: { bindTo:'{currentTask}', deep:true }
+        },
+        // shows if the translation package feature is available for the user. The user can export/reimport translation package only if:
+        // - the user is able to edit task
+        // - the task is reimportable. The task is reimportable if all of the task files are imported with xliff or
+        //   file parser which extends the xliff file parser
+        isTranslatorPackageAvailable: {
+            get: Editor.util.Util.isTranslatorPackageAvailable,
+            bind: { bindTo:'{currentTask}', deep:true }
         }
     }
 });

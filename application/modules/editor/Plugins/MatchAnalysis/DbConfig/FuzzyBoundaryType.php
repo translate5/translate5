@@ -34,9 +34,9 @@ class editor_Plugins_MatchAnalysis_DbConfig_FuzzyBoundaryType extends ZfExtended
         return 'Editor.plugins.MatchAnalysis.view.FuzzyBoundaryConfig';
     }
 
-    public function validateValue(string $type, &$value, ?string &$errorStr): bool
+    public function validateValue(editor_Models_Config $config, &$newvalue, ?string &$errorStr): bool
     {
-        $rawType = parent::validateValue($type, $value, $errorStr);
+        $rawType = parent::validateValue($config, $newvalue, $errorStr);
 
         // if the raw type is not correct fail validation
         if(!$rawType) {
@@ -44,7 +44,7 @@ class editor_Plugins_MatchAnalysis_DbConfig_FuzzyBoundaryType extends ZfExtended
         }
 
         $err = '';
-        $confVal = (array) $this->jsonDecode($value, $err); //from parent validate we still get a string
+        $confVal = (array) $this->jsonDecode($newvalue, $err); //from parent validate we still get a string
         ksort($confVal); //sort by the keys, from the lowest to the biggest
 
         //the following values are mandatory and must be listed in the configuration

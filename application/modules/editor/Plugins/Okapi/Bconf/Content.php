@@ -211,11 +211,28 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
             throw new ZfExtended_Exception('Invalid JSON content of '.self::FILE.': Empty content');
         }
         $json = json_decode($content);
-        if(empty($json) || !is_object($json) || !property_exists($json, 'refs') || !property_exists($json, 'step') || !property_exists($json, 'fprm')){
-            throw new ZfExtended_Exception('Invalid JSON content of '.self::FILE.': Invalid structure ');
+        if(empty($json) || !is_object($json) || !property_exists($json, 'refs') || !property_exists($json, 'fprm')){
+            throw new ZfExtended_Exception('Invalid JSON content of '.self::FILE.': Invalid structure');
         }
-        $this->refs = $json->refs;
-        $this->step = $json->step;
+        if(property_exists($json, 'step')){
+            $this->step = $json->step;
+        } else {
+            // LEGACY FIX:
+            // in the first revisions of the bconf-management, the steps have not been extracted ... we repair that by extracting them from the pipeline
+            $this->step = $this->getLegacySteps();
+        }
+        if(is_array($json->refs)){
+            // LEGACY FIX:
+            // in the first revisions of the bconf-management, the refs have been an array
+            if(count($json->refs) < 1){
+                throw new ZfExtended_Exception('Invalid JSON content of '.self::FILE.': Invalid structure, references missing');
+            }
+            $this->refs = new stdClass();
+            $this->refs->sourceSrxPath = $json->refs[0];
+            $this->refs->targetSrxPath = (count($json->refs) > 1) ? $json->refs[1] : $json->refs[0];
+        } else {
+            $this->refs = $json->refs;
+        }
         $this->fprm = $json->fprm;
     }
 
@@ -228,5 +245,16 @@ final class editor_Plugins_Okapi_Bconf_Content extends editor_Plugins_Okapi_Bcon
         $data->step = $this->step;
         $data->fprm = $this->fprm;
         return json_encode($data, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * Very outdated installations may have no steps parsed into the bconf, we add them here
+     * @return string[]
+     */
+    private function getLegacySteps(): array
+    {
+        $pipelinePath = dirname($this->getPath()) . '/' . editor_Plugins_Okapi_Bconf_Pipeline::FILE;
+        $pipeline = new editor_Plugins_Okapi_Bconf_Pipeline($pipelinePath, null, $this->getBconfId());
+        return $pipeline->getSteps();
     }
 }

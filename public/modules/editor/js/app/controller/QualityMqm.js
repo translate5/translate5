@@ -95,7 +95,15 @@ Ext.define('Editor.controller.QualityMqm', {
     	}
     	var mpForm = this.getMetaInfoForm(),
     		pos = mpForm.items.findIndex('itemId', 'segmentQm') + 1; // MQM will be added after QM panel
-    	mpForm.insert(pos, {xtype: 'qualityMqmFieldset', menuConfig: this.getMenuConfig()});
+    	mpForm.insert(pos, {
+    		xtype: 'qualityMqmFieldset',
+			stateId: 'editor.eastPanelSegmentsMqmInside',
+			menuConfig: this.getMenuConfig(),
+			stateEvents: ['collapse', 'expand'],
+			stateful: {
+				collapsed: true
+			}
+    	});
     },
     /**
      * generates the config menu tree for QM Flag Menu

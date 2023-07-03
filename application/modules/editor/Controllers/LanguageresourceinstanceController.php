@@ -26,10 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use MittagQI\Translate5\LanguageResource\CleanupAssociation;
+use MittagQI\Translate5\LanguageResource\CleanupAssociation\Customer;
+use MittagQI\Translate5\LanguageResource\CleanupAssociation\Task;
 use MittagQI\Translate5\LanguageResource\TaskAssociation;
+use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
 use MittagQI\Translate5\Task\Current\NoAccessException;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\ZfExtended\Controller\Response\Header;
 
 /***
  * Language resource controller
@@ -65,6 +69,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @var editor_Models_Categories
      */
     protected $categories;
+
+    /**
+     * The download-actions need to be csrf unprotected!
+     */
+    protected array $_unprotectedActions = ['download', 'export', 'xlsxexport', 'tbxexport', 'testexport'];
 
     /**
      * @throws ZfExtended_Models_Entity_NotFoundException
@@ -151,7 +160,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
 
             if(empty($resource)) {
-                $languageresource['status'] = editor_Services_Connector_Abstract::STATUS_ERROR;
+                $languageresource['status'] = LanguageResourceStatus::ERROR;
                 $languageresource['statusInfo'] = $t->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
             }
             else {
@@ -281,7 +290,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         /* @var $resource editor_Models_LanguageResources_Resource */
         if(empty($resource)) {
-            $this->view->rows->status = editor_Services_Connector_Abstract::STATUS_NOCONNECTION;
+            $this->view->rows->status = LanguageResourceStatus::NOCONNECTION;
             $this->view->rows->statusInfo = $t->_('Keine Verbindung zur Ressource oder Ressource nicht gefunden.');
             return;
         }
@@ -523,14 +532,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     private function prepareTaskInfo($languageResourceids)
     {
         $assocs = ZfExtended_Factory::get(TaskAssociation::class);
-
         $tasksInfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
 
-        if(empty($tasksInfo)) {
-            return;
-        }
-        //group array by languageResourceid
-        $this->groupedTaskInfo = $this->convertTasknames($tasksInfo);
+        $assocs = ZfExtended_Factory::get(TaskPivotAssociation::class);
+        $tasksPivotInfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
+
+        $result = array_merge($tasksInfo,$tasksPivotInfo);
+        $result = $this->convertTasknames($result);
+        $this->groupedTaskInfo = $result;
     }
 
     /**
@@ -546,9 +555,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
 
             $taskToPrint = $taskInfo['taskName'];
+            $isPivot = str_contains(strtolower($taskInfo['tableName']),'pivot');
 
             if(!empty($taskInfo['taskNr'])) {
                 $taskToPrint .= ' ('.$taskInfo['taskNr'].')';
+            }
+
+            if($isPivot){
+                $taskToPrint .= ' (Pivot)';
             }
 
             if ($taskInfo['state'] === editor_Models_Task::STATE_IMPORT) {
@@ -605,9 +619,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         $data = $connector->getTm($validExportTypes[$type]);
-        header('Content-Type: '.$validExportTypes[$type], TRUE);
-        $type = '.'.strtolower($type);
-        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getName()).$type.'"');
+
+        Header::sendDownload(
+            rawurlencode($this->entity->getName()) . '.' . strtolower($type),
+            $validExportTypes[$type]
+        );
         echo $data;
         exit;
     }
@@ -714,18 +730,29 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         parent::putAction();
         if ($this->wasValid) {
 
-
-            if( (bool)$this->getParam('forced',false) === true){
-                $this->checkOrCleanAssociation(true, $this->getDataField('customerIds') ?? []);
-            }
-
             // especially tests are not respecting the array format ...
             editor_Utils::ensureFieldsAreArrays($this->data, ['customerIds', 'customerUseAsDefaultIds', 'customerWriteAsDefaultIds', 'customerPivotAsDefaultIds']);
 
+            if ((bool)$this->getParam('forced', false) === true) {
+                $this->checkOrCleanCustomerAssociation(true, $this->getDataField('customerIds') ?? []);
+            }
+
             $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            $customerAssoc->updateAssocRequest($this->entity->getId(),$this->data);
+            $customerAssoc->updateAssocRequest($this->entity->getId(), $this->data);
 
             $this->addAssocData();
+        }
+    }
+
+    /**
+     * The above injectors add additional error messages, which are evaluated here
+     * @throws ZfExtended_ValidateException
+     */
+    protected function additionalValidations()
+    {
+        if ($this->getRequest()->isPut() && (bool)$this->getParam('forced', false) === false) {
+            // check for association to be cleaned only when it is put and the forced flag is not set
+            $this->checkOrCleanCustomerAssociation(false, $this->getDataField('customerIds') ?? []);
         }
     }
 
@@ -800,19 +827,19 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     public function exportAction() {
-        $proposals=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        $proposals = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         /* @var $proposals editor_Models_Terminology_Models_TermModel */
 
-        $collectionIds=$this->getParam('collectionId');
-        if(is_string($collectionIds)){
-            $collectionIds=explode(',', $collectionIds);
+        $collectionIds = $this->getParam('collectionId');
+        if (is_string($collectionIds)) {
+            $collectionIds = explode(',', $collectionIds);
         }
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
         $allowedCollections = $termCollection->getCollectionForAuthenticatedUser();
         $rows = $proposals->loadProposalExportData(array_intersect($collectionIds, $allowedCollections), $this->getParam('exportDate'));
-        if(empty($rows)){
-            $this->view->message='No results where found.';
+        if (empty($rows)) {
+            $this->view->message = 'No results where found.';
             return;
         }
         $proposals->exportProposals($rows);
@@ -851,14 +878,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             // Unset session's download flag
             unset($_SESSION['download']);
 
-            // Convert collection name to filename
-            $filename = rawurlencode($_['collectionId']['name']);
-
             // Set up headers
-            header('Cache-Control: no-cache');
-            header('X-Accel-Buffering: no');
-            header('Content-Type: text/xml');
-            header('Content-Disposition: attachment; filename*=UTF-8\'\'' . $filename . '.xlsx; filename=' . $filename . '.xlsx');
+            Header::sendDownload(
+                rawurlencode($_['collectionId']['name']).'.xlsx',
+                'text/xml',
+                'no-cache',
+                -1,
+                [ 'X-Accel-Buffering' => 'no' ]
+            );
 
             // Flush the entire file
             readfile($file);
@@ -1138,7 +1165,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
 
         //set the language resource status to importing
-        $this->entity->addSpecificData('status',editor_Services_Connector_FilebasedAbstract::STATUS_IMPORT);
+        $this->entity->setStatus(LanguageResourceStatus::IMPORT);
         $this->entity->save();
 
         $workerId = $worker->queue();
@@ -1189,33 +1216,21 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     public function deleteAction(){
-        //load the entity
+        //load the entity abd store a copy for later use.
         $this->entityLoad();
-
-        // clone the current entity, so it can be re-applied later again after the entity is removed fron the database.
-        // there may be some post-delete events where the deleted entity should be checked
         $clone = clone $this->entity;
-
-        // if the current entity is term collection, init the entity as term collection
-        if($this->entity->isTc()){
-            $collection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            /* @var $collection editor_Models_TermCollection_TermCollection */
-            $collection->init($this->entity->toArray());
-            $this->entity = $collection;
-        }
+        
+        // detect parameters
+        $forced = (bool)$this->getParam('forced',false);
+        $deleteInResource = !$this->getParam('deleteLocally', false);
+        
+        // check entity version
         $this->processClientReferenceVersion();
-
-        //encapsulate the deletion in a transaction to rollback if for example the real file based resource can not be deleted
-        $this->entity->db->getAdapter()->beginTransaction();
+        
+        // now try to remove the language-resource associations, customer and task
         try {
-            $entity = clone $this->entity;
-
-            $clean = (bool)$this->getParam('forced',false);
-
-            $this->checkOrCleanAssociation($clean,$this->entity->getCustomers() ?? []);
-
-            //delete the entity in the DB
-            $this->entity->delete();
+            $remover = ZfExtended_Factory::get(editor_Models_LanguageResources_Remover::class, [ $this->entity ]);
+            $remover->remove(forced: $forced, deleteInResource: $deleteInResource);
         }
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             //if there are associated tasks we can not delete the language resource
@@ -1224,22 +1239,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             ], 'editor.languageresources');
             throw new ZfExtended_Models_Entity_Conflict('E1158');
         }
-        try {
-            $manager = ZfExtended_Factory::get('editor_Services_Manager');
-            /* @var $manager editor_Services_Manager */
-            $connector = $manager->getConnector($entity);
-            $deleteInResource = !$this->getParam('deleteLocally', false);
-            //try to delete the resource via the connector
-            $deleteInResource && $connector->delete();
-            //if this is successfull we commit the DB delete
-            $this->entity->db->getAdapter()->commit();
-        }
-        catch (Exception $e) {
-            //if not we rollback and throw the original exception
-            $this->entity->db->getAdapter()->rollBack();
-            throw $e;
-        }
+        
+        // and restore the entity for later use in "afterDeleteAction" event-handler
         $this->entity = $clone;
+
     }
 
     /**
@@ -1485,35 +1488,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /**
-     * The above injectors add additional error messages, which are evaluated here
-     * @throws ZfExtended_ValidateException
-     */
-    protected function additionalValidations() {
-
-        if( $this->getRequest()->isPut() === false || (bool)$this->getParam('forced',false) === true){
-            return;
-        }
-        // check for association to be cleaned only when it is put and the forced flag is not set
-        $this->checkOrCleanAssociation(false,$this->getDataField('customerIds') ?? []);
-    }
-
-    /**
-     * Check of clean associations.
+     * Check or clean of customer associations
      * @param bool $clean
      * @return void
      * @throws Zend_Db_Table_Exception
      * @throws ZfExtended_ErrorCodeException
      */
-    private function checkOrCleanAssociation(bool $clean, array $customerIds): void
+    private function checkOrCleanCustomerAssociation(bool $clean, array $customerIds): void
     {
-        $assocClean = ZfExtended_Factory::get(CleanupAssociation::class, [
-            $customerIds,
-            $this->entity->getId()
-        ]);
-
+        $assocClean = ZfExtended_Factory::get(Customer::class, [$this->entity->getId(), $customerIds]);
         $clean ? $assocClean->cleanAssociation() : $assocClean->check();
     }
-
+    
     private function hasImportingAssociatedTasks(int $languageResourceId): bool
     {
         $taskAssociation = ZfExtended_Factory::get(TaskAssociation::class);

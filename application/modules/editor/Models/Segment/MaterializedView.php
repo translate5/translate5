@@ -178,8 +178,8 @@ class editor_Models_Segment_MaterializedView {
      * @throws Zend_Exception
      */
     protected function checkMvFillState() {
-        $fillQuery = 'select mv.cnt mvCnt, tab.cnt tabCnt from (select count(*) cnt from LEK_segments where taskGuid = ?) mv, ';
-        $fillQuery .= '(select count(*) cnt from '.$this->viewName.' where taskGuid = ?) tab;';
+        $fillQuery = 'select mv.cnt mvCnt, tab.cnt tabCnt from (select count(*) cnt from LEK_segments where taskGuid = ?) tab, ';
+        $fillQuery .= '(select count(*) cnt from '.$this->viewName.' where taskGuid = ?) mv;';
         $db = Zend_Db_Table::getDefaultAdapter();
         //we assume a maximum of 28 seconds to wait on the MV
         for($i=1;$i<8;$i++) {

@@ -68,6 +68,9 @@ Ext.define('Editor.view.quality.SegmentQmController', {
                         record = store.add(record);
                         Editor.MessageBox.addSuccess(me.messages.qmHasBeenAdded);
                     }
+
+                    // Reload left panel's qualities tree
+                    Ext.ComponentQuery.query('qualityFilterPanel').pop()?.getStore()?.reload();
                 }
             },
             failure: function(response){

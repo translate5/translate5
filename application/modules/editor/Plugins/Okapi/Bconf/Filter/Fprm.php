@@ -206,7 +206,11 @@ final class editor_Plugins_Okapi_Bconf_Filter_Fprm extends editor_Plugins_Okapi_
         $json = NULL;
         $guiName = strtolower(editor_Plugins_Okapi_Bconf_Filters::getGuiClass($this->getOkapiType(), false));
         if(!empty($guiName)){
-            if(file_exists($translationsDir.$guiName.'.'.$translate->getSourceCodeLocale().'.json')){
+            // FPRM editor localzation in user's langage if available
+            $userLocale = (new Zend_Session_Namespace('user'))->data?->locale;
+            if($userLocale && file_exists($translationsDir.$guiName.'.'.$userLocale.'.json')) {
+                $json = file_get_contents($translationsDir.$guiName.'.'.$userLocale.'.json');
+            } else if(file_exists($translationsDir.$guiName.'.'.$translate->getSourceCodeLocale().'.json')){
                 $json = file_get_contents($translationsDir.$guiName.'.'.$translate->getSourceCodeLocale().'.json');
             } else if(file_exists($translationsDir.$guiName.'.'.self::DEFAULT_GUI_LANGUAGE.'.json')){
                 $json = file_get_contents($translationsDir.$guiName.'.'.self::DEFAULT_GUI_LANGUAGE.'.json');

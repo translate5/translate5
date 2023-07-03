@@ -30,7 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\Test\Config;
+use MittagQI\Translate5\Test\TestConfiguration;
 
 class TestAddIniSectionCommand extends Translate5AbstractTestCommand
 {
@@ -87,34 +87,27 @@ class TestAddIniSectionCommand extends Translate5AbstractTestCommand
             $installationIni .= implode("\n", [
                 "\n",
                 ';test settings, this enables api-tests via command for the instance',
-                'testSettings.testsAllowed = 1',
-                'testSettings.isApiTest = 0'
+                'testSettings.testsAllowed = 1'
             ]);
         } else {
             // if there, we make sure they're correct them
             $installationIni = preg_replace('/ *testSettings.testsAllowed *= *[0,1]*/i', 'testSettings.testsAllowed = 1', $installationIni);
-            $installationIni = preg_replace('/ *testSettings.isApiTest *= *[0,1]*/i', 'testSettings.isApiTest = 0', $installationIni);
             // ... and complement if neccessary
             if(!str_contains($installationIni, 'testSettings.testsAllowed = 1')){
                 $installationIni .= "\n".'testSettings.testsAllowed = 1';
-            }
-            if(!str_contains($installationIni, 'testSettings.isApiTest = 0')){
-                $installationIni .= "\n".'testSettings.isApiTest = 0';
             }
         }
         // add test-section [test:application]
         // retrieve application db-name
         $baseIndex = \ZfExtended_BaseIndex::getInstance();
         $config = $baseIndex->initApplication()->getOption('resources');
-        $testDbname = Config::createTestDatabaseName($config['db']['params']['dbname']);
+        $testDbname = TestConfiguration::createTestDatabaseName($config['db']['params']['dbname']);
         // add seperator and base configurations
         $installationIni .= "\n\n\n".$section."\n";
         // create test-db-name with a fixed scheme
         $installationIni .= 'resources.db.params.dbname = "'.$testDbname.'"'."\n";
         // add application db-name as different param, it must still be accessible when overridden
         $installationIni .= 'testSettings.applicationDbName = "'.$config['db']['params']['dbname'].'"'."\n";
-        // a configuration-option that retrieves if we are API-testing
-        $installationIni .= 'testSettings.isApiTest = 1'."\n";
 
         // save installation ini back
         file_put_contents($installationIniPath, $installationIni);

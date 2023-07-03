@@ -15,6 +15,8 @@ use ZfExtended_Models_Entity_Abstract;
  * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceid)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
+ * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
+ * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(int $autoCreatedOnImport)
  */
 class TaskPivotAssociation extends AssociationAbstract {
     protected $dbInstanceClass = 'MittagQI\Translate5\LanguageResource\Db\TaskPivotAssociation';

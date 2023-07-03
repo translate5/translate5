@@ -26,22 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
  */
-interface editor_Models_File_IFilter {
+interface editor_Models_File_IFilter
+{
     /**
      * Setting the filter manager so that it can be used internally
      * @param editor_Models_File_FilterManager $manager
-     * @param int $parentWorkerId
-     * @param editor_Models_Import_Configuration $importConfig
+     * @param editor_Models_File_FilterConfig $config
      */
-    public function initFilter(editor_Models_File_FilterManager $manager, $parentWorkerId, editor_Models_Import_Configuration $importConfig = null);
+    public function initFilter(editor_Models_File_FilterManager $manager, editor_Models_File_FilterConfig $config);
     
     /**
      * @param editor_Models_Task $task
@@ -50,8 +44,8 @@ interface editor_Models_File_IFilter {
      * @param array $parameters
      * @return string the filename of the file (can be changed internally for further processing)
      */
-    public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters);
-    
+    public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters): string;
+
     /**
      * @param editor_Models_Task $task
      * @param int $fileId
@@ -59,5 +53,5 @@ interface editor_Models_File_IFilter {
      * @param array $parameters
      * @return string the filename of the file (can be changed internally for further processing)
      */
-    public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters);
+    public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters): string;
 }

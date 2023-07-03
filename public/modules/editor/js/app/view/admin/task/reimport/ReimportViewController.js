@@ -31,14 +31,31 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
     alias: 'controller.adminTaskReimportReimport',
 
     requires:[
-        'Editor.view.admin.task.reimport.ReimportWindow'
+        'Editor.view.admin.task.reimport.ReimportWindow',
+        'Editor.view.admin.task.reimport.ReimportZipWindow',
     ],
 
     listen: {
+        component:{
+            '#exportTranslatorPackage':{
+                click:'onExportTranslatorPackageClick'
+            },
+            '#importTranslatorPackage':{
+                click:'onImportTranslatorPackageClick'
+            }
+        },
         messagebus: {
             '#translate5 task': {
                 triggerReload: 'onTriggerTaskReload',
             }
+        }
+    },
+
+    statics: {
+        exportTask: function (task){
+            var taskId = task.get('id');
+            task.set('state','PackageExport');
+            window.open(Editor.data.restpath + Ext.String.format('task/export/id/{0}?format=package&t5ui=true', taskId), '_blank');
         }
     },
 
@@ -74,12 +91,16 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
             scope: this,
             success: function(response){
                 var resp = Ext.util.JSON.decode(response.responseText),
+                    view = me.getView(),
                     result = resp['rows'];
-                // even if the root is disabled, adding root node is the only way to display the data !
-                me.getView().setRootNode({
-                    expanded:true,
-                    children:result
-                });
+
+                if (view){
+                    // even if the root is disabled, adding root node is the only way to display the data !
+                    view.setRootNode({
+                        expanded:true,
+                        children:result
+                    });
+                }
 
             },
             failure: function(response){
@@ -88,7 +109,11 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
         });
     },
 
-    onUploadAction: function (grid, rowIndex, colIndex, actionItem, event, record, row){
+    /***
+     * Check if the current task allows reimport action
+     * @returns {boolean}
+     */
+    isReimportAllowed: function (){
         var me = this,
             task = me.getView().task;
 
@@ -101,12 +126,45 @@ Ext.define('Editor.view.admin.task.reimport.ReimportViewController', {
                 buttons: Ext.Msg.OK,
                 icon: Ext.MessageBox.INFO
             });
+            return false;
+        }
+        return true;
+    },
+
+    onUploadAction: function (grid, rowIndex, colIndex, actionItem, event, record, row){
+        var me = this;
+
+        if( me.isReimportAllowed() === false){
             return;
         }
 
-
         var win = Ext.widget('adminTaskReimportReimportWindow');
         win.loadRecord(record,this.getView().task);
+        win.show();
+    },
+
+    /***
+     *
+     */
+    onExportTranslatorPackageClick: function (){
+        var me = this,
+            task = me.getView().task;
+
+        Editor.view.admin.task.reimport.ReimportViewController.exportTask(task);
+    },
+
+    /***
+     *
+     */
+    onImportTranslatorPackageClick: function (){
+        var me = this;
+
+        if(me.isReimportAllowed() === false){
+            return;
+        }
+
+        var win = Ext.widget('adminTaskReimportReimportZipWindow');
+        win.loadRecord(me.getView().task);
         win.show();
     }
 });

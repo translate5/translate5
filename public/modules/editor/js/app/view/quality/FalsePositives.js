@@ -45,11 +45,14 @@ Ext.define('Editor.view.quality.FalsePositives', {
         xtype: 'grid',
         userCls: 't5falsePositivesGrid',
         border: 0,
-        width: 277,
+        width: '100%',
         height: 'auto',
         store: {
             type: 'json',
             data: []
+        },
+        header: {
+            height: 10
         },
         columns: [{
             width: 35,
@@ -116,9 +119,8 @@ Ext.define('Editor.view.quality.FalsePositives', {
      * @param {Editor.model.quality.Segment[]} records
      */
     loadFalsifiable: function(records){
-        this.down('grid').getStore().setData(
-            Ext.Array.filter(records, rec => rec.get('falsifiable'))
-        );
+        var filteredRecords = (records && records.length) ? Ext.Array.filter(records, rec => rec.get('falsifiable')) : [];
+        this.down('grid').getStore().setData(filteredRecords);
     }
 });
 

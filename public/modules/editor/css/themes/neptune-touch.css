@@ -27,3 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 /* This css will be applied when this theme is active. */
+#segment-metadata .x-fieldset.segmentQualities > legend {
+    padding: 0 3px;
+    margin-left: 10px;
+}
+.x-fieldset.segmentQualities .x-grid .x-column-header[id^=widgetcolumn] .x-column-header-inner {
+    padding-left: 8px;
+    padding-right: 0;
+}
+.x-fieldset.segmentQualities .x-grid .x-column-header[id^=checkcolumn] .x-column-header-inner {
+    padding-right: 5px;
+    padding-left: 4px;
+}

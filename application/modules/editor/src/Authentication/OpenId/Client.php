@@ -121,30 +121,26 @@ class Client {
     }
 
     /**
+     * @return bool
      * @throws ClientException
-     * @throws Zend_Application_Bootstrap_Exception
      */
     public function authenticate(): bool
     {
 
         //if the openid fields for the customer are not set, ignore the auth call
-        if(!$this->isOpenIdCustomerSet()){
+        if (!$this->isOpenIdCustomerSet()) {
             return false;
         }
 
         
-        $bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
-        /* @var $bootstrap Bootstrap */
-        $session = $bootstrap->getPluginResource('ZfExtended_Resource_Session');
-        /* @var $session ZfExtended_Resource_Session */
-        if(!$session->isHttpsRequest()) {
+        if (!ZfExtended_Utils::isHttpsRequest()) {
             throw new ClientException("E1328", $this->getExceptionData());
         }
         
         $isAuthRequest=!empty($this->request->getParam('code')) || !empty($this->request->getParam('id_token'));
         $isLoginRequest=!empty($this->request->getParam('login')) && !empty($this->request->getParam('passwd'));
         $isRedirectRequest=$this->request->getParam('openidredirect')=='openid';
-        if(!$isAuthRequest && !$isRedirectRequest && !$isLoginRequest){
+        if (!$isAuthRequest && !$isRedirectRequest && !$isLoginRequest) {
             return false;
         }
 
@@ -395,14 +391,13 @@ class Client {
         return $roles;
     }
 
-    /***
+    /**
      * @return string
      */
     public function getRedirectDomainUrl(): string
     {
-        return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ?
-            "https" : "http") . "://" . $_SERVER['HTTP_HOST'] .
-            $_SERVER['REQUEST_URI'];
+        return (ZfExtended_Utils::isHttpsRequest() ? "https" : "http").
+            "://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     }
 
     /***

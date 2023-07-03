@@ -423,7 +423,7 @@ Ext.define('Editor.util.Range', {
             allDivTags,
             getCommonDivTag = function(node){
                 while (node) {
-                    if (node.nodeName.toLowerCase() == 'div' && 
+                    if (node.nodeName.toLowerCase() === 'div' && 
                             ( node.classList.contains('open') || node.classList.contains('close') || node.classList.contains('single') ) ) {
                         return node;
                     }
@@ -435,7 +435,7 @@ Ext.define('Editor.util.Range', {
         if (commonDivTag != null) {
             // Is the selection completely within a divTag?
             selRange.selectNode(commonDivTag);
-        } else if (commonContainer.nodeType == 1) {
+        } else if (commonContainer.nodeType === 1) {
             // Does the selection start or end within a divTag?
             allDivTags = commonContainer.getElementsByTagName('div');
             Ext.Array.each(allDivTags, function(divTag) {
@@ -527,15 +527,15 @@ Ext.define('Editor.util.Range', {
             iMax,
             isTagNodeInRange = function(nodeToCheck){
                 var nodeFound = false;
-                Ext.Array.each(tagNodesInRange, function(node, index) {
-                    if (node.id == nodeToCheck.id) {
+                Ext.Array.each(tagNodesInRange, function(node) {
+                    if (node.id === nodeToCheck.id) {
                         nodeFound = true;
                     }
                 });
                 return nodeFound;
             },
             isEmptyTextNode = function(nodeToCheck){
-                if (nodeToCheck.nodeType == 3 && nodeToCheck.data == "") {
+                if (nodeToCheck.nodeType === 3 && nodeToCheck.data === '') {
                     return true;
                 }
                 return false;
@@ -543,27 +543,26 @@ Ext.define('Editor.util.Range', {
             findNodeInEditor = function(nodeToFind){
                 var nodeFound = null,
                     allNodesInEditor = me.getEditorBodyExtDomElement().query('*');
-                Ext.Array.each(allNodesInEditor, function(node, index) {
-                    if ( (node.id != null && node.id != "" && node.id === nodeToFind.id) 
-                            || node.isEqualNode(nodeToFind) ) {
+                Ext.Array.each(allNodesInEditor, function(node) {
+                    if ((node.id != null && node.id !== '' && node.id === nodeToFind.id) || node.isEqualNode(nodeToFind)) {
                         nodeFound = node;
                     }
                 });
                 return nodeFound;
             },
-            getNextBorderNode = function(direction){
-                return (direction == "fromEnd") ? documentFragmentForRange.lastChild : documentFragmentForRange.firstChild;
+            getNextBorderNode = function(dir){
+                return (dir === 'fromEnd') ? documentFragmentForRange.lastChild : documentFragmentForRange.firstChild;
             },
-            seperateNodeFromRange = function(nodeToSeperate,direction){
-                if (direction == "fromEnd") {
-                    range.setEndBefore(nodeToSeperate);
+            seperateNodeFromRange = function(seperatorNode, dir){
+                if (dir === 'fromEnd') {
+                    range.setEndBefore(seperatorNode);
                 } else {
-                    range.setStartAfter(nodeToSeperate);
+                    range.setStartAfter(seperatorNode);
                 }
             },
-            cleanBorderNodesFromRange = function(direction){
+            cleanBorderNodesFromRange = function(dir){
                 i = 0;
-                nodeAtBorder = getNextBorderNode(direction);
+                nodeAtBorder = getNextBorderNode(dir);
                 while (i<iMax && nodeAtBorder != null && (isEmptyTextNode(nodeAtBorder) || isTagNodeInRange(nodeAtBorder)) ) {
                     switch(true) {
                         case isEmptyTextNode(nodeAtBorder):
@@ -573,10 +572,10 @@ Ext.define('Editor.util.Range', {
                         case isTagNodeInRange(nodeAtBorder):
                             nodeToSeperate = findNodeInEditor(nodeAtBorder);
                             if(nodeToSeperate != null) {
-                                seperateNodeFromRange(nodeToSeperate,direction);
+                                seperateNodeFromRange(nodeToSeperate, dir);
                                 documentFragmentForRange = range.cloneContents();
                             } else {
-                                nodeAtBorder ==  null; // stop iteration
+                                nodeAtBorder = null; // stop iteration
                             }
                             break;
                     }
@@ -594,19 +593,19 @@ Ext.define('Editor.util.Range', {
         iMax = documentFragmentForRange.childNodes.length;
         
         if (direction == null) {
-            direction = "fromBothEnds";
+            direction = 'fromBothEnds';
         }
         switch(direction) {
-            case "fromStart":
-                cleanBorderNodesFromRange("fromStart");
+            case 'fromStart':
+                cleanBorderNodesFromRange('fromStart');
                 break;
-            case "fromEnd":
-                cleanBorderNodesFromRange("fromEnd");
+            case 'fromEnd':
+                cleanBorderNodesFromRange('fromEnd');
                 break;
-            case "fromBothEnds":
+            case 'fromBothEnds':
             default:
-                cleanBorderNodesFromRange("fromStart");
-                cleanBorderNodesFromRange("fromEnd");
+                cleanBorderNodesFromRange('fromStart');
+                cleanBorderNodesFromRange('fromEnd');
                 break;
         }
         

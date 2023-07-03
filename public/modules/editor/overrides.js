@@ -34,58 +34,28 @@ END LICENSE AND COPYRIGHT
  */
 
 /**
+ * Add the tabid to the request URL for debugging purposes
+ */
+Ext.define('Ext.overrides.data.proxy.Server', {
+    override: 'Ext.data.proxy.Server',
+    buildUrl: function(request) {
+        let url = this.callParent([request]);
+        if (window.tabQty) {
+            return Ext.String.urlAppend(url, 'tab=' + (window._tabId ?? 0));
+        }
+        return url;
+    }
+});
+
+/**
  * Fixing missing contains method for bufferedstores
  * needed for ext-6.0.0
  * recheck on update
  */
 Ext.define('Ext.overrides.fixed.BufferedStore', {
     override: 'Ext.data.BufferedStore',
-    config: {
-        filterUpdateStoreDelay: 0
-    },
     contains: function(record) {
         return this.indexOf(record) > -1;
-    },
-
-    /**
-     * This method is the same as original, except that if filterUpdateStoreDelay-config is set
-     * then load() call will be made not directly, but via delayed task
-     */
-    onFilterEndUpdate: function() {
-        var me = this,
-            suppressNext = me.suppressNextFilter,
-            filters = me.getFilters(false);
-        // If the collection is not instantiated yet, it's because we are constructing.
-        if (!filters) {
-            return;
-        }
-        if (me.getRemoteFilter()) {
-            me.getFilters().each(function(filter) {
-                if (filter.getInitialConfig().filterFn) {
-                    Ext.raise('Unable to use a filtering function in conjunction with remote filtering.');
-                }
-            });
-            me.currentPage = 1;
-            if (!suppressNext) {
-                if (me.filterUpdateStoreDelay) {                                // +
-                    if (!me.task) {                                             // +
-                        me.task = new Ext.util.DelayedTask(me.load, me);        // +
-                    }                                                           // +
-                    me.task.delay(me.filterUpdateStoreDelay);                   // +
-                } else {                                                        // +
-                    me.load();
-                }                                                               // +
-            }
-        } else if (!suppressNext) {
-            me.fireEvent('datachanged', me);
-            me.fireEvent('refresh', me);
-        }
-        if (me.trackStateChanges) {
-            // We just mutated the filter collection so let's save stateful filters from this point forward.
-            me.saveStatefulFilters = true;
-        }
-        // This is not affected by suppressEvent.
-        me.fireEvent('filterchange', me, me.getFilters().getRange());
     }
 });
 
@@ -163,6 +133,63 @@ Ext.override(Ext.menu.Item, {
             me.menu.parentItem = me;
             me.menu.parentMenu = me.menu.ownerCt = me.parentMenu;
             me.menu.showBy(me, me.menuAlign, me.menuOffset);
+        }
+    }
+});
+
+/**
+ * Added support for checkableDespiteDisabled config
+ */
+Ext.override(Ext.menu.CheckItem, {
+    checkableDespiteDisabled: false,
+    checkboxTooltip: false,
+
+    /**
+     * Setter for checkboxTooltip-prop
+     *
+     * @param tooltip
+     */
+    setCheckboxTooltip: function(tip) {
+        if (tip) {
+            this.checkEl.dom.setAttribute('data-qtip', tip);
+        } else {
+            this.checkEl.dom.removeAttribute('data-qtip');
+        }
+        this.checkboxTooltip = tip;
+    },
+
+    /**
+     * Mare sure checkboxTooltip-config is respected
+     */
+    afterRender: function() {
+
+        // Call parent
+        this.callParent(arguments);
+
+        // Set checkboxTooltip, if configured
+        if (this.checkboxTooltip) {
+            this.setCheckboxTooltip(this.checkboxTooltip);
+        }
+    },
+    onClick: function(e) {
+        var me = this, isDisabled = null;
+
+        // If click was on checkbox of a disabled menu item but checkableDespiteDisabled-flag is true
+        if (me.checkEl.contains(e.target) && me.disabled) {
+
+            // Turn disabled-flag to false temporary
+            me.disabled = false;
+
+            // Remember that
+            isDisabled = true;
+        }
+
+        // Call parent
+        this.callParent([e]);
+
+        // Restore disabled-prop back to true
+        if (isDisabled) {
+            me.disabled = true;
         }
     }
 });
@@ -923,16 +950,12 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
             me.refreshSize();
         }
  
-        // If there are columns to trigger rendering, and the rendered block or not either the view size 
-        // or, if store count less than view size, the store count, set the view count to the rows count
-        if (view.getVisibleColumnManager().getColumns().length && rows.getCount() !== Math.min(me.store.getCount(), me.viewSize)) {
-            view.refresh();
-        }
-        
-        //<debug> 
+        //<debug>
         // If this is still the case, then there's a bug. 
         if (view.getVisibleColumnManager().getColumns().length && rows.getCount() !== Math.min(me.store.getCount(), me.viewSize)) {
-            Ext.raise('rendered block refreshed at ' + rows.getCount() + ' rows while BufferedRenderer view size is ' + me.viewSize);
+            // This will take no effect on the application if it is ignored. It will just produce rootcause errors for the
+            // users. For more info check the comment when scrolling is ignored in case no view rows nodes are existing
+            // Editor.view.project.ProjectPanelViewController->selectProjectRecord
         }
         //</debug> 
         
@@ -1325,6 +1348,25 @@ Ext.override(Ext.grid.column.Column, {
 });
 
 /**
+ * Enabling the collapsed-config to be stateful, as otherwise
+ * it is applied too late, e.g after component is painted
+ */
+ Ext.override(Ext.form.FieldSet, {
+    getState: function() {
+        var me = this,
+            state = me.callParent();
+        return me.addPropertyToState(state, 'collapsed', me.collapsed);
+    },
+    applyState: function(state ) {
+        if(state && state.collapsed) {
+            this.setCollapsed(state.collapsed);
+            delete state.collapsed;
+        }
+        this.callParent([state]);
+    }
+});
+
+/**
  * We use an empty {} as default value, but Window applyState crash when called with an empty object.
  */
 Ext.override(Ext.window.Window, {
@@ -1551,5 +1593,177 @@ Ext.define('Translate5.override.Ext.grid.feature.RowBody', {
 
         // Call parent
         me.callParent(arguments);
+    }
+});
+
+Ext.define('Translate5.override.window.MessageBox', {
+    override: 'Ext.window.MessageBox',
+    isValid: function() {
+
+        // Initial value
+        var isValid = true;
+
+        // Check validity of fields inside msgbox
+        this.query('field[hidden=false]').forEach(field => isValid = field.isValid() && isValid);
+
+        // Disable ok-button if isValid is false
+        this.msgButtons.ok?.setDisabled(!isValid);
+
+        // Return isValid flag
+        return isValid;
+    },
+
+    /**
+     * Add custom items (e.g. fields) to Ext.Msg.promptContainer
+     * and get simple object containing [itemId => value] pairs for
+     * the previously added custom items, if any
+     *
+     * So, in most cases this method can be called twice:
+     * 1.First call is to add fields to promptContainer and hide Ext.Msg's self {xtype: textfield, ...}
+     * 2.Second call is to get values of custom fields with Ext.Msg state reverted back (e.g custom fields destroyed, self textfield shown back)
+     *
+     * This behaviour is similar to Ext.Msg 'reconfigure'-behaviour,
+     * so each call adds items from scratch as if there is nothing previously added so far
+     *
+     * @param items
+     */
+    customFields: function(items) {
+        var params = {};
+
+        // Foreach custom field, that was previously added, if any
+        this.query('[isCustomField]').forEach(customField => {
+
+            // Get value
+            var value = customField.getValue();
+
+            // If value is array (for tagfield-fields, for example) - convert to comma-separated string
+            if (Ext.isArray(value)) value = value.join(',');
+
+            // Add to object
+            params[customField.itemId] = value;
+
+            // Delete custom field
+            customField.destroy();
+        });
+
+        // Reset Ext.Msg singleton to initial state
+        this.down('textfield').show();
+
+        // If items arg is given
+        if (items) {
+
+            // Hide textfield
+            this.down('textfield').hide();
+
+            // Apply isCustomField-flag for each item
+            items.forEach(item => item.isCustomField = true);
+
+            // Add items to prompt container
+            this.promptContainer.add(items);
+
+            // Bring in front of other windows, if any
+            Ext.Msg.toFront();
+        }
+
+        // Return [itemId => value] pairs for the previously added fields
+        return params;
+    },
+    onShow: function() {
+
+        // Call parent
+        this.callParent();
+
+        // Re-enable ok-button
+        this.msgButtons.ok?.setDisabled(false);
+    }
+});
+Ext.define('Translate5.override.data.request.Ajax', {
+    override: 'Ext.data.request.Ajax',
+
+    /**
+     *
+     * @param xhr
+     */
+    createResponse: function(xhr) {
+
+        // Call parent
+        var response = this.callParent(arguments);
+
+        if (~[401, 403].indexOf(response.status)) location = '/login' + location.hash;
+
+        // Parse response and show msgbox if need
+        this.parseResponse(response, this.options);
+
+        // Return
+        return response;
+    },
+
+    /**
+     * Check whether response's message should be shown, and if so do show
+     */
+    parseResponse: function(response, options) {
+        var json = response.responseJson || Ext.JSON.decode(response.responseText, true);
+
+        if (Ext.isObject(json)) {
+
+            // Set responseJson prop on response arg
+            response.responseJson = json;
+
+            // If both `success` and `msg` props are set - show alert
+            if ('success' in json && 'msg' in json) {
+                Ext.Msg.show({
+                    title: '',
+                    header: false,
+                    closable: false,
+                    icon: json.success ? 'x-message-box-info' : 'x-message-box-warning',
+                    message: json.msg,
+                    buttons: Ext.MessageBox.OK,
+                    modal: true,
+                    fn: function(){
+                        Ext.Msg.setUserCls();
+                    }
+                });
+
+            // Else if `confirm` prop is set - show confirmation dialog
+            } else if ('confirm' in json) {
+                Ext.Msg.show({
+                    title: '',
+                    header: false,
+                    closable: false,
+                    message: json.msg,
+                    buttons: Ext.MessageBox[json.buttons || 'OKCANCEL'],
+                    icon: Ext.MessageBox.QUESTION,
+                    modal: true,
+                    fn: function(answer) {
+
+                        var answerIdx = json.confirm === true ? '' : json.confirm;
+
+                        // Append new answer param
+                        options.url = options.url.split('?')[0] + '?answer' + answerIdx + '=' + answer
+                            + rif(options.url.split('?')[1], '&$1');
+
+                        // Make new request
+                        Ext.Ajax.request(options);
+                    }
+                });
+            }
+        }
+    }
+});
+Ext.define('Ext.overrides.grid.filters.filter.Base', {
+    override: 'Ext.grid.filters.filter.Base',
+    createMenu: function () {
+        var me = this;
+        me.setUpdateBuffer(2000);
+        me.callParent();
+    }
+});
+
+Ext.define('Ext.overrides.grid.filters.filter.Number', {
+    override: 'Ext.grid.filters.filter.Number',
+    createMenu: function () {
+        var me = this;
+        me.callParent();
+        me.setUpdateBuffer(0);
     }
 });

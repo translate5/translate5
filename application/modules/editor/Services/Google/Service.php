@@ -44,19 +44,14 @@ class editor_Services_Google_Service extends editor_Services_ServiceAbstract {
      * {@inheritDoc}
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
-    public function isConfigured() {
-        if (!isset($this->config->runtimeOptions->LanguageResources->google->apiKey) || empty($this->config->runtimeOptions->LanguageResources->google->apiKey)) {
-            return false;
-        }
-        if (!isset($this->config->runtimeOptions->LanguageResources->google->projectId) || empty($this->config->runtimeOptions->LanguageResources->google->projectId)) {
-            return false;
-        }
-        if (!isset($this->config->runtimeOptions->LanguageResources->google->matchrate) || empty($this->config->runtimeOptions->LanguageResources->google->matchrate)) {
-            return false;
-        }
-        return true;
+    public function isConfigured(): bool
+    {
+        return
+            $this->isConfigSet($this->config->runtimeOptions->LanguageResources->google->apiKey)
+            && $this->isConfigSet($this->config->runtimeOptions->LanguageResources->google->projectId)
+            && $this->isConfigSet($this->config->runtimeOptions->LanguageResources->google->matchrate);
     }
-    
+
     /**
      *
      * {@inheritDoc}

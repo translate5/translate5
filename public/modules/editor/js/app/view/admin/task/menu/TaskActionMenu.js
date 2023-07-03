@@ -60,6 +60,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
 
     constructor: function (instanceConfig) {
         var me = this,
+            task = instanceConfig.task,
             config = {
                 //Info: all items should be hidden by default, with this we reduce the "blinking" component behaviour
                 items: [{
@@ -200,14 +201,30 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                     },
                     glyph: 'f1c3@FontAwesome5FreeSolid',
                     sortIndex: 13
+                },{
+                    itemId: 'packageExportItem',
+                    bind:{
+                        hidden:'{!isTranslatorPackageAvailable}',
+                        text:'{l10n.tasksGrid.exportMenu.packageExportItem}'
+                    },
+                    action: 'editorPackageExport',
+                    sortIndex: 14,
+                    glyph: 'f019@FontAwesome5FreeSolid'
+                },{
+                    bind:{
+                        hidden:'{!isTranslatorPackageAvailable}',
+                        text: '{l10n.projectOverview.taskManagement.taskReimport.importTranslatorPackage}'
+                    },
+                    action: 'editorPackageReimport',
+                    sortIndex: 15,
+                    glyph: 'e4c7@FontAwesome5FreeSolid'
                 }, {
                     xtype: 'menuseparator',
                     hidden: true,
                     bind: {
                         hidden: '{!isMenuGroupVisible}'
-
                     },
-                    sortIndex: 14
+                    sortIndex: 16
                 }, {
                     text: me.messages.actionDelete,
                     action: 'editorDeleteTask',
@@ -216,14 +233,14 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
                         hidden: '{!isEditorDeleteTask}'
                     },
                     glyph: 'f2ed@FontAwesome5FreeSolid',
-                    sortIndex: 15
+                    sortIndex: 17
                 }, {
                     xtype: 'menuseparator',
                     hidden: true,
                     bind: {
                         hidden: '{!isMenuGroupVisible}'
                     },
-                    sortIndex: 16
+                    sortIndex: 18
                 }]
             };
 

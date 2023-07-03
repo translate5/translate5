@@ -9,24 +9,25 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
+
 /**
  * Language Resource Connector class
  * - provides a connection to a concrete language resource, via the internal adapter (which contains the concrete connector instance)
@@ -38,7 +39,8 @@ use MittagQI\Translate5\Segment\TagRepair\HtmlProcessor;
  * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource) returns the LanguageResource status
  * @method string getLastStatusInfo() getLastStatusInfo() returns the last store status info from the last getStatus call
  */
-class editor_Services_Connector {
+class editor_Services_Connector
+{
     
     /***
      * The request source when language resources is used is InstantTranslate
@@ -97,11 +99,17 @@ class editor_Services_Connector {
     
     /**
      * Connects to a given resource only, for requests not using a concrete language resource (ping calls for example)
+     *
      * @param editor_Models_LanguageResources_Resource $resource
      */
-    protected function connectToResourceOnly(editor_Models_LanguageResources_Resource $resource){
-        $connector = ZfExtended_Factory::get($resource->getServiceType().editor_Services_Manager::CLS_CONNECTOR);
-        /* @var $connector editor_Services_Connector_Abstract */
+    protected function connectToResourceOnly(editor_Models_LanguageResources_Resource $resource): void
+    {
+        if (method_exists($resource, 'getConnector')) {
+            $connector = $resource->getConnector();
+        } else {
+            $connector = ZfExtended_Factory::get($resource->getServiceType() . editor_Services_Manager::CLS_CONNECTOR);
+        }
+
         $connector->setResource($resource);
         $this->adapter = $connector;
     }
@@ -268,13 +276,13 @@ class editor_Services_Connector {
             // conclusion: the connectors themself have to convert the Http exceptions to editor_Services_Connector_Exception exceptions
             // with the below error codes (best directly in the abstract HttpApi)
         } catch (ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
-                //'E1311' => 'Could not connect to language resource {service}: server not reachable',
+                //'E1311' => 'Could not connect to {service}: server not reachable',
                 $ecode = 'E1311';
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut $e) {
-                //'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
+                //'E1312' => 'Could not connect to {service}: timeout on connection to server',
                 $ecode = 'E1312';
         } catch (ZfExtended_Zendoverwrites_Http_Exception_NoResponse $e) {
-                //'E1370' => 'Empty response from language resource {service}',
+                //'E1370' => 'Empty response from {service}',
                 $ecode = 'E1370';
         }
         if(isset($ecode) && isset($e)) {

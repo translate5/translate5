@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -76,6 +77,12 @@ class TestRunCommand extends Translate5AbstractTestCommand
             InputOption::VALUE_NONE,
             'Use this option to recreate the test database before running the test.');
 
+        $this->addOption(
+            'skip-pretests',
+            's',
+            InputOption::VALUE_NONE,
+            'Use this option to skip testing the environment like test-users, worker-state, etc. preceding running the given test/suite. This reduces the API-requests to a single appstate and a single login request before the test runs.');
+
         parent::configure();
     }
 
@@ -87,6 +94,10 @@ class TestRunCommand extends Translate5AbstractTestCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
+
+        if($this->checkCliUsageAsRoot()){
+            return Command::FAILURE;
+        }
 
         $test = trim($this->input->getArgument('test'), '.');
         $testPath = null;
@@ -116,6 +127,10 @@ class TestRunCommand extends Translate5AbstractTestCommand
             }
         } else {
             putenv('DO_CAPTURE=0');
+        }
+        // test-dev option to skip pretests
+        if($this->input->getOption('skip-pretests')){
+            putenv('SKIP_PRETESTS=1');
         }
 
         if($this->initTestEnvironment('test', true, $this->input->getOption('recreate-database'))){

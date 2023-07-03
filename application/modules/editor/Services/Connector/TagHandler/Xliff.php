@@ -181,11 +181,12 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         }, $segment);
         
         if($addedTags) {
-            //logging as debug only, since in GUI they are removed. FIXME whats with pretranslation?
-            $this->logger->debug('E1300', 'The LanguageResource answer did contain additional tags which were added to the segment, starting with Tag Nr {nr}.',[
-                'nr' => $mapCount,
-                'givenContent' => $segment,
-            ]);
+            // FOR NOW WE DO NOT LOG THIS AT IT UNNECCESSARILY FILLS THE LOG WITH THOUSANDS OF ENTRIES IN SOME TASKS
+            // logging as debug only, since in GUI they are removed. FIXME whats with pretranslation?
+            // $this->logger->debug('E1300', 'The LanguageResource answer did contain additional tags which were added to the segment, starting with Tag Nr {nr}.',[
+            //     'nr' => $mapCount,
+            //    'givenContent' => $segment,
+            // ]);
         }
         return $result;
     }

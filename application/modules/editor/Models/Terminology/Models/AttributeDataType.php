@@ -72,14 +72,13 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
     /***
      * Load all data type attributes translated for the current user locale.
      *
-     * @return array|false
+     * @param string $locale
+     * @return array
      * @throws Zend_Db_Statement_Exception
      */
-    public function loadAllWithTranslations(): bool|array
+    public function loadAllWithTranslations(string $locale): array
     {
-
-        $locale = (new Zend_Session_Namespace('user'))->data->locale;
-        $labels = $this->db->getAdapter()->query('
+        return $this->db->getAdapter()->query('
             SELECT
               `id`,
               IF (
@@ -93,8 +92,6 @@ class editor_Models_Terminology_Models_AttributeDataType extends ZfExtended_Mode
               ) AS `title`
             FROM `terms_attributes_datatype`
         ', [':lang' => '$.' . $locale])->fetchAll(PDO::FETCH_KEY_PAIR);
-
-        return $labels;
     }
 
     /**

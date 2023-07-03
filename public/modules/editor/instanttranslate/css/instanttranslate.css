@@ -236,8 +236,14 @@ textarea {font-family: 'Roboto', sans-serif;}
     position: relative;
 }
 
-.error {
+.error,
+a.error {
     color: var(--color-red_01);
+}
+
+a.error:hover {
+    color: var(--color-red_01);
+    filter: brightness(0.7);
 }
 
 .container__instanttranslate {

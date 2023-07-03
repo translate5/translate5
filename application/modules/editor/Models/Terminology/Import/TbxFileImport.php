@@ -51,6 +51,34 @@ class editor_Models_Terminology_Import_TbxFileImport
     protected editor_Models_Terminology_TbxObjects_DataType  $dataType;
 
     /**
+     * Images quantities
+     *
+     * @var array
+     */
+    protected $imageQty = [
+
+        /**
+         * Newly created images on disk
+         */
+        'created' => 0,
+
+        /**
+         * Recreated as having equal contentMd5Hash but missing on disk
+         */
+        'recreated' => 0,
+
+        /**
+         * Unchanged as having equal contentMd5Hash and existing on disk
+         */
+        'unchanged' => 0,
+
+        /**
+         * Sum of all above
+         */
+        'totalCount' => 0
+    ];
+
+    /**
      * $tbxMap = segment names for different TBX standards
      * $this->tbxMap['tig'] = 'tig'; - or if 'ntig' element - $this->tbxMap['tig'] = 'ntig';
      * each possible segment for TBX standard must be defined and will be merged in translate5 standard!
@@ -242,6 +270,7 @@ class editor_Models_Terminology_Import_TbxFileImport
             'terms' => $this->bulkTerm->getStatistics(),
             'attributes' => $this->bulkAttribute->getStatistics(),
             'transacGroups' => $this->bulkTransacGrp->getStatistics(),
+            'images' => $this->imageQty,
             'refObjects' => $this->bulkRefObject->getStatistics(),
             'collection' => $this->collection->getName(),
             'maxMemUsed in MB' => round(memory_get_peak_usage() / 2**20),
@@ -374,7 +403,9 @@ $memLog('Loaded terms:        ');
             if($listType == 'binaryData') {
                 /** @var $binImport editor_Models_Terminology_Import_TbxBinaryDataImport */
                 $binImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxBinaryDataImport', [$this->tbxFilePath]);
-                $binImport->import($this->collection, $node);
+                foreach ($binImport->import($this->collection, $node) as $type => $qty) {
+                    $this->imageQty[$type] += $qty;
+                }
             }
             else {
                 $this->importOtherRefObjects($node, $listType);
@@ -639,7 +670,29 @@ $memLog('Loaded terms:        ');
         $attributes = [];
         /** @var SimpleXMLElement $value */
         foreach ($element as $key => $value) {
-            $attributes[] = $this->createAndAddAttribute($parentNode, $key, (string)$value->attributes()->{'type'}, (string)$value->attributes()->{'target'}, (string) $value, $isDescripGrp);
+
+            // Get type
+            $type = (string) $value->attributes()->{'type'};
+
+            // If no 'type'-attr on node and node-name is not 'note'
+            // Note: '0'-value of $type is also considered as empty
+            // because it's a falsy value and proceeding with that may
+            // lead to problems with the other parts of the application
+            if (!$type && $key !== 'note') {
+
+                // Skip that
+                continue;
+            }
+
+            // Create attribute
+            $attributes[] = $this->createAndAddAttribute(
+                $parentNode,
+                $key,
+                $type,
+                (string) $value->attributes()->{'target'},
+                (string) $value,
+                $isDescripGrp
+            );
         }
 
         return $attributes;
@@ -749,7 +802,7 @@ $memLog('Loaded terms:        ');
             $msg = 'TBX Import: Attribute target was emptied as unsupported for that attribute type';
 
             // Do log
-            $this->log($msg, 'E1447', [
+            $this->log($msg, 'E1472', [
                 'type' => $attribute->type,
                 'wasTarget' => $attribute->wasTarget,
             ], 'warn');

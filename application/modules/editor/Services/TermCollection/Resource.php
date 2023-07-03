@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\LanguageResource\Status as LanguageResourceStatus;
+
 class editor_Services_TermCollection_Resource extends editor_Models_LanguageResources_Resource {
     public function __construct(string $id, string $name) {
         $this->id = $id;
@@ -36,10 +38,13 @@ class editor_Services_TermCollection_Resource extends editor_Models_LanguageReso
     }
     
     /**
-     * returns the initial status for that resource type for the overview list
+     * {@inheritDoc}
      */
-    public function getInitialStatus(&$statusInfo) {
-        $statusInfo = ''; //no addtional info here
-        return editor_Services_Connector_Abstract::STATUS_NOTCHECKED;
+    public function getInitialStatus(&$statusInfo): string
+    {
+        //no addtional info here
+        $statusInfo = '';
+
+        return LanguageResourceStatus::NOTCHECKED;
     }
 }

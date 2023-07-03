@@ -26,17 +26,14 @@
  END LICENSE AND COPYRIGHT
  */
 
+use MittagQI\ZfExtended\Controller\Response\Header;
+
 /**
  * REST Endpoint Controller to serve the Bconf List for the Bconf-Management in the Preferences
  *
  * @property editor_Plugins_Okapi_Bconf_Entity $entity
  */
 class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
-    /***
-     * Should the data post/put param be decoded to associative array
-     * @var bool
-     */
-    protected bool $decodePutAssociative = true;
 
     /**
      * The param-name of the sent bconf
@@ -45,9 +42,20 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
     const FILE_UPLOAD_NAME = 'bconffile';
 
     /**
+     * Should the data post/put param be decoded to associative array
+     * @var bool
+     */
+    protected bool $decodePutAssociative = true;
+
+    /**
      * @var string
      */
     protected $entityClass = 'editor_Plugins_Okapi_Bconf_Entity';
+
+    /**
+     * The download-actions need to be csrf unprotected!
+     */
+    protected array $_unprotectedActions = ['downloadbconf', 'downloadsrx'];
 
     /**
      * sends all bconfs as JSON
@@ -78,11 +86,13 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * Export bconf
      */
     public function downloadbconfAction() {
-        $this->entityLoad();
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="'.$this->entity->getDownloadFilename());
-        header('Cache-Control: no-cache');
-        header('Content-Length: ' . filesize($this->entity->getPath()));
+        $this->entityLoadAndRepack();
+        Header::sendDownload(
+            $this->entity->getDownloadFilename(),
+            'application/octet-stream',
+            'no-cache',
+            filesize($this->entity->getPath())
+        );
         readfile($this->entity->getPath());
         exit;
     }
@@ -109,10 +119,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         }
         $bconf = new editor_Plugins_Okapi_Bconf_Entity();
         $bconf->import($postFile['tmp_name'], $name, $description, $customerId);
-        $ret->id = $bconf->getId();
-        $ret->success = !empty($ret->id);
 
-        echo json_encode($ret);
+        $this->view->success = !empty($bconf->getId());
+        $this->view->id = $bconf->getId();
     }
 
     /**
@@ -123,7 +132,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @throws editor_Plugins_Okapi_Exception
      */
     public function cloneAction() {
-        $this->entityLoad();
+        $this->entityLoadAndRepack();
         $name = $this->getParam('name');
         $description = $this->getParam('description');
         $customerId = $this->getParam('customerId');
@@ -138,7 +147,9 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
         $returnData = $clone->toArray();
         $returnData['customExtensions'] = $clone->findCustomFilterExtensions(); // needed to match the grids data model
 
-        echo json_encode($returnData);
+        foreach($returnData as $key => $val){
+            $this->view->$key = $val;
+        }
     }
 
     /**
@@ -148,7 +159,7 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
      * @throws editor_Plugins_Okapi_Exception
      */
     public function downloadsrxAction() {
-        $this->entityLoad();
+        $this->entityLoadAndRepack();
         $srx = $this->entity->getSrx($this->getParam('purpose'));
         $downloadFilename = editor_Utils::filenameFromUserText($this->entity->getName(), false).'-'.$srx->getFile();
         $srx->download($downloadFilename);
@@ -168,9 +179,36 @@ class editor_Plugins_Okapi_BconfController extends ZfExtended_RestController {
                 'msg' => "No upload files were found. Please try again. If the error persists, please contact the support.",
             ]);
         }
-        $this->entityLoad();
+        $this->entityLoadAndRepack();
         $field = $this->getParam('purpose');
         $segmentation = editor_Plugins_Okapi_Bconf_Segmentation::instance();
         $segmentation->processUpload($this->entity, $field, $_FILES['srx']['tmp_name'], basename($_FILES['srx']['name']));
+    }
+
+    /**
+     * Sets the non-customer/common default bconf
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     */
+    public function setdefaultAction(){
+        $this->entityLoad();
+        $this->view->oldId = $this->entity->setAsDefaultBconf();
+    }
+
+    /**
+     * Helper to load the entity and repack it if the bconf is outdated
+     * This is needed to avoid outdated stuff leaving the system or being cloned
+     * @return void
+     * @throws Zend_Db_Statement_Exception
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey
+     * @throws ZfExtended_UnprocessableEntity
+     * @throws editor_Plugins_Okapi_Exception
+     */
+    private function entityLoadAndRepack()
+    {
+        $this->entityLoad();
+        $this->entity->repackIfOutdated();
     }
 }

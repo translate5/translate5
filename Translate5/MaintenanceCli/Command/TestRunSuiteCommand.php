@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -74,13 +75,17 @@ class TestRunSuiteCommand extends Translate5AbstractTestCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->initInputOutput($input, $output);
-        $suiteNames = $this->getAllSuiteNames();
 
+        if($this->checkCliUsageAsRoot()){
+            return Command::FAILURE;
+        }
+
+        $suiteNames = $this->getAllSuiteNames();
         $suite = ($this->input->hasArgument('suite')) ? $this->input->getArgument('suite') : null;
 
         if($suite === null || !in_array($suite, $suiteNames)) {
-            $uestion = ($suite === null) ? 'Please choose a Suite' : 'Suite "'.$suite.'" doesn\'t exist, choose one of the following';
-            $askSuites = new ChoiceQuestion($uestion, $suiteNames, null);
+            $question = ($suite === null) ? 'Please choose a Suite' : 'Suite "'.$suite.'" doesn\'t exist, choose one of the following';
+            $askSuites = new ChoiceQuestion($question, $suiteNames, null);
             $suite = $this->io->askQuestion($askSuites);
         }
 

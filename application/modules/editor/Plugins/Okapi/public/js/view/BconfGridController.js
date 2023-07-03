@@ -100,25 +100,18 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             grid.setSelection(toSelect);
         }
     },
+    
     /**
      * Delete button handler
      * @param {Editor.plugins.Okapi.view.BconfGrid} view
      * @param {int} rowIndex
+     * ...
+     * @param {Editor.plugins.Okapi.model.BconfModel} record
      */
-    deleteBconf: function(view, rowIndex){
-        view.select(rowIndex); // we need a selected row
-        var me = this;
-        // UGLY/FIXME: it seems the row selection events interfere with the prompt, which is immediately closed when clicking on a delete-icon of an unselected row.
-        Ext.defer(function(){ me.doDeleteBconf(view); }, 50, me);
-    },
-    /**
-     *
-     * @param view
-     */
-    doDeleteBconf: function(view){
-        Ext.Msg.confirm(view.grid.strings.confirmDeleteTitle + `: <i>"${view.selection.get('name')}"</i>`, view.grid.strings.confirmDeleteMessage, function(btnId){
+    deleteBconf: function(view, rowIndex, colIndex, item, e, record){
+        Ext.Msg.confirm(view.grid.strings.confirmDeleteTitle + `: <i>"${record.get('name')}"</i>`, view.grid.strings.confirmDeleteMessage, function(btnId){
             if(btnId === 'yes'){
-                view.selection.drop();
+                record.drop(/* cascade */ false);
             }
         });
     },
@@ -133,6 +126,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         // UGLY/FIXME: it seems the row selection events interfere with the prompt, which is immediately closed when clicking on a clone-icon of an unselected row.
         Ext.defer(function(){ me.doCloneBconf(view); }, 50, me);
     },
+
     doCloneBconf: async function(view){
         var name,
             rec = view.selection;
@@ -242,10 +236,10 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         });
     },
     isDeleteDisabled: function(view, rowIndex, colIndex, item, record){
-        return record.get('isDefault') || view.grid.isCustomerGrid && !record.get('customerId') || record.get('name') === Editor.data.plugins.Okapi.systemStandardBconfName;
+        return record.get('isDefault') || view.grid.isCustomerGrid && !record.get('customerId') || record.get('name') === Editor.data.plugins.Okapi.systemDefaultBconfName;
     },
     isEditDisabled: function(view, rowIndex, colIndex, item, record){
-        return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemStandardBconfName));
+        return ((view.ownerGrid.isCustomerGrid && !record.get('customerId')) || (record.get('name') === Editor.data.plugins.Okapi.systemDefaultBconfName));
     },
 
     filterByText: function(field, searchString){
@@ -397,7 +391,7 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
         var grid = this.getView(),
             {name, customerId} = cellContext.record.getData();
         grid.view.select(cellContext.record);
-        if(name === Editor.data.plugins.Okapi.systemStandardBconfName || grid.isCustomerGrid && !customerId){
+        if(name === Editor.data.plugins.Okapi.systemDefaultBconfName || grid.isCustomerGrid && !customerId){
             return false; // Can't change system default and globals bconfs in customer view
         }
         if(cellContext.field === 'name'){
@@ -428,5 +422,108 @@ Ext.define('Editor.plugins.Okapi.view.BconfGridController', {
             });
         }
         return extraInfo;
+    },
+
+    /**
+     * Handler when a global bconf default checkbox is changed
+     * @param {Object} col
+     * @param {Integer} recordIndex
+     * @param {Boolean} checked: the status of the checkbox
+     * @param {Editor.plugins.Okapi.model.BconfModel} record: the record whose row was clicked
+     * @returns {boolean}
+     */
+    onBeforeGlobalCheckChange: function(col, recordIndex, checked, record){
+        // at times extJs fires this event without record what in theory must not happen. Also not-checked events must be dismissed
+        if(!record || !checked){
+            return false;
+        }
+        var gridView = col.getView();
+        gridView.select(record);
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'plugins_okapi_bconf/setdefault',
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            },
+            params: {
+                id: record.id
+            },
+            success: function(xhr) {
+                var result = Ext.JSON.decode(xhr.responseText, true);
+                record.set('isDefault', true, { dirty: false, commit: false, silent: false });
+                gridView.refreshNode(record);
+                Editor.data.plugins.Okapi.defaultBconfId = record.getId(); // Crucial: the default-id is a global that must be updated!
+                if(result.oldId && result.oldId > 0){
+                    var store = gridView.ownerGrid.getStore(),
+                        oldRrecord = store.getById(result.oldId);
+                    if(oldRrecord){
+                        oldRrecord.set('isDefault', false, { dirty: false, commit: false, silent: false });
+                        gridView.refreshNode(oldRrecord);
+                    }
+                }
+            },
+            failure: function(xhr){
+                Editor.app.getController('ServerException').handleException(xhr);
+            }
+        });
+        return false;
+    },
+
+    /**
+     * Handler when a customer-specific bconf default checkbox is changed
+     * There is always a row to be highlighted and one to be unhighlighted
+     * The exception is, when system default is (de)selected as customer default - then don't refresh old
+     * @param {Object} col
+     * @param {Integer} recordIndex
+     * @param {Boolean} checked: the status of the checkbox
+     * @param {Editor.plugins.Okapi.model.BconfModel} record: the record whose row was clicked
+     * @returns {boolean}
+     */
+    onBeforeCustomerCheckChange: function(col, recordIndex, checked, record){
+        // at times extJs fires this event without record what in theory must not happen
+        if(!record){
+            return;
+        }
+        var gridView = col.getView(),
+            customer = gridView.grid.getCustomer(),
+            customerId = customer.id,
+            oldBconfId = customer.get('defaultBconfId'),
+            newChecked = (oldBconfId !== record.id), // find-params: ... startIndex, anyMatch, caseSensitive, exactMatch
+            newBconfId = newChecked ? record.id : null;
+        gridView.select(record);
+        Ext.Ajax.request({
+            url: Editor.data.restpath + 'customermeta',
+            method: 'PUT',
+            params: {
+                id: customerId,
+                data: Ext.encode({
+                    defaultBconfId: newBconfId
+                })
+            },
+            success: function() {
+                var storeId, store, sCustomer;
+                // unfortunately there are two customer stores, which both act as source for the TaskImport customer selector, so we have to update them both
+                for(storeId of ['customersStore', 'userCustomers']){
+                    store = Ext.getStore(storeId);
+                    sCustomer = (store) ? store.getById(customerId) : null;
+                    if(sCustomer){
+                        sCustomer.set('defaultBconfId', newBconfId, { commit: true, silent: true });
+                    }
+                }
+                // refresh the grid for the changed record
+                gridView.refreshNode(record);
+                if(oldBconfId !== null){
+                    // if there was a old record, refresh the grid for the old record
+                    var bconf = gridView.getStore().getById(oldBconfId);
+                    if(bconf){
+                        gridView.refreshNode(bconf);
+                    }
+                }
+            },
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+        return false; // checked state handled manually via view.refresh
     }
 });

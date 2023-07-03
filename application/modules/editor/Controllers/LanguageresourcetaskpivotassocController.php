@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\LanguageResource\TaskPivotAssociation;
+use MittagQI\ZfExtended\Worker\Queue;
 
 /**
  */
@@ -98,8 +99,7 @@ class editor_LanguageresourcetaskpivotassocController extends ZfExtended_RestCon
         }
 
         if($task->isImporting() === false){
-            $wq = ZfExtended_Factory::get('ZfExtended_Worker_Queue');
-            /* @var $wq ZfExtended_Worker_Queue */
+            $wq = ZfExtended_Factory::get(Queue::class);
             $wq->trigger();
         }
     }

@@ -49,6 +49,13 @@ class PluginListCommand extends Translate5AbstractCommand
         // the full command description shown when running the command with
         // the "--help" option
         ->setHelp('Tool to list all installed translate5 plugins.');
+
+        $this->addOption(
+            '--as-json',
+            null,
+            InputOption::VALUE_NONE,
+            'return the summary just as json'
+        );
     }
 
     /**
@@ -58,9 +65,16 @@ class PluginListCommand extends Translate5AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $isJson = false;
+        if ($input->getOption('as-json')) {
+            $isJson = true;
+            $this->isPorcelain = true;
+            $output->setDecorated(false);
+            $input->setInteractive(false);
+        }
+
         $this->initInputOutput($input, $output);
         $this->initTranslate5AppOrTest();
-        $this->writeTitle('Installed Translate5 Plug-Ins.');
 
         $pluginmanager = \Zend_Registry::get('PluginManager');
         /* @var $pluginmanager \ZfExtended_Plugin_Manager */
@@ -69,16 +83,45 @@ class PluginListCommand extends Translate5AbstractCommand
         $pluginmanager->bootstrap();
         $activePlugins = $pluginmanager->getActive();
         $rows = [];
+
+        if($isJson) {
+            foreach ($plugins as $plugin => $cls) {
+                $rows[] = [
+                    'plugin' => $plugin,
+                    'active' => in_array($cls, $activePlugins),
+                    'type' => $cls::getType(),
+                    'enabledByDefault' => $cls::isEnabledByDefault(),
+                    'description' => $cls::getDescription(),
+                ];
+            }
+            $output->write(json_encode($rows));
+            return self::SUCCESS;
+        }
+
+        $this->writeTitle('Installed Translate5 Plug-Ins.');
+
         foreach($plugins as $plugin => $cls) {
             $desc = $cls::getDescription();
+            $type = $cls::getType();
+            $enabledByDefault = $cls::isEnabledByDefault() ? '<options=bold>on</>' : 'off';
+            switch ($type) {
+                case \ZfExtended_Plugin_Abstract::TYPE_CLIENT_SPECIFIC:
+                    $type = '<fg=magenta>'.$type.'</>';
+                    break;
+                case \ZfExtended_Plugin_Abstract::TYPE_PRIVATE:
+                    $type = '<fg=bright-magenta>'.$type.'</>';
+                    break;
+                default:
+                    break;
+            }
             if(in_array($cls, $activePlugins)) {
-                $rows[] = ['<info>'.$plugin.'</info>', '<info>active</info>', $desc];
+                $rows[] = ['<info>'.$plugin.'</info>', '<info>active</info>', $enabledByDefault, $type, $desc];
             }
             else {
-                $rows[] = [$plugin, 'disabled', $desc];
+                $rows[] = [$plugin, 'disabled', $enabledByDefault, $type, $desc];
             }
         }
-        $this->io->table(['Plugin', 'Status', 'Description'], $rows);
+        $this->io->table(['Plugin', 'Status', 'Default', 'Type', 'Description'], $rows);
         return 0;
     }
 }

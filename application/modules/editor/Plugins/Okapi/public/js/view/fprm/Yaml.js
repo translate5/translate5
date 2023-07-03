@@ -27,6 +27,7 @@
 Ext.define('Editor.plugins.Okapi.view.fprm.Yaml', {
     extend: 'Editor.plugins.Okapi.view.FprmEditor',
     width: 800,
+    resetable: true,
     formPanelLayout: 'fit',
     defaultFocus: 'textarea',
     /**

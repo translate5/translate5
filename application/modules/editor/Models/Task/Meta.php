@@ -25,20 +25,26 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+use MittagQI\Translate5\Plugins\MatchAnalysis\Models\Pricing\Preset;
 /**
- * Entity Model for segment meta data
+ * Entity Model for task meta data
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method int getBconfId() getBconfId()
  * @method setBconfId(int $bconfId)
+ * @method string getBconfInZip() getBconfInZip()
+ * @method setBconfInZip(string $bconfInZip)
+ * @method setPricingPresetId(int $pricingPresetId)
  * @method string getMappingType() getMappingType()
  * @method setMappingType(string $mappingType)
+ * @method bool getPerTaskExport()
+ * @method setPerTaskExport(bool $perTaskExport)
  */
 class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
+    protected $validatorInstanceClass = 'editor_Models_Validator_TaskMeta';
 
     /**
      * @param $taskGuid
@@ -78,5 +84,30 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
             return 0;
         }
         return $this->db->update(['tbxHash'=>''],['taskGuid IN(?)' => $taskGuids]);
+    }
+
+    /**
+     * Get id of a pricing preset to be used for pricing calculation for current task
+     */
+    public function getPricingPresetId() {
+
+        // If no pricingPresetId defined (this may occur for tasks created before pricing-feature released)
+        if (!$this->row->pricingPresetId) {
+
+            // Load task and get it's customerId
+            $task = ZfExtended_Factory::get(editor_Models_Task::class);
+            $task->loadByTaskGuid($this->getTaskGuid());
+            $customerId = $task->getCustomerId();
+
+            // Get pricing preset id: either customer-specific, or system default detected by either isDefault-prop or name-prop
+            $pricingPresetId = ZfExtended_Factory::get(Preset::class)->getDefaultPresetId($customerId);
+
+            // Apply that for task meta
+            $this->setPricingPresetId($pricingPresetId);
+            $this->save();
+        }
+
+        // Return pricingPresetId
+        return $this->row->pricingPresetId;
     }
 }

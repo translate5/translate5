@@ -61,6 +61,10 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
                         html: me.strings.importTmx,
                         padding: 5
                     },{
+                        xtype: 'hiddenfield',
+                        name: 'CsrfToken',
+                        value: Editor.data.csrfToken
+                    },{
                         xtype: 'filefield',
                         fieldLabel: me.strings.file,
                         toolTip: me.strings.importTmx,

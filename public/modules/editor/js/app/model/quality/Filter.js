@@ -79,6 +79,25 @@ Ext.define('Editor.model.quality.Filter', {
     isFaulty: function(){
         return (this.get('qfaulty') == true);
     },
+    hasCriticalErrors: function() {
+        if (!this.get('mustBeZeroErrors')) {
+            return false;
+        }
+
+        if (!this.childNodes.length) {
+            return (!!this.get('qcount') && !this.get('qcountfp')) || (this.get('qcount') !== this.get('qcountfp'));
+        }
+
+        return this.hasCriticalErrorsInChildren();
+    },
+    hasCriticalErrorsInChildren: function(){
+        for(var i=0; i < this.childNodes.length; i++){
+            if(this.childNodes[i].hasCriticalErrors()){
+                return true;
+            }
+        }
+        return false;
+    },
     propagateChecked: function(checked){
         var isQRoot = this.isQualityRoot(), isRubric = this.isRubric(), isCategoryGroup = this.isCategoryGroup();
         if(isQRoot || isRubric || isCategoryGroup){

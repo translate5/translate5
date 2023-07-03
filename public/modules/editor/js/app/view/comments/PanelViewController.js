@@ -131,7 +131,6 @@ Ext.define('Editor.view.comments.PanelViewController', {
                 //enabling the collapsed form gives a visual misbehaviour, so enable it by a own flag on expand
                 if(op.wasSuccessful()) {
                     me.handleCommentsChanged(rec, 'save'); //rec from outer scope is needed!
-                    me.getView() && me.getView().fireEvent('requestCommentClose', me.getCommentPanel());
                     return;
                 }
                 if(rec.phantom) {

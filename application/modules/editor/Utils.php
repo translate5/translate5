@@ -53,6 +53,7 @@ class editor_Utils {
         'double72' => '/^([1-9][0-9]{0,6}|[0-9])(\.[0-9]{1,2})?$/',
         'decimal112' => '/^(-?([1-9][0-9]{1,7}|[0-9]))(\.[0-9]{1,2})?$/',
         'decimal143' => '/^(-?([1-9][0-9]{1,9}|[0-9]))(\.[0-9]{1,3})?$/',
+        'decimal154' => '/^(-?([1-9][0-9]{1,9}|[0-9]))(\.[0-9]{1,4})?$/',
         'datetime' => '/^[0-9]{4}\-[0-9]{2}\-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/',
         'url' => '/^(ht|f)tp(s?)\:\/\/(([a-zA-Z0-9\-\._]+(\.[a-zA-Z0-9\-\._]+)+)|localhost)(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_]*)?([\d\w\.\/\%\+\-\=\&amp;\?\:\\\&quot;\'\,\|\~\;]*)$/',
         'varchar255' => '/^([[:print:]]{0,255})$/u',
@@ -395,6 +396,22 @@ class editor_Utils {
     }
 
     /**
+     * Turns "real" newlines to purely visual ones "↵"
+     * Note, that this method changes the string!!
+     * @param string $text
+     * @return string
+     */
+    public static function visualizeNewlines(string $text): string
+    {
+        // normalize newlines
+        $text = str_replace("\r\n", "\n", $text);
+        // replace orphan carriage returns
+        $text = str_replace("\r", "\n", $text);
+        // visualize them
+        return str_replace("\n", '↵', $text);
+    }
+
+    /**
      * Ensures the definedfields are arrays in the given assoc data
      * This will convert a string to an array, an empty string to an empty array, a missing param to an empty array (set force to false to avoid this)
      * Note, that types other than array/string will also result in an empty array
@@ -450,12 +467,14 @@ class editor_Utils {
      *          - 'tableName'                             - Single row mode. Here columnName is not given, so 'id' assumed
      *          - 'tableName.columnName'                  - Single row mode. Here columnName is explicitly given
      *
-     *          - 'tableName*'                            - Multiple rows mode. Prop value should be comma-separated list or array
-     *          - 'tableName.columnName*'                   of values, that can be, for example, ids, slugs or others kind of data
+     *          - 'tableName+'                            - Multiple rows mode. Prop value should be comma-separated list or array
+     *          - 'tableName.columnName+'                   of values, that can be, for example, ids, slugs or others kind of data
+     *          - 'tableName*'                            - Same as above but no exception is thrown if no rows are found
      *
      *          - 'editor_Models_MyModelName'             - Single row mode. Model class name can be used
      *          - 'editor_Models_MyModelName.columnName'  - Single row mode. Model class name can be used
      *          - $this->entity                           - Single row mode. Model class instance can be used
+     *          - MyModelName::class                      - Single row mode. Model class name shortened via namespaces can be used
      *
      *          Found data is accessible within return value using the same mapping: $_['propNameX'],
      *          and is represented as:
@@ -483,7 +502,7 @@ class editor_Utils {
      *          Prop value should be given as just $_FILES['propNameX'], and if validation is ok - prop value is attached
      *          to return value under $_['propNameX'] mapping
      *
-     * Todo: Add support for 'min' and 'max' rules, that would work for strings, numbers and file sizes
+     * Todo: Add support for 'min' and 'max' rules, that would work for file sizes
      * @param $ruleA
      * @param array|stdClass|ZfExtended_Models_Entity_Abstract $data Data to checked
      * @return array
@@ -508,10 +527,20 @@ class editor_Utils {
         // Foreach prop having mismatch rules
         foreach ($ruleA as $props => $rule) foreach (self::ar($props) as $prop) {
 
+            // Custom msg by rule-type
+            $msg = [];
+
             // Explicitly set up the rule-type keys for which not exist
-            foreach (['req', 'rex', 'ext', 'unq', 'key', 'fis', 'dis'] as $type)
-                if (!isset($rule[$type]))
+            foreach (['req', 'rex', 'ext', 'unq', 'key', 'fis', 'dis', 'min', 'max'] as $type)
+                if (!isset($rule[$type])) {
                     $rule[$type] = '';
+                } else if (is_string($rule[$type])) {
+                    if (preg_match('~:~', $rule[$type])) {
+                        list ($rule[$type], $msg[$type]) = explode(':', $rule[$type], 2);
+                    } else {
+                        $msg[$type] = false;
+                    }
+                }
 
             // Shortcut to $data[$prop]
             $value = $data[$prop] ?? null;
@@ -524,8 +553,17 @@ class editor_Utils {
 
             // If prop is required, but has empty/null/zero value - flush error
             if (($rule['req'] || $rule['unq'])
-                && ((!is_array($value) && !strlen($value)) || (!$value && $rule['key'])))
-                throw new ZfExtended_Mismatch('E2000', [$label]);
+                && ((!is_array($value) && !strlen($value)) || (!$value && $rule['key']))) {
+
+                // Prepare exception msg template args
+                $args = [$label];
+
+                // Append custom msg
+                $args['custom'] = $msg['req'] ?? false;
+
+                // Throw mismatch-exception
+                throw new ZfExtended_Mismatch('E2000', $args);
+            }
 
             // If prop's value should match certain regular expression, but it does not - flush error
             if ($rule['rex'] && strlen($value) && !self::rexm($rule['rex'], $value))
@@ -585,20 +623,43 @@ class editor_Utils {
             }
 
             // If value should not be in the list of disabled values - flush error
-            if ($rule['dis'] && in_array($value, self::ar($rule['dis'])))
-                throw new ZfExtended_Mismatch('E2005', [$value, $label]);
+            if ($rule['dis'] && array_intersect(self::ar($value), self::ar($rule['dis']))) {
+
+                // Prepare exception msg template args
+                $args = [$value, $label];
+
+                // Append custom msg
+                $args['custom'] = $msg['dis'] ?? false;
+
+                // Throw mismatch-exception
+                throw new ZfExtended_Mismatch('E2005', $args);
+            }
 
             // If prop's value should be an identifier of an existing database record
             if ($rule['key'] && strlen($value) && $value != '0') {
+
+                // Setup invert flag, indicating that key-rule-check should be in inverted/negation mode
+                $invert = false;
 
                 // If the rule value is a string
                 if (is_string($rule['key'])) {
 
                     // Get table name
-                    $table = preg_replace('/\*$/', '', $rule['key']);
+                    $table = preg_replace('/[\*\+]$/', '', $rule['key']);
 
                     // Setup $isSingleRow as a flag indicating whether *_Row (single row) or *_Rowset should be fetched
                     $isSingleRow = $table == $rule['key'];
+
+                    // Setup $allowNotFound-flag which can be only true if value of key-rule ends with '*'
+                    $allowNotFound = $isSingleRow ? false : preg_match('~\*$~', $rule['key']);
+
+                    // If exclamation sign is specified at the beginning of the rule value
+                    // it means invert flag should be set to true
+                    if ($invert = preg_match($rex = '~^!~', $rule['key'])) {
+
+                        // Trim that from table name
+                        $table = preg_replace($rex,'', $rule['key']);
+                    }
 
                     // Get key's target table and column
                     $target = explode('.', $table); $table = $target[0]; $column = $target[1] ?? 'id';
@@ -674,9 +735,46 @@ class editor_Utils {
                     $rowA[$prop] = $isSingleRow ? $stmt->fetch() : $stmt->fetchAll();
                 }
 
-                // If no *_Row was fetched, or empty *_Rowset was fetched - flush error
-                if (!$rowA[$prop])
-                    throw new ZfExtended_Mismatch('E2002', [is_string($rule['key']) ? $rule['key'] : get_class($rule['key']), $value]);
+                // Prepare exception msg template args
+                $args = [is_string($rule['key']) ? $rule['key'] : get_class($rule['key']), $value];
+
+                // Append custom msg
+                $args['custom'] = $msg['key'] ?? false;
+
+                // If invert-flag is true
+                if ($invert) {
+
+                    // If non empty result
+                    if ($rowA[$prop]) {
+
+                        // Throw mismatch-exception
+                        throw new ZfExtended_Mismatch('E2008', $args);
+                    }
+
+                // Else
+                } else {
+
+                    // If no *_Row was fetched, or empty *_Rowset was fetched - flush error
+                    if (!$rowA[$prop] && !$allowNotFound) {
+
+                        // Throw mismatch-exception
+                        throw new ZfExtended_Mismatch('E2002', $args);
+                    }
+                }
+            }
+
+            // If min-rule is given, but value is less than it should bee
+            if (is_numeric($rule['min']) && $value < $rule['min']) {
+
+                // Throw exception
+                throw new ZfExtended_Mismatch('E2009', [$value, $label, $rule['min']]);
+            }
+
+            // If max-rule is given, but value is greater than it should bee
+            if (is_numeric($rule['max']) && $value > $rule['max']) {
+
+                // Throw exception
+                throw new ZfExtended_Mismatch('E2010', [$value, $label, $rule['max']]);
             }
 
             // If prop's value should be unique within the whole database table, but it's not - flush error
@@ -1158,7 +1256,45 @@ class ZfExtended_Mismatch extends ZfExtended_ErrorCodeException {
         'E2005' => 'Value "{0}" of param "{1}" - is in the list of disabled values',       // DIS
         'E2006' => 'Value "{0}" of param "{1}" - is not unique. It should be unique.',     // UNQ
         'E2007' => 'Extension "{0}" of file "{1}" - is not in the list of allowed values', // EXT
+        'E2008' => 'Object of type "{0}" already exists having key "{1}"',                 // KEY (negation)
+        'E2009' => 'Value "{0}" of param "{1}" should be minimum "{2}"',                   // MIN
+        'E2010' => 'Value "{0}" of param "{1}" should be maximum "{2}"',                   // MAX
     ];
+
+    /**
+     * Overridden to use custom message if given
+     *
+     * ZfExtended_Mismatch constructor.
+     * @param $errorCode
+     * @param array $extra
+     * @param Exception|null $previous
+     */
+    public function __construct($errorCode, array $extra = [], Exception $previous = null) {
+
+        // Call parent
+        parent::__construct($errorCode, $extra, $previous);
+
+        // If custom message is given
+        if ($extra['custom'] ?? 0) {
+
+            // Get that
+            $msg = $extra['custom'];
+
+        // Else get default one
+        } else {
+            $msg = $this->getMessage();
+        }
+
+        // If message have placeholders like {0}, {1}, {2} etc
+        if (preg_match('~{([0-9])}~', $msg)) {
+
+            // Replace those with values from $extra arg
+            $msg = preg_replace_callback('~{([0-9])}~', fn($m) => $extra[$m[1]] ?? $m[1], $msg);
+        }
+
+        // Spoof msg
+        $this->setMessage($msg);
+    }
 }
 
 /**

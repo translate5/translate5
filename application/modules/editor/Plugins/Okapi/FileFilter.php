@@ -30,26 +30,25 @@ END LICENSE AND COPYRIGHT
  * File Filter to for invoking Okapi post process files on export
  */
 class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter {
-    protected $manager;
-    protected $importConfig;
-    protected $parentWorkerId;
-    
+    protected editor_Models_File_FilterManager $manager;
+    protected editor_Models_File_FilterConfig $config;
+
     /**
      * {@inheritDoc}
      * @see editor_Models_File_IFilter::initFilter()
      */
-    public function initFilter(editor_Models_File_FilterManager $manager, $parentWorkerId, editor_Models_Import_Configuration $importConfig = null) {
+    public function initFilter(editor_Models_File_FilterManager $manager, editor_Models_File_FilterConfig $config) {
+        $this->config = $config;
         $this->manager = $manager;
-        $this->importConfig = $importConfig;
-        $this->parentWorkerId = $parentWorkerId;
     }
     
     /**
      * {@inheritDoc}
      * @see editor_Models_File_IFilter::applyImportFilter()
      */
-    public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters){
-        //renames the original file to original.xlf so that our fileparsers can import them 
+    public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters): string
+    {
+        //renames the original file to original.xlf so that our fileparsers can import them, valid for all contexts!
         return $filePath.editor_Plugins_Okapi_Connector::OUTPUT_FILE_EXTENSION;
     }
     
@@ -57,21 +56,25 @@ class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter {
      * {@inheritDoc}
      * @see editor_Models_File_IFilter::applyExportFilter()
      */
-    public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters){
-        $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
-        /* @var $worker editor_Plugins_Okapi_Worker */
-        
-        $params=[
-                'type' => editor_Plugins_Okapi_Worker::TYPE_EXPORT,
-                'fileId'=>$fileId,
-                'file'=>$filePath
+    public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters): string
+    {
+        if ($this->config->context === editor_Models_Export::EXPORT_PACKAGE) {
+            //we do not re-export with okapi package export but return the filename with XLF extension
+            return $this->applyImportFilter($task, $fileId, $filePath, $parameters);
+        }
+
+        $worker = ZfExtended_Factory::get(editor_Plugins_Okapi_Worker::class);
+        $params = [
+            'type' => editor_Plugins_Okapi_Worker::TYPE_EXPORT,
+            'fileId'=>$fileId,
+            'file'=>$filePath
         ];
         
         // init worker and queue it
         if (!$worker->init($task->getTaskGuid(), $params)) {
-            $this->log->logError('Okapi-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
-            return false;
+            return $filePath;
         }
-        $worker->queue($this->parentWorkerId);
+        $worker->queue($this->config->parentWorkerId);
+        return $filePath;
     }
 }

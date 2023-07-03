@@ -91,7 +91,79 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
 
     Editor.data.l10n.MatchAnalysis = {
         analysisWindow:{
-            title: '<?php echo $this->translate->_('Match-Analyse');?>'
+            title: '<?php echo $this->translate->_('Match-Analyse');?>',
+            summary: '<?php echo $this->translate->_('Summe');?>',
+            amount: '<?php echo $this->translate->_('Betrag');?>',
+            finalAmount: '<?php echo $this->translate->_('Endgültiger Betrag');?>',
+            notDefined: '<?php echo $this->translate->_('Kein Preis für die Kombination von Ausgangs- und Zielsprache festgelegt');?>',
+        },
+        pricing: {
+            preset: {
+                combo: '<?php echo $this->translate->_('Preisvorlage');?>',
+                create: '<?php echo $this->translate->_('Neue Vorlage erstellen');?>',
+                clone: '<?php echo $this->translate->_('Klonen');?>',
+                rename: '<?php echo $this->translate->_('Umbenennen');?>',
+                refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
+                search: '<?php echo $this->translate->_('Suche');?>',
+                title: '<?php echo $this->translate->_('Match-Bereiche &amp; Preise');?>',
+                name: '<?php echo $this->translate->_('Vorlagenname');?>',
+                unitType: {
+                    text: '<?php echo $this->translate->_('Typ');?>',
+                    character: '<?php echo $this->translate->_('Zeichenbasiert');?>',
+                    word: '<?php echo $this->translate->_('Wortbasiert');?>'
+                },
+                desc: '<?php echo $this->translate->_('Beschreibung');?>',
+                priceAdjustment: '<?php echo $this->translate->_('Preisanpassung');?>',
+                isDefault: {
+                    text: '<?php echo $this->translate->_('Standard');?>',
+                    tooltip: '<?php echo $this->translate->_('Standardmäßig bei der Projektanlage ausgewählte Vorlage, falls nicht auf Kundenebene überschrieben');?>'
+                },
+                isCustomerDefault: {
+                    text: '<?php echo $this->translate->_('Kundenstandard');?>',
+                    tooltip: '<?php echo $this->translate->_('Standardmäßig für diesen Kunden bei der Projektanlage ausgewählte Vorlage');?>'
+                },
+                prices: {
+                    text: '<?php echo $this->translate->_('Prices');?>',
+                    tooltip: '<?php echo $this->translate->_('Match-Bereiche &amp; Preise konfigurieren');?>'
+                },
+                actions: {
+                    text: '<?php echo $this->translate->_('Aktionen');?>',
+                    clone: '<?php echo $this->translate->_('Klonen');?>',
+                    delete: '<?php echo $this->translate->_('Löschen');?>',
+                }
+            },
+            prices: {
+                title: '<?php echo $this->translate->_('Match-Bereiche &amp; Preise in Vorlage');?>',
+                create: '<?php echo $this->translate->_('Preise für neue Sprachkombinationen anlegen');?>',
+                search: '<?php echo $this->translate->_('Nach Preis oder Sprache suchen');?>',
+                refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
+                sourceLangs: '<?php echo $this->translate->_('Quellsprache auswählen');?>',
+                targetLangs: '<?php echo $this->translate->_('Zielsprache auswählen');?>',
+                cloneFor: '<?php echo $this->translate->_('Klonen der Preise für');?>',
+                createFor: '<?php echo $this->translate->_('Neu Anlegen der Preise für');?>',
+                sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+                targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+                currency: '<?php echo $this->translate->_('Währung');?>',
+                noMatch: '<?php echo $this->translate->_('Keine Treffer');?>',
+                actions: {
+                    header: '<?php echo $this->translate->_('Aktionen');?>',
+                    edit: '<?php echo $this->translate->_('Bearbeiten');?>',
+                    clone: '<?php echo $this->translate->_('Klonen');?>',
+                    delete: '<?php echo $this->translate->_('Löschen');?>'
+                }
+            },
+            range: {
+                create: '<?php echo $this->translate->_('Neuen Bereich anlegen');?>',
+                delete: '<?php echo $this->translate->_('Bereiche löschen');?>',
+                selectToDelete: '<?php echo $this->translate->_('Bitte zu löschenden Bereich auswählen');?>',
+                hint: '<?php echo $this->translate->_('Zum Bearbeiten der Match-Bereiche klicken Sie auf die Spaltenüberschriften');?>',
+                edit: '<?php echo $this->translate->_('Bereich editieren');?>',
+                less: '<?php echo $this->translate->_('Der Startwert muss kleiner oder gleich dem Endwert sein!');?>',
+                greater: '<?php echo $this->translate->_('Der Endwert muss größer oder gleich dem Startwert sein!');?>',
+                overlaps: '<?php echo $this->translate->_('Dieser Wert überlappt den Bereich');?>',
+                from: '<?php echo $this->translate->_('Von');?>',
+                till: '<?php echo $this->translate->_('Bis');?>'
+            }
         }
     };
 });

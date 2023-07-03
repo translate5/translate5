@@ -744,6 +744,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             dockedItems: [{
                 xtype: 'toolbar',
                 dock: 'top',
+                enableOverflow: true,
                 items: [{
                     xtype: 'button',
                     glyph: 'f2f1@FontAwesome5FreeSolid',

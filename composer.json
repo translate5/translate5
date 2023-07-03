@@ -54,7 +54,7 @@
 				}
 			}
 		}, {
-			"type" : "vcs",
+			"type" : "git",
 			"url" : "https://bitbucket.org/mittagqi/restful-zend-framework/"
 		}, {
 			"type" : "git",
@@ -97,6 +97,8 @@
 		"ext-iconv" : "*",
       	"ext-zip": "*",
       	"ext-fileinfo": "*",
+      	"ext-curl": "*",
+		"ext-posix": "*",
 		"phpunit/phpunit": "^9",
 		"shardj/zf1-future" : "dev-master",
 		"symfony/console" : "^5.0",
@@ -120,7 +122,9 @@
 		"league/flysystem": "^3.0",
 		"league/flysystem-sftp": "^3.0",
 		"symfony/yaml": "^6.0",
-		"symfony/lock": "^6.0"
+		"symfony/lock": "^6.0",
+		"cesargb/php-log-rotation": "^2.7",
+		"ifsnop/mysqldump-php": "^v2.9"
     },
 	"extra" : {
 		"merge-plugin" : {
@@ -161,6 +165,7 @@
 	],
 	"license" : "AGPL-3.0-only",
 	"require-dev" : {
-		"brainmaestro/composer-git-hooks" : "^2.8"
+		"brainmaestro/composer-git-hooks" : "^2.8",
+		"symfony/var-dumper": "^6.0"
 	}
 }

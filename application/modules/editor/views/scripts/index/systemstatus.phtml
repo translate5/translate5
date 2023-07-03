@@ -56,8 +56,10 @@ foreach($this->validationResults as $module => $oneResult) {
         echo join("\n    ", $oneResult->info);
         echo "\n\n";
     }
-    if($oneResult->hasError() || $oneResult->hasWarning()) {
-        print_r ($oneResult->badSummary);
+    // in case of errors or warnings we give hints how to fix that
+    if($oneResult->hasBadSummary() && ($oneResult->hasWarning() || $oneResult->hasError())) {
+        echo "  HINT(s): \n    ";
+        echo join("\n    ", $oneResult->badSummary);
         echo "\n";
     }
 }

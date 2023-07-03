@@ -38,6 +38,9 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
         component: {
             '#taskMainCard combobox#customerId': {
                 change: 'onCustomerChange'
+            },
+            'tabpanel': {
+                tabchange: tabpanel => tabpanel.updateLayout()
             }
         }
     },
@@ -62,10 +65,17 @@ Ext.define('Editor.view.admin.TaskAddWindowViewController', {
         pivotLanguageCombo.setValue(null);
 
         me.selectedCustomersConfigStore.loadByCustomerId(customerId,function (){
+            var view = me.getView();
+
+            if(!view){
+                // the window is already closed. Do not process any customer change
+                return;
+            }
+
             var config = me.selectedCustomersConfigStore.getConfig('project.defaultPivotLanguage'),
                 langId = config ? Ext.getStore('admin.Languages').getIdByRfc(config) : null;
 
-            me.getView().unmask();
+            view.unmask();
 
             if( !langId){
                 return;

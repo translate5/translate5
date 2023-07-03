@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * Provides endpoints for the Help Videos
+ * Since these shall be available externally, there is no CSRF protection active
+ */
 class HelpController extends ZfExtended_Controllers_Action {
 
     public function indexAction(){

@@ -45,8 +45,8 @@ Ext.define('Editor.view.changealike.Window', {
     itemId: 'changealikeWindow',
 
     title: 'Aktuelles Segment für die folgenden Segmente übernehmen?',
-    height: 570,
-    width: 955,
+    height: '65%',
+    width: '65%',
     layout: {
         align: 'stretch',
         type: 'vbox'
@@ -64,7 +64,8 @@ Ext.define('Editor.view.changealike.Window', {
             '{edited}'
         ],
         overwriteSource: '<b><i>#UT#Überschreibe Quelltext mit:</i></b> ',
-        overwriteTarget: '<b><i>#UT#Überschreibe Zieltext mit:</i></b> '
+        overwriteTarget: '<b><i>#UT#Überschreibe Zieltext mit:</i></b> ',
+        disableWindowTip: 'Tipp: Deaktivieren/Konfigurieren Sie dieses Fenster in den Editoreinstellungen links oberhalb der Segmenttabelle'
     },
 
     loadedAlikes: null,
@@ -97,30 +98,26 @@ Ext.define('Editor.view.changealike.Window', {
                     flex: 1
                 }
             ],
-            dockedItems: [
-                {
-                    xtype: 'toolbar',
-                    ui: 'footer',
-                    flex: 1,
-                    dock: 'bottom',
-                    layout: {
-                        pack: 'end',
-                        type: 'hbox'
+            bbar:{
+                items: [
+                    {
+                        xtype: 'displayfield',
+                        fieldLabel:false,
+                        value: me.strings.disableWindowTip,
                     },
-                    items: [
-                        {
-                            xtype: 'button',
-                            itemId: 'cancelBtn',
-                            text: me.strings.cancelBtn
-                        },
-                        {
-                            xtype: 'button',
-                            itemId: 'saveBtn',
-                            text: me.strings.saveBtn
-                        }
-                    ]
-                }
-            ]
+                    '->',
+                    {
+                        xtype: 'button',
+                        itemId: 'cancelBtn',
+                        text: me.strings.cancelBtn
+                    },
+                    {
+                        xtype: 'button',
+                        itemId: 'saveBtn',
+                        text: me.strings.saveBtn
+                    }
+                ]
+            }
         };
 
         if (instanceConfig) {

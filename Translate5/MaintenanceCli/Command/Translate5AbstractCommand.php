@@ -30,6 +30,7 @@ namespace Translate5\MaintenanceCli\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
@@ -41,23 +42,39 @@ abstract class Translate5AbstractCommand extends Command
     /**
      * @var InputInterface
      */
-    protected $input;
+    protected InputInterface $input;
     
     /**
      * @var OutputInterface
      */
-    protected $output;
+    protected OutputInterface $output;
     
     /**
      * @var SymfonyStyle
      */
-    protected $io;
+    protected SymfonyStyle $io;
     
     /**
      * @var Application
      */
-    protected $translate5;
-    
+    protected Application $translate5;
+
+    /**
+     * if true output should be machine-readable!
+     * @var bool
+     */
+    protected bool $isPorcelain = false;
+
+    public function __construct($name = null)
+    {
+        parent::__construct($name);
+        $this->addOption(
+            name: 'porcelain',
+            mode: InputOption::VALUE_NONE,
+            description: 'Return the output in a machine readable way - if implemented in the command.'
+        );
+    }
+
     /**
      * initializes io class variables
      * @param InputInterface $input
@@ -66,6 +83,10 @@ abstract class Translate5AbstractCommand extends Command
     protected function initInputOutput(InputInterface $input, OutputInterface $output) {
         $this->input = $input;
         $this->output = $output;
+        if ($input->getOption('porcelain')) {
+            $this->isPorcelain = true;
+            $output->setDecorated(false);
+        }
         $this->io = new SymfonyStyle($input, $output);
     }
     
@@ -94,7 +115,9 @@ abstract class Translate5AbstractCommand extends Command
             $environment = ($answer === 't' || $answer === 'test') ? 'test' : 'application';
             $this->initTranslate5($environment);
             $config = \Zend_Registry::get('config');
-            $this->io->info('Using database "'.$config->resources->db->params->dbname.'"');
+            if (!$this->isPorcelain) {
+                $this->io->info('Using database "'.$config->resources->db->params->dbname.'"');
+            }
         } else {
             $this->initTranslate5();
         }
@@ -123,7 +146,13 @@ EOF;
      * Shows a title and instance information. Should be used in each translate5 command.
      * @param string $title
      */
-    protected function writeTitle(string $title) {
+    protected function writeTitle(string $title): void
+    {
+        if ($this->isPorcelain) {
+            $this->output->write($this->translate5->getHostname().' ('.$this->translate5->getVersion().'): ');
+            return;
+        }
+
         $this->io->title($title);
         
         $this->output->writeln([
@@ -157,7 +186,6 @@ EOF;
         $this->io->table($headers, $data);
     }
 
-    
     /***
      * Translate5 licence text to be reused in each command
      * @return string
@@ -192,5 +220,35 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */'
 ;
+    }
+
+    /**
+     * Checks, if the command is being called with root-rights or the T5 /data directory is not writable/readable
+     * Displays errors, if so, and then returns true
+     * @return bool
+     */
+    protected function checkCliUsageAsRoot(): bool
+    {
+        // this cannot be checked on windows machines ....
+        if (PHP_OS_FAMILY === 'Windows') {
+            return false;
+        }
+        // prevent root usage
+        $username = posix_getpwuid(posix_geteuid())['name'];
+        if (strtolower($username) === 'root') {
+            $this->io->error('You must not run this command as "' . $username . '"');
+            return true;
+        }
+        // We check if the data-dir is readable & writable (if it exists)
+        $dataDir = realpath(__DIR__ . '/../../../data');
+        if ($dataDir && is_dir($dataDir) && (!is_readable($dataDir) || !is_writable($dataDir))) {
+            $this->io->error('The data-directory "' . $dataDir . '" is not readable/writable for user "' . $username . '"');
+            return true;
+        }
+        // just an info if running with uncommon user-rights
+        if (!in_array(strtolower($username), ['apache', 'apache2', 'dev', 'developer', 'http', 'httpd', 'www-data'])) {
+            $this->io->note('You\'re running the command as user "' . $username . '"');
+        }
+        return false;
     }
 }
