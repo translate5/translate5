@@ -88,7 +88,7 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
         }
 
         // Check if the user is allowed to finish the task
-        if (!user.isAllowed('editorFinishTask', task) || qualityFilter.hasCriticalErrorsInChildren()) {
+        if (!user.isAllowed('editorFinishTask', task) || (qualityFilter && qualityFilter.hasCriticalErrorsInChildren())) {
             me[handlerName]("backBtn");
             return;
         }
