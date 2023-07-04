@@ -9,6 +9,19 @@ definitions:
   services:
     docker:
       memory: 7128
+  steps:
+    - step: &build-step
+        name: SonarQube analysis
+        script:
+          - pipe: sonarsource/sonarqube-scan:1.0.0
+            variables:
+              SONAR_HOST_URL: ${SONAR_HOST_URL} # Get the value from the repository/workspace variable.
+              SONAR_TOKEN: ${SONAR_TOKEN} # Get the value from the repository/workspace variable. You shouldn't set secret in clear text here.
+  caches:
+    sonar: ~/.sonar
+
+clone:
+  depth: full
 
 pipelines:
   custom:
@@ -49,3 +62,6 @@ pipelines:
 
             # Run bunch of containers
             - docker-compose -f docker-compose.runtests.yml up --exit-code-from php
+  branches:
+    '{develop}':
+      - step: *build-step
