@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -32,7 +32,11 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
 {
-    public function write(ZfExtended_Logger_Event $event) {
+    /**
+     * @throws Zend_Exception
+     */
+    public function write(ZfExtended_Logger_Event $event): void
+    {
         //currently we just do not write duplicates and duplicate info to the task log
         // → the duplicate data is kept in the main log
         //TODO we can not just ignore duplicates, since the error may be task independent,
@@ -44,7 +48,7 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
         // if($this->getDuplicateCount($event) > 0) {
         //     return;
         // }
-        
+
         // we clone the event so that we can delete the task afterwards without
         // modifying the real event perhaps used later in another writer
         $event = clone $event;
@@ -66,14 +70,14 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
         /* @var $task editor_Models_Task */
         $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');
         /* @var $taskLog editor_Models_Logger_Task */
-        if($task->isModified()) {
+        if ($task->isModified()) {
             $modified = $task->getModifiedValues();
-            foreach($modified as $field => $value) {
+            foreach ($modified as $field => $value) {
                 //we get also modified values if value is the same, but the type was changed (integer vs string)
                 // therefore we check == for 0, so we get all falsy value changes
                 // otherwise we compare typeless to get only changed values
-                if($value == 0 || $value != $task->__call('get'.ucfirst($field),array())) {
-                    $event->extra['Task field '.$field] = $value;
+                if ($value == 0 || $value != $task->__call('get' . ucfirst($field), array())) {
+                    $event->extra['Task field ' . $field] = $value;
                 }
             }
         }
@@ -87,8 +91,7 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
         $taskLog->setExtra($event->getExtraAsJson());
         try {
             $taskLog->save();
-        }
-        catch(Throwable $e) {
+        } catch (Throwable) {
             //do nothing here! The error itself was logged in the system log,
             // the task seems to be deleted in the meantime, so no need and way to log it here
             // this can happen for example if error happens in a worker (async from GUI),
@@ -96,15 +99,13 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
             // so the task may be deleted while the worker is not finished yet doing the logging
         }
     }
-    
-    public function isAccepted(ZfExtended_Logger_Event $event) {
-        if (
-            empty($event->extra)
-            || empty($event->extra['task'])
-            || (!is_a($event->extra['task'], 'editor_Models_Task') && !is_string($event->extra['task']))
-        ) {
-            return false;
+
+    public function isAccepted(ZfExtended_Logger_Event $event): bool
+    {
+        $task = $event->extra['task'] ?? null;
+        if ($task && (is_string($task) || is_a($task, 'editor_Models_Task'))) {
+            return parent::isAccepted($event);
         }
-        return parent::isAccepted($event);
+        return false;
     }
 }
