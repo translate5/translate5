@@ -27,25 +27,39 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Additional Log Writer which just logs all events with an field "task" with a task Entity in its extra data to a separate task log table
+ * Additional Log Writer which just logs all events with an field "task"
+ * with a task Entity in its extra data to a separate task log table
  */
-class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
+class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract
+{
     public function write(ZfExtended_Logger_Event $event) {
-        //currently we just do not write duplicates and duplicate info to the task log → the duplicate data is kept in the main log
-        //TODO we can not just ignore duplicates, since the error may be task independent, but we should get the error on each affected task!
-        //example: LanguageResource is not available will result in many duplicates, but we should have at least one entry
+        //currently we just do not write duplicates and duplicate info to the task log
+        // → the duplicate data is kept in the main log
+        //TODO we can not just ignore duplicates, since the error may be task independent,
+        // but we should get the error on each affected task!
+        // example: LanguageResource is not available will result in many duplicates,
+        // but we should have at least one entry
         // for each task. Solution: we have to search for the duplication hash in the log of the specific task,
         // if it does not exist, we add the entry, otherwise we ignore it. So the error is at least once in the log.
-//         if($this->getDuplicateCount($event) > 0) {
-//             return;
-//         }
+        // if($this->getDuplicateCount($event) > 0) {
+        //     return;
+        // }
         
-        // we clone the event so that we can delete the task afterwards without modifying the real event perhaps used later in another writer
+        // we clone the event so that we can delete the task afterwards without
+        // modifying the real event perhaps used later in another writer
         $event = clone $event;
         $task = $event->extra['task'];
 
+        if (is_string($task)) {
+            try {
+                $task = editor_ModelInstances::taskByGuid($task);
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                return;
+            }
+        }
+
         $id = $task->getId();
-        if(empty($id)) {
+        if (empty($id)) {
             return;
         }
 
@@ -84,7 +98,11 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
     }
     
     public function isAccepted(ZfExtended_Logger_Event $event) {
-        if(empty($event->extra) || empty($event->extra['task']) || !is_a($event->extra['task'], 'editor_Models_Task')) {
+        if (
+            empty($event->extra)
+            || empty($event->extra['task'])
+            || (!is_a($event->extra['task'], 'editor_Models_Task') && !is_string($event->extra['task']))
+        ) {
             return false;
         }
         return parent::isAccepted($event);

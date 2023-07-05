@@ -59,17 +59,18 @@ class HtmlProcessor {
     public function __construct(bool $preserveComments=false){
         $this->preserveComments = $preserveComments;
     }
+
     /**
      * Retrieves the HTML to be used for requesting the service API
      * @param string $html
      * @return string
-     * @throws \ZfExtended_Exception
      */
-    public function prepareRequest(string $html) : string {
+    public function prepareRequest(string $html) : string
+    {
         try {
             $this->tags = new Tags($html, $this->preserveComments);
             return $this->tags->getRequestHtml();
-        } catch (Exception $e) {
+        } catch (\Exception) {
             $this->preparationFault = true;
             return strip_tags($html);
         }
@@ -81,13 +82,14 @@ class HtmlProcessor {
      * @param string $resultHtml
      * @return string
      */
-    public function restoreResult(string $resultHtml) : string {
-        if($this->preparationFault){
+    public function restoreResult(string $resultHtml) : string
+    {
+        if ($this->preparationFault) {
             return strip_tags($resultHtml);
         }
         try {
             return $this->tags->recreateTags($resultHtml);
-        } catch (Exception $e) {
+        } catch (\Exception) {
             $this->recreationFault = true;
             return strip_tags($resultHtml);
         }
