@@ -148,7 +148,7 @@ class Tags extends \editor_TagSequence {
             }
             return $rendered;
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // reset captured errors
             $this->captureErrors = false;
             if(self::DO_DEBUG && count($this->capturedErrors) > 0) {
