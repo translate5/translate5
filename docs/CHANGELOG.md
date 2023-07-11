@@ -26,6 +26,34 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [6.4.2] - 2023-07-11
+
+### Important Notes:
+#### [TRANSLATE-3417](https://jira.translate5.net/browse/TRANSLATE-3417)
+pdfconverter docker image update is required
+ 
+
+
+### Changed
+**[TRANSLATE-3417](https://jira.translate5.net/browse/TRANSLATE-3417): VisualReview / VisualTranslation - Skip optimization step in pdfconverter** <br>
+PDF converter now doesn't optimize pdf files before conversion by default, but does that as a fallback if conversion failed. Behavior can be changed by enabling runtimeOptions.plugins.VisualReview.optimizeBeforeConversion config option.
+
+
+### Bugfixes
+**[TRANSLATE-3423](https://jira.translate5.net/browse/TRANSLATE-3423): VisualReview / VisualTranslation - Error focusing segment alias in split-frame sidbar** <br>
+Fix for a front-end problem when trying to focus segment in visual split-frame.
+
+**[TRANSLATE-3416](https://jira.translate5.net/browse/TRANSLATE-3416): LanguageResources - DeepL languages request missing languages** <br>
+Fix for a problem where regional languages where not listed as available target option for DeepL language resource
+
+**[TRANSLATE-3412](https://jira.translate5.net/browse/TRANSLATE-3412): LanguageResources - Missing class include in Glossary events** <br>
+Fix for a problem where term collection was not able to be assigned as glossary source
+
+**[TRANSLATE-3399](https://jira.translate5.net/browse/TRANSLATE-3399): InstantTranslate, LanguageResources - Unescaped special chars returned by DeepL** <br>
+It seems like the DeepL API has changed its default behaviour regarding the tag handling. Now we force HTML usage if not explicitly XML is given to fix some encoding problems
+
+
 ## [6.4.1] - 2023-07-03
 
 ### Important Notes:
