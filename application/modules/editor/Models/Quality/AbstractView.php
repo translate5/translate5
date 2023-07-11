@@ -289,8 +289,6 @@ abstract class editor_Models_Quality_AbstractView {
                 $hasNonEditableInternalTagFaults = true;
             }
 
-            $isFaultyInternalTagType = $this->manager->isFaultyInternalTagType($quality['type'], $quality['category']);
-
             if (array_key_exists($type, $this->rowsByType)) {
                 $this->rowsByType[$type][self::RUBRIC]->qcount++;
                 if ($this->isFalsePositive($quality)) {
@@ -312,7 +310,7 @@ abstract class editor_Models_Quality_AbstractView {
             }
 
             // for evaluating if we have internal tag faults we need to check the category from DB
-            if ($isFaultyInternalTagType) {
+            if ($this->manager->isFaultyInternalTagType($quality['type'], $quality['category'])) {
                 $this->hasFaultyInternalTags = true;
             }
         }
@@ -406,12 +404,6 @@ abstract class editor_Models_Quality_AbstractView {
     private function mustBeZeroErrors(string $type, string $category): bool
     {
         return $this->manager->mustBeZeroErrors($type, $category, $this->task);
-    }
-
-    private function isFaultyInternalTagType(string $type, string $category): bool
-    {
-        return editor_Segment_Tag::TYPE_INTERNAL === $type
-            && editor_Segment_Internal_TagComparision::isFault($type, $category);
     }
 
     /**

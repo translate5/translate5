@@ -252,7 +252,7 @@ class editor_Workflow_Default_Hooks {
 
         if($this->newTask->isImporting()) {
             //when task is importing, we may not trigger workflow stuff
-            $saveCallback();
+            $saveCallback(null);
             return;
         }
 

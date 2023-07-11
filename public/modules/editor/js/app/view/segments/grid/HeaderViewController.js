@@ -79,8 +79,7 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
         var me = this,
             str = me.getView().strings,
             task = Editor.data.task,
-            user = Editor.app.authenticatedUser,
-            qualityFilter = Editor.app.viewport.down('qualityFilterPanel').getStore().first();
+            user = Editor.app.authenticatedUser;
 
         // Without any loaded task or if the HeadPanel controller does not exist we can not leave the task
         if (!task) {
@@ -88,7 +87,7 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
         }
 
         // Check if the user is allowed to finish the task
-        if (!user.isAllowed('editorFinishTask', task) || (qualityFilter && qualityFilter.hasCriticalErrorsInChildren())) {
+        if (!user.isAllowed('editorFinishTask', task)) {
             me[handlerName]("backBtn");
             return;
         }

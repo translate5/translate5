@@ -34,6 +34,7 @@ use MittagQI\Translate5\Task\Import\TaskDefaults;
 use MittagQI\Translate5\Task\Import\TaskUsageLogger;
 use MittagQI\Translate5\Task\Lock;
 use MittagQI\Translate5\Task\TaskContextTrait;
+use MittagQI\Translate5\Task\TaskService;
 use MittagQI\ZfExtended\Controller\Response\Header;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
 
@@ -372,8 +373,17 @@ class editor_TaskController extends ZfExtended_RestController
             $userData = $this->getUsersForRendering($rows);
         }
 
+        $tua = ZfExtended_Factory::get(editor_Models_TaskUserAssoc::class);
+        $sessionUser = ZfExtended_Authentication::getInstance()->getUser();
+
         foreach ($rows as &$row) {
-            $row['hasCriticalErrors'] = $this->qualityService->taskHasCriticalErrors($row['taskGuid']);
+            try {
+                $tua->loadByStepOrSortedState($sessionUser->getUserGuid(), $row['taskGuid'], $row['workflowStepName']);
+                $row['hasCriticalErrors'] = $this->qualityService->taskHasCriticalErrors($row['taskGuid'], $tua);
+            } catch (ZfExtended_Models_Entity_NotFoundException) {
+                // In case if current user is not associated to task (PM for example)
+                $row['hasCriticalErrors'] = $this->qualityService->taskHasCriticalErrors($row['taskGuid']);
+            }
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
     
@@ -1330,42 +1340,44 @@ class editor_TaskController extends ZfExtended_RestController
      * @param string $userGuid
      * @param bool $disableWorkflowEvents optional, defaults to false
      */
-    protected function updateUserState(string $userGuid, $disableWorkflowEvents = false) {
-        if(empty($this->data->userState)) {
+    protected function updateUserState(string $userGuid, $disableWorkflowEvents = false): void
+    {
+        if (empty($this->data->userState)) {
             return;
         }
         settype($this->data->userStatePrevious, 'string');
 
-        if(!in_array($this->data->userState, $this->workflow->getStates())) {
+        if (!in_array($this->data->userState, $this->workflow->getStates())) {
             throw new ZfExtended_ValidateException('Given UserState '.$this->data->userState.' does not exist.');
         }
 
-        $isEditAllTasks = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $isEditAllTasks = $this->isAllowed('backend', 'editAllTasks')
+            || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $isOpen = $this->isOpenTaskRequest();
-        $isPmOverride = false;
 
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
         try {
-            
-            if($isEditAllTasks){
-                $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($userGuid, $this->entity);
-            }else{
-                $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $this->entity);
+            if ($isEditAllTasks) {
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($userGuid, $this->entity);
+            } else {
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $this->entity);
             }
             
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            if(! $isEditAllTasks){
-                if($this->isLeavingTaskRequest()) {
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            if (!$isEditAllTasks) {
+                if ($this->isLeavingTaskRequest()) {
                     $messages = Zend_Registry::get('rest_messages');
                     /* @var $messages ZfExtended_Models_Messages */
                     $messages->addError('Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.');
+
                     return; //just allow the user to leave the task - but send a message
                 }
+
                 throw $e;
             }
+
             $userTaskAssoc->setUserGuid($userGuid);
             $userTaskAssoc->setTaskGuid($this->entity->getTaskGuid());
             $userTaskAssoc->setWorkflow($this->workflow->getName());
@@ -1375,37 +1387,46 @@ class editor_TaskController extends ZfExtended_RestController
             $isPmOverride = true;
             $userTaskAssoc->setIsPmOverride($isPmOverride);
         }
+
         $oldUserTaskAssoc = clone $userTaskAssoc;
 
-        if($isOpen){
+        if ($isOpen) {
             $session = new Zend_Session_Namespace();
             $userTaskAssoc->setUsedInternalSessionUniqId($session->internalSessionUniqId);
             $userTaskAssoc->setUsedState($this->data->userState);
         } else {
-            if($isPmOverride && $isEditAllTasks) {
+            if ($isPmOverride && $isEditAllTasks) {
                 $this->log->info('E1011', 'PM left task');
                 $userTaskAssoc->deletePmOverride();
+
                 return;
             }
+
             $userTaskAssoc->setUsedInternalSessionUniqId(null);
             $userTaskAssoc->setUsedState(null);
         }
 
-        if($this->workflow->isStateChangeable($userTaskAssoc, $this->data->userStatePrevious)) {
+        if ($this->workflow->isStateChangeable($userTaskAssoc, $this->data->userStatePrevious)) {
             $userTaskAssoc->setState($this->data->userState);
         }
 
 
-        if($disableWorkflowEvents) {
+        if ($disableWorkflowEvents) {
             $userTaskAssoc->save();
-        }
-        else {
-            $this->workflow->hookin()->doWithUserAssoc($oldUserTaskAssoc, $userTaskAssoc, function() use ($userTaskAssoc) {
-                $userTaskAssoc->save();
-            });
+        } else {
+            $this->workflow->hookin()->doWithUserAssoc(
+                $oldUserTaskAssoc,
+                $userTaskAssoc,
+                function (?string $state) use ($userTaskAssoc) {
+                    if ($state) {
+                        TaskService::validateForTaskFinish($state, $userTaskAssoc, $this->entity);
+                    }
+                    $userTaskAssoc->save();
+                }
+            );
         }
 
-        if($oldUserTaskAssoc->getState() != $this->data->userState){
+        if ($oldUserTaskAssoc->getState() != $this->data->userState) {
             $this->log->info('E1011', 'job status changed from {oldState} to {newState}', [
                 'tua' => $oldUserTaskAssoc,
                 'oldState' => $oldUserTaskAssoc->getState(),
