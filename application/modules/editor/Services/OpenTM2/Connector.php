@@ -655,8 +655,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                         break;
 
                     default:
+                        $result = LanguageResourceStatus::AVAILABLE;
+
                         break;
                 }
+
+                break;
+
+            case 'reorganize':
+                $result = LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+
+                break;
+
+            case 'reorganize failed':
+                $result = LanguageResourceStatus::REORGANIZE_FAILED;
 
                 break;
 
@@ -881,7 +893,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
         );
 
-        $errorSupposesReorganizing = (isset($error->code)
+        $errorSupposesReorganizing = (
+                isset($error->code)
                 && str_replace($errorCodes, '', $error->code) !== $error->code
             )
             || (isset($error->error) && $error->error === 500);
@@ -894,41 +907,36 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function reorganizeTm(): bool
     {
-        if (!$this->isInternalFuzzy()) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $this->languageResource->refresh();
-            $this->languageResource->setStatus(LanguageResourceStatus::REORGANIZE_IN_PROGRESS);
-            $this->languageResource->addSpecificData(
-                self::REORGANIZE_STARTED_AT,
-                date(DateTimeInterface::RFC3339)
-            );
-            $this->languageResource->save();
+        $this->api->reorganizeTm();
+
+        // TODO move to constant
+        $maxWaitTime = 60;
+        $elapsedTime = 0;
+
+        while ($elapsedTime < $maxWaitTime) {
+            $status = $this->getStatus($this->resource);
+
+            if ($status === LanguageResourceStatus::AVAILABLE) {
+                return true;
+            }
+
+            sleep(5);
+            $elapsedTime += 5;
         }
 
-        $reorganized = $this->api->reorganizeTm();
-
-        if (!$this->isInternalFuzzy()) {
-            $this->languageResource->setStatus(
-                $reorganized ? LanguageResourceStatus::AVAILABLE : LanguageResourceStatus::REORGANIZE_FAILED
-            );
-            $this->languageResource->save();
-        }
-
-        return $reorganized;
+        return false;
     }
 
     public function isReorganizingAtTheMoment(): bool
     {
         $this->resetReorganizingIfNeeded();
 
-        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
+        return $this->getStatus($this->resource) === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
     }
 
     public function isReorganizeFailed(): bool
     {
-        return $this->languageResource->getStatus() === LanguageResourceStatus::REORGANIZE_FAILED;
+        return $this->getStatus($this->resource) === LanguageResourceStatus::REORGANIZE_FAILED;
     }
 
     private function addReorganizeWarning(Task $task = null): void
