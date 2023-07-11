@@ -874,7 +874,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     #region Reorganize TM
     // Need to move this region to a dedicated class while refactoring connector
     private const REORGANIZE_ATTEMPTS = 'reorganize_attempts';
-    private const REORGANIZE_ATTEMPTS_MAX = 3;
     private const REORGANIZE_WAIT_TIME_SECONDS = 60;
 
     private function needsReorganizing(stdClass $error): bool
@@ -901,14 +900,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             && $status !== LanguageResourceStatus::REORGANIZE_IN_PROGRESS
             && $status !== LanguageResourceStatus::REORGANIZE_FAILED;
 
+        $maxReorganizeAttempts = $this->config->runtimeOptions->LanguageResources->t5memory->maxReorganizeAttempts;
+
         if ($needsReorganizing
             && $this->languageResource
-            && $this->languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) >= self::REORGANIZE_ATTEMPTS_MAX
+            && $this->languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) >= $maxReorganizeAttempts
         ) {
             $this->logger->warn(
                 'E1314',
                 'The queried TM returned error which is configured for automatic TM reorganization.' .
-                'But there already were ' . self::REORGANIZE_ATTEMPTS_MAX . ' attempts to reorganize it.',
+                'But there already were ' . $maxReorganizeAttempts . ' attempts to reorganize it.',
                 ['apiError' => $this->api->getError()]
             );
             $needsReorganizing = false;
