@@ -71,6 +71,13 @@ class UserUpdateCommand extends UserAbstractCommand
         );
 
         $this->addOption(
+            'editable',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Set if User editable or not. Possible values: 0, 1, true, false, yes, no'
+        );
+
+        $this->addOption(
             'add-roles',
             null,
             InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
@@ -138,6 +145,16 @@ class UserUpdateCommand extends UserAbstractCommand
             $this->io->warning(sprintf('User with login [%s] not found', $this->input->getArgument('login')));
 
             return static::FAILURE;
+        }
+
+        if (null !== $this->input->getOption('editable')) {
+            $val = $this->input->getOption('editable');
+
+            if (!is_numeric($val) && !in_array($val, ['yes', 'no', 'false', 'true'], true)) {
+                $this->io->warning('Invalid value provided for option `editable`');
+            }
+
+            $userModel->setEditable((is_numeric($val) && 1 === (int) $val) || in_array($val, ['yes', 'true'], true));
         }
 
         if ($this->input->getOption('firstname')) {
