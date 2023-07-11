@@ -551,12 +551,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return LanguageResourceStatus::IMPORT;
         }
 
-        // TODO remove after reorganize status is implemented in status query on t5memory side
-        if ($this->isReorganizingAtTheMoment()) {
-            // Status import to prevent any other queries to TM to be performed
-            return LanguageResourceStatus::IMPORT;
-        }
-
         if ($this->api->status()) {
             $result = $this->api->getResult();
 
@@ -879,8 +873,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     #region Reorganize TM
     // Need to move this region to a dedicated class while refactoring connector
-    private const REORGANIZE_STARTED_AT = 'reorganize_started_at';
-    private const MAX_REORGANIZE_TIME_MINUTES = 30;
+    private const REORGANIZE_ATTEMPTS = 'reorganize_attempts';
+    private const REORGANIZE_ATTEMPTS_MAX = 3;
+    private const REORGANIZE_WAIT_TIME_SECONDS = 60;
 
     private function needsReorganizing(stdClass $error): bool
     {
@@ -893,6 +888,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->config->runtimeOptions->LanguageResources->t5memory->reorganizeErrorCodes
         );
 
+        $status = $this->getStatus($this->resource);
+
         $errorSupposesReorganizing = (
                 isset($error->code)
                 && str_replace($errorCodes, '', $error->code) !== $error->code
@@ -900,28 +897,54 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             || (isset($error->error) && $error->error === 500);
 
         // Check if error codes contains any of the values
-        return $errorSupposesReorganizing
-            && !$this->isReorganizingAtTheMoment()
-            && !$this->isReorganizeFailed();
+        $needsReorganizing = $errorSupposesReorganizing
+            && $status !== LanguageResourceStatus::REORGANIZE_IN_PROGRESS
+            && $status !== LanguageResourceStatus::REORGANIZE_FAILED;
+
+        if ($needsReorganizing
+            && $this->languageResource
+            && $this->languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) >= self::REORGANIZE_ATTEMPTS_MAX
+        ) {
+            $this->logger->warn(
+                'E1314',
+                'The queried TM returned error which is configured for automatic TM reorganization.' .
+                'But there already were ' . self::REORGANIZE_ATTEMPTS_MAX . ' attempts to reorganize it.',
+                ['apiError' => $this->api->getError()]
+            );
+            $needsReorganizing = false;
+        }
+
+        return $needsReorganizing;
     }
 
     public function reorganizeTm(): bool
     {
+        if (!$this->isInternalFuzzy()) {
+            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
+            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
+            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
+            $this->languageResource->refresh();
+            $this->languageResource->addSpecificData(
+                self::REORGANIZE_ATTEMPTS,
+                ($this->languageResource->getSpecificData(self::REORGANIZE_ATTEMPTS) ?? 0) + 1
+            );
+            $this->languageResource->save();
+        }
+
         $this->api->reorganizeTm();
 
-        // TODO move to constant
-        $maxWaitTime = 60;
         $elapsedTime = 0;
+        $sleepTime = 5;
 
-        while ($elapsedTime < $maxWaitTime) {
+        while ($elapsedTime < self::REORGANIZE_WAIT_TIME_SECONDS) {
             $status = $this->getStatus($this->resource);
 
             if ($status === LanguageResourceStatus::AVAILABLE) {
                 return true;
             }
 
-            sleep(5);
-            $elapsedTime += 5;
+            sleep($sleepTime);
+            $elapsedTime += $sleepTime;
         }
 
         return false;
@@ -929,8 +952,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
     public function isReorganizingAtTheMoment(): bool
     {
-        $this->resetReorganizingIfNeeded();
-
         return $this->getStatus($this->resource) === LanguageResourceStatus::REORGANIZE_IN_PROGRESS;
     }
 
@@ -954,27 +975,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             'The queried TM returned error which is configured for automatic TM reorganization',
             $params
         );
-    }
-
-    private function resetReorganizingIfNeeded(): void
-    {
-        $reorganizeStartedAt = $this->languageResource->getSpecificData(self::REORGANIZE_STARTED_AT);
-
-        if (null === $reorganizeStartedAt || $this->isInternalFuzzy()) {
-            return;
-        }
-
-        if ((new DateTimeImmutable($reorganizeStartedAt))
-                ->modify(sprintf('+%d minutes', self::MAX_REORGANIZE_TIME_MINUTES)) < new DateTimeImmutable()
-        ) {
-            // TODO In editor_Services_Manager::visitAllAssociatedTms language resource is initialized
-            // without refreshing from DB, which leads th that here it is tried to be inserted as new one
-            // so refreshing it here. Need to check if we can do this in editor_Services_Manager::visitAllAssociatedTms
-            $this->languageResource->refresh();
-            $this->languageResource->removeSpecificData(self::REORGANIZE_STARTED_AT);
-            $this->languageResource->setStatus(LanguageResourceStatus::AVAILABLE);
-            $this->languageResource->save();
-        }
     }
     #endregion Reorganize TM
 
