@@ -90,7 +90,7 @@ $dep->dependencies = [[
             // title       optional, overwrites default title (defined in ZfExtended_Models_Installer_License)
         ]]
     ],[
-        "name" => "termtagger",
+        "name" => "termtagger", //DEPRECATED WITH DOCKER!
         "label" => "openTMS TermTagger",
         "url" => "RELEASE:openTMStermTagger.zip",
         "target" => "application/modules/editor/ThirdParty/XliffTermTagger/",
