@@ -389,6 +389,10 @@ Ext.application({
         if (!Editor.controller.admin || !Editor.controller.admin.TaskOverview) {
             return;
         }
+        if (task) {
+            // reload when we leave the task
+            Ext.state.Manager.getProvider().store.reload();
+        }
         me.removeTaskFromUrl();
         if (me.viewport) {
             me.getController('ViewModes').deactivate();
@@ -633,17 +637,26 @@ Ext.application({
      */
     loadEditorConfigData: function (task, callback) {
         var me = this,
-            store = Ext.StoreManager.get('admin.task.Config');
+            taskStore = Ext.StoreManager.get('admin.task.Config'),
+            userStore = Ext.state.Manager.getProvider().store,
+            counter = 0;
 
-        store.loadByTaskGuid(task.get('taskGuid'), function (records, operation, success) {
+        const onLoadedCallback = (store) => (records, operation, success) => {
+            counter++;
             me.unmask();
             if (!success) {
                 Editor.app.getController('ServerException').handleCallback(records, operation, false);
                 return;
             }
             store.clearFilter(true);
-            callback();
-        });
+
+            if (2 === counter) {
+                callback();
+            }
+        };
+
+        taskStore.loadByTaskGuid(task.get('taskGuid'), onLoadedCallback(taskStore));
+        userStore.loadByTaskGuid(task.get('taskGuid'), onLoadedCallback(userStore));
     },
 
     /***

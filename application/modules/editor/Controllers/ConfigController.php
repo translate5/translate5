@@ -304,23 +304,34 @@ class editor_ConfigController extends ZfExtended_RestController {
      *
      * @return array
      */
-    protected function loadConfig() {
+    protected function loadConfig(): array
+    {
+        $userGuid = $this->getParam('userGuid');
         $taskGuid = $this->getParam('taskGuid');
-        if(!empty($taskGuid)){
+
+        if (!empty($userGuid)) {
+            editor_Models_Config::checkUserGuid($userGuid);
+
+            $taskConfig = [];
+            if (!empty($taskGuid)) {
+                $taskConfig = $this->entity->mergeTaskValues($taskGuid);
+            }
+
+            return array_values($this->entity->mergeUserValues($userGuid, $taskConfig));
+        }
+
+        if (!empty($taskGuid)) {
             return array_values($this->entity->mergeTaskValues($taskGuid));
         }
+
         $customerId = $this->getParam('customerId');
-        if(!empty($customerId)){
+        if (!empty($customerId)) {
             //ignore invalid customer ids
-            if(!is_numeric($customerId)){
+            if (!is_numeric($customerId)) {
                 return [];
             }
+
             return array_values($this->entity->mergeCustomerValues($customerId));
-        }
-        $userGuid = $this->getParam('userGuid');
-        if(!empty($userGuid)){
-            editor_Models_Config::checkUserGuid($userGuid);
-            return array_values($this->entity->mergeUserValues($userGuid));
         }
 
         return array_values($this->entity->mergeInstanceValue());

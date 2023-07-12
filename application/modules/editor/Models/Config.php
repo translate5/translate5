@@ -218,26 +218,31 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @return array
      */
     public function mergeCustomerValues(
-            int $customerId,
-            array $dbResults=[],
-            array $level = [self::CONFIG_LEVEL_CUSTOMER,self::CONFIG_LEVEL_TASK,self::CONFIG_LEVEL_TASKIMPORT]
-        ):array {
-        
-        if(empty($dbResults)){
+        int $customerId,
+        array $dbResults=[],
+        array $level = [
+            self::CONFIG_LEVEL_CUSTOMER,
+            self::CONFIG_LEVEL_TASK,
+            self::CONFIG_LEVEL_TASKIMPORT,
+            self::CONFIG_LEVEL_USER
+        ]
+    ):array {
+        if (empty($dbResults)) {
             //include task levels so we can set the baase values for task config
             //do not load all map config types (usualy default state) since no config editor for the frontend
             //is available for now
-            $dbResults = $this->loadByLevel($level,[ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP]);
+            $dbResults = $this->loadByLevel($level, [ZfExtended_DbConfig_Type_CoreTypes::TYPE_MAP]);
         }
-        array_walk($dbResults, function(&$r) use($customerId){
+        array_walk($dbResults, function (&$r) use ($customerId) {
             $r['customerId'] = $customerId;
         });
         $s = $this->db->select()
             ->setIntegrityCheck(false)
             ->from('LEK_customer_config')
-            ->where('customerId = ?',$customerId);
+            ->where('customerId = ?', $customerId);
         $userResults = $this->db->fetchAll($s)->toArray();
-        return $this->mergeConfig($userResults, $dbResults,self::CONFIG_SOURCE_CUSTOMER);
+
+        return $this->mergeConfig($userResults, $dbResults, self::CONFIG_SOURCE_CUSTOMER);
     }
     
     /***

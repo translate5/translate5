@@ -30,5 +30,25 @@ Ext.define('Editor.store.UserConfig', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.UserConfig',
   storeId: 'UserConfig',
-  pageSize: -1
+  pageSize: -1,
+
+  /**
+   * Load task data for given task guid
+   */
+  loadByTaskGuid: function(curentTaskGuid, callback){
+    if (!curentTaskGuid || curentTaskGuid == ""){
+      return;
+    }
+    var me= this,
+        proxy = me.getProxy(),
+        existing = proxy.getExtraParams(),
+        // spread operation used for cloning
+        merged = Ext.Object.merge({...existing}, {
+          taskGuid : curentTaskGuid
+        });
+    proxy.setExtraParams(merged);
+    me.load(callback);
+    // rollback for when we leave task and reload store
+    proxy.setExtraParams(existing);
+  }
 });
