@@ -93,7 +93,7 @@ class editor_Segment_Numbers_QualityProvider extends editor_Segment_Quality_Prov
             $states = [];
 
             // Include snc lib
-            include_once '../application/modules/editor/Segment/Numbers/SNC/snc_main.php';
+            include_once APPLICATION_PATH.'/modules/editor/Segment/Numbers/SNC/snc_main.php';
 
             // Foreach target
             foreach ($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */

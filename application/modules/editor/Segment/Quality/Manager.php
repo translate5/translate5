@@ -704,8 +704,7 @@ final class editor_Segment_Quality_Manager
 
     public function mustBeZeroErrors(string $type, string $category, editor_Models_Task $task): bool
     {
-        return $this->isFaultyInternalTagType($type, $category)
-            || $this->getProvider($type)?->mustBeZeroErrors($type, $category, $task->getConfig());
+        return (bool) $this->getProvider($type)?->mustBeZeroErrors($type, $category, $task->getConfig());
     }
 
     public function typeHasMustBeZeroErrorsCategories(string $type, editor_Models_Task $task): bool

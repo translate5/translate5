@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 use MittagQI\Translate5\Segment\QualityService;
+use MittagQI\Translate5\Task\TaskService;
 
 /**
  * Controller for the User Task Associations
@@ -273,28 +274,19 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
                 ]);
             }
         }
-
-        if (
-            isset($this->data->state)
-            && editor_Workflow_Default::STATE_FINISH != $this->data->state
-            && (new QualityService())->taskHasCriticalErrors($this->entity->getTaskGuid())
-        ) {
-            ZfExtended_Models_Entity_Conflict::addCodes([
-                'E1542' => 'Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”'
-            ]);
-
-            throw ZfExtended_Models_Entity_Conflict::createResponse(
-                'E1542',
-                ['Bitte lösen Sie alle Fehler der folgenden Kategorie ODER setzen Sie sie auf “falscher Fehler”'],
-                ['task' => $this->entity]
-            );
-        }
         
         $this->entity->validate();
 
-        $workflow->hookin()->doWithUserAssoc($oldEntity, $this->entity, function () {
-            $this->entity->save();
-        });
+        $workflow->hookin()->doWithUserAssoc(
+            $oldEntity,
+            $this->entity,
+            function (?string $state) {
+                if ($state) {
+                    TaskService::validateForTaskFinish($state, $this->entity, $this->task);
+                }
+                $this->entity->save();
+            }
+        );
 
         $this->view->rows = $this->entity->getDataObject();
         $this->addUserInfoToResult();

@@ -218,8 +218,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * loads the task to the given guid
      * @param string $taskGuid
+     * @throws ZfExtended_Models_Entity_NotFoundException
      */
-    public function loadByTaskGuid(string $taskGuid){
+    public function loadByTaskGuid(string $taskGuid): void
+    {
         try {
             $s = $this->db->select()->where('taskGuid = ?', $taskGuid);
             $row = $this->db->fetchRow($s);

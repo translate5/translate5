@@ -35,6 +35,10 @@
       <file>../Plugins/VisualReview/tests/VisualVideoTest.php</file>
       <file>../Plugins/VisualReview/tests/VisualWgetTest.php</file>
     </testsuite>
+    <testsuite name="deepl">
+      <file>../Plugins/DeepL/tests/DeepLGlossaryTest.php</file>
+      <file>../Plugins/DeepL/tests/DeepLLanguageResourceApiTest.php</file>
+    </testsuite>
     <testsuite name="xlfimport">
       <file>editorAPI/XlfImportFailTest.php</file>
       <file>editorAPI/XlfImportTest.php</file>
