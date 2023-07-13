@@ -77,7 +77,7 @@ final class TestConfiguration {
         'runtimeOptions.tbx.termLabelMap' => '{"legalTerm": "permitted", "admittedTerm": "permitted", "preferredTerm": "preferred", "regulatedTerm": "permitted", "deprecatedTerm": "forbidden", "supersededTerm": "forbidden", "standardizedTerm": "permitted"}',
 
         /* Configs that need to be taken from the application database */
-
+        'runtimeOptions.worker.server' => null,
         'runtimeOptions.server.name' => null,
         'runtimeOptions.server.protocol' => null,
         'runtimeOptions.errorCodesUrl' => null,

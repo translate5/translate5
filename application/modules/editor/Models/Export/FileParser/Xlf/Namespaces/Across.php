@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Across;
+
 
 /**
  * XLF Fileparser Add On to parse Across XLF specific stuff
@@ -128,7 +130,7 @@ class editor_Models_Export_FileParser_Xlf_Namespaces_Across extends editor_Model
 
         foreach($this->comments as $comment) {
             //comments already imported from across are ignored
-            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_Namespaces_Across::USERGUID) {
+            if($comment['userGuid'] == Across::USERGUID) {
                 continue;
             }
             self::$xmlWriter->startElement('ax:named-property');
@@ -167,7 +169,7 @@ class editor_Models_Export_FileParser_Xlf_Namespaces_Across extends editor_Model
 
         foreach($this->comments as $comment) {
             //comments already imported from across are ignored:
-            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_Namespaces_Across::USERGUID) {
+            if($comment['userGuid'] == Across::USERGUID) {
                 continue;
             }
             self::$xmlWriter->startElement('ax:errorInfo');
