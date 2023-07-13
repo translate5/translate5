@@ -98,8 +98,7 @@ class Task extends Base
     {
         $params = $workerModel->getParameters();
 
-        $export = ZfExtended_Factory::get('editor_Models_Export');
-        /* @var editor_Models_Export $export */
+        $export = ZfExtended_Factory::get(editor_Models_Export::class);
         $export->setTaskToExport($this->task, $params['diff']);
         $export->export($this->getFolderPath(), $workerModel->getId(), $export::EXPORT_PACKAGE);
     }
