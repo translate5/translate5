@@ -44,7 +44,7 @@ In across xliff the tags may use a custom unique id instead the default id attri
 **[TRANSLATE-3424](https://jira.translate5.net/browse/TRANSLATE-3424): OpenTM2 integration - Tag mismatch in t5memory results due nonnumeric rids** <br>
 Tags from segments may get removed when taking over from t5memory due mismatching tag ids.
 
-**[TRANSLATE-3402](https://jira.translate5.net/browse/TRANSLATE-3402): Okapi integration - Hotfix: delete deepl glossary on deleting termcollection** <br>
+**[TRANSLATE-3402](https://jira.translate5.net/browse/TRANSLATE-3402): DeepL integration - Hotfix: delete deepl glossary on deleting termcollection** <br>
 When deleting a termcollection the corresponding DeepL glossary was not deleted. This is fixed now.
 
 
