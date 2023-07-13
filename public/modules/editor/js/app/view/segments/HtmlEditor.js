@@ -560,29 +560,55 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             }
 
             let data = me.getData(item, me.getInitialData());
+            let tag;
 
             if (tagsFromReferenceFieldOnly) {
                 switch (data.type) {
                     case 'open':
                         openTagNumber++;
-                        data = me.tagsCheck.getOpeningReferenceTagAtIndex(openTagNumber).data;
+                        tag = me.tagsCheck.getOpeningReferenceTagAtIndexOrNext(openTagNumber);
+
+                        if (null === tag) {
+                            return;
+                        }
+
+                        data = tag.data;
+
                         break;
 
                     case 'close':
                         closeTagNumber++;
-                        data = me.tagsCheck.getClosingReferenceTagAtIndex(closeTagNumber).data;
+                        tag = me.tagsCheck.getClosingReferenceTagAtIndexOrNext(closeTagNumber);
+
+                        if (null === tag) {
+                            return;
+                        }
+
+                        data = tag.data;
 
                         break;
 
                     case 'whitespace':
                         whitespaceTagNumber++;
-                        data = me.tagsCheck.getWhitespaceReferenceTagAtIndex(whitespaceTagNumber).data;
+                        tag = me.tagsCheck.getWhitespaceReferenceTagAtIndex(whitespaceTagNumber);
+
+                        if (null === tag) {
+                            return;
+                        }
+
+                        data = tag.data;
 
                         break;
 
                     case 'single':
                         singleTagNumber++;
-                        data = me.tagsCheck.getSingleReferenceTagAtIndex(singleTagNumber).data;
+                        tag = me.tagsCheck.getSingleReferenceTagAtIndexOrNext(singleTagNumber);
+
+                        if (null === tag) {
+                            return;
+                        }
+
+                        data = tag.data;
 
                         break;
                 }
