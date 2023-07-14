@@ -6,9 +6,9 @@ options:
 # Increase memory from default 1024 to 3072 mb as otherwise run of
 # the pipeline fails with error "Container 'docker' exceeded memory limit"
 definitions:
-#  services:
-#    docker:
-#      memory: 7128
+  services:
+    docker:
+      memory: 7128
   steps:
     - step: &build-step
         name: SonarQube analysis
@@ -63,6 +63,6 @@ pipelines:
 
             # Run bunch of containers
             - docker-compose -f docker-compose.runtests.yml up --exit-code-from php
-  branches:
-    '{develop}':
-      - step: *build-step
+#  branches:
+#    '{develop}':
+#      - step: *build-step
