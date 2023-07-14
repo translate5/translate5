@@ -26,6 +26,55 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+
+## [6.4.3] - 2023-07-13
+
+### Important Notes:
+ 
+
+
+### Bugfixes
+**[TRANSLATE-3426](https://jira.translate5.net/browse/TRANSLATE-3426): Editor general - Error while trying to set content to editor from matches** <br>
+Fix for problem when taking over language resources suggested translations can lead to UI error
+
+**[TRANSLATE-3425](https://jira.translate5.net/browse/TRANSLATE-3425): Import/Export - Tags imported from across get wrong id** <br>
+In across xliff the tags may use a custom unique id instead the default id attribute which leads to problems with duplicated tags which had to be repaired manually in the past. Now the across ID is used instead.
+
+**[TRANSLATE-3424](https://jira.translate5.net/browse/TRANSLATE-3424): OpenTM2 integration - Tag mismatch in t5memory results due nonnumeric rids** <br>
+Tags from segments may get removed when taking over from t5memory due mismatching tag ids.
+
+**[TRANSLATE-3402](https://jira.translate5.net/browse/TRANSLATE-3402): Okapi integration - Hotfix: delete deepl glossary on deleting termcollection** <br>
+When deleting a termcollection the corresponding DeepL glossary was not deleted. This is fixed now.
+
+
+## [6.4.2] - 2023-07-11
+
+### Important Notes:
+#### [TRANSLATE-3417](https://jira.translate5.net/browse/TRANSLATE-3417)
+pdfconverter docker image update is required
+ 
+
+
+### Changed
+**[TRANSLATE-3417](https://jira.translate5.net/browse/TRANSLATE-3417): VisualReview / VisualTranslation - Skip optimization step in pdfconverter** <br>
+PDF converter now doesn't optimize pdf files before conversion by default, but does that as a fallback if conversion failed. Behavior can be changed by enabling runtimeOptions.plugins.VisualReview.optimizeBeforeConversion config option.
+
+
+### Bugfixes
+**[TRANSLATE-3423](https://jira.translate5.net/browse/TRANSLATE-3423): VisualReview / VisualTranslation - Error focusing segment alias in split-frame sidbar** <br>
+Fix for a front-end problem when trying to focus segment in visual split-frame.
+
+**[TRANSLATE-3416](https://jira.translate5.net/browse/TRANSLATE-3416): LanguageResources - DeepL languages request missing languages** <br>
+Fix for a problem where regional languages where not listed as available target option for DeepL language resource
+
+**[TRANSLATE-3412](https://jira.translate5.net/browse/TRANSLATE-3412): LanguageResources - Missing class include in Glossary events** <br>
+Fix for a problem where term collection was not able to be assigned as glossary source
+
+**[TRANSLATE-3399](https://jira.translate5.net/browse/TRANSLATE-3399): InstantTranslate, LanguageResources - Unescaped special chars returned by DeepL** <br>
+It seems like the DeepL API has changed its default behaviour regarding the tag handling. Now we force HTML usage if not explicitly XML is given to fix some encoding problems
+
+
 ## [6.4.1] - 2023-07-03
 
 ### Important Notes:

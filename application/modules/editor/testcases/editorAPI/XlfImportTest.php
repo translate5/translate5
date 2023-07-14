@@ -41,6 +41,7 @@ class XlfImportTest extends editor_Test_JsonTest {
 
     protected static array $requiredRuntimeOptions = [
         'import.xlf.preserveWhitespace' => 0,
+        'import.fileparser.options.protectTags' => 0,
     ];
 
     protected static string $setupUserLogin = 'testlector';
@@ -124,8 +125,8 @@ class XlfImportTest extends editor_Test_JsonTest {
         //test editing of segments with preserved whitespace and segment length count
         $segments = array_merge(
             static::api()->getSegments(null, 6, 80),
-            static::api()->getSegments(null, 1, 106),
-            static::api()->getSegments(null, 18, 116),
+            static::api()->getSegments(null, 1, 107),
+            static::api()->getSegments(null, 18, 117),
         );
         foreach($segments as $idx => $segToEdit) {
             $content = strlen($segToEdit->target) > 0 ? $segToEdit->target : $segToEdit->source;

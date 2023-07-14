@@ -26,6 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+use MittagQI\Translate5\Task\Import\FileParser\Xlf\Namespaces\Across;
+
 /**
  * Initial Class of Plugin "XlfExportTranslateByAutostate"
  * This Plugin is for Across Connection where we have to abuse trans-units,
@@ -100,7 +102,7 @@ class editor_Plugins_XlfExportTranslateByAutostate_Init extends ZfExtended_Plugi
     protected function hasNewComments(array $segments) {
         $comment = ZfExtended_Factory::get('editor_Models_Comment');
         $nonImportedComments = function($item) {
-            return $item['userGuid'] != editor_Models_Import_FileParser_Xlf_Namespaces_Across::USERGUID;
+            return $item['userGuid'] != Across::USERGUID;
         };
         /* @var $comment editor_Models_Comment */
         foreach($segments as $segment) {
